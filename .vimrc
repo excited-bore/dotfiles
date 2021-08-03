@@ -31,10 +31,10 @@ call vundle#begin()
 " let Vundle manage Vundle, required
 Plugin 'VundleVim/Vundle.vim'
 
-"Autocompletion plugin from git"
+"Autocompletion plugin from git
 Plugin 'ycm-core/YouCompleteMe'
 
-"Git plugin, ironically also from git"
+"Git plugin, ironically also from git
 Plugin 'tpope/vim-fugitive'
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
