@@ -1,13 +1,3 @@
-" Plugins will be downloaded under the specified directory.
-call plug#begin('~/.vim/plugged')
-
-" Declare the list of plugins.
-
-" List ends here. Plugins become visible to Vim after this call.
-call plug#end()
-
-"------------------------------------------------------------
-
 
 " These options and commands enable some very useful features in Vim, that
 " no user should have to live without.
