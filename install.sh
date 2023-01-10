@@ -1,7 +1,10 @@
 #!/bin/bash
 
-mkdir ~/.config/nvim/
-mv init.vim ~/.config/nvim/
+if [[ ! -d "~/.config/nvim/" ]]; then
+    mkdir ~/.config/nvim/
+fi
+mv -f init.vim ~/.config/nvim/
+mv -f .tmux.conf ~/.tmux.conf
 
 declare -A osInfo;
 osInfo[/etc/redhat-release]=yum
