@@ -22,9 +22,9 @@ do
         mono-complete golang nodejs openjdk-17-jdk openjdk-17-jre npm
     fi
 done
-#git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-#nvim +PluginInstall +qall
-#python3 ~/.vim/bundle/YouCompleteMe/install.py --all
+git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+nvim +PluginInstall +qall
+python3 ~/.vim/bundle/YouCompleteMe/install.py --all
 
 if grep  -q nvim ~/.vars; then
     echo "Added alias and export for vim in .vars"
