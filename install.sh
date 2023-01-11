@@ -7,12 +7,11 @@ cp -f init.vim ~/.config/nvim/
 cp -f .tmux.conf ~/.tmux.conf
 cp -f .bash_aliases ~/.bash_aliases
 
-grep -q ".bash_aliases" ~/.bashrc 
-if [[ $? -eq 0 ]]; then
-    echo "if [[ -f .bash_aliases ]]; then" >> ~/.bashrc
-    echo "  . .bashrc" >> ~/.bashrc
+if ! grep -q .bash_aliases ~/.bashrc; then
+    echo "if [[ -f ~/.bash_aliases ]]; then" >> ~/.bashrc
+    echo "  . ~/.bash_aliases" >> ~/.bashrc
     echo "fi" >> ~/.bashrc
-    . ~/.bashrc
+    . ~/.bash_aliases 
 fi
 
 
@@ -38,12 +37,24 @@ done
 if [[ -d ~/.vim/bundle/Vundle.vim ]]; then
     rm -rf ~/.vim/bundle/Vundle.vim
 fi
+
+if [[ -d ~/.tmux/plugins/tpm ]]; then
+    rm -rf ~/.tmux/plugins/tpm
+fi
+
+if [[ -d ~/.tmux/plugins/tmux-yank ]]; then
+    rm -rf ~/.tmux/plugins/tmux-yank
+fi
+
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+git clone https://github.com/tmux-plugins/tmux-yank ~/.tmux/plugins/tmux-yank
 git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 nvim +PluginInstall +qall
 python3 ~/.vim/bundle/YouCompleteMe/install.py --all
 
 if ! grep -q nvim ~/.bashrc; then
-    echo "Added alias and export for vim in .vars"
+    echo "Added alias and export for vim in .bashrc"
     echo 'alias vim="nvim"' >> ~/.bashrc
     echo 'export EDITOR="nvim"' >> ~/.bashrc
 fi
+echo "Done! Don't forget to open tmux and Prefix+I !"

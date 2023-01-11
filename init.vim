@@ -26,6 +26,13 @@ Plugin 'ycm-core/YouCompleteMe'
 
 "Git plugin, ironically also from git
 Plugin 'tpope/vim-fugitive'
+
+"Nerdtree (system explorer plug)
+Plugin 'preservim/nerdtree'
+
+"vim-tmux-navigator, smart navigation between vim and tmux panes
+Plugin 'christoomey/vim-tmux-navigator'
+
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
 filetype plugin indent on    " required
@@ -148,21 +155,19 @@ set expandtab
 " which is the default
 map Y y$
 
-" Map <C-L> (redraw screen) to also turn off search highlighting until the
-" next search
-nnoremap <C-L> :nohl<CR><C-L>
+let g:tmux_navigator_no_mappings = 1
 
-" Ctrl + Left => Previous Tab
-nnoremap <C-Left> :tabprevious<CR>
-
-" Ctrl + Right => Next Tab
-nnoremap <C-Right> :tabnext<CR>
+noremap <silent> <C-Left> :<C-U>TmuxNavigateLeft<cr>
+noremap <silent> <C-Down> :<C-U>TmuxNavigateDown<cr>
+noremap <silent> <C-Up> :<C-U>TmuxNavigateUp<cr>
+noremap <silent> <C-Right> :<C-U>TmuxNavigateRight<cr>
+noremap <silent> <C-²> :<C-U>TmuxNavigatePrevious<cr>
 
 " F1 => Quit
-nnoremap <F1> :q<CR>
+nnoremap <C-w> :q<CR>
 
 "F5 => Save
- :inoremap <F5> <c-o>:Update<CR>
+nnoremap <C-s> :Update<CR>
 
 "F6 => Save & Quit
 nnoremap <F6> :wq<CR>
