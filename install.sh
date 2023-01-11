@@ -27,11 +27,12 @@ for f in ${!osInfo[@]}
 do
     if [ -f $f ] && [ $f == /etc/arch-release ];then
         echo Package manager: ${osInfo[$f]}
-        sudo pacman -Su neovim mono go nodejs jre11-openjdk npm
+        sudo pacman -Su neovim mono go nodejs jre11-openjdk npm python
     elif [ -f $f ] && [ $f == /etc/debian_version ];then
         echo Package manager: ${osInfo[$f]}
-        sudo apt install build-essential build-essential cmake vim-nox python3-dev mono-complete golang nodejs openjdk-17-jdk openjdk-17-jre npm
+        sudo apt install build-essential python3 cmake vim-nox python3-dev mono-complete golang nodejs openjdk-17-jdk openjdk-17-jre npm
     fi
+    
 done
 
 if [[ -d ~/.vim/bundle/Vundle.vim ]]; then

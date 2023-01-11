@@ -37,7 +37,11 @@ Plugin 'christoomey/vim-tmux-navigator'
 call vundle#end()            " required
 filetype plugin indent on    " required
 "------------------------------------------------------------
- 
+
+"Fix python3 interpreter
+let g:python3_host_prog = '/usr/bin/python3'
+let g:ycm_path_to_python_interpreter = '/usr/bin/python3'
+
 " These are highly recommended options.
 
 " Vim with default settings does not allow easy switching between multiple files

@@ -1,6 +1,6 @@
-$name="Stan Nys"
-$email="stan96@duck.com"
-
+export NAME="Stan Nys"
+export EMAIL="stan96@duck.com"
+export GITNAME="excited-bore"
 
 #Devolo PLC Stuff
 alias devUp="sudo systemctl start devolonetsvc.service && bash /opt/devolo/dlancockpit/bin/dlancockpit-run.sh"
@@ -34,9 +34,16 @@ alias x="exit"
 
 #Git stuff
 alias gitListedReps="git remote -v"
-function gitSshKey() { cd ~/.ssh/ && ssh-keygen -t ed25519 -C "$2" && eval "$(ssh-agent -s)" && ssh-add ~/.ssh/$1; }
-function gitConfig() { git config --global user.email "$email" && git config --global user.name "$name"; }
-function gitAddRep() { git remote -v add $1 git@github.com:/excited-bore/$1.git; }
+function gitSshKey() {
+    if [ -z "$1" ]; then 
+        echo "Give name of ssh key (and comment)"
+        exit 0
+    else
+        cd ~/.ssh/ && ssh-keygen -t ed25519 -C $2 && eval "$(ssh-agent -s)" && ssh-add ~/.ssh/$1;
+    fi }
+function gitConfig() { git config --global user.email $EMAIL && git config --global user.name $NAME; }
+function gitTest() { ssh -T git@github.com; }
+function gitAddRep() { git remote -v add $1 git@github.com:$GITNAME/$1.git; }
 function gitRenameRep() { git remote -v rename $1; }
 function gitRemoveRep() { git remote -v rm $1; }
 
