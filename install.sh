@@ -1,10 +1,20 @@
 #!/bin/bash
 
-if [[ ! -d "~/.config/nvim/" ]]; then
+if [[ ! -d ~/.config/nvim/ ]]; then
     mkdir ~/.config/nvim/
 fi
-mv -f init.vim ~/.config/nvim/
-mv -f .tmux.conf ~/.tmux.conf
+cp -f init.vim ~/.config/nvim/
+cp -f .tmux.conf ~/.tmux.conf
+cp -f .bash_aliases ~/.bash_aliases
+
+grep -q ".bash_aliases" ~/.bashrc 
+if [[ $? -eq 0 ]]; then
+    echo "if [[ -f .bash_aliases ]]; then" >> ~/.bashrc
+    echo "  . .bashrc" >> ~/.bashrc
+    echo "fi" >> ~/.bashrc
+    . ~/.bashrc
+fi
+
 
 declare -A osInfo;
 osInfo[/etc/redhat-release]=yum
@@ -21,10 +31,13 @@ do
         sudo pacman -Su neovim mono go nodejs jre11-openjdk npm
     elif [ -f $f ] && [ $f == /etc/debian_version ];then
         echo Package manager: ${osInfo[$f]}
-        sudo apt install build-essential build-essential cmake vim-nox python3-dev /
-        mono-complete golang nodejs openjdk-17-jdk openjdk-17-jre npm
+        sudo apt install build-essential build-essential cmake vim-nox python3-dev mono-complete golang nodejs openjdk-17-jdk openjdk-17-jre npm
     fi
 done
+
+if [[ -d ~/.vim/bundle/Vundle.vim ]]; then
+    rm -rf ~/.vim/bundle/Vundle.vim
+fi
 git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 nvim +PluginInstall +qall
 python3 ~/.vim/bundle/YouCompleteMe/install.py --all
