@@ -29,18 +29,15 @@ do
     if [ -f $f ] && [ $f == /etc/arch-release ];then
         echo Package manager: ${osInfo[$f]}
         pm=${osInfo[$f]}
-        sudo pacman -Su neovim mono go nodejs jre11-openjdk npm python
+        sudo pacman -Su neovim mono go nodejs jre11-openjdk npm python ranger atool bat calibre elinks ffmpegthumbnailer fontforge highlight imagemagick kitty mupdf-tools odt2txt
     elif [ -f $f ] && [ $f == /etc/debian_version ];then
         echo Package manager: ${osInfo[$f]}
         pm=${osInfo[$f]}
-        sudo apt install build-essential python2 python3 cmake vim-nox python3-dev mono-complete golang nodejs openjdk-17-jdk openjdk-17-jre npm
-    fi
-    
+        sudo apt install build-essential python2 python3 cmake vim-nox python3-dev python3-pip mono-complete golang nodejs openjdk-17-jdk openjdk-17-jre npm ranger atool bat elinks ffmpegthumbnailer fontforge highlight imagemagick jq kitty libcaca0 odt2txt mupdf-tools
+    fi 
 done
-
-if [[ -d ~/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/go/ ]]; then
-    sudo rm -rf ~/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/go/
-fi
+    ranger --copy-config=all
+    cp -f rc.conf ~/.config/ranger/
 
 if [[ -d ~/.vim/bundle/YouCompleteMe/ ]];then
     sudo rm -rf ~/.vim/bundle/YouCompleteMe/
@@ -58,9 +55,17 @@ if [[ -d ~/.tmux/plugins/tmux-yank ]]; then
     sudo rm -rf ~/.tmux/plugins/tmux-yank
 fi
 
+if [[ -d ~/.config/ranger/plugins/ ]]; then
+    sudo rm -rf ~/.config/ranger/plugins/
+fi
+mkdir ~/.config/ranger/plugins/
+
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 git clone https://github.com/tmux-plugins/tmux-yank ~/.tmux/plugins/tmux-yank
+git clone https://github.com/joouha/ranger_tmux ~/.config/ranger/plugins/ranger_tmux
 git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+python -m ranger_tmux install
+python -m ranger_tmux --tmux install
 nvim +PluginInstall +qall
 
 if [ $pm == /etc/arch-release ]; then
