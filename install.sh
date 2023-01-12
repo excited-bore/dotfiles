@@ -33,10 +33,18 @@ do
     elif [ -f $f ] && [ $f == /etc/debian_version ];then
         echo Package manager: ${osInfo[$f]}
         pm=${osInfo[$f]}
-        sudo apt install build-essential python3 cmake vim-nox python3-dev mono-complete golang nodejs openjdk-17-jdk openjdk-17-jre npm
+        sudo apt install build-essential python2 python3 cmake vim-nox python3-dev mono-complete golang nodejs openjdk-17-jdk openjdk-17-jre npm
     fi
     
 done
+
+if [[ -d ~/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/go/ ]]; then
+    sudo rm -rf ~/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/go/
+fi
+
+if [[ -d ~/.vim/bundle/YouCompleteMe/ ]];then
+    sudo rm -rf ~/.vim/bundle/YouCompleteMe/
+fi
 
 if [[ -d ~/.vim/bundle/Vundle.vim ]]; then
     sudo rm -rf ~/.vim/bundle/Vundle.vim
