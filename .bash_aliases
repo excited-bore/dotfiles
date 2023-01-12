@@ -34,15 +34,9 @@ alias x="exit"
 
 #Git stuff
 alias gitListedReps="git remote -v"
-function gitSshKey() {
-    if [ -z "$1" ]; then 
-        echo "Give name of ssh key (and comment)"
-        exit 0
-    else
-        cd ~/.ssh/ && ssh-keygen -t ed25519 -C $2 && eval "$(ssh-agent -s)" && ssh-add ~/.ssh/$1;
-    fi }
+function gitSshKey() { cd ~/.ssh/ && echo ~/.ssh/$1 | ssh-keygen -t ed25519 -C $1 && eval "$(ssh-agent -s)" && ssh-add ~/.ssh/$1 && cat $1.pub; }
 function gitConfig() { git config --global user.email $EMAIL && git config --global user.name $NAME; }
-function gitTest() { ssh -T git@github.com; }
+function gitTest() { ssh -vT git@github.com; }
 function gitAddRep() { git remote -v add $1 git@github.com:$GITNAME/$1.git; }
 function gitRenameRep() { git remote -v rename $1; }
 function gitRemoveRep() { git remote -v rm $1; }
