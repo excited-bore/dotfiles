@@ -28,7 +28,7 @@ Plugin 'ycm-core/YouCompleteMe'
 Plugin 'tpope/vim-fugitive'
 
 "Nerdtree (system explorer plug)
-#Plugin 'preservim/nerdtree'
+"Plugin 'preservim/nerdtree'
 
 "vim-tmux-navigator, smart navigation between vim and tmux panes
 Plugin 'christoomey/vim-tmux-navigator'

@@ -30,6 +30,7 @@ alias ds4="python3 -m ds4drv --hidraw --udp --udp-port 26760"
 alias checkSongs='serber "cd /mnt/MyStuff/Files/Audio/ && ls -la | xargs -0"'
 alias checkYoutubes='serber "cd /mnt/MyStuff/Files/Videos/YouTubes/ && ls -la "'
 
+alias lsall="ls -al"
 alias x="exit"
 
 #Git stuff
