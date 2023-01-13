@@ -55,8 +55,8 @@ alias vimPluginInstall="vim +PluginInstall +qall"
 alias checkColours="curl -s https://raw.githubusercontent.com/JohnMorales/dotfiles/master/colors/24-bit-color.sh | bash"
 
 function tmuxNewSession(){
-    if [ ! -z $1 ]; then
-        if [ ! -z $2 ]; then
+    if ! [ -z $1 ]; then
+        if ! [ -z $2 ]; then
             tmux new -s $1 -n $2;
         fi;
         tmux new -s $1;
@@ -66,7 +66,7 @@ function tmuxNewSession(){
 }
 
 function tmuxAttach(){
-    if [ ! -z $1 ]; then
+    if ! [ -z $1 ]; then
         tmux attach -t $1;
     else 
         tmux attach ;
@@ -76,7 +76,7 @@ function tmuxAttach(){
 alias tmuxKillServer="tmux kill-server"
 
 function tmuxKillAllButOne(){
-    if [ ! -z $1 ]; then
+    if ! [ -z $1 ]; then
         tmux kill-session -a -t $1;
     else
         #Current session
@@ -90,7 +90,7 @@ alias tmuxListKeybinds="tmux list-keys"
 #Server access
 alias serber="ssh burpi@192.168.129.12 -p 37093"
 function serberMnt() {
-    if [[ ! -d /mnt/mount1 ]]; then
+    if ! [ -d /mnt/mount1 ]; then
         mkdir /mnt/mount1; 
     fi;
     sshfs burpi@192.168.129.12:/mnt/MyStuff/ /mnt/mount1/ -p 37093;
@@ -113,12 +113,11 @@ function gitTest() { ssh -vT git@github.com; }
 function gitAddRep() { git remote -v add $1 git@github.com:$GITNAME/$1.git; }
 function gitChanges() { git status; }
 function gitCommitAll() { 
-    if [ ! -z $1 ]; then 
-        git commit -am $1; 
+    if ! [ -z $1 ]; then 
+        git commit -am $1 ; 
     else
-        git commit -a;
-    fi;
-}
+        git commit -a ;
+    fi; }
 alias gitCommitUsingLast="git commit --amend"
 function gitRenameRep() { git remote -v rename $1; }
 function gitRemoveRep() { git remote -v rm $1; }
