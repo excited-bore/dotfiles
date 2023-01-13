@@ -76,8 +76,8 @@ function tmuxAttach(){
 alias tmuxKillServer="tmux kill-server"
 
 function tmuxKillAllButOne(){
-    if ! [ -z $1 ]; then
-        tmux kill-session -a -t $1;
+    if ! [ -z "$1" ]; then
+        tmux kill-session -a -t "$1";
     else
         #Current session
         tmux kill-session -a;
@@ -113,7 +113,7 @@ function gitTest() { ssh -vT git@github.com; }
 function gitAddRep() { git remote -v add $1 git@github.com:$GITNAME/$1.git; }
 function gitChanges() { git status; }
 function gitCommitAll() { 
-    if ! [ -z $1 ]; then 
+    if ! [ -z "$1" ]; then 
         git commit -am "$1"; 
     else
         git commit -a ;
