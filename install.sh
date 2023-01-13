@@ -29,11 +29,11 @@ do
     if [ -f $f ] && [ $f == /etc/arch-release ];then
         echo Package manager: ${osInfo[$f]}
         pm=${osInfo[$f]}
-        sudo pacman -Su neovim mono go nodejs jre11-openjdk npm python ranger atool bat calibre elinks ffmpegthumbnailer fontforge highlight imagemagick kitty mupdf-tools odt2txt
+        sudo pacman -Su sshfs neovim mono go nodejs jre11-openjdk npm python ranger atool bat calibre elinks ffmpegthumbnailer fontforge highlight imagemagick kitty mupdf-tools odt2txt
     elif [ -f $f ] && [ $f == /etc/debian_version ];then
         echo Package manager: ${osInfo[$f]}
         pm=${osInfo[$f]}
-        sudo apt install build-essential python2 python3 cmake vim-nox python3-dev python3-pip mono-complete golang nodejs openjdk-17-jdk openjdk-17-jre npm ranger atool bat elinks ffmpegthumbnailer fontforge highlight imagemagick jq kitty libcaca0 odt2txt mupdf-tools
+        sudo apt install build-essential python2 python3 sshfs cmake vim-nox python3-dev python3-pip mono-complete golang nodejs openjdk-17-jdk openjdk-17-jre npm ranger atool bat elinks ffmpegthumbnailer fontforge highlight imagemagick jq kitty libcaca0 odt2txt mupdf-tools
     fi 
 done
     ranger --copy-config=all

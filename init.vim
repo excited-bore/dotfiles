@@ -168,7 +168,7 @@ noremap <silent> <C-Right> :<C-U>TmuxNavigateRight<cr>
 noremap <silent> <C-²> :<C-U>TmuxNavigatePrevious<cr>
 
 " F1 => Quit
-nnoremap <C-w> :q<CR>
+nnoremap <C-q> :q<CR>
 
 "F5 => Save
 nnoremap <C-s> :Update<CR>
