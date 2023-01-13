@@ -114,7 +114,7 @@ function gitAddRep() { git remote -v add $1 git@github.com:$GITNAME/$1.git; }
 function gitChanges() { git status; }
 function gitCommitAll() { 
     if ! [ -z $1 ]; then 
-        git commit -am $1 ; 
+        git commit -am "$1"; 
     else
         git commit -a ;
     fi; }
