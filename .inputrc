@@ -1,0 +1,28 @@
+# READLINE config
+
+# \e : escape
+# \M : Meta (alt)
+# \t : tab
+# \C : Ctrl
+# nop => no operation, but 'redraw-current-line' might work better
+# https://unix.stackexchange.com/questions/556703/how-to-bind-a-key-combination-to-null-in-inputrc
+# 'bind -l' for all options
+# 'bind -p' for all bindings
+# You can also run 'read' (or 'cat' + Ctrl+v)
+# That way you can read the characters escape sequences
+# The ^[ indicates an escape character in your shell, so this means that your f.ex. Home key has an escape code of [1~ and you End key has an escape code of [4~. Since these escape codes are not listed in the default Readline configuration, you will need to add them: \e[1~ or \e[4~
+# Ctrl-c to quit
+
+# Also
+# https://unix.stackexchange.com/questions/548726/bash-readline-inputrc-bind-key-to-a-sequence-of-multiple-commands
+
+"\C-p":redraw-current-line
+#"\C-c":redraw-current-line
+"\C-j":redraw-current-line
+"\C-d":redraw-current-line
+
+# Ctrl + home
+#"\C-\e[1~" : start
+
+# Ctrl + End
+#"\C-\e[4~" : stop
