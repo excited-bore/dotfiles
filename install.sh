@@ -7,6 +7,7 @@ cp -f init.vim ~/.config/nvim/
 cp -f .tmux.conf ~/.tmux.conf
 cp -f .bash_aliases ~/.bash_aliases
 cp -f .Xresources ~/.Xresources
+cp -f doas.conf /etc/doas.conf
 xrdb -l ~/.Xresources
 
 if ! grep -q .bash_aliases ~/.bashrc; then
@@ -15,7 +16,6 @@ if ! grep -q .bash_aliases ~/.bashrc; then
     echo "fi" >> ~/.bashrc
     . ~/.bash_aliases 
 fi
-
 
 declare -A osInfo;
 osInfo[/etc/redhat-release]=yum
@@ -31,11 +31,11 @@ do
     if [ -f $f ] && [ $f == /etc/arch-release ];then
         echo Package manager: ${osInfo[$f]}
         pm=${osInfo[$f]}
-        sudo pacman -Su sshfs reptyr neovim mono go nodejs jre11-openjdk npm python ranger atool bat calibre elinks ffmpegthumbnailer fontforge highlight imagemagick kitty mupdf-tools odt2txt btm
+        sudo pacman -Su doas sshfs reptyr gdb neovim mono go nodejs jre11-openjdk npm python ranger atool bat calibre elinks ffmpegthumbnailer fontforge highlight imagemagick kitty mupdf-tools odt2txt btm
     elif [ -f $f ] && [ $f == /etc/debian_version ];then
         echo Package manager: ${osInfo[$f]}
         pm=${osInfo[$f]}
-        sudo apt install reptyr build-essential python2 python3 sshfs cmake vim-nox python3-dev python3-pip mono-complete golang nodejs openjdk-17-jdk openjdk-17-jre npm ranger atool bat elinks ffmpegthumbnailer fontforge highlight imagemagick jq kitty libcaca0 odt2txt mupdf-tools btm
+        sudo apt install doas gdb sshfs reptyr build-essential python2 python3 sshfs cmake vim-nox python3-dev python3-pip mono-complete golang nodejs openjdk-17-jdk openjdk-17-jre npm ranger atool bat elinks ffmpegthumbnailer fontforge highlight imagemagick jq kitty libcaca0 odt2txt mupdf-tools btm
     fi 
 done
     ranger --copy-config=all
@@ -78,9 +78,14 @@ else
     python ~/.vim/bundle/YouCompleteMe/install.py --all
 fi
 
-if ! grep -q nvim ~/.bashrc; then
-    echo "Added alias and export for vim in .bashrc"
-    echo 'alias vim="nvim"' >> ~/.bashrc
-    echo 'export EDITOR="nvim"' >> ~/.bashrc
-fi
-echo "Done! Don't forget to open tmux and Prefix+I !"
+#if ! grep -q nvim ~/.bashrc; then
+#    echo "Added alias and export for vim in .bashrc"
+#    echo 'alias vim="nvim"' >> ~/.bashrc
+#    echo 'export EDITOR="nvim"' >> ~/.bashrc
+#fi
+
+echo "Print: chown -c root:root /etc/doas.conf; chmod -c 0400 /etc/doas.conf; doas -C /etc/doas.conf && echo 'config ok' || echo 'config error' ";
+su -;
+echo "Restart if errors, otherwise don't forget to 'sudo chmod +s /usr/bin/gdb' en when opening tmux, Prefix + I";
+doas chmod +s /usr/bin/gdb && usermod -aG wheel "$USER"
+echo "Also, don't forget to open tmux and Prefix+I !"
