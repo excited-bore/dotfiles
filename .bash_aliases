@@ -9,10 +9,10 @@ export EDITOR="nvim"
 export VISUAL="nvim"
 export PTRACE_ELEVATED_PRIVILIGE="1"
 
-function ptrace_toggle(){
+function ptrace_toggle() {
     echo "Has ptrace currently elevated priviliges: $PTRACE_ELEVATED_PRIVILIGE";
     echo "Change? y/n: ";
-    if [ ! $(read) = "y" ];then
+    if [[ ! $(read) = "y" ]];then
         return;
     fi
     if [ $PTRACE_ELEVATED_PRIVILIGE == 1 ]; then
@@ -33,7 +33,7 @@ function ptrace_toggle(){
 complete -cf doas
 
 # Doas gives less overhead. True example of less > more
-alias sudo='doas'
+#alias sudo='doas'
 function doasedit() { doas -u $USER $EDITOR $1; }
 alias sudoedit='doasedit'
 
@@ -47,9 +47,9 @@ alias doasCheckConf="doas -C /etc/doas.conf && echo 'config ok' || echo 'config 
 # TRY and keep command line at bottom
 alias b="tput cup $(tput lines) 0" 
 # Cp / rm recursively
-alias cp="cp -rv"
+alias cp="cp -riv"
 alias mv="mv -iv"
-alias rm="rm -rv"
+alias rm="rm -riv"
 alias rmTrash="trash"
 # With parent directories and verbose
 alias mkdir="mkdir -pv"
