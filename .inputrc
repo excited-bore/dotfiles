@@ -1,4 +1,21 @@
-# READLINE config
+# Bash config
+
+# Make sure we don't output everything on the 1 line
+set horizontal-scroll-mode Off
+
+# Enable 8bit input
+set meta-flag On 
+set input-meta On
+
+# Turns off 8th bit stripping
+set convert-meta Off
+
+# Keep the 8th bit for display
+set output-meta On
+
+# none, visible or audible
+set bell-style none
+
 
 # \e : escape
 # \M : Meta (alt)
@@ -16,13 +33,15 @@
 # Also
 # https://unix.stackexchange.com/questions/548726/bash-readline-inputrc-bind-key-to-a-sequence-of-multiple-commands
 
-"\C-p":redraw-current-line
+"\C-p": redraw-current-line
 #"\C-c":redraw-current-line
-"\C-j":redraw-current-line
-"\C-d":redraw-current-line
+"\C-j": redraw-current-line
+"\C-d": redraw-current-line
 
-# Ctrl + home
-#"\C-\e[1~" : start
+"\e[1;2D": backward-word
+"\e[1;2C": forward-word
 
-# Ctrl + End
-#"\C-\e[4~" : stop
+# Up and down arrow will now intelligently complete partially completed
+# commands by searching through the existing history.
+#"\e[A": history-search-backward
+#"\e[B": history-search-forward

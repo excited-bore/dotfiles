@@ -46,7 +46,7 @@ alias b="tput cup $(tput lines) 0"
 # Cp / rm recursively
 alias cp="cp -rv"
 alias mv="mv -iv"
-alias rm="rm -tv"
+alias rm="rm -rv"
 alias rmTrash="trash"
 # With parent directories and verbose
 alias mkdir="mkdir -pv"
@@ -274,8 +274,8 @@ function serberMnt1(){
     fi
 }
 
-serberMnt
-serberMnt1
+#serberMnt
+#serberMnt1
 
 function vlcFolder(){
     if [ -d $1 ]; then
