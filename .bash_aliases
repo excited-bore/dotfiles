@@ -26,16 +26,19 @@ function ptrace_toggle(){
 #python3 -m venv python3
 #source venv/bin/activate
 
-# For Tabcompletion 
-complete -cf doas
-
 # Jump to bottom of screen
 # https://stackoverflow.com/questions/49733211/bash-jump-to-bottom-of-terminal
+
+# For Tabcompletion 
+complete -cf doas
 
 # Doas gives less overhead. True example of less > more
 alias sudo='doas'
 function doasedit() { doas -u $USER $EDITOR $1; }
 alias sudoedit='doasedit'
+
+# Check doas.conf works or not
+alias doasCheckConf="doas -C /etc/doas.conf && echo 'config ok' || echo 'config error'"
 
 # Or, alternatively
 # Preserve env
