@@ -3,11 +3,13 @@
 if [[ ! -d ~/.config/nvim/ ]]; then
     mkdir ~/.config/nvim/
 fi
+cp -f .inputrc ~/.inputrc
 cp -f init.vim ~/.config/nvim/
 cp -f .tmux.conf ~/.tmux.conf
 cp -f .bash_aliases ~/.bash_aliases
 cp -f .Xresources ~/.Xresources
 cp -f doas.conf /etc/doas.conf
+cp -f 49-nopasswd_global.rules /etc/polkit-1/rules.d/49-nopasswd_global.rules
 xrdb -l ~/.Xresources
 
 if ! grep -q .bash_aliases ~/.bashrc; then
@@ -15,6 +17,18 @@ if ! grep -q .bash_aliases ~/.bashrc; then
     echo "  . ~/.bash_aliases" >> ~/.bashrc
     echo "fi" >> ~/.bashrc
     . ~/.bash_aliases 
+fi
+
+if [ ! -e ~/lib_systemd ]; then
+    lnSoft /lib/systemd/system/ ~/lib_systemd
+fi
+
+if [ ! -e ~/etc_systemd ]; then
+    lnSoft /etc/systemd/system/ ~/etc_systemd
+fi
+
+if [ ! -e ~/.vimrc ]; then
+    lnSoft .config/nvim/init.vim ~/.vimrc
 fi
 
 declare -A osInfo;
@@ -31,35 +45,37 @@ do
     if [ -f $f ] && [ $f == /etc/arch-release ];then
         echo Package manager: ${osInfo[$f]}
         pm=${osInfo[$f]}
-        sudo pacman -Su doas sshfs reptyr gdb neovim mono go nodejs jre11-openjdk npm python ranger atool bat calibre elinks ffmpegthumbnailer fontforge highlight imagemagick kitty mupdf-tools odt2txt btm
+        sudo pacman -Su snap opendoas sshfs reptyr gdb neovim mono go nodejs jre11-openjdk npm python ranger atool bat calibre elinks ffmpegthumbnailer fontforge highlight imagemagick kitty mupdf-tools odt2txt btm
     elif [ -f $f ] && [ $f == /etc/debian_version ];then
         echo Package manager: ${osInfo[$f]}
         pm=${osInfo[$f]}
-        sudo apt install doas gdb sshfs reptyr build-essential python2 python3 sshfs cmake vim-nox python3-dev python3-pip mono-complete golang nodejs openjdk-17-jdk openjdk-17-jre npm ranger atool bat elinks ffmpegthumbnailer fontforge highlight imagemagick jq kitty libcaca0 odt2txt mupdf-tools btm
+        sudo apt install snap doas gdb sshfs reptyr build-essential python2 python3 sshfs cmake vim-nox python3-dev python3-pip mono-complete golang nodejs openjdk-17-jdk openjdk-17-jre npm ranger atool bat elinks ffmpegthumbnailer fontforge highlight imagemagick jq kitty libcaca0 odt2txt mupdf-tools 
     fi 
 done
     ranger --copy-config=all
+    tmux +Prefix+I
     cp -f rc.conf ~/.config/ranger/
 
 if [[ -d ~/.vim/bundle/YouCompleteMe/ ]];then
-    sudo rm -rf ~/.vim/bundle/YouCompleteMe/
+    #sudo rm -rf ~/.vim/bundle/YouCompleteMe/
 fi
 
 if [[ -d ~/.vim/bundle/Vundle.vim ]]; then
-    sudo rm -rf ~/.vim/bundle/Vundle.vim
+    #sudo rm -rf ~/.vim/bundle/Vundle.vim
 fi
 
 if [[ -d ~/.tmux/plugins/tpm ]]; then
-    sudo rm -rf ~/.tmux/plugins/tpm
+    #sudo rm -rf ~/.tmux/plugins/tpm
 fi
 
 if [[ -d ~/.tmux/plugins/tmux-yank ]]; then
-    sudo rm -rf ~/.tmux/plugins/tmux-yank
+    #sudo rm -rf ~/.tmux/plugins/tmux-yank
 fi
 
 if [[ -d ~/.config/ranger/plugins/ ]]; then
-    sudo rm -rf ~/.config/ranger/plugins/
+    #sudo rm -rf ~/.config/ranger/plugins/
 fi
+
 mkdir ~/.config/ranger/plugins/
 
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
@@ -84,7 +100,7 @@ fi
 #    echo 'export EDITOR="nvim"' >> ~/.bashrc
 #fi
 
-echo "Print: chown -c root:root /etc/doas.conf; chmod -c 0400 /etc/doas.conf; doas -C /etc/doas.conf && echo 'config ok' || echo 'config error' ";
+echo "Print: chown root:root -c /etc/doas.conf; chmod 0644 -c /etc/doas.conf; doas -C /etc/doas.conf && echo 'config ok' || echo 'config error' ";
 su -;
 echo "Restart if errors, otherwise don't forget to 'sudo chmod +s /usr/bin/gdb' en when opening tmux, Prefix + I";
 doas chmod +s /usr/bin/gdb && usermod -aG wheel "$USER"
