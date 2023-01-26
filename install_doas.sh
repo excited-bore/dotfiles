@@ -1,5 +1,5 @@
 #!/bin/bash
-read -p "Installed with sudo? (Ctrl-c to try again) [y/n]: " resp
+:read -p "Installed with sudo? (Ctrl-c to try again) [y/n]: " resp
 if [ "$resp" = "y" ]; then
 
     declare -A osInfo;
@@ -32,7 +32,6 @@ if [ "$resp" = "y" ]; then
     fi
     echo "Enter: chown root:root -c /etc/doas.conf; chmod 0644 -c /etc/doas.conf; doas -C /etc/doas.conf && echo 'config ok' || echo 'config error' ";
     su -;
-    
-    sudo usermod -aG wheel "$USER"
 
+    sudo groupadd wheel && sudo usermod -aG wheel "$USER"
 fi
