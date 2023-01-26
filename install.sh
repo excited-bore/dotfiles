@@ -9,8 +9,8 @@ cp -f .tmux.conf ~/.tmux.conf
 cp -f .bash_aliases ~/.bash_aliases
 cp -f .Xresources ~/.Xresources
 xrdb -l ~/.Xresources
-cp -f doas.conf /etc/doas.conf
-cp -f 49-nopasswd_global.rules /etc/polkit-1/rules.d/49-nopasswd_global.rules
+sudo cp -f doas.conf /etc/doas.conf
+sudo cp -f 49-nopasswd_global.rules /etc/polkit-1/rules.d/49-nopasswd_global.rules
 
 if ! -d ~/Applications; then
     mkdir ~/Applications
@@ -18,6 +18,7 @@ fi
 
 cp -f Applications/general.sh ~/Applications
 cp -f Applications/doas.sh ~/Applications
+cp -f Applications/pac
 cp -f Applications/manjaro.sh ~/Applications
 cp -f Applications/systemctl.sh ~/Applications
 cp -f Applications/git.sh ~/Applications

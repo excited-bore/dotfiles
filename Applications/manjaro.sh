@@ -1,8 +1,5 @@
 
-#Package Managers (don't run pamac with sudo)
-alias update_pacman="doas pacman -Syu"
-alias update_pamac="pamac update"
-alias update_packages="update_pacman && update_pamac"
+
 
 alias GPU_list_drivers="doas mhwd -l -d"
 alias GPU_list_installed_drivers="doas mhwd -li -d" 

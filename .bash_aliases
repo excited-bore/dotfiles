@@ -13,15 +13,15 @@
 . ~/Applications/variety.sh
 
 if [ ! -e ~/lib_systemd ]; then
-    linkSoft /lib/systemd/system/ ~/lib_systemd
+    link_soft /lib/systemd/system/ ~/lib_systemd
 fi
 
 if [ ! -e ~/etc_systemd ]; then
-    linkSoft /etc/systemd/system/ ~/etc_systemd
+    link_soft /etc/systemd/system/ ~/etc_systemd
 fi
 
 if [ ! -e ~/.vimrc ]; then
-    linkSoft .config/nvim/init.vim ~/.vimrc
+    link_soft .config/nvim/init.vim ~/.vimrc
 fi
 
 # Set caps as AltGr

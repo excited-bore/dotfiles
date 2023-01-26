@@ -1,16 +1,26 @@
 ### SSH ###
 
 # To prevent 'failed to preserve ownership' errors
-function cp_sshfs(){ cp -r --no-preserve=mode "$1" "$2"; }
-function mv_sshfs(){ cp -r --no-preserve=mode "$1" "$2" && rmTrash "$1"; }
+function copy_sshfs(){ cp -r --no-preserve=mode "$1" "$2"; }
+function move_sshfs(){ cp -r --no-preserve=mode "$1" "$2" && rmTrash "$1"; }
 
+function copy_to_serber() { scp -r burpi@192.168.129.12:37093$1 $2; }
+#function cp_from_serber() { scp -r }
+
+function ssh_key_and_add() { 
+    if [ ! -z "$1" ]; then
+        (cd ~/.ssh/ && echo "$1" | ssh-keygen -t ed25519 -C "$1" && eval $(ssh-agent -s)  && ssh-add "$1" && cat "$1.pub"); 
+    else
+        (cd ~/.ssh/ && ssh-keygen -t ed25519 && read -p "Give up name again" $name && eval $(ssh-agent -s) && ssh-add $name && cat $name.pub); 
+    fi
+}
 
 #Server access
-alias serber="ssh burpi@192.168.129.12 -p 37093"
-alias serberUmnt="fusermount3 -u /mnt/mount1/"
-alias serberUmnt1="fusermount3 -u /mnt/mount2/"
+alias serber="ssh -i ~/.ssh/id_burpi pi@192.168.129.17"
+alias serber_unmnt="fusermount3 -u /mnt/mount1/"
+alias serber_unmnt1="fusermount3 -u /mnt/mount2/"
 
-function serberMnt() {
+function serber_mnt() {
     if [ ! -d /mnt/mount1 ]; then
         mkdir /mnt/mount1; 
     fi;
@@ -19,7 +29,7 @@ function serberMnt() {
     fi
 }
 
-function serberMnt1(){
+function serber_mnt1(){
     if ! [ -d /mnt/mount2 ]; then
         mkdir /mnt/mount2; 
     fi;
