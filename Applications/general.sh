@@ -1,8 +1,6 @@
 # TRY and keep command line at bottom
 alias b="tput cup $(tput lines) 0" 
 
-b && ls 
-
 # Cp / rm recursively
 alias cp="cp -rv"
 alias copy="cp"
@@ -35,7 +33,7 @@ alias sttyBinds="stty -a"
 alias GPU_list_drivers="inxi -G"
 
 
-function linkSoft(){
+function link_soft(){
     if ([[ "$1" = /* ]] || [ -d "$1" ] || [ -f "$1" ]) && ([[ $(readlink -f "$2") ]] || [[ $(readlink -d "$2") ]]); then
         if [[ "$1" = /* ]]; then  
             ln -s "$1" "$2";
@@ -47,7 +45,7 @@ function linkSoft(){
     fi
 }
 
-function linkHard(){
+function link_hard(){
     if ([[ "$0" = /* ]] || [ -d "$1" ] || [ -f "$1" ]) && ([[ $(readlink -f "$2") ]] || [[ $(readlink -d "$2") ]]); then
         if [[ "$1" = /* ]]; then  
             ln "$1" "$2";

@@ -1,5 +1,5 @@
 #!/bin/bash
-read -p "Installed with sudo? (Ctrl-c to try again) [y/n]" $resp
+read -p "Installed with sudo? (Ctrl-c to try again) [y/n]: " resp
 if [ $resp = "y" ]; then
 
     if [[ ! -d ~/.config/nvim/ ]]; then

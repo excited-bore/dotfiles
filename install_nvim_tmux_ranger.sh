@@ -1,5 +1,9 @@
 # !/bin/bash
 
+if [[ ! -d ~/.config/nvim/ ]]; then
+    mkdir ~/.config/nvim/
+fi
+
 declare -A osInfo;
 osInfo[/etc/redhat-release]=yum
 osInfo[/etc/arch-release]=pacman
