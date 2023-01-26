@@ -23,11 +23,11 @@
             sudo apt install doas
         fi 
     done
-    sed -i "s/user/$USER/g" doas.conf
+    sed -i "s/user/$USER/g" ./doas.conf
     sudo cp -f doas.conf /etc/doas.conf
 
-    read -p "Add polkit rules? (Only for systems with map at /etc/polkit-1/rules.d/) [y/n]: " resp1
-    if [ $resp1 = "y" ]; then
+    read -p "Add polkit rules? (Only for systems with map at /etc/polkit-1/rules.d/) [Y/n]: " resp1
+    if [ -z $resp1 ]; then
         sudo cp -f 49-nopasswd_global.rules /etc/polkit-1/rules.d/49-nopasswd_global.rules
     fi
     echo "Enter: chown root:root -c /etc/doas.conf; chmod 0644 -c /etc/doas.conf; doas -C /etc/doas.conf && echo 'config ok' || echo 'config error' ";
