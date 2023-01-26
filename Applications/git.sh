@@ -1,12 +1,6 @@
 #Git stuff
 alias git_list_remotes="git remote -v"
-function git_gen_ssh_key() { 
-    if [ ! -z "$1" ]; then
-        (cd ~/.ssh/ && echo "~/.ssh/$1" | ssh-keygen -t ed25519 -C "$1" && eval $(ssh-agent -s)  && ssh-add "~/.ssh/$1" && cat "$1.pub"); 
-    else
-        (cd ~/.ssh/ && ssh-keygen -t ed25519 && eval $(ssh-agent -s) && ssh-add ~/.ssh/id_ed25519 && cat id_ed25519.pub); 
-    fi
-}
+
 function git_config() { git config --global user.email $EMAIL && git config --global user.name $NAME; }
 function git_test_conn_github() { ssh -vT git@github.com; }
 function git_add_remote_url() { git remote -v add "$1" "$2"; }

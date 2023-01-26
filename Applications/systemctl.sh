@@ -12,8 +12,7 @@ alias systemctl_status_daemon="doas systemctl status"
 alias systemctl_bios="doas systemctl reboot --firmware-setup"
 alias systemctl_bluetooth_startup="doas systemctl start bluetooth.service && blueman-manager"
 alias systemctl_bluetooth_down="doas systemctl stop bluetooth.service"
-alias systemctl_devolo_startup="doas systemctl start devolonetsvc.service && bash /opt/devolo/dlancockpit/bin/dlancockpit-run.sh"
-alias systemctl_devolo_down="doas systemctl stop devolonetsvc.service"
+
 
 alias journalctl_boot="doas journalctl -xb"
 alias journalctl_live="doas journalctl -xf"

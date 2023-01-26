@@ -9,15 +9,17 @@ cp -f .tmux.conf ~/.tmux.conf
 cp -f .bash_aliases ~/.bash_aliases
 cp -f .Xresources ~/.Xresources
 xrdb -l ~/.Xresources
-cp -f doas.conf /etc/doas.conf
-cp -f 49-nopasswd_global.rules /etc/polkit-1/rules.d/49-nopasswd_global.rules
+sudo cp -f doas.conf /etc/doas.conf
+sudo cp -f 49-nopasswd_global.rules /etc/polkit-1/rules.d/49-nopasswd_global.rules
 
-if ! -d ~/Applications; then
+if [ ! -d ~/Applications ]; then
     mkdir ~/Applications
 fi
 
 cp -f Applications/general.sh ~/Applications
 cp -f Applications/doas.sh ~/Applications
+cp -f Applications/package_managers.sh ~/Applications
+cp -f Applications/variety.sh ~/Applications
 cp -f Applications/manjaro.sh ~/Applications
 cp -f Applications/systemctl.sh ~/Applications
 cp -f Applications/git.sh ~/Applications
@@ -47,15 +49,15 @@ if [ "y" = $var ];then
 fi
 
 if [ ! -e ~/lib_systemd ]; then
-    link_soft /lib/systemd/system/ ~/lib_systemd
+    ln -s /lib/systemd/system/ ~/lib_systemd
 fi
 
 if [ ! -e ~/etc_systemd ]; then
-    link_soft /etc/systemd/system/ ~/etc_systemd
+    ln -s /etc/systemd/system/ ~/etc_systemd
 fi
 
 if [ ! -e ~/.vimrc ]; then
-    link_soft .config/nvim/init.vim ~/.vimrc
+    ln -s .config/nvim/init.vim ~/.vimrc
 fi
 
 declare -A osInfo;

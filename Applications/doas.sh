@@ -6,9 +6,9 @@ complete -cf doas
 alias doas="doas "
 
 # Doas bc less > more
-alias sudo="doas -n"
+#alias sudo="doas -n "
 function doasedit() { doas $EDITOR $1; }
-alias sudoedit='doasedit'
+alias sudoedit='doasedit '
 
 # Check doas.conf works or not
 alias check_conf_doas="doas doas -C /etc/doas.conf && echo 'config ok' || echo 'config error'"

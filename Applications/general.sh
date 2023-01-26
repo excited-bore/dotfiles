@@ -4,16 +4,20 @@ alias b="tput cup $(tput lines) 0"
 b && ls 
 
 # Cp / rm recursively
-alias cp="cp -riv"
+alias cp="cp -rv"
 alias copy="cp"
+function cpAll(){
+    cp -t "$1" ./*;
+}
 # Ask for Interaction when overwriting newer files
-alias mv="mv -iv"
+alias mv="mv -nv"
 alias move="mv"
 function mvAll(){
-    mv ./* "$1";
+    mv -t "$1" ./*;
 }
-alias rm="rm -r -v"
+alias rm="rm -rv"
 alias remove="rm"
+alias rmAll="rm ./*";
 # With parent directories and verbose
 alias mkdir="mkdir -pv"
 # Listen hidden files and permissions
@@ -31,7 +35,7 @@ alias sttyBinds="stty -a"
 alias GPU_list_drivers="inxi -G"
 
 
-function link_dynamic(){
+function linkSoft(){
     if ([[ "$1" = /* ]] || [ -d "$1" ] || [ -f "$1" ]) && ([[ $(readlink -f "$2") ]] || [[ $(readlink -d "$2") ]]); then
         if [[ "$1" = /* ]]; then  
             ln -s "$1" "$2";
@@ -43,7 +47,7 @@ function link_dynamic(){
     fi
 }
 
-function link_static(){
+function linkHard(){
     if ([[ "$0" = /* ]] || [ -d "$1" ] || [ -f "$1" ]) && ([[ $(readlink -f "$2") ]] || [[ $(readlink -d "$2") ]]); then
         if [[ "$1" = /* ]]; then  
             ln "$1" "$2";
