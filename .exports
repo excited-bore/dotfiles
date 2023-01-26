@@ -12,7 +12,7 @@ export TMPDIR=/tmp
 # Tip: Search binaries with 'whereis'
 # And check with 'printenv'
 
-# VIM
+export DISPLAY=":0.0"
 export VISUAL="nvim"
 export EDITOR="nvim"
 export MYVIMRC=".config/nvim/init.vim"
