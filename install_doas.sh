@@ -1,6 +1,6 @@
 #!/bin/bash
-read -p "Installed with sudo? (Ctrl-c to try again) [y/n]: " resp
-if [ "$resp" = "y" ]; then
+#read -p "Installed with sudo? (Ctrl-c to try again) [y/n]: " resp
+#if [ "$resp" = "y" ]; then
 
     declare -A osInfo;
     osInfo[/etc/redhat-release]=yum
@@ -34,4 +34,4 @@ if [ "$resp" = "y" ]; then
     su -;
 
     sudo groupadd wheel && sudo usermod -aG wheel "$USER"
-fi
+#fi
