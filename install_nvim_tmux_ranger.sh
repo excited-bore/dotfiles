@@ -1,1 +1,0 @@
-/home/burp/Applications/install_nvim_tmux_ranger.sh

@@ -1,1 +1,2 @@
-/home/burp/.Xresources
+XTerm*titeInhibit: true
+urxvt*secondaryScreen: false
