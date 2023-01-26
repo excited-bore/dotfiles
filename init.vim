@@ -148,8 +148,11 @@ set expandtab
 "set tabstop=4
 
 "------------------------------------------------------------
+" Useful mappings
+"
 
 " vim tmux navigator integrator
+let mapleader = "\<Space>"
 
 let g:tmux_navigator_no_mappings = 1
 noremap <silent> <C-Left> :<C-U>TmuxNavigateLeft<cr>
@@ -158,30 +161,72 @@ noremap <silent> <C-Up> :<C-U>TmuxNavigateUp<cr>
 noremap <silent> <C-Right> :<C-U>TmuxNavigateRight<cr>
 "noremap <silent> <C-²> :<C-U>TmuxNavigatePrevious<cr>
 
-" Useful mappings
+" Reload init.vim
+map :r :source $MYVIMRC
 
-" Map Y to act like D and C, i.e. to yank until EOL, rather than act as yy,
-" which is the default
-map Y y$
+" CTRL-A  N  CTRL-A	add N to the number at or after the cursor
+" CTRL-X  N  CTRL-X	subtract N from the number at or after the cursor
+" mapping them to + And  - 
+nnoremap + <C-a>
+nnoremap - <C-x>
+vnoremap + <C-a>
+vnoremap - <C-x>
+
+"Map Shift to visual mode from normal mode
+nnoremap <C-S>  
+
+" Enter -> newline without entering insert mode
+nnoremap <Enter> o<Esc>0"_U
 
 " Move lines while holding shift
 " Multiple lines => select in visual mode
-nnoremap <S-Down> :m .+1<CR>==
-nnoremap <S-Up> :m .-2<CR>==
-inoremap <S-Down> <Esc>:m .+1<CR>==gi
-inoremap <S-Up> <Esc>:m .-2<CR>==gi
-vnoremap <S-Down> :m '>+1<CR>gv=gv
-vnoremap <S-Up> :m '<-2<CR>gv=gv
+nnoremap <S-M-Down> :m .+2<CR>==
+nnoremap <S-M-Up> :m .-2<CR>==
+inoremap <S-M-Down> <Esc>:m .+1<CR>==gi
+inoremap <S-M-Up> <Esc>:m .-2<CR>==gi
+vnoremap <S-M-Down> :m '>+1<CR>gv=gv
+vnoremap <S-M-Up> :m '<-2<CR>gv=gv
 
+" Ctrl-o is mapped to nth older iposition in jump list
+" Ctrl-i is mapped to nth newer position in jump list
 " Quickly insert an empty new line without entering insert modef
-nnoremap <Leader>o o<Esc>0"_D
-nnoremap <Leader>O O<Esc>0"_D
+" nnoremap <Leader>o o<Esc>0"_D
+" nnoremap <Leader>O O<Esc>0"_D
+
+" unnamedplus	A variant of the "unnamed" flag which uses the
+" clipboard register "+" (quoteplus) instead of
+" register "*" for all yank, delete, change and put
+" operations which would normally go to the unnamed
+" register.
+
+" Ctrl - z is -> undo instead of stop 
+nnoremap <C-z> :u <Enter>
+vnoremap <C-z> <Esc> :u <Enter> <CR>==gv 
+inoremap <C-z> <Esc> :u <Enter> <CR>==gi
+
+" Normal clipboard functionality for yy, y and d
+set clipboard+=unnamedplus
+
+"nnoremap <C-c> yy
+"nnoremap <C-v> p
+"inoremap <C-c> <Esc> yy <CR>==gi
+"inoremap <C-v> <Esc> p <CR>==gi
+"vnoremap <C-c> y 
+"vnoremap <C-v> p 
+
+" C-x -> Escape
+" inoremap <C-x> <Esc>
+" vnoremap <C-x> <Esc>
 
 " C-s => Save
-nnoremap <C-s> :write<CR>
+nnoremap <C-s> :write! <Enter>
+inoremap <C-s> <Esc> :write! <Enter> <CR>==gi
+vnoremap <C-s> <Esc> :write! <Enter> <CR>==gv
 
 " C-q => Quit
-nnoremap <C-q> :q!<CR>
+nnoremap <C-q> :q! <Enter>
+inoremap <C-q> <Esc> :q! <Enter> <CR>==gi
+vnoremap <C-q> <Esc> :q! <Enter> <CR>==gv
 
 " C-w => Save and quit
-nnoremap <C-w> :wq<CR>
+" nnoremap <C-w> :wq<CR>
