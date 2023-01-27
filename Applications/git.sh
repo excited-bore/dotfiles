@@ -20,12 +20,12 @@ function git_remote_https_to_ssh(){
         echo "You should give up the name of a remote";
         read -p "Do you want me to look for 'origin'? [Y/n]" resp
         if [ -z $resp ]; then
-            gitRm=$(git remote get-url --push origin | sed 's,https://github.com/,git@github.com:,g'); git remote -v set-url --push origin $gitRm;
-            git remote get-url --push origin;
+            gitRm=$(git remote get-url origin | sed 's,https://github.com/,git@github.com:,g'); git remote -v set-url origin $gitRm;
+            git remote get-url origin;
         fi        
     else
-            gitRm=$(git remote get-url --push $1 | sed 's,https://github.com/,git@github.com:,g'); git remote -v set-url --push origin $gitRm;
-            git remote get-url --push $1;
+            gitRm=$(git remote get-url $1 | sed 's,https://github.com/,git@github.com:,g'); git remote -v set-url origin $gitRm;
+            git remote get-url $1;
     fi
 }
 
@@ -34,12 +34,12 @@ function git_remote_ssh_to_https(){
         echo "You should give up the name of a remote";
         read -p "Do you want me to look for 'origin'? [Y/n]" resp
         if [ -z $resp ]; then
-            gitRm=$(git remote get-url --push origin | sed 's,git@github.com:,https://github.com/,g'); git remote -v set-url --push origin $gitRm;
-            git remote get-url --push origin;
+            gitRm=$(git remote get-url origin | sed 's,git@github.com:,https://github.com/,g'); git remote -v set-url origin $gitRm;
+            git remote get-url origin;
         fi        
     else
-        gitRm=$(git remote get-url --push $1 | sed 's,git@github.com:,https://github.com/,g'); git remote -v set-url --push origin $gitRm;
-        git remote get-url --push $1;
+        gitRm=$(git remote get-url $1 | sed 's,git@github.com:,https://github.com/,g'); git remote -v set-url origin $gitRm;
+        git remote get-url $1;
     fi
 }
 
