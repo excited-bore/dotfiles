@@ -75,6 +75,8 @@ set visible-stats On
 
 # \015 represents the enter key
 "\C-l": "\C-U clear && tput cup $(tput lines) 0 && ls \015" 
+# Undo to Ctrl+Z (unbound in tty) instead of only on Ctrl+_
+"\C-z": vi-undo
 
 # Shift left/right
 "\e[1;2D": backward-word

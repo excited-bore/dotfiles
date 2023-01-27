@@ -1,6 +1,7 @@
 # TRY and keep command line at bottom
 alias b="tput cup $(tput lines) 0" 
 
+b && ls
 # Cp / rm recursively
 alias cp="cp -rv"
 alias copy="cp"

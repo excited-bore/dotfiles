@@ -1,86 +1,201 @@
-#!/bin/bash
-read -p "Installed with sudo? (Ctrl-c to try again) [y/n]: " resp
-if [ $resp = "y" ]; then
 
-    if [[ ! -d ~/.config/nvim/ ]]; then
-        mkdir ~/.config/nvim/
-    fi
-    cp -f .exports ~/.exports
-    cp -f .inputrc ~/.inputrc
-    cp -f init.vim ~/.config/nvim/
-    cp -f .tmux.conf ~/.tmux.conf
-    cp -f .bash_aliases ~/.bash_aliases
+read -p "Create /etc/profile.d/ to user directory symlink? [Y/n]:" sym1
+if [ -z $sym1 ] && [ ! -e ~/profile.d ]; then
+    sudo ln -s /etc/profile.d/ ~/etc_profiles
+fi
+
+read -p "Create /lib/systemd/system/ to user directory symlink? [Y/n]:" sym2
+if [ -z $sym2 ] && [ ! -e ~/lib_systemd ]; then
+    ln -s /lib/systemd/system/ ~/lib_systemd
+fi
+
+read -p "Create /etc/systemd/system/ to user directory symlink? [Y/n]:" sym3
+if [ -z $sym3 ] && [ ! -e ~/etc_systemd ]; then
+    ln -s /etc/systemd/system/ ~/etc_systemd
+fi
+
+read -p "Install .Xresources (xfce4 config) [Y/n]:" Xresources
+if [ -z $Xresources ]; then
     cp -f .Xresources ~/.Xresources
     xrdb -l ~/.Xresources
+fi
 
-    if [ ! -d ~/Applications ]; then
-        mkdir ~/Applications
+read -p "Install nvidia settings? [Y/n]: " nvid
+if [ -z $nvid ];then
+    if ! grep -q "nvidia-settings" ~/.xinitrc ; then 
+        echo "exec nvidia-settings --load-config-only" >> ~/.xinitrc 
     fi
+fi
 
-    cp -f Applications/general.sh ~/Applications
-    cp -f Applications/doas.sh ~/Applications
-    cp -f Applications/package_managers.sh ~/Applications
-    cp -f Applications/variety.sh ~/Applications
-    cp -f Applications/manjaro.sh ~/Applications
-    cp -f Applications/systemctl.sh ~/Applications
-    cp -f Applications/git.sh ~/Applications
-    cp -f Applications/tmux.sh ~/Applications
-    cp -f Applications/youtube.sh ~/Applications
-    cp -f Applications/ssh.sh ~/Applications
+read -p "Install .inputrc? (readline config) [Y/n]:" inputrc
+if [ -z $inputrc ]; then 
+    cp -f .inputrc ~/
+fi
 
-    if ! grep -q .bash_aliases ~/.bashrc; then
-        echo "if [[ -f ~/.bash_aliases ]]; then" >> ~/.bashrc
-        echo "  . ~/.bash_aliases" >> ~/.bashrc
+
+read -p "Install bindings.sh? (bash keybindings) [Y/n]:" aliases
+if [ -z $aliases ]; then 
+
+    cp -f Applications/bindings.sh ~/Applications/
+    if ! grep -q bindings.sh ~/.bashrc; then
+
+        echo "if [[ -f ~/Applications/bindings.sh ]]; then" >> ~/.bashrc
+        echo "  . ~/Applications/bindings.sh" >> ~/.bashrc
         echo "fi" >> ~/.bashrc
     fi
 
-    if ! grep -q .bash_aliases /etc/profile; then
-        sudo echo "if [[ -f ~/.bash_aliases ]]; then" >> /etc/profile
-        sudo echo "  . ~/.bash_aliases" >> /etc/profile
-        sudo echo "fi" >> /etc/profile
+    read -p "Install bindings.sh globally? [Y/n]:" galiases  
+    if [ -z $galiases ]; then 
+        sudo ln -s Applications/bindings.sh /etc/profile.d/
+    fi
+fi
+
+read -p "Install general.sh? (bash general commands aliases) [Y/n]:" general
+if [ -z $general ]; then 
+    cp -f Applications/general.sh ~/Applications/
+    if ! grep -q general.sh ~/.bashrc; then
+        echo "if [[ -f ~/Applications/general.sh ]]; then" >> ~/.bashrc
+        echo "  . ~/Applications/general.sh" >> ~/.bashrc
+        echo "fi" >> ~/.bashrc
+    fi
+    read -p "Install general.sh globally? [Y/n]:" ggeneral  
+    if [ -z $ggeneral ]; then 
+        sudo ln -s Applications/general.sh /etc/profile.d/
+    fi
+fi
+
+read -p "Install exports.sh? (environment variables) [Y/n]:" exports
+    if [ -z $exports ]; then 
+    cp -f Applications/exports.sh ~/Applications/
+    if ! grep -q exports.sh ~/.bashrc; then
+        echo "if [[ -f ~/Applications/exports.sh ]]; then" >> ~/.bashrc
+        echo "  . ~/Applications/exports.sh" >> ~/.bashrc
+        echo "fi" >> ~/.bashrc
+    fi
+    read -p "Install exports.sh globally? [Y/n]:" gexports  
+    if [ -z $gexports ]; then 
+        sudo ln -s Applications/exports.sh /etc/profile.d/
+    fi
+fi
+
+read -p "Install systemctl.sh? [Y/n]:" systemctl
+if [ -z $systemctl ]; then 
+    cp -f Applications/systemctl.sh ~/Applications/
+    if ! grep -q systemctl.sh ~/.bashrc; then
+        echo "if [[ -f ~/Applications/systemctl.sh ]]; then" >> ~/.bashrc
+        echo "  . ~/Applications/systemctl.sh" >> ~/.bashrc
+        echo "fi" >> ~/.bashrc
+    fi
+    read -p "Install systemctl.sh globally? [Y/n]:" gsystemctl  
+    if [ -z $gsystemctl ]; then 
+        sudo ln -s Applications/systemctl.sh /etc/profile.d/
+    fi
+fi
+
+read -p "Install git.sh? [Y/n]:" gitsh
+if [ -z $gitsh ]; then 
+
+    cp -f Applications/git.sh ~/Applications/
+
+    if ! grep -q git.sh ~/.bashrc; then
+        echo "if [[ -f ~/Applications/git.sh ]]; then" >> ~/.bashrc
+        echo "  . ~/Applications/git.sh" >> ~/.bashrc
+        echo "fi" >> ~/.bashrc
     fi
 
-    . ~/.bash_aliases 
+    read -p "Install git.sh globally? [Y/n]:" ggit  
 
-    read -p "Install nvidia settings? (y/n): " $var
-    if [ "y" = $var ];then
-        if ! grep -q "nvidia-settings"; then 
-            echo "exec nvidia-settings --load-config-only" >> ~/.xinitrc 
-        fi
+    if [ -z $ggit ]; then 
+        sudo ln -s Applications/git.sh /etc/profile.d/
+    fi
+fi
+
+read -p "Install ssh.sh? [Y/n]:" sshsh
+if [ -z $sshsh ]; then 
+
+    cp -f Applications/ssh.sh ~/Applications/
+
+    if ! grep -q ssh.sh ~/.bashrc; then
+    echo "if [[ -f ~/Applications/ssh.sh ]]; then" >> ~/.bashrc
+    echo "  . ~/Applications/ssh.sh" >> ~/.bashrc
+    echo "fi" >> ~/.bashrc
     fi
 
-    if [ ! -e ~/lib_systemd ]; then
-        ln -s /lib/systemd/system/ ~/lib_systemd
+    read -p "Install ssh.sh globally? [Y/n]:" gssh  
+
+    if [ -z $gssh ]; then 
+        sudo ln -s Applications/ssh.sh /etc/profile.d/
+    fi
+fi
+
+read -p "Install package_managers.sh? [Y/n]:" packmang
+if [ -z $packmang ]; then 
+
+    cp -f Applications/package_managers.sh ~/Applications/
+
+    if ! grep -q manjaro.sh ~/.bashrc; then
+        echo "if [[ -f ~/Applications/package_managers.sh ]]; then" >> ~/.bashrc
+        echo "  . ~/Applications/package_managers.sh" >> ~/.bashrc
+        echo "fi" >> ~/.bashrc
     fi
 
-    if [ ! -e ~/etc_systemd ]; then
-        ln -s /etc/systemd/system/ ~/etc_systemd
+    read -p "Install package_managers.sh globally? [Y/n]:" gpackmang  
+
+    if [ -z $gpackmang ]; then 
+        sudo ln -s Applications/package_managers.sh /etc/profile.d/
+    fi
+fi
+
+read -p "Install manjaro.sh? [Y/n]:" manjar
+if [ -z $manjar ]; then
+
+    cp -f Applications/manjaro.sh ~/Applications/
+
+    if ! grep -q manjaro.sh ~/.bashrc; then
+        echo "if [[ -f ~/Applications/manjaro.sh ]]; then" >> ~/.bashrc
+        echo "  . ~/Applications/manjaro.sh" >> ~/.bashrc
+        echo "fi" >> ~/.bashrc
     fi
 
-    if [ ! -e ~/.vimrc ]; then
-        ln -s .config/nvim/init.vim ~/.vimrc
+    read -p "Install manjaro.sh globally? [Y/n]:" gmanjaro 
+    if [ -z $gmanjaro ]; then 
+        sudo ln -s Applications/manjaro.sh /etc/profile.d/
+    fi
+fi
+
+read -p "Install youtube.sh? [Y/n]:" youtube
+if [ -z $youtube ]; then 
+
+    cp -f Applications/youtube.sh ~/Applications/
+
+    if ! grep -q youtube.sh ~/.bashrc; then
+        echo "if [[ -f ~/Applications/youtube.sh ]]; then" >> ~/.bashrc
+        echo "  . ~/Applications/youtube.sh" >> ~/.bashrc
+        echo "fi" >> ~/.bashrc
     fi
 
-    declare -A osInfo;
-    osInfo[/etc/redhat-release]=yum
-    osInfo[/etc/arch-release]=pacman
-    osInfo[/etc/gentoo-release]=emerge
-    osInfo[/etc/SuSE-release]=zypp
-    osInfo[/etc/debian_version]=apt
-    osInfo[/etc/alpine-release]=apk
+    read -p "Install youtube.sh globally? [Y/n]:" gyoutube
 
-    pm=/
-    for f in ${!osInfo[@]}
-    do
-        if [ -f $f ] && [ $f == /etc/arch-release ];then
-            echo Package manager: ${osInfo[$f]}
-            pm=${osInfo[$f]}
-            sudo pacman -Su flatpak libpamac-flatpak-plugin snap xclip sshfs reptyr gdb neovim mono go nodejs jre11-openjdk npm python ranger atool bat calibre elinks ffmpegthumbnailer fontforge highlight imagemagick kitty mupdf-tools odt2txt btm
-        elif [ -f $f ] && [ $f == /etc/debian_version ];then
-            echo Package manager: ${osInfo[$f]}
-            pm=${osInfo[$f]}
-            sudo apt install flatpak xclip gdb sshfs reptyr build-essential python2 python3 sshfs cmake vim-nox python3-dev python3-pip mono-complete golang nodejs openjdk-17-jdk openjdk-17-jre npm ranger atool bat elinks ffmpegthumbnailer fontforge highlight imagemagick jq kitty libcaca0 odt2txt mupdf-tools 
-        fi 
-    done
-    echo "Restart if errors, otherwise don't forget to 'sudo chmod +s /usr/bin/gdb'";
+    if [ -z $gyoutube ]; then 
+        sudo ln -s Applications/youtube.sh /etc/profile.d/
+    fi
+
+fi
+
+read -p "Install variety.sh? [Y/n]:" variety
+if [ -z $variety ]; then 
+
+    cp -f Applications/variety.sh ~/Applications/
+
+    if ! grep -q variety.sh ~/.bashrc; then
+        echo "if [[ -f ~/Applications/variety.sh ]]; then" >> ~/.bashrc
+        echo "  . ~/Applications/variety.sh" >> ~/.bashrc
+        echo "fi" >> ~/.bashrc
+    fi
+
+    read -p "Install variety.sh globally? [Y/n]:" gvariety
+
+    if [ -z $gvariety ]; then 
+        sudo ln -s Applications/variety.sh /etc/profile.d/
+    fi
 fi

@@ -1,3 +1,4 @@
+# Bash_aliases
 # global bashrc -> /etc/bash.bashrc
 # global shell profiles -> /etc/profile
 . ~/Applications/exports.sh
@@ -12,7 +13,7 @@
 . ~/Applications/youtube.sh
 . ~/Applications/variety.sh
 
-#b && ls
+b && ls
 
 if [ ! -e ~/lib_systemd ]; then
     ln -s /lib/systemd/system/ ~/lib_systemd
@@ -36,7 +37,8 @@ xmodmap -e "keycode 119 = Delete BackSpace"
 # unbinds ctrl-c and bind the function to ctrl-x
 stty intr '^x'
 stty start 'undef' 
-stty stop 'undef' 
+stty stop 'undef'
+stty susp 'undef'
 #stty 'eol' 'home'
 
 # python virtual env
