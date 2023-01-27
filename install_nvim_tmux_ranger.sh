@@ -25,12 +25,39 @@ do
         fi 
     done
 
-    cp -f init.vim ~/.config/nvim/
-    cp -f .tmux.conf ~/.tmux.conf
-    tmux source-file ~/.tmux.conf
-    ranger --copy-config=all
-    cp -f rc.conf ~/.config/ranger/
-    read -p "Install tmux.sh? (tmux aliases) [Y/n]:" tmuxx
+    read -p "Install init.vim? (neovim conf at ~/.config/nvim/) [Y/n]:" init
+        if [ -z $init ]; then
+        cp -f init.vim ~/.config/nvim/
+    fi
+
+    read -p "Install vim.sh at ~/Applications/ (nvim aliases)? [Y/n]:" aliases
+    if [ -z $aliases ]; then 
+
+        if [ ! -d ~/Applications ]; then
+            mkdir ~/Applications
+        fi
+
+        cp -f Applications/vim_nvim.sh ~/Applications/
+        if ! grep -q vim_nvim.sh ~/.bashrc; then
+
+            echo "if [[ -f ~/Applications/vim_nvim.sh ]]; then" >> ~/.bashrc
+            echo "  . ~/Applications/vim_nvim.sh" >> ~/.bashrc
+            echo "fi" >> ~/.bashrc
+        fi
+
+        read -p "Install vim_nvim.sh globally at /etc/profile.d/ ? [Y/n]:" galiases  
+        if [ -z $galiases ]; then 
+            sudo ln -s Applications/vim_nvim.sh /etc/profile.d/
+        fi
+    fi
+
+    read -p "Install tmux.conf? (tmux conf at ~/.tmux.conf) [Y/n]:" tmuxc
+    if [ -z $tmuxc ]; then
+        cp -f .tmux.conf ~/
+        tmux source-file ~/.tmux.conf
+    fi
+
+    read -p "Install tmux.sh at ~/Applications? (tmux aliases) [Y/n]:" tmuxx
     if [ -z $tmuxx ]; then 
         cp -f Applications/tmux.sh ~/Applications/
         if ! grep -q tmux.sh ~/.bashrc; then
@@ -38,11 +65,18 @@ do
             echo "  . ~/Applications/tmux.sh" >> ~/.bashrc
             echo "fi" >> ~/.bashrc
         fi
-        read -p "Install tmux.sh globally? [Y/n]:" gtmux 
+        read -p "Install tmux.sh globally? (/etc/profile.d/tmux.sh) [Y/n]:" gtmux 
         if [ -z $gtmux ]; then 
             sudo ln -s Applications/tmux.sh /etc/profile.d/
         fi
     fi
+    
+    read -p "Install rc.conf? (ranger conf at ~/.config/ranger/) [Y/n]:" rangr
+    if [ -z $rangr ]; then
+        ranger --copy-config=all
+        cp -f rc.conf ~/.config/ranger/
+    fi
+
     if [[ -d ~/.vim/bundle/YouCompleteMe/ ]];then
         sudo rm -rf ~/.vim/bundle/YouCompleteMe/
     fi

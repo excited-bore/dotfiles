@@ -18,20 +18,13 @@ alias thunderbird="kdocker thunderbird"
 #    doas echo $PTRACE_ELEVATED_PRIVILIGE > /proc/sys/kernel/yama/ptrace_scope;   
 #}
  
-### VIM ###
-
-alias vim="nvim -u ~/.config/nvim/init.vim" 
-alias vim_check_health="vim +checkhealth"
-alias vim_install_plugin="vim +PluginInstall +qall"
-
-function vlcFolder(){
+function vlc_folder(){
     if [ -d $1 ]; then
         vlc --recursive expand "./$1";
     else
         pwd | vlc --recursive expand ;
     fi;
 }
-
 
 # Docker
 alias docker_update="docker-compose down && docker-compose pull && docker-compose up &"

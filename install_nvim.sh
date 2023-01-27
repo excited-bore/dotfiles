@@ -25,9 +25,30 @@ do
     fi 
 done
 
-read -p "Install init.vim? (neovim conf) [Y/n]:" init
+read -p "Install init.vim? (neovim conf at ~/.config/nvim/) [Y/n]:" init
 if [ -z $init ]; then
     cp -f init.vim ~/.config/nvim/
+fi
+
+read -p "Install vim.sh at ~/Applications/ (nvim aliases)? [Y/n]:" aliases
+if [ -z $aliases ]; then 
+
+    if [ ! -d ~/Applications ]; then
+        mkdir ~/Applications
+    fi
+
+    cp -f Applications/vim_nvim.sh ~/Applications/
+    if ! grep -q vim_nvim.sh ~/.bashrc; then
+
+        echo "if [[ -f ~/Applications/vim_nvim.sh ]]; then" >> ~/.bashrc
+        echo "  . ~/Applications/vim_nvim.sh" >> ~/.bashrc
+        echo "fi" >> ~/.bashrc
+    fi
+
+    read -p "Install vim_nvim.sh globally at /etc/profile.d/ ? [Y/n]:" galiases  
+    if [ -z $galiases ]; then 
+        sudo ln -s Applications/vim_nvim.sh /etc/profile.d/
+    fi
 fi
 
 if [[ -d ~/.vim/bundle/YouCompleteMe/ ]];then
