@@ -53,7 +53,7 @@ set visible-stats On
 # \M : Meta (alt)
 # \t : tab
 # \C : Ctrl
-# Backspace : Rubout
+# \b : backspace
 # nop => no operation, but 'redraw-current-line' might work better
 # https://unix.stackexchange.com/questions/556703/how-to-bind-a-key-combination-to-null-in-inputrc
 # 'bind -l' for all options
@@ -81,7 +81,8 @@ set visible-stats On
 # Shift left/right
 "\e[1;2D": backward-word
 "\e[1;2C": forward-word
-#"\e": backward-kill-word
+
+# "\C-\b": backward-kill-word
 
 # Up and down arrow will now intelligently complete partially completed
 # commands by searching through the existing history.

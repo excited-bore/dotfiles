@@ -1,4 +1,5 @@
-
+:colorscheme evening
+:highlight Visual cterm=reverse ctermbg=NONE
 " These options and commands enable some very useful features in Vim, that
 " no user should have to live without.
 
@@ -32,6 +33,9 @@ Plugin 'tpope/vim-fugitive'
 
 "vim-tmux-navigator, smart navigation between vim and tmux panes
 Plugin 'christoomey/vim-tmux-navigator'
+
+" Self documemting vim wiki\
+Plugin 'vimwiki/vimwiki'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -150,7 +154,6 @@ set expandtab
 "------------------------------------------------------------
 " Useful mappings
 "
-
 " vim tmux navigator integrator
 let mapleader = "\<Space>"
 
@@ -172,15 +175,46 @@ nnoremap - <C-x>
 vnoremap + <C-a>
 vnoremap - <C-x>
 
+"Different visual block mode
+set virtualedit=all
+
+map "0p p
+
 "Map Shift to visual mode from normal mode
-nnoremap <C-S>  
+nnoremap <S-Up> <CR>==gv   
+nnoremap <S-Down> <CR>==gv  
+nnoremap <S-Left> <CR>==gv
+nnoremap <S-Right> <CR>==gv
+inoremap <S-Up><Esc> <CR>==gv
+inoremap <S-Down><Esc> <CR>==gv
+inoremap <S-Left><Esc> <CR>==gv
+inoremap <S-Right><Esc> <CR>==gv
+
+" Few ways to remap both ctrl-v and ctrl-q
+"nnoremap <S-C-Up><C-Q>   
+"nnoremap <S-C-Down><C-Q>  
+"nnoremap <S-C-Left><C-Q>
+"nnoremap <S-C-Right><C-Q>
+"inoremap <S-C-Up><C-Q>
+"inoremap <S-C-Down><C-Q>
+"inoremap <S-C-Left> <C-Q>
+"inoremap <S-C-Right> <C-Q>
+
+nnoremap <C-c> yy
+nnoremap <C-v> p
+inoremap <C-c> <Esc> yy <CR>==gi
+inoremap <C-v> <Esc> p <CR>==gi
+vnoremap <C-c> y 
+vnoremap <C-v> p 
 
 " Enter -> newline without entering insert mode
-nnoremap <Enter> o<Esc>0"_U
+nnoremap <Enter> O<esc> <Up><CR>==
+" backspace -> backspace no leave normal mode
+nnoremap <Backspace> i<Backspace><esc>g;
 
 " Move lines while holding shift
 " Multiple lines => select in visual mode
-nnoremap <S-M-Down> :m .+2<CR>==
+nnoremap <S-M-Down> :m .+1<CR>==
 nnoremap <S-M-Up> :m .-2<CR>==
 inoremap <S-M-Down> <Esc>:m .+1<CR>==gi
 inoremap <S-M-Up> <Esc>:m .-2<CR>==gi
@@ -198,35 +232,23 @@ vnoremap <S-M-Up> :m '<-2<CR>gv=gv
 " register "*" for all yank, delete, change and put
 " operations which would normally go to the unnamed
 " register.
-
-" Ctrl - z is -> undo instead of stop 
-nnoremap <C-z> :u <Enter>
-vnoremap <C-z> <Esc> :u <Enter> <CR>==gv 
-inoremap <C-z> <Esc> :u <Enter> <CR>==gi
-
 " Normal clipboard functionality for yy, y and d
 set clipboard+=unnamedplus
 
-"nnoremap <C-c> yy
-"nnoremap <C-v> p
-"inoremap <C-c> <Esc> yy <CR>==gi
-"inoremap <C-v> <Esc> p <CR>==gi
-"vnoremap <C-c> y 
-"vnoremap <C-v> p 
-
-" C-x -> Escape
-" inoremap <C-x> <Esc>
-" vnoremap <C-x> <Esc>
+" Ctrl - z is -> undo instead of stop 
+nnoremap <C-z> :u <CR>==
+vnoremap <C-z> <Esc> :u <CR>==gv 
+inoremap <C-z> <Esc> :u <CR>==gi
 
 " C-s => Save
-nnoremap <C-s> :write! <Enter>
-inoremap <C-s> <Esc> :write! <Enter> <CR>==gi
-vnoremap <C-s> <Esc> :write! <Enter> <CR>==gv
+nnoremap <C-s> :write! <CR>==
+inoremap <C-s> <Esc> :write! <CR>==gi
+vnoremap <C-s> <Esc> :write! <CR>==gv
 
-" C-q => Quit
-nnoremap <C-q> :q! <Enter>
-inoremap <C-q> <Esc> :q! <Enter> <CR>==gi
-vnoremap <C-q> <Esc> :q! <Enter> <CR>==gv
+" C-x => Quit
+nnoremap <C-x> :q! <Enter>
+inoremap <C-x> <Esc> :q! <CR>==gi
+vnoremap <C-x> <Esc> :q! <CR>==gv
 
 " C-w => Save and quit
 " nnoremap <C-w> :wq<CR>
