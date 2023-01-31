@@ -27,6 +27,9 @@ done
 
 read -p "Install init.vim? (neovim conf at ~/.config/nvim/) [Y/n]:" init
 if [ -z $init ]; then
+    if [ ! -e ~/ .config/nvim ]; then
+        mkdir -p .config/nvim
+    fi
     cp -f init.vim ~/.config/nvim/
 fi
 
