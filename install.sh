@@ -1,70 +1,207 @@
-% Color settings
-color normal lightgray black
-color status yellow blue
-color underline yellow black
-color overstrike brightblue black
+read -p "Create /etc/profile.d/ to user directory symlink? [Y/n]:" sym1
+if [ -z $sym1 ] && [ ! -e ~/profile.d ]; then
+    sudo ln -s /etc/profile.d/ ~/etc_profiles
+fi
 
-% This is an example configuration file that provides a `less' emulation 
-% for MOST.
-%
-% The format is simple: 
-%       setkey <function-name> <key-name>
-%       unsetkey <key-name>
-%       color <object-name> <fg> <bg>
-%
-% Here <key-name> must be enclosed in double quotes.  '^' represents Ctrl.
-% The function name is not in double quotes.
-% 
-%
-% When MOST starts up, it looks for a keymap file given by the environment 
-% variable MOST_INITFILE.  If that environment variable does not exist, 
-% MOST will look in the users HOME directory for .mostrc on Unix systems
-% and MOST.RC on VMS systems.
-%
-% The file `most.rc' contains a listing of the default MOST keybindings.
+read -p "Create /lib/systemd/system/ to user directory symlink? [Y/n]:" sym2
+if [ -z $sym2 ] && [ ! -e ~/lib_systemd ]; then
+    ln -s /lib/systemd/system/ ~/lib_systemd
+fi
 
-% Color settings
+read -p "Create /etc/systemd/system/ to user directory symlink? [Y/n]:" sym3
+if [ -z $sym3 ] && [ ! -e ~/etc_systemd ]; then
+    ln -s /etc/systemd/system/ ~/etc_systemd
+fi
 
-color normal lightgray black
-color status yellow blue
-color underline brightgreen black
-color overstrike brightred black
+read -p "Install .Xresources at ~/ ? (xfce4 config) [Y/n]:" Xresources
+if [ -z $Xresources ]; then
+    cp -f .Xresources ~/.Xresources
+    xrdb -l ~/.Xresources
+fi
 
-% Keybindings
+read -p "Add nvidia settings to .xinitrc? [Y/n]:" nvid
+if [ -z $nvid ];then
+    if ! grep -q "nvidia-settings" ~/.xinitrc ; then 
+        echo "exec nvidia-settings --load-config-only" >> ~/.xinitrc 
+    fi
+fi
 
-unsetkey "^K"
-setkey up "^K"
+read -p "Install .inputrc at ~/ ? (readline config) [Y/n]:" inputrc
+if [ -z $inputrc ]; then 
+    cp -f .inputrc ~/
+fi
 
-unsetkey ":"
-setkey next_file ":n"
-setkey find_file ":e"
-setkey next_file ":p"
-setkey toggle_options ":o"
-setkey toggle_case ":c"
-setkey delete_file ":d"
-setkey exit ":q"
+read -p "Create ~/Applications and install further scripts? [Y/n]:" scripts
+if [ -z $scripts ]; then
 
-setkey down "e"
-setkey down "E"
-setkey down "j"
-setkey down "^N"
-setkey up "y"
-setkey up "^Y"
-setkey up "k"
-setkey up "^P"
-setkey page_down "f"
-setkey page_down "^F"
-setkey page_up "b"
-setkey page_up "^B"
-setkey other_window "z"
-setkey other_window "w"
-setkey search_backward "?"
-setkey bob "p"
-setkey goto_mark "'"
-setkey find_file "E"
-setkey edit "v"
+    if [ ! -d ~/Applications ]; then
+        mkdir ~/Applications
+    fi
 
-setkey bob "g"
-setkey eob "G"
-setkey page_down "d"
-setkey page_up "u"
+    read -p "Install bindings.sh at ~/Applications/ (bash keybindings)? [Y/n]:" aliases
+    if [ -z $aliases ]; then 
+
+        cp -f Applications/bindings.sh ~/Applications/
+        if ! grep -q bindings.sh ~/.bashrc; then
+
+            echo "if [[ -f ~/Applications/bindings.sh ]]; then" >> ~/.bashrc
+            echo "  . ~/Applications/bindings.sh" >> ~/.bashrc
+            echo "fi" >> ~/.bashrc
+        fi
+
+        read -p "Install bindings.sh globally at /etc/profile.d/ ? [Y/n]:" galiases  
+        if [ -z $galiases ]; then 
+            sudo ln -s Applications/bindings.sh /etc/profile.d/
+        fi
+    fi
+
+    read -p "Install general.sh at ~/Applications/ (bash general commands aliases)? [Y/n]:" general
+    if [ -z $general ]; then 
+        cp -f Applications/general.sh ~/Applications/
+        if ! grep -q general.sh ~/.bashrc; then
+            echo "if [[ -f ~/Applications/general.sh ]]; then" >> ~/.bashrc
+            echo "  . ~/Applications/general.sh" >> ~/.bashrc
+            echo "fi" >> ~/.bashrc
+        fi
+        read -p "Install general.sh globally at /etc/profile.d/? [Y/n]:" ggeneral  
+        if [ -z $ggeneral ]; then 
+            sudo ln -s Applications/general.sh /etc/profile.d/
+        fi
+    fi
+
+    read -p "Install exports.sh at ~/Applications/ (environment variables)? [Y/n]:" exports
+        if [ -z $exports ]; then 
+        cp -f Applications/exports.sh ~/Applications/
+        if ! grep -q exports.sh ~/.bashrc; then
+            echo "if [[ -f ~/Applications/exports.sh ]]; then" >> ~/.bashrc
+            echo "  . ~/Applications/exports.sh" >> ~/.bashrc
+            echo "fi" >> ~/.bashrc
+        fi
+        read -p "Install exports.sh globally at /etc/profile.d/? [Y/n]:" gexports  
+        if [ -z $gexports ]; then 
+            sudo ln -s Applications/exports.sh /etc/profile.d/
+        fi
+    fi
+
+    read -p "Install systemctl.sh? ~/Applications/ (systemctl aliases/functions)? [Y/n]:" systemctl
+    if [ -z $systemctl ]; then 
+        cp -f Applications/systemctl.sh ~/Applications/
+        if ! grep -q systemctl.sh ~/.bashrc; then
+            echo "if [[ -f ~/Applications/systemctl.sh ]]; then" >> ~/.bashrc
+            echo "  . ~/Applications/systemctl.sh" >> ~/.bashrc
+            echo "fi" >> ~/.bashrc
+        fi
+        read -p "Install systemctl.sh globally at /etc/profile.d/? [Y/n]:" gsystemctl  
+        if [ -z $gsystemctl ]; then 
+            sudo ln -s Applications/systemctl.sh /etc/profile.d/
+        fi
+    fi
+
+    read -p "Install git.sh at ~/Applications (git aliases)? [Y/n]:" gitsh
+    if [ -z $gitsh ]; then 
+
+        cp -f Applications/git.sh ~/Applications/
+
+        if ! grep -q git.sh ~/.bashrc; then
+            echo "if [[ -f ~/Applications/git.sh ]]; then" >> ~/.bashrc
+            echo "  . ~/Applications/git.sh" >> ~/.bashrc
+            echo "fi" >> ~/.bashrc
+        fi
+
+        read -p "Install git.sh globall at /etc/profile.d/? [Y/n]:" ggit  
+
+        if [ -z $ggit ]; then 
+            sudo ln -s Applications/git.sh /etc/profile.d/
+        fi
+    fi
+
+    read -p "Install ssh.sh at ~/Applications (ssh related aliases)? [Y/n]:" sshsh
+    if [ -z $sshsh ]; then 
+
+        cp -f Applications/ssh.sh ~/Applications/
+
+        if ! grep -q ssh.sh ~/.bashrc; then
+        echo "if [[ -f ~/Applications/ssh.sh ]]; then" >> ~/.bashrc
+        echo "  . ~/Applications/ssh.sh" >> ~/.bashrc
+        echo "fi" >> ~/.bashrc
+        fi
+
+        read -p "Install ssh.sh globally at /etc/profile.d/ ? [Y/n]:" gssh  
+
+        if [ -z $gssh ]; then 
+            sudo ln -s Applications/ssh.sh /etc/profile.d/
+        fi
+    fi
+
+    read -p "Install package_managers.sh at ~/Applications (package manager aliases)? [Y/n]:" packmang
+    if [ -z $packmang ]; then 
+
+        cp -f Applications/package_managers.sh ~/Applications/
+
+        if ! grep -q manjaro.sh ~/.bashrc; then
+            echo "if [[ -f ~/Applications/package_managers.sh ]]; then" >> ~/.bashrc
+            echo "  . ~/Applications/package_managers.sh" >> ~/.bashrc
+            echo "fi" >> ~/.bashrc
+        fi
+
+        read -p "Install package_managers.sh globally at /etc/profile.d/ ? [Y/n]:" gpackmang  
+
+        if [ -z $gpackmang ]; then 
+            sudo ln -s Applications/package_managers.sh /etc/profile.d/
+        fi
+    fi
+
+    read -p "Install manjaro.sh at ~/Applications (manjaro specific aliases)? [Y/n]:" manjar
+    if [ -z $manjar ]; then
+
+        cp -f Applications/manjaro.sh ~/Applications/
+
+        if ! grep -q manjaro.sh ~/.bashrc; then
+            echo "if [[ -f ~/Applications/manjaro.sh ]]; then" >> ~/.bashrc
+            echo "  . ~/Applications/manjaro.sh" >> ~/.bashrc
+            echo "fi" >> ~/.bashrc
+        fi
+
+        read -p "Install manjaro.sh globally at /etc/profile.d/ ? [Y/n]:" gmanjaro 
+        if [ -z $gmanjaro ]; then 
+            sudo ln -s Applications/manjaro.sh /etc/profile.d/
+        fi
+    fi
+
+    read -p "Install youtube.sh at ~/Applications (youtube-dl aliases)? [Y/n]:" youtube
+    if [ -z $youtube ]; then 
+
+        cp -f Applications/youtube.sh ~/Applications/
+
+        if ! grep -q youtube.sh ~/.bashrc; then
+            echo "if [[ -f ~/Applications/youtube.sh ]]; then" >> ~/.bashrc
+            echo "  . ~/Applications/youtube.sh" >> ~/.bashrc
+            echo "fi" >> ~/.bashrc
+        fi
+
+        read -p "Install youtube.sh globally at /etc/profile.d/ ? [Y/n]:" gyoutube
+
+        if [ -z $gyoutube ]; then 
+            sudo ln -s Applications/youtube.sh /etc/profile.d/
+        fi
+
+    fi
+
+    read -p "Install variety.sh at ~/Applications (variety of applications)? [Y/n]:" variety
+    if [ -z $variety ]; then 
+
+        cp -f Applications/variety.sh ~/Applications/
+
+        if ! grep -q variety.sh ~/.bashrc; then
+            echo "if [[ -f ~/Applications/variety.sh ]]; then" >> ~/.bashrc
+            echo "  . ~/Applications/variety.sh" >> ~/.bashrc
+            echo "fi" >> ~/.bashrc
+        fi
+
+        read -p "Install variety.sh globally? at /etc/profile.d/ [Y/n]:" gvariety
+
+        if [ -z $gvariety ]; then 
+            sudo ln -s Applications/variety.sh /etc/profile.d/
+        fi
+    fi
+fi
