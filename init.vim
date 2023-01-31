@@ -208,13 +208,13 @@ vnoremap <C-c> y
 vnoremap <C-v> p 
 
 " Enter -> newline without entering insert mode
-nnoremap <Enter> O<esc> <Up><CR>==
+nnoremap <Enter> i<Enter><esc>
 " backspace -> backspace no leave normal mode
 nnoremap <Backspace> i<Backspace><esc>g;
 
 " Move lines while holding shift
 " Multiple lines => select in visual mode
-nnoremap <S-M-Down> :m .+1<CR>==
+nnoremap <S-M-Down> :m .+1<CR>
 nnoremap <S-M-Up> :m .-2<CR>==
 inoremap <S-M-Down> <Esc>:m .+1<CR>==gi
 inoremap <S-M-Up> <Esc>:m .-2<CR>==gi
