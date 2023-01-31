@@ -11,7 +11,7 @@ export SYSTEMD_PAGER=$PAGER
 #Don't use 
 #export TERM=vt100
 
-export DISPLAY=":0.0"
+#export DISPLAY=":0.0"
 export VISUAL="nvim"
 export EDITOR="nvim"
 

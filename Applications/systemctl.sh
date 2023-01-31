@@ -13,7 +13,6 @@ alias systemctl_bios="sudo systemctl reboot --firmware-setup"
 alias systemctl_bluetooth_startup="sudo systemctl start bluetooth.service && blueman-manager"
 alias systemctl_bluetooth_down="sudo systemctl stop bluetooth.service"
 
-
 alias journalctl_boot="sudo journalctl -xb"
 alias journalctl_live="sudo journalctl -xf"
 alias journalctl_live_reverse="sudo journalctl -xr"
@@ -32,10 +31,9 @@ function create_systemd_daemon(){
         else
             sudo touch $serv;
             sudo echo "[Unit]" >> $serv;
-            sudo echo "Description=Example systemd service." >> $serv;
+            sudo echo "Description=$serv service." >> $serv;
 
             sudo echo "[Service]" >> $serv;
-            sudo echo "Type=simple" >> $serv;
             sudo echo "ExecStart=/bin/bash /usr/bin/test_service.sh" >> $serv;
 
             sudo echo "[Install]" >> $serv;
