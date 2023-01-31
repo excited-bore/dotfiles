@@ -10,9 +10,9 @@ function git_ssh_key_and_add_to_agent() {
     (cd ~/.ssh/ && read -p "Give up name: " name &&
     echo ~/.ssh/$name | ssh-keygen -t ed25519 &&
     echo "  IdentityFile ~/.ssh/$name" >> ~/.ssh/config &&
-    echo "  User git" >> ~/.ssh/config &&
+    echo "  User git" >> ~/.ssh/config && eval $(ssh-agent -s) &&
     ssh-add -vH ~/.ssh/known_hosts ~/.ssh/"$name" &&
-    eval $(ssh-agent -s) && cat $name.pub); 
+    cat ~/.ssh/$name.pub); 
 }
 
 function git_remote_https_to_ssh(){
@@ -46,7 +46,7 @@ function git_remote_ssh_to_https(){
 alias git_list_remotes="git remote -v"
 function git_test_conn_github() { ssh -vT git@github.com; }
 function git_status() { git status; }
-function git_config() { git config --global user.email '$EMAIL'; git config --global user.name '$NAME'; }
+function git_config() { git config --global user.email $EMAIL && git config --global user.name $NAME; }
 function git_add_remote_url() { git remote -v add "$1" "$2"; }
 function git_add_remote_ssh() { git remote -v add "$1" git@github.com:$GITNAME/"$2.git"; }
 

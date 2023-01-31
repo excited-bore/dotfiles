@@ -3,7 +3,7 @@
 # global shell profiles -> /etc/profile
 
 # Install bindings from xterm
- xrdb ~/.Xresources
+ xrdb merge ~/.Xresources
 
 # Set caps as Escape
 #setxkbmap -option "escape:caps_switch" 

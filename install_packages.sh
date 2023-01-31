@@ -12,7 +12,7 @@ do
     if [ -f $f ] && [ $f == /etc/arch-release ];then
         echo Package manager: ${osInfo[$f]}
         pm=${osInfo[$f]}
-        sudo pacman -Su flatpak xorg-xrdb libpamac-flatpak-plugin snap xclip sshfs reptyr gdb neovim mono go nodejs jre11-openjdk npm python ranger atool bat calibre elinks ffmpegthumbnailer fontforge highlight imagemagick kitty mupdf-tools odt2txt btm
+        sudo pacman -Su flatpak xorg-xrdb libpamac-flatpak-plugin snap xclip sshfs reptyr gdb neovim mono go nodejs jre11-openjdk npm python ranger atool bat calibre elinks ffmpegthumbnailer fontforge highlight imagemagick kitty mupdf-tools odt2txt bottom
     elif [ -f $f ] && [ $f == /etc/debian_version ];then
         echo Package manager: ${osInfo[$f]}
         pm=${osInfo[$f]}

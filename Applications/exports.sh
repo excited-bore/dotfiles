@@ -1,6 +1,5 @@
 #!/bin/bash
 
-export NAME="Stan Nys"
 export EMAIL="stan96@duck.com"
 export GITNAME="excited-bore"
 

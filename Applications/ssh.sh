@@ -8,7 +8,7 @@ function copy_to_serber() { scp -r burpi@192.168.129.12:37093$1 $2; }
 #function cp_from_serber() { scp -r }
 
 #Server access
-alias serber="ssh -i ~/.ssh/peepie pi@192.168.129.17"
+alias serber="ssh -i ~/.ssh/peepie funnyman@192.168.129.17"
 alias serber_unmnt="fusermount3 -u /mnt/mount1/"
 alias serber_unmnt1="fusermount3 -u /mnt/mount2/"
 
@@ -24,8 +24,8 @@ function ssh_key_and_add_to_agent_by_host() {
     echo ~/.ssh/$name | ssh-keygen -t ed25519 &&
     echo "  IdentityFile ~/.ssh/$name" >> ~/.ssh/config &&
     read -p "Give up username: " uname && echo "  User $uname" >> ~/.ssh/config &&
-    ssh-add -vH ~/.ssh/known_hosts ~/.ssh/"$name" &&
-    eval $(ssh-agent -s) && cat $name.pub); 
+    ssh-add -vH ~/.ssh/known_hosts ~/.ssh/"$name" && eval $(ssh-agent -s) &&
+    cat ~/.ssh/$name.pub); 
 }
 
 function serber_mnt() {
@@ -33,7 +33,7 @@ function serber_mnt() {
         mkdir /mnt/mount1; 
     fi;
     if [ ! -e ~/Files/Files ]; then
-        sshfs pi@192.168.129.17:/mnt/MyStuff/ /mnt/mount1/ -o IdentityFile=/home/burp/.ssh/id_burpi,follow_symlinks,reconnect,default_permissions,uid=1000,gid=1001,workaround=rename;
+        sshfs funnyman@192.168.129.17:/mnt/MyStuff/ /mnt/mount1/ -o IdentityFile=/home/burp/.ssh/pie,follow_symlinks,reconnect,default_permissions,uid=1000,gid=1001,workaround=rename;
     fi
 }
 
