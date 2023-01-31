@@ -5,6 +5,11 @@ export GITNAME="excited-bore"
 
 # If installed will give manuals a color scheme
 export PAGER="most"
+export SYSTEMD_PAGER=$PAGER
+# export SYSTEMD_LESS="FRXMK"
+
+#Don't use 
+#export TERM=vt100
 
 export DISPLAY=":0.0"
 export VISUAL="nvim"
@@ -21,12 +26,15 @@ export TMPDIR=/tmp
 # Tip: Search binaries with 'whereis'
 # And check with 'printenv'
 
+# VIM
+export MYVIMRC="~/.config/nvim/init.vim"
+
 # EMACS
 export PATH='~/.emacs.d/bin/':$PATH
 
 # PYTHON
 export PYTHONPATH='/usr/bin/python:/usr/bin/python3:/usr/bin/python3.10'
-
+export PYTHON_ARGCOMPLETE_OK="True"
 # JAVA
 # For arch: Also changeable with 'archlinux-java'
 export JAVA_HOME=/usr/lib/jvm/java-8-openjdk

@@ -2,17 +2,33 @@
 # global bashrc -> /etc/bash.bashrc
 # global shell profiles -> /etc/profile
 
-# Set caps as AltGr
-setxkbmap -option "lv3:caps_switch" 
+# Install bindings from xterm
+ xrdb ~/.Xresources
+
+# Set caps as Escape
+#setxkbmap -option "escape:caps_switch" 
+
+# Set caps to Escape
+setxkbmap -option caps:escape
+
 # Set Shift delete to backspace
 xmodmap -e "keycode 119 = Delete BackSpace"
 
 ## stty settings
-# see with 'stty -a'
+# see with 'stty -a' 
+# ^ control
+#stty werase '[3;2~'
+
 # unbinds ctrl-c and bind the function to ctrl-x
 stty intr '^x'
+
+# Turn off flow control
+stty -ixon
+stty -ixoff
 stty start 'undef' 
 stty stop 'undef'
+
+#Free up Ctrl-z
 stty susp 'undef'
 #stty 'eol' 'home'
 

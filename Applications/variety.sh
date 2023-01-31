@@ -45,6 +45,7 @@ alias wick="sudo wickrme --no-sandbox"
 alias systemctl_devolo_startup="doas systemctl start devolonetsvc.service && bash /opt/devolo/dlancockpit/bin/dlancockpit-run.sh"
 alias systemctl_devolo_down="doas systemctl stop devolonetsvc.service"
 
+alias copy_to="python ~/Applications/copy_to/copy_to_setup.py "
 
 #alias vmOn="sudo virsh net-autostart default && sudo virsh net-start default && sudo mv /etc/modprobe.d/vfio.conf.orig /etc/modprobe.d/vfio.conf && sudo mkinitcpio -p linux515 && reboot"
 #alias vmOff="sudo virsh net-destroy default && sudo mv /etc/modprobe.d/vfio.conf /etc/modprobe.d/vfio.conf.orig && sudo mkinitcpio -p linux515 && reboot"

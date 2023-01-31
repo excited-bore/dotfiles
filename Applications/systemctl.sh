@@ -1,22 +1,22 @@
-alias systemctl_list_unit_services="doas systemctl list-units --type=service"
-alias systemctl_list_unit_sockets="doas systemctl list-units --type=socket"
-alias systemctl_list_unit_files="doas systemctl list-unit-files"
-alias systemctl_start="doas systemctl start"
-alias systemctl_restart="doas systemctl restart"
-alias systemctl_stop="doas systemctl stop"
-alias systemctl_enable="doas systemctl enable"
-alias systemctl_enable_now="doas systemctl enable --now"
-alias systemctl_disable="doas systemctl disable"
-alias systemctl_disable_now="doas systmctl disable --now"
-alias systemctl_status_daemon="doas systemctl status"
-alias systemctl_bios="doas systemctl reboot --firmware-setup"
-alias systemctl_bluetooth_startup="doas systemctl start bluetooth.service && blueman-manager"
-alias systemctl_bluetooth_down="doas systemctl stop bluetooth.service"
+alias systemctl_list_unit_services="sudo systemctl list-units --type=service"
+alias systemctl_list_unit_sockets="sudo systemctl list-units --type=socket"
+alias systemctl_list_unit_files="sudo systemctl list-unit-files"
+alias systemctl_start="sudo systemctl start"
+alias systemctl_restart="sudo systemctl restart"
+alias systemctl_stop="sudo systemctl stop"
+alias systemctl_enable="sudo systemctl enable"
+alias systemctl_enable_now="sudo systemctl enable --now"
+alias systemctl_disable="sudo systemctl disable"
+alias systemctl_disable_now="sudo systmctl disable --now"
+alias systemctl_status_daemon="sudo systemctl status"
+alias systemctl_bios="sudo systemctl reboot --firmware-setup"
+alias systemctl_bluetooth_startup="sudo systemctl start bluetooth.service && blueman-manager"
+alias systemctl_bluetooth_down="sudo systemctl stop bluetooth.service"
 
 
-alias journalctl_boot="doas journalctl -xb"
-alias journalctl_live="doas journalctl -xf"
-alias journalctl_live_reverse="doas journalctl -xr"
+alias journalctl_boot="sudo journalctl -xb"
+alias journalctl_live="sudo journalctl -xf"
+alias journalctl_live_reverse="sudo journalctl -xr"
 
 function create_systemd_daemon(){
     read -p "Give up a '*.service' name: " inpt;
@@ -28,21 +28,21 @@ function create_systemd_daemon(){
         echo "File will be at '$serv'";
         sleep 2;
         if [ -e ~/systemd_example.service ]; then
-            doas cp ~/systemd_example.service $serv;
+            sudo cp ~/systemd_example.service $serv;
         else
-            doas touch $serv;
-            doas echo "[Unit]" >> $serv;
-            doas echo "Description=Example systemd service." >> $serv;
+            sudo touch $serv;
+            sudo echo "[Unit]" >> $serv;
+            sudo echo "Description=Example systemd service." >> $serv;
 
-            doas echo "[Service]" >> $serv;
-            doas echo "Type=simple" >> $serv;
-            doas echo "ExecStart=/bin/bash /usr/bin/test_service.sh" >> $serv;
+            sudo echo "[Service]" >> $serv;
+            sudo echo "Type=simple" >> $serv;
+            sudo echo "ExecStart=/bin/bash /usr/bin/test_service.sh" >> $serv;
 
-            doas echo "[Install]" >> $serv;
-            doas echo "WantedBy=multi-user.target" >> $serv;
+            sudo echo "[Install]" >> $serv;
+            sudo echo "WantedBy=multi-user.target" >> $serv;
         fi
     fi
-    doas chmod 644 $serv;
-    doasedit $serv;
+    sudo chmod 644 $serv;
+    sudoedit $serv;
     systemctl_start $serv;
 }

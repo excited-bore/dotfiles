@@ -8,15 +8,23 @@ alias copy="cp"
 function cpAll(){
     cp -t "$1" ./*;
 }
+function cpAllHidden(){
+    cp -t "$1" .[!.]*;
+}
 # Ask for Interaction when overwriting newer files
 alias mv="mv -nv"
 alias move="mv"
 function mvAll(){
-    mv -t "$1" ./*;
-}
+    mv -t "$1" .[!.]* *;
+} 
+function mvAllHidden(){
+    mv -t "$1" .[!.]* *;
+} 
 alias rm="rm -rv"
 alias remove="rm"
 alias rmAll="rm ./*";
+alias rmAllHiddn="rm .[!.]* *";
+
 # With parent directories and verbose
 alias mkdir="mkdir -pv"
 # Listen hidden files and permissions
