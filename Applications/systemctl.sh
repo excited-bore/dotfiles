@@ -17,28 +17,22 @@ alias journalctl_boot="sudo journalctl -xb"
 alias journalctl_live="sudo journalctl -xf"
 alias journalctl_live_reverse="sudo journalctl -xr"
 
-function create_systemd_daemon(){
+function systemctl_create_daemon(){
     read -p "Give up a '*.service' name: " inpt;
     if [ -z "$inpt" ]; then
         echo "Give up a viable filename please";
         return;
     else
-        serv=/etc/systemd/system/"$inpt.service";
-        echo "File will be at '$serv'";
-        sleep 2;
-        if [ -e ~/systemd_example.service ]; then
-            sudo cp ~/systemd_example.service $serv;
-        else
-            sudo touch $serv;
-            sudo echo "[Unit]" >> $serv;
-            sudo echo "Description=$serv service." >> $serv;
+        serv="/etc/systemd/system/$inpt.service"
+        touch $serv;
+        echo "[Unit]" >> $serv;
+        echo "Description=$serv service." >> $serv;
 
-            sudo echo "[Service]" >> $serv;
-            sudo echo "ExecStart=/bin/bash /usr/bin/test_service.sh" >> $serv;
+        echo "[Service]" >> $serv;
+        echo "ExecStart=/bin/bash /usr/bin/test_service.sh" >> $serv;
 
-            sudo echo "[Install]" >> $serv;
-            sudo echo "WantedBy=multi-user.target" >> $serv;
-        fi
+        echo "[Install]" >> $serv;
+        echo "WantedBy=multi-user.target" >> $serv;
     fi
     sudo chmod 644 $serv;
     sudoedit $serv;

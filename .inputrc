@@ -3,7 +3,10 @@
 # This line carries over site-wide readline configuration to the user configuration. Usually /etc/inputrc includes some goodies.
 $include /etc/inputrc
 
-# Make sure we don't output everything on the 1 line
+#If you copy commands from the web, you might have noticed that when you copy a newline, Bash will interpret that newline as an Enter and execute whatever it is in your input buffer at the moment. This is unsafe, because what you see might not be what you copy. You can be avoided by setting:
+set enable-bracketed-paste On
+
+ # Make sure we don't output everything on the 1 line
 set horizontal-scroll-mode Off
 
 # Enable 8bit input
@@ -24,7 +27,6 @@ set bell-style none
 
 # No echoing of f.ex. ^C after pressing keys
 set echo-control-characters off
-
 
 #This line sets 3 to be the maximum number of characters to be the common prefix to display for completions. 
 #If the common prefix has more than 3 characters, they are replaced by ellipsis. For example, assume we are in a directory with files Screenshot_20170730.png and Screenshot_20170731.png. 
@@ -48,6 +50,12 @@ set show-all-if-unmodified On
 # This lines sets completions to be appended by characters that indicate their file types reported by the stat system call
 set visible-stats On
 
+# Mark symlinked directories
+set mark-symlinked-directories On
+# Color the common prefix
+set colored-completion-prefix On
+# Color the common prefix in menu-complete
+set menu-complete-display-prefix On
 
 # \e : escape
 # \M : Meta (alt)
@@ -67,7 +75,8 @@ set visible-stats On
 # And To see the complete character string sent by a key, you can use this command, and type the key within 2 seconds:
 # stty raw; sleep 2; echo; stty cooked
 
-
+# Free these commands
+"\C-b": redraw-current-line
 "\C-p": redraw-current-line
 "\C-c":redraw-current-line
 "\C-j": redraw-current-line
@@ -75,14 +84,25 @@ set visible-stats On
 
 # \015 represents the enter key
 "\C-l": "\C-U clear && tput cup $(tput lines) 0 && ls \015" 
+
 # Undo to Ctrl+Z (unbound in tty) instead of only on Ctrl+_
 "\C-z": vi-undo
 
-# Shift left/right
-"\e[1;2D": backward-word
-"\e[1;2C": forward-word
+set comment-begin #
+#https://stackoverflow.com/questions/67535351/how-to-provide-arguments-to-readline-functions-via-inputrc
+# Insert as comment 
+"\C-b": insert-comment 1
+"\C-n": "\C-a\e[3~"  
 
-# "\C-\b": backward-kill-word
+# Control backspace
+"\C-h": backward-kill-word
+
+# Keep command without clearing it when pressing Enter
+# "\e[20;5" : "\C-o"
+
+# Control left/right to jump from words instead of chars
+"\e[1;5D": backward-word
+"\e[1;5C": forward-word
 
 # Up and down arrow will now intelligently complete partially completed
 # commands by searching through the existing history.

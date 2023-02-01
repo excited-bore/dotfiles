@@ -46,9 +46,11 @@ function git_remote_ssh_to_https(){
 alias git_list_remotes="git remote -v"
 function git_test_conn_github() { ssh -vT git@github.com; }
 function git_status() { git status; }
-function git_config() { git config --global user.email $EMAIL && git config --global user.name $NAME; }
+function git_config_using_vars() { git config --global user.email $EMAIL && git config --global user.name $NAME; }
 function git_add_remote_url() { git remote -v add "$1" "$2"; }
 function git_add_remote_ssh() { git remote -v add "$1" git@github.com:$GITNAME/"$2.git"; }
+
+alias git_add_all="git add -A"
 
 function git_commit_all() { 
     if [ ! -z "$1" ]; then 
@@ -58,13 +60,21 @@ function git_commit_all() {
     fi
 }
 
-function git_add_and_commit_all(){
+function git_add_commit_all(){
     if [ ! -z "$1" ]; then
         git add -A && git commit -m "$1";
     else
         git add -A && git commit;
     fi
 }
+ 
+function git_add_commit_push_all(){
+    if [ ! -z "$1" ]; then
+        git add -A && git commit -m "$1" && git push;
+    else
+        git add -A && git commit && git push; 
+    fi
+} 
 
 alias git_commit_using_last="git commit --amend"
 alias git_list_branches="git branch --list"

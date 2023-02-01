@@ -1,4 +1,4 @@
-:colorscheme evening
+":colorscheme evening
 :highlight Visual cterm=reverse ctermbg=NONE
 " These options and commands enable some very useful features in Vim, that
 " no user should have to live without.
@@ -178,18 +178,37 @@ vnoremap - <C-x>
 "Different visual block mode
 set virtualedit=all
 
-map "0p p
+" unnamedplus	A variant of the "unnamed" flag which uses the
+" clipboard register "+" (quoteplus) instead of
+" register "*" for all yank, delete, change and put
+" operations which would normally go to the unnamed
+" register.
+" Normal clipboard functionality for yy, y and d
+set clipboard+=unnamedplus
+"map "0p p
+
+
+
 
 "Map Shift to visual mode from normal mode
-nnoremap <S-Up> <CR>==gv   
-nnoremap <S-Down> <CR>==gv  
-nnoremap <S-Left> <CR>==gv
-nnoremap <S-Right> <CR>==gv
-inoremap <S-Up><Esc> <CR>==gv
-inoremap <S-Down><Esc> <CR>==gv
-inoremap <S-Left><Esc> <CR>==gv
-inoremap <S-Right><Esc> <CR>==gv
+map <S-Up> <Nop>
+map <S-Down> <Nop>
+map <S-Left> <Nop>
+map <S-Right> <Nop>
 
+nnoremap <S-Up> v   
+nnoremap <S-Down> v  
+nnoremap <S-Left> v
+nnoremap <S-Right> v
+inoremap <S-Up><Esc> v
+inoremap <S-Down><Esc> v
+inoremap <S-Left><Esc> v
+inoremap <S-Right><Esc> v
+vnoremap <S-Up> <Esc> 
+vnoremap <S-Down> <Esc> 
+vnoremap <S-Left> <Esc> 
+vnoremap <S-Right> <Esc> 
+                              
 " Few ways to remap both ctrl-v and ctrl-q
 "nnoremap <S-C-Up><C-Q>   
 "nnoremap <S-C-Down><C-Q>  
@@ -200,17 +219,25 @@ inoremap <S-Right><Esc> <CR>==gv
 "inoremap <S-C-Left> <C-Q>
 "inoremap <S-C-Right> <C-Q>
 
-nnoremap <C-c> yy
-nnoremap <C-v> p
-inoremap <C-c> <Esc> yy <CR>==gi
-inoremap <C-v> <Esc> p <CR>==gi
-vnoremap <C-c> y 
-vnoremap <C-v> p 
-
 " Enter -> newline without entering insert mode
 nnoremap <Enter> i<Enter><esc>
+"Shift Enter -> newline without entering insert mode
+map <Esc>[13;2u <S-Enter>
+nnoremap <S-Enter><C-o>i<Enter><esc>
 " backspace -> backspace no leave normal mode
 nnoremap <Backspace> i<Backspace><esc>g;
+" Tab => add tab"
+nnoremap <Tab> i<Tab><esc>
+
+nmap <C-c> yy
+"nmap <C-v> p
+nmap <C-V> <c-o><Enter>P
+imap <C-c> <Esc> yy <CR>==gi
+"imap <C-v> <Esc> p <CR>==gi
+imap <C-V> <Esc> P <CR>==gi
+vmap <C-c> y 
+"vmap <C-v> p
+vmap <C-V> P
 
 " Move lines while holding shift
 " Multiple lines => select in visual mode
@@ -226,14 +253,6 @@ vnoremap <S-M-Up> :m '<-2<CR>gv=gv
 " Quickly insert an empty new line without entering insert modef
 " nnoremap <Leader>o o<Esc>0"_D
 " nnoremap <Leader>O O<Esc>0"_D
-
-" unnamedplus	A variant of the "unnamed" flag which uses the
-" clipboard register "+" (quoteplus) instead of
-" register "*" for all yank, delete, change and put
-" operations which would normally go to the unnamed
-" register.
-" Normal clipboard functionality for yy, y and d
-set clipboard+=unnamedplus
 
 " Ctrl - z is -> undo instead of stop 
 nnoremap <C-z> :u <CR>==
@@ -251,4 +270,13 @@ inoremap <C-x> <Esc> :q! <CR>==gi
 vnoremap <C-x> <Esc> :q! <CR>==gv
 
 " C-w => Save and quit
-" nnoremap <C-w> :wq<CR>
+" nnoremap <C-w> :wq<CR>   
+
+function! CurrentLineInfo()
+    lua << EOF
+    vim.keymap.set('n', '<Space>', function()
+         local cnt=1
+         return vim.fn.pumvisible() == 1 and "<C-n>" or "<Tab>"
+       end, { expr = true })
+EOF
+endfunction

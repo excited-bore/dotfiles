@@ -5,7 +5,8 @@ URxvt.colorIT:      #87af5f
 URxvt.colorBD:      #d7d7d7
 URxvt.colorUL:      #87afd7
 
-URxvt.keysym.S-Return:     \033[13;2u
-URxvt.keysym.C-Return:     \033[13;5u
-
-*URxvt.translations: #override Shift <Key>BackSpace: backward-kill-word()
+!URxvt.keysym.S-Return:     \033[13;2u
+!URxvt.keysym.C-Return:     \033[13;5u
+!Maps to F33 and F44 respectively
+!URxvt.translations: #override Shift<Key>Return:string("\033[20;5~")
+URxvt.translations: #override Ctrl<Key>BackSpace:string("\033[20;5~")

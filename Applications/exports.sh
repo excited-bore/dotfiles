@@ -1,5 +1,4 @@
 #!/bin/bash
-
 export EMAIL="stan96@duck.com"
 export GITNAME="excited-bore"
 
@@ -17,7 +16,6 @@ export EDITOR="nvim"
 
 export INPUTRC='~/.inputrc'
 export RANGER_LOAD_DEFAULT_RC="~/rc.conf"
-export MYVIMRC=".config/nvim/init.vim"
 
 # Firefox hardware acceleration driver
 export LIBVA_DRIVER_NAME="mesa"
@@ -27,7 +25,8 @@ export TMPDIR=/tmp
 # And check with 'printenv'
 
 # VIM
-export MYVIMRC="~/.config/nvim/init.vim"
+export MYVIMRC=".config/nvim/init.vim"
+export MYGVIMRC=".config/nvim/init.vim"
 
 # EMACS
 export PATH='~/.emacs.d/bin/':$PATH
