@@ -185,10 +185,17 @@ set virtualedit=all
 " register.
 " Normal clipboard functionality for yy, y and d
 set clipboard+=unnamedplus
-"map "0p p
+map +0p p
 
-
-
+nmap <C-c> yy
+nmap <C-v> p
+nmap <C-V> <c-o><Enter>P
+imap <C-c> <Esc>yy<CR>==gi
+imap <C-v> <Esc>p<CR>==gi
+imap <C-V> <Esc>P<CR>==gi
+vmap <C-c> y 
+vmap <C-v> p
+vmap <C-V> P
 
 "Map Shift to visual mode from normal mode
 map <S-Up> <Nop>
@@ -200,10 +207,10 @@ nnoremap <S-Up> v
 nnoremap <S-Down> v  
 nnoremap <S-Left> v
 nnoremap <S-Right> v
-inoremap <S-Up><Esc> v
-inoremap <S-Down><Esc> v
-inoremap <S-Left><Esc> v
-inoremap <S-Right><Esc> v
+inoremap <S-Up> <Esc>v
+inoremap <S-Down> <Esc>v
+inoremap <S-Left> <Esc>v
+inoremap <S-Right> <Esc>v
 vnoremap <S-Up> <Esc> 
 vnoremap <S-Down> <Esc> 
 vnoremap <S-Left> <Esc> 
@@ -219,25 +226,19 @@ vnoremap <S-Right> <Esc>
 "inoremap <S-C-Left> <C-Q>
 "inoremap <S-C-Right> <C-Q>
 
+"map <Esc> 
+"set <f26>=^[OM
+
 " Enter -> newline without entering insert mode
-nnoremap <Enter> i<Enter><esc>
-"Shift Enter -> newline without entering insert mode
-map <Esc>[13;2u <S-Enter>
-nnoremap <S-Enter><C-o>i<Enter><esc>
+nnoremap <Enter> i<Enter><esc>g;
+"Alt Enter -> newline without entering insert mode
+nnoremap <A-Enter> 0i<Enter><esc>g;
 " backspace -> backspace no leave normal mode
 nnoremap <Backspace> i<Backspace><esc>g;
 " Tab => add tab"
 nnoremap <Tab> i<Tab><esc>
-
-nmap <C-c> yy
-"nmap <C-v> p
-nmap <C-V> <c-o><Enter>P
-imap <C-c> <Esc> yy <CR>==gi
-"imap <C-v> <Esc> p <CR>==gi
-imap <C-V> <Esc> P <CR>==gi
-vmap <C-c> y 
-"vmap <C-v> p
-vmap <C-V> P
+" Space => add space"
+nnoremap <Space> i<Space><esc>
 
 " Move lines while holding shift
 " Multiple lines => select in visual mode
@@ -272,11 +273,11 @@ vnoremap <C-x> <Esc> :q! <CR>==gv
 " C-w => Save and quit
 " nnoremap <C-w> :wq<CR>   
 
-function! CurrentLineInfo()
-    lua << EOF
-    vim.keymap.set('n', '<Space>', function()
-         local cnt=1
-         return vim.fn.pumvisible() == 1 and "<C-n>" or "<Tab>"
-       end, { expr = true })
-EOF
-endfunction
+"function! CurrentLineInfo()
+"    lua << EOF
+"    vim.keymap.set('n', '<Space>', function()
+"         local cnt=1
+"         return vim.fn.pumvisible() == 1 and "<C-n>" or "<Tab>"
+"       end, { expr = true })
+"EOF
+"endfunction
