@@ -25,13 +25,22 @@ do
     fi 
 done
 
-read -p "Install init.vim? (neovim conf at ~/.config/nvim/) [Y/n]:" init
+read -p "Install init.vim as user conf? (neovim conf at ~/.config/nvim/) [Y/n]:" init
 if [ -z $init ]; then
-    if [ ! -e ~/ .config/nvim ]; then
-        mkdir -p .config/nvim
+    if [ ! -e ~/.config/nvim ]; then
+        mkdir -p ~/.config/nvim
     fi
     cp -f init.vim ~/.config/nvim/
+
+    read -p "Install init.vim with root symlink? (neovim conf at /root/.config/nvim/) [Y/n]:" root
+    if [ -z $root ]; then
+        if [ ! -e /root/.config/nvim ]; then
+            sudo mkdir -p /root/.config/nvim
+        fi
+        sudo cp -f init.vim /root/.config/nvim/
+    fi
 fi
+
 
 read -p "Install vim.sh at ~/Applications/ (nvim aliases)? [Y/n]:" aliases
 if [ -z $aliases ]; then 

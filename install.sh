@@ -13,6 +13,11 @@ if [ -z $sym3 ] && [ ! -e ~/etc_systemd ]; then
     ln -s /etc/systemd/system/ ~/etc_systemd
 fi
 
+read -p "Create /usr/local/bin (Default script folder) to user directory symlink? [Y/n]:" sym4
+if [ -z $sym4 ] && [ ! -e ~/usr_local_bin ]; then
+    ln -s /usr/local/bin ~/usr_local_bin
+fi 
+
 read -p "Install .Xresources at ~/ ? (xfce4 config) [Y/n]:" Xresources
 if [ -z $Xresources ]; then
     cp -f .Xresources ~/.Xresources
@@ -108,7 +113,7 @@ if [ -z $scripts ]; then
             echo "fi" >> ~/.bashrc
         fi
 
-        read -p "Install git.sh globall at /etc/profile.d/? [Y/n]:" ggit  
+        read -p "Install git.sh globally at /etc/profile.d/? [Y/n]:" ggit  
 
         if [ -z $ggit ]; then 
             sudo ln -s Applications/git.sh /etc/profile.d/

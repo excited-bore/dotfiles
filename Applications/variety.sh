@@ -26,6 +26,11 @@ function vlc_folder(){
     fi;
 }
 
+if [ ! -e "`python -m site --user-site`" ];then
+    mkdir -p "`python -m site --user-site`"
+    ln -s $(python -m site --user-site) ~/python_user_site  
+fi
+
 # Docker
 alias docker_update="docker-compose down && docker-compose pull && docker-compose up &"
 
@@ -36,16 +41,20 @@ alias ds4LOn="ds4drv --led ff0000"
 alias ds4LOff="ds4drv --led 000000"
 alias ds4="python3 -m ds4drv --hidraw --udp --udp-port 26760"
 
+function python_install(){
+    python $@ install --user;
+}
+
+alias copy_to="python $(python -m site --user-site)/copy_to/copy_to.py "
 alias udev_reload="sudo udevadm control --reload-rules && sudo udevadm trigger"
 
 # Wickr
 alias wick="sudo wickrme --no-sandbox"
 
 #Devolo PLC Stuff
-alias systemctl_devolo_startup="doas systemctl start devolonetsvc.service && bash /opt/devolo/dlancockpit/bin/dlancockpit-run.sh"
-alias systemctl_devolo_down="doas systemctl stop devolonetsvc.service"
+alias systemctl_devolo_startup="sudo systemctl start devolonetsvc.service && bash /opt/devolo/dlancockpit/bin/dlancockpit-run.sh"
+alias systemctl_devolo_down="sudo systemctl stop devolonetsvc.service"
 
-alias copy_to="python ~/Applications/copy_to/copy_to_setup.py "
 
 #alias vmOn="sudo virsh net-autostart default && sudo virsh net-start default && sudo mv /etc/modprobe.d/vfio.conf.orig /etc/modprobe.d/vfio.conf && sudo mkinitcpio -p linux515 && reboot"
 #alias vmOff="sudo virsh net-destroy default && sudo mv /etc/modprobe.d/vfio.conf /etc/modprobe.d/vfio.conf.orig && sudo mkinitcpio -p linux515 && reboot"

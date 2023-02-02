@@ -167,6 +167,15 @@ noremap <silent> <C-Right> :<C-U>TmuxNavigateRight<cr>
 " Reload init.vim
 map :r :source $MYVIMRC
 
+map <esc>[1;5A <C-Up>
+map <esc>[1;5B <C-Down>
+map <esc>[1;5C <C-Right>
+map <esc>[1;5D <C-Left>
+imap <ESC>[1;5A <C-Up>
+imap <ESC>[1;5B <C-Down>
+imap <ESC>[1;5C <C-Right>
+imap <ESC>[1;5D <C-Left>
+
 " CTRL-A  N  CTRL-A	add N to the number at or after the cursor
 " CTRL-X  N  CTRL-X	subtract N from the number at or after the cursor
 " mapping them to + And  - 
@@ -185,17 +194,28 @@ set virtualedit=all
 " register.
 " Normal clipboard functionality for yy, y and d
 set clipboard+=unnamedplus
-map +0p p
 
+"Yank register, no deleted info in paste buffer
+map +0p p
+map "0p P
+
+map +0d d
+map "0d D
+
+nmap <C-c> <Nop> 
+nmap <C-v> <Nop>
+nmap <C-V> <Nop>
+
+" F9 => Paste/nopaste toggle by neovim
 nmap <C-c> yy
-nmap <C-v> p
-nmap <C-V> <c-o><Enter>P
-imap <C-c> <Esc>yy<CR>==gi
-imap <C-v> <Esc>p<CR>==gi
-imap <C-V> <Esc>P<CR>==gi
+nmap <C-v> p        
+nmap <C-V> :set paste<CR>p:set nopaste<CR>
+imap <C-c> <esc>yy<CR>==gi
+imap <C-v> <esc>p<CR>==gi
+imap <C-V> <esc>:set paste<CR>p:set nopaste<CR>==gi 
 vmap <C-c> y 
 vmap <C-v> p
-vmap <C-V> P
+vmap <C-V> :set paste<CR>p:set nopaste<CR>==gv
 
 "Map Shift to visual mode from normal mode
 map <S-Up> <Nop>
@@ -256,19 +276,19 @@ vnoremap <S-M-Up> :m '<-2<CR>gv=gv
 " nnoremap <Leader>O O<Esc>0"_D
 
 " Ctrl - z is -> undo instead of stop 
-nnoremap <C-z> :u <CR>==
-vnoremap <C-z> <Esc> :u <CR>==gv 
-inoremap <C-z> <Esc> :u <CR>==gi
+nnoremap <C-z> :u<CR>==
+vnoremap <C-z> <Esc>:u<CR>==gv 
+inoremap <C-z> <Esc>:u<CR>==gi
 
 " C-s => Save
-nnoremap <C-s> :write! <CR>==
-inoremap <C-s> <Esc> :write! <CR>==gi
-vnoremap <C-s> <Esc> :write! <CR>==gv
+nnoremap <C-s> :write!<CR>
+inoremap <C-s> <Esc>:write!<CR>i
+vnoremap <C-s> <Esc>:write!<CR>v
 
 " C-x => Quit
-nnoremap <C-x> :q! <Enter>
-inoremap <C-x> <Esc> :q! <CR>==gi
-vnoremap <C-x> <Esc> :q! <CR>==gv
+nnoremap <C-x> :q!<Enter>
+inoremap <C-x> <Esc>:q!<CR>==gi
+vnoremap <C-x> <Esc>:q!<CR>==gv
 
 " C-w => Save and quit
 " nnoremap <C-w> :wq<CR>   
