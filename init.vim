@@ -193,10 +193,15 @@ set virtualedit=all
 " Normal clipboard functionality for yy, y and d
 set clipboard+=unnamedplus
 
-nnoremap y "+y
-nnoremap yy "+0yg_
-nnoremap Y "+Y
-nnoremap YY "+0Yg_
+nnoremap c "+y
+nnoremap cc "+0yg_
+nnoremap C "+Y
+nnoremap CC "+0Yg_
+
+nnoremap y c
+nnoremap yy cc
+nnoremap Y C
+nnoremap YY CC
 
 nnoremap x "+x
 nnoremap X "+X
@@ -220,14 +225,6 @@ vnoremap <C-c> y
 vnoremap <C-v> p 
 vnoremap <C-x> x 
 
-"nmap <C-c> <Nop> 
-"nmap <C-v> <Nop>
-
-"Map Shift to visual mode from normal mode
-"map <S-Up> <Nop>
-"map <S-Down> <Nop>
-"map <S-Left> <Nop>
-"map <S-Right> <Nop>
 
 nnoremap <M-Up> v<Up>  
 nnoremap <M-Down> v<Down>  
@@ -242,20 +239,9 @@ vnoremap <M-Down> <Esc><Down>
 vnoremap <M-Left> <Esc><Left> 
 vnoremap <M-Right> <Esc><Right> 
                               
-" Few ways to remap both ctrl-v and ctrl-q
-"nnoremap <S-C-Up><C-Q>   
-"nnoremap <S-C-Down><C-Q>  
-"nnoremap <S-C-Left><C-Q>
-"nnoremap <S-C-Right><C-Q>
-"inoremap <S-C-Up><C-Q>
-"inoremap <S-C-Down><C-Q>
-"inoremap <S-C-Left> <C-Q>
-"inoremap <S-C-Right> <C-Q>
-
 "Escape Won't ask for motion
-"map <Esc> <Esc><Left>
+"map <Esc> <Esc>
 "set <f26>=^[OM
-
 
 " Enter -> newline without entering insert mode
 nnoremap <Enter> i<Enter><Esc>g;
@@ -276,12 +262,6 @@ inoremap <S-M-Down> <Esc>:m .+1<CR>==gi
 inoremap <S-M-Up> <Esc>:m .-2<CR>==gi
 vnoremap <S-M-Down> :m '>+1<CR>gv=gv
 vnoremap <S-M-Up> :m '<-2<CR>gv=gv
-
-" Ctrl-o is mapped to nth older iposition in jump list
-" Ctrl-i is mapped to nth newer position in jump list
-" Quickly insert an empty new line without entering insert modef
-" nnoremap <Leader>o o<Esc>0"_D
-" nnoremap <Leader>O O<Esc>0"_D
 
 " Ctrl - z is -> undo instead of stop 
 nnoremap <C-z> u
