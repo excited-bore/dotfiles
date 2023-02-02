@@ -211,11 +211,11 @@ nnoremap DD "*DD
 
 " F9 => Paste/nopaste toggle by neovim
 nnoremap <C-c> yy
-nnoremap <C-v> P
-nnoremap <C-x> Vx
-inoremap <C-c> <Esc>yyi
-inoremap <C-v> <Esc>Pi
-inoremap <C-x> <Esc>Jcc
+nnoremap <C-v> Pg;
+nnoremap <C-x> Vxg;
+inoremap <C-c> <Right><Esc>yg_i
+inoremap <C-v> <Esc>pg;i
+inoremap <C-x> <Right><Esc>C
 vnoremap <C-c> y 
 vnoremap <C-v> p 
 vnoremap <C-x> x 
@@ -258,15 +258,15 @@ vnoremap <M-Right> <Esc><Right>
 
 
 " Enter -> newline without entering insert mode
-nnoremap <Enter> i<Enter><esc>g;
+nnoremap <Enter> i<Enter><Esc>g;
 "Alt Enter -> newline without entering insert mode
-nnoremap <A-Enter> 0i<Enter><esc>g;
+nnoremap <A-Enter> 0i<Enter><Esc>g;
 " backspace -> backspace no leave normal mode
-nnoremap <Backspace> i<Backspace><esc>g;
+nnoremap <Backspace> i<Backspace><Esc>g;
 " Tab => add tab"
-nnoremap <Tab> i<Tab><esc>g;
+nnoremap <Tab> i<Tab><Esc>g;
 " Space => add space"
-nnoremap <Space> i<Space><esc>g;
+nnoremap <Space> i<Space><Esc>g;
 
 " Move lines while holding shift
 " Multiple lines => select in visual mode
@@ -285,7 +285,7 @@ vnoremap <S-M-Up> :m '<-2<CR>gv=gv
 
 " Ctrl - z is -> undo instead of stop 
 nnoremap <C-z> u
-inoremap <C-z> <Esc>u<CR>==gi
+inoremap <C-z> <Esc>ui
 vnoremap <C-z> u 
 
 " C-s => Save
