@@ -21,9 +21,8 @@ set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 
 " let Vundle manage Vundle, required
-Plugin 'VundleVim/Vundle.vim'
 
-"Autocompletion plugin from git
+" plugin from git
 Plugin 'ycm-core/YouCompleteMe'
 
 "Git plugin, ironically also from git
@@ -214,13 +213,15 @@ nnoremap dd "*dd
 nnoremap D  "*D
 nnoremap DD "*DD
 
-" F9 => Paste/nopaste toggle by neovim
+" Normal mode => whole line
+" Insert mode => word
+" visual => by selection
 nnoremap <C-c> yy
 nnoremap <C-v> Pg;
 nnoremap <C-x> Vxg;
-inoremap <C-c> <Right><Esc>yg_i
-inoremap <C-v> <Esc>pg;i
-inoremap <C-x> <Right><Esc>C
+inoremap <C-c> <Esc>yiwa
+" Paste with P if at beginning of line
+inoremap <expr> <C-v> (col(".") ==? 1 ? "<Esc>Pg;a" : "<Esc>pg;a")
 vnoremap <C-c> y 
 vnoremap <C-v> p 
 vnoremap <C-x> x 
@@ -265,7 +266,7 @@ vnoremap <S-M-Up> :m '<-2<CR>gv=gv
 
 " Ctrl - z is -> undo instead of stop 
 nnoremap <C-z> u
-inoremap <C-z> <Esc>ui
+inoremap <C-z> <Esc>ua
 vnoremap <C-z> u 
 
 " C-s => Save
