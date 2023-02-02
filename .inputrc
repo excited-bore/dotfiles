@@ -83,18 +83,23 @@ set menu-complete-display-prefix On
 "\C-d": redraw-current-line
 
 # \015 represents the enter key
-"\C-l": "\C-U clear && tput cup $(tput lines) 0 && ls \015" 
+"\C-l": "\C-U clear && tput cup $(tput lines) 0 && ls && history -d -1 \015" 
 
 # Undo to Ctrl+Z (unbound in tty) instead of only on Ctrl+_
 "\C-z": vi-undo
 
 set comment-begin #
 #https://stackoverflow.com/questions/67535351/how-to-provide-arguments-to-readline-functions-via-inputrc
-# Insert as comment 
+# Insert as comment (also on alt+#)
 "\C-b": insert-comment 1
 "\C-n": "\C-a\e[3~"  
-
-# Control backspace
+ 
+# Proper copy
+# https://askubuntu.com/questions/302263/selecting-text-in-the-terminal-without-using-the-mouse
+#"\C-c": yank
+"\C-c": "\C-u echo \C-y | xclip -i -sel c && history -d 1 && tput cuu1  \C-m\C-y"
+ 
+# Control backspace kill word
 "\C-h": backward-kill-word
 
 # Keep command without clearing it when pressing Enter

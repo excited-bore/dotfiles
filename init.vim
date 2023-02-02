@@ -1,11 +1,9 @@
 ":colorscheme evening
 :highlight Visual cterm=reverse ctermbg=NONE
 " These options and commands enable some very useful features in Vim, that
-" no user should have to live without.
 
 " Set 'nocompatible' to ward off unexpected things that your distro might
 " have made, as well as sanely reset options when re-sourcing .vimrc
-set nocompatible
 
 " Attempt to determine the type of a file based on its name and possibly its
 " contents. Use this to allow intelligent auto-indenting for each filetype,
@@ -167,14 +165,14 @@ noremap <silent> <C-Right> :<C-U>TmuxNavigateRight<cr>
 " Reload init.vim
 map :r :source $MYVIMRC
 
-map <esc>[1;5A <C-Up>
-map <esc>[1;5B <C-Down>
-map <esc>[1;5C <C-Right>
-map <esc>[1;5D <C-Left>
-imap <ESC>[1;5A <C-Up>
-imap <ESC>[1;5B <C-Down>
-imap <ESC>[1;5C <C-Right>
-imap <ESC>[1;5D <C-Left>
+"map <esc>[1;5A <C-Up>
+"map <esc>[1;5B <C-Down>
+"map <esc>[1;5C <C-Right>
+"map <esc>[1;5D <C-Left>
+"imap <ESC>[1;5A <C-Up>
+"imap <ESC>[1;5B <C-Down>
+"imap <ESC>[1;5C <C-Right>
+"imap <ESC>[1;5D <C-Left>
 
 " CTRL-A  N  CTRL-A	add N to the number at or after the cursor
 " CTRL-X  N  CTRL-X	subtract N from the number at or after the cursor
@@ -195,46 +193,54 @@ set virtualedit=all
 " Normal clipboard functionality for yy, y and d
 set clipboard+=unnamedplus
 
-"Yank register, no deleted info in paste buffer
-map +0p p
-map "0p P
+nnoremap y "+y
+nnoremap yy "+0yg_
+nnoremap Y "+Y
+nnoremap YY "+0Yg_
 
-map +0d d
-map "0d D
+nnoremap x "+x
+nnoremap X "+X
 
-nmap <C-c> <Nop> 
-nmap <C-v> <Nop>
-nmap <C-V> <Nop>
+nnoremap p :set paste<CR>"+p:set nopaste<CR>
+nnoremap P :set paste<CR>"+P:set nopaste<CR> 
+
+nnoremap d  "*d 
+nnoremap dd "*dd
+nnoremap D  "*D
+nnoremap DD "*DD
 
 " F9 => Paste/nopaste toggle by neovim
-nmap <C-c> yy
-nmap <C-v> p        
-nmap <C-V> :set paste<CR>p:set nopaste<CR>
-imap <C-c> <esc>yy<CR>==gi
-imap <C-v> <esc>p<CR>==gi
-imap <C-V> <esc>:set paste<CR>p:set nopaste<CR>==gi 
-vmap <C-c> y 
-vmap <C-v> p
-vmap <C-V> :set paste<CR>p:set nopaste<CR>==gv
+nnoremap <C-c> yy
+nnoremap <C-v> P
+nnoremap <C-x> Vx
+inoremap <C-c> <Esc>yyi
+inoremap <C-v> <Esc>Pi
+inoremap <C-x> <Esc>Jcc
+vnoremap <C-c> y 
+vnoremap <C-v> p 
+vnoremap <C-x> x 
+
+"nmap <C-c> <Nop> 
+"nmap <C-v> <Nop>
 
 "Map Shift to visual mode from normal mode
-map <S-Up> <Nop>
-map <S-Down> <Nop>
-map <S-Left> <Nop>
-map <S-Right> <Nop>
+"map <S-Up> <Nop>
+"map <S-Down> <Nop>
+"map <S-Left> <Nop>
+"map <S-Right> <Nop>
 
-nnoremap <S-Up> v   
-nnoremap <S-Down> v  
-nnoremap <S-Left> v
-nnoremap <S-Right> v
-inoremap <S-Up> <Esc>v
-inoremap <S-Down> <Esc>v
-inoremap <S-Left> <Esc>v
-inoremap <S-Right> <Esc>v
-vnoremap <S-Up> <Esc> 
-vnoremap <S-Down> <Esc> 
-vnoremap <S-Left> <Esc> 
-vnoremap <S-Right> <Esc> 
+nnoremap <M-Up> v<Up>  
+nnoremap <M-Down> v<Down>  
+nnoremap <M-Left> v<Left>
+nnoremap <M-Right> v<Right>
+inoremap <M-Up> <Esc>v<Up>
+inoremap <M-Down> <Esc>v<Down>
+inoremap <M-Left> <Esc>v<Left>
+inoremap <M-Right> <Esc>v<Right>
+vnoremap <M-Up> <Esc><Up>
+vnoremap <M-Down> <Esc><Down> 
+vnoremap <M-Left> <Esc><Left> 
+vnoremap <M-Right> <Esc><Right> 
                               
 " Few ways to remap both ctrl-v and ctrl-q
 "nnoremap <S-C-Up><C-Q>   
@@ -246,8 +252,10 @@ vnoremap <S-Right> <Esc>
 "inoremap <S-C-Left> <C-Q>
 "inoremap <S-C-Right> <C-Q>
 
-"map <Esc> 
+"Escape Won't ask for motion
+"map <Esc> <Esc><Left>
 "set <f26>=^[OM
+
 
 " Enter -> newline without entering insert mode
 nnoremap <Enter> i<Enter><esc>g;
@@ -256,9 +264,9 @@ nnoremap <A-Enter> 0i<Enter><esc>g;
 " backspace -> backspace no leave normal mode
 nnoremap <Backspace> i<Backspace><esc>g;
 " Tab => add tab"
-nnoremap <Tab> i<Tab><esc>
+nnoremap <Tab> i<Tab><esc>g;
 " Space => add space"
-nnoremap <Space> i<Space><esc>
+nnoremap <Space> i<Space><esc>g;
 
 " Move lines while holding shift
 " Multiple lines => select in visual mode
@@ -276,19 +284,24 @@ vnoremap <S-M-Up> :m '<-2<CR>gv=gv
 " nnoremap <Leader>O O<Esc>0"_D
 
 " Ctrl - z is -> undo instead of stop 
-nnoremap <C-z> :u<CR>==
-vnoremap <C-z> <Esc>:u<CR>==gv 
-inoremap <C-z> <Esc>:u<CR>==gi
+nnoremap <C-z> u
+inoremap <C-z> <Esc>u<CR>==gi
+vnoremap <C-z> u 
 
 " C-s => Save
 nnoremap <C-s> :write!<CR>
-inoremap <C-s> <Esc>:write!<CR>i
-vnoremap <C-s> <Esc>:write!<CR>v
+inoremap <C-s> <Esc>:write!<CR>==gi
+vnoremap <C-s> <Esc>:write!<CR>==gv
 
-" C-x => Quit
-nnoremap <C-x> :q!<Enter>
-inoremap <C-x> <Esc>:q!<CR>==gi
-vnoremap <C-x> <Esc>:q!<CR>==gv
+"Ctrl-a => Ctrl-a
+nnoremap <C-a> <C-q>
+inoremap <C-a> <esc><C-q>
+vnoremap <C-a> <C-q>
+
+" C-q => Quit
+nnoremap <C-q> :q!<Enter>
+inoremap <C-q> <Esc>:q!<CR>==gi
+vnoremap <C-q> <Esc>:q!<CR>==gv
 
 " C-w => Save and quit
 " nnoremap <C-w> :wq<CR>   

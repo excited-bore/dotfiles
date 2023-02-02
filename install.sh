@@ -54,7 +54,7 @@ if [ -z $scripts ]; then
             echo "fi" >> ~/.bashrc
         fi
 
-        read -p "Install bindings.sh globally at /etc/profile.d/ ? [Y/n]:" galiases  
+        read -p "Install bindings.sh softlinked at /etc/profile.d/ ? [Y/n]:" galiases  
         if [ -z $galiases ]; then 
             sudo ln -s Applications/bindings.sh /etc/profile.d/
         fi
@@ -68,7 +68,7 @@ if [ -z $scripts ]; then
             echo "  . ~/Applications/general.sh" >> ~/.bashrc
             echo "fi" >> ~/.bashrc
         fi
-        read -p "Install general.sh globally at /etc/profile.d/? [Y/n]:" ggeneral  
+        read -p "Install general.sh softlinked at /etc/profile.d/? [Y/n]:" ggeneral  
         if [ -z $ggeneral ]; then 
             sudo ln -s Applications/general.sh /etc/profile.d/
         fi
@@ -82,7 +82,7 @@ if [ -z $scripts ]; then
             echo "  . ~/Applications/exports.sh" >> ~/.bashrc
             echo "fi" >> ~/.bashrc
         fi
-        read -p "Install exports.sh globally at /etc/profile.d/? [Y/n]:" gexports  
+        read -p "Install exports.sh softlinked at /etc/profile.d/? [Y/n]:" gexports  
         if [ -z $gexports ]; then 
             sudo ln -s Applications/exports.sh /etc/profile.d/
         fi
@@ -96,7 +96,7 @@ if [ -z $scripts ]; then
             echo "  . ~/Applications/systemctl.sh" >> ~/.bashrc
             echo "fi" >> ~/.bashrc
         fi
-        read -p "Install systemctl.sh globally at /etc/profile.d/? [Y/n]:" gsystemctl  
+        read -p "Install systemctl.sh softlinked at /etc/profile.d/? [Y/n]:" gsystemctl  
         if [ -z $gsystemctl ]; then 
             sudo ln -s Applications/systemctl.sh /etc/profile.d/
         fi
@@ -113,7 +113,7 @@ if [ -z $scripts ]; then
             echo "fi" >> ~/.bashrc
         fi
 
-        read -p "Install git.sh globally at /etc/profile.d/? [Y/n]:" ggit  
+        read -p "Install git.sh softlinked at /etc/profile.d/? [Y/n]:" ggit  
 
         if [ -z $ggit ]; then 
             sudo ln -s Applications/git.sh /etc/profile.d/
@@ -131,7 +131,7 @@ if [ -z $scripts ]; then
         echo "fi" >> ~/.bashrc
         fi
 
-        read -p "Install ssh.sh globally at /etc/profile.d/ ? [Y/n]:" gssh  
+        read -p "Install ssh.sh softlinked at /etc/profile.d/ ? [Y/n]:" gssh  
 
         if [ -z $gssh ]; then 
             sudo ln -s Applications/ssh.sh /etc/profile.d/
@@ -149,7 +149,7 @@ if [ -z $scripts ]; then
             echo "fi" >> ~/.bashrc
         fi
 
-        read -p "Install package_managers.sh globally at /etc/profile.d/ ? [Y/n]:" gpackmang  
+        read -p "Install package_managers.sh softlinked at /etc/profile.d/ ? [Y/n]:" gpackmang  
 
         if [ -z $gpackmang ]; then 
             sudo ln -s Applications/package_managers.sh /etc/profile.d/
@@ -167,7 +167,7 @@ if [ -z $scripts ]; then
             echo "fi" >> ~/.bashrc
         fi
 
-        read -p "Install manjaro.sh globally at /etc/profile.d/ ? [Y/n]:" gmanjaro 
+        read -p "Install manjaro.sh softlinked at /etc/profile.d/ ? [Y/n]:" gmanjaro 
         if [ -z $gmanjaro ]; then 
             sudo ln -s Applications/manjaro.sh /etc/profile.d/
         fi
@@ -184,7 +184,7 @@ if [ -z $scripts ]; then
             echo "fi" >> ~/.bashrc
         fi
 
-        read -p "Install youtube.sh globally at /etc/profile.d/ ? [Y/n]:" gyoutube
+        read -p "Install youtube.sh softlinked at /etc/profile.d/ ? [Y/n]:" gyoutube
 
         if [ -z $gyoutube ]; then 
             sudo ln -s Applications/youtube.sh /etc/profile.d/
@@ -203,7 +203,7 @@ if [ -z $scripts ]; then
             echo "fi" >> ~/.bashrc
         fi
 
-        read -p "Install variety.sh globally? at /etc/profile.d/ [Y/n]:" gvariety
+        read -p "Install variety.sh softlinked at /etc/profile.d/ [Y/n]:" gvariety
 
         if [ -z $gvariety ]; then 
             sudo ln -s Applications/variety.sh /etc/profile.d/
