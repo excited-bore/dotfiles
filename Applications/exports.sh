@@ -3,6 +3,7 @@ export EMAIL="stan96@duck.com"
 export GITNAME="excited-bore"
 
 # If installed will give manuals a color scheme
+#export PS1=$PS1:'$(whoami)@$(hostname):$(pwd) '
 export PAGER="most"
 export SYSTEMD_PAGER=$PAGER
 # export SYSTEMD_LESS="FRXMK"
