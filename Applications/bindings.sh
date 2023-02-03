@@ -1,6 +1,10 @@
 # Bash_aliases
 # global bashrc -> /etc/bash.bashrc
 # global shell profiles -> /etc/profile
+# Other bindings at .inputrc
+
+alias sttyBinds="stty -a"
+alias readlineBinds="bind -p | less"
 
 # Install bindings from xterm
  xrdb merge ~/.Xresources
@@ -19,18 +23,22 @@ xmodmap -e "keycode 119 = Delete BackSpace"
 # ^ control
 #stty werase '[3;2~'
 
-# unbinds ctrl-c and bind the function to ctrl-x
-stty intr '^x'
+# unbinds ctrl-c and bind the function to ctrl-q
+stty intr '^q'
 
-# Turn off flow control
+# Turn off flow control and free up Ctr-s 
 stty -ixon
 stty -ixoff
 stty start 'undef' 
 stty stop 'undef'
+stty lnext '^'
 
 #Free up Ctrl-z
 stty susp 'undef'
-#stty 'eol' 'home'
+
+#bind -x '"\C-o": accept-line' 
+#bind -x '"\C-m": "\C-o tput cup $(stty size|awk '{print int($1/2);}') 0 && tput cuu1 && tput el && history -d -1 \C-o"'
+#bind -x 
 
 # python virtual env
 #python3 -m venv python3

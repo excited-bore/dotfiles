@@ -37,8 +37,7 @@ alias w="cd -"
 alias w="clear ;b; ls -a"
 alias x="cd .."
 alias men="man man"
-alias bashBinds="bind -p | less"
-alias sttyBinds="stty -a"
+
 alias GPU_list_drivers="inxi -G"
 
 

@@ -1,3 +1,4 @@
+
 # Bash config
 # https://www.topbug.net/blog/2017/07/31/inputrc-for-humans/
 # This line carries over site-wide readline configuration to the user configuration. Usually /etc/inputrc includes some goodies.
@@ -27,6 +28,10 @@ set bell-style none
 
 # No echoing of f.ex. ^C after pressing keys
 set echo-control-characters off
+
+#Prevent altering history command when reusing it
+#https://superuser.com/questions/302230/how-to-prevent-bash-from-altering-history
+set revert-all-at-newline on
 
 #This line sets 3 to be the maximum number of characters to be the common prefix to display for completions. 
 #If the common prefix has more than 3 characters, they are replaced by ellipsis. For example, assume we are in a directory with files Screenshot_20170730.png and Screenshot_20170731.png. 
@@ -82,28 +87,38 @@ set menu-complete-display-prefix On
 "\C-j": redraw-current-line
 "\C-d": redraw-current-line
 
+"\C-x": "cd .."
+
+"\C-m": accept-line
+
 # \015 represents the enter key
-"\C-l": "\C-U clear && tput cup $(tput lines) 0 && ls && history -d -1 \015" 
+"\C-l": "\C-u\C-e clear && r && tput cup $(stty size | awk '{print int($1/2);}') 0 && tput cuu1 && tput ed && ls && history -d -1 \C-m" 
+
+#"\C-m": "\C-o"
+"\C-o": "\C-l\C-m"
 
 # Undo to Ctrl+Z (unbound in tty) instead of only on Ctrl+_
 "\C-z": vi-undo
 
 set comment-begin #
-#https://stackoverflow.com/questions/67535351/how-to-provide-arguments-to-readline-functions-via-inputrc
+# https://stackoverflow.com/questions/67535351/how-to-provide-arguments-to-readline-functions-via-inputrc
+
 # Insert as comment (also on alt+#)
 "\C-b": insert-comment 1
 "\C-n": "\C-a\e[3~"  
  
 # Proper copy
 # https://askubuntu.com/questions/302263/selecting-text-in-the-terminal-without-using-the-mouse
-#"\C-c": yank
-"\C-c": "\C-u echo \C-y | xclip -i -sel c && history -d 1 && tput cuu1  \C-m\C-y"
- 
+#"\C-c": copy to clipboard
+"\C-c": "\C-u\C-e echo \C-y | xclip -i -sel c && tput cuu1 && tput el && history -d -1 \C-m\C-y"
+
+#"\C-v": paste from clipboard
+# This is what you would call an 'uuuuggglllllyyyy' hack
+#"\ey": _xyank'
+"\C-v": "\C-u\C-e tput cuu1 && tput el && xdotool type --clearmodifiers --delay 25 $(xclip -o -sel clip) && history -d -1 \C-m" 
+
 # Control backspace kill word
 "\C-h": backward-kill-word
-
-# Keep command without clearing it when pressing Enter
-# "\e[20;5" : "\C-o"
 
 # Control left/right to jump from words instead of chars
 "\e[1;5D": backward-word
