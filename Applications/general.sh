@@ -31,13 +31,15 @@ alias mkdir="mkdir -pv"
 alias lsall="ls -Al"
 alias less="less -X"
 # Cant source .inputrc in any way though
-alias r=". ~/.bashrc"
 alias q="exit"
 alias w="cd -"
 alias w="clear ;b; ls -a"
 alias x="cd .."
 alias men="man man"
 
+alias unzip="unzip"
+alias untar_gz="tar -xvf"
+alias tar_gz_list="tar -tvf"
 alias GPU_list_drivers="inxi -G"
 
 

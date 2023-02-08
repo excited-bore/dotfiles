@@ -1,4 +1,6 @@
 #!/bin/bash
+
+# For git
 export EMAIL="stan96@duck.com"
 export GITNAME="excited-bore"
 
@@ -8,12 +10,13 @@ export PAGER="most"
 export SYSTEMD_PAGER=$PAGER
 # export SYSTEMD_LESS="FRXMK"
 
-#Don't use 
+#Don't use or do this 
 #export TERM=vt100
-
+ 
+export LC_ALL=en_US.UTF-8
 #export DISPLAY=":0.0"
-export VISUAL="nvim"
 export EDITOR="nvim"
+export VISUAL="/usr/bin/code --unity-launch %F"
 
 export INPUTRC='~/.inputrc'
 export RANGER_LOAD_DEFAULT_RC="~/rc.conf"
@@ -34,12 +37,15 @@ export PATH='~/.emacs.d/bin/':$PATH
 
 # PYTHON
 export PYTHONPATH='/usr/bin/python:/usr/bin/python3:/usr/bin/python3.10'
-export PATH=$PATH:$PYTHONPATH
+export PATH=$PYTHONPATH:$PATH
 export PYTHON_ARGCOMPLETE_OK="True"
 # JAVA
 # For arch: Also changeable with 'archlinux-java'
-export JAVA_HOME=/usr/lib/jvm/java-8-openjdk
-export PATH=$JAVA_HOME/bin:$PATH
+export JAVA_HOME='/usr/lib/jvm/java-17-openjdk/bin'
+export PATH=$JAVA_HOME:$PATH
+
+# LUA
+export LUA_PATH=""
 
 # GO
 export PATH='/usr/local/go/bin:/usr/bin/go:/usr/lib/go:/usr/share/go':$PATH

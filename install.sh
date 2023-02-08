@@ -43,58 +43,59 @@ if [ -z $scripts ]; then
         mkdir ~/Applications
     fi
 
-    read -p "Install bindings.sh at ~/Applications/ (bash keybindings)? [Y/n]:" aliases
+    read -p "Install shell_bindings.sh at /etc/X11/xinit/xinitrc.d/ (bash keybindings)? [Y/n]:" aliases
     if [ -z $aliases ]; then 
+        
+        chmod u+x Applications/shell_bindings.sh
+        cp -f Applications/shell_bindings.sh /etc/X11/xinit/xinitrc.d/ 
+        #if ! grep -q shell_bindings.sh ~/.bashrc; then
 
-        cp -f Applications/bindings.sh ~/Applications/
-        if ! grep -q bindings.sh ~/.bashrc; then
+            #echo "if [[ -f ~/Applications/shell_bindings.sh ]]; then" >> ~/.bashrc
+            #echo "  . ~/Applications/shell_bindings.sh" >> ~/.bashrc
+            #echo "fi" >> ~/.bashrc
+        #fi
 
-            echo "if [[ -f ~/Applications/bindings.sh ]]; then" >> ~/.bashrc
-            echo "  . ~/Applications/bindings.sh" >> ~/.bashrc
-            echo "fi" >> ~/.bashrc
-        fi
-
-        read -p "Install bindings.sh softlinked at /etc/profile.d/ ? [Y/n]:" galiases  
+        read -p "Install shell_bindings.sh softlinked at /etc/profile.d/ ? [Y/n]:" galiases  
         if [ -z $galiases ]; then 
-            sudo ln -s Applications/bindings.sh /etc/profile.d/
+            sudo ln -s /etc/X11/xinit/xinitrc/shell_bindings.sh /etc/profile.d/
         fi
     fi
 
-    read -p "Install general.sh at ~/Applications/ (bash general commands aliases)? [Y/n]:" general
+    read -p "Install general.sh at /etc/X11/xinit/xinitrc.d/ (bash general commands aliases)? [Y/n]:" general
     if [ -z $general ]; then 
-        cp -f Applications/general.sh ~/Applications/
-        if ! grep -q general.sh ~/.bashrc; then
-            echo "if [[ -f ~/Applications/general.sh ]]; then" >> ~/.bashrc
-            echo "  . ~/Applications/general.sh" >> ~/.bashrc
-            echo "fi" >> ~/.bashrc
-        fi
+        cp -f Applications/general.sh /etc/X11/xinit/xinitrc.d/
+        #if ! grep -q general.sh ~/.bashrc; then
+        #    echo "if [[ -f ~/Applications/general.sh ]]; then" >> ~/.bashrc
+        #    echo "  . ~/Applications/general.sh" >> ~/.bashrc
+        #    echo "fi" >> ~/.bashrc
+        #fi
         read -p "Install general.sh softlinked at /etc/profile.d/? [Y/n]:" ggeneral  
         if [ -z $ggeneral ]; then 
-            sudo ln -s Applications/general.sh /etc/profile.d/
+            sudo ln -s /etc/X11/xinit/xinitrc.d/general.sh /etc/profile.d/
         fi
     fi
 
-    read -p "Install exports.sh at ~/Applications/ (environment variables)? [Y/n]:" exports
+    read -p "Install exports.sh at /etc/X11/xinit/xinitrc.d/ (environment variables)? [Y/n]:" exports
         if [ -z $exports ]; then 
-        cp -f Applications/exports.sh ~/Applications/
-        if ! grep -q exports.sh ~/.bashrc; then
-            echo "if [[ -f ~/Applications/exports.sh ]]; then" >> ~/.bashrc
-            echo "  . ~/Applications/exports.sh" >> ~/.bashrc
-            echo "fi" >> ~/.bashrc
-        fi
+        cp -f Applications/exports.sh /etc/X11/xinit/xinitrc.d/
+        #if ! grep -q exports.sh ~/.bashrc; then
+        #    echo "if [[ -f ~/Applications/exports.sh ]]; then" >> ~/.bashrc
+        #    echo "  . ~/Applications/exports.sh" >> ~/.bashrc
+        #    echo "fi" >> ~/.bashrc
+        #fi
         read -p "Install exports.sh softlinked at /etc/profile.d/? [Y/n]:" gexports  
         if [ -z $gexports ]; then 
-            sudo ln -s Applications/exports.sh /etc/profile.d/
+            sudo ln -s /etc/X11/xinit/xinitrc.d/exports.sh /etc/profile.d/
         fi
     fi
 
-    read -p "Install systemctl.sh? ~/Applications/ (systemctl aliases/functions)? [Y/n]:" systemctl
+    read -p "Install systemctl.sh? /etc/X11/xinit/xinitrc.d/ (systemctl aliases/functions)? [Y/n]:" systemctl
     if [ -z $systemctl ]; then 
-        cp -f Applications/systemctl.sh ~/Applications/
+        cp -f Applications/systemctl.sh /etc/X11/xinit/xinitrc.d/
         if ! grep -q systemctl.sh ~/.bashrc; then
-            echo "if [[ -f ~/Applications/systemctl.sh ]]; then" >> ~/.bashrc
-            echo "  . ~/Applications/systemctl.sh" >> ~/.bashrc
-            echo "fi" >> ~/.bashrc
+           # echo "if [[ -f ~/Applications/systemctl.sh ]]; then" >> ~/.bashrc
+           # echo "  . ~/Applications/systemctl.sh" >> ~/.bashrc
+           # echo "fi" >> ~/.bashrc
         fi
         read -p "Install systemctl.sh softlinked at /etc/profile.d/? [Y/n]:" gsystemctl  
         if [ -z $gsystemctl ]; then 
@@ -102,16 +103,16 @@ if [ -z $scripts ]; then
         fi
     fi
 
-    read -p "Install git.sh at ~/Applications (git aliases)? [Y/n]:" gitsh
+    read -p "Install git.sh at /etc/X11/xinit/xinitrc.d (git aliases)? [Y/n]:" gitsh
     if [ -z $gitsh ]; then 
 
-        cp -f Applications/git.sh ~/Applications/
+        cp -f Applications/git.sh /etc/X11/xinit/xinitrc.d/
 
-        if ! grep -q git.sh ~/.bashrc; then
-            echo "if [[ -f ~/Applications/git.sh ]]; then" >> ~/.bashrc
-            echo "  . ~/Applications/git.sh" >> ~/.bashrc
-            echo "fi" >> ~/.bashrc
-        fi
+        #if ! grep -q git.sh ~/.bashrc; then
+        #    echo "if [[ -f /etc/X11/xinit/xinitrc.d/git.sh ]]; then" >> ~/.bashrc
+        #    echo "  . /etc/X11/xinit/xinitrc.d/git.sh" >> ~/.bashrc
+        #    echo "fi" >> ~/.bashrc
+        #fi
 
         read -p "Install git.sh softlinked at /etc/profile.d/? [Y/n]:" ggit  
 
@@ -120,16 +121,16 @@ if [ -z $scripts ]; then
         fi
     fi
 
-    read -p "Install ssh.sh at ~/Applications (ssh related aliases)? [Y/n]:" sshsh
+    read -p "Install ssh.sh at /etc/X11/xinit/xinitrc.d (ssh related aliases)? [Y/n]:" sshsh
     if [ -z $sshsh ]; then 
 
-        cp -f Applications/ssh.sh ~/Applications/
+        cp -f Applications/ssh.sh /etc/X11/xinit/xinitrc.d/
 
-        if ! grep -q ssh.sh ~/.bashrc; then
-        echo "if [[ -f ~/Applications/ssh.sh ]]; then" >> ~/.bashrc
-        echo "  . ~/Applications/ssh.sh" >> ~/.bashrc
-        echo "fi" >> ~/.bashrc
-        fi
+        #if ! grep -q ssh.sh ~/.bashrc; then
+        #    echo "if [[ -f /etc/X11/xinit/xinitrc.d/ssh.sh ]]; then" >> ~/.bashrc
+        #    echo "  . /etc/X11/xinit/xinitrc.d/ssh.sh" >> ~/.bashrc
+        #    echo "fi" >> ~/.bashrc
+        #fi
 
         read -p "Install ssh.sh softlinked at /etc/profile.d/ ? [Y/n]:" gssh  
 
@@ -138,16 +139,16 @@ if [ -z $scripts ]; then
         fi
     fi
 
-    read -p "Install package_managers.sh at ~/Applications (package manager aliases)? [Y/n]:" packmang
+    read -p "Install package_managers.sh at /etc/X11/xinit/xinitrc.d (package manager aliases)? [Y/n]:" packmang
     if [ -z $packmang ]; then 
 
-        cp -f Applications/package_managers.sh ~/Applications/
+        cp -f Applications/package_managers.sh /etc/X11/xinit/xinitrc.d/
 
-        if ! grep -q manjaro.sh ~/.bashrc; then
-            echo "if [[ -f ~/Applications/package_managers.sh ]]; then" >> ~/.bashrc
-            echo "  . ~/Applications/package_managers.sh" >> ~/.bashrc
-            echo "fi" >> ~/.bashrc
-        fi
+        #if ! grep -q manjaro.sh ~/.bashrc; then
+        #    echo "if [[ -f /etc/X11/xinit/xinitrc.d/package_managers.sh ]]; then" >> ~/.bashrc
+        #    echo "  . /etc/X11/xinit/xinitrc.d/package_managers.sh" >> ~/.bashrc
+        #    echo "fi" >> ~/.bashrc
+        #fi
 
         read -p "Install package_managers.sh softlinked at /etc/profile.d/ ? [Y/n]:" gpackmang  
 
@@ -156,16 +157,16 @@ if [ -z $scripts ]; then
         fi
     fi
 
-    read -p "Install manjaro.sh at ~/Applications (manjaro specific aliases)? [Y/n]:" manjar
+    read -p "Install manjaro.sh at /etc/X11/xinit/xinitrc.d (manjaro specific aliases)? [Y/n]:" manjar
     if [ -z $manjar ]; then
 
-        cp -f Applications/manjaro.sh ~/Applications/
+        cp -f Applications/manjaro.sh /etc/X11/xinit/xinitrc.d/
 
-        if ! grep -q manjaro.sh ~/.bashrc; then
-            echo "if [[ -f ~/Applications/manjaro.sh ]]; then" >> ~/.bashrc
-            echo "  . ~/Applications/manjaro.sh" >> ~/.bashrc
-            echo "fi" >> ~/.bashrc
-        fi
+        #if ! grep -q manjaro.sh ~/.bashrc; then
+        #    echo "if [[ -f /etc/X11/xinit/xinitrc.d/manjaro.sh ]]; then" >> ~/.bashrc
+        #    echo "  . /etc/X11/xinit/xinitrc.d/manjaro.sh" >> ~/.bashrc
+        #    echo "fi" >> ~/.bashrc
+        #fi
 
         read -p "Install manjaro.sh softlinked at /etc/profile.d/ ? [Y/n]:" gmanjaro 
         if [ -z $gmanjaro ]; then 
@@ -173,16 +174,16 @@ if [ -z $scripts ]; then
         fi
     fi
 
-    read -p "Install youtube.sh at ~/Applications (youtube-dl aliases)? [Y/n]:" youtube
+    read -p "Install youtube.sh at /etc/X11/xinit/xinitrc.d (youtube-dl aliases)? [Y/n]:" youtube
     if [ -z $youtube ]; then 
 
-        cp -f Applications/youtube.sh ~/Applications/
+        cp -f Applications/youtube.sh /etc/X11/xinit/xinitrc.d/
 
-        if ! grep -q youtube.sh ~/.bashrc; then
-            echo "if [[ -f ~/Applications/youtube.sh ]]; then" >> ~/.bashrc
-            echo "  . ~/Applications/youtube.sh" >> ~/.bashrc
-            echo "fi" >> ~/.bashrc
-        fi
+        #if ! grep -q youtube.sh ~/.bashrc; then
+        #    echo "if [[ -f /etc/X11/xinit/xinitrc.d/youtube.sh ]]; then" >> ~/.bashrc
+        #    echo "  . /etc/X11/xinit/xinitrc.d/youtube.sh" >> ~/.bashrc
+        #    echo "fi" >> ~/.bashrc
+        #fi
 
         read -p "Install youtube.sh softlinked at /etc/profile.d/ ? [Y/n]:" gyoutube
 
@@ -192,14 +193,14 @@ if [ -z $scripts ]; then
 
     fi
 
-    read -p "Install variety.sh at ~/Applications (variety of applications)? [Y/n]:" variety
+    read -p "Install variety.sh at /etc/X11/xinit/xinitrc.d (variety of applications)? [Y/n]:" variety
     if [ -z $variety ]; then 
 
-        cp -f Applications/variety.sh ~/Applications/
+        cp -f Applications/variety.sh /etc/X11/xinit/xinitrc.d/
 
         if ! grep -q variety.sh ~/.bashrc; then
-            echo "if [[ -f ~/Applications/variety.sh ]]; then" >> ~/.bashrc
-            echo "  . ~/Applications/variety.sh" >> ~/.bashrc
+            echo "if [[ -f /etc/X11/xinit/xinitrc.d/variety.sh ]]; then" >> ~/.bashrc
+            echo "  . /etc/X11/xinit/xinitrc.d/variety.sh" >> ~/.bashrc
             echo "fi" >> ~/.bashrc
         fi
 

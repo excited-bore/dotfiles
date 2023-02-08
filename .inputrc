@@ -110,12 +110,12 @@ set comment-begin #
 # Proper copy
 # https://askubuntu.com/questions/302263/selecting-text-in-the-terminal-without-using-the-mouse
 #"\C-c": copy to clipboard
-"\C-c": "\C-u\C-e echo \C-y | xclip -i -sel c && tput cuu1 && tput el && history -d -1 \C-m\C-y"
+#"\C-c": "\C-u\C-e echo \C-y | xclip -i -sel c && tput cuu1 && tput el && history -d -1 \C-m\C-y"
 
 #"\C-v": paste from clipboard
 # This is what you would call an 'uuuuggglllllyyyy' hack
 #"\ey": _xyank'
-"\C-v": "\C-u\C-e tput cuu1 && tput el && xdotool type --clearmodifiers --delay 25 $(xclip -o -sel clip) && history -d -1 \C-m" 
+#"\C-v": "\C-u\C-e tput cuu1 && tput el && xdotool type --clearmodifiers --delay 25 $(xclip -o -sel clip) && history -d -1 \C-m" 
 
 # Control backspace kill word
 "\C-h": backward-kill-word

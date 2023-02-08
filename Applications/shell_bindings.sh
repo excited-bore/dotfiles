@@ -3,11 +3,17 @@
 # global shell profiles -> /etc/profile
 # Other bindings at .inputrc
 
-alias sttyBinds="stty -a"
-alias readlineBinds="bind -p | less"
+alias binds_xterm="xrdb -query -all"
+alias binds_stty="stty -a"
+alias binds_readline="bind -p | less"
+
+exec /usr/bin/urxvt $@
+
+alias r=". ~/.bashrc"
 
 # Install bindings from xterm
- xrdb merge ~/.Xresources
+# xrdb -merge ~/.Xresources
+# .Inputrc (readline conf) however has to be compiled, so restart shell
 
 # Set caps as Escape
 #setxkbmap -option "escape:caps_switch" 
@@ -36,8 +42,10 @@ stty lnext '^'
 #Free up Ctrl-z
 stty susp 'undef'
 
+alias tty_size_half="tput cup $(stty size | awk '{print int($1/2);}') 0"
+
 #bind -x '"\C-o": accept-line' 
-#bind -x '"\C-m": "\C-o tput cup $(stty size|awk '{print int($1/2);}') 0 && tput cuu1 && tput el && history -d -1 \C-o"'
+#bind -x '"\C-l": "\C-u \C-e clear && tty_size_half && tput cuu1 && tput ed && ls && history -d -1 \C-m\C-y"'
 #bind -x 
 
 # python virtual env

@@ -1,14 +1,377 @@
-":colorscheme evening
-:highlight Visual cterm=reverse ctermbg=NONE
-" These options and commands enable some very useful features in Vim, that
+" set the runtime path to include Vundle and initialize
+set rtp+=~/.vim/bundle/Vundle.vim
+" And Java
+set runtimepath+=/usr/lib/jvm/java-17-openjdk/bin/java
+call vundle#begin()
+"
+" let Vundle manage Vundle, required
+"
+" Autocomplete plugin from git
+ Plugin 'ycm-core/YouCompleteMe'
+"       
+"Git plugin, ironically also from git
+ Plugin 'tpope/vim-fugitive'
+"
+""vim-tmux-navigator, smart navigation between vim and tmux panes
+" Plugin 'christoomey/vim-tmux-navigator'
+"
+"" Self documemting vim wiki\
+ Plugin 'vimwiki/vimwiki'
 
+" Vim lua plugin
+" Plugin 'svermeulen/vimpeccable'
+
+"" All of your Plugins must be added before the following line
+call vundle#end()
+
+let g:ycm_auto_hover =0
+"umap <C-Tab>
+nmap <C-tab> <plug>(YCMHover)
+nmap <C-tab> :echo 'Kapootis crepitoos'<CR>
+let g:ycm_enable_semantic_highlighting=1
+let g:ycm_key_list_select_completion = ['<Tab>', '<Down>']
+let g:ycm_key_list_previous_completion = ['<S-Tab>', '<Up>']
+let g:ycm_key_list_stop_completion = ['<C-y>']
+let g:ycm_key_invoke_completion = '<C-Space>'
+let g:ycm_add_preview_to_completeopt = 1
+
+" Moving up and down will always recenter 
+" Move up/down half a page => Ctrl+Arrowkeys (Up-Down)
+" Move up/down full page => Shift+Arrowkeys (default)
+" Move to top/bottom => Ctrl+Shift+Arrowkeys
+" Same for Ctrlk jk
+
+nnoremap <Up>   <Up>zz
+nnoremap <Down> <Down>zz
+nnoremap j      jzz
+nnoremap k      kzz
+
+"inoremap <C-P>  <Up><C-o>zz
+"inoremap <C-N>  <Down><C-o>zz
+"For some reason, insert mode doesn't count up down
+
+function! DownCheck()
+    echo 'g:ycm_max_num_candidates_to_detail'
+endfunction
+
+inoremap <Down> <Down><C-o>zz
+inoremap <Up>   <Up><C-o>zz
+vnoremap <Up>   <Up>zz
+vnoremap <Down> <Down>zz
+
+nnoremap    <C-Up> <C-u>zz
+nnoremap    <C-K> <C-u>zz
+nnoremap    <C-Down> <C-d>zz
+nnoremap    <C-J> <C-d>zz
+inoremap    <C-Up> <C-u><C-o>zz
+inoremap    <C-Down> <C-d><C-o>zz
+inoremap    <C-J> <C-u><C-o>zz
+inoremap    <C-K> <C-d><C-o>zz
+vnoremap    <C-Up> <C-u>zz
+vnoremap    <C-Down> <C-d>zz
+vnoremap    <C-J> <C-u>zz
+vnoremap    <C-K> <C-d>zz
+
+" Both K and Ctrl Shift K go one page up in normal mode
+nnoremap    <S-Up>      <S-Up>zz
+nnoremap    K           <S-Up>zz
+nnoremap    <C-S-K>     <S-Up>zz
+nnoremap    <S-Down>    <S-Down>zz
+nnoremap    J           <S-Down>zz
+nnoremap    <C-S-J>     <S-Down>zz
+inoremap    <S-Up>      <S-Up><C-o>zz
+inoremap    <S-Down>    <S-Down><C-o>zz
+inoremap    <C-S-J>     <S-Down><C-o>zz
+inoremap    <C-S-K>     <S-Up><C-o>zz
+vnoremap    <S-Up>      <S-Up>zzgv
+vnoremap    <S-Down>    <C-d>zzgv
+vnoremap    <C-S-J>     <S-J>zzgv
+vnoremap    <C-S-K>     <S-K>zzgv
+
+nnoremap    <C-S-Up>    1G
+nnoremap    <C-S-Down>  G
+inoremap    <C-S-Up>    <C-o>1Gi
+inoremap    <C-S-Down>  <C-o>Gi
+vnoremap    <C-S-Up>    1G
+vnoremap    <C-S-Down>  G
+
+" https://vim.fandom.com/wiki/Moving_lines_up_or_down#Mappings%20to%20move%20lines
+" Move lines while holding Alt
+" Multiple lines => select in visual mode
+nnoremap    <A-Down> :m .+1<CR>
+nnoremap    <A-Up>   :m .-2<CR>
+inoremap    <A-Down> <Esc>:m .+1<CR>a
+inoremap    <A-Up>   <Esc>:m .-2<CR>a
+vnoremap    <A-Down> :m '>+1<CR>gv
+vnoremap    <A-Up>   :m '<-2<CR>gv
+
+nnoremap    <A-J> :m .+1<CR>
+nnoremap    <A-K>   :m .-2<CR>
+inoremap    <A-J> <Esc>:m .+1<CR>a
+inoremap    <A-K>   <Esc>:m .-2<CR>a
+vnoremap    <A-J> :m '>+1<CR>gv
+vnoremap    <A-K>   :m '<-2<CR>gv
+
+" Move one 'word' Left/Right (cursor at end) => Ctrl+Left/Right
+" Move one space seperated word (cursor at end) => Shift+Left/Right
+" Move to beginning/end / cycle lines => Alt+Left/Right
+nnoremap <C-Right>  e
+nnoremap <S-Right>  E
+nnoremap <C-Left>   b
+nnoremap <C-Left>   B
+inoremap <C-Right>  <Esc>ea
+inoremap <S-Right>  <Esc>Ea
+inoremap <C-Left>   <Esc>ba
+inoremap <C-Left>   <Esc>Ba
+vnoremap <C-Right>  e
+vnoremap <S-Right>  E
+vnoremap <C-Left>   b
+vnoremap <C-Left>   B
+
+
+" 0 => beginning of 'column'
+" ^ => First non blank character in line
+" nnoremap <A-Right> 0
+
+" If at beginning already, go to beginning previous line
+" Else, go up
+" Same for End of line, only you go down
+
+function! LastCheck()
+    if col(".") ==? col("$")-1 || col('$') ==? 1
+        return 'j$'
+    else
+        return '$'
+    endif
+endfunction
+
+nnoremap <expr> <A-Left>    (col(".") ==? 1 ? '<Up>0' : '0')
+nnoremap <expr> <A-right>   LastCheck()
+inoremap <A-right>          (col(".") ==? 1 ? '<esc><up>0i' : '<esc>0i')
+inoremap <A-left>           LastCheck()
+vnoremap <A-right>          (col(".") ==? 1 ? '<up>0' : '0')
+vnoremap <A-left>           LastCheck()
+
+
+" enter -> newline without entering insert mode
+nnoremap <Enter> i<Enter><Esc>
+"nnoremap <Enter> mode()
+" ctrl enter => move current line down
+nnoremap <C-Enter>      0i<enter><up><esc>
+inoremap <C-Enter>      <Esc>0i<enter>
+vnoremap <C-Enter>      <Esc>`<i<Enter><Esc>gv
+"alt enter -> newline without entering insert mode
+nnoremap <A-Enter>      o<esc>
+inoremap <A-Enter>      <Esc>o
+vnoremap <A-Enter>      `<<esc>o<esc>gv
+
+
+" BackSpace -> backspace no leave normal mode
+nnoremap <expr> <BackSpace>    (col(".") ==? 1 ? 'dd<Up>$' : 'i<BackSpace><right><esc>')
+vnoremap <Backspace>    <Delete>
+" Ctrl-Backspace => Delete appended 'word'
+" Alt-BackSpace => Delete line 
+" Shift-Backspace => Delete stuff forwards
+nnoremap <expr> <C-Backspace>  (col(".") ==? 1 ? 'dd<Up>$' : 'diw')
+inoremap <expr> <C-Backspace>  (col(".") ==? 1 ? '<Esc>dd<Up>$i' : '<Esc>diwi')
+nnoremap <A-Backspace>      dd<Up>$
+inoremap <A-Backspace>      <Esc>dd<Up>$i
+nnoremap <C-S-backspace>      <Delete>
+inoremap <C-S-backspace>      <Delete>
+
+" Tab => Add Tab"
+" V => indent
+nnoremap <tab>      i<tab><esc><right>
+vnoremap <tab>      >gv
+vnoremap <s-tab>    <gv
+
+" Space => add space"
+nnoremap <space>    i<space><esc><Right>
+
+" ctrl-a  n  ctrl-a	add n to the number at or after the cursor
+" ctrl-x  n  ctrl-x	subtract n from the number at or after the cursor
+" mapping them to + and  - 
+nnoremap + <c-a>
+nnoremap - <C-x>
+vnoremap + <C-a>
+vnoremap - <C-x>
+
+" Swap case insert
+"inoremap <C-~> <Esc>~a
+
+"Regular m => Middle of screen
+nnoremap m zz
+
+" Ctrl - r is -> Redo (universal) :
+nnoremap <C-r> :redo<CR>
+inoremap <C-r> <C-o>:redo<CR>
+vnoremap <C-r> <Esc>:redo<CR>gv 
+
+" Regular z => undo
+nnoremap z u
+" Ctrl - z is -> undo instead of stop 
+nnoremap <C-z> u
+inoremap <C-z> <C-o>:u<CR>
+vnoremap <C-z> u 
+
+" C-w => Write
+nnoremap <C-w> :write!<CR>
+inoremap <C-w> <C-o>:write!<CR>
+vnoremap <C-w> <Esc>:write!<CR>gv
+
+" C-q => Quit
+nnoremap <C-q> :q!<Enter>
+inoremap <C-q> <Esc>:q!<CR>
+vnoremap <C-q> <Esc>:q!<CR> 
+
+" Toggle highlight => Ctrl+l
+" https://stackoverflow.com/questions/9054780/how-to-toggle-vims-search-highlight-visibility-without-disabling-it
+let hlstate=0
+nnoremap <silent> <C-l> :if (hlstate == 0) \| nohlsearch \| else \| set hlsearch \| endif \| let hlstate=1-hlstate<cr>
+inoremap <silent> <C-l> <C-o>:if (hlstate == 0) \| nohlsearch \| else \| set hlsearch \| endif \| let hlstate=1-hlstate<cr>
+vnoremap <silent> <C-l> <Esc>:if (hlstate == 0) \| nohlsearch \| else \| set hlsearch \| endif \| let hlstate=1-hlstate<cr>gv
+
+"let mapleader = "\<Space>"
+" Set backspace key to
+set t_kb=^?
+" Set Delete key to
+set t_kD=^[[3~
+
+" Ctrl - H => Find and replace
+" For thos from visual code or smth, Ctrl-h can be finnicky in terminals
+" Because that keycombo generates the exact keycode for Backspace, for
+" compatibility reasons (but not in some terminal emulators, like kitty f.ex")
+ 
+" Ctrl - f => Find
+" Don't forget: Enter, not escape
+nnoremap f /
+nnoremap <C-f> /
+inoremap <C-f> <Esc>/
+vnoremap <C-f> /
+
+"Ctrl-Shift-F => Backward search
+"Also Shift F normal mode
+
+nnoremap F ?
+nnoremap <C-S-F> ?
+"nnoremap <ESC>[70;5u ?
+"inoremap <ESC>[70;5u <Esc>?
+"vnoremap <ESC>[70;5u ?
+
+" Alt-f => Global search
+nnoremap <A-f> :%s,,,gc<Left><Left><Left><Left>
+inoremap <A-f> <C-o>:%s,,,gc<Left><Left><Left><Left>
+vnoremap <A-f> :%s,,,gc<Left><Left><Left><Left>
+cnoremap <A-f> <C-e><C-u>nohl<CR>:<Esc>
+" Different seperator for Alt+Shift
+nnoremap <M-S-F> :%s///gc<Left><Left><Left><Left>
+inoremap <M-S-F> <C-o>:%s///gc<Left><Left><Left><Left>
+vnoremap <M-S-F> :%s///gc<Left><Left><Left><Left>
+cnoremap <M-S-F> <C-e><C-u><CR>:<Esc>
+
+" unnamedplus	A variant of the "unnamed" flag which uses the
+" clipboard register "+" (quoteplus) instead of
+" register "*" for all yank, delete, change and put
+" operations which would normally go to the unnamed
+" register.
+" Normal clipboard functionality for yy, y and d
+
+set clipboard+=unnamedplus
+nnoremap c "+y
+nnoremap cc "+0yg_
+nnoremap C "+Y
+nnoremap CC "+0Yg_
+vnoremap c "+y
+vnoremap cc "+0yg_
+vnoremap C "+Y
+vnoremap CC "+0Yg_"
+
+nnoremap v :set paste<CR>"+p:set nopaste<CR>
+nnoremap V :set paste<CR>"+P:set nopaste<CR>
+
+"" Normal mode => whole line
+"" Insert mode => word
+"" visual => by selection
+" Best register no register
+nnoremap <C-c>          "+yy 
+nnoremap <silent> <C-v> :r !xclip -o -sel c<CR>
+nnoremap <C-d>          "*dd
+"" Paste with P if at beginning of line
+inoremap <expr> <C-c>   (col(".") ==? 1 ? '<C-o>"+yawa' : '<C-o>"+yiwa')
+"" Paste with P if at beginning of line
+inoremap <silent> <C-v> <C-o>:r !xclip -o -sel c<CR>
+"" Cut with a word instead of inner word if at beginning of line
+inoremap <expr> <C-d>   (col(".") ==? 1 ? '<C-o>daw' : '<C-o>diw')
+"inoremap <expr> <C-x>
+vnoremap <C-c>          "+y 
+vnoremap <silent> <C-v> <C-o>:r !xclip -o -sel c<CR>
+vnoremap <C-d>          "*d 
+
+
+" a => (insert) Append after cursor
+" A => Insert before
+"noremap A i      
+" Ctrl-A normal => insert
+" Ctrl-A visual => Change selected line
+" Ctrl-A Insert => Back to normal
+nnoremap <C-a> a
+vnoremap <C-a> a
+inoremap <C-a> <Esc>
+"Alt-A => Replace (insert variant)
+nnoremap <A-a> R
+vnoremap <A-a> R
+inoremap <A-a> <Esc>
+"" Ctrl-Alt-A => Virtual Replace mode                    
+"" This mode differs from replace in that it plays nicely with tabs and spaces
+"" in files
+nnoremap <C-A-a> gR
+vnoremap <C-A-a> <Esc>gR 
+inoremap <C-A-a> <Esc>
+
+"" Visual mode becomes 'Select' mode or smth idk
+"" S => visual mode
+nnoremap s v
+nnoremap S V
+"" Ctrl-s => Visual mode everywhere
+nnoremap <C-S> v
+vnoremap <C-s> <Esc>
+inoremap <C-S> <C-o>v
+""Different visual block mode
+"set virtualedit=all
+""Alt-s => Visual block mode
+nnoremap <A-s> <C-q>
+vnoremap <A-s> <C-q> 
+inoremap <A-s> <C-o><C-q>
+""Ctrl-Alt-S => Visual line mode
+nnoremap <C-A-S> V
+vnoremap <C-A-S> <Esc> 
+inoremap <C-A-S> <C-o>V
+
+
+" Vim ® Autocompletion 
+"nnoremap <C-tab> i<C-x>
+
+
+"" vim tmux navigator integrator
+"let g:tmux_navigator_no_mappings = 1
+"noremap <silent> <C-S-Left> :<C-U>TmuxNavigateLeft<cr>
+"noremap <silent> <C-S-Down> :<C-U>TmuxNavigateDown<cr>
+"noremap <silent> <C-S-Up> :<C-U>TmuxNavigateUp<cr>
+"noremap <silent> <C-S-Right> :<C-U>TmuxNavigateRight<cr>
+"noremap <silent> <C-²> :<C-U>TmuxNavigatePrevious<cr>
+
+
+":colorscheme evening
+highlight Visual cterm=reverse ctermbg=NONE
+" These options and commands enable some very useful features in Vim, that
+" no user should live without
 " Set 'nocompatible' to ward off unexpected things that your distro might
 " have made, as well as sanely reset options when re-sourcing .vimrc
 
 " Attempt to determine the type of a file based on its name and possibly its
 " contents. Use this to allow intelligent auto-indenting for each filetype,
 " and for plugins that are filetype specific.
-filetype off
+filetype plugin indent on
 
 " Enable syntax highlighting
 syntax on
@@ -16,27 +379,24 @@ syntax on
 " Relative number lines
 set relativenumber 
 
-" set the runtime path to include Vundle and initialize
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
+" Enable Omnicomplete features
+set omnifunc=syntaxcomplete#Complete
 
-" let Vundle manage Vundle, required
+"https://vim.fandom.com/wiki/GNU/Linux_clipboard_copy/paste_with_xclip
+"The 'a' and 'A' options enables copying selected text to system clipboard 
+set guioptions=aAimrLT
 
-" plugin from git
-Plugin 'ycm-core/YouCompleteMe'
+"lua <<EOF
+"    vim.o.rtp += ~/.vim/bundle/Vundle.vim
+"    local Plug = vim.fn['plug#']
+"    vim.call('vundle#begin', '~/.config/nvim/plugged')
+"    Plug('tpope/vim-sensible')
+"    Plug('christoomey/vim-tmux-navigator') 
+"    Plug('vimwiki/vimwiki') 
+"    Plug('svermeulen/vimpeccable') 
+"    vim.call('vundle#end')
+"EOF
 
-"Git plugin, ironically also from git
-Plugin 'tpope/vim-fugitive'
-
-"vim-tmux-navigator, smart navigation between vim and tmux panes
-Plugin 'christoomey/vim-tmux-navigator'
-
-" Self documemting vim wiki\
-Plugin 'vimwiki/vimwiki'
-
-" All of your Plugins must be added before the following line
-call vundle#end()            " required
-filetype plugin indent on    " required
 "------------------------------------------------------------
 
 "Fix python3 interpreter
@@ -97,7 +457,7 @@ set autoindent
 " Stop certain movements from always going to the first character of a line.
 " While this behaviour deviates from that of Vi, it does what most users
 " coming from other editors would expect.
-"set nostartofline
+set nostartofline
 
 " Display the cursor position on the last line of the screen or in the status
 " line of a window
@@ -122,7 +482,7 @@ set t_vb=
 set mouse=a
 
 " Set the command window height to 2 lines, to avoid many cases of having to
-" "press <Enter> to continue"
+" 'press <Enter> to continue'
 set cmdheight=2
 
 " Display line numbers on the left
@@ -135,7 +495,7 @@ set wrap
 set notimeout ttimeout ttimeoutlen=200
 
 " Use <F9> to toggle between 'paste' and 'nopaste'
-set pastetoggle=<F9>
+" set pastetoggle=<F9>
 
 "------------------------------------------------------------
 
@@ -150,148 +510,15 @@ set expandtab
 
 "------------------------------------------------------------
 " Useful mappings
-"
-" vim tmux navigator integrator
-let mapleader = "\<Space>"
-
-let g:tmux_navigator_no_mappings = 1
-noremap <silent> <C-Left> :<C-U>TmuxNavigateLeft<cr>
-noremap <silent> <C-Down> :<C-U>TmuxNavigateDown<cr>
-noremap <silent> <C-Up> :<C-U>TmuxNavigateUp<cr>
-noremap <silent> <C-Right> :<C-U>TmuxNavigateRight<cr>
-"noremap <silent> <C-²> :<C-U>TmuxNavigatePrevious<cr>
-
-" Reload init.vim
-map :r :source $MYVIMRC
-
-"map <esc>[1;5A <C-Up>
-"map <esc>[1;5B <C-Down>
-"map <esc>[1;5C <C-Right>
-"map <esc>[1;5D <C-Left>
-"imap <ESC>[1;5A <C-Up>
-"imap <ESC>[1;5B <C-Down>
-"imap <ESC>[1;5C <C-Right>
-"imap <ESC>[1;5D <C-Left>
-
-" CTRL-A  N  CTRL-A	add N to the number at or after the cursor
-" CTRL-X  N  CTRL-X	subtract N from the number at or after the cursor
-" mapping them to + And  - 
-nnoremap + <C-a>
-nnoremap - <C-x>
-vnoremap + <C-a>
-vnoremap - <C-x>
-
-"Different visual block mode
-set virtualedit=all
-
-" unnamedplus	A variant of the "unnamed" flag which uses the
-" clipboard register "+" (quoteplus) instead of
-" register "*" for all yank, delete, change and put
-" operations which would normally go to the unnamed
-" register.
-" Normal clipboard functionality for yy, y and d
-set clipboard+=unnamedplus
-
-nnoremap c "+y
-nnoremap cc "+0yg_
-nnoremap C "+Y
-nnoremap CC "+0Yg_
-
-nnoremap y c
-nnoremap yy cc
-nnoremap Y C
-nnoremap YY CC
-
-nnoremap x "+x
-nnoremap X "+X
-
-nnoremap p :set paste<CR>"+p:set nopaste<CR>
-nnoremap P :set paste<CR>"+P:set nopaste<CR> 
-
-nnoremap d  "*d 
-nnoremap dd "*dd
-nnoremap D  "*D
-nnoremap DD "*DD
-
-" Normal mode => whole line
-" Insert mode => word
-" visual => by selection
-nnoremap <C-c> yy
-nnoremap <C-v> Pg;
-nnoremap <C-x> Vxg;
-inoremap <C-c> <Esc>yiwa
-" Paste with P if at beginning of line
-inoremap <expr> <C-v> (col(".") ==? 1 ? "<Esc>Pg;a" : "<Esc>pg;a")
-vnoremap <C-c> y 
-vnoremap <C-v> p 
-vnoremap <C-x> x 
 
 
-nnoremap <M-Up> v<Up>  
-nnoremap <M-Down> v<Down>  
-nnoremap <M-Left> v<Left>
-nnoremap <M-Right> v<Right>
-inoremap <M-Up> <Esc>v<Up>
-inoremap <M-Down> <Esc>v<Down>
-inoremap <M-Left> <Esc>v<Left>
-inoremap <M-Right> <Esc>v<Right>
-vnoremap <M-Up> <Esc><Up>
-vnoremap <M-Down> <Esc><Down> 
-vnoremap <M-Left> <Esc><Left> 
-vnoremap <M-Right> <Esc><Right> 
-                              
-"Escape Won't ask for motion
-"map <Esc> <Esc>
-"set <f26>=^[OM
-
-" Enter -> newline without entering insert mode
-nnoremap <Enter> i<Enter><Esc>g;
-"Alt Enter -> newline without entering insert mode
-nnoremap <A-Enter> 0i<Enter><Esc>g;
-" backspace -> backspace no leave normal mode
-nnoremap <Backspace> i<Backspace><Esc>g;
-" Tab => add tab"
-nnoremap <Tab> i<Tab><Esc>g;
-" Space => add space"
-nnoremap <Space> i<Space><Esc>g;
-
-" Move lines while holding shift
-" Multiple lines => select in visual mode
-nnoremap <S-M-Down> :m .+1<CR>
-nnoremap <S-M-Up> :m .-2<CR>==
-inoremap <S-M-Down> <Esc>:m .+1<CR>==gi
-inoremap <S-M-Up> <Esc>:m .-2<CR>==gi
-vnoremap <S-M-Down> :m '>+1<CR>gv=gv
-vnoremap <S-M-Up> :m '<-2<CR>gv=gv
-
-" Ctrl - z is -> undo instead of stop 
-nnoremap <C-z> u
-inoremap <C-z> <Esc>ua
-vnoremap <C-z> u 
-
-" C-s => Save
-nnoremap <C-s> :write!<CR>
-inoremap <C-s> <Esc>:write!<CR>==gi
-vnoremap <C-s> <Esc>:write!<CR>==gv
-
-"Ctrl-a => Ctrl-a
-nnoremap <C-a> <C-q>
-inoremap <C-a> <esc><C-q>
-vnoremap <C-a> <C-q>
-
-" C-q => Quit
-nnoremap <C-q> :q!<Enter>
-inoremap <C-q> <Esc>:q!<CR>==gi
-vnoremap <C-q> <Esc>:q!<CR>==gv
-
-" C-w => Save and quit
-" nnoremap <C-w> :wq<CR>   
-
-"function! CurrentLineInfo()
-"    lua << EOF
-"    vim.keymap.set('n', '<Space>', function()
-"         local cnt=1
-"         return vim.fn.pumvisible() == 1 and "<C-n>" or "<Tab>"
-"       end, { expr = true })
+"vim.cmd 'packadd paq-nvim'
+"require 'paq' {
+"    {'savq/paq-nvim', opt = true};
+"    'svermeulen/vimpeccable'
+"}
+"lua <<EOF
+"    local vimp = require('vimpeccable')
+"    vimp.bind('n', '<C-Tab>', 'i<C-X>')
+"    vimp.bind('n', '<C-cr>', ':echom 'Hello C + R'<CR>')
 "EOF
-"endfunction
