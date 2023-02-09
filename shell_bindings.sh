@@ -7,7 +7,7 @@ alias binds_xterm="xrdb -query -all"
 alias binds_stty="stty -a"
 alias binds_readline="bind -p | less"
 
-#exec /usr/bin/urxvt 
+alias binds_kitty='kitty +kitten show_key -m kitty'
 
 alias r=". ~/.bashrc"
 

@@ -1,4 +1,5 @@
-" set the runtime path to include Vundle and initialize
+
+" set the iruntime path to include Vundle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
 " And Java
 set runtimepath+=/usr/lib/jvm/java-17-openjdk/bin/java
@@ -6,34 +7,38 @@ call vundle#begin()
 "
 " let Vundle manage Vundle, required
 "
-" Autocomplete plugin from git
- Plugin 'ycm-core/YouCompleteMe'
-"       
+"" Autocomplete plugin from git
+Plugin 'ycm-core/YouCompleteMe'
+
 "Git plugin, ironically also from git
- Plugin 'tpope/vim-fugitive'
+Plugin 'tpope/vim-fugitive'
 "
 ""vim-tmux-navigator, smart navigation between vim and tmux panes
-" Plugin 'christoomey/vim-tmux-navigator'
+"Plugin 'christoomey/vim-tmux-navigator'
 "
 "" Self documemting vim wiki\
- Plugin 'vimwiki/vimwiki'
+Plugin 'vimwiki/vimwiki'
 
 " Vim lua plugin
 " Plugin 'svermeulen/vimpeccable'
 
 "" All of your Plugins must be added before the following line
 call vundle#end()
-
+            
 let g:ycm_auto_hover =0
-"umap <C-Tab>
-nmap <C-tab> <plug>(YCMHover)
-nmap <C-tab> :echo 'Kapootis crepitoos'<CR>
-let g:ycm_enable_semantic_highlighting=1
-let g:ycm_key_list_select_completion = ['<Tab>', '<Down>']
-let g:ycm_key_list_previous_completion = ['<S-Tab>', '<Up>']
-let g:ycm_key_list_stop_completion = ['<C-y>']
-let g:ycm_key_invoke_completion = '<C-Space>'
+let g:ycm_key_invoke_completion = '<C-x>'
+let g:ycm_key_list_stop_completion = ['<C-y>', '<Right>', '<Space>']
+let g:ycm_key_list_select_completion = ['<Tab>', '<Down>', '<C-j>']
+let g:ycm_key_list_previous_completion = ['<S-Tab>', '<Up>', '<C-k>']
 let g:ycm_add_preview_to_completeopt = 1
+let g:ycm_enable_semantic_highlighting=1
+let g:ycm_update_diagnostics_in_insert_mode = 1
+"let g:ycm_echo_current_diagnostic = 'virtual-text'
+
+nnoremap <C-x> i<C-x>
+vnoremap <C-x> i<C-x>
+
+inoremap <Space> <C-y><Space>
 
 " Moving up and down will always recenter 
 " Move up/down half a page => Ctrl+Arrowkeys (Up-Down)
@@ -45,17 +50,8 @@ nnoremap <Up>   <Up>zz
 nnoremap <Down> <Down>zz
 nnoremap j      jzz
 nnoremap k      kzz
-
-"inoremap <C-P>  <Up><C-o>zz
-"inoremap <C-N>  <Down><C-o>zz
-"For some reason, insert mode doesn't count up down
-
-function! DownCheck()
-    echo 'g:ycm_max_num_candidates_to_detail'
-endfunction
-
-inoremap <Down> <Down><C-o>zz
-inoremap <Up>   <Up><C-o>zz
+"inoremap <Up>   <Up><C-o>zz
+"inoremap <Down> <Down><C-o>zz
 vnoremap <Up>   <Up>zz
 vnoremap <Down> <Down>zz
 
@@ -167,15 +163,16 @@ vnoremap <A-Enter>      `<<esc>o<esc>gv
 
 
 " BackSpace -> backspace no leave normal mode
-nnoremap <expr> <BackSpace>    (col(".") ==? 1 ? 'dd<Up>$' : 'i<BackSpace><right><esc>')
+nnoremap <BackSpace>    i<BackSpace><right><esc>
+inoremap <expr> <Backspace>    (mode() ==# 'R' && col('.') ==? 1 ? '<Esc>i<Backspace><Right><Esc>R' : mode() ==# 'R' ? '<Esc>a<BackSpace><Right><Esc>R' : '<BackSpace>')
 vnoremap <Backspace>    <Delete>
 " Ctrl-Backspace => Delete appended 'word'
 " Alt-BackSpace => Delete line 
 " Shift-Backspace => Delete stuff forwards
-nnoremap <expr> <C-Backspace>  (col(".") ==? 1 ? 'dd<Up>$' : 'diw')
-inoremap <expr> <C-Backspace>  (col(".") ==? 1 ? '<Esc>dd<Up>$i' : '<Esc>diwi')
+nnoremap <expr> <C-Backspace>  (col(".") ==? 1 ? '<BackSpace>' : 'dge')
+inoremap <expr> <C-Backspace>  (col(".") ==? 1 ? '<BackSpace>' : '<Esc>dgei')
 nnoremap <A-Backspace>      dd<Up>$
-inoremap <A-Backspace>      <Esc>dd<Up>$i
+inoremap <A-Backspace>      <Esc>dd<Up>$a
 nnoremap <C-S-backspace>      <Delete>
 inoremap <C-S-backspace>      <Delete>
 
@@ -191,32 +188,35 @@ nnoremap <space>    i<space><esc><Right>
 " ctrl-a  n  ctrl-a	add n to the number at or after the cursor
 " ctrl-x  n  ctrl-x	subtract n from the number at or after the cursor
 " mapping them to + and  - 
-nnoremap + <c-a>
+nnoremap + <C-a>
 nnoremap - <C-x>
-vnoremap + <C-a>
-vnoremap - <C-x>
+vnoremap + <C-a>gv
+vnoremap - <C-x>gv
+inoremap <A-+> <C-a>
+inoremap <A--> <C-x>
+"557++++++++++++++++++++++124
 
 " Swap case insert
 "inoremap <C-~> <Esc>~a
 
 "Regular m => Middle of screen
-nnoremap m zz
+"nnoremap m zz
 
 " Ctrl - r is -> Redo (universal) :
 nnoremap <C-r> :redo<CR>
-inoremap <C-r> <C-o>:redo<CR>
+inoremap <C-r> <C-\><C-o>:redo<CR>
 vnoremap <C-r> <Esc>:redo<CR>gv 
 
 " Regular z => undo
 nnoremap z u
 " Ctrl - z is -> undo instead of stop 
 nnoremap <C-z> u
-inoremap <C-z> <C-o>:u<CR>
+inoremap <C-z> <C-\><C-o>:u<CR>
 vnoremap <C-z> u 
 
 " C-w => Write
 nnoremap <C-w> :write!<CR>
-inoremap <C-w> <C-o>:write!<CR>
+inoremap <C-w> <C-\><C-o>:write!<CR>
 vnoremap <C-w> <Esc>:write!<CR>gv
 
 " C-q => Quit
@@ -224,11 +224,12 @@ nnoremap <C-q> :q!<Enter>
 inoremap <C-q> <Esc>:q!<CR>
 vnoremap <C-q> <Esc>:q!<CR> 
 
+
 " Toggle highlight => Ctrl+l
 " https://stackoverflow.com/questions/9054780/how-to-toggle-vims-search-highlight-visibility-without-disabling-it
 let hlstate=0
 nnoremap <silent> <C-l> :if (hlstate == 0) \| nohlsearch \| else \| set hlsearch \| endif \| let hlstate=1-hlstate<cr>
-inoremap <silent> <C-l> <C-o>:if (hlstate == 0) \| nohlsearch \| else \| set hlsearch \| endif \| let hlstate=1-hlstate<cr>
+inoremap <silent> <C-l> <C-\><C-o>:if (hlstate == 0) \| nohlsearch \| else \| set hlsearch \| endif \| let hlstate=1-hlstate<cr>
 vnoremap <silent> <C-l> <Esc>:if (hlstate == 0) \| nohlsearch \| else \| set hlsearch \| endif \| let hlstate=1-hlstate<cr>gv
 
 "let mapleader = "\<Space>"
@@ -249,25 +250,27 @@ nnoremap <C-f> /
 inoremap <C-f> <Esc>/
 vnoremap <C-f> /
 
-"Ctrl-Shift-F => Backward search
-"Also Shift F normal mode
-
+" Shift F backwards search mode
 nnoremap F ?
-nnoremap <C-S-F> ?
+
+"Also Ctrl-Shift-F => Backward search
+" But this conflicts with kitty 'move window forward'
+"nnoremap <C-S-F> ?
+
 "nnoremap <ESC>[70;5u ?
 "inoremap <ESC>[70;5u <Esc>?
 "vnoremap <ESC>[70;5u ?
 
 " Alt-f => Global search
 nnoremap <A-f> :%s,,,gc<Left><Left><Left><Left>
-inoremap <A-f> <C-o>:%s,,,gc<Left><Left><Left><Left>
+inoremap <A-f> <C-\><C-o>:%s,,,gc<Left><Left><Left><Left>
 vnoremap <A-f> :%s,,,gc<Left><Left><Left><Left>
 cnoremap <A-f> <C-e><C-u>nohl<CR>:<Esc>
 " Different seperator for Alt+Shift
 nnoremap <M-S-F> :%s///gc<Left><Left><Left><Left>
-inoremap <M-S-F> <C-o>:%s///gc<Left><Left><Left><Left>
+inoremap <M-S-F> <C-\><C-o>:%s///gc<Left><Left><Left><Left>
 vnoremap <M-S-F> :%s///gc<Left><Left><Left><Left>
-cnoremap <M-S-F> <C-e><C-u><CR>:<Esc>
+cnoremap <M-S-F> <C-e><C-u>nohl<CR>:<Esc>
 
 " unnamedplus	A variant of the "unnamed" flag which uses the
 " clipboard register "+" (quoteplus) instead of
@@ -289,35 +292,42 @@ vnoremap CC "+0Yg_"
 nnoremap v :set paste<CR>"+p:set nopaste<CR>
 nnoremap V :set paste<CR>"+P:set nopaste<CR>
 
+nnoremap <A-d> cc
+vnoremap <A-d> c
+inoremap <A-d> <C-\><C-o>cc
+
 "" Normal mode => whole line
 "" Insert mode => word
 "" visual => by selection
-" Best register no register
+"" Best register no register
 nnoremap <C-c>          "+yy 
 nnoremap <silent> <C-v> :r !xclip -o -sel c<CR>
-nnoremap <C-d>          "*dd
+nnoremap <C-d>          (col(".") ==? 1 ? '<C-\><C-o>daw' : '<C-\><C-o>diw')
 "" Paste with P if at beginning of line
-inoremap <expr> <C-c>   (col(".") ==? 1 ? '<C-o>"+yawa' : '<C-o>"+yiwa')
+inoremap <expr> <C-c>   (col(".") ==? 1 ? '<C-\><C-o>"+yawa' : '<C-\><C-o>"+yiwa')
 "" Paste with P if at beginning of line
-inoremap <silent> <C-v> <C-o>:r !xclip -o -sel c<CR>
+inoremap <silent> <C-v> <C-\><C-o>:r !xclip -o -sel c<CR>
 "" Cut with a word instead of inner word if at beginning of line
-inoremap <expr> <C-d>   (col(".") ==? 1 ? '<C-o>daw' : '<C-o>diw')
+inoremap <expr> <C-d>   (col(".") ==? 1 ? '<C-\><C-o>daw' : '<C-\><C-o>diw')
 "inoremap <expr> <C-x>
 vnoremap <C-c>          "+y 
-vnoremap <silent> <C-v> <C-o>:r !xclip -o -sel c<CR>
+vnoremap <silent> <C-v> <C-\><C-o>:r !xclip -o -sel c<CR>
 vnoremap <C-d>          "*d 
-
+"
+nnoremap <C-S-d>          <Down>"*dd<Up>
+inoremap <expr> <C-S-d>   (col(".") ==? 1 ? '<C-\><C-o>daW' : '<C-\><C-o>diW')
+vnoremap <C-S-d>          "*D
 
 " a => (insert) Append after cursor
 " A => Insert before
-"noremap A i      
+"
 " Ctrl-A normal => insert
 " Ctrl-A visual => Change selected line
 " Ctrl-A Insert => Back to normal
 nnoremap <C-a> a
-vnoremap <C-a> a
+vnoremap <C-a> <C-o>
 inoremap <C-a> <Esc>
-"Alt-A => Replace (insert variant)
+""Alt-A => Replace (insert variant)
 nnoremap <A-a> R
 vnoremap <A-a> R
 inoremap <A-a> <Esc>
@@ -331,21 +341,42 @@ inoremap <C-A-a> <Esc>
 "" Visual mode becomes 'Select' mode or smth idk
 "" S => visual mode
 nnoremap s v
+vnoremap s v
 nnoremap S V
-"" Ctrl-s => Visual mode everywhere
+vnoremap S V
+""" Ctrl-s => Visual mode everywhere
 nnoremap <C-S> v
 vnoremap <C-s> <Esc>
 inoremap <C-S> <C-o>v
-""Different visual block mode
-"set virtualedit=all
-""Alt-s => Visual block mode
+
+"""Different visual block mode
+set virtualedit=all
+"""Alt-s => Visual block mode
 nnoremap <A-s> <C-q>
 vnoremap <A-s> <C-q> 
 inoremap <A-s> <C-o><C-q>
-""Ctrl-Alt-S => Visual line mode
+"""Ctrl-Alt-S => Visual line mode
 nnoremap <C-A-S> V
 vnoremap <C-A-S> <Esc> 
 inoremap <C-A-S> <C-o>V
+
+
+"function! MyFunc()
+"    let m = visualmode()
+"    if m == "\<C-V>"
+"        echo 'block-wise visual'
+"    endif
+"endfunction
+
+vnoremap [          di[]<Esc><Left>p<Esc> 
+vnoremap {          di{}<Esc><Left>p<Esc> 
+vnoremap (          di()<Esc><Left>p<Esc> 
+vnoremap <          di<><Esc><Left>p<Esc>
+vnoremap <C-<>      di</><Esc><Left><Left>p<Esc>
+vnoremap `          di``<Esc><Left>p<Esc>
+vnoremap '          di''<Esc><Left>p<Esc> 
+vnoremap <expr> "   visualmode() == "\<C-V>" ?  'I"<Esc>' : 'di""<Esc><Left>p<Esc>'
+vnoremap <expr> #   visualmode() == "\<C-V>" ?  'I#<Esc>' : 'di##<Esc><Left>p<Esc>'
 
 
 " Vim ® Autocompletion 
@@ -362,7 +393,7 @@ inoremap <C-A-S> <C-o>V
 
 
 ":colorscheme evening
-highlight Visual cterm=reverse ctermbg=NONE
+"highlight Visual cterm=reverse ctermbg=NONE
 " These options and commands enable some very useful features in Vim, that
 " no user should live without
 " Set 'nocompatible' to ward off unexpected things that your distro might
@@ -492,7 +523,7 @@ set number
 set wrap
 
 " Quickly time out on keycodes, but never time out on mappings
-set notimeout ttimeout ttimeoutlen=200
+set ttimeout ttimeoutlen=100
 
 " Use <F9> to toggle between 'paste' and 'nopaste'
 " set pastetoggle=<F9>
