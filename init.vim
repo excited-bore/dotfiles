@@ -377,7 +377,7 @@ nnoremap CC "+0Yg_
 vnoremap c "+y
 vnoremap cc "+0yg_
 vnoremap C "+Y
-vnoremap CC "+0Yg_"
+vnoremap CC "+0Yg_
 
 nnoremap v "0p
 nnoremap V "0P
