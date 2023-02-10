@@ -1,12 +1,20 @@
+" Avoid error message lingering
+autocmd CursorHold      * echo mode(1)
+autocmd CursorHoldI     * echo mode(1)
+autocmd CursorMoved     * set cul
+autocmd CursorMovedI    * set cul
+"autocmd InsertEnter     * set cul
+"autocmd InsertLeave     * set nocul
 
-" set the iruntime path to include Vundle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
 " And Java
 set runtimepath+=/usr/lib/jvm/java-17-openjdk/bin/java
 call vundle#begin()
+
+"
+" set the iruntime path to include Vundle and initialize
 "
 " let Vundle manage Vundle, required
-"
 "" Autocomplete plugin from git
 Plugin 'ycm-core/YouCompleteMe'
 
@@ -16,73 +24,143 @@ Plugin 'tpope/vim-fugitive'
 ""vim-tmux-navigator, smart navigation between vim and tmux panes
 "Plugin 'christoomey/vim-tmux-navigator'
 "
-"" Self documemting vim wiki\
+"" Self documemting vim wiki
 Plugin 'vimwiki/vimwiki'
+
+"" Nice themey
+Plugin 'morhetz/gruvbox'
+
+" Nice status bar thingy
+Plugin 'vim-airline/vim-airline'
 
 " Vim lua plugin
 " Plugin 'svermeulen/vimpeccable'
 
 "" All of your Plugins must be added before the following line
 call vundle#end()
-            
+
+ "Use 24-bit (true-color) mode in Vim/Neovim when outside tmux.
+"If you're using tmux version 2.2 or later, you can remove the outermost $TMUX check and use tmux's 24-bit color support
+"(see < http://sunaku.github.io/tmux-24bit-color.html#usage > for more information.)
+
+
+"" Gruvbox things
+let g:gruvbox_italic=1
+colorscheme gruvbox
+
+if (empty($TMUX))
+  if (has("nvim"))
+    "For Neovim 0.1.3 and 0.1.4 < https://github.com/neovim/neovim/pull/2198 >
+    let $NVIM_TUI_ENABLE_TRUE_COLOR=1
+  endif
+  "For Neovim > 0.1.5 and Vim > patch 7.4.1799 < https://github.com/vim/vim/commit/61be73bb0f965a895bfb064ea3e55476ac175162 >
+  "Based on Vim patch 7.4.1770 (`guicolors` option) < https://github.com/vim/vim/commit/8a633e3427b47286869aa4b96f2bfc1fe65b25cd >
+  " < https://github.com/neovim/neovim/wiki/Following-HEAD#20160511 >
+  if (has("termguicolors"))
+    set termguicolors
+  endif
+endif
+
+""" YouCompleteMe stuff
+
 let g:ycm_auto_hover =0
-let g:ycm_key_invoke_completion = '<C-x>'
+let g:ycm_key_invoke_completion = '<C-Tab>'
 let g:ycm_key_list_stop_completion = ['<C-y>', '<Right>', '<Space>']
 let g:ycm_key_list_select_completion = ['<Tab>', '<Down>', '<C-j>']
 let g:ycm_key_list_previous_completion = ['<S-Tab>', '<Up>', '<C-k>']
-let g:ycm_add_preview_to_completeopt = 1
 let g:ycm_enable_semantic_highlighting=1
-let g:ycm_update_diagnostics_in_insert_mode = 1
+let g:ycm_enable_inlay_hints=1
+let g:ycm_add_preview_to_completeopt = 1
+let g:ycm_update_diagnostics_in_insert_mode = 0
 "let g:ycm_echo_current_diagnostic = 'virtual-text'
 
-nnoremap <C-x> i<C-x>
-vnoremap <C-x> i<C-x>
+nnoremap <C-Tab> i
+vnoremap <C-Tab> i
+inoremap <expr> <C-Tab> mode(1) == "ic" ?  '<Esc>a' : '<plug>(YCMComplete)'
 
 inoremap <Space> <C-y><Space>
+inoremap <Right> <C-y><Right>
+
+" Vim ® Autocompletion 
+" Tab => Add Tab"
+" V => indent
+nnoremap <tab>      i<tab><esc><right>
+vnoremap <tab>      >gv
+vnoremap <s-tab>    <gv
+
+"inoremap [          []
+vnoremap [          di[]<Esc><Left>p<Esc> 
+
+"inoremap {          {}
+vnoremap {          di{}<Esc><Left>p<Esc> 
+
+"inoremap (          ()
+vnoremap (          di()<Esc><Left>p<Esc> 
+
+"inoremap <           <>
+vnoremap <          di<><Esc><Left>p<Esc>
+vnoremap <C-<>      di</><Esc><Left><Left>p<Esc>
+
+vnoremap `          di``<Esc><Left>p<Esc>
+
+"inoremap '          ' 
+vnoremap '          di''<Esc><Left>p<Esc>
+
+"inoremap "          ""
+vnoremap <expr> "   visualmode() == "\<C-V>" ?  'I"<Esc>' : 'di""<Esc><Left>p<Esc>'
+vnoremap <expr> #   visualmode() == "\<C-V>" ?  'I#<Esc>' : 'di##<Esc><Left>p<Esc>'
+
+vnoremap <expr> !   visualmode() == "\<C-V>" ?  'I!<Esc>' : 'di!!<Esc><Left>p<Esc>'
+
 
 " Moving up and down will always recenter 
-" Move up/down half a page => Ctrl+Arrowkeys (Up-Down)
+" Move up/down 1 paragraph => Ctrl+Arrowkeys (Up-Down)
 " Move up/down full page => Shift+Arrowkeys (default)
 " Move to top/bottom => Ctrl+Shift+Arrowkeys
 " Same for Ctrlk jk
 
-nnoremap <Up>   <Up>zz
-nnoremap <Down> <Down>zz
-nnoremap j      jzz
-nnoremap k      kzz
-"inoremap <Up>   <Up><C-o>zz
-"inoremap <Down> <Down><C-o>zz
-vnoremap <Up>   <Up>zz
-vnoremap <Down> <Down>zz
+"nnoremap <C-y> <C-y>
+"nnoremap <C-e> <C-e>
+"
+"nnoremap <Up>   <Up>
+"nnoremap <Down> <Down>
+"nnoremap j      j
+"nnoremap k      k
+"
+"inoremap <expr> <Up> mode(1) == "ic" ?  '<Up>' : '<Up><C-o>' 
+"inoremap <expr> <Down> mode(1) == "ic" ?  '<Down>' : '<Down><C-o>' 
+"vnoremap <Up>   <Up>
+"vnoremap <Down> <Down>
 
-nnoremap    <C-Up> <C-u>zz
-nnoremap    <C-K> <C-u>zz
-nnoremap    <C-Down> <C-d>zz
-nnoremap    <C-J> <C-d>zz
-inoremap    <C-Up> <C-u><C-o>zz
-inoremap    <C-Down> <C-d><C-o>zz
-inoremap    <C-J> <C-u><C-o>zz
-inoremap    <C-K> <C-d><C-o>zz
-vnoremap    <C-Up> <C-u>zz
-vnoremap    <C-Down> <C-d>zz
-vnoremap    <C-J> <C-u>zz
-vnoremap    <C-K> <C-d>zz
+nnoremap    <C-Up> {
+nnoremap    <C-K> {
+nnoremap    <C-Down> }
+nnoremap    <C-J> }
+inoremap    <C-Up> <C-\><C-o>{<C-\><C-o>
+inoremap    <C-K> <C-\><C-o>{<C-\><C-o>
+inoremap    <C-Down> <C-\><C-o>}<C-\><C-o>
+inoremap    <C-J> <C-\><C-o>}<C-\><C-o>
+vnoremap    <C-Up> {
+vnoremap    <C-Down> {
+vnoremap    <C-J> }
+vnoremap    <C-K> }
+
 
 " Both K and Ctrl Shift K go one page up in normal mode
-nnoremap    <S-Up>      <S-Up>zz
-nnoremap    K           <S-Up>zz
-nnoremap    <C-S-K>     <S-Up>zz
-nnoremap    <S-Down>    <S-Down>zz
-nnoremap    J           <S-Down>zz
-nnoremap    <C-S-J>     <S-Down>zz
-inoremap    <S-Up>      <S-Up><C-o>zz
-inoremap    <S-Down>    <S-Down><C-o>zz
-inoremap    <C-S-J>     <S-Down><C-o>zz
-inoremap    <C-S-K>     <S-Up><C-o>zz
-vnoremap    <S-Up>      <S-Up>zzgv
-vnoremap    <S-Down>    <C-d>zzgv
-vnoremap    <C-S-J>     <S-J>zzgv
-vnoremap    <C-S-K>     <S-K>zzgv
+nnoremap    <S-Up>      <PageUp>
+nnoremap    K           <S-Up>
+nnoremap    <C-S-K>     <S-Up>
+nnoremap    <S-Down>    <S-Down>
+nnoremap    J           <S-Down>
+nnoremap    <C-S-J>     <S-Down>
+inoremap    <S-Up>      <S-Up><C-o>
+inoremap    <S-Down>    <S-Down><C-o>
+inoremap    <C-S-J>     <S-Down><C-o>
+inoremap    <C-S-K>     <S-Up><C-o>
+vnoremap    <S-Up>      <S-Up>gv
+vnoremap    <S-Down>    <C-d>gv
+vnoremap    <C-S-J>     <S-J>gv
+vnoremap    <C-S-K>     <S-K>gv
 
 nnoremap    <C-S-Up>    1G
 nnoremap    <C-S-Down>  G
@@ -114,15 +192,15 @@ vnoremap    <A-K>   :m '<-2<CR>gv
 nnoremap <C-Right>  e
 nnoremap <S-Right>  E
 nnoremap <C-Left>   b
-nnoremap <C-Left>   B
-inoremap <C-Right>  <Esc>ea
-inoremap <S-Right>  <Esc>Ea
-inoremap <C-Left>   <Esc>ba
-inoremap <C-Left>   <Esc>Ba
+nnoremap <S-Left>   B
+inoremap <C-Right>  <C-\><C-o>e
+inoremap <S-Right>  <C-\><C-o>E
+inoremap <C-Left>   <C-\><C-o>b
+inoremap <S-Left>   <C-\><C-o>B
 vnoremap <C-Right>  e
 vnoremap <S-Right>  E
 vnoremap <C-Left>   b
-vnoremap <C-Left>   B
+vnoremap <S-Left>   B
 
 
 " 0 => beginning of 'column'
@@ -134,20 +212,33 @@ vnoremap <C-Left>   B
 " Same for End of line, only you go down
 
 function! LastCheck()
-    if col(".") ==? col("$")-1 || col('$') ==? 1
-        return 'j$'
+    if col(".") == col("$")-1 || col('$') == 1
+        return 1
     else
-        return '$'
+        return 0
     endif
 endfunction
 
-nnoremap <expr> <A-Left>    (col(".") ==? 1 ? '<Up>0' : '0')
-nnoremap <expr> <A-right>   LastCheck()
-inoremap <A-right>          (col(".") ==? 1 ? '<esc><up>0i' : '<esc>0i')
-inoremap <A-left>           LastCheck()
-vnoremap <A-right>          (col(".") ==? 1 ? '<up>0' : '0')
-vnoremap <A-left>           LastCheck()
+function! LastCheckI()
+    if col(".") == col("$") || col('$') == 1
+        return 1
+    else
+        return 0
+    endif
+endfunction 
 
+nnoremap <expr> <A-Left>    (col(".") ==? 1 ? '<Up>0' : '0')
+nnoremap <expr> <A-right>   LastCheck() ? '<Down>$' : '$' 
+inoremap <expr> <A-Left>    (col('.') ==? 1 ? '<Up><C-\><C-o>0' : '<C-\><C-o>0')
+inoremap <expr> <A-Right>   LastCheckI() ? '<C-o><Down><C-\><C-o>$' : '<C-\><C-o>$'
+vnoremap <expr> <A-Left>    (col(".") ==? 1 ? '<Up>0' : '0')
+vnoremap <expr> <A-Right>   LastCheck() ? '<Down>$' : '$'
+
+" Space for normal mode"
+nnoremap <space>    i<space><esc><Right>
+
+" Delete for normal mode
+nnoremap <Delete> i<Delete><Esc>
 
 " enter -> newline without entering insert mode
 nnoremap <Enter> i<Enter><Esc>
@@ -157,9 +248,10 @@ nnoremap <C-Enter>      0i<enter><up><esc>
 inoremap <C-Enter>      <Esc>0i<enter>
 vnoremap <C-Enter>      <Esc>`<i<Enter><Esc>gv
 "alt enter -> newline without entering insert mode
+
 nnoremap <A-Enter>      o<esc>
 inoremap <A-Enter>      <Esc>o
-vnoremap <A-Enter>      `<<esc>o<esc>gv
+vnoremap <A-Enter>      o<esc><enter>gv
 
 
 " BackSpace -> backspace no leave normal mode
@@ -176,14 +268,6 @@ inoremap <A-Backspace>      <Esc>dd<Up>$a
 nnoremap <C-S-backspace>      <Delete>
 inoremap <C-S-backspace>      <Delete>
 
-" Tab => Add Tab"
-" V => indent
-nnoremap <tab>      i<tab><esc><right>
-vnoremap <tab>      >gv
-vnoremap <s-tab>    <gv
-
-" Space => add space"
-nnoremap <space>    i<space><esc><Right>
 
 " ctrl-a  n  ctrl-a	add n to the number at or after the cursor
 " ctrl-x  n  ctrl-x	subtract n from the number at or after the cursor
@@ -194,17 +278,14 @@ vnoremap + <C-a>gv
 vnoremap - <C-x>gv
 inoremap <A-+> <C-a>
 inoremap <A--> <C-x>
-"557++++++++++++++++++++++124
+"879++++++++++++++++++++++124
 
 " Swap case insert
 "inoremap <C-~> <Esc>~a
 
-"Regular m => Middle of screen
-"nnoremap m zz
-
 " Ctrl - r is -> Redo (universal) :
 nnoremap <C-r> :redo<CR>
-inoremap <C-r> <C-\><C-o>:redo<CR>
+inoremap <C-r> <Esc>:redo<CR>a
 vnoremap <C-r> <Esc>:redo<CR>gv 
 
 " Regular z => undo
@@ -216,7 +297,7 @@ vnoremap <C-z> u
 
 " C-w => Write
 nnoremap <C-w> :write!<CR>
-inoremap <C-w> <C-\><C-o>:write!<CR>
+inoremap <C-w> <Esc>:write!<CR>a
 vnoremap <C-w> <Esc>:write!<CR>gv
 
 " C-q => Quit
@@ -280,6 +361,15 @@ cnoremap <M-S-F> <C-e><C-u>nohl<CR>:<Esc>
 " Normal clipboard functionality for yy, y and d
 
 set clipboard+=unnamedplus
+nnoremap y "+y
+nnoremap yy "+0yg_
+nnoremap Y "+Y
+nnoremap YY "+0Yg_
+vnoremap y "+y
+vnoremap yy "+0yg_
+vnoremap Y "+Y
+vnoremap YY "+0Yg_
+
 nnoremap c "+y
 nnoremap cc "+0yg_
 nnoremap C "+Y
@@ -289,40 +379,47 @@ vnoremap cc "+0yg_
 vnoremap C "+Y
 vnoremap CC "+0Yg_"
 
-nnoremap v :set paste<CR>"+p:set nopaste<CR>
-nnoremap V :set paste<CR>"+P:set nopaste<CR>
+nnoremap v "0p
+nnoremap V "0P
+vnoremap v "0p  
+vnoremap V "0P
+
+nnoremap p "0p
+nnoremap P "0P
+vnoremap p "0p  
+vnoremap P "0P
 
 nnoremap <A-d> cc
 vnoremap <A-d> c
-inoremap <A-d> <C-\><C-o>cc
+inoremap <A-d> <Esc>cc
 
 "" Normal mode => whole line
 "" Insert mode => word
 "" visual => by selection
 "" Best register no register
-nnoremap <C-c>          "+yy 
-nnoremap <silent> <C-v> :r !xclip -o -sel c<CR>
-nnoremap <C-d>          (col(".") ==? 1 ? '<C-\><C-o>daw' : '<C-\><C-o>diw')
+"" https://stackoverflow.com/questions/22598644/vim-copy-non-linewise-without-leading-or-trailing-spaces
+nnoremap <C-c>  "+^yg_ 
+nnoremap <silent> <C-v> "0P
+nnoremap <C-d>  (col(".") ==? 1 ? '<C-\><C-o>daw' : '<C-\><C-o>diw')
+""" Copy inner word except when on first line (copy a word)
+inoremap <expr> <C-c>   (col(".") ==? 1 ? '<C-\><C-o>"+yaw' : '<C-\><C-o>"+yiw')
 "" Paste with P if at beginning of line
-inoremap <expr> <C-c>   (col(".") ==? 1 ? '<C-\><C-o>"+yawa' : '<C-\><C-o>"+yiwa')
-"" Paste with P if at beginning of line
-inoremap <silent> <C-v> <C-\><C-o>:r !xclip -o -sel c<CR>
+inoremap <silent> <C-v> <C-\><C-o>"0P
 "" Cut with a word instead of inner word if at beginning of line
 inoremap <expr> <C-d>   (col(".") ==? 1 ? '<C-\><C-o>daw' : '<C-\><C-o>diw')
-"inoremap <expr> <C-x>
-vnoremap <C-c>          "+y 
-vnoremap <silent> <C-v> <C-\><C-o>:r !xclip -o -sel c<CR>
-vnoremap <C-d>          "*d 
-"
-nnoremap <C-S-d>          <Down>"*dd<Up>
-inoremap <expr> <C-S-d>   (col(".") ==? 1 ? '<C-\><C-o>daW' : '<C-\><C-o>diW')
-vnoremap <C-S-d>          "*D
+vnoremap <C-c>  "+y 
+vnoremap <silent> <C-v> "0P
+vnoremap <C-d>  "*d 
+
+nnoremap <C-S-d>    <Down>"*dd<Up>
+inoremap <expr> <C-S-d> (col(".") ==? 1 ? '<C-\><C-o>daW' : '<C-\><C-o>diW')
+vnoremap <C-S-d>    "*D
 
 " a => (insert) Append after cursor
 " A => Insert before
 "
 " Ctrl-A normal => insert
-" Ctrl-A visual => Change selected line
+" Ctrl-A visual => Chang$e selected line
 " Ctrl-A Insert => Back to normal
 nnoremap <C-a> a
 vnoremap <C-a> <C-o>
@@ -368,20 +465,6 @@ inoremap <C-A-S> <C-o>V
 "    endif
 "endfunction
 
-vnoremap [          di[]<Esc><Left>p<Esc> 
-vnoremap {          di{}<Esc><Left>p<Esc> 
-vnoremap (          di()<Esc><Left>p<Esc> 
-vnoremap <          di<><Esc><Left>p<Esc>
-vnoremap <C-<>      di</><Esc><Left><Left>p<Esc>
-vnoremap `          di``<Esc><Left>p<Esc>
-vnoremap '          di''<Esc><Left>p<Esc> 
-vnoremap <expr> "   visualmode() == "\<C-V>" ?  'I"<Esc>' : 'di""<Esc><Left>p<Esc>'
-vnoremap <expr> #   visualmode() == "\<C-V>" ?  'I#<Esc>' : 'di##<Esc><Left>p<Esc>'
-
-
-" Vim ® Autocompletion 
-"nnoremap <C-tab> i<C-x>
-
 
 "" vim tmux navigator integrator
 "let g:tmux_navigator_no_mappings = 1
@@ -391,13 +474,14 @@ vnoremap <expr> #   visualmode() == "\<C-V>" ?  'I#<Esc>' : 'di##<Esc><Left>p<Es
 "noremap <silent> <C-S-Right> :<C-U>TmuxNavigateRight<cr>
 "noremap <silent> <C-²> :<C-U>TmuxNavigatePrevious<cr>
 
-
-":colorscheme evening
 "highlight Visual cterm=reverse ctermbg=NONE
 " These options and commands enable some very useful features in Vim, that
 " no user should live without
 " Set 'nocompatible' to ward off unexpected things that your distro might
 " have made, as well as sanely reset options when re-sourcing .vimrc
+
+"If you set scrollof to a very large value (999) the cursor line will always be at the middle 
+ set scrolloff=999
 
 " Attempt to determine the type of a file based on its name and possibly its
 " contents. Use this to allow intelligent auto-indenting for each filetype,
@@ -523,7 +607,7 @@ set number
 set wrap
 
 " Quickly time out on keycodes, but never time out on mappings
-set ttimeout ttimeoutlen=100
+set ttimeout ttimeoutlen=200
 
 " Use <F9> to toggle between 'paste' and 'nopaste'
 " set pastetoggle=<F9>
