@@ -20,7 +20,7 @@ do
     fi 
 done
 if ! sudo grep -q VncAuth /root/.vnc/config.d/vncserver-x11; then
-    echo "Execute: 'echo \"Authentication=VncAuth\" >> /root/.vnc/config.d/vncserver-x11"
+    echo "Execute: echo \"Authentication=VncAuth\" >> /root/.vnc/config.d/vncserver-x11"
     sudo -i
 fi
 sudo vncpasswd -service
