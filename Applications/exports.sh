@@ -16,8 +16,8 @@ export SYSTEMD_PAGER=$PAGER
 export LC_ALL=en_US.UTF-8
 #export DISPLAY=":0.0"
 export EDITOR="nvim"
+#export VISUAL="/usr/bin/code --unity-launch %F"
 export VISUAL="nvim"
-export VISUAL="/usr/bin/code --unity-launch %F"
 
 export INPUTRC='~/.inputrc'
 export RANGER_LOAD_DEFAULT_RC="~/rc.conf"
@@ -35,6 +35,10 @@ export MYGVIMRC=".config/nvim/init.vim"
 
 # EMACS
 export PATH='~/.emacs.d/bin/':$PATH
+
+# KITTY
+export KITTY_PATH=~/.local/bin/
+export PATH=$KITTY_PATH:$PATH
 
 # PYTHON
 export PYTHONPATH='/usr/bin/python:/usr/bin/python3:/usr/bin/python3.10'
