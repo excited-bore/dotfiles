@@ -32,22 +32,25 @@ if [ -z $init ]; then
     fi
     cp -f init.vim ~/.config/nvim/
 
-    read -p "Install init.vim with root symlink? (neovim conf at /root/.config/nvim/) [Y/n]:" root
+    read -p "Install .vimrc for user with symlink? (vim conf at ~/.vimrc) [Y/n]:" vimrc
+    if [ -z $vimrc ]; then
+        ln -s ~/.config/nvim/init.vim ~/.vimrc
+    fi
+
+    read -p "Install init.vim, .vimrc and .vim/ with root symlink? (neovim and vim conf at /root/) [Y/n]:" root
     if [ -z $root ]; then
         if [ ! -e /root/.config/nvim ]; then
             sudo mkdir -p /root/.config/nvim
         fi
-        sudo cp -f init.vim /root/.config/nvim/
+        sudo ln -s ~/.config/nvim/init.vim /root/.config/nvim/
+        sudo ln -s ~/.config/nvim/init.vim /root/.vimrc
+        sudo ln -s ~/.vim /root/
     fi
 fi
 
 
-read -p "Install vim.sh at ~/Applications/ (nvim aliases)? [Y/n]:" aliases
+read -p "Install vim_nvim.sh at ~/Applications/ (nvim aliases)? [Y/n]:" aliases
 if [ -z $aliases ]; then 
-
-    if [ ! -d ~/Applications ]; then
-        mkdir ~/Applications
-    fi
 
     cp -f Applications/vim_nvim.sh ~/.bash_aliases.d/
     #if ! grep -q vim_nvim.sh ~/.bashrc; then
@@ -63,13 +66,13 @@ if [ -z $aliases ]; then
     fi
 fi
 
-if [[ -d ~/.vim/bundle/YouCompleteMe/ ]];then
-    sudo rm -rf ~/.vim/bundle/YouCompleteMe/
-fi
-
-if [[ -d ~/.vim/bundle/Vundle.vim ]]; then
-    sudo rm -rf ~/.vim/bundle/Vundle.vim
-fi
+#if [[ -d ~/.vim/bundle/YouCompleteMe/ ]];then
+#    sudo rm -rf ~/.vim/bundle/YouCompleteMe/
+#fi
+#
+#if [[ -d ~/.vim/bundle/Vundle.vim ]]; then
+#    sudo rm -rf ~/.vim/bundle/Vundle.vim
+#fi
 git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 nvim +PluginInstall +qall
 
