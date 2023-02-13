@@ -46,6 +46,6 @@ fi
  read -p "Install kitty conf? (at ~/.config/kitty/kitty.conf) [Y/n]:" kittn
 if [ -z $kittn ]; then
     mkdir -p ~/.config/kitty
-    cp -f kitty/kitty.conf .config/kitty/kitty.conf
+    cp -f kitty/kitty.conf ~/.config/kitty/kitty.conf
 fi
 
