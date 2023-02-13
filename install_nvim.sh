@@ -49,7 +49,7 @@ if [ -z $init ]; then
 fi
 
 
-read -p "Install vim_nvim.sh at ~/Applications/ (nvim aliases)? [Y/n]:" aliases
+read -p "Install vim_nvim.sh at ~/.bash_aliases.d/ (nvim aliases)? [Y/n]:" aliases
 if [ -z $aliases ]; then 
 
     cp -f Applications/vim_nvim.sh ~/.bash_aliases.d/

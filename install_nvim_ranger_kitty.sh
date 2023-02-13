@@ -34,7 +34,7 @@ done
 read -p "Install rc.conf and rifle.conf? (ranger conf at ~/.conf/ranger/) [Y/n]:" rcc
 if [ -z $rcc ]; then
     mkdir -p ~/.config/ranger/
-    cp -f -t ~/.config/ranger range/rc.conf ranger/rifle.conf
+    cp -f -t ~/.config/ranger ranger/rc.conf ranger/rifle.conf
 fi
 
 read -p "Install ranger plugins? (plugins at ~/.conf/ranger/plugins) [Y/n]:" rplg
