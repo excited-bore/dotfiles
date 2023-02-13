@@ -1,13 +1,13 @@
-# Bash_aliases
+# Bash_aliases at ~/.bash_aliases.d/ 
 # global bashrc -> /etc/bash.bashrc
-# global shell profiles -> /etc/profile
+# root shell profiles -> /etc/profile
 # Other bindings at .inputrc
 
 alias binds_xterm="xrdb -query -all"
 alias binds_stty="stty -a"
 alias binds_readline="bind -p | less"
 
-exec /usr/bin/urxvt $@
+alias binds_kitty='kitty +kitten show_key -m kitty'
 
 alias r=". ~/.bashrc"
 
@@ -30,14 +30,14 @@ xmodmap -e "keycode 119 = Delete BackSpace"
 #stty werase '[3;2~'
 
 # unbinds ctrl-c and bind the function to ctrl-q
-stty intr '^q'
+stty intr '^x'
 
 # Turn off flow control and free up Ctr-s 
 stty -ixon
 stty -ixoff
 stty start 'undef' 
 stty stop 'undef'
-stty lnext '^'
+stty lnext '^V'
 
 #Free up Ctrl-z
 stty susp 'undef'

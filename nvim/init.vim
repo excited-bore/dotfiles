@@ -40,12 +40,17 @@ Plugin 'morhetz/gruvbox'
 " Nice status bar thingy
 Plugin 'vim-airline/vim-airline'
 
+" Nice icons
+Plugin 'ryanoasis/vim-devicons'
 
 " Vim lua plugin
 " Plugin 'svermeulen/vimpeccable'
 
 "" All of your Plugins must be added before the following line
 call vundle#end()
+
+"For vim-devicons
+"set encoding=UTF-8
 
  "Use 24-bit (true-color) mode in Vim/Neovim when outside tmux.
 "If you're using tmux version 2.2 or later, you can remove the outermost $TMUX check and use tmux's 24-bit color support
@@ -104,6 +109,8 @@ inoremap <expr> <C-Tab> mode(1) == "ic" ?  '<Esc>a' : '<plug>(YCMComplete)'
 
 inoremap <Space> <C-y><Space>
 inoremap <Right> <C-y><Right>
+inoremap <Space> <C-y><Enter>
+
 
 " Buffer things 
 map <leader><Right> :bnext<cr>
@@ -126,7 +133,7 @@ vnoremap {          di{}<Esc><Left>p<Esc>
 vnoremap (          di()<Esc><Left>p<Esc> 
 
 "inoremap <           <>
-vnoremap <          di<><Esc><Left>p<Esc>
+"vnoremap <          di<><Esc><Left>p<Esc>
 vnoremap <C-<>      di</><Esc><Left><Left>p<Esc>
 
 vnoremap `          di``<Esc><Left>p<Esc>
@@ -313,8 +320,8 @@ inoremap <A--> <C-x>
 
 " Ctrl - r is -> Redo (universal) :
 nnoremap <C-r> :redo<CR>
-inoremap <C-r> <Esc>:redo<CR>a
-vnoremap <C-r> <Esc>:redo<CR>gv 
+inoremap <C-r> <C-o>:redo<CR>a
+vnoremap <C-r> <C-o>:redo<CR>gv 
 
 " Regular z => undo
 nnoremap z u

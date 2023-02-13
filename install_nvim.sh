@@ -21,7 +21,7 @@ do
     elif [ -f $f ] && [ $f == /etc/debian_version ];then
         echo Package manager: ${osInfo[$f]}
         pm=${osInfo[$f]}
-        sudo apt install neovim xclip build-essential cmake python3-dev mono-complete golang nodejs openjdk-17-jdk openjdk-17-jre npm
+        sudo apt install neovim xclip build-essential cmake python3-dev mono-complete golang gopls nodejs openjdk-17-jdk openjdk-17-jre npm
     fi 
 done
 
@@ -49,17 +49,17 @@ if [ -z $aliases ]; then
         mkdir ~/Applications
     fi
 
-    cp -f Applications/vim_nvim.sh ~/Applications/
-    if ! grep -q vim_nvim.sh ~/.bashrc; then
+    cp -f Applications/vim_nvim.sh ~/.bash_aliases.d/
+    #if ! grep -q vim_nvim.sh ~/.bashrc; then
 
-        echo "if [[ -f ~/Applications/vim_nvim.sh ]]; then" >> ~/.bashrc
-        echo "  . ~/Applications/vim_nvim.sh" >> ~/.bashrc
-        echo "fi" >> ~/.bashrc
-    fi
+    #    echo "if [[ -f ~/Applications/vim_nvim.sh ]]; then" >> ~/.bashrc
+    #    echo "  . ~/Applications/vim_nvim.sh" >> ~/.bashrc
+    #    echo "fi" >> ~/.bashrc
+    #fi
 
     read -p "Install vim_nvim.sh globally at /etc/profile.d/ ? [Y/n]:" galiases  
     if [ -z $galiases ]; then 
-        sudo ln -s Applications/vim_nvim.sh /etc/profile.d/
+        sudo cp -f ~/.bash_aliases.d/vim_nvim.sh /etc/profile.d/
     fi
 fi
 

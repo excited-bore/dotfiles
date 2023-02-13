@@ -67,6 +67,15 @@ function link_hard(){
     fi
 }
 
+# Shamelessly stolen from manjaro /etc/profile
+append_path () {
+    case ":$PATH:" in
+        *:"$1":*)
+            ;;
+        *)
+            PATH="${PATH:+$PATH:}$1"
+    esac
+}
 
 function trash(){
     for arg in $@ ; do
