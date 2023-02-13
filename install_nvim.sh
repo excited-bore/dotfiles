@@ -76,10 +76,4 @@ fi
 git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 nvim +PluginInstall +qall
 
-if [ $pm == /etc/arch-release ]; then
-    python ~/.vim/bundle/YouCompleteMe/install.py --all
-elif [ $pm == /etc/debian_version ];then  
-    python3 ~/.vim/bundle/YouCompleteMe/install.py --all
-else
-    python ~/.vim/bundle/YouCompleteMe/install.py --all
-fi
+python3 ~/.vim/bundle/YouCompleteMe/install.py --all
