@@ -44,7 +44,7 @@ if [ -z $scripts ]; then
     if ! grep -q "~/.bash_aliases.d" ~/.bashrc; then
 
         echo "if [[ -d ~/.bash_aliases.d/ ]]; then" >> ~/.bashrc
-        echo "  for alias in ~/.bash_aliases.d/; do" >> ~/.bashrc
+        echo "  for alias in ~/.bash_aliases.d/*.sh; do" >> ~/.bashrc
         echo "      . \"\$alias\" " >> ~/.bashrc
         echo "  done" >> ~/.bashrc
         echo "fi" >> ~/.bashrc
@@ -110,7 +110,7 @@ if [ -z $scripts ]; then
         fi
     fi
 
-    read -p "Install git.sh at /etc/X11/xinit/xinitrc.d (git aliases)? [Y/n]:" gitsh
+    read -p "Install git.sh at ~/.bash_aliases.d/ (git aliases)? [Y/n]:" gitsh
     if [ -z $gitsh ]; then 
 
         cp -f Applications/git.sh ~/.bash_aliases.d/
@@ -128,7 +128,7 @@ if [ -z $scripts ]; then
         fi
     fi
 
-    read -p "Install ssh.sh at /etc/X11/xinit/xinitrc.d (ssh related aliases)? [Y/n]:" sshsh
+    read -p "Install ssh.sh at ~/.bash_aliases.d/ (ssh related aliases)? [Y/n]:" sshsh
     if [ -z $sshsh ]; then 
 
         cp -f Applications/ssh.sh ~/.bash_aliases.d/
@@ -146,7 +146,7 @@ if [ -z $scripts ]; then
         fi
     fi
 
-    read -p "Install package_managers.sh at /etc/X11/xinit/xinitrc.d (package manager aliases)? [Y/n]:" packmang
+    read -p "Install package_managers.sh at ~/.bash_aliases.d/ (package manager aliases)? [Y/n]:" packmang
     if [ -z $packmang ]; then 
 
         cp -f Applications/package_managers.sh ~/.bash_aliases.d/
@@ -164,7 +164,7 @@ if [ -z $scripts ]; then
         fi
     fi
 
-    read -p "Install manjaro.sh at /etc/X11/xinit/xinitrc.d (manjaro specific aliases)? [Y/n]:" manjar
+    read -p "Install manjaro.sh at ~/.bash_aliases.d/ (manjaro specific aliases)? [Y/n]:" manjar
     if [ -z $manjar ]; then
 
         cp -f Applications/manjaro.sh ~/.bash_aliases.d/
@@ -181,7 +181,7 @@ if [ -z $scripts ]; then
         fi
     fi
 
-    read -p "Install youtube.sh at /etc/X11/xinit/xinitrc.d (youtube-dl aliases)? [Y/n]:" youtube
+    read -p "Install youtube.sh at ~/.bash_aliases.d/ (youtube-dl aliases)? [Y/n]:" youtube
     if [ -z $youtube ]; then 
 
         cp -f Applications/youtube.sh ~/.bash_aliases.d/
@@ -200,16 +200,16 @@ if [ -z $scripts ]; then
 
     fi
 
-    read -p "Install variety.sh at /etc/X11/xinit/xinitrc.d (variety of applications)? [Y/n]:" variety
+    read -p "Install variety.sh at ~/.bash_aliases.d/ (variety of applications)? [Y/n]:" variety
     if [ -z $variety ]; then 
 
         cp -f Applications/variety.sh ~/.bash_aliases.d/
 
-        if ! grep -q variety.sh ~/.bashrc; then
-            echo "if [[ -f ~/.bash_aliases.d/variety.sh ]]; then" >> ~/.bashrc
-            echo "  . ~/.bash_aliases.d/variety.sh" >> ~/.bashrc
-            echo "fi" >> ~/.bashrc
-        fi
+        #if ! grep -q variety.sh ~/.bashrc; then
+        #    echo "if [[ -f ~/.bash_aliases.d/variety.sh ]]; then" >> ~/.bashrc
+        #    echo "  . ~/.bash_aliases.d/variety.sh" >> ~/.bashrc
+        #    echo "fi" >> ~/.bashrc
+        #fi
 
         read -p "Install variety.sh globally at /etc/profile.d/ [Y/n]:" gvariety
 

@@ -15,9 +15,6 @@ alias r=". ~/.bashrc"
 # xrdb -merge ~/.Xresources
 # .Inputrc (readline conf) however has to be compiled, so restart shell
 
-# Set caps as Escape
-#setxkbmap -option "escape:caps_switch" 
-
 # Set caps to Escape
 setxkbmap -option caps:escape
 
