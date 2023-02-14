@@ -23,14 +23,7 @@ Plugin 'tpope/vim-fugitive'
 "
 ""vim-tmux-navigator, smart navigation between vim and tmux panes
 "Plugin 'christoomey/vim-tmux-navigator'
-
-" Ranger integration
-" https://github.com/francoiscabrol/ranger.vim
-Plugin 'francoiscabrol/ranger.vim'
-Plugin 'rbgrouleff/bclose.vim'
-
-"Plugin 'Lokaltog/neoranger'
-
+"
 "" Self documemting vim wiki
 Plugin 'vimwiki/vimwiki'
 
@@ -40,38 +33,16 @@ Plugin 'morhetz/gruvbox'
 " Nice status bar thingy
 Plugin 'vim-airline/vim-airline'
 
-" Nice icons
-Plugin 'ryanoasis/vim-devicons'
-
 " Vim lua plugin
 " Plugin 'svermeulen/vimpeccable'
 
 "" All of your Plugins must be added before the following line
 call vundle#end()
 
-"For vim-devicons
-"set encoding=UTF-8
-
  "Use 24-bit (true-color) mode in Vim/Neovim when outside tmux.
 "If you're using tmux version 2.2 or later, you can remove the outermost $TMUX check and use tmux's 24-bit color support
 "(see < http://sunaku.github.io/tmux-24bit-color.html#usage > for more information.)
 
- "" vim tmux navigator integrator
-"let g:tmux_navigator_no_mappings = 1
-"noremap <silent> <C-S-Left> :<C-U>TmuxNavigateLeft<cr>
-"noremap <silent> <C-S-Down> :<C-U>TmuxNavigateDown<cr>
-"noremap <silent> <C-S-Up> :<C-U>TmuxNavigateUp<cr>
-"noremap <silent> <C-S-Right> :<C-U>TmuxNavigateRight<cr>
-"noremap <silent> <C-²> :<C-U>TmuxNavigatePrevious<cr>
-
-" Tell vim-airline to use a different font
-"  https://blog.pdhawan.com/vim-airline-powerful-status-line-4dda605adae5
-let g:airline_powerline_fonts = 1
-let g:airline#extensions#tabline#enabled = 1
-
-" Open ranger instead of netrw when you open a directory
- let g:ranger_replace_netrw = 1 
- let g:ranger_command_override = 'ranger --cmd "set show_hidden=true"'
 
 "" Gruvbox things
 let g:gruvbox_italic=1
@@ -109,16 +80,10 @@ inoremap <expr> <C-Tab> mode(1) == "ic" ?  '<Esc>a' : '<plug>(YCMComplete)'
 
 inoremap <Space> <C-y><Space>
 inoremap <Right> <C-y><Right>
-inoremap <Space> <C-y><Enter>
 
-
-" Buffer things 
-map <leader><Right> :bnext<cr>
-map <leader><Left> :bprevious<cr>
-"map <leader>k :bdelete<cr>
-
+" Vim ® Autocompletion 
 " Tab => Add Tab"
-" Visualmode => indent
+" V => indent
 nnoremap <tab>      i<tab><esc><right>
 vnoremap <tab>      >gv
 vnoremap <s-tab>    <gv
@@ -133,7 +98,8 @@ vnoremap {          di{}<Esc><Left>p<Esc>
 vnoremap (          di()<Esc><Left>p<Esc> 
 
 "inoremap <           <>
-"vnoremap <          di<><Esc><Left>p<Esc>
+vnoremap >          >gv
+vnoremap <          <gv
 vnoremap <C-<>      di</><Esc><Left><Left>p<Esc>
 
 vnoremap `          di``<Esc><Left>p<Esc>
@@ -188,10 +154,10 @@ nnoremap    <C-S-K>     <S-Up>
 nnoremap    <S-Down>    <S-Down>
 nnoremap    J           <S-Down>
 nnoremap    <C-S-J>     <S-Down>
-inoremap    <S-Up>      <S-Up>
-inoremap    <S-Down>    <S-Down>
-inoremap    <C-S-J>     <S-Down>
-inoremap    <C-S-K>     <S-Up>
+inoremap    <S-Up>      <S-Up><C-o>
+inoremap    <S-Down>    <S-Down><C-o>
+inoremap    <C-S-J>     <S-Down><C-o>
+inoremap    <C-S-K>     <S-Up><C-o>
 vnoremap    <S-Up>      <S-Up>gv
 vnoremap    <S-Down>    <C-d>gv
 vnoremap    <C-S-J>     <S-J>gv
@@ -199,8 +165,8 @@ vnoremap    <C-S-K>     <S-K>gv
 
 nnoremap    <C-S-Up>    1G
 nnoremap    <C-S-Down>  G
-inoremap    <C-S-Up>    <C-\><C-o>1G
-inoremap    <C-S-Down>  <C-\><C-o>G
+inoremap    <C-S-Up>    <C-o>1Gi
+inoremap    <C-S-Down>  <C-o>Gi
 vnoremap    <C-S-Up>    1G
 vnoremap    <C-S-Down>  G
 
@@ -320,8 +286,8 @@ inoremap <A--> <C-x>
 
 " Ctrl - r is -> Redo (universal) :
 nnoremap <C-r> :redo<CR>
-inoremap <C-r> <C-o>:redo<CR>a
-vnoremap <C-r> <C-o>:redo<CR>gv 
+inoremap <C-r> <Esc>:redo<CR>a
+vnoremap <C-r> <Esc>:redo<CR>gv 
 
 " Regular z => undo
 nnoremap z u
@@ -335,15 +301,11 @@ nnoremap <C-w> :write!<CR>
 inoremap <C-w> <Esc>:write!<CR>a
 vnoremap <C-w> <Esc>:write!<CR>gv
 
-" C-q => Quit buffer
-nnoremap <silent> <expr> <C-q> len(filter(range(1, bufnr('$')), 'buflisted(v:val)')) == 1 ? ':q!<CR>' : ':bdelete<CR>'
-inoremap <silent> <expr> <C-q> len(filter(range(1, bufnr('$')), 'buflisted(v:val)')) == 1 ? '<C-\><C-o>:q!<CR>' : '<C-\><C-o>:bdelete<CR>'                                                     
-vnoremap <silent> <C-q> <C-\><C-o>:bdelete<CR>gv 
- " C-q => Quit buffer
-nnoremap <silent> <A-q> :q!<Enter>
-inoremap <silent> <A-q> <Esc>:q!<CR>
-vnoremap <silent> <A-q> <Esc>:q!<CR> 
- 
+" C-q => Quit
+nnoremap <C-q> :q!<Enter>
+inoremap <C-q> <Esc>:q!<CR>
+vnoremap <C-q> <Esc>:q!<CR> 
+
 
 " Toggle highlight => Ctrl+l
 " https://stackoverflow.com/questions/9054780/how-to-toggle-vims-search-highlight-visibility-without-disabling-it
@@ -384,12 +346,12 @@ nnoremap F ?
 " Alt-f => Global search
 nnoremap <A-f> :%s,,,gc<Left><Left><Left><Left>
 inoremap <A-f> <C-\><C-o>:%s,,,gc<Left><Left><Left><Left>
-vnoremap <A-f> :%s,,,gc<Left><Left><Left><Left>
+vnoremap <A-f> <esc>:%s,\%V,,gc<Left><Left><Left>
 cnoremap <A-f> <C-e><C-u>nohl<CR>:<Esc>
 " Different seperator for Alt+Shift
 nnoremap <M-S-F> :%s///gc<Left><Left><Left><Left>
 inoremap <M-S-F> <C-\><C-o>:%s///gc<Left><Left><Left><Left>
-vnoremap <M-S-F> :%s///gc<Left><Left><Left><Left>
+vnoremap <M-S-F> <esc>:%s/\%V//gc<Left><Left><Left>
 cnoremap <M-S-F> <C-e><C-u>nohl<CR>:<Esc>
 
 " unnamedplus	A variant of the "unnamed" flag which uses the
@@ -400,14 +362,14 @@ cnoremap <M-S-F> <C-e><C-u>nohl<CR>:<Esc>
 " Normal clipboard functionality for yy, y and d
 
 set clipboard+=unnamedplus
-nnoremap y "+y
-nnoremap yy "+0yg_
-nnoremap Y "+Y
-nnoremap YY "+0Yg_
+nnoremap y "+^y
+nnoremap yy "+^yg_
+nnoremap Y "+^Y
+nnoremap YY "+^Yg_
 vnoremap y "+y
-vnoremap yy "+0yg_
+"vnoremap yy "+^yg_
 vnoremap Y "+Y
-vnoremap YY "+0Yg_
+"vnoremap YY "+^Yg_
 
 nnoremap c "+y
 nnoremap cc "+0yg_
@@ -424,9 +386,9 @@ vnoremap v "+p
 vnoremap V "+P
 
 nnoremap p "+p
-nnoremap P "+P
+nnoremap P o<esc>"+P
 vnoremap p "+p  
-vnoremap P "+P
+vnoremap P o<esc>"+P
 
 nnoremap <A-d> cc
 vnoremap <A-d> c
@@ -439,20 +401,23 @@ inoremap <A-d> <Esc>cc
 "" https://stackoverflow.com/questions/22598644/vim-copy-non-linewise-without-leading-or-trailing-spaces
 nnoremap <C-c>  "+^yg_ 
 nnoremap <silent> <C-v> "+P
-nnoremap <expr> <C-d>  (col(".") ==? 1 ? '"+daw' : '"+diw')
+nnoremap <C-d>  (col(".") ==? 1 ? '<C-\><C-o>daw' : '<C-\><C-o>diw')
 """ Copy inner word except when on first line (copy a word)
 inoremap <expr> <C-c>   (col(".") ==? 1 ? '<C-\><C-o>"+yaw' : '<C-\><C-o>"+yiw')
 "" Paste with P if at beginning of line
 inoremap <silent> <C-v> <C-\><C-o>"+P
 "" Cut with a word instead of inner word if at beginning of line
-inoremap <expr> <C-d>   (col(".") ==? 1 ? '<C-\><C-o>"+daw' : '<C-\><C-o>"+diw')
+inoremap <expr> <C-d>   (col(".") ==? 1 ? '<C-\><C-o>daw' : '<C-\><C-o>diw')
 vnoremap <C-c>  "+y 
 vnoremap <silent> <C-v> "+P
-vnoremap <C-d>  "+d 
+vnoremap <C-d>  "*d 
+"tnoremap <C-c>  <C-\><C-N>
+"tnoremap <C-v>  <C-W>"+
 
-nnoremap <C-S-d>    <Down>"+dd<Up>
+
+nnoremap <C-S-d>    <Down>"*dd<Up>
 inoremap <expr> <C-S-d> (col(".") ==? 1 ? '<C-\><C-o>daW' : '<C-\><C-o>diW')
-vnoremap <C-S-d>    "+D
+vnoremap <C-S-d>    "*D
 
 " a => (insert) Append after cursor
 " A => Insert before
@@ -505,6 +470,13 @@ inoremap <C-A-S> <C-o>V
 "endfunction
 
 
+"" vim tmux navigator integrator
+"let g:tmux_navigator_no_mappings = 1
+"noremap <silent> <C-S-Left> :<C-U>TmuxNavigateLeft<cr>
+"noremap <silent> <C-S-Down> :<C-U>TmuxNavigateDown<cr>
+"noremap <silent> <C-S-Up> :<C-U>TmuxNavigateUp<cr>
+"noremap <silent> <C-S-Right> :<C-U>TmuxNavigateRight<cr>
+"noremap <silent> <C-²> :<C-U>TmuxNavigatePrevious<cr>
 
 "highlight Visual cterm=reverse ctermbg=NONE
 " These options and commands enable some very useful features in Vim, that
