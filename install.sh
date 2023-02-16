@@ -49,15 +49,13 @@ fi
 
 read -p "Install .Xresources at ~/ ? (xfce4 config) [Y/n]:" Xresources
 if [ -z $Xresources ] || [ "y" == $Xresources ]; then
-    cp -f .Xresources ~/.Xresources
+    cp -f xterm/.Xresources ~/.Xresources
 #    xrdb -merge ~/.Xresources
 fi
 
 read -p "Install .inputrc at ~/ ? (readline config) [Y/n]:" inputrc
 if [ -z $inputrc ] || [ "y" == $inputrc ]; then 
-    cp -f .inputrc ~/
-else
-    echo $inputrc
+    cp -f readline/.inputrc ~/
 fi
 
 read -p "Create ~/.bash_aliases.d/, link it to .bashrc and install further scripts? [Y/n]:" scripts

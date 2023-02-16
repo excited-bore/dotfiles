@@ -30,7 +30,7 @@ if [ -z $init ]; then
     if [ ! -e ~/.config/nvim ]; then
         mkdir -p ~/.config/nvim
     fi
-    cp -f init.vim ~/.config/nvim/
+    cp -f vim/init.vim ~/.config/nvim/
 
     read -p "Install .vimrc for user with symlink? (vim conf at ~/.vimrc) [Y/n]:" vimrc
     if [ -z $vimrc ]; then
@@ -52,13 +52,7 @@ fi
 read -p "Install vim_nvim.sh at ~/.bash_aliases.d/ (nvim aliases)? [Y/n]:" aliases
 if [ -z $aliases ]; then 
 
-    cp -f Applications/vim_nvim.sh ~/.bash_aliases.d/
-    #if ! grep -q vim_nvim.sh ~/.bashrc; then
-
-    #    echo "if [[ -f ~/Applications/vim_nvim.sh ]]; then" >> ~/.bashrc
-    #    echo "  . ~/Applications/vim_nvim.sh" >> ~/.bashrc
-    #    echo "fi" >> ~/.bashrc
-    #fi
+    cp -f vim/vim_nvim.sh ~/.bash_aliases.d/
 
     read -p "Install vim_nvim.sh globally at /etc/profile.d/ ? [Y/n]:" galiases  
     if [ -z $galiases ]; then 

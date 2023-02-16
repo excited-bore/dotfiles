@@ -24,22 +24,17 @@ done
 sed -i "s/user/$USER/g" doas.conf
 sudo cp -f doas.conf /etc/doas.conf
 
-read -p "Add polkit rules? (rules at /etc/polkit-1/rules.d/) [Y/n]: " resp1
-if [ -z $resp1 ]; then
-    sudo cp -f 49-nopasswd_global.rules /etc/polkit-1/rules.d/49-nopasswd_global.rules
-fi
+./install_polkit_wheel.sh
 
 read -p "Install doas.sh? (Applications/doas.sh) [Y/n]:" doas
 if [ -z $doas ]; then 
-    cp -f Applications/doas.sh ~/Applications/doas.sh
-    if ! grep -q doas.sh ~/.bashrc; then
-        echo "if [[ -f ~/Applications/doas.sh ]]; then" >> ~/.bashrc
-        echo "  . ~/Applications/doas.sh" >> ~/.bashrc
-        echo "fi" >> ~/.bashrc
+    if [ ! -d ~/.bash_aliases.d/ ]; then
+        mkdir ~/.bash_aliases.d/
     fi
+    cp -f doas/doas.sh ~/.bash_aliases.d/doas.sh
     read -p "Install doas.sh globally? (/etc/profile.d/doas.sh [Y/n]:" gdoas  
     if [ -z $gdoas ]; then 
-        sudo ln -s Applications/doas.sh /etc/profile.d/doas.sh
+        sudo cp -f doas/doas.sh /etc/profile.d/doas.sh
     fi
 fi
 
