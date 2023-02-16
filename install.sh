@@ -63,7 +63,7 @@ fi
 read -p "Create ~/.bash_aliases.d/, link it to .bashrc and install further scripts? [Y/n]:" scripts
 if [ -z $scripts ] || [ "y" == $scripts ]; then
 
-    if  ! -d ~/.bash_aliases.d/ ; then
+    if [ ! -d ~/.bash_aliases.d/ ]; then
         mkdir ~/.bash_aliases.d/
     fi
 
@@ -78,7 +78,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
 
     read -p "Install bash completions for aliases in ~/.bash_completion.d? " compl
     if [ -z $compl ] || [ "y" == $compl ]; then
-        if ! -d ~/.bash_completion.d/ ; then 
+        if [ ! -d ~/.bash_completion.d/ ]; then 
             mkdir ~/.bash_completion.d
         fi
         if [ ! -e ~/.bash_completion.d/complete_alias ]; then
