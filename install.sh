@@ -23,12 +23,12 @@ do
 done
 
 read -p "Create ~/.config to ~/config symlink? [Y/n]:" sym1
-if [ -z $sym1 ] || [ "y" == $sym1 ] && [ ! -e ~/.config ]; then
+if [ -z $sym1 ] || [ "y" == $sym1 ] && [ ! -e ~/config ]; then
     ln -s ~/.config ~/config
 fi
 
 read -p "Create /etc/profile.d/ to user directory symlink? [Y/n]:" sym1
-if [ -z $sym1 ] || [ "y" == $sym1 ] && [ ! -e ~/profile.d ]; then
+if [ -z $sym1 ] || [ "y" == $sym1 ] && [ ! -e ~/etc_profiles ]; then
     sudo ln -s /etc/profile.d/ ~/etc_profiles
 fi
 
@@ -114,14 +114,21 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         fi
     fi
 
+    read -p "Install PS1_colours.sh at ~/.bash_aliases.d/ (terminal colours)? [Y/n]:" colors
+    if [ -z $bash ] || [ "y" == $bash ]; then 
+        
+        chmod u+x Applications/PS1_colours.sh
+        cp -f Applications/PS1_colours.sh ~/.bash_aliases.d/ 
+
+        read -p "Install PS1_colours.sh globally at /etc/profile.d/ ? [Y/n]:" gcolors  
+        if [ -z $gcolors ] || [ "y" == $gcolors ]; then 
+            sudo cp -f ~/.bash_aliases.d/PS1_colours.sh /etc/profile.d/
+        fi
+    fi
+
     read -p "Install general.sh at ~/.bash_aliases.d/ (bash general commands aliases)? [Y/n]:" general
     if [ -z $general ] || [ "y" == $general ]; then 
         cp -f Applications/general.sh ~/.bash_aliases.d/
-        #if ! grep -q general.sh ~/.bashrc; then
-        #    echo "if [[ -f ~/Applications/general.sh ]]; then" >> ~/.bashrc
-        #    echo "  . ~/Applications/general.sh" >> ~/.bashrc
-        #    echo "fi" >> ~/.bashrc
-        #fi
         read -p "Install general.sh globally at /etc/profile.d/? [Y/n]:" ggeneral  
         if [ -z $ggeneral ] || [ "y" == $ggeneral ]; then 
             sudo cp -f ~/.bash_aliases.d/general.sh /etc/profile.d/
@@ -131,11 +138,6 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     read -p "Install exports.sh at ~/.bash_aliases.d/ (environment variables)? [Y/n]:" exports
         if [ -z $exports ] || [ "y" == $exports ]; then 
         cp -f Applications/exports.sh ~/.bash_aliases.d/
-        #if ! grep -q exports.sh ~/.bashrc; then
-        #    echo "if [[ -f ~/Applications/exports.sh ]]; then" >> ~/.bashrc
-        #    echo "  . ~/Applications/exports.sh" >> ~/.bashrc
-        #    echo "fi" >> ~/.bashrc
-        #fi
         read -p "Install exports.sh globally at /etc/profile.d/? [Y/n]:" gexports  
         if [ -z $gexports ] || [ "y" == $gexports ]; then 
             sudo cp -f ~/.bash_aliases.d/exports.sh /etc/profile.d/
