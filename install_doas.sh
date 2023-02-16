@@ -21,8 +21,8 @@ do
         sudo apt install doas
     fi 
 done
-sed -i "s/user/$USER/g" doas.conf
-sudo cp -f doas.conf /etc/doas.conf
+sed -i "s/user/$USER/g" doas/doas.conf
+sudo cp -f doas/doas.conf /etc/doas.conf
 
 ./install_polkit_wheel.sh
 
