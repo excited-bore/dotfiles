@@ -137,9 +137,10 @@ function git_backup_branch_and_reset_to_remote() {
         echo "First backup branch, then remote. No remote means 'origin/main'" ;
     fi   
 }
-alias git_rename_remote="git remote -v rename"
-alias git_remove_remote="git remote -v rm"
+alias git_remote_rename="git remote -v rename"
+alias git_remote_remove="git remote -v rm"
 alias git_switch_branch="git checkout"
+alias git_remote_set_url="git remote -v set-url"
 
 function git_set_default_remote_branch() { 
     if [ -z "$1" ] && [ -z "$2" ]; then
@@ -150,6 +151,7 @@ function git_set_default_remote_branch() {
         git remote set-head "$1" "$2";
     fi
 }
+
 function git_remote_get_default_branch() { 
     if [ -z "$1" ]; then
         git remote set-head origin -a;
@@ -157,3 +159,5 @@ function git_remote_get_default_branch() {
         git remote set-head "$1" -a;
     fi
 }
+
+

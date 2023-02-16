@@ -51,7 +51,7 @@ python_install(){
     python $@ install --user;
 }
 
-alias copy_to="python $(python -m site --user-site)/copy_to/copy_to.py "
+alias copy-to="python $(python -m site --user-site)/copy-to/copy-to.py "
 alias udev_reload="sudo udevadm control --reload-rules && sudo udevadm trigger"
 
 # Wickr

@@ -98,7 +98,8 @@ vnoremap {          di{}<Esc><Left>p<Esc>
 vnoremap (          di()<Esc><Left>p<Esc> 
 
 "inoremap <           <>
-vnoremap <          di<><Esc><Left>p<Esc>
+vnoremap >          >gv
+vnoremap <          <gv
 vnoremap <C-<>      di</><Esc><Left><Left>p<Esc>
 
 vnoremap `          di``<Esc><Left>p<Esc>
@@ -345,12 +346,12 @@ nnoremap F ?
 " Alt-f => Global search
 nnoremap <A-f> :%s,,,gc<Left><Left><Left><Left>
 inoremap <A-f> <C-\><C-o>:%s,,,gc<Left><Left><Left><Left>
-vnoremap <A-f> :%s,,,gc<Left><Left><Left><Left>
+vnoremap <A-f> <esc>:%s,\%V,,gc<Left><Left><Left>
 cnoremap <A-f> <C-e><C-u>nohl<CR>:<Esc>
 " Different seperator for Alt+Shift
 nnoremap <M-S-F> :%s///gc<Left><Left><Left><Left>
 inoremap <M-S-F> <C-\><C-o>:%s///gc<Left><Left><Left><Left>
-vnoremap <M-S-F> :%s///gc<Left><Left><Left><Left>
+vnoremap <M-S-F> <esc>:%s/\%V//gc<Left><Left><Left>
 cnoremap <M-S-F> <C-e><C-u>nohl<CR>:<Esc>
 
 " unnamedplus	A variant of the "unnamed" flag which uses the
@@ -361,14 +362,17 @@ cnoremap <M-S-F> <C-e><C-u>nohl<CR>:<Esc>
 " Normal clipboard functionality for yy, y and d
 
 set clipboard+=unnamedplus
-nnoremap y "+y
-nnoremap yy "+0yg_
-nnoremap Y "+Y
-nnoremap YY "+0Yg_
+nnoremap y "+^y
+nnoremap yy "+^yg_
+nnoremap Y "+^Y
+nnoremap YY "+^Yg_
 vnoremap y "+y
-vnoremap yy "+0yg_
+"vnoremap yy "+^yg_
 vnoremap Y "+Y
-vnoremap YY "+0Yg_
+"vnoremap YY "+^Yg_
+
+vnoremap d c
+vnoremap D C
 
 nnoremap c "+y
 nnoremap cc "+0yg_
@@ -379,15 +383,15 @@ vnoremap cc "+0yg_
 vnoremap C "+Y
 vnoremap CC "+0Yg_
 
-nnoremap v "0p
-nnoremap V "0P
-vnoremap v "0p  
-vnoremap V "0P
+nnoremap v "+p
+nnoremap V "+P
+vnoremap v "+p  
+vnoremap V "+P
 
-nnoremap p "0p
-nnoremap P "0P
-vnoremap p "0p  
-vnoremap P "0P
+nnoremap p "+p
+nnoremap P o<esc>"+P
+vnoremap p "+p  
+vnoremap P o<esc>"+P
 
 nnoremap <A-d> cc
 vnoremap <A-d> c
@@ -399,17 +403,20 @@ inoremap <A-d> <Esc>cc
 "" Best register no register
 "" https://stackoverflow.com/questions/22598644/vim-copy-non-linewise-without-leading-or-trailing-spaces
 nnoremap <C-c>  "+^yg_ 
-nnoremap <silent> <C-v> "0P
+nnoremap <silent> <C-v> "+P
 nnoremap <C-d>  (col(".") ==? 1 ? '<C-\><C-o>daw' : '<C-\><C-o>diw')
 """ Copy inner word except when on first line (copy a word)
 inoremap <expr> <C-c>   (col(".") ==? 1 ? '<C-\><C-o>"+yaw' : '<C-\><C-o>"+yiw')
 "" Paste with P if at beginning of line
-inoremap <silent> <C-v> <C-\><C-o>"0P
+inoremap <silent> <C-v> <C-\><C-o>"+P
 "" Cut with a word instead of inner word if at beginning of line
 inoremap <expr> <C-d>   (col(".") ==? 1 ? '<C-\><C-o>daw' : '<C-\><C-o>diw')
 vnoremap <C-c>  "+y 
-vnoremap <silent> <C-v> "0P
+vnoremap <silent> <C-v> "+P
 vnoremap <C-d>  "*d 
+"tnoremap <C-c>  <C-\><C-N>
+"tnoremap <C-v>  <C-W>"+
+
 
 nnoremap <C-S-d>    <Down>"*dd<Up>
 inoremap <expr> <C-S-d> (col(".") ==? 1 ? '<C-\><C-o>daW' : '<C-\><C-o>diW')
