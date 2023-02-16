@@ -17,7 +17,7 @@ do
     if [ -f $f ] && [ $f == /etc/arch-release ];then
             echo Package manager: ${osInfo[$f]}
             pm=${osInfo[$f]}
-            sudo pacman -Su tttf-nerd-fonts-symbols-common tf-nerd-fonts-symbols-2048-em ttf-nerd-fonts-symbols-2048-em-mono ranger kitty xclip sshfs neovim mono go nodejs jre11-openjdk npm python atool bat calibre elinks ffmpegthumbnailer fontforge highlight imagemagick mupdf-tools odt2txt btm
+            sudo pacman -Su ttf-nerd-fonts-symbols-common ttf-nerd-fonts-symbols-2048-em ttf-nerd-fonts-symbols-2048-em-mono ranger kitty xclip sshfs neovim mono go nodejs jre11-openjdk npm python atool bat calibre elinks ffmpegthumbnailer fontforge highlight imagemagick mupdf-tools odt2txt bottom
     elif [ -f $f ] && [ $f == /etc/debian_version ];then
         echo Package manager: ${osInfo[$f]}
         pm=${osInfo[$f]}
