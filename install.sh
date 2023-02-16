@@ -63,7 +63,7 @@ fi
 read -p "Create ~/.bash_aliases.d/, link it to .bashrc and install further scripts? [Y/n]:" scripts
 if [ -z $scripts ] || [ "y" == $scripts ]; then
 
-    if [ ! -d ~/.bash_aliases.d/ ]; then
+    if  ! -d ~/.bash_aliases.d/ ; then
         mkdir ~/.bash_aliases.d/
     fi
 
@@ -78,7 +78,9 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
 
     read -p "Install bash completions for aliases in ~/.bash_completion.d? " compl
     if [ -z $compl ] || [ "y" == $compl ]; then
-        mkdir ~/.bash_completion.d
+        if ! -d ~/.bash_completion.d/ ; then 
+            mkdir ~/.bash_completion.d
+        fi
         if [ ! -e ~/.bash_completion.d/complete_alias ]; then
             curl https://raw.githubusercontent.com/cykerway/complete-alias/master/complete_alias > ~/.bash_completion.d/complete_alias 
             sed -i s/"#complete -F _complete_alias \"\(.*\)"/"complete -F _complete_alias \"\1"/g .bash_completion.d/complete_alias
@@ -87,18 +89,24 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
             echo ". ~/.bash_completion.d/complete_alias" >> ~/.bashrc
         fi
     fi
+    
+    read -p "Install bash.sh at ~/.bash_aliases.d/ (bash specific aliases)? [Y/n]:" bash
+    if [ -z $bash ] || [ "y" == $bash ]; then 
+        
+        chmod u+x Applications/bash.sh
+        cp -f Applications/bash.sh ~/.bash_aliases.d/ 
+
+        read -p "Install bash.sh globally at /etc/profile.d/ ? [Y/n]:" gbash  
+        if [ -z $gbash ] || [ "y" == $gbash ]; then 
+            sudo cp -f ~/.bash_aliases.d/bash.sh /etc/profile.d/
+        fi
+    fi
 
     read -p "Install shell_bindings.sh at ~/.bash_aliases.d/ (bash keybindings)? [Y/n]:" aliases
     if [ -z $aliases ] || [ "y" == $aliases ]; then 
         
         chmod u+x Applications/shell_bindings.sh
         cp -f Applications/shell_bindings.sh ~/.bash_aliases.d/ 
-        #if ! grep -q shell_bindings.sh ~/.bashrc; then
-
-            #echo "if [[ -f ~/Applications/shell_bindings.sh ]]; then" >> ~/.bashrc
-            #echo "  . ~/Applications/shell_bindings.sh" >> ~/.bashrc
-            #echo "fi" >> ~/.bashrc
-        #fi
 
         read -p "Install shell_bindings.sh globally at /etc/profile.d/ ? [Y/n]:" galiases  
         if [ -z $galiases ] || [ "y" == $galiases ]; then 
