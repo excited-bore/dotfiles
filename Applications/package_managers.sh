@@ -7,6 +7,7 @@ alias apt_full_upgrade="sudo apt update && sudo apt full-upgrade && sudo apt aut
 # For manjaro: consider pacui
 # https://forum.manjaro.org/t/pacui-bash-script-providing-advanced-pacman-and-yay-pikaur-aurman-pakku-trizen-pacaur-pamac-cli-functionality-in-a-simple-ui/561
 alias pamac_update="pamac update"
+alias pamac_update_yes="yes | pamac update"
 alias pamac_upgrade="pamac upgrade"
 alias pamac_forcerefresh="pamac update --force-refresh && pamac upgrade --force-refresh"
 alias pamac_clean="pamac clean"

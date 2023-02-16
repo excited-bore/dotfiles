@@ -1,3 +1,4 @@
+. ~/.bash_aliases.d/bash.sh
 # TRY and keep command line at bottom
 alias b="tput cup $(tput lines) 0" 
 
@@ -35,11 +36,42 @@ alias q="exit"
 alias w="cd -"
 alias w="clear ;b; ls -a"
 alias x="cd .."
+
+function man_bash(){
+    help -m $@ | $PAGER;
+}
+
+complete -F _commands man_bash
+
 alias men="man man"
 
 alias unzip="unzip"
 alias untar_gz="tar -xvf"
 alias tar_gz_list="tar -tvf"
+
+extract(){  
+    if [ -f $1 ] ; then
+    case $1 in
+      *.tar.bz2)   tar xjf $1   ;;
+      *.tar.gz)    tar xzf $1   ;;
+      *.bz2)       bunzip2 $1   ;;
+      *.rar)       unrar x $1     ;;
+      *.gz)        gunzip $1    ;;
+      *.tar)       tar xf $1    ;;
+      *.tbz2)      tar xjf $1   ;;
+      *.tgz)       tar xzf $1   ;;
+      *.zip)       unzip $1     ;;
+      *.Z)         uncompress $1;;
+      *.7z)        7z x $1      ;;
+      *)           echo "'$1' cannot be extracted with extract" ;;
+    esac
+  else
+    echo "'$1' is not a valid file"
+  fi
+}
+
+complete -F _files extract
+
 alias GPU_list_drivers="inxi -G"
 
 
@@ -55,6 +87,9 @@ function link_soft(){
     fi
 }
 
+complete -F _files link_soft
+
+
 function link_hard(){
     if ([[ "$0" = /* ]] || [ -d "$1" ] || [ -f "$1" ]) && ([[ $(readlink -f "$2") ]] || [[ $(readlink -d "$2") ]]); then
         if [[ "$1" = /* ]]; then  
@@ -67,8 +102,11 @@ function link_hard(){
     fi
 }
 
+complete -F _files link_hard
+                      
 # Shamelessly stolen from manjaro /etc/profile
-append_path () {
+# Alternative to export PATH:$PATH
+append_path() {
     case ":$PATH:" in
         *:"$1":*)
             ;;
@@ -89,6 +127,8 @@ function trash(){
     done
 }
 
+complete -F _files trash
+
 alias trash_list="gio trash --list"
 alias trash_empty="gio trash --empty"
 
@@ -102,10 +142,12 @@ function add_to_group() {
     if [[ -z $1 ]]; then
         echo "Give a group and a username (default: $USER)"
     elif [[ -z $2 ]]; then
-        sudo usermod -aG $1 $USER;
+        sudo usermod -aG $USER $1;
     else
         sudo usermod -aG $1 $2;
     fi; }
+
+complete -F _groups add_to_group
 
 function mark_user_executable() {
     if [[ ! -f $1 ]] ; then
@@ -113,6 +155,10 @@ function mark_user_executable() {
     else
         sudo chmod u+x $1;
     fi; }
+
+complete -F _files mark_user_executable
+
+alias list_enabled_locales="locale -a"
 
 # https://askubuntu.com/questions/76808/how-do-i-use-variables-in-a-sed-command
 # https://stackoverflow.com/questions/18439528/sed-insert-line-with-spaces-to-a-specific-line    
@@ -132,6 +178,8 @@ function file_insert_after_line(){
     fi
 }
 
+complete -F _files file_insert_after_line
+
 function file_put_quotations_around(){
     if [ -f "$1" ]; then
         var1=$(sed 's/ /\\ /g' <<< $2);
@@ -140,3 +188,5 @@ function file_put_quotations_around(){
         echo "Give up a filename.\n Give all arguments that use spaces a \" \"";
     fi
 }
+
+complete -F _files file_put_quotations_around

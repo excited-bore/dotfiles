@@ -1,10 +1,10 @@
 ### SSH ###
 
 # To prevent 'failed to preserve ownership' errors
-function copy_sshfs(){ cp -r --no-preserve=mode "$1" "$2"; }
-function move_sshfs(){ cp -r --no-preserve=mode "$1" "$2" && rmTrash "$1"; }
+copy_sshfs(){ cp -r --no-preserve=mode "$1" "$2"; }
+move_sshfs(){ cp -r --no-preserve=mode "$1" "$2" && rmTrash "$1"; }
 
-function copy_to_serber() { scp -r burpi@192.168.129.12:37093$1 $2; }
+copy_to_serber() { scp -r burpi@192.168.129.12:37093$1 $2; }
 #function cp_from_serber() { scp -r }
 
 ssh_file="~/.ssh/peepie"
@@ -15,7 +15,7 @@ alias kserber="kitty +kitten ssh -i $ssh_file funnyman@192.168.129.17"
 alias serber_unmnt="fusermount3 -u /mnt/mount1/"
 alias serber_unmnt1="fusermount3 -u /mnt/mount2/"
 
-function ssh_key_and_add_to_agent_by_host() {
+ssh_key_and_add_to_agent_by_host() {
     read -p "Give up a hostname: " host
     if [ ! -f ~/.ssh/config ]; then
         touch ~/.ssh/config;
@@ -31,7 +31,7 @@ function ssh_key_and_add_to_agent_by_host() {
     cat ~/.ssh/$name.pub); 
 }
 
-function serber_mnt() {
+serber_mnt() {
     if [ ! -d /mnt/mount1 ]; then
         mkdir /mnt/mount1; 
     fi;
@@ -40,7 +40,7 @@ function serber_mnt() {
     fi
 }
 
-function serber_mnt1(){
+serber_mnt1(){
     if ! [ -d /mnt/mount2 ]; then
         mkdir /mnt/mount2; 
     fi;

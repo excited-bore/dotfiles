@@ -1,3 +1,4 @@
+. ~/.bash_aliases.d/bash.sh
 #Git stuff
 
 function git_ssh_key_and_add_to_agent() { 
@@ -44,11 +45,11 @@ function git_remote_ssh_to_https(){
 }
 
 alias git_list_remotes="git remote -v"
-function git_test_conn_github() { ssh -vT git@github.com; }
-function git_status() { git status; }
-function git_config_using_vars() { git config --global user.email $EMAIL && git config --global user.name $NAME; }
-function git_add_remote_url() { git remote -v add "$1" "$2"; }
-function git_add_remote_ssh() { git remote -v add "$1" git@github.com:$GITNAME/"$2.git"; }
+git_test_conn_github() { ssh -vT git@github.com; }
+git_status() { git status; }
+git_config_using_vars() { git config --global user.email $EMAIL && git config --global user.name $NAME; }
+git_add_remote_url() { git remote -v add "$1" "$2"; }
+git_add_remote_ssh() { git remote -v add "$1" git@github.com:$GITNAME/"$2.git"; }
 
 alias git_add_all="git add -A"
 

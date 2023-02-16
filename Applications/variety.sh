@@ -18,7 +18,7 @@ alias thunderbird="kdocker thunderbird"
 #    doas echo $PTRACE_ELEVATED_PRIVILIGE > /proc/sys/kernel/yama/ptrace_scope;   
 #}
  
-function vlc_folder(){
+vlc_folder(){
     if [ -d $1 ]; then
         vlc --recursive expand "./$1";
     else
@@ -47,7 +47,7 @@ alias ds4LOn="ds4drv --led ff0000"
 alias ds4LOff="ds4drv --led 000000"
 alias ds4="python3 -m ds4drv --hidraw --udp --udp-port 26760"
 
-function python_install(){
+python_install(){
     python $@ install --user;
 }
 
