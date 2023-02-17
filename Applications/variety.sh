@@ -47,19 +47,21 @@ alias ds4LOn="ds4drv --led ff0000"
 alias ds4LOff="ds4drv --led 000000"
 alias ds4="python3 -m ds4drv --hidraw --udp --udp-port 26760"
 
-python_install(){
+python_install_user(){
     python $@ install --user;
 }
+alias python_twine_install="python3 -m pip install --upgrade twine"
+alias python_twine_upload="python3 -m pip install --upgrade build && python3 -m build && python3 -m twine check dist/* && python3 -m twine upload dist/*"
 
-alias copy-to="python $(python -m site --user-site)/copy-to/copy-to.py "
+
 alias udev_reload="sudo udevadm control --reload-rules && sudo udevadm trigger"
 
 # Wickr
 alias wick="sudo wickrme --no-sandbox"
 
 #Devolo PLC Stuff
-alias systemctl_devolo_startup="sudo systemctl start devolonetsvc.service && bash /opt/devolo/dlancockpit/bin/dlancockpit-run.sh"
-alias systemctl_devolo_down="sudo systemctl stop devolonetsvc.service"
+alias devolo_start="sudo systemctl start devolonetsvc.service && bash /opt/devolo/dlancockpit/bin/dlancockpit-run.sh"
+alias devolo_down="sudo systemctl stop devolonetsvc.service"
 
 
 #alias vmOn="sudo virsh net-autostart default && sudo virsh net-start default && sudo mv /etc/modprobe.d/vfio.conf.orig /etc/modprobe.d/vfio.conf && sudo mkinitcpio -p linux515 && reboot"

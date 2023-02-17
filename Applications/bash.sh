@@ -16,6 +16,11 @@ _commands(){
     return 0
 }
 
+_builtins(){
+    COMPREPLY=($(compgen -b $2))
+    return 0
+}
+
 _files(){
     COMPREPLY=($(compgen -f $2))
     return 0
@@ -25,3 +30,10 @@ _groups(){
     COMPREPLY=($(compgen -g $2))
     return 0
 }
+
+
+man_bash(){
+    help -m $@ | $PAGER;
+}
+
+complete -F _builtins man_bash

@@ -1,12 +1,26 @@
 #!/bin/bash
 
+# Shamelessly stolen from manjaro /etc/profile
+# Alternative to export PATH:$PATH
+append_path() {
+    case ":$PATH:" in
+        *:"$1":*)
+            ;;
+        *)
+            PATH="${PATH:+$PATH:}$1"
+    esac
+}
+
+append_path $(python -m site --user-site)/copy-to/
+
 # For git
 export EMAIL="stan96@duck.com"
 export GITNAME="excited-bore"
 
-# If installed will give manuals a color scheme
-#export PS1=$PS1:'$(whoami)@$(hostname):$(pwd) '
-export PAGER="most"
+export MOAR='--statusbar=bold -colors 256'
+export PAGER=/usr/local/bin/moar
+export SYSTEMD_PAGERSECURE=1
+export SYSTEMD_COLORS=256
 export SYSTEMD_PAGER=$PAGER
 # export SYSTEMD_LESS="FRXMK"
 
@@ -34,29 +48,29 @@ export MYVIMRC=".config/nvim/init.vim"
 export MYGVIMRC=".config/nvim/init.vim"
 
 # EMACS
-export PATH='~/.emacs.d/bin/':$PATH
+append_path '~/.emacs.d/bin/'
 
 # KITTY
 export KITTY_PATH=~/.local/bin/
-export PATH=$KITTY_PATH:$PATH
+append_path $KITTY_PATH
 
 # PYTHON
 export PYTHONPATH='/usr/bin/python:/usr/bin/python3:/usr/bin/python3.10'
-export PATH=$PYTHONPATH:$PATH
+append_path $PYTHONPATH
 export PYTHON_ARGCOMPLETE_OK="True"
 # JAVA
 # For arch: Also changeable with 'archlinux-java'
 export JAVA_HOME='/usr/lib/jvm/java-17-openjdk/bin'
-export PATH=$JAVA_HOME:$PATH
+append_path $JAVA_HOME
 
 # LUA
 export LUA_PATH=""
 
 # GO
-export PATH='/usr/local/go/bin:/usr/bin/go:/usr/lib/go:/usr/share/go':$PATH
+append_path '/usr/local/go/bin:/usr/bin/go:/usr/lib/go:/usr/share/go'
 
 # SNAP
-export PATH='/snap/bin:/var/lib/snapd/snap/bin':$PATH
+append_path '/snap/bin:/var/lib/snapd/snap/bin'
 
 # SYSTEMD 
 # FLATPAK FOR XDG_DATA_HOME AND XDG_DATA_DIRS

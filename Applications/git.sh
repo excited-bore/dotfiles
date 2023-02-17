@@ -1,4 +1,4 @@
-. ~/.bash_aliases.d/bash.sh
+#. ~/.bash_aliases.d/bash.sh
 #Git stuff
 
 function git_ssh_key_and_add_to_agent() { 
@@ -16,30 +16,30 @@ function git_ssh_key_and_add_to_agent() {
     cat ~/.ssh/$name.pub); 
 }
 
-function git_remote_https_to_ssh(){
+git_remote_https_to_ssh(){
     if [ -z $1 ]; then
         echo "You should give up the name of a remote";
         read -p "Do you want me to look for 'origin'? [Y/n]" resp
         if [ -z $resp ]; then
-            gitRm=$(git remote get-url origin | sed 's,https://github.com/,git@github.com:,g'); git remote -v set-url origin $gitRm;
+            gitRm=$(git remote get-url origin | sed 's,.*.com/,git@github.com:,g'); git remote -v set-url origin $gitRm;
             git remote get-url origin;
         fi        
     else
-            gitRm=$(git remote get-url $1 | sed 's,https://github.com/,git@github.com:,g'); git remote -v set-url origin $gitRm;
+            gitRm=$(git remote get-url $1 | sed 's,.*.com/,git@github.com:,g'); git remote -v set-url origin $gitRm;
             git remote get-url $1;
     fi
 }
 
-function git_remote_ssh_to_https(){
+git_remote_ssh_to_https(){
     if [ -z $1 ]; then
         echo "You should give up the name of a remote";
         read -p "Do you want me to look for 'origin'? [Y/n]" resp
         if [ -z $resp ]; then
-            gitRm=$(git remote get-url origin | sed 's,git@github.com:,https://github.com/,g'); git remote -v set-url origin $gitRm;
+            gitRm=$(git remote get-url origin | sed 's,.*.com:,https://github.com/,g'); git remote -v set-url origin $gitRm;
             git remote get-url origin;
         fi        
     else
-        gitRm=$(git remote get-url $1 | sed 's,git@github.com:,https://github.com/,g'); git remote -v set-url origin $gitRm;
+        gitRm=$(git remote get-url $1 | sed 's,.*.com:,https://github.com/,g'); git remote -v set-url origin $gitRm;
         git remote get-url $1;
     fi
 }
@@ -53,7 +53,7 @@ git_add_remote_ssh() { git remote -v add "$1" git@github.com:$GITNAME/"$2.git"; 
 
 alias git_add_all="git add -A"
 
-function git_commit_all() { 
+git_commit_all() { 
     if [ ! -z "$1" ]; then 
         git commit -am "$1"; 
     else
@@ -61,7 +61,7 @@ function git_commit_all() {
     fi
 }
 
-function git_add_commit_all(){
+git_add_commit_all(){
     if [ ! -z "$1" ]; then
         git add -A && git commit -m "$1";
     else
@@ -69,7 +69,7 @@ function git_add_commit_all(){
     fi
 }
  
-function git_add_commit_push_all(){
+git_add_commit_push_all(){
     if [ ! -z "$1" ]; then
         git add -A && git commit -m "$1" && git push;
     else
@@ -81,7 +81,7 @@ alias git_commit_using_last="git commit --amend"
 alias git_list_branches="git branch --list"
 
 #https://stackoverflow.com/questions/1125968/how-do-i-force-git-pull-to-overwrite-local-files
-function git_backup_branch_and_reset_to_remote() {
+git_backup_branch_and_reset_to_remote() {
     remote=origin;
     branch=master;
     backp_branch=1;

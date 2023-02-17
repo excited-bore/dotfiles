@@ -16,7 +16,7 @@ alias r=". ~/.bashrc"
 # .Inputrc (readline conf) however has to be compiled, so restart shell
 
 # Set caps to Escape
-#setxkbmap -option caps:escape
+setxkbmap -option caps:escape
 
 # Set Shift delete to backspace
 #xmodmap -e "keycode 119 = Delete BackSpace"

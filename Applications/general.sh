@@ -37,12 +37,6 @@ alias w="cd -"
 alias w="clear ;b; ls -a"
 alias x="cd .."
 
-function man_bash(){
-    help -m $@ | $PAGER;
-}
-
-complete -F _commands man_bash
-
 alias men="man man"
 
 alias unzip="unzip"
@@ -104,16 +98,6 @@ function link_hard(){
 
 complete -F _files link_hard
                       
-# Shamelessly stolen from manjaro /etc/profile
-# Alternative to export PATH:$PATH
-append_path() {
-    case ":$PATH:" in
-        *:"$1":*)
-            ;;
-        *)
-            PATH="${PATH:+$PATH:}$1"
-    esac
-}
 
 function trash(){
     for arg in $@ ; do

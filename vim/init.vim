@@ -70,7 +70,7 @@ let g:ycm_key_list_select_completion = ['<Tab>', '<Down>', '<C-j>']
 let g:ycm_key_list_previous_completion = ['<S-Tab>', '<Up>', '<C-k>']
 let g:ycm_enable_semantic_highlighting=1
 let g:ycm_enable_inlay_hints=1
-let g:ycm_add_preview_to_completeopt = 1
+"let g:ycm_add_preview_to_completeopt = 1
 let g:ycm_update_diagnostics_in_insert_mode = 0
 "let g:ycm_echo_current_diagnostic = 'virtual-text'
 
@@ -286,7 +286,7 @@ inoremap <A--> <C-x>
 
 " Ctrl - r is -> Redo (universal) :
 nnoremap <C-r> :redo<CR>
-inoremap <C-r> <Esc>:redo<CR>a
+inoremap <C-r> <C-\><C-o>:redo<CR>a
 vnoremap <C-r> <Esc>:redo<CR>gv 
 
 " Regular z => undo
@@ -298,7 +298,7 @@ vnoremap <C-z> u
 
 " C-w => Write
 nnoremap <C-w> :write!<CR>
-inoremap <C-w> <Esc>:write!<CR>a
+inoremap <C-w> <C-\><C-o>:write!<CR>
 vnoremap <C-w> <Esc>:write!<CR>gv
 
 " C-q => Quit

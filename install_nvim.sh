@@ -54,9 +54,16 @@ if [ -z $aliases ]; then
 
     cp -f vim/vim_nvim.sh ~/.bash_aliases.d/
 
-    read -p "Install vim_nvim.sh globally at /etc/profile.d/ ? [Y/n]:" galiases  
-    if [ -z $galiases ]; then 
-        sudo cp -f ~/.bash_aliases.d/vim_nvim.sh /etc/profile.d/
+    read -p "Install vim_nvim.sh at /root/bash_aliases.d/ ? [Y/n]:" galiases  
+    if [ -z $galiases ]; then
+        if ! sudo test -d /root/.bash_aliases.d/ ; then
+            sudo mkdir /root/.bash_aliases.d/
+        fi
+
+        if ! sudo grep -q "/root/.bash_aliases.d" /root/.bashrc; then
+             printf "if [[ -d /root/.bash_aliases.d/ ]]; then\n  for alias in /root/.bash_aliases.d/*.sh; do\n      . \"\$alias\" \n  done\nfi" | sudo tee -a /root/.bashrc > /dev/null
+        fi
+        sudo cp -f ~/.bash_aliases.d/vim_nvim.sh /root/.bash_aliases.d/
     fi
 fi
 
