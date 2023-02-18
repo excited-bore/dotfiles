@@ -12,6 +12,7 @@ ssh_file="~/.ssh/id_ed25519"
 #Server access
 alias serber="ssh -i $ssh_file funnyman@192.168.129.17"
 alias kserber="kitty +kitten ssh -i $ssh_file funnyman@192.168.129.17"
+alias kitty_remote_fix="infocmp -a xterm-kitty | serber tic -x -o \~/.terminfo /dev/stdin"
 alias serber_unmnt="fusermount3 -u /mnt/mount1/"
 alias serber_unmnt1="fusermount3 -u /mnt/mount2/"
 
