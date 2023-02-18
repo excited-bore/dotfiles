@@ -1,33 +1,19 @@
+. ./check_distro.sh
 
 if [[ ! -d ~/.config/nvim/ ]]; then
     mkdir ~/.config/nvim/
 fi
 
-declare -A osInfo;
-osInfo[/etc/redhat-release]=yum
-osInfo[/etc/arch-release]=pacman
-osInfo[/etc/gentoo-release]=emerge
-osInfo[/etc/SuSE-release]=zypp
-osInfo[/etc/debian_version]=apt
-osInfo[/etc/alpine-release]=apk
 
-pm=/
-for f in ${!osInfo[@]}
-do
-    if [ -f $f ] && [ $f == /etc/arch-release ];then
-        echo Package manager: ${osInfo[$f]}
-        pm=${osInfo[$f]}
-        sudo pacman -Su xclip neovim cmake python go nodejs mono openjdk17-src
-    elif [ -f $f ] && [ $f == /etc/debian_version ];then
-        echo Package manager: ${osInfo[$f]}
-        pm=${osInfo[$f]}
-        sudo apt install xclip build-essential cmake python3-dev mono-complete golang gopls nodejs openjdk-17-jdk openjdk-17-jre npm
-        curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
-        chmod u+x nvim.appimage
-        ./nvim.appimage
-        rm nvim.appimage
-    fi 
-done
+if [[ $dist == "Manjaro" || $dist == "Arch" ]];then
+    sudo pacman -Su xclip neovim cmake python go nodejs mono openjdk17-src
+elif [ $dist == "Debian" ];then
+    sudo apt install xclip build-essential cmake python3-dev mono-complete golang gopls nodejs openjdk-17-jdk openjdk-17-jre npm
+    curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
+    chmod u+x nvim.appimage
+    ./nvim.appimage
+    rm nvim.appimage
+fi 
 
 read -p "Install init.vim as user conf? (neovim conf at ~/.config/nvim/) [Y/n]:" init
 if [ -z $init ]; then
@@ -71,14 +57,6 @@ if [ -z $aliases ]; then
     fi
 fi
 
-#if [[ -d ~/.vim/bundle/YouCompleteMe/ ]];then
-#    sudo rm -rf ~/.vim/bundle/YouCompleteMe/
-#fi
-#
-#if [[ -d ~/.vim/bundle/Vundle.vim ]]; then
-#    sudo rm -rf ~/.vim/bundle/Vundle.vim
-#fi
 git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 nvim +PluginInstall +qall
-go install -v golang.org/x/tools/gopls@latest
 python3 ~/.vim/bundle/YouCompleteMe/install.py --all

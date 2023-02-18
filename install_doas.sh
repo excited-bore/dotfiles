@@ -1,40 +1,34 @@
+#!/bin/bash
 
+. ./check_distro.sh
 
-declare -A osInfo;
-osInfo[/etc/redhat-release]=yum
-osInfo[/etc/arch-release]=pacman
-osInfo[/etc/gentoo-release]=emerge
-osInfo[/etc/SuSE-release]=zypp
-osInfo[/etc/debian_version]=apt
-osInfo[/etc/alpine-release]=apk
+if [[ $dist == "Manjaro" || $dist == "Arch" ]];then
+    sudo pacman -Su opendoas 
+elif [ $dist == "Debian" ];then
+    sudo apt install doas
+fi 
 
-pm=/
-for f in ${!osInfo[@]}
-do
-    if [ -f $f ] && [ $f == /etc/arch-release ];then
-        echo Package manager: ${osInfo[$f]}
-        pm=${osInfo[$f]}
-        sudo pacman -Su opendoas 
-    elif [ -f $f ] && [ $f == /etc/debian_version ];then
-        echo Package manager: ${osInfo[$f]}
-        pm=${osInfo[$f]}
-        sudo apt install doas
-    fi 
-done
 sed -i "s/user/$USER/g" doas/doas.conf
 sudo cp -f doas/doas.conf /etc/doas.conf
 
-./install_polkit_wheel.sh
+#./install_polkit_wheel.sh
 
-read -p "Install doas.sh? (Applications/doas.sh) [Y/n]:" doas
+read -p "Install doas.sh? (~/.bash_aliases.d/doas.sh) [Y/n]:" doas
 if [ -z $doas ]; then 
     if [ ! -d ~/.bash_aliases.d/ ]; then
         mkdir ~/.bash_aliases.d/
     fi
     cp -f doas/doas.sh ~/.bash_aliases.d/doas.sh
-    read -p "Install doas.sh globally? (/etc/profile.d/doas.sh [Y/n]:" gdoas  
-    if [ -z $gdoas ]; then 
-        sudo cp -f doas/doas.sh /etc/profile.d/doas.sh
+    read -p "Install doas.sh globally? (/root/.bash_aliases.d/doas.sh [Y/n]:" gdoas  
+    if [ -z $gdoas ]; then
+        if ! sudo test -d ~/.bash_aliases.d/ ; then
+            sudo mkdir /root/.bash_aliases.d/
+        fi
+        if ! sudo grep -q "/root/.bash_aliases.d" /root/.bashrc; then
+
+            printf "\nif [[ -d /root/.bash_aliases.d/ ]]; then\n  for alias in /root/.bash_aliases.d/*.sh; do\n      . \"\$alias\" \n  done\nfi" | sudo tee -a /root/.bashrc > /dev/null
+        fi
+        sudo cp -f doas/doas.sh /root/.bash_aliases.d/doas.sh
     fi
 fi
 

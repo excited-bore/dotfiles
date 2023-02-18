@@ -1,30 +1,14 @@
+#!/bin/bash
 #https://bbs.archlinux.org/viewtopic.php?id=271850
-declare -A osInfo;
-osInfo[/etc/redhat-release]=yum
-osInfo[/etc/arch-release]=pacman
-osInfo[/etc/manjaro-release]=pacman
-osInfo[/etc/gentoo-release]=emerge
-osInfo[/etc/SuSE-release]=zypp
-osInfo[/etc/debian_version]=apt
-osInfo[/etc/alpine-release]=apk
+. ./check_distro.sh
 
-pm=/
-for f in ${!osInfo[@]};
-do
-    if [ -f $f ] && [ $f == /etc/manjaro-release ] && [ $pm == / ]; then
-        echo Package manager: ${osInfo[$f]}
-        pm=${osInfo[$f]}
-        sudo pacman -Su pipewire pipewire-pulse manjaro-pipewire
-    elif [ -f $f ] && [ $f == /etc/arch-release ] && [ $pm == / ];then
-        echo Package manager: ${osInfo[$f]}
-        pm=${osInfo[$f]}
-        sudo pacman -Su pipewire pipewire-pulse
-    elif [ -f $f ] && [ $f == /etc/debian_version ] && [ $pm == / ];then
-        echo Package manager: ${osInfo[$f]}
-        pm=${osInfo[$f]}
-        sudo apt install pipewire
-    fi 
-done
+if [ $dist == "Manjaro" ]; then
+    sudo pacman -Su pipewire pipewire-pulse manjaro-pipewire
+elif [ $dist == "Arch" ]; then
+    sudo pacman -Su pipewire pipewire-pulse
+elif [ $dist == "Debian" ]; then
+    sudo apt install pipewire
+fi 
 
 mkdir -p ~/.config/pipewire/pipewire-pulse.conf.d/
 mkdir -p /etc/pipewire/pipewire-pulse.conf.d/
@@ -43,7 +27,7 @@ sudo mv -f $conf /etc/pipewire/pipewire-pulse.conf.d
 
 serv="pipewire-load-switch-on-connect"
 servF="$serv.service"
-myuser="burp"
+myuser="$USER"
 servFile=/etc/systemd/user/$serv.service;
 touch $servF
 echo "[Unit]" >> $servF;

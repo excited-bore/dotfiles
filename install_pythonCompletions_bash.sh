@@ -1,7 +1,21 @@
+if [ ! -d ~/.bash_completion.d ]; then
+    mkdir ~/.bash_completion.d
+fi
+
 pip3 install argcomplete
 activate-global-python-argcomplete --dest=$HOME/.bash_completion.d
-#pip install shtab
 
-if ! grep -q activate-global-python-argcomplete ~/.bashrc; then
-    echo 'activate-global-python-argcomplete --dest=$HOME/.bash_completion.d' >> ~/.bashrc
+if ! grep -q "python-argcomplete" ~/.bashrc; then
+    echo ". $HOME/.bash_completion.d/python-argcomplete" >> ~/.bashrc
+fi
+read -p "Install system wide? (/root/.bashrc) [Y/n]:" arg
+if [ -z $arg ] || [ "y" == $arg ]; then 
+    if ! sudo test -d /root/.bash_completion.d; then
+        sudo mkdir /root/.bash_completion.d
+    fi
+    sudo -H pip3 install argcomplete
+    sudo activate-global-python-argcomplete --dest=/root/.bash_completion.d
+    if ! sudo grep -q "python-argcomplete" /root/.bashrc; then
+        echo '. /root/.bash_completion.d/python-argcomplete' | sudo tee -a /root/.bashrc
+    fi
 fi

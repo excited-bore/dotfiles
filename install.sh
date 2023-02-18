@@ -1,26 +1,5 @@
-declare -A osInfo;
-osInfo[/etc/redhat-release]=yum
-osInfo[/etc/arch-release]=pacman
-osInfo[/etc/manjaro-release]=pacman
-osInfo[/etc/gentoo-release]=emerge
-osInfo[/etc/SuSE-release]=zypp
-osInfo[/etc/debian_version]=apt
-osInfo[/etc/alpine-release]=apk
 
-dist=/
-for f in ${!osInfo[@]};
-do
-    if [ -f $f ] && [ $f == /etc/manjaro-release ] && [ $dist == / ]; then
-        echo Package manager: ${osInfo[$f]}
-        dist="Manjaro"
-    elif [ -f $f ] && [ $f == /etc/arch-release ] && [ $dist == / ];then
-        echo Package manager: ${osInfo[$f]}
-        dist="Arch"
-    elif [ -f $f ] && [ $f == /etc/debian_version ] && [ $dist == / ];then
-        echo Package manager: ${osInfo[$f]}
-        dist="Debian"
-    fi 
-done
+. ./check_distro.sh
 
 read -p "Create ~/.config to ~/config symlink? [Y/n]:" sym1
 if [ -z $sym1 ] || [ "y" == $sym1 ] && [ ! -e ~/config ]; then
@@ -35,23 +14,8 @@ fi
 read -p "Create /etc/systemd/system/ to user directory symlink? [Y/n]:" sym3
 if [ -z $sym3 ] || [ "y" == $sym3 ] && [ ! -e ~/etc_systemd ]; then
     ln -s /etc/systemd/system/ ~/etc_systemd
-fi
+fi 
 
-#read -p "Create /usr/local/bin (Default user folder) to user directory symlink? [Y/n]:" sym4
-#if [ -z $sym4 ] || [ "y" == $sym4 ] && [ ! -e ~/usr_local_bin ]; then
-#    ln -s /usr/local/bin ~/usr_local_bin
-#fi 
-
-read -p "Install .Xresources at ~/ ? (xterm config) [Y/n]:" Xresources
-if [ -z $Xresources ] || [ "y" == $Xresources ]; then
-    cp -f xterm/.Xresources ~/.Xresources
-#    xrdb -merge ~/.Xresources
-fi
-
-read -p "Install .inputrc at ~/ ? (readline config) [Y/n]:" inputrc
-if [ -z $inputrc ] || [ "y" == $inputrc ]; then 
-    cp -f readline/.inputrc ~/
-fi
 
 read -p "Create ~/.bash_aliases.d/, link it to .bashrc and install scripts? [Y/n]:" scripts
 if [ -z $scripts ] || [ "y" == $scripts ]; then
@@ -226,5 +190,25 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         if [ -z $rscripts ] || [ "y" == $rscripts ]; then 
             sudo cp -f Applications/variety.sh /root/.bash_aliases.d/
         fi
+    fi
+fi
+
+read -p "Install .Xresources at ~/ ? (xterm config) [Y/n]:" Xresources
+if [ -z $Xresources ] || [ "y" == $Xresources ]; then
+    cp -f xterm/.Xresources ~/.Xresources
+    
+    read -p "Install .Xresources at /root/ ? (xterm config) [Y/n]:" RXresources
+    if [ -z $RXresources ] || [ "y" == $RXresources ]; then
+        sudo cp -f xterm/.Xresources /root/.Xresources
+    fi
+fi
+
+read -p "Install .inputrc at ~/ ? (readline config) [Y/n]:" inputrc
+if [ -z $inputrc ] || [ "y" == $inputrc ]; then 
+    cp -f readline/.inputrc ~/
+    
+    read -p "Install .inputrc at /root/ ? (readline config) [Y/n]:" Rinputrc
+    if [ -z $Rinputrc ] || [ "y" == $Rinputrc ]; then
+        sudo cp -f readline/.inputrc /root/.inputrc
     fi
 fi
