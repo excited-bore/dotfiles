@@ -6,3 +6,4 @@ elif [ $dist == "Debian" ]; then
     sudo apt install snapd
 fi
 sudo systemctl daemon-reload
+sudo snap install core

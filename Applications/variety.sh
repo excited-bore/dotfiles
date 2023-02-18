@@ -26,10 +26,10 @@ vlc_folder(){
     fi;
 }
 
-if [ ! -e "`python -m site --user-site`" ];then
-    mkdir -p "`python -m site --user-site`"
-    ln -s $(python -m site --user-site) ~/python_user_site  
-fi
+#if [ ! -e "`python -m site --user-site`" ];then
+#    mkdir -p "`python -m site --user-site`"
+#    ln -s $(python -m site --user-site) ~/python_user_site  
+#fi
 
 # Ranger 
 alias ranger='source ranger ranger'

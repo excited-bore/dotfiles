@@ -6,11 +6,17 @@ fi
 
 
 if [[ $dist == "Manjaro" || $dist == "Arch" ]];then
-    sudo pacman -Su xclip neovim cmake python go nodejs mono openjdk17-src
+    sudo pacman -Su xclip neovim cmake python go nodejs mono openjdk17-src python-pynvim
 elif [ $dist == "Debian" ];then
-    sudo apt install xclip build-essential cmake python3-dev mono-complete golang gopls nodejs openjdk-17-jdk openjdk-17-jre npm
-    . ./install_snapd.sh
-    sudo snap install --classic nvim
+    sudo apt install xclip build-essential cmake python3-dev mono-complete golang gopls nodejs openjdk-17-jdk openjdk-17-jre npm python3-pip 
+    pip3 install --upgrade pynvim
+    read -p "Neovim on apt Debian is usually deprecated. Install through snapd? [Y/n]:" snp
+    if [[ -z $snp || $snp == "y" ]]; then
+        . ./install_snapd.sh
+        sudo snap install --classic nvim
+    else
+        sudo apt install neovim python3-pynvim
+    fi
 fi 
 
 read -p "Install init.vim as user conf? (neovim conf at ~/.config/nvim/) [Y/n]:" init
