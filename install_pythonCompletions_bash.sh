@@ -16,6 +16,6 @@ if [ -z $arg ] || [ "y" == $arg ]; then
     sudo -H pip3 install argcomplete
     sudo activate-global-python-argcomplete --dest=/root/.bash_completion.d
     if ! sudo grep -q "python-argcomplete" /root/.bashrc; then
-        echo '. /root/.bash_completion.d/python-argcomplete' | sudo tee -a /root/.bashrc
+        printf "\n. /root/.bash_completion.d/python-argcomplete" | sudo tee -a /root/.bashrc
     fi
 fi

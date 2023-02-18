@@ -9,10 +9,8 @@ if [[ $dist == "Manjaro" || $dist == "Arch" ]];then
     sudo pacman -Su xclip neovim cmake python go nodejs mono openjdk17-src
 elif [ $dist == "Debian" ];then
     sudo apt install xclip build-essential cmake python3-dev mono-complete golang gopls nodejs openjdk-17-jdk openjdk-17-jre npm
-    curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
-    chmod u+x nvim.appimage
-    ./nvim.appimage
-    rm nvim.appimage
+    . ./install_snapd.sh
+    sudo snap install --classic nvim
 fi 
 
 read -p "Install init.vim as user conf? (neovim conf at ~/.config/nvim/) [Y/n]:" init

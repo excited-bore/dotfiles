@@ -20,7 +20,7 @@ ssh_key_and_add_to_agent_by_host() {
         touch ~/.ssh/config;
     fi
     read -p "Give up a hostname: " host
-    read -p "Give up filename: (nothing for standard id, else it's sensible to got for ~/.ssh/smth)" name
+    read -p "Give up filename: (nothing for standard id, else it's sensible to got for ~/.ssh/name)" name
     read -p "Give up remote username: " uname  
     echo "$name" | ssh-keygen -t ed25519
     ssh-add -vH ~/.ssh/known_hosts "$name" 

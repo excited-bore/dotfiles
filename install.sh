@@ -52,7 +52,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
             mkdir ~/.bash_completion.d
         fi
         if [ ! -e ~/.bash_completion.d/complete_alias ]; then
-            curl https://raw.githubusercontent.com/cykerway/complete-alias/master/complete_alias > ~/.bash_completion.d/complete_alias 
+            curl https://raw.githubusercontent.com/cykerway/complete-alias/master/complete_alias > ~/.bash_completion.d/complete_alias > /dev/null
             sed -i s/"#complete -F _complete_alias \"\(.*\)"/"complete -F _complete_alias \"\1"/g ~/.bash_completion.d/complete_alias
         fi
         if ! grep -q "~/.bash_completion.d" ~/.bashrc; then
@@ -65,11 +65,11 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
                 sudo mkdir /root/.bash_completion.d
             fi
             if ! sudo test -e /root/.bash_completion.d/complete_alias ; then
-                curl https://raw.githubusercontent.com/cykerway/complete-alias/master/complete_alias | sudo tee /root/.bash_completion.d/complete_alias 
+                curl https://raw.githubusercontent.com/cykerway/complete-alias/master/complete_alias | sudo tee /root/.bash_completion.d/complete_alias > /dev/null
                 sudo sed -i s/"#complete -F _complete_alias \"\(.*\)"/"complete -F _complete_alias \"\1"/g /root/.bash_completion.d/complete_alias
             fi
             if ! sudo grep -q "/root/.bash_completion.d" /root/.bashrc; then
-                printf "\n. /root/.bash_completion.d/complete_alias" | sudo tee -a /root/.bashrc
+                printf "\n. /root/.bash_completion.d/complete_alias\n" | sudo tee -a /root/.bashrc
             fi
         fi
     fi

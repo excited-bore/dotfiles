@@ -11,12 +11,16 @@ set rtp+=~/.vim/bundle/Vundle.vim
 set runtimepath+=/usr/lib/jvm/java-17-openjdk/bin/java
 call vundle#begin()
 
-"
-" set the iruntime path to include Vundle and initialize
+" set the runtime path to include Vundle and initialize
 "
 " let Vundle manage Vundle, required
 "" Autocomplete plugin from git
 Plugin 'ycm-core/YouCompleteMe'
+
+"Ranger integration
+Plugin 'francoiscabrol/ranger.vim'
+Plugin 'rbgrouleff/bclose.vim'
+let g:ranger_replace_netrw = 1
 
 "Git plugin, ironically also from git
 Plugin 'tpope/vim-fugitive'
