@@ -33,7 +33,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         echo "fi" >> ~/.bashrc
     fi
     
-    cp -f Applications/check_distro.sh ~/.bash_aliases.d/check_distro.sh
+    cp -f ./check_distro.sh ~/.bash_aliases.d/check_distro.sh
 
     read -p "Create /root/.bash_aliases.d/, link it to /root/.bashrc and install scripts? [Y/n]:" rscripts
     if [ -z $rscripts ] || [ "y" == $rscripts ]; then
@@ -47,7 +47,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
             printf "\nif [[ -d /root/.bash_aliases.d/ ]]; then\n  for alias in /root/.bash_aliases.d/*.sh; do\n      . \"\$alias\" \n  done\nfi" | sudo tee -a /root/.bashrc > /dev/null
         fi
         
-        sudo cp -f Applications/check_distro.sh /root/.bash_aliases.d/check_distro.sh
+        sudo cp -f ./check_distro.sh /root/.bash_aliases.d/check_distro.sh
     fi
 
     read -p "Install bash completions for aliases in ~/.bash_completion.d? [Y/n]:" compl
