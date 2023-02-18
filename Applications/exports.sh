@@ -67,7 +67,7 @@ append_path $JAVA_HOME
 export LUA_PATH=""
 
 # GO
-append_path '/usr/local/go/bin:/usr/bin/go:/usr/lib/go:/usr/share/go'
+#append_path '/usr/local/go/bin:/usr/bin/go:/usr/lib/go:/usr/share/go'
 
 # SNAP
 append_path '/snap/bin:/var/lib/snapd/snap/bin'
