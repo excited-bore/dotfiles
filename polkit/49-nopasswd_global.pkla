@@ -3,14 +3,20 @@
 [No passwords sudo]
 Identity=unix-group:sudo
 Action=*
+ResultAny=yes
+ResultInactive=yes
 ResultActive=yes
 
 [No passwords admin]
 Identity=unix-group:admin
 Action=*
+ResultAny=yes
+ResultInactive=yes
 ResultActive=yes
 
 [No passwords wheel]
 Identity=unix-group:wheel
 Action=*
+ResultAny=yes
+ResultInactive=yes
 ResultActive=yes
