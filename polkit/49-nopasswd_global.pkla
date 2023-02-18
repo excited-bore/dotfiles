@@ -1,6 +1,16 @@
 # Allow members of the wheel group to execute any actions
 #  without password authentication, similar to "sudo NOPASSWD:"
-[No Passwords]
-Identity=unix-group:sudo;unix-group:admin;unix-group:wheel
+[No passwords sudo]
+Identity=unix-group:sudo
+Action=*
+ResultActive=yes
+
+[No passwords admin]
+Identity=unix-group:admin
+Action=*
+ResultActive=yes
+
+[No passwords wheel]
+Identity=unix-group:wheel
 Action=*
 ResultActive=yes
