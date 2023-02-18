@@ -74,6 +74,11 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         fi
     fi
     
+    read -p  "Install python completions in ~/.bash_completion.d? [Y/n]:" pycomp
+    if [ -z $pycomp ] || [ "y" == $pycomp ]; then
+        . ./install_pythonCompletions_bash.sh
+    fi
+
     read -p "Install bash.sh? (bash specific aliases)? [Y/n]:" bash
     if [ -z $bash ] || [ "y" == $bash ]; then 
         
@@ -86,7 +91,10 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
 
     read -p "Install shell_bindings.sh at ~/.bash_aliases.d/ (bash keybindings)? [Y/n]:" aliases
     if [ -z $aliases ] || [ "y" == $aliases ]; then 
-        
+        # To prevent stuff from breaking when on a system without a keyboard (raspi)
+        if ! grep -q "#setxkbmap" Applications/shell_bindings.sh; then
+            sed -i s/"setxkbmap\(.*\)"/"#setxkbmap\1"/g Applications/shell_bindings.sh  
+        fi
         cp -f Applications/shell_bindings.sh ~/.bash_aliases.d/ 
 
         if [ -z $rscripts ] || [ "y" == $rscripts ]; then 
