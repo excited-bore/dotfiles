@@ -76,5 +76,5 @@ fi
 #fi
 git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 nvim +PluginInstall +qall
-
+go install -v golang.org/x/tools/gopls@latest
 python3 ~/.vim/bundle/YouCompleteMe/install.py --all
