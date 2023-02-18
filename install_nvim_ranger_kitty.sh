@@ -30,21 +30,29 @@ done
 
 ./install_nvim.sh
 
+read -p "Integrate ranger with nvim? (Install nvim ranger plugins) [Y/n]:" rangrvim
+if [ -z $rangrvim ] || [ "y" == $rangrvim ]; then
+    if ! grep -q "Ranger integration" ~/.config/nvim/init.vim; then
+        sed -i s/"\(Plugin 'ycm-core\/YouCompleteMe'\)"/"\1\n\n\"Ranger integration\nPlugin 'francoiscabrol\/ranger.vim'\nPlugin 'rbgrouleff\/bclose.vim'\nlet g:ranger_replace_netrw = 1"/g ~/.config/nvim/init.vim
+        nvim +PluginInstall +q +q 
+    fi
+fi
 
 read -p "Install rc.conf and rifle.conf? (ranger conf at ~/.conf/ranger/) [Y/n]:" rcc
-if [ -z $rcc ]; then
+if [ -z $rcc ] || [ "y" == $rcc ]; then
     mkdir -p ~/.config/ranger/
     cp -f -t ~/.config/ranger ranger/rc.conf ranger/rifle.conf
 fi
 
+
 read -p "Install ranger plugins? (plugins at ~/.conf/ranger/plugins) [Y/n]:" rplg
-if [ -z $rplg ]; then
+if [ -z $rplg ] || [ "y" == $rplg ]; then
     mkdir -p ~/.config/ranger/plugins
     git clone https://github.com/cdump/ranger-devicons2 ~/.config/ranger/plugins/devicons2
 fi
 
  read -p "Install kitty conf? (at ~/.config/kitty/kitty.conf) [Y/n]:" kittn
-if [ -z $kittn ]; then
+if [ -z $kittn ] || [ "y" == $kittn ]; then
     mkdir -p ~/.config/kitty
     cp -f kitty/kitty.conf ~/.config/kitty/kitty.conf
 fi
