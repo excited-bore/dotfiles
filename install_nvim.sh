@@ -21,7 +21,11 @@ do
     elif [ -f $f ] && [ $f == /etc/debian_version ];then
         echo Package manager: ${osInfo[$f]}
         pm=${osInfo[$f]}
-        sudo apt install neovim xclip build-essential cmake python3-dev mono-complete golang gopls nodejs openjdk-17-jdk openjdk-17-jre npm
+        sudo apt install xclip build-essential cmake python3-dev mono-complete golang gopls nodejs openjdk-17-jdk openjdk-17-jre npm
+        curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
+        chmod u+x nvim.appimage
+        ./nvim.appimage
+        rm nvim.appimage
     fi 
 done
 
