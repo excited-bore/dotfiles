@@ -14,8 +14,10 @@ elif [ $dist== "Debian" ];then
     (mkdir ~/.local/share/fonts && cd ~/.local/share/fonts && wget https://github.com/vorillaz/devicons/archive/master.zip && wget https://github.com/ryanoasis/nerd-fonts/releases/download/v2.1.0/Hermit.zip && unzip master.zip Hermit.zip && yes | rm master.zip Hermit.zip && sudo fc-cache -fv)
 fi 
 
-
-./install_nvim.sh
+read -p "Install nvim? [Y/n]:" nvim
+if [ -z $nvim ] || [ "y" == $nvim ]; then
+    ./install_nvim.sh
+fi
 
 read -p "Integrate ranger with nvim? (Install nvim ranger plugins) [Y/n]:" rangrvim
 if [ -z $rangrvim ] || [ "y" == $rangrvim ]; then

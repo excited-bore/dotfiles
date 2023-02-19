@@ -22,11 +22,16 @@ Plugin 'francoiscabrol/ranger.vim'
 Plugin 'rbgrouleff/bclose.vim'
 let g:ranger_replace_netrw = 1
 
-"Git plugin, ironically also from git
+"Vim plugins point to githubs wich is very nice and just fucking cool
+
+"Git plugin
 Plugin 'tpope/vim-fugitive'
 "
 ""vim-tmux-navigator, smart navigation between vim and tmux panes
 "Plugin 'christoomey/vim-tmux-navigator'
+
+"Sudo write
+Plugin 'tpope/vim-eunuch'
 "
 "" Self documemting vim wiki
 Plugin 'vimwiki/vimwiki'
@@ -294,7 +299,8 @@ inoremap <C-r> <C-\><C-o>:redo<CR>a
 vnoremap <C-r> <Esc>:redo<CR>gv 
 
 " Regular z => undo
-nnoremap z u
+" nnoremap z u
+
 " Ctrl - z is -> undo instead of stop 
 nnoremap <C-z> u
 inoremap <C-z> <C-\><C-o>:u<CR>

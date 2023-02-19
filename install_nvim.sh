@@ -9,11 +9,11 @@ if [[ $dist == "Manjaro" || $dist == "Arch" ]];then
     sudo pacman -Su xclip neovim cmake python go nodejs mono openjdk17-src python-pynvim
 elif [ $dist == "Debian" ];then
     sudo apt install xclip build-essential cmake python3-dev mono-complete golang gopls nodejs openjdk-17-jdk openjdk-17-jre npm python3-pip 
-    pip3 install --upgrade pynvim
-    read -p "Neovim on apt Debian is usually deprecated. Install through snapd? [Y/n]:" snp
+    read -p "Neovim on apt Debian is usually deprecated. Install from source? [Y/n]:" snp
     if [[ -z $snp || $snp == "y" ]]; then
-        . ./install_snapd.sh
-        sudo snap install --classic nvim
+        pip3 install --upgrade pynvim
+        sudo apt install gettext
+        (cd /tmp/ && wget https://github.com/neovim/neovim/archive/refs/tags/stable.tar.gz && tar -xvzf *.tar.gz && cd ./neovim-stable && make CMAKE_BUILD_TYPE=RelWithDebInfo && sudo make install)
     else
         sudo apt install neovim python3-pynvim
     fi

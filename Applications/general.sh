@@ -35,6 +35,7 @@ alias less="less -X"
 alias q="exit"
 alias w="cd -"
 alias w="clear ;b; ls -a"
+alias z="cd -"
 alias x="cd .."
 
 alias men="man man"

@@ -8,7 +8,7 @@ activate-global-python-argcomplete --dest=$HOME/.bash_completion.d
 if ! grep -q "python-argcomplete" ~/.bashrc; then
     echo ". $HOME/.bash_completion.d/python-argcomplete" >> ~/.bashrc
 fi
-read -p "Install system wide? (/root/.bashrc) [Y/n]:" arg
+read -p "Install python completion system wide? (/root/.bashrc) [Y/n]:" arg
 if [ -z $arg ] || [ "y" == $arg ]; then 
     if ! sudo test -d /root/.bash_completion.d; then
         sudo mkdir /root/.bash_completion.d
