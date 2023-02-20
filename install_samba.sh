@@ -5,25 +5,25 @@ read -p "Public [Y/n]:" public
 read -p "Create file mask (Default: 0777):" fmask
 read -p "Directory mask (Default: 0777):" dmask
 
-if [ -z write ]; then
+if [ -z $write ]; then
     write="yes"
 else
     write="no"
 fi
 
-if [ -z public ]; then
+if [ -z $public ]; then
     public="yes"
 else
     public="no"
 fi
 
-if [ -z fmask ]; then
+if [ -z $fmask ]; then
     fmask=0777
 else
     fmask=0777
 fi
 
-if [ -z dmask ]; then
+if [ -z $dmask ]; then
     dmask=0777
 else
     dmask=0777
@@ -44,9 +44,11 @@ if [ -z $usr ]; then
 fi
 
 if [ -z $pswd ]; then
-    smbpasswd -n $USER
-else
+    smbpasswd -n $usr
+    printf "Set no password for $usr"
+else    
     smbpasswd -w $pswd $usr
+    printf "Set given password for $usr"
 fi
 
 
