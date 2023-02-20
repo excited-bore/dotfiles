@@ -2,7 +2,7 @@
  * without password authentication, similar to "sudo NOPASSWD:"
  */
 polkit.addRule(function(action, subject) {
-    if (subject.isInGroup("wheel") || (subject.isInGroup("sudo")) {
+    if (subject.isInGroup("wheel") || subject.isInGroup("sudo")) {
         return polkit.Result.YES;
     }
 });
