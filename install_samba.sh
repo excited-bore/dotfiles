@@ -38,16 +38,16 @@ elif [ $dist == "Debian" ];then
 fi
 
 read -p "User for login to drive? (Default $USER):" usr
-read -p "Password? (Default: No password" pswd
+read -p "Password? (Default: No password):" pswd
 if [ -z $usr ]; then
     $usr=$USER
 fi
 
 if [ -z $pswd ]; then
-    smbpasswd -n $usr
+    sudo smbpasswd -n $usr
     printf "Set no password for $usr"
 else    
-    smbpasswd -w $pswd $usr
+    sudo smbpasswd -w $pswd $usr
     printf "Set given password for $usr"
 fi
 
@@ -60,5 +60,5 @@ Create mask=$fmask
 Directory mask=$dmask" | sudo tee -a /etc/samba/smb.conf
 
 
-sudo systemctl restart smbd.conf
-sudo systemctl status smbd.conf
+sudo systemctl restart smbd.service
+sudo systemctl status smbd.service
