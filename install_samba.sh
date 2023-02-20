@@ -1,10 +1,9 @@
-read -p "Drive name: (doesn't matter)" drive
-
-read -p "Mount point (path name): " mnt
-read -p "Writeable: [Y/n]" write
-read -p "Public [Y/n]" public
-read -p "Create file mask: (Default: 0777)" fmask
-read -p "Directory mask: (Default: 0777)" dmask
+read -p "Drive name: (doesn't matter):" drive
+read -e -p "Mount point (path name):" mnt
+read -p "Writeable: [Y/n]:" write
+read -p "Public [Y/n]:" public
+read -p "Create file mask (Default: 0777):" fmask
+read -p "Directory mask (Default: 0777):" dmask
 
 if [ -z write ]; then
     write="yes"
@@ -13,14 +12,26 @@ else
 fi
 
 if [ -z public ]; then
-    write='yes'
+    public="yes"
 else
-    write='no'
+    public="no"
 fi
 
-echo "[$drive]" >> /etc/samba/smb.conf
-echo "path=$mnt" >> /etc/samba/smb.conf
-echo "writeable=$write" >> /etc/samba/smb.conf
-echo "public=$public" >> /etc/samba/smb.conf
-echo "create mask=$fmask" >> /etc/samba/smb.conf
-echo "directory mas=$dmask" >> /etc/samba/smb.conf
+if [ -z fmask ]; then
+    fmask=0777
+else
+    fmask=0777
+fi
+
+if [ -z dmask ]; then
+    dmask=0777
+else
+    dmask=0777
+fi
+
+printf "[$drive]
+Path=$mnt
+Writeable=$write
+Public=$public
+Create mask=$fmask
+Directory mask=$dmask" | sudo tee -a /etc/samba/smb.conf

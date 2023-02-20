@@ -19,6 +19,9 @@ if [ -z $nvim ] || [ "y" == $nvim ]; then
     ./install_nvim.sh
 fi
 
+sudo ranger --confdir=/home/$USER/.config/ranger --copy-config=all
+sudo ranger --copy-config=all
+
 read -p "Integrate ranger with nvim? (Install nvim ranger plugins) [Y/n]:" rangrvim
 if [ -z $rangrvim ] || [ "y" == $rangrvim ]; then
     if ! grep -q "Ranger integration" ~/.config/nvim/init.vim; then
