@@ -53,11 +53,11 @@ if [ -z $usr ]; then
 fi
 
 if [[ -z $nopswd || "y" == $nopswd ]]; then
-    sudo smbpasswd -a $usr
-else    
     sudo smbpasswd -n $usr
     printf "\n  null passwords=yes" | sudo tee -a /etc/samba/smb.conf
     printf "Set no password for $usr"
+else    
+    sudo smbpasswd -a $usr
 fi
 
 sudo systemctl restart smbd.service
