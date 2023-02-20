@@ -44,10 +44,12 @@ printf "\n[$drive]
     Create mask=$fmask
     Directory mask=$dmask" | sudo tee -a /etc/samba/smb.conf
 
+echo ""
+
 read -p "User for login to drive? (Default $USER): " usr
 read -p "No password? (You will have to set it otherwise) [Y/n]: " nopswd
 if [ -z $usr ]; then
-    $usr=$USER
+    usr=$USER
 fi
 
 if [[ -z $nopswd || "y" == $nopswd ]]; then
@@ -57,8 +59,6 @@ else
     printf "\n  null passwords=yes" | sudo tee -a /etc/samba/smb.conf
     printf "Set no password for $usr"
 fi
-
-
 
 sudo systemctl restart smbd.service
 sudo systemctl status smbd.service
