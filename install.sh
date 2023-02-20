@@ -124,11 +124,11 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         fi
     fi
 
-    read -p "Install exports.sh at ~/.bash_aliases.d/ (environment variables)? [Y/n]:" exports
+    read -p "Install pathvariables.sh at ~/.bash_aliases.d/ (environment variables)? [Y/n]:" exports
         if [ -z $exports ] || [ "y" == $exports ]; then 
-        cp -f Applications/exports.sh ~/.bash_aliases.d/
+        cp -f Applications/pathvariables.sh ~/.bash_aliases.d/
         if [ -z $rscripts ] || [ "y" == $rscripts ]; then 
-            sudo cp -f Applications/exports.sh /root/.bash_aliases.d/
+            sudo cp -f Applications/pathvariables.sh /root/.bash_aliases.d/
         fi
     fi
 

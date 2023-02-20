@@ -21,12 +21,12 @@ function git_ssh_key_and_add_to_agent() {
         keytype=ed25519
     fi
     ssh-keygen -t $keytype
-    echo "Host github.com" >> ~/.ssh/config;
+    echo "Host github.com" >> ~/.ssh/config
     echo "  IdentityFile $name" >> ~/.ssh/config 
     echo "  User git" >> ~/.ssh/config  
     eval $(ssh-agent -s) 
     ssh-add -vH ~/.ssh/known_hosts $name 
-    cat ~/.ssh/$name.pub);
+    cat ~/.ssh/$name.pub
     cd -
 }
 
