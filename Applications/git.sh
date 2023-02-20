@@ -1,19 +1,33 @@
 #. ~/.bash_aliases.d/bash.sh
 #Git stuff
 
+alias git_config_pull_rebase_false="git config pull.rebase false"
+alias git_set_pull_merge="git config pull.rebase false"
+
+alias git_config_pull_rebase_true="git config pull.rebase true"
+alias git_set_pull_rebase="git config pull.rebase true"
+
+alias git_config_pull_fast_forward_only="git config pull.ff only"
+alias git_set_pull_fastforward_only="git config pull.ff only"
+
 function git_ssh_key_and_add_to_agent() { 
     if [ ! -f ~/.ssh/config ]; then
         touch ~/.ssh/config;
-        echo "Host github.com" > ~/.ssh/config;
-    elif ! grep -q github.com ~/.ssh/config; then 
-        echo "Host github.com" > ~/.ssh/config;
     fi
-    (cd ~/.ssh/ && read -p "Give up name: " name &&
-    echo ~/.ssh/$name | ssh-keygen -t ed25519 &&
-    echo "  IdentityFile ~/.ssh/$name" >> ~/.ssh/config &&
-    echo "  User git" >> ~/.ssh/config && eval $(ssh-agent -s) &&
-    ssh-add -vH ~/.ssh/known_hosts ~/.ssh/"$name" &&
-    cat ~/.ssh/$name.pub); 
+    cd ~/.ssh/
+    read -p "Give up name: " name
+    read -e -p "Give up keytype (dsa | ecdsa | ed25519 (Default) | ed25519-sk | rsa): " keytype
+    if [ -z $keytype ]; then
+        keytype=ed25519
+    fi
+    ssh-keygen -t $keytype
+    echo "Host github.com" >> ~/.ssh/config;
+    echo "  IdentityFile $name" >> ~/.ssh/config 
+    echo "  User git" >> ~/.ssh/config  
+    eval $(ssh-agent -s) 
+    ssh-add -vH ~/.ssh/known_hosts $name 
+    cat ~/.ssh/$name.pub);
+    cd -
 }
 
 git_remote_https_to_ssh(){
@@ -33,8 +47,8 @@ git_remote_https_to_ssh(){
 git_remote_ssh_to_https(){
     if [ -z $1 ]; then
         echo "You should give up the name of a remote";
-        read -p "Do you want me to look for 'origin'? [Y/n]" resp
-        if [ -z $resp ]; then
+        read -p "Do you want me to look for 'origin'? [Y/n]:" resp
+        if [[ -z $resp  ||  "y" == $resp ]] ; then
             gitRm=$(git remote get-url origin | sed 's,.*.com:,https://github.com/,g'); git remote -v set-url origin $gitRm;
             git remote get-url origin;
         fi        
