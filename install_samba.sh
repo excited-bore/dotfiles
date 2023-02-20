@@ -5,13 +5,13 @@ read -p "Public [Y/n]:" public
 read -p "Create file mask (Default: 0777):" fmask
 read -p "Directory mask (Default: 0777):" dmask
 
-if [ -z $write ]; then
+if [[ -z $write || "y" == $write ]]; then
     write="yes"
 else
     write="no"
 fi
 
-if [ -z $public ]; then
+if [[ -z $public || "y" == $public ]]; then
     public="yes"
 else
     public="no"
@@ -37,27 +37,27 @@ elif [ $dist == "Debian" ];then
     sudo apt install samba samba-common  
 fi
 
-read -p "User for login to drive? (Default $USER):" usr
-read -p "Password? (Default: No password):" pswd
-if [ -z $usr ]; then
-    $usr=$USER
-fi
-
-if [ -z $pswd ]; then
-    sudo smbpasswd -n $usr
-    printf "Set no password for $usr"
-else    
-    sudo smbpasswd -w $pswd $usr
-    printf "Set given password for $usr"
-fi
-
-
-printf "[$drive]
+printf "\n[$drive]
 Path=$mnt
 Writeable=$write
 Public=$public
 Create mask=$fmask
 Directory mask=$dmask" | sudo tee -a /etc/samba/smb.conf
+
+read -p "User for login to drive? (Default $USER): " usr
+read -p "No password? (You will have to set it otherwise) [Y/n]: " nopswd
+if [ -z $usr ]; then
+    $usr=$USER
+fi
+
+if [[ -z $nopswd || "y" == $nopswd ]]; then
+    sudo smbpasswd -a $usr
+else    
+    sudo smbpasswd -n $usr
+    printf "\nnull passwords=yes" | sudo tee -a /etc/samba/smb.conf
+    printf "Set no password for $usr"
+fi
+
 
 
 sudo systemctl restart smbd.service
