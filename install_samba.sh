@@ -38,11 +38,11 @@ elif [ $dist == "Debian" ];then
 fi
 
 printf "\n[$drive]
-Path=$mnt
-Writeable=$write
-Public=$public
-Create mask=$fmask
-Directory mask=$dmask" | sudo tee -a /etc/samba/smb.conf
+    Path=$mnt
+    Writeable=$write
+    Public=$public
+    Create mask=$fmask
+    Directory mask=$dmask" | sudo tee -a /etc/samba/smb.conf
 
 read -p "User for login to drive? (Default $USER): " usr
 read -p "No password? (You will have to set it otherwise) [Y/n]: " nopswd
@@ -54,7 +54,7 @@ if [[ -z $nopswd || "y" == $nopswd ]]; then
     sudo smbpasswd -a $usr
 else    
     sudo smbpasswd -n $usr
-    printf "\nnull passwords=yes" | sudo tee -a /etc/samba/smb.conf
+    printf "\n  null passwords=yes" | sudo tee -a /etc/samba/smb.conf
     printf "Set no password for $usr"
 fi
 
