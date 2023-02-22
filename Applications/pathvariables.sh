@@ -56,6 +56,7 @@ append_path $KITTY_PATH
 export PYTHONPATH='/usr/bin/python:/usr/bin/python3:/usr/bin/python3.10'
 append_path $PYTHONPATH
 export PYTHON_ARGCOMPLETE_OK="True"
+
 # JAVA
 # For arch: Also changeable with 'archlinux-java'
 export JAVA_HOME='/usr/lib/jvm/java-17-openjdk/bin'
@@ -66,6 +67,9 @@ export LUA_PATH=""
 
 # GO
 #append_path '/usr/local/go/bin:/usr/bin/go:/usr/lib/go:/usr/share/go'
+
+# NINJA
+append_path '/usr/bin/ninja'
 
 # SNAP
 append_path '/snap/bin:/var/lib/snapd/snap/bin'
