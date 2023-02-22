@@ -51,7 +51,8 @@ python_install_user(){
     python $@ install --user;
 }
 alias python_twine_install="python3 -m pip install --upgrade twine"
-alias python_twine_upload="python3 -m pip install --upgrade build && python3 -m build && python3 -m twine check dist/* && python3 -m twine upload dist/*"
+alias python_twine_upload_test="python3 -m pip install --upgrade build && python3 -m build && python3 -m twine check dist/* && python3 -m twine upload --repository testpypi dist/* && rm dist/* && echo 'Uploaded to https://test.pypi.org/'"
+alias python_twine_upload="python3 -m pip install --upgrade build && python3 -m build && python3 -m twine check dist/* && python3 -m twine upload dist/* && rm dist/* && echo 'Uploaded to https://pypi.org/' "
 
 
 alias udev_reload="sudo udevadm control --reload-rules && sudo udevadm trigger"

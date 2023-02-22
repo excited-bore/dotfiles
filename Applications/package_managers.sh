@@ -9,6 +9,7 @@ alias apt_full_upgrade="sudo apt update && sudo apt full-upgrade && sudo apt aut
 alias pamac_update="pamac update"
 alias pamac_update_yes="yes | pamac update"
 alias pamac_upgrade="pamac upgrade"
+alias pamac_search_aur="pamac search --aur"
 alias pamac_forcerefresh="pamac update --force-refresh && pamac upgrade --force-refresh"
 alias pamac_clean="pamac clean"
 alias pamac_checkupdates="checkupdates -a"

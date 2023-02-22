@@ -11,8 +11,6 @@ append_path() {
     esac
 }
 
-append_path $(python -m site --user-site)/copy-to/
-
 # For git
 export EMAIL="stan96@duck.com"
 export GITNAME="excited-bore"
