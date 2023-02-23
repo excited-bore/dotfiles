@@ -5,7 +5,8 @@ repo=$4
 tag=$5
 bcommands=$6
 uinstall=$7
-install=$8
+clean=$8
+install=$9
 
 if [ -z $1 ]; then
     read -p "This will make a directory specifically for keeping source files if it does not exist yet. Specify a directory with global variable GIT_SOURCE_BUILDS (Default: ~/Applications). OK? [Y/n]: " ok
@@ -53,10 +54,17 @@ if [ -z "$bcommands" ]; then
 fi
 
 if [ -z "$7" ]; then
-    read -p  "Uninstall command? Called before rebuilding (Default: \"sudo make uninstall\"): " uinstall
+    read -p  "Uninstall command? Called from source folder before rebuilding (Default: \"sudo make uninstall\"): " uinstall
 fi
 if [ -z "$uinstall" ]; then
     uinstall="sudo make uninstall"
+fi
+
+if [ -z "$8" ]; then
+    read -p  "Clean command? Called from source folder (Default: \"sudo rm -rf build/*\"): " clean
+fi
+if [ -z "$clean" ]; then
+    cleam="sudo rm -rf build/*"
 fi
 
 if [ ! -d $dir ]; then
@@ -77,8 +85,9 @@ echo "tag=$tag" >> $file
 echo "commit=$curr_commit" >> $file
 echo "build=\"$bcommands\"" >> $file
 echo "uninstall=\"$uinstall\"" >> $file
+echo "clean=\"$clean\"" >> $file
 
-if [ -z $8 ]; then
+if [ -z $9 ]; then
     read -p "Install? [Y/n]: " install
 fi
 if [[ -z $install || "y" == $install ]]; then
@@ -89,6 +98,7 @@ if [[ -z $install || "y" == $install ]]; then
     cd ./build
     git checkout $commit
     eval "$build"
+    eval "$clean"
     echo "Done!"
     )
 fi

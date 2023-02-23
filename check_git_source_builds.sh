@@ -23,6 +23,7 @@ for d in $dir/*; do
             git pull $remote/$repo.git HEAD
             git checkout $commit
             eval "$build"
+            eval "$clean"
             cd ..
         else
             echo "$name is up-to-date"
