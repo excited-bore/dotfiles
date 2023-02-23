@@ -22,7 +22,7 @@ elif [[ $dist == "Debian" || $dist == "Raspbian" ]];then
         pip3 install --upgrade pynvim
         sudo apt install gettext
         ./setup_git_build_from_source.sh "y" "neovim" "https://github.com" "neovim/neovim" "releases/stable" "make CMAKE_BUILD_TYPE=RelWithDebInfo && sudo make install" "sudo make uninstall" "sudo rm -rf build/" "y"
-    else
+    elif [ $snp == "n" ]; then
         sudo apt install neovim python3-pynvim
     fi
     
