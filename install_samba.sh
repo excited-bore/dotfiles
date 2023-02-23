@@ -1,3 +1,11 @@
+. ./check_distro.sh
+
+if [[ $dist == "Manjaro" || $dist == "Arch" ]];then
+    sudo pacman -Su samba
+elif [[ $dist == "Debian" || $dist == "Raspbian" ]];then
+    sudo apt install samba samba-common  
+fi
+
 read -p "Drive name: (doesn't matter):" drive
 read -e -p "Mount point (path name):" mnt
 read -p "Writeable: [Y/n]:" write
@@ -29,13 +37,6 @@ else
     dmask=0777
 fi
 
-. ./check_distro.sh
-
-if [[ $dist == "Manjaro" || $dist == "Arch" ]];then
-    sudo pacman -Su samba
-elif [ $dist == "Debian" ];then
-    sudo apt install samba samba-common  
-fi
 
 printf "\n[$drive]
     Path=$mnt

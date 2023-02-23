@@ -1,8 +1,8 @@
 . ./check_distro.sh
 
-if [[ $dist == "Manjaro" || $dist== "Arch" ]];then
+if [[ $dist == "Manjaro" || $dist== "Arch" ]]; then
     sudo pacman -Su remmina
-elif [ $dist == "Debian" ];then
+elif [[ $dist == "Debian" || $dist == "Raspbian" ]]; then
     sudo apt update && sudo apt install realvnc-vnc-server realvnc-vnc-viewer
 fi
 

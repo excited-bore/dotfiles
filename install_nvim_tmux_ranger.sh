@@ -7,12 +7,15 @@ if [[ ! -d ~/.config/nvim/ ]]; then
 fi
 
 if [[ $dist == "Manjaro" || $dist == "Arch" ]]; then
-    sudo pacman -Su xclip sshfs neovim mono go nodejs jre11-openjdk npm python ranger atool bat calibre elinks ffmpegthumbnailer fontforge highlight imagemagick kitty mupdf-tools odt2txt btm
-elif [ $dist == "Debian" ]; then
-    sudo apt install build-essential python2 python3 cmake neovim python3-dev python3-pip mono-complete golang nodejs openjdk-17-jdk openjdk-17-jre npm ranger atool bat elinks ffmpegthumbnailer fontforge highlight imagemagick jq libcaca0 odt2txt mupdf-tools 
+    sudo pacman -Su xclip mono go nodejs jre11-openjdk npm python ranger atool bat calibre elinks ffmpegthumbnailer fontforge highlight imagemagick kitty mupdf-tools odt2txt btm
+elif [[ $dist == "Debian" || $dist == "Raspbian" ]]; then  
+    sudo apt install build-essential python2 python3 cmake python3-dev python3-pip mono-complete golang nodejs openjdk-17-jdk openjdk-17-jre npm ranger atool bat elinks ffmpegthumbnailer fontforge highlight imagemagick jq libcaca0 odt2txt mupdf-tools 
 fi 
 
-
+read -p "Install nvim? [Y/n]:" nvim
+if [ -z $nvim ] || [ "y" == $nvim ]; then
+    ./install_nvim.sh
+fi
 
 
 read -p "Install init.vim as user conf? (neovim conf at ~/.config/nvim/) [Y/n]:" init

@@ -1,4 +1,3 @@
-
 . ./check_distro.sh
 
 read -p "Create ~/.config to ~/config symlink? [Y/n]:" sym1

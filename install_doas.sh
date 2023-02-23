@@ -4,7 +4,7 @@
 
 if [[ $dist == "Manjaro" || $dist == "Arch" ]];then
     sudo pacman -Su opendoas 
-elif [ $dist == "Debian" ];then
+elif [[ $dist == "Debian" || $dist == "Raspbian" ]];then
     sudo apt install doas
 fi 
 

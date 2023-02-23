@@ -6,7 +6,7 @@ if [ $dist == "Manjaro" ]; then
     sudo pacman -Su pipewire pipewire-pulse manjaro-pipewire
 elif [ $dist == "Arch" ]; then
     sudo pacman -Su pipewire pipewire-pulse
-elif [ $dist == "Debian" ]; then
+elif [[ $dist == "Debian" || $dist == "Raspbian" ]]; then
     sudo apt install pipewire
 fi 
 
