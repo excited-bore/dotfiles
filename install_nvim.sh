@@ -13,7 +13,7 @@ elif [ $dist == "Debian" ];then
     if [[ -z $snp || $snp == "y" ]]; then
         pip3 install --upgrade pynvim
         sudo apt install gettext
-        (cd /tmp/ && wget https://github.com/neovim/neovim/archive/refs/tags/stable.tar.gz && tar -xvzf *.tar.gz && cd ./neovim-stable && make CMAKE_BUILD_TYPE=RelWithDebInfo && sudo make install)
+        ./setup_git_build_from_source.sh "y" "neovim" "https://github.com" "neovim/neovim" "releases/stable" "make CMAKE_BUILD_TYPE=RelWithDebInfo && sudo make install" "sudo make uninstall" "y"
     else
         sudo apt install neovim python3-pynvim
     fi
