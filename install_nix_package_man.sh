@@ -1,5 +1,5 @@
 #https://christitus.com/nix-package-manager/
-curl -L https://nixos.org/nix/install | sh
+sh <(curl -L https://nixos.org/nix/install) --daemon
 
 read -p "Install nix.sh (nix bash aliases) [Y/n}: " nix
 if [[ -z $nix || "y" == $nix ]]; then
@@ -10,3 +10,4 @@ if [[ -z $nix || "y" == $nix ]]; then
     fi
 fi
 
+nix-shell -p nix-info --run nix-info
