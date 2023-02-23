@@ -70,6 +70,7 @@ if [ -z $aliases ]; then
     fi
 fi
 
-git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+
+git clone https://github.com/excited-bore/VundleVimCopy.git ~/.vim/bundle/Vundle.vim
 nvim +PluginInstall +qall
 python3 ~/.vim/bundle/YouCompleteMe/install.py --all
