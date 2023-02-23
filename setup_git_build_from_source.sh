@@ -1,4 +1,15 @@
-read -p "This will make a directory specifically for keeping source files if it does not exist yet. Specify a directory with global variable GIT_SOURCE_BUILDS (Default: ~/Applications). OK? [Y/n]: " ok
+ok=$1
+name=$2
+http=$3
+repo=$4
+tag=$5
+bcommands=$6
+uinstall=$7
+install=$8
+
+if [ -z $1 ]; then
+    read -p "This will make a directory specifically for keeping source files if it does not exist yet. Specify a directory with global variable GIT_SOURCE_BUILDS (Default: ~/Applications). OK? [Y/n]: " ok
+fi
 
 if ! [[ -z $ok || "y" == $ok ]]; then
     return
@@ -10,31 +21,40 @@ else
     dir=$GIT_SOURCE_BUILDS
 fi
 
-read -p "Give up a name for the github build: " name
-if [ -z $name ]; then
-    echo "Give up a non empty name"
-    return
+if [ -z $2 ]; then
+    while [ -z $name ]; do
+        read -p "Give up a name for the github build: " name
+    done;
 fi
-    
-read -p "Give up a domain reference (Default: https://github.com): " http
+
+if [ -z $3 ]; then   
+    read -p "Give up a domain reference (Default: https://github.com): " http
+fi
 if [ -z $http ]; then
     http="https://github.com"
 fi
+if [ -z $4 ]; then
+    while [ -z $repo ]; do 
+        read -p "Give up a repo (For example: neovim/neovim): " repo
+    done;
+fi
 
-while [ -z $repo ]; do 
-    read -p "Give up a repo (For example: neovim/neovim): " repo
-done;
+if [ -z $5 ]; then
+    while [ -z $tag ]; do 
+        read -p "Give up the github build tag (For example: releases/stable): " tag
+    done;
+fi
 
-while [ -z $tag ]; do 
-    read -p "Give up the github build tag (For example: releases/stable): " tag
-done;
-
-read -p  "Give up build commands (Default: \"make && sudo make install\"): " bcommands
+if [ -z $6 ]; then
+    read -p  "Give up build commands (Default: \"make && sudo make install\"): " bcommands
+fi
 if [ -z "$bcommands" ]; then
     bcommands="make && sudo make install"
 fi
 
-read -p  "Uninstall command? Called before rebuilding (Default: \"sudo make uninstall\"): " uinstall
+if [ -z $7 ]; then
+    read -p  "Uninstall command? Called before rebuilding (Default: \"sudo make uninstall\"): " uinstall
+fi
 if [ -z "$uinstall" ]; then
     uinstall="sudo make uninstall"
 fi
@@ -58,8 +78,9 @@ echo "commit=$curr_commit" >> $file
 echo "build=$bcommands" >> $file
 echo "uninstall=$uinstall" >> $file
 
-
-read -p "Install? [Y/n]: " install
+if [ -z $8 ]; then
+    read -p "Install? [Y/n]: " install
+fi
 if [[ -z $install || "y" == $install ]]; then
     (
     cd $dir/$name
