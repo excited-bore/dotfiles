@@ -1,10 +1,11 @@
 . ./check_distro.sh
-if [ $dist == "Raspbian" ]; then
-    read -p "Install 64bit kernel before install nix? [Y/n]: " newkrn
-    if [[ -z $newkrn || "y" == $newkrn ]]; then
-        . ./install_rpi_64bit_kernel.sh
-    fi
-fi
+
+#if [ $dist == "Raspbian" ]; then
+#    read -p "Install 64bit kernel before install nix? [Y/n]: " newkrn
+#    if [[ -z $newkrn || "y" == $newkrn ]]; then
+#        . ./install_rpi_64bit_kernel.sh
+#    fi
+#fi
 
 #https://christitus.com/nix-package-manager/
 
