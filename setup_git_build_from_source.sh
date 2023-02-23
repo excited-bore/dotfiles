@@ -61,10 +61,10 @@ if [ -z "$uinstall" ]; then
 fi
 
 if [ -z "$8" ]; then
-    read -p  "Clean command? Called from source folder (Default: \"sudo rm -rf build/*\"): " clean
+    read -p  "Clean command? Called from source folder (Default: \"sudo rm -rf build/\"): " clean
 fi
 if [ -z "$clean" ]; then
-    cleam="sudo rm -rf build/*"
+    cleam="sudo rm -rf build/"
 fi
 
 if [ ! -d $dir ]; then
