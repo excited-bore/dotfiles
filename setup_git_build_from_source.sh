@@ -1,7 +1,7 @@
 read -p "This will make a directory specifically for keeping source files if it does not exist yet. Specify a directory with global variable GIT_SOURCE_BUILDS (Default: ~/Applications). OK? [Y/n]: " ok
 
 if ! [[ -z $ok || "y" == $ok ]]; then
-    exit 1
+    return
 fi
 
 if [ -z $GIT_SOURCE_BUILDS ]; then
@@ -13,7 +13,7 @@ fi
 read -p "Give up a name for the github build: " name
 if [ -z $name ]; then
     echo "Give up a non empty name"
-    exit 1
+    return
 fi
     
 read -p "Give up a domain reference (Default: https://github.com): " http
@@ -64,8 +64,9 @@ if [[ -z $install || "y" == $install ]]; then
     (
     cd $dir/$name
     . ./git_install.sh
-    git clone $domain/$repo/$tag ./build
+    git clone $domain/$repo.git ./build
     cd ./build
+    git checkout $commit
     eval "$build"
     echo "Done!"
     )

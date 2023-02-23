@@ -26,7 +26,7 @@ export SYSTEMD_PAGER=$PAGER
 #export TERM=vt100
  
 #export LC_ALL="en_US.UTF-8"
-#export DISPLAY=":0.0"
+export DISPLAY=":0.0"
 export EDITOR="nvim"
 #export VISUAL="/usr/bin/code --unity-launch %F"
 export VISUAL="nvim"
