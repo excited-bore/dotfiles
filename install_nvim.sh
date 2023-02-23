@@ -9,7 +9,6 @@ if [[ $dist == "Manjaro" || $dist == "Arch" ]];then
     sudo pacman -Su neovim cmake python go ninja nodejs mono openjdk17-src python-pynvim
 elif [ $dist == "Debian" ];then
     sudo apt install build-essential cmake ninja ninja-build python3-dev mono-complete golang gopls nodejs openjdk-17-jdk openjdk-17-jre npm python3-pip 
-    sudo n
     read -p "Neovim on apt Debian is usually deprecated. Install from source? [Y/n]:" snp
     if [[ -z $snp || $snp == "y" ]]; then
         pip3 install --upgrade pynvim
@@ -65,5 +64,5 @@ fi
 
 git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 nvim +PluginInstall +qall
-(cd ~/.vim/bundle/neoclip/src/ && cmake -B build -G Ninja && ninja -C build install/strip)
+(cd ~/.vim/bundle/neoclip/src/ && export PATH=/usr/bin/ninja:$PATH && cmake -B build -G Ninja && ninja -C build install/strip)
 python3 ~/.vim/bundle/YouCompleteMe/install.py --all
