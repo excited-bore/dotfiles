@@ -55,8 +55,8 @@ echo "domain=$http" > $file
 echo "repo=$repo" >> $file
 echo "tag=$tag" >> $file
 echo "commit=$curr_commit" >> $file
-echo "build=$bcommands" >> $file
-echo "uninstall=$uinstall" >> $file
+echo "build=\"$bcommands\"" >> $file
+echo "uninstall=\"$uinstall\"" >> $file
 
 
 read -p "Install? [Y/n]: " install
