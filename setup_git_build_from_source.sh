@@ -45,14 +45,14 @@ if [ -z $5 ]; then
     done;
 fi
 
-if [ -z $6 ]; then
+if [ -z "$6" ]; then
     read -p  "Give up build commands (Default: \"make && sudo make install\"): " bcommands
 fi
 if [ -z "$bcommands" ]; then
     bcommands="make && sudo make install"
 fi
 
-if [ -z $7 ]; then
+if [ -z "$7" ]; then
     read -p  "Uninstall command? Called before rebuilding (Default: \"sudo make uninstall\"): " uinstall
 fi
 if [ -z "$uinstall" ]; then
