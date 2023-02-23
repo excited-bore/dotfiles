@@ -14,9 +14,9 @@ for d in $dir/*; do
         (
         cd $d;
         . ./git_install.sh
-        curr_commit=$(curl -sL $domain/$repo/$tag | grep "/$repo/commit" | perl -pe 's|.*/'$repo'/commit/(.*?)".*|\1|')
+        curr_commit=$(curl -sL $full_url | grep "/$repo/commit" | perl -pe 's|.*/'$repo'/commit/(.*?)".*|\1|')
         if [ ! $commit == $curr_commit ]; then
-            echo "$d needs updating. Will be rebuild"
+            echo "$name needs updating. Will be rebuild"
             perl -i -pe '4,s|commit=.*|commit='$curr_commit'|' ./git_install.sh
             cd $name/build
             eval "$uninstall"
@@ -25,7 +25,7 @@ for d in $dir/*; do
             eval "$build"
             cd ..
         else
-            echo "$d is up-to-date"
+            echo "$name is up-to-date"
         fi
         )                           
     fi
