@@ -13,9 +13,27 @@ sh <(curl -L https://nixos.org/nix/install) --daemon
 
 read -p "Install nix.sh (nix bash aliases) [Y/n}: " nix
 if [[ -z $nix || "y" == $nix ]]; then
+    if [ ! -d ~/.bash_aliases.d ]; then
+        mkdir ~/.bash_aliases.d/
+    fi
+     if ! grep -q "~/.bash_aliases.d" ~/.bashrc; then
+
+        echo "if [[ -d ~/.bash_aliases.d/ ]]; then" >> ~/.bashrc
+        echo "  for alias in ~/.bash_aliases.d/*.sh; do" >> ~/.bashrc
+        echo "      . \"\$alias\" " >> ~/.bashrc
+        echo "  done" >> ~/.bashrc
+        echo "fi" >> ~/.bashrc
+    fi
     cp -f Applications/nix.sh ~/.bash_aliases.d/nix.sh
     read -p "Install nix.sh for root? [Y/n]: " rnix
     if [[ -z $rnix || "y" == $rnix ]]; then
+        if ! sudo test -d /root/.bash_aliases.d; then
+            sudo mkdir /root/.bash_aliases.d/
+        fi
+        if ! sudo grep -q "/root/.bash_aliases.d" /root/.bashrc; then
+
+            printf "\nif [[ -d /root/.bash_aliases.d/ ]]; then\n  for alias in /root/.bash_aliases.d/*.sh; do\n      . \"\$alias\" \n  done\nfi" | sudo tee -a /root/.bashrc > /dev/null
+        fi
         sudo cp -f Applications/nix.sh /root/.bash_aliases.d/
     fi
 fi
