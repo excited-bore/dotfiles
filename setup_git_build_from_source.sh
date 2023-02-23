@@ -75,8 +75,8 @@ echo "domain=$http" > $file
 echo "repo=$repo" >> $file
 echo "tag=$tag" >> $file
 echo "commit=$curr_commit" >> $file
-echo "build=$bcommands" >> $file
-echo "uninstall=$uinstall" >> $file
+echo "build=\"$bcommands\"" >> $file
+echo "uninstall=\"$uinstall\"" >> $file
 
 if [ -z $8 ]; then
     read -p "Install? [Y/n]: " install
