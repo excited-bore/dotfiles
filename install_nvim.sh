@@ -21,8 +21,8 @@ elif [[ $dist == "Debian" || $dist == "Raspbian" ]];then
     elif [ $snp == "s" ]; then
         echo "Begin installation neovim stable from source"
         pip3 install --upgrade pynvim
-        sudo apt-get install ninja-build gettext libtool libtool-bin cmake g++ pkg-config unzip curl doxygen
-        ./setup_git_build_from_source.sh "y" "neovim" "https://github.com" "neovim/neovim" "releases/stable" "make CMAKE_BUILD_TYPE=RelWithDebInfo && sudo make install" "sudo make uninstall" "sudo rm -rf build/" "y"
+        sudo apt install ninja-build gettext libtool libtool-bin cmake g++ pkg-config unzip curl doxygen
+        ./setup_git_build_from_source.sh "y" "neovim" "https://github.com" "neovim/neovim" "releases/stable" "ninja-build gettext libtool libtool-bin cmake g++ pkg-config unzip curl doxygen" "make CMAKE_BUILD_TYPE=RelWithDebInfo && sudo make install" "sudo make uninstall" "sudo rm -rf build/" "y"
     elif [ $snp == "n" ]; then
         sudo apt install neovim python3-pynvim
     fi

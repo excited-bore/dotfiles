@@ -17,6 +17,15 @@ for d in $dir/*; do
         curr_commit=$(curl -sL $domain/$repo/$tag | grep "/$repo/commit" | perl -pe 's|.*/'$repo'/commit/(.*?)".*|\1|')
         if [ ! $commit == $curr_commit ]; then
             echo "$d needs updating. Will be rebuild"
+            if [ $dist == "Manjaro" ]; then
+                yes | pamac install "$prereqs"; 
+            elif [ $dist == "Arch" ]; then
+                yes | sudo pacman -Su "$prereqs";
+            elif [[ $dist == "Debian" || $dist == "Raspbian" ]]; then
+                sudo apt update
+                yes | sudo apt install "$prereqs"
+                yes | sudo apt autoremove
+            fi
             perl -i -pe '4,s|commit=.*|commit='$curr_commit'|' ./git_install.sh
             cd $name/build
             eval "$uninstall"
