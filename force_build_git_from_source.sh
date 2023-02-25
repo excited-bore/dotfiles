@@ -12,7 +12,7 @@ if [ $# -eq 0 ]; then
         if [ -d $i ] && [ -f $i/git_install.sh ]; then
             . $i/git_install.sh
             if [ "$name" == "$dirss" ]; then
-                cd $i/$name/build
+                cd $i/build
                 eval "$prereqs"
                 eval "$uninstall"
                 git pull $domain/$repo.git HEAD
