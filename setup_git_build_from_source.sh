@@ -148,10 +148,12 @@ echo "domain=$http" > $file
 echo "repo=$repo" >> $file
 echo "tag=$tag" >> $file
 echo "commit=$curr_commit" >> $file
-echo "prereqs=\"$preqs\"" >> $file 
+echo "prereqs=\"$prereqs\"" >> $file 
 echo "build=\"$bcommands\"" >> $file
 echo "uninstall=\"$uinstall\"" >> $file
 echo "clean=\"$clean\"" >> $file
+
+cat $file
 
 if [ ! "$#" -gt 9 ]; then
     read -p "Run now? [Y/n]: " install
