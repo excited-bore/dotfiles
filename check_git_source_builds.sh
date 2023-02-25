@@ -23,7 +23,7 @@ for d in $dir/*; do
         if [ ! $commit == $curr_commit ]; then
             echo "$d needs updating. Will be rebuild"
             eval "$prereqs"
-            perl -i -pe '4,s|commit=.*|commit='$curr_commit'|' ./git_install.sh
+            perl -i -pe '5,s|commit=.*|commit='$curr_commit'|' ./git_install.sh
             cd $name/build
             eval "$uninstall"
             git pull $domain/$repo.git HEAD

@@ -145,7 +145,8 @@ touch $dir/$name/git_install.sh
 
 file=$dir/$name/git_install.sh
 
-echo "domain=$http" > $file
+echo "name=$name" > $file
+echo "domain=$http" >> $file
 echo "repo=$repo" >> $file
 echo "tag=$tag" >> $file
 echo "commit=$curr_commit" >> $file

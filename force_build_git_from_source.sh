@@ -11,7 +11,7 @@ if [ $# -eq 0 ]; then
     for i in $dir/*; do
         if [ -d $i ] && [ -f $i/git_install.sh ]; then
             . $i/git_install.sh
-            if [ $name == $dirss ]; then
+            if [ "$name" == "$dirss" ]; then
                 cd $i/$name/build
                 eval "$prereqs"
                 eval "$uninstall"
