@@ -14,18 +14,15 @@ for d in $dir/*; do
         (
         cd $d;
         . ./git_install.sh
-        curr_commit=$(curl -sL $domain/$repo/$tag | grep "/$repo/commit" | perl -pe 's|.*/'$repo'/commit/(.*?)".*|\1|')
+        if [ ! -z $tag ]; then
+            echo "Will use $tag"
+            commit=$(curl -sL "$httprepo/tags" |  grep "/$repo/releases/tag/$tag" | perl -pe 's|.*/'$repo'/releases/tag/'$tag'(.*?)".*|'$tag'\1|' | uniq | awk 'NR==1{max=$1;print $0; exit;}' | while read -r i; do curl -sL "$http/$repo/releases/tag/$i" |  grep "/$repo/commit" | perl -pe 's|.*/'$repo'/commit/(.*?)".*|\1|' | awk 'NR==1{max=$1;print $0; exit;}'; done)
+        else
+            commit=$(curl -sL "$httprepo/tags" |  grep "/$repo/releases/tag/$tg" | perl -pe 's|.*/'$repo'/releases/tag/'$tg'(.*?)".*|'$tg'\1|' | uniq | awk 'NR==1{max=$1;print $0; exit;}' | while read -r i; do echo -n "$i  "; curl -sL "$http/$repo/releases/tag/$i" |  grep "/$repo/commit" | perl -pe 's|.*/'$repo'/commit/(.*?)".*|\1|' | awk 'NR==1{max=$1;print $0; exit;}';  done)
+        fi
         if [ ! $commit == $curr_commit ]; then
             echo "$d needs updating. Will be rebuild"
-            if [ $dist == "Manjaro" ]; then
-                yes | pamac install "$prereqs"; 
-            elif [ $dist == "Arch" ]; then
-                yes | sudo pacman -Su "$prereqs";
-            elif [[ $dist == "Debian" || $dist == "Raspbian" ]]; then
-                sudo apt update
-                yes | sudo apt install "$prereqs"
-                yes | sudo apt autoremove
-            fi
+            eval "$prereqs"
             perl -i -pe '4,s|commit=.*|commit='$curr_commit'|' ./git_install.sh
             cd $name/build
             eval "$uninstall"

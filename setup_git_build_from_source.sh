@@ -42,9 +42,38 @@ if [ -z $4 ]; then
 fi
 
 if [ -z $5 ]; then
-    while [ -z $tag ]; do 
-        read -p "Give up the github build tag (For example: releases/stable): " tag
+        tag=""
+        tg=""
+        httprepo=$http/$repo
+        echo "Give up a identifiable release version (For example: v0.8.3, stable)"
+        echo "You can make sure that it's valid if you see an associated commit hash"
+        echo "Giving up something like 'v0.8' would also work"
+        echo "Only last entered tag will get saved. 'q' and Enter to quit. An empty Enter will default to topresult (usually latest, works dynamically): "
+        echo "All tags: (-> indicates default)"
+        echo -n "-> "
+        curl -sL "$httprepo/tags" |  grep "/$repo/releases/tag" | perl -pe 's|.*/'$repo'/releases/tag/(.*?)".*|\1|' | uniq | awk 'NR==1{max=$1;print $0; exit;}' | while read -r i; do echo -n "$i  "; curl -sL "$http/$repo/releases/tag/$i" |  grep "/$repo/commit" | perl -pe 's|.*/'$repo'/commit/(.*?)".*|\1|' | awk 'NR==1{max=$1;print $0; exit;}';  done
+        curl -sL "$httprepo/tags" |  grep "/$repo/releases/tag" | perl -pe 's|.*/'$repo'/releases/tag/(.*?)".*|\1|' | uniq |  while read -r i; do echo -n "$i  "; curl -sL "$http/$repo/releases/tag/$i" |  grep "/$repo/commit" | perl -pe 's|.*/'$repo'/commit/(.*?)".*|\1|' | awk 'NR==1{max=$1;print $0; exit;}';  done
+     while ! [ "$tg" == "q" ]; do 
+        read tg
+        if ! [ "$tg" == "q" ]; then
+            if ! [ -z "$tg" ]; then
+                echo -n "-> "
+                curl -sL "$httprepo/tags" |  grep "/$repo/releases/tag/$tg" | perl -pe 's|.*/'$repo'/releases/tag/'$tg'(.*?)".*|'$tg'\1|' | uniq | awk 'NR==1{max=$1;print $0; exit;}' | while read -r i; do echo -n "$i  "; curl -sL "$http/$repo/releases/tag/$i" |  grep "/$repo/commit" | perl -pe 's|.*/'$repo'/commit/(.*?)".*|\1|' |  awk 'NR==1{max=$1;print $0; exit;}';  done
+                curl -sL "$httprepo/tags" |  grep "/$repo/releases/tag/$tg" | perl -pe 's|.*/'$repo'/releases/tag/'$tg'(.*?)".*|'$tg'\1|' | uniq | while read -r i; do echo -n "$i  "; curl -sL "$http/$repo/releases/tag/$i" |  grep "/$repo/commit" | perl -pe 's|.*/'$repo'/commit/(.*?)".*|\1|' | awk 'NR==1{max=$1;print $0; exit;}';  done
+                tag=$tg
+            else
+                echo -n "-> "
+                curl -sL "$httprepo/tags" |  grep "/$repo/releases/tag" | perl -pe 's|.*/'$repo'/releases/tag/(.*?)".*|\1|' | uniq | sort | while read -r i; do echo -n "$i  "; curl -sL "$http/$repo/releases/tag/$i" |  grep "/$repo/commit" | perl -pe 's|.*/'$repo'/commit/(.*?)".*|\1|' | awk 'NR==1{max=$1;print $0; exit;}';  done
+            fi
+        fi
     done;
+fi
+
+if [ ! -z $tag ]; then
+    echo "Will use $tag"
+    commit=$(curl -sL "$httprepo/tags" |  grep "/$repo/releases/tag/$tag" | perl -pe 's|.*/'$repo'/releases/tag/'$tag'(.*?)".*|'$tag'\1|' | uniq | awk 'NR==1{max=$1;print $0; exit;}' | while read -r i; do curl -sL "$http/$repo/releases/tag/$i" |  grep "/$repo/commit" | perl -pe 's|.*/'$repo'/commit/(.*?)".*|\1|' | awk 'NR==1{max=$1;print $0; exit;}'; done)
+else
+    commit=$(curl -sL "$httprepo/tags" |  grep "/$repo/releases/tag/$tg" | perl -pe 's|.*/'$repo'/releases/tag/'$tg'(.*?)".*|'$tg'\1|' | uniq | awk 'NR==1{max=$1;print $0; exit;}' | while read -r i; do echo -n "$i  "; curl -sL "$http/$repo/releases/tag/$i" |  grep "/$repo/commit" | perl -pe 's|.*/'$repo'/commit/(.*?)".*|\1|' | awk 'NR==1{max=$1;print $0; exit;}';  done)
 fi
 
 if [ -z "$6" ]; then
@@ -104,15 +133,14 @@ if [ -z "$clean" ]; then
     clean="sudo rm -rf build/"
 fi
 
+
 if [ ! -d $dir ]; then
     mkdir -p $dir
 fi
 (cd $dir && mkdir $name)
 touch $dir/$name/git_install.sh
 
-full_url="$http/$repo/$tag"
 
-curr_commit=$(curl -sL $full_url | grep "/$repo/commit" | perl -pe 's|.*/'$repo'/commit/(.*?)".*|\1|')
 
 file=$dir/$name/git_install.sh
 
@@ -124,6 +152,8 @@ echo "prereqs=\"$preqs\"" >> $file
 echo "build=\"$bcommands\"" >> $file
 echo "uninstall=\"$uinstall\"" >> $file
 echo "clean=\"$clean\"" >> $file
+
+cat $file
 
 if [ -z "$10" ]; then
     read -p "Run now? [Y/n]: " install
