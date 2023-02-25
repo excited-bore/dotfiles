@@ -11,3 +11,8 @@ elif [[ $dist == "Debian" || $dist == "Raspbian" ]]; thena
     fi
     flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 fi
+
+read -p "Install for no password with pam conf? [Y/n]:" pam
+if [[ -z $pam || "y" == $pam ]]; then
+    . ./install_polkit_wheel.sh
+fi

@@ -3,6 +3,7 @@ dist=/
 pm=/
 declare -A osInfo;
 osInfo[/etc/redhat-release]=yum
+osInfo[/etc/rpi-issue]=apt
 osInfo[/etc/manjaro-release]=pamac
 osInfo[/etc/arch-release]=pacman
 osInfo[/etc/gentoo-release]=emerge
@@ -30,6 +31,9 @@ do
     elif [ -f $f ] && [ $f == /etc/arch-release ] && [ $dist == / ];then
         pm=${osInfo[$f]}
         dist="Arch"
+    elif [ -f $f ] && [ $f == /etc/rpi-issue ] && [ $dist == / ];then
+        pm=${osInfo[$f]}
+        dist="Raspbian"
     elif [ -f $f ] && [ $f == /etc/debian_version ] && [ $dist == / ];then
         pm=${osInfo[$f]}
         dist="Debian"

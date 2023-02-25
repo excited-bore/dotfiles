@@ -26,14 +26,18 @@ _files(){
     return 0
 }
 
+_users(){
+    COMPREPLY=($(compgen -u $2))
+    return 0
+}
+
 _groups(){
     COMPREPLY=($(compgen -g $2))
     return 0
 }
 
-
-man_bash(){
+man-bash(){
     help -m $@ | $PAGER;
 }
 
-complete -F _builtins man_bash
+complete -F _builtins man-bash

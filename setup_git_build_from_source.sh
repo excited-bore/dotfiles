@@ -1,4 +1,4 @@
-. ./check_distro.sh
+. ./check_distro.sh 
 ok=$1
 name=$2
 http=$3
@@ -24,7 +24,6 @@ else
     dir=$GIT_SOURCE_BUILDS
 fi
 if [ -z $2 ]; then
-
     while [ -z $name ]; do
         read -p "Give up a name for the github build: " name
     done;
@@ -49,30 +48,60 @@ if [ -z $5 ]; then
 fi
 
 if [ -z "$6" ]; then
-    while [ -z $preqs ]; do 
-        read -p "Give up the installation preqs (For example: make cmake gettext): " preqs
+    prereqs=""
+    echo "Give up the installation preqs (For example: sudo apt install make cmake)"
+    echo "'q' and Enter to quit: "
+    while ! [ "$preqs" == "q" ]; do 
+        read -e preqs
+        if ! [ "$preqs" == "q" ]; then
+            prereqs+="$preqs;"
+        fi
     done;
 fi
 
 if [ -z "$7" ]; then
-    read -p  "Give up build commands (Default: \"make && sudo make install\"): " bcommands
+    bcommands=""
+    echo "Give up build commands (Default: \"make && sudo make install\"): " 
+    echo "'q' and Enter to quit: "
+    while ! [ "$bcmd" == "q" ]; do
+    read -e bcmd
+        if ! [ "$bcmd" == "q" ]; then
+            bcommands+="$bcmd;"
+        fi
+    done;
 fi
 if [ -z "$bcommands" ]; then
     bcommands="make && sudo make install"
 fi
 
 if [ -z "$8" ]; then
-    read -p  "Uninstall command? Called from source folder before rebuilding (Default: \"sudo make uninstall\"): " uinstall
+    uinstall=""
+    echo  "Uninstall command? Called from source folder before rebuilding (Default: \"sudo make uninstall\"): " 
+    echo "'q' and Enter to quit: "
+    while ! [ "$unstll" == "q" ]; do
+    read -e unstll
+        if ! [ "$unstll" == "q" ]; then
+            uinstall+="$unstll;"
+        fi
+    done;
 fi
 if [ -z "$uinstall" ]; then
     uinstall="sudo make uninstall"
 fi
 
 if [ -z "$9" ]; then
-    read -p  "Clean command? Called from source folder (Default: \"sudo rm -rf build/\"): " clean
+    clean=""
+    echo  "Clean command? Called from source folder (Default: \"sudo rm -rf build/\"): " 
+    echo "'q' and Enter to quit: "
+    while ! [ "$cln" == "q" ]; do
+    read -e cln
+        if ! [ "$cln" == "q" ]; then
+            clean+="$cln;"
+        fi
+    done;
 fi
 if [ -z "$clean" ]; then
-    cleam="sudo rm -rf build/"
+    clean="sudo rm -rf build/"
 fi
 
 if [ ! -d $dir ]; then
@@ -97,21 +126,13 @@ echo "uninstall=\"$uinstall\"" >> $file
 echo "clean=\"$clean\"" >> $file
 
 if [ -z "$10" ]; then
-    read -p "Install? [Y/n]: " install
+    read -p "Run now? [Y/n]: " install
 fi
 if [[ -z $install || "y" == $install ]]; then
     (
     cd $dir/$name
     . ./git_install.sh
-    if [ $dist == "Manjaro" ]; then
-        yes | pamac install "$prereqs"; 
-    elif [ $dist == "Arch" ]; then
-        yes | sudo pacman -Su "$prereqs";
-    elif [[ $dist == "Debian" || $dist == "Raspbian" ]]; then
-        sudo apt update
-        yes | sudo apt install "$prereqs"
-        yes | sudo apt autoremove
-    fi
+    eval "$prereqs"
     git clone $domain/$repo.git ./build
     cd ./build
     git checkout $commit
