@@ -65,6 +65,7 @@ git_config_using_vars() { git config --global user.email $EMAIL && git config --
 git_add_remote_url() { git remote -v add "$1" "$2"; }
 git_add_remote_ssh() { git remote -v add "$1" git@github.com:$GITNAME/"$2.git"; }
 
+alias git_reset_to_last_HEAD="git reset --hard"
 alias git_add_all="git add -A"
 
 git_commit_all() { 
