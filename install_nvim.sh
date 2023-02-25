@@ -10,20 +10,20 @@ if [[ $dist == "Manjaro" || $dist == "Arch" ]];then
 elif [[ $dist == "Debian" || $dist == "Raspbian" ]];then
     sudo apt install build-essential xclip python3-dev mono-complete golang gopls nodejs openjdk-17-jdk openjdk-17-jre npm python3-pip 
     pip3 install --user cmake
-    read -p "Neovim on apt Debian is usually deprecated. Install from elsewhere? [ Nx (Nix package manager)/ s (build from source)/ n (apt)]:" snp
-    if [[ -z $snp || $snp == "Nx" ]]; then
+    read -p "Neovim on apt Debian is usually deprecated. Install from elsewhere? [ S (Build from source)/ n (Nix package manager) / a (apt)]:" snp
+    if [[ -z $snp || $snp == "S" ]]; then
+        echo "Begin installation neovim stable from source"
+        pip3 install --upgrade pynvim
+        sudo apt install ninja-build gettext libtool libtool-bin cmake g++ pkg-config unzip curl doxygen
+        ./setup_git_build_from_source.sh "y" "neovim" "https://github.com" "neovim/neovim" "stable" "sudo apt update; sudo apt install ninja-build gettext libtool libtool-bin cmake g++ pkg-config unzip curl doxygen" "make CMAKE_BUILD_TYPE=RelWithDebInfo; sudo make install" "sudo make uninstall" "make distclean; make deps" "y"
+    if [ $snp == "n" ]; then
         read -p "Install Nix? [Y/n]: " nx
         if [[ -z $nx || $nx == "y" ]]; then
             . ./install_nix_package_man.sh
         fi
         pip3 install --upgrade pynvim
         nix-env -iA nixpkgs.neovim
-    elif [ $snp == "s" ]; then
-        echo "Begin installation neovim stable from source"
-        pip3 install --upgrade pynvim
-        sudo apt install ninja-build gettext libtool libtool-bin cmake g++ pkg-config unzip curl doxygen
-        ./setup_git_build_from_source.sh "y" "neovim" "https://github.com" "neovim/neovim" "stable" "sudo apt update; sudo apt install ninja-build gettext libtool libtool-bin cmake g++ pkg-config unzip curl doxygen" "make CMAKE_BUILD_TYPE=RelWithDebInfo; sudo make install" "sudo make uninstall" "make distclean; make deps" ""
-    elif [ $snp == "n" ]; then
+    elif [ $snp == "a" ]; then
         sudo apt install neovim python3-pynvim
     fi
     

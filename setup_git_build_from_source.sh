@@ -73,6 +73,7 @@ if [ ! -z $tag ]; then
     echo "Will use $tag"
     commit=$(curl -sL "$httprepo/tags" |  grep "/$repo/releases/tag/$tag" | perl -pe 's|.*/'$repo'/releases/tag/'$tag'(.*?)".*|'$tag'\1|' | uniq | awk 'NR==1{max=$1;print $0; exit;}' | while read -r i; do curl -sL "$http/$repo/releases/tag/$i" |  grep "/$repo/commit" | perl -pe 's|.*/'$repo'/commit/(.*?)".*|\1|' | awk 'NR==1{max=$1;print $0; exit;}'; done)
 else
+    echo "Will look for top of /tags"
     commit=$(curl -sL "$httprepo/tags" |  grep "/$repo/releases/tag/$tg" | perl -pe 's|.*/'$repo'/releases/tag/'$tg'(.*?)".*|'$tg'\1|' | uniq | awk 'NR==1{max=$1;print $0; exit;}' | while read -r i; do echo -n "$i  "; curl -sL "$http/$repo/releases/tag/$i" |  grep "/$repo/commit" | perl -pe 's|.*/'$repo'/commit/(.*?)".*|\1|' | awk 'NR==1{max=$1;print $0; exit;}';  done)
 fi
 
@@ -130,7 +131,7 @@ if [ -z "$9" ]; then
     done;
 fi
 if [ -z "$clean" ]; then
-    clean="sudo rm -rf build/"
+    clean="make distclean"
 fi
 
 
@@ -158,7 +159,7 @@ cat $file
 if [ ! "$#" -gt 9 ]; then
     read -p "Run now? [Y/n]: " install
 fi
-if [[ -z $install || "y" == $install ]]; then
+if [[ -z $install || "y" == $install || ! -z $10 ]]; then
     (
     cd $dir/$name
     . ./git_install.sh
@@ -166,8 +167,8 @@ if [[ -z $install || "y" == $install ]]; then
     git clone $domain/$repo.git ./build
     cd ./build
     git checkout $commit
-    eval "$build"
     eval "$clean"
+    eval "$build"
     echo "Done!"
     )
 fi
