@@ -8,7 +8,7 @@ preqs=$6
 bcommands=$7
 uinstall=$8
 clean=$9
-install=$10
+install="$10"
 
 if [ -z $1 ]; then
     read -p "This will make a directory specifically for keeping source files if it does not exist yet. Specify a directory with global variable GIT_SOURCE_BUILDS (Default: ~/Applications). OK? [Y/n]: " ok
@@ -153,9 +153,7 @@ echo "build=\"$bcommands\"" >> $file
 echo "uninstall=\"$uinstall\"" >> $file
 echo "clean=\"$clean\"" >> $file
 
-cat $file
-
-if [ -z "$10" ]; then
+if [ ! "$#" -gt 9 ]; then
     read -p "Run now? [Y/n]: " install
 fi
 if [[ -z $install || "y" == $install ]]; then
