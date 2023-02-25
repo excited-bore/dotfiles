@@ -121,7 +121,7 @@ fi
 
 if [ -z "$9" ]; then
     clean=""
-    echo  "Clean command? Called from source folder (Default: \"sudo rm -rf build/\"): " 
+    echo  "Clean command? Called from source folder (Default: \"make distclean/\"): " 
     echo "'q' and Enter to quit: "
     while ! [ "$cln" == "q" ]; do
     read -e cln
@@ -149,7 +149,7 @@ echo "name=$name" > $file
 echo "domain=$http" >> $file
 echo "repo=$repo" >> $file
 echo "tag=$tag" >> $file
-echo "commit=$curr_commit" >> $file
+echo "commit=$commit" >> $file
 echo "prereqs=\"$prereqs\"" >> $file 
 echo "build=\"$bcommands\"" >> $file
 echo "uninstall=\"$uinstall\"" >> $file
