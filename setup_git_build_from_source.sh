@@ -74,8 +74,10 @@ if [ ! -z $tag ]; then
     commit=$(curl -sL "$httprepo/tags" |  grep "/$repo/releases/tag/$tag" | perl -pe 's|.*/'$repo'/releases/tag/'$tag'(.*?)".*|'$tag'\1|' | uniq | awk 'NR==1{max=$1;print $0; exit;}' | while read -r i; do curl -sL "$http/$repo/releases/tag/$i" |  grep "/$repo/commit" | perl -pe 's|.*/'$repo'/commit/(.*?)".*|\1|' | awk 'NR==1{max=$1;print $0; exit;}'; done)
 else
     echo "Will look for top of /tags"
-    commit=$(curl -sL "$httprepo/tags" |  grep "/$repo/releases/tag/$tg" | perl -pe 's|.*/'$repo'/releases/tag/'$tg'(.*?)".*|'$tg'\1|' | uniq | awk 'NR==1{max=$1;print $0; exit;}' | while read -r i; do echo -n "$i  "; curl -sL "$http/$repo/releases/tag/$i" |  grep "/$repo/commit" | perl -pe 's|.*/'$repo'/commit/(.*?)".*|\1|' | awk 'NR==1{max=$1;print $0; exit;}';  done)
+    commit=$(curl -sL "$httprepo/tags" |  grep "/$repo/releases/tag" | perl -pe 's|.*/'$repo'/releases/tag/(.*?)".*|\1|' | uniq | awk 'NR==1{max=$1;print $0; exit;}' | while read -r i; do curl -sL "$http/$repo/releases/tag/$i" |  grep "/$repo/commit" | perl -pe 's|.*/'$repo'/commit/(.*?)".*|\1|' | awk 'NR==1{max=$1;print $0; exit;}';  done)
 fi
+
+echo $commit
 
 if [ -z "$6" ]; then
     prereqs=""
@@ -121,7 +123,7 @@ fi
 
 if [ -z "$9" ]; then
     clean=""
-    echo  "Clean command? Called from source folder (Default: \"make distclean/\"): " 
+    echo  "Clean command? Called from source folder (Default: \"make distclean\"): " 
     echo "'q' and Enter to quit: "
     while ! [ "$cln" == "q" ]; do
     read -e cln
