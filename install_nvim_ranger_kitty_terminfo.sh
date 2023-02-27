@@ -7,7 +7,7 @@ if [[ ! -d ~/.config/nvim/ ]]; then
 fi
 
 if [[ $dist == "Manjaro" || $dist == "Arch" ]];then
-    sudo pacman -Su ttf-nerd-fonts-symbols-common ttf-nerd-fonts-symbols-2048-em ttf-nerd-fonts-symbols-2048-em-mono ranger kitty xclip neovim mono go nodejs jre11-openjdk npm python atool bat calibre elinks ffmpegthumbnailer fontforge highlight imagemagick mupdf-tools odt2txt
+    sudo pacman -Su ttf-nerd-fonts-symbols-common ttf-nerd-fonts-symbols-2048-em ttf-nerd-fonts-symbols-2048-em-mono ranger kitty-terminfo xclip neovim mono go nodejs jre11-openjdk npm python atool bat calibre elinks ffmpegthumbnailer fontforge highlight imagemagick mupdf-tools odt2txt
 elif [[ $dist == "Debian" || $dist == "Raspbian" ]]; then    
     sudo apt update && sudo apt upgrade
     sudo apt install kitty ranger build-essential python2 python3 cmake python3-dev python3-pip mono-complete nodejs openjdk-17-jdk openjdk-17-jre npm atool bat elinks ffmpegthumbnailer fontforge highlight imagemagick jq libcaca0 odt2txt mupdf-tools 
