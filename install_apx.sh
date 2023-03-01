@@ -11,5 +11,10 @@ fi
 git clone https://github.com/Vanilla-OS/apx
 cd apx/
 go build -o apx main.go
+install -Dm755 "./apx" "/usr/bin/apx"
+install -Dm644 "./man/apx.1" "/usr/share/man/man1/apx.1"
+install -Dm644 "./man/es/apx.1" "/usr/share/man/es/man1/apx.1"
+
+install -Dm644 "./config.json" "/etc/apx/config.json"
 )
  
