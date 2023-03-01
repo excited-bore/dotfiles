@@ -11,9 +11,6 @@ append_path() {
     esac
 }
 
-# For git
-export EMAIL="stan96@duck.com"
-export GITNAME="excited-bore"
 
 export MOAR='--statusbar=bold -colors 256'
 export PAGER=/usr/local/bin/moar

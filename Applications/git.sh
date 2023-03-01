@@ -1,4 +1,4 @@
-#. ~/.bash_aliases.d/bash.sh
+ #. ~/.bash_aliases.d/bash.sh
 #Git stuff
 
 alias git_config_pull_rebase_false="git config pull.rebase false"
@@ -20,13 +20,16 @@ function git_ssh_key_and_add_to_agent() {
     if [ -z $keytype ]; then
         keytype=ed25519
     fi
+    if [ -z $name ]; then
+        name="id_$keytype"   
+    fi
     ssh-keygen -t $keytype
-    echo "Host github.com" >> ~/.ssh/config
-    echo "  IdentityFile $name" >> ~/.ssh/config 
-    echo "  User git" >> ~/.ssh/config  
     eval $(ssh-agent -s) 
-    ssh-add -vH ~/.ssh/known_hosts $name 
+    ssh-add -v ~/.ssh/$name 
     cat ~/.ssh/$name.pub
+    echo "Host github.com" >> ~/.ssh/config
+    echo "  IdentityFile ~/.ssh/$name" >> ~/.ssh/config 
+    echo "  User git" >> ~/.ssh/config  
     cd -
 }
 
@@ -61,7 +64,7 @@ git_remote_ssh_to_https(){
 alias git_list_remotes="git remote -v"
 git_test_conn_github() { ssh -vT git@github.com; }
 git_status() { git status; }
-git_config_using_vars() { git config --global user.email \"$EMAIL\" && git config --global user.name \"$GITNAME\"; }
+#git_config_using_vars() { git config --global user.email \"$EMAIL\" && git config --global user.name \"$GITNAME\"; }
 git_add_remote_url() { git remote -v add "$1" "$2"; }
 git_add_remote_ssh() { git remote -v add "$1" git@github.com:$GITNAME/"$2.git"; }
 

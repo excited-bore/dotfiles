@@ -92,28 +92,19 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         fi
     fi
 
-    read -p "Install shell_bindings.sh at ~/.bash_aliases.d/ (bash keybindings)? [Y/n]:" aliases
+    read -p "Install shell_keybindings.sh at ~/.bash_aliases.d/ (bash keybindings)? [Y/n]:" aliases
     if [ -z $aliases ] || [ "y" == $aliases ]; then 
         # To prevent stuff from breaking when on a system without a keyboard (raspi)
-        if ! grep -q "#setxkbmap" Applications/shell_bindings.sh; then
-            sed -i s/"setxkbmap\(.*\)"/"#setxkbmap\1"/g Applications/shell_bindings.sh  
+        if ! grep -q "#setxkbmap" Applications/shell_keybindings.sh; then
+            sed -i s/"setxkbmap\(.*\)"/"#setxkbmap\1"/g Applications/shell_keybindings.sh  
         fi
-        cp -f Applications/shell_bindings.sh ~/.bash_aliases.d/ 
+        cp -f Applications/shell_keybindings.sh ~/.bash_aliases.d/ 
 
         if [ -z $rscripts ] || [ "y" == $rscripts ]; then 
-            sudo cp -f Applications/shell_bindings.sh /root/.bash_aliases.d/
+            sudo cp -f Applications/shell_keybindings.sh /root/.bash_aliases.d/
         fi
     fi
 
-    read -p "Install PS1_colours.sh at ~/.bash_aliases.d/ (terminal colours)? [Y/n]:" colors
-    if [ -z $bash ] || [ "y" == $bash ]; then 
-        
-        cp -f Applications/PS1_colours.sh ~/.bash_aliases.d/ 
-
-        if [ -z $rscripts ] || [ "y" == $rscripts ]; then 
-            sudo cp -f Applications/PS1_colours.sh /root/.bash_aliases.d/
-        fi
-    fi
 
     read -p "Install general.sh at ~/.bash_aliases.d/ (bash general commands aliases)? [Y/n]:" general
     if [ -z $general ] || [ "y" == $general ]; then 
@@ -142,6 +133,13 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
 
     read -p "Install git.sh at ~/.bash_aliases.d/ (git aliases)? [Y/n]:" gitsh
     if [ -z $gitsh ] || [ "y" == $gitsh ]; then 
+        read -p "Configure global user and email git? [Y/n]: " gitcnf
+        if [ -z $gitcnf ] || [ "y" == $gitcnf ]; then
+            read -p "Email: " mail
+            read -p "name: " name
+            git config --global user.email "$mail"
+            git config --global user.name "$name"
+        fi
 
         cp -f Applications/git.sh ~/.bash_aliases.d/
 
@@ -167,6 +165,16 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
 
         if [ -z $rscripts ] || [ "y" == $rscripts ]; then 
             sudo cp -f Applications/package_managers.sh /root/.bash_aliases.d/
+        fi
+    fi
+    
+    read -p "Install PS1_colours.sh at ~/.bash_aliases.d/ (terminal colours)? [Y/n]:" colors
+    if [ -z $bash ] || [ "y" == $bash ]; then 
+        
+        cp -f Applications/PS1_colours.sh ~/.bash_aliases.d/ 
+
+        if [ -z $rscripts ] || [ "y" == $rscripts ]; then 
+            sudo cp -f Applications/PS1_colours.sh /root/.bash_aliases.d/
         fi
     fi
 
