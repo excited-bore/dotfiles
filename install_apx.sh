@@ -1,5 +1,5 @@
 . ./check_distro.sh
-if [ $dist == "Raspbian" ]; then
+if [[ $dist == "Raspbian" && go version | grep -q "go.1.2*" ]]; then
     . ./install_go_rpi.sh
 fi
 . ./install_distrobox.sh
