@@ -150,7 +150,7 @@ alias service_user_disable_now="systemctl --user disable --now "
 alias service_status="systemctl status"
 alias service_system_reloadall="sudo systemctl daemon-reload"
 alias service_user_reloadall="systemctl --user daemon-reload"
-alias bios="sudo systemctl reboot --firmware-setup"
+alias bios="systemctl reboot --firmware-setup"
 alias bluetooth_start="sudo systemctl start bluetooth.service && blueman-manager"
 alias bluetooth_down="sudo systemctl stop bluetooth.service"
 

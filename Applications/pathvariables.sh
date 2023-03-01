@@ -66,7 +66,8 @@ append_path $JAVA_HOME
 export LUA_PATH=""
 
 # GO
-#append_path '/usr/local/go/bin:/usr/bin/go:/usr/lib/go:/usr/share/go'
+append_path '/usr/local/go/bin:/usr/bin/go:/usr/lib/go:/usr/share/go'
+GOPATH=$HOME/go
 
 # NINJA
 append_path '/usr/bin/ninja'

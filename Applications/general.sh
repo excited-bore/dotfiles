@@ -98,7 +98,7 @@ function link_hard(){
 }
 
 complete -F _files link_hard
-                      
+
 
 function trash(){
     for arg in $@ ; do
