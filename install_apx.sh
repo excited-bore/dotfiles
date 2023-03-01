@@ -1,6 +1,6 @@
 . ./check_distro.sh
 if [ $dist == "Raspbian" ]; then
-    if go version | ! grep -q "go.1.2*" ; then
+    if go version | grep -q "go.1.2*" ; then
         . ./install_go_rpi.sh
     fi
 fi
