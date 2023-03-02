@@ -1,8 +1,15 @@
+. ./check_distro.sh
 if [ ! -d ~/.bash_completion.d ]; then
     mkdir ~/.bash_completion.d
 fi
 
-pip3 install argcomplete
+if [[ $dist == "Raspbian" || $dist == "Debian" ]]; then
+    sudo apt install python3 python3-pip
+    pip3 install argcomplete
+elif [[ $dist == "Manjaro" || $dist == "Arch" ]]; then
+    sudo pacman -Su python python-pip
+    pip install argcomplete
+fi
 . ~/.bashrc
 activate-global-python-argcomplete --dest=$HOME/.bash_completion.d
 
