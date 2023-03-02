@@ -16,7 +16,7 @@ elif [[ $dist == "Debian" || $dist == "Raspbian" ]];then
         pip3 install --upgrade pynvim
         sudo apt install ninja-build gettext libtool libtool-bin cmake g++ pkg-config unzip curl doxygen
         ./setup_git_build_from_source.sh "y" "neovim" "https://github.com" "neovim/neovim" "stable" "sudo apt update; sudo apt install ninja-build gettext libtool libtool-bin cmake g++ pkg-config unzip curl doxygen" "make CMAKE_BUILD_TYPE=RelWithDebInfo; sudo make install" "sudo make uninstall" "make distclean; make deps" "y"
-    if [ $snp == "n" ]; then
+    elif [ $snp == "n" ]; then
         read -p "Install Nix? [Y/n]: " nx
         if [[ -z $nx || $nx == "y" ]]; then
             . ./install_nix_package_man.sh
