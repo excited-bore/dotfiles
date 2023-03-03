@@ -19,8 +19,8 @@ if [[ -z $nvim || "y" == $nvim ]]; then
     ./install_nvim.sh
 fi
 
-sudo ranger --confdir=/home/$USER/.config/ranger --copy-config=all
-sudo ranger --copy-config=all
+ranger --confdir=/home/$USER/.config/ranger --copy-config=all
+ranger --copy-config=all
 
 read -p "Integrate ranger with nvim? (Install nvim ranger plugins) [Y/n]:" rangrvim
 if [[ -z $rangrvim || "y" == $rangrvim ]]; then
@@ -32,20 +32,20 @@ fi
 
 read -p "Install rc.conf and rifle.conf? (ranger conf at ~/.conf/ranger/) [Y/n]:" rcc
 if [ -z $rcc ] || [ "y" == $rcc ]; then
-    sudo mkdir -p ~/.config/ranger/
-    sudo cp -f -t ~/.config/ranger ranger/rc.conf ranger/rifle.conf
+    mkdir -p ~/.config/ranger/
+    cp -f -t ~/.config/ranger ranger/rc.conf ranger/rifle.conf
 fi
 
 
 read -p "Install ranger plugins? (plugins at ~/.conf/ranger/plugins) [Y/n]:" rplg
 if [ -z $rplg ] || [ "y" == $rplg ]; then
-    sudo mkdir -p ~/.config/ranger/plugins
-    sudo git clone https://github.com/cdump/ranger-devicons2 ~/.config/ranger/plugins/devicons2
+    mkdir -p ~/.config/ranger/plugins
+    git clone https://github.com/cdump/ranger-devicons2 ~/.config/ranger/plugins/devicons2
 fi
 
  read -p "Install kitty conf? (at ~/.config/kitty/kitty.conf) [Y/n]:" kittn
 if [ -z $kittn ] || [ "y" == $kittn ]; then
-    sudo mkdir -p ~/.config/kitty
-    sudo cp -f kitty/kitty.conf ~/.config/kitty/kitty.conf
+    mkdir -p ~/.config/kitty
+    cp -f kitty/kitty.conf ~/.config/kitty/kitty.conf
 fi
 

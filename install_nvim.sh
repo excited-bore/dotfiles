@@ -6,9 +6,9 @@ fi
 
 
 if [[ $dist == "Manjaro" || $dist == "Arch" ]];then
-    sudo pacman -Su neovim cmake xclip python go ninja nodejs mono openjdk17-src python-pynvim
+    sudo pacman -Su neovim make cmake gcc xclip python go ninja nodejs mono openjdk17-src python-pynvim
 elif [[ $dist == "Debian" || $dist == "Raspbian" ]];then
-    sudo apt install build-essential xclip python3-dev mono-complete golang gopls nodejs openjdk-17-jdk openjdk-17-jre npm python3-pip 
+    sudo apt install build-essential xclip python3-dev make mono-complete golang gopls nodejs openjdk-17-jdk openjdk-17-jre npm python3-pip 
     pip3 install --user cmake
     read -p "Neovim on apt Debian is usually deprecated. Install from elsewhere? [ S (Build from source)/ n (Nix package manager) / a (apt)]:" snp
     if [[ -z $snp || $snp == "S" ]]; then

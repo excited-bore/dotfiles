@@ -136,7 +136,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         read -p "Configure global user and email git? [Y/n]: " gitcnf
         if [ -z $gitcnf ] || [ "y" == $gitcnf ]; then
             read -p "Email: " mail
-            read -p "name: " name
+            read -p "Gitname: " name
             git config --global user.email "$mail"
             git config --global user.name "$name"
         fi
@@ -231,3 +231,5 @@ if [ -z $inputrc ] || [ "y" == $inputrc ]; then
         sudo cp -f readline/.inputrc /root/.inputrc
     fi
 fi
+
+. ~/.bashrc
