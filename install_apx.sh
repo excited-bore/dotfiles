@@ -1,11 +1,16 @@
 . ./check_distro.sh
-if [ $dist == "Raspbian" ]; then
+if [ $dist == "Manjaro" ]; then
+    pamac install git-apx
+elif [ $dist == "Arch" ]; then
+    echo "Install with git-apx with AUR launcher of choice (f.ex. yay, pamac)"
+    exit 1
+elif [[ $dist == "Debian" || $dist == "Raspbian" ]]; then
     if go version | grep -q "go.1.2*" ; then
         . ./install_go_rpi.sh
     fi
-fi
 . ./install_distrobox.sh
 . ./install_docker.sh
+fi
 
 (cd /tmp;
 git clone https://github.com/Vanilla-OS/apx
