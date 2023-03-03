@@ -1,6 +1,6 @@
 . ./check_distro.sh
 if [ $dist == "Manjaro" ]; then
-    pamac install git-apx
+    pamac install apx-git
 elif [ $dist == "Arch" ]; then
     echo "Install with git-apx with AUR launcher of choice (f.ex. yay, pamac)"
     exit 1

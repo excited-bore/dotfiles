@@ -14,7 +14,7 @@ elif [[ $dist == "Debian" || $dist == "Raspbian" ]];then
     if [[ -z $snp || $snp == "X" ]]; then
         . ./install_apx.sh
         pip3 install --upgrade pynvim
-        sudo apx install neovim
+        apx install neovim
     elif [ $snp == "n" ]; then
         echo "Begin installation neovim stable from source using tag 'stable'"
         pip3 install --upgrade pynvim
