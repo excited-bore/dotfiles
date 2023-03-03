@@ -21,5 +21,6 @@ sudo install -Dm644 "./man/apx.1" "/usr/share/man/man1/apx.1"
 sudo install -Dm644 "./man/es/apx.1" "/usr/share/man/es/man1/apx.1"
 sudo install -Dm644 "./config/config.json" "/etc/apx/config.json"
 sudo sed -i "s,\(\"distroboxpath\": \"\).*,\1/home/$USER/.local/bin/distrobox\",g" /etc/apx/config.json
+apx completion bash > ~/.bash_completion.d/complete_apx
 )
  
