@@ -1,10 +1,9 @@
 . ./check_distro.sh     i
 if [ $dist == "Manjaro" ]; then
-    pamac install apx-git
+    yes | pamac install apx-git
 elif [ $dist == "Arch" ]; then
     echo "Install with git-apx with AUR launcher of choice (f.ex. yay, pamac)"
 elif [ $dist == "Debian" ] || [ $dist == "Raspbian" ]; then
-    yes | sudo apt install docker
     if ! [ -x "$(command -v go version)" ]; then
         . ./install_go_rpi.sh
     else
@@ -14,7 +13,7 @@ elif [ $dist == "Debian" ] || [ $dist == "Raspbian" ]; then
         fi
     fi
     . ./install_distrobox.sh
-    #. ./install_docker.sh
+    . ./install_docker.sh
     (cd /tmp;
     git clone https://github.com/Vanilla-OS/apx
     cd apx/
@@ -31,5 +30,6 @@ apx completion bash > ~/.bash_completion.d/complete_apx
 if ! grep -q "~/.bash_completion.d/complete_apx" ~/.bashrc; then
     echo ". ~/.bash_completion.d/complete_apx" >> ~/.bashrc
 fi
-. ~/.bashrc
+
+source ~/.bashrc
  
