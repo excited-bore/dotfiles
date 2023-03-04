@@ -12,7 +12,9 @@ elif [[ $dist == "Debian" || $dist == "Raspbian" ]];then
     pip3 install --user cmake
     read -p "Neovim on apt Debian is usually deprecated. Install from elsewhere? [ X (Install apx package manager wrapper) / s (Build from source) / a (just use apt) ]: " snp
     if [[ -z $snp || $snp == "X" ]]; then
-        . ./install_apx.sh
+        if ! [ -x "$(command -v apx help)" ]; then
+            . ./install_apx.sh
+        fi
         pip3 install --upgrade pynvim
         apx install neovim
     elif [ $snp == "n" ]; then
