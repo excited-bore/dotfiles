@@ -4,13 +4,19 @@ if [ $dist == "Manjaro" ]; then
 elif [ $dist == "Arch" ]; then
     echo "Install with git-apx with AUR launcher of choice (f.ex. yay, pamac)"
 elif [ $dist == "Debian" ] || [ $dist == "Raspbian" ]; then
-    if go version | grep -q "go.1.2*" ; then
+    yes | sudo apt install docker
+    if ! type "go version" > /dev/null; then
         . ./install_go_rpi.sh
+    else
+        go version |
+        if grep -q "go.1.2*" $1 ; then
+            . ./install_go_rpi.sh
+        fi
     fi
     . ./install_distrobox.sh
-    . ./install_docker.sh
-    git clone https://github.com/Vanilla-OS/apx
+    #. ./install_docker.sh
     (cd /tmp;
+    git clone https://github.com/Vanilla-OS/apx
     cd apx/
     go build -o apx main.go
     sudo install -Dm755 "./apx" "/usr/bin/apx"
