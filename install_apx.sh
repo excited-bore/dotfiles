@@ -1,15 +1,15 @@
-. ./check_distro.sh
+. ./check_distro.sh     i
 if [ $dist == "Manjaro" ]; then
     pamac install apx-git
 elif [ $dist == "Arch" ]; then
     echo "Install with git-apx with AUR launcher of choice (f.ex. yay, pamac)"
 elif [ $dist == "Debian" ] || [ $dist == "Raspbian" ]; then
     yes | sudo apt install docker
-    if ! type "go version" > /dev/null; then
+    if ! [ -x "$(command -v go version)" ]; then
         . ./install_go_rpi.sh
     else
-        go version |
-        if grep -q "go.1.2*" $1 ; then
+        isgo=$(go version)
+        if [ ! "$isgo" =~ go1.2* ]; then
             . ./install_go_rpi.sh
         fi
     fi
