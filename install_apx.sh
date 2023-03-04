@@ -9,7 +9,7 @@ elif [ $dist == "Debian" ] || [ $dist == "Raspbian" ]; then
         . ./install_go_rpi.sh
     else
         isgo=$(go version)
-        if [ ! "$isgo" =~ go1.2* ]; then
+        if [[ ! "$isgo" =~ go1.2* ]]; then
             . ./install_go_rpi.sh
         fi
     fi
