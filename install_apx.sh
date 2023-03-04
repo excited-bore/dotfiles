@@ -3,8 +3,7 @@ if [ $dist == "Manjaro" ]; then
     pamac install apx-git
 elif [ $dist == "Arch" ]; then
     echo "Install with git-apx with AUR launcher of choice (f.ex. yay, pamac)"
-    exit 1
-elif [[ $dist == "Debian" || $dist == "Raspbian" ]]; then
+elif [ $dist == "Debian" ] || [ $dist == "Raspbian" ]; then
     if go version | grep -q "go.1.2*" ; then
         . ./install_go_rpi.sh
     fi
