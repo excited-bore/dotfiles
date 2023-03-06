@@ -234,4 +234,9 @@ if [ -z $inputrc ] || [ "y" == $inputrc ]; then
     fi
 fi
 
+read -p "Install moar? [Y/n]: " moar
+if [ -z $moar ] || [ "Y" == $moar ] || [ $moar == "y" ]; then
+   . ./install_moar.sh 
+fi
+
 . ~/.bashrc
