@@ -11,7 +11,7 @@ elif [[ $dist == "Manjaro" || $dist == "Arch" ]]; then
     pip3 install argcomplete
 fi
 . ~/.bashrc
-activate-global-python-argcomplete --dest=~/.bash_completion.d
+activate-global-python-argcomplete --dest=/home/$USER/.bash_completion.d
 
 if ! grep -q "python-argcomplete" ~/.bashrc; then
     echo ". ~/.bash_completion.d/python-argcomplete" >> ~/.bashrc
