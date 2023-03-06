@@ -19,7 +19,7 @@ elif [ $dist == "Debian" ] || [ $dist == "Raspbian" ]; then
     #sudo sed -i "s,\(\"distroboxpath\": \"\).*,\1/home/$USER/.local/bin/distrobox\",g" /etc/apx/config.json
     sudo mkdir /usr/lib/apx
     curl -s https://raw.githubusercontent.com/89luca89/distrobox/main/install | sh -s -- --prefix ~/.local
-    sudo mv ~/.local/share/distrobox* /usr/lib/apx
+    sudo mv ~/.local/bin/distrobox* /usr/lib/apx
     )
 fi
 
