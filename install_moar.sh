@@ -1,5 +1,5 @@
-. ./check_distro.sh
 . ./install_go.sh
+. ./check_distro.sh
 
 if [ $dist == "Arch" ]; then
     echo "Install using AUR helper (f.ex. yay install moar)"
