@@ -42,7 +42,7 @@ do
 done
 
 if lscpu | grep -q "Intel"; then
-    archit="i386"
+    archit="386"
 elif lscpu | grep -q "AMD"; then
     if lscpu | grep -q "x86_64"; then 
         archit="amd64"

@@ -5,14 +5,7 @@ if [ $dist == "Manjaro" ]; then
 elif [ $dist == "Arch" ]; then
     echo "Install with git-apx with AUR launcher of choice (f.ex. yay, pamac)"
 elif [ $dist == "Debian" ] || [ $dist == "Raspbian" ]; then
-    if ! [ -x "$(command -v go version)" ]; then
-        . ./install_go_rpi.sh
-    else
-        isgo=$(go version)
-        if [[ ! "$isgo" =~ go1.2* ]]; then
-            . ./install_go_rpi.sh
-        fi
-    fi
+    . ./install_go.sh
     . ./install_distrobox.sh
     . ./install_docker.sh
     (cd /tmp;
