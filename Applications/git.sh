@@ -16,17 +16,17 @@ function git_ssh_key_and_add_to_agent() {
     fi
     cd ~/.ssh/
     read -p "Give up name: " name
-    read -e -p "Give up keytype (dsa | ecdsa | ed25519 (Default) | ed25519-sk | rsa): " keytype
+    read -p "Give up keytype (dsa | ecdsa | ecdsa-sk | ed25519 (Default) | ed25519-sk | rsa): " keytype
     if [ -z $keytype ]; then
         keytype=ed25519
     fi
     if [ -z $name ]; then
         name="id_$keytype"   
     fi
-    ssh-keygen -t $keytype
+    ssh-keygen -t $keytype -f ~/.ssh/$name
     eval $(ssh-agent -s) 
     ssh-add -v ~/.ssh/$name 
-    cat ~/.ssh/$name.pub
+    cat "~/.ssh/$name.pub"
     echo "Host github.com" >> ~/.ssh/config
     echo "  IdentityFile ~/.ssh/$name" >> ~/.ssh/config 
     echo "  User git" >> ~/.ssh/config  
@@ -38,7 +38,8 @@ git_remote_https_to_ssh(){
         echo "You should give up the name of a remote";
         read -p "Do you want me to look for 'origin'? [Y/n]" resp
         if [ -z $resp ]; then
-            gitRm=$(git remote get-url origin | sed 's,.*.com/,git@github.com:,g'); git remote -v set-url origin $gitRm;
+            gitRm=$(git remote get-url origin | sed 's,.*.com/,git@github.com:,g'); git remote -v set-url origin $g
+            itRm;
             git remote get-url origin;
         fi        
     else

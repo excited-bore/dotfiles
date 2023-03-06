@@ -1,4 +1,4 @@
-### SSH ###
+### SSH ###                           
 
 ssh_file="~/.ssh/id_ed25519"
 user="funnyman"
@@ -21,16 +21,24 @@ ssh_key_and_add_to_agent_by_host() {
     if [ ! -f ~/.ssh/config ]; then
         touch ~/.ssh/config;
     fi
-    read -p "Give up a hostname: " host
-    read -p "Give up filename: (nothing for standard id, else it's sensible to got for ~/.ssh/name)" name
+    read -p "Give up filename: (nothing for id_keytype, sensible to leave as such in certain situations): " name
+    read -p "Give up keytype (dsa | ecdsa | ecdsa-sk | ed25519 (Default) | ed25519-sk | rsa): " keytype
+    read -p "Give up a hostname : " host
     read -p "Give up remote username: " uname  
-    echo "$name" | ssh-keygen -t ed25519
-    ssh-add -vH ~/.ssh/known_hosts "$name" 
+    if [ -z $keytype ]; then
+        keytype=ed25519
+    fi
+    if [ -z $name ]; then
+        name="id_$keytype"   
+    fi
+    ssh-keygen -t $keytype -f ~/.ssh/$name
+    ssh-add -vH ~/.ssh/known_hosts ~/.ssh/$name 
     eval $(ssh-agent -s) 
     echo "Host $host" >> ~/.ssh/config;
     echo "  IdentityFile $name" >> ~/.ssh/config
-    echo "  User $uname" >> ~/.ssh/config 
-    cat $name.pub; 
+    echo "  User $uname" >> ~/.ssh/config
+    echo "Public key: "
+    cat ~/.ssh/$name.pub; 
 }
 
 serber_mnt() {
@@ -49,4 +57,4 @@ serber_mnt1(){
     if [ ! -e /mnt/mount2/.bashrc ]; then
         sshfs $user@$ip:/media/ /mnt/mount2/ -o IdentityFile=$ssh_file,follow_symlinks,reconnect,default_permissions,uid=1000,gid=1001,workaround=rename;
     fi
-}                 
+}                                    
