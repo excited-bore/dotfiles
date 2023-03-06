@@ -11,12 +11,15 @@ elif [ $dist == "Debian" ] || [ $dist == "Raspbian" ]; then
     (cd /tmp;
     git clone https://github.com/Vanilla-OS/apx
     cd apx/
-    go build -o apx main.go
+    go build 
     sudo install -Dm755 "./apx" "/usr/bin/apx"
     sudo install -Dm644 "./man/apx.1" "/usr/share/man/man1/apx.1"
     sudo install -Dm644 "./man/es/apx.1" "/usr/share/man/es/man1/apx.1"
     sudo install -Dm644 "./config/config.json" "/etc/apx/config.json"
-    sudo sed -i "s,\(\"distroboxpath\": \"\).*,\1/home/$USER/.local/bin/distrobox\",g" /etc/apx/config.json
+    #sudo sed -i "s,\(\"distroboxpath\": \"\).*,\1/home/$USER/.local/bin/distrobox\",g" /etc/apx/config.json
+    sudo mkdir /usr/lib/apx
+    curl -s https://raw.githubusercontent.com/89luca89/distrobox/main/install | sh -s -- --prefix ~/.local
+    sudo mv ~/.local/share/distrobox* /usr/lib/apx
     )
 fi
 
