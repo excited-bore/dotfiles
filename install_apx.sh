@@ -1,6 +1,7 @@
 . ./check_distro.sh     i
 if [ $dist == "Manjaro" ]; then
     yes | pamac install apx-git
+    sudo usermod -aG docker $USER
 elif [ $dist == "Arch" ]; then
     echo "Install with git-apx with AUR launcher of choice (f.ex. yay, pamac)"
 elif [ $dist == "Debian" ] || [ $dist == "Raspbian" ]; then

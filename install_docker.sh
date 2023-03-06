@@ -7,4 +7,5 @@ if [[ $dist == "Debian" || $dist == "Raspbian" ]]; then
     echo "You should relogin for docker to work"
 elif [[ $dist == "Arch" || $dist == "Manjaro" ]]; then
     sudo pacman -Su docker
+    sudo usermod -aG docker $USER
 fi
