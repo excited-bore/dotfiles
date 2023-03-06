@@ -1,6 +1,7 @@
 #!/bin/bash
 dist=/
 pm=/
+archit=/
 declare -A osInfo;
 osInfo[/etc/redhat-release]=yum
 osInfo[/etc/rpi-issue]=apt
@@ -39,3 +40,20 @@ do
         dist="Debian"
     fi 
 done
+
+if lscpu | grep -q "Intel"; then
+    archit="i386"
+elif lscpu | grep -q "AMD"; then
+    if lscpu | grep -q "x86_64"; then 
+        archit="amd64"
+    else
+        archit="amd32"
+    fi
+elif lscpu | grep -q "armv"; then
+    archit="armv7l"
+elif lscpu | grep -q "aarch"; then
+    archit="arm64"
+fi
+    
+
+                 
