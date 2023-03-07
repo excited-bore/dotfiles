@@ -6,25 +6,26 @@ fi
 
 
 if [[ $dist == "Manjaro" || $dist == "Arch" ]];then
-    sudo pacman -Su neovim make cmake gcc xclip python go ninja nodejs mono openjdk17-src python-pynvim
-elif [[ $dist == "Debian" || $dist == "Raspbian" ]];then
-    sudo apt install build-essential xclip python3-dev make mono-complete golang gopls nodejs openjdk-17-jdk openjdk-17-jre npm python3-pip 
-    pip3 install --user cmake
+    sudo pacman -Su neovim cpanminus make cmake gcc xclip python go ninja nodejs mono openjdk17-src python-pynvim
+    cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+    cpanm -n Neovim::Ext
+elif [[ $dist == "Debian" || $dist == "Raspbian" ]];then                                                         11
+    sudo apt install cpanminus build-essential xclip python3-dev make mono-complete golang gopls nodejs openjdk-17-jdk openjdk-17-jre npm python3-pip 
+    pip3 install --user cmake pynvim
+    cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+    cpanm -n Neovim::Ext
     read -p "Neovim on apt Debian is usually deprecated. Install from elsewhere? [ X (Install apx package manager wrapper) / s (Build from source) / a (just use apt) ]: " snp
     if [[ -z $snp || $snp == "X" ]]; then
         if [ -x "$(command -v apx help)" ]; then
             . ./install_apx.sh
         fi
-        pip3 install --upgrade pynvim
         apx install neovim
     elif [ $snp == "n" ]; then
         echo "Begin installation neovim stable from source using tag 'stable'"
-        pip3 install --upgrade pynvim
         sudo apt install ninja-build gettext libtool libtool-bin cmake g++ pkg-config unzip curl doxygen
         ./setup_git_build_from_source.sh "y" "neovim" "https://github.com" "neovim/neovim" "stable" "sudo apt update; sudo apt install ninja-build gettext libtool libtool-bin cmake g++ pkg-config unzip curl doxygen" "make CMAKE_BUILD_TYPE=RelWithDebInfo; sudo make install" "sudo make uninstall" "make distclean; make deps" "y"
     elif [ $snp == "a" ]; then
-        sudo apt install neovim python3-pip
-        pip3 install --upgrade pynvim              
+        sudo apt install neovim
     fi
     
 fi 
