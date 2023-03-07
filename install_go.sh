@@ -22,7 +22,7 @@ elif [[ $dist == "Debian" || $dist == "Raspbian" ]]; then
         echo "Checksum file: $sum"
         if [ ! "$sum" == "$checksum" ]; then
             echo "Checksums are different; Aborting"
-            exit 1
+            exit
         fi
         sudo tar -C /usr/local -xzf $file
         rm $file

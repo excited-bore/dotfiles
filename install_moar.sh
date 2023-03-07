@@ -1,4 +1,3 @@
-. ./install_go.sh
 . ./check_distro.sh
 
 read -p "Install moar from binary (default) or quit [B/q]: " answer
