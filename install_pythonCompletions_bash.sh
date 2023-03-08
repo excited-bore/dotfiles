@@ -10,12 +10,15 @@ elif [[ $dist == "Manjaro" || $dist == "Arch" ]]; then
     sudo pacman -Su python python-pip
     pip3 install argcomplete
 fi
-. ~/.bashrc
-activate-global-python-argcomplete --dest=/home/$USER/.bash_completion.d
 
+
+source ~/.bashrc
+activate-global-python-argcomplete --dest=/home/$USER/.bash_completion.d
 if ! grep -q "python-argcomplete" ~/.bashrc; then
     echo ". ~/.bash_completion.d/python-argcomplete" >> ~/.bashrc
 fi
+source ~/.bashrc
+
 read -p "Install python completion system wide? (/root/.bashrc) [Y/n]:" arg
 if [ -z $arg ] || [ "y" == $arg ]; then 
     if ! sudo test -d /root/.bash_completion.d; then
