@@ -1,7 +1,6 @@
 . ./check_distro.sh
 
-if [ $dist == "Raspbian" ] || [ $dist == "Debian" ]; then
-    sudo apt install software-properties-common
+if [ $dist == "Debian" ]; then
     sudo add-apt-repository ppa:lakinduakash/lwh
     sudo apt install linux-wifi-hotspot
 elif [ $dist == "Arch" ]; then

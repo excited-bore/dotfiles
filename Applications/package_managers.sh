@@ -2,6 +2,7 @@
 alias pacman_update="sudo pacman -Syu"
 alias pacman_mirrors_pacman_refresh="sudo pacman-mirrors -f 5 && sudo pacman -Syyu"
 alias pacman_rm_lock="sudo rm /var/lib/pacman/db.lck"
+alias pacman_list_AUR_installed="pacman -Qm"
 alias apt_full_upgrade="sudo apt update && sudo apt full-upgrade && sudo apt autoremove"
 # For manjaro: consider pacui
 # https://forum.manjaro.org/t/pacui-bash-script-providing-advanced-pacman-and-yay-pikaur-aurman-pakku-trizen-pacaur-pamac-cli-functionality-in-a-simple-ui/561

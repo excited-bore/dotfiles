@@ -12,8 +12,8 @@ append_path() {
 }
 
 
-#export MOAR='--statusbar=bold -colors 256'
-#export PAGER=/usr/local/bin/moar
+export MOAR='--statusbar=bold -colors 256'
+export PAGER=/usr/local/bin/moar
 export SYSTEMD_PAGERSECURE=1
 export SYSTEMD_COLORS=256
 export SYSTEMD_PAGER=$PAGER
@@ -37,6 +37,7 @@ export TMPDIR=/tmp
 
 # Tip: Search binaries with 'whereis'
 # And check with 'printenv'
+
 
 # VIM
 export MYVIMRC=".config/nvim/init.vim"
@@ -68,6 +69,10 @@ GOPATH=$HOME/go
 
 # NINJA
 append_path '/usr/bin/ninja'
+
+
+# NIX (also for apx)
+export PATH=$PATH:$HOME/.nix-profile/bin
 
 # SNAP
 append_path '/snap/bin:/var/lib/snapd/snap/bin'

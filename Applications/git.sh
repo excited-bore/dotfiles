@@ -26,7 +26,7 @@ function git_ssh_key_and_add_to_agent() {
     ssh-keygen -t $keytype -f ~/.ssh/$name
     eval $(ssh-agent -s) 
     ssh-add -v ~/.ssh/$name 
-    cat "~/.ssh/$name.pub"
+    cat ~/.ssh/$name.pub
     echo "Host github.com" >> ~/.ssh/config
     echo "  IdentityFile ~/.ssh/$name" >> ~/.ssh/config 
     echo "  User git" >> ~/.ssh/config  

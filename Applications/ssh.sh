@@ -1,8 +1,8 @@
 ### SSH ###                           
 
-ssh_file="~/.ssh/id_ed25519"
+ssh_file="~/.ssh/id_ecdsa"
 user="funnyman"
-ip="192.168.129.20"
+ip="192.168.129.17"
 
 # To prevent 'failed to preserve ownership' errors
 copy_sshfs(){ cp -r --no-preserve=mode "$1" "$2"; }
@@ -35,7 +35,7 @@ ssh_key_and_add_to_agent_by_host() {
     ssh-add -vH ~/.ssh/known_hosts ~/.ssh/$name 
     eval $(ssh-agent -s) 
     echo "Host $host" >> ~/.ssh/config;
-    echo "  IdentityFile $name" >> ~/.ssh/config
+    echo "  IdentityFile ~/.ssh/$name" >> ~/.ssh/config
     echo "  User $uname" >> ~/.ssh/config
     echo "Public key: "
     cat ~/.ssh/$name.pub; 
