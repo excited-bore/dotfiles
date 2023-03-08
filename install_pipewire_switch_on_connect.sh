@@ -16,7 +16,7 @@ mkdir -p ~/.config/systemd/user/
 
 conf=~/.config/pipewire/pipewire-pulse.conf.d/switch-on-connect.conf
 
-if [ ! -e $conf ] || ! grep -q "# override for pipewire-pulse.conf ile" $conf; then
+if [ ! -e $conf ] || ! grep -q "# override for pipewire-pulse.conf file" $conf; then
     echo "# override for pipewire-pulse.conf file" >> $conf
     echo "pulse.cmd = [" >> $conf
     echo "  { cmd = \"load-module\" args = \"module-always-sink\" flags = [ ] }" >> $conf
