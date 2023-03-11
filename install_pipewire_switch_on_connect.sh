@@ -42,5 +42,9 @@ echo "WantedBy=default.target" >> $servF;
 sudo mv -f $servF $servFile
 systemctl --user enable --now $servFile
 
-printf "Added pipewire conf at: \n~/.config/pipewire/pipewire-pulse.conf.d\n /etc/pipewire/pipewire.conf.d/\n $servFile\n"
+if ! sudo grep -q "load-module module-switch-on-connect" /etc/pulse/default.pa; then
+    sudo sed -i "s,\(load-module module-switch-on-port-available\),\1\nload-module module-switch-on-connect,g" /etc/pulse/default.pa
+fi
+
+printf "Added pipewire conf at: \n~/.config/pipewire/pipewire-pulse.conf.d\n /etc/pipewire/pipewire.conf.d/\n $servFile\n /etc/pulse/default.pa\n"
 
