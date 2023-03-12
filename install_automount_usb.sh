@@ -1,5 +1,8 @@
 #! /bin/bash
+
+. ./check_rlwrap.sh
 # https://unix.stackexchange.com/questions/278631/bash-script-auto-complete-for-user-input-based-on-array-data
+
 sudo blkid
 readecomp=($(sudo blkid | awk 'BEGIN { FS = ":" };{print $1;}'))
 drive=$(rlwrap -S 'Choose drive to mount: ' -f <(echo "${readecomp[@]}") -o cat)
