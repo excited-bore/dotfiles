@@ -46,5 +46,11 @@ if ! sudo grep -q "load-module module-switch-on-connect" /etc/pulse/default.pa; 
     sudo sed -i "s,\(load-module module-switch-on-port-available\),\1\nload-module module-switch-on-connect,g" /etc/pulse/default.pa
 fi
 
+# pactl list for full list
+read -p "Unlist Dualshock 4 from audio sources? [Y/n]: " ds4
+if [ -z $ds4 ] || [ "y" == $ds4 ] || [ "Y" == $ds4 ]; then
+    pactl set-card-profile alsa_card.usb-Sony_Interactive_Entertainment_Wireless_Controller-00 off
+fi
+
 printf "Added pipewire conf at: \n~/.config/pipewire/pipewire-pulse.conf.d\n /etc/pipewire/pipewire.conf.d/\n $servFile\n /etc/pulse/default.pa\n"
 

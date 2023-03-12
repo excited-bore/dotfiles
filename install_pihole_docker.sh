@@ -25,8 +25,8 @@ git clone https://github.com/pi-hole/docker-pi-hole
 cd ./docker-pi-hole
 
 #Todo: more timezones
-readecomp=("Africa/Abidjan", "Africa/Accra", "Africa/Addis_Ababa ", "America/Chicago", "Europe/Brussels", "Europe/London", "Europe/Zurich")
-Tz=$(rlwrap -S 'Timezone? : ' -f <(echo "${readecomp[@]}") -o cat)
+readecomp=("Africa/Abidjan" "Africa/Accra" "Africa/Addis_Ababa " "America/Chicago" "Europe/Brussels" "Europe/London" "Europe/Zurich")
+Tz=$(rlwrap -S 'Timezone? : ' -b " " -f <(echo "${readecomp[@]}") -o cat)
 
 read -p "Use pi-hole as DHCP server? (Not needed if running only local) [Y/n]: " dhcp
 
@@ -37,8 +37,8 @@ echo ""
 
 rply=$(hostname -i | cut -d ' ' -f1)
 
-readcomp=("default-dark", "default-darker", "default-light", "default-auto", "lcars")
-theme=$(rlwrap -S 'Theme? : ' -f <(echo "${readcomp[@]}") -o cat)
+readcomp=("default-dark" "default-darker" "default-light" "default-auto" "lcars")
+theme=$(rlwrap -S 'Theme? : ' -b " " -f <(echo "${readcomp[@]}") -o cat)
 
 if [ -z $theme ]; then
     theme="default-darker"
