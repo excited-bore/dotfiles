@@ -20,6 +20,9 @@ do
     elif [ -f $f ] && [ $f == /etc/manjaro-release ] && [ $dist == / ]; then
         pm=${osInfo[$f]}
         dist="Manjaro"
+    elif grep -q "Ubuntu" /etc/issue && [ $dist == / ]; then
+        pm=apt
+        dist="Ubuntu"
     elif [ -f $f ] && [ $f == /etc/SuSE-release ] && [ $dist == / ];then
         pm=${osInfo[$f]}
         dist="Suse"
