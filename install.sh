@@ -34,7 +34,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     
     cp -f ./check_distro.sh ~/.bash_aliases.d/check_distro.sh
 
-    . ./install_rlwrap.sh
+    . ./check_rlwrap.sh
 
     read -p "Create /root/.bash_aliases.d/, link it to /root/.bashrc and install scripts? [Y/n]:" rscripts
     if [ -z $rscripts ] || [ "y" == $rscripts ]; then
