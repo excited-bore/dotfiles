@@ -1,4 +1,5 @@
 ### SSH ###                           
+. ~/.bash_aliases.d/reade.sh 
 
 ssh_file="~/.ssh/id_ecdsa"
 user="funnyman"
@@ -22,7 +23,7 @@ ssh_key_and_add_to_agent_by_host() {
         touch ~/.ssh/config;
     fi
     read -p "Give up filename: (nothing for id_keytype, sensible to leave as such in certain situations): " name
-    read -p "Give up keytype (dsa | ecdsa | ecdsa-sk | ed25519 (Default) | ed25519-sk | rsa): " keytype
+    reade -p "Give up keytype (dsa | ecdsa | ecdsa-sk | ed25519 (Default) | ed25519-sk | rsa): " "dsa ecdsa ecdsa-sk ed25519 ed25519-sk rsa" keytype
     read -p "Give up a hostname : " host
     read -p "Give up remote username: " uname  
     if [ -z $keytype ]; then

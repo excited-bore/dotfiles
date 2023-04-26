@@ -1,6 +1,5 @@
-#. ~/.bash_aliases.d/bash.sh
+### GIT ###                           
 . ~/.bash_aliases.d/reade.sh
-#Git stuff
 
 alias git_config_pull_rebase_false="git config pull.rebase false"
 alias git_set_pull_merge="git config pull.rebase false"
