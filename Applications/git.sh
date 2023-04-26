@@ -1,4 +1,5 @@
- #. ~/.bash_aliases.d/bash.sh
+#. ~/.bash_aliases.d/bash.sh
+. ~/.bash_aliases.d/reade.sh
 #Git stuff
 
 alias git_config_pull_rebase_false="git config pull.rebase false"
@@ -14,9 +15,8 @@ function git_ssh_key_and_add_to_agent() {
     if [ ! -f ~/.ssh/config ]; then
         touch ~/.ssh/config;
     fi
-    cd ~/.ssh/
-    read -p "Give up name: " name
-    read -p "Give up keytype (dsa | ecdsa | ecdsa-sk | ed25519 (Default) | ed25519-sk | rsa): " keytype
+    read -p "Give up name: (Default:'id_keytype')" name
+    reade -p "Give up keytype (dsa | ecdsa | ecdsa-sk | ed25519 (Default) | ed25519-sk | rsa): " "dsa ecdsa ecdsa-sk ed25519 ed25519-sk rsa" keytype
     if [ -z $keytype ]; then
         keytype=ed25519
     fi
@@ -30,7 +30,6 @@ function git_ssh_key_and_add_to_agent() {
     echo "Host github.com" >> ~/.ssh/config
     echo "  IdentityFile ~/.ssh/$name" >> ~/.ssh/config 
     echo "  User git" >> ~/.ssh/config  
-    cd -
 }
 
 git_remote_https_to_ssh(){

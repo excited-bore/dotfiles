@@ -1,6 +1,7 @@
 #!/bin/bash
 dist=/
 pm=/
+archit=/
 declare -A osInfo;
 osInfo[/etc/redhat-release]=yum
 osInfo[/etc/rpi-issue]=apt
@@ -19,6 +20,9 @@ do
     elif [ -f $f ] && [ $f == /etc/manjaro-release ] && [ $dist == / ]; then
         pm=${osInfo[$f]}
         dist="Manjaro"
+    elif grep -q "Ubuntu" /etc/issue && [ $dist == / ]; then
+        pm=apt
+        dist="Ubuntu"
     elif [ -f $f ] && [ $f == /etc/SuSE-release ] && [ $dist == / ];then
         pm=${osInfo[$f]}
         dist="Suse"
@@ -39,3 +43,20 @@ do
         dist="Debian"
     fi 
 done
+
+if lscpu | grep -q "Intel"; then
+    archit="386"
+elif lscpu | grep -q "AMD"; then
+    if lscpu | grep -q "x86_64"; then 
+        archit="amd64"
+    else
+        archit="amd32"
+    fi
+elif lscpu | grep -q "armv"; then
+    archit="armv7l"
+elif lscpu | grep -q "aarch"; then
+    archit="arm64"
+fi
+    
+
+                 

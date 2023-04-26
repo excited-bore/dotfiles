@@ -14,7 +14,7 @@ append_path() {
 
 export MOAR='--statusbar=bold -colors 256'
 export PAGER=/usr/local/bin/moar
-export SYSTEMD_PAGERSECURE=1
+export SYSTEMD_PAGERSECURE=0
 export SYSTEMD_COLORS=256
 export SYSTEMD_PAGER=$PAGER
 # export SYSTEMD_LESS="FRXMK"
