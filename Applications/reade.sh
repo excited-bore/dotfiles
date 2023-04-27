@@ -4,7 +4,6 @@ reade(){
         case "${flag}" in
             p)  args="${@:3}"
                 value=$(rlwrap -S "$2" -b '' -f <(echo "${args[@]}") -o cat)
-                echo ${@:4}
                 eval ${@:4}="$value" 
                 ;;
         esac
