@@ -1,0 +1,16 @@
+[core]
+	editor = nvim
+[help]
+	autocorrect = 1
+[color]
+	ui = true
+[credential]
+	helper = cache --timeout 360
+[alias]
+	gr = log --graph --all --pretty=format:\"%x1b[33m%h%x09%x1b[32m%d%x1b[0m%x20%s\"
+	lb = log --graph --all --decorate
+	ll = log --graph --pretty=format:\"%C(yellow)%h%Creset%C(cyan)%C(bold)%d%Creset %C(cyan)(%cr)%Creset %C(green)%ce%Creset %s\"
+	lf = log --pretty=fuller
+[user]
+	name = excited-bore
+	email = stan96@duck.com
