@@ -1,4 +1,5 @@
-. ~/.bash_aliases.d/bash.sh
+DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+. $DIR/bash.sh
 # TRY and keep command line at bottom
 alias b="tput cup $(tput lines) 0" 
 
@@ -33,9 +34,8 @@ alias lsall="ls -Al"
 alias less="less -X"
 # Cant source .inputrc in any way though
 alias q="exit"
-alias w="cd -"
-alias w="clear ;b; ls -a"
-alias z="cd -"
+#alias w="clear ;b; ls -Al"
+alias c="cd -"
 alias x="cd .."
 
 alias men="man man"

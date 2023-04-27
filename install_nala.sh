@@ -1,4 +1,5 @@
-. ./check_distro.sh
+ DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+. $DIR/check_distro.sh
 if [[ $dist == "Debian" || $dist == "Raspbian" ]]; then
     if [ $dist == "Raspbian" ]; then
         read -p "Raspbian not fully supported. Continue? [Y/n]: " cnt

@@ -1,5 +1,6 @@
-. ./install_go.sh
-. ./check_distro.sh     
+ DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+. $DIR/install_go.sh
+. $DIR/check_distro.sh     
 if [ $dist == "Manjaro" ]; then
     yes | pamac install apx-git
     sudo usermod -aG docker $USER

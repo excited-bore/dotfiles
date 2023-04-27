@@ -1,4 +1,5 @@
-. ./check_distro.sh
+ DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+. $DIR/check_distro.sh
 
 if [[ $dist == "Manjaro" || $dist == "Arch" ]];then
     sudo pacman -Su flatpak xorg-xrdb libpamac-flatpak-plugin snap xclip sshfs reptyr gdb neovim mono go nodejs jre11-openjdk npm python ranger atool bat calibre elinks ffmpegthumbnailer fontforge highlight imagemagick kitty mupdf-tools odt2txt bottom

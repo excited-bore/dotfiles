@@ -1,6 +1,7 @@
 #!/bin/bash
 #https://bbs.archlinux.org/viewtopic.php?id=271850
-. ./check_distro.sh
+ DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+. $DIR/check_distro.sh
 
 if [ $dist == "Manjaro" ]; then
     sudo pacman -Su pipewire pipewire-pulse manjaro-pipewire

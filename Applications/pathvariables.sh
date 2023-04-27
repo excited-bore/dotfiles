@@ -1,4 +1,6 @@
 #!/bin/bash
+# Tip: Search binaries with 'whereis'
+# And check with 'printenv'
 
 # Shamelessly stolen from manjaro /etc/profile
 # Alternative to export PATH:$PATH
@@ -11,6 +13,7 @@ append_path() {
     esac
 }
 
+#export BASH_ALIASES=~/.bash_aliases.d
 
 export MOAR='--statusbar=bold -colors 256'
 export PAGER=/usr/local/bin/moar
@@ -35,8 +38,6 @@ export RANGER_LOAD_DEFAULT_RC="~/rc.conf"
 export LIBVA_DRIVER_NAME="mesa"
 export TMPDIR=/tmp
 
-# Tip: Search binaries with 'whereis'
-# And check with 'printenv'
 
 
 # VIM

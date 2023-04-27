@@ -4,6 +4,8 @@
 # thunderbird does not support trays on linux, which why we do this
 alias thunderbird="kdocker thunderbird"
 
+alias w="ranger"
+
 #function ptrace_toggle() {
 #    echo "Has ptrace currently elevated priviliges: $PTRACE_ELEVATED_PRIVILIGE";
 #    echo "Change? y/n: ";

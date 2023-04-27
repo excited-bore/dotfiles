@@ -1,4 +1,5 @@
-. ./check_distro.sh
+ DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+. $DIR/check_distro.sh
 
 if [[ ! -d ~/.config/nvim/ ]]; then
     mkdir ~/.config/nvim/

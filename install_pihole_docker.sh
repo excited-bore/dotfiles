@@ -1,6 +1,7 @@
-. ./check_distro.sh
-. ./check_rlwrap.sh
-. ./install_docker.sh
+ DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+. $DIR/check_distro.sh
+. $DIR/check_rlwrap.sh
+. $DIR/install_docker.sh
 
 if [ $dist == "Manjaro" ] || [ $dist == "Arch" ]; then
     yes | sudo pacman -S docker-compose

@@ -1,5 +1,6 @@
 ### GIT ###                           
-. ~/.bash_aliases.d/reade.sh
+ DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd ) 
+. $DIR/reade.sh
 
 alias git_config_pull_rebase_false="git config pull.rebase false"
 alias git_set_pull_merge="git config pull.rebase false"
