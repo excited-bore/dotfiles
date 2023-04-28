@@ -3,7 +3,7 @@ DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 # TRY and keep command line at bottom
 alias b="tput cup $(tput lines) 0" 
 
-b && ls
+tput cup $(stty size | awk '{print int($1/2);}') 0 && tput cuu1 && tput ed && ls
 # Cp / rm recursively
 alias cp="cp -rv"
 alias copy="cp"
@@ -40,7 +40,6 @@ alias x="cd .."
 
 alias men="man man"
 
-alias unzip="unzip"
 alias untar_gz="tar -xvf"
 alias tar_gz_list="tar -tvf"
 

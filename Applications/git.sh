@@ -69,14 +69,8 @@ git_add_remote_ssh() { git remote -v add "$1" git@github.com:$GITNAME/"$2.git"; 
 
 alias git_reset_to_last_HEAD="git reset --hard"
 alias git_add_all="git add -A"
-
-git_commit_all() { 
-    if [ ! -z "$1" ]; then 
-        git commit -am "$1"; 
-    else
-        git commit -a ;
-    fi
-}
+alias git_commit_all="git commit -a";
+alias git_commit_all_message="git commit -am";
 
 git_add_commit_all(){
     if [ ! -z "$1" ]; then
@@ -157,6 +151,7 @@ git_backup_branch_and_reset_to_remote() {
 alias git_remote_rename="git remote -v rename"
 alias git_remote_remove="git remote -v rm"
 alias git_switch_branch="git checkout"
+alias git_switch_branch_and_track_remote="git checkout -t"
 alias git_remote_set_url="git remote -v set-url"
 
 function git_set_default_remote_branch() { 
