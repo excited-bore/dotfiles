@@ -107,20 +107,22 @@ Tab: menu-complete
 "\C-d": redraw-current-line
 
 
-#https://www.baeldung.com/linux/echo-printf-overwrite-terminal-line
+#https://unix.stackexchange.com/questions/278884/save-cursor-position-and-restore-it-in-terminal
 #enter
-"\C-m": accept-line
-#Store line position
-"\C-o": "\033[s \n\C-m"
+"\C-p": accept-line
+
+
 #Restore line position
-"\C-p": "\033[u \n\C-m"
+"\C-m": "\C-e\C-u tput ed && tput rc && tput cuu1 && history -d -1  \C-p\C-y\C-p tput cuu1 && tput ed && tput rc && history -d -1\C-p\e[A\e[B"
+#Store line position
+"\C-o": "tput sc && history -d -1 &> /dev/null \C-m"
 
 
 "\C-x": "cd ..\C-m"
 
-# \015 represents the enter key
 #
-"\C-l": "\C-u\C-e clear && tput cup $(stty size | awk '{print int($1/2);}') 0 && tput cuu1 && tput ed && history -d -1 \C-m" 
+#"\C-l": "\C-u\C-e clear && tput cup $(stty size | awk '{print int($1/2);}') 0 && tput cuu1 && tput ed && history -d -1 \C-m" 
+"\C-l": "\C-u\C-e clear && tput cup $LINE_TPUT 0 && tput cuu1 && tput ed && history -d -1 \C-m"
 
 # Undo to Ctrl+Z (unbound in tty) instead of only on Ctrl+_
 "\C-z": vi-undo
@@ -143,6 +145,10 @@ set comment-begin #
 
 # Control backspace kill word
 "\C-h": backward-kill-word
+
+# Control left/right to jump from words instead of chars
+"\e[1;5B": "\C-u\C-e clear && let LINE_TPUT=$LINE_TPUT+1 && if [ $LINE_TPUT -gt $LINES ];then LINE_TPUT=0;fi && tput cup $LINE_TPUT 0 && \C-o"
+"\e[1;5A": "\C-u\C-e clear && let LINE_TPUT=$LINE_TPUT-1 && if [ $LINE_TPUT -lt 0 ];then LINE_TPUT=$LINES;fi && tput cup $LINE_TPUT 0 && \C-o"
 
 # Control left/right to jump from words instead of chars
 "\e[1;5D": backward-word
