@@ -127,7 +127,7 @@ Tab: menu-complete
 "\C-x": "cd ..\C-m"
 
 #"\C-l": "\C-u\C-e clear && tput cup $(stty size | awk '{print int($1/2);}') 0 && tput cuu1 && tput ed && history -d -1 \C-m" 
-"\C-l": "\C-u\C-e\C-1 clear && tput cup $LINE_TPUT 0 && tput cuu1 && tput ed && stty echo && history -d -1 \C-p"
+"\C-l": "\C-u\C-e\C-1 clear && tput cup $LINE_TPUT 0 && tput cuu1 && tput sc && tput ed && stty echo && history -d -1 \C-p"
 
 # Undo to Ctrl+Z (unbound in tty) instead of only on Ctrl+_
 "\C-z": vi-undo
