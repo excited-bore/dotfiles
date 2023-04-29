@@ -40,12 +40,11 @@ set revert-all-at-newline on
 #This can be very useful when auto completing in a directory in which a lot of files have a long common prefix, such a camera image directory.
 #set completion-prefix-display-length 3
 
-
 # Prevent the prompt 'Display all possibilities? (y/n)'
 set completion-query-items 0
 set page-completions off
 
-# Ignore cases
+# Ignore upper/lower cases, case-insensitive
 set completion-ignore-case On
 
 # This line sets the completions to be listed immediately instead of ringing the bell, when the completing word has more than one possible completion.
@@ -75,6 +74,7 @@ set history-preserve-point on
 # a b c
 # a b c
 set print-completions-horizontally on
+
 
 # \e : escape
 # \M : Meta (alt)
@@ -120,14 +120,14 @@ Tab: menu-complete
 
 
 #Restore line position (Enter)
-"\C-m": "\C-e\C-u\C-1 clear && tput rc && history -d -1 \C-p\C-y\C-p tput cuu1 && tput ed && tput rc && stty echo && history -d -1\C-p"
+"\C-m": "\C-e\C-u\C-1 clear && let LINE_TPUT=$LINE_TPUT+1 && tput cup $LINE_TPUT 0 && stty echo && history -d -1 \C-p\C-y\C-p\C-1 let LINE_TPUT=$LINE_TPUT-1 && tput cuu1 && tput ed && tput sc && stty echo && history -d -1\C-p\C-c"
 #Store line position
 #"\C-o": "tput sc && history -d -1 \C-m"
 
 "\C-x": "cd ..\C-m"
 
 #"\C-l": "\C-u\C-e clear && tput cup $(stty size | awk '{print int($1/2);}') 0 && tput cuu1 && tput ed && history -d -1 \C-m" 
-"\C-l": "\C-u\C-e\C-1 clear && tput cup $LINE_TPUT 0 && tput cuu1 && tput sc && tput ed && stty echo && history -d -1 \C-p"
+"\C-l": "\C-u\C-e\C-1 clear && tput cup $LINE_TPUT 0 && tput sc && tput cuu1 && tput ed && stty echo && history -d -1 \C-p"
 
 # Undo to Ctrl+Z (unbound in tty) instead of only on Ctrl+_
 "\C-z": vi-undo
