@@ -15,11 +15,11 @@ append_path() {
 
 #export BASH_ALIASES=~/.bash_aliases.d
 
-export MOAR='--statusbar=bold -colors 256'
+export MOAR='--statusbar=bold -colors 256 -render-unprintable highlight'
 export PAGER=/usr/local/bin/moar
 export SYSTEMD_PAGERSECURE=0
-export SYSTEMD_COLORS=256
 export SYSTEMD_PAGER=$PAGER
+export SYSTEMD_COLORS=256
 # export SYSTEMD_LESS="FRXMK"
 
 #Don't use or do this 
@@ -30,6 +30,7 @@ export DISPLAY=":0.0"
 export EDITOR="nvim"
 #export VISUAL="/usr/bin/code --unity-launch %F"
 export VISUAL="nvim"
+export LINE_TPUT=0
 
 export INPUTRC='~/.inputrc'
 export RANGER_LOAD_DEFAULT_RC="~/rc.conf"

@@ -3,7 +3,7 @@ DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 # TRY and keep command line at bottom
 alias b="tput cup $(tput lines) 0" 
 
-tput cup $(stty size | awk '{print int($1/2);}') 0 && tput cuu1 && tput ed && ls
+#tput cup $(stty size | awk '{print int($1/2);}') 0 && tput cuu1 && tput ed && ls
 # Cp / rm recursively
 alias cp="cp -rv"
 alias copy="cp"
@@ -29,6 +29,12 @@ alias rmAllHiddn="rm .[!.]* *";
 
 # With parent directories and verbose
 alias mkdir="mkdir -pv"
+
+#Always output colours for ls, grep and variants
+alias ls="ls --color=always"
+alias grep='grep --colour=always'
+alias egrep='egrep --colour=always'
+alias fgrep='fgrep --colour=always'
 # Listen hidden files and permissions
 alias lsall="ls -Al"
 alias less="less -X"
@@ -65,6 +71,9 @@ extract(){
 }
 
 complete -F _files extract
+
+
+alias get_tty_="exec 1>/dev/pts/"
 
 alias GPU_list_drivers="inxi -G"
 

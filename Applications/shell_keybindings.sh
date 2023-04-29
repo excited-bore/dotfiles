@@ -42,7 +42,7 @@ stty susp 'undef'
 
 alias tty_size_half="tput cup $(stty size | awk '{print int($1/2);}') 0"
 
-bind '"\C-o": "echo -ne \"\033[s\" \C-m"'
+#bind '"\C-o": "echo -ne \"\033[s\" \C-m"'
 
 #bind -x '"\C-o": accept-line' 
 #bind -x '"\C-l": "\C-u \C-e clear && tty_size_half && tput cuu1 && tput ed && ls && history -d -1 \C-m\C-y"'
