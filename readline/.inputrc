@@ -120,7 +120,7 @@ Tab: menu-complete
 
 
 #Restore line position (Enter)
-"\C-m": "\C-e\C-u\C-1 clear && let LINE_TPUT=$LINE_TPUT+1 && tput cup $LINE_TPUT 0 && stty echo && history -d -1 \C-p\C-y\C-p\C-1 let LINE_TPUT=$LINE_TPUT-1 && tput cuu1 && tput ed && tput sc && stty echo && history -d -1\C-p\C-c"
+"\C-m": "\C-e\C-u\C-1 clear && tput cup $LINE_TPUT 0 && stty echo && history -d -1 \C-p\C-y\C-p\C-1 tput cuu1 && tput ed && tput sc && stty echo && history -d -1\C-p\C-c"
 #Store line position
 #"\C-o": "tput sc && history -d -1 \C-m"
 
