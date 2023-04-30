@@ -4,8 +4,6 @@
 # thunderbird does not support trays on linux, which why we do this
 alias thunderbird="kdocker thunderbird"
 
-alias w="ranger"
-
 #function ptrace_toggle() {
 #    echo "Has ptrace currently elevated priviliges: $PTRACE_ELEVATED_PRIVILIGE";
 #    echo "Change? y/n: ";
@@ -19,7 +17,9 @@ alias w="ranger"
 #    fi
 #    doas echo $PTRACE_ELEVATED_PRIVILIGE > /proc/sys/kernel/yama/ptrace_scope;   
 #}
- 
+
+alias mp4tomp3="ffmpeg -i \".mp4\" -vn -acodec libmp3lame -ac 2 -ab 160k -ar 48000 \".mp3\""
+
 vlc_folder(){
     if [ -d $1 ]; then
         vlc --recursive expand "./$1";

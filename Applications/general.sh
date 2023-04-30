@@ -1,18 +1,15 @@
 DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 . $DIR/bash.sh
 # TRY and keep command line at bottom
-alias b="tput cup $(tput lines) 0" 
+#alias b="tput cup $(tput lines) 0" 
 
 #tput cup $(stty size | awk '{print int($1/2);}') 0 && tput cuu1 && tput ed && ls
 # Cp / rm recursively
 alias cp="cp -rv"
 alias copy="cp"
-function cpAll(){
-    cp -t "$1" ./*;
-}
-function cpAllHidden(){
-    cp -t "$1" .[!.]*;
-}
+
+alias cpAllHidden="cp -t $1 .[!.]*"
+
 # Ask for Interaction when overwriting newer files
 alias mv="mv -nv"
 alias move="mv"
@@ -73,7 +70,7 @@ extract(){
 complete -F _files extract
 
 
-alias get_tty_="exec 1>/dev/pts/"
+alias redirect_tty_output_to_="exec 1>/dev/pts/"
 
 alias GPU_list_drivers="inxi -G"
 

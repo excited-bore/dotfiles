@@ -1,22 +1,30 @@
-. ./check_distro.sh
+ DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+. $DIR/check_rlwrap.sh
+. $DIR/bash.sh
+. $DIR/readline/reade.sh
+. $DIR/check_distro.sh
 
-read -p "Create ~/.config to ~/config symlink? [Y/n]:" sym1
-if [ -z $sym1 ] || [ "y" == $sym1 ] && [ ! -e ~/config ]; then
-    ln -s ~/.config ~/config
-fi
+function yes_edit_no(){
+    if [ -z "$1" ] || [ -z "$3" ]; then
+        printf "Needs 3 parameters.\n 1) Prompt (adds [y/n/e]: afterwards)\n 2) Default \"yes\",\"edit\",\"no\"\n 3) Return string variable \n (4) Optional - Colour)\n"
+        return 0
+    else
+        clr=""
+        deflt=" [Y/e/n]: " 
+        if [ "$2" == "edit" ]; then
+            deflt=" [y/E/n]: "
+        elif [ "$2" == "no" ]; then
+            deflt=" [y/e/N]: "
+        fi
+        if [ ! -z "$4" ]; then
+            clr="-Q $4"
+        fi
+        reade -p "$1" "y e n" pass
+        eval "$3"="$pass"
+    fi
+}
 
-read -p "Create /lib/systemd/system/ to user directory symlink? [Y/n]:" sym2
-if [ -z $sym2 ] || [ "y" == $sym2 ] && [ ! -e ~/lib_systemd ]; then
-    ln -s /lib/systemd/system/ ~/lib_systemd
-fi
-
-read -p "Create /etc/systemd/system/ to user directory symlink? [Y/n]:" sym3
-if [ -z $sym3 ] || [ "y" == $sym3 ] && [ ! -e ~/etc_systemd ]; then
-    ln -s /etc/systemd/system/ ~/etc_systemd
-fi 
-
-
-read -p "Create ~/.bash_aliases.d/, link it to .bashrc and install scripts? [Y/n]:" scripts
+read -p "Create ~/.bash_aliases.d/, link it to .bashrc and install scripts? (Readline included) [Y/n]:" scripts
 if [ -z $scripts ] || [ "y" == $scripts ]; then
 
     if [ ! -d ~/.bash_aliases.d/ ]; then
@@ -25,6 +33,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
 
     if ! grep -q "~/.bash_aliases.d" ~/.bashrc; then
 
+        echo "alias pwd-bash=\"cd -- \"\$( dirname -- \"\${BASH_SOURCE[0]}\" )\" &> /dev/null && pwd"
         echo "if [[ -d ~/.bash_aliases.d/ ]]; then" >> ~/.bashrc
         echo "  for alias in ~/.bash_aliases.d/*.sh; do" >> ~/.bashrc
         echo "      . \"\$alias\" " >> ~/.bashrc
@@ -32,11 +41,10 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         echo "fi" >> ~/.bashrc
     fi
     
-    cp -f ./check_distro.sh ~/.bash_aliases.d/check_distro.sh
+    cp -f $DIR/check_distro.sh ~/.bash_aliases.d/check_distro.sh
 
-    . ./check_rlwrap.sh
 
-    read -p "Create /root/.bash_aliases.d/, link it to /root/.bashrc and install scripts? [Y/n]:" rscripts
+    read -p "Create /root/.bash_aliases.d/, link it to /root/.bashrc [Y/n]:" rscripts
     if [ -z $rscripts ] || [ "y" == $rscripts ]; then
 
         if ! sudo test -d /root/.bash_aliases.d/ ; then
@@ -48,7 +56,30 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
             printf "\nif [[ -d /root/.bash_aliases.d/ ]]; then\n  for alias in /root/.bash_aliases.d/*.sh; do\n      . \"\$alias\" \n  done\nfi" | sudo tee -a /root/.bashrc > /dev/null
         fi
         
-        sudo cp -f ./check_distro.sh /root/.bash_aliases.d/check_distro.sh
+        sudo cp -f $DIR/check_distro.sh /root/.bash_aliases.d/check_distro.sh
+    else
+
+    fi
+
+    read -p "Install .inputrc at ~/ ? (readline config) [Y/n]:" inputrc
+    if [ -z $inputrc ] || [ "y" == $inputrc ]; then 
+        cp -f readline/.inputrc ~/
+        cp -f readline/readline.sh ~/.bash_aliases/
+        read -p "Install .inputrc at /root/? [Y/n]:" Rinputrc
+        if [ -z $Rinputrc ] || [ "y" == $Rinputrc ]; then
+            sudo cp -f readline/.inputrc /root/.inputrc
+            sudo cp -f readline/readline.sh /root/.bash_aliases/
+        fi
+    fi
+
+    read -p "Install .Xresources at ~/ ? (xterm config) [Y/n]:" Xresources
+    if [ -z $Xresources ] || [ "y" == $Xresources ]; then
+        cp -f xterm/.Xresources ~/.Xresources
+        
+        read -p "Install .Xresources at /root/? [Y/n]:" RXresources
+        if [ -z $RXresources ] || [ "y" == $RXresources ]; then
+            sudo cp -f xterm/.Xresources /root/.Xresources
+        fi
     fi
 
     read -p "Install bash completions for aliases in ~/.bash_completion.d? [Y/n]:" compl
@@ -79,16 +110,17 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         fi
     fi
     
-    read -p  "Install python completions in ~/.bash_completion.d? [Y/n]:" pycomp
+    read -p  "Install python completions in */.bash_completion.d? [Y/n]:" pycomp
     if [ -z $pycomp ] || [ "y" == $pycomp ]; then
-        . ./install_pythonCompletions_bash.sh
+        . $DIR/install_pythonCompletions_bash.sh
     fi
 
-    read -p "Install bash.sh? (bash specific aliases)? [Y/n]:" bash
+    read -p "Install bash.sh at ~/ ? (bash specific aliases)? [Y/n]:" bash
     if [ -z $bash ] || [ "y" == $bash ]; then 
         
         cp -f Applications/bash.sh ~/.bash_aliases.d/ 
         
+        reade -p "Install bash.sh at /root/?" "edit" rbash "red"
         if [ -z $rscripts ] || [ "y" == $rscripts ]; then 
             sudo cp -f Applications/bash.sh /root/.bash_aliases.d/
         fi
@@ -133,6 +165,16 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         fi
     fi
 
+    read -p "Install sudo.sh at ~/.bash_aliases.d/ (sudo aliases)? [Y/n]:" dosu
+    if [ -z $dosu ] || [ "y" == $packmang ]; then 
+
+        cp -f Applications/sudo.sh ~/.bash_aliases.d/
+
+        if [ -z $rscripts ] || [ "y" == $rscripts ]; then 
+            sudo cp -f Applications/sudo.sh /root/.bash_aliases.d/
+        fi
+    fi
+    
     read -p "Install git.sh at ~/.bash_aliases.d/ (git aliases)? [Y/n]:" gitsh
     if [ -z $gitsh ] || [ "y" == $gitsh ]; then 
         read -p "Configure global user and email git? [Y/n]: " gitcnf
@@ -149,7 +191,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
             sudo cp -f Applications/git.sh /root/.bash_aliases.d/
         fi
     fi
-
+    
     read -p "Install ssh.sh at ~/.bash_aliases.d/ (ssh related aliases)? [Y/n]:" sshsh
     if [ -z $sshsh ] || [ "y" == $sshsh ]; then 
 
@@ -159,7 +201,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
             sudo cp -f Applications/ssh.sh /root/.bash_aliases.d/
         fi
     fi
-
+    
     read -p "Install package_managers.sh at ~/.bash_aliases.d/ (package manager aliases)? [Y/n]:" packmang
     if [ -z $packmang ] || [ "y" == $packmang ]; then 
 
@@ -214,29 +256,24 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     fi
 fi
 
-read -p "Install .Xresources at ~/ ? (xterm config) [Y/n]:" Xresources
-if [ -z $Xresources ] || [ "y" == $Xresources ]; then
-    cp -f xterm/.Xresources ~/.Xresources
-    
-    read -p "Install .Xresources at /root/ ? (xterm config) [Y/n]:" RXresources
-    if [ -z $RXresources ] || [ "y" == $RXresources ]; then
-        sudo cp -f xterm/.Xresources /root/.Xresources
-    fi
+read -p "Create ~/.config to ~/config symlink? [Y/n]:" sym1
+if [ -z $sym1 ] || [ "y" == $sym1 ] && [ ! -e ~/config ]; then
+    ln -s ~/.config ~/config
 fi
 
-read -p "Install .inputrc at ~/ ? (readline config) [Y/n]:" inputrc
-if [ -z $inputrc ] || [ "y" == $inputrc ]; then 
-    cp -f readline/.inputrc ~/
-    
-    read -p "Install .inputrc at /root/ ? (readline config) [Y/n]:" Rinputrc
-    if [ -z $Rinputrc ] || [ "y" == $Rinputrc ]; then
-        sudo cp -f readline/.inputrc /root/.inputrc
-    fi
+read -p "Create /lib/systemd/system/ to user directory symlink? [Y/n]:" sym2
+if [ -z $sym2 ] || [ "y" == $sym2 ] && [ ! -e ~/lib_systemd ]; then
+    ln -s /lib/systemd/system/ ~/lib_systemd
+fi
+
+read -p "Create /etc/systemd/system/ to user directory symlink? [Y/n]:" sym3
+if [ -z $sym3 ] || [ "y" == $sym3 ] && [ ! -e ~/etc_systemd ]; then
+    ln -s /etc/systemd/system/ ~/etc_systemd
 fi
 
 read -p "Install moar? [Y/n]: " moar
 if [ -z $moar ] || [ "Y" == $moar ] || [ $moar == "y" ]; then
-   . ./install_moar.sh 
+   . $DIR/install_moar.sh 
 fi
 
 . ~/.bashrc

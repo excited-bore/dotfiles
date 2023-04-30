@@ -23,7 +23,7 @@ reade(){
                 ;;
             p)  rlwstring=$(echo $rlwstring | sed "s/rlwrap /rlwrap \-S \"${OPTARG}\" /g")
                 ;;
-            Q)  rlwstring=$(echo $rlwstring | sed "s/rlwrap /rlwrap \-p\"${OPTARG}\" /g")
+            Q)  rlwstring=$(echo $rlwstring | sed "s/rlwrap /rlwrap \-p \"${OPTARG}\" /g")
                 ;;
         esac
     done
