@@ -1,6 +1,6 @@
 #! /bin/bash
- DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-. $DIR/check_rlwrap.sh
+#DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+. ./checks/check_rlwrap.sh
 # https://unix.stackexchange.com/questions/278631/bash-script-auto-complete-for-user-input-based-on-array-data
 
 sudo blkid

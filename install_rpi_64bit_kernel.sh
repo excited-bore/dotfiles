@@ -1,7 +1,7 @@
- DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-. $DIR/check_distro.sh
+ #DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+. ./checks/check_distro.sh
 
-if [ $dist == "Raspbian" ]; then
+if [ $distro == "Raspbian" ]; then
     sudo rpi-update
     if ! sudo grep -q "arm_64bit=1" /boot/config.txt; then
         sudo sed -i "s,\[pi4\],[pi4]\narm_64bit=1,g" /boot/config.txt

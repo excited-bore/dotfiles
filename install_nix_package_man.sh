@@ -1,5 +1,4 @@
- DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-. $DIR/check_distro.sh
+. ./checks/check_distro.sh
 
 #if [ $dist == "Raspbian" ]; then
 #    read -p "Install 64bit kernel before install nix? [Y/n]: " newkrn
@@ -40,7 +39,7 @@ if [[ -z $nix || "y" == $nix ]]; then
     fi
 fi
 
-if [[ $dist == "Raspbian" && $(uname -m) == "aarch64" ]]; then
+if [[ $distro == "Raspbian" && $(uname -m) == "aarch64" ]]; then
     echo "system = aarch64-linux" | sudo tee -a /etc/nix/nix.conf
 fi
 

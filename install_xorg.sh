@@ -1,9 +1,10 @@
 #!/bin/bash 
+. ./checks/check_distro.sh
 
-if [[ $dist == "Manjaro" || $dist == "Arch" ]];then
-    sudo pacman -Su xorg
-elif [[ $dist == "Debian" || $dist == "Raspbian" ]];then
-    sudo apt install xorg 
+if [ $distro_base == "Arch" ];then
+    yes | sudo pacman -Su xorg
+elif [ $distro_base == "Debian" ];then
+    yes | sudo apt install xorg 
 fi 
 
 #This should create a xorg.conf.new file in /root/ that you can copy over to /etc/X11/xorg.conf

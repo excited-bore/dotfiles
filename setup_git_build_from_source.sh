@@ -1,4 +1,4 @@
-. ./check_distro.sh 
+. ./checks/check_distro.sh 
 ok=$1
 name=$2
 http=$3

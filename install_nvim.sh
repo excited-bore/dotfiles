@@ -1,16 +1,16 @@
- DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-. $DIR/check_distro.sh
+ #DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+. ./checks/check_distro.sh
 
 if [[ ! -d ~/.config/nvim/ ]]; then
     mkdir ~/.config/nvim/
 fi
 
 
-if [[ $dist == "Manjaro" || $dist == "Arch" ]];then
+if [[ $distro == "Arch" || $distro_base == "Arch" ]];then
     sudo pacman -Su neovim cpanminus make cmake gcc xclip python go ninja nodejs mono openjdk17-src python-pynvim
     cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
     cpanm -n Neovim::Ext
-elif [[ $dist == "Debian" || $dist == "Raspbian" ]];then                                                         11
+elif [[ $distro == "Debian" || $distro_base == "Debian" ]];then                                                         
     sudo apt install cpanminus build-essential xclip python3-dev make mono-complete golang gopls nodejs openjdk-17-jdk openjdk-17-jre npm python3-pip 
     pip3 install --user cmake pynvim
     cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
@@ -24,7 +24,7 @@ elif [[ $dist == "Debian" || $dist == "Raspbian" ]];then                        
     elif [ $snp == "n" ]; then
         echo "Begin installation neovim stable from source using tag 'stable'"
         sudo apt install ninja-build gettext libtool libtool-bin cmake g++ pkg-config unzip curl doxygen
-        ./setup_git_build_from_source.sh "y" "neovim" "https://github.com" "neovim/neovim" "stable" "sudo apt update; sudo apt install ninja-build gettext libtool libtool-bin cmake g++ pkg-config unzip curl doxygen" "make CMAKE_BUILD_TYPE=RelWithDebInfo; sudo make install" "sudo make uninstall" "make distclean; make deps" "y"
+        . $DIR/setup_git_build_from_source.sh "y" "neovim" "https://github.com" "neovim/neovim" "stable" "sudo apt update; sudo apt install ninja-build gettext libtool libtool-bin cmake g++ pkg-config unzip curl doxygen" "make CMAKE_BUILD_TYPE=RelWithDebInfo; sudo make install" "sudo make uninstall" "make distclean; make deps" "y"
     elif [ $snp == "a" ]; then
         sudo apt install neovim
     fi

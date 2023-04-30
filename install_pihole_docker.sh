@@ -1,11 +1,10 @@
- DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-. $DIR/check_distro.sh
-. $DIR/check_rlwrap.sh
-. $DIR/install_docker.sh
+. ./checks/check_distro.sh
+. ./checks/check_rlwrap.sh
+. ./install_docker.sh
 
-if [ $dist == "Manjaro" ] || [ $dist == "Arch" ]; then
+if [ $distro_base == "Arch" ]; then
     yes | sudo pacman -S docker-compose
-elif [ $dist == "Debian" ] || [ $dist == "Raspbian" ]; then
+elif [ $distro_base == "Debian" ]; then
     yes | sudo apt install docker-compose
 fi
 

@@ -1,9 +1,8 @@
- DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-. $DIR/check_distro.sh
+. ./checks/check_distro.sh
 
-if [[ $dist == "Manjaro" || $dist == "Arch" ]]; then
+if [ $distro_base == "Arch" ]; then
     sudo pacman -S make cmake
-elif [[ $dist == "Debian" || $dist == "Raspbian" ]]; then
+elif [ $distro_base == "Debian" ]; then
     sudo apt install make cmake autoconf g++ gettext libncurses5-dev libtool libtool-bin 
 fi
 

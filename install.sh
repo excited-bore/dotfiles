@@ -1,70 +1,5 @@
- #DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-. ./check_rlwrap.sh
-. ./readline/reade.sh
-. ./check_distro.sh
-
-function yes_edit_no(){
-    if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ]; then
-        printf "Needs 3 parameters.\n 1) Function with commands if yes\n 2) File to edit\n 3) prompt (adds [y/n/e]: afterwards) \n (4) Default \"yes\",\"edit\",\"no\")\n (5) Optional - Colour)\n";
-        return 0;
-    else
-        pass="";
-        clr="";
-        pre="y"
-        deflt=" [Y/e/n]: "; 
-        prompt="$3$deflt";
-        if [ "$4" == "edit" ]; then
-            pre="e"
-            deflt=" [y/E/n]: ";
-        elif [ "$4" == "no" ]; then
-            pre="n"
-            deflt=" [y/e/N]: ";
-        fi
-        if [ ! -z "$5" ]; then
-            clr="-Q $5"
-        fi
-        reade $clr -P "$pre" -p "$prompt" " y e n" pass;
-        if [ "$pass" == "y" ]; then
-           $1; 
-        elif [ "$pass" == "e" ]; then
-            str=($2);
-            for i in "${str[@]}"; do
-                $EDITOR $i;
-            done;
-            deflt=" [y/n]: "
-            prompt="$3$deflt";
-            reade $clr -p "$prompt" "y n" pass2;
-            if [ "$pass2" == "y" ]; then
-                $1;
-            fi
-        fi
-    fi
-}
-
-function yes_no(){
-    if [ -z "$1" ] || [ -z "$2" ]; then
-        printf "Needs 3 parameters.\n 1) String with commands if yes\n 2) prompt (adds [y/n]: afterwards) \n(3) Default \"yes\",\"no\")\n(4) Optional - Colour)\n";
-        return 0;
-    else
-        pass="";
-        clr="";
-        pre="y"
-        deflt=" [Y/n]: "; 
-        prompt="$2$deflt";
-        if [ "$3" == "no" ]; then
-            pre="n"
-            deflt=" [y/N]: ";
-        fi
-        if [ ! -z "$4" ]; then
-            clr="-Q $4"
-        fi
-        reade $clr -P "$pre" -p "$prompt" " y e n" pass;
-        if [ "$pass" == "y" ]; then
-           $1; 
-        fi
-    fi
-}
-
+. ./readline/rlwrap_scripts.sh
+. ./checks/check_distro.sh
 
 reade -Q "GREEN" -P "y" -p "Create ~/.bash_aliases.d/, link it to .bashrc and install scripts? (Readline included) [Y/n]:" "y n" scripts
 if [ -z $scripts ] || [ "y" == $scripts ]; then
@@ -83,7 +18,8 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         echo "fi" >> ~/.bashrc
     fi
     
-    cp -fv check_distro.sh ~/.bash_aliases.d/check_distro.sh
+    cp -fv checks/check_distro.sh ~/.bash_aliases.d/check_distro.sh
+    cp -fv readline/rlwrap_scripts.sh ~/.bash_aliases.d/rlwrap_scripts.sh
 
 
     reade -Q "YELLOW" -P "y" -p "Create /root/.bash_aliases.d/, link it to /root/.bashrc [Y/n]:" "y n" rscripts
@@ -98,7 +34,8 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
             printf "\nif [[ -d /root/.bash_aliases.d/ ]]; then\n  for alias in /root/.bash_aliases.d/*.sh; do\n      . \"\$alias\" \n  done\nfi" | sudo tee -a /root/.bashrc > /dev/null
         fi
         
-        sudo cp -fv check_distro.sh /root/.bash_aliases.d/check_distro.sh
+        sudo cp -fv checks/check_distro.sh /root/.bash_aliases.d/check_distro.sh
+        sudo cp -fv readline/rlwrap_scripts.sh ~/.bash_aliases.d/rlwrap_scripts.sh 
     fi
     
     function inputrc_r(){
@@ -251,9 +188,9 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     }
 
     gitt(){
-        if [ $dist == "Arch" ] || [ $dist == "Manjaro" ]; then
+        if [ $distro == "Arch" ] || [ $distro_base == "Arch" ]; then
             sudo pacman -Su git
-        elif [ $dist == "Debian" ] || [ $dist == "Ubuntu" ] || [ $dist == "Raspbian" ]; then
+        elif [ $distro == "Debian" ] || [ $distro_base == "Debian" ]; then
             sudo apt install git
         fi
         read -p "Configure global user and email git? [Y/n]: " gitcnf
@@ -278,7 +215,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     }
     yes_edit_no ps11 "Applications/PS1_colours.sh" "Install PS1_colours.sh at ~/.bash_aliases.d/ (Coloured command prompt)? " "yes" "GREEN"
     
-    if [ $dist == "Manjaro" ] ; then
+    if [ $distro == "Manjaro" ] ; then
         manj_r(){
             sudo cp -fv Applications/manjaro.sh /root/.bash_aliases.d/;
         }

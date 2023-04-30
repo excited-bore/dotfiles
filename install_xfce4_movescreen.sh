@@ -1,5 +1,5 @@
-. $DIR/check_distro.sh
-if [ $dist == "Manjaro" ]; then
+. ./checks/check_distro.sh
+if [ $distro == "Manjaro" ]; then
     yes | pamac install python xorg-xrandr xorg-xwininfo wmctrl xdotool
 fi
 

@@ -1,0 +1,67 @@
+#!/bin/bash
+distro_base=/
+distro=/
+packagemanager=/
+architecture=/
+declare -A osInfo;
+osInfo[/etc/redhat-release]=yum
+osInfo[/etc/rpi-issue]=apt
+osInfo[/etc/manjaro-release]=pamac
+osInfo[/etc/arch-release]=pacman
+osInfo[/etc/gentoo-release]=emerge
+osInfo[/etc/SuSE-release]=zypp
+osInfo[/etc/debian_version]=apt
+osInfo[/etc/alpine-release]=apk
+
+for f in ${!osInfo[@]};
+do
+    if [ -f $f ] && [ $f == /etc/alpine-release ] && [ $distro == / ]; then
+        packagemanager=${osInfo[$f]}
+        distro_base="Gentoo"
+        distro="Alpine"
+    elif [ -f $f ] && [ $f == /etc/manjaro-release ] && [ $distro == / ]; then
+        packagemanager=${osInfo[$f]}
+        distro_base="Arch"
+        distro="Manjaro"
+    elif grep -q "Ubuntu" /etc/issue && [ $distro == / ]; then
+        packagemanager=apt
+        distro_base="Debian"
+        distro="Ubuntu"
+    elif [ -f $f ] && [ $f == /etc/SuSE-release ] && [ $distro == / ];then
+        packagemanager=${osInfo[$f]}
+        distro="Suse"
+    elif [ -f $f ] && [ $f == /etc/gentoo-release ] && [ $distro == / ];then
+        packagemanager=${osInfo[$f]}
+        distro="Gentoo"
+    elif [ -f $f ] && [ $f == /etc/redhat-release ] && [ $distro == / ];then
+        packagemanager=${osInfo[$f]}
+        distro="Redhat"
+    elif [ -f $f ] && [ $f == /etc/arch-release ] && [ $distro == / ];then
+        packagemanager=${osInfo[$f]}
+        distro="Arch"
+    elif [ -f $f ] && [ $f == /etc/rpi-issue ] && [ $distro == / ];then
+        packagemanager=${osInfo[$f]}
+        distro_base="Debian"
+        distro="Raspbian"
+    elif [ -f $f ] && [ $f == /etc/debian_version ] && [ $distro == / ];then
+        packagemanager=${osInfo[$f]}
+        distro="Debian"
+    fi 
+done
+
+if lscpu | grep -q "Intel"; then
+    architecture="386"
+elif lscpu | grep -q "AMD"; then
+    if lscpu | grep -q "x86_64"; then 
+        architecture="amd64"
+    else
+        architecture="amd32"
+    fi
+elif lscpu | grep -q "armv"; then
+    architecture="armv7l"
+elif lscpu | grep -q "aarch"; then
+    architecture="arm64"
+fi
+    
+
+                 

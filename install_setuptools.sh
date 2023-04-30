@@ -1,10 +1,9 @@
- DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-. $DIR/check_distro.sh
+. ./checks/check_distro.sh
 
-if [[ $dist == "Manjaro" || $dist == "Arch" ]]; then
-    sudo pacman -S make cmake
-elif [[ $dist == "Debian" || $dist == "Raspbian" ]]; then
-    sudo apt install make cmake autoconf g++ gettext libncurses5-dev libtool libtool-bin 
+if [ $distro_base == "Arch" ]; then
+    yes | sudo pacman -S make cmake
+elif [ $distro_base == "Debian" ]; then
+    yes | sudo apt install make cmake autoconf g++ gettext libncurses5-dev libtool libtool-bin 
 fi
 
 if which pip 2>/dev/null || echo FALSE ; then

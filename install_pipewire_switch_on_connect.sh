@@ -1,14 +1,13 @@
 #!/bin/bash
 #https://bbs.archlinux.org/viewtopic.php?id=271850
- DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-. $DIR/check_distro.sh
+. ./checks/check_distro.sh
 
-if [ $dist == "Manjaro" ]; then
-    sudo pacman -Su pipewire pipewire-pulse manjaro-pipewire
-elif [ $dist == "Arch" ]; then
-    sudo pacman -Su pipewire pipewire-pulse
-elif [[ $dist == "Debian" || $dist == "Raspbian" ]]; then
-    sudo apt install pipewire
+if [ $distro == "Manjaro" ]; then
+    yes | sudo pacman -Su pipewire pipewire-pulse manjaro-pipewire
+elif [ $distro == "Arch" ]; then
+    yes | sudo pacman -Su pipewire pipewire-pulse
+elif [ $distro_base == "Debian" ]; then
+    yes | sudo apt install pipewire
 fi 
 
 mkdir -p ~/.config/pipewire/pipewire-pulse.conf.d/

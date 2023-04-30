@@ -1,14 +1,13 @@
 # !/bin/bash
- DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-. $DIR/check_distro.sh
+. ./checks/check_distro.sh
 
 if [[ ! -d ~/.config/nvim/ ]]; then
     mkdir ~/.config/nvim/
 fi
 
-if [[ $dist == "Manjaro" || $dist == "Arch" ]]; then
+if [ $distro_base == "Arch" ]; then
     sudo pacman -Su xclip mono go nodejs jre11-openjdk npm python ranger atool bat calibre elinks ffmpegthumbnailer fontforge highlight imagemagick kitty mupdf-tools odt2txt btm
-elif [[ $dist == "Debian" || $dist == "Raspbian" ]]; then  
+elif [ $distro_base == "Debian" ]; then  
     sudo apt install build-essential python2 python3 cmake python3-dev python3-pip mono-complete golang nodejs openjdk-17-jdk openjdk-17-jre npm ranger atool bat elinks ffmpegthumbnailer fontforge highlight imagemagick jq libcaca0 odt2txt mupdf-tools 
 fi 
 

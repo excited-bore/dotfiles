@@ -1,15 +1,15 @@
  # DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-. ./check_distro.sh
-. ./readline/reade.sh
+. ./checks/check_distro.sh
+. ./readline/rlwrap_scripts.sh
 
 if [ ! -d ~/.bash_completion.d ]; then
     mkdir ~/.bash_completion.d
 fi
 
-if [[ $dist == "Raspbian" || $dist == "Debian" ]]; then
+if [[ $distro == "Debian" || $distro_base == "Debian" ]]; then
     sudo apt install python3 python3-pip
     python3 -m pip install argcomplete
-elif [[ $dist == "Manjaro" || $dist == "Arch" ]]; then
+elif [[ $distro == "Arch" || $distro_base == "Arch" ]]; then
     sudo pacman -Su python python-pip
     pip3 install argcomplete
 fi

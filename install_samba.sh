@@ -1,10 +1,9 @@
- DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-. $DIR/check_distro.sh
+. ./checks/check_distro.sh
 
-if [[ $dist == "Manjaro" || $dist == "Arch" ]];then
-    sudo pacman -Su samba
-elif [[ $dist == "Debian" || $dist == "Raspbian" ]];then
-    sudo apt install samba samba-common  
+if [ $distro_base == "Arch" ];then
+    yes | sudo pacman -Su samba
+elif [ $distro_base == "Debian" ];then
+    yes | sudo apt install samba samba-common  
 fi
 
 read -p "Drive name: (doesn't matter):" drive
