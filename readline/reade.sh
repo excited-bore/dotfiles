@@ -13,17 +13,17 @@ reade(){
     rlwstring="rlwrap -b \"$breaklines\" -f <(echo \"${args[@]}\") -o cat"
     while getopts ':a:b:e:p:Q:' flag; do
         case "${flag}" in
-            a)  rlwstring=$(echo $rlwstring | sed "s/rlwrap /rlwrap \-aN\"${OPTARG}\" /g")
+            a)  rlwstring=$(echo $rlwstring | sed "s/rlwrap /rlwrap \-aN ${OPTARG} /g")
                 ;;
             b)  breaklines="${OPTARG}"
                 ;;
             c)  rlwstring=$(echo $rlwstring | sed "s/rlwrap /rlwrap \-c /g")
                 ;;
-            e)  rlwstring=$(echo $rlwstring | sed "s/rlwrap /rlwrap \-e \"${OPTARG}\" /g")
+            e)  rlwstring=$(echo $rlwstring | sed "s/rlwrap /rlwrap \-e ${OPTARG} /g")
                 ;;
-            p)  rlwstring=$(echo $rlwstring | sed "s/rlwrap /rlwrap \-S \"${OPTARG}\" /g")
+            p)  rlwstring=$(echo $rlwstring | sed "s/rlwrap /rlwrap \-S ${OPTARG} /g")
                 ;;
-            Q)  rlwstring=$(echo $rlwstring | sed "s/rlwrap /rlwrap \-p \"${OPTARG}\" /g")
+            Q)  rlwstring=$(echo $rlwstring | sed "s/rlwrap /rlwrap \-p ${OPTARG} /g")
                 ;;
         esac
     done
