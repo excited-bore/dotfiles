@@ -1,27 +1,28 @@
- DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-. $DIR/check_distro.sh
+ # DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+. ./check_distro.sh
+. ./readline/reade.sh
+
 if [ ! -d ~/.bash_completion.d ]; then
     mkdir ~/.bash_completion.d
 fi
 
 if [[ $dist == "Raspbian" || $dist == "Debian" ]]; then
     sudo apt install python3 python3-pip
-    pip3 install argcomplete
+    python3 -m pip install argcomplete
 elif [[ $dist == "Manjaro" || $dist == "Arch" ]]; then
     sudo pacman -Su python python-pip
     pip3 install argcomplete
 fi
 
-
-source ~/.bashrc
 activate-global-python-argcomplete --dest=/home/$USER/.bash_completion.d
 if ! grep -q "python-argcomplete" ~/.bashrc; then
     echo ". ~/.bash_completion.d/python-argcomplete" >> ~/.bashrc
 fi
 source ~/.bashrc
 
-read -p "Install python completion system wide? (/root/.bashrc) [Y/n]:" arg
-if [ -z $arg ] || [ "y" == $arg ]; then 
+reade -Q "YELLOW" -P "y" -p "Install python completion system wide? (/root/.bashrc) [Y/n]:" "y n" arg
+    sleep 5
+if [ "y" == "$arg" ]; then 
     if ! sudo test -d /root/.bash_completion.d; then
         sudo mkdir /root/.bash_completion.d
     fi

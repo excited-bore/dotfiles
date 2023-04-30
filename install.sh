@@ -5,30 +5,68 @@
 
 function yes_edit_no(){
     if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ]; then
-        printf "Needs 3 parameters.\n 1) String with commands if yes\n 2) File to edit\n 3) prompt (adds [y/n/e]: afterwards) \n (4) Default \"yes\",\"edit\",\"no\")\n (5) Optional - Colour)\n"
-        return 0
+        printf "Needs 3 parameters.\n 1) Function with commands if yes\n 2) File to edit\n 3) prompt (adds [y/n/e]: afterwards) \n (4) Default \"yes\",\"edit\",\"no\")\n (5) Optional - Colour)\n";
+        return 0;
     else
-        clr=""
-        deflt=" [Y\/e\/n]: " 
+        pass="";
+        clr="";
+        pre="y"
+        deflt=" [Y/e/n]: "; 
+        prompt="$3$deflt";
         if [ "$4" == "edit" ]; then
-            deflt=" [y\/E\/n]: "
+            pre="e"
+            deflt=" [y/E/n]: ";
         elif [ "$4" == "no" ]; then
-            deflt=" [y\/e\/N]: "
+            pre="n"
+            deflt=" [y/e/N]: ";
         fi
         if [ ! -z "$5" ]; then
             clr="-Q $5"
         fi
-        echo $3
-        reade -p "$3" "y e n" pass
+        reade $clr -P "$pre" -p "$prompt" " y e n" pass;
         if [ "$pass" == "y" ]; then
-           eval "$1" 
+           $1; 
         elif [ "$pass" == "e" ]; then
-           $EDITOR "$3"
+            str=($2);
+            for i in "${str[@]}"; do
+                $EDITOR $i;
+            done;
+            deflt=" [y/n]: "
+            prompt="$3$deflt";
+            reade $clr -p "$prompt" "y n" pass2;
+            if [ "$pass2" == "y" ]; then
+                $1;
+            fi
         fi
     fi
 }
 
-read -p "Create ~/.bash_aliases.d/, link it to .bashrc and install scripts? (Readline included) [Y/n]:" scripts
+function yes_no(){
+    if [ -z "$1" ] || [ -z "$2" ]; then
+        printf "Needs 3 parameters.\n 1) String with commands if yes\n 2) prompt (adds [y/n]: afterwards) \n(3) Default \"yes\",\"no\")\n(4) Optional - Colour)\n";
+        return 0;
+    else
+        pass="";
+        clr="";
+        pre="y"
+        deflt=" [Y/n]: "; 
+        prompt="$2$deflt";
+        if [ "$3" == "no" ]; then
+            pre="n"
+            deflt=" [y/N]: ";
+        fi
+        if [ ! -z "$4" ]; then
+            clr="-Q $4"
+        fi
+        reade $clr -P "$pre" -p "$prompt" " y e n" pass;
+        if [ "$pass" == "y" ]; then
+           $1; 
+        fi
+    fi
+}
+
+
+reade -Q "GREEN" -P "y" -p "Create ~/.bash_aliases.d/, link it to .bashrc and install scripts? (Readline included) [Y/n]:" "y n" scripts
 if [ -z $scripts ] || [ "y" == $scripts ]; then
 
     if [ ! -d ~/.bash_aliases.d/ ]; then
@@ -37,7 +75,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
 
     if ! grep -q "~/.bash_aliases.d" ~/.bashrc; then
 
-        echo "alias pwd-bash=\"cd -- \"\$( dirname -- \"\${BASH_SOURCE[0]}\" )\" &> /dev/null && pwd"
+        #echo "alias pwd-bash=\"cd -- \"\$( dirname -- \"\${BASH_SOURCE[0]}\" )\" &> /dev/null && pwd"
         echo "if [[ -d ~/.bash_aliases.d/ ]]; then" >> ~/.bashrc
         echo "  for alias in ~/.bash_aliases.d/*.sh; do" >> ~/.bashrc
         echo "      . \"\$alias\" " >> ~/.bashrc
@@ -45,10 +83,10 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         echo "fi" >> ~/.bashrc
     fi
     
-    cp -f check_distro.sh ~/.bash_aliases.d/check_distro.sh
+    cp -fv check_distro.sh ~/.bash_aliases.d/check_distro.sh
 
 
-    read -p "Create /root/.bash_aliases.d/, link it to /root/.bashrc [Y/n]:" rscripts
+    reade -Q "YELLOW" -P "y" -p "Create /root/.bash_aliases.d/, link it to /root/.bashrc [Y/n]:" "y n" rscripts
     if [ -z $rscripts ] || [ "y" == $rscripts ]; then
 
         if ! sudo test -d /root/.bash_aliases.d/ ; then
@@ -60,25 +98,33 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
             printf "\nif [[ -d /root/.bash_aliases.d/ ]]; then\n  for alias in /root/.bash_aliases.d/*.sh; do\n      . \"\$alias\" \n  done\nfi" | sudo tee -a /root/.bashrc > /dev/null
         fi
         
-        sudo cp -f check_distro.sh /root/.bash_aliases.d/check_distro.sh
+        sudo cp -fv check_distro.sh /root/.bash_aliases.d/check_distro.sh
     fi
+    
+    function inputrc_r(){
+         sudo cp -fv readline/.inputrc /root/.inputrc
+         sudo cp -fv readline/readline.sh /root/.bash_aliases.d/
+    }
+    function inputrc() {
+        cp -fv readline/.inputrc ~/
+        cp -fv readline/readline.sh ~/.bash_aliases.d/
+        yes_edit_no inputrc_r "readline/.inputrc readline/readline.sh" "Install .inputrc at /root/?" "edit" "RED"
+    }
+    yes_edit_no inputrc "readline/.inputrc readline/readline.sh" "Install .inputrc at ~/ ? (readline config)" "edit" "YELLOW"
 
-    read -p "Install .inputrc at ~/ ? (readline config) [Y/n]:" inputrc
-    if [ -z $inputrc ] || [ "y" == $inputrc ]; then 
-        cp -f readline/.inputrc ~/
-        cp -f readline/readline.sh ~/.bash_aliases.d/
-        yes_edit_no "sudo cp -f readline/.inputrc /root/.inputrc && sudo cp -f readline/readline.sh /root/.bash_aliases.d/" ".inputrc" "Install .inputrc at \/root\/?" "edit" "red"
-    fi
 
-    read -p "Install .Xresources at ~/ ? (xterm config) [Y/n]:" Xresources
-    if [ -z $Xresources ] || [ "y" == $Xresources ]; then
-        cp -f xterm/.Xresources ~/.Xresources
-        
-        yes_edit_no "sudo cp -f xterm/.Xresources /root/.Xresources" xterm/.Xresources "Install .inputrc at \/root\/?" "edit" "red"
-            
-    fi
+    function xresources_r(){
+        sudo cp -fv xterm/.Xresources /root/.Xresources
+    }
+    function xresources(){
+        cp -fv xterm/.Xresources ~/.Xresources
+        yes_edit_no xresources_r "xterm/.Xresources" "Install .Xresources at /root/?" "edit" "RED"
+    }
+    yes_edit_no xresources "xterm/.Xresources" "Install .Xresources at ~/ ? (readline config)" "edit" "YELLOW"
 
-    read -p "Install bash completions for aliases in ~/.bash_completion.d? [Y/n]:" compl
+
+
+    reade -Q "GREEN" -P "y" -p "Install bash completions for aliases in ~/.bash_completion.d? [Y/n]:" "y n" compl
     if [ -z $compl ] || [ "y" == $compl ]; then
         if [ ! -d ~/.bash_completion.d/ ]; then 
             mkdir ~/.bash_completion.d
@@ -91,7 +137,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
             echo ". ~/.bash_completion.d/complete_alias" >> ~/.bashrc
         fi
         
-        read -p "Install bash completions for aliases in /root/.bash_completion.d? [Y/n]:" rcompl
+        reade -Q "YELLOW" -P "y" -p "Install bash completions for aliases in /root/.bash_completion.d? [y/n]:" "y n" rcompl
         if [ -z $rcompl ] || [ "y" == $rcompl ]; then
             if ! sudo test -d /root/.bash_completion.d/ ; then 
                 sudo mkdir /root/.bash_completion.d
@@ -106,123 +152,166 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         fi
     fi
     
-    read -p  "Install python completions in */.bash_completion.d? [Y/n]:" pycomp
+    reade -Q "GREEN" -P "y" -p "Install python completions in */.bash_completion.d? [Y/n]:" "y n" pycomp
     if [ -z $pycomp ] || [ "y" == $pycomp ]; then
         . install_pythonCompletions_bash.sh
+        sleep 10
     fi
 
-    read -p "Install bash.sh at ~/ ? (bash specific aliases)? [Y/n]:" bash
-    if [ -z $bash ] || [ "y" == $bash ]; then 
-        
-        cp -f Applications/bash.sh ~/.bash_aliases.d/ 
-        
-        yes_edit_no -p "sudo cp -f Applications/bash.sh /root/.bash_aliases.d/" "Applications/bash.sh" "Install bash.sh at \/root\/?" "yes" "green"
-    fi
+    function bash_yes_r(){
+        sudo cp -fv Applications/bash.sh /root/.bash_aliases.d/;
+    }
 
-    read -p "Install shell_keybindings.sh at ~/.bash_aliases.d/ (bash keybindings)? [Y/n]:" aliases
-    if [ -z $aliases ] || [ "y" == $aliases ]; then 
+    function bash_yes() {
+        cp -fv Applications/bash.sh ~/.bash_aliases.d/;
+        yes_edit_no bash_yes_r "Applications/bash.sh" "Install bash.sh at /root/?" "yes" "YELLOW";
+    }
+
+    yes_edit_no bash_yes "Applications/bash.sh" "Install bash.sh at ~/ ? (bash specific aliases)?" "yes" "GREEN";
+    
+    keybinds_r(){
+        sudo cp -fv Applications/shell_keybindings.sh /root/.bash_aliases.d
+    }
+    keybinds(){
+        cp -fv Applications/shell_keybindings.sh ~/.bash_aliases.d/
         # To prevent stuff from breaking when on a system without a keyboard (raspi)
         if ! grep -q "#setxkbmap" Applications/shell_keybindings.sh; then
-            sed -i s/"setxkbmap\(.*\)"/"#setxkbmap\1"/g Applications/shell_keybindings.sh  
-        fi
-        cp -f Applications/shell_keybindings.sh ~/.bash_aliases.d/ 
+            sed -i "s|"setxkbmap\(.*\)"|"#setxkbmap\1"|g" Applications/shell_keybindings.sh  
+        fi                                               
+        yes_edit_no keybinds_r "Applications/shell_keybindings.sh" "Install shell_keybindings.sh at /root/?" "yes" "YELLOW" 
+    }
+    yes_edit_no keybinds "Applications/shell_keybindings.sh" "Install shell_keybindings.sh at ~/ ? (generally related to keybinds)? " "yes" "GREEN";
+    
 
-        yes_edit_no -p "sudo cp -f Applications/shell_keybindings.sh /root/.bash_aliases.d/" "Applications/shell_keybindings.sh" "Install shell_keybindings.sh at \/root\/?" "edit" "orange"
-    fi
-
-    read -p "Install pathvariables.sh at ~/.bash_aliases.d/ (environment variables)? [Y/n]:" exports
-        if [ -z $exports ] || [ "y" == $exports ]; then 
-        cp -f Applications/pathvariables.sh ~/.bash_aliases.d/
-        yes_edit_no -p "sudo cp -f Applications/pathvariables.sh /root/.bash_aliases.d/" "Applications/pathvariables.sh" "Install pathvariables.sh at \/root\/?" "edit" "orange" 
-    fi
-
-    read -p "Install general.sh at ~/.bash_aliases.d/ (bash general commands aliases)? [Y/n]:" general
-    if [ -z $general ] || [ "y" == $general ]; then 
-        cp -f Applications/general.sh ~/.bash_aliases.d/
-        yes_edit_no -p "sudo cp -f Applications/general.sh /root/.bash_aliases.d/" "Applications/general.sh" "Install general.sh at \/root\/?" "yes" "orange"
-    fi
+    pathvariables_r(){
+         sudo cp -fv Applications/pathvariables.sh /root/.bash_aliases.d/
+    }
+    pathvariables(){
+        cp -fv Applications/pathvariables.sh ~/.bash_aliases.d/
+        yes_edit_no pathvariables_r "Applications/pathvariables.sh" "Install pathvariables.sh at /root/?" "yes" "YELLOW"
+    }
+    yes_edit_no pathvariables "Applications/pathvariables.sh" "Install pathvariables.sh at ~/ ? " "edit" "YELLOW"
 
 
-    read -p "Install systemctl.sh? ~/.bash_aliases.d/ (systemctl aliases/functions)? [Y/n]:" systemctl
-    if [ -z $systemctl ] || [ "y" == $systemctl ]; then 
-        cp -f Applications/systemctl.sh ~/.bash_aliases.d/
+    general_r(){
+         sudo cp -fv Applications/general.sh /root/.bash_aliases.d/
+    }
+    general(){
+        cp -fv Applications/general.sh ~/.bash_aliases.d/
+        yes_edit_no general_r "Applications/general.sh" "Install general.sh at /root/?" "yes" "GREEN"
+    }
+    yes_edit_no general "Applications/general.sh" "Install general.sh at ~/ ? (general terminal related aliases) " "yes" "YELLOW"
+
+
+    systemd_r(){
+        sudo cp -fv Applications/systemctl.sh /root/.bash_aliases.d/
+    }
+    systemd(){
+        cp -fv Applications/systemctl.sh ~/.bash_aliases.d/
+        yes_edit_no systemd_r "Applications/systemctl.sh" "Install systemctl.sh at /root/?" "yes" "GREEN" 
+    }
+    yes_edit_no systemd "Applications/systemctl.sh" "Install systemctl.sh? ~/.bash_aliases.d/ (systemctl aliases/functions)?" "edit" "GREEN"
         
-        yes_edit_no -p "sudo cp -f Applications/systemctl.sh /root/.bash_aliases.d/" "Applications/systemctl.sh" "Install systemctl.sh at \/root\/?" "yes" "green" 
-    fi
+    dosu_r(){
+        sudo cp -fv Applications/sudo.sh /root/.bash_aliases.d/;
+    }
 
-    read -p "Install sudo.sh at ~/.bash_aliases.d/ (sudo aliases)? [Y/n]:" dosu
-    if [ -z $dosu ] || [ "y" == $dosu ]; then 
+    dosu(){
+        cp -fv Applications/sudo.sh ~/.bash_aliases.d/
+        yes_edit_no dosu_r "Applications/sudo.sh" "Install sudo.sh at /root/?" "yes" "GREEN" 
+    }
 
-        cp -f Applications/sudo.sh ~/.bash_aliases.d/
+    yes_edit_no dosu "Applications/sudo.sh" "Install sudo.sh at ~/.bash_aliases.d/ (sudo aliases)? " "edit" "GREEN"
 
-        yes_edit_no -p "sudo cp -f Applications/sudo.sh /root/.bash_aliases.d/" "Applications/sudo.sh" "Install sudo.sh at \/root\/?" "yes" "green" 
-    fi
+    packman_r(){
+        sudo cp -fv Applications/package_managers.sh /root/.bash_aliases.d/;
+    }
+
+    packman(){
+        cp -fv Applications/package_managers.sh ~/.bash_aliases.d/
+        yes_edit_no packman_r "Applications/package_managers.sh" "Install package_managers.sh at /root/?" "edit" "YELLOW" 
+    }
+
+    yes_edit_no packman "Applications/package_managers.sh" "Install package_managers.sh at ~/.bash_aliases.d/ (package manager aliases)? " "edit" "GREEN"
     
-    read -p "Install package_managers.sh at ~/.bash_aliases.d/ (package manager aliases)? [Y/n]:" packmang
-    if [ -z $packmang ] || [ "y" == $packmang ]; then 
-
-        cp -f Applications/package_managers.sh ~/.bash_aliases.d/
-
-        yes_edit_no -p "sudo cp -f Applications/package_managers.sh /root/.bash_aliases.d/" "Applications/package_managers.sh" "Install package_managers.sh at \/root\/?" "edit" "orange" 
-    fi
     
-    read -p "Install ssh.sh at ~/.bash_aliases.d/ (ssh related aliases)? [Y/n]:" sshsh
-    if [ -z $sshsh ] || [ "y" == $sshsh ]; then 
+    ssh_r(){
+        sudo cp -fv Applications/ssh.sh /root/.bash_aliases.d/;
+    }
 
-        cp -f Applications/ssh.sh ~/.bash_aliases.d/
+    sshh(){
+        cp -fv Applications/ssh.sh ~/.bash_aliases.d/
+        yes_edit_no ssh_r "Applications/ssh.sh" "Install ssh.sh at /root/?" "edit" "YELLOW" 
+    }
 
-        yes_edit_no -p "sudo cp -f Applications/ssh.sh /root/.bash_aliases.d/" "Applications/ssh.sh" "Install ssh.sh at \/root\/?" "no" "orange" 
-    fi
-    
-    read -p "Install git.sh at ~/.bash_aliases.d/ (git aliases)? [Y/n]:" gitsh
-    if [ -z $gitsh ] || [ "y" == $gitsh ]; then 
+    yes_edit_no sshh "Applications/ssh.sh" "Install ssh.sh at ~/.bash_aliases.d/ (ssh aliases)? " "edit" "GREEN"
+
+    git_r(){
+        sudo cp -fv Applications/git.sh /root/.bash_aliases.d/;
+    }
+
+    gitt(){
+        if [ $dist == "Arch" ] || [ $dist == "Manjaro" ]; then
+            sudo pacman -Su git
+        elif [ $dist == "Debian" ] || [ $dist == "Ubuntu" ] || [ $dist == "Raspbian" ]; then
+            sudo apt install git
+        fi
         read -p "Configure global user and email git? [Y/n]: " gitcnf
         if [ -z $gitcnf ] || [ "y" == $gitcnf ]; then
             read -p "Email: " mail
             read -p "Gitname: " name
             git config --global user.email "$mail"
             git config --global user.name "$name"
-        fi
+        fi 
+        cp -fv Applications/git.sh ~/.bash_aliases.d/
+        yes_edit_no git_r "Applications/git.sh" "Install git.sh at /root/?" "no" "RED" 
+    }
+    yes_edit_no gitt "Applications/git.sh" "Install git.sh at ~/.bash_aliases.d/ (git aliases)? " "yes" "GREEN"
+    
+    ps1_r(){
+        sudo cp -fv Applications/PS1_colours.sh /root/.bash_aliases.d/;
+    }
 
-        cp -f Applications/git.sh ~/.bash_aliases.d/
+    ps11(){
+        cp -fv Applications/PS1_colours.sh ~/.bash_aliases.d/
+        yes_edit_no ps1_r "Applications/PS1_colours.sh" "Install PS1_colours.sh at /root/?" "yes" "GREEN" 
+    }
+    yes_edit_no ps11 "Applications/PS1_colours.sh" "Install PS1_colours.sh at ~/.bash_aliases.d/ (Coloured command prompt)? " "yes" "GREEN"
+    
+    if [ $dist == "Manjaro" ] ; then
+        manj_r(){
+            sudo cp -fv Applications/manjaro.sh /root/.bash_aliases.d/;
+        }
 
-        yes_edit_no -p "sudo cp -f Applications/git.sh /root/.bash_aliases.d/" "Applications/git.sh" "Install git.sh at \/root\/?" "no" "orange" 
+        manj(){
+            cp -fv Applications/manjaro.sh ~/.bash_aliases.d/
+            yes_edit_no manj_r "Applications/manjaro.sh" "Install manjaro.sh at /root/?" "yes" "GREEN" 
+        }
+        yes_edit_no manj "Applications/manjaro.sh" "Install manjaro.sh at ~/.bash_aliases.d/ (manjaro specific aliases)? " "yes" "GREEN"
     fi
     
-    read -p "Install PS1_colours.sh at ~/.bash_aliases.d/ (terminal colours)? [Y/n]:" colors
-    if [ -z $bash ] || [ "y" == $bash ]; then 
-        
-        cp -f Applications/PS1_colours.sh ~/.bash_aliases.d/ 
+    variti_r(){
+        sudo cp -fv Applications/variety.sh /root/.bash_aliases.d/;
+    }
 
-        yes_edit_no -p "sudo cp -f Applications/PS1_colours.sh /root/.bash_aliases.d/" "Applications/PS1_colours.sh" "Install PS1_colours.sh at \/root\/?" "yes" "green"
-    fi
+    variti(){
+        cp -fv Applications/variety.sh ~/.bash_aliases.d/
+        yes_edit_no variti_r "Applications/variety.sh" "Install variety.sh at /root/?" "no" "YELLOW" 
+    }
+    yes_edit_no variti "Applications/variety.sh" "Install variety.sh at ~/.bash_aliases.d/ (aliases for a variety of tools)? " "edit" "GREEN" 
+    
+   
+    ytbe_r(){
+        sudo cp -fv Applications/youtube.sh /root/.bash_aliases.d/;
+    }
 
-    if [ $dist == "Manjaro" ] ; then
-        read -p "Install manjaro.sh at ~/.bash_aliases.d/ (manjaro specific aliases)? [Y/n]:" manjar
-        if [ -z $manjar ] || [ "y" == $manjar ]; then
+    ytbe(){
+        . ./check_youtube.sh
+        cp -fv Applications/youtube.sh ~/.bash_aliases.d/
+        yes_edit_no ytbe_r "Applications/youtube.sh" "Install youtube.sh at /root/?" "no" "YELLOW" 
+    }
+    yes_edit_no ytbe "Applications/youtube.sh" "Install yt-dlp (youtube cli download) and youtube.sh at ~/.bash_aliases.d/ (yt-dlp aliases)? " "yes" "GREEN"
 
-            cp -f Applications/manjaro.sh ~/.bash_aliases.d/
-            
-            yes_edit_no -p "sudo cp -f Applications/manjaro.sh /root/.bash_aliases.d/" "Applications/manjaro.sh" "Install manjaro.sh at \/root\/?" "yes" "green"
-        fi
-    fi
-
-    read -p "Install youtube.sh at ~/.bash_aliases.d/ (youtube-dl aliases)? [Y/n]:" youtube
-    if [ -z $youtube ] || [ "y" == $youtube ]; then 
-        
-        . check_youtube.sh
-        cp -f Applications/youtube.sh ~/.bash_aliases.d/
-
-        yes_edit_no -p "sudo cp -f Applications/youtube.sh /root/.bash_aliases.d/" "Applications/youtube.sh" "Install youtube.sh at \/root\/?" "no" "orange" 
-    fi
-
-    read -p "Install variety.sh at ~/.bash_aliases.d/ (variety of applications)? [Y/n]:" variety
-    if [ -z $variety ] || [ "y" == $variety ]; then 
-
-        cp -f Applications/variety.sh ~/.bash_aliases.d/
-
-        yes_edit_no -p "sudo cp -f Applications/variety.sh /root/.bash_aliases.d/" "Applications/variety.sh" "Install variety.sh at \/root\/?" "edit" "orange" 
-    fi
 fi
 
 read -p "Create ~/.config to ~/config symlink? [Y/n]:" sym1
@@ -240,7 +329,7 @@ if [ -z $sym3 ] || [ "y" == $sym3 ] && [ ! -e ~/etc_systemd ]; then
     ln -s /etc/systemd/system/ ~/etc_systemd
 fi
 
-read -p "Install moar? [Y/n]: " moar
+reade -Q "GREEN" -P "y" -p "Install moar? (Pager with linenumbers) [Y/n]: " "y n" moar
 if [ -z $moar ] || [ "Y" == $moar ] || [ $moar == "y" ]; then
    . ./install_moar.sh 
 fi
