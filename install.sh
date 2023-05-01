@@ -40,14 +40,14 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     
     function inputrc_r(){
          sudo cp -fv readline/.inputrc /root/.inputrc
-         sudo cp -fv readline/readline.sh /root/.bash_aliases.d/
+         sudo cp -fv readline/shell_keybindings.sh /root/.bash_aliases.d/
     }
     function inputrc() {
         cp -fv readline/.inputrc ~/
-        cp -fv readline/readline.sh ~/.bash_aliases.d/
-        yes_edit_no inputrc_r "readline/.inputrc readline/readline.sh" "Install .inputrc at /root/?" "edit" "RED"
+        cp -fv readline/shell_keybindings.sh ~/.bash_aliases.d/
+        yes_edit_no inputrc_r "readline/.inputrc readline/shell_keybindings.sh" "Install .inputrc at /root/?" "edit" "RED"
     }
-    yes_edit_no inputrc "readline/.inputrc readline/readline.sh" "Install .inputrc at ~/ ? (readline config)" "edit" "YELLOW"
+    yes_edit_no inputrc "readline/.inputrc readline/shell_keybindings.sh" "Install .inputrc at ~/ ? (readline config)" "edit" "YELLOW"
 
 
     function xresources_r(){

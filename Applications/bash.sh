@@ -1,3 +1,5 @@
+alias r=". ~/.bashrc"
+
 alias bash_list_commands="compgen -c | $PAGER"
 alias bash_list_keywords="compgen -k | $PAGER"
 alias bash_list_builtins="compgen -b | $PAGER"

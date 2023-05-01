@@ -49,6 +49,10 @@ alias ds4LOn="ds4drv --led ff0000"
 alias ds4LOff="ds4drv --led 000000"
 alias ds4="python3 -m ds4drv --hidraw --udp --udp-port 26760"
 
+# python virtual env
+#python3 -m venv python3
+#source venv/bin/activate
+
 python_install_user(){
     python $@ install --user;
 }
