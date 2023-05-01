@@ -1,5 +1,5 @@
 ### SSH ###                           
-. ~/.bash_aliases.d/reade.sh 
+. ./rlwrap_scripts.sh
 
 ssh_file="~/.ssh/id_ecdsa"
 user="funnyman"

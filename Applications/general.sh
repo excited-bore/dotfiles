@@ -1,5 +1,4 @@
-DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-. $DIR/bash.sh
+. ./bash.sh
 # TRY and keep command line at bottom
 #alias b="tput cup $(tput lines) 0" 
 
