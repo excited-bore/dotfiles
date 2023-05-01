@@ -1,5 +1,5 @@
 ### SSH ###                           
-. ./rlwrap_scripts.sh
+. ~/.bash_aliases.d/rlwrap_scripts.sh
 
 ssh_file="~/.ssh/id_ecdsa"
 user="funnyman"

@@ -1,4 +1,4 @@
-. ./bash.sh
+. ~/.bash_aliases.d/bash.sh
 # TRY and keep command line at bottom
 #alias b="tput cup $(tput lines) 0" 
 

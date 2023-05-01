@@ -1,5 +1,5 @@
 ### GIT ###                           
-. ./rlwrap_scripts.sh
+. ~/.bash_aliases.d/rlwrap_scripts.sh
 
 alias git_config_pull_rebase_false="git config pull.rebase false"
 alias git_set_pull_merge="git config pull.rebase false"
