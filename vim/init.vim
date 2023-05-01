@@ -6,14 +6,15 @@ autocmd CursorMovedI    * set cul
 "autocmd InsertEnter     * set cul
 "autocmd InsertLeave     * set nocul
 
+" let Vundle manage Vundle, required
+" set the runtime path to include Vundle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
 " And Java
 set runtimepath+=/usr/lib/jvm/java-17-openjdk/bin/java
 call vundle#begin()
 
-" set the runtime path to include Vundle and initialize
-"
-" let Vundle manage Vundle, required
+"Vim plugins point to githubs wich is very nice and just fucking cool
+
 "" Autocomplete plugin from git
 Plugin 'ycm-core/YouCompleteMe'
 
@@ -22,7 +23,9 @@ Plugin 'francoiscabrol/ranger.vim'
 Plugin 'rbgrouleff/bclose.vim'
 let g:ranger_replace_netrw = 1
 
-"Vim plugins point to githubs wich is very nice and just fucking cool
+"Fuzzy finder plugin"
+Plugin 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plugin 'junegunn/fzf.vim' 
 
 "Git plugin
 Plugin 'tpope/vim-fugitive'
@@ -96,6 +99,22 @@ inoremap <Right> <C-y><Right>
 nnoremap <tab>      i<tab><esc><right>
 vnoremap <tab>      >gv
 vnoremap <s-tab>    <gv
+
+"Ranger F2
+nnoremap <F2>   :Ranger<CR>
+inoremap <F2>   <Esc>:Ranger<CR>
+vnoremap <F2>   <Esc>:Ranger<CR>
+
+" Git files F3
+nnoremap <F3>   :Files<CR>
+inoremap <F3>   <Esc>:Files<CR>
+vnoremap <F3>   <Esc>:Files<CR>
+
+" Git files F4
+nnoremap <F4>   :GFiles<CR>
+inoremap <F4>   <Esc>:GFiles<CR>
+vnoremap <F4>   <Esc>:GFiles<CR>
+
 
 "inoremap [          []
 vnoremap [          di[]<Esc><Left>p<Esc> 
