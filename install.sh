@@ -106,18 +106,18 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
 
     yes_edit_no bash_yes "Applications/bash.sh" "Install bash.sh at ~/ ? (bash specific aliases)?" "yes" "GREEN";
     
-    keybinds_r(){
-        sudo cp -fv Applications/shell_keybindings.sh /root/.bash_aliases.d
-    }
-    keybinds(){
-        cp -fv Applications/shell_keybindings.sh ~/.bash_aliases.d/
-        # To prevent stuff from breaking when on a system without a keyboard (raspi)
-        if ! grep -q "#setxkbmap" Applications/shell_keybindings.sh; then
-            sed -i "s|"setxkbmap\(.*\)"|"#setxkbmap\1"|g" Applications/shell_keybindings.sh  
-        fi                                               
-        yes_edit_no keybinds_r "Applications/shell_keybindings.sh" "Install shell_keybindings.sh at /root/?" "yes" "YELLOW" 
-    }
-    yes_edit_no keybinds "Applications/shell_keybindings.sh" "Install shell_keybindings.sh at ~/ ? (generally related to keybinds)? " "yes" "GREEN";
+    #keybinds_r(){
+        #sudo cp -fv Applications/shell_keybindings.sh /root/.bash_aliases.d
+    #}
+    #keybinds(){
+    #    cp -fv Applications/shell_keybindings.sh ~/.bash_aliases.d/
+    #    # To prevent stuff from breaking when on a system without a keyboard (raspi)
+    #    if ! grep -q "#setxkbmap" Applications/shell_keybindings.sh; then
+    #        sed -i "s|"setxkbmap\(.*\)"|"#setxkbmap\1"|g" Applications/shell_keybindings.sh  
+    #    fi                                               
+    #    yes_edit_no keybinds_r "Applications/shell_keybindings.sh" "Install shell_keybindings.sh at /root/?" "yes" "YELLOW" 
+    #}
+    #yes_edit_no keybinds "Applications/shell_keybindings.sh" "Install shell_keybindings.sh at ~/ ? (generally related to keybinds)? " "yes" "GREEN";
     
 
     pathvariables_r(){
