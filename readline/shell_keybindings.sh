@@ -65,12 +65,13 @@ bind -x '"\e[1;5A": "clear && let LINE_TPUT=$LINE_TPUT-1 && if [ $LINE_TPUT -lt 
 # Expand by looping through options
 # Shift+tab for reverse
 bind 'Tab: menu-complete'
-bind '"\e\t": menu-complete-backward'
-bind '"\e[Z": menu-complete'
 bind '"\e[Z": menu-complete-backward'
 
 # (Kitty) Ctrl-tab expands aliases
 bind '"\e[9;5u": alias-expand-line'
+
+# Recall position
+bind -x '"\C-r": tput rc'
 
 #Backup enter
 bind '"\C-p": accept-line' 
@@ -79,7 +80,7 @@ bind '"\C-p": accept-line'
 alias _="stty -echo && tput cuu1 && history -d -1"
 
 #Enter kills line, then clears screen, then yanks line to prompt and enters it
-bind '"\C-m": "\C-e\C-u _\C-p clear && tput rc && stty echo && history -d -1 \C-p\C-y\C-p"'
+bind '"\C-m": "\C-e\C-u _\C-p clear && tput rc && stty echo && history -d -1 \C-p\C-y\C-p\C-r\e[A\e[B"'
 #Store line position
 #"\C-o": "tput sc && history -d -1 \C-m"
 
@@ -116,8 +117,7 @@ bind -x '"\eOQ": ranger'
 
 # F5, Ctrl-r - Reload .bashrc /.inputrc
 #bind '"\e[15~": re-read-init-file'
-bind -x '"\e[15~":  . ~/.bashrc && tput sc'
-bind '"\C-r": "\e[15~"'
+bind -x '"\e[15~":  . ~/.bashrc && tput cup $LINENO 0 && tput rc'
 
 #C-x used as modifier for a lot of stuff
 #"\C-x": "cd ..\C-m"
