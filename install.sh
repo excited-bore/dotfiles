@@ -92,99 +92,98 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     reade -Q "GREEN" -P "y" -p "Install python completions in */.bash_completion.d? [Y/n]:" "y n" pycomp
     if [ -z $pycomp ] || [ "y" == $pycomp ]; then
         . install_pythonCompletions_bash.sh
-        sleep 10
     fi
 
     function bash_yes_r(){
-        sudo cp -fv Applications/bash.sh /root/.bash_aliases.d/;
+        sudo cp -fv aliases/bash.sh /root/.bash_aliases.d/;
     }
 
     function bash_yes() {
-        cp -fv Applications/bash.sh ~/.bash_aliases.d/;
-        yes_edit_no bash_yes_r "Applications/bash.sh" "Install bash.sh at /root/?" "yes" "YELLOW";
+        cp -fv aliases/bash.sh ~/.bash_aliases.d/;
+        yes_edit_no bash_yes_r "aliases/bash.sh" "Install bash.sh at /root/?" "yes" "YELLOW";
     }
 
-    yes_edit_no bash_yes "Applications/bash.sh" "Install bash.sh at ~/ ? (bash specific aliases)?" "yes" "GREEN";
+    yes_edit_no bash_yes "aliases/bash.sh" "Install bash.sh at ~/ ? (bash specific aliases)?" "yes" "GREEN";
     
     #keybinds_r(){
-        #sudo cp -fv Applications/shell_keybindings.sh /root/.bash_aliases.d
+        #sudo cp -fv aliases/shell_keybindings.sh /root/.bash_aliases.d
     #}
     #keybinds(){
-    #    cp -fv Applications/shell_keybindings.sh ~/.bash_aliases.d/
+    #    cp -fv aliases/shell_keybindings.sh ~/.bash_aliases.d/
     #    # To prevent stuff from breaking when on a system without a keyboard (raspi)
-    #    if ! grep -q "#setxkbmap" Applications/shell_keybindings.sh; then
-    #        sed -i "s|"setxkbmap\(.*\)"|"#setxkbmap\1"|g" Applications/shell_keybindings.sh  
+    #    if ! grep -q "#setxkbmap" aliases/shell_keybindings.sh; then
+    #        sed -i "s|"setxkbmap\(.*\)"|"#setxkbmap\1"|g" aliases/shell_keybindings.sh  
     #    fi                                               
-    #    yes_edit_no keybinds_r "Applications/shell_keybindings.sh" "Install shell_keybindings.sh at /root/?" "yes" "YELLOW" 
+    #    yes_edit_no keybinds_r "aliases/shell_keybindings.sh" "Install shell_keybindings.sh at /root/?" "yes" "YELLOW" 
     #}
-    #yes_edit_no keybinds "Applications/shell_keybindings.sh" "Install shell_keybindings.sh at ~/ ? (generally related to keybinds)? " "yes" "GREEN";
+    #yes_edit_no keybinds "aliases/shell_keybindings.sh" "Install shell_keybindings.sh at ~/ ? (generally related to keybinds)? " "yes" "GREEN";
     
 
     pathvariables_r(){
-         sudo cp -fv Applications/pathvariables.sh /root/.bash_aliases.d/
+         sudo cp -fv aliases/pathvariables.sh /root/.bash_aliases.d/
     }
     pathvariables(){
-        cp -fv Applications/pathvariables.sh ~/.bash_aliases.d/
-        yes_edit_no pathvariables_r "Applications/pathvariables.sh" "Install pathvariables.sh at /root/?" "yes" "YELLOW"
+        cp -fv aliases/pathvariables.sh ~/.bash_aliases.d/
+        yes_edit_no pathvariables_r "aliases/pathvariables.sh" "Install pathvariables.sh at /root/?" "yes" "YELLOW"
     }
-    yes_edit_no pathvariables "Applications/pathvariables.sh" "Install pathvariables.sh at ~/ ? " "edit" "YELLOW"
+    yes_edit_no pathvariables "aliases/pathvariables.sh" "Install pathvariables.sh at ~/ ? " "edit" "YELLOW"
 
 
     general_r(){
-         sudo cp -fv Applications/general.sh /root/.bash_aliases.d/
+         sudo cp -fv aliases/general.sh /root/.bash_aliases.d/
     }
     general(){
-        cp -fv Applications/general.sh ~/.bash_aliases.d/
-        yes_edit_no general_r "Applications/general.sh" "Install general.sh at /root/?" "yes" "GREEN"
+        cp -fv aliases/general.sh ~/.bash_aliases.d/
+        yes_edit_no general_r "aliases/general.sh" "Install general.sh at /root/?" "yes" "GREEN"
     }
-    yes_edit_no general "Applications/general.sh" "Install general.sh at ~/ ? (general terminal related aliases) " "yes" "YELLOW"
+    yes_edit_no general "aliases/general.sh" "Install general.sh at ~/ ? (general terminal related aliases) " "yes" "YELLOW"
 
 
     systemd_r(){
-        sudo cp -fv Applications/systemctl.sh /root/.bash_aliases.d/
+        sudo cp -fv aliases/systemctl.sh /root/.bash_aliases.d/
     }
     systemd(){
-        cp -fv Applications/systemctl.sh ~/.bash_aliases.d/
-        yes_edit_no systemd_r "Applications/systemctl.sh" "Install systemctl.sh at /root/?" "yes" "GREEN" 
+        cp -fv aliases/systemctl.sh ~/.bash_aliases.d/
+        yes_edit_no systemd_r "aliases/systemctl.sh" "Install systemctl.sh at /root/?" "yes" "GREEN" 
     }
-    yes_edit_no systemd "Applications/systemctl.sh" "Install systemctl.sh? ~/.bash_aliases.d/ (systemctl aliases/functions)?" "edit" "GREEN"
+    yes_edit_no systemd "aliases/systemctl.sh" "Install systemctl.sh? ~/.bash_aliases.d/ (systemctl aliases/functions)?" "edit" "GREEN"
         
     dosu_r(){
-        sudo cp -fv Applications/sudo.sh /root/.bash_aliases.d/;
+        sudo cp -fv aliases/sudo.sh /root/.bash_aliases.d/;
     }
 
     dosu(){
-        cp -fv Applications/sudo.sh ~/.bash_aliases.d/
-        yes_edit_no dosu_r "Applications/sudo.sh" "Install sudo.sh at /root/?" "yes" "GREEN" 
+        cp -fv aliases/sudo.sh ~/.bash_aliases.d/
+        yes_edit_no dosu_r "aliases/sudo.sh" "Install sudo.sh at /root/?" "yes" "GREEN" 
     }
 
-    yes_edit_no dosu "Applications/sudo.sh" "Install sudo.sh at ~/.bash_aliases.d/ (sudo aliases)? " "edit" "GREEN"
+    yes_edit_no dosu "aliases/sudo.sh" "Install sudo.sh at ~/.bash_aliases.d/ (sudo aliases)? " "edit" "GREEN"
 
     packman_r(){
-        sudo cp -fv Applications/package_managers.sh /root/.bash_aliases.d/;
+        sudo cp -fv aliases/package_managers.sh /root/.bash_aliases.d/;
     }
 
     packman(){
-        cp -fv Applications/package_managers.sh ~/.bash_aliases.d/
-        yes_edit_no packman_r "Applications/package_managers.sh" "Install package_managers.sh at /root/?" "edit" "YELLOW" 
+        cp -fv aliases/package_managers.sh ~/.bash_aliases.d/
+        yes_edit_no packman_r "aliases/package_managers.sh" "Install package_managers.sh at /root/?" "edit" "YELLOW" 
     }
 
-    yes_edit_no packman "Applications/package_managers.sh" "Install package_managers.sh at ~/.bash_aliases.d/ (package manager aliases)? " "edit" "GREEN"
+    yes_edit_no packman "aliases/package_managers.sh" "Install package_managers.sh at ~/.bash_aliases.d/ (package manager aliases)? " "edit" "GREEN"
     
     
     ssh_r(){
-        sudo cp -fv Applications/ssh.sh /root/.bash_aliases.d/;
+        sudo cp -fv aliases/ssh.sh /root/.bash_aliases.d/;
     }
 
     sshh(){
-        cp -fv Applications/ssh.sh ~/.bash_aliases.d/
-        yes_edit_no ssh_r "Applications/ssh.sh" "Install ssh.sh at /root/?" "edit" "YELLOW" 
+        cp -fv aliases/ssh.sh ~/.bash_aliases.d/
+        yes_edit_no ssh_r "aliases/ssh.sh" "Install ssh.sh at /root/?" "edit" "YELLOW" 
     }
 
-    yes_edit_no sshh "Applications/ssh.sh" "Install ssh.sh at ~/.bash_aliases.d/ (ssh aliases)? " "edit" "GREEN"
+    yes_edit_no sshh "aliases/ssh.sh" "Install ssh.sh at ~/.bash_aliases.d/ (ssh aliases)? " "edit" "GREEN"
 
     git_r(){
-        sudo cp -fv Applications/git.sh /root/.bash_aliases.d/;
+        sudo cp -fv aliases/git.sh /root/.bash_aliases.d/;
     }
 
     gitt(){
@@ -200,54 +199,54 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
             git config --global user.email "$mail"
             git config --global user.name "$name"
         fi 
-        cp -fv Applications/git.sh ~/.bash_aliases.d/
-        yes_edit_no git_r "Applications/git.sh" "Install git.sh at /root/?" "no" "RED" 
+        cp -fv aliases/git.sh ~/.bash_aliases.d/
+        yes_edit_no git_r "aliases/git.sh" "Install git.sh at /root/?" "no" "RED" 
     }
-    yes_edit_no gitt "Applications/git.sh" "Install git.sh at ~/.bash_aliases.d/ (git aliases)? " "yes" "GREEN"
+    yes_edit_no gitt "aliases/git.sh" "Install git.sh at ~/.bash_aliases.d/ (git aliases)? " "yes" "GREEN"
     
     ps1_r(){
-        sudo cp -fv Applications/PS1_colours.sh /root/.bash_aliases.d/;
+        sudo cp -fv aliases/PS1_colours.sh /root/.bash_aliases.d/;
     }
 
     ps11(){
-        cp -fv Applications/PS1_colours.sh ~/.bash_aliases.d/
-        yes_edit_no ps1_r "Applications/PS1_colours.sh" "Install PS1_colours.sh at /root/?" "yes" "GREEN" 
+        cp -fv aliases/PS1_colours.sh ~/.bash_aliases.d/
+        yes_edit_no ps1_r "aliases/PS1_colours.sh" "Install PS1_colours.sh at /root/?" "yes" "GREEN" 
     }
-    yes_edit_no ps11 "Applications/PS1_colours.sh" "Install PS1_colours.sh at ~/.bash_aliases.d/ (Coloured command prompt)? " "yes" "GREEN"
+    yes_edit_no ps11 "aliases/PS1_colours.sh" "Install PS1_colours.sh at ~/.bash_aliases.d/ (Coloured command prompt)? " "yes" "GREEN"
     
     if [ $distro == "Manjaro" ] ; then
         manj_r(){
-            sudo cp -fv Applications/manjaro.sh /root/.bash_aliases.d/;
+            sudo cp -fv aliases/manjaro.sh /root/.bash_aliases.d/;
         }
 
         manj(){
-            cp -fv Applications/manjaro.sh ~/.bash_aliases.d/
-            yes_edit_no manj_r "Applications/manjaro.sh" "Install manjaro.sh at /root/?" "yes" "GREEN" 
+            cp -fv aliases/manjaro.sh ~/.bash_aliases.d/
+            yes_edit_no manj_r "aliases/manjaro.sh" "Install manjaro.sh at /root/?" "yes" "GREEN" 
         }
-        yes_edit_no manj "Applications/manjaro.sh" "Install manjaro.sh at ~/.bash_aliases.d/ (manjaro specific aliases)? " "yes" "GREEN"
+        yes_edit_no manj "aliases/manjaro.sh" "Install manjaro.sh at ~/.bash_aliases.d/ (manjaro specific aliases)? " "yes" "GREEN"
     fi
     
     variti_r(){
-        sudo cp -fv Applications/variety.sh /root/.bash_aliases.d/;
+        sudo cp -fv aliases/variety.sh /root/.bash_aliases.d/;
     }
 
     variti(){
-        cp -fv Applications/variety.sh ~/.bash_aliases.d/
-        yes_edit_no variti_r "Applications/variety.sh" "Install variety.sh at /root/?" "no" "YELLOW" 
+        cp -fv aliases/variety.sh ~/.bash_aliases.d/
+        yes_edit_no variti_r "aliases/variety.sh" "Install variety.sh at /root/?" "no" "YELLOW" 
     }
-    yes_edit_no variti "Applications/variety.sh" "Install variety.sh at ~/.bash_aliases.d/ (aliases for a variety of tools)? " "edit" "GREEN" 
+    yes_edit_no variti "aliases/variety.sh" "Install variety.sh at ~/.bash_aliases.d/ (aliases for a variety of tools)? " "edit" "GREEN" 
     
    
     ytbe_r(){
-        sudo cp -fv Applications/youtube.sh /root/.bash_aliases.d/;
+        sudo cp -fv aliases/youtube.sh /root/.bash_aliases.d/;
     }
 
     ytbe(){
         . ./check_youtube.sh
-        cp -fv Applications/youtube.sh ~/.bash_aliases.d/
-        yes_edit_no ytbe_r "Applications/youtube.sh" "Install youtube.sh at /root/?" "no" "YELLOW" 
+        cp -fv aliases/youtube.sh ~/.bash_aliases.d/
+        yes_edit_no ytbe_r "aliases/youtube.sh" "Install youtube.sh at /root/?" "no" "YELLOW" 
     }
-    yes_edit_no ytbe "Applications/youtube.sh" "Install yt-dlp (youtube cli download) and youtube.sh at ~/.bash_aliases.d/ (yt-dlp aliases)? " "yes" "GREEN"
+    yes_edit_no ytbe "aliases/youtube.sh" "Install yt-dlp (youtube cli download) and youtube.sh at ~/.bash_aliases.d/ (yt-dlp aliases)? " "yes" "GREEN"
 
 fi
 

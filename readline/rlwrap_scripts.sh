@@ -54,9 +54,11 @@ function yes_edit_no(){
         if [ "$4" == "edit" ]; then
             pre="e"
             deflt=" [y/E/n]: ";
+            prompt="$3$deflt";
         elif [ "$4" == "no" ]; then
             pre="n"
             deflt=" [y/e/N]: ";
+            prompt="$3$deflt";
         fi
         if [ ! -z "$5" ]; then
             clr="-Q $5"
