@@ -70,8 +70,10 @@ bind '"\e[Z": menu-complete'
 bind '"\e[Z": menu-complete-backward'
 
 # (Kitty) Ctrl-tab expands aliases
-bind '"\e[9": alias-expand-line'
+bind '"\e[9;5u": alias-expand-line'
 
+#Backup enter
+bind '"\C-p": accept-line' 
 
 #Silence output
 alias _="stty -echo && tput cuu1 && history -d -1"
@@ -93,8 +95,6 @@ bind '"\C-s": reverse-search-history'
 # Undo to Ctrl+Z (unbound in tty) instead of only on Ctrl+_
 bind '"\C-z": vi-undo'
 
-#Backup enter
-bind '"\C-p": accept-line' 
 
 # Ctrl-f adds a piped grep for convenience
 bind '"\C-f": " | grep -i "'
