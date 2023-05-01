@@ -80,7 +80,8 @@ bind '"\C-p": accept-line'
 alias _="stty -echo && tput cuu1 && history -d -1"
 
 #Enter kills line, then clears screen, then yanks line to prompt and enters it
-bind '"\C-m": "\C-e\C-u _\C-p clear && tput rc && stty echo && history -d -1 \C-p\C-y\C-p\C-r\e[A\e[B"'
+#bind '"\C-m": "\C-e\C-u\C-l _\C-p tput rc && stty echo && history -d -1 \C-p\C-y\C-p\C-r\e[A\e[B"'
+bind '"\C-m": "\C-e\C-u\C-l\C-y\C-p"'
 #Store line position
 #"\C-o": "tput sc && history -d -1 \C-m"
 
