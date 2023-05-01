@@ -85,7 +85,7 @@ bind '"\C-m": "\C-e\C-u _\C-p clear && tput rc && stty echo && history -d -1 \C-
 #"\C-o": "tput sc && history -d -1 \C-m"
 
 # Ctrl-l clears
-bind -x '"\C-l": clear && tput rc'
+bind -x '"\C-l": clear && tput cup $LINE_TPUT 0 && tput sc'
 
 # Ctrl-q quits terminal
 bind -x '"\C-q": exit'
