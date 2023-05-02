@@ -73,7 +73,5 @@ if [ -z $aliases ]; then
     fi
 fi
 
-
-git clone https://github.com/excited-bore/VundleVimCopy.git ~/.vim/bundle/Vundle.vim
-nvim +PluginInstall +qall
-python3 ~/.vim/bundle/YouCompleteMe/install.py --all
+nvim +PlugInstall +qall
+nvim "+CocInstall coc-json coc-tsserver coc-fzf-preview +qall"
