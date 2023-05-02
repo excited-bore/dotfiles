@@ -1,55 +1,73 @@
 " Avoid error message lingering
-autocmd CursorHold      * echo mode(1)
-autocmd CursorHoldI     * echo mode(1)
+"autocmd CursorHold      * echo mode(1)
+"autocmd CursorHoldI     * echo mode(1)
 autocmd CursorMoved     * set cul
 autocmd CursorMovedI    * set cul
 "autocmd InsertEnter     * set cul
 "autocmd InsertLeave     * set nocul
+autocmd BufEnter * call MyLastWindow()
 
-" let Vundle manage Vundle, required
-" set the runtime path to include Vundle and initialize
-set rtp+=~/.vim/bundle/Vundle.vim
-" And Java
+" https://stackoverflow.com/questions/7069927/in-vimscript-how-to-test-if-a-window-is-the-last-window
+function! MyLastWindow()
+   if &buftype=="quickfix"
+      " if this window is last on screen quit without warning
+      if winbufnr(2) == -1
+         quit!
+      endif
+   endif
+endfunction
+
+
+let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
+if empty(glob(data_dir . '/autoload/plug.vim'))
+  silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
 set runtimepath+=/usr/lib/jvm/java-17-openjdk/bin/java
-call vundle#begin()
+call plug#begin()
 
 "Vim plugins point to githubs wich is very nice and just fucking cool
 
 "" Autocomplete plugin from git
-Plugin 'ycm-core/YouCompleteMe'
+"Plug 'ycm-core/YouCompleteMe'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 "Ranger integration
-Plugin 'francoiscabrol/ranger.vim'
-Plugin 'rbgrouleff/bclose.vim'
+Plug 'francoiscabrol/ranger.vim'
+Plug 'rbgrouleff/bclose.vim'
 let g:ranger_replace_netrw = 1
+let g:ranger_map_keys = 0
 
-"Fuzzy finder plugin"
-Plugin 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plugin 'junegunn/fzf.vim' 
+"" Fuzzy finder plugin
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim' 
+"" Fuzzy finder preview   
+Plug 'yuki-yano/fzf-preview.vim', { 'branch': 'release/remote', 'do': ':UpdateRemotePlugins' }
 
-"Git plugin
-Plugin 'tpope/vim-fugitive'
+"" Git plugin
+Plug 'tpope/vim-fugitive'
 "
 ""vim-tmux-navigator, smart navigation between vim and tmux panes
 "Plugin 'christoomey/vim-tmux-navigator'
 
 "Sudo write
-Plugin 'tpope/vim-eunuch'
+Plug 'tpope/vim-eunuch'
 "
-"" Self documemting vim wiki
-Plugin 'vimwiki/vimwiki'
+"" Self documenting vim wiki
+Plug 'vimwiki/vimwiki'
 
 "" Nice themey
-Plugin 'morhetz/gruvbox'
+Plug 'morhetz/gruvbox'
 
-" Nice status bar thingy
-Plugin 'vim-airline/vim-airline'
+"" Nice status bar thingy
+Plug 'vim-airline/vim-airline'
 
 " Vim lua plugin
 " Plugin 'svermeulen/vimpeccable'
 
 "" All of your Plugins must be added before the following line
-call vundle#end()
+call plug#end()
 
  "Use 24-bit (true-color) mode in Vim/Neovim when outside tmux.
 "If you're using tmux version 2.2 or later, you can remove the outermost $TMUX check and use tmux's 24-bit color support
@@ -75,46 +93,267 @@ endif
 
 """ YouCompleteMe stuff
 
-let g:ycm_auto_hover =0
-let g:ycm_key_invoke_completion = '<C-Tab>'
-let g:ycm_key_list_stop_completion = ['<C-y>', '<Right>', '<Space>']
-let g:ycm_key_list_select_completion = ['<Tab>', '<Down>', '<C-j>']
-let g:ycm_key_list_previous_completion = ['<S-Tab>', '<Up>', '<C-k>']
-let g:ycm_enable_semantic_highlighting=1
-let g:ycm_enable_inlay_hints=1
-"let g:ycm_add_preview_to_completeopt = 1
-let g:ycm_update_diagnostics_in_insert_mode = 0
-"let g:ycm_echo_current_diagnostic = 'virtual-text'
+"let g:ycm_auto_hover =0
+"let g:ycm_key_invoke_completion = '<C-Tab>'
+"let g:ycm_key_list_stop_completion = ['<C-y>', '<Right>', '<Space>']
+"let g:ycm_key_list_select_completion = ['<Tab>', '<Down>', '<C-j>']
+"let g:ycm_key_list_previous_completion = ['<S-Tab>', '<Up>', '<C-k>']
+"let g:ycm_enable_semantic_highlighting=1
+"let g:ycm_enable_inlay_hints=1
+"""let g:ycm_add_preview_to_completeopt = 1
+"let g:ycm_update_diagnostics_in_insert_mode = 0
+"""let g:ycm_echo_current_diagnostic = 'virtual-text'
 
-nnoremap <C-Tab> i
-vnoremap <C-Tab> i
-inoremap <expr> <C-Tab> mode(1) == "ic" ?  '<Esc>a' : '<plug>(YCMComplete)'
+"Add tab 
+"nnoremap <tab>      i<tab><esc><right>
+"Visual mode 
+"vnoremap <tab>      >gv
+"vnoremap <s-tab>    <gv
 
-inoremap <Space> <C-y><Space>
-inoremap <Right> <C-y><Right>
+"nnoremap <C-Tab> i
+"vnoremap <C-Tab> i
+"inoremap <expr> <C-Tab> mode(1) == "ic" ?  '<Esc>a' : '<plug>(YCMComplete)'
 
-" Vim ® Autocompletion 
-" Tab => Add Tab"
-" V => indent
-nnoremap <tab>      i<tab><esc><right>
-vnoremap <tab>      >gv
-vnoremap <s-tab>    <gv
+"inoremap <Space> <C-y><Space>
+"inoremap <Right> <C-y><Right>
+
+ 
+" May need for Vim (not Neovim) since coc.nvim calculates byte offset by count
+" utf-8 byte sequence
+set encoding=utf-8
+" Some servers have issues with backup files, see #649
+set nobackup
+set nowritebackup
+
+" Having longer updatetime (default is 4000 ms = 4s) leads to noticeable
+" delays and poor user experience
+set updatetime=300
+
+" Always show the signcolumn, otherwise it would shift the text each time
+" diagnostics appear/become resolved
+set signcolumn=yes
+
+" Use tab for trigger completion with characters ahead and navigate
+" NOTE: There's always complete item selected by default, you may want to enable
+" no select by `"suggest.noselect": true` in your configuration file
+" NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
+" other plugin before putting this into your config
+inoremap <silent><expr> <TAB>
+      \ coc#pum#visible() ? coc#pum#next(1) :
+      \ CheckBackspace() ? "\<Tab>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
+
+" Make <CR> to accept selected completion item or notify coc.nvim to format
+" <C-g>u breaks current undo, please make your own choice
+inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm()
+                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+
+function! CheckBackspace() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+" Use <c-space> to trigger completion
+if has('nvim')
+  inoremap <silent><expr> <C-space> coc#refresh()
+else
+  inoremap <silent><expr> <c-@> coc#refresh()
+endif
+
+" Use `[g` and `]g` to navigate diagnostics
+" Use `:CocDiagnostics` to get all diagnostics of current buffer in location list
+nmap <silent> [g <Plug>(coc-diagnostic-prev)
+nmap <silent> ]g <Plug>(coc-diagnostic-next)
+
+" GoTo code navigation
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+" Use K to show documentation in preview window
+nnoremap <silent> K :call ShowDocumentation()<CR>
+
+function! ShowDocumentation()
+  if CocAction('hasProvider', 'hover')
+    call CocActionAsync('doHover')
+  else
+    call feedkeys('K', 'in')
+  endif
+endfunction
+
+" Highlight the symbol and its references when holding the cursor
+autocmd CursorHold * silent call CocActionAsync('highlight')
+
+" Symbol renaming
+nmap <leader>rn <Plug>(coc-rename)
+
+" Formatting selected code
+xmap <Leader>f  <Plug>(coc-format-selected)
+nmap <Leader>f  <Plug>(coc-format-selected)
+
+augroup mygroup
+  autocmd!
+  " Setup formatexpr specified filetype(s)
+  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+  " Update signature help on jump placeholder
+  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+augroup end
+
+" Applying code actions to the selected code block
+" Example: `<Leader>aap` for current paragraph
+xmap <Leader>a  <Plug>(coc-codeaction-selected)
+nmap <Leader>a  <Plug>(coc-codeaction-selected)
+
+" Remap keys for applying code actions at the cursor position
+nmap <>ac  <Plug>(coc-codeaction-cursor)
+" Remap keys for apply code actions affect whole buffer
+nmap <Leader>as  <Plug>(coc-codeaction-source)
+" Apply the most preferred quickfix action to fix diagnostic on the current line
+nmap <Leader>qf  <Plug>(coc-fix-current)
+
+" Remap keys for applying refactor code actions
+nmap <silent> <Leader>re <Plug>(coc-codeaction-refactor)
+xmap <silent> <Leader>r  <Plug>(coc-codeaction-refactor-selected)
+nmap <silent> <Leader>r  <Plug>(coc-codeaction-refactor-selected)
+
+" Run the Code Lens action on the current line
+nmap <Leader>cl  <Plug>(coc-codelens-action)
+
+" Map function and class text objects
+" NOTE: Requires 'textDocument.documentSymbol' support from the language server
+xmap if <Plug>(coc-funcobj-i)
+omap if <Plug>(coc-funcobj-i)
+xmap af <Plug>(coc-funcobj-a)
+omap af <Plug>(coc-funcobj-a)
+xmap ic <Plug>(coc-classobj-i)
+omap ic <Plug>(coc-classobj-i)
+xmap ac <Plug>(coc-classobj-a)
+omap ac <Plug>(coc-classobj-a)
+
+" Remap <C-f> and <C-b> to scroll float windows/popups
+"if has('nvim-0.4.0') || has('patch-8.2.0750')
+"  nnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
+"  nnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
+"  inoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
+"  inoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
+"  vnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
+"  vnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
+"endif
+
+" Use CTRL-S for selections ranges
+" Requires 'textDocument/selectionRange' support of language server
+nmap <silent> <C-Tab> <Plug>(coc-range-select)
+xmap <silent> <C-Tab> <Plug>(coc-range-select)
+
+" Add `:Format` command to format current buffer
+command! -nargs=0 Format :call CocActionAsync('format')
+
+" Add `:Fold` command to fold current buffer
+command! -nargs=? Fold :call     CocAction('fold', <f-args>)
+
+" Add `:OR` command for organize imports of the current buffer
+command! -nargs=0 OR   :call     CocActionAsync('runCommand', 'editor.action.organizeImport')
+
+" Add (Neo)Vim's native statusline support
+" NOTE: Please see `:h coc-status` for integrations with external plugins that
+" provide custom statusline: lightline.vim, vim-airline
+set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
+
+" Mappings for CoCList
+" Show all diagnostics
+nnoremap <silent><nowait> <Tab>a  :<C-u>CocList diagnostics<cr>
+" Manage extensions
+nnoremap <silent><nowait> <Tab>e  :<C-u>CocList extensions<cr>
+" Show commands
+nnoremap <silent><nowait> <Tab>c  :<C-u>CocList commands<cr>
+" Find symbol of current document
+nnoremap <silent><nowait> <Tab>o  :<C-u>CocList outline<cr>
+" Search workspace symbols
+nnoremap <silent><nowait> <Tab>s  :<C-u>CocList -I symbols<cr>
+" Do default action for next item
+nnoremap <silent><nowait> <Tab>j  :<C-u>CocNext<CR>
+" Do default action for previous item
+nnoremap <silent><nowait> <Tab>k  :<C-u>CocPrev<CR>
+" Resume latest coc list
+nnoremap <silent><nowait> <Tab>p  :<C-u>CocListResume<CR>
 
 "Ranger F2
-nnoremap <F2>   :Ranger<CR>
-inoremap <F2>   <Esc>:Ranger<CR>
-vnoremap <F2>   <Esc>:Ranger<CR>
+nnoremap <F2>   :RangerWorkingDirectory<CR>
+inoremap <F2>   <Esc>:RangerWorkingDirectory<CR>
+vnoremap <F2>   <Esc>:RangerWorkingDirectory<CR>
 
 " Git files F3
-nnoremap <F3>   :Files<CR>
-inoremap <F3>   <Esc>:Files<CR>
-vnoremap <F3>   <Esc>:Files<CR>
+nnoremap <F3>   :Files /<CR>
+inoremap <F3>   <Esc>:Files /<CR>
+vnoremap <F3>   <Esc>:Files /<CR>
 
 " Git files F4
 nnoremap <F4>   :GFiles<CR>
 inoremap <F4>   <Esc>:GFiles<CR>
 vnoremap <F4>   <Esc>:GFiles<CR>
 
+nnoremap <F6> :e $MYVIMRC<CR>
+nnoremap <F5> :source $MYVIMRC<CR>
+nmap <F7> [fzf-p]
+xmap <F7> [fzf-p]
+
+nnoremap <silent> [fzf-p]p     :<C-u>CocCommand fzf-preview.FromResources project_mru git<CR>
+nnoremap <silent> [fzf-p]gs    :<C-u>CocCommand fzf-preview.GitStatus<CR>
+nnoremap <silent> [fzf-p]ga    :<C-u>CocCommand fzf-preview.GitActions<CR>
+nnoremap <silent> [fzf-p]b     :<C-u>CocCommand fzf-preview.Buffers<CR>
+nnoremap <silent> [fzf-p]B     :<C-u>CocCommand fzf-preview.AllBuffers<CR>
+nnoremap <silent> [fzf-p]o     :<C-u>CocCommand fzf-preview.FromResources buffer project_mru<CR>
+nnoremap <silent> [fzf-p]<C-o> :<C-u>CocCommand fzf-preview.Jumps<CR>
+nnoremap <silent> [fzf-p]g;    :<C-u>CocCommand fzf-preview.Changes<CR>
+nnoremap <silent> [fzf-p]/     :<C-u>CocCommand fzf-preview.Lines --add-fzf-arg=--no-sort --add-fzf-arg=--query="'"<CR>
+nnoremap <silent> [fzf-p]*     :<C-u>CocCommand fzf-preview.Lines --add-fzf-arg=--no-sort --add-fzf-arg=--query="'<C-r>=expand('<cword>')<CR>"<CR>
+nnoremap          [fzf-p]gr    :<C-u>CocCommand fzf-preview.ProjectGrep<Space>
+xnoremap          [fzf-p]gr    "sy:CocCommand   fzf-preview.ProjectGrep<Space>-F<Space>"<C-r>=substitute(substitute(@s, '\n', '', 'g'), '/', '\\/', 'g')<CR>"
+nnoremap <silent> [fzf-p]t     :<C-u>CocCommand fzf-preview.BufferTags<CR>
+nnoremap <silent> [fzf-p]q     :<C-u>CocCommand fzf-preview.QuickFix<CR>
+nnoremap <silent> [fzf-p]l     :<C-u>CocCommand fzf-preview.LocationList<CR>
+
+" Use ctrl-[hjkl] to select the active split!
+nmap <silent> <c-k> :wincmd k<CR>
+nmap <silent> <c-j> :wincmd j<CR>
+nmap <silent> <c-h> :wincmd h<CR>
+nmap <silent> <c-l> :wincmd l<CR>
+
+" C-w => Write
+nnoremap <C-w> :write!<CR>
+inoremap <C-w> <C-\><C-o>:write!<CR>
+vnoremap <C-w> <Esc>:write!<CR>gv
+
+function! CloseWindow()
+    " if this window is last on screen quit without warning
+    if winbufnr(2) == -1
+        quit!
+    else
+        close!
+    endif
+endfunction
+
+" C-q => Quit
+nnoremap <C-q> :call CloseWindow()<Enter>
+inoremap <C-q> <Esc>:call CloseWindow()<CR>
+vnoremap <C-q> <Esc>:call CloseWindow()<CR>
+
+" Ctrl - r is -> Redo (universal) :
+nnoremap <C-r> :redo<CR>
+inoremap <C-r> <C-\><C-o>:redo<CR>a
+vnoremap <C-r> <Esc>:redo<CR>gv 
+
+ " Ctrl - z is -> undo instead of stop 
+nnoremap <C-z> u
+inoremap <C-z> <C-\><C-o>:u<CR>
+vnoremap <C-z> u 
+
+
+
+
+" Visual mode remaps
 
 "inoremap [          []
 vnoremap [          di[]<Esc><Left>p<Esc> 
@@ -310,30 +549,11 @@ inoremap <A--> <C-x>
 "879++++++++++++++++++++++124
 
 " Swap case insert
-"inoremap <C-~> <Esc>~a
+nnoremap <C-²> ~
+inoremap <C-²> <Esc>~a
 
-" Ctrl - r is -> Redo (universal) :
-nnoremap <C-r> :redo<CR>
-inoremap <C-r> <C-\><C-o>:redo<CR>a
-vnoremap <C-r> <Esc>:redo<CR>gv 
 
-" Regular z => undo
-" nnoremap z u
-
-" Ctrl - z is -> undo instead of stop 
-nnoremap <C-z> u
-inoremap <C-z> <C-\><C-o>:u<CR>
-vnoremap <C-z> u 
-
-" C-w => Write
-nnoremap <C-w> :write!<CR>
-inoremap <C-w> <C-\><C-o>:write!<CR>
-vnoremap <C-w> <Esc>:write!<CR>gv
-
-" C-q => Quit
-nnoremap <C-q> :q!<Enter>
-inoremap <C-q> <Esc>:q!<CR>
-vnoremap <C-q> <Esc>:q!<CR> 
+ 
 
 
 " Toggle highlight => Ctrl+l

@@ -116,6 +116,9 @@ bind '"\C-n": "\C-a\e[3~"'
 # F2 - Ranger (file explorer)
 bind -x '"\eOQ": ranger'
 
+# F3 - FuzzyFinderls -l | fzf --preview="echo user={3} when={-4..-2}; cat {-1}" --header-lines=1 (file explorer)
+bind -x '"\eOR": fzf -i'
+
 # F5, Ctrl-r - Reload .bashrc /.inputrc
 #bind '"\e[15~": re-read-init-file'
 bind -x '"\e[15~":  . ~/.bashrc && tput cup $LINENO 0 && tput rc'
