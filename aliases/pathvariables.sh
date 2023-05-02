@@ -31,10 +31,12 @@ export EDITOR="nvim"
 #export VISUAL="/usr/bin/code --unity-launch %F"
 export VISUAL="nvim"
 
+# READLINE
+export INPUTRC='~/.inputrc'
 #Custom variable
 export LINE_TPUT=0
 
-export INPUTRC='~/.inputrc'
+# RANGER
 export RANGER_LOAD_DEFAULT_RC="~/rc.conf"
 
 # Firefox hardware acceleration driver
@@ -43,8 +45,12 @@ export TMPDIR=/tmp
 
 
 # VIM
-export MYVIMRC=".config/nvim/init.vim"
-export MYGVIMRC=".config/nvim/init.vim"
+export MYVIMRC="~/.config/nvim/init.vim"
+export MYGVIMRC="~/.config/nvim/init.vim"
+
+# FZF
+export FZF_DEFAULT_COMMAND='fd --type f --strip-cwd-prefix --hidden --follow --exclude .git .dll'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
 # EMACS
 append_path '~/.emacs.d/bin/'
