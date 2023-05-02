@@ -336,9 +336,9 @@ function! CloseWindow()
 endfunction
 
 " C-q => Quit
-nnoremap <C-q> :call CloseWindow()<Enter>
-inoremap <C-q> <Esc>:call CloseWindow()<CR>
-vnoremap <C-q> <Esc>:call CloseWindow()<CR>
+nnoremap <silent><C-q> :call CloseWindow()<Enter>
+inoremap <silent><C-q> <Esc>:call CloseWindow()<CR>
+vnoremap <silent><C-q> <Esc>:call CloseWindow()<CR>
 
 " Ctrl - r is -> Redo (universal) :
 nnoremap <C-r> :redo<CR>
