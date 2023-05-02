@@ -49,7 +49,7 @@ export MYVIMRC="~/.config/nvim/init.vim"
 export MYGVIMRC="~/.config/nvim/init.vim"
 
 # FZF
-export FZF_DEFAULT_COMMAND='fd --type f --strip-cwd-prefix --hidden --follow --exclude .git .dll'
+export FZF_DEFAULT_COMMAND='fd --type f --strip-cwd-prefix --hidden --follow --exclude ".dll .git .so .go"'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
 # EMACS
