@@ -1,6 +1,32 @@
 . ./readline/rlwrap_scripts.sh
 . ./checks/check_distro.sh
 
+reade -Q "GREEN" -P "y" -p "Install moar? (Pager with linenumbers) [Y/n]: " "y n" moar
+if [ -z $moar ] || [ "Y" == $moar ] || [ $moar == "y" ]; then
+   . ./install_moar.sh 
+fi
+
+reade -Q "GREEN" -P "y" -p "Install fzf? (Fuzzy file/folder finder (better reverse-search)) [Y/n]: " "y n" findr
+if [ -z $findr ] || [ "Y" == $findr ] || [ $findr == "y" ]; then
+   . ./install_fzf.sh 
+fi
+
+read -p "Create ~/.config to ~/config symlink? [Y/n]:" sym1
+if [ -z $sym1 ] || [ "y" == $sym1 ] && [ ! -e ~/config ]; then
+    ln -s ~/.config ~/config
+fi
+
+read -p "Create /lib/systemd/system/ to user directory symlink? [Y/n]:" sym2
+if [ -z $sym2 ] || [ "y" == $sym2 ] && [ ! -e ~/lib_systemd ]; then
+    ln -s /lib/systemd/system/ ~/lib_systemd
+fi
+
+read -p "Create /etc/systemd/system/ to user directory symlink? [Y/n]:" sym3
+if [ -z $sym3 ] || [ "y" == $sym3 ] && [ ! -e ~/etc_systemd ]; then
+    ln -s /etc/systemd/system/ ~/etc_systemd
+fi
+
+
 reade -Q "GREEN" -P "y" -p "Create ~/.bash_aliases.d/, link it to .bashrc and install scripts? (Readline included) [Y/n]:" "y n" scripts
 if [ -z $scripts ] || [ "y" == $scripts ]; then
 
@@ -250,24 +276,6 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
 
 fi
 
-read -p "Create ~/.config to ~/config symlink? [Y/n]:" sym1
-if [ -z $sym1 ] || [ "y" == $sym1 ] && [ ! -e ~/config ]; then
-    ln -s ~/.config ~/config
-fi
 
-read -p "Create /lib/systemd/system/ to user directory symlink? [Y/n]:" sym2
-if [ -z $sym2 ] || [ "y" == $sym2 ] && [ ! -e ~/lib_systemd ]; then
-    ln -s /lib/systemd/system/ ~/lib_systemd
-fi
-
-read -p "Create /etc/systemd/system/ to user directory symlink? [Y/n]:" sym3
-if [ -z $sym3 ] || [ "y" == $sym3 ] && [ ! -e ~/etc_systemd ]; then
-    ln -s /etc/systemd/system/ ~/etc_systemd
-fi
-
-reade -Q "GREEN" -P "y" -p "Install moar? (Pager with linenumbers) [Y/n]: " "y n" moar
-if [ -z $moar ] || [ "Y" == $moar ] || [ $moar == "y" ]; then
-   . ./install_moar.sh 
-fi
 
 . ~/.bashrc
