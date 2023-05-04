@@ -40,7 +40,7 @@ let g:ranger_replace_netrw = 1
 let g:ranger_map_keys = 0
 
 "" Fuzzy finder plugin
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug '~/.fzf'
 Plug 'junegunn/fzf.vim' 
 "" Fuzzy finder preview   
 Plug 'yuki-yano/fzf-preview.vim', { 'branch': 'release/remote', 'do': ':UpdateRemotePlugins' }
@@ -294,8 +294,14 @@ nnoremap <F4>   :GFiles<CR>
 inoremap <F4>   <Esc>:GFiles<CR>
 vnoremap <F4>   <Esc>:GFiles<CR>
 
-nnoremap <F6> :e $MYVIMRC<CR>
+" Reload .vimrc/init.vim F5
 nnoremap <F5> :source $MYVIMRC<CR>
+
+" Edit .vimrc/init.vim F6
+nnoremap <F6> :e $MYVIMRC<CR>
+
+
+" Leader key Fzf-Preview F7
 nmap <F7> [fzf-p]
 xmap <F7> [fzf-p]
 
@@ -336,9 +342,9 @@ function! CloseWindow()
 endfunction
 
 " C-q => Quit
-nnoremap <silent><C-q> :call CloseWindow()<Enter>
-inoremap <silent><C-q> <Esc>:call CloseWindow()<CR>
-vnoremap <silent><C-q> <Esc>:call CloseWindow()<CR>
+nnoremap <C-q> :call CloseWindow()<Enter>
+inoremap <C-q> <Esc>:call CloseWindow()<CR>
+vnoremap <C-q> <Esc>:call CloseWindow()<CR>
 
 " Ctrl - r is -> Redo (universal) :
 nnoremap <C-r> :redo<CR>
@@ -401,17 +407,17 @@ vnoremap <expr> !   visualmode() == "\<C-V>" ?  'I!<Esc>' : 'di!!<Esc><Left>p<Es
 "vnoremap <Down> <Down>
 
 nnoremap    <C-Up> {
-nnoremap    <C-K> {
+"nnoremap    <C-K> {
 nnoremap    <C-Down> }
-nnoremap    <C-J> }
+"nnoremap    <C-J> }
 inoremap    <C-Up> <C-\><C-o>{<C-\><C-o>
-inoremap    <C-K> <C-\><C-o>{<C-\><C-o>
+"inoremap    <C-K> <C-\><C-o>{<C-\><C-o>
 inoremap    <C-Down> <C-\><C-o>}<C-\><C-o>
-inoremap    <C-J> <C-\><C-o>}<C-\><C-o>
+"inoremap    <C-J> <C-\><C-o>}<C-\><C-o>
 vnoremap    <C-Up> {
 vnoremap    <C-Down> {
-vnoremap    <C-J> }
-vnoremap    <C-K> }
+"vnoremap    <C-J> }
+"vnoremap    <C-K> }
 
 
 " Both K and Ctrl Shift K go one page up in normal mode
@@ -503,20 +509,20 @@ vnoremap <expr> <A-Left>    (col(".") ==? 1 ? '<Up>0' : '0')
 vnoremap <expr> <A-Right>   LastCheck() ? '<Down>$' : '$'
 
 " Space for normal mode"
-nnoremap <space>    i<space><esc><Right>
+nnoremap <space> i<space><esc><Right>
 
 " Delete for normal mode
 nnoremap <Delete> i<Delete><Esc>
 
 " enter -> newline without entering insert mode
 nnoremap <Enter> i<Enter><Esc>
-"nnoremap <Enter> mode()
+
 " ctrl enter => move current line down
 nnoremap <C-Enter>      0i<enter><up><esc>
 inoremap <C-Enter>      <Esc>0i<enter>
 vnoremap <C-Enter>      <Esc>`<i<Enter><Esc>gv
-"alt enter -> newline without entering insert mode
 
+"alt enter -> newline without entering insert mode
 nnoremap <A-Enter>      o<esc>
 inoremap <A-Enter>      <Esc>o
 vnoremap <A-Enter>      o<esc><enter>gv
@@ -588,15 +594,12 @@ nnoremap F ?
 " But this conflicts with kitty 'move window forward'
 "nnoremap <C-S-F> ?
 
-"nnoremap <ESC>[70;5u ?
-"inoremap <ESC>[70;5u <Esc>?
-"vnoremap <ESC>[70;5u ?
-
 " Alt-f => Global search
 nnoremap <A-f> :%s,,,gc<Left><Left><Left><Left>
 inoremap <A-f> <C-\><C-o>:%s,,,gc<Left><Left><Left><Left>
 vnoremap <A-f> <esc>:%s,\%V,,gc<Left><Left><Left>
 cnoremap <A-f> <C-e><C-u>nohl<CR>:<Esc>
+
 " Different seperator for Alt+Shift
 nnoremap <M-S-F> :%s///gc<Left><Left><Left><Left>
 inoremap <M-S-F> <C-\><C-o>:%s///gc<Left><Left><Left><Left>
@@ -680,6 +683,7 @@ vnoremap <C-S-d>    "*D
 nnoremap <C-a> a
 vnoremap <C-a> <C-o>
 inoremap <C-a> <Esc>
+
 ""Alt-A => Replace (insert variant)
 nnoremap <A-a> R
 vnoremap <A-a> R
@@ -737,7 +741,7 @@ inoremap <C-A-S> <C-o>V
 " have made, as well as sanely reset options when re-sourcing .vimrc
 
 "If you set scrollof to a very large value (999) the cursor line will always be at the middle 
- set scrolloff=999
+" set scrolloff=999
 
 " Attempt to determine the type of a file based on its name and possibly its
 " contents. Use this to allow intelligent auto-indenting for each filetype,
@@ -756,17 +760,6 @@ set omnifunc=syntaxcomplete#Complete
 "https://vim.fandom.com/wiki/GNU/Linux_clipboard_copy/paste_with_xclip
 "The 'a' and 'A' options enables copying selected text to system clipboard 
 set guioptions=aAimrLT
-
-"lua <<EOF
-"    vim.o.rtp += ~/.vim/bundle/Vundle.vim
-"    local Plug = vim.fn['plug#']
-"    vim.call('vundle#begin', '~/.config/nvim/plugged')
-"    Plug('tpope/vim-sensible')
-"    Plug('christoomey/vim-tmux-navigator') 
-"    Plug('vimwiki/vimwiki') 
-"    Plug('svermeulen/vimpeccable') 
-"    vim.call('vundle#end')
-"EOF
 
 "------------------------------------------------------------
 
@@ -880,10 +873,20 @@ set expandtab
 "set tabstop=4
 
 "------------------------------------------------------------
-" Useful mappings
+ "lua <<EOF
+"    vim.o.rtp += ~/.vim/bundle/Vundle.vim
+"    local Plug = vim.fn['plug#']
+"    vim.call('vundle#begin', '~/.config/nvim/plugged')
+"    Plug('tpope/vim-sensible')
+"    Plug('christoomey/vim-tmux-navigator') 
+"    Plug('vimwiki/vimwiki') 
+"    Plug('svermeulen/vimpeccable') 
+"    vim.call('vundle#end')
+"EOF 
 
 
-"vim.cmd 'packadd paq-nvim'
+" Lua package for vim
+" vim.cmd 'packadd paq-nvim'
 "require 'paq' {
 "    {'savq/paq-nvim', opt = true};
 "    'svermeulen/vimpeccable'

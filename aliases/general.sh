@@ -138,7 +138,7 @@ function add_to_group() {
 
 complete -F _groups add_to_group
 
-function mark_user_executable() {
+function permission_user_executable() {
     if [[ ! -f $1 ]] ; then
         echo "Give a file to set as an executable";
     else
@@ -152,8 +152,8 @@ alias list_enabled_locales="locale -a"
 # https://askubuntu.com/questions/76808/how-do-i-use-variables-in-a-sed-command
 # https://stackoverflow.com/questions/18439528/sed-insert-line-with-spaces-to-a-specific-line    
 
-# Use ""
-function return_no_spaces(){
+# Set an escape character \ before each space
+function escape_spaces(){
      sed 's/ /\\ /g' <<< $@; 
 }
 

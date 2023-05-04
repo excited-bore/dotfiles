@@ -76,5 +76,5 @@ set history-preserve-point on
 # a b c
 # a b c
 # a b c
-set print-completions-horizontally on
+#set print-completions-horizontally on
 

@@ -48,8 +48,14 @@ export TMPDIR=/tmp
 export MYVIMRC="~/.config/nvim/init.vim"
 export MYGVIMRC="~/.config/nvim/init.vim"
 
+# RIPGREP
+export RG_PREFIX="rg --column --line-number --no-heading --color=always --smart-case "
 # FZF
-export FZF_DEFAULT_COMMAND='fd --type f --strip-cwd-prefix --hidden --follow --exclude ".dll .git .so .go"'
+export FZF_DEFAULT_COMMAND='fd --search-path / --type f --hidden --follow --exclude ".dll .so .go"'
+#export FZF_DEFAULT_COMMAND="$RG_PREFIX '$INITIAL_QUERY'" \
+#  fzf --bind "change:reload:$RG_PREFIX {q} || true" \
+#      --ansi --disabled --query "$INITIAL_QUERY" \
+#      --height=50% --layout=reverse
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
 # EMACS
