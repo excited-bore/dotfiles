@@ -86,8 +86,9 @@ ctrl-s(){
     shellscrpt=""; 
     audio="";
     video="";
-    while IFS= read -r line; do
-        ftype=$(xdg-mime query filetype "$line");
+    #https://unix.stackexchange.com/questions/628527/split-string-on-newline-and-write-it-into-array-using-read
+    IFS=$'\n' read -d "\034" -r -a line <<<"${file}\034";
+    ftype=$(xdg-mime query filetype "$line");
         #line=$(sed 's/ /\\ /g' <<< "$line");
         if [[ $ftype == application/x-shellscript ]]; then
             shellscrpt="$shellscrpt$line"; 
@@ -98,15 +99,15 @@ ctrl-s(){
         else
             xdg-open "$line";
         fi
-    done <<< "$file";
     if [ ! -z "$shellscrpt" ]; then
-        $EDITOR "$shellscrpt"; 
+        $EDITOR "${shellscrpt[@]}"; 
     fi
     if [ ! -z "$audio" ]; then
-        vlc "$audio" & disown;
+        vlc "${audio[@]}" > /dev/null 2>&1 & disown;
+
     fi
     if [ ! -z "$video" ]; then
-        vlc "$video" & disown;
+        vlc "${video[@]}"  > /dev/null 2>&1 & disown;
     fi
 }
 
