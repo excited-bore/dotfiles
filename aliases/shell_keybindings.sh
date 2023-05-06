@@ -3,10 +3,7 @@
 # root shell profiles -> /etc/profile
 # Other bindings at .inputrc
 
-alias ls_stty="stty -a"
 alias ls_binds="bind -p"
-alias ls_xterm="xrdb -query -all"
-alias ls_kitty='kitty +kitten show_key -m kitty'
 
 #alias tty_size_half="tput cup $(stty size | awk '{print int($1/2);}') 0"
 
@@ -51,7 +48,7 @@ bind '"\e[Z": menu-complete-backward'
 bind '"\e[9;5u": alias-expand-line'
 
 # Recall position
-bind -x '"\C-r": tput rc'
+#bind -x '"\C-r": tput rc'
 
 #Backup enter
 bind '"\C-p": accept-line' 
@@ -126,7 +123,7 @@ bind '"\C-b": insert-comment 1'
 # Ctrl-n removes first character from command line (uncomment)
 bind '"\C-n": "\C-a\e[3~"'
 
-# Ctrl-n removes first character from command line (uncomment)
+# Ctrl-o gives a man of command if theres one
 bind '"\C-o": "\C-u man \C-y\C-m"'
 
 # F2 - Ranger (file explorer)
@@ -149,19 +146,3 @@ bind -x '"\e[15~": . ~/.inputrc && . ~/.bashrc && tput cup $LINENO 0 && tput rc'
 
 #"\C-v": paste from clipboard
 #"\C-v": "\C-u\C-e tput cuu1 && tput el && xdotool type --clearmodifiers --delay 25 $(xclip -o -sel clip) && history -d -1 \C-m"
-
-
-# XRESOURCES
-
-# Install bindings from xterm
-# xrdb -merge ~/.Xresources
-# .Inputrc (readline conf) however has to be compiled, so restart shell
-
-# Set caps to Escape
-#setxkbmap -option caps:escape
-
-# Set Shift delete to backspace
-##xmodmap -e "keycode 119 = Delete BackSpace"
-
-
-

@@ -105,10 +105,10 @@ endif
 """let g:ycm_echo_current_diagnostic = 'virtual-text'
 
 "Add tab 
-"nnoremap <tab>      i<tab><esc><right>
+nnoremap <C-Tab>      i<tab><esc><right>
 "Visual mode 
-"vnoremap <tab>      >gv
-"vnoremap <s-tab>    <gv
+vnoremap <C-Tab>      >gv
+vnoremap <C-S-Tab>    <gv
 
 "nnoremap <C-Tab> i
 "vnoremap <C-Tab> i
@@ -132,6 +132,7 @@ set updatetime=300
 " Always show the signcolumn, otherwise it would shift the text each time
 " diagnostics appear/become resolved
 set signcolumn=yes
+
 
 " Use tab for trigger completion with characters ahead and navigate
 " NOTE: There's always complete item selected by default, you may want to enable
@@ -244,8 +245,8 @@ omap ac <Plug>(coc-classobj-a)
 
 " Use CTRL-S for selections ranges
 " Requires 'textDocument/selectionRange' support of language server
-nmap <silent> <C-Tab> <Plug>(coc-range-select)
-xmap <silent> <C-Tab> <Plug>(coc-range-select)
+nmap <silent> <C-S> <Plug>(coc-range-select)
+xmap <silent> <C-S> <Plug>(coc-range-select)
 
 " Add `:Format` command to format current buffer
 command! -nargs=0 Format :call CocActionAsync('format')
@@ -817,6 +818,10 @@ set backspace=indent,eol,start
 " When opening a new line and no filetype-specific indenting is enabled, keep
 " the same indent as the line you're currently on. Useful for READMEs, etc.
 set autoindent
+
+"Automatically load file changes into buffer when external sources modify the
+"file your currently editing
+set autoread
 
 " Stop certain movements from always going to the first character of a line.
 " While this behaviour deviates from that of Vi, it does what most users

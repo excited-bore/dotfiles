@@ -1,4 +1,4 @@
- # !/bin/bash
+# !/bin/bash
 . ./checks/check_distro.sh
 
 if [[ ! -d ~/.config/nvim/ ]]; then

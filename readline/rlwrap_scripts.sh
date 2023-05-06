@@ -2,41 +2,69 @@
 # 'man rlwrap' to see all unimplemented options
 
 reade(){
-    if [[ $# < 2 ]]; then
-        echo "Give up at least two variables for reade(). "
-        echo "First a string with autocompletions, space seperated"
-        echo "Second a variable (could be empty) for the return string"
-        return 0
+    if [ ! -x "$(command -v rlwrap)" ]; then 
+        readstr="read  ";
+        while getopts ':b:e:i:p:Q:s:S:' flag; do
+            case "${flag}" in
+                b)  ;;
+                e)  readstr=$(echo "$readstr" | sed "s|read |read \-e |g");
+                    ;;
+                i)  readstr=$(echo "$readstr" | sed "s|read |read \-i \"${OPTARG}\" |g");
+                    ;;
+                p)  readstr=$(echo "$readstr" | sed "s|read |read \-p \"${OPTARG}\" |g");
+                    ;;
+                Q)  ;;
+                s)  readstr=$(echo "$readstr" | sed "s|read |read \-s\"${OPTARG}\" |g");
+                    ;;
+                S)  ;;
+            esac
+        done; 
+        OPTIND=1;
+        value=$(eval "$readstr");
+        eval "${@:$#:1}=$value";
+    else
+        if [[ $# < 2 ]]; then
+            echo "Give up at least two variables for reade(). "
+            echo "First a string with autocompletions, space seperated"
+            echo "Second a variable (could be empty) for the return string"
+            return 0
+        fi
+        
+        args="${@:$#-1:1}"
+        breaklines=''
+        rlwstring="rlwrap -b \"$breaklines\" -f <(echo \"${args[@]}\") -o cat"
+        while getopts ':b:e:i:p:Q:s:S:' flag; do
+            case "${flag}" in
+                b)  breaklines=${OPTARG};
+                    ;;
+                # File completions
+                e)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-c |g");
+                    ;;
+                # Pre-filled answer
+                i)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-P \"${OPTARG}\" |g");
+                    ;;
+                # Prompt
+                p)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-S \"${OPTARG}\" |g");
+                    ;;
+                # Prompt colours
+                Q)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-p${OPTARG} |g");
+                    ;;
+                # Password
+                s)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-aN\"${OPTARG}\" |g");
+                    ;;
+                # Always echo *** w/ passwords
+                S)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-E\"${OPTARG}\" |g");
+                    ;;
+            esac
+        done
+        value=$(eval "$rlwstring");
+        eval "${@:$#:1}=$value";
+        #if [ $OPTIND -eq 1 ]; then
+        #    value=$(rlwrap -b '' -f <(echo "${args[@]}") -o cat);
+        #    eval "${@:2}=$value";
+        #fi
+        OPTIND=1
     fi
-    
-    args="${@:$#-1:1}"
-    breaklines=''
-    rlwstring="rlwrap -b \"$breaklines\" -f <(echo \"${args[@]}\") -o cat"
-    while getopts ':a:b:e:p:P:Q:' flag; do
-        case "${flag}" in
-            a)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-aN\"${OPTARG}\" |g");
-                ;;
-            b)  breaklines=${OPTARG};
-                ;;
-            c)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-c |g");
-                ;;
-            e)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-e \"${OPTARG}\" |g");
-                ;;
-            p)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-S \"${OPTARG}\" |g");
-                ;;
-            P)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-P \"${OPTARG}\" |g");
-                ;;
-            Q)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-p${OPTARG} |g");
-                ;;
-        esac
-    done
-    value=$(eval "$rlwstring");
-    eval "${@:$#:1}=$value";
-    #if [ $OPTIND -eq 1 ]; then
-    #    value=$(rlwrap -b '' -f <(echo "${args[@]}") -o cat);
-    #    eval "${@:2}=$value";
-    #fi
-    OPTIND=1
 }
 
 #reade -p "Usb ids" $(sudo lsusb | awk 'BEGIN { FS = ":" };{print $1;}')
@@ -63,7 +91,13 @@ function yes_edit_no(){
         if [ ! -z "$5" ]; then
             clr="-Q $5"
         fi
-        reade $clr -P "$pre" -p "$prompt" " y e n" pass;
+        
+        reade $clr -i "$pre" -p "$prompt" " y e n" pass;
+        
+        if [ -z "$pass" ]; then
+            pass="$pre";
+        fi
+        
         if [ "$pass" == "y" ]; then
            $1; 
         elif [ "$pass" == "e" ]; then
@@ -71,7 +105,7 @@ function yes_edit_no(){
             for i in "${str[@]}"; do
                 $EDITOR $i;
             done;
-            deflt=" [y/n]: "
+            deflt=" [y/N]: "
             prompt="$3$deflt";
             reade $clr -p "$prompt" "y n" pass2;
             if [ "$pass2" == "y" ]; then
@@ -98,7 +132,7 @@ function yes_no(){
         if [ ! -z "$4" ]; then
             clr="-Q $4"
         fi
-        reade $clr -P "$pre" -p "$prompt" " y e n" pass;
+        reade $clr -i "$pre" -p "$prompt" " y e n" pass;
         if [ "$pass" == "y" ]; then
            $1; 
         fi
