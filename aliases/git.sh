@@ -90,7 +90,10 @@ git_add_commit_push_all(){
 } 
 
 alias git_commit_using_last="git commit --amend"
-alias git_list_branches="git branch --list"
+alias git_list_branches="git branch --list -vv"
+alias git_create_and_switch_branch="git checkout -b "
+alias git_push_to_branch="git push -u origin "
+
 
 #https://stackoverflow.com/questions/1125968/how-do-i-force-git-pull-to-overwrite-local-files
 git_backup_branch_and_reset_to_remote() {

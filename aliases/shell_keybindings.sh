@@ -72,8 +72,8 @@ bind -x '"\C-q": exit'
 # Undo to Ctrl+Z (unbound in tty) instead of only on Ctrl+_
 bind '"\C-z": vi-undo'
 
-# Ctrl-f adds a piped grep for convenience
-bind '"\C-f": " | grep -i "'
+# Ctrl-g adds a piped grep for convenience
+bind '"\C-g": " | grep -i "'
 
 ctrl-s(){
     file="$(fzf -m --no-sort --height 75% --reverse)"; 
@@ -109,7 +109,7 @@ ctrl-s(){
 }
 
 # Ctrl-s; Open files using default-applications and fzf
-###bind -x '"\C-s": ctrl-s'
+bind -x '"\C-s": ctrl-s'
 
 # Ctrl-Enter gives you a paged output
 bind '"\e[13": " | $PAGER\C-p"' 
@@ -123,14 +123,14 @@ bind '"\C-b": insert-comment 1'
 # Ctrl-n removes first character from command line (uncomment)
 bind '"\C-n": "\C-a\e[3~"'
 
-# Ctrl-o gives a man of command if theres one
+# Ctrl-n removes first character from command line (uncomment)
 bind '"\C-o": "\C-u man \C-y\C-m"'
 
 # F2 - Ranger (file explorer)
 bind -x '"\eOQ": ranger'
 
 # F3 - FuzzyFinderls -l | fzf --preview="echo user={3} when={-4..-2}; cat {-1}" --header-lines=1 (file explorer)
-###bind -x '"\eOR": ctrl-s'
+bind -x '"\eOR": ctrl-s'
 
 # F5, Ctrl-r - Reload .bashrc /.inputrc
 #bind '"\e[15~": re-read-init-file'
@@ -146,3 +146,4 @@ bind -x '"\e[15~": . ~/.inputrc && . ~/.bashrc && tput cup $LINENO 0 && tput rc'
 
 #"\C-v": paste from clipboard
 #"\C-v": "\C-u\C-e tput cuu1 && tput el && xdotool type --clearmodifiers --delay 25 $(xclip -o -sel clip) && history -d -1 \C-m"
+

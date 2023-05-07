@@ -41,7 +41,8 @@ let g:coc_global_extensions = [
             \'coc-python',
             \'coc-sh',
             \'coc-fzf-preview',
-            \'coc-git'
+            \'coc-git',
+            \'coc-vimlsp'
             \]
 
 "Ranger integration

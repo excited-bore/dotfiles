@@ -1,4 +1,3 @@
-. ~/.bash_aliases.d/bash.sh
 # TRY and keep command line at bottom
 #alias b="tput cup $(tput lines) 0" 
 
@@ -147,7 +146,7 @@ function permission_user_executable() {
 
 complete -F _files mark_user_executable
 
-alias list_enabled_locales="locale -a"
+alias ls_enabled_locales="locale -a"
 
 # https://askubuntu.com/questions/76808/how-do-i-use-variables-in-a-sed-command
 # https://stackoverflow.com/questions/18439528/sed-insert-line-with-spaces-to-a-specific-line    
@@ -156,6 +155,13 @@ alias list_enabled_locales="locale -a"
 function escape_spaces(){
      sed 's/ /\\ /g' <<< $@; 
 }
+
+function lines_to_words(){
+    # 1 Output with lines
+    # 2 Return string with words
+    IFS=$'\n' read -d "\034" -r -a $2 <<<"$1\034";
+}
+
 
 function file_insert_after_line(){
     if [ -f "$1" ]; then
