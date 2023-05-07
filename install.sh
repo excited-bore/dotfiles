@@ -65,11 +65,11 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         printf "$prmpt"
         reade -Q "GREEN" -i "less" -p "PAGER=" "$pagers" pgr2
         if [ "$pgr2" == "less" ] || [ -z "$pgr2" ]; then
-            sed 's/export PAGER=.*/export PAGER="/usr/bin/less"/' -i pathvars/.pathvariables.sh
+            sed 's|export PAGER=.*|export PAGER="/usr/bin/less"|' -i pathvars/.pathvariables.sh
         elif [ "$pgr2" == "more" ]; then
-            sed 's/export PAGER=.*/export PAGER="/usr/bin/more"/' -i pathvars/.pathvariables.sh
+            sed 's|export PAGER=.*|export PAGER="/usr/bin/more"|' -i pathvars/.pathvariables.sh
         elif [ "$pgr2" == "most" ]; then
-            sed 's/export PAGER=.*/export PAGER="/usr/bin/most"/' -i pathvars/.pathvariables.sh
+            sed 's|export PAGER=.*|export PAGER="/usr/bin/most"|' -i pathvars/.pathvariables.sh
         elif [ "$pgr2" == "moar" ]; then
             sed 's|export PAGER=.*|export PAGER="/usr/local/bin/moar"|' -i pathvars/.pathvariables.sh
             sed 's/#export MOAR=/export MOAR=/' -i pathvars/.pathvariables.sh
@@ -82,8 +82,8 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         # Make .txt file and output file
         touch $TMPDIR/editor-check.txt $TMPDIR/editor-outpt
         # Redirect output to file in subshell (mimeopen gives output but also starts read. This cancels read). In tmp because that gets cleaned up
-        (mimeopen -a $TMPDIR/editor-check.txt &> "$TMPDIR/editor-outpt" & )
-        compedit="$(awk 'NR>2 {if (prev_2_line) print prev_2_line; prev_2_line=prev_1_line; prev_1_line=prev_line} {prev_line=$2}' $TMPDIR/editor-outpt)"
+        (mimeopen -a $TMPDIR/editor-check.txt &> $TMPDIR/editor-outpt &) 
+        compedit=$(awk 'NR>2 {if (prev_2_line) print prev_2_line; prev_2_line=prev_1_line; prev_1_line=prev_line} {prev_line=$2}' $TMPDIR/editor-outpt)
         frst="$(echo $compedit | awk '{print $1}')"
         reade -Q "GREEN" -i "$frst" -p "(Terminal editor) EDITOR=" "$compedit" edtor
         reade -Q "GREEN" -i "$frst" -p "(GUI editor) VISUAL=" "$compedit" vsual
