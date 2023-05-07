@@ -2,9 +2,12 @@
 . ./checks/check_distro.sh
 . ./checks/check_rlwrap.sh
 
+if [ -z "$TMPDIR" ]; then
+    TMPDIR=/tmp
+fi
 
 if [ ! -e ~/config ]; then
-    reade -Q "BLUE" -i "y" -p "Create ~/.config to ~/config symlink? [Y/n]:" "y n" sym1
+    reade -Q "BLUE" -i "y" -p "Create ~/.config to ~/config symlink? [Y(es)/n(o)]:" "y n" sym1
     if [ -z $sym1 ] || [ "y" == $sym1 ] && [ ! -e ~/config ]; then
         ln -s ~/.config ~/config
     fi
@@ -33,36 +36,73 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
     # First comment out every export
     sed -e '/export/ s/^#*/#/' -i pathvars/.pathvariables.sh
     
+    # Then set TMPDIR but don't ask if user would want another directory because that breaks stuff
+    sed 's|#export TMPDIR|export TMPDIR|' -i pathvars/.pathvariables.sh
+
     # Then iterate through all predefined pathvars
     reade -Q "GREEN" -i "y" -p "Set LS_COLORS with some predefined values? [Y/n]:" "y n" lsclrs
     if [ "$lsclrs" == "y" ] || [ -z "$lsclrs" ]; then
         sed 's/^#export LS_COLORS/export LS_COLORS/' -i pathvars/.pathvariables.sh
     fi
     
-    reade -Q "GREEN" -i "y" -p "Set EDITOR and VISUAL? [Y/n]:" "y n" dsply
-    if [ "$dsply" == "y" ] || [ -z "$dsply" ]; then
+    reade -Q "GREEN" -i "y" -p "Set PAGER? (Page reader) [Y/n]:" "y n" pgr
+    if [ "$pgr" == "y" ] || [ -z "$pgr" ]; then
+        
+        # Uncomment export PAGER=
+        sed 's/^#export PAGER=/export PAGER=/' -i pathvars/.pathvariables.sh
+        
+        pagers="less more"
+        prmpt="${green} \tless = Default pager - clears screen\n\
+        more = Preinstalled other pager - leaves text\n"
+        if [ -x "$(command -v most)" ]; then
+            pagers="$pagers most"
+            prmpt="$prmpt \tmost = Pager with customizable colours - clears screen \n"
+        fi
+        if [ -x "$(command -v moar)" ]; then
+            pagers="$pagers moar"
+            prmpt="$prmpt \tmoar = Pager with linenumbers and great defaults - clears screen \n"
+        fi
+        printf "$prmpt"
+        reade -Q "GREEN" -i "less" -p "PAGER=" "$pagers" pgr2
+        if [ "$pgr2" == "less" ] || [ -z "$pgr2" ]; then
+            sed 's/export PAGER=.*/export PAGER="/usr/bin/less"/' -i pathvars/.pathvariables.sh
+        elif [ "$pgr2" == "more" ]; then
+            sed 's/export PAGER=.*/export PAGER="/usr/bin/more"/' -i pathvars/.pathvariables.sh
+        elif [ "$pgr2" == "most" ]; then
+            sed 's/export PAGER=.*/export PAGER="/usr/bin/most"/' -i pathvars/.pathvariables.sh
+        elif [ "$pgr2" == "moar" ]; then
+            sed 's|export PAGER=.*|export PAGER="/usr/local/bin/moar"|' -i pathvars/.pathvariables.sh
+            sed 's/#export MOAR=/export MOAR=/' -i pathvars/.pathvariables.sh
+        fi
+
+    fi
+
+    reade -Q "GREEN" -i "y" -p "Set EDITOR and VISUAL? [Y/n]:" "y n" edtvsl
+    if [ "$edtvsl" == "y" ] || [ -z "$edtvsl" ]; then
         # Make .txt file and output file
         touch $TMPDIR/editor-check.txt $TMPDIR/editor-outpt
         # Redirect output to file in subshell (mimeopen gives output but also starts read. This cancels read). In tmp because that gets cleaned up
         (mimeopen -a $TMPDIR/editor-check.txt &> "$TMPDIR/editor-outpt" & )
         compedit="$(awk 'NR>2 {if (prev_2_line) print prev_2_line; prev_2_line=prev_1_line; prev_1_line=prev_line} {prev_line=$2}' $TMPDIR/editor-outpt)"
-        frst=$(echo $compedit | awk '{print $1}')
+        frst="$(echo $compedit | awk '{print $1}')"
         reade -Q "GREEN" -i "$frst" -p "(Terminal editor) EDITOR=" "$compedit" edtor
         reade -Q "GREEN" -i "$frst" -p "(GUI editor) VISUAL=" "$compedit" vsual
         sed 's/^#export EDITOR=.*/export EDITOR="'$edtor'"/' -i pathvars/.pathvariables.sh
         sed 's/^#export VISUAL=.*/export VISUAL="'$vsual'"/' -i pathvars/.pathvariables.sh
     fi
 
+    # Set DISPLAY
     reade -Q "YELLOW" -i "n" -p "Set DISPLAY to ':0.0'? [Y/n]:" "y n" dsply
     if [ "$dsply" == "y" ] || [ -z "$dsply" ]; then
         sed 's/^#export DISPLAY=.*/export DISPLAY=":0.0"/' -i pathvars/.pathvariables.sh
     fi
 
+    # TODO do something for flatpak  (XDG_DATA_DIRS)
     # Check if xdg installed
-    if [ ! -x "$(command -v xdg-open)" ]; then
-        prmpt="${yellow}\tThis will set XDG patvariables to their respective defaults\n\
-        Setting these might be usefull for when installing applications\n\
-        That are XDG compatible (For example: flatpak would need to extend XDG_DATA_DIRS)\n\
+    if [ -x "$(command -v xdg-open)" ]; then
+        prmpt="${yellow}This will set XDG pathvariables to their respective defaults\n\
+        XDG is related to default applications\n\
+        Setting these could be usefull when installing external package managers (f.ex. flatpak) \n\
         Defaults:\n\
         - XDG_CACHE_HOME=$HOME/.cache\n\
         - XDG_CONFIG_HOME=$HOME/.config\n\
@@ -71,28 +111,51 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         - XDG_DATA_DIRS=/usr/local/share/:/usr/share\n\
         - XDG_STATE_HOME=$HOME/.local/state\n"
         printf "$prmpt"
-        reade -Q "YELLOW" -i "n" -p "\t[Y/n]: " "y n" xdgInst
+        reade -Q "YELLOW" -i "n" -p "[Y/n]: " "y n" xdgInst
         if [ -z "$xdgInst" ] || [ "y" == "$xdgInst" ]; then
             sed 's/^#export XDG_CACHE_HOME=\(.*\)/export XDG_CACHE_HOME=\1/' -i pathvars/.pathvariables.sh 
-            sed 's/^#export XDG_CACHE_HOME=\(.*\)/export XDG_CACHE_HOME=\1/' -i pathvars/.pathvariables.sh
+            sed 's/^#export XDG_CONFIG_HOME=\(.*\)/export XDG_CONFIG_HOME=\1/' -i pathvars/.pathvariables.sh
+            sed 's/^#export XDG_CONFIG_DIRS=\(.*\)/export XDG_CONFIG_DIRS=\1/' -i pathvars/.pathvariables.sh
+            sed 's/^#export XDG_DATA_HOME=\(.*\)/export XDG_DATA_HOME=\1/' -i pathvars/.pathvariables.sh    
+            sed 's/^#export XDG_DATA_DIRS=\(.*\)/export XDG_DATA_DIRS=\1/' -i pathvars/.pathvariables.sh
+            sed 's/^#export XDG_STATE_HOME=\(.*\)/export XDG_STATE_HOME=\1/' -i pathvars/.pathvariables.sh
+            sed 's/^#export XDG_RUNTIME_DIR=\(.*\)/export XDG_RUNTIME_DIR=\1/' -i pathvars/.pathvariables.sh
+        fi
+    fi
+    
+    # TODO: check around for other systemdvars 
+    # Check if systemd installed
+    if [ -x "$(command -v systemctl)" ]; then
+        prmpt="${yellow}\tThis will set SYSTEMD pathvariables\n\
+        When setting a new pager for systemd or changing logging specifics\n\
+        Defaults:\n\
+        - SYSTEMD_PAGER=$PAGER\n\
+        - SYSTEMD_COLORS=256\n\
+        - SYSTEMD_PAGERSECURE=1\n\
+        - SYSTEMD_LESS=\"FRXMK\"\n\
+        - SYSTEMD_LOG_LEVEL=\"warning\"\n\
+        - SYSTEMD_LOG_COLOR=\"true\"\n\
+        - SYSTEMD_LOG_TIME=\"true\"\n\
+        - SYSTEMD_LOG_LOCATION=\"true\"\n\
+        - SYSTEMD_LOG_TID=\"true\"\n\
+        - SYSTEMD_LOG_TARGET=\"auto\"\n\
+        "
+        printf "$prmpt"
+        reade -Q "YELLOW" -i "n" -p "[Y/n]: " "y n" xdgInst
+        if [ -z "$xdgInst" ] || [ "y" == "$xdgInst" ]; then
+            sed 's/^#export SYSTEMD_PAGER=\(.*\)/export SYSTEMD_PAGER=\1/' -i pathvars/.pathvariables.sh 
+            sed 's/^#export SYSTEMD_PAGERSECURE=\(.*\)/export SYSTEMD_PAGERSECURE=\1/' -i pathvars/.pathvariables.sh
+            sed 's/^#export SYSTEMD_COLORS=\(.*\)/export SYSTEMD_COLORS=\1/' -i pathvars/.pathvariables.sh
+            sed 's/^#export SYSTEMD_LESS=\(.*\)/export SYSTEMD_LESS=\1/' -i pathvars/.pathvariables.sh    
+            sed 's/^#export SYSTEMD_LOG_LEVEL=\(.*\)/export SYSTEMD_LOG_LEVEL=\1/' -i pathvars/.pathvariables.sh
+            sed 's/^#export SYSTEMD_LOG_TIME=\(.*\)/export SYSTEMD_LOG_TIME=\1/' -i pathvars/.pathvariables.sh
+            sed 's/^#export SYSTEMD_LOG_LOCATION=\(.*\)/export SYSTEMD_LOG_LOCATION=\1/' -i pathvars/.pathvariables.sh
+            sed 's/^#export SYSTEMD_LOG_TID=\(.*\)/export SYSTEMD_LOG_TID=\1/' -i pathvars/.pathvariables.sh
+            sed 's/^#export SYSTEMD_LOG_TARGET=\(.*\)/export SYSTEMD_LOG_TARGET=\1/' -i pathvars/.pathvariables.sh
         fi
     fi
 fi
 
-
-if grep -q "export MOAR=" pathvars/.pathvariables.sh && \
-! grep -q "#export MOAR=" pathvars/.pathvariables.sh; then
-    sed -i "s/export MOAR=/#export MOAR=/g" pathvars/.pathvariables.sh 
-    sed -i "s/export PAGER=/#export PAGER=/g" pathvars/.pathvariables.sh
-    #sed -i "s/export SYSTEMD_PAGER=/#export SYSTEMD_PAGER=/g" pathvars/.pathvariables.sh
-    #sed -i "s/export SYSTEMD_PAGERSECURE=/#export SYSTEMD_PAGERSECURE=/g" pathvars/.pathvariables.sh
-fi
-
-if grep -q "export FZF_DEFAULT_COMMAND" pathvars/.pathvariables.sh && \
-! grep -q "#export FZF_DEFAULT_COMMAND" pathvars/.pathvariables.sh; then
-    sed -i 's|export FZF_DEFAULT_COMMAND|#export FZF_DEFAULT_COMMAND|g' pathvars/.pathvariables.sh
-    sed -i 's|export FZF_CTRL_T_COMMAND|#export FZF_CTRL_T_COMMAND|g' pathvars/.pathvariables.sh  
-fi
 
 pathvariables_r(){ 
      if ! sudo grep -q "/root/.pathvariables.sh" /root/.bashrc; then
@@ -122,7 +185,6 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
 
     if ! grep -q "~/.bash_aliases.d" ~/.bashrc; then
 
-        #echo "alias pwd-bash=\"cd -- \"\$( dirname -- \"\${BASH_SOURCE[0]}\" )\" &> /dev/null && pwd"
         echo "if [[ -d ~/.bash_aliases.d/ ]]; then" >> ~/.bashrc
         echo "  for alias in ~/.bash_aliases.d/*.sh; do" >> ~/.bashrc
         echo "      . \"\$alias\" " >> ~/.bashrc
@@ -203,7 +265,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
             reade -Q "GREEN" -i "y" -p "Set moar default pager for $USER? [Y/n]: " "y n" moar_usr
             if [ -z "$moar_usr" ] || [ "y" == "$moar_usr" ] || [ "Y" == "$moar_usr" ]; then
                 sed -i "s/#export MOAR=/export MOAR=/g" pathvars/.pathvariables.sh 
-                sed -i "s/#export PAGER=/export PAGER=/g" pathvars/.pathvariables.sh
+                sed -i "s|#export PAGER=.*|export PAGER=/usr/local/bin/moar|g" pathvars/.pathvariables.sh
                 #sed -i "s/#export SYSTEMD_PAGER=/export SYSTEMD_PAGER=/g" pathvars/.pathvariables.sh
                 sed -i "s/#export SYSTEMD_PAGERSECURE=/export SYSTEMD_PAGERSECURE=/g" pathvars/.pathvariables.sh
 
