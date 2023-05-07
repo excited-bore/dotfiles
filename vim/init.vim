@@ -31,7 +31,18 @@ call plug#begin()
 
 "" Autocomplete plugin from git
 "Plug 'ycm-core/YouCompleteMe'
+"https://github.com/neoclide/coc.nvim/wiki/Using-coc-extensions#implemented-coc-extensions
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
+let g:coc_global_extensions = [
+            \'coc-html',
+            \'coc-css',
+            \'coc-tsserver',
+            \'coc-json', 
+            \'coc-python',
+            \'coc-sh',
+            \'coc-fzf-preview',
+            \'coc-git'
+            \]
 
 "Ranger integration
 Plug 'francoiscabrol/ranger.vim'
@@ -43,7 +54,7 @@ let g:ranger_map_keys = 0
 Plug '~/.fzf'
 Plug 'junegunn/fzf.vim' 
 "" Fuzzy finder preview   
-Plug 'yuki-yano/fzf-preview.vim', { 'branch': 'release/remote', 'do': ':UpdateRemotePlugins' }
+"Plug 'yuki-yano/fzf-preview.vim', { 'branch': 'release/remote', 'do': ':UpdateRemotePlugins' }
 
 "" Git plugin
 Plug 'tpope/vim-fugitive'

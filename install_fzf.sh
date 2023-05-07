@@ -4,7 +4,7 @@
 
 # Fzf (Fuzzy Finder)
 
-if [ ! -x "$(command -v fzf)" ]; then
+#if [ ! -x "$(command -v fzf)" ]; then
     reade -Q "GREEN" -i "y" -p "Install fzf? (Fuzzy file/folder finder - keybinding yes for upgraded Ctrl-R/reverse-search, fzf filenames on Ctrl+T and fzf-version of 'cd' on Alt-C + Custom script: Ctrl-f becomes system-wide file opener) [Y/n]: " "y n" findr
     if [ -z $findr ] || [ "Y" == $findr ] || [ $findr == "y" ]; then
         
@@ -13,18 +13,20 @@ if [ ! -x "$(command -v fzf)" ]; then
         
         reade -Q "GREEN" -i "y" -p "Install fd and use for fzf? (Faster find) [Y/n]: " "y n" fdr
         if [ -z $fdr ] || [ "Y" == $fdr ] || [ $fdr == "y" ]; then
-            if [ $distro_base == "Arch" ];then
-                sudo pacman -Su fd
-            elif [ $distro_base == "Debian" ]; then
-                sudo apt update
-                sudo apt install fd 
+            if [ ! -x "$(command -v fd)" ]; then
+                if [ $distro_base == "Arch" ];then
+                    yes | sudo pacman -Su fd
+                elif [ $distro_base == "Debian" ]; then
+                    yes | sudo apt update
+                    yes | sudo apt install fd 
+                fi
             fi
-            if grep -q "#export FZF_DEFAULT_COMMAND" $PATHVAR; then
+            if grep -q '#export FZF_DEFAULT_COMMAND' $PATHVAR; then
                 sed -i 's|#export FZF_DEFAULT_COMMAND|export FZF_DEFAULT_COMMAND|g' $PATHVAR
-                sed -i 's|#export FZF_CTRL_T_COMMAND|export FZF_CTRL_T_COMMAND|g' $PATHVAR    else
+                sed -i 's|#export FZF_CTRL_T_COMMAND|export FZF_CTRL_T_COMMAND|g' $PATHVAR    
                 printf "# FZF\nexport FZF_DEFAULT_COMMAND='fd --search-path / --type f --hidden --follow --exclude \".dll .so .go\"'\nexport FZF_CTRL_T_COMMAND=\"$FZF_DEFAULT_COMMAND\"" >> $PATHVAR
             fi
-            if sudo grep -q "#export FZF_DEFAULT_COMMAND" $PATHVAR_R; then
+            if sudo grep -q '#export FZF_DEFAULT_COMMAND' $PATHVAR_R; then
                 sudo sed -i 's|#export FZF_DEFAULT_COMMAND|export FZF_DEFAULT_COMMAND|g' $PATHVAR_R
                 sudo sed -i 's|#export FZF_CTRL_T_COMMAND|export FZF_CTRL_T_COMMAND|g' $PATHVAR_R 
             else
@@ -35,15 +37,14 @@ if [ ! -x "$(command -v fzf)" ]; then
         reade -Q "GREEN" -i "y" -p "Install ripgrep? (Recursive grep, opens possibility for line by line fzf ) [Y/n]: " "y n" rpgrp
         if [ -z $rpgrp ] || [ "Y" == $rpgrp ] || [ $rpgrp == "y" ]; then
             if [ $distro_base == "Arch" ];then
-                sudo pacman -Su ripgrep
+                yes | sudo pacman -Su ripgrep
             elif [ $distro_base == "Debian" ]; then
-                sudo apt update
-                sudo apt install ripgrep 
+                yes | sudo apt update
+                yes | sudo apt install ripgrep 
             fi
         fi
 
-
-        if grep -q "source \"$USER/.fzf/shell/key-bindings.bash\"" ~/.fzf.bash ; then
+        if grep -q 'source "$USER/.fzf/shell/key-bindings.bash"' ~/.fzf.bash ; then
             
             reade -Q "GREEN" -i "y" -p "Replace fzf bind Ctrl-Z to Ctrl-j to keep vi-undo? (other then emacs and vi editing mode)?" "y n" fzf_z
             if [ $fzf_z == "y" ] || [ -z $fzf_z ]; then
@@ -80,4 +81,4 @@ if [ ! -x "$(command -v fzf)" ]; then
             
         fi
     fi
-fi
+#fi

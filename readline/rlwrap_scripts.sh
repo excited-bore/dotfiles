@@ -1,5 +1,20 @@
+# https://stackoverflow.com/questions/5412761/using-colors-with-printf
+# Execute (during printf) for colored prompt
+# printf  "${blue}This text is blue${white}\n"
+red=$(tput setaf 1)
+green=$(tput setaf 2)
+yellow=$(tput setaf 3)
+blue=$(tput setaf 4)
+pink=$(tput setaf 5)
+cyan=$(tput setaf 6)
+white=$(tput setaf 7)
+grey=$(tput setaf 8)
+red1=$(tput setaf 9)
+#...
+
 # Arguments: Completions(string with space entries, AWK works too),return value(-a password prompt, -c complete filenames, -p prompt flag, -Q prompt colour, -b break-chars (when does a string break for autocomp), -e change char given for multiple autocompletions)
 # 'man rlwrap' to see all unimplemented options
+
 
 reade(){
     if [ ! -x "$(command -v rlwrap)" ]; then 
@@ -94,6 +109,9 @@ function yes_edit_no(){
         
         reade $clr -i "$pre" -p "$prompt" " y e n" pass;
         
+        #Undercase only
+        pass=$(echo "$pass" | tr '[:upper:]' '[:lower:]')
+
         if [ -z "$pass" ]; then
             pass="$pre";
         fi
@@ -133,6 +151,10 @@ function yes_no(){
             clr="-Q $4"
         fi
         reade $clr -i "$pre" -p "$prompt" " y e n" pass;
+        
+        #Undercase only
+        pass=$(echo "$pass" | tr '[:upper:]' '[:lower:]')
+        
         if [ "$pass" == "y" ]; then
            $1; 
         fi
