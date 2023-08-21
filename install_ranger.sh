@@ -5,10 +5,8 @@
  # Ranger (File explorer)
 reade -Q "GREEN" -i "y" -p "Install Ranger? (Terminal file explorer - keybinding F2 [Y/n]: " "y n" rngr
 if [ -z $rngr ] || [ "Y" == $rngr ] || [ $rngr == "y" ]; then
-
     if [ $distro_base == "Arch" ];then
-        yes | sudo pacman -Su ttf-nerd-fonts-symbols-common ttf-nerd-fonts-symbols-2048-em ttf-nerd-fonts-symbols-2048-em-mono ranger python 
-        sudo pacman -S kitty atool bat calibre elinks ffmpegthumbnailer fontforge highlight imagemagick mupdf-tools odt2txt
+        yes | sudo pacman -Su ttf-nerd-fonts-symbols-common ttf-nerd-fonts-symbols ttf-nerd-fonts-symbols-mono ranger python 
     elif [ $distro_base == "Debian" ]; then    
         sudo apt update 
         yes | sudo apt install ranger python3 python3-dev python3-pip 
@@ -30,9 +28,13 @@ if [ -z $rngr ] || [ "Y" == $rngr ] || [ $rngr == "y" ]; then
 
     reade -Q "GREEN" -i "y" -p "F2 for Ranger? [Y/n]:" "y n" rf2
     if [ -z $rf2 ] || [ "y" == $rf2 ]; then
-    
-     if grep -q "bind -x '\"\\eOQ\": ranger'" aliases/shell_keybindings.sh; then
-        sed -i 's|#bind -x '\''"\\eOQ\": ranger'\''|bind -x '\''"\\eOQ\": ranger'\''|g' aliases/shell_keybindings.sh
+        binds=~/.bashrc
+        if [ -f ~/.bash_aliases/shell_keybindings ]; then
+            binds=~/.bash_aliases/shell_keybindings
+        fi
+        if grep -q "bind -x '\"\\\eOQ\": ranger'" $binds; then
+            sed -i 's|#bind -x '\''"\\eOQ\": ranger'\''|bind -x '\''"\\eOQ\": ranger'\''|g' $binds
+        fi
     fi
 
     reade -Q "GREEN" -i "y" -p "Install ranger plugins? (plugins at ~/.conf/ranger/plugins) [Y/n]:" "y n" rplg
@@ -42,13 +44,12 @@ if [ -z $rngr ] || [ "Y" == $rngr ] || [ $rngr == "y" ]; then
     fi
      
     # TODO Fixthis
-    if [ -x "$(command -v nvim)" ]; then
-        read -p "Integrate ranger with nvim? (Install nvim ranger plugins) [Y/n]:" rangrvim
-        if [[ -z $rangrvim || "y" == $rangrvim ]]; then
-            if ! grep -q "Ranger integration" ~/.config/nvim/init.vim; then
+    #if [ -x "$(command -v nvim)" ]; then
+    #    read -p "Integrate ranger with nvim? (Install nvim ranger plugins) [Y/n]:" rangrvim
+    #    if [[ -z $rangrvim || "y" == $rangrvim ]]; then
+    #        if ! grep -q "Ranger integration" ~/.config/nvim/init.vim; then
                 #sed -i s/"\(Plugin 'ycm-core\/YouCompleteMe'\)"/"\1\n\n\"Ranger integration\nPlugin 'francoiscabrol\/ranger.vim'\nPlugin 'rbgrouleff\/bclose.vim'\nlet g:ranger_replace_netrw = 1"/g ~/.config/nvim/init.vim
                 #nvim +PlugInstall +qall
-            fi
-        fi
-    fi
+    #        fi
+    #    fi
 fi

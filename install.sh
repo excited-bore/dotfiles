@@ -1,3 +1,4 @@
+
 . ./readline/rlwrap_scripts.sh
 . ./checks/check_distro.sh
 . ./checks/check_rlwrap.sh
@@ -89,7 +90,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
 
     # Readline
     
-     function inputrc_r(){
+    function inputrc_r(){
          sudo cp -fv readline/.inputrc /root/.inputrc
     }
     function inputrc() {
@@ -100,12 +101,12 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     
     # Shell-keybindings
     
-    if [ grep -q "bind -x '\"\C-s\": ctrl-s'" ./aliases/shell_keybindings.sh ] && [ ! grep -q "#bind -x '\"\C-s\": ctrl-s'" ./aliases/shell_keybindings.sh ]; then
+    if grep -q "bind -x '\"\\\C-s\": ctrl-s'" ./aliases/shell_keybindings.sh && ! grep -q "#bind -x '\"\\\C-s\": ctrl-s'" ./aliases/shell_keybindings.sh; then
         sed -i 's|bind -x '\''"\\C-s\": ctrl-s'\''|#bind -x '\''"\\C-s\": ctrl-s'\''|g' ./aliases/shell_keybindings.sh
         sed -i 's|bind -x '\''"\\eOR\": ctrl-s'\''|#bind -x '\''"\\eOR\": ctrl-s'\''|g' ./aliases/shell_keybindings.sh
     fi
 
-    if grep -q "bind -x '\"\eOQ\": ranger'" readline/shell_keybindings.sh; then
+    if grep -q "bind -x '\"\\\eOQ\": ranger'" readline/shell_keybindings.sh; then
         sed -i 's|bind -x '\''"\\eOQ\": ranger'\''|#bind -x '\''"\\eOQ\": ranger'\''|g' ./readline/shell_keybindings.sh
     fi
 
@@ -114,19 +115,19 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     }
     function shell-keybindings() {
         cp -fv aliases/shell_keybindings.sh ~/.bash_aliases.d/
-        yes_edit_no shell-keybindings_r "aliases/shell_keybindings.sh" "Install .bash_aliases.d/shell_keybindings.sh at /root/?" "edit" "RED"
+        yes_edit_no shell-keybindings_r "aliases/shell_keybindings.sh" "Install shell_keybindings.sh at /root/.bash_aliases/?" "edit" "RED"
     }
-    yes_edit_no shell-keybindings_r "aliases/shell_keybindings.sh" "Install .bash_aliases.d/shell-keybindings.sh at ~/ ? (bind commands)" "edit" "YELLOW"
+    yes_edit_no shell-keybindings "aliases/shell_keybindings.sh" "Install shell-keybindings.sh at ~/.bash_aliases/ ? (bind commands)" "yes" "GREEN"
 
     # Pathvariables
-    if [ grep -q "export MOAR=" aliases/00-pathvariables.sh ] && [ ! grep -q "#export MOAR=" aliases/00-pathvariables.sh ]; then
+    if grep -q "export MOAR=" aliases/00-pathvariables.sh && ! grep -q "#export MOAR=" aliases/00-pathvariables.sh ; then
         sed -i "s/export MOAR=/#export MOAR=/g" aliases/00-pathvariables.sh 
         sed -i "s/export PAGER=/#export PAGER=/g" aliases/00-pathvariables.sh
         sed -i "s/export SYSTEMD_PAGER=/#export SYSTEMD_PAGER=/g" aliases/00-pathvariables.sh
         sed -i "s/export SYSTEMD_PAGERSECURE=/#export SYSTEMD_PAGERSECURE=/g" aliases/00-pathvariables.sh
     fi
 
-    if [ grep -q "export FZF_DEFAULT_COMMAND" aliases/00-pathvariables.sh ] && [ ! grep -q "#export FZF_DEFAULT_COMMAND" aliases/00-pathvariables.sh ]; then
+    if grep -q "export FZF_DEFAULT_COMMAND" aliases/00-pathvariables.sh && ! grep -q "#export FZF_DEFAULT_COMMAND" aliases/00-pathvariables.sh ; then
         sed -i 's|export FZF_DEFAULT_COMMAND|#export FZF_DEFAULT_COMMAND|g' aliases/00-pathvariables.sh
         sed -i 's|export FZF_CTRL_T_COMMAND|#export FZF_CTRL_T_COMMAND|g' aliases/00-pathvariables.sh  
     fi
@@ -148,20 +149,26 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
             . ./install_moar.sh 
             reade -Q "GREEN" -i "y" -p "Set moar default pager for $USER? [Y/n]: " "y n" moar_usr
             if [ -z "$moar_usr" ] || [ "y" == "$moar_usr" ] || [ "Y" == "$moar_usr" ]; then
-                sed -i "s/#export MOAR=/export MOAR=/g" ~/aliases/00-pathvariables.sh 
-                sed -i "s/#export PAGER=/export PAGER=/g" ~/aliases/00-pathvariables.sh
-                sed -i "s/#export SYSTEMD_PAGER=/export SYSTEMD_PAGER=/g" ~/aliases/00-pathvariables.sh
-                sed -i "s/#export SYSTEMD_PAGERSECURE=/export SYSTEMD_PAGERSECURE=/g" ~/aliases/00-pathvariables.sh
-
+                path=~/.bashrc
+                if [ -f ~/.bash_aliases/00-pathvariables.sh ]; then
+                    path=~/.bash_aliases/00-pathvariables.sh
+                fi
+                sed -i "s/#export MOAR=/export MOAR=/g" $path 
+                sed -i "s/#export PAGER=/export PAGER=/g" $path
+                sed -i "s/#export SYSTEMD_PAGER=/export SYSTEMD_PAGER=/g" $path
+                sed -i "s/#export SYSTEMD_PAGERSECURE=/export SYSTEMD_PAGERSECURE=/g" $path
             fi
             
             reade -Q "YELLOW" -i "y" -p "Set moar default pager for root? [Y/n]: " "y n" moar_root
             if [ -z "$moar_root" ] || [ "y" == "$moar_root" ] || [ "Y" == "$moar_root" ]; then
-                sudo sed -i "s/#export MOAR=/export MOAR=/g" /root/.aliases/00-pathvariables.sh 
-                sudo sed -i "s/#export PAGER=/export PAGER=/g" /root/aliases/00-pathvariables.sh
-                sudo sed -i "s/#export SYSTEMD_PAGER=/export SYSTEMD_PAGER=/g" /root/aliases/00-pathvariables.sh
-                sudo sed -i "s/#export SYSTEMD_PAGERSECURE=/export SYSTEMD_PAGERSECURE=/g" /root/aliases/00-pathvariables.sh
-
+                path=/root/.bashrc
+                if [ -f /root/.bash_aliases/00-pathvariables.sh ]; then
+                    path=/root/.bash_aliases/00-pathvariables.sh
+                fi
+                sudo sed -i "s/#export MOAR=/export MOAR=/g" $path 
+                sudo sed -i "s/#export PAGER=/export PAGER=/g" $path
+                sudo sed -i "s/#export SYSTEMD_PAGER=/export SYSTEMD_PAGER=/g" $path
+                sudo sed -i "s/#export SYSTEMD_PAGERSECURE=/export SYSTEMD_PAGERSECURE=/g" $path
             fi
         fi
     fi
@@ -355,7 +362,6 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     yes_edit_no ytbe "aliases/youtube.sh" "Install yt-dlp (youtube cli download) and youtube.sh at ~/.bash_aliases.d/ (yt-dlp aliases)? " "yes" "GREEN"
 
 fi
-
 
 
 . ~/.bashrc
