@@ -109,7 +109,7 @@ ctrl-s(){
 }
 
 # Ctrl-s; Open files using default-applications and fzf
-bind -x '"\C-s": ctrl-s'
+#bind -x '"\C-s": ctrl-s'
 
 # Ctrl-Enter gives you a paged output
 bind '"\e[13": " | $PAGER\C-p"' 
@@ -130,7 +130,7 @@ bind '"\C-o": "\C-u man \C-y\C-m"'
 bind -x '"\eOQ": ranger'
 
 # F3 - FuzzyFinderls -l | fzf --preview="echo user={3} when={-4..-2}; cat {-1}" --header-lines=1 (file explorer)
-bind -x '"\eOR": ctrl-s'
+#bind -x '"\eOR": ctrl-s'
 
 # F5, Ctrl-r - Reload .bashrc /.inputrc
 #bind '"\e[15~": re-read-init-file'

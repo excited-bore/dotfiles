@@ -76,13 +76,15 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         fi
 
     fi
-
+    # TODO Add nano 
+    # TODO Fix mimeopen subshell thing
     reade -Q "GREEN" -i "y" -p "Set EDITOR and VISUAL? [Y/n]:" "y n" edtvsl
     if [ "$edtvsl" == "y" ] || [ -z "$edtvsl" ]; then
         # Make .txt file and output file
         touch $TMPDIR/editor-check.txt $TMPDIR/editor-outpt
         # Redirect output to file in subshell (mimeopen gives output but also starts read. This cancels read). In tmp because that gets cleaned up
-        (mimeopen -a $TMPDIR/editor-check.txt &> $TMPDIR/editor-outpt &) 
+        (mimeopen -a $TMPDIR/editor-check.txt &> $TMPDIR/editor-outpt &)
+        cat $TMPDIR/editor-outpt
         compedit=$(awk 'NR>2 {if (prev_2_line) print prev_2_line; prev_2_line=prev_1_line; prev_1_line=prev_line} {prev_line=$2}' $TMPDIR/editor-outpt)
         frst="$(echo $compedit | awk '{print $1}')"
         reade -Q "GREEN" -i "$frst" -p "(Terminal editor) EDITOR=" "$compedit" edtor

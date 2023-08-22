@@ -1,14 +1,13 @@
 # DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 . ./install_go.sh
 . ./checks/check_distro.sh     
+. ./install_docker.sh
 if [ $distro == "Manjaro" ]; then
-    yes | pamac install apx-git
-    sudo usermod -aG docker $USER
+    yes | pamac install apx
 elif [ $distro == "Arch" ]; then
-    echo "Install with git-apx with AUR launcher of choice (f.ex. yay, pamac)"
+    echo "Install with apx with AUR launcher of choice (f.ex. yay, pamac)"
     return 0
 elif [ $distro == "Debian" ] || [ $distro_base == "Debian" ]; then
-    . ./install_docker.sh
     git clone https://github.com/Vanilla-OS/apx /tmp/apx
     go build /tmp/apx
     sudo install -Dm755 "/tmp/apx/apx" "/usr/bin/apx"
