@@ -1,6 +1,7 @@
  #DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-. checks/check_distro.sh
-. readline/rlwrap_scripts.sh
+. ./checks/check_pathvar.sh
+. ./checks/check_distro.sh
+. ./readline/rlwrap_scripts.sh
 
 #. $DIR/setup_git_build_from_source.sh "y" "neovim" "https://github.com" "neovim/neovim" "stable" "sudo apt update; sudo apt install ninja-build gettext libtool libtool-bin cmake g++ pkg-config unzip curl doxygen" "make CMAKE_BUILD_TYPE=RelWithDebInfo; sudo make install" "sudo make uninstall" "make distclean; make deps" "y"
 
@@ -67,6 +68,15 @@ function instvim_r(){
         sudo mkdir /root/.config/nvim/
     fi
     sudo cp -fv vim/init.vim /root/.config/nvim/init.vim
+
+    if [ $PATHVAR_R == /root/.pathvariables.sh ]; then
+       sudo sed -i 's|#export MYVIMRC="~|export MYVIMRC="/root|g' $PATHVAR_R
+        sudo sed -i 's|#export MYGVIMRC="~|export MYGVIMRC="/root|g' $PATHVAR_R
+    elif ! sudo grep -q "export MYVIMRC=" $PATHVAR_R; then
+        echo 'export MYVIMRC="/root/.config/nvim/init.vim' | sudo tee -a $PATHVAR_R
+        echo 'export MYGVIMRC="/root/.config/nvim/init.vim' | sudo tee -a $PATHVAR_R
+    fi
+
     reade -Q "YELLOW" -p "Make symlink for init.vim at /root/.vimrc for user? (Might conflict with nvim +checkhealth) [Y/n]:" vimrc_r
     if [ -z $vimrc_r ] || [ "y" == $vimrc_r ] ; then
         ln -s ~/.config/nvim/init.vim ~/.vimrc
@@ -79,7 +89,15 @@ function instvim(){
     fi
     cp -fv vim/init.vim ~/.config/nvim/init.vim
     
-    reade -Q "YELLOW" -p "Make symlink for init.vim at ~/.vimrc for user? (Might conflict with nvim +checkhealth) [Y/n]:" vimrc
+    if [ $PATHVAR == ~/.pathvariables.sh ]; then
+        sed -i "s|#export MYVIMRC=|export MYVIMRC=|g" $PATHVAR
+        sed -i "s|#export MYGVIMRC=|export MYGVIMRC=|g" $PATHVAR
+    elif ! grep -q "export MYVIMRC=" $PATHVAR; then
+        echo 'export MYVIMRC="~/.config/nvim/init.vim' >> $PATHVAR
+        echo 'export MYGVIMRC="~/.config/nvim/init.vim' >> $PATHVAR
+    fi
+    
+        reade -Q "YELLOW" -p "Make symlink for init.vim at ~/.vimrc for user? (Might conflict with nvim +checkhealth) [Y/n]:" vimrc
     if [ -z $vimrc ]; then
         ln -s ~/.config/nvim/init.vim ~/.vimrc
     fi

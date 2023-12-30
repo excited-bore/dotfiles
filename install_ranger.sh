@@ -3,19 +3,13 @@
 . ./readline/rlwrap_scripts.sh
 
  # Ranger (File explorer)
-reade -Q "GREEN" -i "y" -p "Install Ranger? (Terminal file explorer - keybinding F2 [Y/n]: " "y n" rngr
+ reade -Q "GREEN" -i "y" -p "Install Ranger? (Terminal file explorer) [Y/n]: " "y n" rngr
 if [ -z $rngr ] || [ "Y" == $rngr ] || [ $rngr == "y" ]; then
     if [ $distro_base == "Arch" ];then
-        yes | sudo pacman -Su ttf-nerd-fonts-symbols-common ttf-nerd-fonts-symbols-2048-em ttf-nerd-fonts-symbols-2048-em-mono ranger python 
-        sudo pacman -S kitty atool bat calibre elinks ffmpegthumbnailer fontforge highlight imagemagick mupdf-tools odt2txt
+        yes | sudo pacman -Su ranger python ttf-nerd-fonts-symbols-common ttf-nerd-fonts-symbols ttf-nerd-fonts-symbols-mono atool bat calibre elinks ffmpegthumbnailer fontforge highlight terminology mupdf-tools odt2txt
     elif [ $distro_base == "Debian" ]; then    
         sudo apt update 
-        yes | sudo apt install ranger python3 python3-dev python3-pip 
-        sudo apt install kitty atool bat elinks ffmpegthumbnailer fontforge highlight imagemagick jq libcaca0 odt2txt mupdf-tools 
-        reade -Q "YELLOW" -i "y" -p "Install Nerdfonts from binary - no apt? (Special FontIcons) [Y/n]: " "y n" nrdfnts
-        if [ -z $nrdfnts ] || [ "Y" == $nrdfnts ] || [ $nrdfnts == "y" ]; then
-            . install_nerdfonts.sh
-        fi
+        yes | sudo apt install ranger python3 python3-dev python3-pip atool bat elinks ffmpegthumbnailer fontforge highlight jq libcaca0 odt2txt mupdf-tools terminology 
     fi
     
     #ranger --copy-config=all
@@ -25,31 +19,51 @@ if [ -z $rngr ] || [ "Y" == $rngr ] || [ $rngr == "y" ]; then
         if [ ! -d ~/.config/ranger/ ]; then 
             mkdir -p ~/.config/ranger/
         fi
-        cp -fv -t ~/.config/ranger ranger/rc.conf ranger/rifle.conf
+        cp -fv -t ~/.config/ranger ./ranger/rc.conf ./ranger/rifle.conf ./ranger/scope.sh
     }
-    yes_edit_no rangr_cnf "ranger/rc.conf ranger/rifle.conf" "Install rc.conf and rifle.conf at ~/.config/ranger/ (ranger config)? " "edit" "GREEN"
+    yes_edit_no rangr_cnf "ranger/rc.conf ranger/rifle.conf" "Install predefined configuration (rc.conf,rifle.conf and scope.sh at ~/.config/ranger/)? " "edit" "GREEN"
 
     reade -Q "GREEN" -i "y" -p "F2 for Ranger? [Y/n]:" "y n" rf2
     if [ -z $rf2 ] || [ "y" == $rf2 ]; then
-        if grep -q 'bind -x '\''"\\eOQ": ranger'\''' aliases/shell_keybindings.sh; then
-            sed -i 's|#bind -x '\''"\\eOQ": ranger'\''|bind -x '\''"\\eOQ": ranger'\''|g' aliases/shell_keybindings.sh
+        if grep -q 'bind -x '\''"\\eOQ": ranger'\''' ./aliases/shell_keybindings.sh; then
+            sed -i 's|#bind -x '\''"\\eOQ": ranger'\''|bind -x '\''"\\eOQ": ranger'\''|g' ./aliases/shell_keybindings.sh
         fi
     fi
 
-    reade -Q "GREEN" -i "y" -p "Install ranger devicons? (ranger plugin at ~/.conf/ranger/plugins) [Y/n]:" "y n" rplg
+    reade -Q "GREEN" -i "y" -p "Install ranger (dev)icons? (ranger plugin at ~/.conf/ranger/plugins) [Y/n]:" "y n" rplg
     if [ -z $rplg ] || [ "y" == $rplg ]; then
         mkdir -p ~/.config/ranger/plugins
         git clone https://github.com/cdump/ranger-devicons2 ~/.config/ranger/plugins/devicons2
+        if [ $distro_base == "Arch" ];then
+            yes | sudo pacman -Su ttf-nerd-fonts-symbols-common ttf-nerd-fonts-symbols ttf-nerd-fonts-symbols-mono
+        elif [ $distro_base == "Debian" ]; then    
+            reade -Q "YELLOW" -i "y" -p "Install Nerdfonts from binary - no apt? (Special FontIcons) [Y/n]: " "y n" nrdfnts
+            if [ -z $nrdfnts ] || [ "Y" == $nrdfnts ] || [ $nrdfnts == "y" ]; then
+                ./install_nerdfonts.sh
+            fi
+        fi
     fi
-     
-    # TODO Fixthis
-    #if [ -x "$(command -v nvim)" ]; then
-        #read -p "Integrate ranger with nvim? (Install nvim ranger plugins) [Y/n]:" rangrvim
-        #if [[ -z $rangrvim || "y" == $rangrvim ]]; then
-            #if ! grep -q "Ranger integration" ~/.config/nvim/init.vim; then
-                #sed -i s/"\(Plugin 'ycm-core\/YouCompleteMe'\)"/"\1\n\n\"Ranger integration\nPlugin 'francoiscabrol\/ranger.vim'\nPlugin 'rbgrouleff\/bclose.vim'\nlet g:ranger_replace_netrw = 1"/g ~/.config/nvim/init.vim
-                #nvim +PlugInstall +qall
-            #fi
-        #fi
+    
+    #reade -Q "GREEN" -i "y" -p "Install and enable ranger image previews? (Installs terminology) [Y/n]:" "y n" rplg
+    #sed -i 's|set preview_images false|set preview_images true|g' ~/.config/ranger/rc.conf
+    #if [ -z $rplg ] || [ "y" == $rplg ]; then
+    #    if [ $distro_base == "Arch" ];then
+    #        yes | sudo pacman -Su terminology
+    #    elif [ $distro_base == "Debian" ]; then 
+    #        yes | sudo apt install terminology
+    #    fi
     #fi
+     
+    if [ -x "$(command -v nvim)" ]; then
+        read -p "Integrate ranger with nvim? (Install nvim ranger plugins) [Y/n]:" rangrvim
+        if [[ -z $rangrvim || "y" == $rangrvim ]]; then
+            if ! grep -q "Ranger integration" ~/.config/nvim/init.vim; then
+                sed -i 's|"Plug '\''francoiscabrol/ranger.vim'\''|Plug '\''francoiscabrol/ranger.vim'\''|g'
+                sed -i 's|"Plug '\''rbgrouleff/bclose.vim'\''|Plug '\''rbgrouleff/bclose.vim'\''|g'
+                sed -i 's|"let g:ranger_replace_netrw = 1|let g:ranger_replace_netrw = 1|g'
+                sed -i 's|"let g:ranger_map_keys = 0|let g:ranger_map_keys = 0|g'
+                nvim +PlugInstall
+            fi
+        fi
+    fi
 fi
