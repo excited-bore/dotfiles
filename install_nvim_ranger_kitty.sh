@@ -5,8 +5,8 @@ if [[ ! -d ~/.config/nvim/ ]]; then
     mkdir ~/.config/nvim/
 fi
 
-if [ $distro_base == "Arch" ];then
-    sudo pacman -Su ttf-nerd-fonts-symbols-common ttf-nerd-fonts-symbols-2048-em ttf-nerd-fonts-symbols-2048-em-mono ranger kitty xclip neovim mono go nodejs jre11-openjdk npm python atool bat calibre elinks ffmpegthumbnailer fontforge highlight imagemagick mupdf-tools odt2txt
+if [ $distro_base == "Arch" ]; then
+    sudo pacman -Su ttf-nerd-fonts-symbols-common ttf-nerd-fonts-symbols ttf-nerd-fonts-symbols-mono ranger kitty xclip neovim mono go nodejs jre11-openjdk npm python atool bat calibre elinks ffmpegthumbnailer fontforge highlight imagemagick mupdf-tools odt2txt
 elif [ $distro_base == "Debian" ]; then    
     sudo apt update 
     sudo apt install kitty ranger build-essential python2 python3 cmake python3-dev python3-pip mono-complete nodejs openjdk-17-jdk openjdk-17-jre npm atool bat elinks ffmpegthumbnailer fontforge highlight imagemagick jq libcaca0 odt2txt mupdf-tools 

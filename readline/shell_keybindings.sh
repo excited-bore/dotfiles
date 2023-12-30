@@ -114,7 +114,7 @@ bind '"\C-b": insert-comment 1'
 bind '"\C-n": "\C-a\e[3~"'
 
 # F2 - Ranger (file explorer)
-#############bind -x '"\eOQ": ranger'
+#####################bind -x '"\eOQ": ranger'
 
 # F3 - FuzzyFinderls -l | fzf --preview="echo user={3} when={-4..-2}; cat {-1}" --header-lines=1 (file explorer)
 bind -x '"\eOR": fzf -i'

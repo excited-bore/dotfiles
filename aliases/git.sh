@@ -12,19 +12,21 @@ alias git_set_pull_fastforward_only="git config pull.ff only"
 
 function git_ssh_key_and_add_to_agent() { 
     if [ ! -f ~/.ssh/config ]; then
+        mkdir ~/.ssh;
         touch ~/.ssh/config;
     fi
-    read -p "Give up name: (Default:'id_keytype')" name
-    reade -p "Give up keytype (dsa | ecdsa | ecdsa-sk | ed25519 (Default) | ed25519-sk | rsa): " "dsa ecdsa ecdsa-sk ed25519 ed25519-sk rsa" keytype
+    read -p "Give up name (Default:'id_keytype'): " name
+    reade -p "Give up keytype \(dsa \| ecdsa \| ecdsa-sk \| ed25519 (Default) \| ed25519-sk \| rsa\): " "dsa ecdsa ecdsa-sk ed25519 ed25519-sk rsa" keytype
     if [ -z $keytype ]; then
-        keytype=ed25519
+        keytype="ed25519"
     fi
     if [ -z $name ]; then
         name="id_$keytype"   
     fi
     ssh-keygen -t $keytype -f ~/.ssh/$name
     eval $(ssh-agent -s) 
-    ssh-add -v ~/.ssh/$name 
+    ssh-add -v ~/.ssh/$name
+    echo ""
     cat ~/.ssh/$name.pub
     echo "Host github.com" >> ~/.ssh/config
     echo "  IdentityFile ~/.ssh/$name" >> ~/.ssh/config 

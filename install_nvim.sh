@@ -17,7 +17,7 @@ if [[ $distro == "Arch" || $distro_base == "Arch" ]];then
     reade -Q "GREEN" -i "y" -p "Install nvim-javascript? [Y/n]:" "y n" jsscripts
     if [ -z $jsscripts ] || [ "y" == $jsscripts ]; then
         yes | sudo pacman -Su nodejs npm
-        npm install -g neovim
+        sudo npm install -g neovim
     fi
     reade -Q "GREEN" -i "y" -p "Install nvim-ruby? [Y/n]:" "y n" rubyscripts
     if [ -z $rubyscripts ] || [ "y" == $rubyscripts ]; then
@@ -46,7 +46,7 @@ elif [[ $distro == "Debian" || $distro_base == "Debian" ]];then
     reade -Q "GREEN" -i "y" -p "Install nvim-javascript? [Y/n]:" "y n" jsscripts
     if [ -z $jsscripts ] || [ "y" == $jsscripts ]; then
         yes | sudo apt install nodejs npm
-        npm install -g neovim
+        sudo npm install -g neovim
     fi
     reade -Q "GREEN" -i "y" -p "Install nvim-ruby? [Y/n]:" "y n" rubyscripts
     if [ -z $rubyscripts ] || [ "y" == $rubyscripts ]; then
@@ -64,7 +64,7 @@ fi
 
 function instvim_r(){
     if ! sudo test -d /root/.config/nvim/; then
-        mkdir /root/.config/nvim/
+        sudo mkdir /root/.config/nvim/
     fi
     sudo cp -fv vim/init.vim /root/.config/nvim/init.vim
     reade -Q "YELLOW" -p "Make symlink for init.vim at /root/.vimrc for user? (Might conflict with nvim +checkhealth) [Y/n]:" vimrc_r
@@ -87,12 +87,15 @@ function instvim(){
 }
 yes_edit_no instvim "vim/init.vim" "Install init.vim at ~/.config/nvim/init.vim ? (nvim config)" "edit" "GREEN"
 
-nvim +PlugInstall +qall
-nvim +checkhealth
+nvim +PlugInstall +checkhealth
 
-vimsh_r(){ sudo cp -fv vim/vim_nvim.sh /root/.bash_aliases.d/; }
+vimsh_r(){ 
+    sudo mkdir -p /root/.bash_aliases.d/
+    sudo cp -fv vim/vim_nvim.sh /root/.bash_aliases.d/; 
+}
 
 vimsh(){
+    mkdir -p ~/.bash_aliases.d/
     cp -fv vim/vim_nvim.sh ~/.bash_aliases.d/
     yes_edit_no vimsh_r "vim/vim_nvim.sh" "Install vim aliases at /root/.bash_aliases.d/? " "yes" "GREEN"
 }

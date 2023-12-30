@@ -71,7 +71,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         elif [ "$pgr2" == "most" ]; then
             sed 's|export PAGER=.*|export PAGER="/usr/bin/most"|' -i pathvars/.pathvariables.sh
         elif [ "$pgr2" == "moar" ]; then
-            sed 's|export PAGER=.*|export PAGER="/usr/local/bin/moar"|' -i pathvars/.pathvariables.sh
+            sed 's|export PAGER=.*|export PAGER="/usr/bin/moar"|' -i pathvars/.pathvariables.sh
             sed 's/#export MOAR=/export MOAR=/' -i pathvars/.pathvariables.sh
         fi
 
@@ -210,18 +210,18 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         fi
         
         sudo cp -fv checks/check_distro.sh /root/.bash_aliases.d/check_distro.sh
-        sudo cp -fv readline/rlwrap_scripts.sh ~/.bash_aliases.d/rlwrap_scripts.sh 
+        sudo cp -fv readline/rlwrap_scripts.sh /root/.bash_aliases.d/rlwrap_scripts.sh 
     fi
     
     # Xresources
     
     xresources_r(){
         sudo cp -fv xterm/.Xresources /root/.Xresources;
-        sudo cp -fv xterm/xterm.sh /root/xterm.sh;}
+        sudo cp -fv xterm/xterm.sh /root/.bash_aliases.d/xterm.sh;}
     xresources(){
         cp -fv xterm/.Xresources ~/.Xresources;
-        cp -fv xterm/xterm.sh ~/xterm.sh;
-        yes_edit_no xresources_r "xterm/.Xresources xterm/xterm.sh" "Install .Xresources and xterm.sh at /root/?" "edit" "RED"; }
+        cp -fv xterm/xterm.sh ~/.bash_aliases.d/xterm.sh;
+        yes_edit_no xresources_r "xterm/.Xresources xterm/xterm.sh" "Install .Xresources and xterm.sh at /root/.bash_aliases.d/?" "edit" "RED"; }
     yes_edit_no xresources "xterm/.Xresources xterm/xterm.sh" "Install .Xresources and xterm.sh at ~/.bash_aliases.d/? (readline config)" "edit" "YELLOW"
     
     # Tty keybinding
@@ -255,7 +255,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     shell-keybindings() {
         cp -fv aliases/shell_keybindings.sh ~/.bash_aliases.d/
         yes_edit_no shell-keybindings_r "aliases/shell_keybindings.sh" "Install .bash_aliases.d/shell_keybindings.sh at /root/?" "edit" "RED"; }
-    yes_edit_no shell-keybindings_r "aliases/shell_keybindings.sh" "Install .bash_aliases.d/shell-keybindings.sh at ~/? (bind commands)" "edit" "YELLOW"
+    yes_edit_no shell-keybindings "aliases/shell_keybindings.sh" "Install .bash_aliases.d/shell-keybindings.sh at ~/? (bind commands)" "edit" "YELLOW"
 
     
     # Moar (Custom pager instead of less)
@@ -404,8 +404,11 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
             fi
         fi
         
-        if [ ! -x "$(command -v copy-to)" ]; then 
-            . install_copy-conf.sh
+        if [ ! -x "$(command -v copy-to)" ]; then
+            reade -Q "GREEN" -i "y" -p "Install copy-to [Y/n]: " "y n" cpcnf;
+            if [ "y" == $cpcnf ] || [ -z $cpcnf ]; then
+                ./install_copy-conf.sh
+            fi
         fi
         #yes_edit_no git_r "aliases/git.sh" "Install git.sh at /root/?" "no" "RED" 
     }
@@ -440,7 +443,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     #
     ytbe_r(){ sudo cp -fv aliases/youtube.sh /root/.bash_aliases.d/;}
     ytbe(){
-        . checks/check_youtube.sh
+        . ./checks/check_youtube.sh
         cp -fv aliases/youtube.sh ~/.bash_aliases.d/
         yes_edit_no ytbe_r "aliases/youtube.sh" "Install youtube.sh at /root/?" "no" "YELLOW" 
     }
