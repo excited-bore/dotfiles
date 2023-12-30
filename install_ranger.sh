@@ -8,13 +8,21 @@ if [ -z $rngr ] || [ "Y" == $rngr ] || [ $rngr == "y" ]; then
     if [ $distro_base == "Arch" ];then
         yes | sudo pacman -Su ranger python ttf-nerd-fonts-symbols-common ttf-nerd-fonts-symbols ttf-nerd-fonts-symbols-mono atool bat calibre elinks ffmpegthumbnailer fontforge highlight terminology mupdf-tools odt2txt
     elif [ $distro_base == "Debian" ]; then    
-        sudo apt update 
+        yes | sudo apt update 
         yes | sudo apt install ranger python3 python3-dev python3-pip atool bat elinks ffmpegthumbnailer fontforge highlight jq libcaca0 odt2txt mupdf-tools terminology 
     fi
     
+    # Remove message ('Removed /tmp/ranger_cd54qzd') after quitting ranger
+    if [ -f /usr/bin/ranger ] && ! grep -q 'rm -f -- "$temp_file" 2>/dev/null' /usr/bin/ranger; then
+       sudo sed -i 's|rm -f -- "$temp_file"|rm -f -- "$temp_file" 2>/dev/null|g' /usr/bin/ranger; 
+    fi
+
     #ranger --copy-config=all
     ranger --confdir=/home/$USER/.config/ranger --copy-config=all
-    
+    if [ -d ~/.bash_aliases.d/ ]; then
+        cp -fv ./aliases/ranger.sh ~/.bash_aliases.d/ranger.sh
+    fi
+
     rangr_cnf(){
         if [ ! -d ~/.config/ranger/ ]; then 
             mkdir -p ~/.config/ranger/
@@ -25,9 +33,13 @@ if [ -z $rngr ] || [ "Y" == $rngr ] || [ $rngr == "y" ]; then
 
     reade -Q "GREEN" -i "y" -p "F2 for Ranger? [Y/n]:" "y n" rf2
     if [ -z $rf2 ] || [ "y" == $rf2 ]; then
-        if grep -q 'bind -x '\''"\\eOQ": ranger'\''' ./aliases/shell_keybindings.sh; then
-            sed -i 's|#bind -x '\''"\\eOQ": ranger'\''|bind -x '\''"\\eOQ": ranger'\''|g' ./aliases/shell_keybindings.sh
-        fi
+        if [ -f ~/.bash_aliases.d/shell_keybindings.sh ]; then
+            if grep -q 'bind -x '\''"\\eOQ": ranger'\''' ~/.bash_aliases.d/shell_keybindings.sh; then
+                sed -i 's|#bind -x '\''"\\eOQ": ranger'\''|bind -x '\''"\\eOQ": ranger'\''|g' ~/.bash_aliases.d/shell_keybindings.sh
+            fi
+        elif ! grep -q 'bind -x '\''"\\eOQ": ranger'\''' ~/.bashrc; then
+             echo 'bind -x '\''"\\eOQ": ranger'\''' >> ~/.bashrc
+        fi 
     fi
 
     reade -Q "GREEN" -i "y" -p "Install ranger (dev)icons? (ranger plugin at ~/.conf/ranger/plugins) [Y/n]:" "y n" rplg
