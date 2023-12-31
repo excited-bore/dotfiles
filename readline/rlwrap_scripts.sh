@@ -53,7 +53,8 @@ reade(){
                 b)  breaklines=${OPTARG};
                     ;;
                 # File completions
-                e)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-c |g");
+                e)  rlwstring=$(echo $rlwstring | sed "s| -f <(echo \"${args[@]}\") | |g");
+                    rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-c |g");
                     ;;
                 # Pre-filled answer
                 i)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-P \"${OPTARG}\" |g");
