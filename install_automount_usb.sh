@@ -19,9 +19,9 @@ uuid=$(sudo blkid | grep $drive | perl -pe 's|.*?UUID="(.*?)".*|UUID=\1|')
 type_fs=$(sudo blkid | grep $drive | perl -pe 's|.*?TYPE="(.*?)".*|\1|')
 
 if [[ $type_fs == "vfat" || $type_fs == "ntfs" ]]; then
-    attr="nosuid,nodev,nofail,noauto,x-gvfs-show,umask=000"
+    attr="nosuid,nodev,nofail,auto,x-gvfs-show,umask=000 0 0"
 elif [[ $type_fs == "exfat" || $type_fs == "ext4" ]]; then
-    attr="nosuid,nodev,nofail,noauto,x-gvfs-show"
+    attr="nosuid,nodev,nofail,auto,x-gvfs-show 0 0"
 else
     echo "Unrecognized filetype"
     exit 1
