@@ -93,7 +93,9 @@ git_add_commit_push_all(){
 
 alias git_commit_using_last="git commit --amend"
 alias git_list_branches="git branch --list -vv"
-alias git_create_and_switch_branch="git checkout -b "
+alias git_switch_branch="git checkout - "
+alias git_switch_branch_and_track_remote="git checkout -t - "
+alias git_create_and_switch_branch="git checkout -b - "
 alias git_push_to_branch="git push -u origin "
 
 
@@ -156,8 +158,6 @@ git_backup_branch_and_reset_to_remote() {
 }
 alias git_remote_rename="git remote -v rename"
 alias git_remote_remove="git remote -v rm"
-alias git_switch_branch="git checkout"
-alias git_switch_branch_and_track_remote="git checkout -t"
 alias git_remote_set_url="git remote -v set-url"
 
 function git_set_default_remote_branch() { 
