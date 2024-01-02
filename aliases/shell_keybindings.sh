@@ -3,6 +3,8 @@
 # root shell profiles -> /etc/profile
 # Other bindings at .inputrc
 
+# https://stackoverflow.com/questions/8366450/complex-keybinding-in-bash
+
 alias ls_binds="bind -p"
 
 #alias tty_size_half="tput cup $(stty size | awk '{print int($1/2);}') 0"
@@ -109,7 +111,7 @@ ctrl-s(){
 }
 
 # Ctrl-s; Open files using default-applications and fzf
-bind -x '"\C-s": ctrl-s'
+#bind -x '"\C-s": ctrl-s'
 
 # Ctrl-Enter gives you a paged output
 bind '"\e[13": " | $PAGER\C-p"' 
@@ -126,11 +128,13 @@ bind '"\C-n": "\C-a\e[3~"'
 # Ctrl-n removes first character from command line (uncomment)
 bind '"\C-o": "\C-u man \C-y\C-m"'
 
-# F2 - Ranger (file explorer)
-bind -x '"\eOQ": . ranger'
+# F2 - ranger (file explorer)
+# \201 is a 'fake' key
+bind -x '"\201": ranger'
+bind '"\eOQ": "\201\n\C-l"'
 
 # F3 - FuzzyFinderls -l | fzf --preview="echo user={3} when={-4..-2}; cat {-1}" --header-lines=1 (file explorer)
-bind -x '"\eOR": ctrl-s'
+#bind -x '"\eOR": ctrl-s'
 
 # F5, Ctrl-r - Reload .bashrc /.inputrc
 #bind '"\e[15~": re-read-init-file'
