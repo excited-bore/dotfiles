@@ -347,10 +347,10 @@ vnoremap <C-w> <Esc>:write!<CR>gv
 
 function! CloseWindow()
     " if this window is last on screen quit without warning
-    if winbufnr(2) == -1
-        quit!
+    if len(filter(range(1, bufnr('$')), 'buflisted(v:val)')) > 1
+        bd!
     else
-        close!
+        quit!
     endif
 endfunction
 

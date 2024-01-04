@@ -77,38 +77,32 @@ bind '"\C-z": vi-undo'
 # Ctrl-g adds a piped grep for convenience
 bind '"\C-g": "| grep -i "'
 
-ctrl-s(){
-    file="$(fzf -m --no-sort --height 75% --reverse)"; 
-    if [ -z "$file" ]; then
-        return 0;
-    fi
-    shellscrpt=""; 
-    audio="";
-    video="";
-    #https://unix.stackexchange.com/questions/628527/split-string-on-newline-and-write-it-into-array-using-read
-    IFS=$'\n' read -d "\034" -r -a line <<<"${file}\034";
-    ftype=$(xdg-mime query filetype "$line");
-        #line=$(sed 's/ /\\ /g' <<< "$line");
-        if [[ $ftype == application/x-shellscript ]]; then
-            shellscrpt="$shellscrpt$line"; 
-        elif [[ $ftype == audio/mpeg ]]; then
-            audio="$audio$line";
-        elif [[ $ftype == video/mp4 ]]; then
-            audio="$video$line";
-        else
-            xdg-open "$line";
-        fi
-    if [ ! -z "$shellscrpt" ]; then
-        $EDITOR "${shellscrpt[@]}"; 
-    fi
-    if [ ! -z "$audio" ]; then
-        vlc "${audio[@]}" > /dev/null 2>&1 & disown;
-
-    fi
-    if [ ! -z "$video" ]; then
-        vlc "${video[@]}"  > /dev/null 2>&1 & disown;
-    fi
-}
+#ctrl-s(){
+#    file="$(fzf -m --no-sort --height 75% --reverse)";
+#    if [ -z "$file" ]; then
+#        return 0;
+#    else
+#        lines="$(echo "$file" | wc -l)";
+#        if [ "$lines" == 1 ]; then
+#            if [ -d "$file" ]; then
+#                result=$(printf "0:change directory \n1:Use rifle" | fzf --height 75% --reverse) 
+#                if [ "${result::1}" == "0" ]; then
+#                    cd "$file";
+#                    return 0;
+#                fi
+#            else
+#                result=$(rifle -l "$file" | fzf --height 75% --reverse);
+#                rifle -p "${result::1}" "$file";
+#                return 0;
+#            fi
+#        else
+#            IFS=$'\n' read -d "\034" -r -a files <<<"${file}\034";
+#            result=$(rifle -l "$files" | fzf --height 75% --reverse);
+#            rifle -p "${result::1}" "${files[@]}"
+#            return 0;
+#        fi    
+#    fi
+#}
 
 # Ctrl-s; Open files using default-applications and fzf
 #bind -x '"\C-s": ctrl-s'
@@ -125,12 +119,14 @@ bind '"\C-b": insert-comment 1'
 # Ctrl-n removes first character from command line (uncomment)
 bind '"\C-n": "\C-a\e[3~"'
 
-# Ctrl-n removes first character from command line (uncomment)
+# Ctrl-o searches for a manual for the typed command 
 bind '"\C-o": "\C-u man \C-y\C-m"'
 
 # F2 - ranger (file explorer)
 bind -x '"\201": ranger'
-bind '"\eOQ": \201\n\C-l'
+bind '"\eOQ": "\201\n\C-l"'
+#bind -x '"\eOQ": ranger'
+
 # F3 - FuzzyFinderls -l | fzf --preview="echo user={3} when={-4..-2}; cat {-1}" --header-lines=1 (file explorer)
 #bind -x '"\eOR": ctrl-s'
 
