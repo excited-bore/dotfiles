@@ -6,11 +6,11 @@ if [ ! -d ~/.bash_completion.d ]; then
 fi
 
 if [[ $distro == "Debian" || $distro_base == "Debian" ]]; then
-    sudo apt install python3 python3-pip
-    python3 -m pip install argcomplete
+    yes | sudo apt install python3 python3-pipx
+    pipx install argcomplete
 elif [[ $distro == "Arch" || $distro_base == "Arch" ]]; then
-    sudo pacman -Su python python-pip
-    pip3 install argcomplete
+    yes | sudo pacman -Su python python-pipx
+    pipx install argcomplete
 fi
 
 activate-global-python-argcomplete --dest=/home/$USER/.bash_completion.d
@@ -23,8 +23,7 @@ if [ "y" == "$arg" ]; then
     if ! sudo test -d /root/.bash_completion.d; then
         sudo mkdir /root/.bash_completion.d
     fi
-    sudo -H pip3 install argcomplete
-    sudo activate-global-python-argcomplete --dest=/root/.bash_completion.d
+    sudo activate-global-python-argcomplete
     if ! sudo grep -q "python-argcomplete" /root/.bashrc; then
         printf "\n. /root/.bash_completion.d/python-argcomplete" | sudo tee -a /root/.bashrc
     fi

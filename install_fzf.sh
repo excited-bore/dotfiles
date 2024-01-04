@@ -49,11 +49,10 @@
         fi
 
         if test -f ~/.fzf.bash ; then
-            
-            reade -Q "GREEN" -i "y" -p "Replace fzf bind Ctrl-Z to Ctrl-j to keep vi-undo? (other then emacs and vi editing mode)?" "y n" fzf_z
-            if [ $fzf_z == "y" ] || [ -z $fzf_z ]; then
-                sed -i  's|\\C-z|\\C-z|g' ~/.fzf/shell/key-bindings.bash
-                sed -i  's|ctrl-z|ctrl-j|g' ~/.fzf/shell/key-bindings.bash
+            if [ -f ~/.bash_aliases/shell_keybindings.sh ] && grep -w '\C-z' ~/.bash_aliases/shell_keybindings.sh == "bind '\"\C-z\": vi-undo'"; then
+                sed -i  's|bind -m vi-command '\''"\C-z"|#bind -m vi-command '\''"\C-z"|g' ~/.fzf/shell/key-bindings.bash
+                sed -i  's|bind -m vi-insert '\''"\C-z"|#bind -m vi-insert '\''"\C-z"|g' ~/.fzf/shell/key-bindings.bash
+                sed -i  's|bind -m emacs-standard '\''"\C-z"|#bind -m emacs-standard '\''"\C-z"|g' ~/.fzf/shell/key-bindings.bash
             fi
             
             reade -Q "GREEN" -i "y" -p "Add shortcut Ctrl-S and F3 for fzf search? (uses xdg-open) [Y/n]:" "y n" fzf_s
@@ -64,12 +63,12 @@
                 fi
             fi
             
-            reade -Q "GREEN" -i "y" -p "Change shortcut Ctrl-T to Ctrl-F? (Fzf and paste in console) [Y/n]:" "y n" fzf_t
+            reade -Q "GREEN" -i "y" -p "Change shortcut for filesearch from Ctrl-T to Ctrl-F? (Fzf and paste in console) [Y/n]:" "y n" fzf_t
             if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ] ; then 
+                sed -i 's|# CTRL-T|# CTRL-F|g' ~/.fzf/shell/key-bindings.bash
                 sed -i 's|bind -m emacs-standard '\''"\\C-t": |bind -m emacs-standard '\''"\\C-f": |g' ~/.fzf/shell/key-bindings.bash
                 sed -i 's|bind -m vi-command '\''"\\C-t": |bind -m vi-command '\''"\\C-f": |g' ~/.fzf/shell/key-bindings.bash
                 sed -i 's|bind -m vi-insert '\''"\\C-t": |bind -m vi-insert '\''"\\C-f": |g' ~/.fzf/shell/key-bindings.bash
-                
                 sed -i 's|bind -m emacs-standard -x '\''"\\C-t": |bind -m emacs-standard -x '\''"\\C-f": |g' ~/.fzf/shell/key-bindings.bash
                 sed -i 's|bind -m vi-command -x '\''"\\C-t": |bind -m vi-command -x '\''"\\C-f": |g' ~/.fzf/shell/key-bindings.bash
                 sed -i 's|bind -m vi-insert -x '\''"\\C-t": |bind -m vi-insert -x '\''"\\C-f": |g' ~/.fzf/shell/key-bindings.bash
@@ -78,9 +77,9 @@
             reade -Q "GREEN" -i "y" -p "Change Alt-C shortcut to Alt-F for fzf cd? [Y/n]:" "y n" fzf_f
             if [ "$fzf_f" == "y" ] || [ -z "$fzf_f" ] ; then 
                 sed -i 's|# ALT-C - cd into the selected directory|# ALT-F - cd into the selected directory|g' ~/.fzf/shell/key-bindings.bash
-                sed -i 's|bind -m emacs-standard '\''"\ec": |bind -m emacs-standard '\''"\ef": |g'  ~/.fzf/shell/key-bindings.bash
-                sed -i 's|bind -m vi-command '\''"\ec": |bind -m vi-command '\''"\ef": |g' ~/.fzf/shell/key-bindings.bash
-                sed -i 's|bind -m vi-insert  '\''"\ec": |bind -m vi-insert  '\''"\ef": |g' ~/.fzf/shell/key-bindings.bash
+                sed -i 's|bind -m emacs-standard '\''"\\ec"|bind -m emacs-standard '\''"\\ef"|g'  ~/.fzf/shell/key-bindings.bash
+                sed -i 's|bind -m vi-command '\''"\\ec"|bind -m vi-command '\''"\\ef"|g' ~/.fzf/shell/key-bindings.bash
+                sed -i 's|bind -m vi-insert  '\''"\\ec"|bind -m vi-insert  '\''"\\ef"|g' ~/.fzf/shell/key-bindings.bash
             fi
             
         fi

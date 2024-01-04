@@ -13,11 +13,12 @@ if [[ $distro == "Arch" || $distro_base == "Arch" ]];then
     fi
     reade -Q "GREEN" -i "y" -p "Install nvim-python? [Y/n]:" "y n" pyscripts
     if [ -z $pyscripts ] || [ "y" == $pyscripts ]; then
-        yes | sudo pacman -Su python python-pip python-pynvim   
+        yes | sudo pacman -Su python python-pynvim python-pipx
+        pipx install pynvim pylint
     fi
     reade -Q "GREEN" -i "y" -p "Install nvim-javascript? [Y/n]:" "y n" jsscripts
     if [ -z $jsscripts ] || [ "y" == $jsscripts ]; then
-        yes | sudo pacman -Su nodejs npm
+        yes | sudo pacman -Su npm nodejs
         sudo npm install -g neovim
     fi
     reade -Q "GREEN" -i "y" -p "Install nvim-ruby? [Y/n]:" "y n" rubyscripts
@@ -41,8 +42,8 @@ elif [[ $distro == "Debian" || $distro_base == "Debian" ]];then
     fi
     reade -Q "GREEN" -i "y" -p "Install nvim-python? [Y/n]:" "y n" pyscripts
     if [ -z $pyscripts ] || [ "y" == $pyscripts ]; then
-        yes | sudo apt install python3 python3-dev python3-pip  
-        pip3 install pynvim
+        yes | sudo apt install python3 python3-dev python3-pipx  
+        pipx install pynvim pylint
     fi
     reade -Q "GREEN" -i "y" -p "Install nvim-javascript? [Y/n]:" "y n" jsscripts
     if [ -z $jsscripts ] || [ "y" == $jsscripts ]; then

@@ -75,7 +75,7 @@ bind -x '"\C-q": exit'
 bind '"\C-z": vi-undo'
 
 # Ctrl-g adds a piped grep for convenience
-bind '"\C-g": " | grep -i "'
+bind '"\C-g": "| grep -i "'
 
 ctrl-s(){
     file="$(fzf -m --no-sort --height 75% --reverse)"; 
@@ -129,10 +129,8 @@ bind '"\C-n": "\C-a\e[3~"'
 bind '"\C-o": "\C-u man \C-y\C-m"'
 
 # F2 - ranger (file explorer)
-# \201 is a 'fake' key
 bind -x '"\201": ranger'
-bind '"\eOQ": "\201\n\C-l"'
-
+bind '"\eOQ": \201\n\C-l'
 # F3 - FuzzyFinderls -l | fzf --preview="echo user={3} when={-4..-2}; cat {-1}" --header-lines=1 (file explorer)
 #bind -x '"\eOR": ctrl-s'
 

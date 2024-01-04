@@ -36,7 +36,7 @@ if [ -z $rngr ] || [ "Y" == $rngr ] || [ $rngr == "y" ]; then
         if [ -f ~/.bash_aliases.d/shell_keybindings.sh ]; then
             if grep -q '#bind -x '\''"\\201": ranger'\''' ~/.bash_aliases.d/shell_keybindings.sh; then
                 sed -i 's|#bind -x '\''"\\201": ranger'\''|bind -x '\''"\\201": ranger'\''|g' ~/.bash_aliases.d/shell_keybindings.sh
-                sed -i 's|#bind '\''"\\eOQ": "\\201\\n\\C-l"'\''|bind '\''"\\eOQ": \\201\\n\\C-l'\''|g' ~/.bash_aliases.d/shell_keybindings.sh
+                sed -i 's|#bind '\''"\\eOQ": "\\201\\n\\C-l"'\''|bind '\''"\\eOQ": "\\201\\n\\C-l"'\''|g' ~/.bash_aliases.d/shell_keybindings.sh
             fi
         elif ! grep -q 'bind -x '\''"\\201": ranger'\''' ~/.bashrc; then
             echo 'bind -x '\''"\\201": ranger'\''' >> ~/.bashrc

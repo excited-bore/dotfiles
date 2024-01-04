@@ -40,7 +40,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
     sed 's|#export TMPDIR|export TMPDIR|' -i pathvars/.pathvariables.sh
 
     # Then iterate through all predefined pathvars
-    reade -Q "GREEN" -i "y" -p "Set LS_COLORS with some predefined values? [Y/n]:" "y n" lsclrs
+    reade -Q "GREEN" -i "n" -p "Set LS_COLORS with some predefined values? [Y/n]:" "y n" lsclrs
     if [ "$lsclrs" == "y" ] || [ -z "$lsclrs" ]; then
         sed 's/^#export LS_COLORS/export LS_COLORS/' -i pathvars/.pathvariables.sh
     fi
@@ -160,9 +160,9 @@ fi
 
 
 pathvariables_r(){ 
-     if ! sudo grep -q "/root/.pathvariables.sh" /root/.bashrc; then
-        echo "if [[ -f /root/.pathvariables.sh ]]; then" | sudo tee -a /root/.bashrc
-        echo "  . /root/.pathvariables.sh" | sudo tee -a /root/.bashrc
+     if ! sudo grep -q "~/.pathvariables.sh" /root/.bashrc; then
+        echo "if [[ -f ~/.pathvariables.sh ]]; then" | sudo tee -a /root/.bashrc
+        echo "  . ~/.pathvariables.sh" | sudo tee -a /root/.bashrc
         echo "fi" | sudo tee -a /root/.bashrc
     fi
     sudo cp -fv pathvars/.pathvariables.sh /root/.pathvariables.sh;
@@ -205,8 +205,8 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
             sudo mkdir /root/.bash_aliases.d/
         fi
 
-        if ! sudo grep -q "/root/.bash_aliases.d" /root/.bashrc; then
-            printf "\nif [[ -d /root/.bash_aliases.d/ ]]; then\n  for alias in /root/.bash_aliases.d/*.sh; do\n      . \"\$alias\" \n  done\nfi" | sudo tee -a /root/.bashrc > /dev/null
+        if ! sudo grep -q "~/.bash_aliases.d" /root/.bashrc; then
+            printf "\nif [[ -d ~/.bash_aliases.d/ ]]; then\n  for alias in ~/.bash_aliases.d/*.sh; do\n      . \"\$alias\" \n  done\nfi" | sudo tee -a /root/.bashrc > /dev/null
         fi
         
         sudo cp -fv checks/check_distro.sh /root/.bash_aliases.d/check_distro.sh
@@ -217,11 +217,12 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     
     xresources_r(){
         sudo cp -fv xterm/.Xresources /root/.Xresources;
-        sudo cp -fv xterm/xterm.sh /root/.bash_aliases.d/xterm.sh;}
+        #sudo cp -fv xterm/xterm.sh /root/.bash_aliases.d/xterm.sh;
+        }
     xresources(){
         cp -fv xterm/.Xresources ~/.Xresources;
         cp -fv xterm/xterm.sh ~/.bash_aliases.d/xterm.sh;
-        yes_edit_no xresources_r "xterm/.Xresources xterm/xterm.sh" "Install .Xresources and xterm.sh at /root/.bash_aliases.d/?" "edit" "RED"; }
+        yes_edit_no xresources_r "xterm/.Xresources xterm/xterm.sh" "Install .Xresources at /root/.bash_aliases.d/?" "edit" "RED"; }
     yes_edit_no xresources "xterm/.Xresources xterm/xterm.sh" "Install .Xresources and xterm.sh at ~/.bash_aliases.d/? (readline config)" "edit" "YELLOW"
     
     # Tty keybinding
@@ -316,16 +317,16 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
                 curl https://raw.githubusercontent.com/cykerway/complete-alias/master/complete_alias | sudo tee /root/.bash_completion.d/complete_alias > /dev/null
                 sudo sed -i s/"#complete -F _complete_alias \"\(.*\)"/"complete -F _complete_alias \"\1"/g /root/.bash_completion.d/complete_alias
             fi
-            if ! sudo grep -q "/root/.bash_completion.d/complete_alias" /root/.bashrc; then
-                printf "\n. /root/.bash_completion.d/complete_alias\n" | sudo tee -a /root/.bashrc
+            if ! sudo grep -q "~/.bash_completion.d/complete_alias" /root/.bashrc; then
+                printf "\n. ~/.bash_completion.d/complete_alias\n" | sudo tee -a /root/.bashrc
             fi
         fi
     fi
     
-    #reade -Q "GREEN" -i "y" -p "Install python completions in */.bash_completion.d? [Y/n]:" "y n" pycomp
-    #if [ -z $pycomp ] || [ "y" == $pycomp ]; then
-    #    . install_pythonCompletions_bash.sh
-    #fi
+    reade -Q "GREEN" -i "y" -p "Install python completions in */.bash_completion.d? [Y/n]:" "y n" pycomp
+    if [ -z $pycomp ] || [ "y" == $pycomp ]; then
+        . ./install_pythonCompletions_bash.sh
+    fi
     
     bash_yes_r(){ sudo cp -fv aliases/bash.sh /root/.bash_aliases.d/; }
     bash_yes() {
