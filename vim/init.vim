@@ -1,4 +1,3 @@
-"Avoid errior message lingering
 "autocmd CursorHold      * echo mode(1)
 "autocmd CursorHoldI     * echo mode(1)
 autocmd CursorMoved     * set cul
@@ -352,8 +351,8 @@ function! CloseWindow()
     " if the amount of open buffers is still more then 1, close buffer
      elseif len(filter(range(1, bufnr('$')), 'buflisted(v:val)')) > 1
         bd!
-    else
     " otherwise, close without warning
+    else
         quit!
     endif
 endfunction
