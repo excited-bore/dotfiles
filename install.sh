@@ -418,7 +418,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         
         if [[ ! $(git config --list | grep 'name') ]]; then
             reade -Q "GREEN" -i "y" -p "Configure git name? [Y/n]: " "y n" gitname
-            if [ "y" == $gitname ] || [ -z $gitname ]; then        
+            if [ "y" == $gitname ]; then        
                 reade -Q "CYAN" -p "Name: " name
                 if [ ! -z $name ]; then
                     git config --global user.name "$name"
@@ -428,10 +428,25 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         
         if [[ ! $(git config --list | grep 'email') ]]; then
             reade -Q "GREEN" -i "y" -p "Configure git email? [Y/n]: " "y n" gitmail ;
-            if [ "y" == $gitmail ] || [ -z $gitmail ]; then
+            if [ "y" == $gitmail ]; then
                 reade -Q "CYAN" -p "Email: " mail ;
                 if [ ! -z $mail ]; then
                     git config --global user.email "$mail" ;
+                fi
+            fi
+        fi
+
+         if [[ ! $(git config --list | grep 'merge') ]]; then
+            reade -Q "GREEN" -i "y" -p "Configure git mergetool? [Y/n]: " "y n" gitmerge ;
+            if [ "y" == $gitmerge ]; then
+                git mergetool --tool-help &> $TMPDIR/gitresults
+                amnt=$(cat $TMPDIR/gitresults | tail -n+2 | sed '0,/^$/d' | wc -l)
+                #amnt=$((++amnt))
+                rslt=$(cat $TMPDIR/gitresults | tail -n+2 | head -n-"$amnt" | awk '{print $1}')
+                git mergetool --tool-help
+                reade -Q "CYAN" -p "Mergetool: " "$(git mergetool --tool-help)" "$rslt" merge ;
+                if [ ! -z $merge ]; then
+                    git config --global merge.tool "$merge" ;
                 fi
             fi
         fi
