@@ -26,13 +26,13 @@
                 sed -i 's|#export FZF_DEFAULT_COMMAND|export FZF_DEFAULT_COMMAND|g' $PATHVAR
                 sed -i 's|#export FZF_CTRL_T_COMMAND|export FZF_CTRL_T_COMMAND|g' $PATHVAR
             elif ! grep -q "export FZF_DEFAULT_COMMAND" $PATHVAR; then
-                printf "\n# FZF\nexport FZF_DEFAULT_COMMAND='fd --search-path / --type f --hidden --follow --exclude \".dll .so .go\"'\nexport FZF_CTRL_T_COMMAND='$FZF_DEFAULT_COMMAND'" >> $PATHVAR
+                printf "\n# FZF\nexport FZF_DEFAULT_COMMAND=\"fd --search-path / --type f --hidden --exclude '*.dll *.pak *.bat *.so *.go' \"\nexport FZF_CTRL_T_COMMAND='$FZF_DEFAULT_COMMAND'" >> $PATHVAR
             fi
             if [ $PATHVAR_R == /root/.pathvariables.sh ] ; then
                 sudo sed -i 's|#export FZF_DEFAULT_COMMAND|export FZF_DEFAULT_COMMAND|g' $PATHVAR_R
                 sudo sed -i 's|#export FZF_CTRL_T_COMMAND|export FZF_CTRL_T_COMMAND|g' $PATHVAR_R 
             elif ! sudo grep -q "export FZF_DEFAULT_COMMAND" $PATHVAR_R; then
-                printf "\n# FZF\nexport FZF_DEFAULT_COMMAND='fd --search-path / --type f --hidden --follow --exclude \".dll .so .go\"'\nexport FZF_CTRL_T_COMMAND='$FZF_DEFAULT_COMMAND'" | sudo tee -a $PATHVAR_R
+                printf "\n# FZF\nexport FZF_DEFAULT_COMMAND=\"fd --search-path / --type f --hidden --exclude '*.dll *.pak *.bat *.so *.go' \"\nexport FZF_CTRL_T_COMMAND='$FZF_DEFAULT_COMMAND'" | sudo tee -a $PATHVAR_R
             fi
         fi
         

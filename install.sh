@@ -56,11 +56,11 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         more = Preinstalled other pager - leaves text\n"
         if [ -x "$(command -v most)" ]; then
             pagers="$pagers most"
-            prmpt="$prmpt \tmost = Pager with customizable colours - clears screen \n"
+            prmpt="$prmpt \tmost = Installed pager - Customizable \n"
         fi
         if [ -x "$(command -v moar)" ]; then
             pagers="$pagers moar"
-            prmpt="$prmpt \tmoar = Pager with linenumbers and great defaults - clears screen \n"
+            prmpt="$prmpt \tmoar = Installed pager - Pager with linenumbers; Also customizable\n"
         fi
         printf "$prmpt"
         reade -Q "GREEN" -i "less" -p "PAGER=" "$pagers" pgr2
@@ -76,27 +76,58 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         fi
 
     fi
+    unset $prmpt
+
     # TODO Add nano 
     # TODO Fix mimeopen subshell thing
     reade -Q "GREEN" -i "y" -p "Set EDITOR and VISUAL? [Y/n]:" "y n" edtvsl
     if [ "$edtvsl" == "y" ] || [ -z "$edtvsl" ]; then
+        editors="nano vi"
+        prmpt="${green} \tnano = Default editor - Basic, but userfriendly\n\
+        vi = Other preinstalled editor - Least userfriendly and archaic editor\n" 
+        if [ -x "$(command -v micro)" ]; then
+            editors="$pagers micro"
+            prmpt="$prmpt \tMicro = Relatively good out-of-the-box editor - Decent keybindings, yet no customizations\n"
+        fi
+        if [ -x "$(command -v ne)" ]; then
+            editors="$pagers ne"
+            prmpt="$prmpt \tNice editor = Relatively good out-of-the-box editor - Decent keybindings, yet no customizations\n"
+        fi
+        if [ -x "$(command -v vim)" ]; then
+            editors="$editors vim"
+            prmpt="$prmpt \tVim = The one and only true modal editor - Not userfriendly, but many features (maybe even too many) and greatly customizable\n"
+        fi
+        if [ -x "$(command -v nvim)" ]; then                                  
+            editors="$editors nvim"
+            prmpt="$prmpt \tNeovim = A better vim? - Faster and less buggy then regular vim, even a little userfriendlier\n"
+        fi
+        if [ -x "$(command -v emacs)" ]; then
+            editors="$editors emacs"
+            prmpt="$prmpt \tEmacs = One of the oldest and versatile editors - Modal and featurerich, but overwhelming as well\n"
+        fi
+        printf "$prmpt"
+        reade -Q "GREEN" -i "nano" -p "EDITOR (Terminal)=" "$editors" edtor
+        if [ "$edtor" == "emacs" ]; then
+            edtor="emacs -nw"
+        fi
+        edtor=$(whereis "$edtor" | awk '{print $2}')
+        sed 's|#export EDITOR=.*|export EDITOR="'$edtor'"|g' -i pathvars/.pathvariables.sh
+        
         # Make .txt file and output file
-        touch $TMPDIR/editor-check.txt $TMPDIR/editor-outpt
+        touch $TMPDIR/editor-outpt
         # Redirect output to file in subshell (mimeopen gives output but also starts read. This cancels read). In tmp because that gets cleaned up
-        (mimeopen -a $TMPDIR/editor-check.txt &> $TMPDIR/editor-outpt &)
-        cat $TMPDIR/editor-outpt
-        compedit=$(awk 'NR>2 {if (prev_2_line) print prev_2_line; prev_2_line=prev_1_line; prev_1_line=prev_line} {prev_line=$2}' $TMPDIR/editor-outpt)
+        (echo "" | mimeopen -a editor-check.sh &> $TMPDIR/editor-outpt)
+        compedit=$(cat $TMPDIR/editor-outpt | awk 'NR > 2' | awk '{if (prev_1_line) print prev_1_line; prev_1_line=prev_line} {prev_line=$NF}' | sed 's|[()]||g' | tr -s [:space:] \\n | uniq | tr '\n' ' ')
         frst="$(echo $compedit | awk '{print $1}')"
-        reade -Q "GREEN" -i "$frst" -p "(Terminal editor) EDITOR=" "$compedit" edtor
-        reade -Q "GREEN" -i "$frst" -p "(GUI editor) VISUAL=" "$compedit" vsual
-        sed 's/^#export EDITOR=.*/export EDITOR="'$edtor'"/' -i pathvars/.pathvariables.sh
-        sed 's/^#export VISUAL=.*/export VISUAL="'$vsual'"/' -i pathvars/.pathvariables.sh
+        reade -Q "GREEN" -i "$frst" -p "VISUAL (GUI editor)=" "$compedit" vsual
+        sed 's|#export VISUAL=.*|export VISUAL="'$vsual'"|' -i pathvars/.pathvariables.sh
     fi
+    unset edtvsl compedit frst editors prmpt
 
     # Set DISPLAY
     reade -Q "YELLOW" -i "n" -p "Set DISPLAY to ':0.0'? [Y/n]:" "y n" dsply
     if [ "$dsply" == "y" ] || [ -z "$dsply" ]; then
-        sed 's/^#export DISPLAY=.*/export DISPLAY=":0.0"/' -i pathvars/.pathvariables.sh
+        sed 's|#export DISPLAY=.*|export DISPLAY=":0.0"|' -i pathvars/.pathvariables.sh
     fi
 
     # TODO do something for flatpak  (XDG_DATA_DIRS)
