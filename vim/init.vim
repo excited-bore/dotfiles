@@ -421,7 +421,8 @@ vnoremap '          di''<Esc>hp<Esc>
 
 " Easy multiblock commenting
 vnoremap <expr> #   (visualmode() == "\<C-V>" ? 'I#<esc>' : 'di##<Esc>hp<Esc>')
-vnoremap <expr> "   (visualmode() == "\<C-V>" ? 'I"<esc>' : visualmode() == "V" ? '<Esc>O"""<Esc>jo"""<Esc>' : 'di""<Esc>hp<Esc>')
+"vnoremap <expr> "   (visualmode() == "\<C-V>" ? 'I"<esc>' : visualmode() == "V" ? '<Esc>O"""<Esc>jo"""<Esc>' : 'di""<Esc>hp<Esc>')
+vnoremap <expr> "   (visualmode() == "\<C-V>" ? 'I"<esc>' : 'di""<Esc>hp<Esc>')
 vnoremap <expr> !   (visualmode() == "\<C-V>" ? 'I!<esc>' : 'di!!<Esc>hp<Esc>')
 
 " Moving up and down will always recenter 
@@ -551,18 +552,18 @@ nnoremap <space> i<space><esc><Right>
 " Delete for normal mode
 nnoremap <Delete> i<Delete><Esc>
 
-" enter -> newline without entering insert mode
+" Enter -> newline without entering insert mode
 nnoremap <Enter> i<Enter><Esc>
 
-" ctrl enter => move current line down
-nnoremap <C-Enter>      0i<enter><up><esc>
-inoremap <C-Enter>      <Esc>0i<enter>
-vnoremap <C-Enter>      <Esc>`<i<Enter><Esc>gv
+" Ctrl-enter -> Start at a new line 
+nnoremap <C-Enter>      o<esc>
+inoremap <C-Enter>      <Esc>o
+vnoremap <C-Enter>      o<esc><enter>gv
 
-"Alt enter -> newline without entering insert mode
-nnoremap <A-Enter>      o<esc>
-inoremap <A-Enter>      <Esc>o
-vnoremap <A-Enter>      o<esc><enter>gv
+" Alt-enter -> Insert line at current lineposition 
+nnoremap <A-Enter>      0i<enter><up><esc>
+inoremap <A-Enter>      <Esc>0i<enter>
+vnoremap <A-Enter>      <Esc>`<i<Enter><Esc>gv
 
 
 " BackSpace -> backspace no leave normal mode
@@ -708,7 +709,7 @@ nnoremap <C-d>  (col(".") ==? 1 ? '<C-\><C-o>daw' : '<C-\><C-o>diw')
 """ Copy inner word except when on first line (copy a word)
 inoremap <expr> <C-c>   (col(".") ==? 1 ? '<C-\><C-o>"+yaw' : '<C-\><C-o>"+yiw')
 "" Paste with P if at beginning of line
-inoremap <silent> <C-v> <C-\><C-o>"+Pl
+inoremap <silent> <C-v> <C-\><C-o>"+P
 "" Cut with a word instead of inner word if at beginning of line
 inoremap <expr> <C-d>   (col(".") ==? 1 ? '<C-\><C-o>daw' : '<C-\><C-o>diw')
 vnoremap <C-c>  "+y 

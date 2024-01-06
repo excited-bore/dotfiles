@@ -6,8 +6,8 @@
 # Fzf (Fuzzy Finder)
 
 #if [ ! -x "$(command -v fzf)" ]; then
-    reade -Q "GREEN" -i "y" -p "Install fzf? (Fuzzy file/folder finder - keybinding yes for upgraded Ctrl-R/reverse-search, fzf filenames on Ctrl+T and fzf-version of 'cd' on Alt-C + Custom script: Ctrl-f becomes system-wide file opener) [Y/n]: " "y n" findr
-    if [ -z $findr ] || [ "Y" == $findr ] || [ $findr == "y" ]; then
+    #reade -Q "GREEN" -i "y" -p "Install fzf? (Fuzzy file/folder finder - keybinding yes for upgraded Ctrl-R/reverse-search, fzf filenames on Ctrl+T and fzf-version of 'cd' on Alt-C + Custom script: Ctrl-f becomes system-wide file opener) [Y/n]: " "y n" findr
+    #if [ -z $findr ] || [ "Y" == $findr ] || [ $findr == "y" ]; then
         
         git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
         ~/.fzf/install
@@ -59,9 +59,9 @@
         fi
 
         if test -f ~/.fzf.bash ; then
-            if [ -f ~/.bash_aliases/shell_keybindings.sh ] && grep -w '\C-z' ~/.bash_aliases/shell_keybindings.sh == "bind '\"\\C-z\": vi-undo'"; then
-                sed -i 's|\\C-f||g'
-                sed -i 's|\\C-z|\\C-f|g'
+            if [ -f ~/.bash_aliases/shell_keybindings.sh ] && grep -w '\\C-z' ~/.bash_aliases/shell_keybindings.sh == "bind '\"\\C-z\": vi-undo'"; then
+                sed -i 's|\\C-f||g' ~/.fzf/shell/key-bindings.bash
+                sed -i 's|\\C-z|\\C-f|g' ~/.fzf/shell/key-bindings.bash
                 #sed -i  's|bind -m emacs-standard '\''"\C-z"|#bind -m emacs-standard '\''"\C-z"|g' ~/.fzf/shell/key-bindings.bash
                 #sed -i  's|bind -m vi-command '\''"\C-z"|#bind -m vi-command '\''"\C-z"|g' ~/.fzf/shell/key-bindings.bash
                 #sed -i  's|bind -m vi-insert '\''"\C-z"|#bind -m vi-insert '\''"\C-z"|g' ~/.fzf/shell/key-bindings.bash
@@ -113,5 +113,5 @@
             unset fzf_t
 
         fi
-    fi
+    #fi
 #fi

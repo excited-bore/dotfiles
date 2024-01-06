@@ -3,8 +3,8 @@
 . ./readline/rlwrap_scripts.sh
 
  # Ranger (File explorer)
- reade -Q "GREEN" -i "y" -p "Install Ranger? (Terminal file explorer) [Y/n]: " "y n" rngr
-if [ -z $rngr ] || [ "Y" == $rngr ] || [ $rngr == "y" ]; then
+#reade -Q "GREEN" -i "y" -p "Install Ranger? (Terminal file explorer) [Y/n]: " "y n" rngr
+#if [ -z $rngr ] || [ "Y" == $rngr ] || [ $rngr == "y" ]; then
     if [ $distro_base == "Arch" ];then
         yes | sudo pacman -Su ranger python ttf-nerd-fonts-symbols-common ttf-nerd-fonts-symbols ttf-nerd-fonts-symbols-mono atool bat calibre elinks ffmpegthumbnailer fontforge highlight terminology mupdf-tools odt2txt
     elif [ $distro_base == "Debian" ]; then    
@@ -80,4 +80,4 @@ if [ -z $rngr ] || [ "Y" == $rngr ] || [ $rngr == "y" ]; then
             fi
         fi
     fi
-fi
+#fi

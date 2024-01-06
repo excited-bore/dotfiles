@@ -28,6 +28,8 @@ if [ ! -e ~/etc_systemd ]; then
 fi
 
 
+
+
 # Pathvariables
 
 reade -Q "GREEN" -i "y" -p "Check existence (and create) ~/.pathvariables.sh and link it to .bashrc? [Y/n]:" "y n" pathvars
@@ -40,6 +42,12 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
     sed 's|#export TMPDIR|export TMPDIR|' -i pathvars/.pathvariables.sh
 
     # Then iterate through all predefined pathvars
+    
+    # Package Managers
+    reade -Q "GREEN" -i "y" -p "Check and create DIST,DIST_BASE,ARCH,PM and WRAPPER? (distro, distro base, architecture, package manager and pm wrapper) [Y/n]:" "y n" Dists
+    if [ "$Dists" == "y" ]; then
+       printf "NOT YET IMPLEMENTED\n"
+    fi
     reade -Q "GREEN" -i "n" -p "Set LS_COLORS with some predefined values? [Y/n]:" "y n" lsclrs
     if [ "$lsclrs" == "y" ] || [ -z "$lsclrs" ]; then
         sed 's/^#export LS_COLORS/export LS_COLORS/' -i pathvars/.pathvariables.sh
@@ -52,34 +60,31 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         sed 's/^#export PAGER=/export PAGER=/' -i pathvars/.pathvariables.sh
         
         pagers="less more"
-        prmpt="${green} \tless = Default pager - clears screen\n\
-        more = Preinstalled other pager - leaves text\n"
+        prmpt="${green} \tless = Default pager - Oldest and most customizable\n\
+            more = Preinstalled other pager - leaves text by default, less customizable (ironically)\n"
         if [ -x "$(command -v most)" ]; then
             pagers="$pagers most"
-            prmpt="$prmpt \tmost = Installed pager - Customizable \n"
+            prmpt="$prmpt \tmost = Installed pager\n"
         fi
         if [ -x "$(command -v moar)" ]; then
             pagers="$pagers moar"
-            prmpt="$prmpt \tmoar = Installed pager - Pager with linenumbers; Also customizable\n"
+            prmpt="$prmpt \tmoar = Installed pager\n"
         fi
         printf "$prmpt"
         reade -Q "GREEN" -i "less" -p "PAGER=" "$pagers" pgr2
-        if [ "$pgr2" == "less" ] || [ -z "$pgr2" ]; then
-            sed 's|export PAGER=.*|export PAGER="/usr/bin/less"|' -i pathvars/.pathvariables.sh
-        elif [ "$pgr2" == "more" ]; then
-            sed 's|export PAGER=.*|export PAGER="/usr/bin/more"|' -i pathvars/.pathvariables.sh
-        elif [ "$pgr2" == "most" ]; then
-            sed 's|export PAGER=.*|export PAGER="/usr/bin/most"|' -i pathvars/.pathvariables.sh
-        elif [ "$pgr2" == "moar" ]; then
-            sed 's|export PAGER=.*|export PAGER="/usr/bin/moar"|' -i pathvars/.pathvariables.sh
-            sed 's/#export MOAR=/export MOAR=/' -i pathvars/.pathvariables.sh
+        pgr2=$(whereis "$pgr2" | awk '{print $2}')
+        sed -i 's|export PAGER=.*|export PAGER='$pgr2'|' pathvars/.pathvariables.sh
+        if grep -q "less" "$pgr2"; then
+            sed -i 's/#export LESS=/export LESS=/' pathvars/.pathvariables.sh
+            #sed -i 's/#export LESSEDIT=/export LESSEDIT=/' pathvars/.pathvariables.sh
+        fi
+        if grep -q "moar" "$pgr2"; then
+            sed -i 's/#export MOAR=/export MOAR=/' pathvars/.pathvariables.sh
         fi
 
     fi
-    unset $prmpt
+    unset prmpt
 
-    # TODO Add nano 
-    # TODO Fix mimeopen subshell thing
     reade -Q "GREEN" -i "y" -p "Set EDITOR and VISUAL? [Y/n]:" "y n" edtvsl
     if [ "$edtvsl" == "y" ] || [ -z "$edtvsl" ]; then
         editors="nano vi"
@@ -96,10 +101,14 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         if [ -x "$(command -v vim)" ]; then
             editors="$editors vim"
             prmpt="$prmpt \tVim = The one and only true modal editor - Not userfriendly, but many features (maybe even too many) and greatly customizable\n"
+            sed -i "s|#export MYVIMRC=|export MYVIMRC=|g" pathvars/.pathvariables.sh
+            sed -i "s|#export MYGVIMRC=|export MYGVIMRC=|g" pathvars/.pathvariables.sh
         fi
         if [ -x "$(command -v nvim)" ]; then                                  
             editors="$editors nvim"
             prmpt="$prmpt \tNeovim = A better vim? - Faster and less buggy then regular vim, even a little userfriendlier\n"
+            sed -i "s|#export MYVIMRC=|export MYVIMRC=|g" pathvars/.pathvariables.sh
+            sed -i "s|#export MYGVIMRC=|export MYGVIMRC=|g" pathvars/.pathvariables.sh
         fi
         if [ -x "$(command -v emacs)" ]; then
             editors="$editors emacs"
@@ -111,7 +120,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
             edtor="emacs -nw"
         fi
         edtor=$(whereis "$edtor" | awk '{print $2}')
-        sed 's|#export EDITOR=.*|export EDITOR="'$edtor'"|g' -i pathvars/.pathvariables.sh
+        sed -i 's|#export EDITOR=.*|export EDITOR='$edtor'|g' pathvars/.pathvariables.sh
         
         # Make .txt file and output file
         touch $TMPDIR/editor-outpt
@@ -120,14 +129,15 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         compedit=$(cat $TMPDIR/editor-outpt | awk 'NR > 2' | awk '{if (prev_1_line) print prev_1_line; prev_1_line=prev_line} {prev_line=$NF}' | sed 's|[()]||g' | tr -s [:space:] \\n | uniq | tr '\n' ' ')
         frst="$(echo $compedit | awk '{print $1}')"
         reade -Q "GREEN" -i "$frst" -p "VISUAL (GUI editor)=" "$compedit" vsual
-        sed 's|#export VISUAL=.*|export VISUAL="'$vsual'"|' -i pathvars/.pathvariables.sh
+        vsual=$(whereis "$vsual" | awk '{print $2}')
+        sed -i 's|#export VISUAL=.*|export VISUAL='$vsual'|' pathvars/.pathvariables.sh
     fi
     unset edtvsl compedit frst editors prmpt
 
     # Set DISPLAY
     reade -Q "YELLOW" -i "n" -p "Set DISPLAY to ':0.0'? [Y/n]:" "y n" dsply
     if [ "$dsply" == "y" ] || [ -z "$dsply" ]; then
-        sed 's|#export DISPLAY=.*|export DISPLAY=":0.0"|' -i pathvars/.pathvariables.sh
+        sed -i 's|#export DISPLAY=.*|export DISPLAY=":0.0"|'  pathvars/.pathvariables.sh
     fi
 
     # TODO do something for flatpak  (XDG_DATA_DIRS)
@@ -187,27 +197,26 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
             sed 's/^#export SYSTEMD_LOG_TARGET=\(.*\)/export SYSTEMD_LOG_TARGET=\1/' -i pathvars/.pathvariables.sh
         fi
     fi
+
+    pathvariables_r(){ 
+         if ! sudo grep -q "~/.pathvariables.sh" /root/.bashrc; then
+            echo "if [[ -f ~/.pathvariables.sh ]]; then" | sudo tee -a /root/.bashrc
+            echo "  . ~/.pathvariables.sh" | sudo tee -a /root/.bashrc
+            echo "fi" | sudo tee -a /root/.bashrc
+        fi
+        sudo cp -fv pathvars/.pathvariables.sh /root/.pathvariables.sh;
+    }                                            
+    pathvariables(){
+        if ! grep -q "~/.pathvariables.sh" ~/.bashrc; then
+            echo "if [[ -f ~/.pathvariables.sh ]]; then" >> ~/.bashrc
+            echo "  . ~/.pathvariables.sh" >> ~/.bashrc
+            echo "fi" >> ~/.bashrc
+        fi
+        cp -fv pathvars/.pathvariables.sh ~/.pathvariables.sh
+        yes_edit_no pathvariables_r "pathvars/.pathvariables.sh" "Install .pathvariables.sh at /root/?" "edit" "YELLOW"; 
+    }
+    yes_edit_no pathvariables "pathvars/.pathvariables.sh" "Install .pathvariables.sh at ~/? " "edit" "GREEN"
 fi
-
-
-pathvariables_r(){ 
-     if ! sudo grep -q "~/.pathvariables.sh" /root/.bashrc; then
-        echo "if [[ -f ~/.pathvariables.sh ]]; then" | sudo tee -a /root/.bashrc
-        echo "  . ~/.pathvariables.sh" | sudo tee -a /root/.bashrc
-        echo "fi" | sudo tee -a /root/.bashrc
-    fi
-    sudo cp -fv pathvars/.pathvariables.sh /root/.pathvariables.sh;
-}                                            
-pathvariables(){
-    if ! grep -q "~/.pathvariables.sh" ~/.bashrc; then
-        echo "if [[ -f ~/.pathvariables.sh ]]; then" >> ~/.bashrc
-        echo "  . ~/.pathvariables.sh" >> ~/.bashrc
-        echo "fi" >> ~/.bashrc
-    fi
-    cp -fv pathvars/.pathvariables.sh ~/.pathvariables.sh
-    yes_edit_no pathvariables_r "pathvars/.pathvariables.sh" "Install .pathvariables.sh at /root/?" "edit" "YELLOW"; 
-}
-yes_edit_no pathvariables "pathvars/.pathvariables.sh" "Install .pathvariables.sh at ~/? " "edit" "GREEN"
     
 reade -Q "GREEN" -i "y" -p "Check existence (and create) ~/.bash_aliases.d/ and link it to .bashrc? (other .sh files will be placed here) [Y/n]:" "y n" scripts
 if [ -z $scripts ] || [ "y" == $scripts ]; then
@@ -266,9 +275,17 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
 
     # Readline
     
-    inputrc_r(){ sudo cp -fv readline/.inputrc /root/.inputrc; }
+    inputrc_r(){ 
+        sudo cp -fv readline/.inputrc /root/.inputrc; 
+        if [ -f /root/.pathvariables.sh ]; then
+           sed -i 's|#export INPUTRC|export INPUTRC|g' /root/.pathvariables.sh
+        fi
+    }
     inputrc() {
         cp -fv readline/.inputrc ~/
+        if [ -f ~/.pathvariables.sh ]; then
+           sed -i 's|#export INPUTRC|export INPUTRC|g' ~/.pathvariables.sh
+        fi
         yes_edit_no inputrc_r "readline/.inputrc" "Install .inputrc at /root/?" "edit" "GREEN"; }
     yes_edit_no inputrc "readline/.inputrc" "Install .inputrc at ~/? (readline config)" "edit" "GREEN"
     
@@ -290,8 +307,8 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     yes_edit_no shell-keybindings "aliases/shell_keybindings.sh" "Install .bash_aliases.d/shell-keybindings.sh at ~/? (bind commands)" "edit" "YELLOW"
 
     
-    # Moar (Custom pager instead of less)
     
+    # Moar (Custom pager instead of less)
     if [ ! -x "$(command -v moar)" ]; then
         reade -Q "GREEN" -i "y" -p "Install moar? (Custom pager instead of less with linenumbers) [Y/n]: " "y n" moar
         if [ -z $moar ] || [ "Y" == $moar ] || [ $moar == "y" ]; then
@@ -316,15 +333,38 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         fi
     fi
 
-    # Fzf (Fuzzy Finder)
-    #if [ ! -x "$(command -v fzf)" ]; then
-        . ./install_fzf.sh
-    #fi
+    # Nvim (Editor)
+    if [ ! -x "$(command -v nvim)" ]; then
+        reade -Q "GREEN" -i "y" -p "Install Neovim? (Terminal editor) [Y/n]: " "y n" nvm
+        if [ "y" == "$nvm" ]; then
+            . ./install_nvim.sh
+        fi
+    fi
     
+    # Kitty (Terminal emulator)
+    if [ ! -x "$(command -v kitty)" ]; then
+        reade -Q "GREEN" -i "y" -p "Install Kitty? (Terminal emulator) [Y/n]: " "y n" kittn
+        if [ "y" == "$kittn" ]; then
+            . ./install_kitty.sh
+        fi
+    fi
+
     # Ranger (File explorer)
     if [ ! -x "$(command -v ranger)" ]; then
-        . ./install_ranger.sh
+        reade -Q "GREEN" -i "y" -p "Install Ranger? (Terminal file explorer) [Y/n]: " "y n" rngr
+        if [ "y" == "$rngr" ]; then
+            . ./install_ranger.sh
+        fi
     fi
+
+    # Fzf (Fuzzy Finder)
+    if [ ! -x "$(command -v fzf)" ]; then
+        reade -Q "GREEN" -i "y" -p "Install fzf? (Fuzzy file/folder finder - keybinding yes for upgraded Ctrl-R/reverse-search, fzf filenames on Ctrl+T and fzf-version of 'cd' on Alt-C + Custom script: Ctrl-f becomes system-wide file opener) [Y/n]: " "y n" findr
+        if [ "y" == "$findr" ]; then
+            . ./install_fzf.sh
+        fi
+    fi
+    
     
     reade -Q "GREEN" -i "y" -p "Install bash completions for aliases in ~/.bash_completion.d? [Y/n]:" "y n" compl
     if [ -z $compl ] || [ "y" == $compl ]; then
@@ -354,9 +394,11 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         fi
     fi
     
-    reade -Q "GREEN" -i "y" -p "Install python completions in */.bash_completion.d? [Y/n]:" "y n" pycomp
-    if [ -z $pycomp ] || [ "y" == $pycomp ]; then
-        . ./install_pythonCompletions_bash.sh
+    if [ ! -f ~/.bash_completion.d/_python-argcomplete ]; then
+        reade -Q "GREEN" -i "y" -p "Install python completions in */.bash_completion.d? [Y/n]:" "y n" pycomp
+        if [ -z $pycomp ] || [ "y" == $pycomp ]; then
+            . ./install_pythonCompletions_bash.sh
+        fi
     fi
     
     bash_yes_r(){ sudo cp -fv aliases/bash.sh /root/.bash_aliases.d/; }
@@ -492,10 +534,9 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     ytbe(){
         . ./checks/check_youtube.sh
         cp -fv aliases/youtube.sh ~/.bash_aliases.d/
-        yes_edit_no ytbe_r "aliases/youtube.sh" "Install youtube.sh at /root/?" "no" "YELLOW" 
+        yes_edit_no ytbe_r "aliases/youtube.sh" "Install youtube.sh at /root/?" "no" "YELLOW"; 
     }
-    yes_edit_no ytbe "aliases/youtube.sh" "Install yt-dlp (youtube cli download) and youtube.sh at ~/.bash_aliases.d/ (yt-dlp aliases)? " "yes" "GREEN"
-
+    yes_edit_no ytbe "aliases/youtube.sh" "Install yt-dlp (youtube cli download) and youtube.sh at ~/.bash_aliases.d/ (yt-dlp aliases)?" "yes" "GREEN"
 fi
 
-. ~/.bashrc         i
+. ~/.bashrc         

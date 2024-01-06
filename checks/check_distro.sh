@@ -1,4 +1,3 @@
-#!/bin/bash
 distro_base=/
 distro=/
 packagemanager=/
@@ -61,7 +60,4 @@ elif lscpu | grep -q "armv"; then
     architecture="armv7l"
 elif lscpu | grep -q "aarch"; then
     architecture="arm64"
-fi
-    
-
-                 
+fi      
