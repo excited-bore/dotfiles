@@ -36,7 +36,7 @@ alias less="less -X"
 # Cant source .inputrc in any way though
 alias q="exit"
 #alias w="clear ;b; ls -Al"
-alias c="cd -"
+alias c="cd"
 alias x="cd .."
 
 alias men="man man"

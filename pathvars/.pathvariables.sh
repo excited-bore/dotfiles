@@ -121,11 +121,18 @@ export MYGVIMRC=~/.config/nvim/init.vim
 #export RANGER_LOAD_DEFAULT_RC="~/rc.conf"
 
 # RIPGREP
-#export RG_PREFIX="rg --column --line-number --no-heading --color=always --smart-case "
+export RG_PREFIX="rg --column --line-number --no-heading --color=always --smart-case "
 
 # FZF
-#export FZF_DEFAULT_COMMAND='fd --search-path / --type f --hidden --exclude "*.dll *.so.* *.go *.bin"'
-#export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+FZF_PREVIEW_COLUMNS=0
+FZF_PREVIEW_LINES=0
+export FZF_DEFAULT_COMMAND='fd --search-path / --type f --hidden --exclude "*.dll *.so.* *.go *.bin"'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+#export FZF_CTRL_T_OPTS='--preview="kitty icat --clear --transfer-mode=memory --stdin=no --place=${FZF_PREVIEW_COLUMNS}x${FZF_PREVIEW_LINES}@0x0 {}'
+#export FZF_CTRL_T_OPTS='--preview='\''kitten icat --clear --transfer-mode=memory --stdin=no --place=${FZF_PREVIEW_COLUMNS}x${FZF_PREVIEW_LINES}@110x1 {} > /dev/tty'\'' --bind ctrl-t:change-preview-window(down|hidden|)'
+export FZF_ALT_C_OPTS="--preview 'tree -C {}'"
+export FZF_CTRL_R_OPTS=" --preview 'echo {}' --preview-window up:3:hidden:wrap --bind 'ctrl-t:toggle-preview' --bind 'alt-c:execute-silent(echo -n {2..} | xclip -i -sel c)+abort' --color header:italic --header 'Press ALT-C to copy command into clipboard'"
+
 
 # EMACS
 #export PATH="~/.emacs.d/bin/:$PATH"

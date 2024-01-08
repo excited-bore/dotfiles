@@ -264,14 +264,6 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         cp -fv xterm/xterm.sh ~/.bash_aliases.d/xterm.sh;
         yes_edit_no xresources_r "xterm/.Xresources xterm/xterm.sh" "Install .Xresources at /root/.bash_aliases.d/?" "edit" "RED"; }
     yes_edit_no xresources "xterm/.Xresources xterm/xterm.sh" "Install .Xresources and xterm.sh at ~/.bash_aliases.d/? (readline config)" "edit" "YELLOW"
-    
-    # Tty keybinding
-
-    stty_r(){ sudo cp -fv aliases/tty.sh /root/.bash_aliases.d/;}
-    stty_n(){
-        cp -fv aliases/tty.sh ~/.bash_aliases.d/
-        yes_edit_no stty_r "aliases/tty.sh" "Install tty.sh at /root/.bash_aliases.d/?" "yes" "YELLOW"; }
-    yes_edit_no stty_n "aliases/tty.sh" "Install tty.sh at ~/.bash_aliases.d/ (Tty keybindings and other startup lines)? " "edit" "YELLOW"
 
     # Readline
     
@@ -291,13 +283,14 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     
     # Shell-keybindings
     
-    if grep -q 'bind -x '\''"\\C-s": ctrl-s'\''' aliases/shell_keybindings.sh && ! grep -q '#bind -x '\''"\\C-s": ctrl-s'\''' aliases/shell_keybindings.sh; then
-        sed -i 's|bind -x '\''"\\C-s": ctrl-s'\''|#bind -x '\''"\\C-s": ctrl-s'\''|g' aliases/shell_keybindings.sh
-        sed -i 's|bind -x '\''"\\eOR": ctrl-s'\''|#bind -x '\''"\\eOR": ctrl-s'\''|g' aliases/shell_keybindings.sh
-    fi
+    #if grep -q 'bind -x '\''"\\C-s": ctrl-s'\''' aliases/shell_keybindings.sh && ! grep -q '#bind -x '\''"\\C-s": ctrl-s'\''' aliases/shell_keybindings.sh; then
+    #    sed -i 's|bind -x '\''"\\C-s": ctrl-s'\''|#bind -x '\''"\\C-s": ctrl-s'\''|g' aliases/shell_keybindings.sh
+    #    sed -i 's|bind -x '\''"\\eOR": ctrl-s'\''|#bind -x '\''"\\eOR": ctrl-s'\''|g' aliases/shell_keybindings.sh
+    #fi
 
-    if grep -q 'bind -x '\''"\\eOQ": ranger'\''' readline/shell_keybindings.sh; then
-        sed -i 's|bind -x '\''"\\eOQ": ranger'\''|#bind -x '\''"\\eOQ": ranger'\''|g' readline/shell_keybindings.sh
+    if grep -q 'bind -x '\''"\\201": ranger'\''' readline/shell_keybindings.sh; then
+        sed -i 's|bind -x '\''"\\201": ranger'\''|#bind -x '\''"\\201": ranger'\''|g' readline/shell_keybindings.sh
+        sed -i 's|bind '\''"\\eOQ":|#bind '\''"\\eOQ":|g' readline/shell_keybindings.sh
     fi
 
     shell-keybindings_r(){ sudo cp -fv aliases/shell_keybindings.sh /root/.bash_aliases.d/; }

@@ -7,6 +7,29 @@
 
 alias ls_binds="bind -p"
 
+# TTY
+
+# To see the complete character string sent by a key, you can use this command, and type the key within 2 seconds:
+# stty raw; sleep 2; echo; stty cooked
+# But Ctrl-v, then keycombination still works best
+
+# Turn off flow control and free up Ctrl-s and Ctrl-q
+stty -ixon
+stty -ixoff
+stty start 'undef' 
+stty stop 'undef'
+stty rprnt 'undef'
+#stty lnext '^V'
+
+# Unset suspend signal shortcut (Ctrl+z)
+stty susp 'undef'
+
+# Unset backward word erase shortcut (Ctrl+w)
+stty werase 'undef'
+
+# unbinds ctrl-c and bind the function to ctrl-q
+#stty intr '^q'
+
 #alias tty_size_half="tput cup $(stty size | awk '{print int($1/2);}') 0"
 
 # READLINE
@@ -46,8 +69,11 @@ bind -x '"\e[1;5A": "clear && let LINE_TPUT=$LINE_TPUT-1 && if [ $LINE_TPUT -lt 
 bind 'Tab: menu-complete'
 bind '"\e[Z": menu-complete-backward'
 
-# (Kitty) Ctrl-tab expands aliases
-bind '"\e[9;5u": alias-expand-line'
+# Ctrl-w expands aliases
+bind '"\C-w": alias-expand-line'
+
+# (Kitty) Ctrl-tab for fzf autocompletion
+bind '"\e[9;5u": " **\t"'
 
 # Recall position
 #bind -x '"\C-r": tput rc'
@@ -77,36 +103,6 @@ bind '"\C-z": vi-undo'
 # Ctrl-g adds a piped grep for convenience
 bind '"\C-g": "| grep -i "'
 
-#ctrl-s(){
-#    file="$(fzf -m --no-sort --height 75% --reverse)";
-#    if [ -z "$file" ]; then
-#        return 0;
-#    else
-#        lines="$(echo "$file" | wc -l)";
-#        if [ "$lines" == 1 ]; then
-#            if [ -d "$file" ]; then
-#                result=$(printf "0:change directory \n1:Use rifle" | fzf --height 75% --reverse) 
-#                if [ "${result::1}" == "0" ]; then
-#                    cd "$file";
-#                    return 0;
-#                fi
-#            else
-#                result=$(rifle -l "$file" | fzf --height 75% --reverse);
-#                rifle -p "${result::1}" "$file";
-#                return 0;
-#            fi
-#        else
-#            IFS=$'\n' read -d "\034" -r -a files <<<"${file}\034";
-#            result=$(rifle -l "$files" | fzf --height 75% --reverse);
-#            rifle -p "${result::1}" "${files[@]}"
-#            return 0;
-#        fi    
-#    fi
-#}
-
-# Ctrl-s; Open files using default-applications and fzf
-#bind -x '"\C-s": ctrl-s'
-
 # Ctrl-Enter gives you a paged output
 bind '"\e[13": " | $PAGER\C-p"' 
 
@@ -127,21 +123,18 @@ bind -x '"\201": ranger'
 bind '"\eOQ": "\201\n\C-l"'
 #bind -x '"\eOQ": ranger'
 
-# F3 - FuzzyFinderls -l | fzf --preview="echo user={3} when={-4..-2}; cat {-1}" --header-lines=1 (file explorer)
-#bind -x '"\eOR": ctrl-s'
-
-# F5, Ctrl-r - Reload .bashrc /.inputrc
+# F5, Ctrl-r - Reload .bashrc
 #bind '"\e[15~": re-read-init-file'
-bind -x '"\e[15~": . ~/.inputrc && . ~/.bashrc && tput cup $LINENO 0 && tput rc'
+bind -x '"\e[15~": . ~/.bashrc && tput cup $LINENO 0 && tput rc'
 
 #C-x used as modifier for a lot of stuff
 #bind "\C-x": "cd\C-m"
 
 # Proper copy
 # https://askubuntu.com/questions/302263/selecting-text-in-the-terminal-without-using-the-mouse
-#"\C-c": copy to clipboard
-#"\C-c": "\C-u\C-e echo \C-y | xclip -i -sel c && tput cuu1 && tput el && history -d -1 \C-m\C-y"
+#"\e-c": copy to clipboard
+#bind '"\e-c": "\C-u\C-e echo \C-y | xclip -i -sel c && tput cuu1 && tput el && history -d -1 \C-m\C-y"'
 
-#"\C-v": paste from clipboard
-#"\C-v": "\C-u\C-e tput cuu1 && tput el && xdotool type --clearmodifiers --delay 25 $(xclip -o -sel clip) && history -d -1 \C-m"
-
+#"\e-v": paste from clipboard
+#bind '"\e-v": "\C-u\C-e tput cuu1 && tput el && xdotool type --clearmodifiers --delay 25 $(xclip -o -sel clip) && history -d -1 \C-m"'
+#bind -x '"\e-v": "xclip -o -sel clip"'
