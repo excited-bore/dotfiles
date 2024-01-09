@@ -93,11 +93,24 @@ git_add_commit_push_all(){
 
 alias git_commit_using_last="git commit --amend"
 alias git_list_branches="git branch --list -vv"
+alias git_delete_branch="git branch -d - "
 alias git_switch_branch="git checkout - "
 alias git_switch_branch_and_track_remote="git checkout -t - "
 alias git_create_and_switch_branch="git checkout -b - "
 alias git_push_to_branch="git push -u origin "
 
+git_switch_commit() {
+    commit=$(git log --oneline --color=always | nl | fzf --ansi --track --no-sort --layout=reverse-list | awk '{print $2}');
+    git checkout "$commit";
+}
+
+git_new_branch() {
+    commit=$(git log --oneline --color=always | nl | fzf --ansi --track --no-sort --layout=reverse-list | awk '{print $2}');
+    reade -Q "GREEN" -p "Give up a new branch name: " branch
+    if [ ! -z "$branch" ]; then
+        git checkout -b "$branch" "$commit";
+    fi
+}
 
 #https://stackoverflow.com/questions/1125968/how-do-i-force-git-pull-to-overwrite-local-files
 git_backup_branch_and_reset_to_remote() {

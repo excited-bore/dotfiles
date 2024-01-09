@@ -12,7 +12,7 @@
         git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
         ~/.fzf/install
         
-        reade -Q "GREEN" -i "y" -p "Install fd and use for fzf? (Faster find) [Y/n]: " "y n" fdr
+        reade -Q "GREEN" -i "y" -p "Install fd and use for fzf? (Faster find, required for file-extensions file similar to gitignore) [Y/n]: " "y n" fdr
         if [ -z $fdr ] || [ "Y" == $fdr ] || [ $fdr == "y" ]; then
             if [ ! -x "$(command -v fd)" ]; then
                 if [ $distro_base == "Arch" ];then
@@ -21,6 +21,12 @@
                     yes | sudo apt update
                     yes | sudo apt install fd 
                 fi
+            fi
+            if [ ! -f ~/.fdignore ]; then
+               touch ~/.fdignore             
+            fi
+            if [ ! -f ~/.fzf_history ]; then
+                touch ~/.fzf_history 
             fi
             if [ $PATHVAR == ~/.pathvariables.sh ] ; then
                 sed -i 's|#export FZF_DEFAULT_COMMAND|export FZF_DEFAULT_COMMAND|g' $PATHVAR

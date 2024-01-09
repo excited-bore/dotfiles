@@ -73,7 +73,7 @@ bind '"\e[Z": menu-complete-backward'
 bind '"\C-w": alias-expand-line'
 
 # (Kitty) Ctrl-tab for fzf autocompletion
-bind '"\e[9;5u": " **\t"'
+#bind '"\e[9;5u": " **\t"'
 
 # Recall position
 #bind -x '"\C-r": tput rc'
@@ -125,10 +125,16 @@ bind '"\eOQ": "\201\n\C-l"'
 
 # F5, Ctrl-r - Reload .bashrc
 #bind '"\e[15~": re-read-init-file'
-bind -x '"\e[15~": . ~/.bashrc && tput cup $LINENO 0 && tput rc'
+bind -x '"\e[15~": . ~/.bashrc && tput cup 0 0 && tput rc'
 
-#C-x used as modifier for a lot of stuff
-#bind "\C-x": "cd\C-m"
+# Alt-Left arrow to go up one directory
+bind '"\e[1;3D": "cd .. \C-m"'
+
+# Alt-Right arrow to go to last visited directory
+bind '"\e[1;3C": "cd - \C-m"'
+
+# Alt-Down arrow to go to home directory
+bind '"\e[1;3B": "cd \C-m"'
 
 # Proper copy
 # https://askubuntu.com/questions/302263/selecting-text-in-the-terminal-without-using-the-mouse

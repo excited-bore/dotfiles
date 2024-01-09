@@ -110,7 +110,7 @@ export SYSTEMD_LOG_TARGET="auto"
 #export PATH="/snap/bin:/var/lib/snapd/snap/bin:$PATH"
 
 # FLATPAK FOR XDG_DATA_HOME AND XDG_DATA_DIRS
-#export FLATPAKS="/var/lib/flatpak/exports/share:$HOME/.local/share/flatpak/exports/share"
+export FLATPAKS="/var/lib/flatpak/exports/share:$HOME/.local/share/flatpak/exports/share"
 
 
 # VIM
@@ -120,26 +120,37 @@ export MYGVIMRC=~/.config/nvim/init.vim
 # RANGER
 #export RANGER_LOAD_DEFAULT_RC="~/rc.conf"
 
+. ~/.fzf/shell/*.bash
+
 # RIPGREP
 export RG_PREFIX="rg --column --line-number --no-heading --color=always --smart-case "
+export INITIAL_QUERY="${*:-}"
 
 # FZF
 FZF_PREVIEW_COLUMNS=0
 FZF_PREVIEW_LINES=0
-export FZF_DEFAULT_COMMAND='fd --search-path / --type f --hidden --exclude "*.dll *.so.* *.go *.bin"'
+#echo $excludes
+export FZF_DEFAULT_COMMAND="fd --search-path / --type f --hidden"
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 #export FZF_CTRL_T_OPTS='--preview="kitty icat --clear --transfer-mode=memory --stdin=no --place=${FZF_PREVIEW_COLUMNS}x${FZF_PREVIEW_LINES}@0x0 {}'
 #export FZF_CTRL_T_OPTS='--preview='\''kitten icat --clear --transfer-mode=memory --stdin=no --place=${FZF_PREVIEW_COLUMNS}x${FZF_PREVIEW_LINES}@110x1 {} > /dev/tty'\'' --bind ctrl-t:change-preview-window(down|hidden|)'
-export FZF_ALT_C_OPTS="--preview 'tree -C {}'"
-export FZF_CTRL_R_OPTS=" --preview 'echo {}' --preview-window up:3:hidden:wrap --bind 'ctrl-t:toggle-preview' --bind 'alt-c:execute-silent(echo -n {2..} | xclip -i -sel c)+abort' --color header:italic --header 'Press ALT-C to copy command into clipboard'"
-
+export FZF_ALT_C_OPTS='--preview "tree -C {}" 
+                        --bind "ctrl-v:become(vlc --recursive expand {})"
+                        --bind "ctrl-v:become(cd .. && __fzf_cd__})"
+                        --bind "ctrl-g:become(. ~/.fzf/shell/ripgrep-directory.bash && cd {} &&  ripgrep-dir > /dev/tty)"'
+export FZF_CTRL_R_OPTS="--preview 'echo {}' \
+                        --preview-window up:3:hidden:wrap \
+                        --bind 'ctrl-t:toggle-preview' \
+                        --bind 'alt-c:execute-silent(echo -n {2..} | xclip -i -sel c)+abort' \
+                        --color header:italic --header 'Press ALT-C to copy command into clipboard'"
+export FZF_BIND_TYPES='fd --search-path / --type f --hidden | xargs -n 5 basename -a | perl -ne '\''print $1 if m/\.([^.\/]+)$/'\'' | sort -u'
 
 # EMACS
 #export PATH="~/.emacs.d/bin/:$PATH"
 
 # KITTY
-#export KITTY_PATH="~/.local/bin/"
-#export PATH="$KITTY_PATH:$PATH"
+export KITTY_PATH=~/.local/bin/
+export PATH=$KITTY_PATH:$PATH
 
 # NINJA
 #export PATH="/usr/bin/ninja:$PATH"
