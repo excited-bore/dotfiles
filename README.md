@@ -17,3 +17,6 @@ Automount drives in /etc/fstab
 # Install_pipewire_switch_on_connect.sh
 Setup autoswitch to newest audiodevice. Blocks DS4 controller.
 
+# Install_gitignore.sh
+Setup local or global gitignore files
+

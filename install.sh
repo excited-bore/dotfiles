@@ -27,8 +27,27 @@ if [ ! -e ~/etc_systemd ]; then
     fi
 fi
 
+if [ "$distro_base" == "Arch" ]; then
+   ./install_AUR-helper.sh 
+fi
 
+if [ ! -x "$(command -v flatpak)" ]; then
+    printf "%s\n" "${blue}No flatpak detected. (Independent package manager from Red Hat){normal}"
+    reade -Q "GREEN" -i "y" -p "Install? [Y/n]:" "y n" insflpk 
+    if [ "y" == "$insflpk" ]; then
+       ./install_flatpak.sh 
+    fi
+fi
+unset insflpk
 
+if [ ! -x "$(command -v snap)" ]; then
+    printf "%s\n" "${blue}No snap detected. (Independent package manager from Canonical){normal}"
+    reade -Q "YELLOW" -i "n" -p "Install? [Y/n]:" "y n" inssnap 
+    if [ "y" == "$insflpk" ]; then
+       ./install_snapd.sh 
+    fi
+fi
+unset inssnap
 
 # Pathvariables
 
@@ -48,7 +67,9 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
     if [ "$Dists" == "y" ]; then
        printf "NOT YET IMPLEMENTED\n"
     fi
-    reade -Q "GREEN" -i "n" -p "Set LS_COLORS with some predefined values? [Y/n]:" "y n" lsclrs
+    
+    # TODO: non ugly values
+    reade -Q "GREEN" -i "n" -p "Set LS_COLORS with some predefined values? (WARNING: ugly values) [Y/n]:" "y n" lsclrs
     if [ "$lsclrs" == "y" ] || [ -z "$lsclrs" ]; then
         sed 's/^#export LS_COLORS/export LS_COLORS/' -i pathvars/.pathvariables.sh
     fi
@@ -137,15 +158,25 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
     # Set DISPLAY
     reade -Q "YELLOW" -i "n" -p "Set DISPLAY to ':0.0'? [Y/n]:" "y n" dsply
     if [ "$dsply" == "y" ] || [ -z "$dsply" ]; then
-        sed -i 's|#export DISPLAY=.*|export DISPLAY=":0.0"|'  pathvars/.pathvariables.sh
+        sed -i 's|#export DISPLAY=.*|export DISPLAY=":0.0"|' pathvars/.pathvariables.sh
     fi
+    unset dsply
+
+    if [ -x "$(command -v snap)" ]; then
+        reade -Q "GREEN" -i "n" -p "Add snap dirs to path? [Y/n]:" "y n" snapvrs 
+        if [ "$snapvrs" == "y" ]; then
+            sed -i 's|#export PATH="/snap|export PATH="/snap|' pathvars/.pathvariables.sh 
+        fi
+    fi
+    unset snapvrs
+    
 
     # TODO do something for flatpak  (XDG_DATA_DIRS)
     # Check if xdg installed
     if [ -x "$(command -v xdg-open)" ]; then
-        prmpt="${yellow}This will set XDG pathvariables to their respective defaults\n\
+        prmpt="${green}This will set XDG pathvariables to their respective defaults\n\
         XDG is related to default applications\n\
-        Setting these could be usefull when installing external package managers (f.ex. flatpak) \n\
+        Setting these could be usefull when installing certain programs \n\
         Defaults:\n\
         - XDG_CACHE_HOME=$HOME/.cache\n\
         - XDG_CONFIG_HOME=$HOME/.config\n\
@@ -165,7 +196,18 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
             sed 's/^#export XDG_RUNTIME_DIR=\(.*\)/export XDG_RUNTIME_DIR=\1/' -i pathvars/.pathvariables.sh
         fi
     fi
+    unset xdgInst
     
+    if [ -x "$(command -v flatpak)" ]; then
+        reade -Q "GREEN" -i "n" -p "Add flatpak dirs to path? (XDG_DATA_DIRS) [Y/n]:" "y n" flpkvrs 
+        if [ "$flpkvrs" == "y" ]; then
+            sed 's/^#export XDG_DATA_DIRS=\(.*\)/export XDG_DATA_DIRS=\1/' -i pathvars/.pathvariables.sh
+            sed -i 's|#export FLATPAK=|export FLATPAK=|'  pathvars/.pathvariables.sh 
+        fi
+    fi
+    unset flpkvrs
+
+
     # TODO: check around for other systemdvars 
     # Check if systemd installed
     if [ -x "$(command -v systemctl)" ]; then
@@ -333,7 +375,8 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
             . ./install_nvim.sh
         fi
     fi
-    
+    unset nvm
+
     # Kitty (Terminal emulator)
     if [ ! -x "$(command -v kitty)" ]; then
         reade -Q "GREEN" -i "y" -p "Install Kitty? (Terminal emulator) [Y/n]: " "y n" kittn
@@ -341,6 +384,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
             . ./install_kitty.sh
         fi
     fi
+    unset kittn
 
     # Ranger (File explorer)
     if [ ! -x "$(command -v ranger)" ]; then
@@ -349,6 +393,16 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
             . ./install_ranger.sh
         fi
     fi
+    unset rngr
+    
+    # Ranger (File explorer)
+    if [ ! -x "$(command -v tmux)" ]; then
+        reade -Q "GREEN" -i "y" -p "Install tmux? (Terminal multiplexer) [Y/n]: " "y n" tmx
+        if [ "y" == "$tmx" ]; then
+            . ./install_tmux.sh
+        fi
+    fi
+    unset tmx
 
     # Fzf (Fuzzy Finder)
     if [ ! -x "$(command -v fzf)" ]; then
@@ -357,6 +411,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
             . ./install_fzf.sh
         fi
     fi
+    unset findr
     
     
     reade -Q "GREEN" -i "y" -p "Install bash completions for aliases in ~/.bash_completion.d? [Y/n]:" "y n" compl

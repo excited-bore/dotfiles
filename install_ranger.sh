@@ -6,15 +6,20 @@
 #reade -Q "GREEN" -i "y" -p "Install Ranger? (Terminal file explorer) [Y/n]: " "y n" rngr
 #if [ -z $rngr ] || [ "Y" == $rngr ] || [ $rngr == "y" ]; then
     if [ $distro_base == "Arch" ];then
-        yes | sudo pacman -Su ranger python ttf-nerd-fonts-symbols-common ttf-nerd-fonts-symbols ttf-nerd-fonts-symbols-mono atool bat calibre elinks ffmpegthumbnailer fontforge highlight terminology mupdf-tools odt2txt
+        yes | sudo pacman -Su ranger python python-pipx ttf-nerd-fonts-symbols-common ttf-nerd-fonts-symbols ttf-nerd-fonts-symbols-mono atool bat calibre elinks ffmpegthumbnailer fontforge highlight terminology mupdf-tools odt2txt
     elif [ $distro_base == "Debian" ]; then    
         yes | sudo apt update 
-        yes | sudo apt install ranger python3 python3-dev python3-pip atool bat elinks ffmpegthumbnailer fontforge highlight jq libcaca0 odt2txt mupdf-tools terminology 
+        yes | sudo apt install ranger python3 python3-dev python3-pipx atool bat elinks ffmpegthumbnailer fontforge highlight jq libcaca0 odt2txt mupdf-tools terminology 
     fi
-    
+
     # Remove message ('Removed /tmp/ranger_cd54qzd') after quitting ranger
     if [ -f /usr/bin/ranger ] && ! grep -q 'rm -f -- "$temp_file" 2>/dev/null' /usr/bin/ranger; then
        sudo sed -i 's|rm -f -- "$temp_file"|rm -f -- "$temp_file" 2>/dev/null|g' /usr/bin/ranger; 
+    fi
+
+    # Remove message ('Removed /tmp/ranger_cd54qzd') after quitting ranger
+    if [ -f /home/burp/.local/bin/ranger ] && ! grep -q 'rm -f -- "$temp_file" 2>/dev/null' /home/burp/.local/bin/ranger; then
+       sudo sed -i 's|rm -f -- "$temp_file"|rm -f -- "$temp_file" 2>/dev/null|g' /home/burp/.local/bin/ranger; 
     fi
 
     #ranger --copy-config=all
