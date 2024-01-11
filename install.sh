@@ -481,13 +481,25 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
                 git mergetool --tool-help
                 reade -Q "CYAN" -p "Mergetool: " "$(git mergetool --tool-help)" "$rslt" merge ;
                 if [ ! -z $merge ]; then
+                    git config --global diff.tool "$merge" ;
                     git config --global merge.tool "$merge" ;
                 fi
             fi
         fi
         
+        reade -Q "GREEN" -i "y" -p "Check git config? [Y/n]: " "y n" gitcnf ;
+        if [ "y" == $gitcnf ]; then
+            git config --global -e 
+        fi
+
+        reade -Q "GREEN" -i "y" -p "Check and create global gitignore? (~/.config/git/ignore) [Y/n]: " "y n" gitign 
+        if [ "y" == "$gitign" ]; then
+           ./install_gitignore.sh
+        
+        fi
+
         if [ ! -x "$(command -v copy-to)" ]; then
-            reade -Q "GREEN" -i "y" -p "Install copy-to [Y/n]: " "y n" cpcnf;
+            reade -Q "GREEN" -i "y" -p "Install copy-to? [Y/n]: " "y n" cpcnf;
             if [ "y" == $cpcnf ] || [ -z $cpcnf ]; then
                 ./install_copy-conf.sh
             fi

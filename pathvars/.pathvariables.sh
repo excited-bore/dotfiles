@@ -42,6 +42,16 @@ export INPUTRC=~/.inputrc
 # DISPLAY
 #export DISPLAY=":0.0"
 
+# VIM
+export MYVIMRC=~/.config/nvim/init.vim
+export MYGVIMRC=~/.config/nvim/init.vim
+
+# SNAP
+#export PATH="/snap/bin:/var/lib/snapd/snap/bin:$PATH"
+
+# FLATPAK FOR XDG_DATA_HOME AND XDG_DATA_DIRS
+export FLATPAKS="/var/lib/flatpak/exports/share:$HOME/.local/share/flatpak/exports/share"
+
 # XDG
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
 # $XDG_CACHE_HOME defines the base directory relative to which user-specific non-essential data files should be stored. If $XDG_CACHE_HOME is either not set or empty, a default equal to $HOME/.cache should be used. 
@@ -106,16 +116,6 @@ export SYSTEMD_LOG_TARGET="auto"
 # GO
 #export PATH="/usr/local/go/bin:/usr/bin/go:/usr/lib/go:/usr/share/go:$PATH"
 
-# SNAP
-#export PATH="/snap/bin:/var/lib/snapd/snap/bin:$PATH"
-
-# FLATPAK FOR XDG_DATA_HOME AND XDG_DATA_DIRS
-export FLATPAKS="/var/lib/flatpak/exports/share:$HOME/.local/share/flatpak/exports/share"
-
-
-# VIM
-export MYVIMRC=~/.config/nvim/init.vim
-export MYGVIMRC=~/.config/nvim/init.vim
 
 # RANGER
 #export RANGER_LOAD_DEFAULT_RC="~/rc.conf"

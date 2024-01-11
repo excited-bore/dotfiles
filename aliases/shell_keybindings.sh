@@ -100,14 +100,15 @@ bind -x '"\C-q": exit'
 # Undo to Ctrl+Z (unbound in tty) instead of only on Ctrl+_
 bind '"\C-z": vi-undo'
 
-# Ctrl-g adds a piped grep for convenience
-bind '"\C-g": "| grep -i "'
+# !Ctrl-g adds a piped grep for convenience
+#  Ctrl-g gives a ripgrep function overview
+bind -x '"\C-g": "ripgrep-dir"'
 
 # Ctrl-Enter gives you a paged output
 bind '"\e[13": " | $PAGER\C-p"' 
 
 # Ctrl-backspace deletes (kills) line backward
-bind '"\C-h": backward-kill-line'
+bind '"\C-h": backward-kill-word'
 
 # Ctrl-b Insert as comment (also on alt+#)
 bind '"\C-b": insert-comment 1'
