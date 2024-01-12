@@ -26,7 +26,7 @@ export TMPDIR=/tmp
 export PAGER=/usr/bin/less
 
 # LESS
-export LESS="--CLEAR-SCREEN --redraw-on-quit --LINE-NUMBERS --line-num-width=2 --window=10 --use-color --color=Ng$ --color=Scb$ --color=Pkg$ --IGNORE-CASE --LONG-PROMPT --chop-long-lines --underline-special  --mouse --QUIET --status-line --no-vbell --follow-name --exit-follow-on-close"
+export LESS="--CLEAR-SCREEN --RAW-CONTROL-CHARS --redraw-on-quit --LINE-NUMBERS --line-num-width=2 --window=10 --use-color --color=Ng$ --color=Scb$ --color=Pkg$ --IGNORE-CASE --LONG-PROMPT --chop-long-lines --underline-special  --mouse --QUIET --status-line --no-vbell --follow-name --exit-follow-on-close"
 #export LESSEDIT=$EDITOR
 
 # MOAR
@@ -37,7 +37,7 @@ export EDITOR=/usr/bin/nvim
 export VISUAL=/usr/bin/nvim
 
 # READLINE
-#export INPUTRC=~/.inputrc
+export INPUTRC=~/.inputrc
 
 # DISPLAY
 #export DISPLAY=":0.0"
