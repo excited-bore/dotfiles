@@ -5,7 +5,7 @@ Everything from less environment variables to a fully working installer for kitt
 
 # Install.sh
 Meat and bones of dotfiles. Creates a file for all your pathvariables while helping to point out wich one are worth configuring (technically, mostly preconfigured)
-Suggests and helps installing git (mergetool) / moar / nvim / ranger / kitty / fzf with preconfigured stuff
+Suggests and helps installing git (mergetool) / moar / nvim / tmux / ranger / kitty / fzf with preconfigured stuff
 Also sets up a whole lot of bash keybindings, aliases and functions
 
 # Install_polkit_wheel.sh
