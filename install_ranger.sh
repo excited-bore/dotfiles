@@ -1,5 +1,6 @@
  # !/bin/bash
 . ./checks/check_distro.sh
+. ./checks/check_pathvar.sh 
 . ./readline/rlwrap_scripts.sh
 
  # Ranger (File explorer)
@@ -9,7 +10,7 @@
         yes | sudo pacman -Su ranger python python-pipx ttf-nerd-fonts-symbols-common ttf-nerd-fonts-symbols ttf-nerd-fonts-symbols-mono atool bat calibre elinks ffmpegthumbnailer fontforge highlight terminology mupdf-tools odt2txt
     elif [ $distro_base == "Debian" ]; then    
         yes | sudo apt update 
-        yes | sudo apt install ranger python3 python3-dev python3-pipx atool bat elinks ffmpegthumbnailer fontforge highlight jq libcaca0 odt2txt mupdf-tools terminology 
+        yes | sudo apt install ranger python3 python3-dev pipx atool bat elinks ffmpegthumbnailer fontforge highlight jq libcaca0 odt2txt mupdf-tools terminology 
     fi
 
     # Remove message ('Removed /tmp/ranger_cd54qzd') after quitting ranger
@@ -24,9 +25,17 @@
 
     #ranger --copy-config=all
     ranger --confdir=/home/$USER/.config/ranger --copy-config=all
+    if [ "$PATHVAR" == ~/.pathvariables.sh ]; then
+        sed -i 's|#export RANGER_LOAD_DEFAULT_RC=|export RANGER_LOAD_DEFAULT_RC=|g' $PATHVAR
+        sudo sed -i 's|#export RANGER_LOAD_DEFAULT_RC=|export RANGER_LOAD_DEFAULT_RC=|g' $PATHVAR_R
+    else
+        echo "export RANGER_LOAD_DEFAULT_RC=FALSE" >> $PATHVAR
+        printf "export RANGER_LOAD_DEFAULT_RC=FALSE\n" | sudo tee -a $PATHVAR_R
+    fi
     if [ -d ~/.bash_aliases.d/ ]; then
         cp -fv ./aliases/ranger.sh ~/.bash_aliases.d/ranger.sh
     fi
+
 
     rangr_cnf(){
         if [ ! -d ~/.config/ranger/ ]; then 

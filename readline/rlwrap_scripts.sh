@@ -122,7 +122,7 @@ function yes_edit_no(){
         elif [ "$pass" == "e" ]; then
             str=($2);
             for i in "${str[@]}"; do
-                $EDITOR $i;
+                "$EDITOR" "$i";
             done;
             deflt=" [y/N]: "
             prompt="$3$deflt";

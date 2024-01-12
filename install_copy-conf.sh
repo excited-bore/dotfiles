@@ -8,7 +8,7 @@ if [ -z $compl ] || [ "y" == $compl ]; then
         if [ $distro_base == "Arch" ]; then
             yes | sudo pacman -Su python-pipx
         elif [ $distro_base == "Debian" ]; then
-            yes | sudo apt install python3-pipx
+            yes | sudo apt install pipx
         fi
     fi
 fi

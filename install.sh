@@ -226,7 +226,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         - SYSTEMD_LOG_TARGET=\"auto\"\n\
         "
         printf "$prmpt"
-        reade -Q "YELLOW" -i "n" -p "Set systemd environment? [Y/n]: " "y n" xdgInst
+        reade -Q "YELLOW" -i "y" -p "Set systemd environment? [Y/n]: " "y n" xdgInst
         if [ -z "$xdgInst" ] || [ "y" == "$xdgInst" ]; then
             sed 's/^#export SYSTEMD_PAGER=\(.*\)/export SYSTEMD_PAGER=\1/' -i pathvars/.pathvariables.sh 
             sed 's/^#export SYSTEMD_PAGERSECURE=\(.*\)/export SYSTEMD_PAGERSECURE=\1/' -i pathvars/.pathvariables.sh
@@ -242,9 +242,9 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
 
     pathvariables_r(){ 
          if ! sudo grep -q "~/.pathvariables.sh" /root/.bashrc; then
-            echo "if [[ -f ~/.pathvariables.sh ]]; then" | sudo tee -a /root/.bashrc
-            echo "  . ~/.pathvariables.sh" | sudo tee -a /root/.bashrc
-            echo "fi" | sudo tee -a /root/.bashrc
+            printf "if [[ -f ~/.pathvariables.sh ]]; then\n" | sudo tee -a /root/.bashrc
+            printf "  . ~/.pathvariables.sh\n" | sudo tee -a /root/.bashrc
+            printf "fi\n" | sudo tee -a /root/.bashrc
         fi
         sudo cp -fv pathvars/.pathvariables.sh /root/.pathvariables.sh;
     }                                            
@@ -302,6 +302,10 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         #sudo cp -fv xterm/xterm.sh /root/.bash_aliases.d/xterm.sh;
         }
     xresources(){
+        reade -Q "YELLOW" -i "n" -p "Set caps to escape? (xterm.sh - Might cause errors about display) [Y/n]: " "y n" xtrm
+        if [ ! "$xtrm" == "y" ] && [ ! -z "$xtrm" ]; then
+            sed -i "s|setxkbmap |#setxkbmap |g" aliases/xterm.sh
+        fi
         cp -fv xterm/.Xresources ~/.Xresources;
         cp -fv xterm/xterm.sh ~/.bash_aliases.d/xterm.sh;
         yes_edit_no xresources_r "xterm/.Xresources xterm/xterm.sh" "Install .Xresources at /root/.bash_aliases.d/?" "edit" "RED"; }
@@ -341,7 +345,18 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         yes_edit_no shell-keybindings_r "aliases/shell_keybindings.sh" "Install .bash_aliases.d/shell_keybindings.sh at /root/?" "edit" "RED"; }
     yes_edit_no shell-keybindings "aliases/shell_keybindings.sh" "Install .bash_aliases.d/shell-keybindings.sh at ~/? (bind commands)" "edit" "YELLOW"
 
+
+    reade -Q "GREEN" -i "y" -p "Install bash completions for aliases in ~/.bash_completion.d? [Y/n]:" "y n" compl
+    if [ -z $compl ] || [ "y" == $compl ]; then
+        ./install_bash_alias_completions.sh
+    fi
     
+    if [ ! -f ~/.bash_completion.d/_python-argcomplete ]; then
+        reade -Q "GREEN" -i "y" -p "Install python completions in ~/.bash_completion.d? [Y/n]:" "y n" pycomp
+        if [ -z $pycomp ] || [ "y" == $pycomp ]; then
+            . ./install_pythonCompletions_bash.sh
+        fi
+    fi
     
     # Moar (Custom pager instead of less)
     if [ ! -x "$(command -v moar)" ]; then
@@ -368,62 +383,42 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         fi
     fi
 
+    
     # Nvim (Editor)
-    if [ ! -x "$(command -v nvim)" ]; then
-        reade -Q "GREEN" -i "y" -p "Install Neovim? (Terminal editor) [Y/n]: " "y n" nvm
-        if [ "y" == "$nvm" ]; then
-            . ./install_nvim.sh
-        fi
+    reade -Q "GREEN" -i "y" -p "Install Neovim? (Terminal editor) [Y/n]: " "y n" nvm
+    if [ "y" == "$nvm" ]; then
+        . ./install_nvim.sh
     fi
     unset nvm
 
     # Kitty (Terminal emulator)
-    if [ ! -x "$(command -v kitty)" ]; then
-        reade -Q "GREEN" -i "y" -p "Install Kitty? (Terminal emulator) [Y/n]: " "y n" kittn
-        if [ "y" == "$kittn" ]; then
-            . ./install_kitty.sh
-        fi
+    reade -Q "GREEN" -i "y" -p "Install Kitty? (Terminal emulator) [Y/n]: " "y n" kittn
+    if [ "y" == "$kittn" ]; then
+        . ./install_kitty.sh
     fi
     unset kittn
 
     # Ranger (File explorer)
-    if [ ! -x "$(command -v ranger)" ]; then
-        reade -Q "GREEN" -i "y" -p "Install Ranger? (Terminal file explorer) [Y/n]: " "y n" rngr
-        if [ "y" == "$rngr" ]; then
-            . ./install_ranger.sh
-        fi
+    reade -Q "GREEN" -i "y" -p "Install Ranger? (Terminal file explorer) [Y/n]: " "y n" rngr
+    if [ "y" == "$rngr" ]; then
+        . ./install_ranger.sh
     fi
     unset rngr
     
     # Ranger (File explorer)
-    if [ ! -x "$(command -v tmux)" ]; then
-        reade -Q "GREEN" -i "y" -p "Install tmux? (Terminal multiplexer) [Y/n]: " "y n" tmx
-        if [ "y" == "$tmx" ]; then
-            . ./install_tmux.sh
-        fi
+    reade -Q "GREEN" -i "y" -p "Install tmux? (Terminal multiplexer) [Y/n]: " "y n" tmx
+    if [ "y" == "$tmx" ]; then
+        . ./install_tmux.sh
     fi
     unset tmx
 
     # Fzf (Fuzzy Finder)
-    if [ ! -x "$(command -v fzf)" ]; then
-        reade -Q "GREEN" -i "y" -p "Install fzf? (Fuzzy file/folder finder - keybinding yes for upgraded Ctrl-R/reverse-search, fzf filenames on Ctrl+T and fzf-version of 'cd' on Alt-C + Custom script: Ctrl-f becomes system-wide file opener) [Y/n]: " "y n" findr
-        if [ "y" == "$findr" ]; then
-            . ./install_fzf.sh
-        fi
+    reade -Q "GREEN" -i "y" -p "Install fzf? (Fuzzy file/folder finder - keybinding yes for upgraded Ctrl-R/reverse-search, fzf filenames on Ctrl+T and fzf-version of 'cd' on Alt-C + Custom script: Ctrl-f becomes system-wide file opener) [Y/n]: " "y n" findr
+    if [ "y" == "$findr" ]; then
+        . ./install_fzf.sh
     fi
     unset findr
     
-    reade -Q "GREEN" -i "y" -p "Install bash completions for aliases in ~/.bash_completion.d? [Y/n]:" "y n" compl
-    if [ -z $compl ] || [ "y" == $compl ]; then
-        ./install_bash_alias_completions.sh
-    fi
-    
-    if [ ! -f ~/.bash_completion.d/_python-argcomplete ]; then
-        reade -Q "GREEN" -i "y" -p "Install python completions in */.bash_completion.d? [Y/n]:" "y n" pycomp
-        if [ -z $pycomp ] || [ "y" == $pycomp ]; then
-            . ./install_pythonCompletions_bash.sh
-        fi
-    fi
     
     bash_yes_r(){ sudo cp -fv aliases/bash.sh /root/.bash_aliases.d/; }
     bash_yes() {
@@ -502,7 +497,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
             fi
         fi
 
-         if [[ ! $(git config --list | grep 'merge') ]]; then
+         if [[ ! $(git config --list | grep 'merge.tool') ]]; then
             reade -Q "GREEN" -i "y" -p "Configure git mergetool? [Y/n]: " "y n" gitmerge ;
             if [ "y" == $gitmerge ]; then
                 git mergetool --tool-help &> $TMPDIR/gitresults
@@ -513,7 +508,9 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
                 reade -Q "CYAN" -p "Mergetool: " "$(git mergetool --tool-help)" "$rslt" merge ;
                 if [ ! -z $merge ]; then
                     git config --global diff.tool "$merge" ;
+                    git config --global diff.guitool "$merge" ;
                     git config --global merge.tool "$merge" ;
+                    git config --global merge.guitool "$merge" ;
                 fi
             fi
         fi

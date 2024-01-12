@@ -8,7 +8,7 @@ fi
 if [ $distro_base == "Arch" ]; then
     sudo pacman -Su xclip mono go nodejs jre11-openjdk npm python ranger atool bat calibre elinks ffmpegthumbnailer fontforge highlight imagemagick kitty mupdf-tools odt2txt btm
 elif [ $distro_base == "Debian" ]; then  
-    sudo apt install build-essential python2 python3 cmake python3-dev python3-pip mono-complete golang nodejs openjdk-17-jdk openjdk-17-jre npm ranger atool bat elinks ffmpegthumbnailer fontforge highlight imagemagick jq libcaca0 odt2txt mupdf-tools 
+    sudo apt install build-essential python2 python3 cmake python3-dev python3-pip mono-complete golang nodejs openjdk-17-jdk openjdk-17-jre npm atool bat elinks ffmpegthumbnailer fontforge highlight imagemagick jq libcaca0 odt2txt mupdf-tools 
 fi 
 
 read -p "Install nvim? [Y/n]:" nvim

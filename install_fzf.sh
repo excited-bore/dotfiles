@@ -27,7 +27,8 @@
                     yes | sudo pacman -Su fd
                 elif [ $distro_base == "Debian" ]; then
                     yes | sudo apt update
-                    yes | sudo apt install fd 
+                    yes | sudo apt install fd-find
+                    ln -s $(which fdfind) ~/.local/bin/fd
                 fi
             fi
             if [ ! -f ~/.fdignore ]; then
@@ -76,6 +77,7 @@
             elif ! sudo grep -q "export RG_PREFIX" $PATHVAR_R; then
                  printf "\n# RIPGREP\nexport RG_PREFIX='rg --column --line-number --no-heading --color=always --smart-case \"" | sudo tee -a $PATHVAR_R
             fi
+            cp -fv ./fzf/ripgrep-directory.bash ~/.bash_aliases.d/
         fi
         unset rpgrp
         

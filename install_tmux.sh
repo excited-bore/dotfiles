@@ -54,7 +54,7 @@ sed -i 's|set -g @continuum-restore '\''on'\''|#set -g @continuum-restore '\''on
 reade -Q "GREEN" -i "y" -p "Install tmux.conf? (tmux conf at ~/.tmux.conf) [Y/n]:" "y n" tmuxc
 if [ "$tmuxc"  == "y" ] || [ -z "$tmuxc" ]; then
     cp -f tmux/.tmux.conf ~/
-    tmux source-file ~/.tmux.conf
+    #tmux source-file ~/.tmux.conf
 fi
 unset tmuxc
 
@@ -129,6 +129,12 @@ echo "Install plugins in tmux with 'C-b + I' / Update with 'C-b + U'"
 
 reade -Q "GREEN" -i "y" -p "Install tmux completions? [Y/n]:" "y n"  tmuxx
 if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
+    if [ ! -d ~/.bash_completion.d/ ]; then
+        mkdir ~/.bash_completion.d/
+    fi
+    if [ ! -f ~/.bash_completion.d/ ]; then
+        touch ~/.bash_completion.d/tmux
+    fi
     if [ ! -e ~/.bash_completion.d/tmux ]; then
         curl https://raw.githubusercontent.com/imomaliev/tmux-bash-completion/master/completions/tmux > ~/.bash_completion.d/tmux 2> /dev/null
         if ! grep -q "~/.bash_completion.d/tmux" ~/.bashrc; then

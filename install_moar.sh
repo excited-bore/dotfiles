@@ -34,7 +34,7 @@ if [ ! -x "$(command -v moar)" ]; then
             (cd /tmp
             wget "https://github.com/walles/moar/releases/download/$latest/moar-$latest-linux-$architecture"
             chmod a+x moar-*-*-*
-            sudo mv moar-* /usr/local/bin/moar
+            sudo mv moar-* /usr//bin/moar
             )
             echo "Done!"
         fi

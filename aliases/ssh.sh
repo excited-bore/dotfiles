@@ -1,9 +1,9 @@
 ### SSH ###                           
 . ~/.bash_aliases.d/rlwrap_scripts.sh
 
-ssh_file="~/.ssh/id_ecdsa"
-user="funnyman"
-ip="192.168.129.17"
+ssh_file="~/.ssh/id_rsa"
+user="burp"
+ip="192.168.0.140"
 
 # To prevent 'failed to preserve ownership' errors
 copy_sshfs(){ cp -r --no-preserve=mode "$1" "$2"; }
@@ -24,8 +24,15 @@ ssh_key_and_add_to_agent_by_host() {
     fi
     read -p "Give up filename: (nothing for id_keytype, sensible to leave as such in certain situations): " name
     reade -p "Give up keytype \(dsa \| ecdsa \| ecdsa-sk \| ed25519 (Default) \| ed25519-sk \| rsa\): " "dsa ecdsa ecdsa-sk ed25519 ed25519-sk rsa" keytype
-    read -p "Give up a hostname : " host
-    read -p "Give up remote username: " uname  
+    read -p "Give up hostname : " host
+    if [ -z $host ]; then
+        host=$(hostname) 
+    fi
+    read -p "Give up remote username: " uname
+    if [ -z $uname ]; then
+        echo "Remote username can't be empty";
+        return 0
+    fi
     if [ -z $keytype ]; then
         keytype=ed25519
     fi
