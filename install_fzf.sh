@@ -11,7 +11,15 @@
         
         git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
         ~/.fzf/install
-        
+    
+        # Bash completion issue with fzf fix
+        # https://github.com/cykerway/complete-alias/issues/46
+        if grep -q "complete_alias" ~/.bashrc; then
+            sed -i 's|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash||g' ~/.bashrc
+            sed -i 's|\(.*complete_alias\)|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\n\1|g' ~/.bashrc
+        fi
+        . ~/.bashrc
+
         reade -Q "GREEN" -i "y" -p "Install fd and use for fzf? (Faster find, required for file-extensions file similar to gitignore) [Y/n]: " "y n" fdr
         if [ -z $fdr ] || [ "Y" == $fdr ] || [ $fdr == "y" ]; then
             if [ ! -x "$(command -v fd)" ]; then
@@ -31,12 +39,16 @@
             if [ $PATHVAR == ~/.pathvariables.sh ] ; then
                 sed -i 's|#export FZF_DEFAULT_COMMAND|export FZF_DEFAULT_COMMAND|g' $PATHVAR
                 sed -i 's|#export FZF_CTRL_T_COMMAND|export FZF_CTRL_T_COMMAND|g' $PATHVAR
+                sed -i 's|#export FZF_CTRL_R_OPTS|export FZF_CTRL_R_OPTS|g' $PATHVAR
+                sed -i 's|#export FZF_BIND_TYPES|export FZF_BIND_TYPES|g' $PATHVAR
             elif ! grep -q "export FZF_DEFAULT_COMMAND" $PATHVAR; then
                 printf "\n# FZF\nexport FZF_DEFAULT_COMMAND=\"fd --search-path / --type f --hidden --exclude '*.dll *.pak *.bat *.so *.go' \"\nexport FZF_CTRL_T_COMMAND='$FZF_DEFAULT_COMMAND'" >> $PATHVAR
             fi
             if [ $PATHVAR_R == /root/.pathvariables.sh ] ; then
                 sudo sed -i 's|#export FZF_DEFAULT_COMMAND|export FZF_DEFAULT_COMMAND|g' $PATHVAR_R
-                sudo sed -i 's|#export FZF_CTRL_T_COMMAND|export FZF_CTRL_T_COMMAND|g' $PATHVAR_R 
+                sudo sed -i 's|#export FZF_CTRL_T_COMMAND|export FZF_CTRL_T_COMMAND|g' $PATHVAR_R
+                sudo sed -i 's|#export FZF_CTRL_R_OPTS|export FZF_CTRL_R_OPTS|g' $PATHVAR_R
+                sudo sed -i 's|#export FZF_BIND_TYPES|export FZF_BIND_TYPES|g' $PATHVAR_R
             elif ! sudo grep -q "export FZF_DEFAULT_COMMAND" $PATHVAR_R; then
                 printf "\n# FZF\nexport FZF_DEFAULT_COMMAND=\"fd --search-path / --type f --hidden --exclude '*.dll *.pak *.bat *.so *.go' \"\nexport FZF_CTRL_T_COMMAND='$FZF_DEFAULT_COMMAND'" | sudo tee -a $PATHVAR_R
             fi

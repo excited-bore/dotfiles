@@ -82,7 +82,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         
         pagers="less more"
         prmpt="${green} \tless = Default pager - Oldest and most customizable\n\
-            more = Preinstalled other pager - leaves text by default, less customizable (ironically)\n"
+        more = Preinstalled other pager - leaves text by default, less customizable (ironically)\n"
         if [ -x "$(command -v most)" ]; then
             pagers="$pagers most"
             prmpt="$prmpt \tmost = Installed pager\n"
@@ -163,9 +163,9 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
     unset dsply
 
     if [ -x "$(command -v snap)" ]; then
-        reade -Q "GREEN" -i "n" -p "Add snap dirs to path? [Y/n]:" "y n" snapvrs 
+        reade -Q "GREEN" -i "y" -p "Add snap dirs to path? [Y/n]:" "y n" snapvrs 
         if [ "$snapvrs" == "y" ]; then
-            sed -i 's|#export PATH="/snap|export PATH="/snap|' pathvars/.pathvariables.sh 
+            sed -i 's|#export PATH="/bin|export PATH="/bin|' pathvars/.pathvariables.sh 
         fi
     fi
     unset snapvrs
@@ -185,7 +185,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         - XDG_DATA_DIRS=/usr/local/share/:/usr/share\n\
         - XDG_STATE_HOME=$HOME/.local/state\n"
         printf "$prmpt"
-        reade -Q "YELLOW" -i "n" -p "[Y/n]: " "y n" xdgInst
+        reade -Q "GREEN" -i "y" -p "Set XDG environment? [Y/n]: " "y n" xdgInst
         if [ -z "$xdgInst" ] || [ "y" == "$xdgInst" ]; then
             sed 's/^#export XDG_CACHE_HOME=\(.*\)/export XDG_CACHE_HOME=\1/' -i pathvars/.pathvariables.sh 
             sed 's/^#export XDG_CONFIG_HOME=\(.*\)/export XDG_CONFIG_HOME=\1/' -i pathvars/.pathvariables.sh
@@ -199,7 +199,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
     unset xdgInst
     
     if [ -x "$(command -v flatpak)" ]; then
-        reade -Q "GREEN" -i "n" -p "Add flatpak dirs to path? (XDG_DATA_DIRS) [Y/n]:" "y n" flpkvrs 
+        reade -Q "GREEN" -i "y" -p "Add flatpak dirs to path? (XDG_DATA_DIRS) [Y/n]:" "y n" flpkvrs 
         if [ "$flpkvrs" == "y" ]; then
             sed 's/^#export XDG_DATA_DIRS=\(.*\)/export XDG_DATA_DIRS=\1/' -i pathvars/.pathvariables.sh
             sed -i 's|#export FLATPAK=|export FLATPAK=|'  pathvars/.pathvariables.sh 
@@ -226,7 +226,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         - SYSTEMD_LOG_TARGET=\"auto\"\n\
         "
         printf "$prmpt"
-        reade -Q "YELLOW" -i "n" -p "[Y/n]: " "y n" xdgInst
+        reade -Q "YELLOW" -i "n" -p "Set systemd environment? [Y/n]: " "y n" xdgInst
         if [ -z "$xdgInst" ] || [ "y" == "$xdgInst" ]; then
             sed 's/^#export SYSTEMD_PAGER=\(.*\)/export SYSTEMD_PAGER=\1/' -i pathvars/.pathvariables.sh 
             sed 's/^#export SYSTEMD_PAGERSECURE=\(.*\)/export SYSTEMD_PAGERSECURE=\1/' -i pathvars/.pathvariables.sh
@@ -413,33 +413,9 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     fi
     unset findr
     
-    
     reade -Q "GREEN" -i "y" -p "Install bash completions for aliases in ~/.bash_completion.d? [Y/n]:" "y n" compl
     if [ -z $compl ] || [ "y" == $compl ]; then
-        if [ ! -d ~/.bash_completion.d/ ]; then 
-            mkdir ~/.bash_completion.d
-        fi
-        if [ ! -e ~/.bash_completion.d/complete_alias ]; then
-            curl https://raw.githubusercontent.com/cykerway/complete-alias/master/complete_alias > ~/.bash_completion.d/complete_alias > /dev/null
-            sed -i s/"#complete -F _complete_alias \"\(.*\)"/"complete -F _complete_alias \"\1"/g ~/.bash_completion.d/complete_alias
-        fi
-        if ! grep -q "~/.bash_completion.d/complete_alias" ~/.bashrc; then
-            echo ". ~/.bash_completion.d/complete_alias" >> ~/.bashrc
-        fi
-        
-        reade -Q "YELLOW" -i "y" -p "Install bash completions for aliases in /root/.bash_completion.d? [Y/n]:" "y n" rcompl
-        if [ -z $rcompl ] || [ "y" == $rcompl ]; then
-            if ! sudo test -d /root/.bash_completion.d/ ; then 
-                sudo mkdir /root/.bash_completion.d
-            fi
-            if ! sudo test -e /root/.bash_completion.d/complete_alias ; then
-                curl https://raw.githubusercontent.com/cykerway/complete-alias/master/complete_alias | sudo tee /root/.bash_completion.d/complete_alias > /dev/null
-                sudo sed -i s/"#complete -F _complete_alias \"\(.*\)"/"complete -F _complete_alias \"\1"/g /root/.bash_completion.d/complete_alias
-            fi
-            if ! sudo grep -q "~/.bash_completion.d/complete_alias" /root/.bashrc; then
-                printf "\n. ~/.bash_completion.d/complete_alias\n" | sudo tee -a /root/.bashrc
-            fi
-        fi
+        ./install_bash_alias_completions.sh
     fi
     
     if [ ! -f ~/.bash_completion.d/_python-argcomplete ]; then

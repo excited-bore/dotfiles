@@ -14,7 +14,8 @@
 #fi
 
 #https://stackoverflow.com/questions/41783367/tmux-tmux-true-color-is-not-working-properly
-alias check_terminal_colours="curl -s https://raw.githubusercontent.com/JohnMorales/dotfiles/master/colors/24-bit-color.sh | bash"
+alias terminal_colours="curl -s https://raw.githubusercontent.com/JohnMorales/dotfiles/master/colors/24-bit-color.sh | bash"
+alias tmuxSource="tmux source ~/.tmux.conf"
 
 function tmuxNewSession(){
     if ! [ -z $1 ]; then

@@ -44,11 +44,6 @@ fi
 reade -Q "GREEN" -i "y" -p "Install tmux.sh at ~/.bash_aliases.d/? (tmux aliases) [Y/n]:" "y n"  tmuxx
 if [ -z "$tmuxx" ] || [ "$tmuxx"  == "y" ]; then 
     cp -f tmux/tmux.sh ~/.bash_aliases.d/
-    if ! grep -q tmux.sh ~/.bashrc; then
-        echo "if [[ -f ~/Applications/tmux.sh ]]; then" >> ~/.bashrc
-        echo "  . ~/Applications/tmux.sh" >> ~/.bashrc
-        echo "fi" >> ~/.bashrc
-    fi
 fi
 unset tmuxx
 
@@ -129,6 +124,19 @@ if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
 fi
 unset tmuxx
 
+~/.tmux/plugins/tpm/bin/install_plugins
+echo "Install plugins in tmux with 'C-b + I' / Update with 'C-b + U'"
+
+reade -Q "GREEN" -i "y" -p "Install tmux completions? [Y/n]:" "y n"  tmuxx
+if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
+    if [ ! -e ~/.bash_completion.d/tmux ]; then
+        curl https://raw.githubusercontent.com/imomaliev/tmux-bash-completion/master/completions/tmux > ~/.bash_completion.d/tmux 2> /dev/null
+        if ! grep -q "~/.bash_completion.d/tmux" ~/.bashrc; then
+            echo ". ~/.bash_completion.d/tmux" >> ~/.bashrc
+        fi
+        . ~/.bashrc
+    fi
+fi
 
 #awk '$0=="#run '\''~/.tmux/plugins/tpm/tpm'\''"{lastline=$0;next}{print $0}END{print lastline}' ~/.tmux.conf > ~/.tmux.conf
 #awk '$0=="run '\''~/.tmux/plugins/tpm/tpm'\''"{lastline=$0;next}{print $0}END{print lastline}' ~/.tmux.conf > ~/.tmux.conf
@@ -148,6 +156,11 @@ if [ -x "$(command -v ranger)" ]; then
         pip install --break-system-packages ranger_tmux
         python3 -m ranger_tmux --tmux install
         
+        # Silent tracking
+        if ! grep -q "history" ~/.local/lib/python3.11/site-packages/ranger_tmux/util.py; then
+            sed -i 's|"'\''.format(path)|" \&\& history -d -1 \&\& clear'\''.format(path)|g' ~/.local/lib/python3.11/site-packages/ranger_tmux/util.py
+        fi    
+
         sed -i 's|#set tmux_cwd_sync .*|set tmux_cwd_sync true|g' ~/.config/ranger/rc.conf
         sed -i 's|#set tmux_cwd_track .*|set tmux_cwd_track true|g' ~/.config/ranger/rc.conf
         if ! grep -q "set tmux_cwd_sync" ~/.config/ranger/rc.conf; then
@@ -160,5 +173,3 @@ if [ -x "$(command -v ranger)" ]; then
 fi
 unset tmuxx
 
-tmux source ~/.tmux.conf
-echo "Install plugins in tmux with '@-I'"

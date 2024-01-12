@@ -39,14 +39,17 @@ if [ "$distro_base" == "Arch" ]; then
     elif [ -x "$(command -v pamac)" ]; then
         printf "Your distro ($distro) seems to use 'pamac' as a possible AUR helper\n"
         # Check for AUR
-        reade -Q "GREEN" -i "y" -p "Enable AUR in pamac? [Y/n]:" "y n" aurset
-        if [ "$aurset" == "y" ]; then
-            sudo sed -i 's|#EnableAUR|EnableAUR|g' /etc/pamac.conf 
-        elif [ "$aurset" == "n" ]; then
-            sudo sed -i 's|EnableAUR|#EnableAUR|g' /etc/pamac.conf
+        if grep -q "#EnableAUR" /etc/pamac.conf; then
+            reade -Q "GREEN" -i "y" -p "Enable AUR in pamac? [Y/n]:" "y n" aurset
+            if [ "$aurset" == "y" ]; then
+                sudo sed -i 's|#EnableAUR|EnableAUR|g' /etc/pamac.conf 
+            elif [ "$aurset" == "n" ]; then
+                sudo sed -i 's|EnableAUR|#EnableAUR|g' /etc/pamac.conf
+            fi
+            unset aurset
         fi
-        
-        if [ "$aurset" == "y" ]; then
+
+        if grep -q "#KeepBuiltPkgs" /etc/pamac.conf; then
             reade -Q "GREEN" -i "y" -p "Keep build AUR packages? [Y/n]:" "y n" aurset1
             if [ "$aurset1" == "y" ]; then
                 sudo sed -i 's|#KeepBuiltPkgs|KeepBuiltPkgs|g' /etc/pamac.conf 
@@ -54,7 +57,9 @@ if [ "$distro_base" == "Arch" ]; then
                 sudo sed -i 's|KeepBuiltPkgs|#KeepBuiltPkgs|g' /etc/pamac.conf
             fi
             unset aurset1
-            
+        fi
+        
+        if grep -q "#CheckAURUpdates" /etc/pamac.conf; then
             reade -Q "GREEN" -i "y" -p "Check AUR for updates? [Y/n]:" "y n" aurset1
             if [ "$aurset1" == "y" ]; then
                 sudo sed -i 's|#CheckAURUpdates|CheckAURUpdates|g' /etc/pamac.conf 
@@ -62,7 +67,9 @@ if [ "$distro_base" == "Arch" ]; then
                 sudo sed -i 's|CheckAURUpdates|#CheckAURUpdates|g' /etc/pamac.conf
             fi
             unset aurset1    
-            
+        fi
+
+        if grep -q "#CheckAURVCSUpdates" /etc/pamac.conf; then
             reade -Q "GREEN" -i "y" -p "Check AUR for updates to development packages? [Y/n]:" "y n" aurset1
             if [ "$aurset1" == "y" ]; then
                 sudo sed -i 's|#CheckAURVCSUpdates|CheckAURVCSUpdates|g' /etc/pamac.conf 
@@ -71,7 +78,6 @@ if [ "$distro_base" == "Arch" ]; then
             fi
             unset aurset1
         fi
-        unset aurset
         
         # Check for flatpak
         if [ ! -x "$(command -v flatpak)" ]; then
@@ -80,24 +86,29 @@ if [ "$distro_base" == "Arch" ]; then
                 . ./install_flatpak.sh
             fi
         fi
+        
         if [ -x "$(command -v flatpak)" ]; then 
-            reade -Q "GREEN" -i "y" -p "Enable flatpak in pamac? [Y/n]:" "y n" fltpak
-            if [ "$fltpak" == "y" ]; then
-                yes | sudo pacman -Syu libpamac-flatpak-plugin
-                sudo sed -i 's|#EnableFlatpak|EnableFlatpak|g' /etc/pamac.conf 
-            elif [ "$fltpak" == "n" ]; then  
-                sudo sed -i 's|EnableFlatpak|#EnableFlatpak|g' /etc/pamac.conf
-            fi
-            if [ "$fltpak" == "y" ]; then 
-                reade -Q "GREEN" -i "y" -p "Check flatpak for updates? [Y/n]:" "y n" fltpak1
-                if [ "$fltpak1" == "y" ]; then
-                    sudo sed -i 's|#CheckFlatpakUpdates|CheckFlatpakUpdates|g' /etc/pamac.conf 
-                elif [ "$fltpak1" == "n" ]; then  
-                    sudo sed -i 's|CheckFlatpakUpdates|#CheckFlatpakUpdates|g' /etc/pamac.conf
+            if grep -q "#EnableFlatpak" /etc/pamac.conf; then
+                reade -Q "GREEN" -i "y" -p "Enable flatpak in pamac? [Y/n]:" "y n" fltpak
+                if [ "$fltpak" == "y" ]; then
+                    yes | sudo pacman -Syu libpamac-flatpak-plugin
+                    sudo sed -i 's|#EnableFlatpak|EnableFlatpak|g' /etc/pamac.conf 
+                elif [ "$fltpak" == "n" ]; then  
+                    sudo sed -i 's|EnableFlatpak|#EnableFlatpak|g' /etc/pamac.conf
                 fi
-                unset fltpak1
+                if grep -q "#CheckFlatpakUpdates" /etc/pamac.conf; then
+                    if [ "$fltpak" == "y" ]; then 
+                        reade -Q "GREEN" -i "y" -p "Check flatpak for updates? [Y/n]:" "y n" fltpak1
+                        if [ "$fltpak1" == "y" ]; then
+                            sudo sed -i 's|#CheckFlatpakUpdates|CheckFlatpakUpdates|g' /etc/pamac.conf 
+                        elif [ "$fltpak1" == "n" ]; then  
+                            sudo sed -i 's|CheckFlatpakUpdates|#CheckFlatpakUpdates|g' /etc/pamac.conf
+                        fi
+                        unset fltpak1
+                    fi
+                    unset fltpak
+                fi
             fi
-            unset fltpak
         fi
 
         # Check for snap
@@ -108,14 +119,16 @@ if [ "$distro_base" == "Arch" ]; then
             fi
         fi
         if [ -x "$(command -v snap)" ]; then
-            reade -Q "GREEN" -i "y" -p "Enable snap in pamac? [Y/n]:" "y n" snap
-            if [ "$snap" == "y" ]; then
-                yes | sudo pacman -Syu libpamac-snap-plugin
-                sudo sed -i 's|#EnableSnap|EnableSnap|g' /etc/pamac.conf 
-            elif [ "$snap" == "n" ]; then  
-                sudo sed -i 's|EnableSnap|#EnableSnap|g' /etc/pamac.conf
+            if grep -q "#EnableSnap" /etc/pamac.conf; then
+                reade -Q "GREEN" -i "y" -p "Enable snap in pamac? [Y/n]:" "y n" snap
+                if [ "$snap" == "y" ]; then
+                    yes | sudo pacman -Syu libpamac-snap-plugin
+                    sudo sed -i 's|#EnableSnap|EnableSnap|g' /etc/pamac.conf 
+                elif [ "$snap" == "n" ]; then  
+                    sudo sed -i 's|EnableSnap|#EnableSnap|g' /etc/pamac.conf
+                fi
+            unset snapIns snap
             fi
-        unset snapIns snap
         fi
     fi
 fi

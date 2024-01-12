@@ -51,8 +51,8 @@ Plug 'junegunn/fzf.vim'
 "" Git plugin
 Plug 'tpope/vim-fugitive'
 "
-""vim-tmux-navigator, smart navigation between vim and tmux panes
-"Plugin 'christoomey/vim-tmux-navigator'
+"vim-tmux-navigator, smart navigation between vim and tmux panes
+Plug 'christoomey/vim-tmux-navigator'
 
 "Sudo write
 Plug 'tpope/vim-eunuch'
@@ -81,18 +81,15 @@ call plug#end()
 let g:gruvbox_italic=1
 colorscheme gruvbox
 
-if (empty($TMUX))
-  if (has("nvim"))
-    "For Neovim 0.1.3 and 0.1.4 < https://github.com/neovim/neovim/pull/2198 >
-    let $NVIM_TUI_ENABLE_TRUE_COLOR=1
-  endif
-  "For Neovim > 0.1.5 and Vim > patch 7.4.1799 < https://github.com/vim/vim/commit/61be73bb0f965a895bfb064ea3e55476ac175162 >
-  "Based on Vim patch 7.4.1770 (`guicolors` option) < https://github.com/vim/vim/commit/8a633e3427b47286869aa4b96f2bfc1fe65b25cd >
-  " < https://github.com/neovim/neovim/wiki/Following-HEAD#20160511 >
-  if (has("termguicolors"))
+"For Neovim > 0.1.5 and Vim > patch 7.4.1799 < https://github.com/vim/vim/commit/61be73bb0f965a895bfb064ea3e55476ac175162 >
+let $NVIM_TUI_ENABLE_TRUE_COLOR=1
+
+"Tmux has problems with nvim colors if we dont supply it with true colors
+"https://unix.stackexchange.com/questions/251847/clear-to-end-of-line-uses-the-wrong-background-color-in-tmux/252078#252078
+if (has("termguicolors"))
     set termguicolors
-  endif
 endif
+  
 
 """ YouCompleteMe stuff
 
@@ -779,24 +776,24 @@ inoremap <C-A-s> <C-o>V
 "Buffers and panes
 
 "List buffers
-nnoremap <silent><C-w>b :Buffers<cr> 
-inoremap <silent><C-w>b <C-\><C-o>:Buffers<cr>
-vnoremap <silent><C-w>b <esc>:Buffers<cr>gv
+nnoremap <silent><C-w>b :<C-u>CocCommand fzf-preview.AllBuffers<CR> 
+inoremap <silent><C-w>b <C-\><C-o><C-u>CocCommand fzf-preview.AllBuffers<CR>
+vnoremap <silent><C-w>b <esc>:<C-u>CocCommand fzf-preview.AllBuffers<CR>gv
 
 " Open next buffer
-nnoremap <silent><S-A-Right> :vert next<cr>
-inoremap <silent><S-A-Right> <C-\><C-o>:vert next<cr>
-vnoremap <silent><S-A-Right> <esc>:vert next<cr>
+nnoremap <silent><S-A-Right> :bNext<cr>
+inoremap <silent><S-A-Right> <C-\><C-o>:bNext<cr>
+vnoremap <silent><S-A-Right> <esc>:bNext<cr>
 
-" Open vertical pane
-nnoremap <silent><S-A-Left> :vert prev<cr>
-inoremap <silent><S-A-Left> <C-\><C-o>:vert prev<cr>
-vnoremap <silent><S-A-Left> <esc>:vert prev<cr>
+" Open previous buffer
+nnoremap <silent><S-A-Left> :bprevious<cr>
+inoremap <silent><S-A-Left> <C-\><C-o>bprevious<cr>
+vnoremap <silent><S-A-Left> <esc>:bprevious<cr>
 
 " Open Horizontal buffer
-"nnoremap <S-A-Up> :horizontal sb
-"vnoremap <S-A-Up> <esc>:horizontal sb
-"inoremap <S-A-Up> <C-\><C-o>:horizontal sb
+nnoremap <silent><C-w>h :split<cr>
+inoremap <silent><C-w>h <C-\><C-o>:split<cr>
+vnoremap <silent><C-w>h <esc>:split<cr>gv
 
 "" Open Vertical buffer
 "nnoremap <S-A-Down> :vertical sb
@@ -839,11 +836,11 @@ noremap <silent><C-A-Down> <esc>:wincmd j<cr>
 
 
 "" vim tmux navigator integrator
-"let g:tmux_navigator_no_mappings = 1
-"noremap <silent> <C-S-Left> :<C-U>TmuxNavigateLeft<cr>
-"noremap <silent> <C-S-Down> :<C-U>TmuxNavigateDown<cr>
-"noremap <silent> <C-S-Up> :<C-U>TmuxNavigateUp<cr>
-"noremap <silent> <C-S-Right> :<C-U>TmuxNavigateRight<cr>
+let g:tmux_navigator_no_mappings = 1
+noremap <silent> <C-M-Left> :<C-U>TmuxNavigateLeft<cr>
+noremap <silent> <C-M-Down> :<C-U>TmuxNavigateDown<cr>
+noremap <silent> <C-M-Up> :<C-U>TmuxNavigateUp<cr>
+noremap <silent> <C-M-Right> :<C-U>TmuxNavigateRight<cr>
 "noremap <silent> <C-²> :<C-U>TmuxNavigatePrevious<cr>
 
 "highlight Visual cterm=reverse ctermbg=NONE

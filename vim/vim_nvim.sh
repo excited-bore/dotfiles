@@ -1,7 +1,8 @@
 ### VIM ###
 
 alias vim="nvim -u ~/.config/nvim/init.vim" 
-alias svim="sudo nvim"
+alias svim="sudo vim"
+#alias snvim="sudo nvim"
 function rvim(){ nvr --remote $@; }
 alias vim_noconf="nvim -Nu NONE"
 alias vim_check_health="nvim +checkhealth"
