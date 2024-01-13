@@ -32,7 +32,7 @@ fzf_rifle(){
     else 
         printf "\x1b_Ga=d,d=A\x1b\\"; 
         bat --color always --style numbers --line-range :200 {};
-        fi;' \
+    fi;' \
     --prompt="Files> " \
     --header=$'Each file can get opened using rifle\nCTRL-G choose wich file to append to' \
     --preview-window='right,50%,border-left' \
@@ -42,7 +42,7 @@ fzf_rifle(){
     --bind=$'ctrl-f:reload:$FZF_DEFAULT_COMMAND+change-prompt(Files> )+change-header('$'Each file can get opened using rifle\nChoose a file and append to it using CTRL-G'')+change-preview(size=$(kitten icat --print-window-size {});     
         t_mode="memory";
         [[ -n "$SSH_TTY" ]] && t_mode="stream";   
-        x_img=$(($(echo $size | cut -d"x" -f 1) / $COLUMNS)); y_img=$(($(echo $size | cut -d"x" -f 2) / "$LINES"));
+        x_img=$(($(echo $size | cut -d"x" -f 1) / "$COLUMNS")); y_img=$(($(echo $size | cut -d"x" -f 2) / "$LINES"));
         x_img=$((($FZF_PREVIEW_COLUMNS*$x_img/100)*4)); y_img=$((($FZF_PREVIEW_LINES*$y_img/100)*4));
     if file --mime-type {} | grep -qF image/; then 
         kitten icat --clear --transfer-mode=${t_mode} --place=${x_img}x${y_img}@125x1 --stdin=no {} > /dev/tty; 
@@ -55,7 +55,7 @@ fzf_rifle(){
     else 
         printf "\x1b_Ga=d,d=A\x1b\\"; 
         bat --color always --style numbers --line-range :200 {};
-        fi;');
+    fi;');
     #--bind 'focus:transform-preview-label:file --brief {}'
     if [ -z "$fle" ]; then
         return 0;
@@ -63,13 +63,13 @@ fzf_rifle(){
         lines="$(echo "$fle" | wc -l)";
         if [ "$lines" == 1 ]; then
             if [ -d "$fle" ]; then
-                result=$(printf "0:change directory \n1:Use rifle" | fzf --height 30% --reverse $FZF_CTRL_T_OPTS) 
+                result=$(printf "0:change directory \n1:Use rifle" | fzf --height 30% --reverse) 
                 if [ "${result::1}" == "0" ]; then
                     cd "$fle";
                     return 0;
                 fi
             else
-                result=$(rifle -l "$fle" | fzf --height 50% --reverse "$FZF_CTRL_T_OPTS");
+                result=$(rifle -l "$fle" | fzf --height 50% --reverse);
                 rifle -p "${result::1}" "$fle";
                 return 0;
             fi
