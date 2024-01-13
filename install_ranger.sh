@@ -10,7 +10,11 @@
         yes | sudo pacman -Su ranger python python-pipx ttf-nerd-fonts-symbols-common ttf-nerd-fonts-symbols ttf-nerd-fonts-symbols-mono atool bat calibre elinks ffmpegthumbnailer fontforge highlight terminology mupdf-tools odt2txt
     elif [ $distro_base == "Debian" ]; then    
         yes | sudo apt update 
-        yes | sudo apt install ranger python3 python3-dev pipx atool bat elinks ffmpegthumbnailer fontforge highlight jq libcaca0 odt2txt mupdf-tools terminology 
+        yes | sudo apt install ranger python3 python3-dev pipx atool bat elinks ffmpegthumbnailer fontforge highlight jq libcaca0 odt2txt mupdf-tools terminology
+        if [ -x "$(command -v batcat)" ]; then
+            mkdir -p ~/.local/bin
+            ln -s /usr/bin/batcat ~/.local/bin/bat
+        fi
     fi
 
     # Remove message ('Removed /tmp/ranger_cd54qzd') after quitting ranger

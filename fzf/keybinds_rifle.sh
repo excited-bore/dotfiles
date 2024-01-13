@@ -16,8 +16,8 @@ fzf_rifle(){
     ##--bind 'ctrl-t:change-preview-window(down|hidden|)'\
     local file
     INITIAL_QUERY="${*:-}"     
-    local fle=$(fzf -m --reverse --height 100% --query "$INITIAL_QUERY" --ansi  --header-first --history="/home/$USER/.fzf_history" --preview='size=$(kitten icat --print-window-size {})
-        x_img=$(($(echo $size | cut -d"x" -f 1) / $COLUMNS)); y_img=$(($(echo $size | cut -d"x" -f 2) / $LINES));
+    local fle=$(fzf -m --reverse --height 100% --query "$INITIAL_QUERY" --ansi  --header-first --history="$HOME/.fzf_history" --preview='size=$(kitten icat --print-window-size {})
+        x_img=$(($(echo $size | cut -d"x" -f 1) / $COLUMNS)); y_img=$(($(echo $size | cut -d"x" -f 2) / "$LINES"));
         x_img=$((($FZF_PREVIEW_COLUMNS*$x_img/100)*4)); y_img=$((($FZF_PREVIEW_LINES*$y_img/100)*4));
     if file --mime-type {} | grep -qF image/; then 
         kitten icat --clear --transfer-mode=memory --place=${x_img}x${y_img}@125x1 --stdin=no {} > /dev/tty; 

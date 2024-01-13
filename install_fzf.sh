@@ -133,7 +133,11 @@
                         yes | sudo pacman -Su bat
                     elif [ $distro_base == "Debian" ]; then
                         yes | sudo apt update
-                        yes | sudo apt install bat 
+                        yes | sudo apt install bat
+                        if [ -x "$(command -v batcat)" ]; then
+                            mkdir -p ~/.local/bin
+                            ln -s /usr/bin/batcat ~/.local/bin/bat
+                        fi
                     fi
                 fi 
             fi
