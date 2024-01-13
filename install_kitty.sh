@@ -5,7 +5,11 @@ if [ "$distro" == "Arch" ] || [ "$distro_base" == "Arch" ]; then
     yes | sudo pacman -Su kitty 
 elif [ "$distro" == "Debian" ] || [ "$distro_base" == "Debian" ]; then    
     yes | sudo apt update 
-    yes | sudo apt install kitty 
+    yes | sudo apt install kitty
+    if [  ! -x "$(command -v kitten)" ]; then
+        sudo ln -s ~/.local/share/kitty-ssh-kitten/kitty/bin/kitten    
+    fi
+    kitten update-self 
 fi
 
 reade -Q "GREEN" -i "y" -p "Install kitty conf? (at ~/.config/kitty/kitty.conf) [Y/n]:" "y n" kittn
@@ -14,6 +18,8 @@ if [ "y" == "$kittn" ]; then
     cp -f kitty/kitty.conf ~/.config/kitty/kitty.conf
 fi
 unset kittn
+
+
 
 #if [ -x "$(command -v xdg-open)" ]; then
 #    reade -Q "GREEN" -p -i "y" "Set kitty as default terminal? [Y/n]:" "y n" kittn

@@ -15,17 +15,19 @@ fzf_rifle(){
     #fi;' --preview-window 'right,50%,border-left')"
     ##--bind 'ctrl-t:change-preview-window(down|hidden|)'\
     local file
-    INITIAL_QUERY="${*:-}"     
+    INITIAL_QUERY="${*:-}"
     local fle=$(fzf -m --reverse --height 100% --query "$INITIAL_QUERY" --ansi  --header-first --history="$HOME/.fzf_history" --preview='size=$(kitten icat --print-window-size {})
+        t_mode="memory"
+        [[ -n "$SSH_TTY" ]] && t_mode="stream"    
         x_img=$(($(echo $size | cut -d"x" -f 1) / $COLUMNS)); y_img=$(($(echo $size | cut -d"x" -f 2) / "$LINES"));
         x_img=$((($FZF_PREVIEW_COLUMNS*$x_img/100)*4)); y_img=$((($FZF_PREVIEW_LINES*$y_img/100)*4));
     if file --mime-type {} | grep -qF image/; then 
-        kitten icat --clear --transfer-mode=memory --place=${x_img}x${y_img}@125x1 --stdin=no {} > /dev/tty; 
+        kitten icat --clear --transfer-mode=${t_mode} --place=${x_img}x${y_img}@125x1 --stdin=no {} > /dev/tty; 
     elif file --mime-type {} | grep -q video/; then
         TMP_DIR="/tmp/.vidthumbs.$(tr -dc A-Za-z0-9 </dev/urandom | head -c6)";
         mkdir -- "$TMP_DIR" >&2;
         ffmpegthumbnailer -i {} -s 256 -o "$TMP_DIR/$(basename {}).jpg" 2>/dev/null;
-        kitten icat --clear --transfer-mode=memory --scale-up --place=${x_img}x${y_img}@125x1 --stdin=no "$TMP_DIR" > /dev/tty;
+        kitten icat --clear --transfer-mode=${t_mode} --scale-up --place=${x_img}x${y_img}@125x1 --stdin=no "$TMP_DIR" > /dev/tty;
         $(rm -rf -- "$TMP_DIR" 2>/dev/null);
     else 
         printf "\x1b_Ga=d,d=A\x1b\\"; 
@@ -38,20 +40,22 @@ fzf_rifle(){
     #--bind "change:reload:sleep 0.1; $RG_PREFIX {q} || true" \
     --bind='ctrl-g:change-prompt(Append> )+change-header('\''Append stuff\nCTRL+F to go back'\'')+change-preview(printf "\x1b_Ga=d,d=A\x1b\\"; bat --color=always {1} --highlight-line {2})+reload:$RG_PREFIX {q}"' \
     --bind=$'ctrl-f:reload:$FZF_DEFAULT_COMMAND+change-prompt(Files> )+change-header('$'Each file can get opened using rifle\nChoose a file and append to it using CTRL-G'')+change-preview(size=$(kitten icat --print-window-size {});     
-    x_img=$(($(echo $size | cut -d"x" -f 1) / $COLUMNS)); y_img=$(($(echo $size | cut -d"x" -f 2) / $LINES)); 
-    x_img=$((($FZF_PREVIEW_COLUMNS*$x_img/100)*4)); y_img=$((($FZF_PREVIEW_LINES*$y_img/100)*4))
+        t_mode="memory";
+        [[ -n "$SSH_TTY" ]] && t_mode="stream";   
+        x_img=$(($(echo $size | cut -d"x" -f 1) / $COLUMNS)); y_img=$(($(echo $size | cut -d"x" -f 2) / "$LINES"));
+        x_img=$((($FZF_PREVIEW_COLUMNS*$x_img/100)*4)); y_img=$((($FZF_PREVIEW_LINES*$y_img/100)*4));
     if file --mime-type {} | grep -qF image/; then 
-        kitten icat --clear --transfer-mode=memory --place=${x_img}x${y_img}@125x1 --stdin=no {} > /dev/tty; 
+        kitten icat --clear --transfer-mode=${t_mode} --place=${x_img}x${y_img}@125x1 --stdin=no {} > /dev/tty; 
     elif file --mime-type {} | grep -q video/; then
-        TMP_DIR="/tmp/.vidthumbs.$(tr -dc A-Za-z0-9 </dev/urandom | head -c6)"
-        mkdir -- "$TMP_DIR" >&2
-        ffmpegthumbnailer -i {} -s 256 -o "$TMP_DIR/$(basename {}).jpg" 2>/dev/null
-        kitten icat --clear --transfer-mode=memory --scale-up --place=${x_img}x${y_img}@125x1 --stdin=no "$TMP_DIR" > /dev/tty;
-        $(rm -rf -- "$TMP_DIR" 2>/dev/null)
-   else 
+        TMP_DIR="/tmp/.vidthumbs.$(tr -dc A-Za-z0-9 </dev/urandom | head -c6)";
+        mkdir -- "$TMP_DIR" >&2;
+        ffmpegthumbnailer -i {} -s 256 -o "$TMP_DIR/$(basename {}).jpg" 2>/dev/null;
+        kitten icat --clear --transfer-mode=${t_mode} --scale-up --place=${x_img}x${y_img}@125x1 --stdin=no "$TMP_DIR" > /dev/tty;
+        $(rm -rf -- "$TMP_DIR" 2>/dev/null);
+    else 
         printf "\x1b_Ga=d,d=A\x1b\\"; 
-        bat --color always --style numbers --line-range :200 {}
-    fi;)');
+        bat --color always --style numbers --line-range :200 {};
+        fi;');
     #--bind 'focus:transform-preview-label:file --brief {}'
     if [ -z "$fle" ]; then
         return 0;
