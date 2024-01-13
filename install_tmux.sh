@@ -168,6 +168,10 @@ if [ -x "$(command -v ranger)" ]; then
             echo "# When True, ranger's current directory tracks the other pane" >> ~/.config/ranger/rc.conf
             echo "set tmux_cwd_track true" >> ~/.config/ranger/rc.conf
         fi
+        reade -Q "GREEN" -i "y" -p "Set tmux shortcut from  Bspace  to  \`  ?  [Y/n]:" "y n"  tmuxx
+        if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
+            sed -i 's|Bspace run-shell -b|\` run-shell -b|g'  ~/.tmux.conf 
+        fi
     fi
 fi
 unset tmuxx

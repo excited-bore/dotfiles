@@ -126,7 +126,7 @@
             unset fzf_t
 
             #TODO: keybinds-rifle sh still has bat part (could use sed check)
-            reade -Q "GREEN" -i "y" -p "Install bat? (Video thumbnails for riflesearch) [Y/n]: " "y n" bat
+            reade -Q "GREEN" -i "y" -p "Install bat? (File previews/thumbnails for riflesearch) [Y/n]: " "y n" bat
             if [ "$bat" == "y" ]; then
                 if [ ! -x "$(command -v bat)" ]; then 
                     if [ $distro_base == "Arch" ];then

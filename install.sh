@@ -337,7 +337,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     xresources(){
         reade -Q "YELLOW" -i "n" -p "Set caps to escape? (xterm.sh - Might cause errors about display) [Y/n]: " "y n" xtrm
         if [ ! "$xtrm" == "y" ] && [ ! -z "$xtrm" ]; then
-            sed -i "s|setxkbmap |#setxkbmap |g" aliases/xterm.sh
+            sed -i "s|setxkbmap |#setxkbmap |g" xterm/xterm.sh
         fi
         cp -fv xterm/.Xresources ~/.Xresources;
         cp -fv xterm/xterm.sh ~/.bash_aliases.d/xterm.sh;

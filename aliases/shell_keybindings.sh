@@ -101,8 +101,7 @@ bind -x '"\C-q": exit'
 bind '"\C-z": vi-undo'
 
 # !Ctrl-g adds a piped grep for convenience
-#  Ctrl-g gives a ripgrep function overview
-bind -x '"\C-g": "ripgrep-dir"'
+bind -x '"\C-g": " | grep "'
 
 # Ctrl-Enter gives you a paged output
 bind '"\e[13": " | $PAGER\C-p"' 

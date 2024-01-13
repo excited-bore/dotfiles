@@ -17,16 +17,12 @@
 alias terminal_colours="curl -s https://raw.githubusercontent.com/JohnMorales/dotfiles/master/colors/24-bit-color.sh | bash"
 alias tmuxSource="tmux source ~/.tmux.conf"
 
-# If something goes wrong:
-# ssh -t myname@myserver bash --norc
-# --no-rc to avoid configuration
-# https://stackoverflow.com/questions/27613209/how-to-automatically-start-tmux-on-ssh-session
 function install_tmux_login_for_ssh(){
     
     touch ~/.bash_aliases.d/tmux_startup.sh
     
     echo 'if [[ $- =~ i ]] && [[ -z "$TMUX" ]] && [[ -n "$SSH_TTY" ]]; then' >> ~/.bash_aliases.d/tmux_startup.sh
-    echo '  tmux attach-session -t ssh_tmux || tmux new-session -s ssh_tmux;' >> ~/.bash_aliases.d/tmux_startup.sh  
+    echo 'tmux attach-session -t ssh_tmux || tmux new-session -s ssh_tmux;' >> ~/.bash_aliases.d/tmux_startup.sh  
     echo 'fi' >> ~/.bash_aliases.d/tmux_startup.sh 
 
 }

@@ -14,7 +14,7 @@ if [[ $distro == "Arch" || $distro_base == "Arch" ]];then
         echo "${green} If this is for use with ssh on serverside, X11 needs to be forwarded?"
         echo "${green} At clientside, 'ForwardX11 yes' also needs to be put in ~/.ssh/config under Host"
         echo "${green} Connection also need to start with -X flag (ssh -X ..@..)"
-        reade -Q "GREEN" -i "n" -p "Forward X11 in /etc/ssh/sshd.config? () [Y/n]:" "y n" x11f
+        reade -Q "GREEN" -i "n" -p "Forward X11 in /etc/ssh/sshd.config? [Y/n]:" "y n" x11f
         if [ -z $x11f ] || [ "y" == $x11f ]; then
            sudo sed -i 's|.X11Forwarding yes|X11Forwarding yes|g' /etc/ssh/sshd_config
         fi
@@ -59,7 +59,7 @@ elif [[ $distro == "Debian" || $distro_base == "Debian" ]];then
         echo "${green} If this is for use with ssh on serverside, X11 needs to be forwarded?"
         echo "${green} At clientside, 'ForwardX11 yes' also needs to be put in ~/.ssh/config under Host"
         echo "${green} Connection also need to start with -X flag (ssh -X ..@..)"
-        reade -Q "GREEN" -i "n" -p "Forward X11 in /etc/ssh/sshd.config? () [Y/n]:" "y n" x11f
+        reade -Q "GREEN" -i "n" -p "Forward X11 in /etc/ssh/sshd.config? [Y/n]:" "y n" x11f
         if [ -z $x11f ] || [ "y" == $x11f ]; then
            sudo sed -i 's|.X11Forwarding yes|X11Forwarding yes|g' /etc/ssh/sshd_config
         fi
@@ -101,7 +101,7 @@ unset clip x11f pyscripts jsscripts rubyscripts perlscripts
 
 function instvim_r(){
     if ! sudo test -d /root/.config/nvim/; then
-        sudo mkdir /root/.config/nvim/
+        sudo mkdir -p /root/.config/nvim/
     fi
     sudo cp -fv vim/init.vim /root/.config/nvim/init.vim
 
