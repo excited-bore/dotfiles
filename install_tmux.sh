@@ -40,13 +40,6 @@ if ! grep -q ".bashrc" ~/.profile; then
    echo "fi" >> ~/.profile 
 fi
 
-
-reade -Q "GREEN" -i "y" -p "Install tmux.sh at ~/.bash_aliases.d/? (tmux aliases) [Y/n]:" "y n"  tmuxx
-if [ -z "$tmuxx" ] || [ "$tmuxx"  == "y" ]; then 
-    cp -f tmux/tmux.sh ~/.bash_aliases.d/
-fi
-unset tmuxx
-
 sed -i 's|^set -g @plugin|#set -g @plugin|g' tmux/.tmux.conf
 sed -i 's|^run '\''~/.tmux/plugins/tpm/tpm'\''|#run '\''~/.tmux/plugins/tpm/tpm'\''|g' tmux/.tmux.conf
 sed -i 's|set -g @continuum-restore '\''on'\''|#set -g @continuum-restore '\''on'\''|g' tmux/.tmux.conf
@@ -179,3 +172,18 @@ if [ -x "$(command -v ranger)" ]; then
 fi
 unset tmuxx
 
+
+reade -Q "GREEN" -i "y" -p "Install tmux.sh at ~/.bash_aliases.d/? (tmux aliases) [Y/n]:" "y n"  tmuxx
+if [ -z "$tmuxx" ] || [ "$tmuxx"  == "y" ]; then 
+    cp -f tmux/tmux.sh ~/.bash_aliases.d/
+fi
+unset tmuxx 
+
+reade -Q "GREEN" -i "y" -p "Set tmux at shell login for SSH? [Y/n]:" "y n"  tmuxx
+if [ -z "$tmuxx" ] || [ "$tmuxx"  == "y" ]; then 
+    touch ~/.bash_aliases.d/tmux_startup.sh
+    echo 'if [[ $- =~ i ]] && [[ -z "$TMUX" ]] && [[ -n "$SSH_TTY" ]]; then' >> ~/.bash_aliases.d/tmux_startup.sh
+    echo 'tmux attach-session -t ssh_tmux || tmux new-session -s ssh_tmux;' >> ~/.bash_aliases.d/tmux_startup.sh  
+    echo 'fi' >> ~/.bash_aliases.d/tmux_startup.sh
+fi
+unset tmuxx

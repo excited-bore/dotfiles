@@ -91,7 +91,7 @@ git_add_commit_push_all(){
     fi
 } 
 
-alias git_commit_using_last="git commit --amend"
+alias git_commit_amend="git commit --amend"
 alias git_list_branches="git branch --list -vv"
 alias git_delete_branch="git branch -d - "
 alias git_switch_branch="git checkout - "

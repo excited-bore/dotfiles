@@ -77,9 +77,18 @@
             elif ! sudo grep -q "export RG_PREFIX" $PATHVAR_R; then
                  printf "\n# RIPGREP\nexport RG_PREFIX='rg --column --line-number --no-heading --color=always --smart-case \"" | sudo tee -a $PATHVAR_R
             fi
-            cp -fv ./fzf/ripgrep-directory.bash ~/.bash_aliases.d/
+            
+            reade -Q "GREEN" -i "y" -p "Add shortcut for ripgrep files in dir? (Ctrl-g) [Y/n]:" "y n" rpgrpdir
+            if [ -z $rpgrp ] || [ "Y" == $rpgrp ] || [ $rpgrp == "y" ]; then
+                
+                cp -fv ./fzf/ripgrep-directory.sh ~/.bash_aliases.d/
+                if ! grep -q "ripgrep-dir" ~/.fzf/shell/key-bindings.bash; then 
+                    echo "#  Ctrl-g gives a ripgrep function overview" >> ~/.fzf/shell/key-bindings.bash
+                    echo 'bind -x '\''"\C-g": "ripgrep-dir"'\''' >> ~/.fzf/shell/key-bindings.bash
+                fi
+            fi
         fi
-        unset rpgrp
+        unset rpgrp rpgrpdir
         
         if [ ! -x "$(command -v kitty)" ] && ! grep -q "(Kitty)" ~/.fzf/shell/key-bindings.bash; then
             reade -Q "GREEN" -i "y" -p "Add shortcut for fzf-autocompletion? (CTRL-Tab) [Y/n]:" "y n" comp_key

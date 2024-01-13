@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 # https://github.com/junegunn/fzf/blob/master/ADVANCED.md#using-fzf-as-interactive-ripgrep-launcher
 
 # 1. Search for text in files using Ripgrep

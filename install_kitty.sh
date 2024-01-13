@@ -8,16 +8,16 @@ elif [ "$distro" == "Debian" ] || [ "$distro_base" == "Debian" ]; then
     yes | sudo apt install kitty 
 fi
 
-reade -Q "GREEN" -p -i "y" "Install kitty conf? (at ~/.config/kitty/kitty.conf) [Y/n]:" "y n" kittn
+reade -Q "GREEN" -i "y" -p "Install kitty conf? (at ~/.config/kitty/kitty.conf) [Y/n]:" "y n" kittn
 if [ "y" == "$kittn" ]; then
     mkdir -p ~/.config/kitty
     cp -f kitty/kitty.conf ~/.config/kitty/kitty.conf
 fi
+unset kittn
 
-unset "$kittn"
-if [ -x "$(command -v xdg-open)" ]; then
-    reade -Q "GREEN" -p -i "y" "Set kitty as default terminal? [Y/n]:" "y n" kittn
-    if [ "y" == "$kittn" ]; then
-        
-    fi
-fi
+#if [ -x "$(command -v xdg-open)" ]; then
+#    reade -Q "GREEN" -p -i "y" "Set kitty as default terminal? [Y/n]:" "y n" kittn
+#    if [ "y" == "$kittn" ]; then
+#        
+#    fi
+#fi

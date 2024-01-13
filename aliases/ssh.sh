@@ -14,7 +14,7 @@ copy_to_serber() { scp -r $user@$ip:$1 $2; }
 
 
 #Server access
-alias serber="ssh -i $ssh_file $user@$ip"
+alias serber="ssh -X -i $ssh_file $user@$ip"
 alias serber_unmnt="fusermount3 -u /mnt/mount1/"
 alias serber_unmnt1="fusermount3 -u /mnt/mount2/"
 
@@ -22,6 +22,7 @@ ssh_key_and_add_to_agent_by_host() {
     if [ ! -f ~/.ssh/config ]; then
         touch ~/.ssh/config;
     fi
+    local opts name host keytype uname sx11
     read -p "Give up filename: (nothing for id_keytype, sensible to leave as such in certain situations): " name
     reade -p "Give up keytype \(dsa \| ecdsa \| ecdsa-sk \| ed25519 (Default) \| ed25519-sk \| rsa\): " "dsa ecdsa ecdsa-sk ed25519 ed25519-sk rsa" keytype
     read -p "Give up hostname : " host
@@ -32,6 +33,10 @@ ssh_key_and_add_to_agent_by_host() {
     if [ -z $uname ]; then
         echo "Remote username can't be empty";
         return 0
+    fi
+    read -p "Forward X11? Needed for xclip [Y/n]:" sx11
+    if [ -z "$sx11" ] || [ "$sx11" == "y" ]; then
+        opts="ForwardX11 yes\n"
     fi
     if [ -z $keytype ]; then
         keytype=ed25519
@@ -46,6 +51,7 @@ ssh_key_and_add_to_agent_by_host() {
     echo "Host $host" >> ~/.ssh/config;
     echo "  IdentityFile ~/.ssh/$name" >> ~/.ssh/config
     echo "  User $uname" >> ~/.ssh/config
+    printf $opts >> ~/.ssh/config
     echo "Public key: "
     cat ~/.ssh/$name.pub; 
 }

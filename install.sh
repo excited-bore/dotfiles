@@ -2,6 +2,7 @@
 . ./checks/check_distro.sh
 . ./checks/check_rlwrap.sh
 
+
 if [ -z "$TMPDIR" ]; then
     TMPDIR=/tmp
 fi
@@ -63,7 +64,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
     # Then iterate through all predefined pathvars
     
     # Package Managers
-    reade -Q "GREEN" -i "y" -p "Check and create DIST,DIST_BASE,ARCH,PM and WRAPPER? (distro, distro base, architecture, package manager and pm wrapper) [Y/n]:" "y n" Dists
+    reade -Q "YELLOW" -i "y" -p "Check and create DIST,DIST_BASE,ARCH,PM and WRAPPER? (distro, distro base, architecture, package manager and pm wrapper) [Y/n]:" "y n" Dists
     if [ "$Dists" == "y" ]; then
        printf "NOT YET IMPLEMENTED\n"
     fi
@@ -156,9 +157,11 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
     unset edtvsl compedit frst editors prmpt
 
     # Set DISPLAY
+    addr=$(nmcli device show | grep IP4.ADDR | awk 'NR==1{print $2}'| sed 's|\(.*\)/.*|\1|')
+    #reade -Q "GREEN" -i "n" -p "Set DISPLAY to ':$(addr).0'? [Y/n]:" "y n" dsply
     reade -Q "YELLOW" -i "n" -p "Set DISPLAY to ':0.0'? [Y/n]:" "y n" dsply
     if [ "$dsply" == "y" ] || [ -z "$dsply" ]; then
-        sed -i 's|#export DISPLAY=.*|export DISPLAY=":0.0"|' pathvars/.pathvariables.sh
+        sed -i "s|.export DISPLAY=.*|export DISPLAY=\":0.0\"|" pathvars/.pathvariables.sh
     fi
     unset dsply
 
@@ -259,45 +262,75 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
     }
     yes_edit_no pathvariables "pathvars/.pathvariables.sh" "Install .pathvariables.sh at ~/? " "edit" "GREEN"
 fi
+
+    # Bash alias completions
+    reade -Q "GREEN" -i "y" -p "Install bash completions for aliases in ~/.bash_completion.d? [Y/n]:" "y n" compl
+    if [ -z $compl ] || [ "y" == $compl ]; then
+        ./install_bash_alias_completions.sh
+    fi
+    unset compl
     
-reade -Q "GREEN" -i "y" -p "Check existence (and create) ~/.bash_aliases.d/ and link it to .bashrc? (other .sh files will be placed here) [Y/n]:" "y n" scripts
+    # Python completions
+    if [ ! -f ~/.bash_completion.d/_python-argcomplete ]; then
+        reade -Q "GREEN" -i "y" -p "Install python completions in ~/.bash_completion.d? [Y/n]:" "y n" pycomp
+        if [ -z $pycomp ] || [ "y" == $pycomp ]; then
+            ./install_pythonCompletions_bash.sh
+        fi
+    fi
+    unset pycomp
+
+    # Moar (Custom pager instead of less)
+    reade -Q "GREEN" -i "y" -p "Install moar? (Custom pager instead of less with linenumbers) [Y/n]: " "y n" moar
+    if [ -z $moar ] || [ "Y" == $moar ] || [ $moar == "y" ]; then
+        ./install_moar.sh 
+    fi
+    unset moar
+
+    # Nvim (Editor)
+    reade -Q "GREEN" -i "y" -p "Install Neovim? (Terminal editor) [Y/n]: " "y n" nvm
+    if [ "y" == "$nvm" ]; then
+        ./install_nvim.sh
+    fi
+    unset nvm
+
+
+    # Ranger (File explorer)
+    reade -Q "GREEN" -i "y" -p "Install Ranger? (Terminal file explorer) [Y/n]: " "y n" rngr
+    if [ "y" == "$rngr" ]; then
+        ./install_ranger.sh
+    fi
+    unset rngr
+    
+    # Tmux (File explorer)
+    reade -Q "GREEN" -i "y" -p "Install tmux? (Terminal multiplexer) [Y/n]: " "y n" tmx
+    if [ "y" == "$tmx" ]; then
+        ./install_tmux.sh
+    fi
+    unset tmx
+
+    # Kitty (Terminal emulator)
+    reade -Q "GREEN" -i "y" -p "Install Kitty? (Terminal emulator) [Y/n]: " "y n" kittn
+    if [ "y" == "$kittn" ]; then
+        ./install_kitty.sh
+    fi
+    unset kittn
+    
+    # Fzf (Fuzzy Finder)
+    reade -Q "GREEN" -i "y" -p "Install fzf? (Fuzzy file/folder finder - keybinding yes for upgraded Ctrl-R/reverse-search, fzf filenames on Ctrl+T and fzf-version of 'cd' on Alt-C + Custom script: Ctrl-f becomes system-wide file opener) [Y/n]: " "y n" findr
+    if [ "y" == "$findr" ]; then
+        ./install_fzf.sh
+    fi
+    unset findr
+    
+reade -Q "GREEN" -i "y" -p "Install bash aliases and other config? [Y/n]:" "y n" scripts
 if [ -z $scripts ] || [ "y" == $scripts ]; then
 
-    if [ ! -d ~/.bash_aliases.d/ ]; then
-        mkdir ~/.bash_aliases.d/
-    fi
-
-    if ! grep -q "~/.bash_aliases.d" ~/.bashrc; then
-
-        echo "if [[ -d ~/.bash_aliases.d/ ]]; then" >> ~/.bashrc
-        echo "  for alias in ~/.bash_aliases.d/*.sh; do" >> ~/.bashrc
-        echo "      . \"\$alias\" " >> ~/.bashrc
-        echo "  done" >> ~/.bashrc
-        echo "fi" >> ~/.bashrc
-    fi
-    
-    cp -fv checks/check_distro.sh ~/.bash_aliases.d/check_distro.sh
-    cp -fv readline/rlwrap_scripts.sh ~/.bash_aliases.d/rlwrap_scripts.sh
-
-
-    reade -Q "YELLOW" -i "y" -p "Create /root/.bash_aliases.d/ and link it to /root/.bashrc? [Y/n]:" "y n" rscripts
-    if [ -z $rscripts ] || [ "y" == $rscripts ]; then
-
-        if ! sudo test -d /root/.bash_aliases.d/ ; then
-            sudo mkdir /root/.bash_aliases.d/
-        fi
-
-        if ! sudo grep -q "~/.bash_aliases.d" /root/.bashrc; then
-            printf "\nif [[ -d ~/.bash_aliases.d/ ]]; then\n  for alias in ~/.bash_aliases.d/*.sh; do\n      . \"\$alias\" \n  done\nfi" | sudo tee -a /root/.bashrc > /dev/null
-        fi
-        
-        sudo cp -fv checks/check_distro.sh /root/.bash_aliases.d/check_distro.sh
-        sudo cp -fv readline/rlwrap_scripts.sh /root/.bash_aliases.d/rlwrap_scripts.sh 
-    fi
+     ./install_bashalias_dir.sh
     
     # Xresources
     
     xresources_r(){
+        
         sudo cp -fv xterm/.Xresources /root/.Xresources;
         #sudo cp -fv xterm/xterm.sh /root/.bash_aliases.d/xterm.sh;
         }
@@ -334,9 +367,9 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     #    sed -i 's|bind -x '\''"\\eOR": ctrl-s'\''|#bind -x '\''"\\eOR": ctrl-s'\''|g' aliases/shell_keybindings.sh
     #fi
 
-    if grep -q 'bind -x '\''"\\201": ranger'\''' readline/shell_keybindings.sh; then
-        sed -i 's|bind -x '\''"\\201": ranger'\''|#bind -x '\''"\\201": ranger'\''|g' readline/shell_keybindings.sh
-        sed -i 's|bind '\''"\\eOQ":|#bind '\''"\\eOQ":|g' readline/shell_keybindings.sh
+    if grep -q 'bind -x '\''"\\201": ranger'\''' aliases/shell_keybindings.sh; then
+        sed -i 's|bind -x '\''"\\201": ranger'\''|#bind -x '\''"\\201": ranger'\''|g' aliases/shell_keybindings.sh
+        sed -i 's|bind '\''"\\eOQ":|#bind '\''"\\eOQ":|g' aliases/shell_keybindings.sh
     fi
 
     shell-keybindings_r(){ sudo cp -fv aliases/shell_keybindings.sh /root/.bash_aliases.d/; }
@@ -346,80 +379,8 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     yes_edit_no shell-keybindings "aliases/shell_keybindings.sh" "Install .bash_aliases.d/shell-keybindings.sh at ~/? (bind commands)" "edit" "YELLOW"
 
 
-    reade -Q "GREEN" -i "y" -p "Install bash completions for aliases in ~/.bash_completion.d? [Y/n]:" "y n" compl
-    if [ -z $compl ] || [ "y" == $compl ]; then
-        ./install_bash_alias_completions.sh
-    fi
     
-    if [ ! -f ~/.bash_completion.d/_python-argcomplete ]; then
-        reade -Q "GREEN" -i "y" -p "Install python completions in ~/.bash_completion.d? [Y/n]:" "y n" pycomp
-        if [ -z $pycomp ] || [ "y" == $pycomp ]; then
-            . ./install_pythonCompletions_bash.sh
-        fi
-    fi
-    
-    # Moar (Custom pager instead of less)
-    if [ ! -x "$(command -v moar)" ]; then
-        reade -Q "GREEN" -i "y" -p "Install moar? (Custom pager instead of less with linenumbers) [Y/n]: " "y n" moar
-        if [ -z $moar ] || [ "Y" == $moar ] || [ $moar == "y" ]; then
-            . ./install_moar.sh 
-            reade -Q "GREEN" -i "y" -p "Set moar default pager for $USER? [Y/n]: " "y n" moar_usr
-            if [ -z "$moar_usr" ] || [ "y" == "$moar_usr" ] || [ "Y" == "$moar_usr" ]; then
-                sed -i "s/#export MOAR=/export MOAR=/g" pathvars/.pathvariables.sh 
-                sed -i "s|#export PAGER=.*|export PAGER=/usr/local/bin/moar|g" pathvars/.pathvariables.sh
-                #sed -i "s/#export SYSTEMD_PAGER=/export SYSTEMD_PAGER=/g" pathvars/.pathvariables.sh
-                sed -i "s/#export SYSTEMD_PAGERSECURE=/export SYSTEMD_PAGERSECURE=/g" pathvars/.pathvariables.sh
 
-            fi
-            
-            reade -Q "YELLOW" -i "y" -p "Set moar default pager for root? [Y/n]: " "y n" moar_root
-            if [ -z "$moar_root" ] || [ "y" == "$moar_root" ] || [ "Y" == "$moar_root" ]; then
-                sudo sed -i "s/#export MOAR=/export MOAR=/g" /root/.pathvars/.pathvariables.sh 
-                sudo sed -i "s/#export PAGER=/export PAGER=/g" /root/pathvars/.pathvariables.sh
-                #sudo sed -i "s/#export SYSTEMD_PAGER=/export SYSTEMD_PAGER=/g" /root/pathvars/.pathvariables.sh
-                sudo sed -i "s/#export SYSTEMD_PAGERSECURE=/export SYSTEMD_PAGERSECURE=/g" /root/pathvars/.pathvariables.sh
-
-            fi
-        fi
-    fi
-
-    
-    # Nvim (Editor)
-    reade -Q "GREEN" -i "y" -p "Install Neovim? (Terminal editor) [Y/n]: " "y n" nvm
-    if [ "y" == "$nvm" ]; then
-        . ./install_nvim.sh
-    fi
-    unset nvm
-
-    # Kitty (Terminal emulator)
-    reade -Q "GREEN" -i "y" -p "Install Kitty? (Terminal emulator) [Y/n]: " "y n" kittn
-    if [ "y" == "$kittn" ]; then
-        . ./install_kitty.sh
-    fi
-    unset kittn
-
-    # Ranger (File explorer)
-    reade -Q "GREEN" -i "y" -p "Install Ranger? (Terminal file explorer) [Y/n]: " "y n" rngr
-    if [ "y" == "$rngr" ]; then
-        . ./install_ranger.sh
-    fi
-    unset rngr
-    
-    # Ranger (File explorer)
-    reade -Q "GREEN" -i "y" -p "Install tmux? (Terminal multiplexer) [Y/n]: " "y n" tmx
-    if [ "y" == "$tmx" ]; then
-        . ./install_tmux.sh
-    fi
-    unset tmx
-
-    # Fzf (Fuzzy Finder)
-    reade -Q "GREEN" -i "y" -p "Install fzf? (Fuzzy file/folder finder - keybinding yes for upgraded Ctrl-R/reverse-search, fzf filenames on Ctrl+T and fzf-version of 'cd' on Alt-C + Custom script: Ctrl-f becomes system-wide file opener) [Y/n]: " "y n" findr
-    if [ "y" == "$findr" ]; then
-        . ./install_fzf.sh
-    fi
-    unset findr
-    
-    
     bash_yes_r(){ sudo cp -fv aliases/bash.sh /root/.bash_aliases.d/; }
     bash_yes() {
         cp -fv aliases/bash.sh ~/.bash_aliases.d/;
