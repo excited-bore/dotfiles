@@ -1,3 +1,5 @@
+
+
 "autocmd CursorHold      * echo mode(1)
 "autocmd CursorHoldI     * echo mode(1)
 autocmd CursorMoved     * set cul
@@ -7,20 +9,26 @@ autocmd CursorMovedI    * set cul
 
 
 let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
-if empty(glob(data_dir . '/autoload/plug.vim'))
-  silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+if !has('nvim')
+    if empty(glob(data_dir . '/autoload/plug.vim'))
+      silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+      autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+    endif
 endif
 
-set runtimepath+=/usr/lib/jvm/java-17-openjdk/bin/java
-call plug#begin()
+let g:pluginInstallPath=expand('~/.vim/plugins:p')
+source $HOME/.config/nvim/plug_lazy_adapter.vim
 
+if !has('nvim')
+    call plug#begin(g:pluginInstallPath)
+endif
+"call plug#begin(g:pluginInstallPath)
 "Vim plugins point to githubs wich is very nice and just fucking cool
 
 "" Autocomplete plugin from git
 "Plug 'ycm-core/YouCompleteMe'
 "https://github.com/neoclide/coc.nvim/wiki/Using-coc-extensions#implemented-coc-extensions
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plugin 'neoclide/coc.nvim', {'branch': 'release'}
 let g:coc_global_extensions = [
             \'coc-html',
             \'coc-css',
@@ -37,40 +45,54 @@ let g:coc_global_extensions = [
             \]
 
 "Ranger integration
-Plug 'francoiscabrol/ranger.vim'
-Plug 'rbgrouleff/bclose.vim'
+Plugin 'francoiscabrol/ranger.vim'
+Plugin 'rbgrouleff/bclose.vim'
 let g:ranger_replace_netrw = 1
 let g:ranger_map_keys = 0
 
 "" Fuzzy finder plugin
-Plug '~/.fzf'
-Plug 'junegunn/fzf.vim' 
+Plugin 'junegunn/fzf'
+Plugin 'junegunn/fzf.vim' 
+
 "" Fuzzy finder preview   
 "Plug 'yuki-yano/fzf-preview.vim', { 'branch': 'release/remote', 'do': ':UpdateRemotePlugins' }
+Plugin 'yuki-yano/fzf-preview.vim', { 'branch': 'release/remote' }
 
 "" Git plugin
-Plug 'tpope/vim-fugitive'
+Plugin 'tpope/vim-fugitive'
 "
 "vim-tmux-navigator, smart navigation between vim and tmux panes
-Plug 'christoomey/vim-tmux-navigator'
+Plugin 'christoomey/vim-tmux-navigator'
+
+"vim-kitty-navigator, Same thing for panes but with vim and kitty
+Plugin 'knubie/vim-kitty-navigator'
+function! AfterLoadVimKitty()
+    exec '! cd ~/.vim/plugins/vim-kitty-navigator && cp ./*.py ~/.config/kitty/ && cd -'
+endf
 
 "Sudo write
-Plug 'tpope/vim-eunuch'
+Plugin 'tpope/vim-eunuch'
 "
 "" Self documenting vim wiki
-Plug 'vimwiki/vimwiki'
+Plugin 'vimwiki/vimwiki'
 
 "" Nice themey
-Plug 'morhetz/gruvbox'
+Plugin 'morhetz/gruvbox'
 
 "" Nice status bar thingy
-Plug 'vim-airline/vim-airline'
+Plugin 'vim-airline/vim-airline'
 
 " Vim lua plugin
 " Plugin 'svermeulen/vimpeccable'
 
 "" All of your Plugins must be added before the following line
-call plug#end()
+if !has('nvim')
+    call plug#end()
+else
+    source $HOME/.config/nvim/init.lua.vim
+    lua require("lazy")
+endif
+"call plug#end()
 
  "Use 24-bit (true-color) mode in Vim/Neovim when outside tmux.
 "If you're using tmux version 2.2 or later, you can remove the outermost $TMUX check and use tmux's 24-bit color support
@@ -346,7 +368,7 @@ endfunction
 function! CloseWindow()
     " https://stackoverflow.com/questions/7069927/in-vimscript-how-to-test-if-a-window-is-the-last-window
     " if this window isn't the last on screen, just close pane
-    if winbufnr(2) != -1
+    if winbufnr(2) != -1 && winbufnr(2) != 2
          close!
     " if the amount of open buffers is still more then 1, close buffer
      elseif len(filter(range(1, bufnr('$')), 'buflisted(v:val)')) > 1
@@ -627,16 +649,16 @@ set t_kD=^[[3~
 
 
 " Ctrl - f => Find
-"Line search in current buffer
-nnoremap <silent><C-f> :BLines<cr>
-inoremap <silent><C-f> <C-\><C-o>:BLines<cr>
-vnoremap <silent><C-f> <Esc>:BLines<cr>
+"Line search with Ripgrep 
+nnoremap <silent><C-f> :FzfPreviewLines <cr>
+inoremap <silent><C-f> <C-\><C-o>:FzfPreviewLines <cr>
+vnoremap <silent><C-f> <Esc>:FzfPreviewLines <cr>
 
 " Ctrl-Shift-f => Find in loaded buffer
 "Line search in loaded buffer
-nnoremap <silent><C-S-f> :Lines<cr>
-inoremap <silent><C-S-f> <C-\><C-o>:Lines<cr>
-vnoremap <silent><C-S-f> <Esc>:Lines<cr>
+nnoremap <silent><M-f> :Lines<cr>
+inoremap <silent><M-f> <C-\><C-o>:Lines<cr>
+vnoremap <silent><M-f> <Esc>:Lines<cr>
 
 " Ctrl - H => Find and replace
 " For thos from visual code or smth, Ctrl-h can be finnicky in terminals
@@ -781,14 +803,14 @@ inoremap <silent><C-w>b <C-\><C-o><C-u>CocCommand fzf-preview.AllBuffers<CR>
 vnoremap <silent><C-w>b <esc>:<C-u>CocCommand fzf-preview.AllBuffers<CR>gv
 
 " Open next buffer
-nnoremap <silent><S-A-Right> :bNext<cr>
-inoremap <silent><S-A-Right> <C-\><C-o>:bNext<cr>
-vnoremap <silent><S-A-Right> <esc>:bNext<cr>
+nnoremap <silent><C-A-Right> :bNext<cr>
+inoremap <silent><C-A-Right> <C-\><C-o>:bNext<cr>
+vnoremap <silent><C-A-Right> <esc>:bNext<cr>
 
 " Open previous buffer
-nnoremap <silent><S-A-Left> :bprevious<cr>
-inoremap <silent><S-A-Left> <C-\><C-o>bprevious<cr>
-vnoremap <silent><S-A-Left> <esc>:bprevious<cr>
+nnoremap <silent><C-A-Left> :bprevious<cr>
+inoremap <silent><C-A-Left> <C-\><C-o>bprevious<cr>
+vnoremap <silent><C-A-Left> <esc>:bprevious<cr>
 
 " Open Horizontal buffer
 nnoremap <silent><C-w>h :split<cr>
@@ -800,48 +822,44 @@ vnoremap <silent><C-w>h <esc>:split<cr>gv
 "inoremap <S-A-Down> <C-\><C-o>:vertical sb
 "vnoremap <S-A-Down> <esc>:vertical sb
 
-" Choose pane
-nnoremap <silent><C-A-Space> :Windows<cr>
-inoremap <silent><C-A-Space> <C-\><C-o>:Windows<cr>
-vnoremap <silent><C-A-Space> <esc>:Windows<cr>
-
-"Left pane
-nnoremap <silent><C-A-Left> :wincmd h<cr>
-inoremap <silent><C-A-Left> <C-\><C-o>:wincmd h<cr>
-vnoremap <silent><C-A-Left> <esc>:wincmd h<cr>
-
-"Right pane
-nnoremap <silent><C-A-Right> :wincmd l<cr>
-inoremap <silent><C-A-Right> <C-\><C-o>:wincmd l<cr>
-vnoremap <silent><C-A-Right> <esc>:wincmd l<cr>
-
-"Up pane
-nnoremap <silent><C-A-Up> :wincmd k<cr>
-inoremap <silent><C-A-Up> <C-\><C-o>:wincmd k<cr>
-vnoremap <silent><C-A-Up> <esc>:wincmd k<cr>
-
-"Down pane
-nnoremap <silent><C-A-Down> :wincmd j<cr>
-inoremap <silent><C-A-Down> <C-\><C-o>:wincmd j<cr>
-noremap <silent><C-A-Down> <esc>:wincmd j<cr> 
-
-
-
-"function! MyFunc()
-"    let m = visualmode()
-"    if m == "\<C-V>"
-"        echo 'block-wise visual'
-"    endif
-"endfunction
-
-
-"" vim tmux navigator integrator
 let g:tmux_navigator_no_mappings = 1
-noremap <silent> <C-M-Left> :<C-U>TmuxNavigateLeft<cr>
-noremap <silent> <C-M-Down> :<C-U>TmuxNavigateDown<cr>
-noremap <silent> <C-M-Up> :<C-U>TmuxNavigateUp<cr>
-noremap <silent> <C-M-Right> :<C-U>TmuxNavigateRight<cr>
-"noremap <silent> <C-²> :<C-U>TmuxNavigatePrevious<cr>
+noremap <silent> <C-S-Left> :<C-U>TmuxNavigateLeft<cr>
+noremap <silent> <C-S-Down> :<C-U>TmuxNavigateDown<cr>
+noremap <silent> <C-S-Up> :<C-U>TmuxNavigateUp<cr>
+noremap <silent> <C-S-Right> :<C-U>TmuxNavigateRight<cr>
+noremap <silent> <C-²> :<C-U>TmuxNavigatePrevious<cr>
+
+let g:kitty_navigator_no_mappings = 1
+nnoremap <silent> <C-S-Left> :KittyNavigateLeft<cr>
+nnoremap <silent> <C-S-Down> :KittyNavigateDown<cr>
+nnoremap <silent> <C-S-Up> :KittyNavigateUp<cr>
+nnoremap <silent> <C-S-Right> :KittyNavigateRight<cr>
+
+
+" Choose pane
+nnoremap <silent><C-S-Space> :Windows<cr>
+inoremap <silent><C-S-Space> <C-\><C-o>:Windows<cr>
+vnoremap <silent><C-S-Space> <esc>:Windows<cr>gv
+                    
+""Left pane          
+"nnoremap <silent><C-S-Left> :wincmd h<cr>
+"inoremap <silent><C-S-Left> <C-\><C-o>:wincmd h<cr>
+"vnoremap <silent><C-S-Left> <esc>:wincmd h<cr>gv
+"                    
+""Right pane         
+"nnoremap <silent><C-S-Right> :wincmd l<cr>
+"inoremap <silent><C-S-Right> <C-\><C-o>:wincmd l<cr>
+"vnoremap <silent><C-S-Right> <esc>:wincmd l<cr>gv
+"                    
+""Up pane            
+"nnoremap <silent><C-S-Up> :wincmd k<cr>
+"inoremap <silent><C-S-Up> <C-\><C-o>:wincmd k<cr>
+"vnoremap <silent><C-S-Up> <esc>:wincmd k<cr>gv
+"                    
+""Down pane          
+"nnoremap <silent><C-S-Down> :wincmd j<cr>
+"inoremap <silent><C-S-Down> <C-\><C-o>:wincmd j<cr>
+"vnoremap <silent><C-S-Down> <esc>:wincmd j<cr>gv 
 
 "highlight Visual cterm=reverse ctermbg=NONE
 " These options and commands enable some very useful features in Vim, that
@@ -986,26 +1004,3 @@ set expandtab
 "set tabstop=4
 
 "------------------------------------------------------------
- "lua <<EOF
-"    vim.o.rtp += ~/.vim/bundle/Vundle.vim
-"    local Plug = vim.fn['plug#']
-"    vim.call('vundle#begin', '~/.config/nvim/plugged')
-"    Plug('tpope/vim-sensible')
-"    Plug('christoomey/vim-tmux-navigator') 
-"    Plug('vimwiki/vimwiki') 
-"    Plug('svermeulen/vimpeccable') 
-"    vim.call('vundle#end')
-"EOF 
-
-
-" Lua package for vim
-" vim.cmd 'packadd paq-nvim'
-"require 'paq' {
-"    {'savq/paq-nvim', opt = true};
-"    'svermeulen/vimpeccable'
-"}
-"lua <<EOF
-"    local vimp = require('vimpeccable')
-"    vimp.bind('n', '<C-Tab>', 'i<C-X>')
-"    vimp.bind('n', '<C-cr>', ':echom 'Hello C + R'<CR>')
-"EOF
