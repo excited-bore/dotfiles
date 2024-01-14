@@ -7,8 +7,10 @@ elif [ "$distro_base" == "Debian" ]; then
     yes | sudo apt install snapd
 fi
 
-if [ "$PATHVAR" == ~/.pathvariables.sh ]; then
-   sed -i 's|#export SNAP=|export SNAP=|g' ~/.pa
+if grep -q "SNAP" $PATHVAR; then
+    sed -i 's|#export PATH=\(/bin/snap.*\)|export PATH=\1|g' "$PATHVAR"
+else
+    echo "export PATH=/bin/snap:/var/lib/snapd/snap/bin:$PATH" >> "$PATHVAR"
 fi
 
 sudo systemctl daemon-reload

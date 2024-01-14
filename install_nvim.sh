@@ -8,7 +8,7 @@
 
 if [[ $distro == "Arch" || $distro_base == "Arch" ]];then
     yes | sudo pacman -Su neovim 
-    reade -Q "GREEN" -i "y" -p "Install nvim clipboard? (xsel) [Y/n]:" "y n" clip
+    reade -Q "GREEN" -i "y" -p "Install nvim clipboard? (xsel xclip) [Y/n]:" "y n" clip
     if [ -z $clip ] || [ "y" == $clip ]; then
         yes | sudo pacman -Su xsel xclip
         echo "${green} If this is for use with ssh on serverside, X11 needs to be forwarded?"
@@ -50,10 +50,46 @@ if [[ $distro == "Arch" || $distro_base == "Arch" ]];then
         cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
         sudo cpanm --sudo -n Neovim::Ext
     fi
-elif [[ $distro == "Debian" || $distro_base == "Debian" ]];then 
-    yes | sudo apt update
-    yes | sudo apt install neovim 
-    reade -Q "GREEN" -i "y" -p "Install nvim clipboard? (xsel) [Y/n]:" "y n" clip
+elif [  $distro_base == "Debian" ];then
+    b=$(sudo apt search neovim | grep '^neovim/stable' | awk '{print $2}')
+    #Minimum version for Lazy plugin manager
+    if [[ $b < 0.8 ]]; then
+        echo "Neovim version is below 0.8, wich is needed to run Lazy.nvim (nvim plugin manager)"
+        
+        reade -Q "GREEN" -i "y" -p "Install nvim through flatpak? [Y/n]:" "y n" nvmflpk
+        if [ ! -x "$(command -v flatpak)" ]; then
+            printf "%s\n" "${blue}No flatpak detected. (Independent package manager from Red Hat){normal}"
+            reade -Q "GREEN" -i "y" -p "Install? [Y/n]:" "y n" insflpk 
+            if [ "y" == "$insflpk" ]; then
+               ./install_flatpak.sh 
+            fi
+            flatpak install neovim
+        else
+            yes | sudo apt update
+            yes | sudo apt install neovim 
+        fi
+        unset insflpk nvmflpk
+       
+        #reade -Q "GREEN" -i "y" -p "Install nvim through binary? [Y/n]:" "y n" nvmbin
+        #if [ -z $nvmbin ] || [ "y" == $nvmbin ]; then
+            #ltstv=$(curl -sL https://api.github.com/repos/neovim/neovim/releases/latest | jq -r ".tag_name")
+            #(mkdir /tmp/neovim
+            #cd /tmp/neovim
+            #wget https://github.com/neovim/neovim/releases/download/$ltstv/nvim-linux64.tar.gz 
+            #wget https://github.com/neovim/neovim/releases/download/$ltstv/nvim-linux64.tar.gz.sha256sum 
+            #if [ "$(sha256sum nvim-linux64.tar.gz)" != "$(cat nvim-linux64.tar.gz.sha256sum)" ]; then 
+            #    echo "Something went wrong: Sha256sums aren't the same. Try again later"    
+            #else
+            #    tar -xvf nvim-linux64.tar.gz
+            #    
+            #    mv -v nvim-linux64 /usr/bin/nvim
+            #fi
+            #)
+        #else
+        #fi
+    fi
+        
+    reade -Q "GREEN" -i "y" -p "Install nvim clipboard? (xsel xclip) [Y/n]:" "y n" clip
     if [ -z $clip ] || [ "y" == $clip ]; then
         yes | sudo apt install xsel xclip 
         echo "${green} If this is for use with ssh on serverside, X11 needs to be forwarded?"
@@ -97,7 +133,7 @@ elif [[ $distro == "Debian" || $distro_base == "Debian" ]];then
     fi
 fi
 
-unset clip x11f pyscripts jsscripts rubyscripts perlscripts
+unset clip x11f pyscripts jsscripts rubyscripts perlscripts nvmbin
 
 function instvim_r(){
     if ! sudo test -d /root/.config/nvim/; then
@@ -183,7 +219,7 @@ function instvim(){
     fi
     yes_edit_no instvim_r "vim/init.vim" "Install (neo)vim readconfigs at /root/.config/nvim/ ? (init.vim, init.lua, etc..)" "edit" "YELLOW"
 }
-yes_edit_no instvim "vim/init.vim" "Install (neo)vim readconfigs at ~/.config/nvim/ ? (init.vim, init.lua, etc..)" "edit" "GREEN"
+yes_edit_no instvim "vim/init.vim vim/init.lua.vim vim.plug_lazy_adapter.vim" "Install (neo)vim readconfigs at ~/.config/nvim/ ? (init.vim, init.lua, etc..)" "edit" "GREEN"
 
 nvim +checkhealth
 echo "Install Completion language plugins with ':CocInstall coc-..' / Update with :CocUpdate"

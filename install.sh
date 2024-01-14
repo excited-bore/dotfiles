@@ -28,28 +28,6 @@ if [ ! -e ~/etc_systemd ]; then
     fi
 fi
 
-if [ "$distro_base" == "Arch" ]; then
-   ./install_AUR-helper.sh 
-fi
-
-if [ ! -x "$(command -v flatpak)" ]; then
-    printf "%s\n" "${blue}No flatpak detected. (Independent package manager from Red Hat){normal}"
-    reade -Q "GREEN" -i "y" -p "Install? [Y/n]:" "y n" insflpk 
-    if [ "y" == "$insflpk" ]; then
-       ./install_flatpak.sh 
-    fi
-fi
-unset insflpk
-
-if [ ! -x "$(command -v snap)" ]; then
-    printf "%s\n" "${blue}No snap detected. (Independent package manager from Canonical){normal}"
-    reade -Q "YELLOW" -i "n" -p "Install? [Y/n]:" "y n" inssnap 
-    if [ "y" == "$insflpk" ]; then
-       ./install_snapd.sh 
-    fi
-fi
-unset inssnap
-
 # Pathvariables
 
 reade -Q "GREEN" -i "y" -p "Check existence (and create) ~/.pathvariables.sh and link it to .bashrc? [Y/n]:" "y n" pathvars
@@ -200,15 +178,6 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         fi
     fi
     unset xdgInst
-    
-    if [ -x "$(command -v flatpak)" ]; then
-        reade -Q "GREEN" -i "y" -p "Add flatpak dirs to path? (XDG_DATA_DIRS) [Y/n]:" "y n" flpkvrs 
-        if [ "$flpkvrs" == "y" ]; then
-            sed 's/^#export XDG_DATA_DIRS=\(.*\)/export XDG_DATA_DIRS=\1/' -i pathvars/.pathvariables.sh
-            sed -i 's|#export FLATPAK=|export FLATPAK=|'  pathvars/.pathvariables.sh 
-        fi
-    fi
-    unset flpkvrs
 
 
     # TODO: check around for other systemdvars 
@@ -263,64 +232,87 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
     yes_edit_no pathvariables "pathvars/.pathvariables.sh" "Install .pathvariables.sh at ~/? " "edit" "GREEN"
 fi
 
-    # Bash alias completions
-    reade -Q "GREEN" -i "y" -p "Install bash completions for aliases in ~/.bash_completion.d? [Y/n]:" "y n" compl
-    if [ -z $compl ] || [ "y" == $compl ]; then
-        ./install_bash_alias_completions.sh
-    fi
-    unset compl
-    
-    # Python completions
-    if [ ! -f ~/.bash_completion.d/_python-argcomplete ]; then
-        reade -Q "GREEN" -i "y" -p "Install python completions in ~/.bash_completion.d? [Y/n]:" "y n" pycomp
-        if [ -z $pycomp ] || [ "y" == $pycomp ]; then
-            ./install_pythonCompletions_bash.sh
-        fi
-    fi
-    unset pycomp
+if [ "$distro_base" == "Arch" ]; then
+   ./install_AUR-helper.sh 
+fi
 
-    # Moar (Custom pager instead of less)
-    reade -Q "GREEN" -i "y" -p "Install moar? (Custom pager instead of less with linenumbers) [Y/n]: " "y n" moar
-    if [ -z $moar ] || [ "Y" == $moar ] || [ $moar == "y" ]; then
-        ./install_moar.sh 
+if [ ! -x "$(command -v flatpak)" ]; then
+    printf "%s\n" "${blue}No flatpak detected. (Independent package manager from Red Hat){normal}"
+    reade -Q "GREEN" -i "y" -p "Install? [Y/n]:" "y n" insflpk 
+    if [ "y" == "$insflpk" ]; then
+       ./install_flatpak.sh 
     fi
-    unset moar
+fi
+unset insflpk
 
-    # Nvim (Editor)
-    reade -Q "GREEN" -i "y" -p "Install Neovim? (Terminal editor) [Y/n]: " "y n" nvm
-    if [ "y" == "$nvm" ]; then
-        ./install_nvim.sh
+if [ ! -x "$(command -v snap)" ]; then
+    printf "%s\n" "${blue}No snap detected. (Independent package manager from Canonical){normal}"
+    reade -Q "GREEN" -i "n" -p "Install? [Y/n]:" "y n" inssnap 
+    if [ "y" == "$inssnap" ]; then
+       ./install_snapd.sh 
     fi
-    unset nvm
+fi
+unset inssnap
 
 
-    # Ranger (File explorer)
-    reade -Q "GREEN" -i "y" -p "Install Ranger? (Terminal file explorer) [Y/n]: " "y n" rngr
-    if [ "y" == "$rngr" ]; then
-        ./install_ranger.sh
-    fi
-    unset rngr
-    
-    # Tmux (File explorer)
-    reade -Q "GREEN" -i "y" -p "Install tmux? (Terminal multiplexer) [Y/n]: " "y n" tmx
-    if [ "y" == "$tmx" ]; then
-        ./install_tmux.sh
-    fi
-    unset tmx
+# Bash alias completions
+reade -Q "GREEN" -i "y" -p "Install bash completions for aliases in ~/.bash_completion.d? [Y/n]:" "y n" compl
+if [ -z $compl ] || [ "y" == $compl ]; then
+    ./install_bash_alias_completions.sh
+fi
+unset compl
 
-    # Kitty (Terminal emulator)
-    reade -Q "GREEN" -i "y" -p "Install Kitty? (Terminal emulator) [Y/n]: " "y n" kittn
-    if [ "y" == "$kittn" ]; then
-        ./install_kitty.sh
+# Python completions
+if [ ! -f ~/.bash_completion.d/_python-argcomplete ]; then
+    reade -Q "GREEN" -i "y" -p "Install python completions in ~/.bash_completion.d? [Y/n]:" "y n" pycomp
+    if [ -z $pycomp ] || [ "y" == $pycomp ]; then
+        ./install_pythonCompletions_bash.sh
     fi
-    unset kittn
-    
-    # Fzf (Fuzzy Finder)
-    reade -Q "GREEN" -i "y" -p "Install fzf? (Fuzzy file/folder finder - keybinding yes for upgraded Ctrl-R/reverse-search, fzf filenames on Ctrl+T and fzf-version of 'cd' on Alt-C + Custom script: Ctrl-f becomes system-wide file opener) [Y/n]: " "y n" findr
-    if [ "y" == "$findr" ]; then
-        ./install_fzf.sh
-    fi
-    unset findr
+fi
+unset pycomp
+
+# Moar (Custom pager instead of less)
+reade -Q "GREEN" -i "y" -p "Install moar? (Custom pager instead of less with linenumbers) [Y/n]: " "y n" moar
+if [ -z $moar ] || [ "Y" == $moar ] || [ $moar == "y" ]; then
+    ./install_moar.sh 
+fi
+unset moar
+
+# Nvim (Editor)
+reade -Q "GREEN" -i "y" -p "Install Neovim? (Terminal editor) [Y/n]: " "y n" nvm
+if [ "y" == "$nvm" ]; then
+    ./install_nvim.sh
+fi
+unset nvm
+
+
+# Ranger (File explorer)
+reade -Q "GREEN" -i "y" -p "Install Ranger? (Terminal file explorer) [Y/n]: " "y n" rngr
+if [ "y" == "$rngr" ]; then
+    ./install_ranger.sh
+fi
+unset rngr
+
+# Tmux (File explorer)
+reade -Q "GREEN" -i "y" -p "Install tmux? (Terminal multiplexer) [Y/n]: " "y n" tmx
+if [ "y" == "$tmx" ]; then
+    ./install_tmux.sh
+fi
+unset tmx
+
+# Kitty (Terminal emulator)
+reade -Q "GREEN" -i "y" -p "Install Kitty? (Terminal emulator) [Y/n]: " "y n" kittn
+if [ "y" == "$kittn" ]; then
+    ./install_kitty.sh
+fi
+unset kittn
+
+# Fzf (Fuzzy Finder)
+reade -Q "GREEN" -i "y" -p "Install fzf? (Fuzzy file/folder finder - keybinding yes for upgraded Ctrl-R/reverse-search, fzf filenames on Ctrl+T and fzf-version of 'cd' on Alt-C + Custom script: Ctrl-f becomes system-wide file opener) [Y/n]: " "y n" findr
+if [ "y" == "$findr" ]; then
+    ./install_fzf.sh
+fi
+unset findr
     
 reade -Q "GREEN" -i "y" -p "Install bash aliases and other config? [Y/n]:" "y n" scripts
 if [ -z $scripts ] || [ "y" == $scripts ]; then
