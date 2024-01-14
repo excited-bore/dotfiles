@@ -104,6 +104,8 @@ function instvim_r(){
         sudo mkdir -p /root/.config/nvim/
     fi
     sudo cp -fv vim/init.vim /root/.config/nvim/init.vim
+    sudo cp -fv vim/init.lua.vim ~/.config/nvim/
+    sudo cp -fv vim/plug_lazy_adapter.vim ~/.config/nvim/
 
     if sudo grep -q "MYVIMRC" $PATHVAR_R; then
        sudo sed -i 's|.export MYVIMRC="|export MYVIMRC=~/.config/nvim/init.vim "|g' $PATHVAR_R
@@ -143,7 +145,9 @@ function instvim(){
     if [[ ! -d ~/.config/nvim/ ]]; then
         mkdir ~/.config/nvim/
     fi
-    cp -fv vim/init.vim ~/.config/nvim/init.vim
+    cp -fv vim/init.vim ~/.config/nvim/
+    cp -fv vim/init.lua.vim ~/.config/nvim/
+    cp -fv vim/plug_lazy_adapter.vim ~/.config/nvim/
     
     if grep -q "MYVIMRC" $PATHVAR; then
         sed -i "s|.export MYVIMRC=.*|export MYVIMRC=~/.config/nvim/init.vim|g" $PATHVAR
@@ -177,12 +181,13 @@ function instvim(){
     if [ -z $vimrc ]; then
         ln -s ~/.config/nvim/init.vim ~/.vimrc
     fi
-    yes_edit_no instvim_r "vim/init.vim" "Install init.vim at /root/.config/nvim/init.vim ? (nvim config)" "edit" "YELLOW"
+    yes_edit_no instvim_r "vim/init.vim" "Install (neo)vim readconfigs at /root/.config/nvim/ ? (init.vim, init.lua, etc..)" "edit" "YELLOW"
 }
-yes_edit_no instvim "vim/init.vim" "Install init.vim at ~/.config/nvim/init.vim ? (nvim config)" "edit" "GREEN"
+yes_edit_no instvim "vim/init.vim" "Install (neo)vim readconfigs at ~/.config/nvim/ ? (init.vim, init.lua, etc..)" "edit" "GREEN"
 
-nvim +PlugInstall +checkhealth
-echo "Install plugins with :CocInstall coc-.. / Update with :CocUpdate"
+nvim +checkhealth
+echo "Install Completion language plugins with ':CocInstall coc-..' / Update with :CocUpdate"
+echo "Check installed nvim plugins with 'Lazy'/ Check installed vim plugins with 'PlugInstalled' (only work on vim and nvim respectively)"
 
 
 vimsh_r(){ 
