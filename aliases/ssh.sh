@@ -15,8 +15,19 @@ copy_to_serber() { scp -r $user@$ip:$1 $2; }
 # SSH in Kitty only really w
 [ "$TERM" = "xterm-kitty" ] && alias ssh="kitty +kitten ssh"
 
+# For Xclip, we need X11 to function properly  
+# Even if X11 fowarding is setup, x11 still needs a display
+# So we need to set the DISPLAY to the host's (you) by passing your IP to DISPLAY before connecting
+addr=$(nmcli device show | grep IP4.ADDR | awk 'NR==1{print $2}'| sed 's|\(.*\)/.*|\1|')
+
+# -t forces allocation for a pseudo-terminal
+# -X enables X11 forwarding
+# -i is for a public/private keyfile
+# We set DISPLAY and start a login shell instead of just connecting
+# This *should* also forward GUI for GUI apps
+
 #Server access
-alias serber="ssh -X -i $ssh_file $user@$ip"
+alias serber="ssh -t -X -i $ssh_file $user@$ip 'export DISPLAY=$addr:0.0; bash -l'"
 alias serber_unmnt="fusermount3 -u /mnt/mount1/"
 alias serber_unmnt1="fusermount3 -u /mnt/mount2/"
 

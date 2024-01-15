@@ -75,7 +75,17 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         pgr2=$(whereis "$pgr2" | awk '{print $2}')
         sed -i 's|export PAGER=.*|export PAGER='$pgr2'|' pathvars/.pathvariables.sh
         if grep -q "less" "$pgr2"; then
-            sed -i 's/#export LESS=/export LESS=/' pathvars/.pathvariables.sh
+            sed -i 's|#export LESS=|export LESS=|g' pathvars/.pathvariables.sh
+            lss=$(cat pathvars/.pathvariables.sh | grep 'export LESS="*"' | sed 's|export LESS="\(.*\)"|\1|g')
+            lss_n=""
+            for opt in ${lss}; do
+                opt1=$(echo "$opt" | sed 's|--\(\)|\1|g')
+                if man less | grep -q -e "${opt1}"; then
+                    lss_n="$lss_n $opt"
+                fi
+            done
+            sed -i "s|export LESS=.*|export LESS=$lss_n|g" pathvars/.pathvariables.sh
+            unset lss lss_n opt opt1
             #sed -i 's/#export LESSEDIT=/export LESSEDIT=/' pathvars/.pathvariables.sh
         fi
         if grep -q "moar" "$pgr2"; then

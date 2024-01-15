@@ -22,6 +22,7 @@ if [ -x "$(command -v flatpak)" ]; then
         if grep -q "FLATPAK" $PATHVAR; then
             sed -i 's|.export PATH=$PATH:$HOME/.local/bin/flatpak|export PATH=$PATH:$HOME/.local/bin/flatpak|g' $PATHVAR
             sed -i 's|.export FLATPAK=|export FLATPAK=$HOME/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share|'  $PATHVAR 
+            sed -i 's|.export FLATPAK_ENABLE_SDK_EXT=|export FLATPAK_ENABLE_SDK_EXT=|' $PATHVAR
             if ! grep -q 'XDG_DATA_DIRS*.*:$FLATPAK' $PATHVAR; then
                 sed -i 's|.export XDG_DATA_DIRS=\(.*\) |export XDG_DATA_DIRS=\1:$FLATPAK|' $PATHVAR
             fi

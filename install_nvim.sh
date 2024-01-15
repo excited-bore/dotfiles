@@ -11,7 +11,7 @@ if [[ $distro == "Arch" || $distro_base == "Arch" ]];then
     reade -Q "GREEN" -i "y" -p "Install nvim clipboard? (xsel xclip) [Y/n]:" "y n" clip
     if [ -z $clip ] || [ "y" == $clip ]; then
         yes | sudo pacman -Su xsel xclip
-        echo "${green} If this is for use with ssh on serverside, X11 needs to be forwarded?"
+        echo "${green} If this is for use with ssh on serverside, X11 needs to be forwarded"
         echo "${green} At clientside, 'ForwardX11 yes' also needs to be put in ~/.ssh/config under Host"
         echo "${green} Connection also need to start with -X flag (ssh -X ..@..)"
         reade -Q "GREEN" -i "n" -p "Forward X11 in /etc/ssh/sshd.config? [Y/n]:" "y n" x11f
@@ -91,7 +91,7 @@ elif [  $distro_base == "Debian" ];then
     reade -Q "GREEN" -i "y" -p "Install nvim clipboard? (xsel xclip) [Y/n]:" "y n" clip
     if [ -z $clip ] || [ "y" == $clip ]; then
         yes | sudo apt install xsel xclip 
-        echo "${green} If this is for use with ssh on serverside, X11 needs to be forwarded?"
+        echo "${green} If this is for use with ssh on serverside, X11 needs to be forwarded"
         echo "${green} At clientside, 'ForwardX11 yes' also needs to be put in ~/.ssh/config under Host"
         echo "${green} Connection also need to start with -X flag (ssh -X ..@..)"
         reade -Q "GREEN" -i "n" -p "Forward X11 in /etc/ssh/sshd.config? [Y/n]:" "y n" x11f
@@ -109,6 +109,28 @@ elif [  $distro_base == "Debian" ];then
     if [ -z $jsscripts ] || [ "y" == $jsscripts ]; then
         yes | sudo apt install nodejs npm
         sudo npm install -g neovim
+        if [ $(which nvim) == "$HOME/.local/bin/flatpak/nvim" ]; then
+            qry=$(flatpak list | grep node)           
+            if [ ! -z "$qry" ] ; then
+                echo "${green} Flatpak version nvim needs flatpak's SDK for a node provider"
+                reade -Q "GREEN" -i "y" -p "Install flatpak node SDK and set in environment? [Y/n]:" "y n" flpknode
+                if [ -z $flpknode ] || [ "y" == $flpknode ]; then 
+                    flatpak install node18
+                    if grep -q "FLATPAK_ENABLE_SDK_EXT*.*node" $PATHVAR; then
+                        sed -i "s|.export FLATPAK_ENABLE_SDK_EXT=|export FLATPAK_ENABLE_SDK_EXT=|g" $PATHVAR  
+                        sed -i 's|export FLATPAK_ENABLE_SDK_EXT=\(.*\)node..\(.*\)|export FLATPAK_ENABLE_SDK_EXT=\1node18\2|g' $PATHVAR
+                    elif grep -q "FLATPAK_ENABLE_SDK_EXT" $PATHVAR; then
+                        sed -i 's|.export FLATPAK_ENABLE_SDK_EXT=|export FLATPAK_ENABLE_SDK_EXT=|g' $PATHVAR
+                        sed -i 's|export FLATPAK_ENABLE_SDK_EXT=\(.*\)|export FLATPAK_ENABLE_SDK_EXT=\1,node18|g' $PATHVAR
+                    else
+                        echo 'export FLATPAK_ENABLE_SDK_EXT=node18' $PATHVAR
+                    fi
+                    
+                fi
+            fi
+            unset flpknode qry
+            
+        fi
     fi
     reade -Q "GREEN" -i "y" -p "Install nvim-ruby? [Y/n]:" "y n" rubyscripts
     if [ -z $rubyscripts ] || [ "y" == $rubyscripts ]; then
@@ -179,7 +201,7 @@ function instvim_r(){
 function instvim(){
     if [[ ! -d ~/.config/nvim/ ]]; then
         mkdir ~/.config/nvim/
-    fi
+    fi    
     cp -fv vim/init.vim ~/.config/nvim/
     cp -fv vim/init.lua.vim ~/.config/nvim/
     cp -fv vim/plug_lazy_adapter.vim ~/.config/nvim/

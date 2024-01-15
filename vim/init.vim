@@ -1,5 +1,3 @@
-
-
 "autocmd CursorHold      * echo mode(1)
 "autocmd CursorHoldI     * echo mode(1)
 autocmd CursorMoved     * set cul
