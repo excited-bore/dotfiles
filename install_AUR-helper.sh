@@ -83,7 +83,7 @@ if [ "$distro_base" == "Arch" ]; then
         if [ ! -x "$(command -v flatpak)" ]; then
             reade -Q "GREEN" -i "y" -p "Install Flatpak? [Y/n]:" "y n" fltpakIns
             if [ "$fltpakIns" == "y" ]; then
-                . ./install_flatpak.sh
+                ./install_flatpak.sh
             fi
         fi
         
@@ -115,7 +115,7 @@ if [ "$distro_base" == "Arch" ]; then
         if [ ! -x "$(command -v snap)" ]; then
             reade -Q "GREEN" -i "y" -p "Install Snap? [Y/n]:" "y n" snapIns
             if [ "$snapIns" == "y" ]; then
-                . ./install_snapd.sh
+                ./install_snapd.sh
             fi
         fi
         if [ -x "$(command -v snap)" ]; then

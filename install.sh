@@ -449,7 +449,8 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
                 fi
             fi
         fi
-        
+        unset name gitname
+
         if [[ ! $(git config --list | grep 'email') ]]; then
             reade -Q "GREEN" -i "y" -p "Configure git email? [Y/n]: " "y n" gitmail ;
             if [ "y" == $gitmail ]; then
@@ -459,8 +460,41 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
                 fi
             fi
         fi
+        unset gitmail mail
 
-         if [[ ! $(git config --list | grep 'merge.tool') ]]; then
+        if [[ ! $(git config --list | grep 'core.pager') ]]; then
+            reade -Q "GREEN" -i "y" -p "Configure git pager? [Y/n]: " "y n" gitpager ;
+            if [ "y" == $gitpager ]; then
+                pagers="less cat more"
+                if [ ! -x "$(command -v most)" ]; then
+                    pagers=$pagers" most"
+                fi
+                if [ ! -x "$(command -v moar)" ]; then
+                    pagers=$pagers" moar"
+                fi
+                if [ ! -x "$(command -v vim)" ]; then
+                    pagers=$pagers" vim"
+                fi
+                if [ ! -x "$(command -v nvim)" ]; then
+                    pagers=$pagers" nvim"
+                fi
+                reade -Q "CYAN" -i "less" -p "Pager: " "$pagers" pager;
+                if [ "$pager" == "nvim" ] || [ "$pager" == "vim" ]; then
+                    reade -Q "CYAN" -i "y" -p "You selected $pager. Will pass option for unprintable characters. Set default colorscheme? [Y/n]: " "y n" pager1
+                    if [ "$pager1" == "y" ] || [ -z "$pager1" ]; then
+                        pager="$pager --cmd 'set isprint=1-255' +'colorscheme default'"
+                    else
+                        pager="$pager --cmd 'set isprint=1-255'"
+                    fi
+                fi
+                if [ ! -z "$pager" ]; then
+                    git config --global core.pager "$pager" ;
+                fi
+            fi
+        fi
+        unset gitpager pager pager1
+
+        if [[ ! $(git config --list | grep 'merge.tool') ]]; then
             reade -Q "GREEN" -i "y" -p "Configure git mergetool? [Y/n]: " "y n" gitmerge ;
             if [ "y" == $gitmerge ]; then
                 git mergetool --tool-help &> $TMPDIR/gitresults

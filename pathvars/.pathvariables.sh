@@ -26,11 +26,11 @@ export TMPDIR=/tmp
 export PAGER=/usr/bin/less
 
 # LESS
-export LESS="--CLEAR-SCREEN --RAW-CONTROL-CHARS --redraw-on-quit --LINE-NUMBERS --line-num-width=2 --window=10 --use-color --color=Ng$ --color=Scb$ --color=Pkg$ --IGNORE-CASE --LONG-PROMPT --chop-long-lines --underline-special  --mouse --QUIET --status-line --no-vbell --follow-name --exit-follow-on-close"
+export LESS=" --quit-if-one-screen --CLEAR-SCREEN --RAW-CONTROL-CHARS --redraw-on-quit --LINE-NUMBERS --line-num-width=2 --window=10 --use-color --color=Ng$ --color=Scb$ --color=Pkg$ --IGNORE-CASE --LONG-PROMPT --chop-long-lines --underline-special  --mouse --QUIET --status-line --no-vbell --follow-name --exit-follow-on-close"
 #export LESSEDIT=$EDITOR
 
 # MOAR
-export MOAR='--statusbar=bold -colors 256 -render-unprintable highlight'
+export MOAR=' -statusbar bold -colors auto -render-unprintable highlight -quit-if-one-screen -mousemode auto'
 
 # EDITORS
 export EDITOR=/usr/bin/nvim

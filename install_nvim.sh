@@ -54,38 +54,41 @@ elif [  $distro_base == "Debian" ];then
     b=$(sudo apt search neovim | grep '^neovim/stable' | awk '{print $2}')
     #Minimum version for Lazy plugin manager
     if [[ $b < 0.8 ]]; then
-        echo "Neovim version is below 0.8, wich is needed to run Lazy.nvim (nvim plugin manager)"
         
-        reade -Q "GREEN" -i "y" -p "Install nvim through flatpak? [Y/n]:" "y n" nvmflpk
-        if [ "$nvmflpk" == "y" ]; then
-            reade -Q "GREEN" -i "y" -p "Install flatpak? [Y/n]:" "y n" insflpk 
-            if [ "y" == "$insflpk" ]; then
-                ./install_flatpak.sh
-            fi
-            flatpak install neovim
-        else
+        echo "Neovim apt version is below 0.8, wich is needed to run Lazy.nvim (nvim plugin manager)"
+        
+        reade -Q "YELLOW" -i "n" -p "Still wish to install through apt? [Y/n]:" "y n" nvmapt
+        if [ "y" == $nvmapt ]; then
             yes | sudo apt update
-            yes | sudo apt install neovim 
+            yes | sudo apt install neovim
+        else
+            reade -Q "GREEN" -i "y" -p "Install nvim through Appimage? [Y/n]:" "y n" nvmappmg
+            if [ "y" == $nvmappmg ]; then
+            ltstv=$(curl -sL https://api.github.com/repos/neovim/neovim/releases/latest | jq -r ".tag_name")
+            (mkdir /tmp/neovim
+            cd /tmp/neovim
+            wget https://github.com/neovim/neovim/releases/download/$ltstv/nvim.appimage 
+            wget https://github.com/neovim/neovim/releases/download/$ltstv/nvim-linux64.sha256sum 
+            if [ "$(sha256sum nvim.appimage)" != "$(cat nvim.appimage.sha256sum)" ]; then 
+                echo "Something went wrong: Sha256sums aren't the same. Try again later"    
+            else
+                chmod u+x nvim.appimage 
+                ./nvim.appimage
+            fi
+            )
+            else
+               reade -Q "GREEN" -i "y" -p "Install nvim through flatpak? [Y/n]:" "y n" nvmflpk
+               if [ "$nvmflpk" == "y" ]; then
+                   reade -Q "GREEN" -i "y" -p "Install flatpak? [Y/n]:" "y n" insflpk 
+                   if [ "y" == "$insflpk" ]; then
+                       ./install_flatpak.sh
+                   fi
+                   flatpak install neovim
+               else
+               fi
+            fi
         fi
-        unset insflpk nvmflpk
-       
-        #reade -Q "GREEN" -i "y" -p "Install nvim through binary? [Y/n]:" "y n" nvmbin
-        #if [ -z $nvmbin ] || [ "y" == $nvmbin ]; then
-            #ltstv=$(curl -sL https://api.github.com/repos/neovim/neovim/releases/latest | jq -r ".tag_name")
-            #(mkdir /tmp/neovim
-            #cd /tmp/neovim
-            #wget https://github.com/neovim/neovim/releases/download/$ltstv/nvim-linux64.tar.gz 
-            #wget https://github.com/neovim/neovim/releases/download/$ltstv/nvim-linux64.tar.gz.sha256sum 
-            #if [ "$(sha256sum nvim-linux64.tar.gz)" != "$(cat nvim-linux64.tar.gz.sha256sum)" ]; then 
-            #    echo "Something went wrong: Sha256sums aren't the same. Try again later"    
-            #else
-            #    tar -xvf nvim-linux64.tar.gz
-            #    
-            #    mv -v nvim-linux64 /usr/bin/nvim
-            #fi
-            #)
-        #else
-        #fi
+        unset nvmapt nvmappmg insflpk nvmflpk
     fi
         
     reade -Q "GREEN" -i "y" -p "Install nvim clipboard? (xsel xclip) [Y/n]:" "y n" clip
@@ -116,15 +119,15 @@ elif [  $distro_base == "Debian" ];then
                 reade -Q "GREEN" -i "y" -p "Install flatpak node SDK and set in environment? [Y/n]:" "y n" flpknode
                 if [ -z $flpknode ] || [ "y" == $flpknode ]; then 
                     flatpak install node18
-                    if grep -q "FLATPAK_ENABLE_SDK_EXT*.*node" $PATHVAR; then
-                        sed -i "s|.export FLATPAK_ENABLE_SDK_EXT=|export FLATPAK_ENABLE_SDK_EXT=|g" $PATHVAR  
-                        sed -i 's|export FLATPAK_ENABLE_SDK_EXT=\(.*\)node..\(.*\)|export FLATPAK_ENABLE_SDK_EXT=\1node18\2|g' $PATHVAR
-                    elif grep -q "FLATPAK_ENABLE_SDK_EXT" $PATHVAR; then
-                        sed -i 's|.export FLATPAK_ENABLE_SDK_EXT=|export FLATPAK_ENABLE_SDK_EXT=|g' $PATHVAR
-                        sed -i 's|export FLATPAK_ENABLE_SDK_EXT=\(.*\)|export FLATPAK_ENABLE_SDK_EXT=\1,node18|g' $PATHVAR
-                    else
-                        echo 'export FLATPAK_ENABLE_SDK_EXT=node18' $PATHVAR
-                    fi
+                    #if grep -q "FLATPAK_ENABLE_SDK_EXT*.*node" $PATHVAR; then
+                    #    sed -i "s|.export FLATPAK_ENABLE_SDK_EXT=|export FLATPAK_ENABLE_SDK_EXT=|g" $PATHVAR  
+                    #    sed -i 's|export FLATPAK_ENABLE_SDK_EXT=\(.*\)node..\(.*\)|export FLATPAK_ENABLE_SDK_EXT=\1node18\2|g' $PATHVAR
+                    #elif grep -q "FLATPAK_ENABLE_SDK_EXT" $PATHVAR; then
+                    #    sed -i 's|.export FLATPAK_ENABLE_SDK_EXT=|export FLATPAK_ENABLE_SDK_EXT=|g' $PATHVAR
+                    #    sed -i 's|export FLATPAK_ENABLE_SDK_EXT=\(.*\)|export FLATPAK_ENABLE_SDK_EXT=\1,node18|g' $PATHVAR
+                    #else
+                    #    echo 'export FLATPAK_ENABLE_SDK_EXT=node18' $PATHVAR
+                    #fi
                     
                 fi
             fi
@@ -160,9 +163,7 @@ function instvim_r(){
     if ! sudo test -d /root/.config/nvim/; then
         sudo mkdir -p /root/.config/nvim/
     fi
-    sudo cp -fv vim/init.vim /root/.config/nvim/init.vim
-    sudo cp -fv vim/init.lua.vim ~/.config/nvim/
-    sudo cp -fv vim/plug_lazy_adapter.vim ~/.config/nvim/
+    sudo cp -fv vim/* /root/.config/nvim/
 
     if sudo grep -q "MYVIMRC" $PATHVAR_R; then
        sudo sed -i 's|.export MYVIMRC="|export MYVIMRC=~/.config/nvim/init.vim "|g' $PATHVAR_R
@@ -202,10 +203,13 @@ function instvim(){
     if [[ ! -d ~/.config/nvim/ ]]; then
         mkdir ~/.config/nvim/
     fi    
-    cp -fv vim/init.vim ~/.config/nvim/
-    cp -fv vim/init.lua.vim ~/.config/nvim/
-    cp -fv vim/plug_lazy_adapter.vim ~/.config/nvim/
-    
+    cp -fv vim/* ~/.config/nvim/
+
+    # Symlink configs to flatpak dirs for possible flatpak nvim use
+    if [ -x "$(command -v flatpak)" ] && [ flatpak list | grep -q neovim ]; then
+        ln -s ~/.config/nvim/* ~/.var/app/io.neovim.nvim/config/nvim/
+    fi
+
     if grep -q "MYVIMRC" $PATHVAR; then
         sed -i "s|.export MYVIMRC=.*|export MYVIMRC=~/.config/nvim/init.vim|g" $PATHVAR
         sed -i "s|.export MYGVIMRC=*|export MYGVIMRC=~/.config/nvim/init.vim|g" $PATHVAR
@@ -235,7 +239,7 @@ function instvim(){
     unset vimrc
     
     reade -Q "YELLOW" -i "y" -p "Make symlink for init.vim at ~/.vimrc for user? (Might conflict with nvim +checkhealth) [Y/n]:" "y n" vimrc
-    if [ -z $vimrc ]; then
+    if [ -z $vimrc ] && [ ! -f ~/.vimrc ]; then
         ln -s ~/.config/nvim/init.vim ~/.vimrc
     fi
     yes_edit_no instvim_r "vim/init.vim" "Install (neo)vim readconfigs at /root/.config/nvim/ ? (init.vim, init.lua, etc..)" "edit" "YELLOW"
@@ -249,12 +253,12 @@ echo "Check installed nvim plugins with 'Lazy'/ Check installed vim plugins with
 
 vimsh_r(){ 
     sudo mkdir -p /root/.bash_aliases.d/
-    sudo cp -fv vim/vim_nvim.sh /root/.bash_aliases.d/; 
+    sudo cp -fv aliases/vim_nvim.sh /root/.bash_aliases.d/; 
 }
 
 vimsh(){
     mkdir -p ~/.bash_aliases.d/
-    cp -fv vim/vim_nvim.sh ~/.bash_aliases.d/
+    cp -fv aliases/vim_nvim.sh ~/.bash_aliases.d/
     yes_edit_no vimsh_r "vim/vim_nvim.sh" "Install vim aliases at /root/.bash_aliases.d/? " "yes" "GREEN"
 }
 yes_edit_no vimsh "vim/vim_nvim.sh" "Install vim aliases at ~/.bash_aliases.d/? " "edit" "GREEN"

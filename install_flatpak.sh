@@ -22,7 +22,7 @@ if [ -x "$(command -v flatpak)" ]; then
         if grep -q "FLATPAK" $PATHVAR; then
             sed -i 's|.export PATH=$PATH:$HOME/.local/bin/flatpak|export PATH=$PATH:$HOME/.local/bin/flatpak|g' $PATHVAR
             sed -i 's|.export FLATPAK=|export FLATPAK=$HOME/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share|'  $PATHVAR 
-            sed -i 's|.export FLATPAK_ENABLE_SDK_EXT=|export FLATPAK_ENABLE_SDK_EXT=|' $PATHVAR
+            sed -i 's|.export FLATPAK_ENABLE_SDK_EXT=|export FLATPAK_ENABLE_SDK_EXT=*|' $PATHVAR
             if ! grep -q 'XDG_DATA_DIRS*.*:$FLATPAK' $PATHVAR; then
                 sed -i 's|.export XDG_DATA_DIRS=\(.*\) |export XDG_DATA_DIRS=\1:$FLATPAK|' $PATHVAR
             fi
@@ -42,18 +42,28 @@ if [ -z $pam ] || [ "y" == $pam ]; then
     if [ ! -f /usr/bin/update_flatpak_cli.py ]; then
         sudo wget -P /usr/bin/ https://gist.githubusercontent.com/ssokolow/db565fd8a82d6002baada946adb81f68/raw/c23b3292441e01c6287de1b417b9e573bce6a571/update_flatpak_cli.py
         sudo chmod u+x /usr/bin/update_flatpak_cli.py
+        sudo sed -i 's|\[ -a "|\[ -f "|g' /usr/bin/update_flatpak_cli.py
     fi
+        
     if [ ! -f ~/.bash_aliases.d/flatpackwrapper.sh ]; then
         touch ~/.bash_aliases.d/flatpackwrapper.sh
-        printf "function flatpak (){\\n  env -u SESSION_MANAGER flatpak \"\$@\"\\n   python /usr/bin/update_flatpak_cli.py\\n}\\n" >> ~/.bash_aliases.d/flatpackwrapper.sh
+        printf "function flatpak (){\\n  env -u SESSION_MANAGER flatpak \"\$@\"\\n  if [ \"\$1\" == \"install\" ]; then\\n      python /usr/bin/update_flatpak_cli.py\\n   fi\\n}\\n" >> ~/.bash_aliases.d/flatpackwrapper.sh
     fi
     if grep -q "FLATPAK" "$PATHVAR"; then
         sed -i 's|.export PATH=$PATH:$HOME/.local/bin/flatpak|export PATH=$PATH:$HOME/.local/bin/flatpak|g' $PATHVAR
     else
         echo 'export PATH=$PATH:$HOME/.local/bin/flatpak' >> $PATHVAR
     fi
+    echo "Wrapper script are bash-based and installed under '~/.local/bin/flatpak/' "
 fi
 unset pam
+
+reade -Q "GREEN" -i "y" -p "Install GUI for configuring flatpak permissions - flatseal? [Y/n]:" "y n" fltseal
+if [ -z $fltseal ] || [ "y" == $fltseal ]; then
+    flatpak update
+    flatpak install flatseal
+fi
+unset fltseal
 
 reade -Q "GREEN" -i "y" -p "Run installer for no password with pam? [Y/n]:" "y n" pam
 if [ -z $pam ] || [ "y" == $pam ]; then
@@ -61,4 +71,4 @@ if [ -z $pam ] || [ "y" == $pam ]; then
 fi
 unset pam
 
-flatpak update
+
