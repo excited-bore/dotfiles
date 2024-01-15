@@ -3,13 +3,13 @@
 if [  $distro_base == "Arch" ]; then
     yes | sudo pacman -Su go
 elif [ $distro_base == "Debian" ]; then
-    if [ "$architecture" == "armv7l" ]; then
-       architecture="armv6l"
-    elif [ "$architecture" == "i386" ]; then
-       architecture="386" 
+    if [ "$arch" == "armv7l" ]; then
+       arch="armv6l"
+    elif [ "$arch" == "i386" ]; then
+       arch="386" 
     fi
     latest=$(curl -sL "https://github.com/golang/go/tags" |  grep "/golang/go/releases/tag" | perl -pe 's|.*/golang/go/releases/tag/(.*?)".*|\1|' | uniq | awk 'NR==1{max=$1;print $0; exit;}')
-    file="$latest.linux-$architecture.tar.gz"
+    file="$latest.linux-$arch.tar.gz"
     
     checksum=$(curl -sL "https://golang.google.cn/dl/" | awk 'BEGIN{FS="\n"; RS=""} $0 ~ /'$file'/ &&  $0 ~ /<\/tt>/ {print $0;}' | grep "<tt>" | sed "s,.*<tt>\(.*\)</tt>.*,\1,g")
     if [ ! -x "$(command -v go version)" ] || [[ ! "$(go version)" =~ $latest ]]; then

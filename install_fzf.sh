@@ -14,9 +14,9 @@
     
         # Bash completion issue with fzf fix
         # https://github.com/cykerway/complete-alias/issues/46
-        if grep -q "complete_alias" ~/.bashrc; then
+        if grep -q "if \[\[ -d ~/.bash_completion.d/" ~/.bashrc; then
             sed -i 's|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash||g' ~/.bashrc
-            sed -i 's|\(.*complete_alias\)|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\n\1|g' ~/.bashrc
+            sed -i 's|\(.*if \[\[ -d ~/.bash_completion.d/.*\)|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\n\n\1|g' ~/.bashrc
         fi
         . ~/.bashrc
 

@@ -20,10 +20,10 @@ elif [ $distro == "Debian" ] || [ $distro_base == "Debian" ]; then
     sudo mv ~/.local/bin/distrobox* /usr/lib/apx
 fi
 
-apx completion bash > ~/.bash_completion.d/complete_apx
-if ! grep -q "~/.bash_completion.d/complete_apx" ~/.bashrc; then
-    echo ". ~/.bash_completion.d/complete_apx" >> ~/.bashrc
-fi
+apx completion bash > ~/.bash_completion.d/complete-apx
+#if ! grep -q "~/.bash_completion.d/complete_apx" ~/.bashrc; then
+#    echo ". ~/.bash_completion.d/complete_apx" >> ~/.bashrc
+#fi
 
 source ~/.bashrc
  

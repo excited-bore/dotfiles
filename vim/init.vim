@@ -14,7 +14,7 @@ if !has('nvim')
     endif
 endif
 
-let g:pluginInstallPath=expand('~/.vim/plugins:p')
+let g:pluginInstallPath=expand('~/.vim/plugins')
 source $HOME/.config/nvim/plug_lazy_adapter.vim
 
 if !has('nvim')

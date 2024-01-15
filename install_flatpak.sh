@@ -39,16 +39,17 @@ if [ -z $pam ] || [ "y" == $pam ]; then
     if [ ! -d ~/.local/bin/flatpak/ ]; then
         mkdir -p ~/.local/bin/flatpak/
     fi
+    if [ ! -f ~/.bash_aliases.d/flatpacks.sh ]; then
+        touch ~/.bash_aliases.d/flatpacks.sh
+        printf "function flatpak (){\\n  env -u SESSION_MANAGER flatpak \"\$@\"\\n  if [ \"\$1\" == \"install\" ]; then\\n      python /usr/bin/update_flatpak_cli.py\\n   fi\\n}\\n" >> ~/.bash_aliases.d/flatpacks.sh
+    fi
+    
     if [ ! -f /usr/bin/update_flatpak_cli.py ]; then
         sudo wget -P /usr/bin/ https://gist.githubusercontent.com/ssokolow/db565fd8a82d6002baada946adb81f68/raw/c23b3292441e01c6287de1b417b9e573bce6a571/update_flatpak_cli.py
         sudo chmod u+x /usr/bin/update_flatpak_cli.py
         sudo sed -i 's|\[ -a "|\[ -f "|g' /usr/bin/update_flatpak_cli.py
     fi
-        
-    if [ ! -f ~/.bash_aliases.d/flatpackwrapper.sh ]; then
-        touch ~/.bash_aliases.d/flatpackwrapper.sh
-        printf "function flatpak (){\\n  env -u SESSION_MANAGER flatpak \"\$@\"\\n  if [ \"\$1\" == \"install\" ]; then\\n      python /usr/bin/update_flatpak_cli.py\\n   fi\\n}\\n" >> ~/.bash_aliases.d/flatpackwrapper.sh
-    fi
+      
     if grep -q "FLATPAK" "$PATHVAR"; then
         sed -i 's|.export PATH=$PATH:$HOME/.local/bin/flatpak|export PATH=$PATH:$HOME/.local/bin/flatpak|g' $PATHVAR
     else

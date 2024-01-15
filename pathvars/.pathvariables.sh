@@ -51,6 +51,7 @@ export PATH=/bin/snap:/var/lib/snapd/snap/bin:$PATH
 
 # FLATPAK FOR XDG_DATA_HOME AND XDG_DATA_DIRS
 export FLATPAK=$HOME/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share
+export FLATPAK_ENABLE_SDK_EXT=*
 export PATH=$PATH:$HOME/.local/bin/flatpak
 
 # XDG

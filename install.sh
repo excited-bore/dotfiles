@@ -28,6 +28,15 @@ if [ ! -e ~/etc_systemd ]; then
     fi
 fi
 
+if [ ! -f /etc/modprobe.d/nobeep.conf ]; then
+    reade -Q "GREEN" -i "y" -p "Remove annoying terminal beep? (blacklist pcspkr) [Y/n]:" "y n" beep
+    if [ "$beep" == "y" ] || [ -z "$beep" ]; then
+        echo "blacklist pcspkr" | sudo tee /etc/modprobe.d/nobeep.conf
+    fi
+fi
+
+unset sym1 sym2 sym3 beep
+
 # Pathvariables
 
 reade -Q "GREEN" -i "y" -p "Check existence (and create) ~/.pathvariables.sh and link it to .bashrc? [Y/n]:" "y n" pathvars
@@ -264,6 +273,8 @@ if [ ! -x "$(command -v snap)" ]; then
 fi
 unset inssnap
 
+
+./install_completions_dir.sh
 
 # Bash alias completions
 reade -Q "GREEN" -i "y" -p "Install bash completions for aliases in ~/.bash_completion.d? [Y/n]:" "y n" compl

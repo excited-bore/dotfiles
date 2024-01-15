@@ -26,15 +26,15 @@ if [ ! -x "$(command -v moar)" ]; then
         printf "Package manager unknown or PM doesn't offer moar (f.ex. apt).\n"; 
         reade -Q "YELLOW" -i "b" -p "Install moar from github binary (b) or not (anything but empty or b) [B/n]: " "b n"  answer
         if [ -z "$answer" ] || [ "B" == "$answer" ] || [ "b" == "$answer" ]; then
-            if [ $architecture == "armv7l" ] || [ $architecture == "arm64" ]; then
-                architecture="arm"
+            if [ $arch == "armv7l" ] || [ $arch == "arm64" ]; then
+                arch="arm"
             fi
-            if [ $architecture == "amd64" ] || [ $architecture == "amd32" ]; then
-                architecture="386"
+            if [ $arch == "amd64" ] || [ $arch == "amd32" ]; then
+                arch="386"
             fi
             latest=$(curl -sL "https://github.com/walles/moar/tags" | grep "/walles/moar/releases/tag" | perl -pe 's|.*/walles/moar/releases/tag/(.*?)".*|\1|' | uniq | awk 'NR==1{max=$1;print $0; exit;}')                          
             (cd /tmp
-            wget "https://github.com/walles/moar/releases/download/$latest/moar-$latest-linux-$architecture"
+            wget "https://github.com/walles/moar/releases/download/$latest/moar-$latest-linux-$arch"
             chmod a+x moar-*-*-*
             sudo mv moar-* /usr/bin/moar
             )

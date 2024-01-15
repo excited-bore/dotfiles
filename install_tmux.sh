@@ -12,33 +12,33 @@ if [ ! -x "$(command -v tmux)" ]; then
     fi
 fi
 
-if [ ! -d ~/.bash_aliases.d/ ]; then
-   mkdir ~/.bash_aliases.d/    
-fi
-
-if ! grep -q "~/.bash_aliases.d" ~/.bashrc; then
-    echo "if [[ -d ~/.bash_aliases.d/ ]]; then" >> ~/.bashrc
-    echo "  for alias in ~/.bash_aliases.d/*.sh; do" >> ~/.bashrc
-    echo "      . \"\$alias\" " >> ~/.bashrc
-    echo "  done" >> ~/.bashrc
-    echo "fi" >> ~/.bashrc
-fi
+#if [ ! -d ~/.bash_aliases.d/ ]; then
+#   mkdir ~/.bash_aliases.d/    
+#fi
+#
+#if ! grep -q "~/.bash_aliases.d" ~/.bashrc; then
+#    echo "if [[ -d ~/.bash_aliases.d/ ]]; then" >> ~/.bashrc
+#    echo "  for alias in ~/.bash_aliases.d/*.sh; do" >> ~/.bashrc
+#    echo "      . \"\$alias\" " >> ~/.bashrc
+#    echo "  done" >> ~/.bashrc
+#    echo "fi" >> ~/.bashrc
+#fi
 
 # Fix tmux not sourcing .bashrc
 # https://unix.stackexchange.com/questions/320465/new-tmux-sessions-do-not-source-bashrc-filehttps://unix.stackexchange.com/questions/320465/new-tmux-sessions-do-not-source-bashrc-filehttps://unix.stackexchange.com/questions/320465/new-tmux-sessions-do-not-source-bashrc-filehttps://unix.stackexchange.com/questions/320465/new-tmux-sessions-do-not-source-bashrc-file
 
-if [ ! -f ~/.profile ]; then
-   touch ~/.profile    
-fi
-
-if ! grep -q ".bashrc" ~/.profile; then
-   echo "if [ -n \"\$BASH_VERSION\" -a -n \"\$PS1\" ]; then" >> ~/.profile
-   echo "   # include .bashrc if it exists" >> ~/.profile
-   echo "   if [ -f \"\$HOME/.bashrc\" ]; then" >> ~/.profile
-   echo "       . \"\$HOME/.bashrc\"" >> ~/.profile
-   echo "   fi" >> ~/.profile
-   echo "fi" >> ~/.profile 
-fi
+#if [ ! -f ~/.profile ]; then
+#   touch ~/.profile    
+#fi
+#
+#if ! grep -q ".bashrc" ~/.profile; then
+#   echo "if [ -n \"\$BASH_VERSION\" -a -n \"\$PS1\" ]; then" >> ~/.profile
+#   echo "   # include .bashrc if it exists" >> ~/.profile
+#   echo "   if [ -f \"\$HOME/.bashrc\" ]; then" >> ~/.profile
+#   echo "       . \"\$HOME/.bashrc\"" >> ~/.profile
+#   echo "   fi" >> ~/.profile
+#   echo "fi" >> ~/.profile 
+#fi
 
 sed -i 's|^set -g @plugin|#set -g @plugin|g' tmux/.tmux.conf
 sed -i 's|^run '\''~/.tmux/plugins/tpm/tpm'\''|#run '\''~/.tmux/plugins/tpm/tpm'\''|g' tmux/.tmux.conf
@@ -130,9 +130,9 @@ if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
     fi
     if [ ! -e ~/.bash_completion.d/tmux ]; then
         curl https://raw.githubusercontent.com/imomaliev/tmux-bash-completion/master/completions/tmux > ~/.bash_completion.d/tmux 2> /dev/null
-        if ! grep -q "~/.bash_completion.d/tmux" ~/.bashrc; then
-            echo ". ~/.bash_completion.d/tmux" >> ~/.bashrc
-        fi
+        #if ! grep -q "~/.bash_completion.d/tmux" ~/.bashrc; then
+        #    echo ". ~/.bash_completion.d/tmux" >> ~/.bashrc
+        #fi
         . ~/.bashrc
     fi
 fi
@@ -188,7 +188,7 @@ reade -Q "GREEN" -i "y" -p "Set tmux at shell login for SSH? [Y/n]:" "y n"  tmux
 if [ -z "$tmuxx" ] || [ "$tmuxx"  == "y" ]; then 
     touch ~/.bash_aliases.d/tmux_startup.sh
     echo 'if [[ $- =~ i ]] && [[ -z "$TMUX" ]] && [[ -n "$SSH_TTY" ]]; then' >> ~/.bash_aliases.d/tmux_startup.sh
-    echo 'tmux attach-session -t ssh_tmux || tmux new-session -s ssh_tmux;' >> ~/.bash_aliases.d/tmux_startup.sh  
+    echo '  tmux attach-session -t ssh_tmux || tmux new-session -s ssh_tmux;' >> ~/.bash_aliases.d/tmux_startup.sh  
     echo 'fi' >> ~/.bash_aliases.d/tmux_startup.sh
 fi
 unset tmuxx
