@@ -80,4 +80,5 @@ fzf_rifle(){
             return 0;
         fi    
     fi
+
 }

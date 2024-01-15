@@ -12,10 +12,11 @@ move_sshfs(){ cp -r --no-preserve=mode "$1" "$2" && rmTrash "$1"; }
 copy_to_serber() { scp -r $user@$ip:$1 $2; }
 #function cp_from_serber() { scp -r }
 
+# SSH in Kitty only really w
+[ "$TERM" = "xterm-kitty" ] && alias ssh="kitty +kitten ssh"
 
 #Server access
 alias serber="ssh -X -i $ssh_file $user@$ip"
-alias serber_tmx="ssh -X -i $ssh_file $user@$ip -c \"tmux\""
 alias serber_unmnt="fusermount3 -u /mnt/mount1/"
 alias serber_unmnt1="fusermount3 -u /mnt/mount2/"
 

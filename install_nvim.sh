@@ -57,11 +57,10 @@ elif [  $distro_base == "Debian" ];then
         echo "Neovim version is below 0.8, wich is needed to run Lazy.nvim (nvim plugin manager)"
         
         reade -Q "GREEN" -i "y" -p "Install nvim through flatpak? [Y/n]:" "y n" nvmflpk
-        if [ ! -x "$(command -v flatpak)" ]; then
-            printf "%s\n" "${blue}No flatpak detected. (Independent package manager from Red Hat){normal}"
-            reade -Q "GREEN" -i "y" -p "Install? [Y/n]:" "y n" insflpk 
+        if [ "$nvmflpk" == "y" ]; then
+            reade -Q "GREEN" -i "y" -p "Install flatpak? [Y/n]:" "y n" insflpk 
             if [ "y" == "$insflpk" ]; then
-               ./install_flatpak.sh 
+                ./install_flatpak.sh
             fi
             flatpak install neovim
         else

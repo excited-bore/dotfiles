@@ -8,10 +8,10 @@ elif [ $distro == "Arch" ]; then
     yes | sudo pacman -Su flatpak python
 elif [[ $distro == "Debian" || $distro_base == "Debian" ]]; then
     sudo apt update
-    if $XDG_CURRENT_DESKTOP == "GNOME"; then
-        yes | sudo apt install gnome-software-plugin-flatpak python3
+    if "$XDG_CURRENT_DESKTOP" == "GNOME"; then
+        yes | sudo apt install gnome-software-plugin-flatpak gir1.2-xdpgtk* gir1.2-flatpak* python3 
     else 
-        yes | sudo apt install flatpak python3
+        yes | sudo apt install flatpak python3 gir1.2-xdpgtk* gir1.2-flatpak*
     fi
     flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 fi

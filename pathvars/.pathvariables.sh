@@ -47,10 +47,11 @@ export MYVIMRC=~/.config/nvim/init.vim
 export MYGVIMRC=~/.config/nvim/init.vim
 
 # SNAP
-export PATH="/bin/snap:/var/lib/snapd/snap/bin:$PATH"
+export PATH=/bin/snap:/var/lib/snapd/snap/bin:$PATH
 
 # FLATPAK FOR XDG_DATA_HOME AND XDG_DATA_DIRS
-export FLATPAK="/var/lib/flatpak/exports/share:$HOME/.local/share/flatpak/exports/share"
+export FLATPAK=$HOME/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share
+export PATH=$PATH:$HOME/.local/bin/flatpak
 
 # XDG
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
@@ -65,7 +66,7 @@ export XDG_CONFIG_DIRS=/etc/xdg
 export XDG_DATA_HOME=$HOME/.local/share
 # $XDG_DATA_DIRS defines the preference-ordered set of base directories to search for data files in addition to the $XDG_DATA_HOME base directory. The directories in $XDG_DATA_DIRS should be seperated with a colon ':'. 
 # If $XDG_DATA_DIRS is either not set or empty, a value equal to /usr/local/share/:/usr/share/ should be used. 
-export XDG_DATA_DIRS=/usr/local/share/:/usr/share:$FLATPAK 
+export XDG_DATA_DIRS=/usr/local/share/:/usr/share:$FLATPAK
 # $XDG_STATE_HOME defines the base directory relative to which user-specific state files should be stored. If $XDG_STATE_HOME is either not set or empty, a default equal to $HOME/.local/state should be used. 
 export XDG_STATE_HOME=$HOME/.local/state
 # $XDG_RUNTIME_DIR defines the base directory relative to which user-specific non-essential runtime files and other file objects (such as sockets, named pipes, ...) should be stored. The directory MUST be owned by the user, and he MUST be the only one having read and write access to it. Its Unix access mode MUST be 0700. 
