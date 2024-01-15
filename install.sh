@@ -84,7 +84,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
                     lss_n="$lss_n $opt"
                 fi
             done
-            sed -i "s|export LESS=.*|export LESS=$lss_n|g" pathvars/.pathvariables.sh
+            sed -i "s|export LESS=.*|export LESS=\" $lss_n\"|g" pathvars/.pathvariables.sh
             unset lss lss_n opt opt1
             #sed -i 's/#export LESSEDIT=/export LESSEDIT=/' pathvars/.pathvariables.sh
         fi
