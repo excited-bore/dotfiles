@@ -136,6 +136,9 @@ bind '"\e[1;3C": "cd - \C-m"'
 # Alt-Down arrow to go to home directory
 bind '"\e[1;3B": "cd \C-m"'
 
+# Alt-Up arrow to go to home directory
+bind '"\e[1;3A": "j \C-i"'
+
 # Proper copy
 # https://askubuntu.com/questions/302263/selecting-text-in-the-terminal-without-using-the-mouse
 #"\e-c": copy to clipboard

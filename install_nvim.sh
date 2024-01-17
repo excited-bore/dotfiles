@@ -86,7 +86,7 @@ elif [  $distro_base == "Debian" ];then
                     yes | sudo apt autoremove neovim
                     echo "Then, install some necessary buildtools"
                     yes | sudo apt update
-                    yes | sudo apt install make cmake libtool gettext
+                    yes | sudo apt-get install ninja-build gettext libtool libtool-bin autoconf automake cmake g++ pkg-config unzip curl doxygen
                     (mkdir /tmp/neovim
                     cd /tmp/neovim
                     git clone https://github.com/neovim/neovim

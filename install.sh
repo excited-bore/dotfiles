@@ -37,6 +37,29 @@ fi
 
 unset sym1 sym2 sym3 beep
 
+
+if [ "$distro_base" == "Arch" ]; then
+   ./install_AUR-helper.sh 
+fi
+
+if [ ! -x "$(command -v flatpak)" ]; then
+    printf "%s\n" "${blue}No flatpak detected. (Independent package manager from Red Hat){normal}"
+    reade -Q "GREEN" -i "y" -p "Install? [Y/n]:" "y n" insflpk 
+    if [ "y" == "$insflpk" ]; then
+       ./install_flatpak.sh 
+    fi
+fi
+unset insflpk
+
+if [ ! -x "$(command -v snap)" ]; then
+    printf "%s\n" "${blue}No snap detected. (Independent package manager from Canonical){normal}"
+    reade -Q "GREEN" -i "n" -p "Install? [Y/n]:" "y n" inssnap 
+    if [ "y" == "$inssnap" ]; then
+       ./install_snapd.sh 
+    fi
+fi
+unset inssnap
+
 # Pathvariables
 
 reade -Q "GREEN" -i "y" -p "Check existence (and create) ~/.pathvariables.sh and link it to .bashrc? [Y/n]:" "y n" pathvars
@@ -108,7 +131,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
     if [ "$edtvsl" == "y" ] || [ -z "$edtvsl" ]; then
         editors="nano vi"
         prmpt="${green} \tnano = Default editor - Basic, but userfriendly\n\
-        vi = Other preinstalled editor - Least userfriendly and archaic editor\n" 
+        vi = Other preinstalled editor - Archaic and non-userfriendly editor\n" 
         if [ -x "$(command -v micro)" ]; then
             editors="$pagers micro"
             prmpt="$prmpt \tMicro = Relatively good out-of-the-box editor - Decent keybindings, yet no customizations\n"
@@ -162,14 +185,21 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
     fi
     unset dsply
 
+    if [ -x "$(command -v go)" ]; then
+        sed -i 's|#export GOPATH|export GOPATH|' pathvars/.pathvariables.sh 
+    fi
+    unset snapvrs
+
     if [ -x "$(command -v snap)" ]; then
-        reade -Q "GREEN" -i "y" -p "Add snap dirs to path? [Y/n]:" "y n" snapvrs 
-        if [ "$snapvrs" == "y" ]; then
-            sed -i 's|#export PATH="/bin|export PATH="/bin|' pathvars/.pathvariables.sh 
-        fi
+        sed -i 's|#export PATH=/bin/snap|export PATH=/bin/snap|' pathvars/.pathvariables.sh 
     fi
     unset snapvrs
     
+    if [ -x "$(command -v flatpak)" ]; then
+        sed -i 's|#export FLATPAK|export FLATPAK|' pathvars/.pathvariables.sh 
+        sed -i 's|#export \(PATH=$PATH:$HOME/.local/bin/flatpak\)|\1|g' pathvars/.pathvariables.sh
+    fi
+    unset snapvrs
 
     # TODO do something for flatpak  (XDG_DATA_DIRS)
     # Check if xdg installed
@@ -251,27 +281,12 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
     yes_edit_no pathvariables "pathvars/.pathvariables.sh" "Install .pathvariables.sh at ~/? " "edit" "GREEN"
 fi
 
-if [ "$distro_base" == "Arch" ]; then
-   ./install_AUR-helper.sh 
+# Go
+reade -Q "GREEN" -i "y" -p "Install Go? [Y/n]:" "y n" go
+if [ -z $go ] || [ "y" == $go ]; then
+    ./install_go.sh
 fi
-
-if [ ! -x "$(command -v flatpak)" ]; then
-    printf "%s\n" "${blue}No flatpak detected. (Independent package manager from Red Hat){normal}"
-    reade -Q "GREEN" -i "y" -p "Install? [Y/n]:" "y n" insflpk 
-    if [ "y" == "$insflpk" ]; then
-       ./install_flatpak.sh 
-    fi
-fi
-unset insflpk
-
-if [ ! -x "$(command -v snap)" ]; then
-    printf "%s\n" "${blue}No snap detected. (Independent package manager from Canonical){normal}"
-    reade -Q "GREEN" -i "n" -p "Install? [Y/n]:" "y n" inssnap 
-    if [ "y" == "$inssnap" ]; then
-       ./install_snapd.sh 
-    fi
-fi
-unset inssnap
+unset go
 
 
 ./install_completions_dir.sh
@@ -291,6 +306,14 @@ if [ ! -f ~/.bash_completion.d/_python-argcomplete ]; then
     fi
 fi
 unset pycomp
+
+# Osc
+reade -Q "GREEN" -i "y" -p "Install Osc? (Universal clipboard tool / works better then xclip over ssh) [Y/n]: " "y n" osc
+if [ -z $osc ] || [ "Y" == $osc ] || [ $osc == "y" ]; then
+    ./install_osc.sh 
+fi
+unset osc
+
 
 # Moar (Custom pager instead of less)
 reade -Q "GREEN" -i "y" -p "Install moar? (Custom pager instead of less with linenumbers) [Y/n]: " "y n" moar
@@ -580,4 +603,4 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     yes_edit_no ytbe "aliases/youtube.sh" "Install yt-dlp (youtube cli download) and youtube.sh at ~/.bash_aliases.d/ (yt-dlp aliases)?" "yes" "GREEN"
 fi
 
-. ~/.bashrc         
+source ~/.bashrc         

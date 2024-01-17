@@ -26,11 +26,11 @@ export TMPDIR=/tmp
 export PAGER=/usr/bin/less
 
 # LESS
-export LESS=" --quit-if-one-screen --CLEAR-SCREEN --RAW-CONTROL-CHARS --redraw-on-quit --LINE-NUMBERS --line-num-width=2 --window=10 --use-color --color=Ng$ --color=Scb$ --color=Pkg$ --IGNORE-CASE --LONG-PROMPT --chop-long-lines --underline-special  --mouse --QUIET --status-line --no-vbell --follow-name --exit-follow-on-close"
+export LESS="  --quit-if-one-screen --CLEAR-SCREEN --RAW-CONTROL-CHARS --redraw-on-quit --LINE-NUMBERS --use-color --IGNORE-CASE --LONG-PROMPT --chop-long-lines --underline-special --mouse --QUIET --status-line --no-vbell --follow-name --exit-follow-on-close"
 #export LESSEDIT=$EDITOR
 
 # MOAR
-export MOAR=' -statusbar bold -colors auto -render-unprintable highlight -quit-if-one-screen -mousemode auto'
+#export MOAR=' -statusbar bold -colors auto -render-unprintable highlight -quit-if-one-screen -mousemode auto'
 
 # EDITORS
 export EDITOR=/usr/bin/nvim
@@ -49,10 +49,10 @@ export MYGVIMRC=~/.config/nvim/init.vim
 # SNAP
 export PATH=/bin/snap:/var/lib/snapd/snap/bin:$PATH
 
-# FLATPAK FOR XDG_DATA_HOME AND XDG_DATA_DIRS
+# FLATPAK
 export FLATPAK=$HOME/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share
 export FLATPAK_ENABLE_SDK_EXT=*
-export PATH=$PATH:$HOME/.local/bin/flatpak
+PATH=$PATH:$HOME/.local/bin/flatpak
 
 # XDG
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
@@ -108,8 +108,8 @@ export SYSTEMD_LOG_TARGET="auto"
 #export PYTHON_ARGCOMPLETE_OK="True"
 
 # RUBY
-export GEM_PATH=/usr/lib/ruby/gems/3.0.0:/home/burp/.local/share/gem/ruby/3.0.0/bin
-export PATH=$PATH:$GEM_PATH
+#export GEM_PATH=/usr/lib/ruby/gems/3.0.0:/home/burp/.local/share/gem/ruby/3.0.0/bin
+#export PATH=$PATH:$GEM_PATH
 
 # For arch: Also changeable with 'archlinux-java'
 # JAVA
@@ -120,22 +120,23 @@ export PATH=$PATH:$GEM_PATH
 #export LUA_PATH=""
 
 # GO
-#export PATH="/usr/local/go/bin:/usr/bin/go:/usr/lib/go:/usr/share/go:$PATH"
+export GOPATH=/home/burp/.local
+#export PATH=$PATH:$GOPATH
 
 
 # RANGER
-export RANGER_LOAD_DEFAULT_RC=FALSE
+#export RANGER_LOAD_DEFAULT_RC=FALSE
 
 # RIPGREP
-export RG_PREFIX="rg --column --line-number --no-heading --color=always --smart-case "
+#export RG_PREFIX="rg --column --line-number --no-heading --color=always --smart-case "
 #export INITIAL_QUERY="${*:-}"
 
 # FZF
 FZF_PREVIEW_COLUMNS=0
 FZF_PREVIEW_LINES=0
 #echo $excludes
-export FZF_DEFAULT_COMMAND="fd --search-path / --type f --hidden"
-export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+#export FZF_DEFAULT_COMMAND="fd --search-path / --type f --hidden"
+#export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 #export FZF_CTRL_T_OPTS='--preview="kitty icat --clear --transfer-mode=memory --stdin=no --place=${FZF_PREVIEW_COLUMNS}x${FZF_PREVIEW_LINES}@0x0 {}'
 #export FZF_CTRL_T_OPTS='--preview='\''kitten icat --clear --transfer-mode=memory --stdin=no --place=${FZF_PREVIEW_COLUMNS}x${FZF_PREVIEW_LINES}@110x1 {} > /dev/tty'\'' --bind ctrl-t:change-preview-window(down|hidden|)'
 FZF_ALT_C_OPTS='--preview "tree -C {}" 
@@ -148,8 +149,8 @@ FZF_CTRL_R_OPTS="--preview 'echo {}' \
                 --bind 'ctrl-t:toggle-preview' \
                 --bind 'alt-c:execute-silent(echo -n {2..} | xclip -i -sel c)+abort' \
                 --color header:italic --header 'Press ALT-C to copy command into clipboard'"
-export FZF_CTRL_R_OPTS=$FZF_CTRL_R_OPTS
-export FZF_BIND_TYPES='fd --search-path / --type f --hidden | xargs -n 5 basename -a | perl -ne '\''print $1 if m/\.([^.\/]+)$/'\'' | sort -u'
+#export FZF_CTRL_R_OPTS=$FZF_CTRL_R_OPTS
+#export FZF_BIND_TYPES='fd --search-path / --type f --hidden | xargs -n 5 basename -a | perl -ne '\''print $1 if m/\.([^.\/]+)$/'\'' | sort -u'
 
 # EMACS
 #export PATH="~/.emacs.d/bin/:$PATH"

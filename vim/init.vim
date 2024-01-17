@@ -6,6 +6,17 @@ autocmd CursorMovedI    * set cul
 "autocmd InsertLeave     * set nocul
 
 
+" unnamedplus	A variant of the "unnamed" flag which uses the
+" clipboard register "+" (quoteplus) instead of
+" register "*" for all yank, delete, change and put
+" operations which would normally go to the unnamed
+" register.
+" Normal clipboard functionality for yy, y and d
+" Xclip can be problematic over ssh though, so this setting can cause trouble
+
+set clipboard+=unnamedplus
+
+
 let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
 if !has('nvim')
     if empty(glob(data_dir . '/autoload/plug.vim'))
@@ -23,8 +34,7 @@ endif
 "call plug#begin(g:pluginInstallPath)
 "Vim plugins point to githubs wich is very nice and just fucking cool
 
-"" Autocomplete plugin from git
-"Plug 'ycm-core/YouCompleteMe'
+" Autocomplete engine (Conquer of completions)
 "https://github.com/neoclide/coc.nvim/wiki/Using-coc-extensions#implemented-coc-extensions
 Plugin 'neoclide/coc.nvim', {'branch': 'release'}
 let g:coc_global_extensions = [
@@ -42,7 +52,10 @@ let g:coc_global_extensions = [
             \'coc-vimlsp'
             \]
 
-"Ranger integration
+" Non-xclip 
+Plugin 'ojroques/vim-oscyank', {'branch': 'main'}
+
+" Ranger integration
 Plugin 'francoiscabrol/ranger.vim'
 Plugin 'rbgrouleff/bclose.vim'
 let g:ranger_replace_netrw = 1
@@ -675,14 +688,7 @@ inoremap <C-S-h> <C-\><C-o>:%s///gc<Left><Left><Left><Left>
 vnoremap <C-S-h> <esc>:%s/\%V//gc<Left><Left><Left>
 cnoremap <C-S-h> <C-e><C-u>nohl<CR>:<Esc>
 
-" unnamedplus	A variant of the "unnamed" flag which uses the
-" clipboard register "+" (quoteplus) instead of
-" register "*" for all yank, delete, change and put
-" operations which would normally go to the unnamed
-" register.
-" Normal clipboard functionality for yy, y and d
 
-set clipboard+=unnamedplus
 nnoremap y "+^y
 nnoremap yy "+^yg_
 nnoremap Y "+^Y

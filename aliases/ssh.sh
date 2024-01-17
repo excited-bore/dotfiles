@@ -27,7 +27,7 @@ addr=$(nmcli device show | grep IP4.ADDR | awk 'NR==1{print $2}'| sed 's|\(.*\)/
 # This *should* also forward GUI for GUI apps
 
 #Server access
-alias serber="ssh -t -X -i $ssh_file $user@$ip 'export DISPLAY=$addr:0.0; bash -l'"
+alias serber="ssh -t -Y -i $ssh_file $user@$ip 'export DISPLAY=$addr:0.0; bash -l'"
 alias serber_unmnt="fusermount3 -u /mnt/mount1/"
 alias serber_unmnt1="fusermount3 -u /mnt/mount2/"
 
@@ -35,10 +35,17 @@ ssh_key_and_add_to_agent_by_host() {
     if [ ! -f ~/.ssh/config ]; then
         touch ~/.ssh/config;
     fi
-    local opts name host keytype uname sx11
-    read -p "Give up filename: (nothing for id_keytype, sensible to leave as such in certain situations): " name
-    reade -p "Give up keytype \(dsa \| ecdsa \| ecdsa-sk \| ed25519 (Default) \| ed25519-sk \| rsa\): " "dsa ecdsa ecdsa-sk ed25519 ed25519-sk rsa" keytype
-    read -p "Give up hostname : " host
+    local opts name kyname host keytype uname sx11
+    echo "${green}FYI: Some services (f.ex. default setting openssh, github) only check for id_keyname type keys (f.ex. id_ed25519)"
+    reade -Q "GREEN" -i "id_ed25519" -p "Give up filename \(Recommended: id_ed25519, id_ecdsa-sk, id_ed25519-sk, id_dsa, id_ecdsa or id_rsa\): " "id_dsa id_ecdsa id_ecdsa-sk id_ed25519 id_ed25519-sk id_rsa" name
+    if [[ "$name" == "id_"* ]]; then
+        reade -Q "green" -i "y" -p "Given name starts with \"id_\". Use name for keytype?:" "y n" kyname
+        if [ "y" == "$kyname" ]; then
+            keytype=$(echo $name | sed 's|id_||g') 
+        fi
+    fi
+    reade -Q "GREEN" -i "id_ed25519" -p "Give up keytype \(dsa \| ecdsa \| ecdsa-sk \| ed25519 (Default) \| ed25519-sk \| rsa\): " "dsa ecdsa ecdsa-sk ed25519 ed25519-sk rsa" keytype
+    read -p "Give up remote machine (hostname) : " host
     if [ -z $host ]; then
         host=$(hostname) 
     fi
@@ -49,7 +56,7 @@ ssh_key_and_add_to_agent_by_host() {
     fi
     read -p "Forward X11? Needed for xclip [Y/n]:" sx11
     if [ -z "$sx11" ] || [ "$sx11" == "y" ]; then
-        opts="ForwardX11 yes\n"
+        opts="ForwardX11 yes\n  ForwardX11Trusted yes\n"
     fi
     if [ -z $keytype ]; then
         keytype=ed25519
