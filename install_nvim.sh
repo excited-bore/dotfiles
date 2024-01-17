@@ -121,7 +121,7 @@ elif [  $distro_base == "Debian" ];then
     fi
     reade -Q "GREEN" -i "y" -p "Install nvim-python? [Y/n]:" "y n" pyscripts
     if [ -z $pyscripts ] || [ "y" == $pyscripts ]; then
-        yes | sudo apt install python3 python3-dev pipx  
+        yes | sudo apt install python3 python3-dev python3-pynvim pipx  
         pipx install pynvim
         pipx install pylint
     fi

@@ -43,7 +43,7 @@ if [ "$distro_base" == "Arch" ]; then
 fi
 
 if [ ! -x "$(command -v flatpak)" ]; then
-    printf "%s\n" "${blue}No flatpak detected. (Independent package manager from Red Hat){normal}"
+    printf "%s\n" "${blue}No flatpak detected. (Independent package manager from Red Hat)${normal}"
     reade -Q "GREEN" -i "y" -p "Install? [Y/n]:" "y n" insflpk 
     if [ "y" == "$insflpk" ]; then
        ./install_flatpak.sh 
@@ -52,7 +52,7 @@ fi
 unset insflpk
 
 if [ ! -x "$(command -v snap)" ]; then
-    printf "%s\n" "${blue}No snap detected. (Independent package manager from Canonical){normal}"
+    printf "%s\n" "${blue}No snap detected. (Independent package manager from Canonical)${normal}"
     reade -Q "GREEN" -i "n" -p "Install? [Y/n]:" "y n" inssnap 
     if [ "y" == "$inssnap" ]; then
        ./install_snapd.sh 

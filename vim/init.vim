@@ -729,20 +729,29 @@ inoremap <A-d> <Esc>cc
 "" visual => by selection
 "" Best register no register
 "" https://stackoverflow.com/questions/22598644/vim-copy-non-linewise-without-leading-or-trailing-spaces
-nnoremap <C-c>  "+^yg_ 
-nnoremap <silent> <C-v> "+Pl
+
+"nnoremap <C-c>  "+^yg_ 
+nnoremap <silent><C-c> <Plug>OSCYankOperator_
+nnoremap <silent><C-v> "+Pl
 nnoremap <C-d>  (col(".") ==? 1 ? '<C-\><C-o>daw' : '<C-\><C-o>diw')
+
 """ Copy inner word except when on first line (copy a word)
-inoremap <expr> <C-c>   (col(".") ==? 1 ? '<C-\><C-o>"+yaw' : '<C-\><C-o>"+yiw')
+"inoremap <expr> <C-c>   (col(".") ==? 1 ? '<C-\><C-o>"+yaw' : '<C-\><C-o>"+yiw')
+"" Copy entire line
+inoremap <silent><C-c>   <C-\><C-o><Plug>OSCYankOperator_
 "" Paste with P if at beginning of line
 inoremap <silent> <C-v> <C-\><C-o>"+P
 "" Cut with a word instead of inner word if at beginning of line
 inoremap <expr> <C-d>   (col(".") ==? 1 ? '<C-\><C-o>daw' : '<C-\><C-o>diw')
-vnoremap <C-c>  "+y 
+
+"vnoremap <C-c>  "+y
+vnoremap <C-c> <Plug>OSCYankVisual
 vnoremap <silent> <C-v> "+Pl
 vnoremap <C-d>  "*d 
-"tnoremap <C-c>  <C-\><C-N>
-"tnoremap <C-v>  <C-W>"+
+
+cnoremap <C-c> <C-f>
+cnoremap <C-v>  <C-r><C-o>"
+
 
 "nnoremap <C-S-d>    <Down>"*dd<Up>
 "inoremap <expr> <C-S-d> (col(".") ==? 1 ? '<C-\><C-o>daW' : '<C-\><C-o>diW')

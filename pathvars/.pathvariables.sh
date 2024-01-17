@@ -121,7 +121,8 @@ export SYSTEMD_LOG_TARGET="auto"
 
 # GO
 export GOPATH=/home/burp/.local
-#export PATH=$PATH:$GOPATH
+export PATH=$PATH:$GOPATH
+export PATH=$PATH:/usr/local/go/bin
 
 
 # RANGER
