@@ -1,10 +1,10 @@
 #!/bin/bash
 
-if [ ! -d ~/.bash_completions.d/ ]; then
-    mkdir ~/.bash_completions.d/
+if [ ! -d ~/.bash_completion.d/ ]; then
+    mkdir ~/.bash_completion.d/
 fi
 
-if ! grep -q "~/.bash_completions.d" ~/.bashrc; then
+if ! grep -q "~/.bash_completion.d" ~/.bashrc; then
 
     echo "if [[ -d ~/.bash_completion.d/ ]]; then" >> ~/.bashrc
     echo "  for comp in ~/.bash_completion.d/*; do" >> ~/.bashrc
@@ -13,8 +13,8 @@ if ! grep -q "~/.bash_completions.d" ~/.bashrc; then
     echo "fi" >> ~/.bashrc
 fi
 
-if ! sudo test -d /root/.bash_completions.d/ ; then
-    sudo mkdir /root/.bash_completions.d/
+if ! sudo test -d /root/.bash_completion.d/ ; then
+    sudo mkdir /root/.bash_completion.d/
 fi
 
 if ! sudo grep -q "~/.bash_completion.d" /root/.bashrc; then

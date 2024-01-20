@@ -507,12 +507,12 @@ inoremap    <C-S-K>     <S-Up><C-o>
 vnoremap    <C-S-J>     <S-J>gv
 vnoremap    <C-S-K>     <S-K>gv
 
-nnoremap    <C-S-Up>    1G
-nnoremap    <C-S-Down>  G
-inoremap    <C-S-Up>    <C-o>1Gi
-inoremap    <C-S-Down>  <C-o>Gi
-vnoremap    <C-S-Up>    1G
-vnoremap    <C-S-Down>  G
+#nnoremap    <C-S-Up>    1G
+#nnoremap    <C-S-Down>  G
+#inoremap    <C-S-Up>    <C-o>1Gi
+#inoremap    <C-S-Down>  <C-o>Gi
+#vnoremap    <C-S-Up>    1G
+#vnoremap    <C-S-Down>  G
 
 " https://vim.fandom.com/wiki/Moving_lines_up_or_down#Mappings%20to%20move%20lines
 " Move lines while holding Alt
@@ -531,23 +531,23 @@ inoremap    <A-K>   <Esc>:m .-2<CR>a
 vnoremap    <A-J> :m '>+1<CR>gv
 vnoremap    <A-K>   :m '<-2<CR>gv
 
-" Move one 'word' Left/Right (cursor at end) => Ctrl+Left/Right
-" Move one space seperated word (cursor at end) => Shift+Left/Right
-" Move to beginning/end / cycle lines => Alt+Left/Right
-nnoremap <C-Right>  e
+" e => Move one 'word' Left/Right (cursor at end) 
+" E => Move one space seperated word (cursor at end) => Ctrl+Left/Right
+nnoremap <C-Right>  E
 "nnoremap <S-Right>  E
-nnoremap <C-Left>   b
+nnoremap <C-Left>   B
 "nnoremap <S-Left>   B
-inoremap <C-Right>  <C-\><C-o>e
+inoremap <C-Right>  <C-\><C-o>E
 "inoremap <S-Right>  <C-\><C-o>E
-inoremap <C-Left>   <C-\><C-o>b
+inoremap <C-Left>   <C-\><C-o>B
 "inoremap <S-Left>   <C-\><C-o>B
-vnoremap <C-Right>  e
+vnoremap <C-Right>  E
 "vnoremap <S-Right>  E
-vnoremap <C-Left>   b
+vnoremap <C-Left>   B
 "vnoremap <S-Left>   B
 
 
+" Move to beginning/end / cycle lines => Alt+Left/Right
 " 0 => beginning of 'column'
 " ^ => First non blank character in line
 " nnoremap <A-Right> 0
@@ -573,7 +573,7 @@ function! LastCheckI()
 endfunction 
 
 nnoremap <expr> <A-Left>    (col(".") ==? 1 ? '<Up>0' : '0')
-nnoremap <expr> <A-right>   LastCheck() ? '<Down>$' : '$' 
+nnoremap <expr> <A-right>   LastCheck() ? '<Down>$l' : '$l' 
 inoremap <expr> <A-Left>    (col('.') ==? 1 ? '<Up><C-\><C-o>0' : '<C-\><C-o>0')
 inoremap <expr> <A-Right>   LastCheckI() ? '<C-o><Down><C-\><C-o>$' : '<C-\><C-o>$'
 vnoremap <expr> <A-Left>    (col(".") ==? 1 ? '<Up>0' : '0')

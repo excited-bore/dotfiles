@@ -1,4 +1,5 @@
 . ./checks/check_distro.sh
+. ./check/check_pathvar.sh
 . ./readline/rlwrap_scripts.sh
 
 if [ "$distro" == "Arch" ] || [ "$distro_base" == "Arch" ]; then
@@ -19,7 +20,14 @@ if [ "y" == "$kittn" ]; then
 fi
 unset kittn
 
-
+if [ -d ~/.bash_aliases.d/ ]; then
+    sed -i 's|^.\(export KITTY_PATH=~/.local/bin/\)|\1|g' $PATHVAR
+    sed -i 's|^.\(export PATH=$KITTY_PATH:$PATH\)|\1|g' $PATHVAR
+    sed -i 's|^.\(export PATH=$PATH:~/.local/kitty.app/bin/\)|\1|g' $PATHVAR
+    sed -i 's|^.\(if \[\[ \$SSH_TTY \]\] .*\)|\1|g' $PATHVAR
+    sed -i 's|^.*\(export KITTY_PORT=.*\)|  \1|g' $PATHVAR
+    sed -i 's|^.\(fi\)|\1|g' $PATHVAR
+fi              
 
 #if [ -x "$(command -v xdg-open)" ]; then
 #    reade -Q "GREEN" -p -i "y" "Set kitty as default terminal? [Y/n]:" "y n" kittn

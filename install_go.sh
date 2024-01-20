@@ -2,51 +2,7 @@
 . ./readline/rlwrap_scripts.sh
 . ./checks/check_pathvar.sh
 
-reade -Q "GREEN" -i "y" -p "Source installed go binaries? (Set GOPATH/GOROOT):" "y n" gopth
-if [ "y" == "$gopth" ]; then
-    reade -Q "CYAN" -i "$HOME/.local" -p "Set GOPATH (go packages): " -e gopth
-    #echo "${CYAN}Only GOPATH is necessary. Setting GOROOT is usually for development reasons${normal}"
-    #reade -Q "CYAN" -p "Set custom GOROOT? (Go tools, empty means leave default): " -e goroot
-    
-    if grep -q "GOPATH" $PATHVAR; then
-        if [ -z "$goroot" ]; then
-            sed -i "s|.export GOPATH=|export GOPATH=|g" $PATHVAR
-            sed -i "s|export GOPATH=.*|export GOPATH=$gopth|g" $PATHVAR
-            sed -i "s|.export PATH=\$PATH:\$GOPATH|export PATH=\$PATH:\$GOPATH|g" $PATHVAR
-            if [[ "$arch" =~ "arm"* ]]; then
-                sed -i "s|.export PATH=\$PATH:/usr/local/go/bin|export PATH=\$PATH:/usr/local/go/bin|g" $PATHVAR
-            fi
-        else
-            echo "export GOPATH=$gopth" >> $PATHVAR
-            echo "export PATH=\$PATH:\$GOPATH" >> $PATHVAR
-            if [[ "$arch" =~ "arm"* ]]; then
-                echo "export PATH=$PATH:/usr/local/go/bin" >> $PATHVAR
-            fi
-        fi
-    else
-        if [ -z "$goroot" ]; then   
-            sed -i "s|.export GOPATH=|export GOPATH=|g" $PATHVAR
-            sed -i "s|export GOPATH=.*|export GOPATH=$gopth|g" $PATHVAR
-            sed -i "s|.export GOROOT=|export GOROOT=|g" $PATHVAR
-            sed -i "s|export GOROOT=.*|export GOROOT=$goroot|g" $PATHVAR
-            sed -i "s|.export PATH=\$PATH:\$GOPATH|export PATH=\$PATH:\$GOPATH:\$GOROOT|g" $PATHVAR
-            if [[ "$arch" =~ "arm"* ]]; then
-                sed -i "s|.export PATH=\$PATH:/usr/local/go/bin|export PATH=\$PATH:/usr/local/go/bin|g" $PATHVAR
-            fi
-        else
-            echo "export GOPATH=$gopth" >> $PATHVAR
-            echo "export GOROOT=$goroot" >> $PATHVAR
-            echo "export PATH=\$PATH:\$GOPATH:\$GOROOT" >> $PATHVAR
-            if [[ "$arch" =~ "arm"* ]]; then
-                echo "export PATH=$PATH:/usr/local/go/bin" >> $PATHVAR
-            fi
-        fi
-    fi
-fi 
-unset gopth goroot
-
-
-if [  $distro_base == "Arch" ]; then
+if [ $distro_base == "Arch" ]; then
     yes | sudo pacman -Su go
 elif [ $distro_base == "Debian" ]; then
     if [[ "$arch" =~ "arm"* ]]; then
@@ -71,13 +27,37 @@ elif [ $distro_base == "Debian" ]; then
             fi
             sudo tar -C /usr/local -xzf $file
             rm $file
-            )    
+            )
+            if grep -q "GOROOT" $PATHVAR; then
+                sed -i "s|.export GOROOT=|export GOROOT=|g" $PATHVAR
+                sed -i "s|export GOROOT=.*|export GOROOT=$goroot|g" $PATHVAR
+                sed -i "s|.export PATH=\$PATH:\$GOROOT|export PATH=\$PATH:\$GOROOT|g" $PATHVAR
+                
+            else
+                echo "export GOROOT=$goroot" >> $PATHVAR
+                echo "export PATH=\$PATH:\$GOROOT" >> $PATHVAR
+            fi
         fi
     else
-        yes | sudo apt update
         yes | sudo apt install go
     fi
     
 fi    
 
+reade -Q "GREEN" -i "y" -p "Source installed go binaries? (Set GOPATH):" "y n" gopth
+if [ "y" == "$gopth" ]; then
+    reade -Q "CYAN" -i "$HOME/.local" -p "Set GOPATH (go packages): " -e gopth
+    #echo "${CYAN}Only GOPATH is necessary. Setting GOROOT is usually for development reasons${normal}"
+    #reade -Q "CYAN" -p "Set custom GOROOT? (Go tools, empty means leave default): " -e goroot
+    
+     if grep -q "GOPATH" $PATHVAR; then
+        sed -i "s|.export GOPATH=|export GOPATH=|g" $PATHVAR
+        sed -i "s|export GOPATH=.*|export GOPATH=$gopth|g" $PATHVAR
+        sed -i "s|.export PATH=\$PATH:\$GOPATH|export PATH=\$PATH:\$GOPATH|g" $PATHVAR
+     else
+        echo "export GOPATH=$gopth" >> $PATHVAR
+        echo "export PATH=\$PATH:\$GOPATH" >> $PATHVAR
+     fi
+fi 
+unset gopth goroot
 source ~/.bashrc

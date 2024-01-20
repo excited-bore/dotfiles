@@ -92,7 +92,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         sed 's/^#export PAGER=/export PAGER=/' -i pathvars/.pathvariables.sh
         
         pagers="less more"
-        prmpt="${green} \tless = Default pager - Oldest and most customizable\n\
+        prmpt="${green} \tless = Default pager - Basic, archaic but very customizable\n\
         more = Preinstalled other pager - leaves text by default, less customizable (ironically)\n"
         if [ -x "$(command -v most)" ]; then
             pagers="$pagers most"
@@ -179,9 +179,11 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
     # Set DISPLAY
     addr=$(nmcli device show | grep IP4.ADDR | awk 'NR==1{print $2}'| sed 's|\(.*\)/.*|\1|')
     #reade -Q "GREEN" -i "n" -p "Set DISPLAY to ':$(addr).0'? [Y/n]:" "y n" dsply
-    reade -Q "YELLOW" -i "n" -p "Set DISPLAY to ':0.0'? [Y/n]:" "y n" dsply
-    if [ "$dsply" == "y" ] || [ -z "$dsply" ]; then
-        sed -i "s|.export DISPLAY=.*|export DISPLAY=\":0.0\"|" pathvars/.pathvariables.sh
+    if [[ $- =~ i ]] && [[ -n "$SSH_TTY" ]]; then
+        reade -Q "YELLOW" -i "n" -p "Detected shell is SSH. For X11, it's more reliable performance to dissallow shared clipboard (to prevent constant hanging). Set DISPLAY to 'localhost:10.0'? [Y/n]:" "y n" dsply
+        if [ "$dsply" == "y" ] || [ -z "$dsply" ]; then
+            sed -i "s|.export DISPLAY=.*|export DISPLAY=\"localhost:10.0\"|" pathvars/.pathvariables.sh
+        fi
     fi
     unset dsply
 
@@ -280,14 +282,6 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
     }
     yes_edit_no pathvariables "pathvars/.pathvariables.sh" "Install .pathvariables.sh at ~/? " "edit" "GREEN"
 fi
-
-# Go
-reade -Q "GREEN" -i "y" -p "Install Go? [Y/n]:" "y n" go
-if [ -z $go ] || [ "y" == $go ]; then
-    ./install_go.sh
-fi
-unset go
-
 
 ./install_completions_dir.sh
 
