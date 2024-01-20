@@ -1,31 +1,63 @@
 . ./checks/check_distro.sh
+. ./readline/rlwrap_scripts.sh
+. ./checks/check_pathvar.sh
 
-if [  $distro_base == "Arch" ]; then
+if [ $distro_base == "Arch" ]; then
     yes | sudo pacman -Su go
 elif [ $distro_base == "Debian" ]; then
-    if [ "$architecture" == "armv7l" ]; then
-       architecture="armv6l"
-    elif [ "$architecture" == "i386" ]; then
-       architecture="386" 
-    fi
-    latest=$(curl -sL "https://github.com/golang/go/tags" |  grep "/golang/go/releases/tag" | perl -pe 's|.*/golang/go/releases/tag/(.*?)".*|\1|' | uniq | awk 'NR==1{max=$1;print $0; exit;}')
-    file="$latest.linux-$architecture.tar.gz"
-    
-    checksum=$(curl -sL "https://golang.google.cn/dl/" | awk 'BEGIN{FS="\n"; RS=""} $0 ~ /'$file'/ &&  $0 ~ /<\/tt>/ {print $0;}' | grep "<tt>" | sed "s,.*<tt>\(.*\)</tt>.*,\1,g")
-    if [ ! -x "$(command -v go version)" ] || [[ ! "$(go version)" =~ $latest ]]; then
-        (
-        cd /tmp
-        wget https://golang.google.cn/dl/$file
-        sum=$(sha256sum $file | awk '{print $1;}')
-        echo "Checksum golang website: $checksum"
-        echo "Checksum file: $sum"
-        if [ ! "$sum" == "$checksum" ]; then
-            echo "Checksums are different; Aborting"
-            exit
+    if [[ "$arch" =~ "arm"* ]]; then
+       arch="armv6l"
+        #elif [ "$arch" == "i386" ]; then
+        #   arch="386" 
+        rm -rf /usr/local/go 
+        latest=$(curl -sL "https://github.com/golang/go/tags" |  grep "/golang/go/releases/tag" | perl -pe 's|.*/golang/go/releases/tag/(.*?)".*|\1|' | uniq | awk 'NR==1{max=$1;print $0; exit;}')
+        file="$latest.linux-$arch.tar.gz"
+        
+        checksum=$(curl -sL "https://golang.google.cn/dl/" | awk 'BEGIN{FS="\n"; RS=""} $0 ~ /'$file'/ &&  $0 ~ /<\/tt>/ {print $0;}' | grep "<tt>" | sed "s,.*<tt>\(.*\)</tt>.*,\1,g")
+        if [ ! -x "$(command -v go version)" ] || [[ ! "$(go version)" =~ $latest ]]; then
+            (
+            cd /tmp
+            wget https://golang.google.cn/dl/$file
+            sum=$(sha256sum $file | awk '{print $1;}')
+            echo "Checksum golang website: $checksum"
+            echo "Checksum file: $sum"
+            if [ ! "$sum" == "$checksum" ]; then
+                echo "Checksums are different; Aborting"
+                exit
+            fi
+            sudo tar -C /usr/local -xzf $file
+            rm $file
+            )
+            if grep -q "GOROOT" $PATHVAR; then
+                sed -i "s|.export GOROOT=|export GOROOT=|g" $PATHVAR
+                sed -i "s|export GOROOT=.*|export GOROOT=$goroot|g" $PATHVAR
+                sed -i "s|.export PATH=\$PATH:\$GOROOT|export PATH=\$PATH:\$GOROOT|g" $PATHVAR
+                
+            else
+                echo "export GOROOT=$goroot" >> $PATHVAR
+                echo "export PATH=\$PATH:\$GOROOT" >> $PATHVAR
+            fi
         fi
-        sudo tar -C /usr/local -xzf $file
-        rm $file
-        )    
+    else
+        yes | sudo apt install go
     fi
     
-fi
+fi    
+
+reade -Q "GREEN" -i "y" -p "Source installed go binaries? (Set GOPATH):" "y n" gopth
+if [ "y" == "$gopth" ]; then
+    reade -Q "CYAN" -i "$HOME/.local" -p "Set GOPATH (go packages): " -e gopth
+    #echo "${CYAN}Only GOPATH is necessary. Setting GOROOT is usually for development reasons${normal}"
+    #reade -Q "CYAN" -p "Set custom GOROOT? (Go tools, empty means leave default): " -e goroot
+    
+     if grep -q "GOPATH" $PATHVAR; then
+        sed -i "s|.export GOPATH=|export GOPATH=|g" $PATHVAR
+        sed -i "s|export GOPATH=.*|export GOPATH=$gopth|g" $PATHVAR
+        sed -i "s|.export PATH=\$PATH:\$GOPATH|export PATH=\$PATH:\$GOPATH|g" $PATHVAR
+     else
+        echo "export GOPATH=$gopth" >> $PATHVAR
+        echo "export PATH=\$PATH:\$GOPATH" >> $PATHVAR
+     fi
+fi 
+unset gopth goroot
+source ~/.bashrc

@@ -12,19 +12,21 @@ alias git_set_pull_fastforward_only="git config pull.ff only"
 
 function git_ssh_key_and_add_to_agent() { 
     if [ ! -f ~/.ssh/config ]; then
+        mkdir ~/.ssh;
         touch ~/.ssh/config;
     fi
-    read -p "Give up name: (Default:'id_keytype')" name
-    reade -p "Give up keytype (dsa | ecdsa | ecdsa-sk | ed25519 (Default) | ed25519-sk | rsa): " "dsa ecdsa ecdsa-sk ed25519 ed25519-sk rsa" keytype
+    read -p "Give up name (Default:'id_keytype'): " name
+    reade -p "Give up keytype \(dsa \| ecdsa \| ecdsa-sk \| ed25519 (Default) \| ed25519-sk \| rsa\): " "dsa ecdsa ecdsa-sk ed25519 ed25519-sk rsa" keytype
     if [ -z $keytype ]; then
-        keytype=ed25519
+        keytype="ed25519"
     fi
     if [ -z $name ]; then
         name="id_$keytype"   
     fi
     ssh-keygen -t $keytype -f ~/.ssh/$name
     eval $(ssh-agent -s) 
-    ssh-add -v ~/.ssh/$name 
+    ssh-add -v ~/.ssh/$name
+    echo ""
     cat ~/.ssh/$name.pub
     echo "Host github.com" >> ~/.ssh/config
     echo "  IdentityFile ~/.ssh/$name" >> ~/.ssh/config 
@@ -89,8 +91,26 @@ git_add_commit_push_all(){
     fi
 } 
 
-alias git_commit_using_last="git commit --amend"
-alias git_list_branches="git branch --list"
+alias git_commit_amend="git commit --amend"
+alias git_list_branches="git branch --list -vv"
+alias git_delete_branch="git branch -d - "
+alias git_switch_branch="git checkout - "
+alias git_switch_branch_and_track_remote="git checkout -t - "
+alias git_create_and_switch_branch="git checkout -b - "
+alias git_push_to_branch="git push -u origin "
+
+git_switch_commit() {
+    commit=$(git log --oneline --color=always | nl | fzf --ansi --track --no-sort --layout=reverse-list | awk '{print $2}');
+    git checkout "$commit";
+}
+
+git_new_branch() {
+    commit=$(git log --oneline --color=always | nl | fzf --ansi --track --no-sort --layout=reverse-list | awk '{print $2}');
+    reade -Q "GREEN" -p "Give up a new branch name: " branch
+    if [ ! -z "$branch" ]; then
+        git checkout -b "$branch" "$commit";
+    fi
+}
 
 #https://stackoverflow.com/questions/1125968/how-do-i-force-git-pull-to-overwrite-local-files
 git_backup_branch_and_reset_to_remote() {
@@ -151,8 +171,6 @@ git_backup_branch_and_reset_to_remote() {
 }
 alias git_remote_rename="git remote -v rename"
 alias git_remote_remove="git remote -v rm"
-alias git_switch_branch="git checkout"
-alias git_switch_branch_and_track_remote="git checkout -t"
 alias git_remote_set_url="git remote -v set-url"
 
 function git_set_default_remote_branch() { 

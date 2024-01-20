@@ -1,73 +1,109 @@
-" Avoid error message lingering
 "autocmd CursorHold      * echo mode(1)
 "autocmd CursorHoldI     * echo mode(1)
 autocmd CursorMoved     * set cul
 autocmd CursorMovedI    * set cul
 "autocmd InsertEnter     * set cul
 "autocmd InsertLeave     * set nocul
-autocmd BufEnter * call MyLastWindow()
 
-" https://stackoverflow.com/questions/7069927/in-vimscript-how-to-test-if-a-window-is-the-last-window
-function! MyLastWindow()
-   if &buftype=="quickfix"
-      " if this window is last on screen quit without warning
-      if winbufnr(2) == -1
-         quit!
-      endif
-   endif
-endfunction
+
+" unnamedplus	A variant of the "unnamed" flag which uses the
+" clipboard register "+" (quoteplus) instead of
+" register "*" for all yank, delete, change and put
+" operations which would normally go to the unnamed
+" register.
+" Normal clipboard functionality for yy, y and d
+" Xclip can be problematic over ssh though, so this setting can cause trouble
+
+set clipboard+=unnamedplus
 
 
 let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
-if empty(glob(data_dir . '/autoload/plug.vim'))
-  silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+if !has('nvim')
+    if empty(glob(data_dir . '/autoload/plug.vim'))
+      silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+      autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+    endif
 endif
 
-set runtimepath+=/usr/lib/jvm/java-17-openjdk/bin/java
-call plug#begin()
+let g:pluginInstallPath=expand('~/.vim/plugins')
+source $HOME/.config/nvim/plug_lazy_adapter.vim
 
+if !has('nvim')
+    call plug#begin(g:pluginInstallPath)
+endif
+"call plug#begin(g:pluginInstallPath)
 "Vim plugins point to githubs wich is very nice and just fucking cool
 
-"" Autocomplete plugin from git
-"Plug 'ycm-core/YouCompleteMe'
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
+" Autocomplete engine (Conquer of completions)
+"https://github.com/neoclide/coc.nvim/wiki/Using-coc-extensions#implemented-coc-extensions
+Plugin 'neoclide/coc.nvim', {'branch': 'release'}
+let g:coc_global_extensions = [
+            \'coc-html',
+            \'coc-css',
+            \'coc-tsserver',
+            \'coc-json',
+            \'coc-clangd',
+            \'coc-clang-format-style-options',
+            \'coc-cmake',
+            \'coc-python',
+            \'coc-sh',
+            \'coc-fzf-preview',
+            \'coc-git',
+            \'coc-vimlsp'
+            \]
 
-"Ranger integration
-Plug 'francoiscabrol/ranger.vim'
-Plug 'rbgrouleff/bclose.vim'
+" Non-xclip 
+Plugin 'ojroques/vim-oscyank', {'branch': 'main'}
+
+" Ranger integration
+Plugin 'francoiscabrol/ranger.vim'
+Plugin 'rbgrouleff/bclose.vim'
 let g:ranger_replace_netrw = 1
 let g:ranger_map_keys = 0
 
 "" Fuzzy finder plugin
-Plug '~/.fzf'
-Plug 'junegunn/fzf.vim' 
+Plugin 'junegunn/fzf'
+Plugin 'junegunn/fzf.vim' 
+
 "" Fuzzy finder preview   
-Plug 'yuki-yano/fzf-preview.vim', { 'branch': 'release/remote', 'do': ':UpdateRemotePlugins' }
+"Plug 'yuki-yano/fzf-preview.vim', { 'branch': 'release/remote', 'do': ':UpdateRemotePlugins' }
+Plugin 'yuki-yano/fzf-preview.vim', { 'branch': 'release/remote' }
 
 "" Git plugin
-Plug 'tpope/vim-fugitive'
+Plugin 'tpope/vim-fugitive'
 "
-""vim-tmux-navigator, smart navigation between vim and tmux panes
-"Plugin 'christoomey/vim-tmux-navigator'
+"vim-tmux-navigator, smart navigation between vim and tmux panes
+Plugin 'christoomey/vim-tmux-navigator'
+
+"vim-kitty-navigator, Same thing for panes but with vim and kitty
+Plugin 'knubie/vim-kitty-navigator'
+function! AfterLoadVimKitty()
+    exec '! cd ~/.vim/plugins/vim-kitty-navigator && cp ./*.py ~/.config/kitty/ && cd -'
+endf
 
 "Sudo write
-Plug 'tpope/vim-eunuch'
+Plugin 'tpope/vim-eunuch'
 "
 "" Self documenting vim wiki
-Plug 'vimwiki/vimwiki'
+Plugin 'vimwiki/vimwiki'
 
 "" Nice themey
-Plug 'morhetz/gruvbox'
+Plugin 'morhetz/gruvbox'
 
 "" Nice status bar thingy
-Plug 'vim-airline/vim-airline'
+Plugin 'vim-airline/vim-airline'
 
 " Vim lua plugin
 " Plugin 'svermeulen/vimpeccable'
 
 "" All of your Plugins must be added before the following line
-call plug#end()
+if !has('nvim')
+    call plug#end()
+else
+    source $HOME/.config/nvim/init.lua.vim
+    lua require("lazy")
+endif
+"call plug#end()
 
  "Use 24-bit (true-color) mode in Vim/Neovim when outside tmux.
 "If you're using tmux version 2.2 or later, you can remove the outermost $TMUX check and use tmux's 24-bit color support
@@ -78,18 +114,15 @@ call plug#end()
 let g:gruvbox_italic=1
 colorscheme gruvbox
 
-if (empty($TMUX))
-  if (has("nvim"))
-    "For Neovim 0.1.3 and 0.1.4 < https://github.com/neovim/neovim/pull/2198 >
-    let $NVIM_TUI_ENABLE_TRUE_COLOR=1
-  endif
-  "For Neovim > 0.1.5 and Vim > patch 7.4.1799 < https://github.com/vim/vim/commit/61be73bb0f965a895bfb064ea3e55476ac175162 >
-  "Based on Vim patch 7.4.1770 (`guicolors` option) < https://github.com/vim/vim/commit/8a633e3427b47286869aa4b96f2bfc1fe65b25cd >
-  " < https://github.com/neovim/neovim/wiki/Following-HEAD#20160511 >
-  if (has("termguicolors"))
+"For Neovim > 0.1.5 and Vim > patch 7.4.1799 < https://github.com/vim/vim/commit/61be73bb0f965a895bfb064ea3e55476ac175162 >
+let $NVIM_TUI_ENABLE_TRUE_COLOR=1
+
+"Tmux has problems with nvim colors if we dont supply it with true colors
+"https://unix.stackexchange.com/questions/251847/clear-to-end-of-line-uses-the-wrong-background-color-in-tmux/252078#252078
+if (has("termguicolors"))
     set termguicolors
-  endif
 endif
+  
 
 """ YouCompleteMe stuff
 
@@ -281,30 +314,38 @@ nnoremap <silent><nowait> <Tab>k  :<C-u>CocPrev<CR>
 nnoremap <silent><nowait> <Tab>p  :<C-u>CocListResume<CR>
 
 "Ranger F2
-nnoremap <F2>   :RangerWorkingDirectory<CR>
-inoremap <F2>   <Esc>:RangerWorkingDirectory<CR>
-vnoremap <F2>   <Esc>:RangerWorkingDirectory<CR>
+nnoremap <silent><F2>   :RangerWorkingDirectory<CR>
+inoremap <silent><F2>   <Esc>:RangerWorkingDirectory<CR>
+vnoremap <silent><F2>   <Esc>:RangerWorkingDirectory<CR>
+
+" FZF files F3
+"nnoremap <F3>   :Files /<CR>
+"inoremap <F3>   <Esc>:Files /<CR>
+"vnoremap <F3>   <Esc>:Files /<CR>
 
 " Git files F3
-nnoremap <F3>   :Files /<CR>
-inoremap <F3>   <Esc>:Files /<CR>
-vnoremap <F3>   <Esc>:Files /<CR>
+nnoremap <F3>   :GFiles<CR>
+inoremap <F3>   <Esc>:GFiles<CR>
+vnoremap <F3>   <Esc>:GFiles<CR>
 
-" Git files F4
-nnoremap <F4>   :GFiles<CR>
-inoremap <F4>   <Esc>:GFiles<CR>
-vnoremap <F4>   <Esc>:GFiles<CR>
+" Git status F4
+nnoremap <F4>   :Changes<CR>
+inoremap <F4>   <Esc>:Changes<CR>
+vnoremap <F4>   <Esc>:Changes<CR>
 
 " Reload .vimrc/init.vim F5
 nnoremap <F5> :source $MYVIMRC<CR>
+inoremap <F5> :source $MYVIMRC<CR>
+vnoremap <F5> :source $MYVIMRC<CR>gv
 
 " Edit .vimrc/init.vim F6
 nnoremap <F6> :e $MYVIMRC<CR>
-
+inoremap <F6> :e $MYVIMRC<CR>
+vnoremap <F6> :e $MYVIMRC<CR>gv
 
 " Leader key Fzf-Preview F7
-nmap <F7> [fzf-p]
-xmap <F7> [fzf-p]
+nmap <C-w>f [fzf-p]
+xmap <C-w>f [fzf-p]
 
 nnoremap <silent> [fzf-p]p     :<C-u>CocCommand fzf-preview.FromResources project_mru git<CR>
 nnoremap <silent> [fzf-p]gs    :<C-u>CocCommand fzf-preview.GitStatus<CR>
@@ -312,7 +353,7 @@ nnoremap <silent> [fzf-p]ga    :<C-u>CocCommand fzf-preview.GitActions<CR>
 nnoremap <silent> [fzf-p]b     :<C-u>CocCommand fzf-preview.Buffers<CR>
 nnoremap <silent> [fzf-p]B     :<C-u>CocCommand fzf-preview.AllBuffers<CR>
 nnoremap <silent> [fzf-p]o     :<C-u>CocCommand fzf-preview.FromResources buffer project_mru<CR>
-nnoremap <silent> [fzf-p]<C-o> :<C-u>CocCommand fzf-preview.Jumps<CR>
+nnoremap <silent> [fzf-p]<C-r> :<C-u>CocCommand fzf-preview.Jumps<CR>
 nnoremap <silent> [fzf-p]g;    :<C-u>CocCommand fzf-preview.Changes<CR>
 nnoremap <silent> [fzf-p]/     :<C-u>CocCommand fzf-preview.Lines --add-fzf-arg=--no-sort --add-fzf-arg=--query="'"<CR>
 nnoremap <silent> [fzf-p]*     :<C-u>CocCommand fzf-preview.Lines --add-fzf-arg=--no-sort --add-fzf-arg=--query="'<C-r>=expand('<cword>')<CR>"<CR>
@@ -322,71 +363,100 @@ nnoremap <silent> [fzf-p]t     :<C-u>CocCommand fzf-preview.BufferTags<CR>
 nnoremap <silent> [fzf-p]q     :<C-u>CocCommand fzf-preview.QuickFix<CR>
 nnoremap <silent> [fzf-p]l     :<C-u>CocCommand fzf-preview.LocationList<CR>
 
-" Use ctrl-[hjkl] to select the active split!
-nmap <silent> <c-k> :wincmd k<CR>
-nmap <silent> <c-j> :wincmd j<CR>
-nmap <silent> <c-h> :wincmd h<CR>
-nmap <silent> <c-l> :wincmd l<CR>
+autocmd BufEnter * call MyLastWindow()
 
-" C-w => Write
-nnoremap <C-w> :write!<CR>
-inoremap <C-w> <C-\><C-o>:write!<CR>
-vnoremap <C-w> <Esc>:write!<CR>gv
+" https://stackoverflow.com/questions/7069927/in-vimscript-how-to-test-if-a-window-is-the-last-window
+function! MyLastWindow()
+   if &buftype=="quickfix"
+      " if this window is last on screen quit without warning
+      if winbufnr(2) == -1
+         quit!
+      endif
+   endif
+endfunction
+            
 
 function! CloseWindow()
-    " if this window is last on screen quit without warning
-    if winbufnr(2) == -1
-        quit!
+    " https://stackoverflow.com/questions/7069927/in-vimscript-how-to-test-if-a-window-is-the-last-window
+    " if this window isn't the last on screen, just close pane
+    if winbufnr(2) != -1 && winbufnr(2) != 2
+         close!
+    " if the amount of open buffers is still more then 1, close buffer
+     elseif len(filter(range(1, bufnr('$')), 'buflisted(v:val)')) > 1
+        bd!
+    " otherwise, close without warning
     else
-        close!
+        quit!
     endif
 endfunction
 
-" C-q => Quit
-nnoremap <C-q> :call CloseWindow()<Enter>
-inoremap <C-q> <Esc>:call CloseWindow()<CR>
-vnoremap <C-q> <Esc>:call CloseWindow()<CR>
+
+" Ctrl - s => Write / Save
+nnoremap <C-s> :write!<CR>
+inoremap <C-s> <C-\><C-o>:write!<CR>
+vnoremap <C-s> <Esc>:write!<CR>gv
+
+" Ctrl - q => Quit
+nnoremap <silent><C-q> :call CloseWindow()<Enter>
+inoremap <silent><C-q> <Esc>:call CloseWindow()<CR>
+vnoremap <silent><C-q> <Esc>:call CloseWindow()<CR>
 
 " Ctrl - r is -> Redo (universal) :
 nnoremap <C-r> :redo<CR>
 inoremap <C-r> <C-\><C-o>:redo<CR>a
 vnoremap <C-r> <Esc>:redo<CR>gv 
 
- " Ctrl - z is -> undo instead of stop 
+" Ctrl - z is -> undo instead of stop 
 nnoremap <C-z> u
 inoremap <C-z> <C-\><C-o>:u<CR>
 vnoremap <C-z> u 
 
+" t => : (open cmdline)
+nnoremap t :
+vnoremap t :
 
+" T => : (open cmdline)
+nnoremap T :terminal 
+vnoremap T :terminal 
+
+" Ctrl - t is -> :
+nnoremap <C-t> :
+inoremap <C-t> <C-\><C-o>:
+vnoremap <C-t> : 
+
+" Ctrl - x is -> CocCommand fzf-preview.
+nnoremap <C-x> :CocCommand fzf-preview.
+inoremap <C-x> <C-\><C-o>:CocCommand fzf-preview.
+vnoremap <C-x> :CocCommand fzf-preview.
 
 
 " Visual mode remaps
-
 "inoremap [          []
-vnoremap [          di[]<Esc><Left>p<Esc> 
+vnoremap [          di[]<Esc>hp<Esc> 
 
 "inoremap {          {}
-vnoremap {          di{}<Esc><Left>p<Esc> 
+vnoremap {          di{}<Esc>hp<Esc> 
 
 "inoremap (          ()
-vnoremap (          di()<Esc><Left>p<Esc> 
+vnoremap (          di()<Esc>hp<Esc> 
 
 "inoremap <           <>
 vnoremap >          >gv
 vnoremap <          <gv
-vnoremap <C-<>      di</><Esc><Left><Left>p<Esc>
+vnoremap <C-<>      di</><Esc>hhp<Esc>
 
-vnoremap `          di``<Esc><Left>p<Esc>
+vnoremap `          di``<Esc>hp<Esc>
 
 "inoremap '          ' 
-vnoremap '          di''<Esc><Left>p<Esc>
+vnoremap '          di''<Esc>hp<Esc>
 
 "inoremap "          ""
-vnoremap <expr> "   visualmode() == "\<C-V>" ?  'I"<Esc>' : 'di""<Esc><Left>p<Esc>'
-vnoremap <expr> #   visualmode() == "\<C-V>" ?  'I#<Esc>' : 'di##<Esc><Left>p<Esc>'
 
-vnoremap <expr> !   visualmode() == "\<C-V>" ?  'I!<Esc>' : 'di!!<Esc><Left>p<Esc>'
-
+" Easy multiblock commenting
+vnoremap <expr> #   (visualmode() == "\<C-V>" ? 'I#<esc>' : 'di##<Esc>hp<Esc>')
+"vnoremap <expr> "   (visualmode() == "\<C-V>" ? 'I"<esc>' : visualmode() == "V" ? '<Esc>O"""<Esc>jo"""<Esc>' : 'di""<Esc>hp<Esc>')
+vnoremap <expr> "   (visualmode() == "\<C-V>" ? 'I"<esc>' : 'di""<Esc>hp<Esc>')
+vnoremap <expr> !   (visualmode() == "\<C-V>" ? 'I!<esc>' : 'di!!<Esc>hp<Esc>')
 
 " Moving up and down will always recenter 
 " Move up/down 1 paragraph => Ctrl+Arrowkeys (Up-Down)
@@ -416,33 +486,33 @@ inoremap    <C-Up> <C-\><C-o>{<C-\><C-o>
 inoremap    <C-Down> <C-\><C-o>}<C-\><C-o>
 "inoremap    <C-J> <C-\><C-o>}<C-\><C-o>
 vnoremap    <C-Up> {
-vnoremap    <C-Down> {
+vnoremap    <C-Down> }
 "vnoremap    <C-J> }
 "vnoremap    <C-K> }
 
 
 " Both K and Ctrl Shift K go one page up in normal mode
-nnoremap    <S-Up>      <PageUp>
+"nnoremap    <S-Up>      <PageUp>
 nnoremap    K           <S-Up>
 nnoremap    <C-S-K>     <S-Up>
-nnoremap    <S-Down>    <S-Down>
+"nnoremap    <S-Down>    <S-Down>
 nnoremap    J           <S-Down>
 nnoremap    <C-S-J>     <S-Down>
-inoremap    <S-Up>      <S-Up><C-o>
-inoremap    <S-Down>    <S-Down><C-o>
+"inoremap    <S-Up>      <S-Up><C-o>
+"inoremap    <S-Down>    <S-Down><C-o>
 inoremap    <C-S-J>     <S-Down><C-o>
 inoremap    <C-S-K>     <S-Up><C-o>
-vnoremap    <S-Up>      <S-Up>gv
-vnoremap    <S-Down>    <C-d>gv
+"vnoremap    <S-Up>      <S-Up>gv
+"vnoremap    <S-Down>    <C-d>gv
 vnoremap    <C-S-J>     <S-J>gv
 vnoremap    <C-S-K>     <S-K>gv
 
-nnoremap    <C-S-Up>    1G
-nnoremap    <C-S-Down>  G
-inoremap    <C-S-Up>    <C-o>1Gi
-inoremap    <C-S-Down>  <C-o>Gi
-vnoremap    <C-S-Up>    1G
-vnoremap    <C-S-Down>  G
+#nnoremap    <C-S-Up>    1G
+#nnoremap    <C-S-Down>  G
+#inoremap    <C-S-Up>    <C-o>1Gi
+#inoremap    <C-S-Down>  <C-o>Gi
+#vnoremap    <C-S-Up>    1G
+#vnoremap    <C-S-Down>  G
 
 " https://vim.fandom.com/wiki/Moving_lines_up_or_down#Mappings%20to%20move%20lines
 " Move lines while holding Alt
@@ -461,23 +531,23 @@ inoremap    <A-K>   <Esc>:m .-2<CR>a
 vnoremap    <A-J> :m '>+1<CR>gv
 vnoremap    <A-K>   :m '<-2<CR>gv
 
-" Move one 'word' Left/Right (cursor at end) => Ctrl+Left/Right
-" Move one space seperated word (cursor at end) => Shift+Left/Right
+" e => Move one 'word' Left/Right (cursor at end) 
+" E => Move one space seperated word (cursor at end) => Ctrl+Left/Right
+nnoremap <C-Right>  E
+"nnoremap <S-Right>  E
+nnoremap <C-Left>   B
+"nnoremap <S-Left>   B
+inoremap <C-Right>  <C-\><C-o>E
+"inoremap <S-Right>  <C-\><C-o>E
+inoremap <C-Left>   <C-\><C-o>B
+"inoremap <S-Left>   <C-\><C-o>B
+vnoremap <C-Right>  E
+"vnoremap <S-Right>  E
+vnoremap <C-Left>   B
+"vnoremap <S-Left>   B
+
+
 " Move to beginning/end / cycle lines => Alt+Left/Right
-nnoremap <C-Right>  e
-nnoremap <S-Right>  E
-nnoremap <C-Left>   b
-nnoremap <S-Left>   B
-inoremap <C-Right>  <C-\><C-o>e
-inoremap <S-Right>  <C-\><C-o>E
-inoremap <C-Left>   <C-\><C-o>b
-inoremap <S-Left>   <C-\><C-o>B
-vnoremap <C-Right>  e
-vnoremap <S-Right>  E
-vnoremap <C-Left>   b
-vnoremap <S-Left>   B
-
-
 " 0 => beginning of 'column'
 " ^ => First non blank character in line
 " nnoremap <A-Right> 0
@@ -503,7 +573,7 @@ function! LastCheckI()
 endfunction 
 
 nnoremap <expr> <A-Left>    (col(".") ==? 1 ? '<Up>0' : '0')
-nnoremap <expr> <A-right>   LastCheck() ? '<Down>$' : '$' 
+nnoremap <expr> <A-right>   LastCheck() ? '<Down>$l' : '$l' 
 inoremap <expr> <A-Left>    (col('.') ==? 1 ? '<Up><C-\><C-o>0' : '<C-\><C-o>0')
 inoremap <expr> <A-Right>   LastCheckI() ? '<C-o><Down><C-\><C-o>$' : '<C-\><C-o>$'
 vnoremap <expr> <A-Left>    (col(".") ==? 1 ? '<Up>0' : '0')
@@ -515,18 +585,18 @@ nnoremap <space> i<space><esc><Right>
 " Delete for normal mode
 nnoremap <Delete> i<Delete><Esc>
 
-" enter -> newline without entering insert mode
+" Enter -> newline without entering insert mode
 nnoremap <Enter> i<Enter><Esc>
 
-" ctrl enter => move current line down
-nnoremap <C-Enter>      0i<enter><up><esc>
-inoremap <C-Enter>      <Esc>0i<enter>
-vnoremap <C-Enter>      <Esc>`<i<Enter><Esc>gv
+" Ctrl-enter -> Start at a new line 
+nnoremap <C-Enter>      o<esc>
+inoremap <C-Enter>      <Esc>o
+vnoremap <C-Enter>      o<esc><enter>gv
 
-"alt enter -> newline without entering insert mode
-nnoremap <A-Enter>      o<esc>
-inoremap <A-Enter>      <Esc>o
-vnoremap <A-Enter>      o<esc><enter>gv
+" Alt-enter -> Insert line at current lineposition 
+nnoremap <A-Enter>      0i<enter><up><esc>
+inoremap <A-Enter>      <Esc>0i<enter>
+vnoremap <A-Enter>      <Esc>`<i<Enter><Esc>gv
 
 
 " BackSpace -> backspace no leave normal mode
@@ -556,12 +626,10 @@ inoremap <A--> <C-x>
 "879++++++++++++++++++++++124
 
 " Swap case insert
+nnoremap ² ~
+
 nnoremap <C-²> ~
 inoremap <C-²> <Esc>~a
-
-
- 
-
 
 " Toggle highlight => Ctrl+l
 " https://stackoverflow.com/questions/9054780/how-to-toggle-vims-search-highlight-visibility-without-disabling-it
@@ -576,45 +644,51 @@ set t_kb=^?
 " Set Delete key to
 set t_kD=^[[3~
 
-" Ctrl - H => Find and replace
-" For thos from visual code or smth, Ctrl-h can be finnicky in terminals
-" Because that keycombo generates the exact keycode for Backspace, for
-" compatibility reasons (but not in some terminal emulators, like kitty f.ex")
  
 " Ctrl - f => Find
 " Don't forget: Enter, not escape
-nnoremap f /
-nnoremap <C-f> /
-inoremap <C-f> <Esc>/
-vnoremap <C-f> /
+"nnoremap <C-f> /
+"inoremap <C-f> <Esc>/
+"vnoremap <C-f> /
 
 " Shift F backwards search mode
-nnoremap F ?
+"nnoremap F ?
 
 "Also Ctrl-Shift-F => Backward search
 " But this conflicts with kitty 'move window forward'
 "nnoremap <C-S-F> ?
 
-" Alt-f => Global search
-nnoremap <A-f> :%s,,,gc<Left><Left><Left><Left>
-inoremap <A-f> <C-\><C-o>:%s,,,gc<Left><Left><Left><Left>
-vnoremap <A-f> <esc>:%s,\%V,,gc<Left><Left><Left>
-cnoremap <A-f> <C-e><C-u>nohl<CR>:<Esc>
 
-" Different seperator for Alt+Shift
-nnoremap <M-S-F> :%s///gc<Left><Left><Left><Left>
-inoremap <M-S-F> <C-\><C-o>:%s///gc<Left><Left><Left><Left>
-vnoremap <M-S-F> <esc>:%s/\%V//gc<Left><Left><Left>
-cnoremap <M-S-F> <C-e><C-u>nohl<CR>:<Esc>
+" Ctrl - f => Find
+"Line search with Ripgrep 
+nnoremap <silent><C-f> :FzfPreviewLines <cr>
+inoremap <silent><C-f> <C-\><C-o>:FzfPreviewLines <cr>
+vnoremap <silent><C-f> <Esc>:FzfPreviewLines <cr>
 
-" unnamedplus	A variant of the "unnamed" flag which uses the
-" clipboard register "+" (quoteplus) instead of
-" register "*" for all yank, delete, change and put
-" operations which would normally go to the unnamed
-" register.
-" Normal clipboard functionality for yy, y and d
+" Ctrl-Shift-f => Find in loaded buffer
+"Line search in loaded buffer
+nnoremap <silent><M-f> :Lines<cr>
+inoremap <silent><M-f> <C-\><C-o>:Lines<cr>
+vnoremap <silent><M-f> <Esc>:Lines<cr>
 
-set clipboard+=unnamedplus
+" Ctrl - H => Find and replace
+" For thos from visual code or smth, Ctrl-h can be finnicky in terminals
+" Because that keycombo generates the exact keycode for Backspace, for
+" compatibility reasons (but not in some terminal emulators, like kitty f.ex")
+
+" C-h => Global search
+nnoremap <C-h> :%s,,,gc<Left><Left><Left><Left>
+inoremap <C-h> <C-\><C-o>:%s,,,gc<Left><Left><Left><Left>
+vnoremap <C-h> <esc>:%s,\%V,,gc<Left><Left><Left>
+cnoremap <C-h> <C-e><C-u>nohl<CR>:<Esc>
+
+" Different seperator for Ctrl+Shift+h
+nnoremap <C-S-h> :%s///gc<Left><Left><Left><Left>
+inoremap <C-S-h> <C-\><C-o>:%s///gc<Left><Left><Left><Left>
+vnoremap <C-S-h> <esc>:%s/\%V//gc<Left><Left><Left>
+cnoremap <C-S-h> <C-e><C-u>nohl<CR>:<Esc>
+
+
 nnoremap y "+^y
 nnoremap yy "+^yg_
 nnoremap Y "+^Y
@@ -655,85 +729,150 @@ inoremap <A-d> <Esc>cc
 "" visual => by selection
 "" Best register no register
 "" https://stackoverflow.com/questions/22598644/vim-copy-non-linewise-without-leading-or-trailing-spaces
-nnoremap <C-c>  "+^yg_ 
-nnoremap <silent> <C-v> "+P
+
+"nnoremap <C-c>  "+^yg_ 
+nnoremap <silent><C-c> <Plug>OSCYankOperator_
+nnoremap <silent><C-v> "+Pl
 nnoremap <C-d>  (col(".") ==? 1 ? '<C-\><C-o>daw' : '<C-\><C-o>diw')
+
 """ Copy inner word except when on first line (copy a word)
-inoremap <expr> <C-c>   (col(".") ==? 1 ? '<C-\><C-o>"+yaw' : '<C-\><C-o>"+yiw')
+"inoremap <expr> <C-c>   (col(".") ==? 1 ? '<C-\><C-o>"+yaw' : '<C-\><C-o>"+yiw')
+"" Copy entire line
+inoremap <silent><C-c>   <C-\><C-o><Plug>OSCYankOperator_
 "" Paste with P if at beginning of line
 inoremap <silent> <C-v> <C-\><C-o>"+P
 "" Cut with a word instead of inner word if at beginning of line
 inoremap <expr> <C-d>   (col(".") ==? 1 ? '<C-\><C-o>daw' : '<C-\><C-o>diw')
-vnoremap <C-c>  "+y 
-vnoremap <silent> <C-v> "+P
+
+"vnoremap <C-c>  "+y
+vnoremap <C-c> <Plug>OSCYankVisual
+vnoremap <silent> <C-v> "+Pl
 vnoremap <C-d>  "*d 
-"tnoremap <C-c>  <C-\><C-N>
-"tnoremap <C-v>  <C-W>"+
+
+cnoremap <C-c> <C-f>
+cnoremap <C-v>  <C-r><C-o>"
 
 
-nnoremap <C-S-d>    <Down>"*dd<Up>
-inoremap <expr> <C-S-d> (col(".") ==? 1 ? '<C-\><C-o>daW' : '<C-\><C-o>diW')
-vnoremap <C-S-d>    "*D
+"nnoremap <C-S-d>    <Down>"*dd<Up>
+"inoremap <expr> <C-S-d> (col(".") ==? 1 ? '<C-\><C-o>daW' : '<C-\><C-o>diW')
+"vnoremap <C-S-d>    "*D
 
-" a => (insert) Append after cursor
-" A => Insert before
-"
-" Ctrl-A normal => insert
-" Ctrl-A visual => Chang$e selected line
-" Ctrl-A Insert => Back to normal
-nnoremap <C-a> a
-vnoremap <C-a> <C-o>
-inoremap <C-a> <Esc>
+"a => Insert
+"nnoremap a i
+"vnoremap a i
 
-""Alt-A => Replace (insert variant)
+"A => Append
+"nnoremap A a
+"vnoremap A a
+
+"Ctrl-a => Toggle insert
+nnoremap <C-a> i
+inoremap <C-a> <esc>l
+vnoremap <C-a> i
+
+
+"Ctrl-Shift-a => Begin at next line
+"nnoremap <C-a> o
+"inoremap <C-S-a> <esc>
+"vnoremap <C-S-a> o
+
+"Alt-A => Replace (insert variant)
 nnoremap <A-a> R
+inoremap <A-a> <Esc>l
 vnoremap <A-a> R
-inoremap <A-a> <Esc>
-"" Ctrl-Alt-A => Virtual Replace mode                    
-"" This mode differs from replace in that it plays nicely with tabs and spaces
-"" in files
-nnoremap <C-A-a> gR
-vnoremap <C-A-a> <Esc>gR 
-inoremap <C-A-a> <Esc>
 
-"" Visual mode becomes 'Select' mode or smth idk
-"" S => visual mode
+" Ctrl-Alt-A => Virtual Replace mode                    
+" This mode differs from replace in that it plays nicely with tabs and spaces in files
+nnoremap <C-A-a> gR
+inoremap <C-A-a> <Esc>
+vnoremap <C-A-a> <Esc>gR 
+
+" S (instead of v) becomes \"select mode" or something
+" S => visual mode
 nnoremap s v
 vnoremap s v
 nnoremap S V
 vnoremap S V
-""" Ctrl-s => Visual mode everywhere
-nnoremap <C-S> v
-vnoremap <C-s> <Esc>
-inoremap <C-S> <C-o>v
 
-"""Different visual block mode
+
+"Different visual block mode
 set virtualedit=all
-"""Alt-s => Visual block mode
+
+"Ctrl-Shift-s => Visual block mode
 nnoremap <A-s> <C-q>
 vnoremap <A-s> <C-q> 
 inoremap <A-s> <C-o><C-q>
-"""Ctrl-Alt-S => Visual line mode
-nnoremap <C-A-S> V
-vnoremap <C-A-S> <Esc> 
-inoremap <C-A-S> <C-o>V
+""Ctrl-Alt-S => Visual line mode
+nnoremap <C-A-s> V
+vnoremap <C-A-s> <Esc> 
+inoremap <C-A-s> <C-o>V
 
 
-"function! MyFunc()
-"    let m = visualmode()
-"    if m == "\<C-V>"
-"        echo 'block-wise visual'
-"    endif
-"endfunction
+"Buffers and panes
+
+"List buffers
+nnoremap <silent><C-w>b :<C-u>CocCommand fzf-preview.AllBuffers<CR> 
+inoremap <silent><C-w>b <C-\><C-o><C-u>CocCommand fzf-preview.AllBuffers<CR>
+vnoremap <silent><C-w>b <esc>:<C-u>CocCommand fzf-preview.AllBuffers<CR>gv
+
+" Open next buffer
+nnoremap <silent><C-A-Right> :bNext<cr>
+inoremap <silent><C-A-Right> <C-\><C-o>:bNext<cr>
+vnoremap <silent><C-A-Right> <esc>:bNext<cr>
+
+" Open previous buffer
+nnoremap <silent><C-A-Left> :bprevious<cr>
+inoremap <silent><C-A-Left> <C-\><C-o>bprevious<cr>
+vnoremap <silent><C-A-Left> <esc>:bprevious<cr>
+
+" Open Horizontal buffer
+nnoremap <silent><C-w>h :split<cr>
+inoremap <silent><C-w>h <C-\><C-o>:split<cr>
+vnoremap <silent><C-w>h <esc>:split<cr>gv
+
+"" Open Vertical buffer
+"nnoremap <S-A-Down> :vertical sb
+"inoremap <S-A-Down> <C-\><C-o>:vertical sb
+"vnoremap <S-A-Down> <esc>:vertical sb
+
+let g:tmux_navigator_no_mappings = 1
+noremap <silent> <C-S-Left> :<C-U>TmuxNavigateLeft<cr>
+noremap <silent> <C-S-Down> :<C-U>TmuxNavigateDown<cr>
+noremap <silent> <C-S-Up> :<C-U>TmuxNavigateUp<cr>
+noremap <silent> <C-S-Right> :<C-U>TmuxNavigateRight<cr>
+noremap <silent> <C-²> :<C-U>TmuxNavigatePrevious<cr>
+
+let g:kitty_navigator_no_mappings = 1
+nnoremap <silent> <C-S-Left> :KittyNavigateLeft<cr>
+nnoremap <silent> <C-S-Down> :KittyNavigateDown<cr>
+nnoremap <silent> <C-S-Up> :KittyNavigateUp<cr>
+nnoremap <silent> <C-S-Right> :KittyNavigateRight<cr>
 
 
-"" vim tmux navigator integrator
-"let g:tmux_navigator_no_mappings = 1
-"noremap <silent> <C-S-Left> :<C-U>TmuxNavigateLeft<cr>
-"noremap <silent> <C-S-Down> :<C-U>TmuxNavigateDown<cr>
-"noremap <silent> <C-S-Up> :<C-U>TmuxNavigateUp<cr>
-"noremap <silent> <C-S-Right> :<C-U>TmuxNavigateRight<cr>
-"noremap <silent> <C-²> :<C-U>TmuxNavigatePrevious<cr>
+" Choose pane
+nnoremap <silent><C-S-Space> :Windows<cr>
+inoremap <silent><C-S-Space> <C-\><C-o>:Windows<cr>
+vnoremap <silent><C-S-Space> <esc>:Windows<cr>gv
+                    
+""Left pane          
+"nnoremap <silent><C-S-Left> :wincmd h<cr>
+"inoremap <silent><C-S-Left> <C-\><C-o>:wincmd h<cr>
+"vnoremap <silent><C-S-Left> <esc>:wincmd h<cr>gv
+"                    
+""Right pane         
+"nnoremap <silent><C-S-Right> :wincmd l<cr>
+"inoremap <silent><C-S-Right> <C-\><C-o>:wincmd l<cr>
+"vnoremap <silent><C-S-Right> <esc>:wincmd l<cr>gv
+"                    
+""Up pane            
+"nnoremap <silent><C-S-Up> :wincmd k<cr>
+"inoremap <silent><C-S-Up> <C-\><C-o>:wincmd k<cr>
+"vnoremap <silent><C-S-Up> <esc>:wincmd k<cr>gv
+"                    
+""Down pane          
+"nnoremap <silent><C-S-Down> :wincmd j<cr>
+"inoremap <silent><C-S-Down> <C-\><C-o>:wincmd j<cr>
+"vnoremap <silent><C-S-Down> <esc>:wincmd j<cr>gv 
 
 "highlight Visual cterm=reverse ctermbg=NONE
 " These options and commands enable some very useful features in Vim, that
@@ -878,26 +1017,3 @@ set expandtab
 "set tabstop=4
 
 "------------------------------------------------------------
- "lua <<EOF
-"    vim.o.rtp += ~/.vim/bundle/Vundle.vim
-"    local Plug = vim.fn['plug#']
-"    vim.call('vundle#begin', '~/.config/nvim/plugged')
-"    Plug('tpope/vim-sensible')
-"    Plug('christoomey/vim-tmux-navigator') 
-"    Plug('vimwiki/vimwiki') 
-"    Plug('svermeulen/vimpeccable') 
-"    vim.call('vundle#end')
-"EOF 
-
-
-" Lua package for vim
-" vim.cmd 'packadd paq-nvim'
-"require 'paq' {
-"    {'savq/paq-nvim', opt = true};
-"    'svermeulen/vimpeccable'
-"}
-"lua <<EOF
-"    local vimp = require('vimpeccable')
-"    vimp.bind('n', '<C-Tab>', 'i<C-X>')
-"    vimp.bind('n', '<C-cr>', ':echom 'Hello C + R'<CR>')
-"EOF

@@ -1,8 +1,7 @@
-#!/bin/bash
 distro_base=/
 distro=/
 packagemanager=/
-architecture=/
+arch=/
 declare -A osInfo;
 osInfo[/etc/redhat-release]=yum
 osInfo[/etc/rpi-issue]=apt
@@ -50,18 +49,15 @@ do
 done
 
 if lscpu | grep -q "Intel"; then
-    architecture="386"
+    arch="386"
 elif lscpu | grep -q "AMD"; then
     if lscpu | grep -q "x86_64"; then 
-        architecture="amd64"
+        arch="amd64"
     else
-        architecture="amd32"
+        arch="amd32"
     fi
 elif lscpu | grep -q "armv"; then
-    architecture="armv7l"
+    arch="armv7l"
 elif lscpu | grep -q "aarch"; then
-    architecture="arm64"
-fi
-    
-
-                 
+    arch="arm64"
+fi      

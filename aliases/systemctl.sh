@@ -1,4 +1,4 @@
-source /usr/share/bash-completion/completions/systemctl 
+#source /usr/share/bash-completion/completions/systemctl 
 alias service_system_list_units="sudo systemctl list-units --all"
 alias service_user_list_units="systemctl --user list-units --all"
 alias service_system_list_services="sudo systemctl list-units --type=service"

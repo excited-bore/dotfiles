@@ -1,25 +1,27 @@
 #! /bin/bash
 #DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-. ./checks/check_rlwrap.sh
 # https://unix.stackexchange.com/questions/278631/bash-script-auto-complete-for-user-input-based-on-array-data
+. ./readline/rlwrap_scripts.sh
 
 sudo blkid
 readecomp=($(sudo blkid | awk 'BEGIN { FS = ":" };{print $1;}'))
-drive=$(rlwrap -S 'Choose drive to mount: ' -f <(echo "${readecomp[@]}") -o cat)
+drives="${readecomp[@]}"
 
-read -e -p "Mount point? (will make if not exists): " mnt
+reade -Q "GREEN" -i "/dev/" -p "Choose drive to mount: " "$drives" drive
+reade -Q "GREEN" -i "/mnt" -p "Mount point? (will make if not exists): " -e mnt
 if [ ! -d $mnt ]; then
-    mkdir -p $mnt
+    sudo mkdir -p $mnt
     echo "Created $mnt"
 fi
+sudo chown -R $USER $mnt
 
 uuid=$(sudo blkid | grep $drive | perl -pe 's|.*?UUID="(.*?)".*|UUID=\1|')
 type_fs=$(sudo blkid | grep $drive | perl -pe 's|.*?TYPE="(.*?)".*|\1|')
 
 if [[ $type_fs == "vfat" || $type_fs == "ntfs" ]]; then
-    attr="defaults,auto,users,rw,nofail,umask=000 0 0"
+    attr="nosuid,nodev,nofail,auto,x-gvfs-show,umask=000 0 0"
 elif [[ $type_fs == "exfat" || $type_fs == "ext4" ]]; then
-    attr="defaults,auto,users,rw,nofail 0 0"
+    attr="nosuid,nodev,nofail,auto,x-gvfs-show 0 0"
 else
     echo "Unrecognized filetype"
     exit 1

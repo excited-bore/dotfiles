@@ -3,7 +3,35 @@
 # root shell profiles -> /etc/profile
 # Other bindings at .inputrc
 
+# https://stackoverflow.com/questions/8366450/complex-keybinding-in-bash
+
+alias ls_stty="stty -a"
 alias ls_binds="bind -p"
+alias ls_xterm="xrdb -query -all"
+alias ls_kitty='kitty +kitten show_key -m kitty' 
+
+# TTY
+
+# To see the complete character string sent by a key, you can use this command, and type the key within 2 seconds:
+# stty raw; sleep 2; echo; stty cooked
+# But Ctrl-v, then keycombination still works best
+
+# Turn off flow control and free up Ctrl-s and Ctrl-q
+stty -ixon
+stty -ixoff
+stty start 'undef' 
+stty stop 'undef'
+stty rprnt 'undef'
+#stty lnext '^V'
+
+# Unset suspend signal shortcut (Ctrl+z)
+stty susp 'undef'
+
+# Unset backward word erase shortcut (Ctrl+w)
+stty werase 'undef'
+
+# unbinds ctrl-c and bind the function to ctrl-q
+#stty intr '^q'
 
 #alias tty_size_half="tput cup $(stty size | awk '{print int($1/2);}') 0"
 
@@ -44,8 +72,11 @@ bind -x '"\e[1;5A": "clear && let LINE_TPUT=$LINE_TPUT-1 && if [ $LINE_TPUT -lt 
 bind 'Tab: menu-complete'
 bind '"\e[Z": menu-complete-backward'
 
-# (Kitty) Ctrl-tab expands aliases
-bind '"\e[9;5u": alias-expand-line'
+# Ctrl-w expands aliases
+bind '"\C-w": alias-expand-line'
+
+# (Kitty) Ctrl-tab for fzf autocompletion
+#bind '"\e[9;5u": " **\t"'
 
 # Recall position
 #bind -x '"\C-r": tput rc'
@@ -75,47 +106,11 @@ bind '"\C-z": vi-undo'
 # Ctrl-f adds a piped grep for convenience
 bind '"\C-f": " | grep -i "'
 
-ctrl-s(){
-    file="$(fzf -m --no-sort --height 75% --reverse)"; 
-    if [ -z "$file" ]; then
-        return 0;
-    fi
-    shellscrpt=""; 
-    audio="";
-    video="";
-    #https://unix.stackexchange.com/questions/628527/split-string-on-newline-and-write-it-into-array-using-read
-    IFS=$'\n' read -d "\034" -r -a line <<<"${file}\034";
-    ftype=$(xdg-mime query filetype "$line");
-        #line=$(sed 's/ /\\ /g' <<< "$line");
-        if [[ $ftype == application/x-shellscript ]]; then
-            shellscrpt="$shellscrpt$line"; 
-        elif [[ $ftype == audio/mpeg ]]; then
-            audio="$audio$line";
-        elif [[ $ftype == video/mp4 ]]; then
-            audio="$video$line";
-        else
-            xdg-open "$line";
-        fi
-    if [ ! -z "$shellscrpt" ]; then
-        $EDITOR "${shellscrpt[@]}"; 
-    fi
-    if [ ! -z "$audio" ]; then
-        vlc "${audio[@]}" > /dev/null 2>&1 & disown;
-
-    fi
-    if [ ! -z "$video" ]; then
-        vlc "${video[@]}"  > /dev/null 2>&1 & disown;
-    fi
-}
-
-# Ctrl-s; Open files using default-applications and fzf
-#bind -x '"\C-s": ctrl-s'
-
 # Ctrl-Enter gives you a paged output
 bind '"\e[13": " | $PAGER\C-p"' 
 
 # Ctrl-backspace deletes (kills) line backward
-bind '"\C-h": backward-kill-line'
+bind '"\C-h": backward-kill-word'
 
 # Ctrl-b Insert as comment (also on alt+#)
 bind '"\C-b": insert-comment 1'
@@ -123,26 +118,50 @@ bind '"\C-b": insert-comment 1'
 # Ctrl-n removes first character from command line (uncomment)
 bind '"\C-n": "\C-a\e[3~"'
 
-# Ctrl-o gives a man of command if theres one
+# Ctrl-o searches for a manual for the typed command 
 bind '"\C-o": "\C-u man \C-y\C-m"'
 
-# F2 - Ranger (file explorer)
-bind -x '"\eOQ": ranger'
+# F2 - ranger (file explorer)
+#bind -x '"\201": ranger'
+#bind '"\eOQ": "\201\n\C-l"'
+#bind -x '"\eOQ": ranger'
 
 # F3 - FuzzyFinderls -l | fzf --preview="echo user={3} when={-4..-2}; cat {-1}" --header-lines=1 (file explorer)
 #bind -x '"\eOR": ctrl-s'
 
-# F5, Ctrl-r - Reload .bashrc /.inputrc
+# F5, Ctrl-r - Reload .bashrc
 #bind '"\e[15~": re-read-init-file'
-bind -x '"\e[15~": . ~/.inputrc && . ~/.bashrc && tput cup $LINENO 0 && tput rc'
+bind -x '"\e[15~": . ~/.bashrc && tput cup 0 0 && tput rc'
 
-#C-x used as modifier for a lot of stuff
-#"\C-x": "cd ..\C-m"
+# Alt-Left arrow to go up one directory
+bind '"\e[1;3D": "cd .. \C-m"'
+
+# Alt-Right arrow to go to last visited directory
+bind '"\e[1;3C": "cd - \C-m"'
+
+# Alt-Down arrow to go to home directory
+bind '"\e[1;3B": "cd \C-m"'
+
+# Alt-Up arrow to go to home directory
+bind '"\e[1;3A": "j \C-i"'
 
 # Proper copy
 # https://askubuntu.com/questions/302263/selecting-text-in-the-terminal-without-using-the-mouse
-#"\C-c": copy to clipboard
-#"\C-c": "\C-u\C-e echo \C-y | xclip -i -sel c && tput cuu1 && tput el && history -d -1 \C-m\C-y"
+#"\e-c": copy to clipboard
+#bind '"\e-c": "\C-u\C-e echo \C-y | xclip -i -sel c && tput cuu1 && tput el && history -d -1 \C-m\C-y"'
 
-#"\C-v": paste from clipboard
-#"\C-v": "\C-u\C-e tput cuu1 && tput el && xdotool type --clearmodifiers --delay 25 $(xclip -o -sel clip) && history -d -1 \C-m"
+#"\e-v": paste from clipboard
+#bind '"\e-v": "\C-u\C-e tput cuu1 && tput el && xdotool type --clearmodifiers --delay 25 $(xclip -o -sel clip) && history -d -1 \C-m"'
+#bind -x '"\e-v": "xclip -o -sel clip"'
+
+# XRESOURCES
+
+# Install bindings from xterm
+# xrdb -merge ~/.Xresources
+# .Inputrc (readline conf) however has to be compiled, so restart shell
+
+# Set caps to Escape
+#setxkbmap -option caps:escape
+
+# Set Shift delete to backspace
+##xmodmap -e "keycode 119 = Delete BackSpace"     #
