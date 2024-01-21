@@ -1,9 +1,130 @@
-"autocmd CursorHold      * echo mode(1) 
-"autocmd CursorHoldI     * echo mode(1)
-autocmd CursorMoved     * set cul
-autocmd CursorMovedI    * set cul
-"autocmd InsertEnter     * set cul
-"autocmd InsertLeave     * set nocul
+
+"highlight Visual cterm=reverse ctermbg=NONE
+" These options and commands enable some very useful features in Vim, that
+" no user should live without
+" Set 'nocompatible' to ward off unexpected things that your distro might
+" have made, as well as sanely reset options when re-sourcing .vimrc
+
+"If you set scrollof to a very large value (999) the cursor line will always be at the middle 
+" set scrolloff=999
+
+" Attempt to determine the type of a file based on its name and possibly its
+" contents. Use this to allow intelligent auto-indenting for each filetype,
+" and for plugins that are filetype specific.
+filetype plugin indent on
+
+" Enable syntax highlighting
+syntax on
+
+" Relative number lines
+set relativenumber 
+
+" Enable Omnicomplete features
+set omnifunc=syntaxcomplete#Complete
+
+"https://vim.fandom.com/wiki/GNU/Linux_clipboard_copy/paste_with_xclip
+"The 'a' and 'A' options enables copying selected text to system clipboard 
+set guioptions=aAimrLT
+
+"------------------------------------------------------------
+
+" These are highly recommended options.
+
+" Vim with default settings does not allow easy switching between multiple files
+" in the same editor window. Users can use multiple split windows or multiple
+" tab pages to edit multiple files, but it is still best to enable an option to
+" allow easier switching between files.
+"
+" One such option is the 'hidden' option, which allows you to re-use the same
+" window and switch from an unsaved buffer without saving it first. Also allows
+" you to keep an undo history for multiple files when re-using the same window
+" in this way. Note that using persistent undo also lets you undo in multiple
+" files even in the same window, but is less efficient and is actually designed
+" for keeping undo history after closing Vim entirely. Vim will complain if you
+" try to quit without saving, and swap files will keep you safe if your computer
+" crashes.
+set hidden
+
+" Note that not everyone likes working this way (with the hidden option).
+" Alternatives include using tabs or split windows instead of re-using the same
+" window as mentioned above, and/or either of the following options:
+" set confirm
+" set autowriteall
+
+" Better command-line completion
+set wildmenu
+
+" Show partial commands in the last line of the screen
+set showcmd
+
+" Highlight searches (use <C-L> to temporarily turn off highlighting; see the
+" mapping of <C-L> below)
+set hlsearch
+
+"------------------------------------------------------------
+"
+" These are options that users frequently set in their .vimrc. Some of them
+" change Vim's behaviour in ways which deviate from the true Vi way, but
+" which are considered to add usability. Which, if any, of these options to
+" use is very much a personal preference, but they are harmless.
+
+" Use case insensitive search, except when using capital letters
+set ignorecase
+set smartcase
+
+" Allow backspacing over autoindent, line breaks and start of insert action
+set backspace=indent,eol,start
+
+" When opening a new line and no filetype-specific indenting is enabled, keep
+" the same indent as the line you're currently on. Useful for READMEs, etc.
+set autoindent
+
+"Automatically load file changes into buffer when external sources modify the
+"file your currently editing
+set autoread
+
+" Stop certain movements from always going to the first character of a line.
+" While this behaviour deviates from that of Vi, it does what most users
+" coming from other editors would expect.
+set nostartofline
+
+" Display the cursor position on the last line of the screen or in the status
+" line of a window
+set ruler
+
+" Always display the status line, even if only one window is displayed
+"set laststatus=2
+
+" Instead of failing a command because of unsaved changes, instead raise a
+" dialogue asking if you wish to save changed files.
+set confirm
+
+" Use visual bell instead of beeping when doing something wrong
+set visualbell
+
+" And reset the terminal code for the visual bell. If visualbell is set, and
+" this line is also included, vim will neither flash nor beep. If visualbell
+" is unset, this does nothing.
+set t_vb=
+
+" Enable use of the mouse for all modes
+set mouse=a
+
+" Set the command window height to 2 lines, to avoid many cases of having to
+" 'press <Enter> to continue'
+set cmdheight=2
+
+" Display line numbers on the left
+set number
+
+"Always wrap long lines
+set wrap
+
+" Quickly time out on keycodes, but never time out on mappings
+set ttimeout ttimeoutlen=200
+
+" Use <F9> to toggle between 'paste' and 'nopaste'
+" set pastetoggle=<F9>
 
 " unnamedplus	A variant of the "unnamed" flag which uses the
 " clipboard register "+" (quoteplus) instead of
@@ -13,12 +134,63 @@ autocmd CursorMovedI    * set cul
 " Normal clipboard functionality for yy, y and d
 "
 " If vim is accessed over ssh though, be carefull for using this. Xclip can be
-" troublesome so test this setting to see that this is your possible problem
-
+" troublesome so test this setting to see that this is your possible problem 
 set clipboard+=unnamedplus
 
+" Indentation settings according to personal preference.
+
+" Indentation settings for using 4 spaces instead of tabs.
+" Do not change 'tabstop' from its default value of 8 with this setup.
+set shiftwidth=4
+set softtabstop=4
+set expandtab
+"set tabstop=4
+
 " Ignore whitespace for vimdiff
-set diffopt+=iwhite
+set diffopt+=iwhite 
+
+" Different visual block mode
+set virtualedit=all    
+
+" COC settings 
+
+" May need for Vim (not Neovim) since coc.nvim calculates byte offset by count
+" utf-8 byte sequence
+set encoding=utf-8
+" Some servers have issues with backup files, see #649
+set nobackup
+set nowritebackup
+
+" Having longer updatetime (default is 4000 ms = 4s) leads to noticeable
+" delays and poor user experience
+set updatetime=300
+
+" Always show the signcolumn, otherwise it would shift the text each time
+" diagnostics appear/become resolved
+set signcolumn=yes 
+
+"For Neovim > 0.1.5 and Vim > patch 7.4.1799 < https://github.com/vim/vim/commit/61be73bb0f965a895bfb064ea3e55476ac175162 >
+let $NVIM_TUI_ENABLE_TRUE_COLOR=1
+
+"Tmux has problems with nvim colors if we dont supply it with true colors
+"https://unix.stackexchange.com/questions/251847/clear-to-end-of-line-uses-the-wrong-background-color-in-tmux/252078#252078
+if (has("termguicolors"))
+    set termguicolors
+endif 
+
+
+"Fix python3 interpreter
+let g:python3_host_prog = '/usr/bin/python3'
+let g:ycm_path_to_python_interpreter = '/usr/bin/python3'
+                                                             
+
+"autocmd CursorHold      * echo mode(1) 
+"autocmd CursorHoldI     * echo mode(1)
+autocmd CursorMoved     * set cul
+autocmd CursorMovedI    * set cul
+"autocmd InsertEnter     * set cul
+"autocmd InsertLeave     * set nocul
+
 
 let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
 if !has('nvim')
@@ -55,21 +227,24 @@ let g:coc_global_extensions = [
             \'coc-vimlsp'
             \]
 
-" Non-xclip 
+" Totally independent OS52 clipboard
 Plugin 'ojroques/vim-oscyank', {'branch': 'main'}
+
+" Devicons
+Plugin 'ryanoasis/vim-devicons'
 
 " Ranger integration
 Plugin 'francoiscabrol/ranger.vim'
 Plugin 'rbgrouleff/bclose.vim'
 let g:ranger_replace_netrw = 1
 let g:ranger_map_keys = 0
+let g:ranger_command_override = 'ranger --cmd "set show_hidden=true"'
 
 "" Fuzzy finder plugin
 Plugin 'junegunn/fzf'
 Plugin 'junegunn/fzf.vim' 
 
 "" Fuzzy finder preview   
-"Plug 'yuki-yano/fzf-preview.vim', { 'branch': 'release/remote', 'do': ':UpdateRemotePlugins' }
 Plugin 'yuki-yano/fzf-preview.vim', { 'branch': 'release/remote' }
 
 "" Git plugin
@@ -89,16 +264,22 @@ function! AfterLoadKittyTmuxVim()
     call system('(cd ~/.vim/plugins/kitty-vim-tmux-navigator && cp -f ./*.py ~/.config/kitty/)')
 endf
 
-"Sudo write
+" Sudo write
 Plugin 'tpope/vim-eunuch'
-"
-"" Self documenting vim wiki
+
+" Nerd commenter
+Plugin 'preservim/nerdcommenter'
+" Create default mappings
+let g:NERDCreateDefaultMappings = 1
+
+" Self documenting vim wiki
 Plugin 'vimwiki/vimwiki'
 
-"" Nice themey
+
+" Nice and cool themey
 Plugin 'morhetz/gruvbox'
 
-"" Nice status bar thingy
+" Nice and cool status bar thingy
 Plugin 'vim-airline/vim-airline'
 
 " Vim lua plugin
@@ -117,49 +298,18 @@ endif
 "If you're using tmux version 2.2 or later, you can remove the outermost $TMUX check and use tmux's 24-bit color support
 "(see < http://sunaku.github.io/tmux-24bit-color.html#usage > for more information.)
 
+" Ranger
 
 "" Gruvbox things
 let g:gruvbox_italic=1
 colorscheme gruvbox
 
-"For Neovim > 0.1.5 and Vim > patch 7.4.1799 < https://github.com/vim/vim/commit/61be73bb0f965a895bfb064ea3e55476ac175162 >
-let $NVIM_TUI_ENABLE_TRUE_COLOR=1
-
-"Tmux has problems with nvim colors if we dont supply it with true colors
-"https://unix.stackexchange.com/questions/251847/clear-to-end-of-line-uses-the-wrong-background-color-in-tmux/252078#252078
-if (has("termguicolors"))
-    set termguicolors
-endif
-  
 
 "Add tab 
-nnoremap <C-Tab>      i<tab><esc><right>
+nnoremap <Tab>      i<tab><esc><right>
 "Visual mode 
-vnoremap <C-Tab>      >gv
-vnoremap <C-S-Tab>    <gv
-
-"nnoremap <C-Tab> i
-"vnoremap <C-Tab> i
-"inoremap <expr> <C-Tab> mode(1) == "ic" ?  '<Esc>a' : '<plug>(YCMComplete)'
-
-"inoremap <Space> <C-y><Space>
-"inoremap <Right> <C-y><Right>
-
- 
-" May need for Vim (not Neovim) since coc.nvim calculates byte offset by count
-" utf-8 byte sequence
-set encoding=utf-8
-" Some servers have issues with backup files, see #649
-set nobackup
-set nowritebackup
-
-" Having longer updatetime (default is 4000 ms = 4s) leads to noticeable
-" delays and poor user experience
-set updatetime=300
-
-" Always show the signcolumn, otherwise it would shift the text each time
-" diagnostics appear/become resolved
-set signcolumn=yes
+vnoremap <Tab>      >gv
+vnoremap <S-Tab>    <gv 
 
 
 " Use tab for trigger completion with characters ahead and navigate
@@ -167,11 +317,11 @@ set signcolumn=yes
 " no select by `"suggest.noselect": true` in your configuration file
 " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
 " other plugin before putting this into your config
-inoremap <silent><expr> <TAB>
+inoremap <silent><expr> <C-TAB>
       \ coc#pum#visible() ? coc#pum#next(1) :
       \ CheckBackspace() ? "\<Tab>" :
       \ coc#refresh()
-inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
+inoremap <expr><C-S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
 
 " Make <CR> to accept selected completion item or notify coc.nvim to format
 " <C-g>u breaks current undo, please make your own choice
@@ -236,7 +386,7 @@ xmap <Leader>a  <Plug>(coc-codeaction-selected)
 nmap <Leader>a  <Plug>(coc-codeaction-selected)
 
 " Remap keys for applying code actions at the cursor position
-nmap <>ac  <Plug>(coc-codeaction-cursor)
+nmap <Leader>ac  <Plug>(coc-codeaction-cursor)
 " Remap keys for apply code actions affect whole buffer
 nmap <Leader>as  <Plug>(coc-codeaction-source)
 " Apply the most preferred quickfix action to fix diagnostic on the current line
@@ -248,7 +398,7 @@ xmap <silent> <Leader>r  <Plug>(coc-codeaction-refactor-selected)
 nmap <silent> <Leader>r  <Plug>(coc-codeaction-refactor-selected)
 
 " Run the Code Lens action on the current line
-nmap <Leader>cl  <Plug>(coc-codelens-action)
+"nmap <Leader>cl  <Plug>(coc-codelens-action)
 
 " Map function and class text objects
 " NOTE: Requires 'textDocument.documentSymbol' support from the language server
@@ -261,20 +411,6 @@ omap ic <Plug>(coc-classobj-i)
 xmap ac <Plug>(coc-classobj-a)
 omap ac <Plug>(coc-classobj-a)
 
-" Remap <C-f> and <C-b> to scroll float windows/popups
-"if has('nvim-0.4.0') || has('patch-8.2.0750')
-"  nnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
-"  nnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
-"  inoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
-"  inoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
-"  vnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
-"  vnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
-"endif
-
-" Use CTRL-S for selections ranges
-" Requires 'textDocument/selectionRange' support of language server
-"nmap <silent> <C-Tab> <Plug>(coc-range-select)
-"xmap <silent> <C-Tab> <Plug>(coc-range-select)
 
 " Add `:Format` command to format current buffer
 command! -nargs=0 Format :call CocActionAsync('format')
@@ -284,7 +420,7 @@ command! -nargs=? Fold :call     CocAction('fold', <f-args>)
 
 " Add `:OR` command for organize imports of the current buffer
 command! -nargs=0 OR   :call     CocActionAsync('runCommand', 'editor.action.organizeImport')
-
+ 
 " Add (Neo)Vim's native statusline support
 " NOTE: Please see `:h coc-status` for integrations with external plugins that
 " provide custom statusline: lightline.vim, vim-airline
@@ -292,55 +428,61 @@ set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 
 " Mappings for CoCList
 " Show all diagnostics
-nnoremap <silent><nowait> <Tab>a  :<C-u>CocList diagnostics<cr>
+nnoremap <silent><nowait> <C-Tab>a  :<C-u>CocList diagnostics<cr>
 " Manage extensions
-nnoremap <silent><nowait> <Tab>e  :<C-u>CocList extensions<cr>
+nnoremap <silent><nowait> <C-Tab>e  :<C-u>CocList extensions<cr>
 " Show commands
-nnoremap <silent><nowait> <Tab>c  :<C-u>CocList commands<cr>
+nnoremap <silent><nowait> <C-Tab>c  :<C-u>CocList commands<cr>
 " Find symbol of current document
-nnoremap <silent><nowait> <Tab>o  :<C-u>CocList outline<cr>
+nnoremap <silent><nowait> <C-Tab>o  :<C-u>CocList outline<cr>
 " Search workspace symbols
-nnoremap <silent><nowait> <Tab>s  :<C-u>CocList -I symbols<cr>
+nnoremap <silent><nowait> <C-Tab>s  :<C-u>CocList -I symbols<cr>
 " Do default action for next item
-nnoremap <silent><nowait> <Tab>j  :<C-u>CocNext<CR>
+nnoremap <silent><nowait> <C-Tab>j  :<C-u>CocNext<CR>
 " Do default action for previous item
-nnoremap <silent><nowait> <Tab>k  :<C-u>CocPrev<CR>
-" Resume latest coc list
-nnoremap <silent><nowait> <Tab>p  :<C-u>CocListResume<CR>
+nnoremap <silent><nowait> <C-Tab>k  :<C-u>CocPrev<CR>
+" Resume latest coc list        
+nnoremap <silent><nowait> <C-Tab>p  :<C-u>CocListResume<CR>
 
 "Ranger F2
 nnoremap <silent><F2>   :RangerWorkingDirectory<CR>
 inoremap <silent><F2>   <Esc>:RangerWorkingDirectory<CR>
 vnoremap <silent><F2>   <Esc>:RangerWorkingDirectory<CR>
 
-" FZF files F3
-"nnoremap <F3>   :Files /<CR>
-"inoremap <F3>   <Esc>:Files /<CR>
-"vnoremap <F3>   <Esc>:Files /<CR>
-
 " Git files F3
-nnoremap <F3>   :GFiles<CR>
-inoremap <F3>   <Esc>:GFiles<CR>
-vnoremap <F3>   <Esc>:GFiles<CR>
+nnoremap <F3>   :FzfPreviewGitActions<CR>
+inoremap <F3>   <Esc>:FzfPreviewGitActions<CR>a
+vnoremap <F3>   :FzfPreviewGitActions<CR>gv
 
 " Git status F4
-nnoremap <F4>   :Changes<CR>
-inoremap <F4>   <Esc>:Changes<CR>
-vnoremap <F4>   <Esc>:Changes<CR>
+nnoremap <F4>   :FzfPreviewChanges<CR>
+inoremap <F4>   <Esc>:FzfPreviewChanges<CR>a
+vnoremap <F4>   :FzfPreviewChanges<CR>gv
 
 " Reload .vimrc/init.vim F5
 nnoremap <F5> :source $MYVIMRC<CR>
-inoremap <F5> :source $MYVIMRC<CR>
+inoremap <F5> <esc>:source $MYVIMRC<CR>a
 vnoremap <F5> :source $MYVIMRC<CR>gv
 
 " Edit .vimrc/init.vim F6
 nnoremap <F6> :e $MYVIMRC<CR>
-inoremap <F6> :e $MYVIMRC<CR>
+inoremap <F6> <esc>:e $MYVIMRC<CR>a
 vnoremap <F6> :e $MYVIMRC<CR>gv
 
+" Checkout Files in current dir F7
+nnoremap <F7> :FzfPreviewDirectoryFiles<CR>
+inoremap <F7> <esc>:FzfPreviewDirectoryFiles<CR>a
+vnoremap <F7> :FzfPreviewDirectoryFiles<CR>gv
+
+" Checkout Git Files in current dir F7
+nnoremap <S-F7> :FzfPreviewGitFiles<CR>
+inoremap <S-F7> <esc>:FzfPreviewGitFiles<CR>a
+vnoremap <S-F7> :FzfPreviewGitFiles<CR>gv 
+
+
 " Leader key Fzf-Preview F7
-nmap <C-w>f [fzf-p]
-xmap <C-w>f [fzf-p]
+nmap <F8> [fzf-p]
+xmap <F8> [fzf-p]
 
 nnoremap <silent> [fzf-p]p     :<C-u>CocCommand fzf-preview.FromResources project_mru git<CR>
 nnoremap <silent> [fzf-p]gs    :<C-u>CocCommand fzf-preview.GitStatus<CR>
@@ -437,10 +579,20 @@ endfunction
 command -nargs=+ TmuxKittyNavigate call TmuxKittyNavigate(<f-args>)
 
 
-noremap <silent><C-S-Left> :<C-u>TmuxKittyNavigate Left<cr>
-noremap <silent><C-S-Down> :<C-u>TmuxKittyNavigate Down<cr>
-noremap <silent><C-S-Up> :<C-u>TmuxKittyNavigate Up<cr>
-noremap <silent><C-S-Right> :<C-u>TmuxKittyNavigate Right<cr>
+nnoremap <silent><C-S-Left> :<C-u>TmuxKittyNavigate Left<cr>
+nnoremap <silent><C-S-Down> :<C-u>TmuxKittyNavigate Down<cr>
+nnoremap <silent><C-S-Up> :<C-u>TmuxKittyNavigate Up<cr>
+nnoremap <silent><C-S-Right> :<C-u>TmuxKittyNavigate Right<cr>
+
+inoremap <silent><C-S-Left> <esc>:<C-u>TmuxKittyNavigate Left<cr>i
+inoremap <silent><C-S-Down> <esc>:<C-u>TmuxKittyNavigate Down<cr>i
+inoremap <silent><C-S-Up> <esc>:<C-u>TmuxKittyNavigate Up<cr>i
+inoremap <silent><C-S-Right> <esc>:<C-u>TmuxKittyNavigate Right<cr>i
+
+vnoremap <silent><C-S-Left> :<C-u>TmuxKittyNavigate Left<cr>gv
+vnoremap <silent><C-S-Down> :<C-u>TmuxKittyNavigate Down<cr>gv
+vnoremap <silent><C-S-Up> :<C-u>TmuxKittyNavigate Up<cr>gv
+vnoremap <silent><C-S-Right> :<C-u>TmuxKittyNavigate Right<cr>gv 
 
 
 " Constantly set LastWindow
@@ -460,7 +612,7 @@ endfunction
 function! CloseWindow()
     " https://stackoverflow.com/questions/7069927/in-vimscript-how-to-test-if-a-window-is-the-last-window
     " if this window isn't the last on screen, just close pane
-    if winbufnr(2) != -1 && winbufnr(2) != 2
+    if winbufnr(2) != -1
          close!
     " if the amount of open buffers is still more then 1, close buffer
      elseif len(filter(range(1, bufnr('$')), 'buflisted(v:val)')) > 1
@@ -515,22 +667,18 @@ vnoremap <C-x> :CocCommand fzf-preview.
 vnoremap [      di[]<Esc>hp<Esc> 
 vnoremap {      di{}<Esc>hp<Esc> 
 vnoremap (      di()<Esc>hp<Esc> 
-vnoremap >      >gv
-vnoremap <      <gv
-vnoremap <C-<>  di</><Esc>hhp<Esc>
+vnoremap <      di<><Esc>hp<Esc>
+vnoremap `      di``<Esc>hp<Esc>
+vnoremap '      di''<Esc>hp<Esc>
 
-vnoremap `          di``<Esc>hp<Esc>
-
-"inoremap '          ' 
-vnoremap '          di''<Esc>hp<Esc>
-
-"inoremap "          ""
 
 " Easy multiblock commenting
-vnoremap <expr> #   (visualmode() == "\<C-V>" ? 'I#<esc>' : 'di##<Esc>hp<Esc>')
-"vnoremap <expr> "   (visualmode() == "\<C-V>" ? 'I"<esc>' : visualmode() == "V" ? '<Esc>O"""<Esc>jo"""<Esc>' : 'di""<Esc>hp<Esc>')
-vnoremap <expr> "   (visualmode() == "\<C-V>" ? 'I"<esc>' : 'di""<Esc>hp<Esc>')
-vnoremap <expr> !   (visualmode() == "\<C-V>" ? 'I!<esc>' : 'di!!<Esc>hp<Esc>')
+vnoremap <expr> #   (visualmode() == "\<C-V>" ? ':norm i#<cr>gv' : 'c##<Esc>hp<Esc>')
+vnoremap <expr> //   (visualmode() == "\<C-V>" ? ':norm i//<cr>gv' : 'c/*<enter><esc>pi<enter>*/<enter><Esc>')
+vnoremap <expr> --   (visualmode() == "\<C-V>" ? ':norm i--<cr>gv' : 'c--[[<enter><esc>pi<enter>--]]<enter><Esc>')
+vnoremap <expr> "   (visualmode() == "\<C-V>" ? ':norm "<cr>gv' : 'c"""<enter><esc>pi<enter>"""<enter><Esc>')
+vnoremap <expr> '   (visualmode() == "\<C-V>" ? ":norm i'<cr>gv" : "c''<Esc>hp<Esc>")
+vnoremap <expr> !   (visualmode() == "\<C-V>" ? ':norm i#<cr>gv' : 'c!!<Esc>hp<Esc>')
 
 " Moving up and down will always recenter 
 " Move up/down 1 paragraph => Ctrl+Arrowkeys (Up-Down)
@@ -705,7 +853,6 @@ nnoremap <silent> <C-l> :if (hlstate == 0) \| nohlsearch \| else \| set hlsearch
 inoremap <silent> <C-l> <C-\><C-o>:if (hlstate == 0) \| nohlsearch \| else \| set hlsearch \| endif \| let hlstate=1-hlstate<cr>
 vnoremap <silent> <C-l> <Esc>:if (hlstate == 0) \| nohlsearch \| else \| set hlsearch \| endif \| let hlstate=1-hlstate<cr>gv
 
-"let mapleader = "\<Space>"
 " Set backspace key to
 set t_kb=^?
 " Set Delete key to
@@ -724,7 +871,6 @@ set t_kD=^[[3~
 "Also Ctrl-Shift-F => Backward search
 " But this conflicts with kitty 'move window forward'
 "nnoremap <C-S-F> ?
-
 
 " Ctrl - f => Find
 "Line search with Ripgrep 
@@ -861,10 +1007,6 @@ vnoremap s v
 nnoremap S V
 vnoremap S V
 
-
-"Different visual block mode
-set virtualedit=all
-
 "Ctrl-Shift-s => Visual block mode
 nnoremap <A-s> <C-q>
 vnoremap <A-s> <C-q> 
@@ -873,148 +1015,3 @@ inoremap <A-s> <C-o><C-q>
 nnoremap <C-A-s> V
 vnoremap <C-A-s> <Esc> 
 inoremap <C-A-s> <C-o>V
-
-
-"highlight Visual cterm=reverse ctermbg=NONE
-" These options and commands enable some very useful features in Vim, that
-" no user should live without
-" Set 'nocompatible' to ward off unexpected things that your distro might
-" have made, as well as sanely reset options when re-sourcing .vimrc
-
-"If you set scrollof to a very large value (999) the cursor line will always be at the middle 
-" set scrolloff=999
-
-" Attempt to determine the type of a file based on its name and possibly its
-" contents. Use this to allow intelligent auto-indenting for each filetype,
-" and for plugins that are filetype specific.
-filetype plugin indent on
-
-" Enable syntax highlighting
-syntax on
-
-" Relative number lines
-set relativenumber 
-
-" Enable Omnicomplete features
-set omnifunc=syntaxcomplete#Complete
-
-"https://vim.fandom.com/wiki/GNU/Linux_clipboard_copy/paste_with_xclip
-"The 'a' and 'A' options enables copying selected text to system clipboard 
-set guioptions=aAimrLT
-
-"------------------------------------------------------------
-
-"Fix python3 interpreter
-let g:python3_host_prog = '/usr/bin/python3'
-let g:ycm_path_to_python_interpreter = '/usr/bin/python3'
-
-" These are highly recommended options.
-
-" Vim with default settings does not allow easy switching between multiple files
-" in the same editor window. Users can use multiple split windows or multiple
-" tab pages to edit multiple files, but it is still best to enable an option to
-" allow easier switching between files.
-"
-" One such option is the 'hidden' option, which allows you to re-use the same
-" window and switch from an unsaved buffer without saving it first. Also allows
-" you to keep an undo history for multiple files when re-using the same window
-" in this way. Note that using persistent undo also lets you undo in multiple
-" files even in the same window, but is less efficient and is actually designed
-" for keeping undo history after closing Vim entirely. Vim will complain if you
-" try to quit without saving, and swap files will keep you safe if your computer
-" crashes.
-set hidden
-
-" Note that not everyone likes working this way (with the hidden option).
-" Alternatives include using tabs or split windows instead of re-using the same
-" window as mentioned above, and/or either of the following options:
-" set confirm
-" set autowriteall
-
-" Better command-line completion
-set wildmenu
-
-" Show partial commands in the last line of the screen
-set showcmd
-
-" Highlight searches (use <C-L> to temporarily turn off highlighting; see the
-" mapping of <C-L> below)
-set hlsearch
-
-"------------------------------------------------------------
-"
-" These are options that users frequently set in their .vimrc. Some of them
-" change Vim's behaviour in ways which deviate from the true Vi way, but
-" which are considered to add usability. Which, if any, of these options to
-" use is very much a personal preference, but they are harmless.
-
-" Use case insensitive search, except when using capital letters
-set ignorecase
-set smartcase
-
-" Allow backspacing over autoindent, line breaks and start of insert action
-set backspace=indent,eol,start
-
-" When opening a new line and no filetype-specific indenting is enabled, keep
-" the same indent as the line you're currently on. Useful for READMEs, etc.
-set autoindent
-
-"Automatically load file changes into buffer when external sources modify the
-"file your currently editing
-set autoread
-
-" Stop certain movements from always going to the first character of a line.
-" While this behaviour deviates from that of Vi, it does what most users
-" coming from other editors would expect.
-set nostartofline
-
-" Display the cursor position on the last line of the screen or in the status
-" line of a window
-set ruler
-
-" Always display the status line, even if only one window is displayed
-"set laststatus=2
-
-" Instead of failing a command because of unsaved changes, instead raise a
-" dialogue asking if you wish to save changed files.
-set confirm
-
-" Use visual bell instead of beeping when doing something wrong
-set visualbell
-
-" And reset the terminal code for the visual bell. If visualbell is set, and
-" this line is also included, vim will neither flash nor beep. If visualbell
-" is unset, this does nothing.
-set t_vb=
-
-" Enable use of the mouse for all modes
-set mouse=a
-
-" Set the command window height to 2 lines, to avoid many cases of having to
-" 'press <Enter> to continue'
-set cmdheight=2
-
-" Display line numbers on the left
-set number
-
-"Always wrap long lines
-set wrap
-
-" Quickly time out on keycodes, but never time out on mappings
-set ttimeout ttimeoutlen=200
-
-" Use <F9> to toggle between 'paste' and 'nopaste'
-" set pastetoggle=<F9>
-
-"------------------------------------------------------------
-
-" Indentation settings according to personal preference.
-
-" Indentation settings for using 4 spaces instead of tabs.
-" Do not change 'tabstop' from its default value of 8 with this setup.
-set shiftwidth=4
-set softtabstop=4
-set expandtab
-"set tabstop=4
-
-"------------------------------------------------------------
