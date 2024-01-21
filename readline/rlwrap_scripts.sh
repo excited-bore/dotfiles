@@ -10,6 +10,8 @@ cyan=$(tput setaf 6)
 white=$(tput setaf 7)
 grey=$(tput setaf 8)
 red1=$(tput setaf 9)
+bold=$(tput bold)
+normal=$(tput sgr0)
 #...
 
 # Arguments: Completions(string with space entries, AWK works too),return value(-a password prompt, -c complete filenames, -p prompt flag, -Q prompt colour, -b break-chars (when does a string break for autocomp), -e change char given for multiple autocompletions)

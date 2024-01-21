@@ -611,4 +611,6 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     yes_edit_no ytbe "aliases/youtube.sh" "Install yt-dlp (youtube cli download) and youtube.sh at ~/.bash_aliases.d/ (yt-dlp aliases)?" "yes" "GREEN"
 fi
 
-source ~/.bashrc         
+source ~/.bashrc
+echo "${cyan}${bold}You can check all aliases with 'alias <TAB>'"
+echo "${green}${bold}Done!"

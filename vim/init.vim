@@ -1,10 +1,9 @@
-"autocmd CursorHold      * echo mode(1)
+"autocmd CursorHold      * echo mode(1) 
 "autocmd CursorHoldI     * echo mode(1)
 autocmd CursorMoved     * set cul
 autocmd CursorMovedI    * set cul
 "autocmd InsertEnter     * set cul
 "autocmd InsertLeave     * set nocul
-
 
 " unnamedplus	A variant of the "unnamed" flag which uses the
 " clipboard register "+" (quoteplus) instead of
@@ -12,10 +11,14 @@ autocmd CursorMovedI    * set cul
 " operations which would normally go to the unnamed
 " register.
 " Normal clipboard functionality for yy, y and d
-" Xclip can be problematic over ssh though, so this setting can cause trouble
+"
+" If vim is accessed over ssh though, be carefull for using this. Xclip can be
+" troublesome so test this setting to see that this is your possible problem
 
 set clipboard+=unnamedplus
 
+" Ignore whitespace for vimdiff
+set diffopt+=iwhite
 
 let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
 if !has('nvim')
@@ -76,9 +79,14 @@ Plugin 'tpope/vim-fugitive'
 Plugin 'christoomey/vim-tmux-navigator'
 
 "vim-kitty-navigator, Same thing for panes but with vim and kitty
-Plugin 'knubie/vim-kitty-navigator'
-function! AfterLoadVimKitty()
-    exec '! cd ~/.vim/plugins/vim-kitty-navigator && cp ./*.py ~/.config/kitty/ && cd -'
+"Plugin 'knubie/vim-kitty-navigator'
+function! AfterLoadKittyVim()
+    call system('(cd ~/.vim/plugins/vim-kitty-navigator && cp -f ./*.py ~/.config/kitty/)')
+endf
+
+Plugin 'NikoKS/kitty-vim-tmux-navigator', { 'afterLoad': 'AfterLoadKittyTmuxVim'}
+function! AfterLoadKittyTmuxVim()
+    call system('(cd ~/.vim/plugins/kitty-vim-tmux-navigator && cp -f ./*.py ~/.config/kitty/)')
 endf
 
 "Sudo write
@@ -123,19 +131,6 @@ if (has("termguicolors"))
     set termguicolors
 endif
   
-
-""" YouCompleteMe stuff
-
-"let g:ycm_auto_hover =0
-"let g:ycm_key_invoke_completion = '<C-Tab>'
-"let g:ycm_key_list_stop_completion = ['<C-y>', '<Right>', '<Space>']
-"let g:ycm_key_list_select_completion = ['<Tab>', '<Down>', '<C-j>']
-"let g:ycm_key_list_previous_completion = ['<S-Tab>', '<Up>', '<C-k>']
-"let g:ycm_enable_semantic_highlighting=1
-"let g:ycm_enable_inlay_hints=1
-"""let g:ycm_add_preview_to_completeopt = 1
-"let g:ycm_update_diagnostics_in_insert_mode = 0
-"""let g:ycm_echo_current_diagnostic = 'virtual-text'
 
 "Add tab 
 nnoremap <C-Tab>      i<tab><esc><right>
@@ -278,8 +273,8 @@ omap ac <Plug>(coc-classobj-a)
 
 " Use CTRL-S for selections ranges
 " Requires 'textDocument/selectionRange' support of language server
-nmap <silent> <C-S> <Plug>(coc-range-select)
-xmap <silent> <C-S> <Plug>(coc-range-select)
+"nmap <silent> <C-Tab> <Plug>(coc-range-select)
+"xmap <silent> <C-Tab> <Plug>(coc-range-select)
 
 " Add `:Format` command to format current buffer
 command! -nargs=0 Format :call CocActionAsync('format')
@@ -363,9 +358,95 @@ nnoremap <silent> [fzf-p]t     :<C-u>CocCommand fzf-preview.BufferTags<CR>
 nnoremap <silent> [fzf-p]q     :<C-u>CocCommand fzf-preview.QuickFix<CR>
 nnoremap <silent> [fzf-p]l     :<C-u>CocCommand fzf-preview.LocationList<CR>
 
+
+
+"Buffers and panes
+
+"List buffers
+nnoremap <silent><C-w>b :<C-u>CocCommand fzf-preview.AllBuffers<CR> 
+inoremap <silent><C-w>b <C-\><C-o><C-u>CocCommand fzf-preview.AllBuffers<CR>
+vnoremap <silent><C-w>b <esc>:<C-u>CocCommand fzf-preview.AllBuffers<CR>gv
+
+" Open next buffer
+nnoremap <silent><C-A-Right> :bNext<cr>
+inoremap <silent><C-A-Right> <C-\><C-o>:bNext<cr>
+vnoremap <silent><C-A-Right> <esc>:bNext<cr>
+
+" Open previous buffer
+nnoremap <silent><C-A-Left> :bprevious<cr>
+inoremap <silent><C-A-Left> <C-\><C-o>bprevious<cr>
+vnoremap <silent><C-A-Left> <esc>:bprevious<cr>
+
+" Open Horizontal buffer
+nnoremap <silent><C-w>h :split<cr>
+inoremap <silent><C-w>h <C-\><C-o>:split<cr>
+vnoremap <silent><C-w>h <esc>:split<cr>gv
+
+"" Open Vertical buffer
+"nnoremap <S-A-Down> :vertical sb
+"inoremap <S-A-Down> <C-\><C-o>:vertical sb
+"vnoremap <S-A-Down> <esc>:vertical sb
+
+
+" Choose pane
+nnoremap <silent><C-S-Space> :Windows<cr>
+inoremap <silent><C-S-Space> <C-\><C-o>:Windows<cr>
+vnoremap <silent><C-S-Space> <esc>:Windows<cr>gv
+                    
+""Left pane          
+"nnoremap <silent><C-S-Left> :wincmd h<cr>
+"inoremap <silent><C-S-Left> <C-\><C-o>:wincmd h<cr>
+"vnoremap <silent><C-S-Left> <esc>:wincmd h<cr>gv
+"                    
+""Right pane         
+"nnoremap <silent><C-S-Right> :wincmd l<cr>
+"inoremap <silent><C-S-Right> <C-\><C-o>:wincmd l<cr>
+"vnoremap <silent><C-S-Right> <esc>:wincmd l<cr>gv
+"                    
+""Up pane            
+"nnoremap <silent><C-S-Up> :wincmd k<cr>
+"inoremap <silent><C-S-Up> <C-\><C-o>:wincmd k<cr>
+"vnoremap <silent><C-S-Up> <esc>:wincmd k<cr>gv
+"                    
+""Down pane          
+"nnoremap <silent><C-S-Down> :wincmd j<cr>
+"inoremap <silent><C-S-Down> <C-\><C-o>:wincmd j<cr>
+"vnoremap <silent><C-S-Down> <esc>:wincmd j<cr>gv 
+
+function! TmuxKittyNavigate(direction)
+    if empty($TMUX)  
+        execute "KittyNavigate" .. a:direction 
+    else
+         if a:direction == "Left"
+            let dir = "left"
+        elseif a:direction == "Right"
+            let dir = "right"
+        elseif a:direction == "Up"
+            let dir = "top"
+        elseif a:direction == "Down"
+            let dir = "bottom"
+        endif
+        let isLast = system('tmux display-message -p -F "#{pane_at_' .. dir .. '}"')
+        if isLast == 1
+            execute "KittyNavigate" .. a:direction
+        else
+            execute "TmuxNavigate" .. a:direction 
+        endif
+    endif
+endfunction
+command -nargs=+ TmuxKittyNavigate call TmuxKittyNavigate(<f-args>)
+
+
+noremap <silent><C-S-Left> :<C-u>TmuxKittyNavigate Left<cr>
+noremap <silent><C-S-Down> :<C-u>TmuxKittyNavigate Down<cr>
+noremap <silent><C-S-Up> :<C-u>TmuxKittyNavigate Up<cr>
+noremap <silent><C-S-Right> :<C-u>TmuxKittyNavigate Right<cr>
+
+
+" Constantly set LastWindow
+" https://stackoverflow.com/questions/7069927/in-vimscript-how-to-test-if-a-window-is-the-last-window
 autocmd BufEnter * call MyLastWindow()
 
-" https://stackoverflow.com/questions/7069927/in-vimscript-how-to-test-if-a-window-is-the-last-window
 function! MyLastWindow()
    if &buftype=="quickfix"
       " if this window is last on screen quit without warning
@@ -431,19 +512,12 @@ vnoremap <C-x> :CocCommand fzf-preview.
 
 
 " Visual mode remaps
-"inoremap [          []
-vnoremap [          di[]<Esc>hp<Esc> 
-
-"inoremap {          {}
-vnoremap {          di{}<Esc>hp<Esc> 
-
-"inoremap (          ()
-vnoremap (          di()<Esc>hp<Esc> 
-
-"inoremap <           <>
-vnoremap >          >gv
-vnoremap <          <gv
-vnoremap <C-<>      di</><Esc>hhp<Esc>
+vnoremap [      di[]<Esc>hp<Esc> 
+vnoremap {      di{}<Esc>hp<Esc> 
+vnoremap (      di()<Esc>hp<Esc> 
+vnoremap >      >gv
+vnoremap <      <gv
+vnoremap <C-<>  di</><Esc>hhp<Esc>
 
 vnoremap `          di``<Esc>hp<Esc>
 
@@ -507,13 +581,6 @@ inoremap    <C-S-K>     <S-Up><C-o>
 vnoremap    <C-S-J>     <S-J>gv
 vnoremap    <C-S-K>     <S-K>gv
 
-#nnoremap    <C-S-Up>    1G
-#nnoremap    <C-S-Down>  G
-#inoremap    <C-S-Up>    <C-o>1Gi
-#inoremap    <C-S-Down>  <C-o>Gi
-#vnoremap    <C-S-Up>    1G
-#vnoremap    <C-S-Down>  G
-
 " https://vim.fandom.com/wiki/Moving_lines_up_or_down#Mappings%20to%20move%20lines
 " Move lines while holding Alt
 " Multiple lines => select in visual mode
@@ -531,23 +598,23 @@ inoremap    <A-K>   <Esc>:m .-2<CR>a
 vnoremap    <A-J> :m '>+1<CR>gv
 vnoremap    <A-K>   :m '<-2<CR>gv
 
-" e => Move one 'word' Left/Right (cursor at end) 
-" E => Move one space seperated word (cursor at end) => Ctrl+Left/Right
-nnoremap <C-Right>  E
+" Move one 'word' Left/Right (cursor at end) => Ctrl+Left/Right
+" Move one space seperated word (cursor at end) => Shift+Left/Right
+" Move to beginning/end / cycle lines => Alt+Left/Right
+nnoremap <C-Right>  e
 "nnoremap <S-Right>  E
-nnoremap <C-Left>   B
+nnoremap <C-Left>   b
 "nnoremap <S-Left>   B
-inoremap <C-Right>  <C-\><C-o>E
+inoremap <C-Right>  <C-\><C-o>e
 "inoremap <S-Right>  <C-\><C-o>E
-inoremap <C-Left>   <C-\><C-o>B
+inoremap <C-Left>   <C-\><C-o>b
 "inoremap <S-Left>   <C-\><C-o>B
-vnoremap <C-Right>  E
+vnoremap <C-Right>  e
 "vnoremap <S-Right>  E
-vnoremap <C-Left>   B
+vnoremap <C-Left>   b
 "vnoremap <S-Left>   B
 
 
-" Move to beginning/end / cycle lines => Alt+Left/Right
 " 0 => beginning of 'column'
 " ^ => First non blank character in line
 " nnoremap <A-Right> 0
@@ -557,7 +624,7 @@ vnoremap <C-Left>   B
 " Same for End of line, only you go down
 
 function! LastCheck()
-    if col(".") == col("$")-1 || col('$') == 1
+    if col(".") == col("$") || col('$') == 1
         return 1
     else
         return 0
@@ -565,7 +632,7 @@ function! LastCheck()
 endfunction
 
 function! LastCheckI()
-    if col(".") == col("$") || col('$') == 1
+    if col(".") == col("$") || col('$') == 1 
         return 1
     else
         return 0
@@ -573,11 +640,11 @@ function! LastCheckI()
 endfunction 
 
 nnoremap <expr> <A-Left>    (col(".") ==? 1 ? '<Up>0' : '0')
-nnoremap <expr> <A-right>   LastCheck() ? '<Down>$l' : '$l' 
+nnoremap <expr> <A-right>   LastCheck() ? '<Down>$<Right>' : '$<Right>'
 inoremap <expr> <A-Left>    (col('.') ==? 1 ? '<Up><C-\><C-o>0' : '<C-\><C-o>0')
-inoremap <expr> <A-Right>   LastCheckI() ? '<C-o><Down><C-\><C-o>$' : '<C-\><C-o>$'
+inoremap <expr> <A-Right>   LastCheckI() ? '<C-o><Down><C-\><C-o>$<Right>' : '<C-\><C-o>$<Right>'
 vnoremap <expr> <A-Left>    (col(".") ==? 1 ? '<Up>0' : '0')
-vnoremap <expr> <A-Right>   LastCheck() ? '<Down>$' : '$'
+vnoremap <expr> <A-Right>   LastCheck() ? '<Down>$<Right>' : '$<Right>'
 
 " Space for normal mode"
 nnoremap <space> i<space><esc><Right>
@@ -702,7 +769,7 @@ vnoremap d c
 vnoremap D C
 
 nnoremap c "+y
-nnoremap cc "+0yg_
+nnoremap cc "0yg_
 nnoremap C "+Y
 nnoremap CC "+0Yg_
 vnoremap c "+y
@@ -807,72 +874,6 @@ nnoremap <C-A-s> V
 vnoremap <C-A-s> <Esc> 
 inoremap <C-A-s> <C-o>V
 
-
-"Buffers and panes
-
-"List buffers
-nnoremap <silent><C-w>b :<C-u>CocCommand fzf-preview.AllBuffers<CR> 
-inoremap <silent><C-w>b <C-\><C-o><C-u>CocCommand fzf-preview.AllBuffers<CR>
-vnoremap <silent><C-w>b <esc>:<C-u>CocCommand fzf-preview.AllBuffers<CR>gv
-
-" Open next buffer
-nnoremap <silent><C-A-Right> :bNext<cr>
-inoremap <silent><C-A-Right> <C-\><C-o>:bNext<cr>
-vnoremap <silent><C-A-Right> <esc>:bNext<cr>
-
-" Open previous buffer
-nnoremap <silent><C-A-Left> :bprevious<cr>
-inoremap <silent><C-A-Left> <C-\><C-o>bprevious<cr>
-vnoremap <silent><C-A-Left> <esc>:bprevious<cr>
-
-" Open Horizontal buffer
-nnoremap <silent><C-w>h :split<cr>
-inoremap <silent><C-w>h <C-\><C-o>:split<cr>
-vnoremap <silent><C-w>h <esc>:split<cr>gv
-
-"" Open Vertical buffer
-"nnoremap <S-A-Down> :vertical sb
-"inoremap <S-A-Down> <C-\><C-o>:vertical sb
-"vnoremap <S-A-Down> <esc>:vertical sb
-
-let g:tmux_navigator_no_mappings = 1
-noremap <silent> <C-S-Left> :<C-U>TmuxNavigateLeft<cr>
-noremap <silent> <C-S-Down> :<C-U>TmuxNavigateDown<cr>
-noremap <silent> <C-S-Up> :<C-U>TmuxNavigateUp<cr>
-noremap <silent> <C-S-Right> :<C-U>TmuxNavigateRight<cr>
-noremap <silent> <C-²> :<C-U>TmuxNavigatePrevious<cr>
-
-let g:kitty_navigator_no_mappings = 1
-nnoremap <silent> <C-S-Left> :KittyNavigateLeft<cr>
-nnoremap <silent> <C-S-Down> :KittyNavigateDown<cr>
-nnoremap <silent> <C-S-Up> :KittyNavigateUp<cr>
-nnoremap <silent> <C-S-Right> :KittyNavigateRight<cr>
-
-
-" Choose pane
-nnoremap <silent><C-S-Space> :Windows<cr>
-inoremap <silent><C-S-Space> <C-\><C-o>:Windows<cr>
-vnoremap <silent><C-S-Space> <esc>:Windows<cr>gv
-                    
-""Left pane          
-"nnoremap <silent><C-S-Left> :wincmd h<cr>
-"inoremap <silent><C-S-Left> <C-\><C-o>:wincmd h<cr>
-"vnoremap <silent><C-S-Left> <esc>:wincmd h<cr>gv
-"                    
-""Right pane         
-"nnoremap <silent><C-S-Right> :wincmd l<cr>
-"inoremap <silent><C-S-Right> <C-\><C-o>:wincmd l<cr>
-"vnoremap <silent><C-S-Right> <esc>:wincmd l<cr>gv
-"                    
-""Up pane            
-"nnoremap <silent><C-S-Up> :wincmd k<cr>
-"inoremap <silent><C-S-Up> <C-\><C-o>:wincmd k<cr>
-"vnoremap <silent><C-S-Up> <esc>:wincmd k<cr>gv
-"                    
-""Down pane          
-"nnoremap <silent><C-S-Down> :wincmd j<cr>
-"inoremap <silent><C-S-Down> <C-\><C-o>:wincmd j<cr>
-"vnoremap <silent><C-S-Down> <esc>:wincmd j<cr>gv 
 
 "highlight Visual cterm=reverse ctermbg=NONE
 " These options and commands enable some very useful features in Vim, that
