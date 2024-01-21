@@ -93,7 +93,7 @@ elif [  $distro_base == "Debian" ];then
                     cd neovim && git checkout stable && make CMAKE_BUILD_TYPE=RelWithDebInfo
                     cd build && cpack -G DEB && sudo dpkg -i nvim-linux64.deb 
                     )
-                elif [ "$nvmflpk" == "f" ]; then 
+                elif [ "$nvmflpk" == "y" ]; then 
                    reade -Q "GREEN" -i "y" -p "Install flatpak? [Y/n]:" "y n" insflpk 
                    if [ "y" == "$insflpk" ]; then
                        ./install_flatpak.sh
