@@ -1,4 +1,3 @@
-
 "highlight Visual cterm=reverse ctermbg=NONE
 " These options and commands enable some very useful features in Vim, that
 " no user should live without
@@ -261,7 +260,7 @@ function! AfterLoadKittyVim()
     call system('(cd ~/.vim/plugins/vim-kitty-navigator && cp -f ./*.py ~/.config/kitty/)')
 endf
 
-Plugin 'NikoKS/kitty-vim-tmux-navigator', { 'afterInstall': 'AfterLoadKittyTmuxVim'}
+"Plugin 'NikoKS/kitty-vim-tmux-navigator', { 'afterInstall': 'AfterLoadKittyTmuxVim'}
 function! AfterLoadKittyTmuxVim()
     call system('(cd ~/.vim/plugins/kitty-vim-tmux-navigator && cp -f ./*.py ~/.config/kitty/)')
 endf
