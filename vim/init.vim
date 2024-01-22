@@ -224,7 +224,9 @@ let g:coc_global_extensions = [
             \'coc-sh',
             \'coc-fzf-preview',
             \'coc-git',
-            \'coc-vimlsp'
+            \'coc-vimlsp',
+            \'coc-webview',
+            \'coc-markdown-preview-enhanced'
             \]
 
 " Totally independent OS52 clipboard
@@ -247,9 +249,9 @@ Plugin 'junegunn/fzf.vim'
 "" Fuzzy finder preview   
 Plugin 'yuki-yano/fzf-preview.vim', { 'branch': 'release/remote' }
 
-"" Git plugin
+"" Plugin for git
 Plugin 'tpope/vim-fugitive'
-"
+
 "vim-tmux-navigator, smart navigation between vim and tmux panes
 Plugin 'christoomey/vim-tmux-navigator'
 
@@ -259,18 +261,29 @@ function! AfterLoadKittyVim()
     call system('(cd ~/.vim/plugins/vim-kitty-navigator && cp -f ./*.py ~/.config/kitty/)')
 endf
 
-Plugin 'NikoKS/kitty-vim-tmux-navigator', { 'afterLoad': 'AfterLoadKittyTmuxVim'}
+Plugin 'NikoKS/kitty-vim-tmux-navigator', { 'afterInstall': 'AfterLoadKittyTmuxVim'}
 function! AfterLoadKittyTmuxVim()
     call system('(cd ~/.vim/plugins/kitty-vim-tmux-navigator && cp -f ./*.py ~/.config/kitty/)')
 endf
 
+
+Plugin 'excited-bore/vim-tmux-kitty-navigator', { 'afterInstall': 'AfterInstallKittyTmuxVim'}
+function! AfterInstallKittyTmuxVim()
+    call system('(cd ~/.vim/plugins/vim-tmux-kitty-navigator && cp -f ./pass_keys.py ~/.config/kitty/)')
+endf
+
 " Sudo write
 Plugin 'tpope/vim-eunuch'
+Plugin 'lambdalisue/suda.vim'
+let g:suda_smart_edit = 1
+
+" Give passwords prompts in vim
+"Plugin 'lambdalisue/askpass.vim'
+" Dependency for askpass, Deno
+"Plugin 'vim-denops/denops.vim'
 
 " Nerd commenter
 Plugin 'preservim/nerdcommenter'
-" Create default mappings
-let g:NERDCreateDefaultMappings = 1
 
 " Self documenting vim wiki
 Plugin 'vimwiki/vimwiki'
@@ -317,11 +330,11 @@ vnoremap <S-Tab>    <gv
 " no select by `"suggest.noselect": true` in your configuration file
 " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
 " other plugin before putting this into your config
-inoremap <silent><expr> <C-TAB>
+inoremap <silent><expr> <TAB>
       \ coc#pum#visible() ? coc#pum#next(1) :
       \ CheckBackspace() ? "\<Tab>" :
       \ coc#refresh()
-inoremap <expr><C-S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
+inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
 
 " Make <CR> to accept selected completion item or notify coc.nvim to format
 " <C-g>u breaks current undo, please make your own choice
@@ -555,44 +568,44 @@ vnoremap <silent><C-S-Space> <esc>:Windows<cr>gv
 "inoremap <silent><C-S-Down> <C-\><C-o>:wincmd j<cr>
 "vnoremap <silent><C-S-Down> <esc>:wincmd j<cr>gv 
 
-function! TmuxKittyNavigate(direction)
-    if empty($TMUX)  
-        execute "KittyNavigate" .. a:direction 
-    else
-         if a:direction == "Left"
-            let dir = "left"
-        elseif a:direction == "Right"
-            let dir = "right"
-        elseif a:direction == "Up"
-            let dir = "top"
-        elseif a:direction == "Down"
-            let dir = "bottom"
-        endif
-        let isLast = system('tmux display-message -p -F "#{pane_at_' .. dir .. '}"')
-        if isLast == 1
-            execute "KittyNavigate" .. a:direction
-        else
-            execute "TmuxNavigate" .. a:direction 
-        endif
-    endif
-endfunction
-command -nargs=+ TmuxKittyNavigate call TmuxKittyNavigate(<f-args>)
+"function! TmuxKittyNavigate(direction)
+"    if empty($TMUX)  
+"        execute "KittyNavigate" .. a:direction 
+"    else
+"         if a:direction == "Left"
+"            let dir = "left"
+"        elseif a:direction == "Right"
+"            let dir = "right"
+"        elseif a:direction == "Up"
+"            let dir = "top"
+"        elseif a:direction == "Down"
+"            let dir = "bottom"
+"        endif
+"        let isLast = system('tmux display-message -p -F "#{pane_at_' .. dir .. '}"')
+"        if isLast == 1
+"            execute "KittyNavigate" .. a:direction
+"        else
+"            execute "TmuxNavigate" .. a:direction 
+"        endif
+"    endif
+"endfunction
+"command -nargs=+ TmuxKittyNavigate call TmuxKittyNavigate(<f-args>)
 
 
-nnoremap <silent><C-S-Left> :<C-u>TmuxKittyNavigate Left<cr>
-nnoremap <silent><C-S-Down> :<C-u>TmuxKittyNavigate Down<cr>
-nnoremap <silent><C-S-Up> :<C-u>TmuxKittyNavigate Up<cr>
-nnoremap <silent><C-S-Right> :<C-u>TmuxKittyNavigate Right<cr>
+nnoremap <silent><C-S-Left> :<C-u>TmuxKittyNavigateLeft<cr>
+nnoremap <silent><C-S-Down> :<C-u>TmuxKittyNavigateDown<cr>
+nnoremap <silent><C-S-Up> :<C-u>TmuxKittyNavigateUp<cr>
+nnoremap <silent><C-S-Right> :<C-u>TmuxKittyNavigateRight<cr>
 
-inoremap <silent><C-S-Left> <esc>:<C-u>TmuxKittyNavigate Left<cr>i
-inoremap <silent><C-S-Down> <esc>:<C-u>TmuxKittyNavigate Down<cr>i
-inoremap <silent><C-S-Up> <esc>:<C-u>TmuxKittyNavigate Up<cr>i
-inoremap <silent><C-S-Right> <esc>:<C-u>TmuxKittyNavigate Right<cr>i
+inoremap <silent><C-S-Left> <esc>:<C-u>TmuxKittyNavigateLeft<cr>i
+inoremap <silent><C-S-Down> <esc>:<C-u>TmuxKittyNavigateDown<cr>i
+inoremap <silent><C-S-Up> <esc>:<C-u>TmuxKittyNavigateUp<cr>i
+inoremap <silent><C-S-Right> <esc>:<C-u>TmuxKittyNavigateRight<cr>i
 
-vnoremap <silent><C-S-Left> :<C-u>TmuxKittyNavigate Left<cr>gv
-vnoremap <silent><C-S-Down> :<C-u>TmuxKittyNavigate Down<cr>gv
-vnoremap <silent><C-S-Up> :<C-u>TmuxKittyNavigate Up<cr>gv
-vnoremap <silent><C-S-Right> :<C-u>TmuxKittyNavigate Right<cr>gv 
+vnoremap <silent><C-S-Left> :<C-u>TmuxKittyNavigateLeft<cr>gv
+vnoremap <silent><C-S-Down> :<C-u>TmuxKittyNavigateDown<cr>gv
+vnoremap <silent><C-S-Up> :<C-u>TmuxKittyNavigateUp<cr>gv
+vnoremap <silent><C-S-Right> :<C-u>TmuxKittyNavigateRight<cr>gv 
 
 
 " Constantly set LastWindow

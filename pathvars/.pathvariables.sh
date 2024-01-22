@@ -23,6 +23,9 @@ export TMPDIR=/tmp
 # LC_ALL
 #export LC_ALL="en_US.UTF-8"
 
+# SUDO
+#export SUDO_ASKPASS=/usr/bin/nvim
+
 # PAGER
 export PAGER=/usr/bin/less
 
