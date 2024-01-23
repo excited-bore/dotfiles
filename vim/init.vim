@@ -1,4 +1,4 @@
-"highlight Visual cterm=reverse ctermbg=NONE
+" highlight Visual cterm=reverse ctermbg=NONE
 " These options and commands enable some very useful features in Vim, that
 " no user should live without
 " Set 'nocompatible' to ward off unexpected things that your distro might
@@ -254,23 +254,6 @@ Plugin 'tpope/vim-fugitive'
 "vim-tmux-navigator, smart navigation between vim and tmux panes
 Plugin 'christoomey/vim-tmux-navigator'
 
-"vim-kitty-navigator, Same thing for panes but with vim and kitty
-"Plugin 'knubie/vim-kitty-navigator'
-function! AfterLoadKittyVim()
-    call system('(cd ~/.vim/plugins/vim-kitty-navigator && cp -f ./*.py ~/.config/kitty/)')
-endf
-
-"Plugin 'NikoKS/kitty-vim-tmux-navigator', { 'afterInstall': 'AfterLoadKittyTmuxVim'}
-function! AfterLoadKittyTmuxVim()
-    call system('(cd ~/.vim/plugins/kitty-vim-tmux-navigator && cp -f ./*.py ~/.config/kitty/)')
-endf
-
-
-Plugin 'excited-bore/vim-tmux-kitty-navigator', { 'afterInstall': 'AfterInstallKittyTmuxVim'}
-function! AfterInstallKittyTmuxVim()
-    call system('(cd ~/.vim/plugins/vim-tmux-kitty-navigator && cp -f ./pass_keys.py ~/.config/kitty/;)')
-endf
-
 " Sudo write
 Plugin 'tpope/vim-eunuch'
 Plugin 'lambdalisue/suda.vim'
@@ -284,9 +267,28 @@ let g:suda_smart_edit = 1
 " Nerd commenter
 Plugin 'preservim/nerdcommenter'
 
+"vim-kitty-navigator, Same thing for panes but with vim and kitty
+"Plugin 'knubie/vim-kitty-navigator'
+function! AfterLoadKittyVim()
+    call system('(cd ~/.vim/plugins/vim-kitty-navigator && cp -f ./*.py ~/.config/kitty/)')
+endf
+
+"Plugin 'NikoKS/kitty-vim-tmux-navigator', { 'build': 'cd ~/.vim/plugins/kitty-vim-tmux-navigator && cp -f ./*.py ~/.config/kitty/'}
+
+
+Plugin 'excited-bore/vim-tmux-kitty-navigator', { 'build' : 'cd ~/.vim/plugins/vim-tmux-kitty-navigator && cp -f ./pass_keys.py ~/.config/kitty/;'}
+
+" Minimap to keep track of where in file
+Plugin 'wfxr/minimap.vim'
+let g:minimap_width = 10
+let g:minimap_highlight_range = 1
+let g:minimap_enable_highlight_colorgroup = 1
+"let g:minimap_auto_start = 1
+let g:minimap_git_colors = 1
+let g:minimap_auto_start_win_enter = 1
+
 " Self documenting vim wiki
 Plugin 'vimwiki/vimwiki'
-
 
 " Nice and cool themey
 Plugin 'morhetz/gruvbox'
@@ -316,12 +318,11 @@ endif
 let g:gruvbox_italic=1
 colorscheme gruvbox
 
-
 "Add tab 
-nnoremap <Tab>      i<tab><esc><right>
+nnoremap <Tab>   i<tab><esc><right>
 "Visual mode 
-vnoremap <Tab>      >gv
-vnoremap <S-Tab>    <gv 
+vnoremap <Tab>   >gv
+vnoremap <S-Tab> <gv 
 
 
 " Use tab for trigger completion with characters ahead and navigate
@@ -381,8 +382,8 @@ autocmd CursorHold * silent call CocActionAsync('highlight')
 nmap <leader>rn <Plug>(coc-rename)
 
 " Formatting selected code
-xmap <Leader>f  <Plug>(coc-format-selected)
-nmap <Leader>f  <Plug>(coc-format-selected)
+xmap <Leader>p  <Plug>(coc-format-selected)
+nmap <Leader>p  <Plug>(coc-format-selected)
 
 augroup mygroup
   autocmd!
@@ -493,8 +494,8 @@ vnoremap <S-F7> :FzfPreviewGitFiles<CR>gv
 
 
 " Leader key Fzf-Preview F7
-nmap <F8> [fzf-p]
-xmap <F8> [fzf-p]
+nmap <leader>f [fzf-p]
+xmap <leader>f [fzf-p]
 
 nnoremap <silent> [fzf-p]p     :<C-u>CocCommand fzf-preview.FromResources project_mru git<CR>
 nnoremap <silent> [fzf-p]gs    :<C-u>CocCommand fzf-preview.GitStatus<CR>
@@ -528,7 +529,7 @@ vnoremap <silent><C-A-Right> <esc>:bNext<cr>
 
 " Open previous buffer
 nnoremap <silent><C-A-Left> :bprevious<cr>
-inoremap <silent><C-A-Left> <C-\><C-o>bprevious<cr>
+inoremap <silent><C-A-Left> <C-\><C-o>:bprevious<cr>
 vnoremap <silent><C-A-Left> <esc>:bprevious<cr>
 
 " Open Horizontal buffer
@@ -636,25 +637,30 @@ function! CloseWindow()
 endfunction
 
 
-" Ctrl - s => Write / Save
+" Ctrl - S => Write / Save
 nnoremap <C-s> :write!<CR>
 inoremap <C-s> <C-\><C-o>:write!<CR>
 vnoremap <C-s> <Esc>:write!<CR>gv
 
-" Ctrl - q => Quit
+" Ctrl - Q => Quit
 nnoremap <silent><C-q> :call CloseWindow()<Enter>
 inoremap <silent><C-q> <Esc>:call CloseWindow()<CR>
 vnoremap <silent><C-q> <Esc>:call CloseWindow()<CR>
 
-" Ctrl - r is -> Redo (universal) :
+" Ctrl - R is -> Redo (universal) :
 nnoremap <C-r> :redo<CR>
 inoremap <C-r> <C-\><C-o>:redo<CR>a
 vnoremap <C-r> <Esc>:redo<CR>gv 
 
-" Ctrl - z is -> undo instead of stop 
+" Ctrl - Z is -> Undo instead of stop 
 nnoremap <C-z> u
 inoremap <C-z> <C-\><C-o>:u<CR>
 vnoremap <C-z> u 
+
+" Ctrl - E is -> Set to edit file in buffer  
+nnoremap <C-e> :e ./
+inoremap <C-e> <C-\><C-o>:e ./
+vnoremap <C-e> :e ./
 
 " t => : (open cmdline)
 nnoremap t :
@@ -664,15 +670,25 @@ vnoremap t :
 nnoremap T :terminal 
 vnoremap T :terminal 
 
-" Ctrl - t is -> :
+" Ctrl - T is -> :
 nnoremap <C-t> :
 inoremap <C-t> <C-\><C-o>:
 vnoremap <C-t> : 
 
-" Ctrl - x is -> CocCommand fzf-preview.
-nnoremap <C-x> :CocCommand fzf-preview.
-inoremap <C-x> <C-\><C-o>:CocCommand fzf-preview.
-vnoremap <C-x> :CocCommand fzf-preview.
+"Ctrl - M is -> Minimap 
+nnoremap <silent><C-m> <esc>:MinimapToggle<CR>:MinimapUpdateHighlight<cr>
+inoremap <silent><C-m> <C-\><C-o>:MinimapToggle<CR>:MinimapUpdateHighlight<cr>
+vnoremap <silent><C-m> <esc>:MinimapToggle<CR>:MinimapUpdateHighlight<cr>
+
+" Alt - C is -> CocCommand 
+nnoremap <M-c> :CocCommand 
+inoremap <M-c> <C-\><C-o>:CocCommand 
+vnoremap <M-c> :CocCommand 
+
+" Leader (\) - m is -> CocCommand markdown-preview-enhanced.openPreview
+nnoremap <leader>m :CocCommand markdown-preview-enhanced.openPreview<cr>
+inoremap <leader>m <C-\><C-o>:CocCommand markdown-preview-enhanced.openPreview<cr> 
+vnoremap <leader>m :CocCommand markdown-preview-enhanced.openPreview<cr>gv
 
 
 " Visual mode remaps
@@ -761,17 +777,17 @@ vnoremap    <A-K>   :m '<-2<CR>gv
 " Move one 'word' Left/Right (cursor at end) => Ctrl+Left/Right
 " Move one space seperated word (cursor at end) => Shift+Left/Right
 " Move to beginning/end / cycle lines => Alt+Left/Right
-nnoremap <C-Right>  e
+nnoremap <C-Right>  E
 "nnoremap <S-Right>  E
-nnoremap <C-Left>   b
+nnoremap <C-Left>   B
 "nnoremap <S-Left>   B
-inoremap <C-Right>  <C-\><C-o>e
+inoremap <C-Right>  <C-\><C-o>E
 "inoremap <S-Right>  <C-\><C-o>E
-inoremap <C-Left>   <C-\><C-o>b
+inoremap <C-Left>   <C-\><C-o>B
 "inoremap <S-Left>   <C-\><C-o>B
-vnoremap <C-Right>  e
+vnoremap <C-Right>  E
 "vnoremap <S-Right>  E
-vnoremap <C-Left>   b
+vnoremap <C-Left>   B
 "vnoremap <S-Left>   B
 
 
@@ -886,15 +902,15 @@ set t_kD=^[[3~
 
 " Ctrl - f => Find
 "Line search with Ripgrep 
-nnoremap <silent><C-f> :FzfPreviewLines <cr>
-inoremap <silent><C-f> <C-\><C-o>:FzfPreviewLines <cr>
-vnoremap <silent><C-f> <Esc>:FzfPreviewLines <cr>
+nnoremap <silent><C-f> :FzfPreviewLines<cr>
+inoremap <silent><C-f> <C-\><C-o>:FzfPreviewLines<cr>
+vnoremap <silent><C-f> y<Esc>:FzfPreviewLines --add-fzf-arg=--query="<C-r>=expand('<cword>')<CR>"<CR>
 
-" Ctrl-Shift-f => Find in loaded buffer
+" Ctrl-Shift-f => Find in all loaded buffer (even non-files(?))
 "Line search in loaded buffer
-nnoremap <silent><M-f> :Lines<cr>
-inoremap <silent><M-f> <C-\><C-o>:Lines<cr>
-vnoremap <silent><M-f> <Esc>:Lines<cr>
+nnoremap <silent><M-f> :FzfPreviewBufferLines<cr>
+inoremap <silent><M-f> <C-\><C-o>:FzfPreviewBufferLines<cr>
+vnoremap <silent><M-f> y<Esc>:FzfPreviewBufferLines --add-fzf-arg=--query="<C-r>=expand('<cword>')<CR>"<CR>
 
 " Ctrl - H => Find and replace
 " For thos from visual code or smth, Ctrl-h can be finnicky in terminals
@@ -904,14 +920,14 @@ vnoremap <silent><M-f> <Esc>:Lines<cr>
 " C-h => Global search
 nnoremap <C-h> :%s,,,gc<Left><Left><Left><Left>
 inoremap <C-h> <C-\><C-o>:%s,,,gc<Left><Left><Left><Left>
-vnoremap <C-h> <esc>:%s,\%V,,gc<Left><Left><Left>
+vnoremap <C-h> y:%s,<C-r>",,gc<Left><Left><Left>
 cnoremap <C-h> <C-e><C-u>nohl<CR>:<Esc>
 
 " Different seperator for Ctrl+Shift+h
-nnoremap <C-S-h> :%s///gc<Left><Left><Left><Left>
-inoremap <C-S-h> <C-\><C-o>:%s///gc<Left><Left><Left><Left>
-vnoremap <C-S-h> <esc>:%s/\%V//gc<Left><Left><Left>
-cnoremap <C-S-h> <C-e><C-u>nohl<CR>:<Esc>
+nnoremap <M-h> :%s///gc<Left><Left><Left><Left>
+inoremap <M-h> <C-\><C-o>:%s///gc<Left><Left><Left><Left>
+vnoremap <M-h> y:%s/<C-r>"//gc<Left><Left><Left>
+cnoremap <M-h> <C-e><C-u>nohl<CR>:<Esc>
 
 
 nnoremap y "+^y

@@ -1,3 +1,8 @@
+if [ ! -f ~/.bash_aliases.d/rlwrap_scripts.sh ]; then
+    . ../readline/rlwrap_scripts.sh
+else
+    . ~/.bash_aliases.d/rlwrap_scripts.sh
+fi
 # TRY and keep command line at bottom
 #alias b="tput cup $(tput lines) 0" 
 
@@ -9,16 +14,42 @@
 alias cp="cp -rv"
 alias cpOld="cp -ruv"
 alias copy="cp"
-function cpAllTo(){
-    cp -t $@ .[!.]*;
+
+function copy-dir-to(){
+    local dest
+    reade -Q "GREEN" -i "~/" -p "This will copy the entire directory to: " -e dest
+    if [ ! -z "$dest" ]; then
+        cp -v -t "$dest" .[!.]*;
+    fi
 }
+
+function copy-rec-dir-to(){
+    local dest
+    reade -Q "GREEN" -i "~/" -p "This will copy the entire directory to: " -e dest
+    if [ ! -z "$dest" ]; then
+        cp -rv -t "$dest" .[!.]*;
+    fi
+}
+
+complete -F _filedir cpAllTo
+
+function copy-force-trash(){
+    cp -f --backup=1;
+}
+complete -F _files cpf1Bkup
+
+
+function copy-force-1backup(){
+    cp -f --backup=1;
+}
+complete -F _files cpf1Bkup
 
 # mv (recursively native) verbose and only ask for interaction when overwriting newer files
 
 alias mv="mv -v"
 alias mvOld="mv -nv"
 alias move="mv"
-function mvAllTo(){
+function mvDirTo(){
     mv -t "$@" .[!.]* *;
 } 
 
@@ -49,10 +80,11 @@ alias x="cd .."
 # (:
 alias men="man man"
 
-alias untar_gz="tar -xvf"
-alias tar_gz_list="tar -tvf"
+alias targz-create="tar -cvf"
+alias targz-unpack="tar -xvf"
+alias targz-list="tar -tvf"
 
-extract(){  
+extract-archive(){  
     if [ -f $1 ] ; then
     case $1 in
       *.tar.bz2)   tar xjf $1   ;;
@@ -76,12 +108,12 @@ extract(){
 complete -F _files extract
 
 
-alias redirect_tty_output_to_="exec 1>/dev/pts/"
+alias redirect-tty-output-to="exec 1>/dev/pts/"
 
-alias GPU_list_drivers="inxi -G"
+alias GPU-list-drivers="inxi -G"
 
 
-function link_soft(){
+function link-soft(){
     if ([[ "$1" = /* ]] || [ -d "$1" ] || [ -f "$1" ]) && ([[ $(readlink -f "$2") ]] || [[ $(readlink -d "$2") ]]); then
         if [[ "$1" = /* ]]; then  
             ln -s "$1" "$2";
@@ -96,7 +128,7 @@ function link_soft(){
 complete -F _files link_soft
 
 
-function link_hard(){
+function link-hard(){
     if ([[ "$0" = /* ]] || [ -d "$1" ] || [ -f "$1" ]) && ([[ $(readlink -f "$2") ]] || [[ $(readlink -d "$2") ]]); then
         if [[ "$1" = /* ]]; then  
             ln "$1" "$2";
@@ -111,30 +143,30 @@ function link_hard(){
 complete -F _files link_hard
 
 
-#function trash(){
-#    for arg in $@ ; do
-#        if [ -f "$arg" ] || [ -d "$arg" ]; then
-#            gio trash $arg;
-#        elif [ -L "$arg" ]; then
-#            rm $arg;
-#        else
-#            echo "Trash one or more files / directories. Nothing passed as argument";
-#        fi
-#    done
-#}
-#
-#complete -F _files trash
-#
-#alias trash-list="gio trash --list"
-#alias trash-empty="gio trash --empty"
-#
-#function trash-restore(){
-#    for arg in $@; do
-#        gio trash --restore $arg;
-#    done
-#}
+function trash(){
+    for arg in $@ ; do
+        if [ -f "$arg" ] || [ -d "$arg" ]; then
+            gio trash $arg;
+        elif [ -L "$arg" ]; then
+            rm $arg;
+        else
+            echo "Trash one or more files / directories. Nothing passed as argument";
+        fi
+    done
+}
 
-function add_to_group() {
+complete -F _files trash
+
+alias trash-list="gio trash --list"
+alias trash-empty="gio trash --empty"
+
+function trash-restore(){
+    for arg in $@; do
+        gio trash --restore $arg;
+    done
+}
+
+function add-to-group() {
     if [[ -z $1 ]]; then
         echo "Give a group and a username (default: $USER)"
     elif [[ -z $2 ]]; then
@@ -145,7 +177,7 @@ function add_to_group() {
 
 complete -F _groups add_to_group
 
-function permission_user_executable() {
+function set-user-executable() {
     if [[ ! -f $1 ]] ; then
         echo "Give a file to set as an executable";
     else
@@ -164,7 +196,7 @@ function escape_spaces(){
      sed 's/ /\\ /g' <<< $@; 
 }
 
-function lines_to_words(){
+function lines-to-words(){
     # 1 Output with lines
     # 2 Return string with words
     IFS=$'\n' read -d "\034" -r -a $2 <<<"$1\034";

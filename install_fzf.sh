@@ -101,7 +101,7 @@
         unset comp_key
 
         if test -f ~/.fzf.bash ; then
-            if [ -f ~/.bash_aliases.d/shell_keybindings.sh ] && grep -q -w "bind '\"\\\C-z\": vi-undo'" ~/.bash_aliases.d/shell_keybindings.sh; then
+            if [ -f ~/.keybinds.sh ] && grep -q -w "bind '\"\\\C-z\": vi-undo'" ~/.keybinds.sh; then
                 sed -i 's|\(\\C-y\\ey\\C-x\\C-x\)\\C-f|\1|g' ~/.fzf/shell/key-bindings.bash
                 sed -i 's|\\C-z|\\ep|g' ~/.fzf/shell/key-bindings.bash
                 #sed -i  's|bind -m emacs-standard '\''"\C-z"|#bind -m emacs-standard '\''"\C-z"|g' ~/.fzf/shell/key-bindings.bash

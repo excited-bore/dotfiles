@@ -52,16 +52,16 @@ if [ -z $rngr ] || [ "Y" == $rngr ] || [ $rngr == "y" ]; then
     reade -Q "GREEN" -i "y" -p "F2 for Ranger? [Y/n]:" "y n" rf2
     if [ -z $rf2 ] || [ "y" == $rf2 ]; then
         binds=~/.bashrc
-        if [ -f ~/.bash_aliases/shell_keybindings ]; then
-            binds=~/.bash_aliases/shell_keybindings
+        if [ -f ~/.keybinds.sh]; then
+            binds=~/.keybinds.sh
         fi
         if grep -q "bind -x '\"\\\eOQ\": ranger'" $binds; then
             sed -i 's|#bind -x '\''"\\eOQ\": ranger'\''|bind -x '\''"\\eOQ\": ranger'\''|g' $binds
         fi
-        if [ -f ~/.bash_aliases.d/shell_keybindings.sh ]; then
-            if grep -q '#bind -x '\''"\\201": ranger'\''' ~/.bash_aliases.d/shell_keybindings.sh; then
-                sed -i 's|#bind -x '\''"\\201": ranger'\''|bind -x '\''"\\201": ranger'\''|g' ~/.bash_aliases.d/shell_keybindings.sh
-                sed -i 's|#bind '\''"\\eOQ": "\\201\\n\\C-l"'\''|bind '\''"\\eOQ": "\\201\\n\\C-l"'\''|g' ~/.bash_aliases.d/shell_keybindings.sh
+        if [ -f ~/.keybinds.sh ]; then
+            if grep -q '#bind -x '\''"\\201": ranger'\''' ~/.keybinds.sh; then
+                sed -i 's|#bind -x '\''"\\201": ranger'\''|bind -x '\''"\\201": ranger'\''|g' ~/.keybinds.sh
+                sed -i 's|#bind '\''"\\eOQ": "\\201\\n\\C-l"'\''|bind '\''"\\eOQ": "\\201\\n\\C-l"'\''|g' ~/.keybinds.sh
             fi
         elif ! grep -q 'bind -x '\''"\\201": ranger'\''' ~/.bashrc; then
             echo 'bind -x '\''"\\201": ranger'\''' >> ~/.bashrc

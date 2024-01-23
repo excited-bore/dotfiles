@@ -1,7 +1,6 @@
 # Bash_aliases at ~/.bash_aliases.d/ 
 # global bashrc -> /etc/bash.bashrc
 # root shell profiles -> /etc/profile
-# Other bindings at .inputrc
 
 # https://stackoverflow.com/questions/8366450/complex-keybinding-in-bash
 
@@ -121,9 +120,12 @@ bind '"\C-n": "\C-a\e[3~"'
 # Ctrl-o searches for a manual for the typed command 
 bind '"\C-o": "\C-u man \C-y\C-m"'
 
+# Ctrl-x is for autojump
+bind '"\C-x": "j \C-i"'
+
 # F2 - ranger (file explorer)
-##bind -x '"\201": ranger'
-##bind '"\eOQ": "\201\n\C-l"'
+#bind -x '"\201": ranger'
+#bind '"\eOQ": "\201\n\C-l"'
 #bind -x '"\eOQ": ranger'
 
 # F3 - FuzzyFinderls -l | fzf --preview="echo user={3} when={-4..-2}; cat {-1}" --header-lines=1 (file explorer)

@@ -1,3 +1,5 @@
+#!/bin/bash
+
 . ./readline/rlwrap_scripts.sh
 . ./checks/check_distro.sh
 . ./checks/check_rlwrap.sh
@@ -286,7 +288,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
     yes_edit_no pathvariables "pathvars/.pathvariables.sh" "Install .pathvariables.sh at ~/? " "edit" "GREEN"
 fi
 
-./install_completions_dir.sh
+./checks/check_completions_dir.sh
 
 # Bash alias completions
 reade -Q "GREEN" -i "y" -p "Install bash completions for aliases in ~/.bash_completion.d? [Y/n]:" "y n" compl
@@ -302,6 +304,7 @@ if [ -z $pycomp ] || [ "y" == $pycomp ]; then
 fi
 unset pycomp
 
+
 # Osc
 reade -Q "GREEN" -i "y" -p "Install Osc? (Universal clipboard tool / works better then xclip over ssh) [Y/n]: " "y n" osc
 if [ -z $osc ] || [ "Y" == $osc ] || [ $osc == "y" ]; then
@@ -309,6 +312,8 @@ if [ -z $osc ] || [ "Y" == $osc ] || [ $osc == "y" ]; then
 fi
 unset osc
 
+# Autojump
+./install_autojump.sh
 
 # Moar (Custom pager instead of less)
 reade -Q "GREEN" -i "y" -p "Install moar? (Custom pager instead of less with linenumbers) [Y/n]: " "y n" moar
@@ -356,7 +361,7 @@ unset findr
 reade -Q "GREEN" -i "y" -p "Install bash aliases and other config? [Y/n]:" "y n" scripts
 if [ -z $scripts ] || [ "y" == $scripts ]; then
 
-     ./install_bashalias_dir.sh
+    ./checks/check__aliases_dir.sh
     
     # Xresources
     
@@ -374,7 +379,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     function inputrc_r(){ 
         sudo cp -fv readline/.inputrc /root/.inputrc; 
         if [ -f /root/.pathvariables.sh ]; then
-           sed -i 's|#export INPUTRC|export INPUTRC|g' /root/.pathvariables.sh
+           sudi sed -i 's|#export INPUTRC|export INPUTRC|g' /root/.pathvariables.sh
         fi
     }
     inputrc() {
@@ -385,28 +390,41 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         yes_edit_no inputrc_r "readline/.inputrc" "Install .inputrc at /root/?" "edit" "GREEN"; }
     yes_edit_no inputrc "readline/.inputrc" "Install .inputrc at ~/? (readline config)" "edit" "GREEN"
     
-    # Shell-keybindings
+    # Shell-keybinds
     
-    #if grep -q 'bind -x '\''"\\C-s": ctrl-s'\''' aliases/shell_keybindings.sh && ! grep -q '#bind -x '\''"\\C-s": ctrl-s'\''' aliases/shell_keybindings.sh; then
-    #    sed -i 's|bind -x '\''"\\C-s": ctrl-s'\''|#bind -x '\''"\\C-s": ctrl-s'\''|g' aliases/shell_keybindings.sh
-    #    sed -i 's|bind -x '\''"\\eOR": ctrl-s'\''|#bind -x '\''"\\eOR": ctrl-s'\''|g' aliases/shell_keybindings.sh
+    #if grep -q 'bind -x '\''"\\C-s": ctrl-s'\''' ~/.keybinds.sh && ! grep -q '#bind -x '\''"\\C-s": ctrl-s'\''' ~/.keybinds.sh; then
+    #    sed -i 's|bind -x '\''"\\C-s": ctrl-s'\''|#bind -x '\''"\\C-s": ctrl-s'\''|g' ~/.keybinds.sh
+    #    sed -i 's|bind -x '\''"\\eOR": ctrl-s'\''|#bind -x '\''"\\eOR": ctrl-s'\''|g' ~/.keybinds.sh
     #fi
 
-    if grep -q 'bind -x '\''"\\201": ranger'\''' aliases/shell_keybindings.sh; then
-        sed -i 's|bind -x '\''"\\201": ranger'\''|#bind -x '\''"\\201": ranger'\''|g' aliases/shell_keybindings.sh
-        sed -i 's|bind '\''"\\eOQ":|#bind '\''"\\eOQ":|g' aliases/shell_keybindings.sh
+    if grep -q 'bind -x '\''"\\201": ranger'\''' ~/.keybinds.sh; then
+        sed -i 's|bind -x '\''"\\201": ranger'\''|#bind -x '\''"\\201": ranger'\''|g' ~/.keybinds.sh
+        sed -i 's|bind '\''"\\eOQ":|#bind '\''"\\eOQ":|g' ~/.keybinds.sh
     fi
 
-    shell-keybindings_r(){ sudo cp -fv aliases/shell_keybindings.sh /root/.bash_aliases.d/; }
-    shell-keybindings() {
+    shell-keybinds_r(){ 
+        if ! sudo grep -q "/root/.keybinds.sh" /root/.bashrc; then
+            printf "if [[ -f /root/.keybinds.sh ]]; then\n" | sudo tee -a /root/.bashrc
+            printf "  . /root/.keybinds.sh\n" | sudo tee -a /root/.bashrc
+            printf "fi\n" | sudo tee -a /root/.bashrc
+        fi
+        sudo cp -fv keybinds/.keybinds.sh /root/; 
+    }
+    shell-keybinds() {
         reade -Q "YELLOW" -i "n" -p "Set caps to escape? (Might cause X11 errors with SSH) [Y/n]: " "y n" xtrm
         if [ ! "$xtrm" == "y" ] && [ ! -z "$xtrm" ]; then
-            sed -i "s|setxkbmap |#setxkbmap |g" aliases/shell_keybindings.sh
+            sed -i "s|setxkbmap |#setxkbmap |g" keybinds/.keybinds.sh
         fi
         
-        cp -fv aliases/shell_keybindings.sh ~/.bash_aliases.d/
-        yes_edit_no shell-keybindings_r "aliases/shell_keybindings.sh" "Install .bash_aliases.d/shell_keybindings.sh at /root/?" "edit" "RED"; }
-    yes_edit_no shell-keybindings "aliases/shell_keybindings.sh" "Install .bash_aliases.d/shell-keybindings.sh at ~/? (bind commands)" "edit" "YELLOW"
+        if ! grep -q "~/.keybinds.sh" ~/.bashrc; then
+            echo "if [[ -f ~/.keybinds.sh ]]; then" >> ~/.bashrc
+            echo "  . ~/.keybinds.sh" >> ~/.bashrc
+            echo "fi" >> ~/.bashrc
+        fi 
+        
+        cp -fv keybinds/.keybinds.sh ~/
+        yes_edit_no shell-keybinds_r "keybinds/.keybinds.sh" "Install .keybinds.sh at /root/?" "edit" "RED"; }
+    yes_edit_no shell-keybinds "keybinds/.keybinds.sh" "Install .keybinds.sh at ~/? (bind commands)" "edit" "YELLOW"
 
 
     

@@ -14,7 +14,7 @@ copy_to_serber() { scp -r $user@$ip:$1 $2; }
 
 # SSH in Kitty only really w
 #[ "$TERM" = "xterm-kitty" ] && alias ssh="kitty +kitten ssh -R 50000:${KITTY_LISTEN_ON#*:}"
-[ "$TERM" = "xterm-kitty" ] && alias ssh="kitty +kitten ssh"
+[ "$TERM" = "xterm-kitty" ] && alias ssh="kitten ssh"
 
 
 # For Xclip, we need X11 to function properly  
@@ -29,7 +29,7 @@ addr=$(nmcli device show | grep IP4.ADDR | awk 'NR==1{print $2}'| sed 's|\(.*\)/
 # This *should* also forward GUI for GUI apps
 
 #Server access
-alias serber="ssh -t -Y -i $ssh_file $user@$ip 'export DISPLAY=$addr:0.0; bash -l'"
+alias serber="ssh -XY -i $ssh_file $user@$ip"
 alias serber_unmnt="fusermount3 -u /mnt/mount1/"
 alias serber_unmnt1="fusermount3 -u /mnt/mount2/"
 
