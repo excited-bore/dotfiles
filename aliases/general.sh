@@ -2,25 +2,32 @@
 #alias b="tput cup $(tput lines) 0" 
 
 #tput cup $(stty size | awk '{print int($1/2);}') 0 && tput cuu1 && tput ed && ls
-# Cp / rm recursively
+
+# cp recursively, verbose ()
+# cpOld same but no files older are overwritten
+
 alias cp="cp -rv"
+alias cpOld="cp -ruv"
 alias copy="cp"
+function cpAllTo(){
+    cp -t $@ .[!.]*;
+}
 
-alias cpAllHidden="cp -t $1 .[!.]*"
+# mv (recursively native) verbose and only ask for interaction when overwriting newer files
 
-# Ask for Interaction when overwriting newer files
-alias mv="mv -nv"
+alias mv="mv -v"
+alias mvOld="mv -nv"
 alias move="mv"
-function mvAll(){
-    mv -t "$1" .[!.]* *;
+function mvAllTo(){
+    mv -t "$@" .[!.]* *;
 } 
-function mvAllHidden(){
-    mv -t "$1" .[!.]* *;
-} 
+
+# rm recursively and verbose
+
 alias rm="rm -rv"
 alias remove="rm"
-alias rmAll="rm ./*";
-alias rmAllHiddn="rm .[!.]* *";
+alias rmAll="rm -v ./*";
+alias rmAllHiddn="rm -v .[!.]* *";
 
 # With parent directories and verbose
 alias mkdir="mkdir -pv"
@@ -30,15 +37,16 @@ alias ls="ls --color=always"
 alias grep='grep --colour=always'
 alias egrep='egrep --colour=always'
 alias fgrep='fgrep --colour=always'
+alias rg='rg --color=always'
+
+
 # Listen hidden files and permissions
 alias lsall="ls -Al"
-alias less="less -X"
-# Cant source .inputrc in any way though
 alias q="exit"
-#alias w="clear ;b; ls -Al"
 alias c="cd"
 alias x="cd .."
 
+# (:
 alias men="man man"
 
 alias untar_gz="tar -xvf"
@@ -103,28 +111,28 @@ function link_hard(){
 complete -F _files link_hard
 
 
-function trash(){
-    for arg in $@ ; do
-        if [ -f "$arg" ] || [ -d "$arg" ]; then
-            gio trash $arg;
-        elif [ -L "$arg" ]; then
-            rm $arg;
-        else
-            echo "Trash one or more files / directories. Nothing passed as argument";
-        fi
-    done
-}
-
-complete -F _files trash
-
-alias trash_list="gio trash --list"
-alias trash_empty="gio trash --empty"
-
-function trash_restore(){
-    for arg in $@; do
-        gio trash --restore $arg;
-    done
-}
+#function trash(){
+#    for arg in $@ ; do
+#        if [ -f "$arg" ] || [ -d "$arg" ]; then
+#            gio trash $arg;
+#        elif [ -L "$arg" ]; then
+#            rm $arg;
+#        else
+#            echo "Trash one or more files / directories. Nothing passed as argument";
+#        fi
+#    done
+#}
+#
+#complete -F _files trash
+#
+#alias trash-list="gio trash --list"
+#alias trash-empty="gio trash --empty"
+#
+#function trash-restore(){
+#    for arg in $@; do
+#        gio trash --restore $arg;
+#    done
+#}
 
 function add_to_group() {
     if [[ -z $1 ]]; then

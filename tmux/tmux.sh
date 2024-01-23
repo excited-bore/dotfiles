@@ -17,6 +17,14 @@
 alias terminal_colours="curl -s https://raw.githubusercontent.com/JohnMorales/dotfiles/master/colors/24-bit-color.sh | bash"
 alias tmuxSource="tmux source ~/.tmux.conf"
 
+function tmux(){
+    if [[ "$#" == 0 ]]; then 
+        kitten @ launch --env TMUX="$TMPDIR/tmux-1000/default" bash -c 'tmux; kitten @ launch --env TMUX= && kitten @ close-window --self' && kitten @ close-window --self
+    else
+        /usr/bin/tmux "$@";
+    fi
+}
+
 function install_tmux_login_for_ssh(){
     
     touch ~/.bash_aliases.d/tmux_startup.sh

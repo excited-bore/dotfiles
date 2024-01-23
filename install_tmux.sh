@@ -117,25 +117,7 @@ if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
 fi
 unset tmuxx
 
-~/.tmux/plugins/tpm/bin/install_plugins
-echo "Install plugins in tmux with 'C-b + I' / Update with 'C-b + U'"
 
-reade -Q "GREEN" -i "y" -p "Install tmux completions? [Y/n]:" "y n"  tmuxx
-if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
-    if [ ! -d ~/.bash_completion.d/ ]; then
-        mkdir ~/.bash_completion.d/
-    fi
-    if [ ! -f ~/.bash_completion.d/ ]; then
-        touch ~/.bash_completion.d/tmux
-    fi
-    if [ ! -e ~/.bash_completion.d/tmux ]; then
-        curl https://raw.githubusercontent.com/imomaliev/tmux-bash-completion/master/completions/tmux > ~/.bash_completion.d/tmux 2> /dev/null
-        #if ! grep -q "~/.bash_completion.d/tmux" ~/.bashrc; then
-        #    echo ". ~/.bash_completion.d/tmux" >> ~/.bashrc
-        #fi
-        . ~/.bashrc
-    fi
-fi
 
 #awk '$0=="#run '\''~/.tmux/plugins/tpm/tpm'\''"{lastline=$0;next}{print $0}END{print lastline}' ~/.tmux.conf > ~/.tmux.conf
 #awk '$0=="run '\''~/.tmux/plugins/tpm/tpm'\''"{lastline=$0;next}{print $0}END{print lastline}' ~/.tmux.conf > ~/.tmux.conf
@@ -177,6 +159,22 @@ if [ -x "$(command -v ranger)" ]; then
 fi
 unset tmuxx
 
+reade -Q "GREEN" -i "y" -p "Install tmux completions? [Y/n]:" "y n"  tmuxx
+if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
+    if [ ! -d ~/.bash_completion.d/ ]; then
+        mkdir ~/.bash_completion.d/
+    fi
+    if [ ! -f ~/.bash_completion.d/ ]; then
+        touch ~/.bash_completion.d/tmux
+    fi
+    if [ ! -e ~/.bash_completion.d/tmux ]; then
+        curl https://raw.githubusercontent.com/imomaliev/tmux-bash-completion/master/completions/tmux > ~/.bash_completion.d/tmux 2> /dev/null
+        #if ! grep -q "~/.bash_completion.d/tmux" ~/.bashrc; then
+        #    echo ". ~/.bash_completion.d/tmux" >> ~/.bashrc
+        #fi
+        . ~/.bashrc
+    fi
+fi
 
 reade -Q "GREEN" -i "y" -p "Install tmux.sh at ~/.bash_aliases.d/? (tmux aliases) [Y/n]:" "y n"  tmuxx
 if [ -z "$tmuxx" ] || [ "$tmuxx"  == "y" ]; then 
@@ -192,3 +190,6 @@ if [ -z "$tmuxx" ] || [ "$tmuxx"  == "y" ]; then
     echo 'fi' >> ~/.bash_aliases.d/tmux_startup.sh
 fi
 unset tmuxx
+
+tmux
+echo "${green}Install plugins in tmux with 'C-b + I' / Update with 'C-b + U'"

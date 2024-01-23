@@ -1,7 +1,9 @@
-
 . ./readline/rlwrap_scripts.sh
 . ./checks/check_distro.sh
 . ./checks/check_rlwrap.sh
+. ./aliases/general.sh
+
+echo "${green}${bold}If all files are sourced this text looks green and bold. If not, something went wrong."
 
 
 if [ -z "$TMPDIR" ]; then

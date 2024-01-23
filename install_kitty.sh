@@ -13,10 +13,11 @@ elif [ "$distro" == "Debian" ] || [ "$distro_base" == "Debian" ]; then
     kitten update-self 
 fi
 
-reade -Q "GREEN" -i "y" -p "Install kitty conf? (at ~/.config/kitty/kitty.conf) [Y/n]:" "y n" kittn
+reade -Q "GREEN" -i "y" -p "Install kitty conf? (at ~/.config/kitty/kitty.conf|ssh.conf) [Y/n]:" "y n" kittn
 if [ "y" == "$kittn" ]; then
     mkdir -p ~/.config/kitty
     cp -f kitty/kitty.conf ~/.config/kitty/kitty.conf
+    cp -f kitty/ssh.conf ~/.config/kitty/ssh.conf
 fi
 unset kittn
 

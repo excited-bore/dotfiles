@@ -268,7 +268,7 @@ endf
 
 Plugin 'excited-bore/vim-tmux-kitty-navigator', { 'afterInstall': 'AfterInstallKittyTmuxVim'}
 function! AfterInstallKittyTmuxVim()
-    call system('(cd ~/.vim/plugins/vim-tmux-kitty-navigator && cp -f ./pass_keys.py ~/.config/kitty/)')
+    call system('(cd ~/.vim/plugins/vim-tmux-kitty-navigator && cp -f ./pass_keys.py ~/.config/kitty/;)')
 endf
 
 " Sudo write
@@ -688,7 +688,7 @@ vnoremap '      di''<Esc>hp<Esc>
 vnoremap <expr> #   (visualmode() == "\<C-V>" ? ':norm i#<cr>gv' : 'c##<Esc>hp<Esc>')
 vnoremap <expr> //   (visualmode() == "\<C-V>" ? ':norm i//<cr>gv' : 'c/*<enter><esc>pi<enter>*/<enter><Esc>')
 vnoremap <expr> --   (visualmode() == "\<C-V>" ? ':norm i--<cr>gv' : 'c--[[<enter><esc>pi<enter>--]]<enter><Esc>')
-vnoremap <expr> "   (visualmode() == "\<C-V>" ? ':norm "<cr>gv' : 'c"""<enter><esc>pi<enter>"""<enter><Esc>')
+vnoremap <expr> "   (visualmode() == "\<C-V>" ? ':norm "<cr>gv' : 'c""<Esc>hp<Esc>')
 vnoremap <expr> '   (visualmode() == "\<C-V>" ? ":norm i'<cr>gv" : "c''<Esc>hp<Esc>")
 vnoremap <expr> !   (visualmode() == "\<C-V>" ? ':norm i#<cr>gv' : 'c!!<Esc>hp<Esc>')
 

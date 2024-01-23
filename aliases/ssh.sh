@@ -13,7 +13,9 @@ copy_to_serber() { scp -r $user@$ip:$1 $2; }
 #function cp_from_serber() { scp -r }
 
 # SSH in Kitty only really w
+#[ "$TERM" = "xterm-kitty" ] && alias ssh="kitty +kitten ssh -R 50000:${KITTY_LISTEN_ON#*:}"
 [ "$TERM" = "xterm-kitty" ] && alias ssh="kitty +kitten ssh"
+
 
 # For Xclip, we need X11 to function properly  
 # Even if X11 fowarding is setup, x11 still needs a display
