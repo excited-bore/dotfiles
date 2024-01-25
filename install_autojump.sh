@@ -1,14 +1,21 @@
 . ./checks/check_distro.sh
 . ./readline/rlwrap_scripts.sh
 . ./checks/check_keybinds.sh
+./install_AUR-helper.sh
 
 if [ ! -x "$(command -v autojump)" ]; then
     reade -Q "GREEN" -i "y" -p "Install autojump? [Y/n]:" "y n" tojump
     if [ "$tojump" == "y" ]; then
-        if [ $distro_base == "Arch" ]; then
-            yes | sudo pacman -Su autojump
+        if [ $distro == "Manjaro" ]; then
+            pamac install autojump
         elif [ $distro_base == "Debian" ]; then
             yes | sudo apt install autojump
+        fi
+        if ! grep "autojump" ~/.bashrc; then
+            printf "[[ -s /etc/profile.d/autojump.sh ]] && source /etc/profile.d/autojump.sh\n" >> ~/.bashrc
+        fi
+        if sudo ! grep "autojump" /root/.bashrc; then
+            printf "[[ -s /etc/profile.d/autojump.sh ]] && source /etc/profile.d/autojump.sh\n" | sudo tee -a /root/.bashrc
         fi
     fi
 fi
@@ -17,8 +24,8 @@ fi
 # https://bestasciitable.com/
 reade -Q "GREEN" -i "y" -p "Install autojump keybind at Ctrl-x for user?" "y n" bnd
 if [ "$bnd" == "y" ]; then
-    if grep -q 'bind '\''"\\C-x": "j \\C-i"'\''' $KEYBIND; then
-        sed -i 's|.*\(bind .*\C-x": "j.*\)|\1|g'  $KEYBIND
+    if grep -q 'bind '\''"\C-x": "j \C-i"'\''' $KEYBIND; then
+        sed -i 's|.*\(bind .*\C-x": "j.*\)|\1|g' $KEYBIND
     else
         printf '# Ctrl-x is for autojump\nbind '\''"\C-x": "j \C-i"'\''\n' >> $KEYBIND
     fi

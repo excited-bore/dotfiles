@@ -106,6 +106,11 @@ set visualbell
 " is unset, this does nothing.
 set t_vb=
 
+"https://vi.stackexchange.com/questions/37386/cursor-not-changing-to-beam-in-insert-mode-when-using-kitty-terminal
+let &t_SI = "\<Esc>[6 q"
+let &t_SR = "\<Esc>[4 q"
+let &t_EI = "\<Esc>[2 q"
+
 " Enable use of the mouse for all modes
 set mouse=a
 
@@ -675,10 +680,10 @@ nnoremap <C-t> :
 inoremap <C-t> <C-\><C-o>:
 vnoremap <C-t> : 
 
-"Ctrl - M is -> Minimap 
-nnoremap <silent><C-m> <esc>:MinimapToggle<CR>:MinimapUpdateHighlight<cr>
-inoremap <silent><C-m> <C-\><C-o>:MinimapToggle<CR>:MinimapUpdateHighlight<cr>
-vnoremap <silent><C-m> <esc>:MinimapToggle<CR>:MinimapUpdateHighlight<cr>
+"Alt - M is -> Minimap 
+nnoremap <silent><M-m> <esc>:MinimapToggle<CR>:MinimapUpdateHighlight<cr>
+inoremap <silent><M-m> <C-\><C-o>:MinimapToggle<CR>:MinimapUpdateHighlight<cr>
+vnoremap <silent><M-m> <esc>:MinimapToggle<CR>:MinimapUpdateHighlight<cr>
 
 " Alt - C is -> CocCommand 
 nnoremap <M-c> :CocCommand 

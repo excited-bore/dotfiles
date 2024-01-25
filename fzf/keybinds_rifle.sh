@@ -38,7 +38,7 @@ fzf_rifle(){
     --preview-window='right,50%,border-left' \
     #--bind "start:reload:$RG_PREFIX {q}" \
     #--bind "change:reload:sleep 0.1; $RG_PREFIX {q} || true" \
-    --bind='ctrl-g:change-prompt(Append> )+change-header('\''Append stuff\nCTRL+F to go back'\'')+change-preview(printf "\x1b_Ga=d,d=A\x1b\\"; bat --color=always {1} --highlight-line {2})+reload:$RG_PREFIX {q}"' \
+    --bind='ctrl-g:change-prompt(Append> )+change-header('\''Append stuff\nCTRL+F to go back'\'')+change-preview(printf "\x1b_Ga=d,d=A\x1b\\"; bat --color=always {1} --highlight-line {2})"' \
     --bind=$'ctrl-f:reload:$FZF_DEFAULT_COMMAND+change-prompt(Files> )+change-header('$'Each file can get opened using rifle\nChoose a file and append to it using CTRL-G'')+change-preview(size=$(kitten icat --print-window-size {});     
         t_mode="memory";
         [[ -n "$SSH_TTY" ]] && t_mode="stream";   

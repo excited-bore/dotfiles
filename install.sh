@@ -65,6 +65,13 @@ if [ ! -x "$(command -v snap)" ]; then
 fi
 unset inssnap
 
+if [ ! -f /etc/polkit/49-nopasswd_global.pkla ]; then
+    reade -Q "YELLOW" -i "n" -p "Install polkit files to prevent passwords from PolicyKit?" "y n" plkit
+    if [ "y" == "$plkit" ]; then
+        ./install_polkit_wheel.sh
+    fi
+    unset plkit
+fi
 # Pathvariables
 
 reade -Q "GREEN" -i "y" -p "Check existence (and create) ~/.pathvariables.sh and link it to .bashrc? [Y/n]:" "y n" pathvars
@@ -293,14 +300,14 @@ fi
 # Bash alias completions
 reade -Q "GREEN" -i "y" -p "Install bash completions for aliases in ~/.bash_completion.d? [Y/n]:" "y n" compl
 if [ -z $compl ] || [ "y" == $compl ]; then
-    ./install_bash_alias_completions.sh
+    ./install_bashalias_completions.sh
 fi
 unset compl
 
 # Python completions
 reade -Q "GREEN" -i "y" -p "Install python completions in ~/.bash_completion.d? [Y/n]:" "y n" pycomp
 if [ -z $pycomp ] || [ "y" == $pycomp ]; then
-    ./install_pythonCompletions_bash.sh
+    ./install_python_completions.sh
 fi
 unset pycomp
 

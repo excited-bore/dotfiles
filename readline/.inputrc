@@ -3,9 +3,22 @@
 # This line carries over site-wide readline configuration to the user configuration. Usually /etc/inputrc includes some goodies.
 $include /etc/inputrc
 
+# Vi style editing shortcuts/interface
+set editing-mode vi
 
-set comment-begin #
+# Show whether it's normal or insert mode
+set show-mode-in-prompt on
+
+# You can set a different cursor shape for each mode by using "\1 .. \2" escapes: 
+$if term=linux
+	set vi-ins-mode-string \1\e[?0c\2
+	set vi-cmd-mode-string \1\e[?8c\2
+$else
+	set vi-ins-mode-string \1\e[6 q\2
+	set vi-cmd-mode-string \1\e[2 q\2
+$endif
 # https://stackoverflow.com/questions/67535351/how-to-provide-arguments-to-readline-functions-via-inputrc
+set comment-begin #
 
 #If you copy commands from the web, you might have noticed that when you copy a newline, Bash will interpret that newline as an Enter and execute whatever it is in your input buffer at the moment. This is unsafe, because what you see might not be what you copy. You can be avoided by setting:
 set enable-bracketed-paste On
@@ -27,10 +40,11 @@ set output-meta On
 set bell-style none
 
 # This line sets every completion which is a symbolic link to a directory to have a slash appended.
-#set mark-symlinked-directories On
+set mark-symlinked-directories On
 
 # No echoing of f.ex. ^C after pressing keys
-set echo-control-characters off
+# Leave this for C-v functionality
+set echo-control-characters on
 
 #Prevent altering history command when reusing it
 #https://superuser.com/questions/302230/how-to-prevent-bash-from-altering-history
@@ -54,7 +68,7 @@ set completion-ignore-case On
 set show-all-if-ambiguous On
 
 # This line sets the completions to be listed immediately instead of ringing the bell, when the completing word has more than one possible completion but no partial completion can be made
-set show-all-if-unmodified On
+set show-all-if-unmodified on
 
 # This line sets readline to display possible completions using different colors to indicate their file types. The colors are determined by the environmental variable LS_COLORS, which can be nicely configured.
 set colored-stats On
@@ -69,7 +83,8 @@ set colored-completion-prefix On
 # Color the common prefix in menu-complete
 set menu-complete-display-prefix On
 
-set history-preserve-point on
+# Leave history instead of going back to empty line when browsing history
+set history-preserve-point off
 
 # aaa bbb ccc
 # instead of

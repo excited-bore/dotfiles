@@ -103,10 +103,10 @@ bind -x '"\C-q": exit'
 bind '"\C-z": vi-undo'
 
 # Ctrl-f adds a piped grep for convenience
-bind '"\C-f": " | grep -i "'
+#bind '"\C-f": " | grep -i "'
 
 # Ctrl-Enter gives you a paged output
-bind '"\e[13": " | $PAGER\C-p"' 
+#bind '"\e[13": " | $PAGER\C-p"' 
 
 # Ctrl-backspace deletes (kills) line backward
 bind '"\C-h": backward-kill-word'
@@ -133,7 +133,11 @@ bind '"\C-x": "j \C-i"'
 
 # F5, Ctrl-r - Reload .bashrc
 #bind '"\e[15~": re-read-init-file'
-bind -x '"\e[15~": . ~/.bashrc && tput cup 0 0 && tput rc'
+bind -x '"\e[15~": . ~/.bashrc && tput cup 0 0 && clear && tput rc'
+
+# 
+# Jump to beginning search backward
+#bind '"\e[A": "\e[5~\eOH"'
 
 # Alt-Left arrow to go up one directory
 bind '"\e[1;3D": "cd .. \C-m"'
@@ -163,7 +167,7 @@ bind '"\e[1;3A": "j \C-i"'
 # .Inputrc (readline conf) however has to be compiled, so restart shell
 
 # Set caps to Escape
-#setxkbmap -option caps:escape
+setxkbmap -option caps:escape
 
 # Set Shift delete to backspace
 ##xmodmap -e "keycode 119 = Delete BackSpace"     #

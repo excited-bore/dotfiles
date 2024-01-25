@@ -11,21 +11,12 @@ fi
 # cp recursively, verbose ()
 # cpOld same but no files older are overwritten
 
-alias cp="cp -rv"
 alias cpOld="cp -ruv"
 alias copy="cp"
 
-function copy-dir-to(){
+function cpAllto(){
     local dest
-    reade -Q "GREEN" -i "~/" -p "This will copy the entire directory to: " -e dest
-    if [ ! -z "$dest" ]; then
-        cp -v -t "$dest" .[!.]*;
-    fi
-}
-
-function copy-rec-dir-to(){
-    local dest
-    reade -Q "GREEN" -i "~/" -p "This will copy the entire directory to: " -e dest
+    reade -Q "GREEN" -i "~/" -p "This will do a recursive copy in the current directory to: " -e dest
     if [ ! -z "$dest" ]; then
         cp -rv -t "$dest" .[!.]*;
     fi
@@ -33,32 +24,203 @@ function copy-rec-dir-to(){
 
 complete -F _filedir cpAllTo
 
-function copy-force-trash(){
-    cp -f --backup=1;
+alias cpf-bckup="cp -f -b"
+
+complete -F _files copy-force-trash
+
+function cpf-trash(){
+    local dest="${@: -1}"
+    local sorce=()
+    local target=0
+    local i=0
+    for arg in $@ ; do
+        i=$((i+1))
+        case "$arg" in
+            -b | --backup)  echo "-b/--backup flag already given.";
+                return 0 ;;
+            -f | --force)   echo "-f/--force flag already given.";
+                return 0 ;;
+            -t | --target-directory)  
+                target=1
+                dest="${@: i+1:1}" ;;
+        esac
+    done
+    
+    cp -f -b "$@"
+    
+    if [ "${#dest[@]}" -gt 1 ]; then
+        target=1
+    fi
+    
+    if [ $target == 1 ] ; then
+        for s in "${sorce[@]}"; do
+            if [ -a "$dest/$s~" ]; then 
+                gio trash "$dest/$(basename $s~)" 
+            fi 
+        done
+    else
+        gio trash "$dest~"  
+    fi
+    echo "Backup(s) put in trash. Use 'gio trash --list' to list / 'gio trash --restore' to restore"
 }
-complete -F _files cpf1Bkup
 
 
-function copy-force-1backup(){
-    cp -f --backup=1;
+function cp-trash(){
+    local dest="${@: -1}"
+    local sorce=()
+    local target=0
+    local i=0
+    local bcp=0
+    local frc=0
+    for arg in $@ ; do
+        i=$((i+1))
+        case "$arg" in
+            -b | --backup)  bcp=1 ;;
+            -f | --force) frc=1   ;;
+            -t | --target-directory)  
+                target=1
+                dest="${@: i+1:1}" ;;
+        esac
+    done
+    
+    if [ $bcp == 1 ]; then
+        cp "$@"
+        return 0
+    else
+        if [ $frc == 1 ]; then
+            cp -b "$@"
+        else
+            cp -f -b "$@"
+        fi
+    fi
+    
+    if [ "${#dest[@]}" -gt 1 ]; then
+        target=1
+    fi
+    
+    if [ $target == 1 ] ; then
+        for s in "${sorce[@]}"; do
+            if [ -a "$dest/$s~" ]; then 
+                gio trash "$dest/$(basename $s~)" 
+            fi 
+        done
+    else
+        gio trash "$dest~"  
+    fi
 }
-complete -F _files cpf1Bkup
+
+
+alias cp="cp-trash -rv"
+
 
 # mv (recursively native) verbose and only ask for interaction when overwriting newer files
 
-alias mv="mv -v"
+
 alias mvOld="mv -nv"
 alias move="mv"
-function mvDirTo(){
-    mv -t "$@" .[!.]* *;
+function mv-dir-to(){
+    local dest
+    reade -Q "GREEN" -i "~/" -p "This will copy the entire directory to: " -e dest
+    if [ ! -z "$dest" ]; then
+        mv -t "$dest" .[!.]* *;
+    fi
 } 
 
+function mvf-trash(){
+    local dest="${@: -1}"
+    local sorce=()
+    local target=0
+    local i=0
+    for arg in $@ ; do
+        i=$((i+1))
+        case "$arg" in
+            -b | --backup)  echo "-b/--backup flag already given.";
+                return 0 ;;
+            -f | --force)   echo "-f/--force flag already given.";
+                return 0 ;;
+            -t | --target-directory)  
+                target=1
+                dest="${@: i+1:1}" ;;
+        esac
+    done
+    
+    for arg in "${@}"; do
+        if [ -a "$arg" ] && [ "$arg" != "$dest" ]; then
+            sorce+=($(basename "$arg"))
+        fi
+    done 
+
+    mv -f -b "$@"
+    
+    if [ "${#dest[@]}" -gt 1 ]; then
+        target=1
+    fi
+    
+    if [ $target == 1 ] ; then
+        for s in "${sorce[@]}"; do
+            if [ -a "$dest/$s~" ]; then 
+                gio trash "$dest/$(basename $s~)" 
+            fi 
+        done
+    else
+        gio trash "$dest~"  
+    fi
+    echo "Backup(s) put in trash. Use 'gio trash --list' to list / 'gio trash --restore' to restore"
+}
+
+function mv-trash(){
+    local dest="${@: -1}"
+    local sorce=()
+    local target=0
+    local i=0
+    local bcp=0
+    local frc=0
+    for arg in $@ ; do
+        i=$((i+1))
+        case "$arg" in
+            -b | --backup)  bcp=1 ;;
+            -f | --force) frc=1   ;;
+            -t | --target-directory)  
+                target=1
+                dest="${@: i+1:1}" ;;
+        esac
+    done
+    
+    if [ $bcp == 1 ]; then
+        mv "$@"
+        return 0
+    else
+        if [ $frc == 1 ]; then
+            mv -b "$@"
+        else
+            mv -f -b "$@"
+        fi
+    fi
+    
+    if [ "${#dest[@]}" -gt 1 ]; then
+        target=1
+    fi
+    
+    if [ $target == 1 ] ; then
+        for s in "${sorce[@]}"; do
+            if [ -a "$dest/$s~" ]; then 
+                gio trash "$dest/$(basename $s~)" 
+            fi 
+        done
+    else
+        gio trash "$dest~"  
+    fi
+} 
+
+alias mv="mv-trash -v"
 # rm recursively and verbose
 
 alias rm="rm -rv"
 alias remove="rm"
 alias rmAll="rm -v ./*";
 alias rmAllHiddn="rm -v .[!.]* *";
+
+alias rm="trash"
 
 # With parent directories and verbose
 alias mkdir="mkdir -pv"
@@ -77,6 +239,8 @@ alias q="exit"
 alias c="cd"
 alias x="cd .."
 
+# All man pages
+alias men="man -a"
 # (:
 alias men="man man"
 
@@ -160,11 +324,26 @@ complete -F _files trash
 alias trash-list="gio trash --list"
 alias trash-empty="gio trash --empty"
 
+_trash_empty(){
+    COMPREPLY=($(gio trash --list))
+    return 0
+}
+
+_trash(){
+    COMPREPLY=($(gio trash --list | awk '{print $1;}'))
+    return 0
+}
+
+complete -F _trash trash-empty 
+
 function trash-restore(){
-    for arg in $@; do
-        gio trash --restore $arg;
+    for arg in "$@"; do
+        gio trash --restore "$arg";
     done
 }
+
+
+complete -F _trash trash-restore
 
 function add-to-group() {
     if [[ -z $1 ]]; then
