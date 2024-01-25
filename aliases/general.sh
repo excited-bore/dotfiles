@@ -55,11 +55,13 @@ function cpf-trash(){
     if [ $target == 1 ] ; then
         for s in "${sorce[@]}"; do
             if [ -a "$dest/$s~" ]; then 
-                gio trash "$dest/$(basename $s~)" 
+                trash "$dest/$(basename $s~)" 
             fi 
         done
     else
-        gio trash "$dest~"  
+        if [ -a "$dest~" ]; then
+            trash "$dest~"
+        fi
     fi
     echo "Backup(s) put in trash. Use 'gio trash --list' to list / 'gio trash --restore' to restore"
 }
@@ -101,11 +103,13 @@ function cp-trash(){
     if [ $target == 1 ] ; then
         for s in "${sorce[@]}"; do
             if [ -a "$dest/$s~" ]; then 
-                gio trash "$dest/$(basename $s~)" 
+                trash "$dest/$(basename $s~)" 
             fi 
         done
     else
-        gio trash "$dest~"  
+        if [ -a "$dest~" ]; then
+            trash "$dest~"
+        fi  
     fi
 }
 
@@ -159,11 +163,11 @@ function mvf-trash(){
     if [ $target == 1 ] ; then
         for s in "${sorce[@]}"; do
             if [ -a "$dest/$s~" ]; then 
-                gio trash "$dest/$(basename $s~)" 
+                trash "$dest/$(basename $s~)" 
             fi 
         done
     else
-        gio trash "$dest~"  
+        trash "$dest~"  
     fi
     echo "Backup(s) put in trash. Use 'gio trash --list' to list / 'gio trash --restore' to restore"
 }
@@ -204,11 +208,11 @@ function mv-trash(){
     if [ $target == 1 ] ; then
         for s in "${sorce[@]}"; do
             if [ -a "$dest/$s~" ]; then 
-                gio trash "$dest/$(basename $s~)" 
+                trash "$dest/$(basename $s~)" 
             fi 
         done
     else
-        gio trash "$dest~"  
+        trash "$dest~"  
     fi
 } 
 
@@ -254,7 +258,7 @@ extract-archive(){
       *.tar.bz2)   tar xjf $1   ;;
       *.tar.gz)    tar xzf $1   ;;
       *.bz2)       bunzip2 $1   ;;
-      *.rar)       unrar x $1     ;;
+      *.rar)       unrar x $1   ;;
       *.gz)        gunzip $1    ;;
       *.tar)       tar xf $1    ;;
       *.tbz2)      tar xjf $1   ;;
@@ -306,11 +310,18 @@ function link-hard(){
 
 complete -F _files link_hard
 
-
 function trash(){
     for arg in $@ ; do
         if [ -f "$arg" ] || [ -d "$arg" ]; then
             gio trash $arg;
+            if [ $(gio trash --list | wc -l) -gt $TRASHBIN_LIMIT ]; then
+                local ansr
+                echo "${yellow}Trashbin has more then $TRASHBIN_LIMIT items"
+                reade -Q "YELLOW" -i "y" -p "Empty? ('trash-restore' to restore) [Y/n]: " "y n"  ansr
+                if [ $ansr == "y" ]; then
+                    trash-empty
+                fi
+            fi
         elif [ -L "$arg" ]; then
             rm $arg;
         else
@@ -324,17 +335,10 @@ complete -F _files trash
 alias trash-list="gio trash --list"
 alias trash-empty="gio trash --empty"
 
-_trash_empty(){
-    COMPREPLY=($(gio trash --list))
-    return 0
-}
-
 _trash(){
     COMPREPLY=($(gio trash --list | awk '{print $1;}'))
     return 0
 }
-
-complete -F _trash trash-empty 
 
 function trash-restore(){
     for arg in "$@"; do
