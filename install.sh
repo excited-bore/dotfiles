@@ -295,6 +295,70 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
     yes_edit_no pathvariables "pathvars/.pathvariables.sh" "Install .pathvariables.sh at ~/? " "edit" "GREEN"
 fi
 
+
+    # Xresources
+    
+    xresources_r(){
+        
+        sudo cp -fv xterm/.Xresources /root/.Xresources;
+        }
+    xresources(){
+        cp -fv xterm/.Xresources ~/.Xresources;
+        yes_edit_no xresources_r "xterm/.Xresources" "Install .Xresources at /root/.bash_aliases.d/?" "edit" "RED"; }
+    yes_edit_no xresources "xterm/.Xresources" "Install .Xresources at ~/.bash_aliases.d/? (readline config)" "edit" "YELLOW"
+
+    # Readline
+    
+    function inputrc_r(){ 
+        sudo cp -fv readline/.inputrc /root/.inputrc; 
+        if [ -f /root/.pathvariables.sh ]; then
+           sudi sed -i 's|#export INPUTRC|export INPUTRC|g' /root/.pathvariables.sh
+        fi
+    }
+    inputrc() {
+        cp -fv readline/.inputrc ~/
+        if [ -f ~/.pathvariables.sh ]; then
+           sed -i 's|#export INPUTRC|export INPUTRC|g' ~/.pathvariables.sh
+        fi
+        yes_edit_no inputrc_r "readline/.inputrc" "Install .inputrc at /root/?" "edit" "GREEN"; }
+    yes_edit_no inputrc "readline/.inputrc" "Install .inputrc at ~/? (readline config)" "edit" "GREEN"
+    
+    # Shell-keybinds
+    
+    #if grep -q 'bind -x '\''"\\C-s": ctrl-s'\''' ~/.keybinds.sh && ! grep -q '#bind -x '\''"\\C-s": ctrl-s'\''' ~/.keybinds.sh; then
+    #    sed -i 's|bind -x '\''"\\C-s": ctrl-s'\''|#bind -x '\''"\\C-s": ctrl-s'\''|g' ~/.keybinds.sh
+    #    sed -i 's|bind -x '\''"\\eOR": ctrl-s'\''|#bind -x '\''"\\eOR": ctrl-s'\''|g' ~/.keybinds.sh
+    #fi
+
+    if grep -q 'bind -x '\''"\\201": ranger'\''' ~/.keybinds.sh; then
+        sed -i 's|bind -x '\''"\\201": ranger'\''|#bind -x '\''"\\201": ranger'\''|g' ~/.keybinds.sh
+        sed -i 's|bind '\''"\\eOQ":|#bind '\''"\\eOQ":|g' ~/.keybinds.sh
+    fi
+
+    shell-keybinds_r(){ 
+        if ! sudo grep -q "/root/.keybinds.sh" /root/.bashrc; then
+            printf "if [[ -f /root/.keybinds.sh ]]; then\n" | sudo tee -a /root/.bashrc
+            printf "  . /root/.keybinds.sh\n" | sudo tee -a /root/.bashrc
+            printf "fi\n" | sudo tee -a /root/.bashrc
+        fi
+        sudo cp -fv keybinds/.keybinds.sh /root/; 
+    }
+    shell-keybinds() {
+        reade -Q "YELLOW" -i "n" -p "Set caps to escape? (Might cause X11 errors with SSH) [Y/n]: " "y n" xtrm
+        if [ ! "$xtrm" == "y" ] && [ ! -z "$xtrm" ]; then
+            sed -i "s|setxkbmap |#setxkbmap |g" keybinds/.keybinds.sh
+        fi
+        
+        if ! grep -q "~/.keybinds.sh" ~/.bashrc; then
+            echo "if [[ -f ~/.keybinds.sh ]]; then" >> ~/.bashrc
+            echo "  . ~/.keybinds.sh" >> ~/.bashrc
+            echo "fi" >> ~/.bashrc
+        fi 
+        
+        cp -fv keybinds/.keybinds.sh ~/
+        yes_edit_no shell-keybinds_r "keybinds/.keybinds.sh" "Install .keybinds.sh at /root/?" "edit" "RED"; }
+    yes_edit_no shell-keybinds "keybinds/.keybinds.sh" "Install .keybinds.sh at ~/? (bind commands)" "edit" "YELLOW"
+
 ./checks/check_completions_dir.sh
 
 # Bash alias completions
@@ -369,86 +433,25 @@ reade -Q "GREEN" -i "y" -p "Install bash aliases and other config? [Y/n]:" "y n"
 if [ -z $scripts ] || [ "y" == $scripts ]; then
 
     ./checks/check__aliases_dir.sh
-    
-    # Xresources
-    
-    xresources_r(){
-        
-        sudo cp -fv xterm/.Xresources /root/.Xresources;
-        }
-    xresources(){
-        cp -fv xterm/.Xresources ~/.Xresources;
-        yes_edit_no xresources_r "xterm/.Xresources" "Install .Xresources at /root/.bash_aliases.d/?" "edit" "RED"; }
-    yes_edit_no xresources "xterm/.Xresources" "Install .Xresources at ~/.bash_aliases.d/? (readline config)" "edit" "YELLOW"
 
-    # Readline
-    
-    function inputrc_r(){ 
-        sudo cp -fv readline/.inputrc /root/.inputrc; 
-        if [ -f /root/.pathvariables.sh ]; then
-           sudi sed -i 's|#export INPUTRC|export INPUTRC|g' /root/.pathvariables.sh
+    general_r(){ sudo cp -fv aliases/general.sh /root/.bash_aliases.d/;}
+    general(){                                                                                     
+        local ansr
+        reade -Q "GREEN" -i "y" -p "Set cp/mv (when overwriting) and rm to trash files? (cp/mv will make backups):" "y n" ansr         
+        if [ "$ansr" != "y" ]; then
+            sed -i 's|alias cp="cp-trash -rv"|#alias cp="cp-trash -rv"|g' aliases/general.sh
+            sed -i 's|alias mv="mv-trash -v"|#alias mv="mv-trash -v"|g' aliases/general.sh
+            sed -i 's|alias rm="trash"|#alias rm="trash"|g' aliases/general.sh
         fi
-    }
-    inputrc() {
-        cp -fv readline/.inputrc ~/
-        if [ -f ~/.pathvariables.sh ]; then
-           sed -i 's|#export INPUTRC|export INPUTRC|g' ~/.pathvariables.sh
-        fi
-        yes_edit_no inputrc_r "readline/.inputrc" "Install .inputrc at /root/?" "edit" "GREEN"; }
-    yes_edit_no inputrc "readline/.inputrc" "Install .inputrc at ~/? (readline config)" "edit" "GREEN"
-    
-    # Shell-keybinds
-    
-    #if grep -q 'bind -x '\''"\\C-s": ctrl-s'\''' ~/.keybinds.sh && ! grep -q '#bind -x '\''"\\C-s": ctrl-s'\''' ~/.keybinds.sh; then
-    #    sed -i 's|bind -x '\''"\\C-s": ctrl-s'\''|#bind -x '\''"\\C-s": ctrl-s'\''|g' ~/.keybinds.sh
-    #    sed -i 's|bind -x '\''"\\eOR": ctrl-s'\''|#bind -x '\''"\\eOR": ctrl-s'\''|g' ~/.keybinds.sh
-    #fi
-
-    if grep -q 'bind -x '\''"\\201": ranger'\''' ~/.keybinds.sh; then
-        sed -i 's|bind -x '\''"\\201": ranger'\''|#bind -x '\''"\\201": ranger'\''|g' ~/.keybinds.sh
-        sed -i 's|bind '\''"\\eOQ":|#bind '\''"\\eOQ":|g' ~/.keybinds.sh
-    fi
-
-    shell-keybinds_r(){ 
-        if ! sudo grep -q "/root/.keybinds.sh" /root/.bashrc; then
-            printf "if [[ -f /root/.keybinds.sh ]]; then\n" | sudo tee -a /root/.bashrc
-            printf "  . /root/.keybinds.sh\n" | sudo tee -a /root/.bashrc
-            printf "fi\n" | sudo tee -a /root/.bashrc
-        fi
-        sudo cp -fv keybinds/.keybinds.sh /root/; 
-    }
-    shell-keybinds() {
-        reade -Q "YELLOW" -i "n" -p "Set caps to escape? (Might cause X11 errors with SSH) [Y/n]: " "y n" xtrm
-        if [ ! "$xtrm" == "y" ] && [ ! -z "$xtrm" ]; then
-            sed -i "s|setxkbmap |#setxkbmap |g" keybinds/.keybinds.sh
-        fi
-        
-        if ! grep -q "~/.keybinds.sh" ~/.bashrc; then
-            echo "if [[ -f ~/.keybinds.sh ]]; then" >> ~/.bashrc
-            echo "  . ~/.keybinds.sh" >> ~/.bashrc
-            echo "fi" >> ~/.bashrc
-        fi 
-        
-        cp -fv keybinds/.keybinds.sh ~/
-        yes_edit_no shell-keybinds_r "keybinds/.keybinds.sh" "Install .keybinds.sh at /root/?" "edit" "RED"; }
-    yes_edit_no shell-keybinds "keybinds/.keybinds.sh" "Install .keybinds.sh at ~/? (bind commands)" "edit" "YELLOW"
-
-
-    
+        cp -fv aliases/general.sh ~/.bash_aliases.d/
+        yes_edit_no general_r "aliases/general.sh" "Install general.sh at /root/?" "yes" "GREEN"; }
+    yes_edit_no general "aliases/general.sh" "Install general.sh at ~/? (general terminal related aliases) " "yes" "YELLOW"
 
     bash_yes_r(){ sudo cp -fv aliases/bash.sh /root/.bash_aliases.d/; }
     bash_yes() {
         cp -fv aliases/bash.sh ~/.bash_aliases.d/;
         yes_edit_no bash_yes_r "aliases/bash.sh" "Install bash.sh at /root/?" "yes" "YELLOW"; }
     yes_edit_no bash_yes "aliases/bash.sh" "Install bash.sh at ~/? (bash specific aliases)?" "yes" "GREEN";
-
-
-    general_r(){ sudo cp -fv aliases/general.sh /root/.bash_aliases.d/;}
-    general(){
-        cp -fv aliases/general.sh ~/.bash_aliases.d/
-        yes_edit_no general_r "aliases/general.sh" "Install general.sh at /root/?" "yes" "GREEN"; }
-    yes_edit_no general "aliases/general.sh" "Install general.sh at ~/? (general terminal related aliases) " "yes" "YELLOW"
-
 
     systemd_r(){ sudo cp -fv aliases/systemctl.sh /root/.bash_aliases.d/;}
     systemd(){
