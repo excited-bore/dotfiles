@@ -10,7 +10,7 @@ fi
 
 # cp recursively, verbose ()
 # cpOld same but no files older are overwritten
-
+alias cp="cp -rv"
 alias cpOld="cp -ruv"
 alias copy="cp"
 
@@ -116,10 +116,9 @@ function cp-trash(){
 
 alias cp="cp-trash -rv"
 
-
 # mv (recursively native) verbose and only ask for interaction when overwriting newer files
 
-
+alias mv="mv -v"
 alias mvOld="mv -nv"
 alias move="mv"
 function mv-dir-to(){
@@ -217,6 +216,8 @@ function mv-trash(){
 } 
 
 alias mv="mv-trash -v"
+
+
 # rm recursively and verbose
 
 alias rm="rm -rv"
@@ -316,7 +317,7 @@ function trash(){
             gio trash $arg;
             if [ $(gio trash --list | wc -l) -gt $TRASHBIN_LIMIT ]; then
                 local ansr
-                echo "${yellow}Trashbin has more then $TRASHBIN_LIMIT items"
+                echo "${red1}Trashbin has more then $TRASHBIN_LIMIT items"
                 reade -Q "YELLOW" -i "y" -p "Empty? ('trash-restore' to restore) [Y/n]: " "y n"  ansr
                 if [ $ansr == "y" ]; then
                     trash-empty

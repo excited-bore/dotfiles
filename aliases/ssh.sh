@@ -1,9 +1,9 @@
 ### SSH ###                           
 . ~/.bash_aliases.d/rlwrap_scripts.sh
 
-ssh_file="~/.ssh/id_rsa"
 user="burp"
 ip="192.168.0.140"
+ssh_file="~/.ssh/id_rsa"
 
 # To prevent 'failed to preserve ownership' errors
 copy_sshfs(){ cp -r --no-preserve=mode "$1" "$2"; }

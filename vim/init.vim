@@ -265,9 +265,9 @@ Plugin 'lambdalisue/suda.vim'
 let g:suda_smart_edit = 1
 
 " Give passwords prompts in vim
-"Plugin 'lambdalisue/askpass.vim'
+Plugin 'lambdalisue/askpass.vim'
 " Dependency for askpass, Deno
-"Plugin 'vim-denops/denops.vim'
+Plugin 'vim-denops/denops.vim'
 
 " Nerd commenter
 Plugin 'preservim/nerdcommenter'
@@ -654,7 +654,7 @@ vnoremap <silent><C-q> <Esc>:call CloseWindow()<CR>
 
 " Ctrl - R is -> Redo (universal) :
 nnoremap <C-r> :redo<CR>
-inoremap <C-r> <C-\><C-o>:redo<CR>a
+inoremap <C-r> <C-\><C-o>:redo<CR>
 vnoremap <C-r> <Esc>:redo<CR>gv 
 
 " Ctrl - Z is -> Undo instead of stop 
@@ -848,18 +848,16 @@ vnoremap <A-Enter>      <Esc>`<i<Enter><Esc>gv
 
 
 " BackSpace -> backspace no leave normal mode
-nnoremap <BackSpace>    i<BackSpace><right><esc>
-inoremap <expr> <Backspace>    (mode() ==# 'R' && col('.') ==? 1 ? '<Esc>i<Backspace><Right><Esc>R' : mode() ==# 'R' ? '<Esc>a<BackSpace><Right><Esc>R' : '<BackSpace>')
+nnoremap <BackSpace>    a<BackSpace><esc>
+inoremap <expr> <Backspace>    (mode() ==# 'R' && col('.') ==? 1 ? '<BackSpace><esc>lR' : mode() ==# 'R' ? '<BackSpace><Esc>lR' : '<BackSpace>')
 vnoremap <Backspace>    <Delete>
 " Ctrl-Backspace => Delete appended 'word'
 " Alt-BackSpace => Delete line 
 " Shift-Backspace => Delete stuff forwards
-nnoremap <expr> <C-Backspace>  (col(".") ==? 1 ? '<BackSpace>' : 'dge')
-inoremap <expr> <C-Backspace>  (col(".") ==? 1 ? '<BackSpace>' : '<Esc>dgei')
+"nnoremap <expr> <C-Backspace>  (col(".") ==? 1 ? '<BackSpace>' : 'dge')
+"inoremap <expr> <C-Backspace>  (col(".") ==? 1 ? '<BackSpace>' : '<Esc>dgei')
 nnoremap <A-Backspace>      dd<Up>$
 inoremap <A-Backspace>      <Esc>dd<Up>$a
-nnoremap <C-S-backspace>      <Delete>
-inoremap <C-S-backspace>      <Delete>
 
 
 " ctrl-a  n  ctrl-a	add n to the number at or after the cursor
@@ -891,7 +889,8 @@ set t_kb=^?
 " Set Delete key to
 set t_kD=^[[3~
 
- 
+
+vnoremap / y/<C-r>0
 " Ctrl - f => Find
 " Don't forget: Enter, not escape
 "nnoremap <C-f> /
