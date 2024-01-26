@@ -1,12 +1,20 @@
 #!/bin/bash
 
+. ./checks/check_rlwrap.sh
 . ./readline/rlwrap_scripts.sh
 . ./checks/check_distro.sh
-. ./checks/check_rlwrap.sh
 . ./aliases/general.sh
 
 echo "${green}${bold}If all files are sourced this text looks green and bold. If not, something went wrong."
 
+
+reade -Q "GREEN" -i "y" -p "Set cp/mv (when overwriting) to backup files? (will also trash backups):" "y n" ansr         
+if [ "$ansr" != "y" ]; then
+    sed -i 's|alias cp="cp-trash -rv"|#alias cp="cp-trash -rv"|g' aliases/general.sh
+    sed -i 's|alias mv="mv-trash -v"|#alias mv="mv-trash -v"|g' aliases/general.sh
+    sed -i 's|alias rm="trash"|#alias rm="trash"|g' aliases/general.sh
+fi      
+unset ansr
 
 if [ -z "$TMPDIR" ]; then
     TMPDIR=/tmp
@@ -302,7 +310,7 @@ fi
     #    sed -i 's|bind -x '\''"\\eOR": ctrl-s'\''|#bind -x '\''"\\eOR": ctrl-s'\''|g' ~/.keybinds.sh
     #fi
 
-    if grep -q 'bind -x '\''"\\201": ranger'\''' ~/.keybinds.sh; then
+    if [-f ~/.keybinds.sh ] && grep -q 'bind -x '\''"\\201": ranger'\''' ~/.keybinds.sh; then
         sed -i 's|bind -x '\''"\\201": ranger'\''|#bind -x '\''"\\201": ranger'\''|g' ~/.keybinds.sh
         sed -i 's|bind '\''"\\eOQ":|#bind '\''"\\eOQ":|g' ~/.keybinds.sh
     fi
@@ -317,7 +325,7 @@ fi
            sudo sed -i 's|#export INPUTRC|export INPUTRC|g' /root/.pathvariables.sh
         fi
         sudo cp -fv readline/.keybinds.sh /root/; 
-        sudo cp -fv readline/.inputrc /root/.inputrc; 
+        sudo cp -fv readline/.inputrc /root/;
         
     }
     shell-keybinds(){
@@ -428,18 +436,15 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
 
     ./checks/check__aliases_dir.sh
 
-    general_r(){ sudo cp -fv aliases/general.sh /root/.bash_aliases.d/;}
+    general_r(){ 
+        sudo cp -fv aliases/general.sh /root/.bash_aliases.d/;
+        sudo cp -fv readline/rlwrap_scripts.sh /root/.bash_aliases.d/;
+    }
     general(){                                                                                     
-        local ansr
-        reade -Q "GREEN" -i "y" -p "Set cp/mv (when overwriting) and rm to trash files? (cp/mv will make backups):" "y n" ansr         
-        if [ "$ansr" != "y" ]; then
-            sed -i 's|alias cp="cp-trash -rv"|#alias cp="cp-trash -rv"|g' aliases/general.sh
-            sed -i 's|alias mv="mv-trash -v"|#alias mv="mv-trash -v"|g' aliases/general.sh
-            sed -i 's|alias rm="trash"|#alias rm="trash"|g' aliases/general.sh
-        fi
         cp -fv aliases/general.sh ~/.bash_aliases.d/
-        yes_edit_no general_r "aliases/general.sh" "Install general.sh at /root/?" "yes" "GREEN"; }
-    yes_edit_no general "aliases/general.sh" "Install general.sh at ~/? (general terminal related aliases) " "yes" "YELLOW"
+        cp -fv readline/rlwrap_scripts.sh ~/.bash_aliases.d/
+        yes_edit_no general_r "aliases/general.sh readline/rlwrap_scripts.sh" "Install general.sh and rlwrap_scripts.sh at /root/?" "yes" "GREEN"; }
+        yes_edit_no general "aliases/general.sh readline/rlwrap_scripts.sh" "Install general.sh and rlwrap_scripts.sh at ~/? (aliases related to general actions - cd/mv/cp/rm / completion script replacement for 'read -e') " "yes" "YELLOW"
 
     bash_yes_r(){ sudo cp -fv aliases/bash.sh /root/.bash_aliases.d/; }
     bash_yes() {

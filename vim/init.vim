@@ -848,14 +848,14 @@ vnoremap <A-Enter>      <Esc>`<i<Enter><Esc>gv
 
 
 " BackSpace -> backspace no leave normal mode
-nnoremap <BackSpace>    a<BackSpace><esc>
-inoremap <expr> <Backspace>    (mode() ==# 'R' && col('.') ==? 1 ? '<BackSpace><esc>lR' : mode() ==# 'R' ? '<BackSpace><Esc>lR' : '<BackSpace>')
-vnoremap <Backspace>    <Delete>
+nnoremap <BackSpace>    d<Left>
+inoremap <expr> <Backspace>    (mode() ==# 'R' && col('.') ==? 1 ? '<esc>d<Left>R' : mode() ==# 'R' ? '<esc>d<Left>R' : '<BackSpace>')
+vnoremap <Backspace>    d
 " Ctrl-Backspace => Delete appended 'word'
 " Alt-BackSpace => Delete line 
 " Shift-Backspace => Delete stuff forwards
-"nnoremap <expr> <C-Backspace>  (col(".") ==? 1 ? '<BackSpace>' : 'dge')
-"inoremap <expr> <C-Backspace>  (col(".") ==? 1 ? '<BackSpace>' : '<Esc>dgei')
+nnoremap <expr> <C-Backspace>  (col(".") ==? 1 ? '<BackSpace>' : 'hdge')
+inoremap <expr> <C-Backspace>  (col(".") ==? 1 ? '<BackSpace>' : 'hdgei')
 nnoremap <A-Backspace>      dd<Up>$
 inoremap <A-Backspace>      <Esc>dd<Up>$a
 

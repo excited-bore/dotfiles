@@ -11,7 +11,5 @@ if [ ! -x "$(command -v rlwrap)" ]; then
             yes | sudo pacman -Su rlwrap;
         fi
         source ~/.bashrc;
-    else
-        return 0;
     fi
 fi

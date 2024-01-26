@@ -48,7 +48,7 @@ function cpf-trash(){
     
     cp -f -b "$@"
     
-    if [ "${#dest[@]}" -gt 1 ]; then
+    if [ -d "$dest" ]; then
         target=1
     fi
     
@@ -96,7 +96,7 @@ function cp-trash(){
         fi
     fi
     
-    if [ "${#dest[@]}" -gt 1 ]; then
+    if [ -d "$dest" ]; then
         target=1
     fi
     
@@ -155,7 +155,7 @@ function mvf-trash(){
 
     mv -f -b "$@"
     
-    if [ "${#dest[@]}" -gt 1 ]; then
+    if [ -d "$dest" ]; then
         target=1
     fi
     
@@ -200,7 +200,7 @@ function mv-trash(){
         fi
     fi
     
-    if [ "${#dest[@]}" -gt 1 ]; then
+    if [ -d "$dest" ]; then
         target=1
     fi
     
