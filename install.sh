@@ -5,8 +5,7 @@
 . ./checks/check_distro.sh
 . ./aliases/general.sh
 
-echo "${green}${bold}If all files are sourced this text looks green and bold. If not, something went wrong."
-
+printf "${green}If all necessary files are sourced correctly, this text looks green.\n If not, something went wrong.\n"
 
 reade -Q "GREEN" -i "y" -p "Set cp/mv (when overwriting) to backup files? (will also trash backups):" "y n" ansr         
 if [ "$ansr" != "y" ]; then
@@ -73,7 +72,7 @@ if [ ! -x "$(command -v snap)" ]; then
 fi
 unset inssnap
 
-if [ ! -f /etc/polkit/49-nopasswd_global.pkla ]; then
+if [ ! -f /etc/polkit/49-nopasswd_global.pkla ] && [ ! -f /etc/polkit-1/rules.d/90-nopasswd_global.rules ]; then
     reade -Q "YELLOW" -i "n" -p "Install polkit files for automatic authentication for passwords? [Y/n]:" "y n" plkit
     if [ "y" == "$plkit" ]; then
         ./install_polkit_wheel.sh
@@ -310,7 +309,7 @@ fi
     #    sed -i 's|bind -x '\''"\\eOR": ctrl-s'\''|#bind -x '\''"\\eOR": ctrl-s'\''|g' ~/.keybinds.sh
     #fi
 
-    if [-f ~/.keybinds.sh ] && grep -q 'bind -x '\''"\\201": ranger'\''' ~/.keybinds.sh; then
+    if [ -f ~/.keybinds.sh ] && grep -q 'bind -x '\''"\\201": ranger'\''' ~/.keybinds.sh; then
         sed -i 's|bind -x '\''"\\201": ranger'\''|#bind -x '\''"\\201": ranger'\''|g' ~/.keybinds.sh
         sed -i 's|bind '\''"\\eOQ":|#bind '\''"\\eOQ":|g' ~/.keybinds.sh
     fi
@@ -398,7 +397,7 @@ unset moar
 # Nvim (Editor)
 reade -Q "GREEN" -i "y" -p "Install Neovim? (Terminal editor) [Y/n]: " "y n" nvm
 if [ "y" == "$nvm" ]; then
-    ./install_nvim.sh
+    . ./install_nvim.sh
 fi
 unset nvm
 
@@ -444,7 +443,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         cp -fv aliases/general.sh ~/.bash_aliases.d/
         cp -fv readline/rlwrap_scripts.sh ~/.bash_aliases.d/
         yes_edit_no general_r "aliases/general.sh readline/rlwrap_scripts.sh" "Install general.sh and rlwrap_scripts.sh at /root/?" "yes" "GREEN"; }
-        yes_edit_no general "aliases/general.sh readline/rlwrap_scripts.sh" "Install general.sh and rlwrap_scripts.sh at ~/? (aliases related to general actions - cd/mv/cp/rm / completion script replacement for 'read -e') " "yes" "YELLOW"
+        yes_edit_no general "aliases/general.sh readline/rlwrap_scripts.sh" "Install general.sh and rlwrap_scripts.sh at ~/? (aliases related to general actions - cd/mv/cp/rm + completion script replacement for 'read -e') " "yes" "YELLOW"
 
     bash_yes_r(){ sudo cp -fv aliases/bash.sh /root/.bash_aliases.d/; }
     bash_yes() {

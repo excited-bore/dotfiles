@@ -22,7 +22,7 @@ fi
 
 # If you want Ctrl-j, read this first: 
 # https://bestasciitable.com/
-reade -Q "GREEN" -i "y" -p "Install autojump keybind at Ctrl-x for user?" "y n" bnd
+reade -Q "GREEN" -i "y" -p "Install autojump keybind at Ctrl-x for user? [Y/n]:" "y n" bnd
 if [ "$bnd" == "y" ]; then
     if grep -q 'bind '\''"\C-x": "j \C-i"'\''' $KEYBIND; then
         sed -i 's|.*\(bind .*\C-x": "j.*\)|\1|g' $KEYBIND
@@ -31,7 +31,7 @@ if [ "$bnd" == "y" ]; then
     fi
 fi
 
-reade -Q "YELLOW" -i "y" -p "Install autojump keybind at Ctrl-x for root?" "y n" bnd_r
+reade -Q "YELLOW" -i "y" -p "Install autojump keybind at Ctrl-x for root? [Y/n]:" "y n" bnd_r
 if [ "$bnd" == "y" ]; then
     if sudo grep -q 'bind '\''"\\C-x": "j \\C-i"'\''' $KEYBIND_R; then
         sudo sed -i 's|.*\(bind .*\C-x": "j.*\)|\1|g'  $KEYBIND_R
