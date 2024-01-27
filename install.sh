@@ -109,11 +109,11 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         more = Preinstalled other pager - leaves text by default, less customizable (ironically)\n"
         if [ -x "$(command -v most)" ]; then
             pagers="$pagers most"
-            prmpt="$prmpt \tmost = Installed pager\n"
+            prmpt="$prmpt \tmost = Installed pager that is very customizable\n"
         fi
         if [ -x "$(command -v moar)" ]; then
             pagers="$pagers moar"
-            prmpt="$prmpt \tmoar = Installed pager\n"
+            prmpt="$prmpt \tmoar = Installed pager with an awesome default configuration\n"
         fi
         printf "$prmpt"
         reade -Q "GREEN" -i "less" -p "PAGER=" "$pagers" pgr2
@@ -125,7 +125,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
             lss_n=""
             for opt in ${lss}; do
                 opt1=$(echo "$opt" | sed 's|--\(\)|\1|g' | sed 's|\(\)\=.*|\1|g')
-                if man less | grep -Fq "${opt1}"; then
+                if (man less | grep -Fq "${opt1}") 2> /dev/null; then
                     lss_n="$lss_n $opt"
                 fi
             done
@@ -324,9 +324,9 @@ fi
         sudo cp -bfv readline/.inputrc /root/;
         sudo gio trash /root/.inputrc~
     }
-    shell-keybinds(){
+    shell-keybinds() {
         reade -Q "YELLOW" -i "n" -p "Set caps to escape? (Might cause X11 errors with SSH) [Y/n]: " "y n" xtrm
-        if [ ! "$xtrm" == "y" ] && [ ! -z "$xtrm" ]; then
+        if [ "$xtrm" != "y" ] && ! [ -z "$xtrm" ]; then
             sed -i "s|setxkbmap |#setxkbmap |g" readline/.keybinds.sh
         fi
         
@@ -385,6 +385,14 @@ if [ -z $osc ] || [ "Y" == $osc ] || [ $osc == "y" ]; then
 fi
 unset osc
 
+# Bat
+reade -Q "GREEN" -i "y" -p "Install Bat? (Cat clone with syntax highlighting) [Y/n]: " "y n" bat
+if [ -z $bat ] || [ "Y" == $bat ] || [ $bat == "y" ]; then
+    ./install_bat.sh 
+fi
+unset bat
+
+
 # Autojump
 ./install_autojump.sh
 
@@ -441,15 +449,25 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         sudo gio trash /root/.bash_aliases.d/general.sh~
     }
     general(){              
+        sed -i 's|^export TRASH_BIN_LIMIT=|export TRASH_BIN_LIMIT=|g' ~/.pathvariables.sh
         local ansr
         reade -Q "GREEN" -i "y" -p "Set cp/mv (when overwriting) to backup files? (will also trash backups):" "y n" ansr         
         if [ "$ansr" != "y" ]; then
             sed -i 's|alias cp="cp-trash -rv"|#alias cp="cp-trash -rv"|g' aliases/general.sh
             sed -i 's|alias mv="mv-trash -v"|#alias mv="mv-trash -v"|g' aliases/general.sh
+        fi
+        unset ansr
+        reade -Q "GREEN" -i "y" -p "Set 'gio trash' alias for rm? [Y/n]:" "y n" ansr 
+        if [ "$ansr" != "y" ]; then
             sed -i 's|alias rm="trash"|#alias rm="trash"|g' aliases/general.sh
-        elif [ -f ~/.pathvariables.sh ]; then
-            sed -i 's|^export TRASH_BIN_LIMIT=|export TRASH_BIN_LIMIT=|g' ~/.pathvariables.sh
-        fi      
+        fi
+        if [ -x "$(command -v bat)" ]; then
+            reade -Q "GREEN" -i "y" -p "Set a 'bat' alias for cat? [Y/n]" "y n" cat
+            if [ "$cat" != "y" ]; then
+                sed -i 's|alias cat="bat"|#alias cat="bat"|g' aliases/general.sh
+            fi
+        fi
+        unset cat
         cp -bfv aliases/general.sh ~/.bash_aliases.d/
         gio trash ~/.bash_aliases.d/general.sh~
         yes_edit_no general_r "aliases/general.sh readline/rlwrap_scripts.sh" "Install general.sh and rlwrap_scripts.sh at /root/?" "yes" "GREEN"; }

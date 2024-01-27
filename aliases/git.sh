@@ -85,7 +85,7 @@ alias git_log_pretty_graph="git log --graph --all --pretty=format:\"%x1b[33m%h%x
 
 git_add_commit_all(){
     reade -Q "CYAN" -p "Give up a commit message: " msg
-    if [ ! -z "$msg" ]; then
+    if ! [ -z "$msg" ]; then
         git add -A && git commit -m "$msg";
     else
         git add -A && git commit;

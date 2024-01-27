@@ -4,14 +4,11 @@
 . ./readline/rlwrap_scripts.sh
 
  # Ranger (File explorer)
-if [ $distro_base == "Arch" ];then
-    yes | sudo pacman -Su ranger python python-pipx ttf-nerd-fonts-symbols-common ttf-nerd-fonts-symbols ttf-nerd-fonts-symbols-mono atool bat calibre elinks ffmpegthumbnailer fontforge highlight terminology mupdf-tools odt2txt
-elif [ $distro_base == "Debian" ]; then    
-    yes | sudo apt update 
-    yes | sudo apt install ranger python3 python3-dev pipx atool bat elinks ffmpegthumbnailer fontforge highlight jq libcaca0 odt2txt mupdf-tools terminology
-    if [ -x "$(command -v batcat)" ]; then
-        mkdir -p ~/.local/bin
-        ln -s /usr/bin/batcat ~/.local/bin/bat
+ if [ -x "$(command -v ranger)" ]; then
+     if [ $distro_base == "Arch" ];then
+        yes | sudo pacman -Su ranger python python-pipx
+    elif [ $distro_base == "Debian" ]; then    
+        yes | sudo apt install ranger python3 python3-dev pipx
     fi
 fi
 
@@ -24,6 +21,7 @@ fi
 if [ -f /home/burp/.local/bin/ranger ] && ! grep -q 'rm -f -- "$temp_file" 2>/dev/null' /home/burp/.local/bin/ranger; then
    sudo sed -i 's|rm -f -- "$temp_file"|rm -f -- "$temp_file" 2>/dev/null|g' /home/burp/.local/bin/ranger; 
 fi
+
 
 #ranger --copy-config=all
 ranger --confdir=/home/$USER/.config/ranger --copy-config=all
@@ -40,8 +38,8 @@ if [ -d ~/.bash_aliases.d/ ]; then
 fi
 
 
-rangr_cnf(){
-    if [ ! -d ~/.config/ranger/ ]; then 
+rangr_cnf() {
+    if ! [ -d ~/.config/ranger/ ]; then 
         mkdir -p ~/.config/ranger/
     fi
     cp -bfv -t ~/.config/ranger ./ranger/rc.conf ./ranger/rifle.conf ./ranger/scope.sh
@@ -54,9 +52,6 @@ if [ -z "$rf2" ] || [ "y" == "$rf2" ]; then
     binds=~/.bashrc
     if [ -f ~/.keybinds.sh ]; then
         binds=~/.keybinds.sh
-    fi
-    if grep -q "bind -x '\"\\\eOQ\": ranger'" $binds; then
-        sed -i 's|#bind -x '\''"\\eOQ\": ranger'\''|bind -x '\''"\\eOQ\": ranger'\''|g' $binds
     fi
     if [ -f ~/.keybinds.sh ]; then
         if grep -q '#bind -x '\''"\\201": ranger'\''' ~/.keybinds.sh; then

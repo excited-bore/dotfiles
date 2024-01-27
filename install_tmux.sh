@@ -48,7 +48,6 @@ reade -Q "GREEN" -i "y" -p "Install tmux.conf? (tmux conf at ~/.tmux.conf) [Y/n]
 if [ "$tmuxc"  == "y" ] || [ -z "$tmuxc" ]; then
     cp -bfv tmux/.tmux.conf ~/
     gio trash ~/.tmux.conf~
-    #tmux source-file ~/.tmux.conf
 fi
 unset tmuxc
 
@@ -129,70 +128,70 @@ if [ -x $(command -v nvim) ] && [ -x $(command -v kitty) ]; then
 fi
 unset tmuxx
 
-#awk '$0=="#run '\''~/.tmux/plugins/tpm/tpm'\''"{lastline=$0;next}{print $0}END{print lastline}' ~/.tmux.conf > ~/.tmux.conf
-#awk '$0=="run '\''~/.tmux/plugins/tpm/tpm'\''"{lastline=$0;next}{print $0}END{print lastline}' ~/.tmux.conf > ~/.tmux.conf
 
-
-if [ "$(which ranger)" != "" ]; then
-    reade -Q "GREEN" -i "y" -p "Install ranger tmux plugin? (ranger_tmux) [Y/n]:" "y n"  tmuxx
-    if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
-        if [ ! -x "$(command -v pip)" ]; then
-            if [ $distro_base == "Arch" ]; then
-                yes | sudo pacman -Syu python-pip
-            elif [ $distro_base == "Debian" ]; then
-                yes | sudo apt update
-                yes | sudo apt install python3-pip
-            fi
-        fi
-        pip install --break-system-packages ranger_tmux
-        python3 -m ranger_tmux --tmux install
-        
-        # Silent tracking
-        if ! grep -q "history" ~/.local/lib/python3.11/site-packages/ranger_tmux/util.py; then
-            sed -i 's|"'\''.format(path)|" \&\& history -d -1 \&\& clear'\''.format(path)|g' ~/.local/lib/python3.11/site-packages/ranger_tmux/util.py
-        fi    
-
-        sed -i 's|#set tmux_cwd_sync .*|set tmux_cwd_sync true|g' ~/.config/ranger/rc.conf
-        sed -i 's|#set tmux_cwd_track .*|set tmux_cwd_track true|g' ~/.config/ranger/rc.conf
-        if ! grep -q "set tmux_cwd_sync" ~/.config/ranger/rc.conf; then
-            echo "# When True, ranger's current directory is synced to the other pane" >> ~/.config/ranger/rc.conf
-            echo "set tmux_cwd_sync true" >> ~/.config/ranger/rc.conf
-            echo "# When True, ranger's current directory tracks the other pane" >> ~/.config/ranger/rc.conf
-            echo "set tmux_cwd_track true" >> ~/.config/ranger/rc.conf
-        fi
-        
-        reade -Q "GREEN" -i "y" -p 'Set ranger-tmux shortcut from  Bspace  to  \\`  ?  [Y/n]:' "y n"  tmuxx
-        if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
-            sed -i 's|Bspace run-shell -b|\` run-shell -b|g'  ~/.tmux.conf 
-        fi
-    fi
-fi
-unset tmuxx
+#if [ "$(which ranger)" != "" ]; then
+#    reade -Q "GREEN" -i "y" -p "Install ranger tmux plugin? (ranger_tmux) [Y/n]:" "y n"  tmuxx
+#    if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
+#        if [ ! -x "$(command -v pip)" ]; then
+#            if [ $distro_base == "Arch" ]; then
+#                yes | sudo pacman -Syu python-pip
+#            elif [ $distro_base == "Debian" ]; then
+#                yes | sudo apt update
+#                yes | sudo apt install python3-pip
+#            fi
+#        fi
+#        pip install --break-system-packages ranger_tmux
+#        python3 -m ranger_tmux --tmux install
+#        
+#        # Silent tracking
+#        if ! grep -q "history" ~/.local/lib/python3.11/site-packages/ranger_tmux/util.py; then
+#            sed -i 's|"'\''.format(path)|" \&\& history -d -1 \&\& clear'\''.format(path)|g' ~/.local/lib/python3.11/site-packages/ranger_tmux/util.py
+#        fi    
+#
+#        sed -i 's|#set tmux_cwd_sync .*|set tmux_cwd_sync true|g' ~/.config/ranger/rc.conf
+#        sed -i 's|#set tmux_cwd_track .*|set tmux_cwd_track true|g' ~/.config/ranger/rc.conf
+#        if ! grep -q "set tmux_cwd_sync" ~/.config/ranger/rc.conf; then
+#            echo "# When True, ranger's current directory is synced to the other pane" >> ~/.config/ranger/rc.conf
+#            echo "set tmux_cwd_sync true" >> ~/.config/ranger/rc.conf
+#            echo "# When True, ranger's current directory tracks the other pane" >> ~/.config/ranger/rc.conf
+#            echo "set tmux_cwd_track true" >> ~/.config/ranger/rc.conf
+#        fi
+#        
+#        reade -Q "GREEN" -i "y" -p 'Set ranger-tmux shortcut from  Bspace  to  \\`  ?  [Y/n]:' "y n"  tmuxx
+#        if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
+#            sed -i 's|Bspace run-shell -b|\` run-shell -b|g'  ~/.tmux.conf 
+#        fi
+#    fi
+#fi
+#unset tmuxx
 
 reade -Q "GREEN" -i "y" -p "Install tmux completions? [Y/n]:" "y n"  tmuxx
 if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
-    if [ ! -d ~/.bash_completion.d/ ]; then
-        mkdir ~/.bash_completion.d/
-    fi
-    if [ ! -f ~/.bash_completion.d/ ]; then
-        touch ~/.bash_completion.d/tmux
-    fi
+    ./checks/check_completions_dir.sh
     if [ ! -e ~/.bash_completion.d/tmux ]; then
         curl https://raw.githubusercontent.com/imomaliev/tmux-bash-completion/master/completions/tmux > ~/.bash_completion.d/tmux 2> /dev/null
-        #if ! grep -q "~/.bash_completion.d/tmux" ~/.bashrc; then
-        #    echo ". ~/.bash_completion.d/tmux" >> ~/.bashrc
-        #fi
         . ~/.bashrc
     fi
 fi
 
+unset tmuxx
+
+reade -Q "YELLOW" -i "y" -p "Install tmux completions at root? [Y/n]:" "y n"  tmuxx
+if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
+    if [ ! -e /root/.bash_completion.d/tmux ]; then
+       curl https://raw.githubusercontent.com/imomaliev/tmux-bash-completion/master/completions/tmux | sudo tee -a /root/.bash_completion.d/tmux > /dev/null
+    fi
+fi
+unset tmuxx
+
 reade -Q "GREEN" -i "y" -p "Install tmux.sh at ~/.bash_aliases.d/? (tmux aliases) [Y/n]:" "y n"  tmuxx
 if [ -z "$tmuxx" ] || [ "$tmuxx"  == "y" ]; then 
-    cp -f tmux/tmux.sh ~/.bash_aliases.d/
+    cp -bfv tmux/tmux.sh ~/.bash_aliases.d/
+    gio trash ~/.bash_aliases.d/tmux.sh~
 fi
 unset tmuxx 
 
-reade -Q "GREEN" -i "y" -p "Set tmux at shell login for SSH? [Y/n]:" "y n"  tmuxx
+reade -Q "YELLOW" -i "n" -p "Set tmux at shell login for SSH? (Conflicts with vim-tmux-kitty navigator) [Y/n]:" "y n"  tmuxx
 if [ -z "$tmuxx" ] || [ "$tmuxx"  == "y" ]; then 
     touch ~/.bash_aliases.d/tmux_startup.sh
     echo 'if [[ $- =~ i ]] && [[ -z "$TMUX" ]] && [[ -n "$SSH_TTY" ]]; then' >> ~/.bash_aliases.d/tmux_startup.sh
@@ -201,5 +200,8 @@ if [ -z "$tmuxx" ] || [ "$tmuxx"  == "y" ]; then
 fi
 unset tmuxx
 
-tmux
+tmux source-file ~/.tmux.conf
+. ~/.tmux/plugins/tpm/bin/install_plugins
+. ~/.tmux/plugins/tpm/bin/update_plugins all
+
 echo "${green}Install plugins in tmux with 'C-b + I' / Update with 'C-b + U'"

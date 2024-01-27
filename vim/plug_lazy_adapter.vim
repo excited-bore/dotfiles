@@ -1,4 +1,4 @@
-  " This command is your main interface to the plugin:
+ " This command is your main interface to the plugin:
 " args: anything vim-plug supports in its extra options, plus:
 " * afterLoad: the name of a vimscript function to run after the plugin
 " lazy-loads.

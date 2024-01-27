@@ -230,7 +230,7 @@ alias remove="rm"
 alias rmAll="rm -v ./*";
 alias rmAllHiddn="rm -v .[!.]* *";
 
-alias rm="trash"
+alias rm="gio trash"
 
 # With parent directories and verbose
 alias mkdir="mkdir -pv"
@@ -242,6 +242,7 @@ alias egrep='egrep --colour=always'
 alias fgrep='fgrep --colour=always'
 alias rg='rg --color=always'
 
+alias cat="bat"
 
 # Listen hidden files and permissions
 alias lsall="ls -Al"
@@ -250,7 +251,7 @@ alias c="cd"
 alias x="cd .."
 
 # All man pages
-alias men="man -a"
+alias man="man -a"
 # (:
 alias men="man man"
 
