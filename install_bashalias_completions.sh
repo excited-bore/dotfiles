@@ -1,9 +1,8 @@
 #!/bin/bash
 . ./readline/rlwrap_scripts.sh
+. ./checks/check_completions_dir.sh
 
-if [ ! -d ~/.bash_completion.d/ ]; then 
-    mkdir ~/.bash_completion.d
-fi
+
 if [ ! -e ~/.bash_completion.d/complete_alias ]; then
     curl https://raw.githubusercontent.com/cykerway/complete-alias/master/complete_alias > ~/.bash_completion.d/complete_alias 2> /dev/null
     sed -i 's/#complete -F _complete_alias "\(.*\)"/complete -F _complete_alias "\1"/g' ~/.bash_completion.d/complete_alias

@@ -46,7 +46,8 @@ sed -i 's|set -g @continuum-restore '\''on'\''|#set -g @continuum-restore '\''on
 
 reade -Q "GREEN" -i "y" -p "Install tmux.conf? (tmux conf at ~/.tmux.conf) [Y/n]:" "y n" tmuxc
 if [ "$tmuxc"  == "y" ] || [ -z "$tmuxc" ]; then
-    cp -f tmux/.tmux.conf ~/
+    cp -bfv tmux/.tmux.conf ~/
+    gio trash ~/.tmux.conf~
     #tmux source-file ~/.tmux.conf
 fi
 unset tmuxc

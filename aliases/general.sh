@@ -3,6 +3,12 @@ if [ ! -f ~/.bash_aliases.d/rlwrap_scripts.sh ]; then
 else
     . ~/.bash_aliases.d/rlwrap_scripts.sh
 fi
+
+
+if [ -z $TRASHBIN_LIMIT ]; then
+   TRASHBIN_LIMIT=100 
+fi
+
 # TRY and keep command line at bottom
 #alias b="tput cup $(tput lines) 0" 
 
@@ -113,6 +119,8 @@ function cp-trash(){
     fi
 }
 
+export -f cpf-trash
+export -f cp-trash
 
 alias cp="cp-trash -rv"
 
@@ -215,8 +223,10 @@ function mv-trash(){
     fi
 } 
 
-alias mv="mv-trash -v"
+export -f mvf-trash
+export -f mv-trash
 
+alias mv="mv-trash -v"
 
 # rm recursively and verbose
 
@@ -315,7 +325,7 @@ function trash(){
     for arg in $@ ; do
         if [ -f "$arg" ] || [ -d "$arg" ]; then
             gio trash $arg;
-            if [ $(gio trash --list | wc -l) -gt $TRASHBIN_LIMIT ]; then
+            if [ $(gio trash --list | wc -l) -gt "$TRASHBIN_LIMIT" ]; then
                 local ansr
                 echo "${red1}Trashbin has more then $TRASHBIN_LIMIT items"
                 reade -Q "YELLOW" -i "y" -p "Empty? ('trash-restore' to restore) [Y/n]: " "y n"  ansr

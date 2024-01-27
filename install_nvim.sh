@@ -46,7 +46,7 @@ if [[ $distro == "Arch" || $distro_base == "Arch" ]];then
     fi
     reade -Q "GREEN" -i "y" -p "Install nvim-perl? [Y/n]:" "y n" perlscripts
     if [ -z $perlscripts ] || [ "y" == $perlscripts ]; then
-        yes | sudo apt install cpanminus
+        yes | sudo pacman -Su cpanminus
         cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
         sudo cpanm --sudo -n Neovim::Ext
     fi
@@ -180,8 +180,8 @@ function instvim_r(){
     if ! sudo test -d /root/.config/nvim/; then
         sudo mkdir -p /root/.config/nvim/
     fi
-    sudo cp -fv vim/* /root/.config/nvim/
-
+    sudo cp -bfv vim/* /root/.config/nvim/
+    sudo gio trash /root/.config/nvim/*~
     if sudo grep -q "MYVIMRC" $PATHVAR_R; then
        sudo sed -i 's|.export MYVIMRC="|export MYVIMRC=~/.config/nvim/init.vim "|g' $PATHVAR_R
         sudo sed -i 's|.export MYGVIMRC="|export MYGVIMRC=~/.config/nvim/init.vim "|g' $PATHVAR_R
@@ -220,7 +220,8 @@ function instvim(){
     if [[ ! -d ~/.config/nvim/ ]]; then
         mkdir ~/.config/nvim/
     fi    
-    cp -fv vim/* ~/.config/nvim/
+    cp -bfv vim/* ~/.config/nvim/
+    gio trash ~/.config/nvim/*~
 
     # Symlink configs to flatpak dirs for possible flatpak nvim use
     if [ -x "$(command -v flatpak)" ] && echo "$(flatpak list)" | grep -q "neovim"; then
@@ -270,12 +271,14 @@ echo "Check installed nvim plugins with 'Lazy'/ Check installed vim plugins with
 
 vimsh_r(){ 
     sudo mkdir -p /root/.bash_aliases.d/
-    sudo cp -fv aliases/vim_nvim.sh /root/.bash_aliases.d/; 
+    sudo cp -bfv aliases/vim_nvim.sh /root/.bash_aliases.d/; 
+    sudo gio trash /root/.bash_aliases.d/vim_nvim.sh~
 }
 
 vimsh(){
     mkdir -p ~/.bash_aliases.d/
-    cp -fv aliases/vim_nvim.sh ~/.bash_aliases.d/
+    cp -bfv aliases/vim_nvim.sh ~/.bash_aliases.d/
+    gio trash ~/.bash_aliases.d/vim_nvim.sh~
     yes_edit_no vimsh_r "vim/vim_nvim.sh" "Install vim aliases at /root/.bash_aliases.d/? " "yes" "GREEN"
 }
 yes_edit_no vimsh "vim/vim_nvim.sh" "Install vim aliases at ~/.bash_aliases.d/? " "edit" "GREEN"

@@ -14,7 +14,7 @@ if [ ! -x "$(command -v autojump)" ]; then
         if ! grep "autojump" ~/.bashrc; then
             printf "[[ -s /etc/profile.d/autojump.sh ]] && source /etc/profile.d/autojump.sh\n" >> ~/.bashrc
         fi
-        if sudo ! grep "autojump" /root/.bashrc; then
+        if ! sudo grep "autojump" /root/.bashrc; then
             printf "[[ -s /etc/profile.d/autojump.sh ]] && source /etc/profile.d/autojump.sh\n" | sudo tee -a /root/.bashrc
         fi
     fi

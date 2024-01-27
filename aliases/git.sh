@@ -2,13 +2,13 @@
 . ~/.bash_aliases.d/rlwrap_scripts.sh
 
 alias git_config_pull_rebase_false="git config pull.rebase false"
-alias git_set_pull_merge="git config pull.rebase false"
+alias git_config_global_pull_rebase_false="git config --global pull.rebase false"
 
 alias git_config_pull_rebase_true="git config pull.rebase true"
-alias git_set_pull_rebase="git config pull.rebase true"
+alias git_config_global_pull_rebase_true="git config --global pull.rebase true"
 
-alias git_config_pull_fast_forward_only="git config pull.ff only"
-alias git_set_pull_fastforward_only="git config pull.ff only"
+alias git_config_global_pull_fastforward_only="git config pull.ff only"
+alias git_config_pull_fastforward_only="git config --global pull.ff only"
 
 function git_ssh_key_and_add_to_agent() { 
     if [ ! -f ~/.ssh/config ]; then
@@ -62,6 +62,7 @@ git_remote_ssh_to_https(){
 }
 
 alias git_list_remotes="git remote -v"
+
 git_test_conn_github() { ssh -vT git@github.com; }
 git_status() { git status; }
 #git_config_using_vars() { git config --global user.email \"$EMAIL\" && git config --global user.name \"$GITNAME\"; }
@@ -71,21 +72,30 @@ git_add_remote_ssh() { git remote -v add "$1" git@github.com:$GITNAME/"$2.git"; 
 alias git_reset_to_last_HEAD="git reset --hard"
 alias git_add_all="git add -A"
 alias git_commit_all="git commit -a";
-alias git_commit_all_message="git commit -am";
+
+function git_commit_all_message(){
+    reade -Q "CYAN" -p "Give up a commit message: " msg
+    if [ ! -z "$msg" ]; then
+        git commit -am "$msg";
+    fi
+}
+    
 alias git_log_pretty_graph="git log --graph --all --pretty=format:\"%x1b[33m%h%x09%x1b[32m%d%x1b[0m%x20%s\""
 
 
 git_add_commit_all(){
-    if [ ! -z "$1" ]; then
-        git add -A && git commit -m "$1";
+    reade -Q "CYAN" -p "Give up a commit message: " msg
+    if [ ! -z "$msg" ]; then
+        git add -A && git commit -m "$msg";
     else
         git add -A && git commit;
     fi
 }
  
 git_add_commit_push_all(){
-    if [ ! -z "$1" ]; then
-        git add -A && git commit -m "$1" && git push;
+    reade -Q "CYAN" -p "Give up a commit message: " msg
+    if [ ! -z "$msg" ]; then
+        git add -A && git commit -m "$msg" && git push;
     else
         git add -A && git commit && git push; 
     fi
@@ -104,9 +114,55 @@ git_switch_commit() {
     git checkout "$commit";
 }
 
-git_new_branch() {
-    commit=$(git log --oneline --color=always | nl | fzf --ansi --track --no-sort --layout=reverse-list | awk '{print $2}');
+git_add_worktree_and_ignore(){
+    reade -Q "CYAN" -p "Give up a (new) worktree path: " -e path
+    if [ ! -z "$path" ]; then
+        git worktree add "$path"
+        if [ "${path: -1}" != "/" ]; then
+            path="$path/"
+        fi
+        if [ ! -f ./.gitignore ]; then
+            touch .gitignore
+        fi
+        echo "$path" >> .gitignore
+    fi
+}
+
+git_add_worktree_and_ignore(){
+    reade -Q "CYAN" -p "Give up a (new) worktree path: " -e path
+    if [ ! -z "$path" ]; then
+        git worktree add "$path"
+        if [ "${path: -1}" != "/" ]; then
+            path="$path/"
+        fi
+        if [ ! -f ./.gitignore ]; then
+            touch .gitignore
+        fi
+        echo "$path" >> .gitignore
+    fi
+}
+
+git_remove_worktree_and_ignore(){
+    wrktree=$(git worktree list -v | tail -n +2 | nl | fzf --ansi --track --no-sort --layout=reverse-list | awk '{print $2}');
+    if [ ! -z "$wrktree" ]; then
+        git worktree remove "$wrktree"
+        top=$(git rev-parse --show-toplevel)
+        path=$(echo $wrktree | sed "s|$top/||" )
+        if [ "${path: -1}" != "/" ]; then
+            path="$path/"
+        fi
+        if [ ! -f ./.gitignore ]; then
+            touch .gitignore
+        fi
+        sed -i "s|.*$path.*||" .gitignore
+        sed -i -r '/^\s*$/d' .gitignore
+        echo "${cyan}Worktree "$path" removed!${normal}"
+    fi
+}
+
+git_add_branch() {
     reade -Q "GREEN" -p "Give up a new branch name: " branch
+    commit=$(git log --oneline --color=always | nl | fzf --ansi --track --no-sort --layout=reverse-list | awk '{print $2}');
     if [ ! -z "$branch" ]; then
         git checkout -b "$branch" "$commit";
     fi

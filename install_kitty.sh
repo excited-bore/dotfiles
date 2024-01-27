@@ -7,7 +7,7 @@ if [ "$distro" == "Arch" ] || [ "$distro_base" == "Arch" ]; then
 elif [ "$distro" == "Debian" ] || [ "$distro_base" == "Debian" ]; then    
     yes | sudo apt update 
     yes | sudo apt install kitty
-    if [  ! -x "$(command -v kitten)" ]; then
+    if [ ! -x "$(command -v kitten)" ]; then
         sudo ln -s ~/.local/share/kitty-ssh-kitten/kitty/bin/kitten    
     fi
     kitten update-self 
@@ -16,8 +16,10 @@ fi
 reade -Q "GREEN" -i "y" -p "Install kitty conf? (at ~/.config/kitty/kitty.conf|ssh.conf) [Y/n]:" "y n" kittn
 if [ "y" == "$kittn" ]; then
     mkdir -p ~/.config/kitty
-    cp -f kitty/kitty.conf ~/.config/kitty/kitty.conf
-    cp -f kitty/ssh.conf ~/.config/kitty/ssh.conf
+    cp -vf kitty/kitty.conf ~/.config/kitty/kitty.conf
+    gio trash ~/.config/kitty/kitty.conf~
+    cp -vf kitty/ssh.conf ~/.config/kitty/ssh.conf
+    gio trash ~/.config/kitty/ssh.conf~
 fi
 unset kittn
 
@@ -26,7 +28,7 @@ if [ -d ~/.bash_aliases.d/ ]; then
     sed -i 's|^.\(export PATH=$KITTY_PATH:$PATH\)|\1|g' $PATHVAR
     sed -i 's|^.\(export PATH=$PATH:~/.local/kitty.app/bin/\)|\1|g' $PATHVAR
     sed -i 's|^.\(if \[\[ \$SSH_TTY \]\] .*\)|\1|g' $PATHVAR
-    sed -i 's|^.*\(export KITTY_PORT=.*\)|  \1|g' $PATHVAR
+    sed -i 's|^.*\(export KITTY_PORT=.*\)|\1|g' $PATHVAR
     sed -i 's|^.\(fi\)|\1|g' $PATHVAR
 fi              
 

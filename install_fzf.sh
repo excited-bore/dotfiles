@@ -81,7 +81,8 @@
             reade -Q "GREEN" -i "y" -p "Add shortcut for ripgrep files in dir? (Ctrl-g) [Y/n]:" "y n" rpgrpdir
             if [ -z $rpgrp ] || [ "Y" == $rpgrp ] || [ $rpgrp == "y" ]; then
                 
-                cp -fv ./fzf/ripgrep-directory.sh ~/.bash_aliases.d/
+                cp -bfv ./fzf/ripgrep-directory.sh ~/.bash_aliases.d/
+                gio trash ~/.bash_aliases.d/ripgrep-directory.sh~
                 if ! grep -q "ripgrep-dir" ~/.fzf/shell/key-bindings.bash; then 
                     echo "#  Ctrl-g gives a ripgrep function overview" >> ~/.fzf/shell/key-bindings.bash
                     echo 'bind -x '\''"\C-g": "ripgrep-dir"'\''' >> ~/.fzf/shell/key-bindings.bash
@@ -115,7 +116,8 @@
                     sudo wget "https://raw.githubusercontent.com/ranger/ranger/master/ranger/ext/rifle.py" /usr/bin/
                     sudo mv -v /usr/bin/rifle.py /usr/bin/rifle
                     sudo chmod +x /usr/bin/rifle
-                    cp -fv ranger/rifle.conf ~/.config/ranger/rifle.conf 
+                    cp -bfv ranger/rifle.conf ~/.config/ranger/rifle.conf
+                    gio trash ~/.config/ranger/rifle.conf~
                 fi
                 cp -fv fzf/keybinds_rifle.sh ~/.fzf/shell/
                 if ! grep -q "keybinds_rifle.sh" ~/.fzf/shell/key-bindings.bash; then

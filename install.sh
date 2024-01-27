@@ -3,17 +3,10 @@
 . ./checks/check_rlwrap.sh
 . ./readline/rlwrap_scripts.sh
 . ./checks/check_distro.sh
-. ./aliases/general.sh
 
-printf "${green}If all necessary files are sourced correctly, this text looks green.\n If not, something went wrong.\n"
+printf "${green}If all necessary files are sourced correctly, this text looks green.\nIf not, something went wrong.\n"
+printf "\n${green}Files that get overwritten get backed up and trashed (to prevent clutter).\nRecover using ${cyan}'gio trash --list'${green} and ${cyan}'gio trash --restore' ${normal}\n"
 
-reade -Q "GREEN" -i "y" -p "Set cp/mv (when overwriting) to backup files? (will also trash backups):" "y n" ansr         
-if [ "$ansr" != "y" ]; then
-    sed -i 's|alias cp="cp-trash -rv"|#alias cp="cp-trash -rv"|g' aliases/general.sh
-    sed -i 's|alias mv="mv-trash -v"|#alias mv="mv-trash -v"|g' aliases/general.sh
-    sed -i 's|alias rm="trash"|#alias rm="trash"|g' aliases/general.sh
-fi      
-unset ansr
 
 if [ -z "$TMPDIR" ]; then
     TMPDIR=/tmp
@@ -72,13 +65,14 @@ if [ ! -x "$(command -v snap)" ]; then
 fi
 unset inssnap
 
-if [ ! -f /etc/polkit/49-nopasswd_global.pkla ] && [ ! -f /etc/polkit-1/rules.d/90-nopasswd_global.rules ]; then
+if ! sudo test -f /etc/polkit/49-nopasswd_global.pkla && ! sudo test -f /etc/polkit-1/rules.d/90-nopasswd_global.rules; then
     reade -Q "YELLOW" -i "n" -p "Install polkit files for automatic authentication for passwords? [Y/n]:" "y n" plkit
     if [ "y" == "$plkit" ]; then
         ./install_polkit_wheel.sh
     fi
     unset plkit
 fi
+
 # Pathvariables
 
 reade -Q "GREEN" -i "y" -p "Check existence (and create) ~/.pathvariables.sh and link it to .bashrc? [Y/n]:" "y n" pathvars
@@ -126,12 +120,12 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         pgr2=$(whereis "$pgr2" | awk '{print $2}')
         sed -i 's|export PAGER=.*|export PAGER='$pgr2'|' .pathvariables.sh
         if grep -q "less" "$pgr2"; then
-            sed -i 's|#export LESS=|export LESS=|g' .pathvariables.sh
+            sed -i 's|#export LESS=|export LESS="*"|g' .pathvariables.sh
             lss=$(cat .pathvariables.sh | grep 'export LESS="*"' | sed 's|export LESS="\(.*\)"|\1|g')
             lss_n=""
             for opt in ${lss}; do
-                opt1=$(echo "$opt" | sed 's|--\(\)|\1|g')
-                if man less | grep -q -e "${opt1}"; then
+                opt1=$(echo "$opt" | sed 's|--\(\)|\1|g' | sed 's|\(\)\=.*|\1|g')
+                if man less | grep -Fq "${opt1}"; then
                     lss_n="$lss_n $opt"
                 fi
             done
@@ -288,7 +282,8 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
             printf "  . ~/.pathvariables.sh\n" | sudo tee -a /root/.bashrc
             printf "fi\n" | sudo tee -a /root/.bashrc
         fi
-        sudo cp -fv .pathvariables.sh /root/.pathvariables.sh;
+        sudo cp -bfv .pathvariables.sh /root/.pathvariables.sh;
+        sudo gio trash /root/.pathvariables.sh~
     }                                            
     pathvariables(){
         if ! grep -q "~/.pathvariables.sh" ~/.bashrc; then
@@ -296,7 +291,8 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
             echo "  . ~/.pathvariables.sh" >> ~/.bashrc
             echo "fi" >> ~/.bashrc
         fi
-        cp -fv .pathvariables.sh ~/.pathvariables.sh
+        cp -bfv .pathvariables.sh ~/.pathvariables.sh
+        gio trash ~/.pathvariables.sh~
         yes_edit_no pathvariables_r ".pathvariables.sh" "Install .pathvariables.sh at /root/?" "edit" "YELLOW"; 
     }
     yes_edit_no pathvariables ".pathvariables.sh" "Install .pathvariables.sh at ~/? " "edit" "GREEN"
@@ -323,9 +319,10 @@ fi
         if [ -f /root/.pathvariables.sh ]; then
            sudo sed -i 's|#export INPUTRC|export INPUTRC|g' /root/.pathvariables.sh
         fi
-        sudo cp -fv readline/.keybinds.sh /root/; 
-        sudo cp -fv readline/.inputrc /root/;
-        
+        sudo cp -bfv readline/.keybinds.sh /root/;
+        sudo gio trash /root/.keybinds.sh~
+        sudo cp -bfv readline/.inputrc /root/;
+        sudo gio trash /root/.inputrc~
     }
     shell-keybinds(){
         reade -Q "YELLOW" -i "n" -p "Set caps to escape? (Might cause X11 errors with SSH) [Y/n]: " "y n" xtrm
@@ -339,8 +336,10 @@ fi
             echo "fi" >> ~/.bashrc
         fi 
         
-        cp -fv readline/.keybinds.sh ~/
-        cp -fv readline/.inputrc ~/
+        cp -bfv readline/.keybinds.sh ~/
+        gio trash ~/.keybinds.sh~
+        cp -bfv readline/.inputrc ~/
+        gio trash ~/.inputrc~
         if [ -f ~/.pathvariables.sh ]; then
            sed -i 's|#export INPUTRC|export INPUTRC|g' ~/.pathvariables.sh
         fi
@@ -352,10 +351,12 @@ fi
     
     xresources_r(){
         
-        sudo cp -fv xterm/.Xresources /root/.Xresources;
+        sudo cp -bfv xterm/.Xresources /root/.Xresources;
+        sudo gio trash /root/.Xresources~
         }
     xresources(){
-        cp -fv xterm/.Xresources ~/.Xresources;
+        cp -bfv xterm/.Xresources ~/.Xresources;
+        gio trash ~/.Xresources~
         yes_edit_no xresources_r "xterm/.Xresources" "Install .Xresources at /root/.bash_aliases.d/?" "edit" "RED"; }
     yes_edit_no xresources "xterm/.Xresources" "Install .Xresources at ~/.bash_aliases.d/? (readline config)" "edit" "YELLOW"
     
@@ -433,49 +434,78 @@ unset findr
 reade -Q "GREEN" -i "y" -p "Install bash aliases and other config? [Y/n]:" "y n" scripts
 if [ -z $scripts ] || [ "y" == $scripts ]; then
 
-    ./checks/check__aliases_dir.sh
+    ./checks/check_aliases_dir.sh
 
     general_r(){ 
-        sudo cp -fv aliases/general.sh /root/.bash_aliases.d/;
-        sudo cp -fv readline/rlwrap_scripts.sh /root/.bash_aliases.d/;
+        sudo cp -bfv aliases/general.sh /root/.bash_aliases.d/;
+        sudo gio trash /root/.bash_aliases.d/general.sh~
     }
-    general(){                                                                                     
-        cp -fv aliases/general.sh ~/.bash_aliases.d/
-        cp -fv readline/rlwrap_scripts.sh ~/.bash_aliases.d/
+    general(){              
+        local ansr
+        reade -Q "GREEN" -i "y" -p "Set cp/mv (when overwriting) to backup files? (will also trash backups):" "y n" ansr         
+        if [ "$ansr" != "y" ]; then
+            sed -i 's|alias cp="cp-trash -rv"|#alias cp="cp-trash -rv"|g' aliases/general.sh
+            sed -i 's|alias mv="mv-trash -v"|#alias mv="mv-trash -v"|g' aliases/general.sh
+            sed -i 's|alias rm="trash"|#alias rm="trash"|g' aliases/general.sh
+        else
+            sed -i 's|^export TRASH_BIN_LIMIT=|export TRASH_BIN_LIMIT=|g' $PATHVAR
+        fi      
+        cp -bfv aliases/general.sh ~/.bash_aliases.d/
+        gio trash ~/.bash_aliases.d/general.sh~
         yes_edit_no general_r "aliases/general.sh readline/rlwrap_scripts.sh" "Install general.sh and rlwrap_scripts.sh at /root/?" "yes" "GREEN"; }
         yes_edit_no general "aliases/general.sh readline/rlwrap_scripts.sh" "Install general.sh and rlwrap_scripts.sh at ~/? (aliases related to general actions - cd/mv/cp/rm + completion script replacement for 'read -e') " "yes" "YELLOW"
 
-    bash_yes_r(){ sudo cp -fv aliases/bash.sh /root/.bash_aliases.d/; }
+    bash_yes_r(){ 
+        sudo cp -bfv aliases/bash.sh /root/.bash_aliases.d/; 
+        sudo gio trash /root/.bash_aliases.d/bash.sh~;
+    }
     bash_yes() {
-        cp -fv aliases/bash.sh ~/.bash_aliases.d/;
+        cp -bfv aliases/bash.sh ~/.bash_aliases.d/;
+        gio trash ~/.bash_aliases.d/bash.sh~
         yes_edit_no bash_yes_r "aliases/bash.sh" "Install bash.sh at /root/?" "yes" "YELLOW"; }
     yes_edit_no bash_yes "aliases/bash.sh" "Install bash.sh at ~/? (bash specific aliases)?" "yes" "GREEN";
 
-    systemd_r(){ sudo cp -fv aliases/systemctl.sh /root/.bash_aliases.d/;}
+    systemd_r(){ 
+        sudo cp -bfv aliases/systemctl.sh /root/.bash_aliases.d/;
+        sudo gio trash /root/.bash_aliases.d/systemctl.sh~;
+    }
     systemd(){
-        cp -fv aliases/systemctl.sh ~/.bash_aliases.d/
+        cp -bfv aliases/systemctl.sh ~/.bash_aliases.d/
+        gio trash ~/.bash_aliases.d/systemctl.sh~;
         yes_edit_no systemd_r "aliases/systemctl.sh" "Install systemctl.sh at /root/?" "yes" "GREEN"; }
     yes_edit_no systemd "aliases/systemctl.sh" "Install systemctl.sh? ~/.bash_aliases.d/ (systemctl aliases/functions)?" "edit" "GREEN"
         
 
-    dosu_r(){ sudo cp -fv aliases/sudo.sh /root/.bash_aliases.d/ ;}    
+    dosu_r(){ 
+        sudo cp -bfv aliases/sudo.sh /root/.bash_aliases.d/ ;
+        sudo gio trash /root/.bash_aliases.d/sudo.sh~
+    }    
 
     dosu(){ 
-        cp -fv aliases/sudo.sh ~/.bash_aliases.d/;
+        cp -bfv aliases/sudo.sh ~/.bash_aliases.d/;
+        gio trash ~/.bash_aliases.d/sudo.sh~
         yes_edit_no dosu_r "aliases/sudo.sh" "Install sudo.sh at /root/?" "yes" "GREEN"; }
     yes_edit_no dosu "aliases/sudo.sh" "Install sudo.sh at ~/.bash_aliases.d/ (sudo aliases)? " "edit" "GREEN"
 
 
-    packman_r(){ sudo cp -fv aliases/package_managers.sh /root/.bash_aliases.d/; }
+    packman_r(){ 
+        sudo cp -bfv aliases/package_managers.sh /root/.bash_aliases.d/
+        sudo gio trash /root/.bash_aliases.d/package_managers.sh~; 
+    }
     packman(){
-        cp -fv aliases/package_managers.sh ~/.bash_aliases.d/
+        cp -bfv aliases/package_managers.sh ~/.bash_aliases.d/
+        gio trash ~/.bash_aliases.d/package_managers.sh~; 
         yes_edit_no packman_r "aliases/package_managers.sh" "Install package_managers.sh at /root/?" "edit" "YELLOW" 
     }
     yes_edit_no packman "aliases/package_managers.sh" "Install package_managers.sh at ~/.bash_aliases.d/ (package manager aliases)? " "edit" "GREEN"
     
-    ssh_r(){ sudo cp -fv aliases/ssh.sh /root/.bash_aliases.d/; }
+    ssh_r(){ 
+        sudo cp -bfv aliases/ssh.sh /root/.bash_aliases.d/; 
+        sudo gio trash /root/.bash_aliases.d/ssh.sh~; 
+    }
     sshh(){
-        cp -fv aliases/ssh.sh ~/.bash_aliases.d/
+        cp -bfv aliases/ssh.sh ~/.bash_aliases.d/
+        gio trash ~/.bash_aliases.d/ssh.sh~; 
         yes_edit_no ssh_r "aliases/ssh.sh" "Install ssh.sh at /root/?" "edit" "YELLOW" 
     }
     yes_edit_no sshh "aliases/ssh.sh" "Install ssh.sh at ~/.bash_aliases.d/ (ssh aliases)? " "edit" "GREEN"
@@ -492,7 +522,8 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
             fi
         fi
 
-        cp -fv aliases/git.sh ~/.bash_aliases.d/
+        cp -bfv aliases/git.sh ~/.bash_aliases.d/
+        gio trash ~/.bash_aliases.d/git.sh~
         
         if [[ ! $(git config --list | grep 'name') ]]; then
             reade -Q "GREEN" -i "y" -p "Configure git name? [Y/n]: " "y n" gitname
@@ -603,17 +634,25 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     }
     yes_edit_no gitt "aliases/git.sh" "Install git.sh at ~/.bash_aliases.d/ (git aliases)? " "yes" "GREEN"
     
-    ps1_r(){ sudo cp -fv aliases/PS1_colours.sh /root/.bash_aliases.d/; }
+    ps1_r(){ 
+        sudo cp -bfv aliases/PS1_colours.sh /root/.bash_aliases.d/; 
+        sudo gio trash /root/.bash_aliases.d/PS1_colours.sh~
+    }
     ps11(){
-        cp -fv aliases/PS1_colours.sh ~/.bash_aliases.d/
+        cp -bfv aliases/PS1_colours.sh ~/.bash_aliases.d/
+        gio trash ~/.bash_aliases.d/PS1_colours.sh~
         yes_edit_no ps1_r "aliases/PS1_colours.sh" "Install PS1_colours.sh at /root/?" "yes" "GREEN" 
     }
     yes_edit_no ps11 "aliases/PS1_colours.sh" "Install PS1_colours.sh at ~/.bash_aliases.d/ (Coloured command prompt)? " "yes" "GREEN"
     
     if [ $distro == "Manjaro" ] ; then
-        manj_r(){ sudo cp -fv aliases/manjaro.sh /root/.bash_aliases.d/; }
+        manj_r(){ 
+            sudo cp -bfv aliases/manjaro.sh /root/.bash_aliases.d/; 
+            sudo gio trash /root/.bash_aliases.d/manjaro.sh~
+        }
         manj(){
-            cp -fv aliases/manjaro.sh ~/.bash_aliases.d/
+            cp -bfv aliases/manjaro.sh ~/.bash_aliases.d/
+            gio trash ~/.bash_aliases.d/manjaro.sh~
             yes_edit_no manj_r "aliases/manjaro.sh" "Install manjaro.sh at /root/?" "yes" "GREEN" 
         }
         yes_edit_no manj "aliases/manjaro.sh" "Install manjaro.sh at ~/.bash_aliases.d/ (manjaro specific aliases)? " "yes" "GREEN"
@@ -621,24 +660,33 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     
     # Variety aliases 
     # 
-    variti_r(){ sudo cp -fv aliases/variety.sh /root/.bash_aliases.d/; }
+    variti_r(){ 
+        sudo cp -bfv aliases/variety.sh /root/.bash_aliases.d/; 
+        sudo gio trash /root/.bash_aliases.d/variety.sh~
+    }
     variti(){
-        cp -fv aliases/variety.sh ~/.bash_aliases.d/
+        cp -bfv aliases/variety.sh ~/.bash_aliases.d/
+        gio trash ~/.bash_aliases.d/variety.sh~
         yes_edit_no variti_r "aliases/variety.sh" "Install variety.sh at /root/?" "no" "YELLOW" 
     }
     yes_edit_no variti "aliases/variety.sh" "Install variety.sh at ~/.bash_aliases.d/ (aliases for a variety of tools)? " "edit" "GREEN" 
     
     # Youtube
     #
-    ytbe_r(){ sudo cp -fv aliases/youtube.sh /root/.bash_aliases.d/;}
+    ytbe_r(){ 
+        sudo cp -bfv aliases/youtube.sh /root/.bash_aliases.d/;
+        sudo gio trash /root/.bash_aliases.d/youtube.sh~
+    }
     ytbe(){
         . ./checks/check_youtube.sh
-        cp -fv aliases/youtube.sh ~/.bash_aliases.d/
+        cp -fbv aliases/youtube.sh ~/.bash_aliases.d/
+        gio trash ~/.bash_aliases.d/youtube.sh~
         yes_edit_no ytbe_r "aliases/youtube.sh" "Install youtube.sh at /root/?" "no" "YELLOW"; 
     }
     yes_edit_no ytbe "aliases/youtube.sh" "Install yt-dlp (youtube cli download) and youtube.sh at ~/.bash_aliases.d/ (yt-dlp aliases)?" "yes" "GREEN"
 fi
 
 source ~/.bashrc
+
 echo "${cyan}${bold}You can check all aliases with 'alias <TAB>'"
 echo "${green}${bold}Done!"
