@@ -119,9 +119,6 @@ function cp-trash(){
     fi
 }
 
-export -f cpf-trash
-export -f cp-trash
-
 alias cp="cp-trash -rv"
 
 # mv (recursively native) verbose and only ask for interaction when overwriting newer files
@@ -223,8 +220,6 @@ function mv-trash(){
     fi
 } 
 
-export -f mvf-trash
-export -f mv-trash
 
 alias mv="mv-trash -v"
 

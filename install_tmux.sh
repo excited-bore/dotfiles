@@ -118,13 +118,22 @@ if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
 fi
 unset tmuxx
 
-
+if [ -x $(command -v nvim) ] && [ -x $(command -v kitty) ]; then
+    reade -Q "GREEN" -i "y" -p "Install vim-tmux-kitty navigator plugin? (tmux-sensible) [Y/n]:" "y n"  tmuxx
+    if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
+        sed -i 's|#set -g @plugin '\''excited-bore/vim-tmux-kitty-navigator'\''|set -g @plugin '\''excited-bore/vim-tmux-kitty-navigator'\''|g' ~/.tmux.conf
+        if ! grep -q "set -g @plugin 'excited-bore/vim-tmux-kitty-navigator'" ~/.tmux.conf; then
+             echo "set -g @plugin 'excited-bore/vim-tmux-kitty-navigator'" >> ~/.tmux.conf
+        fi
+    fi
+fi
+unset tmuxx
 
 #awk '$0=="#run '\''~/.tmux/plugins/tpm/tpm'\''"{lastline=$0;next}{print $0}END{print lastline}' ~/.tmux.conf > ~/.tmux.conf
 #awk '$0=="run '\''~/.tmux/plugins/tpm/tpm'\''"{lastline=$0;next}{print $0}END{print lastline}' ~/.tmux.conf > ~/.tmux.conf
 
 
-if [ -x "$(command -v ranger)" ]; then
+if [ "$(which ranger)" != "" ]; then
     reade -Q "GREEN" -i "y" -p "Install ranger tmux plugin? (ranger_tmux) [Y/n]:" "y n"  tmuxx
     if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
         if [ ! -x "$(command -v pip)" ]; then

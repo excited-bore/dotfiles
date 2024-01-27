@@ -33,7 +33,7 @@ function git_ssh_key_and_add_to_agent() {
     echo "  User git" >> ~/.ssh/config  
 }
 
-git_remote_https_to_ssh(){
+git_https_to_ssh(){
     if [ -z $1 ]; then
         echo "You should give up the name of a remote";
         read -p "Do you want me to look for 'origin'? [Y/n]" resp
@@ -47,7 +47,7 @@ git_remote_https_to_ssh(){
     fi
 }
 
-git_remote_ssh_to_https(){
+git_ssh_to_https(){
     if [ -z $1 ]; then
         echo "You should give up the name of a remote";
         read -p "Do you want me to look for 'origin'? [Y/n]:" resp
@@ -93,9 +93,8 @@ git_add_commit_all(){
 }
  
 git_add_commit_push_all(){
-    reade -Q "CYAN" -p "Give up a commit message: " msg
-    if [ ! -z "$msg" ]; then
-        git add -A && git commit -m "$msg" && git push;
+    if [ ! -z "$1" ]; then
+        git add -A && git commit -m "$1" && git push;
     else
         git add -A && git commit && git push; 
     fi

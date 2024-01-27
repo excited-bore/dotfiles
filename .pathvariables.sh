@@ -24,10 +24,10 @@ export TMPDIR=/tmp
 #export LC_ALL="en_US.UTF-8"
 
 # TRASH
-#export TRASHBIN_LIMIT=1000
+export TRASHBIN_LIMIT=1000
 
 # SUDO
-#export SUDO_ASKPASS=/usr/bin/nvim
+#export SUDO_ASKPASS=/usr/lib/ssh/x11-ssh-askpass
 
 # PAGER
 export PAGER=/usr/bin/moar

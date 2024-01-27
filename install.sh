@@ -447,8 +447,8 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
             sed -i 's|alias cp="cp-trash -rv"|#alias cp="cp-trash -rv"|g' aliases/general.sh
             sed -i 's|alias mv="mv-trash -v"|#alias mv="mv-trash -v"|g' aliases/general.sh
             sed -i 's|alias rm="trash"|#alias rm="trash"|g' aliases/general.sh
-        else
-            sed -i 's|^export TRASH_BIN_LIMIT=|export TRASH_BIN_LIMIT=|g' $PATHVAR
+        elif [ -f ~/.pathvariables.sh ]; then
+            sed -i 's|^export TRASH_BIN_LIMIT=|export TRASH_BIN_LIMIT=|g' ~/.pathvariables.sh
         fi      
         cp -bfv aliases/general.sh ~/.bash_aliases.d/
         gio trash ~/.bash_aliases.d/general.sh~
@@ -688,5 +688,6 @@ fi
 
 source ~/.bashrc
 
-echo "${cyan}${bold}You can check all aliases with 'alias <TAB>'"
+#echo "${cyan}${bold}You can check all aliases with 'alias <TAB>'"
+alias -p | $PAGER
 echo "${green}${bold}Done!"

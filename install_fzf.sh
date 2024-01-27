@@ -22,7 +22,7 @@
 
         reade -Q "GREEN" -i "y" -p "Install fd and use for fzf? (Faster find, required for file-extensions file similar to gitignore) [Y/n]: " "y n" fdr
         if [ -z $fdr ] || [ "Y" == $fdr ] || [ $fdr == "y" ]; then
-            if [ ! -x "$(command -v fd)" ]; then
+            if [ "$(which fd)" == "" ]; then
                 if [ $distro_base == "Arch" ];then
                     yes | sudo pacman -Su fd
                 elif [ $distro_base == "Debian" ]; then
@@ -59,7 +59,7 @@
         # TODO: Do more with ripgrep
         reade -Q "GREEN" -i "y" -p "Install ripgrep? (Recursive grep, opens possibility for line by line fzf ) [Y/n]: " "y n" rpgrp
         if [ -z $rpgrp ] || [ "Y" == $rpgrp ] || [ $rpgrp == "y" ]; then
-            if [ ! -x "$(command -v rg)" ]; then 
+            if [ "$(which rg)" == "" ]; then 
                 if [ $distro_base == "Arch" ];then
                     yes | sudo pacman -Su ripgrep
                 elif [ $distro_base == "Debian" ]; then
@@ -91,7 +91,7 @@
         fi
         unset rpgrp rpgrpdir
         
-        if [ ! -x "$(command -v kitty)" ] && ! grep -q "(Kitty)" ~/.fzf/shell/key-bindings.bash; then
+        if [ "$(which kitty)" == ""] && ! grep -q "(Kitty)" ~/.fzf/shell/key-bindings.bash; then
             reade -Q "GREEN" -i "y" -p "Add shortcut for fzf-autocompletion? (CTRL-Tab) [Y/n]:" "y n" comp_key
             if [ "$comp_key" == "y" ]; then
                printf "\n# (Kitty) Ctrl-tab for fzf autocompletion" >> ~/.fzf/shell/key-bindings.bash
@@ -112,7 +112,7 @@
             
             reade -Q "GREEN" -i "y" -p "Use rifle (file opener from 'ranger') to open found files and dirs with Ctrl-T filesearch shortcut?:" "y n" fzf_t
             if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ] ; then
-                if ! [ -x "$(command -v rifle)" ]; then
+                if [ "$(which rifle)" == "" ]; then
                     sudo wget "https://raw.githubusercontent.com/ranger/ranger/master/ranger/ext/rifle.py" /usr/bin/
                     sudo mv -v /usr/bin/rifle.py /usr/bin/rifle
                     sudo chmod +x /usr/bin/rifle
@@ -130,7 +130,7 @@
             #TODO: keybinds-rifle sh still has bat part (could use sed check)
             reade -Q "GREEN" -i "y" -p "Install bat? (File previews/thumbnails for riflesearch) [Y/n]: " "y n" bat
             if [ "$bat" == "y" ]; then
-                if [ ! -x "$(command -v bat)" ]; then 
+                if [ "$(which bat)" == "" ]; then 
                     if [ $distro_base == "Arch" ];then
                         yes | sudo pacman -Su bat
                     elif [ $distro_base == "Debian" ]; then
@@ -148,7 +148,7 @@
             #TODO: keybinds-rifle sh still has ffmpegthumbnailer part (could use sed check)
             reade -Q "GREEN" -i "y" -p "Install ffmpegthumbnailer? (Video thumbnails for riflesearch) [Y/n]: " "y n" ffmpg
             if [ "$ffmpg" == "y" ]; then
-                if [ ! -x "$(command -v ffmpegthumbnailer)" ]; then 
+                if [ "$(which ffmpegthumbnailer)" == "" ]; then 
                     if [ $distro_base == "Arch" ];then
                         yes | sudo pacman -Su ffmpegthumbnailer
                     elif [ $distro_base == "Debian" ]; then
@@ -177,7 +177,7 @@
                 fi
             fi
 
-            if [ ! -x "$(command -v xclip)" ]; then 
+            if [ "$(which xclip)" == "" ]; then 
                 reade -Q "GREEN" -i "y" -p "Install xclip? (Clipboard tool for Ctrl-R/Reverse history shortcut) [Y/n]: " "y n" xclip
                 if [ "$tree" == "y" ]; then
                     if [ $distro_base == "Arch" ];then
@@ -202,7 +202,7 @@
 
             reade -Q "GREEN" -i "y" -p "Install tree? (Builtin cd shortcut gets a nice directory tree preview ) [Y/n]: " "y n" tree
             if [ "$tree" == "y" ]; then
-                if [ ! -x "$(command -v tree)" ]; then 
+                if [ "$(which tree)" == "" ]; then 
                     if [ $distro_base == "Arch" ];then
                         yes | sudo pacman -Su tree
                     elif [ $distro_base == "Debian" ]; then

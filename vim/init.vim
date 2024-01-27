@@ -246,60 +246,56 @@ let g:ranger_replace_netrw = 1
 let g:ranger_map_keys = 0
 let g:ranger_command_override = 'ranger --cmd "set show_hidden=true"'
 
-"" Fuzzy finder plugin
+" Fuzzy finder plugin
 Plugin 'junegunn/fzf'
 Plugin 'junegunn/fzf.vim' 
 
-"" Fuzzy finder preview   
+" Fuzzy finder preview   
 Plugin 'yuki-yano/fzf-preview.vim', { 'branch': 'release/remote' }
 
-"" Plugin for git
+" Plugin for git
 Plugin 'tpope/vim-fugitive'
 
-"vim-tmux-navigator, smart navigation between vim and tmux panes
-Plugin 'christoomey/vim-tmux-navigator'
+" Nice keybinds overview for nvim
+Plugin 'folke/which-key.nvim'
+
+Plugin 'excited-bore/vim-tmux-kitty-navigator', { 'build' : 'cd ~/.vim/plugins/vim-tmux-kitty-navigator && cp -f ./pass_keys.py ~/.config/kitty/;'}
 
 " Sudo write
-Plugin 'tpope/vim-eunuch'
+"Plugin 'tpope/vim-eunuch'
+
 Plugin 'lambdalisue/suda.vim'
 let g:suda_smart_edit = 1
+"let g:suda#nopass = 1
 
 " Give passwords prompts in vim
-Plugin 'lambdalisue/askpass.vim'
-" Dependency for askpass, Deno
-Plugin 'vim-denops/denops.vim'
+"Plugin 'lambdalisue/askpass.vim'
+"" Dependency for askpass, Deno
+"Plugin 'vim-denops/denops.vim'
 
 " Nerd commenter
 Plugin 'preservim/nerdcommenter'
 
-"vim-kitty-navigator, Same thing for panes but with vim and kitty
-"Plugin 'knubie/vim-kitty-navigator'
-function! AfterLoadKittyVim()
-    call system('(cd ~/.vim/plugins/vim-kitty-navigator && cp -f ./*.py ~/.config/kitty/)')
-endf
-
-"Plugin 'NikoKS/kitty-vim-tmux-navigator', { 'build': 'cd ~/.vim/plugins/kitty-vim-tmux-navigator && cp -f ./*.py ~/.config/kitty/'}
-
-
-Plugin 'excited-bore/vim-tmux-kitty-navigator', { 'build' : 'cd ~/.vim/plugins/vim-tmux-kitty-navigator && cp -f ./pass_keys.py ~/.config/kitty/;'}
-
 " Minimap to keep track of where in file
-Plugin 'wfxr/minimap.vim'
-let g:minimap_width = 10
-let g:minimap_highlight_range = 1
-let g:minimap_enable_highlight_colorgroup = 1
-"let g:minimap_auto_start = 1
-let g:minimap_git_colors = 1
-let g:minimap_auto_start_win_enter = 1
+"Plugin 'wfxr/minimap.vim'
+"let g:minimap_width = 10
+"let g:minimap_highlight_range = 1
+"let g:minimap_enable_highlight_colorgroup = 1
+""let g:minimap_auto_start = 1
+"let g:minimap_git_colors = 1
+"let g:minimap_auto_start_win_enter = 1
 
 " Self documenting vim wiki
 Plugin 'vimwiki/vimwiki'
 
 " Nice and cool themey
 Plugin 'morhetz/gruvbox'
+let g:gruvbox_italic=1
 
 " Nice and cool status bar thingy
 Plugin 'vim-airline/vim-airline'
+" Gives tabs a nice layout as well
+let g:airline#extensions#tabline#enabled = 1
 
 " Vim lua plugin
 " Plugin 'svermeulen/vimpeccable'
@@ -313,15 +309,11 @@ else
 endif
 "call plug#end()
 
- "Use 24-bit (true-color) mode in Vim/Neovim when outside tmux.
+colorscheme gruvbox
+
+"Use 24-bit (true-color) mode in Vim/Neovim when outside tmux.
 "If you're using tmux version 2.2 or later, you can remove the outermost $TMUX check and use tmux's 24-bit color support
 "(see < http://sunaku.github.io/tmux-24bit-color.html#usage > for more information.)
-
-" Ranger
-
-"" Gruvbox things
-let g:gruvbox_italic=1
-colorscheme gruvbox
 
 "Add tab 
 nnoremap <Tab>   i<tab><esc><right>
@@ -522,10 +514,6 @@ nnoremap <silent> [fzf-p]l     :<C-u>CocCommand fzf-preview.LocationList<CR>
 
 "Buffers and panes
 
-"List buffers
-nnoremap <silent><C-w>b :<C-u>CocCommand fzf-preview.AllBuffers<CR> 
-inoremap <silent><C-w>b <C-\><C-o><C-u>CocCommand fzf-preview.AllBuffers<CR>
-vnoremap <silent><C-w>b <esc>:<C-u>CocCommand fzf-preview.AllBuffers<CR>gv
 
 " Open next buffer
 nnoremap <silent><C-A-Right> :bNext<cr>
@@ -573,30 +561,12 @@ vnoremap <silent><C-S-Space> <esc>:Windows<cr>gv
 "inoremap <silent><C-S-Down> <C-\><C-o>:wincmd j<cr>
 "vnoremap <silent><C-S-Down> <esc>:wincmd j<cr>gv 
 
-"function! TmuxKittyNavigate(direction)
-"    if empty($TMUX)  
-"        execute "KittyNavigate" .. a:direction 
-"    else
-"         if a:direction == "Left"
-"            let dir = "left"
-"        elseif a:direction == "Right"
-"            let dir = "right"
-"        elseif a:direction == "Up"
-"            let dir = "top"
-"        elseif a:direction == "Down"
-"            let dir = "bottom"
-"        endif
-"        let isLast = system('tmux display-message -p -F "#{pane_at_' .. dir .. '}"')
-"        if isLast == 1
-"            execute "KittyNavigate" .. a:direction
-"        else
-"            execute "TmuxNavigate" .. a:direction 
-"        endif
-"    endif
-"endfunction
-"command -nargs=+ TmuxKittyNavigate call TmuxKittyNavigate(<f-args>)
+"List buffers
+nnoremap <silent><C-S-Space> :<C-u>CocCommand fzf-preview.AllBuffers<CR> 
+inoremap <silent><C-S-Space> <C-\><C-o><C-u>CocCommand fzf-preview.AllBuffers<CR>
+vnoremap <silent><C-S-Space> <esc>:<C-u>CocCommand fzf-preview.AllBuffers<CR>gv
 
-
+"Move panes
 nnoremap <silent><C-S-Left> :<C-u>TmuxKittyNavigateLeft<cr>
 nnoremap <silent><C-S-Down> :<C-u>TmuxKittyNavigateDown<cr>
 nnoremap <silent><C-S-Up> :<C-u>TmuxKittyNavigateUp<cr>
@@ -631,9 +601,12 @@ function! CloseWindow()
     " https://stackoverflow.com/questions/7069927/in-vimscript-how-to-test-if-a-window-is-the-last-window
     " if this window isn't the last on screen, just close pane
     if winbufnr(2) != -1
-         close!
+        close
+    " then we look at tabs
+    elseif tabpagenr() != 1
+        tabclose
     " if the amount of open buffers is still more then 1, close buffer
-     elseif len(filter(range(1, bufnr('$')), 'buflisted(v:val)')) > 1
+    elseif len(filter(range(1, bufnr('$')), 'buflisted(v:val)')) > 1
         bd!
     " otherwise, close without warning
     else
@@ -663,9 +636,9 @@ inoremap <C-z> <C-\><C-o>:u<CR>
 vnoremap <C-z> u 
 
 " Ctrl - E is -> Set to edit file in buffer  
-nnoremap <C-e> :e ./
-inoremap <C-e> <C-\><C-o>:e ./
-vnoremap <C-e> :e ./
+nnoremap <C-e> :e 
+inoremap <C-e> <C-\><C-o>:e 
+vnoremap <C-e> :e 
 
 " t => : (open cmdline)
 nnoremap t :
@@ -676,9 +649,9 @@ nnoremap T :terminal
 vnoremap T :terminal 
 
 " Ctrl - T is -> :
-nnoremap <C-t> :
-inoremap <C-t> <C-\><C-o>:
-vnoremap <C-t> : 
+nnoremap <C-t> :tab sb 1<Cr>
+inoremap <C-t> <C-\><C-o>:tab sb 1<Cr>
+vnoremap <C-t> :tab sb 1<Cr>
 
 "Alt - M is -> Minimap 
 nnoremap <silent><M-m> <esc>:MinimapToggle<CR>:MinimapUpdateHighlight<cr>
@@ -848,14 +821,14 @@ vnoremap <A-Enter>      <Esc>`<i<Enter><Esc>gv
 
 
 " BackSpace -> backspace no leave normal mode
-nnoremap <BackSpace>    d<Left>
-inoremap <expr> <Backspace>    (mode() ==# 'R' && col('.') ==? 1 ? '<esc>d<Left>R' : mode() ==# 'R' ? '<esc>d<Left>R' : '<BackSpace>')
+nnoremap <expr><BackSpace>    (col(".") ==? 1 ? 'i<BackSpace><esc>' : 'dh')
+inoremap <expr> <Backspace>    (mode() ==# 'R' && col('.') ==? 1 ? '<esc>dhR' : mode() ==# 'R' ? '<esc>dhR' : '<BackSpace>')
 vnoremap <Backspace>    d
 " Ctrl-Backspace => Delete appended 'word'
 " Alt-BackSpace => Delete line 
 " Shift-Backspace => Delete stuff forwards
 nnoremap <expr> <C-Backspace>  (col(".") ==? 1 ? '<BackSpace>' : 'hdge')
-inoremap <expr> <C-Backspace>  (col(".") ==? 1 ? '<BackSpace>' : 'hdgei')
+inoremap <expr> <C-Backspace>  (col(".") ==? 1 ? '<BackSpace>' : '<esc>hdgei')
 nnoremap <A-Backspace>      dd<Up>$
 inoremap <A-Backspace>      <Esc>dd<Up>$a
 

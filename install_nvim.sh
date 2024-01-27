@@ -50,6 +50,12 @@ if [[ $distro == "Arch" || $distro_base == "Arch" ]];then
         cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
         sudo cpanm --sudo -n Neovim::Ext
     fi
+    if ! [ -x "$(command -v ctags)" ]; then 
+        reade -Q "GREEN" -i "y" -p "Install ctags? [Y/n]:" "y n" ctags
+        if  [ "y" == $ctags ]; then
+            yes | sudo pacman -Su ctags
+        fi
+    fi
 elif [  $distro_base == "Debian" ];then
     b=$(sudo apt search neovim | grep '^neovim/stable' | awk '{print $2}')
     #Minimum version for Lazy plugin manager
@@ -172,9 +178,15 @@ elif [  $distro_base == "Debian" ];then
         cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
         sudo cpanm --sudo -n Neovim::Ext
     fi
+    if [ "$(which ctags)" != ""]; then
+        reade -Q "GREEN" -i "y" -p "Install ctags? [Y/n]:" "y n" ctags
+        if  [ "y" == $ctags ]; then
+            yes | sudo apt install ctags
+        fi
+    fi
 fi
 
-unset clip x11f pyscripts jsscripts rubyscripts perlscripts nvmbin
+unset clip x11f pyscripts jsscripts ctags rubyscripts perlscripts nvmbin
 
 function instvim_r(){
     if ! sudo test -d /root/.config/nvim/; then
