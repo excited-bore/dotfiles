@@ -23,13 +23,9 @@ reade -Q "GREEN" -i "y" -p "Install fd and use for fzf? (Faster find, required f
         if [ $distro_base == "Arch" ];then
             yes | sudo pacman -Su fd
         elif [ $distro_base == "Debian" ]; then
-            yes | sudo apt update
             yes | sudo apt install fd-find
             ln -s $(which fdfind) ~/.local/bin/fd
         fi
-    fi
-    if [ ! -f ~/.fdignore ]; then
-       touch ~/.fdignore             
     fi
     if [ ! -f ~/.fzf_history ]; then
         touch ~/.fzf_history 
@@ -60,7 +56,6 @@ reade -Q "GREEN" -i "y" -p "Install fd and use for fzf? (Faster find, required f
         if [ $distro_base == "Arch" ];then
             yes | sudo pacman -Su ripgrep
         elif [ $distro_base == "Debian" ]; then
-            yes | sudo apt update
             yes | sudo apt install ripgrep 
         fi
     fi
@@ -107,7 +102,7 @@ reade -Q "GREEN" -i "y" -p "Install fd and use for fzf? (Faster find, required f
         #sed -i  's|bind -m vi-insert '\''"\C-z"|#bind -m vi-insert '\''"\C-z"|g' ~/.fzf/shell/key-bindings.bash
     fi
     
-    reade -Q "GREEN" -i "y" -p "Use rifle (file opener from 'ranger') to open found files and dirs with Ctrl-T filesearch shortcut?:" "y n" fzf_t
+    reade -Q "GREEN" -i "y" -p "Use rifle (file opener from 'ranger') to open found files and dirs with Ctrl-T filesearch shortcut? [Y/n]:" "y n" fzf_t
     if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ] ; then
         if [ "$(which rifle)" == "" ]; then
             sudo wget "https://raw.githubusercontent.com/ranger/ranger/master/ranger/ext/rifle.py" /usr/bin/
@@ -210,7 +205,7 @@ reade -Q "GREEN" -i "y" -p "Install fd and use for fzf? (Faster find, required f
     unset tree
 
     reade -Q "GREEN" -i "y" -p "Change Alt-C shortcut to Ctrl-S for fzf cd? [Y/n]:" "y n" fzf_t
-    if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ] ; then 
+    if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ]; then 
         sed -i 's|# ALT-C - cd into the selected directory|# CTRL-S - cd into the selected directory|g' ~/.fzf/shell/key-bindings.bash
         sed -i 's|\\ec|\\C-s|g'  ~/.fzf/shell/key-bindings.bash
         #sed -i 's|bind -m emacs-standard '\''"\\ec"|bind -m emacs-standard '\''"\\es"|g'  ~/.fzf/shell/key-bindings.bash
@@ -218,6 +213,6 @@ reade -Q "GREEN" -i "y" -p "Install fd and use for fzf? (Faster find, required f
         #sed -i 's|bind -m vi-insert  '\''"\\ec"|bind -m vi-insert  '\''"\\es"|g' ~/.fzf/shell/key-bindings.bash
     fi
     
-    unset fzf_t
+    unset fzf_t;
 
  fi

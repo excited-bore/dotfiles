@@ -126,7 +126,7 @@ bind '"\C-x": "j \C-i"'
 # F2 - ranger (file explorer)
 bind -x '"\201": ranger'
 bind '"\eOQ": "\201\n\C-l"'
-bind -x '"\eOQ": ranger'
+#bind -x '"\eOQ": ranger'
 
 # F3 - FuzzyFinderls -l | fzf --preview="echo user={3} when={-4..-2}; cat {-1}" --header-lines=1 (file explorer)
 #bind -x '"\eOR": ctrl-s'
@@ -171,6 +171,8 @@ setxkbmap -option caps:escape
 
 # Set Shift delete to backspace
 ##xmodmap -e "keycode 119 = Delete BackSpace"     #
+# Ctrl-x is for autojump
+bind '"\C-x": "j \C-i"'
 # Ctrl-x is for autojump
 bind '"\C-x": "j \C-i"'
 # Ctrl-x is for autojump

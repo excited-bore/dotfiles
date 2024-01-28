@@ -1,3 +1,4 @@
+#!/bin/bash
 . ./checks/check_distro.sh
 . ./checks/check_pathvar.sh
 . ./readline/rlwrap_scripts.sh

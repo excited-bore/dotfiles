@@ -173,6 +173,9 @@ set updatetime=300
 " diagnostics appear/become resolved
 set signcolumn=yes 
 
+"Use 24-bit (true-color) mode in Vim/Neovim when outside tmux.
+"If you're using tmux version 2.2 or later, you can remove the outermost $TMUX check and use tmux's 24-bit color support
+"(see < http://sunaku.github.io/tmux-24bit-color.html#usage > for more information.)
 "For Neovim > 0.1.5 and Vim > patch 7.4.1799 < https://github.com/vim/vim/commit/61be73bb0f965a895bfb064ea3e55476ac175162 >
 let $NVIM_TUI_ENABLE_TRUE_COLOR=1
 
@@ -233,11 +236,21 @@ let g:coc_global_extensions = [
             \'coc-markdown-preview-enhanced'
             \]
 
+" Devicons
+Plugin 'ryanoasis/vim-devicons'
+
+" Nerdtree | Left block directory tree
+Plugin 'preservim/nerdtree' 
+" Nerdtree git plugin
+Plugin 'Xuyuanp/nerdtree-git-plugin'
+" Nerdtree syntax highlighting / Laggiest plugin
+"Plugin 'tiagofumo/vim-nerdtree-syntax-highlight'
+"let g:NERDTreeLimitedSyntax = 1
+"let g:NERDTreeHighlightCursorline = 0
+
 " Totally independent OS52 clipboard
 Plugin 'ojroques/vim-oscyank', {'branch': 'main'}
 
-" Devicons
-Plugin 'ryanoasis/vim-devicons'
 
 " Ranger integration
 Plugin 'francoiscabrol/ranger.vim'
@@ -261,12 +274,12 @@ Plugin 'folke/which-key.nvim'
 
 Plugin 'excited-bore/vim-tmux-kitty-navigator', { 'build' : 'cd ~/.vim/plugins/vim-tmux-kitty-navigator && cp -f ./pass_keys.py ~/.config/kitty/;'}
 
-" Sudo write
-"Plugin 'tpope/vim-eunuch'
+" Normal file operations
+Plugin 'tpope/vim-eunuch'
 
 Plugin 'lambdalisue/suda.vim'
 let g:suda_smart_edit = 1
-"let g:suda#nopass = 1
+let g:suda#nopass = 1
 
 " Give passwords prompts in vim
 "Plugin 'lambdalisue/askpass.vim'
@@ -307,13 +320,36 @@ else
     source $HOME/.config/nvim/init.lua.vim
     lua require("lazy")
 endif
-"call plug#end()
+
+" Show lines per file
+let g:NERDTreeFileLines = 1
+
+" Start NERDTree and put the cursor back in the other window.
+autocmd VimEnter * NERDTree | wincmd p
+
+" Start NERDTree. If a file is specified, move the cursor to its window.
+autocmd StdinReadPre * let s:std_in=1
+autocmd VimEnter * NERDTree | if argc() > 0 || exists("s:std_in") | wincmd p | endif
+
+" Exit Vim if NERDTree is the only window remaining in the only tab.
+autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
+ 
+" Close the tab if NERDTree is the only window remaining in it.
+autocmd BufEnter * if winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
+
+ " If another buffer tries to replace NERDTree, put it in the other window, and bring back NERDTree.
+autocmd BufEnter * if winnr() == winnr('h') && bufname('#') =~ 'NERD_tree_\d\+' && bufname('%') !~ 'NERD_tree_\d\+' && winnr('$') > 1 |
+    \ let buf=bufnr() | buffer# | execute "normal! \<C-W>w" | execute 'buffer'.buf | endif
+
+ " Open the existing NERDTree on each new tab.
+autocmd BufWinEnter * if &buftype != 'quickfix' && getcmdwintype() == '' | silent NERDTreeMirror | endif
+
+nnoremap <C-n> :NERDTreeToggle<CR>
+inoremap <C-n> <C-\><C-o>:NERDTreeToggle<CR>
+vnoremap <C-n> :NERDTreeToggle<CR>
+
 
 colorscheme gruvbox
-
-"Use 24-bit (true-color) mode in Vim/Neovim when outside tmux.
-"If you're using tmux version 2.2 or later, you can remove the outermost $TMUX check and use tmux's 24-bit color support
-"(see < http://sunaku.github.io/tmux-24bit-color.html#usage > for more information.)
 
 "Add tab 
 nnoremap <Tab>   i<tab><esc><right>
@@ -516,9 +552,9 @@ nnoremap <silent> [fzf-p]l     :<C-u>CocCommand fzf-preview.LocationList<CR>
 
 
 " Open next buffer
-nnoremap <silent><C-A-Right> :bNext<cr>
-inoremap <silent><C-A-Right> <C-\><C-o>:bNext<cr>
-vnoremap <silent><C-A-Right> <esc>:bNext<cr>
+nnoremap <silent><C-A-Right> :bnext<cr>
+inoremap <silent><C-A-Right> <C-\><C-o>:bnext<cr>
+vnoremap <silent><C-A-Right> <esc>:bnext<cr>
 
 " Open previous buffer
 nnoremap <silent><C-A-Left> :bprevious<cr>
