@@ -1,5 +1,5 @@
 ### VIM ###
-alias nvim="nvim -u ~/.config/nvim/init.vim"
+
 alias vim="nvim -u ~/.config/nvim/init.vim" 
 alias svim="sudo nvim"
 #alias snvim="sudo nvim"

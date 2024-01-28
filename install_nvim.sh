@@ -193,7 +193,7 @@ function instvim_r(){
         sudo mkdir -p /root/.config/nvim/
     fi
     sudo cp -bfv vim/* /root/.config/nvim/
-    sudo gio trash /root/.config/nvim/*~
+    sudo bash -c 'gio trash /root/.config/nvim/*~'
     if sudo grep -q "MYVIMRC" $PATHVAR_R; then
        sudo sed -i 's|.export MYVIMRC="|export MYVIMRC=~/.config/nvim/init.vim "|g' $PATHVAR_R
         sudo sed -i 's|.export MYGVIMRC="|export MYGVIMRC=~/.config/nvim/init.vim "|g' $PATHVAR_R
@@ -276,6 +276,7 @@ function instvim(){
 }
 yes_edit_no instvim "vim/init.vim vim/init.lua.vim vim.plug_lazy_adapter.vim" "Install (neo)vim readconfigs at ~/.config/nvim/ ? (init.vim, init.lua, etc..)" "edit" "GREEN"
 
+nvim +CocUpdate
 nvim +checkhealth
 echo "Install Completion language plugins with ':CocInstall coc-..' / Update with :CocUpdate"
 echo "Check installed nvim plugins with 'Lazy'/ Check installed vim plugins with 'PlugInstalled' (only work on vim and nvim respectively)"

@@ -24,7 +24,7 @@ fi
 # https://bestasciitable.com/
 reade -Q "GREEN" -i "y" -p "Install autojump keybind at Ctrl-x for user? [Y/n]:" "y n" bnd
 if [ "$bnd" == "y" ]; then
-    if grep -q 'bind '\''"\C-x": "j \C-i"'\''' $KEYBIND; then
+    if grep -q 'bind '\''"\\C-x": "j \\C-i"'\''' $KEYBIND; then
         sed -i 's|.*\(bind .*\C-x": "j.*\)|\1|g' $KEYBIND
     else
         printf '# Ctrl-x is for autojump\nbind '\''"\C-x": "j \C-i"'\''\n' >> $KEYBIND

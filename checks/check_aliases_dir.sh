@@ -5,7 +5,7 @@ fi
 
 if ! grep -q "~/.bash_aliases.d" ~/.bashrc; then
 
-    echo "if [[ -d ~/.bash_aliases.d/ ]]; then" >> ~/.bashrc
+    echo "if [ -d ~/.bash_aliases.d/ ] && [ \"\$(ls -A ~/.bash_aliases.d/)\" ]; then" >> ~/.bashrc
     echo "  for alias in ~/.bash_aliases.d/*.sh; do" >> ~/.bashrc
     echo "      . \"\$alias\" " >> ~/.bashrc
     echo "  done" >> ~/.bashrc
@@ -22,7 +22,7 @@ if ! sudo test -d /root/.bash_aliases.d/ ; then
 fi
 
 if ! sudo grep -q "~/.bash_aliases.d" /root/.bashrc; then
-    printf "\nif [[ -d ~/.bash_aliases.d/ ]]; then\n  for alias in ~/.bash_aliases.d/*.sh; do\n      . \"\$alias\" \n  done\nfi" | sudo tee -a /root/.bashrc > /dev/null
+    printf "\nif [ -d ~/.bash_aliases.d/ ] && [ \"\$(ls -A ~/.bash_aliases.d/)\" ]; then\n  for alias in ~/.bash_aliases.d/*.sh; do\n      . \"\$alias\" \n  done\nfi" | sudo tee -a /root/.bashrc > /dev/null
 fi
 
 sudo cp -fvb checks/check_distro.sh /root/.bash_aliases.d/check_distro.sh

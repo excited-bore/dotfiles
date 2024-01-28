@@ -30,14 +30,14 @@ export TMPDIR=/tmp
 #export SUDO_ASKPASS=/usr/lib/ssh/x11-ssh-askpass
 
 # PAGER
-export PAGER=/usr/bin/less
+export PAGER=/usr/bin/moar
 
 # LESS
 export LESS="  --CLEAR-SCREEN --redraw-on-quit --LINE-NUMBERS --line-num-width=2 --window=10 --use-color --color=Ng$ --color=Scb$ --color=Pkg$ --IGNORE-CASE --LONG-PROMPT --chop-long-lines --underline-special --mouse --QUIET --status-line --no-vbell --follow-name --exit-follow-on-close"
 #export LESSEDIT=$EDITOR
 
 # MOAR
-#export MOAR='--statusbar=bold -colors 256 -render-unprintable highlight'
+export MOAR='--statusbar=bold -colors 256 -render-unprintable highlight'
 
 # EDITORS
 export EDITOR=/usr/bin/nvim
@@ -116,7 +116,7 @@ export SYSTEMD_LOG_TARGET="auto"
 
 # RUBY
 GEM_PATH=/usr/lib/ruby/gems/3.0.0:/home/burp/.local/share/gem/ruby/3.0.0/bin
-#export PATH=$PATH:$GEM_PATH
+export PATH=$PATH:$GEM_PATH
 
 # For arch: Also changeable with 'archlinux-java'
 # JAVA
@@ -133,7 +133,7 @@ export GOPATH=/home/burp/.local
 
 
 # RANGER
-#export RANGER_LOAD_DEFAULT_RC=FALSE
+export RANGER_LOAD_DEFAULT_RC=FALSE
 
 # RIPGREP
 export RG_PREFIX="rg --column --line-number --no-heading --color=always --smart-case "

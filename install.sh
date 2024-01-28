@@ -438,7 +438,14 @@ if [ "y" == "$findr" ]; then
     ./install_fzf.sh
 fi
 unset findr
-    
+
+# Starship
+reade -Q "GREEN" -i "y" -p "Install Starship? (Snazzy looking prompt) [Y/n]: " "y n" strshp
+if [ $strshp == "y" ]; then
+    ./install_starship.sh 
+fi
+unset strshp
+
 reade -Q "GREEN" -i "y" -p "Install bash aliases and other config? [Y/n]:" "y n" scripts
 if [ -z $scripts ] || [ "y" == $scripts ]; then
 
@@ -707,5 +714,5 @@ fi
 source ~/.bashrc
 
 #echo "${cyan}${bold}You can check all aliases with 'alias <TAB>'"
-alias -p | $PAGER
+alias -p
 echo "${green}${bold}Done!"

@@ -36,11 +36,12 @@ stty werase 'undef'
 
 # READLINE
 
-# \e : escape
+# \e : Escape
 # \M : Meta (alt)
-# \t : tab
+# \t : Tab
 # \C : Ctrl
-# \b : backspace
+# \b : Backspace
+# \n : newline
 # nop => no operation, but 'redraw-current-line' might work better
 # https://unix.stackexchange.com/questions/556703/how-to-bind-a-key-combination-to-null-in-inputrc
 # 'bind -l' for all options
@@ -48,31 +49,31 @@ stty werase 'undef'
 # You can also run 'read' (or 'cat' + Ctrl+v)
 # That way you can read the characters escape sequences
 # The ^[ indicates an escape character in your shell, so this means that your f.ex. Home key has an escape code of [1~ and you End key has an escape code of [4~. Since these escape codes are not listed in the default Readline configuration, you will need to add them: \e[1~ or \e[4~
+# It's good to use unused keys for complex keybindings since you can't combine readline commands with regular bash expressions in the same bind
 # Also
 # https://unix.stackexchange.com/questions/548726/bash-readline-inputrc-bind-key-to-a-sequence-of-multiple-commands 
 
 # Up and down arrow will now intelligently complete partially completed
 # commands by searching through the existing history.
-bind '"\e[A": history-search-backward'
-bind '"\e[B": history-search-forward'
+bind    '"\e[A": history-search-backward'
+bind    '"\e[B": history-search-forward'
 
 # Control left/right to jump from words instead of chars
-bind '"\e[1;5D": backward-word'
-bind '"\e[1;5C": forward-word'
+bind    '"\e[1;5D": backward-word'
+bind    '"\e[1;5C": forward-word'
 
 #https://unix.stackexchange.com/questions/278884/save-cursor-position-and-restore-it-in-terminal
 # Control up/down to change cursor line 
-bind -x '"\e[1;5B": "clear && let LINE_TPUT=$LINE_TPUT+1 && if [ $LINE_TPUT -gt $LINES ];then LINE_TPUT=0;fi && tput cup $LINE_TPUT 0 && tput sc"'
-bind -x '"\e[1;5A": "clear && let LINE_TPUT=$LINE_TPUT-1 && if [ $LINE_TPUT -lt 0 ];then LINE_TPUT=$LINES;fi && tput cup $LINE_TPUT 0 && tput sc"'
- 
+bind -x '"\e[1;5A": clear && let LINE_TPUT=$LINE_TPUT-1 && if [ $LINE_TPUT -lt 0 ];then LINE_TPUT=$LINES;fi && tput cup $LINE_TPUT 0 && tput sc && echo "${PS1@P}" && tput cuu1'
+bind -x '"\e[1;5B": clear && let LINE_TPUT=$LINE_TPUT+1 && if [ $LINE_TPUT -gt $LINES ];then LINE_TPUT=0;fi && tput cup $LINE_TPUT 0 && tput sc && echo "${PS1@P}" && tput cuu1'
 
 # Expand by looping through options
 # Shift+tab for reverse
-bind 'Tab: menu-complete'
-bind '"\e[Z": menu-complete-backward'
+bind    'Tab: menu-complete'
+bind    '"\e[Z": menu-complete-backward'
 
 # Ctrl-w expands aliases
-bind '"\C-w": alias-expand-line'
+bind    '"\C-w": alias-expand-line'
 
 # (Kitty) Ctrl-tab for fzf autocompletion
 #bind '"\e[9;5u": " **\t"'
@@ -80,11 +81,8 @@ bind '"\C-w": alias-expand-line'
 # Recall position
 #bind -x '"\C-r": tput rc'
 
-#Backup enter
-bind '"\C-p": accept-line' 
-
 #Silence output
-alias _="stty -echo && tput cuu1 && history -d -1"
+#alias _="stty -echo && tput cuu1 && history -d -1"
 
 #Enter kills line, then clears screen, then yanks line to prompt and enters it
 #bind '"\C-m": "\C-e\C-u\C-l _\C-p tput rc && stty echo && history -d -1 \C-p\C-y\C-p\C-r\e[A\e[B"'
@@ -100,7 +98,7 @@ bind -x '"\C-l": clear && tput cup $LINE_TPUT 0 && tput sc'
 bind -x '"\C-q": exit'
 
 # Undo to Ctrl+Z (unbound in tty) instead of only on Ctrl+_
-bind '"\C-z": vi-undo'
+bind    '"\C-z": vi-undo'
 
 # Ctrl-f adds a piped grep for convenience
 #bind '"\C-f": " | grep -i "'
@@ -109,7 +107,7 @@ bind '"\C-z": vi-undo'
 #bind '"\e[13": " | $PAGER\C-p"' 
 
 # Ctrl-backspace deletes (kills) line backward
-bind '"\C-h": backward-kill-word'
+bind    '"\C-h": backward-kill-word'
 
 # Ctrl-b Insert as comment (also on alt+#)
 bind '"\C-b": insert-comment 1'
@@ -140,10 +138,10 @@ bind -x '"\e[15~": . ~/.bashrc && tput cup 0 0 && clear && tput rc'
 #bind '"\e[A": "\e[5~\eOH"'
 
 # Alt-Left arrow to go up one directory
-bind '"\e[1;3D": "cd .. \C-m"'
+bind '"\e[1;3D": "cd ..\C-m"'
 
 # Alt-Right arrow to go to last visited directory
-bind '"\e[1;3C": "cd - \C-m"'
+bind '"\e[1;3C": "cd -\C-m"'
 
 # Alt-Down arrow to go to home directory
 bind '"\e[1;3B": "cd \C-m"'
@@ -171,11 +169,3 @@ setxkbmap -option caps:escape
 
 # Set Shift delete to backspace
 ##xmodmap -e "keycode 119 = Delete BackSpace"     #
-# Ctrl-x is for autojump
-bind '"\C-x": "j \C-i"'
-# Ctrl-x is for autojump
-bind '"\C-x": "j \C-i"'
-# Ctrl-x is for autojump
-bind '"\C-x": "j \C-i"'
-# Ctrl-x is for autojump
-bind '"\C-x": "j \C-i"'
