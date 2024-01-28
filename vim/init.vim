@@ -279,7 +279,7 @@ Plugin 'tpope/vim-eunuch'
 
 Plugin 'lambdalisue/suda.vim'
 let g:suda_smart_edit = 1
-let g:suda#nopass = 1
+"let g:suda#nopass = 1
 
 " Give passwords prompts in vim
 "Plugin 'lambdalisue/askpass.vim'
@@ -681,8 +681,8 @@ nnoremap t :
 vnoremap t :
 
 " T => : (open cmdline)
-nnoremap T :terminal 
-vnoremap T :terminal 
+nnoremap T :! 
+vnoremap T :! 
 
 " Ctrl - T is -> :
 nnoremap <C-t> :tab sb 1<Cr>
