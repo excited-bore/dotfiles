@@ -542,7 +542,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
 
     #git_r(){ sudo cp -fv aliases/git.sh /root/.bash_aliases.d/; }
     gitt(){
-        if [ ! -x "$(command -v git)" ]; then
+        if ! [ -x "$(command -v git)" ]; then
             if [ $distro == "Arch" ] || [ $distro_base == "Arch" ]; then
                 yes | sudo pacman -Su git
             elif [ $distro == "Debian" ] || [ $distro_base == "Debian" ]; then
@@ -554,6 +554,16 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         cp -bfv aliases/git.sh ~/.bash_aliases.d/
         gio trash ~/.bash_aliases.d/git.sh~
         
+        if [ -x $(command -v fzf) ]; then
+            reade -Q "GREEN" -i "y" -p "Fzf detected. Install fzf-git? (Extra fzf stuff on leader-key C-g)" "y n" gitfzf
+            if [ "$fzfgit" == "y" ]; then
+                . ./checks/check_aliases_dir.sh
+                wget https://raw.githubusercontent.com/junegunn/fzf-git.sh/main/fzf-git.sh -P ~/.bash_aliases.d/
+            fi
+            unset fzfgit
+               
+        fi
+
         if [[ ! $(git config --list | grep 'name') ]]; then
             reade -Q "GREEN" -i "y" -p "Configure git name? [Y/n]: " "y n" gitname
             if [ "y" == $gitname ]; then        
@@ -638,6 +648,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
                     git config --global merge.guitool "$merge" ;
                 fi
             fi
+
         fi
         
         reade -Q "GREEN" -i "y" -p "Check git config? [Y/n]: " "y n" gitcnf ;

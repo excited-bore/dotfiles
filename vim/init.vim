@@ -865,7 +865,7 @@ vnoremap <Backspace>    d
 " Alt-BackSpace => Delete line 
 " Shift-Backspace => Delete stuff forwards
 nnoremap <expr> <C-Backspace>  (col(".") ==? 1 ? '<BackSpace>' : 'hdge')
-inoremap <expr> <C-Backspace>  (col(".") ==? 1 ? '<BackSpace>' : '<esc>hdgei')
+inoremap <expr> <C-Backspace>  (col(".") ==? 1 ? '<BackSpace>' : '<esc>dgei')
 nnoremap <A-Backspace>      dd<Up>$
 inoremap <A-Backspace>      <Esc>dd<Up>$a
 
