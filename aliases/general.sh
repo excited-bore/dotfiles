@@ -226,7 +226,7 @@ alias mv="mv-trash -v"
 # rm recursively and verbose
 
 alias rm="rm -rv"
-alias remove="rm"
+#alias remove="rm"
 alias rmAll="rm -v ./*";
 alias rmAllHiddn="rm -v .[!.]* *";
 

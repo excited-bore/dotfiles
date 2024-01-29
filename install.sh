@@ -323,6 +323,11 @@ fi
         sudo gio trash /root/.keybinds.sh~
         sudo cp -bfv readline/.inputrc /root/;
         sudo gio trash /root/.inputrc~
+
+        # X based settings is generally not for root and will throw errors 
+        if sudo grep -q '^setxkbmap' /root/.keybinds.sh; then
+            sudo sed -i 's|setxkbmap|#setxkbmap|g' /root/.keybinds.sh
+        fi
     }
     shell-keybinds() {
         reade -Q "YELLOW" -i "n" -p "Set caps to escape? (Might cause X11 errors with SSH) [Y/n]: " "y n" xtrm
@@ -350,7 +355,6 @@ fi
     # Xresources
     
     xresources_r(){
-        
         sudo cp -bfv xterm/.Xresources /root/.Xresources;
         sudo gio trash /root/.Xresources~
         }
@@ -411,7 +415,7 @@ fi
 unset nvm
 
 
-# Ranger (File explorer)
+# Rangercom -bar W exe 'w !sudo tee >/dev/null %:p:S' | setl nomodcom -bar W exe 'w !sudo tee >/dev/null %:p:S' | setl nomodcom -bar W exe 'w !sudo tee >/dev/null %:p:S' | setl nomodcom -bar W exe 'w !sudo tee >/dev/null %:p:S' | setl nomodcom -bar W exe 'w !sudo tee >/dev/null %:p:S' | setl nomodcom -bar W exe 'w !sudo tee >/dev/null %:p:S' | setl nomodcom -bar W exe 'w !sudo tee >/dev/null %:p:S' | setl nomod (File explorer)
 reade -Q "GREEN" -i "y" -p "Install Ranger? (Terminal file explorer) [Y/n]: " "y n" rngr
 if [ "y" == "$rngr" ]; then
     ./install_ranger.sh

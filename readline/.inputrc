@@ -4,7 +4,8 @@
 $include /etc/inputrc
 
 # Vi style editing shortcuts/interface
-set editing-mode vi
+# https://unix.stackexchange.com/questions/303479/what-are-readlines-modes-keymaps-and-their-default-bindings
+set editing-mode emacs
 
 # Show whether it's normal or insert mode
 set show-mode-in-prompt on

@@ -204,14 +204,14 @@ reade -Q "GREEN" -i "y" -p "Install fd and use for fzf? (Faster find, required f
     fi
     unset tree
 
-    reade -Q "GREEN" -i "y" -p "Change Alt-C shortcut to Ctrl-S for fzf cd? [Y/n]:" "y n" fzf_t
-    if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ]; then 
-        sed -i 's|# ALT-C - cd into the selected directory|# CTRL-S - cd into the selected directory|g' ~/.fzf/shell/key-bindings.bash
-        sed -i 's|\\ec|\\C-s|g'  ~/.fzf/shell/key-bindings.bash
-        #sed -i 's|bind -m emacs-standard '\''"\\ec"|bind -m emacs-standard '\''"\\es"|g'  ~/.fzf/shell/key-bindings.bash
-        #sed -i 's|bind -m vi-command '\''"\\ec"|bind -m vi-command '\''"\\es"|g' ~/.fzf/shell/key-bindings.bash
-        #sed -i 's|bind -m vi-insert  '\''"\\ec"|bind -m vi-insert  '\''"\\es"|g' ~/.fzf/shell/key-bindings.bash
-    fi
+   # reade -Q "GREEN" -i "y" -p "Change Alt-C shortcut to Ctrl-S for fzf cd? [Y/n]:" "y n" fzf_t
+   # if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ]; then 
+   #     sed -i 's|# ALT-C - cd into the selected directory|# CTRL-S - cd into the selected directory|g' ~/.fzf/shell/key-bindings.bash
+   #     sed -i 's|\\ec|\\C-s|g'  ~/.fzf/shell/key-bindings.bash
+   #     #sed -i 's|bind -m emacs-standard '\''"\\ec"|bind -m emacs-standard '\''"\\es"|g'  ~/.fzf/shell/key-bindings.bash
+   #     #sed -i 's|bind -m vi-command '\''"\\ec"|bind -m vi-command '\''"\\es"|g' ~/.fzf/shell/key-bindings.bash
+   #     #sed -i 's|bind -m vi-insert  '\''"\\ec"|bind -m vi-insert  '\''"\\es"|g' ~/.fzf/shell/key-bindings.bash
+   # fi
     
     unset fzf_t;
 

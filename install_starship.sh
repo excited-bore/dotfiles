@@ -25,7 +25,6 @@ if ! sudo grep -q "starship" /root/.bashrc; then
         if [ -d /root/.bash_aliases.d/ ]; then
             sudo cp -bfv aliases/starship.sh /root/.bash_aliases.d/
             sudo gio trash ~/.bash_aliases.d/starship.sh~
-            
         fi
     fi
 fi

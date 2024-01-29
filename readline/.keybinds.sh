@@ -4,10 +4,10 @@
 
 # https://stackoverflow.com/questions/8366450/complex-keybinding-in-bash
 
-alias ls_stty="stty -a"
-alias ls_binds="bind -p"
-alias ls_xterm="xrdb -query -all"
-alias ls_kitty='kitty +kitten show_key -m kitty' 
+alias ls-binds-tty="stty -a"
+alias ls-binds-readline="bind -p | $PAGER"
+alias ls-binds-xterm="xrdb -query -all"
+alias ls-binds-kitty='kitty +kitten show_key -m kitty' 
 
 # TTY
 
@@ -21,7 +21,7 @@ stty -ixoff
 stty start 'undef' 
 stty stop 'undef'
 stty rprnt 'undef'
-#stty lnext '^V'
+#stty lnext '^v'
 
 # Unset suspend signal shortcut (Ctrl+z)
 stty susp 'undef'
@@ -29,17 +29,30 @@ stty susp 'undef'
 # Unset backward word erase shortcut (Ctrl+w)
 stty werase 'undef'
 
-# unbinds ctrl-c and bind the function to ctrl-q
-#stty intr '^q'
+# unbinds ctrl-c and bind the function to ctrl-s
+#stty intr '^c'
+stty intr '^c'
 
-#alias tty_size_half="tput cup $(stty size | awk '{print int($1/2);}') 0"
+
+
+# XRESOURCES
+
+# Install bindings from xterm
+# xrdb -merge ~/.Xresources
+# .Inputrc (readline conf) however has to be compiled, so restart shell
+
+# Set caps to Escape
+setxkbmap -option caps:escape
+
+# Set Shift delete to backspace
+# xmodmap -e "keycode 119 = Delete BackSpace"     
 
 # READLINE
 
-# \e : Escape
-# \M : Meta (alt)
-# \t : Tab
 # \C : Ctrl
+# \M : Meta (alt)
+# \e : Escape (alt)
+# \t : Tab
 # \b : Backspace
 # \n : newline
 # nop => no operation, but 'redraw-current-line' might work better
@@ -92,7 +105,7 @@ bind    '"\C-w": alias-expand-line'
 #"\C-o": "tput sc && history -d -1 \C-m"
 
 # Ctrl-l clears
-bind -x '"\C-l": clear && tput cup $LINE_TPUT 0 && tput sc'
+bind -x '"\C-l": clear && tput cup $LINE_TPUT 0 && tput sc && echo "${PS1@P}" && tput cuu1'
 
 # Ctrl-q quits terminal
 bind -x '"\C-q": exit'
@@ -110,16 +123,16 @@ bind    '"\C-z": vi-undo'
 bind    '"\C-h": backward-kill-word'
 
 # Ctrl-b Insert as comment (also on alt+#)
-bind '"\C-b": insert-comment 1'
+#bind    '"\C-b": insert-comment 1'
 
 # Ctrl-n removes first character from command line (uncomment)
-bind '"\C-n": "\C-a\e[3~"'
+bind    '"\C-n": "\C-a\e[3~"'
 
 # Ctrl-o searches for a manual for the typed command 
-bind '"\C-o": "\C-u man \C-y\C-m"'
+bind    '"\C-o": "\C-u man \C-y\C-m"'
 
 # Ctrl-x is for autojump
-bind '"\C-x": "j \C-i"'
+#bind   '"\C-x": "j \C-i"'
 
 # F2 - ranger (file explorer)
 bind -x '"\201": ranger'
@@ -149,23 +162,15 @@ bind '"\e[1;3B": "cd \C-m"'
 # Alt-Up arrow to go to home directory
 bind '"\e[1;3A": "j \C-i"'
 
+_quote_all() { READLINE_LINE="${READLINE_LINE@Q}"; }
+bind -x '"\C-x\C-o":_quote_all'
+
+# Proper paste
+p="'"
+bind -x $'"\237": echo bind $p\\"\\\\225\\": \\"$(xclip -o -sel c)\\"$p > /tmp/paste.sh && source /tmp/paste.sh'
+bind '"\C-v": "\237\225"'
+
 # Proper copy
 # https://askubuntu.com/questions/302263/selecting-text-in-the-terminal-without-using-the-mouse
 #"\e-c": copy to clipboard
-#bind '"\e-c": "\C-u\C-e echo \C-y | xclip -i -sel c && tput cuu1 && tput el && history -d -1 \C-m\C-y"'
-
-#"\e-v": paste from clipboard
-#bind '"\e-v": "\C-u\C-e tput cuu1 && tput el && xdotool type --clearmodifiers --delay 25 $(xclip -o -sel clip) && history -d -1 \C-m"'
-#bind -x '"\e-v": "xclip -o -sel clip"'
-
-# XRESOURCES
-
-# Install bindings from xterm
-# xrdb -merge ~/.Xresources
-# .Inputrc (readline conf) however has to be compiled, so restart shell
-
-# Set caps to Escape
-setxkbmap -option caps:escape
-
-# Set Shift delete to backspace
-##xmodmap -e "keycode 119 = Delete BackSpace"     #
+bind -x '"\C-s" : echo "$READLINE_LINE" | xclip -i -sel c'

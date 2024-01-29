@@ -255,6 +255,7 @@ Plugin 'ojroques/vim-oscyank', {'branch': 'main'}
 " Ranger integration
 Plugin 'francoiscabrol/ranger.vim'
 Plugin 'rbgrouleff/bclose.vim'
+let g:NERDTreeHijackNetrw = 0 
 let g:ranger_replace_netrw = 1
 let g:ranger_map_keys = 0
 let g:ranger_command_override = 'ranger --cmd "set show_hidden=true"'
@@ -282,9 +283,9 @@ let g:suda_smart_edit = 1
 "let g:suda#nopass = 1
 
 " Give passwords prompts in vim
-"Plugin 'lambdalisue/askpass.vim'
+Plugin 'lambdalisue/askpass.vim'
 "" Dependency for askpass, Deno
-"Plugin 'vim-denops/denops.vim'
+Plugin 'vim-denops/denops.vim'
 
 " Nerd commenter
 Plugin 'preservim/nerdcommenter'
