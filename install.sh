@@ -330,11 +330,18 @@ fi
         
         . ./checks/check_keybinds.sh
         
-        reade -Q "YELLOW" -i "n" -p "Set caps to escape? (Might cause X11 errors with SSH) [Y/n]: " "y n" xtrm
-        if [ "$xtrm" != "y" ] && ! [ -z "$xtrm" ]; then
-            sed -i "s|setxkbmap |#setxkbmap |g" keybinds/keybinds.bash
+        reade -Q "GREEN" -i "y" -p "Enable vi-mode instead of emacs? [Y/n]: " "y n" vimde
+        if [ "$vimde" == "y" ]; then
+            sed -i "s|.set editing-mode .*|set editing-mode vi|g" keybinds/.inputrc
         fi
-        
+        reade -Q "GREEN" -i "y" -p "Enable visual que for vi/emacs toggle? (Displayed as '@') [Y/n]: " "y n" vivisual
+        if [ "$vivisual" == "y" ]; then
+            sed -i "s|.set show-mode-in-prompt .*|set show-mode-in-prompt on|g" keybinds/.inputrc
+        fi
+        reade -Q "GREEN" -i "y" -p "Set caps to escape? (Might cause X11 errors with SSH) [Y/n]: " "y n" xtrm
+        if [ "$xtrm" != "y" ] && ! [ -z "$xtrm" ]; then
+            sed -i "s|setxkbmap |#setxkbmap |g" keybinds/.inputrc
+        fi
         cp -bfv keybinds/keybinds.bash ~/.keybinds.d/
         gio trash ~/.keybinds.d/keybinds.bash~
         cp -bfv keybinds/.inputrc ~/
@@ -342,7 +349,8 @@ fi
         if [ -f ~/.pathvariables.sh ]; then
            sed -i 's|#export INPUTRC|export INPUTRC|g' ~/.pathvariables.sh
         fi
-        yes_edit_no shell-keybinds_r "keybinds/.inputrc keybinds/keybinds.bash" "Install .inputrc and keybinds.bash at /root/ and /root/.keybinds.d/?" "edit" "RED"; 
+        unset vimde vivisual xterm
+        yes_edit_no shell-keybinds_r "keybinds/.inputrc keybinds/keybinds.bash" "Install .inputrc and keybinds.bash at /root/ and /root/.keybinds.d/?" "edit" "YELLOW"; 
     }
     yes_edit_no shell-keybinds "keybinds/.inputrc keybinds/keybinds.bash" "Install .inputrc and keybinds.bash at ~/ and ~/.keybinds.d/? (keybinds configuration)" "edit" "YELLOW"
 
@@ -377,7 +385,7 @@ unset pycomp
 
 
 # Osc
-reade -Q "GREEN" -i "y" -p "Install Osc52 clipaboard? (Universal clipboard tool / works natively over ssh) [Y/n]: " "y n" osc
+reade -Q "GREEN" -i "y" -p "Install Osc52 clipboard? (Universal clipboard tool / works natively over ssh) [Y/n]: " "y n" osc
 if [ -z $osc ] || [ "Y" == $osc ] || [ $osc == "y" ]; then
     ./install_osc.sh 
 fi
@@ -390,6 +398,13 @@ if [ -z $bat ] || [ "Y" == $bat ] || [ $bat == "y" ]; then
 fi
 unset bat
 
+# Fzf (Fuzzy Finder)
+reade -Q "GREEN" -i "y" -p "Install fzf? (Fuzzy file/folder finder - keybinding yes for upgraded Ctrl-R/reverse-search, fzf filenames on Ctrl+T and fzf-version of 'cd' on Alt-C + Custom script: Ctrl-f becomes system-wide file opener) [Y/n]: " "y n" findr
+if [ "y" == "$findr" ]; then
+    ./install_fzf.sh
+fi
+unset findr
+
 # Autojump
 ./install_autojump.sh
 
@@ -400,12 +415,6 @@ if [ $strshp == "y" ]; then
 fi
 unset strshp
 
-# Fzf (Fuzzy Finder)
-reade -Q "GREEN" -i "y" -p "Install fzf? (Fuzzy file/folder finder - keybinding yes for upgraded Ctrl-R/reverse-search, fzf filenames on Ctrl+T and fzf-version of 'cd' on Alt-C + Custom script: Ctrl-f becomes system-wide file opener) [Y/n]: " "y n" findr
-if [ "y" == "$findr" ]; then
-    ./install_fzf.sh
-fi
-unset findr
 
 # Moar (Custom pager instead of less)
 reade -Q "GREEN" -i "y" -p "Install moar? (Custom pager instead of less with linenumbers) [Y/n]: " "y n" moar

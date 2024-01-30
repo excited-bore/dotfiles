@@ -1,6 +1,6 @@
 #!/bin/bash
 . ./aliases/rlwrap_scripts.sh
-curl -sS https://starship.rs/install.sh | sh
+curl -sS https://starship.rs/install.sh | sh | yes
 if ! grep -q "starship" ~/.bashrc; then
     reade -Q "GREEN" -i "y" -p "Install starship for user? [Y/n]:" "y n" strship
     if [ "y" == "$strship" ]; then

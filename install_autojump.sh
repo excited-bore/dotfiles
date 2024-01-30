@@ -22,21 +22,21 @@ fi
 
 # If you want Ctrl-j, read this first: 
 # https://bestasciitable.com/
-reade -Q "GREEN" -i "y" -p "Install autojump keybind at Ctrl-x for user? [Y/n]:" "y n" bnd
+reade -Q "GREEN" -i "y" -p "Install autojump keybind at Ctrl-x j for user? [Y/n]:" "y n" bnd
 if [ "$bnd" == "y" ]; then
-    if grep -q 'bind '\''"\\C-x": "j \\C-i"'\''' $KEYBIND; then
-        sed -i 's|.*\(bind .*\C-x": "j.*\)|\1|g' $KEYBIND
+    if grep -q 'bind '\''"\\C-x j": "j"'\''' $KEYBIND; then
+        sed -i 's|.*\(bind .*\C-x j": "j.*\)|\1|g' $KEYBIND
     else
-        printf '# Ctrl-x is for autojump\nbind '\''"\C-x": "j \C-i"'\''\n' >> $KEYBIND
+        printf '# Ctrl-x j for autojump\nbind -m emacs-standard '\''"\C-x j": "j \C-i"'\''\nbind -m vi-command     '\''"\C-x j": "j \C-i"'\''\nbind -m vi-insert      '\''"\C-x j": "j \C-i"' >> $KEYBIND
     fi
 fi
 
-reade -Q "YELLOW" -i "y" -p "Install autojump keybind at Ctrl-x for root? [Y/n]:" "y n" bnd_r
+reade -Q "YELLOW" -i "y" -p "Install autojump keybind at Ctrl-x j for root? [Y/n]:" "y n" bnd_r
 if [ "$bnd" == "y" ]; then
-    if sudo grep -q 'bind '\''"\\C-x": "j \\C-i"'\''' $KEYBIND_R; then
-        sudo sed -i 's|.*\(bind .*\C-x": "j.*\)|\1|g'  $KEYBIND_R
+    if sudo grep -q 'bind '\''"\\C-x j": "j"'\''' $KEYBIND_R; then
+        sudo sed -i 's|.*\(bind .*\C-x j": "j.*\)|\1|g'  $KEYBIND_R
     else
-        printf '# Ctrl-x is for autojump\nbind '\''"\C-x": "j \C-i"'\''\n' | sudo tee -a $KEYBIND_R
+        printf '# Ctrl-x j for autojump\nbind -m emacs-standard '\''"\C-x j": "j \C-i"'\''\nbind -m vi-command     '\''"\C-x j": "j \C-i"'\''\nbind -m vi-insert      '\''"\C-x j": "j \C-i"' | sudo tee -a $KEYBIND_R
     fi
 fi
 
