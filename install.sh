@@ -313,7 +313,6 @@ fi
     fi
 
     shell-keybinds_r(){ 
-        . ./checks/check_keybinds.sh
         if [ -f /root/.pathvariables.sh ]; then
            sudo sed -i 's|#export INPUTRC|export INPUTRC|g' /root/.pathvariables.sh
         fi
@@ -328,6 +327,9 @@ fi
         fi
     }
     shell-keybinds() {
+        
+        . ./checks/check_keybinds.sh
+        
         reade -Q "YELLOW" -i "n" -p "Set caps to escape? (Might cause X11 errors with SSH) [Y/n]: " "y n" xtrm
         if [ "$xtrm" != "y" ] && ! [ -z "$xtrm" ]; then
             sed -i "s|setxkbmap |#setxkbmap |g" keybinds/keybinds.bash
