@@ -1,5 +1,5 @@
 . ./checks/check_distro.sh
-. ./readline/rlwrap_scripts.sh
+. ./aliases/rlwrap_scripts.sh
 . ./checks/check_keybinds.sh
 ./install_AUR-helper.sh
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 . ./checks/check_distro.sh
-. ./readline/rlwrap_scripts.sh
+. ./aliases/rlwrap_scripts.sh
 
 
 if [ ! -x "$(command -v tmux)" ]; then
@@ -190,6 +190,16 @@ if [ -z "$tmuxx" ] || [ "$tmuxx"  == "y" ]; then
     gio trash ~/.bash_aliases.d/tmux.sh~
 fi
 unset tmuxx 
+
+if [ -x $(command -v fzf) ]; then
+    reade -Q "GREEN" -i "y" -p "Fzf detected. Install fzf-tmux? [Y/n]: " "y n" fzftmux
+    if [ "$fzftmux" == "y" ]; then 
+        wget https://raw.githubusercontent.com/junegunn/fzf/master/bin/fzf-tmux -P ~/.bash_aliases.d/
+        mv ~/.bash_aliases.d/fzf-tmux ~/.bash_aliases.d/fzf-tmux.sh
+        sudo cp -f ~/.bash_aliases.d/fzf-tmux.sh /root/.bash_aliases.d/ 
+    fi
+fi
+unset fzftmux
 
 reade -Q "YELLOW" -i "n" -p "Set tmux at shell login for SSH? (Conflicts with vim-tmux-kitty navigator) [Y/n]:" "y n"  tmuxx
 if [ -z "$tmuxx" ] || [ "$tmuxx"  == "y" ]; then 

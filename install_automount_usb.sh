@@ -1,7 +1,7 @@
 #! /bin/bash
 #DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 # https://unix.stackexchange.com/questions/278631/bash-script-auto-complete-for-user-input-based-on-array-data
-. ./readline/rlwrap_scripts.sh
+. ./aliases/rlwrap_scripts.sh
 
 sudo blkid
 readecomp=($(sudo blkid | awk 'BEGIN { FS = ":" };{print $1;}'))

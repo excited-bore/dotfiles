@@ -1,7 +1,7 @@
 #!/bin/bash
 
 . ./checks/check_rlwrap.sh
-. ./readline/rlwrap_scripts.sh
+. ./aliases/rlwrap_scripts.sh
 . ./checks/check_distro.sh
 
 printf "${green}If all necessary files are sourced correctly, this text looks green.\nIf not, something went wrong.\n"
@@ -75,282 +75,274 @@ fi
 
 # Pathvariables
 
-reade -Q "GREEN" -i "y" -p "Check existence (and create) ~/.pathvariables.sh and link it to .bashrc? [Y/n]:" "y n" pathvars
-if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
+if [ ! -f ~/.pathvariables.sh ]; then
+    reade -Q "GREEN" -i "y" -p "Check existence (and create) ~/.pathvariables.sh and link it to .bashrc? [Y/n]:" "y n" pathvars
+    if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
 
-    # First comment out every export
-    sed -e '/export/ s/^#*/#/' -i .pathvariables.sh
-    
-    # Then set TMPDIR but don't ask if user would want another directory because that breaks stuff
-    sed 's|#export TMPDIR|export TMPDIR|' -i .pathvariables.sh
-
-    # Then iterate through all predefined pathvars
-    
-    # Package Managers
-    reade -Q "YELLOW" -i "y" -p "Check and create DIST,DIST_BASE,ARCH,PM and WRAPPER? (distro, distro base, architecture, package manager and pm wrapper) [Y/n]:" "y n" Dists
-    if [ "$Dists" == "y" ]; then
-       printf "NOT YET IMPLEMENTED\n"
-    fi
-    
-    # TODO: non ugly values
-    reade -Q "GREEN" -i "n" -p "Set LS_COLORS with some predefined values? (WARNING: ugly values) [Y/n]:" "y n" lsclrs
-    if [ "$lsclrs" == "y" ] || [ -z "$lsclrs" ]; then
-        sed 's/^#export LS_COLORS/export LS_COLORS/' -i .pathvariables.sh
-    fi
-    
-    reade -Q "GREEN" -i "y" -p "Set PAGER? (Page reader) [Y/n]:" "y n" pgr
-    if [ "$pgr" == "y" ] || [ -z "$pgr" ]; then
+        # First comment out every export
+        sed -e '/export/ s/^#*/#/' -i .pathvariables.sh
         
-        # Uncomment export PAGER=
-        sed 's/^#export PAGER=/export PAGER=/' -i .pathvariables.sh
+        # Then set TMPDIR but don't ask if user would want another directory because that breaks stuff
+        sed 's|#export TMPDIR|export TMPDIR|' -i .pathvariables.sh
+
+        # Then iterate through all predefined pathvars
         
-        pagers="less more"
-        prmpt="${green} \tless = Default pager - Basic, archaic but very customizable\n\
-        more = Preinstalled other pager - leaves text by default, less customizable (ironically)\n"
-        if [ -x "$(command -v most)" ]; then
-            pagers="$pagers most"
-            prmpt="$prmpt \tmost = Installed pager that is very customizable\n"
+        # Package Managers
+        reade -Q "YELLOW" -i "y" -p "Check and create DIST,DIST_BASE,ARCH,PM and WRAPPER? (distro, distro base, architecture, package manager and pm wrapper) [Y/n]:" "y n" Dists
+        if [ "$Dists" == "y" ]; then
+           printf "NOT YET IMPLEMENTED\n"
         fi
-        if [ -x "$(command -v moar)" ]; then
-            pagers="$pagers moar"
-            prmpt="$prmpt \tmoar = Installed pager with an awesome default configuration\n"
-        fi
-        printf "$prmpt"
-        reade -Q "GREEN" -i "less" -p "PAGER=" "$pagers" pgr2
-        pgr2=$(whereis "$pgr2" | awk '{print $2}')
-        sed -i 's|export PAGER=.*|export PAGER='$pgr2'|' .pathvariables.sh
-        if grep -q "less" "$pgr2"; then
-            sed -i 's|#export LESS=|export LESS="*"|g' .pathvariables.sh
-            lss=$(cat .pathvariables.sh | grep 'export LESS="*"' | sed 's|export LESS="\(.*\)"|\1|g')
-            lss_n=""
-            for opt in ${lss}; do
-                opt1=$(echo "$opt" | sed 's|--\(\)|\1|g' | sed 's|\(\)\=.*|\1|g')
-                if (man less | grep -Fq "${opt1}") 2> /dev/null; then
-                    lss_n="$lss_n $opt"
-                fi
-            done
-            sed -i "s|export LESS=.*|export LESS=\" $lss_n\"|g" .pathvariables.sh
-            unset lss lss_n opt opt1
-            #sed -i 's/#export LESSEDIT=/export LESSEDIT=/' .pathvariables.sh
-        fi
-        if grep -q "moar" "$pgr2"; then
-            sed -i 's/#export MOAR=/export MOAR=/' .pathvariables.sh
-        fi
-
-    fi
-    unset prmpt
-
-    reade -Q "GREEN" -i "y" -p "Set EDITOR and VISUAL? [Y/n]:" "y n" edtvsl
-    if [ "$edtvsl" == "y" ] || [ -z "$edtvsl" ]; then
-        editors="nano vi"
-        prmpt="${green} \tnano = Default editor - Basic, but userfriendly\n\
-        vi = Other preinstalled editor - Archaic and non-userfriendly editor\n" 
-        if [ -x "$(command -v micro)" ]; then
-            editors="$pagers micro"
-            prmpt="$prmpt \tMicro = Relatively good out-of-the-box editor - Decent keybindings, yet no customizations\n"
-        fi
-        if [ -x "$(command -v ne)" ]; then
-            editors="$pagers ne"
-            prmpt="$prmpt \tNice editor = Relatively good out-of-the-box editor - Decent keybindings, yet no customizations\n"
-        fi
-        if [ -x "$(command -v vim)" ]; then
-            editors="$editors vim"
-            prmpt="$prmpt \tVim = The one and only true modal editor - Not userfriendly, but many features (maybe even too many) and greatly customizable\n"
-            sed -i "s|#export MYVIMRC=|export MYVIMRC=|g" .pathvariables.sh
-            sed -i "s|#export MYGVIMRC=|export MYGVIMRC=|g" .pathvariables.sh
-        fi
-        if [ -x "$(command -v nvim)" ]; then                                  
-            editors="$editors nvim"
-            prmpt="$prmpt \tNeovim = A better vim? - Faster and less buggy then regular vim, even a little userfriendlier\n"
-            sed -i "s|#export MYVIMRC=|export MYVIMRC=|g" .pathvariables.sh
-            sed -i "s|#export MYGVIMRC=|export MYGVIMRC=|g" .pathvariables.sh
-        fi
-        if [ -x "$(command -v emacs)" ]; then
-            editors="$editors emacs"
-            prmpt="$prmpt \tEmacs = One of the oldest and versatile editors - Modal and featurerich, but overwhelming as well\n"
-        fi
-        printf "$prmpt"
-        reade -Q "GREEN" -i "nano" -p "EDITOR (Terminal)=" "$editors" edtor
-        if [ "$edtor" == "emacs" ]; then
-            edtor="emacs -nw"
-        fi
-        edtor=$(whereis "$edtor" | awk '{print $2}')
-        sed -i 's|#export EDITOR=.*|export EDITOR='$edtor'|g' .pathvariables.sh
         
-        # Make .txt file and output file
-        touch $TMPDIR/editor-outpt
-        # Redirect output to file in subshell (mimeopen gives output but also starts read. This cancels read). In tmp because that gets cleaned up
-        (echo "" | mimeopen -a editor-check.sh &> $TMPDIR/editor-outpt)
-        compedit=$(cat $TMPDIR/editor-outpt | awk 'NR > 2' | awk '{if (prev_1_line) print prev_1_line; prev_1_line=prev_line} {prev_line=$NF}' | sed 's|[()]||g' | tr -s [:space:] \\n | uniq | tr '\n' ' ')
-        frst="$(echo $compedit | awk '{print $1}')"
-        reade -Q "GREEN" -i "$frst" -p "VISUAL (GUI editor)=" "$compedit" vsual
-        vsual=$(whereis "$vsual" | awk '{print $2}')
-        sed -i 's|#export VISUAL=.*|export VISUAL='$vsual'|' .pathvariables.sh
-    fi
-    unset edtvsl compedit frst editors prmpt
-
-    # Set DISPLAY
-    addr=$(nmcli device show | grep IP4.ADDR | awk 'NR==1{print $2}'| sed 's|\(.*\)/.*|\1|')
-    #reade -Q "GREEN" -i "n" -p "Set DISPLAY to ':$(addr).0'? [Y/n]:" "y n" dsply
-    if [[ $- =~ i ]] && [[ -n "$SSH_TTY" ]]; then
-        reade -Q "YELLOW" -i "n" -p "Detected shell is SSH. For X11, it's more reliable performance to dissallow shared clipboard (to prevent constant hanging). Set DISPLAY to 'localhost:10.0'? [Y/n]:" "y n" dsply
-        if [ "$dsply" == "y" ] || [ -z "$dsply" ]; then
-            sed -i "s|.export DISPLAY=.*|export DISPLAY=\"localhost:10.0\"|" .pathvariables.sh
+        # TODO: non ugly values
+        reade -Q "GREEN" -i "n" -p "Set LS_COLORS with some predefined values? (WARNING: ugly values) [Y/n]:" "y n" lsclrs
+        if [ "$lsclrs" == "y" ] || [ -z "$lsclrs" ]; then
+            sed 's/^#export LS_COLORS/export LS_COLORS/' -i .pathvariables.sh
         fi
-    fi
-    unset dsply
+        
+        reade -Q "GREEN" -i "y" -p "Set PAGER? (Page reader) [Y/n]:" "y n" pgr
+        if [ "$pgr" == "y" ] || [ -z "$pgr" ]; then
+            
+            # Uncomment export PAGER=
+            sed 's/^#export PAGER=/export PAGER=/' -i .pathvariables.sh
+            
+            pagers="less more"
+            prmpt="${green} \tless = Default pager - Basic, archaic but very customizable\n\
+            more = Preinstalled other pager - leaves text by default, less customizable (ironically)\n"
+            if [ -x "$(command -v most)" ]; then
+                pagers="$pagers most"
+                prmpt="$prmpt \tmost = Installed pager that is very customizable\n"
+            fi
+            if [ -x "$(command -v moar)" ]; then
+                pagers="$pagers moar"
+                prmpt="$prmpt \tmoar = Installed pager with an awesome default configuration\n"
+            fi
+            printf "$prmpt"
+            reade -Q "GREEN" -i "less" -p "PAGER=" "$pagers" pgr2
+            pgr2=$(whereis "$pgr2" | awk '{print $2}')
+            sed -i 's|export PAGER=.*|export PAGER='$pgr2'|' .pathvariables.sh
+            if grep -q "less" "$pgr2"; then
+                sed -i 's|#export LESS=|export LESS="*"|g' .pathvariables.sh
+                lss=$(cat .pathvariables.sh | grep 'export LESS="*"' | sed 's|export LESS="\(.*\)"|\1|g')
+                lss_n=""
+                for opt in ${lss}; do
+                    opt1=$(echo "$opt" | sed 's|--\(\)|\1|g' | sed 's|\(\)\=.*|\1|g')
+                    if (man less | grep -Fq "${opt1}") 2> /dev/null; then
+                        lss_n="$lss_n $opt"
+                    fi
+                done
+                sed -i "s|export LESS=.*|export LESS=\" $lss_n\"|g" .pathvariables.sh
+                unset lss lss_n opt opt1
+                #sed -i 's/#export LESSEDIT=/export LESSEDIT=/' .pathvariables.sh
+            fi
+            if grep -q "moar" "$pgr2"; then
+                sed -i 's/#export MOAR=/export MOAR=/' .pathvariables.sh
+            fi
 
-    if [ -x "$(command -v go)" ]; then
-        sed -i 's|#export GOPATH|export GOPATH|' .pathvariables.sh 
-    fi
-    unset snapvrs
-
-    if [ -x "$(command -v snap)" ]; then
-        sed -i 's|#export PATH=/bin/snap|export PATH=/bin/snap|' .pathvariables.sh 
-    fi
-    unset snapvrs
-    
-    if [ -x "$(command -v flatpak)" ]; then
-        sed -i 's|#export FLATPAK|export FLATPAK|' .pathvariables.sh 
-        sed -i 's|#export \(PATH=$PATH:$HOME/.local/bin/flatpak\)|\1|g' .pathvariables.sh
-    fi
-    unset snapvrs
-
-    # TODO do something for flatpak  (XDG_DATA_DIRS)
-    # Check if xdg installed
-    if [ -x "$(command -v xdg-open)" ]; then
-        prmpt="${green}This will set XDG pathvariables to their respective defaults\n\
-        XDG is related to default applications\n\
-        Setting these could be usefull when installing certain programs \n\
-        Defaults:\n\
-        - XDG_CACHE_HOME=$HOME/.cache\n\
-        - XDG_CONFIG_HOME=$HOME/.config\n\
-        - XDG_CONFIG_DIRS=/etc/xdg\n\
-        - XDG_DATA_HOME=$HOME/.local/share\n\
-        - XDG_DATA_DIRS=/usr/local/share/:/usr/share\n\
-        - XDG_STATE_HOME=$HOME/.local/state\n"
-        printf "$prmpt"
-        reade -Q "GREEN" -i "y" -p "Set XDG environment? [Y/n]: " "y n" xdgInst
-        if [ -z "$xdgInst" ] || [ "y" == "$xdgInst" ]; then
-            sed 's/^#export XDG_CACHE_HOME=\(.*\)/export XDG_CACHE_HOME=\1/' -i .pathvariables.sh 
-            sed 's/^#export XDG_CONFIG_HOME=\(.*\)/export XDG_CONFIG_HOME=\1/' -i .pathvariables.sh
-            sed 's/^#export XDG_CONFIG_DIRS=\(.*\)/export XDG_CONFIG_DIRS=\1/' -i .pathvariables.sh
-            sed 's/^#export XDG_DATA_HOME=\(.*\)/export XDG_DATA_HOME=\1/' -i .pathvariables.sh    
-            sed 's/^#export XDG_DATA_DIRS=\(.*\)/export XDG_DATA_DIRS=\1/' -i .pathvariables.sh
-            sed 's/^#export XDG_STATE_HOME=\(.*\)/export XDG_STATE_HOME=\1/' -i .pathvariables.sh
-            sed 's/^#export XDG_RUNTIME_DIR=\(.*\)/export XDG_RUNTIME_DIR=\1/' -i .pathvariables.sh
         fi
+        unset prmpt
+
+        reade -Q "GREEN" -i "y" -p "Set EDITOR and VISUAL? [Y/n]:" "y n" edtvsl
+        if [ "$edtvsl" == "y" ] || [ -z "$edtvsl" ]; then
+            editors="nano vi"
+            prmpt="${green} \tnano = Default editor - Basic, but userfriendly\n\
+            vi = Other preinstalled editor - Archaic and non-userfriendly editor\n" 
+            if [ -x "$(command -v micro)" ]; then
+                editors="$pagers micro"
+                prmpt="$prmpt \tMicro = Relatively good out-of-the-box editor - Decent keybindings, yet no customizations\n"
+            fi
+            if [ -x "$(command -v ne)" ]; then
+                editors="$pagers ne"
+                prmpt="$prmpt \tNice editor = Relatively good out-of-the-box editor - Decent keybindings, yet no customizations\n"
+            fi
+            if [ -x "$(command -v vim)" ]; then
+                editors="$editors vim"
+                prmpt="$prmpt \tVim = The one and only true modal editor - Not userfriendly, but many features (maybe even too many) and greatly customizable\n"
+                sed -i "s|#export MYVIMRC=|export MYVIMRC=|g" .pathvariables.sh
+                sed -i "s|#export MYGVIMRC=|export MYGVIMRC=|g" .pathvariables.sh
+            fi
+            if [ -x "$(command -v nvim)" ]; then                                  
+                editors="$editors nvim"
+                prmpt="$prmpt \tNeovim = A better vim? - Faster and less buggy then regular vim, even a little userfriendlier\n"
+                sed -i "s|#export MYVIMRC=|export MYVIMRC=|g" .pathvariables.sh
+                sed -i "s|#export MYGVIMRC=|export MYGVIMRC=|g" .pathvariables.sh
+            fi
+            if [ -x "$(command -v emacs)" ]; then
+                editors="$editors emacs"
+                prmpt="$prmpt \tEmacs = One of the oldest and versatile editors - Modal and featurerich, but overwhelming as well\n"
+            fi
+            printf "$prmpt"
+            reade -Q "GREEN" -i "nano" -p "EDITOR (Terminal)=" "$editors" edtor
+            if [ "$edtor" == "emacs" ]; then
+                edtor="emacs -nw"
+            fi
+            edtor=$(whereis "$edtor" | awk '{print $2}')
+            sed -i 's|#export EDITOR=.*|export EDITOR='$edtor'|g' .pathvariables.sh
+            
+            # Make .txt file and output file
+            touch $TMPDIR/editor-outpt
+            # Redirect output to file in subshell (mimeopen gives output but also starts read. This cancels read). In tmp because that gets cleaned up
+            (echo "" | mimeopen -a editor-check.sh &> $TMPDIR/editor-outpt)
+            compedit=$(cat $TMPDIR/editor-outpt | awk 'NR > 2' | awk '{if (prev_1_line) print prev_1_line; prev_1_line=prev_line} {prev_line=$NF}' | sed 's|[()]||g' | tr -s [:space:] \\n | uniq | tr '\n' ' ')
+            frst="$(echo $compedit | awk '{print $1}')"
+            reade -Q "GREEN" -i "$frst" -p "VISUAL (GUI editor)=" "$compedit" vsual
+            vsual=$(whereis "$vsual" | awk '{print $2}')
+            sed -i 's|#export VISUAL=.*|export VISUAL='$vsual'|' .pathvariables.sh
+        fi
+        unset edtvsl compedit frst editors prmpt
+
+        # Set DISPLAY
+        addr=$(nmcli device show | grep IP4.ADDR | awk 'NR==1{print $2}'| sed 's|\(.*\)/.*|\1|')
+        #reade -Q "GREEN" -i "n" -p "Set DISPLAY to ':$(addr).0'? [Y/n]:" "y n" dsply
+        if [[ $- =~ i ]] && [[ -n "$SSH_TTY" ]]; then
+            reade -Q "YELLOW" -i "n" -p "Detected shell is SSH. For X11, it's more reliable performance to dissallow shared clipboard (to prevent constant hanging). Set DISPLAY to 'localhost:10.0'? [Y/n]:" "y n" dsply
+            if [ "$dsply" == "y" ] || [ -z "$dsply" ]; then
+                sed -i "s|.export DISPLAY=.*|export DISPLAY=\"localhost:10.0\"|" .pathvariables.sh
+            fi
+        fi
+        unset dsply
+
+        if [ -x "$(command -v go)" ]; then
+            sed -i 's|#export GOPATH|export GOPATH|' .pathvariables.sh 
+        fi
+        unset snapvrs
+
+        if [ -x "$(command -v snap)" ]; then
+            sed -i 's|#export PATH=/bin/snap|export PATH=/bin/snap|' .pathvariables.sh 
+        fi
+        unset snapvrs
+        
+        if [ -x "$(command -v flatpak)" ]; then
+            sed -i 's|#export FLATPAK|export FLATPAK|' .pathvariables.sh 
+            sed -i 's|#export \(PATH=$PATH:$HOME/.local/bin/flatpak\)|\1|g' .pathvariables.sh
+        fi
+        unset snapvrs
+
+        # TODO do something for flatpak  (XDG_DATA_DIRS)
+        # Check if xdg installed
+        if [ -x "$(command -v xdg-open)" ]; then
+            prmpt="${green}This will set XDG pathvariables to their respective defaults\n\
+            XDG is related to default applications\n\
+            Setting these could be usefull when installing certain programs \n\
+            Defaults:\n\
+            - XDG_CACHE_HOME=$HOME/.cache\n\
+            - XDG_CONFIG_HOME=$HOME/.config\n\
+            - XDG_CONFIG_DIRS=/etc/xdg\n\
+            - XDG_DATA_HOME=$HOME/.local/share\n\
+            - XDG_DATA_DIRS=/usr/local/share/:/usr/share\n\
+            - XDG_STATE_HOME=$HOME/.local/state\n"
+            printf "$prmpt"
+            reade -Q "GREEN" -i "y" -p "Set XDG environment? [Y/n]: " "y n" xdgInst
+            if [ -z "$xdgInst" ] || [ "y" == "$xdgInst" ]; then
+                sed 's/^#export XDG_CACHE_HOME=\(.*\)/export XDG_CACHE_HOME=\1/' -i .pathvariables.sh 
+                sed 's/^#export XDG_CONFIG_HOME=\(.*\)/export XDG_CONFIG_HOME=\1/' -i .pathvariables.sh
+                sed 's/^#export XDG_CONFIG_DIRS=\(.*\)/export XDG_CONFIG_DIRS=\1/' -i .pathvariables.sh
+                sed 's/^#export XDG_DATA_HOME=\(.*\)/export XDG_DATA_HOME=\1/' -i .pathvariables.sh    
+                sed 's/^#export XDG_DATA_DIRS=\(.*\)/export XDG_DATA_DIRS=\1/' -i .pathvariables.sh
+                sed 's/^#export XDG_STATE_HOME=\(.*\)/export XDG_STATE_HOME=\1/' -i .pathvariables.sh
+                sed 's/^#export XDG_RUNTIME_DIR=\(.*\)/export XDG_RUNTIME_DIR=\1/' -i .pathvariables.sh
+            fi
+        fi
+        unset xdgInst
+
+
+        # TODO: check around for other systemdvars 
+        # Check if systemd installed
+        if [ -x "$(command -v systemctl)" ]; then
+            prmpt="${yellow}\tThis will set SYSTEMD pathvariables\n\
+            When setting a new pager for systemd or changing logging specifics\n\
+            Defaults:\n\
+            - SYSTEMD_PAGER=$PAGER\n\
+            - SYSTEMD_COLORS=256\n\
+            - SYSTEMD_PAGERSECURE=1\n\
+            - SYSTEMD_LESS=\"FRXMK\"\n\
+            - SYSTEMD_LOG_LEVEL=\"warning\"\n\
+            - SYSTEMD_LOG_COLOR=\"true\"\n\
+            - SYSTEMD_LOG_TIME=\"true\"\n\
+            - SYSTEMD_LOG_LOCATION=\"true\"\n\
+            - SYSTEMD_LOG_TID=\"true\"\n\
+            - SYSTEMD_LOG_TARGET=\"auto\"\n\
+            "
+            printf "$prmpt"
+            reade -Q "YELLOW" -i "y" -p "Set systemd environment? [Y/n]: " "y n" xdgInst
+            if [ -z "$xdgInst" ] || [ "y" == "$xdgInst" ]; then
+                sed 's/^#export SYSTEMD_PAGER=\(.*\)/export SYSTEMD_PAGER=\1/' -i .pathvariables.sh 
+                sed 's/^#export SYSTEMD_PAGERSECURE=\(.*\)/export SYSTEMD_PAGERSECURE=\1/' -i .pathvariables.sh
+                sed 's/^#export SYSTEMD_COLORS=\(.*\)/export SYSTEMD_COLORS=\1/' -i .pathvariables.sh
+                sed 's/^#export SYSTEMD_LESS=\(.*\)/export SYSTEMD_LESS=\1/' -i .pathvariables.sh    
+                sed 's/^#export SYSTEMD_LOG_LEVEL=\(.*\)/export SYSTEMD_LOG_LEVEL=\1/' -i .pathvariables.sh
+                sed 's/^#export SYSTEMD_LOG_TIME=\(.*\)/export SYSTEMD_LOG_TIME=\1/' -i .pathvariables.sh
+                sed 's/^#export SYSTEMD_LOG_LOCATION=\(.*\)/export SYSTEMD_LOG_LOCATION=\1/' -i .pathvariables.sh
+                sed 's/^#export SYSTEMD_LOG_TID=\(.*\)/export SYSTEMD_LOG_TID=\1/' -i .pathvariables.sh
+                sed 's/^#export SYSTEMD_LOG_TARGET=\(.*\)/export SYSTEMD_LOG_TARGET=\1/' -i .pathvariables.sh
+            fi
+        fi
+
+        pathvariables_r(){ 
+             if ! sudo grep -q "~/.pathvariables.sh" /root/.bashrc; then
+                printf "if [[ -f ~/.pathvariables.sh ]]; then\n" | sudo tee -a /root/.bashrc
+                printf "  . ~/.pathvariables.sh\n" | sudo tee -a /root/.bashrc
+                printf "fi\n" | sudo tee -a /root/.bashrc
+            fi
+            sudo cp -bfv .pathvariables.sh /root/.pathvariables.sh;
+            sudo gio trash /root/.pathvariables.sh~
+        }                                            
+        pathvariables(){
+            if ! grep -q "~/.pathvariables.sh" ~/.bashrc; then
+                echo "if [[ -f ~/.pathvariables.sh ]]; then" >> ~/.bashrc
+                echo "  . ~/.pathvariables.sh" >> ~/.bashrc
+                echo "fi" >> ~/.bashrc
+            fi
+            cp -bfv .pathvariables.sh ~/.pathvariables.sh
+            gio trash ~/.pathvariables.sh~
+            yes_edit_no pathvariables_r ".pathvariables.sh" "Install .pathvariables.sh at /root/?" "edit" "YELLOW"; 
+        }
+        yes_edit_no pathvariables ".pathvariables.sh" "Install .pathvariables.sh at ~/? " "edit" "GREEN"
     fi
-    unset xdgInst
-
-
-    # TODO: check around for other systemdvars 
-    # Check if systemd installed
-    if [ -x "$(command -v systemctl)" ]; then
-        prmpt="${yellow}\tThis will set SYSTEMD pathvariables\n\
-        When setting a new pager for systemd or changing logging specifics\n\
-        Defaults:\n\
-        - SYSTEMD_PAGER=$PAGER\n\
-        - SYSTEMD_COLORS=256\n\
-        - SYSTEMD_PAGERSECURE=1\n\
-        - SYSTEMD_LESS=\"FRXMK\"\n\
-        - SYSTEMD_LOG_LEVEL=\"warning\"\n\
-        - SYSTEMD_LOG_COLOR=\"true\"\n\
-        - SYSTEMD_LOG_TIME=\"true\"\n\
-        - SYSTEMD_LOG_LOCATION=\"true\"\n\
-        - SYSTEMD_LOG_TID=\"true\"\n\
-        - SYSTEMD_LOG_TARGET=\"auto\"\n\
-        "
-        printf "$prmpt"
-        reade -Q "YELLOW" -i "y" -p "Set systemd environment? [Y/n]: " "y n" xdgInst
-        if [ -z "$xdgInst" ] || [ "y" == "$xdgInst" ]; then
-            sed 's/^#export SYSTEMD_PAGER=\(.*\)/export SYSTEMD_PAGER=\1/' -i .pathvariables.sh 
-            sed 's/^#export SYSTEMD_PAGERSECURE=\(.*\)/export SYSTEMD_PAGERSECURE=\1/' -i .pathvariables.sh
-            sed 's/^#export SYSTEMD_COLORS=\(.*\)/export SYSTEMD_COLORS=\1/' -i .pathvariables.sh
-            sed 's/^#export SYSTEMD_LESS=\(.*\)/export SYSTEMD_LESS=\1/' -i .pathvariables.sh    
-            sed 's/^#export SYSTEMD_LOG_LEVEL=\(.*\)/export SYSTEMD_LOG_LEVEL=\1/' -i .pathvariables.sh
-            sed 's/^#export SYSTEMD_LOG_TIME=\(.*\)/export SYSTEMD_LOG_TIME=\1/' -i .pathvariables.sh
-            sed 's/^#export SYSTEMD_LOG_LOCATION=\(.*\)/export SYSTEMD_LOG_LOCATION=\1/' -i .pathvariables.sh
-            sed 's/^#export SYSTEMD_LOG_TID=\(.*\)/export SYSTEMD_LOG_TID=\1/' -i .pathvariables.sh
-            sed 's/^#export SYSTEMD_LOG_TARGET=\(.*\)/export SYSTEMD_LOG_TARGET=\1/' -i .pathvariables.sh
-        fi
-    fi
-
-    pathvariables_r(){ 
-         if ! sudo grep -q "~/.pathvariables.sh" /root/.bashrc; then
-            printf "if [[ -f ~/.pathvariables.sh ]]; then\n" | sudo tee -a /root/.bashrc
-            printf "  . ~/.pathvariables.sh\n" | sudo tee -a /root/.bashrc
-            printf "fi\n" | sudo tee -a /root/.bashrc
-        fi
-        sudo cp -bfv .pathvariables.sh /root/.pathvariables.sh;
-        sudo gio trash /root/.pathvariables.sh~
-    }                                            
-    pathvariables(){
-        if ! grep -q "~/.pathvariables.sh" ~/.bashrc; then
-            echo "if [[ -f ~/.pathvariables.sh ]]; then" >> ~/.bashrc
-            echo "  . ~/.pathvariables.sh" >> ~/.bashrc
-            echo "fi" >> ~/.bashrc
-        fi
-        cp -bfv .pathvariables.sh ~/.pathvariables.sh
-        gio trash ~/.pathvariables.sh~
-        yes_edit_no pathvariables_r ".pathvariables.sh" "Install .pathvariables.sh at /root/?" "edit" "YELLOW"; 
-    }
-    yes_edit_no pathvariables ".pathvariables.sh" "Install .pathvariables.sh at ~/? " "edit" "GREEN"
 fi
 
     # Shell-keybinds
     
-    #if grep -q 'bind -x '\''"\\C-s": ctrl-s'\''' ~/.keybinds.sh && ! grep -q '#bind -x '\''"\\C-s": ctrl-s'\''' ~/.keybinds.sh; then
-    #    sed -i 's|bind -x '\''"\\C-s": ctrl-s'\''|#bind -x '\''"\\C-s": ctrl-s'\''|g' ~/.keybinds.sh
-    #    sed -i 's|bind -x '\''"\\eOR": ctrl-s'\''|#bind -x '\''"\\eOR": ctrl-s'\''|g' ~/.keybinds.sh
+    #if grep -q 'bind -x '\''"\\C-s": ctrl-s'\''' ~/keybinds.bash && ! grep -q '#bind -x '\''"\\C-s": ctrl-s'\''' ~/keybinds.bash; then
+    #    sed -i 's|bind -x '\''"\\C-s": ctrl-s'\''|#bind -x '\''"\\C-s": ctrl-s'\''|g' ~/keybinds.bash
+    #    sed -i 's|bind -x '\''"\\eOR": ctrl-s'\''|#bind -x '\''"\\eOR": ctrl-s'\''|g' ~/keybinds.bash
     #fi
 
-    if [ -f ~/.keybinds.sh ] && grep -q 'bind -x '\''"\\201": ranger'\''' ~/.keybinds.sh; then
-        sed -i 's|bind -x '\''"\\201": ranger'\''|#bind -x '\''"\\201": ranger'\''|g' ~/.keybinds.sh
-        sed -i 's|bind '\''"\\eOQ":|#bind '\''"\\eOQ":|g' ~/.keybinds.sh
+    if [ -f ~/.keybinds.d/keybinds.bash ] && grep -q 'bind -x '\''"\\201": ranger'\''' ~/.keybinds.d/keybinds.bash; then
+        sed -i 's|bind -x '\''"\\201": ranger'\''|#bind -x '\''"\\201": ranger'\''|g' ~/.keybinds.d/keybinds.bash
+        sed -i 's|bind '\''"\\eOQ":|#bind '\''"\\eOQ":|g' ~/.keybinds.d/keybinds.bash
     fi
 
     shell-keybinds_r(){ 
-        if ! sudo grep -q "/root/.keybinds.sh" /root/.bashrc; then
-            printf "if [[ -f /root/.keybinds.sh ]]; then\n" | sudo tee -a /root/.bashrc
-            printf "  . /root/.keybinds.sh\n" | sudo tee -a /root/.bashrc
-            printf "fi\n" | sudo tee -a /root/.bashrc
-        fi
+        . ./checks/check_keybinds.sh
         if [ -f /root/.pathvariables.sh ]; then
            sudo sed -i 's|#export INPUTRC|export INPUTRC|g' /root/.pathvariables.sh
         fi
-        sudo cp -bfv readline/.keybinds.sh /root/;
-        sudo gio trash /root/.keybinds.sh~
-        sudo cp -bfv readline/.inputrc /root/;
+        sudo cp -bfv keybinds/keybinds.bash /root/.keybinds.d/;
+        sudo gio trash /root/.keybinds.d/keybinds.bash~
+        sudo cp -bfv keybinds/.inputrc /root/ ;
         sudo gio trash /root/.inputrc~
 
         # X based settings is generally not for root and will throw errors 
-        if sudo grep -q '^setxkbmap' /root/.keybinds.sh; then
-            sudo sed -i 's|setxkbmap|#setxkbmap|g' /root/.keybinds.sh
+        if sudo grep -q '^setxkbmap' /root/.keybinds.d/keybinds.bash; then
+            sudo sed -i 's|setxkbmap|#setxkbmap|g' /root/.keybinds.d/keybinds.bash
         fi
     }
     shell-keybinds() {
         reade -Q "YELLOW" -i "n" -p "Set caps to escape? (Might cause X11 errors with SSH) [Y/n]: " "y n" xtrm
         if [ "$xtrm" != "y" ] && ! [ -z "$xtrm" ]; then
-            sed -i "s|setxkbmap |#setxkbmap |g" readline/.keybinds.sh
+            sed -i "s|setxkbmap |#setxkbmap |g" keybinds/keybinds.bash
         fi
         
-        if ! grep -q "~/.keybinds.sh" ~/.bashrc; then
-            echo "if [[ -f ~/.keybinds.sh ]]; then" >> ~/.bashrc
-            echo "  . ~/.keybinds.sh" >> ~/.bashrc
-            echo "fi" >> ~/.bashrc
-        fi 
-        
-        cp -bfv readline/.keybinds.sh ~/
-        gio trash ~/.keybinds.sh~
-        cp -bfv readline/.inputrc ~/
+        cp -bfv keybinds/keybinds.bash ~/.keybinds.d/
+        gio trash ~/.keybinds.d/keybinds.bash~
+        cp -bfv keybinds/.inputrc ~/
         gio trash ~/.inputrc~
         if [ -f ~/.pathvariables.sh ]; then
            sed -i 's|#export INPUTRC|export INPUTRC|g' ~/.pathvariables.sh
         fi
-        yes_edit_no shell-keybinds_r "readline/.inputrc readline/.keybinds.sh" "Install .inputrc and .keybinds.sh at /root/?" "edit" "RED"; 
+        yes_edit_no shell-keybinds_r "keybinds/.inputrc keybinds/keybinds.bash" "Install .inputrc and keybinds.bash at /root/ and /root/.keybinds.d/?" "edit" "RED"; 
     }
-    yes_edit_no shell-keybinds "readline/.inputrc readline/.keybinds.sh" "Install .inputrc and .keybinds.sh at ~/? (readline configuration)" "edit" "YELLOW"
+    yes_edit_no shell-keybinds "keybinds/.inputrc keybinds/keybinds.bash" "Install .inputrc and keybinds.bash at ~/ and ~/.keybinds.d/? (keybinds configuration)" "edit" "YELLOW"
 
     # Xresources
     
@@ -362,7 +354,7 @@ fi
         cp -bfv xterm/.Xresources ~/.Xresources;
         gio trash ~/.Xresources~
         yes_edit_no xresources_r "xterm/.Xresources" "Install .Xresources at /root/.bash_aliases.d/?" "edit" "RED"; }
-    yes_edit_no xresources "xterm/.Xresources" "Install .Xresources at ~/.bash_aliases.d/? (readline config)" "edit" "YELLOW"
+    yes_edit_no xresources "xterm/.Xresources" "Install .Xresources at ~/.bash_aliases.d/? (keybinds config)" "edit" "YELLOW"
     
 
 ./checks/check_completions_dir.sh
@@ -383,7 +375,7 @@ unset pycomp
 
 
 # Osc
-reade -Q "GREEN" -i "y" -p "Install Osc? (Universal clipboard tool / works better then xclip over ssh) [Y/n]: " "y n" osc
+reade -Q "GREEN" -i "y" -p "Install Osc52 clipaboard? (Universal clipboard tool / works natively over ssh) [Y/n]: " "y n" osc
 if [ -z $osc ] || [ "Y" == $osc ] || [ $osc == "y" ]; then
     ./install_osc.sh 
 fi
@@ -396,9 +388,22 @@ if [ -z $bat ] || [ "Y" == $bat ] || [ $bat == "y" ]; then
 fi
 unset bat
 
-
 # Autojump
 ./install_autojump.sh
+
+# Starship
+reade -Q "GREEN" -i "y" -p "Install Starship? (Snazzy looking prompt) [Y/n]: " "y n" strshp
+if [ $strshp == "y" ]; then
+    ./install_starship.sh 
+fi
+unset strshp
+
+# Fzf (Fuzzy Finder)
+reade -Q "GREEN" -i "y" -p "Install fzf? (Fuzzy file/folder finder - keybinding yes for upgraded Ctrl-R/reverse-search, fzf filenames on Ctrl+T and fzf-version of 'cd' on Alt-C + Custom script: Ctrl-f becomes system-wide file opener) [Y/n]: " "y n" findr
+if [ "y" == "$findr" ]; then
+    ./install_fzf.sh
+fi
+unset findr
 
 # Moar (Custom pager instead of less)
 reade -Q "GREEN" -i "y" -p "Install moar? (Custom pager instead of less with linenumbers) [Y/n]: " "y n" moar
@@ -413,7 +418,6 @@ if [ "y" == "$nvm" ]; then
     . ./install_nvim.sh
 fi
 unset nvm
-
 
 # Rangercom -bar W exe 'w !sudo tee >/dev/null %:p:S' | setl nomodcom -bar W exe 'w !sudo tee >/dev/null %:p:S' | setl nomodcom -bar W exe 'w !sudo tee >/dev/null %:p:S' | setl nomodcom -bar W exe 'w !sudo tee >/dev/null %:p:S' | setl nomodcom -bar W exe 'w !sudo tee >/dev/null %:p:S' | setl nomodcom -bar W exe 'w !sudo tee >/dev/null %:p:S' | setl nomodcom -bar W exe 'w !sudo tee >/dev/null %:p:S' | setl nomod (File explorer)
 reade -Q "GREEN" -i "y" -p "Install Ranger? (Terminal file explorer) [Y/n]: " "y n" rngr
@@ -436,19 +440,7 @@ if [ "y" == "$kittn" ]; then
 fi
 unset kittn
 
-# Fzf (Fuzzy Finder)
-reade -Q "GREEN" -i "y" -p "Install fzf? (Fuzzy file/folder finder - keybinding yes for upgraded Ctrl-R/reverse-search, fzf filenames on Ctrl+T and fzf-version of 'cd' on Alt-C + Custom script: Ctrl-f becomes system-wide file opener) [Y/n]: " "y n" findr
-if [ "y" == "$findr" ]; then
-    ./install_fzf.sh
-fi
-unset findr
 
-# Starship
-reade -Q "GREEN" -i "y" -p "Install Starship? (Snazzy looking prompt) [Y/n]: " "y n" strshp
-if [ $strshp == "y" ]; then
-    ./install_starship.sh 
-fi
-unset strshp
 
 reade -Q "GREEN" -i "y" -p "Install bash aliases and other config? [Y/n]:" "y n" scripts
 if [ -z $scripts ] || [ "y" == $scripts ]; then
@@ -481,8 +473,8 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         unset cat
         cp -bfv aliases/general.sh ~/.bash_aliases.d/
         gio trash ~/.bash_aliases.d/general.sh~
-        yes_edit_no general_r "aliases/general.sh readline/rlwrap_scripts.sh" "Install general.sh and rlwrap_scripts.sh at /root/?" "yes" "GREEN"; }
-        yes_edit_no general "aliases/general.sh readline/rlwrap_scripts.sh" "Install general.sh and rlwrap_scripts.sh at ~/? (aliases related to general actions - cd/mv/cp/rm + completion script replacement for 'read -e') " "yes" "YELLOW"
+        yes_edit_no general_r "aliases/general.sh" "Install general.sh at /root/?" "yes" "GREEN"; }
+        yes_edit_no general "aliases/general.sh" "Install general.sh at ~/? (aliases related to general actions - cd/mv/cp/rm + completion script replacement for 'read -e') " "yes" "YELLOW"
 
     bash_yes_r(){ 
         sudo cp -bfv aliases/bash.sh /root/.bash_aliases.d/; 

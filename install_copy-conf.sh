@@ -1,5 +1,5 @@
 # !/bin/bash
-. ./readline/rlwrap_scripts.sh
+. ./aliases/rlwrap_scripts.sh
 . ./checks/check_distro.sh
 
 reade -Q "GREEN" -i "y" -p "Install copy-to? (Python tool for copying between 2 maps) [Y/n]:" "y n" cpcnf

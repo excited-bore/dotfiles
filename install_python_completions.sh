@@ -1,5 +1,5 @@
 . ./checks/check_distro.sh
-. ./readline/rlwrap_scripts.sh
+. ./aliases/rlwrap_scripts.sh
 . ./checks/check_completions_dir.sh
 
 if [ -x "$(command -v argcomplete)" ]; then

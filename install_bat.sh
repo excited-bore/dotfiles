@@ -1,5 +1,5 @@
 # !/bin/bash
-. ./readline/rlwrap_scripts.sh
+. ./aliases/rlwrap_scripts.sh
 
 if [ "$(which bat)" == "" ]; then 
     if [ $distro_base == "Arch" ];then

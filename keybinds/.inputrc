@@ -5,9 +5,9 @@ $include /etc/inputrc
 
 # Vi style editing shortcuts/interface
 # https://unix.stackexchange.com/questions/303479/what-are-readlines-modes-keymaps-and-their-default-bindings
-set editing-mode emacs
+#set editing-mode vi
 
-# Show whether it's normal or insert mode
+# Show whether it's normal or insert mode (@ - Change back with Alt-p)
 set show-mode-in-prompt on
 
 # You can set a different cursor shape for each mode by using "\1 .. \2" escapes: 
@@ -18,6 +18,8 @@ $else
 	set vi-ins-mode-string \1\e[6 q\2
 	set vi-cmd-mode-string \1\e[2 q\2
 $endif
+
+
 # https://stackoverflow.com/questions/67535351/how-to-provide-arguments-to-readline-functions-via-inputrc
 set comment-begin #
 

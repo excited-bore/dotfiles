@@ -13,7 +13,7 @@ if ! grep -q "~/.bash_aliases.d" ~/.bashrc; then
 fi
 
 cp -bfv checks/check_distro.sh ~/.bash_aliases.d/check_distro.sh
-cp -bfv readline/rlwrap_scripts.sh ~/.bash_aliases.d/rlwrap_scripts.sh
+cp -bfv aliases/rlwrap_scripts.sh ~/.bash_aliases.d/rlwrap_scripts.sh
 gio trash ~/.bash_aliases.d/check_distro.sh~ ~/.bash_aliases.d/rlwrap_scripts.sh~
 
 
@@ -26,5 +26,5 @@ if ! sudo grep -q "~/.bash_aliases.d" /root/.bashrc; then
 fi
 
 sudo cp -fvb checks/check_distro.sh /root/.bash_aliases.d/check_distro.sh
-sudo cp -fvb readline/rlwrap_scripts.sh /root/.bash_aliases.d/rlwrap_scripts.sh 
+sudo cp -fvb aliases/rlwrap_scripts.sh /root/.bash_aliases.d/rlwrap_scripts.sh 
 sudo gio trash /root/.bash_aliases.d/check_distro.sh~ /root/.bash_aliases.d/rlwrap_scripts.sh~

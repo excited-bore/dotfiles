@@ -1,7 +1,7 @@
  #DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 . ./checks/check_distro.sh
 . ./checks/check_pathvar.sh
-. ./readline/rlwrap_scripts.sh
+. ./aliases/rlwrap_scripts.sh
 
 answer=""
 if [ ! -x "$(command -v moar)" ]; then

@@ -1,6 +1,6 @@
 . ./checks/check_distro.sh
 . ./checks/check_pathvar.sh
-. ./readline/rlwrap_scripts.sh
+. ./aliases/rlwrap_scripts.sh
 
 if [ $distro == "Manjaro" ]; then
     yes | pamac install flatpak libpamac-flatpak-plugin python

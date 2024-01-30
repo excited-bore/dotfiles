@@ -1,5 +1,5 @@
 #!/bin/bash
-. ./readline/rlwrap_scripts.sh
+. ./aliases/rlwrap_scripts.sh
 . ./checks/check_completions_dir.sh
 
 

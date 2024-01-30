@@ -247,11 +247,10 @@ alias cat="bat"
 # Listen hidden files and permissions
 alias lsall="ls -Al"
 alias q="exit"
+alias d="dirs"
 alias c="cd"
 alias x="cd .."
 
-# All man pages
-alias man="man -a"
 # (:
 alias men="man man"
 

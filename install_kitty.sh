@@ -1,7 +1,7 @@
 #!/bin/bash
 . ./checks/check_distro.sh
 . ./checks/check_pathvar.sh
-. ./readline/rlwrap_scripts.sh
+. ./aliases/rlwrap_scripts.sh
 
 if ! [ -x "$(command -v kitty)" ]; then
     if [ "$distro" == "Arch" ] || [ "$distro_base" == "Arch" ]; then

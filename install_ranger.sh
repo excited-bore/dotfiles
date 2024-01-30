@@ -1,7 +1,7 @@
  # !/bin/bash
 . ./checks/check_distro.sh
 . ./checks/check_pathvar.sh 
-. ./readline/rlwrap_scripts.sh
+. ./aliases/rlwrap_scripts.sh
 
  # Ranger (File explorer)
  if [ -x "$(command -v ranger)" ]; then
@@ -50,13 +50,13 @@ yes_edit_no rangr_cnf "ranger/rc.conf ranger/rifle.conf" "Install predefined con
 reade -Q "GREEN" -i "y" -p "F2 for Ranger? [Y/n]:" "y n" rf2
 if [ -z "$rf2" ] || [ "y" == "$rf2" ]; then
     binds=~/.bashrc
-    if [ -f ~/.keybinds.sh ]; then
-        binds=~/.keybinds.sh
+    if [ -f ~/.keybinds.d/keybinds.bash ]; then
+        binds=~/.keybinds.d/keybinds.bash
     fi
-    if [ -f ~/.keybinds.sh ]; then
-        if grep -q '#bind -x '\''"\\201": ranger'\''' ~/.keybinds.sh; then
-            sed -i 's|#bind -x '\''"\\201": ranger'\''|bind -x '\''"\\201": ranger'\''|g' ~/.keybinds.sh
-            sed -i 's|#bind '\''"\\eOQ": "\\201\\n\\C-l"'\''|bind '\''"\\eOQ": "\\201\\n\\C-l"'\''|g' ~/.keybinds.sh
+    if [ -f ~/.keybinds.d/keybinds.bash ]; then
+        if grep -q '#bind -x '\''"\\201": ranger'\''' ~/.keybinds.d/keybinds.bash; then
+            sed -i 's|#bind -x '\''"\\201": ranger'\''|bind -x '\''"\\201": ranger'\''|g' ~/.keybinds.d/keybinds.bash
+            sed -i 's|#bind '\''"\\eOQ": "\\201\\n\\C-l"'\''|bind '\''"\\eOQ": "\\201\\n\\C-l"'\''|g' ~/.keybinds.d/keybinds.bash
         fi
     elif ! grep -q 'bind -x '\''"\\201": ranger'\''' ~/.bashrc; then
         echo 'bind -x '\''"\\201": ranger'\''' >> ~/.bashrc

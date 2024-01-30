@@ -1,4 +1,4 @@
-. ./readline/rlwrap_scripts.sh
+. ./aliases/rlwrap_scripts.sh
 . ./checks/check_distro.sh
 
 if [ "$distro_base" == "Arch" ]; then

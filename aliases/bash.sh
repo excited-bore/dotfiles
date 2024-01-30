@@ -39,7 +39,7 @@ _groups(){
 }
 
 man-bash(){
-    help -m $@ | $PAGER;
+    help -m $@ | $MANPAGER;
 }
 
 complete -F _builtins man-bash

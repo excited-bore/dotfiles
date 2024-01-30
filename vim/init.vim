@@ -185,6 +185,22 @@ if (has("termguicolors"))
     set termguicolors
 endif 
 
+" Read gz files without opening them
+" https://stackoverflow.com/questions/5396363/how-to-open-gzip-text-files-in-gvim-without-unzipping
+augroup gzip
+ autocmd!
+ autocmd BufReadPre,FileReadPre *.gz set bin
+ autocmd BufReadPost,FileReadPost   *.gz '[,']!gunzip
+ autocmd BufReadPost,FileReadPost   *.gz set nobin
+ autocmd BufReadPost,FileReadPost   *.gz execute ":doautocmd BufReadPost " . expand("%:r")
+ autocmd BufWritePost,FileWritePost *.gz !mv <afile> <afile>:r
+ autocmd BufWritePost,FileWritePost *.gz !gzip <afile>:r
+ autocmd FileAppendPre      *.gz !gunzip <afile>
+ autocmd FileAppendPre      *.gz !mv <afile>:r <afile>
+ autocmd FileAppendPost     *.gz !mv <afile> <afile>:r
+ autocmd FileAppendPost     *.gz !gzip <afile>:r
+augroup END
+
 
 "Fix python3 interpreter
 let g:python3_host_prog = '/usr/bin/python3'
@@ -299,6 +315,10 @@ Plugin 'preservim/nerdcommenter'
 "let g:minimap_git_colors = 1
 "let g:minimap_auto_start_win_enter = 1
 
+" Vim pager
+"Plugin 'rkitover/vimpager'
+"set rtp^=/usr/bin/vimpager
+
 " Self documenting vim wiki
 Plugin 'vimwiki/vimwiki'
 
@@ -357,6 +377,56 @@ nnoremap <Tab>   i<tab><esc><right>
 "Visual mode 
 vnoremap <Tab>   >gv
 vnoremap <S-Tab> <gv 
+
+"nnoremap <C-S-d>    <Down>"*dd<Up>
+"inoremap <expr> <C-S-d> (col(".") ==? 1 ? '<C-\><C-o>daW' : '<C-\><C-o>diW')
+"vnoremap <C-S-d>    "*D
+
+"a => Insert
+"nnoremap a i
+"vnoremap a i
+
+"A => Append
+"nnoremap A a
+"vnoremap A a
+
+"Ctrl-a => Toggle insert
+nnoremap <C-a> i
+inoremap <C-a> <esc>l
+vnoremap <C-a> i
+
+
+"Ctrl-Shift-a => Begin at next line
+"nnoremap <C-a> o
+"inoremap <C-S-a> <esc>
+"vnoremap <C-S-a> o
+
+"Alt-A => Replace (insert variant)
+nnoremap <A-a> R
+inoremap <A-a> <Esc>l
+vnoremap <A-a> R
+
+" Ctrl-Alt-A => Virtual Replace mode                    
+" This mode differs from replace in that it plays nicely with tabs and spaces in files
+nnoremap <C-A-a> gR
+inoremap <C-A-a> <Esc>
+vnoremap <C-A-a> <Esc>gR 
+
+" S (instead of v) becomes \"select mode" or something
+" S => visual mode
+nnoremap s v
+vnoremap s v
+nnoremap S V
+vnoremap S V
+
+"Ctrl-Shift-s => Visual block mode
+nnoremap <A-s> <C-q>
+vnoremap <A-s> <C-q> 
+inoremap <A-s> <C-o><C-q>
+""Ctrl-Alt-S => Visual line mode
+nnoremap <C-A-s> V
+vnoremap <C-A-s> <Esc> 
+inoremap <C-A-s> <C-o>V
 
 
 " Use tab for trigger completion with characters ahead and navigate
@@ -1006,54 +1076,3 @@ vnoremap <C-d>  "*d
 
 cnoremap <C-c> <C-f>
 cnoremap <C-v>  <C-r><C-o>"
-
-
-"nnoremap <C-S-d>    <Down>"*dd<Up>
-"inoremap <expr> <C-S-d> (col(".") ==? 1 ? '<C-\><C-o>daW' : '<C-\><C-o>diW')
-"vnoremap <C-S-d>    "*D
-
-"a => Insert
-"nnoremap a i
-"vnoremap a i
-
-"A => Append
-"nnoremap A a
-"vnoremap A a
-
-"Ctrl-a => Toggle insert
-nnoremap <C-a> i
-inoremap <C-a> <esc>l
-vnoremap <C-a> i
-
-
-"Ctrl-Shift-a => Begin at next line
-"nnoremap <C-a> o
-"inoremap <C-S-a> <esc>
-"vnoremap <C-S-a> o
-
-"Alt-A => Replace (insert variant)
-nnoremap <A-a> R
-inoremap <A-a> <Esc>l
-vnoremap <A-a> R
-
-" Ctrl-Alt-A => Virtual Replace mode                    
-" This mode differs from replace in that it plays nicely with tabs and spaces in files
-nnoremap <C-A-a> gR
-inoremap <C-A-a> <Esc>
-vnoremap <C-A-a> <Esc>gR 
-
-" S (instead of v) becomes \"select mode" or something
-" S => visual mode
-nnoremap s v
-vnoremap s v
-nnoremap S V
-vnoremap S V
-
-"Ctrl-Shift-s => Visual block mode
-nnoremap <A-s> <C-q>
-vnoremap <A-s> <C-q> 
-inoremap <A-s> <C-o><C-q>
-""Ctrl-Alt-S => Visual line mode
-nnoremap <C-A-s> V
-vnoremap <C-A-s> <Esc> 
-inoremap <C-A-s> <C-o>V

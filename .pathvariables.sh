@@ -30,10 +30,11 @@ export TMPDIR=/tmp
 #export SUDO_ASKPASS=/usr/lib/ssh/x11-ssh-askpass
 
 # PAGER
-export PAGER=/usr/bin/moar
+export PAGER=/usr/bin/less
+export MANPAGER='nvim +Man! -o'
 
 # LESS
-export LESS="  --CLEAR-SCREEN --redraw-on-quit --LINE-NUMBERS --line-num-width=2 --window=10 --use-color --color=Ng$ --color=Scb$ --color=Pkg$ --IGNORE-CASE --LONG-PROMPT --chop-long-lines --underline-special --mouse --QUIET --status-line --no-vbell --follow-name --exit-follow-on-close"
+export LESS=" --CLEAR-SCREEN --redraw-on-quit --LINE-NUMBERS --line-num-width=2 --window=10 --use-color --color=Ng$ --color=Scb$ --color=Pkg$ --IGNORE-CASE --LONG-PROMPT --chop-long-lines --underline-special --mouse --QUIET --status-line --no-vbell --follow-name --exit-follow-on-close"
 #export LESSEDIT=$EDITOR
 
 # MOAR
