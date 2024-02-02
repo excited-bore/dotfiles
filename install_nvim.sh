@@ -178,7 +178,7 @@ elif [  $distro_base == "Debian" ];then
         cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
         sudo cpanm --sudo -n Neovim::Ext
     fi
-    if [ "$(which ctags)" != ""]; then
+    if [ "$(which ctags)" != "" ]; then
         reade -Q "GREEN" -i "y" -p "Install ctags? [Y/n]:" "y n" ctags
         if  [ "y" == $ctags ]; then
             yes | sudo apt install ctags

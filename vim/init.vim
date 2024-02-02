@@ -1055,15 +1055,33 @@ inoremap <A-d> <Esc>cc
 "" Best register no register
 "" https://stackoverflow.com/questions/22598644/vim-copy-non-linewise-without-leading-or-trailing-spaces
 
+if (!has('nvim') && !has('clipboard_working'))
+    " In the event that the clipboard isn't working, it's quite likely that
+    " the + and * registers will not be distinct from the unnamed register. In
+    " this case, a:event.regname will always be '' (empty string). However, it
+    " can be the case that `has('clipboard_working')` is false, yet `+` is
+    " still distinct, so we want to check them all.
+    let s:VimOSCYankPostRegisters = ['', '+', '*']
+    function! s:VimOSCYankPostCallback(event)
+        if a:event.operator == 'y' && index(s:VimOSCYankPostRegisters, a:event.regname) != -1
+            call OSCYankRegister(a:event.regname)
+        endif
+    endfunction
+    augroup VimOSCYankPost
+        autocmd!
+        autocmd TextYankPost * call s:VimOSCYankPostCallback(v:event)
+    augroup END
+endif
+
 "nnoremap <C-c>  "+^yg_ 
-nnoremap <silent><C-c> <Plug>OSCYankOperator_
+nnoremap <silent><C-c> ^<Plug>OSCYankOperator_
 nnoremap <silent><C-v> "+Pl
 nnoremap <C-d>  (col(".") ==? 1 ? '<C-\><C-o>daw' : '<C-\><C-o>diw')
 
 """ Copy inner word except when on first line (copy a word)
 "inoremap <expr> <C-c>   (col(".") ==? 1 ? '<C-\><C-o>"+yaw' : '<C-\><C-o>"+yiw')
-"" Copy entire line
-inoremap <silent><C-c>   <C-\><C-o><Plug>OSCYankOperator_
+" Copy entire line
+inoremap <silent><C-c>   <C-\><C-o>^<C-\><C-o><Plug>OSCYankOperator_
 "" Paste with P if at beginning of line
 inoremap <silent> <C-v> <C-\><C-o>"+P
 "" Cut with a word instead of inner word if at beginning of line

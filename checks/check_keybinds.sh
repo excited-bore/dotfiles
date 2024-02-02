@@ -18,7 +18,7 @@ if ! sudo test -d /root/.keybinds.d/ ; then
 fi
 
 if ! sudo grep -q "~/.keybinds.d" /root/.bashrc; then
-    printf "\nif [ -d ~/.keybinds.d/ ] && [ \"\$(ls -A ~/.keybinds.d/)\" ]; then\n  for comp in ~/.keybinds.d/*.bash; do\n      . \"\$comp\" \n  done\nfi" | sudo tee -a /root/.bashrc > /dev/null
+    printf "\nif [ -d ~/.keybinds.d/ ] && [ \"\$(ls -A ~/.keybinds.d/)\" ]; then\n  for comp in ~/.keybinds.d/*.bash; do\n      . \"\$comp\" \n  done\nfi\n" | sudo tee -a /root/.bashrc > /dev/null
 fi
 
 KEYBIND=~/.bashrc

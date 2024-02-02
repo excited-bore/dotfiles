@@ -330,7 +330,7 @@ fi
         
         . ./checks/check_keybinds.sh
         
-        reade -Q "GREEN" -i "y" -p "Enable vi-mode instead of emacs? [Y/n]: " "y n" vimde
+        reade -Q "GREEN" -i "y" -p "Enable vi-mode instead of emacs mode? [Y/n]: " "y n" vimde
         if [ "$vimde" == "y" ]; then
             sed -i "s|.set editing-mode .*|set editing-mode vi|g" keybinds/.inputrc
         fi
@@ -360,7 +360,7 @@ fi
         sudo cp -bfv xterm/.Xresources /root/.Xresources;
         sudo gio trash /root/.Xresources~
         }
-    xresources(){
+    xresources() {
         cp -bfv xterm/.Xresources ~/.Xresources;
         gio trash ~/.Xresources~
         yes_edit_no xresources_r "xterm/.Xresources" "Install .Xresources at /root/.bash_aliases.d/?" "edit" "RED"; }
@@ -406,7 +406,11 @@ fi
 unset findr
 
 # Autojump
-./install_autojump.sh
+reade -Q "GREEN" -i "y" -p "Install autojump? [Y/n]:" "y n" tojump
+if [ "$tojump" == "y" ]; then
+    ./install_autojump.sh
+fi
+unset tojump
 
 # Starship
 reade -Q "GREEN" -i "y" -p "Install Starship? (Snazzy looking prompt) [Y/n]: " "y n" strshp
@@ -430,7 +434,7 @@ if [ "y" == "$nvm" ]; then
 fi
 unset nvm
 
-# Rangercom -bar W exe 'w !sudo tee >/dev/null %:p:S' | setl nomodcom -bar W exe 'w !sudo tee >/dev/null %:p:S' | setl nomodcom -bar W exe 'w !sudo tee >/dev/null %:p:S' | setl nomodcom -bar W exe 'w !sudo tee >/dev/null %:p:S' | setl nomodcom -bar W exe 'w !sudo tee >/dev/null %:p:S' | setl nomodcom -bar W exe 'w !sudo tee >/dev/null %:p:S' | setl nomodcom -bar W exe 'w !sudo tee >/dev/null %:p:S' | setl nomod (File explorer)
+# Ranger (File explorer)
 reade -Q "GREEN" -i "y" -p "Install Ranger? (Terminal file explorer) [Y/n]: " "y n" rngr
 if [ "y" == "$rngr" ]; then
     ./install_ranger.sh
@@ -471,12 +475,12 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
             sed -i 's|alias mv="mv-trash -v"|#alias mv="mv-trash -v"|g' aliases/general.sh
         fi
         unset ansr
-        reade -Q "GREEN" -i "y" -p "Set 'gio trash' alias for rm? [Y/n]:" "y n" ansr 
+        reade -Q "YELLOW" -i "n" -p "Set 'gio trash' alias for rm? [Y/n]:" "y n" ansr 
         if [ "$ansr" != "y" ]; then
             sed -i 's|alias rm="trash"|#alias rm="trash"|g' aliases/general.sh
         fi
         if [ -x "$(command -v bat)" ]; then
-            reade -Q "GREEN" -i "y" -p "Set a 'bat' alias for cat? [Y/n]" "y n" cat
+            reade -Q "GREEN" -i "y" -p "Set 'cat' as alias for 'bat'? [Y/n]" "y n" cat
             if [ "$cat" != "y" ]; then
                 sed -i 's|alias cat="bat"|#alias cat="bat"|g' aliases/general.sh
             fi
@@ -486,16 +490,6 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         gio trash ~/.bash_aliases.d/general.sh~
         yes_edit_no general_r "aliases/general.sh" "Install general.sh at /root/?" "yes" "GREEN"; }
         yes_edit_no general "aliases/general.sh" "Install general.sh at ~/? (aliases related to general actions - cd/mv/cp/rm + completion script replacement for 'read -e') " "yes" "YELLOW"
-
-    bash_yes_r(){ 
-        sudo cp -bfv aliases/bash.sh /root/.bash_aliases.d/; 
-        sudo gio trash /root/.bash_aliases.d/bash.sh~;
-    }
-    bash_yes() {
-        cp -bfv aliases/bash.sh ~/.bash_aliases.d/;
-        gio trash ~/.bash_aliases.d/bash.sh~
-        yes_edit_no bash_yes_r "aliases/bash.sh" "Install bash.sh at /root/?" "yes" "YELLOW"; }
-    yes_edit_no bash_yes "aliases/bash.sh" "Install bash.sh at ~/? (bash specific aliases)?" "yes" "GREEN";
 
     systemd_r(){ 
         sudo cp -bfv aliases/systemctl.sh /root/.bash_aliases.d/;
@@ -558,7 +552,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         gio trash ~/.bash_aliases.d/git.sh~
         
         if [ -x $(command -v fzf) ]; then
-            reade -Q "GREEN" -i "y" -p "Fzf detected. Install fzf-git? (Extra fzf stuff on leader-key C-g)" "y n" gitfzf
+            reade -Q "GREEN" -i "y" -p "Fzf detected. Install fzf-git? (Extra fzf stuff on leader-key C-g): [Y/n]: /" "y n" gitfzf
             if [ "$fzfgit" == "y" ]; then
                 . ./checks/check_aliases_dir.sh
                 wget https://raw.githubusercontent.com/junegunn/fzf-git.sh/main/fzf-git.sh -P ~/.bash_aliases.d/

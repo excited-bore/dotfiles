@@ -5,7 +5,7 @@ $include /etc/inputrc
 
 # Vi style editing shortcuts/interface
 # https://unix.stackexchange.com/questions/303479/what-are-readlines-modes-keymaps-and-their-default-bindings
-#set editing-mode vi
+set editing-mode vi
 
 # Show whether it's normal or insert mode (@ - Change back with Alt-p)
 set show-mode-in-prompt on

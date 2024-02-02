@@ -1,5 +1,5 @@
 if [ ! -f ~/.bash_aliases.d/rlwrap_scripts.sh ]; then
-    . ../readline/rlwrap_scripts.sh
+    . ../aliases/rlwrap_scripts.sh
 else
     . ~/.bash_aliases.d/rlwrap_scripts.sh
 fi
@@ -32,51 +32,113 @@ complete -F _filedir cpAllTo
 
 alias cpf-bckup="cp -f -b"
 
-complete -F _files copy-force-trash
-
-function cpf-trash(){
-    local dest="${@: -1}"
-    local sorce=()
-    local target=0
-    local i=0
-    for arg in $@ ; do
-        i=$((i+1))
-        case "$arg" in
-            -b | --backup)  echo "-b/--backup flag already given.";
-                return 0 ;;
-            -f | --force)   echo "-f/--force flag already given.";
-                return 0 ;;
-            -t | --target-directory)  
-                target=1
-                dest="${@: i+1:1}" ;;
-        esac
-    done
-    
-    cp -f -b "$@"
-    
-    if [ -d "$dest" ]; then
-        target=1
-    fi
-    
-    if [ $target == 1 ] ; then
-        for s in "${sorce[@]}"; do
-            if [ -a "$dest/$s~" ]; then 
-                trash "$dest/$(basename $s~)" 
-            fi 
-        done
-    else
-        if [ -a "$dest~" ]; then
-            trash "$dest~"
-        fi
-    fi
-    echo "Backup(s) put in trash. Use 'gio trash --list' to list / 'gio trash --restore' to restore"
-}
+#function cp-reverse(){
+#    getopt -T
+#    if [ "$?" != 4 ]; then
+#        echo 2>&1 "Wrong version of 'getopt' detected, exiting..."
+#        exit 1
+#    fi
+#    local dest="${@: -1:1}"
+#    local sorce=()
+#    local target=0
+#    local args=$@
+#    #VALID_ARGS=$(getopt -o abdfiHlPpRrsStTuvxZ --long \
+#    #archive, \
+#    #attributes-only, \
+#    #backup:, \
+#    #copy-contents, \
+#    #debug, \
+#    #force, \
+#    #interactive, \
+#    #link, \
+#    #no-dereference, \
+#    #preserve:, \
+#    #no-preserve:, \
+#    #parents¸ \
+#    #recursive, \
+#    #reflink:, \
+#    #remove-destination, \
+#    #sparse:, \
+#    #strip-trailing-slashes, \
+#    #symbolic-link, \
+#    #suffix:, \
+#    #target-directory:, \
+#    #no-target-directory, \
+#    #update:, \
+#    #verbose, \
+#    #one-file-system, \
+#    #context:, \
+#    #help, \
+#    #version -- "$@")
+#    #
+#    #eval set -- "$VALID_ARGS"
+#    
+#    while : ; do
+#        case "$1" in
+#            --backup | --preserve | --no-preserve | --sparse | -S | --suffix | -u | --update | --context)         
+#                if [ "$2" ] && ([ "$2" == "none" ] || [ "$2" == "off" ] || [ $2 == "numbered" ] || [ $2 == "t" ] || [ $2 == "existing" ] || [ $2 == "simple" ] || [ $2 == "never" ]); then 
+#                    shift 2
+#                else
+#                    shift
+#                fi
+#               ;;
+#             --target-directory | -!(-*)t)  
+#                target=1
+#                if test -d "$2"; then
+#                    dest="$2" 
+#                    shift 2 
+#                fi
+#                ;;
+#            -* | --*)  
+#                shift 
+#                ;;
+#            --) 
+#                shift
+#                break
+#                ;;
+#            *) 
+#                break
+#                ;;
+#        esac
+#    done
+#
+#    for arg in $@; do
+#        echo $arg
+#        for arg1 in ${args} ; do
+#            if [[ "$arg" == "$arg1" ]] ; then
+#                args=("${args[@]/$arg}")
+#            fi
+#        done
+#        if [[ "$arg" != "$dest" ]]; then
+#            sorce+=("$arg")
+#        fi
+#    done 
+#    
+#    if test -d "$dest"; then
+#        target=1
+#    fi
+#    if test "$target" == 1 ; then
+#        for s in "${sorce[@]}"; do
+#            if test -a "$dest/$(basename $s)"; then 
+#                echo ${args[@]}
+#                cp "${args[@]}" "$(dirname $dest)/$(basename $s)" "$s" 
+#            else
+#                echo "Files that were previously the destination have not been found"
+#            fi 
+#        done
+#    else
+#        if [[ "${#sorce[@]}" == 1 ]]; then
+#            cp  ${args[@]} "$dest" "${sorce[0]}" 
+#        fi  
+#    fi
+#}
 
 
 function cp-trash(){
-    local dest="${@: -1}"
+    local dest="${@: -1:1}"
     local sorce=()
     local target=0
+    local suff="~"
     local i=0
     local bcp=0
     local frc=0
@@ -84,22 +146,18 @@ function cp-trash(){
         i=$((i+1))
         case "$arg" in
             -b | --backup)  bcp=1 ;;
-            -f | --force) frc=1   ;;
+            -S | --suffix)
+                suff=dest="${@: $i+1:1}";;
             -t | --target-directory)  
                 target=1
-                dest="${@: i+1:1}" ;;
+                dest="${@: $i+1:1}" ;;
         esac
     done
     
     if [ $bcp == 1 ]; then
         cp "$@"
-        return 0
     else
-        if [ $frc == 1 ]; then
-            cp -b "$@"
-        else
-            cp -f -b "$@"
-        fi
+        cp -b "$@"
     fi
     
     if [ -d "$dest" ]; then
@@ -108,13 +166,15 @@ function cp-trash(){
     
     if [ $target == 1 ] ; then
         for s in "${sorce[@]}"; do
-            if [ -a "$dest/$s~" ]; then 
-                trash "$dest/$(basename $s~)" 
+            if [ -a "$dest/$s$suff" ]; then 
+                trash "$dest/$(basename $s$suff)" 
             fi 
         done
+        echo "Backup(s) put in trash. Use 'gio trash --list' to list / 'gio trash --restore' to restore"
     else
-        if [ -a "$dest~" ]; then
-            trash "$dest~"
+        if test -a "$dest$suff"; then
+            trash "$dest$suff"
+            echo "Backup(s) put in trash. Use 'gio trash --list' to list / 'gio trash --restore' to restore"
         fi  
     fi
 }
@@ -134,52 +194,12 @@ function mv-dir-to(){
     fi
 } 
 
-function mvf-trash(){
-    local dest="${@: -1}"
-    local sorce=()
-    local target=0
-    local i=0
-    for arg in $@ ; do
-        i=$((i+1))
-        case "$arg" in
-            -b | --backup)  echo "-b/--backup flag already given.";
-                return 0 ;;
-            -f | --force)   echo "-f/--force flag already given.";
-                return 0 ;;
-            -t | --target-directory)  
-                target=1
-                dest="${@: i+1:1}" ;;
-        esac
-    done
-    
-    for arg in "${@}"; do
-        if [ -a "$arg" ] && [ "$arg" != "$dest" ]; then
-            sorce+=($(basename "$arg"))
-        fi
-    done 
-
-    mv -f -b "$@"
-    
-    if [ -d "$dest" ]; then
-        target=1
-    fi
-    
-    if [ $target == 1 ] ; then
-        for s in "${sorce[@]}"; do
-            if [ -a "$dest/$s~" ]; then 
-                trash "$dest/$(basename $s~)" 
-            fi 
-        done
-    else
-        trash "$dest~"  
-    fi
-    echo "Backup(s) put in trash. Use 'gio trash --list' to list / 'gio trash --restore' to restore"
-}
 
 function mv-trash(){
-    local dest="${@: -1}"
+    local dest="${@: -1:1}"
     local sorce=()
     local target=0
+    local suff="~"
     local i=0
     local bcp=0
     local frc=0
@@ -190,13 +210,12 @@ function mv-trash(){
             -f | --force) frc=1   ;;
             -t | --target-directory)  
                 target=1
-                dest="${@: i+1:1}" ;;
+                dest="${@: $i+1:1}" ;;
         esac
     done
     
     if [ $bcp == 1 ]; then
         mv "$@"
-        return 0
     else
         if [ $frc == 1 ]; then
             mv -b "$@"
@@ -205,18 +224,20 @@ function mv-trash(){
         fi
     fi
     
-    if [ -d "$dest" ]; then
+    if test -d "$dest"; then
         target=1
     fi
     
     if [ $target == 1 ] ; then
         for s in "${sorce[@]}"; do
-            if [ -a "$dest/$s~" ]; then 
-                trash "$dest/$(basename $s~)" 
+            if test -a "$dest/$s$suff"; then 
+                trash "$dest/$(basename $s$suff)" 
             fi 
         done
-    else
-        trash "$dest~"  
+        echo "Backup(s) put in trash. Use 'gio trash --list' to list / 'gio trash --restore' to restore"
+    elif test -f "$dest$suff"; then
+        trash "$dest$suff"  
+        echo "Backup(s) put in trash. Use 'gio trash --list' to list / 'gio trash --restore' to restore"
     fi
 } 
 
@@ -342,7 +363,12 @@ alias trash-list="gio trash --list"
 alias trash-empty="gio trash --empty"
 
 _trash(){
-    COMPREPLY=($(gio trash --list | awk '{print $1;}'))
+    #WORD_ORIG=$COMP_WORDBREAKS
+    #COMP_WORDBREAKS=${COMP_WORDBREAKS/:/}
+    _get_comp_words_by_ref -n : cur 
+    COMPREPLY=($(compgen -W "$(gio trash --list | awk '{print $1;}' | sed 's|trash:///|trash\\\:///|g' )" -- "${COMP_WORDS[1]}") )
+    __ltrim_colon_completions "$cur"
+    #COMP_WORDBREAKS=$WORD_ORIG
     return 0
 }
 
@@ -352,7 +378,9 @@ function trash-restore(){
     done
 }
 
+declare -f _trash-restore
 
+complete -F _trash trash-list
 complete -F _trash trash-restore
 
 function add-to-group() {

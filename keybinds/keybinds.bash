@@ -117,11 +117,17 @@ function cd() {
     fi
     builtin cd -- "$@"; 
 }
-
 complete -F _cd cd
 
+
 #'Silent' clear
-alias _="clear && history -d -1 &>/dev/null"
+if command -v 'starship' &> /dev/null && grep -q  '\\n' ~/.config/starship.toml; then
+    alias _="tput cuu1 && tput cuu1 && tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null"
+elif command -v 'starship' &> /dev/null; then
+    alias _="tput cuu1 && tput cuu1 && tput sc && clear && tput rc && history -d -1 &>/dev/null"
+else
+    alias _="tput cuu1 && tput sc && clear && tput rc && history -d -1 &>/dev/null"
+fi
 
 # Alt-Up arrow rotates over directory history
 bind -x '"\277": pushd +1 &>/dev/null'
@@ -223,3 +229,7 @@ bind -x '"\206": source ~/.bashrc'
 bind -m emacs-standard '"\e[15~": "\205\206"'
 bind -m vi-command     '"\e[15~": "\205\206"'
 bind -m vi-insert      '"\e[15~": "\205\206"'
+# Ctrl-x j for autojump
+bind -m emacs-standard '"\C-x j": "j \C-i"'
+bind -m vi-command     '"\C-x j": "j \C-i"'
+bind -m vi-insert      '"\C-x j": "j \C-i"'
