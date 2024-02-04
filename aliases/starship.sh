@@ -1,7 +1,7 @@
 . ~/.bash_aliases.d/rlwrap_scripts.sh
 if command -v 'starship' &> /dev/null; then
     function starship-presets() {
-        ansr=$(starship preset --list | fzf --reverse);
+        ansr=$(starship preset --list | head -n -1 | fzf --reverse);
         starship preset "$ansr" -o ~/.config/starship.toml
         local hmdir
         reade -Q 'GREEN' -i 'y' -p "Set '~' to '$HOME'? [Y/n]: " "y n" hmdir
@@ -14,12 +14,19 @@ if command -v 'starship' &> /dev/null; then
                 printf '\n[directory]\nhome_symbol = "'"$HOME"'"' >> ~/.config/starship.toml
             fi
         fi
+        source ~/.bashrc
         unset hmdir
         reade -Q 'GREEN' -i 'y' -p "Set prompt identical for root? [Y/n]: " "y n" hmdir
         if [ "$hmdir" == "y" ]; then
-           sudo cp -f ~/.config/starship.toml /root/.config/starship.toml
+            sudo cp -f ~/.config/starship.toml /root/.config/starship.toml
+            unset hmdir
+            reade -Q 'GREEN' -i 'y' -p "Set '~' to '/root'? [Y/n]: " "y n" hmdir
+            if [ "$hmdir" == "y" ]; then
+               sudo sed -i 's|\(home_symbol = \).*|\1"'"/root"'"|' /root/.config/starship.toml  
+            fi
         fi
     }
 
     alias starship-uninstall="sudo sh -c 'rm \"$(command -v 'starship')\"'"
 fi
+

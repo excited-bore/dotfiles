@@ -121,7 +121,7 @@ complete -F _cd cd
 
 
 #'Silent' clear
-if command -v 'starship' &> /dev/null && grep -q  '\\n' ~/.config/starship.toml; then
+if command -v 'starship' &> /dev/null && (grep -q  '\\n' ~/.config/starship.toml || grep -q 'line_break' ~/.config/starship.toml || ! head -n 1 ~/.config/starship.toml | grep -q 'format' ); then
     alias _="tput cuu1 && tput cuu1 && tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null"
 elif command -v 'starship' &> /dev/null; then
     alias _="tput cuu1 && tput cuu1 && tput sc && clear && tput rc && history -d -1 &>/dev/null"
