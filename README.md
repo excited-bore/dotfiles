@@ -4,7 +4,7 @@ My Dotfiles
 Includes all kinds of installers and configurations. 
 Currently only focused on bash on Linux
 
-# Install.sh
+## Install.sh
 
 Creates `.pathvariables.sh` for global pathvariables (Helps setting up variables for MAN,LESS,PAGER,EDITOR/VISUAL,SYSTEMD,XDG, etc..)  
 Creates `~/.keybinds.d/` and for Bash (readline) keybindings    
@@ -42,7 +42,7 @@ Prevents password popups if user in wheel/sudo group
 Script to automate configuring automounting drives in /etc/fstab
 
 ## Install_samba.sh
-Script to automate the installation of samba drives.
+Script to automate the installation of network drives using samba.
 
 ## Install_pipewire_switch_on_connect.sh
 Setup to autoswitch to newest plugged in audiodevice.
