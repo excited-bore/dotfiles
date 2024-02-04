@@ -5,23 +5,24 @@ Includes all kinds of installers and configurations.
 Currently only focused on Bash 
 
 # Install.sh
-Creates `.pathvariables.sh` for global pathvariables (Helps setting up variables for MAN,LESS,PAGER,EDITOR/VISUAL,SYSTEMD,XDG, etc..)
-Creates `~/.keybinds.d/` and for bash keybindings
-Creates `~/.bash_aliases.d/` and `~/.bash_completions/` for bash-aliases and bash-completions respectively
 
-Then it helps with installing/configuring:
-    - Bash-completions: https://raw.githubusercontent.com/cykerway/complete-alias/master/complete_alias
-    - Python-completions: https://github.com/kislyuk/argcomplete
-    - Osc clipboard: https://github.com/theimpostor/osc
-    - Bat (Cat clone): https://github.com/sharkdp/bat
-    - Fzf: https://github.com/junegunn/fzf
-    - Autojump: https://github.com/wting/autojump
-    - Starship: https://starship.rs/
-    - Moar: https://github.com/walles/moar
-    - Ranger: https://github.com/ranger/ranger
-    - Neovim: https://neovim.io/
-    - Tmux: https://github.com/tmux/tmux
-    - Kitty: https://sw.kovidgoyal.net/kitty/
+Creates `.pathvariables.sh` for global pathvariables (Helps setting up variables for MAN,LESS,PAGER,EDITOR/VISUAL,SYSTEMD,XDG, etc..)  
+Creates `~/.keybinds.d/` and for Bash (readline) keybindings    
+Creates `~/.bash_aliases.d/` and `~/.bash_completion.d/` for bash-aliases and bash-completions respectively  
+
+Then it helps with installing/configuring:  
+    - Bash-completions: https://github.com/cykerway/complete-alias/master/complete_alias  
+    - Python-completions: https://github.com/kislyuk/argcomplete  
+    - Osc clipboard: https://github.com/theimpostor/osc   
+    - Bat (Cat clone): https://github.com/sharkdp/bat  
+    - Fzf: https://github.com/junegunn/fzf  
+    - Autojump: https://github.com/wting/autojump  
+    - Starship: https://starship.rs/  
+    - Moar: https://github.com/walles/moar  
+    - Ranger: https://github.com/ranger/ranger  
+    - Neovim: https://neovim.io/  
+    - Tmux: https://github.com/tmux/tmux  
+    - Kitty: https://sw.kovidgoyal.net/kitty/  
 
 Also helps configuring global gitconfig and global gitignore, and gives the option to install all kinds of bash-aliases/functions
 

@@ -2,22 +2,6 @@
 . ./aliases/rlwrap_scripts.sh
 . ./checks/check_distro.sh
 
-#if [ ! -x "$(command -v pipx)" ]; then
-#    reade -Q "GREEN" -i "y" -p "Installer uses pipx. Install? [Y/n]: " "y n" py
-#    if [ "y" == "$py" ]; then
-#        if [ $distro == "Manjaro" ]; then
-#            yes | pamac install python-pipx
-#        elif [ $distro == "Arch" ]; then
-#            yes | sudo pacman -Su python-pipx
-#        elif [[ $distro == "Debian" || $distro_base == "Debian" ]]; then
-#            yes | sudo apt update
-#            yes | sudo apt install pipx
-#        fi
-#    fi
-#    unset py
-#fi
-#pipx install oscclip
-
 
 if [ ! -x "$(command -v go)" ]; then
     reade -Q "GREEN" -i "y" -p "Installer uses go. Install? [Y/n]: " "y n" go
