@@ -1,5 +1,5 @@
 [core]
-	editor = nvim
+	editor = /usr/bin/nvim
 [help]
 	autocorrect = 1
 [color]

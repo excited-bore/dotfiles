@@ -1,17 +1,36 @@
 . ./checks/check_distro.sh
+. ./aliases/rlwrap_scripts.sh
 
-if [ $distro_base == "Arch" ];then
-    yes | sudo pacman -Su samba
-elif [ $distro_base == "Debian" ];then
-    yes | sudo apt install samba samba-common  
+if ! command -v samba &> /dev/null; then
+    if [ $distro_base == "Arch" ];then
+        yes | sudo pacman -Su samba
+    elif [ $distro_base == "Debian" ];then
+        yes | sudo apt install samba samba-common  
+    fi
 fi
 
-read -p "Drive name: (doesn't matter):" drive
-read -e -p "Mount point (path name):" mnt
-read -p "Writeable: [Y/n]:" write
-read -p "Public [Y/n]:" public
-read -p "Create file mask (Default: 0777):" fmask
-read -p "Directory mask (Default: 0777):" dmask
+wordcomp=""
+for i in $(seq 1 7); do
+    for j in $(seq 1 7); do
+        for k in $(seq 1 7); do  
+            wordcomp="$wordcomp 0$i$j$k"
+        done
+    done
+done
+
+reade -Q "GREEN" -p "Drive name: (doesn't matter): " "" drive
+if ! test "$drive"; then
+    printf "${red}Drive name can't be empty\n${normal}"
+    exit 1
+elif sudo grep -q "$drive" /etc/samba/smb.conf; then
+    printf "${red}Drive name already taken\n${normal}"
+    exit 1
+fi
+reade -Q "GREEN" -i "/mnt" -p "Mount point (path name): " -e mnt
+reade -Q "GREEN" -i "y" -p "Writeable: [Y/n]: " "y n" write
+reade -Q "GREEN" -i "y" -p "Public [Y/n]: " "y n" public
+reade -Q "GREEN" -i "0777" -p "Create file mask (Default: 0777): " "$wordcomp"  fmask
+reade -Q "GREEN" -i "0777" -p "Directory mask (Default: 0777): " "$wordcomp" dmask
 
 if [[ -z $write || "y" == $write ]]; then
     write="yes"
@@ -43,24 +62,28 @@ printf "\n[$drive]
     Writeable=$write
     Public=$public
     Create mask=$fmask
-    Directory mask=$dmask" | sudo tee -a /etc/samba/smb.conf
+    Directory mask=$dmask" | sudo tee -a /etc/samba/smb.conf &> /dev/null
 
-echo ""
+reade -Q "YELLOW" -i "y" -p "Edit /etc/samba/smb.conf [Y/n]: " "y n" edit
+if test "$edit" == "y"; then
+    sudo $EDITOR /etc/samba/smb.conf
+fi
 
-read -p "User for login to drive? (Default $USER): " usr
-read -p "No password? (You will have to set it otherwise) [Y/n]: " nopswd
-if [ -z $usr ]; then
+reade -Q "GREEN" -i "$USER" -p "User for login to drive? : " "$USER" usr
+reade -Q "GREEN" -i "y" -p "No password? (You will have to set it otherwise) [Y/n]: " "y n" nopswd
+if ! test "$usr" ; then
     usr=$USER
 fi
 
-sudo smbpasswd -a $usr
-#if [[ -z $nopswd || "y" == $nopswd ]]; then
-#    sudo smbpasswd -n $usr
-#    printf "\n  null passwords=yes" | sudo tee -a /etc/samba/smb.conf
-#    printf "Set no password for $usr"
-#else    
-#    sudo smbpasswd -a -n $usr
-#fi
-
-sudo systemctl restart smbd.service
-sudo systemctl status smbd.service
+if test "$nopswd" == "y"; then
+    if ! sudo grep -q 'null passwords' /etc/samba/smb.conf; then
+        sudo sed -i 's|\(####### Authentication #######\)|\1\n\nnull passwords = yes|g' /etc/samba/smb.conf
+    fi
+    sudo smbpasswd -na $usr
+    sudo systemctl restart smbd.service
+    sudo systemctl status smbd.service
+else
+    sudo smbpasswd -a $usr
+    sudo systemctl restart smbd.service
+    sudo systemctl status smbd.service
+fi
