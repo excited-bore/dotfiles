@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 . ./checks/check_rlwrap.sh
@@ -94,9 +95,16 @@ if [ ! -f ~/.pathvariables.sh ]; then
         fi
         
         # TODO: non ugly values
-        reade -Q "GREEN" -i "n" -p "Set LS_COLORS with some predefined values? (WARNING: ugly values) [Y/n]:" "y n" lsclrs
+        reade -Q "YELLOW" -i "n" -p "Set LS_COLORS with some predefined values? (WARNING: ugly values) [Y/n]:" "y n" lsclrs
         if [ "$lsclrs" == "y" ] || [ -z "$lsclrs" ]; then
             sed 's/^#export LS_COLORS/export LS_COLORS/' -i .pathvariables.sh
+        fi
+        
+        if [ -x $(command -v "nvim") ]; then
+            reade -Q "GREEN" -i "y" -p "Set Neovim as MANPAGER? [Y/n]: " "y n" manvim
+            if [ "$manvim" == "y" ]; then
+               sed -i 's|.export MANPAGER=.*|export MANPAGER='\''nvim +Man!'\''|g' .pathvariables.sh 
+            fi
         fi
         
         reade -Q "GREEN" -i "y" -p "Set PAGER? (Page reader) [Y/n]:" "y n" pgr

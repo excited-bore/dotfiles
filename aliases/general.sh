@@ -251,7 +251,7 @@ alias rm="rm -rv"
 alias rmAll="rm -v ./*";
 alias rmAllHiddn="rm -v .[!.]* *";
 
-alias rm="gio trash"
+#alias rm="gio trash"
 
 # With parent directories and verbose
 alias mkdir="mkdir -pv"
@@ -357,7 +357,7 @@ function trash(){
     done
 }
 
-complete -F _files trash
+complete -F _filedir trash
 
 alias trash-list="gio trash --list"
 alias trash-empty="gio trash --empty"

@@ -247,8 +247,13 @@ function instvim(){
         printf "export MYVIMRC=~/.config/nvim/init.vim\n" >> $PATHVAR
         printf "export MYGVIMRC=~/.config/nvim/init.vim\n" >> $PATHVAR
     fi
-    
-    reade -Q "GREEN" -i "y" -p "Set nvim as default for user EDITOR? [Y/n]:" "y n" vimrc 
+
+    reade -Q "GREEN" -i "y" -p "Set Neovim as MANPAGER? [Y/n]: " "y n" manvim
+    if [ "$manvim" == "y" ]; then
+       sed -i 's|.export MANPAGER=.*|export MANPAGER='\''nvim +Man!'\''|g' $PATHVAR
+    fi
+
+    reade -Q "GREEN" -i "y" -p "Set Neovim as default for user EDITOR? [Y/n]:" "y n" vimrc 
     if [ -z "$vimrc" ] || [ "$vimrc" == "y" ]; then
         if grep -q "EDITOR" $PATHVAR; then
             sed -i "s|.export EDITOR=.*|export EDITOR=~/.config/nvim/init.vim|g" $PATHVAR
@@ -258,7 +263,7 @@ function instvim(){
     fi
     unset vimrc
     
-    reade -Q "GREEN" -i "y" -p "Set nvim as default for user VISUAL? [Y/n]:" "y n" vimrc 
+    reade -Q "GREEN" -i "y" -p "Set Neovim as default for user VISUAL? [Y/n]:" "y n" vimrc 
     if [ -z "$vimrc" ] || [ "$vimrc" == "y" ]; then
        if grep -q "VISUAL" $PATHVAR; then
             sed -i "s|.export VISUAL=*|export VISUAL=~/.config/nvim/init.vim|g" $PATHVAR
