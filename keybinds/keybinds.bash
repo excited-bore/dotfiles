@@ -106,7 +106,7 @@ function cd() {
     local push=1
     local j=0
     for i in $(dirs -l 2>/dev/null); do
-        if [ $(realpath "${@: -1:1}") == "$i" ]; then
+        if test "$(realpath ${@: -1:1})" == "$i"; then
             push=0
             pushd -n +$j &>/dev/null
         fi

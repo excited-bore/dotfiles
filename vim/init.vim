@@ -249,7 +249,8 @@ let g:coc_global_extensions = [
             \'coc-git',
             \'coc-vimlsp',
             \'coc-webview',
-            \'coc-markdown-preview-enhanced'
+            \'coc-markdown-preview-enhanced',
+            \'coc-markdownlint'
             \]
 
 " Devicons
