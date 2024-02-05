@@ -71,14 +71,7 @@ git_add_remote_ssh() { git remote -v add "$1" git@github.com:$GITNAME/"$2.git"; 
 
 alias git_reset_to_last_HEAD="git reset --hard"
 alias git_add_all="git add -A"
-alias git_commit_all="git commit -a";
-
-function git_commit_all_message(){
-    reade -Q "CYAN" -p "Give up a commit message: " msg
-    if test "$msg"; then
-        git commit -am "$msg";
-    fi
-}
+#alias git_commit_all="git commit -a";
     
 alias git_log_pretty_graph="git log --graph --all --pretty=format:\"%x1b[33m%h%x09%x1b[32m%d%x1b[0m%x20%s\""
 
