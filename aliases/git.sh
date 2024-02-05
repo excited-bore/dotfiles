@@ -76,8 +76,15 @@ alias git_add_all="git add -A"
 alias git_log_pretty_graph="git log --graph --all --pretty=format:\"%x1b[33m%h%x09%x1b[32m%d%x1b[0m%x20%s\""
 
 
-function git_commit_all(){
-    reade -Q "CYAN" -p "Give up a commit message: " msg
+function git_commit() {
+    git status
+    local amnd msg
+    reade -Q "CYAN" -i "n" -p "Add to previous commit? [y/N]: " "y n" amnd
+    if [ "$amnd" == "y" ]; then
+        git commit --amend
+    fi
+    
+    reade -Q "CYAN" -p "Give up a commit message: " "" msg
     if [ "$msg" ]; then
         git commit -am "$msg";
     else
@@ -85,7 +92,7 @@ function git_commit_all(){
     fi
 }
  
-git_add_commit_push_all(){
+function git_commit_push_all() {
     if [ ! -z "$1" ]; then
         git add -A && git commit -m "$1" && git push;
     else
