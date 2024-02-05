@@ -21,23 +21,23 @@ normal=$(tput sgr0)
 reade(){
     if [ ! -x "$(command -v rlwrap)" ]; then 
         readstr="read  ";
-        while getopts ':b:e:i:p:Q:s:S:' flag; do
+        while getopts ':b:ei:p:Q:s:S:' flag; do
             case "${flag}" in
                 b)  ;;
-                e)  readstr=$(echo "$readstr" | sed "s|read |read \-e |g");
+                e)  readstr="$(echo $readstr | sed $'s|read |read -e |g')";
                     ;;
-                i)  readstr=$(echo "$readstr" | sed "s|read |read \-i \"${OPTARG}\" |g");
+                i)  readstr="$(echo $readstr | sed $'s|read |read -i "${OPTARG}" |g')";
                     ;;
-                p)  readstr=$(echo "$readstr" | sed "s|read |read \-p \"${OPTARG}\" |g");
+                p)  readstr="$(echo $readstr | sed $'s|read |read -p "${OPTARG}" |g')";
                     ;;
                 Q)  ;;
-                s)  readstr=$(echo "$readstr" | sed "s|read |read \-s\"${OPTARG}\" |g");
+                s)  readstr="$(echo $readstr | sed $'s|read |read -s "${OPTARG}" |g')";
                     ;;
                 S)  ;;
             esac
         done; 
         OPTIND=1;
-        value=$(eval "$readstr");
+        value="$(eval $readstr)";
         eval "${@:$#:1}=$value";
     else
         if [[ $# < 2 ]]; then
@@ -49,33 +49,33 @@ reade(){
         
         args="${@:$#-1:1}"
         breaklines=''
-        rlwstring="rlwrap -b \"$breaklines\" -f <(echo \"${args[@]}\") -o cat"
+        rlwstring=$'rlwrap -b "$breaklines" -f <(echo "${args[@]}") -o cat'
         while getopts ':b:e:i:p:Q:s:S:' flag; do
             case "${flag}" in
                 b)  breaklines=${OPTARG};
                     ;;
                 # File completions
-                e)  rlwstring=$(echo $rlwstring | sed "s| -f <(echo \"${args[@]}\") | |g");
-                    rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-c |g");
+                e)  rlwstring="$(echo $rlwstring | sed $'s| -f <(echo "${args[@]}") | |g')";
+                    rlwstring="$(echo $rlwstring | sed 's|rlwrap |rlwrap -c |g')";
                     ;;
                 # Pre-filled answer
-                i)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-P \"${OPTARG}\" |g");
+                i)  rlwstring="$(echo $rlwstring | sed $'s|rlwrap |rlwrap -P "${OPTARG}" |g')";
                     ;;
                 # Prompt
-                p)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-S \"${OPTARG}\" |g");
+                p)  rlwstring="$(echo $rlwstring | sed $'s|rlwrap |rlwrap -S "${OPTARG}" |g')";
                     ;;
                 # Prompt colours
-                Q)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-p${OPTARG} |g");
+                Q)  rlwstring="$(echo $rlwstring | sed $'s|rlwrap |rlwrap -p"${OPTARG}" |g')";
                     ;;
                 # Password
-                s)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-aN\"${OPTARG}\" |g");
+                s)  rlwstring="$(echo $rlwstring | sed $'s|rlwrap |rlwrap -a "${OPTARG}" |g')";
                     ;;
                 # Always echo *** w/ passwords
-                S)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-E\"${OPTARG}\" |g");
+                S)  rlwstring="$(echo $rlwstring | sed $'s|rlwrap |rlwrap -E "${OPTARG}" |g')";
                     ;;
             esac
         done
-        value=$(eval "$rlwstring");
+        value="$(eval $rlwstring)";
         eval "${@:$#:1}=$value";
         #if [ $OPTIND -eq 1 ]; then
         #    value=$(rlwrap -b '' -f <(echo "${args[@]}") -o cat);
