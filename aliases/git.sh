@@ -85,9 +85,7 @@ function git_commit() {
     fi
     
     reade -Q "CYAN" -p "Give up a commit message: " msg
-    echo "$msg"
-    echo "$amnd"
-    if [ "$msg" != "" ]; then
+    if ! [ "$msg" == "" ]; then
         echo "bluh";
         git commit -am "$msg";
     else

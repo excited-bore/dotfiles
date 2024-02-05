@@ -229,6 +229,7 @@ bind -x '"\206": source ~/.bashrc'
 bind -m emacs-standard '"\e[15~": "\205\206"'
 bind -m vi-command     '"\e[15~": "\205\206"'
 bind -m vi-insert      '"\e[15~": "\205\206"'
+
 # Ctrl-x j for autojump
 bind -m emacs-standard '"\C-x j": "j \C-i"'
 bind -m vi-command     '"\C-x j": "j \C-i"'
