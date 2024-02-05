@@ -75,7 +75,7 @@ alias git_commit_all="git commit -a";
 
 function git_commit_all_message(){
     reade -Q "CYAN" -p "Give up a commit message: " msg
-    if [ ! -z "$msg" ]; then
+    if test "$msg"; then
         git commit -am "$msg";
     fi
 }
@@ -83,12 +83,12 @@ function git_commit_all_message(){
 alias git_log_pretty_graph="git log --graph --all --pretty=format:\"%x1b[33m%h%x09%x1b[32m%d%x1b[0m%x20%s\""
 
 
-git_add_commit_all(){
+function git_commit_all(){
     reade -Q "CYAN" -p "Give up a commit message: " msg
-    if ! [ -z "$msg" ]; then
-        git add -A && git commit -m "$msg";
+    if [ "$msg" ]; then
+        git commit -am "$msg";
     else
-        git add -A && git commit;
+        git commit -a;
     fi
 }
  
