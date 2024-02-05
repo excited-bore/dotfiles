@@ -77,19 +77,23 @@ alias git_log_pretty_graph="git log --graph --all --pretty=format:\"%x1b[33m%h%x
 
 
 function git_commit() {
-    git status
-    local amnd msg
-    reade -Q "CYAN" -i "n" -p "Add to previous commit? [y/N]: " "y n" amnd
-    if [ "$amnd" == "y" ]; then
-        git commit --amend
-    fi
-    
-    reade -Q "CYAN" -p "Give up a commit message: " msg
-    if ! [ "$msg" == "" ]; then
-        echo "bluh";
-        git commit -am "$msg";
+    if git status; then
+        local amnd msg
+        reade -Q "CYAN" -i "n" -p "Add to previous commit? [y/N]: " "y n" amnd
+        if [ "$amnd" == "y" ]; then
+            git commit --amend
+        fi
+        
+        reade -Q "CYAN" -p "Give up a commit message: " " " msg
+        if ! [[ -z "$msg" ]]; then
+            git commit -am "$msg";
+        else
+            git commit -a;
+        fi
+        unset msg amnd
+        return 0
     else
-        git commit -a;
+        return 1
     fi
 }
  
