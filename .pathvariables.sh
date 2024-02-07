@@ -176,3 +176,6 @@ export PATH=$KITTY_PATH:$PATH
 
 # NIX (apx included)
 #export PATH="$HOME/.nix-profile/bin:$PATH"
+
+# LIBVIRT
+export LIBVIRT_DEFAULT_URI=qemu:///system

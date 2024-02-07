@@ -168,9 +168,9 @@ function cp-trash(){
         for s in "${sorce[@]}"; do
             if [ -a "$dest/$s$suff" ]; then 
                 trash "$dest/$(basename $s$suff)" 
+                echo "Backup for $dest/$(basename $s$suff)  put in trash."
             fi 
         done
-        echo "Backup(s) put in trash. Use 'gio trash --list' to list / 'gio trash --restore' to restore"
     else
         if test -a "$dest$suff"; then
             trash "$dest$suff"

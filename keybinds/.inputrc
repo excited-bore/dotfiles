@@ -24,7 +24,7 @@ $endif
 set comment-begin #
 
 #If you copy commands from the web, you might have noticed that when you copy a newline, Bash will interpret that newline as an Enter and execute whatever it is in your input buffer at the moment. This is unsafe, because what you see might not be what you copy. You can be avoided by setting:
-set enable-bracketed-paste On
+set enable-bracketed-paste Off
 
  # Make sure we don't output everything on the 1 line
 set horizontal-scroll-mode Off

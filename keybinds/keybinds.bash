@@ -204,10 +204,10 @@ bind -m emacs-standard '"\e[9;5u": " **\t"'
 bind -m vi-command     '"\e[9;5u": " **\t"'
 bind -m vi-insert      '"\e[9;5u": " **\t"'
 
-# Ctrl-x j for autojump
-bind -m emacs-standard '"\C-x j": "j \C-i"'
-bind -m vi-command     '"\C-x j": "j \C-i"'
-bind -m vi-insert      '"\C-x j": "j \C-i"'
+# Ctrl-x Ctrl-j for autojump
+bind -m emacs-standard '"\C-x\C-j": "j \C-i"'
+bind -m vi-command     '"\C-x\C-j": "j \C-i"'
+bind -m vi-insert      '"\C-x\C-j": "j \C-i"'
 
 # Alt-g: Ripgrep function overview
 bind -m emacs-standard -x '"\eg": "ripgrep-dir"'
@@ -229,8 +229,3 @@ bind -x '"\206": source ~/.bashrc'
 bind -m emacs-standard '"\e[15~": "\205\206"'
 bind -m vi-command     '"\e[15~": "\205\206"'
 bind -m vi-insert      '"\e[15~": "\205\206"'
-
-# Ctrl-x j for autojump
-bind -m emacs-standard '"\C-x j": "j \C-i"'
-bind -m vi-command     '"\C-x j": "j \C-i"'
-bind -m vi-insert      '"\C-x j": "j \C-i"'

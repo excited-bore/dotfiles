@@ -84,9 +84,9 @@ function git_commit() {
             git commit --amend
         fi
         
-        reade -Q "CYAN" -p "Give up a commit message: " " " msg
-        if ! [[ -z "$msg" ]]; then
-            git commit -am "$msg";
+        reade -Q "CYAN" -p "Give up a commit message: " ' ' msg
+        if ! test -z -- "${msg}"; then
+            git commit -am -- "${msg}";
         else
             git commit -a;
         fi

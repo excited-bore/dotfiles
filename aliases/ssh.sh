@@ -2,8 +2,11 @@
 . ~/.bash_aliases.d/rlwrap_scripts.sh
 
 user="burp"
+user1="woolde1q"
 ip="192.168.0.140"
+ip1="185.94.230.115"
 ssh_file="~/.ssh/id_rsa"
+ssh_file="~/.ssh/id_rsa1"
 
 # To prevent 'failed to preserve ownership' errors
 copy_sshfs(){ cp -r --no-preserve=mode "$1" "$2"; }
@@ -30,6 +33,7 @@ addr=$(nmcli device show | grep IP4.ADDR | awk 'NR==1{print $2}'| sed 's|\(.*\)/
 
 #Server access
 alias serber="ssh -XY -i $ssh_file $user@$ip"
+alias serber1="ssh -XY -i $ssh_file1 $user1@$ip1"
 alias serber_unmnt="fusermount3 -u /mnt/mount1/"
 alias serber_unmnt1="fusermount3 -u /mnt/mount2/"
 
