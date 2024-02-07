@@ -1,10 +1,10 @@
 ### SSH ###                           
 . ~/.bash_aliases.d/rlwrap_scripts.sh
 
-user=
-user1=
-ip=
-ip1=
+user="burp"
+user1="woolde1q"
+ip="192.168.0.140"
+ip1="185.94.230.115"
 ssh_file="~/.ssh/id_rsa"
 ssh_file="~/.ssh/id_rsa1"
 

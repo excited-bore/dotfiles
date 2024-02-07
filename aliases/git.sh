@@ -77,11 +77,12 @@ alias git-log-pretty-graph="git log --graph --all --pretty=format:\"%x1b[33m%h%x
 
 
 function git-commit() {
+
     if git status; then
-        
-        if test -f $(git rev-parse --show-toplevel)/.git/hooks/pre-commit; then
-            sh $(git rev-parse --show-toplevel)/.git/hooks/pre-commit 
-        fi
+
+        #if test -f $(git rev-parse --show-toplevel)/.git/hooks/pre-commit; then
+        #    sh $(git rev-parse --show-toplevel)/.git/hooks/pre-commit
+        #fi
 
         local untraked amnd msg
 
