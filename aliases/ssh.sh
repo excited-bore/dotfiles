@@ -1,10 +1,10 @@
 ### SSH ###                           
 . ~/.bash_aliases.d/rlwrap_scripts.sh
 
-user="burp"
-user1="woolde1q"
-ip="192.168.0.140"
-ip1="185.94.230.115"
+user=
+user1=
+ip=
+ip1=
 ssh_file="~/.ssh/id_rsa"
 ssh_file="~/.ssh/id_rsa1"
 
@@ -87,7 +87,7 @@ serber_mnt() {
         mkdir /mnt/mount1; 
     fi;
     if [ ! -e ~/Files/Files ]; then
-        sshfs $user@$ip:/mnt/MyStuff/ /mnt/mount1/ -o IdentityFile=$ssh_file,follow_symlinks,reconnect,default_permissions,uid=1000,gid=1001,workaround=rename;
+        sshfs $user@$ip:/mnt/MyStuff/ /mnt/mount1/ -o IdentityFile=$ssh_file,follow_symlinks,reconnect,default_permissions,uid=1000,gid=1001,workaround=
     fi
 }
 
@@ -96,6 +96,6 @@ serber_mnt1(){
         mkdir /mnt/mount2; 
     fi;
     if [ ! -e /mnt/mount2/.bashrc ]; then
-        sshfs $user@$ip:/media/ /mnt/mount2/ -o IdentityFile=$ssh_file,follow_symlinks,reconnect,default_permissions,uid=1000,gid=1001,workaround=rename;
+        sshfs $user@$ip:/media/ /mnt/mount2/ -o IdentityFile=$ssh_file,follow_symlinks,reconnect,default_permissions,uid=1000,gid=1001,workaround=
     fi
 }                                    
