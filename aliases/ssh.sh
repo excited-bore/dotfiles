@@ -87,7 +87,7 @@ serber_mnt() {
         mkdir /mnt/mount1; 
     fi;
     if [ ! -e ~/Files/Files ]; then
-        sshfs $user@$ip:/mnt/MyStuff/ /mnt/mount1/ -o IdentityFile=$ssh_file,follow_symlinks,reconnect,default_permissions,uid=1000,gid=1001,workaround=
+        sshfs $user@$ip:/mnt/MyStuff/ /mnt/mount1/ -o IdentityFile=$ssh_file,follow_symlinks,reconnect,default_permissions,uid=1000,gid=1001,workaround=rename;
     fi
 }
 
@@ -96,6 +96,6 @@ serber_mnt1(){
         mkdir /mnt/mount2; 
     fi;
     if [ ! -e /mnt/mount2/.bashrc ]; then
-        sshfs $user@$ip:/media/ /mnt/mount2/ -o IdentityFile=$ssh_file,follow_symlinks,reconnect,default_permissions,uid=1000,gid=1001,workaround=
+        sshfs $user@$ip:/media/ /mnt/mount2/ -o IdentityFile=$ssh_file,follow_symlinks,reconnect,default_permissions,uid=1000,gid=1001,workaround=rename;
     fi
 }                                    

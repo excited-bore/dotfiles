@@ -1,16 +1,16 @@
 ### GIT ###                           
 . ~/.bash_aliases.d/rlwrap_scripts.sh
 
-alias git_config_pull_rebase_false="git config pull.rebase false"
-alias git_config_global_pull_rebase_false="git config --global pull.rebase false"
+alias git-config-pull-rebase-false="git config pull.rebase false"
+alias git-config-global-pull-rebase-false="git config --global pull.rebase false"
 
-alias git_config_pull_rebase_true="git config pull.rebase true"
-alias git_config_global_pull_rebase_true="git config --global pull.rebase true"
+alias git-config-pull-rebase-true="git config pull.rebase true"
+alias git-config-global-pull-rebase-true="git config --global pull.rebase true"
 
-alias git_config_global_pull_fastforward_only="git config pull.ff only"
-alias git_config_pull_fastforward_only="git config --global pull.ff only"
+alias git-config-global-pull-fastforward-only="git config pull.ff only"
+alias git-config-pull-fastforward-only="git config --global pull.ff only"
 
-function git_ssh_key_and_add_to_agent() { 
+function git-add-ssh-key() { 
     if [ ! -f ~/.ssh/config ]; then
         mkdir ~/.ssh;
         touch ~/.ssh/config;
@@ -33,7 +33,7 @@ function git_ssh_key_and_add_to_agent() {
     echo "  User git" >> ~/.ssh/config  
 }
 
-git_https_to_ssh(){
+git-https-to-ssh(){
     if [ -z $1 ]; then
         echo "You should give up the name of a remote";
         read -p "Do you want me to look for 'origin'? [Y/n]" resp
@@ -47,7 +47,7 @@ git_https_to_ssh(){
     fi
 }
 
-git_ssh_to_https(){
+git-ssh-to-https(){
     if [ -z $1 ]; then
         echo "You should give up the name of a remote";
         read -p "Do you want me to look for 'origin'? [Y/n]:" resp
@@ -61,43 +61,53 @@ git_ssh_to_https(){
     fi
 }
 
-alias git_list_remotes="git remote -v"
+alias git-list-remotes="git remote -v"
 
-git_test_conn_github() { ssh -vT git@github.com; }
-git_status() { git status; }
-#git_config_using_vars() { git config --global user.email \"$EMAIL\" && git config --global user.name \"$GITNAME\"; }
-git_add_remote_url() { git remote -v add "$1" "$2"; }
-git_add_remote_ssh() { git remote -v add "$1" git@github.com:$GITNAME/"$2.git"; }
+git-test-conn-github() { ssh -vT git@github.com; }
+git-status() { git status; }
+#git-config-using-vars() { git config --global user.email \"$EMAIL\" && git config --global user.name \"$GITNAME\"; }
+git-add-remote-url() { git remote -v add "$1" "$2"; }
+#git-add-remote-ssh() { git remote -v add "$1" git@github.com:$GITNAME/"$2.git"; }
 
-alias git_reset_to_last_HEAD="git reset --hard"
-alias git_add_all="git add -A"
-#alias git_commit_all="git commit -a";
+alias git-reset-to-last-HEAD="git reset --hard"
+alias git-add-all="git add -A"
+#alias git-commit-all="git commit -a";
     
-alias git_log_pretty_graph="git log --graph --all --pretty=format:\"%x1b[33m%h%x09%x1b[32m%d%x1b[0m%x20%s\""
+alias git-log-pretty-graph="git log --graph --all --pretty=format:\"%x1b[33m%h%x09%x1b[32m%d%x1b[0m%x20%s\""
 
 
-function git_commit() {
+function git-commit() {
     if git status; then
-        local amnd msg
+        
+        if test -f $(git rev-parse --show-toplevel)/.git/hooks/pre-commit; then
+            sh $(git rev-parse --show-toplevel)/.git/hooks/pre-commit 
+        fi
+
+        local untraked amnd msg
+
+        reade -Q "CYAN" -i "y" -p "Add all untracked files? [Y/n]: " "y n" amnd
+        if [ "$amnd" == "y" ]; then
+            git add -A
+        fi
+
         reade -Q "CYAN" -i "n" -p "Add to previous commit? [y/N]: " "y n" amnd
         if [ "$amnd" == "y" ]; then
             git commit --amend
         fi
         
-        reade -Q "CYAN" -i '""' -p "Give up a commit message: " "" msg
+        reade -Q "CYAN" -i '\\\"\\\"' -p "Give up a commit message: " '' msg
         if ! test -z "${msg}"; then
             git commit -am "${msg}";
         else
             git commit -a;
         fi
-        unset msg amnd
         return 0
     else
         return 1
     fi
 }
  
-function git_commit_push_all() {
+function git-commit-push-all() {
     if [ ! -z "$1" ]; then
         git add -A && git commit -m "$1" && git push;
     else
@@ -105,20 +115,20 @@ function git_commit_push_all() {
     fi
 } 
 
-alias git_commit_amend="git commit --amend"
-alias git_list_branches="git branch --list -vv"
-alias git_delete_branch="git branch -d - "
-alias git_switch_branch="git checkout - "
-alias git_switch_branch_and_track_remote="git checkout -t - "
-alias git_create_and_switch_branch="git checkout -b - "
-alias git_push_to_branch="git push -u origin "
+alias git-commit-amend="git commit --amend"
+alias git-list-branches="git branch --list -vv"
+alias git-delete-branch="git branch -d - "
+alias git-switch-branch="git checkout - "
+alias git-switch-branch-and-track-remote="git checkout -t - "
+alias git-create-and-switch-branch="git checkout -b - "
+alias git-push-to-branch="git push -u origin "
 
-git_switch_commit() {
+git-switch-commit() {
     commit=$(git log --oneline --color=always | nl | fzf --ansi --track --no-sort --layout=reverse-list | awk '{print $2}');
     git checkout "$commit";
 }
 
-git_add_worktree_and_ignore(){
+git-add-worktree-and-ignore(){
     reade -Q "CYAN" -p "Give up a (new) worktree path: " -e path
     if [ ! -z "$path" ]; then
         git worktree add "$path"
@@ -132,7 +142,7 @@ git_add_worktree_and_ignore(){
     fi
 }
 
-git_add_worktree_and_ignore(){
+git-add-worktree-and-ignore(){
     reade -Q "CYAN" -p "Give up a (new) worktree path: " -e path
     if [ ! -z "$path" ]; then
         git worktree add "$path"
@@ -146,7 +156,7 @@ git_add_worktree_and_ignore(){
     fi
 }
 
-git_remove_worktree_and_ignore(){
+git-remove-worktree-and-ignore(){
     wrktree=$(git worktree list -v | tail -n +2 | nl | fzf --ansi --track --no-sort --layout=reverse-list | awk '{print $2}');
     if [ ! -z "$wrktree" ]; then
         git worktree remove "$wrktree"
@@ -164,7 +174,7 @@ git_remove_worktree_and_ignore(){
     fi
 }
 
-git_add_branch() {
+git-add-branch() {
     reade -Q "GREEN" -p "Give up a new branch name: " branch
     commit=$(git log --oneline --color=always | nl | fzf --ansi --track --no-sort --layout=reverse-list | awk '{print $2}');
     if [ ! -z "$branch" ]; then
@@ -173,21 +183,21 @@ git_add_branch() {
 }
 
 #https://stackoverflow.com/questions/1125968/how-do-i-force-git-pull-to-overwrite-local-files
-git_backup_branch_and_reset_to_remote() {
+git-backup-branch-and-reset-to-remote() {
     remote=origin;
     branch=master;
     backp_branch=1;
     stash=false;
     
     if [ ! -z "$1" ] && [[ ! $(gitListRemotes | grep -q $1) ]]; then
-        echo "Use a legit remote or add it using 'git_add_remote_ssh' or 'git_add_remote_url'";
+        echo "Use a legit remote or add it using 'git-add-remote-ssh' or 'git-add-remote-url'";
     elif [ ! -z "$1" ];then
         remote=$1;
     fi
     echo "Using '$1' as remote\n";
     
     if [ ! -z "$2" ] && [[ ! $(gitListBranches | grep -q $2) ]]; then
-        echo "Use a legit branch or add it using 'git_add_branch'";
+        echo "Use a legit branch or add it using 'git-add-branch'";
     elif [ ! -z "$2" ];then
         remote=$2;
     fi
@@ -229,11 +239,11 @@ git_backup_branch_and_reset_to_remote() {
         echo "First backup branch, then remote. No remote means 'origin/main'" ;
     fi   
 }
-alias git_remote_rename="git remote -v rename"
-alias git_remote_remove="git remote -v rm"
-alias git_remote_set_url="git remote -v set-url"
+alias git-remote-rename="git remote -v rename"
+alias git-remote-remove="git remote -v rm"
+alias git-remote-set-url="git remote -v set-url"
 
-function git_set_default_remote_branch() { 
+function git-set-default-remote-branch() { 
     if [ -z "$1" ] && [ -z "$2" ]; then
         git remote set-head origin main;
     elif [ -z "$1" ]; then
@@ -243,7 +253,7 @@ function git_set_default_remote_branch() {
     fi
 }
 
-function git_remote_get_default_branch() { 
+function git-remote-get-default-branch() { 
     if [ -z "$1" ]; then
         git remote set-head origin -a;
     else 

@@ -11,15 +11,15 @@ alias vim_plugin_install="nvim +PluginInstall|q"
 
 # All man pages
 function man-all-nvim() {
+    local b=()
+    for i in $(man -aw $@); do
+        local e
+        e=$(basename "$i|q" | sed 's|\(\)*.gz|\1|g')
+        b+=("+Man $e");
+    done;
     if echo $(type "$@") | grep -q "shell builtin"; then
-       help -m $@ | $MANPAGER; 
+        nvim "${b[@]}" "+silent Man!" <(help -m $@) "+bfirst" 
     else
-        local b=()
-        for i in $(man -aw $@); do
-            local e
-            e=$(basename "$i|q" | sed 's|\(\)*.gz|\1|g')
-            b+=("+Man $e");
-        done;
         nvim "${b[@]}" "+Bclose" "+bfirst"
     fi
 }

@@ -63,7 +63,7 @@
 # FLATPAK
 #export FLATPAK=$HOME/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share
 #export FLATPAK_ENABLE_SDK_EXT=*
-PATH=$PATH:$HOME/.local/bin/flatpak
+#export PATH=$PATH:$HOME/.local/bin/flatpak
 
 # XDG
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
