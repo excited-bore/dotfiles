@@ -150,8 +150,8 @@ FZF_PREVIEW_LINES=0
 export FZF_DEFAULT_COMMAND="fd --search-path / --type f --hidden"
 
 export FZF_DEFAULT_OPTS='--select-1 --height=66% --layout=reverse-list --hscroll-off=50 --filepath-word --cycle --prompt="$>" --color=dark,fg:cyan'
-label=$(curl -s http://metaphorpsum.com/sentences/1)
-export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS --border --border-label=\"╢ $label ╟\" --border-label-pos=3 --color=label:italic:magenta"
+#label=$(curl -s http://metaphorpsum.com/sentences/1)
+#export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS --border --border-label=\"╢ $label ╟\" --border-label-pos=3 --color=label:italic:magenta"
 #fi
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 #export FZF_CTRL_T_OPTS='--preview="kitty icat --clear --transfer-mode=memory --stdin=no --place=${FZF_PREVIEW_COLUMNS}x${FZF_PREVIEW_LINES}@0x0 {}'
