@@ -4,9 +4,9 @@
 user="burp"
 user1="woolde1q"
 ip="192.168.0.140"
-ip1="185.94.230.115"
+ip1="wooldev.be"
 ssh_file="~/.ssh/id_rsa"
-ssh_file="~/.ssh/id_rsa1"
+ssh_file1="~/.ssh/id_rsa1"
 
 # To prevent 'failed to preserve ownership' errors
 copy_sshfs(){ cp -r --no-preserve=mode "$1" "$2"; }
@@ -17,7 +17,7 @@ copy_to_serber() { scp -r $user@$ip:$1 $2; }
 
 # SSH in Kitty only really w
 #[ "$TERM" = "xterm-kitty" ] && alias ssh="kitty +kitten ssh -R 50000:${KITTY_LISTEN_ON#*:}"
-[ "$TERM" = "xterm-kitty" ] && alias ssh="kitten ssh"
+#[ "$TERM" = "xterm-kitty" ] && alias ssh="kitten ssh"
 
 
 # For Xclip, we need X11 to function properly  
@@ -33,7 +33,7 @@ addr=$(nmcli device show | grep IP4.ADDR | awk 'NR==1{print $2}'| sed 's|\(.*\)/
 
 #Server access
 alias serber="ssh -XY -i $ssh_file $user@$ip"
-alias serber1="ssh -XY -i $ssh_file1 $user1@$ip1"
+alias serber1="ssh -XY -p 4000 -i $ssh_file1 $user1@$ip1"
 alias serber_unmnt="fusermount3 -u /mnt/mount1/"
 alias serber_unmnt1="fusermount3 -u /mnt/mount2/"
 
@@ -62,7 +62,7 @@ ssh_key_and_add_to_agent_by_host() {
     fi
     read -p "Forward X11? Needed for xclip [Y/n]:" sx11
     if [ -z "$sx11" ] || [ "$sx11" == "y" ]; then
-        opts="ForwardX11 yes\n  ForwardX11Trusted yes\n"
+        opts="  ForwardX11 yes\n  ForwardX11Trusted yes\n"
     fi
     if [ -z $keytype ]; then
         keytype=ed25519
@@ -77,7 +77,7 @@ ssh_key_and_add_to_agent_by_host() {
     echo "Host $host" >> ~/.ssh/config;
     echo "  IdentityFile ~/.ssh/$name" >> ~/.ssh/config
     echo "  User $uname" >> ~/.ssh/config
-    printf $opts >> ~/.ssh/config
+    printf "$opts" >> ~/.ssh/config
     echo "Public key: "
     cat ~/.ssh/$name.pub; 
 }

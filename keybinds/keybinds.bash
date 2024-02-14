@@ -182,43 +182,86 @@ bind -m emacs-standard   '"\C-d": "\C-a\e[3~"'
 bind -m vi-command       '"\C-d": "\C-a\e[3~"'
 bind -m vi-insert        '"\C-d": "\C-a\e[3~"'
 
-# Ctrl-s: Proper copy
-bind -m emacs-standard -x '"\C-s" : echo "$READLINE_LINE" | xclip -i -sel c' 
-bind -m vi-command     -x '"\C-s" : echo "$READLINE_LINE" | xclip -i -sel c' 
-bind -m vi-insert      -x '"\C-s" : echo "$READLINE_LINE" | xclip -i -sel c'
-
-# Ctrl-v: Proper paste
-Q="'"
-bind -x $'"\237": echo bind $Q\\"\\\\225\\": \\"$(xclip -o -sel c)\\"$Q > /tmp/paste.sh && source /tmp/paste.sh'
-bind -m emacs-standard '"\C-v": "\237\225"'
-bind -m vi-command     '"\C-v": "\237\225"'
-bind -m vi-insert      '"\C-v": "\237\225"'
-
 _quote_all() { READLINE_LINE="${READLINE_LINE@Q}"; }
 bind -m emacs-standard -x '"\C-x'\''":_quote_all'
 bind -m vi-command     -x '"\C-x'\''":_quote_all'
 bind -m vi-insert      -x '"\C-x'\''":_quote_all'
- 
-# (Kitty only) Ctrl-tab for fzf autocompletion
-bind -m emacs-standard '"\e[9;5u": " **\t"'
-bind -m vi-command     '"\e[9;5u": " **\t"'
-bind -m vi-insert      '"\e[9;5u": " **\t"'
 
-# Ctrl-x Ctrl-j for autojump
-bind -m emacs-standard '"\C-x\C-j": "j \C-i"'
-bind -m vi-command     '"\C-x\C-j": "j \C-i"'
-bind -m vi-insert      '"\C-x\C-j": "j \C-i"'
+if test -x "$(command -v osc)"; then
+    bind -m emacs-standard -x '"\C-s" : echo "$READLINE_LINE" | osc copy' 
+    bind -m vi-command     -x '"\C-s" : echo "$READLINE_LINE" | osc copy' 
+    bind -m vi-insert      -x '"\C-s" : echo "$READLINE_LINE" | osc copy'
 
-# Alt-g: Ripgrep function overview
-bind -m emacs-standard -x '"\eg": "ripgrep-dir"'
-bind -m vi-command     -x '"\eg": "ripgrep-dir"' 
-bind -m vi-insert      -x '"\eg": "ripgrep-dir"'
+    # Ctrl-v: Proper paste
+    Q="'"
+    bind -x $'"\237": echo bind $Q\\"\\\\225\\": \\"$(osc paste)\\"$Q > /tmp/paste.sh && source /tmp/paste.sh'
+    bind -m emacs-standard '"\C-v": "\237\225"'
+    bind -m vi-command     '"\C-v": "\237\225"'
+    bind -m vi-insert      '"\C-v": "\237\225"'
+elif test -x "$(command -v xclip)"; then
+    # Ctrl-s: Proper copy
+    bind -m emacs-standard -x '"\C-s" : echo "$READLINE_LINE" | xclip -i -sel c' 
+    bind -m vi-command     -x '"\C-s" : echo "$READLINE_LINE" | xclip -i -sel c' 
+    bind -m vi-insert      -x '"\C-s" : echo "$READLINE_LINE" | xclip -i -sel c'
+
+    # Ctrl-v: Proper paste
+    Q="'"
+    bind -x $'"\237": echo bind $Q\\"\\\\225\\": \\"$(xclip -o -sel c)\\"$Q > /tmp/paste.sh && source /tmp/paste.sh'
+    bind -m emacs-standard '"\C-v": "\237\225"'
+    bind -m vi-command     '"\C-v": "\237\225"'
+    bind -m vi-insert      '"\C-v": "\237\225"'
+fi
+
+if test -x "$(command -v autojump)"; then
+    # Ctrl-x Ctrl-j for autojump
+    bind -m emacs-standard '"\C-x\C-j": "j \C-i"'
+    bind -m vi-command     '"\C-x\C-j": "j \C-i"'
+    bind -m vi-insert      '"\C-x\C-j": "j \C-i"'
+fi
+
+if test -x "$(command -v fzf)"; then
+    # (Kitty only) Ctrl-tab for fzf autocompletion
+    bind -m emacs-standard '"\e[9;5u": " **\t"'
+    bind -m vi-command     '"\e[9;5u": " **\t"'
+    bind -m vi-insert      '"\e[9;5u": " **\t"'
+
+
+    
+    if [[ "$(type -t ripgrep-dir)" == function ]]; then
+        # Alt-g: Ripgrep function overview
+        bind -m emacs-standard -x '"\eg": "ripgrep-dir"'
+        bind -m vi-command     -x '"\eg": "ripgrep-dir"' 
+        bind -m vi-insert      -x '"\eg": "ripgrep-dir"'
+    fi
+
+    if [[ "$(type -t fzf_rifle)" == function ]]; then
+        # CTRL-F - Paste the selected file path into the command line
+        bind -m emacs-standard -x '"\C-f": fzf_rifle'
+        bind -m vi-command -x '"\C-f": fzf_rifle'
+        bind -m vi-insert -x '"\C-f": fzf_rifle'
+
+        # F3 - Rifle search
+        bind -m emacs-standard -x '"\eOR": "fzf_rifle"'
+        bind -m vi-command -x '"\eOR": "fzf_rifle"'
+        bind -m vi-insert -x '"\eOR": "fzf_rifle"'
+    fi
+    
+    if [[ "$(type -t git-fzf)" == function ]]; then
+        # F4 - Rifle search
+        bind -m emacs-standard -x '"\eOR": "git-fzf"'
+        bind -m vi-command -x '"\eOR": "git-fzf"'
+        bind -m vi-insert -x '"\eOR": "git-fzf"'
+    fi
+
+fi
 
 # F2 - ranger (file explorer)
-#bind -x '"\201": ranger'
-bind -m emacs-standard '"\eOQ": "\201\n\C-l"'
-bind -m vi-command     '"\eOQ": "\201\n\C-l"'
-bind -m vi-insert      '"\eOQ": "\201\n\C-l"'
+if test -x "$(command -v ranger)"; then
+    bind -x '"\201": ranger'
+    bind -m emacs-standard '"\eOQ": "\201\n\C-l"'
+    bind -m vi-command     '"\eOQ": "\201\n\C-l"'
+    bind -m vi-insert      '"\eOQ": "\201\n\C-l"'
+fi
 
 # F3 - FuzzyFinderls -l | fzf --preview="echo user={3} when={-4..-2}; cat {-1}" --header-lines=1 (file explorer)
 #bind -x '"\eOR": ctrl-s'

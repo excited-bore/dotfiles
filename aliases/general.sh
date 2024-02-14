@@ -232,9 +232,9 @@ function mv-trash(){
         for s in "${sorce[@]}"; do
             if test -a "$dest/$s$suff"; then 
                 trash "$dest/$(basename $s$suff)" 
+            echo "Backup $dest/$(basename $s$suff) put in trash."
             fi 
         done
-        echo "Backup(s) put in trash. Use 'gio trash --list' to list / 'gio trash --restore' to restore"
     elif test -f "$dest$suff"; then
         trash "$dest$suff"  
         echo "Backup(s) put in trash. Use 'gio trash --list' to list / 'gio trash --restore' to restore"
@@ -365,8 +365,8 @@ alias trash-empty="gio trash --empty"
 _trash(){
     #WORD_ORIG=$COMP_WORDBREAKS
     #COMP_WORDBREAKS=${COMP_WORDBREAKS/:/}
-    _get_comp_words_by_ref -n : cur 
-    COMPREPLY=($(compgen -W "$(gio trash --list | awk '{print $1;}' | sed 's|trash:///|trash\\\:///|g' )" -- "${COMP_WORDS[1]}") )
+    _get_comp_words_by_ref -n : cur
+    COMPREPLY=($(compgen -W "$(gio trash --list | awk '{print $1;}' | sed 's|trash:///|trash\\\:///|g' )" -- "$cur") )
     __ltrim_colon_completions "$cur"
     #COMP_WORDBREAKS=$WORD_ORIG
     return 0

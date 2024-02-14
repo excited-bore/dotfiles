@@ -18,7 +18,7 @@
         gio trash ~/.bash_aliases.d/git.sh~
 
         if [ -x $(command -v fzf) ]; then
-            reade -Q "GREEN" -i "y" -p "Fzf detected. Install fzf-git? (Extra fzf stuff on leader-key C-g): [Y/n]: /" "y n" gitfzf
+            reade -Q "GREEN" -i "y" -p "Fzf detected. Install fzf-git? (Extra fzf stuff on leader-key C-g): [Y/n]: " "y n" gitfzf
             if [ "$fzfgit" == "y" ]; then
                 . ./checks/check_aliases_dir.sh
                 wget https://raw.githubusercontent.com/junegunn/fzf-git.sh/main/fzf-git.sh -P ~/.bash_aliases.d/

@@ -79,6 +79,10 @@ if [ ! -f ~/.pathvariables.sh ]; then
     reade -Q "GREEN" -i "y" -p "Check existence (and create) ~/.pathvariables.sh and link it to .bashrc? [Y/n]:" "y n" pathvars
     if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         
+        #Comment out every export in .pathvariables
+        sed -i -e '/export/ s/^#*/#/' .pathvariables.sh
+
+        # Set tmpdir
         sed 's|#export TMPDIR|export TMPDIR|' -i .pathvariables.sh
 
         

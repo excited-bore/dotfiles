@@ -173,6 +173,10 @@ set updatetime=300
 " diagnostics appear/become resolved
 set signcolumn=yes 
 
+
+" Load bashrc
+set shellcmdflag=-ic
+
 "Use 24-bit (true-color) mode in Vim/Neovim when outside tmux.
 "If you're using tmux version 2.2 or later, you can remove the outermost $TMUX check and use tmux's 24-bit color support
 "(see < http://sunaku.github.io/tmux-24bit-color.html#usage > for more information.)
@@ -778,21 +782,21 @@ vnoremap <leader>m :CocCommand markdown-preview-enhanced.openPreview<cr>gv
 
 
 " Visual mode remaps
-vnoremap [      di[]<Esc>hp<Esc> 
-vnoremap {      di{}<Esc>hp<Esc> 
-vnoremap (      di()<Esc>hp<Esc> 
-vnoremap <      di<><Esc>hp<Esc>
-vnoremap `      di``<Esc>hp<Esc>
-vnoremap '      di''<Esc>hp<Esc>
+vnoremap [      di[]<Esc>hpgv 
+vnoremap {      di{}<Esc>hpgv 
+vnoremap (      di()<Esc>hpgv 
+vnoremap <      di<><Esc>hpgv
+vnoremap `      di``<Esc>hpgv
+vnoremap '      di''<Esc>hpgv
 
 
 " Easy multiblock commenting
-vnoremap <expr> #   (visualmode() == "\<C-V>" ? ':norm i#<cr>gv' : 'c##<Esc>hp<Esc>')
-vnoremap <expr> //   (visualmode() == "\<C-V>" ? ':norm i//<cr>gv' : 'c/*<enter><esc>pi<enter>*/<enter><Esc>')
-vnoremap <expr> --   (visualmode() == "\<C-V>" ? ':norm i--<cr>gv' : 'c--[[<enter><esc>pi<enter>--]]<enter><Esc>')
-vnoremap <expr> "   (visualmode() == "\<C-V>" ? ':norm "<cr>gv' : 'c""<Esc>hp<Esc>')
-vnoremap <expr> '   (visualmode() == "\<C-V>" ? ":norm i'<cr>gv" : "c''<Esc>hp<Esc>")
-vnoremap <expr> !   (visualmode() == "\<C-V>" ? ':norm i#<cr>gv' : 'c!!<Esc>hp<Esc>')
+vnoremap <expr> #   (visualmode() == "\<C-V>" ? ':norm i#<cr>gv' : 'c##<Esc>hpgv')
+vnoremap <expr> //   (visualmode() == "\<C-V>" ? ':norm i//<cr>gv' : 'c/*<enter><esc>pi<enter>*/<enter><esc>gv')
+vnoremap <expr> --   (visualmode() == "\<C-V>" ? ':norm i--<cr>gv' : 'c--[[<enter><esc>pi<enter>--]]<enter><Esc>gv')
+vnoremap <expr> "   (visualmode() == "\<C-V>" ? ':norm "<cr>gv' : 'c""<Esc>hpgv')
+vnoremap <expr> '   (visualmode() == "\<C-V>" ? ":norm i'<cr>gv" : "c''<Esc>hpgv")
+vnoremap <expr> !   (visualmode() == "\<C-V>" ? ':norm i#<cr>gv' : 'c!!<Esc>hpgv')
 
 " Moving up and down will always recenter 
 " Move up/down 1 paragraph => Ctrl+Arrowkeys (Up-Down)

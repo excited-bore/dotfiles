@@ -82,19 +82,20 @@ reade -Q "GREEN" -i "y" -p "Install fd and use for fzf? (Faster find, required f
     fi
  fi
  unset rpgrp rpgrpdir
- 
- if [ "$(which kitty)" == "" ] && ! grep -q "(Kitty)" ~/.fzf/shell/key-bindings.bash; then
+
+if [ "$(which kitty)" != "" ]; then
     reade -Q "GREEN" -i "y" -p "Add shortcut for fzf-autocompletion? (CTRL-Tab) [Y/n]:" "y n" comp_key
     if [ "$comp_key" == "y" ]; then
-       printf "\n# (Kitty) Ctrl-tab for fzf autocompletion" >> ~/.fzf/shell/key-bindings.bash
-       printf "\nbind '\"\\\e[9;5u\": \" **\\\t\"'" >> ~/.fzf/shell/key-bindings.bash
-    
-    fi
- fi
+        if ! test -f .keybinds.d/keybinds.bash && ! grep -q "(Kitty)" ~/.fzf/shell/key-bindings.bash; then
+            printf "\n# (Kitty) Ctrl-tab for fzf autocompletion" >> ~/.fzf/shell/key-bindings.bash
+            printf "\nbind '\"\\\e[9;5u\": \" **\\\t\"'" >> ~/.fzf/shell/key-bindings.bash
+       fi
+     fi
+fi
  unset comp_key
 
  if test -f ~/.fzf.bash ; then
-    if [ -f ~/.keybinds.sh ] && grep -q -w "bind '\"\\\C-z\": vi-undo'" ~/.keybinds.sh; then
+    if test -f ~/keybinds.d/.keybinds.bash && grep -q -w "bind '\"\\\C-z\": vi-undo'" ~/.keybinds.d/keybinds.bash; then
         sed -i 's|\(\\C-y\\ey\\C-x\\C-x\)\\C-f|\1|g' ~/.fzf/shell/key-bindings.bash
         sed -i 's|\\C-z|\\ep|g' ~/.fzf/shell/key-bindings.bash
         #sed -i  's|bind -m emacs-standard '\''"\C-z"|#bind -m emacs-standard '\''"\C-z"|g' ~/.fzf/shell/key-bindings.bash
