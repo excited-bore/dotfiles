@@ -1,4 +1,4 @@
-alias r=". ~/.bashrc"
+alias r="stty sane && source ~/.bashrc"
 
 alias list_commands_bash="compgen -c | $PAGER"
 alias list_keywords_bash="compgen -k | $PAGER"
