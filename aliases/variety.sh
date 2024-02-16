@@ -33,12 +33,6 @@ vlc_folder(){
 #    ln -s $(python -m site --user-site) ~/python_user_site  
 #fi
 
-# Ranger 
-alias ranger='source ranger ranger'
-if [ -n "$RANGER_LEVEL" ]; then 
-    export PS1="[ranger]$PS1"; 
-fi
-
 # Docker
 alias docker_update="docker-compose down && docker-compose pull && docker-compose up &"
 

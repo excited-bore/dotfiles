@@ -13,9 +13,6 @@ fi
 
 reade -Q "YELLOW" -i "y" -p "Install bash completions for aliases in /root/.bash_completion.d? [Y/n]:" "y n" rcompl
 if [ -z $rcompl ] || [ "y" == $rcompl ]; then
-    if ! sudo test -d /root/.bash_completion.d/ ; then 
-        sudo mkdir /root/.bash_completion.d
-    fi
     if ! sudo test -e /root/.bash_completion.d/complete_alias ; then
         curl https://raw.githubusercontent.com/cykerway/complete-alias/master/complete_alias | sudo tee /root/.bash_completion.d/complete_alias 2> /dev/null
         sudo sed -i 's/#complete -F _complete_alias "\(.*\)"/complete -F _complete_alias "\1"/g' /root/.bash_completion.d/complete_alias

@@ -2,7 +2,7 @@
 . ./checks/check_distro.sh
 
  gitt(){
-        if ! [ -x "$(command -v git)" ]; then
+       if ! [ -x "$(command -v git)" ]; then
             reade -Q "GREEN" -i "y" -p "Install git? [Y/n]:" "y n" nstll
             if [ "$nstll" == "y" ]; then
                 if [ $distro == "Arch" ] || [ $distro_base == "Arch" ]; then
@@ -14,8 +14,17 @@
             fi
         fi
 
-        cp -bfv aliases/git.sh ~/.bash_aliases.d/
-        gio trash ~/.bash_aliases.d/git.sh~
+        if ! [ -x "$(command -v lazygit)" ]; then
+            reade -Q "GREEN" -i "y" -p "Install lazygit? (Git gui) [Y/n]:" "y n" nstll
+            if [ "$nstll" == "y" ]; then
+                if [ $distro == "Arch" ] || [ $distro_base == "Arch" ]; then
+                    yes | sudo pacman -Su lazygit
+                elif [ $distro == "Debian" ] || [ $distro_base == "Debian" ]; then
+                    yes | sudo apt update
+                    yes | sudo apt install lazygit
+                fi
+            fi
+        fi
 
         if [ -x $(command -v fzf) ]; then
             reade -Q "GREEN" -i "y" -p "Fzf detected. Install fzf-git? (Extra fzf stuff on leader-key C-g): [Y/n]: " "y n" gitfzf
@@ -25,6 +34,12 @@
             fi
             unset fzfgit
 
+        fi
+
+        local gitals
+        reade -Q "GREEN" -i "y" -p "Install git.sh? (Git aliases) [Y/n]: " "y n" gitals
+        if [ "$gitals" == "y" ]; then
+            cp -fv aliases/git.sh ~/.bash_aliases.d/
         fi
 
         if [[ ! $(git config --list | grep 'name') ]]; then

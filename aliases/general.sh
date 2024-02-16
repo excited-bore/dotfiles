@@ -4,6 +4,7 @@ else
     . ~/.bash_aliases.d/rlwrap_scripts.sh
 fi
 
+shopt -s expand_aliases  
 
 if [ -z $TRASHBIN_LIMIT ]; then
    TRASHBIN_LIMIT=100 

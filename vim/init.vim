@@ -15,15 +15,27 @@ filetype plugin indent on
 " Enable syntax highlighting
 syntax on
 
-" Relative number lines
-set relativenumber 
-
+" Complete with keywords
+set complete+=k
+set dictionary+=~/.vim/bash_aliases
 " Enable Omnicomplete features
 set omnifunc=syntaxcomplete#Complete
+
+" Better command-line completion
+set wildmenu
+set wildmode=longest,full
+set wildoptions=fuzzy
+
+"Enable relative number lines
+set relativenumber 
 
 "https://vim.fandom.com/wiki/GNU/Linux_clipboard_copy/paste_with_xclip
 "The 'a' and 'A' options enables copying selected text to system clipboard 
 set guioptions=aAimrLT
+
+" Set shell and shell cmd flags (-l/--login, -i/--interactive - WARNING: Might break config)
+"set shell=/bin/bash    
+"set shellcmdflag=-i
 
 "------------------------------------------------------------
 
@@ -50,8 +62,9 @@ set hidden
 " set confirm
 " set autowriteall
 
-" Better command-line completion
-set wildmenu
+" Change to directoy containing file you open
+set autochdir
+
 
 " Show partial commands in the last line of the screen
 set showcmd
@@ -174,9 +187,6 @@ set updatetime=300
 set signcolumn=yes 
 
 
-" Load bashrc
-set shellcmdflag=-ic
-
 "Use 24-bit (true-color) mode in Vim/Neovim when outside tmux.
 "If you're using tmux version 2.2 or later, you can remove the outermost $TMUX check and use tmux's 24-bit color support
 "(see < http://sunaku.github.io/tmux-24bit-color.html#usage > for more information.)
@@ -188,6 +198,15 @@ let $NVIM_TUI_ENABLE_TRUE_COLOR=1
 if (has("termguicolors"))
     set termguicolors
 endif 
+
+" By far, the bashiest answer of them all :) – José Fernández Ramos
+" https://stackoverflow.com/questions/8841116/vim-not-recognizing-aliases-when-in-interactive-mode
+
+
+if (filereadable(expand('~/.bash_aliases')))
+    let $BASH_ENV="~/.bash_aliases"
+endif
+
 
 " Read gz files without opening them
 " https://stackoverflow.com/questions/5396363/how-to-open-gzip-text-files-in-gvim-without-unzipping
@@ -272,12 +291,14 @@ Plugin 'Xuyuanp/nerdtree-git-plugin'
 " Totally independent OS52 clipboard
 Plugin 'ojroques/vim-oscyank', {'branch': 'main'}
 
+" Toggle Terminal
+Plugin 'akinsho/toggleterm.nvim', {'tag' : '*'}
 
 " Ranger integration
 Plugin 'francoiscabrol/ranger.vim'
 Plugin 'rbgrouleff/bclose.vim'
-let g:NERDTreeHijackNetrw = 0 
 let g:ranger_replace_netrw = 1
+let g:NERDTreeHijackNetrw = 0 
 let g:ranger_map_keys = 0
 let g:ranger_command_override = 'ranger --cmd "set show_hidden=true"'
 
@@ -294,6 +315,7 @@ Plugin 'tpope/vim-fugitive'
 " Nice keybinds overview for nvim
 Plugin 'folke/which-key.nvim'
 
+" Vim tmux kitty navigator
 Plugin 'excited-bore/vim-tmux-kitty-navigator', { 'build' : 'cd ~/.vim/plugins/vim-tmux-kitty-navigator && cp -f ./pass_keys.py ~/.config/kitty/;'}
 
 " Normal file operations
@@ -347,13 +369,15 @@ else
     lua require("lazy")
 endif
 
+lua require("toggleterm").setup()
+
 " Show lines per file
 let g:NERDTreeFileLines = 1
 
-"" Start NERDTree and put the cursor back in the other window.
+" Start NERDTree and put the cursor back in the other window.
 "autocmd VimEnter * NERDTree | wincmd p
-"
-"" Start NERDTree. If a file is specified, move the cursor to its window.
+
+" Start NERDTree. If a file is specified, move the cursor to its window.
 "autocmd StdinReadPre * let s:std_in=1
 "autocmd VimEnter * NERDTree | if argc() > 0 || exists("s:std_in") | wincmd p | endif
 
@@ -1099,3 +1123,4 @@ vnoremap <C-d>  "*d
 
 cnoremap <C-c> <C-f>
 cnoremap <C-v>  <C-r><C-o>"
+

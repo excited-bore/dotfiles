@@ -3,6 +3,10 @@ if [ ! -d ~/.bash_aliases.d/ ]; then
     mkdir ~/.bash_aliases.d/
 fi
 
+if ! grep -q "shopt -s expand_aliases" ~/.bashrc; then
+    echo "shopt -s expand_aliases" >> ~/.bashrc
+fi
+
 if ! grep -q "~/.bash_aliases.d" ~/.bashrc; then
 
     echo "if [ -d ~/.bash_aliases.d/ ] && [ \"\$(ls -A ~/.bash_aliases.d/)\" ]; then" >> ~/.bashrc
@@ -20,6 +24,10 @@ gio trash ~/.bash_aliases.d/check_distro.sh~ ~/.bash_aliases.d/rlwrap_scripts.sh
 
 if ! sudo test -d /root/.bash_aliases.d/ ; then
     sudo mkdir /root/.bash_aliases.d/
+fi
+
+if ! sudo grep -q "shopt -s expand_aliases" ~/.bashrc; then
+    printf "shopt -s expand_aliases\n" | sudo tee -a /root/.bashrc
 fi
 
 if ! sudo grep -q "~/.bash_aliases.d" /root/.bashrc; then

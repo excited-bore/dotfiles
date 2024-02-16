@@ -7,6 +7,9 @@
 #Don't use or do this 
 #export TERM=vt100
 
+# BASH
+export BASH_ENV=~/.bashrc
+
 # TMPDIR
 export TMPDIR=/tmp
 
@@ -149,7 +152,7 @@ FZF_PREVIEW_LINES=0
 #echo $excludes
 export FZF_DEFAULT_COMMAND="fd --search-path / --type f --hidden"
 
-export FZF_DEFAULT_OPTS='--select-1 --height=66% --layout=reverse-list --hscroll-off=50 --filepath-word --cycle --prompt="$>" --color=dark,fg:cyan'
+export FZF_DEFAULT_OPTS='--height=66% --layout=reverse-list --hscroll-off=50 --filepath-word --cycle --prompt="$>" --color=dark,fg:cyan'
 #label=$(curl -s http://metaphorpsum.com/sentences/1)
 #export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS --border --border-label=\"╢ $label ╟\" --border-label-pos=3 --color=label:italic:magenta"
 #fi

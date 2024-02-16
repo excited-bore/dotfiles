@@ -240,27 +240,28 @@ if test -x "$(command -v fzf)"; then
         bind -m vi-command -x '"\C-f": fzf_rifle'
         bind -m vi-insert -x '"\C-f": fzf_rifle'
 
-        # F3 - Rifle search
-        bind -m emacs-standard -x '"\eOR": "fzf_rifle"'
-        bind -m vi-command -x '"\eOR": "fzf_rifle"'
-        bind -m vi-insert -x '"\eOR": "fzf_rifle"'
+        # F4 - Rifle search
+        bind -m emacs-standard -x '"\eOS": "fzf_rifle"'
+        bind -m vi-command -x '"\eOS": "fzf_rifle"'
+        bind -m vi-insert -x '"\eOS": "fzf_rifle"'
     fi
     
-    if [[ "$(type -t git-fzf)" == function ]]; then
-        # F4 - Rifle search
-        bind -m emacs-standard -x '"\eOR": "git-fzf"'
-        bind -m vi-command -x '"\eOR": "git-fzf"'
-        bind -m vi-insert -x '"\eOR": "git-fzf"'
-    fi
-
 fi
 
 # F2 - ranger (file explorer)
-if test -x "$(command -v ranger)"; then
+if [ -x "$(command -v ranger)" ]; then
     bind -x '"\201": ranger'
     bind -m emacs-standard '"\eOQ": "\201\n\C-l"'
     bind -m vi-command     '"\eOQ": "\201\n\C-l"'
     bind -m vi-insert      '"\eOQ": "\201\n\C-l"'
+fi
+
+# F3 - lazygit (Git helper)
+if [ -x "$(command -v lazygit)" ]; then
+    bind -x '"\202": stty sane && lazygit'
+    bind -m emacs-standard '"\eOR": "\202\n\C-l"'
+    bind -m vi-command     '"\eOR": "\202\n\C-l"'
+    bind -m vi-insert      '"\eOR": "\202\n\C-l"'
 fi
 
 # F3 - FuzzyFinderls -l | fzf --preview="echo user={3} when={-4..-2}; cat {-1}" --header-lines=1 (file explorer)
