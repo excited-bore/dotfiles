@@ -600,6 +600,6 @@ fi
 
 source ~/.bashrc
 
-#echo "${cyan}${bold}You can check all aliases with 'alias <TAB>'"
+echo "${cyan}${bold}You can check all aliases with 'alias'"
 alias -p
 echo "${green}${bold}Done!"

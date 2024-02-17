@@ -43,19 +43,21 @@ if [ ! -x "$(command -v moar)" ]; then
         
     fi
 fi
+
+
 reade -Q "GREEN" -i "y" -p "Set moar default pager for $USER? [Y/n]: " "y n" moar_usr
 if [ -z "$moar_usr" ] || [ "y" == "$moar_usr" ] || [ "Y" == "$moar_usr" ]; then
     
     if grep -q "MOAR" $PATHVAR; then 
         sed -i "s|.export MOAR=|export MOAR=|g" $PATHVAR 
         
-        sed -i "s|export MOAR=.*|export MOAR='--statusbar=bold -colors 256 -render-unprintable highlight'|g" $PATHVAR 
+        sed -i "s|export MOAR=.*|export MOAR='--statusbar=bold -colors auto -render-unprintable highlight'|g" $PATHVAR 
         sed -i "s|.export PAGER=|export PAGER=|g" $PATHVAR
         sed -i "s|export PAGER=.*|export PAGER=/usr/bin/moar|g" $PATHVAR
         sed -i "s|.export SYSTEMD_PAGER=.*|export SYSTEMD_PAGER=\$PAGER|g" $PATHVAR
         sed -i "s|.export SYSTEMD_PAGERSECURE=.*|export SYSTEMD_PAGERSECURE=1|g" $PATHVAR
     else
-        printf "export MOAR='--statusbar=bold -colors 256 -render-unprintable highlight'\n" >> $PATHVAR
+        printf "export MOAR='--statusbar=bold -colors auto -render-unprintable highlight'\n" >> $PATHVAR
         printf "export PAGER=/usr/bin/moar\n" >> $PATHVAR
         printf "export SYSTEMD_PAGER=\$PAGER" >> $PATHVAR
         printf "export SYSTEMD_PAGERSECURE=1" >> $PATHVAR
