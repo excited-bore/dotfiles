@@ -207,6 +207,8 @@ if (filereadable(expand('~/.bash_aliases')))
     let $BASH_ENV="~/.bash_aliases"
 endif
 
+" For files with EOF
+au BufNewFile * set noeol
 
 " Read gz files without opening them
 " https://stackoverflow.com/questions/5396363/how-to-open-gzip-text-files-in-gvim-without-unzipping
@@ -291,6 +293,10 @@ Plugin 'Xuyuanp/nerdtree-git-plugin'
 " Totally independent OS52 clipboard
 Plugin 'ojroques/vim-oscyank', {'branch': 'main'}
 
+
+" Lazygit plugin
+Plugin 'kdheepak/lazygit.nvim'
+
 " Toggle Terminal
 Plugin 'akinsho/toggleterm.nvim', {'tag' : '*'}
 
@@ -370,6 +376,9 @@ else
 endif
 
 lua require("toggleterm").setup()
+
+" this is pseudo code
+let statusline = '%{&ft == "toggleterm" ? "terminal (".b:toggle_number.")" : ""}'
 
 " Show lines per file
 let g:NERDTreeFileLines = 1
@@ -590,15 +599,26 @@ nnoremap <silent><nowait> <C-Tab>k  :<C-u>CocPrev<CR>
 " Resume latest coc list        
 nnoremap <silent><nowait> <C-Tab>p  :<C-u>CocListResume<CR>
 
+autocmd TermEnter term://*toggleterm#*
+      \ tnoremap <silent><C-`> <Cmd>exe v:count1 . "ToggleTerm"<CR>
+
+" By applying the mappings this way you can pass a count to your
+" mapping to open a specific window.
+" For example: 2<C-t> will open terminal 2
+nnoremap <silent><c-`> <Cmd>exe v:count1 . "ToggleTerm"<CR>
+inoremap <silent><c-`> <Esc><Cmd>exe v:count1 . "ToggleTerm"<CR>
+tnoremap <silent><esc> <C-\><C-n>
+
+
 "Ranger F2
 nnoremap <silent><F2>   :RangerWorkingDirectory<CR>
 inoremap <silent><F2>   <Esc>:RangerWorkingDirectory<CR>
 vnoremap <silent><F2>   <Esc>:RangerWorkingDirectory<CR>
 
 " Git files F3
-nnoremap <F3>   :FzfPreviewGitActions<CR>
-inoremap <F3>   <Esc>:FzfPreviewGitActions<CR>a
-vnoremap <F3>   :FzfPreviewGitActions<CR>gv
+nnoremap <F3>   :LazyGit<CR>
+inoremap <F3>   <Esc>:LazyGit<CR>a
+vnoremap <F3>   :LazyGit<CR>gv
 
 " Git status F4
 nnoremap <F4>   :FzfPreviewChanges<CR>
@@ -717,6 +737,13 @@ vnoremap <silent><C-S-Left> :<C-u>TmuxKittyNavigateLeft<cr>gv
 vnoremap <silent><C-S-Down> :<C-u>TmuxKittyNavigateDown<cr>gv
 vnoremap <silent><C-S-Up> :<C-u>TmuxKittyNavigateUp<cr>gv
 vnoremap <silent><C-S-Right> :<C-u>TmuxKittyNavigateRight<cr>gv 
+
+tnoremap <silent><C-S-Left> <C-\><C-n><cmd>TmuxKittyNavigateLeft<cr>
+tnoremap <silent><C-S-Down> <C-\><C-n><cmd>TmuxKittyNavigateDown<cr>
+tnoremap <silent><C-S-Up> <C-\><C-n><cmd>TmuxKittyNavigateUp<cr>
+tnoremap <silent><C-S-Right> <C-\><C-n><cmd>TmuxKittyNavigateRight<cr>
+
+" set
 
 
 " Constantly set LastWindow

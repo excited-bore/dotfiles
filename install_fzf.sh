@@ -1,63 +1,115 @@
  # !/bin/bash
-. ./aliases/rlwrap_scripts.sh
-. ./checks/check_distro.sh
-. ./checks/check_pathvar.sh
+
+if ! test -f checks/check_distro.sh.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_distro.sh)" 
+else
+    . ./checks/check_distro.sh
+fi
+
+if ! test -f checks/check_pathvar.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pathvar.sh)" 
+else
+    . ./checks/check_pathvar.sh
+fi
+
+if ! test -f aliases/rlwrap_scripts.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/rlwrap_scripts.sh)" 
+else
+    . ./aliases/rlwrap_scripts.sh
+fi
 
 # Fzf (Fuzzy Finder)
 
-        
  git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
  ~/.fzf/install
 
  # Bash completion issue with fzf fix
  # https://github.com/cykerway/complete-alias/issues/46
- if grep -q "if \[\[ -d ~/.bash_completion.d/" ~/.bashrc; then
+ 
+if grep -q "if \[\[ -f ~/.bash_aliases" ~/.bashrc; then
     sed -i 's|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash||g' ~/.bashrc
-    sed -i 's|\(.*if \[\[ -d ~/.bash_completion.d/.*\)|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\n\n\1|g' ~/.bashrc
+    sed -i 's|\(.*if \[\[ -f ~/.bash_aliases.*\)|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\n\n\1|g' ~/.bashrc
+ elif grep -q "if \[\[ -f ~/.bash_completion" ~/.bashrc; then
+    sed -i 's|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash||g' ~/.bashrc
+    sed -i 's|\(.*if \[\[ -f ~/.bash_completion.*\)|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\n\n\1|g' ~/.bashrc
  fi
  . ~/.bashrc
 
-reade -Q "GREEN" -i "y" -p "Install fd and use for fzf? (Faster find, required for file-extensions file similar to gitignore) [Y/n]: " "y n" fdr
- if [ -z $fdr ] || [ "Y" == $fdr ] || [ $fdr == "y" ]; then
-    if [ "$(which fd)" == "" ]; then
-        if [ $distro_base == "Arch" ];then
-            yes | sudo pacman -Su fd
-        elif [ $distro_base == "Debian" ]; then
-            yes | sudo apt install fd-find
-            ln -s $(which fdfind) ~/.local/bin/fd
-        fi
+if [ ! -f ~/.fzf_history ]; then
+    touch ~/.fzf_history 
+fi
+
+fnd="find"
+
+if [ "$(which fd)" == "" ]; then
+    reade -Q "GREEN" -i "y" -p "Install fd and use for fzf? (Faster find) [Y/n]: " "y n" fdr
+     if [ -z $fdr ] || [ "Y" == $fdr ] || [ $fdr == "y" ]; then
+        if ! test -f install_fd.sh; then
+            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fd.sh)" 
+        else
+            ./install_fd.sh
+        fi 
+     fi
+     fnd="fd"
+else
+    fnd="fd"
+fi
+
+echo "${green}Fzf uses 'find'. Set default find options for fzf to:${normal}"
+reade -Q "GREEN" -i "y" -p "    Search globally instead of in current folder? [Y/n]: " "y n" fndgbl
+reade -Q "GREEN" -i "y" -p "    Search only files? [Y/n]: " "y n" fndfle
+reade -Q "GREEN" -i "y" -p "    Include hidden files? [Y/n]: " "y n" fndhiddn
+if [ $fnd == "find" ]; then
+   test "$fndgbl" == "y" && fnd="find /"
+   test "$fndfle" == "y" && fnd="$fnd -type f"
+   test "$fndhiddn" == "y" && fnd="$fnd -iname \".*\""
+else
+   test "$fndgbl" == "y" && fnd="fd --search-path /"
+   test "$fndfle" == "y" && fnd="$fnd --type f"
+   test "$fndhiddn" == "y" && fnd="$fnd --hidden"
+fi
+unset fndgbl fndfle fndhiddn
+
+if test "$(which fd)" != ""; then
+    echo "${green}Fd can read from global gitignore file${normal}"
+    reade -Q "GREEN" -i "y" -p "Generate global gitignore?: " "y n" fndgbl
+    if [ $fndgbl == 'y' ]; then
+        if ! test -f install_gitignore.sh; then
+            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fd.sh "global")" 
+        else
+            ./install_gitignore.sh "global"
+        fi 
     fi
-    if [ ! -f ~/.fzf_history ]; then
-        touch ~/.fzf_history 
-    fi
-    if [ $PATHVAR == ~/.pathvariables.sh ] ; then
-        sed -i 's|#export FZF_DEFAULT_COMMAND|export FZF_DEFAULT_COMMAND|g' $PATHVAR
-        sed -i 's|#export FZF_CTRL_T_COMMAND|export FZF_CTRL_T_COMMAND|g' $PATHVAR
-        sed -i 's|#export FZF_CTRL_R_OPTS|export FZF_CTRL_R_OPTS|g' $PATHVAR
-        sed -i 's|#export FZF_BIND_TYPES|export FZF_BIND_TYPES|g' $PATHVAR
-    elif ! grep -q "export FZF_DEFAULT_COMMAND" $PATHVAR; then
-        printf "\n# FZF\nexport FZF_DEFAULT_COMMAND=\"fd --search-path / --type f --hidden --exclude '*.dll *.pak *.bat *.so *.go' \"\nexport FZF_CTRL_T_COMMAND='$FZF_DEFAULT_COMMAND'" >> $PATHVAR
-    fi
-    if [ $PATHVAR_R == /root/.pathvariables.sh ] ; then
-        sudo sed -i 's|#export FZF_DEFAULT_COMMAND|export FZF_DEFAULT_COMMAND|g' $PATHVAR_R
-        sudo sed -i 's|#export FZF_CTRL_T_COMMAND|export FZF_CTRL_T_COMMAND|g' $PATHVAR_R
-        sudo sed -i 's|#export FZF_CTRL_R_OPTS|export FZF_CTRL_R_OPTS|g' $PATHVAR_R
-        sudo sed -i 's|#export FZF_BIND_TYPES|export FZF_BIND_TYPES|g' $PATHVAR_R
-    elif ! sudo grep -q "export FZF_DEFAULT_COMMAND" $PATHVAR_R; then
-        printf "\n# FZF\nexport FZF_DEFAULT_COMMAND=\"fd --search-path / --type f --hidden --exclude '*.dll *.pak *.bat *.so *.go' \"\nexport FZF_CTRL_T_COMMAND='$FZF_DEFAULT_COMMAND'" | sudo tee -a $PATHVAR_R
-    fi
- fi
+fi
+
+if [ $PATHVAR == ~/.pathvariables.sh ] ; then
+    sed -i 's|#export FZF_DEFAULT_COMMAND|export FZF_DEFAULT_COMMAND|g' $PATHVAR
+    sed -i "s|export FZF_DEFAULT_COMMAND=.*|export FZF_DEFAULT_COMMAND=\"$fnd\"|g" $PATHVAR
+    sed -i 's|#export FZF_CTRL_T_COMMAND|export FZF_CTRL_T_COMMAND|g' $PATHVAR
+    sed -i 's|#export FZF_CTRL_R_OPTS|export FZF_CTRL_R_OPTS|g' $PATHVAR
+    sed -i 's|#export FZF_BIND_TYPES|export FZF_BIND_TYPES|g' $PATHVAR
+elif ! grep -q "export FZF_DEFAULT_COMMAND" $PATHVAR; then
+    printf "\n# FZF\nexport FZF_DEFAULT_COMMAND=\"$fnd\"\nexport FZF_CTRL_T_COMMAND='$FZF_DEFAULT_COMMAND'" >> $PATHVAR
+fi
+
+if [ $PATHVAR_R == /root/.pathvariables.sh ] ; then
+    sudo sed -i 's|#export FZF_DEFAULT_COMMAND|export FZF_DEFAULT_COMMAND |g' $PATHVAR_R
+    sudo sed -i "s|export FZF_DEFAULT_COMMAND=.*|export FZF_DEFAULT_COMMAND=\"$fnd\"|g" $PATHVAR_R
+    sudo sed -i 's|#export FZF_CTRL_T_COMMAND|export FZF_CTRL_T_COMMAND|g' $PATHVAR_R
+    sudo sed -i 's|#export FZF_CTRL_R_OPTS|export FZF_CTRL_R_OPTS|g' $PATHVAR_R
+    sudo sed -i 's|#export FZF_BIND_TYPES|export FZF_BIND_TYPES|g' $PATHVAR_R
+elif ! sudo grep -q "export FZF_DEFAULT_COMMAND" $PATHVAR_R; then
+    printf "\n# FZF\nexport FZF_DEFAULT_COMMAND=\"$fnd\"\nexport FZF_CTRL_T_COMMAND='$FZF_DEFAULT_COMMAND'" | sudo tee -a $PATHVAR_R
+fi
  
  # TODO: Check export for ripgrep
  # TODO: Do more with ripgrep
  reade -Q "GREEN" -i "y" -p "Install ripgrep? (Recursive grep, opens possibility for line by line fzf ) [Y/n]: " "y n" rpgrp
  if [ -z $rpgrp ] || [ "Y" == $rpgrp ] || [ $rpgrp == "y" ]; then
-    if [ "$(which rg)" == "" ]; then 
-        if [ $distro_base == "Arch" ];then
-            yes | sudo pacman -Su ripgrep
-        elif [ $distro_base == "Debian" ]; then
-            yes | sudo apt install ripgrep 
-        fi
+    if ! test -f install_ripgrep.sh; then
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ripgrep.sh)" 
+    else
+        ./install_ripgrep.sh
     fi
     if [ $PATHVAR == ~/.pathvariables.sh ] ; then
         sed -i 's|#export RG_PREFIX|export RG_PREFIX|g' $PATHVAR
@@ -72,9 +124,11 @@ reade -Q "GREEN" -i "y" -p "Install fd and use for fzf? (Faster find, required f
     
     reade -Q "GREEN" -i "y" -p "Add shortcut for ripgrep files in dir? (Ctrl-g) [Y/n]:" "y n" rpgrpdir
     if [ -z $rpgrp ] || [ "Y" == $rpgrp ] || [ $rpgrp == "y" ]; then
-        
-        cp -bfv ./fzf/ripgrep-directory.sh ~/.bash_aliases.d/
-        gio trash ~/.bash_aliases.d/ripgrep-directory.sh~
+        if ! test -f fzf/ripgrep-directory.sh; then
+            wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/ripgrep-directory.sh -P ~/.bash_aliases.d/ 
+        else
+            cp -fv fzf/ripgrep-directory.sh ~/.bash_aliases.d/
+        fi
         if ! grep -q "ripgrep-dir" ~/.fzf/shell/key-bindings.bash; then 
             echo "#  Ctrl-g gives a ripgrep function overview" >> ~/.fzf/shell/key-bindings.bash
             echo 'bind -x '\''"\C-g": "ripgrep-dir"'\''' >> ~/.fzf/shell/key-bindings.bash
@@ -109,11 +163,14 @@ fi
             sudo wget "https://raw.githubusercontent.com/ranger/ranger/master/ranger/ext/rifle.py" /usr/bin/
             sudo mv -v /usr/bin/rifle.py /usr/bin/rifle
             sudo chmod +x /usr/bin/rifle
-            cp -bfv ranger/rifle.conf ~/.config/ranger/rifle.conf
-            gio trash ~/.config/ranger/rifle.conf~
         fi
-        cp -bfv fzf/keybinds_rifle.sh ~/.fzf/shell/
-        gio trash ~/.fzf/shell/keybinds_rifle.sh~ 
+        if ! test -f ranger/rifle.conf; then
+            wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/rifle.conf -P ~/.config/ranger/ 
+            wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/keybinds_rifle.sh -P ~/.fzf/shell/ 
+        else
+            cp -fv ranger/rifle.conf ~/.config/ranger/
+            cp -fv fzf/keybinds_rifle.sh ~/.fzf/shell/
+        fi
         if ! grep -q "keybinds_rifle.sh" ~/.fzf/shell/key-bindings.bash; then
             sed -i "s|\(# Required to refresh the prompt after fzf\)|. ~\/.fzf\/shell\/keybinds_rifle.sh\n\1|" ~/.fzf/shell/key-bindings.bash;
             sed -i "s|: fzf-file-widget|: fzf_rifle|g" ~/.fzf/shell/key-bindings.bash;
@@ -123,20 +180,21 @@ fi
 
     reade -Q "GREEN" -i "y" -p "Install bat? (File previews/thumbnails for riflesearch) [Y/n]: " "y n" bat
     if [ "$bat" == "y" ]; then
-        ./install_bat.sh
+        if ! test -f install_bat.sh; then
+            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bat.sh)" 
+        else
+            ./install_bat.sh
+        fi
     fi
     unset bat 
 
     #TODO: keybinds-rifle sh still has ffmpegthumbnailer part (could use sed check)
     reade -Q "GREEN" -i "y" -p "Install ffmpegthumbnailer? (Video thumbnails for riflesearch) [Y/n]: " "y n" ffmpg
     if [ "$ffmpg" == "y" ]; then
-        if [ "$(which ffmpegthumbnailer)" == "" ]; then 
-            if [ $distro_base == "Arch" ];then
-                yes | sudo pacman -Su ffmpegthumbnailer
-            elif [ $distro_base == "Debian" ]; then
-                yes | sudo apt update
-                yes | sudo apt install ffmpegthumbnailer 
-            fi
+        if ! test -f install_ffmpegthumbnailer.sh; then
+            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ffmpegthumbnailer.sh)" 
+        else
+            ./install_ffmpegthumbnailer.sh
         fi 
     fi
     unset ffmpg
@@ -161,12 +219,11 @@ fi
 
     if [ "$(which xclip)" == "" ]; then 
         reade -Q "GREEN" -i "y" -p "Install xclip? (Clipboard tool for Ctrl-R/Reverse history shortcut) [Y/n]: " "y n" xclip
-        if [ "$tree" == "y" ]; then
-            if [ $distro_base == "Arch" ];then
-                yes | sudo pacman -Su xclip
-            elif [ $distro_base == "Debian" ]; then
-                yes | sudo apt update
-                yes | sudo apt install xclip 
+        if [ "$xclip" == "y" ]; then
+            if ! test -f install_xclip.sh; then
+                /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_xclip.sh)" 
+            else
+                ./install_xclip.sh
             fi
         fi
         if [ $PATHVAR == ~/.pathvariables.sh ] ; then
@@ -182,15 +239,13 @@ fi
     fi
     unset xclip
 
+    
     reade -Q "GREEN" -i "y" -p "Install tree? (Builtin cd shortcut gets a nice directory tree preview ) [Y/n]: " "y n" tree
     if [ "$tree" == "y" ]; then
-        if [ "$(which tree)" == "" ]; then 
-            if [ $distro_base == "Arch" ];then
-                yes | sudo pacman -Su tree
-            elif [ $distro_base == "Debian" ]; then
-                yes | sudo apt update
-                yes | sudo apt install tree 
-            fi
+        if ! test -f install_tree.sh; then
+            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_tree.sh)" 
+        else
+            ./install_tree.sh
         fi
         if [ $PATHVAR == ~/.pathvariables.sh ] ; then
             sed -i 's|#export FZF_ALT_C_OPTS=|export FZF_ALT_C_OPTS=|g' $PATHVAR

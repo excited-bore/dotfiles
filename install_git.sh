@@ -1,5 +1,103 @@
-. ./aliases/rlwrap_scripts.sh
-. ./checks/check_distro.sh
+echo "$(tput setaf 6)This script uses $(tput setaf 2)rlwrap$(tput setaf 6) and $(tput setaf 2)fzf$(tput setaf 6).";
+
+if ! test -f checks/check_distro.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_distro)" 
+else
+    . ./checks/check_distro.sh
+fi
+
+if ! test -f aliases/rlwrap_scripts.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/rlwrap_scripts.sh)" 
+else
+    . ./aliases/rlwrap_scripts.sh
+fi
+
+if ! type fzf > /dev/null ; then
+   if ! test -f ./install_fzf.sh; then
+     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/install_fzf.sh)" 
+    else
+        ./install_fzf.sh
+    fi 
+fi
+
+git_pager(){
+local gitpgr cpager pager pagers global regpager colors 
+cpager=$1
+if ! test -z $2; then
+    global=$2
+else
+    global="--global"
+fi
+
+reade -Q "CYAN" -i "y" -p "Pager instead of only output? [Y/n]: " "y n" regpager ;
+if test "$regpager" == "y"; then
+        
+    pagers="less more"
+    pager="less"
+    
+    if type most > /dev/null ; then
+        pagers=$pagers" most"
+    fi
+    if type moar > /dev/null ; then
+        pagers=$pagers" moar"
+    fi
+    if type bat > /dev/null ; then
+        pagers=$pagers" bat"
+        pager="bat"
+    fi
+    if type vim > /dev/null; then
+        pagers=$pagers" vim"
+        pager="vim"
+    fi
+    if type nvim > /dev/null; then
+        pagers=$pagers" nvim"
+        pager="nvim"
+    fi
+    if type delta > /dev/null; then
+        pagers=$pagers" delta"
+        pager="delta"
+    fi
+    reade -Q "CYAN" -i "less" -p "Pager: " "$pagers" pager;
+    if test $pager == 'less'; then
+        reade -Q "CYAN" -i "y" -p "You selected $pager. Don't page if content fits on a single screen?: " "y n" pager1
+        if test $pager1 == 'y'; then
+            pager='less -FR'
+        else 
+            pager='less -R'
+        fi
+    elif [ "$pager" == "nvim" ] || [ "$pager" == "vim" ]; then
+        echo "You selected $pager."
+        colors="blue darkblue default delek desert elflord evening gruvbox habamax industry koehler lunaperch morning murphy pablo peachpuff quiet ron shine slate torte zellner"
+        if test $pager == "vim"; then
+           colors=$colors" retrobox sorbet wildcharm zaibatsu" 
+        fi
+        pager="$pager --cmd 'set isprint=1-255'"
+        reade -Q "CYAN" -i "y" -p "Set colorscheme? [Y/n]: " "y n" pager1
+        if [ "$pager1" == "y" ]; then
+            reade -Q "CYAN" -i "default" -p "Colorscheme: " "$colors" color
+            pager="$pager +'colorscheme $color'"
+        fi
+        if [ ! -z "$pager" ]; then
+            git config $global $cpager "$pager" ;
+        fi
+    elif test "$regpager" == "n"; then
+        if test $cpager == "core.pager"; then
+            pagers="cat"
+            pager="cat"
+            if type bat > /dev/null; then
+                pagers=$pagers" bat"
+            fi
+            reade -Q "CYAN" -i "cat" -p "Pager: " "$pagers" pager;
+            if [ $pager == "bat" ]; then
+                pager="bat --paging=never"
+            fi
+            git config $global core.pager $pager 
+        else
+            git config $global $cpager $pager 
+        fi
+    fi
+fi
+}
 
  gitt(){
        if ! [ -x "$(command -v git)" ]; then
@@ -15,15 +113,21 @@
         fi
 
         if ! [ -x "$(command -v lazygit)" ]; then
-            ./install_lazygit.sh
+            if ! test -f install_lazygit.sh; then
+                /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_lazygit.sh)" 
+            else
+               ./install_lazygit.sh
+            fi 
         fi
 
-        if [ -x $(command -v fzf) ]; then
-            reade -Q "GREEN" -i "y" -p "Fzf detected. Install fzf-git? (Extra fzf stuff on leader-key C-g): [Y/n]: " "y n" gitfzf
-            if [ "$fzfgit" == "y" ]; then
-                . ./checks/check_aliases_dir.sh
-                wget https://raw.githubusercontent.com/junegunn/fzf-git.sh/main/fzf-git.sh -P ~/.bash_aliases.d/
+        reade -Q "GREEN" -i "y" -p "Install fzf-git? (Extra fzf stuff on leader-key C-g): [Y/n]: " "y n" gitfzf
+        if [ "$fzfgit" == "y" ]; then
+            if ! test -f checks/check_aliases_dir.sh; then
+                eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)" 
+            else
+               . ./checks/check_aliases_dir.sh
             fi
+            wget https://raw.githubusercontent.com/junegunn/fzf-git.sh/main/fzf-git.sh -P ~/.bash_aliases.d/
         fi
 
         local global=""
@@ -42,6 +146,7 @@
         fi
         unset name gitname
 
+        local gitmail mail
         reade -Q "CYAN" -i "y" -p "Configure git email? [Y/n]: " "y n" gitmail ;
         if [ "y" == $gitmail ]; then
             reade -Q "CYAN" -p "Email: " mail ;
@@ -49,130 +154,131 @@
                 git config $global user.email "$mail" ;
             fi
         fi
-        unset gitmail mail
 
-        local gitpgr            
-        reade -Q "CYAN" -i "y" -p "Set git core pager? [Y/n]: " "y n" gitpgr ;
-        if [ "y" == $gitpgr ]; then
-            reade -Q "CYAN" -i "y" -p "Install custom pager? [Y/n]: " "y n" gitpgr ;
-            if test $gitpgr == "y"; then
-                reade -Q "GREEN" -i "bat" -p "Which pager to install? [Bat/moar/most]: " "bat moar most" pager 
-                if test $pager == "bat"; then
-                    . ./install_bat.sh
-                elif test $pager == "moar"; then
-                    . ./install_moar.sh
-                elif test $pager == "most"; then
-                    . ./install_most.sh
+        local gitpgr pager
+        reade -Q "CYAN" -i "y" -p "Install custom pager? [Y/n]: " "y n" gitpgr ;
+        if test $gitpgr == "y"; then
+            reade -Q "GREEN" -i "bat" -p "Which pager to install? [Bat/moar/most]: " "bat moar most" pager 
+            if test $pager == "bat"; then
+                if ! test -f install_bat.sh; then
+                    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bat.sh)"
+                else
+                   ./install_bat.sh
+                fi
+            elif test $pager == "moar"; then
+                if ! test -f install_moar.sh; then
+                    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_moar.sh)"
+                else
+                   ./install_moar.sh
+                fi
+            elif test $pager == "most"; then
+                if ! test -f install_most.sh; then
+                    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_most.sh)"
+                else
+                   ./install_most.sh
                 fi
             fi
-            unset pager 
-
-            reade -Q "CYAN" -i "regular" -p "Regular pager or cat variant (outputs to screen)? [Regular/cat]: " "regular cat" regpager ;
-            if test "$regpager" == "regular"; then
-                
-                pagers="less more"
-                pager="less"
-                
-                if [ ! -x "$(command -v most)" ]; then
-                    pagers=$pagers" most"
-                fi
-                if [ ! -x "$(command -v moar)" ]; then
-                    pagers=$pagers" moar"
-                fi
-                if [ ! -x "$(command -v vim)" ]; then
-                    pagers=$pagers" vim"
-                    pager="vim"
-                fi
-                if [ ! -x "$(command -v nvim)" ]; then
-                    pagers=$pagers" nvim"
-                    pager="nvim"
-                fi
-
-                reade -Q "CYAN" -i "less" -p "Pager: " "$pagers" pager;
-                if test $pager == 'less'; then
-                    reade -Q "CYAN" -i "y" -p "You selected $pager. Don't page if content fits on a single screen?: " "y n" pager1
-                    if test $pager1 == 'y'; then
-                        pager='less -FR'
-                    else 
-                        pager='less -R'
-                    fi
-                elif [ "$pager" == "nvim" ] || [ "$pager" == "vim" ]; then
-                    echo "You selected $pager."
-                    colors="blue darkblue default delek desert elflord evening gruvbox habamax industry koehler lunaperch morning murphy pablo peachpuff quiet ron shine slate torte zellner"
-                    if test $pager == "vim"; then
-                       colors=$colors" retrobox sorbet wildcharm zaibatsu" 
-                    fi
-                    pager="$pager --cmd 'set isprint=1-255'"
-                    reade -Q "CYAN" -i "y" -p "Set colorscheme? [Y/n]: " "y n" pager1
-                    if [ "$pager1" == "y" ]; then
-                        reade -Q "CYAN" -i "default" -p "Colorscheme: " "$colors" color
-                        pager="$pager +'colorscheme $color'"
-                    fi
-                if [ ! -z "$pager" ]; then
-                    git config $global core.pager "$pager" ;
-                fi
-            elif test "$regpager" == "cat"; then
-                pagers="cat"
-                pager="cat"
-                if [ ! -x "$(command -v bat)" ]; then
-                    pagers=$pagers" bat"
-                fi
-                reade -Q "CYAN" -i "cat" -p "Pager: " "$pagers" pager;
-                if [ $pager == "bat" ]; then
-                    pager="bat --paging=never"
-                fi
-                if [ ! -z "$pager" ]; then
-                    git config $global core.pager "$pager" ;
-                fi
-            fi
-            unset gitpager pager pager1 colors
         fi
-
-
         
-        reade -Q "CYAN" -i "y" -p "Install custom diff? [Y/n]: " "y n" gitpager ;
-        if test "y" == $gitpager; then    
-            . ./install_diffs.sh            
-        fi 
-
-        local diff
+        local wpager
+        reade -Q "CYAN" -i "y" -p "Set default pager and wich git commands would use a pager? [Y/n]: " "y n" wpager ;
+        if test $wpager == "y"; then
+            git_pager "core.pager" "$global"
+            confs="$(cur="pager." && compgen -F _git_config 2> /dev/null)"
+        fi
+                
+        local gitdiff
         reade -Q "CYAN" -i "y" -p "Set custom git diff? [Y/n]: " "y n" gitdiff ;
         if [ "y" == $gitdiff ]; then
-            echo "NOT YET"
-        fi
-
-        reade -Q "GREEN" -i "y" -p "Install and configure different git (diff) pager? [Y/n]: " "y n" gitpager ;
-        if [ "y" == $gitpager ]; then
-            pagers="less cat more"
-            if [ ! -x "$(command -v most)" ]; then
-                pagers=$pagers" most"
-            fi
-            if [ ! -x "$(command -v moar)" ]; then
-                pagers=$pagers" moar"
-            fi
-            if [ ! -x "$(command -v vim)" ]; then
-                pagers=$pagers" vim"
-            fi
-            if [ ! -x "$(command -v nvim)" ]; then
-                pagers=$pagers" nvim"
-            fi
-            reade -Q "CYAN" -i "less" -p "Pager: " "$pagers" pager;
-            if test $pager == 'less'; then
-                pager='less -R'
-            fi
+            reade -Q "CYAN" -i "y" -p "Install custom diff? [Y/n]: " "y n" gitdiff1 ;
+            if test "y" == $gitdiff1; then   
+                if test $distro_base == "Arch"; then
+                    reade -Q "GREEN" -i "delta" -p "Which diff to install? [Delta/diff-so-fancy/ydiff/difftastic]: " "diff-so-fancy delta ydiff difftastic" difftool ;
+                    if test $difftool == "diff-so-fancy"; then
+                        sudo pacman -Su diff-so-fancy
+                    elif test $difftool == "delta"; then
+                        sudo pacman -Su git-delta
+                    elif test $difftool == "ydiff"; then
+                        sudo pacman -Su pipx
+                        pipx install --upgrade ydiff
+                    elif test $difftool == "difftastic"; then
+                        sudo pacman -Su difftastic
+                    fi
+                elif test $distro_base == "Debian"; then
+                    reade -Q "GREEN" -i "delta" -p "Which diff to install? [Delta/diff-so-fancy/ydiff/difftastic]: " "diff-so-fancy delta ydiff difftastic" difftool;
+                    if test $difftool == "diff-so-fancy"; then
+                        sudo apt install npm
+                        sudo npm -g install diff-so-fancy 
+                    elif test $difftool == "delta"; then
+                        sudo apt install Debdelta
+                    elif test $difftool == "ydiff"; then
+                        sudo apt install pipx
+                        pipx install --upgrade ydiff
+                    elif test $difftool == "difftastic"; then
+                        if [[ $arch =~ "arm" ]]; then
+                            sudo apt install cargo
+                            cargo install --locked difftastic
+                        else
+                            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+                            brew install difftastic
+                        fi
+                    fi
+                fi
+            fi 
+            unset gitdiff gitdiff1 difftool            
             
-            elif [ "$pager" == "delta" ]; then
-                reade -Q "CYAN" -i "n" -p "You selected $pager. Configure [Y/n]?: " "y n" pager1
-                if [ "$pager1" == "y" ]; then
-                       
+            reade -Q "CYAN" -i "y" -p "Install custom diff? [Y/n]: " "y n" gitdiff1 ;
+            if [ "y" == $gitdiff1 ]; then
+                
+                diffs="diff"
+                if type delta > /dev/null ; then
+                    diffs=$diffs" delta"
+                fi
+                if type diff-so-fancy > /dev/null ; then
+                    diffs=$diffs" diff-so-fancy"
+                fi
+                if type ydiff > /dev/null ; then
+                    diffs=$diffs" ydiff"
+                fi
+                if type difftastic > /dev/null ; then
+                    diffs=$diffs" difftastic"
+                fi
+
+                reade -Q "CYAN" -i "diff" -p "Diffs: " "$diffs" diff;
+                if test $diff == 'delta'; then
+                    diff='delta'
+                fi
+                
+                elif [ "$diff" == "delta" ]; then
+                    reade -Q "CYAN" -i "n" -p "You selected $diff. Configure [Y/n]?: " "y n" delta
+                    if [ "$delta" == "y" ]; then
+                        reade -Q "CYAN" -i "y" -p "Set to navigate? (Move between diff sections) [Y/n]" "y n" delta1
+                        if test "y" == $delta1; then
+                           git config $global delta.navigate true
+                        fi
+
+                        reade -Q "CYAN" -i "y" -p "Set to navigate? (Move between diff sections using n and N) [Y/n]" "y n" delta1
+                        if test "y" == $delta1; then
+                           git config $global delta.navigate true
+                        fi 
+
+                        reade -Q "CYAN" -i "y" -p "Set to dark? [Y/n]" "y n" delta2
+                        if test "y" == $delta2; then
+                           git config $global delta.dark true
+                        fi
+
+                        reade -Q "CYAN" -i "y" -p "Set linenumbers? [Y/n]" "y n" delta3
+                        if test "y" == $delta3; then
+                           git config $global delta.linenumbers true
+                        fi
+                    fi
+                fi
+                if [ ! -z "$diff" ]; then
+                   git config $global diff.tool "$diff" ;
                 fi
             fi
-
-            if [ ! -z "$pager" ]; then
-                git config $global core.pager "$pager" ;
-            fi
         fi
-        unset gitpager pager pager1
+        unset gitpager diff pager1
 
         reade -Q "GREEN" -i "y" -p "Configure git difftool? [Y/n]: " "y n" gitdiff ;
         if [ "y" == $gitmerge ]; then
@@ -209,21 +315,38 @@
 
         reade -Q "GREEN" -i "y" -p "Check and create global gitignore? (~/.config/git/ignore) [Y/n]: " "y n" gitign
         if [ "y" == "$gitign" ]; then
-           ./install_gitignore.sh
+            if ! test -f install_gitignore.sh; then
+                /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_gitignore.sh)"
+            else
+               ./install_gitignore.sh
+            fi 
         fi
 
         local gitals
         reade -Q "GREEN" -i "y" -p "Install git.sh? (Git aliases) [Y/n]: " "y n" gitals
         if [ "$gitals" == "y" ]; then
-            cp -fv aliases/git.sh ~/.bash_aliases.d/
+            if ! test -f checks/check_aliases_dir.sh; then
+                eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)" 
+            else
+               . ./checks/check_aliases_dir.sh
+            fi
+            if ! test -f aliases/git.sh; then
+                wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/git.sh -P ~/.bash_aliases.d/ 
+            else
+                cp -fv aliases/git.sh ~/.bash_aliases.d/
+            fi
         fi
 
         unset gitdiff diff gitmerge merge amt rslt gitcnf gitign
         if [ ! -x "$(command -v copy-to)" ]; then
             reade -Q "GREEN" -i "y" -p "Install copy-to? [Y/n]: " "y n" cpcnf;
             if [ "y" == $cpcnf ] || [ -z $cpcnf ]; then
-                ./install_copy-conf.sh
+                if ! test -f install_copy-conf.sh; then
+                    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_copy-conf.sh)"
+                else
+                    ./install_copy-conf.sh
+                fi
             fi
         fi
     }
-    yes_edit_no gitt "aliases/git.sh" "Install git.sh at ~/.bash_aliases.d/ (git aliases)? " "yes" "GREEN"
+

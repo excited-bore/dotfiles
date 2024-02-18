@@ -249,7 +249,7 @@ if test -x "$(command -v fzf)"; then
 fi
 
 # F2 - ranger (file explorer)
-if [ -x "$(command -v ranger)" ]; then
+if type ranger &> /dev/null; then
     bind -x '"\201": ranger'
     bind -m emacs-standard '"\eOQ": "\201\n\C-l"'
     bind -m vi-command     '"\eOQ": "\201\n\C-l"'
@@ -257,7 +257,7 @@ if [ -x "$(command -v ranger)" ]; then
 fi
 
 # F3 - lazygit (Git helper)
-if [ -x "$(command -v lazygit)" ]; then
+if type lazygit &> /dev/null; then
     bind -x '"\202": stty sane && lazygit'
     bind -m emacs-standard '"\eOR": "\202\n\C-l"'
     bind -m vi-command     '"\eOR": "\202\n\C-l"'

@@ -11,7 +11,7 @@
 export BASH_ENV=~/.bashrc
 
 # TMPDIR
-#export TMPDIR=/tmp
+export TMPDIR=/tmp
 
 # DISTRO stuff (Only used by dotfiles)
 #export DIST_BASE="Arch"
@@ -44,7 +44,7 @@ export LESS=" --CLEAR-SCREEN --redraw-on-quit --LINE-NUMBERS --line-num-width=2 
 #export LESSEDIT=$EDITOR
 
 # MOAR
-export MOAR='--statusbar=bold -colors auto -render-unprintable highlight'
+export MOAR='--statusbar=bold -colors 256 -render-unprintable highlight'
 
 # EDITORS
 export EDITOR=/usr/bin/nvim
