@@ -628,24 +628,34 @@ fi
     fi 
 
 
-    local editor editors difftool mergetool cstyle prompt
+    local editor editors diffs diff difftool mergetool cstyle prompt
     editors="nano vi"
     if type vim &> /dev/null; then
         editors=$editors" vim"
+        editor='vim'
     fi
     if type gvim &> /dev/null ; then
         editors=$editors" gvim"
+        editor='gvim'
     fi
     if type nvim &> /dev/null ; then
         editors=$editors" nvim"
+        editor='nvim'
     fi 
     if type emacs &> /dev/null ; then
         editors=$editors" emacs"
+        editor='emacs'
     fi
     if type code &> /dev/null ; then
         editors=$editors" vscode"
+        editor='vscode'
     fi
-
+    diffs="$editors"
+    diff="$editor"
+    if type difft &> /dev/null; then
+        diffs=$diffs" difftastic"
+        diff="difftastic" 
+    fi
 
     local edpre="n"
     if test "$(git config $global --list | grep 'core.ui' | awk 'BEGIN { FS = "=" } ;{print $2;}')" == '' ; then
@@ -667,7 +677,7 @@ fi
     reade -Q "CYAN" -i "$edpre" -p "Set default editor?: " "y n" editor ;
     if test "y" == "$editor"; then
         unset editor
-        reade -Q "CYAN" -i "nano" -p "Editor: " "$editors" editor;
+        reade -Q "CYAN" -i "$editor" -p "Editor: " "$editors" editor;
         if ! test -z "$editor"; then
             if test "$editor" == "vscode"; then
                 editor="code"
@@ -677,32 +687,33 @@ fi
     fi
     #fi
 
+    
+
     local diffpre="n"
     if test "$(git config $global --list | grep 'diff.tool' | awk 'BEGIN { FS = "=" } ;{print $2;}')" == '' ; then
         diffpre="y"
     fi
-    reade -Q "CYAN" -i "$diffpre" -p "Set difftool and mergetool?: " "y n" difftool;
+    reade -Q "CYAN" -i "$diffpre" -p "Set difftool? [Y/n]: " "y n" difftool;
     if test $difftool == "y"; then
-        reade -Q "CYAN" -i "nano" -p "Tool (editor): " "$editors" editor;
+        reade -Q "CYAN" -i "$diff" -p "Tool: " "$diffs" editor;
         if ! test -z "$editor"; then
             local diff merge
             if test "$editor" == "vim"; then 
                 git config "$global" diff.tool vimdiff
-                git config "$global" merge.tool vimdiff
             elif test "$editor" == "gvim"; then 
                 git config "$global" diff.tool gvimdiff
-                git config "$global" merge.tool gvimdiff
             elif test "$editor" == "nvim"; then 
                 git config "$global" diff.tool nvimdiff
-                git config "$global" merge.tool nvimdiff
             elif test "$editor" == "emacs"; then 
                 git config "$global" diff.tool emerge
-                git config "$global" merge.tool emerge
             elif test "$editor" == "vscode"; then 
                 git config "$global" difftool.vscode.cmd 'code --wait --diff $LOCAL $REMOTE'
                 git config "$global" diff.tool vscode
-                git config "$global" mergetool.vscode.cmd 'code --wait $MERGED'
-                git config "$global" merge.tool vscode
+            elif test "$editor" == "difftastic"; then 
+                git config "$global" diff.tool difftastic
+                git config "$global" difftool.pager true
+                git config "$global" difftool.prompt false
+                git config "$global" difftool.difftastic.cmd 'difft "$LOCAL" "$REMOTE"'
             fi
         fi
     fi
@@ -711,40 +722,104 @@ fi
     if test "$(git config $global --list | grep 'diff.guitool' | awk 'BEGIN { FS = "=" } ;{print $2;}')" == '' ; then
         diffguipre="y"
     fi
-    reade -Q "CYAN" -i "$diffguipre" -p "Set diff guitool and merge guitool?: " "y n" difftool;
+    reade -Q "CYAN" -i "$diffguipre" -p "Set diff guitool? [Y/n]: " "y n" difftool;
     if test $difftool == "y"; then
-        reade -Q "CYAN" -i "nano" -p "Tool (editor): " "$editors" editor;
+        reade -Q "CYAN" -i "$diff" -p "Guitool: " "$diffs" editor;
         if ! test -z "$editor"; then
             local diff merge
             if test "$editor" == "vim"; then
                 git config "$global" diff.guitool vimdiff
-                git config "$global" merge.guitool vimdiff
             elif test "$editor" == "gvim"; then 
                 git config "$global" diff.guitool gvimdiff
-                git config "$global" merge.guitool gvimdiff
             elif test "$editor" == "nvim"; then 
                 git config "$global" diff.guitool nvimdiff
-                git config "$global" merge.guitool nvimdiff
             elif test "$editor" == "emacs"; then 
                 git config "$global" diff.guitool emerge
-                git config "$global" merge.guitool emerge
             elif test "$editor" == "vscode"; then 
                 git config "$global" difftool.vscode.cmd 'code --wait --diff $LOCAL $REMOTE'
                 git config "$global" diff.guitool vscode
+            elif test "$editor" == "difftastic"; then 
+                git config "$global" diff.guitool difftastic
+                git config "$global" diffguitool.pager true
+                git config "$global" diffguitool.prompt false
+                git config "$global" difftool.difftastic.cmd 'difft "$LOCAL" "$REMOTE"'
+            fi
+        fi
+    fi
+
+    local diffpre="n"
+    if test "$(git config $global --list | grep 'merge.tool' | awk 'BEGIN { FS = "=" } ;{print $2;}')" == '' ; then
+        diffpre="y"
+    fi
+    reade -Q "CYAN" -i "$diffpre" -p "Set mergetool? [Y/n]: " "y n" difftool;
+    if test $difftool == "y"; then
+        reade -Q "CYAN" -i "$editor" -p "Tool (editor): " "$editors" editor;
+        if ! test -z "$editor"; then
+            local diff merge
+            if test "$editor" == "vim"; then 
+                git config "$global" merge.tool vimdiff
+            elif test "$editor" == "gvim"; then 
+                git config "$global" merge.tool gvimdiff
+            elif test "$editor" == "nvim"; then 
+                git config "$global" merge.tool nvimdiff
+            elif test "$editor" == "emacs"; then 
+                git config "$global" merge.tool emerge
+            elif test "$editor" == "vscode"; then 
+                git config "$global" mergetool.vscode.cmd 'code --wait $MERGED'
+                git config "$global" merge.tool vscode
+            fi
+        fi
+    fi
+    
+    local diffguipre="n"
+    if test "$(git config $global --list | grep 'merge.guitool' | awk 'BEGIN { FS = "=" } ;{print $2;}')" == '' ; then
+        diffguipre="y"
+    fi
+    reade -Q "CYAN" -i "$diffguipre" -p "Set merge guitool?: " "y n" difftool;
+    if test $difftool == "y"; then
+        reade -Q "CYAN" -i "$editor" -p "Guitool (editor) [Y/n]: " "$editors" editor;
+        if ! test -z "$editor"; then
+            local diff merge
+            if test "$editor" == "vim"; then
+                git config "$global" merge.guitool vimdiff
+            elif test "$editor" == "gvim"; then 
+                git config "$global" merge.guitool gvimdiff
+            elif test "$editor" == "nvim"; then 
+                git config "$global" merge.guitool nvimdiff
+            elif test "$editor" == "emacs"; then 
+                git config "$global" merge.guitool emerge
+            elif test "$editor" == "vscode"; then 
                 git config "$global" mergetool.vscode.cmd 'code --wait $MERGED'
                 git config "$global" merge.guitool vscode
             fi
         fi
+    fi 
+
+    local diffguipre="n"
+    if test "$(git config $global --list | grep 'merge.conflictsstyle' | awk 'BEGIN { FS = "=" } ;{print $2;}')" == '' ; then
+        diffguipre="y"
     fi
-    #fi
-    reade -Q "CYAN" -i "diff3" -p "Set merge conflictsstyle: " "diff diff1 diff2 diff3" cstyle;
-    if ! test -z "$cstyle"; then
-        git config "$global" merge.conflictsstyle "$cstyle" 
+    reade -Q "CYAN" -i "$diffguipre" -p "Set merge conflictsstyle? [Y/n]: " "y n" conflict;
+    if test $conflict == "y"; then
+        reade -Q "GREEN" -i "diff3" -p "Conflictsstyle: " "diff diff1 diff2 diff3" cstyle;
+        if ! test -z "$cstyle"; then
+            git config "$global" merge.conflictsstyle "$cstyle" 
+        fi
     fi
-    reade -Q "CYAN" -i "false" -p "Mergetool prompt?: " "true false" prompt;
-    if ! test -z "$cstyle"; then
-        git config mergetool.prompt "$prompt"
+
+    local diffguipre="n"
+    if test "$(git config $global --list | grep 'mergetool.prompt' | awk 'BEGIN { FS = "=" } ;{print $2;}')" == '' ; then
+        diffguipre="y"
     fi
+    reade -Q "CYAN" -i "$diffguipre" -p "Set mergetool prompt? [Y/n]: " "y n" conflict;
+    if test $conflict == "y"; then
+        reade -Q "GREEN" -i "false" -p "Prompt?: " "true false" prompt;
+        if ! test -z "$cstyle"; then
+            git config mergetool.prompt "$prompt"
+        fi
+    fi
+
+    
      
 
     
