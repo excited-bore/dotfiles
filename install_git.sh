@@ -1,7 +1,7 @@
 echo "$(tput setaf 6)This script uses $(tput setaf 2)rlwrap$(tput setaf 6) and $(tput setaf 2)fzf$(tput setaf 6).";
 
 if ! test -f checks/check_distro.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_distro)" 
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_distro.sh)" 
 else
     . ./checks/check_distro.sh
 fi
@@ -29,50 +29,106 @@ else
     global="--global"
 fi
 
-reade -Q "CYAN" -i "y" -p "Set pager instead of output only? [Y/n]: " "y n" regpager ;
-if test "$regpager" == "y"; then
+reade -Q "CYAN" -i "n" -p "Set $cpager to prevent paging by using cat (or bat/batdiff)? [N/y]: " "y n" regpager ;
+#regpager="$(printf "yes\nno\n" | fzf --border --border-label="Set pager instead of output only?" --reverse)"
+if test "$regpager" == "n"; then
         
     pagers="less more"
+    pagersf="less\nmore\n"
     pager="less"
     
     if type most &> /dev/null ; then
         pagers=$pagers" most"
+        pagersf=$pagersf"most\n"
     fi
     if type moar &> /dev/null ; then
         pagers=$pagers" moar"
+        pagersf=$pagersf"moar\n"
+        pager="moar"
     fi
-    if type bat &> /dev/null ; then
-        pagers=$pagers" bat"
-        pager="bat"
+    if type batdiff &> /dev/null ; then
+        pagers=$pagers" batdiff"
+        pagersf=$pagersf"batdiff\n"
+        pager="batdiff"
     fi
     if type vim &> /dev/null; then
         pagers=$pagers" vim"
+        pagersf=$pagersf"vim\n"
         pager="vim"
     fi
     if type nvim &> /dev/null; then
         pagers=$pagers" nvim"
+        pagersf=$pagersf"nvim\n"
         pager="nvim"
     fi
     if type delta &> /dev/null; then
         pagers=$pagers" delta"
+        pagersf=$pagersf"delta\n"
         pager="delta"
-    fi
-    if type diff-so-fancy &> /dev/null; then
-        pagers=$pagers" diff-so-fancy"
-        pager="diff-so-fancy"
     fi
     if type ydiff &> /dev/null; then
         pagers=$pagers" ydiff"
+        pagersf=$pagersf"ydiff\n"
         pager="ydiff"
     fi
-    reade -Q "CYAN" -i "less" -p "Pager: " "$pagers" pager;
+    if type diffr &> /dev/null; then
+        pagers=$pagers" diffr"
+        pagersf=$pagersf"diffr\n"
+        pager="diffr"
+    fi
+    if type riff &> /dev/null; then
+        pagers=$pagers" riff"
+        pagersf=$pagersf"riff\n"
+        pager="riff"
+    fi
+    if type diff-so-fancy &> /dev/null; then
+        pagers=$pagers" diff-so-fancy"
+        pagersf=$pagersf"diff-so-fancy\n"
+        pager="diff-so-fancy"
+    fi
+    
+    reade -Q "GREEN" -i "$pager" -p "Pager: " "$pagers" pager;
+    #pager="$(printf "$pagersf" | fzf --border --border-label="Pager" --reverse)"
+    
     if test $pager == 'less'; then
-            reade -Q "CYAN" -i "y" -p "You selected $pager. Don't page if content fits on a single screen?: " "y n" pager1
-            if test $pager1 == 'y'; then
-                pager='less -FR'
-            else 
-                pager='less -R'
-            fi
+        reade -Q "CYAN" -i "y" -p "You selected $pager. Don't page if content fits on a single screen?: " "y n" pager1
+        if test $pager1 == 'y'; then
+            pager='less -FR'
+        else 
+            pager='less -R'
+        fi
+    elif [ "$pager" == "moar" ]; then
+        reade -Q "CYAN" -i "y" -p "You selected $pager. Set style? [Y/n]: " "y n" pager1
+        if test $pager1 == 'y'; then
+            local theme
+            local styles="abap\nalgol\nalgol_nu\napi\narduino\nautumn\naverage\nbase16-snazzy\nborland\nbw\ncatppuccin-frappe\ncatppuccin-latte\ncatppuccin-macchiato\ncatppuccin-mocha\ncolorful\ncompat\ndoom-one\ndoom-one2\ndracula\nemacs\nfriendly\nfruity\ngithub-dark\ngithub\ngruvbox-light\ngruvbox\nhr_high_contrast\nhrdark\nigor\nlovelace\nmanni\nmodus-operandi\nmodus-vivendi\nmonokai\nmonokailight\nmurphy\nnative\nnord\nonedark\nonesenterprise\nparaiso-dark\nparaiso-light\npastie\nperldoc\npygments\nrainbow_dash\nrose-pine-dawn\nrose-pine-moon\nrose-pine\nrrt\nsolarized-dark\nsolarized-dark256\nsolarized-light\nswapoff\ntango\ntrac\nvim\nvs\nvulcan\nwitchhazel\nxcode-dark\nxcode"
+            echo "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Sollicitudin nibh sit amet commodo nulla facilisi. Sed cras ornare arcu dui vivamus arcu. Non quam lacus suspendisse faucibus interdum posuere lorem. Consequat ac felis donec et odio pellentesque. Elementum tempus egestas sed sed risus pretium quam. Neque viverra justo nec ultrices dui sapien eget mi proin. Varius vel pharetra vel turpis nunc eget lorem dolor sed. Mauris in aliquam sem fringilla ut morbi tincidunt augue. Cursus euismod quis viverra nibh cras. Diam sollicitudin tempor id eu. Lectus arcu bibendum at varius vel. Posuere morbi leo urna molestie at elementum eu facilisis. Condimentum lacinia quis vel eros. Dolor magna eget est lorem ipsum dolor sit amet consectetur. Ultrices dui sapien eget mi. A arcu cursus vitae congue mauris.
+
+In pellentesque massa placerat duis ultricies lacus sed turpis tincidunt. Dignissim diam quis enim lobortis scelerisque fermentum. Faucibus purus in massa tempor nec. Enim neque volutpat ac tincidunt. Penatibus et magnis dis parturient montes nascetur ridiculus. Ornare aenean euismod elementum nisi quis eleifend quam adipiscing. Elementum pulvinar etiam non quam lacus suspendisse faucibus interdum. Vel eros donec ac odio tempor orci dapibus ultrices. Tempus imperdiet nulla malesuada pellentesque elit eget gravida. In ante metus dictum at tempor commodo ullamcorper.
+
+Feugiat sed lectus vestibulum mattis ullamcorper velit sed ullamcorper. Aliquet nibh praesent tristique magna sit amet purus. Dignissim diam quis enim lobortis scelerisque. Turpis egestas sed tempus urna et. Est sit amet facilisis magna. At tellus at urna condimentum mattis pellentesque. Bibendum ut tristique et egestas quis ipsum suspendisse ultrices. Diam sollicitudin tempor id eu. Vulputate sapien nec sagittis aliquam malesuada bibendum arcu vitae elementum. Aliquet nibh praesent tristique magna sit. Dictum fusce ut placerat orci nulla pellentesque dignissim enim. Laoreet sit amet cursus sit amet dictum. Amet consectetur adipiscing elit duis tristique. Phasellus vestibulum lorem sed risus ultricies tristique nulla aliquet.
+
+Eu augue ut lectus arcu bibendum at varius vel pharetra. Urna nunc id cursus metus. Massa eget egestas purus viverra. Ornare quam viverra orci sagittis eu volutpat odio facilisis. Ornare arcu dui vivamus arcu felis bibendum. Sollicitudin aliquam ultrices sagittis orci a. In eu mi bibendum neque egestas congue quisque egestas diam. Consectetur adipiscing elit duis tristique sollicitudin nibh sit amet commodo. Risus in hendrerit gravida rutrum quisque non. Justo eget magna fermentum iaculis eu. Ut consequat semper viverra nam libero justo laoreet sit. Vel pretium lectus quam id leo in vitae turpis. Praesent semper feugiat nibh sed pulvinar.
+
+Condimentum lacinia quis vel eros donec ac. Nibh sed pulvinar proin gravida hendrerit lectus a. Volutpat consequat mauris nunc congue nisi vitae suscipit tellus. Mi tempus imperdiet nulla malesuada pellentesque elit eget. Scelerisque in dictum non consectetur. Ac ut consequat semper viverra nam libero justo laoreet sit. Lectus magna fringilla urna porttitor rhoncus. Integer vitae justo eget magna fermentum. Nisl pretium fusce id velit ut. In aliquam sem fringilla ut morbi tincidunt augue. Vitae tempus quam pellentesque nec nam aliquam sem et. Eget mauris pharetra et ultrices neque. At augue eget arcu dictum. Eget duis at tellus at. Mauris ultrices eros in cursus turpis massa tincidunt dui. Aliquet nec ullamcorper sit amet. Eu feugiat pretium nibh ipsum consequat nisl vel pretium lectus." > $TMPDIR/dtest1
+            while test -z "$style"; do
+                style=$(printf "$styles" | fzf --reverse --border --border-label="Moar style")
+                moar --style "$style" $TMPDIR/dtest1
+                stty sane && reade -Q "CYAN" -i "n" -p "Set as style? (Will retry if no) [Y/n]: " thme
+                if test "$thme" == "n"; then
+                   style='' 
+                fi
+            done
+            pager=$pager" $style"
+        fi 
+        reade -Q "CYAN" -i "n" -p "Show linenumber? [Y/n]: " "y n" pager1
+        if test $pager1 == 'n'; then
+            pager=$pager' --no-linenumbers'
+        fi
+        reade -Q "CYAN" -i "n" -p "Wrap long lines? [Y/n]: " "y n" pager1
+        if test $pager1 == 'y'; then
+            pager=$pager' --wrap'
+        fi
     elif [ "$pager" == "nvim" ] || [ "$pager" == "vim" ]; then
         echo "You selected $pager."
         colors="blue darkblue default delek desert elflord evening gruvbox habamax industry koehler lunaperch morning murphy pablo peachpuff quiet ron shine slate torte zellner"
@@ -85,62 +141,215 @@ if test "$regpager" == "y"; then
             reade -Q "CYAN" -i "default" -p "Colorscheme: " "$colors" color
             pager="$pager +'colorscheme $color'"
         fi
-        if [ "$pager" == "delta" ] && [ "$cpager" == "core.pager" ]; then
-            reade -Q "CYAN" -i "y" -p "You selected $pager. Configure [Y/n]?: " "y n" delta
-            if [ "$delta" == "y" ]; then
-                reade -Q "CYAN" -i "y" -p "Set to navigate? (Move between diff sections) [Y/n]" "y n" delta1
+    elif [ "$pager" == "riff" ]; then
+            pager="riff"
+            reade -Q "CYAN" -i "y" -p "Ignore changes in amount of whitespace? [Y/n]: " riff1
+            if test "$riff1" == 'y'; then
+                pager=$pager" -b"
+            fi
+            reade -Q "CYAN" -i "y" -p "No special highlighting for lines that only add content? [Y/n]: " riff1
+            if test "$riff1" == 'y'; then
+                pager=$pager" --no-adds-only-special"
+            fi
+    elif [ "$pager" == "diff-so-fancy" ] || [ "$pager" == "diffr" ] || [ "$pager" == "ydiff" ] || [ "$pager" == "delta" ] || [ "$pager" == "batdiff" ] ; then
+        local difffancy
+        reade -Q "CYAN" -i "y" -p "You selected $pager. Configure? [Y/n]: " "y n" difffancy
+        if test "y" == "$difffancy"; then
+            if [ "$pager" == "delta" ]; then
+                reade -Q "CYAN" -i "y" -p "Set side-by-side view? [Y/n]: " "y n" delta1
                 if test "y" == $delta1; then
-                    git config $global delta.navigate true
+                    git config $global delta.side-by-side true
                 fi
 
-                reade -Q "CYAN" -i "y" -p "Set to navigate? (Move between diff sections using n and N) [Y/n]" "y n" delta1
+                reade -Q "CYAN" -i "y" -p "Set to navigate? (Move between diff sections using n and N) [Y/n]: " "y n" delta1
                 if test "y" == $delta1; then
                     git config $global delta.navigate true
                 fi 
 
-                reade -Q "CYAN" -i "y" -p "Set to dark? [Y/n]" "y n" delta2
+                reade -Q "CYAN" -i "y" -p "Set syntax-theme [Y/n]: " "y n" delta1
+                if test "y" == $delta1; then
+                    echo "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Sollicitudin nibh sit amet commodo nulla facilisi. Sed cras ornare arcu dui vivamus arcu. Non quam lacus suspendisse faucibus interdum posuere lorem. Consequat ac felis donec et odio pellentesque. Elementum tempus egestas sed sed risus pretium quam. Neque viverra justo nec ultrices dui sapien eget mi proin. Varius vel pharetra vel turpis nunc eget lorem dolor sed. Mauris in aliquam sem fringilla ut morbi tincidunt augue. Cursus euismod quis viverra nibh cras. Diam sollicitudin tempor id eu. Lectus arcu bibendum at varius vel. Posuere morbi leo urna molestie at elementum eu facilisis. Condimentum lacinia quis vel eros. Dolor magna eget est lorem ipsum dolor sit amet consectetur. Ultrices dui sapien eget mi. A arcu cursus vitae congue mauris.
+
+In pellentesque massa placerat duis ultricies lacus sed turpis tincidunt. Dignissim diam quis enim lobortis scelerisque fermentum. Faucibus purus in massa tempor nec. Enim neque volutpat ac tincidunt. Penatibus et magnis dis parturient montes nascetur ridiculus. Ornare aenean euismod elementum nisi quis eleifend quam adipiscing. Elementum pulvinar etiam non quam lacus suspendisse faucibus interdum. Vel eros donec ac odio tempor orci dapibus ultrices. Tempus imperdiet nulla malesuada pellentesque elit eget gravida. In ante metus dictum at tempor commodo ullamcorper.
+
+Feugiat sed lectus vestibulum mattis ullamcorper velit sed ullamcorper. Aliquet nibh praesent tristique magna sit amet purus. Dignissim diam quis enim lobortis scelerisque. Turpis egestas sed tempus urna et. Est sit amet facilisis magna. At tellus at urna condimentum mattis pellentesque. Bibendum ut tristique et egestas quis ipsum suspendisse ultrices. Diam sollicitudin tempor id eu. Vulputate sapien nec sagittis aliquam malesuada bibendum arcu vitae elementum. Aliquet nibh praesent tristique magna sit. Dictum fusce ut placerat orci nulla pellentesque dignissim enim. Laoreet sit amet cursus sit amet dictum. Amet consectetur adipiscing elit duis tristique. Phasellus vestibulum lorem sed risus ultricies tristique nulla aliquet.
+
+Eu augue ut lectus arcu bibendum at varius vel pharetra. Urna nunc id cursus metus. Massa eget egestas purus viverra. Ornare quam viverra orci sagittis eu volutpat odio facilisis. Ornare arcu dui vivamus arcu felis bibendum. Sollicitudin aliquam ultrices sagittis orci a. In eu mi bibendum neque egestas congue quisque egestas diam. Consectetur adipiscing elit duis tristique sollicitudin nibh sit amet commodo. Risus in hendrerit gravida rutrum quisque non. Justo eget magna fermentum iaculis eu. Ut consequat semper viverra nam libero justo laoreet sit. Vel pretium lectus quam id leo in vitae turpis. Praesent semper feugiat nibh sed pulvinar.
+
+Condimentum lacinia quis vel eros donec ac. Nibh sed pulvinar proin gravida hendrerit lectus a. Volutpat consequat mauris nunc congue nisi vitae suscipit tellus. Mi tempus imperdiet nulla malesuada pellentesque elit eget. Scelerisque in dictum non consectetur. Ac ut consequat semper viverra nam libero justo laoreet sit. Lectus magna fringilla urna porttitor rhoncus. Integer vitae justo eget magna fermentum. Nisl pretium fusce id velit ut. In aliquam sem fringilla ut morbi tincidunt augue. Vitae tempus quam pellentesque nec nam aliquam sem et. Eget mauris pharetra et ultrices neque. At augue eget arcu dictum. Eget duis at tellus at. Mauris ultrices eros in cursus turpis massa tincidunt dui. Aliquet nec ullamcorper sit amet. Eu feugiat pretium nibh ipsum consequat nisl vel pretium lectus." > $TMPDIR/dtest1
+                   echo "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Malesuada fames ac turpis egestas sed tempus urna. Maecenas volutpat blandit aliquam etiam erat velit scelerisque in. Cras fermentum odio eu feugiat pretium nibh ipsum consequat. Nam aliquam sem et tortor consequat id. Habitasse platea dictumst vestibulum rhoncus est pellentesque. Pellentesque habitant morbi tristique senectus et netus et malesuada fames. Mattis molestie a iaculis at erat pellentesque adipiscing. Condimentum lacinia quis vel eros donec ac odio. Vitae congue eu consequat ac. Netus et malesuada fames ac. Sed euismod nisi porta lorem mollis aliquam. Rhoncus est pellentesque elit ullamcorper dignissim cras. Aliquet nibh praesent tristique magna sit amet purus. Odio ut sem nulla pharetra diam sit amet nisl. Bibendum est ultricies integer quis auctor elit sed vulputate mi. Viverra ipsum nunc aliquet bibendum enim facilisis gravida neque convallis.
+
+Sociis natoque penatibus et magnis dis parturient montes. Ornare suspendisse sed nisi lacus sed viverra tellus. Eu augue ut lectus arcu bibendum at varius vel. Morbi leo urna molestie at elementum eu facilisis sed. Integer quis auctor elit sed vulputate mi. At varius vel pharetra vel. Ut consequat semper viverra nam libero. Metus vulputate eu scelerisque felis. In hendrerit gravida rutrum quisque non tellus orci. Eget gravida cum sociis natoque penatibus et magnis. Nec tincidunt praesent semper feugiat nibh sed. Id velit ut tortor pretium. Nibh cras pulvinar mattis nunc sed blandit. Augue neque gravida in fermentum et sollicitudin ac orci phasellus. Ut porttitor leo a diam sollicitudin tempor id. Nec feugiat nisl pretium fusce id velit. Amet purus gravida quis blandit turpis cursus in. Blandit libero volutpat sed cras ornare.
+
+Vestibulum sed arcu non odio euismod lacinia. Cursus in hac habitasse platea dictumst quisque sagittis. Augue eget arcu dictum varius duis at consectetur. Eget egestas purus viverra accumsan in nisl nisi scelerisque eu. Turpis tincidunt id aliquet risus feugiat. Ultrices gravida dictum fusce ut placerat orci. Ullamcorper a lacus vestibulum sed arcu non odio euismod. Dictum fusce ut placerat orci nulla pellentesque dignissim enim. Arcu cursus vitae congue mauris rhoncus aenean vel elit scelerisque. Ornare quam viverra orci sagittis. Tincidunt nunc pulvinar sapien et ligula. Malesuada pellentesque elit eget gravida cum sociis. Non nisi est sit amet facilisis magna etiam. Mauris cursus mattis molestie a iaculis at erat. Praesent tristique magna sit amet. Blandit aliquam etiam erat velit scelerisque in. Urna et pharetra pharetra massa massa ultricies mi. Ultricies leo integer malesuada nunc vel risus commodo. Pellentesque adipiscing commodo elit at imperdiet dui accumsan sit amet.
+
+Tortor aliquam nulla facilisi cras fermentum. A arcu cursus vitae congue mauris rhoncus. Ac orci phasellus egestas tellus rutrum tellus. Eget sit amet tellus cras. Ornare lectus sit amet est placerat in egestas erat. Dis parturient montes nascetur ridiculus. Ut eu sem integer vitae. Viverra orci sagittis eu volutpat odio facilisis mauris sit amet. Enim eu turpis egestas pretium aenean pharetra magna ac. Molestie nunc non blandit massa enim. Felis imperdiet proin fermentum leo vel orci porta non. Nibh mauris cursus mattis molestie a iaculis at erat. Elementum nibh tellus molestie nunc non blandit massa enim nec. Fringilla est ullamcorper eget nulla facilisi etiam dignissim diam quis. Lectus magna fringilla urna porttitor. Dictum fusce ut placerat orci nulla pellentesque dignissim enim. Sed id semper risus in. Nascetur ridiculus mus mauris vitae ultricies.
+
+Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placerat in egestas erat imperdiet sed euismod nisi porta. Nulla aliquet porttitor lacus luctus accumsan. Consequat semper viverra nam libero justo laoreet. Ut diam quam nulla porttitor massa id neque aliquam vestibulum. Cursus metus aliquam eleifend mi. Viverra nam libero justo laoreet sit amet. Malesuada fames ac turpis egestas maecenas pharetra convallis posuere morbi. Orci ac auctor augue mauris augue neque gravida. Sed libero enim sed faucibus turpis in eu mi bibendum. Tellus pellentesque eu tincidunt tortor aliquam nulla facilisi cras fermentum. Scelerisque purus semper eget duis at tellus at urna. Pellentesque habitant morbi tristique senectus. In metus vulputate eu scelerisque felis imperdiet proin fermentum leo. Vulputate mi sit amet mauris commodo quis imperdiet massa tincidunt." > $TMPDIR/dtest2
+                    local theme=''
+                    while test -z "$theme"; do
+                        theme=$(printf "$(delta --list-syntax-themes | tail -n +1)" | fzf --reverse --border --border-label="Syntax theme")
+                        theme=$(echo "$theme" | awk '{print $2;}')
+                        delta --syntax-theme "$theme" $TMPDIR/dtest1 $TMPDIR/dtest2
+                        stty sane && reade -Q "CYAN" -i "n" -p "Set as syntax theme? (Will retry if no) [Y/n]: " dltthme
+                        if test "$dltthme" == "n"; then
+                           theme='' 
+                        fi
+                    done
+                    git config $global delta.syntax-theme "$theme"
+                fi
+
+                reade -Q "CYAN" -i "y" -p "Set to dark? [Y/n]: " "y n" delta2
                 if test "y" == $delta2; then
                     git config $global delta.dark true
                 fi
 
-                reade -Q "CYAN" -i "y" -p "Set linenumbers? [Y/n]" "y n" delta3
+                reade -Q "CYAN" -i "y" -p "Set linenumbers? [Y/n]: " "y n" delta3
                 if test "y" == $delta3; then
                     git config $global delta.linenumbers true
                 fi
-            fi
-        elif [ "$pager" == "diff-so-fancy" ]; then
-            local difffancy
-            reade -Q "CYAN" -i "y" -p "You selected $pager. Configure [Y/n]?: " "y n" difffancy
-            if test "y" == $difffancy; then
-                reade -Q "CYAN" -i "y" -p "Dif-so-fancy can be piped to a pager. Pipe to \$PAGER - $PAGER? [Y/n]" "y n" diffancy
+            elif [ "$pager" == "diff-so-fancy" ]; then
+
+                reade -Q "CYAN" -i "y" -p "Should the first block of an empty line be colored. (Default: true)? [Y/n]: " "y n" diffancy
                 if test "y" == $diffancy; then
-                    if test $PAGER == "less"; then
-                        git config $global core.pager "diff-so-fancy | less --tabs=4 -RF"
-                    else
-                        git config $global core.pager "diff-so-fancy | less --tabs=4 -RF"
+                    git config --bool $global diff-so-fancy.markEmptyLines true                    
+                else
+                    git config --bool $global diff-so-fancy.markEmptyLines false                    
+                fi
+                reade -Q "CYAN" -i "y" -p "Simplify git header chunks to a more human readable format. (Default: true) [Y/n]: " "y n" diffancy
+                if test "y" == $diffancy; then
+                    git config --bool $global diff-so-fancy.changeHunkIndicators true
+                else
+                    git config --bool $global diff-so-fancy.changeHunkIndicators false
+                fi
+                reade -Q "CYAN" -i "y" -p "Should the pesky + or - at line-start be removed. (Default: true) [Y/n]: " "y n" diffancy
+                if test "y" == $diffancy; then
+                    git config --bool $global diff-so-fancy.stripLeadingSymbols true
+                else
+                    git config --bool $global diff-so-fancy.stripLeadingSymbols false
+                fi
+                reade -Q "CYAN" -i "y" -p "By default, the separator for the file header uses Unicode line-drawing characters. If this is causing output errors on your terminal, set this to false to use ASCII characters instead. (Default: true) [Y/n]: " "y n" diffancy
+                if test "y" == $diffancy; then
+                    git config --bool $global diff-so-fancy.useUnicodeRuler true
+                else
+                    git config --bool $global diff-so-fancy.useUnicodeRuler false
+                fi
+                reade -Q "CYAN" -i "47" -p "By default, the separator for the file header spans the full width of the terminal. Use this setting to set the width of the file header manually. (Default: 47): " "$(seq 1 100)" diffancy
+                 # git log's commit header width
+                git config --global diff-so-fancy.rulerWidth $diffancy    
+            elif [ "$pager" == "ydiff" ]; then
+                pager=$pager" --color=auto"
+                reade -Q "CYAN" -i "y" -p "Enable side-by-side mode? [Y/n]: " diffr1
+                if test "$diffr1" == 'y'; then
+                    pager=$pager" --side-by-side"
+                    reade -Q "CYAN" -i "y" -p "Wrap long lines in side-by-side view? [Y/n]: " diffr1
+                    if test "$diffr1" == 'y'; then
+                        pager=$pager" --wrap"
+                    fi        
+                fi
+            elif [ "$pager" == "diffr" ]; then
+                reade -Q "CYAN" -i "y" -p "Set linenumber? [Y/n]: " diffr1
+                if test "$diffr1" == 'y'; then
+                    pager="diffr --line-numbers"
+                    reade -Q "CYAN" -i "n" -p "Set linenumber style? [compact/aligned/n]: " diffr1
+                    if test "$diffr1" == 'compact' || test "$diffr1" == 'aligned'; then
+                        pager="diffr --line-numbers $diffr1"
                     fi
                 fi
             fi
-        fi
-        
+            
+            reade -Q "CYAN" -i "y" -p "$pager could be configured with a pager, even though not necessary. Do so? [Y/n]: " "y n" pipepager
+            if test "$pipepager" == 'y'; then
+                if test "$pager" == "ydiff"; then
+                    pager=$pager"ydiff --pager="
+                fi
+                pagers="less more"
+                pagersf="less\nmore\n"
+                pager="less"
+                if type most &> /dev/null ; then
+                    pagers=$pagers" most"
+                    pagersf=$pagersf"most\n"
+                fi
+                if type moar &> /dev/null ; then
+                    pagers=$pagers" moar"
+                    pagersf=$pagersf"moar\n"
+                    pager="moar"
+                fi
+                if type vim &> /dev/null; then
+                    pagers=$pagers" vim"
+                    pagersf=$pagersf"vim\n"
+                    pager="vim"
+                fi
+                if type nvim &> /dev/null; then
+                    pagers=$pagers" nvim"
+                    pagersf=$pagersf"nvim\n"
+                    pager="nvim"
+                fi
+
+                reade -Q "GREEN" -i "$PAGER" -p "Pager: " "$pagers" diffancy
+                if [[ $diffancy =~ "less" ]]; then
+                    reade -Q "CYAN" -i "n" -p "Set linenumbers for pager? [Y/n]:" "y n" lne 
+                    local ln=""
+                    if test "$lne" == 'n'; then
+                       ln="-n"
+                    fi
+                    if test "$pager" == "ydiff"; then
+                        git config $global "$cpager" "ydiff --pager=less --pager-options=\"--tabs=4 -RF $ln\""
+                    else
+                        git config $global "$cpager" "$pager | less --tabs=4 -RF $ln"
+                    fi
+                    unset ln
+                elif [[ $diffancy =~ "moar" ]]; then
+                    local ln=""
+                    reade -Q "CYAN" -i "n" -p "You selected $diffancy. Show linenumber? [Y/n]: " "y n" pager1
+                    if test $pager1 == 'n'; then
+                        ln=$ln' --no-linenumbers'
+                    fi
+
+                    reade -Q "CYAN" -i "n" -p "Wrap long lines? [Y/n]: " "y n" pager1
+                    if test $pager1 == 'y'; then
+                        ln=$ln' --wrap'
+                    fi
+
+                    if test "$pager" == "ydiff"; then
+                        git config $global "$cpager" "ydiff --pager=moar --pager-options=\"--colors=auto $ln\""
+                    elif test "$pager" == "batdiff"; then
+                        git config $global "$cpager" "batdiff --pager='moar --colors=auto $ln'"
+                    else
+                        git config $global "$cpager" "$pager | moar --colors=auto $ln"
+                    fi
+                else
+                    if test "$pager" == "ydiff"; then
+                        git config $global "$cpager" "ydiff --pager=$diffancy"
+                    elif test "$pager" == "batdiff"; then
+                        git config $global "$cpager" "batdiff --pager='$diffancy'"
+                    else
+                        git config $global "$cpager" "$pager | $diffancy"
+                    fi
+                fi
+            else
+                git config $global "$cpager" "$pager"  
+            fi
+         fi
     fi
     git config "$global" "$cpager" "$pager" ;
-elif test "$regpager" == "n"; then
-    if test "$cpager" == "core.pager"; then
-        pagers="cat"
-        pager="cat"
-        if type bat &> /dev/null; then
-            pagers=$pagers" bat"
-        fi
-        reade -Q "CYAN" -i "cat" -p "Pager: " "$pagers" pager;
-        if [ $pager == "bat" ]; then
-            pager="bat --paging=never"
-        fi                                                            
-        echo bluh
-        git config $global core.pager $pager 
-    else
-        git config "$global" "$cpager" "$pager" 
+elif test "$regpager" == "y"; then
+    pagers="cat"
+    pager="cat"
+    if type bat &> /dev/null; then
+        pagers=$pagers" bat"
     fi
+    if type batdiff &> /dev/null; then
+        pagers=$pagers" batdiff"
+    fi
+    reade -Q "CYAN" -i "cat" -p "Pager: " "$pagers" pager;
+    if [ $pager == "bat" ]; then
+        pager="bat --paging=never"
+    fi 
+    if [ $pager == "batdiff" ]; then
+        pager="batdiff --paging=never"
+    fi
+    git config "$global" "$cpager" "$pager" 
 fi
 }
 
@@ -184,27 +393,240 @@ fi
     fi
     unset gitglobal
     
+    local name gitname
+    local prename='n'
     if test "$(git config $global --list | grep 'user.name' | awk 'BEGIN { FS = "=" } ;{print $2;}')" == '' ; then
-        reade -Q "CYAN" -i "y" -p "Configure git name? [Y/n]: " "y n" gitname
-        if [ "y" == $gitname ]; then
-            reade -Q "CYAN" -p "Name: " name
-            if [ ! -z $name ]; then
-                git config "$global" user.name "$name"
-            fi
+        prename='y'
+    fi
+    reade -Q "CYAN" -i "$prename" -p "Configure git name? [Y/n]: " "y n" gitname
+    if [ "y" == $gitname ]; then
+        reade -Q "CYAN" -p "Name: " name
+        if [ ! -z $name ]; then
+            git config "$global" user.name "$name"
         fi
     fi
-    unset name gitname
 
     local gitmail mail
+    local premail='n'
     if test "$(git config $global --list | grep 'user.email' | awk 'BEGIN { FS = "=" } ;{print $2;}')" == '' ; then
-        reade -Q "CYAN" -i "y" -p "Configure git email? [Y/n]: " "y n" gitmail ;
-        if [ "y" == $gitmail ]; then
-            reade -Q "CYAN" -p "Email: " mail ;
-            if [ ! -z $mail ]; then
-                git config "$global" user.email "$mail" ;
-            fi
+        premail='y'
+    fi
+    reade -Q "CYAN" -i "$premail" -p "Configure git email? [Y/n]: " "y n" gitmail ;
+    if [ "y" == $gitmail ]; then
+        reade -Q "CYAN" -p "Email: " mail ;
+        if [ ! -z $mail ]; then
+            git config "$global" user.email "$mail" ;
         fi
     fi
+
+
+    local gitpgr pager wpager
+    reade -Q "CYAN" -i "y" -p "Configure pager for git core, diff, show and log? [Y/n]: " "y n" wpager ;
+    if test "$wpager" == "y"; then
+        reade -Q "YELLOW" -i "n" -p "Install custom diff syntax highlighter / pager? [N/y]: " "y n" gitpgr ;
+        if test $gitpgr == "y"; then
+            reade -Q "GREEN" -i "moar" -p "Which to install? [Moar/most/delta/diff-so-fancy/riff/ydiff/difftastic/diffr]: " "moar most delta diff-so-fancy riff ydiff diffr difftastic" pager 
+            if test $pager == "bat"; then
+                if ! test -f install_bat.sh; then
+                    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bat.sh)"
+                else
+                   ./install_bat.sh
+                fi
+                
+            elif test $pager == "moar"; then
+                if ! test -f install_moar.sh; then
+                    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_moar.sh)"
+                else
+                   ./install_moar.sh
+                fi
+            elif test $pager == "most"; then
+                if ! test -f install_most.sh; then
+                    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_most.sh)"
+                else
+                   ./install_most.sh
+                fi
+            elif test $pager == "riff"; then
+               if ! test -f install_cargo.sh; then
+                    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)"
+                else
+                   ./install_cargo.sh
+                fi
+                cargo install --locked riffdiff
+            elif test $pager == "difftastic"; then
+               if ! test -f install_cargo.sh; then
+                    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)"
+                else
+                   ./install_cargo.sh
+                fi
+                cargo install --locked difftastic
+            elif test $pager == "diffr"; then
+               if ! test -f install_cargo.sh; then
+                    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)"
+                else
+                   ./install_cargo.sh
+                fi
+                cargo install --locked diffr
+            fi
+            if test $distro_base == "Arch"; then
+                if test $pager == "diff-so-fancy"; then
+                    sudo pacman -Su diff-so-fancy
+                elif test $pager == "delta"; then
+                    sudo pacman -Su git-delta
+                elif test $pager == "ydiff"; then
+                    sudo apt install pipx
+                    pipx install --upgrade ydiff
+                fi
+            elif test $pager == "Debian"; then
+                if test $pager == "diff-so-fancy"; then
+                    sudo apt install npm
+                    sudo npm -g install diff-so-fancy 
+                elif test $pager == "delta"; then
+                    sudo apt install Debdelta
+                elif test $pager == "ydiff"; then
+                    sudo apt install pipx
+                    pipx install --upgrade ydiff
+                fi
+            fi
+        fi
+        unset gitdiff gitdiff1 difftool pager           
+        git_pager "core.pager" "$global"
+        git_pager "pager.diff" "$global"
+        git_pager "pager.show" "$global"
+        git_pager "pager.log" "$global"
+        confs="$(cur="pager." && compgen -F _git_config 2> /dev/null)"
+    fi
+
+    local diffs=""
+    local diff=""
+    if type delta &> /dev/null ; then
+        diffs=$diffs" delta"
+        diff="delta"
+    fi
+    if type ydiff &> /dev/null ; then
+        diffs=$diffs" ydiff"
+        diff="delta"
+    fi
+    if type riff &> /dev/null ; then
+        diffs=$diffs" riff"
+        diff="riff"
+    fi
+    if type diffr &> /dev/null ; then
+        diffs=$diffs" diffr"
+        diff="diffr"
+    fi
+    if type diff-so-fancy &> /dev/null ; then
+        diffs=$diffs" diff-so-fancy"
+        diff="diff-so-fancy"
+    fi
+    if type batdiff &> /dev/null ; then
+        diffs=$diffs" batdiff"
+        diff="batdiff"
+    fi
+    if [ "$diffs" != '' ]; then
+        reade -Q "CYAN" -i "y" -p "Configure custom interactive diff filter? [Y/n]: " "y n" gitdiff1 ;     
+        if [ "y" == "$gitdiff1" ]; then
+            
+            reade -Q "GREEN" -i "$diff" -p "Diff filter: " "$diffs" diff
+
+            if [ "$diff" == "delta" ]; then
+                diff="delta --color-only"
+                reade -Q "CYAN" -i "y" -p "Set linenumbers? [Y/n]" "y n" delta3
+                if test "y" == $delta3; then
+                    git config $global delta.linenumbers true
+                fi
+                
+                reade -Q "CYAN" -i "y" -p "Side-by-side view? [Y/n]" "y n" delta3
+                if test "y" == $delta3; then
+                    git config $global delta.side-by-side true
+                fi
+
+                reade -Q "CYAN" -i "y" -p "Set to navigate? (Move between diff sections using n and N) [Y/n]" "y n" delta1
+                if test "y" == $delta1; then
+                    git config $global delta.navigate true
+                fi 
+
+                reade -Q "CYAN" -i "y" -p "Set to dark? [Y/n]" "y n" delta2
+                if test "y" == $delta2; then
+                    git config $global delta.dark true
+                fi
+
+                reade -Q "CYAN" -i "y" -p "Set hyperlinks? [Y/n]" "y n" delta1
+                if test "y" == $delta1; then
+                    git config $global delta.hyperlinks true
+                fi
+
+            elif [ "$diff" == "diff-so-fancy" ]; then
+                diff="diff-so-fancy --patch"
+                reade -Q "CYAN" -i "y" -p "You selected $pager. Configure? [Y/n]: " "y n" difffancy
+                if test "$difffancy" == "y"; then
+                    reade -Q "CYAN" -i "y" -p "Should the first block of an empty line be colored. (Default: true)? [Y/n]: " "y n" diffancy
+                    if test "y" == $diffancy; then
+                        git config --bool $global diff-so-fancy.markEmptyLines true                    
+                    else
+                        git config --bool $global diff-so-fancy.markEmptyLines false                    
+                    fi
+                    reade -Q "CYAN" -i "y" -p "Simplify git header chunks to a more human readable format. (Default: true) [Y/n]: " "y n" diffancy
+                    if test "y" == $diffancy; then
+                        git config --bool $global diff-so-fancy.changeHunkIndicators true
+                    else
+                        git config --bool $global diff-so-fancy.changeHunkIndicators false
+                    fi
+                    reade -Q "CYAN" -i "y" -p "Should the pesky + or - at line-start be removed. (Default: true) [Y/n]: " "y n" diffancy
+                    if test "y" == $diffancy; then
+                        git config --bool $global diff-so-fancy.stripLeadingSymbols true
+                    else
+                        git config --bool $global diff-so-fancy.stripLeadingSymbols false
+                    fi
+                    reade -Q "CYAN" -i "y" -p "By default, the separator for the file header uses Unicode line-drawing characters. If this is causing output errors on your terminal, set this to false to use ASCII characters instead. (Default: true) [Y/n]: " "y n" diffancy
+                    if test "y" == $diffancy; then
+                        git config --bool $global diff-so-fancy.useUnicodeRuler true
+                    else
+                        git config --bool $global diff-so-fancy.useUnicodeRuler false
+                    fi
+                    reade -Q "CYAN" -i "47" -p "By default, the separator for the file header spans the full width of the terminal. Use this setting to set the width of the file header manually. (Default: 47): " "$(seq 1 100)" diffancy
+                     # git log's commit header width
+                    git config --global diff-so-fancy.rulerWidth $diffancy    
+                elif [ "$diff" == "riff" ]; then
+                    diff="riff --no-pager"
+                    reade -Q "CYAN" -i "y" -p "Ignore changes in amount of whitespace? [Y/n]: " riff1
+                    if test "$riff1" == 'y'; then
+                        diff=$diff" -b"
+                    fi
+                    reade -Q "CYAN" -i "y" -p "No special highlighting for lines that only add content? [Y/n]: " riff1
+                    if test "$riff1" == 'y'; then
+                        diff=$diff" --no-adds-only-special"
+                    fi
+                fi
+            elif [ "$diff" == "ydiff" ]; then
+                diff=$diff" --color=auto"
+                reade -Q "CYAN" -i "y" -p "Enable side-by-side mode? [Y/n]: " diffr1
+                if test "$diffr1" == 'y'; then
+                    diff=$diff" --side-by-side"
+                    reade -Q "CYAN" -i "y" -p "Wrap long lines in side-by-side view? [Y/n]: " diffr1
+                    if test "$diffr1" == 'y'; then
+                        diff=$diff" --wrap"
+                    fi        
+                fi
+            elif [ "$diff" == "diffr" ]; then
+                reade -Q "CYAN" -i "y" -p "Set linenumber? [Y/n]: " diffr1
+                if test "$diffr1" == 'y'; then
+                    diff="diffr --line-numbers"
+                    reade -Q "CYAN" -i "n" -p "Set linenumber style? [compact/aligned/n]: " diffr1
+                    if test "$diffr1" == 'compact' || test "$diffr1" == 'aligned'; then
+                        diff="diffr --line-numbers $diffr1"
+                    fi
+                fi
+            elif [ "$pager" == "batdiff" ]; then
+                  diff="batdiff --staged --paging=never"
+                  reade -Q "CYAN" -i "n" -p "Use delta config? [Y/n]: " diffr1
+                  if test "$diffr1" == 'y'; then
+                        diff=$diff" --delta"
+                  fi
+            fi
+        fi
+        git config "$global" interactive.difffilter "$diff"
+    fi 
+
 
     local editor editors difftool mergetool cstyle prompt
     editors="nano vi"
@@ -224,22 +646,42 @@ fi
         editors=$editors" vscode"
     fi
 
-    #if test "$(git config $global --list | grep 'core.editor' | awk 'BEGIN { FS = "=" } ;{print $2;}')" == '' ; then
-        reade -Q "CYAN" -i "y" -p "Set default editor?: " "y n" editor ;
-        if test "y" == "$editor"; then
-            unset editor
-            reade -Q "CYAN" -i "nano" -p "Editor: " "$editors" editor;
-            if ! test -z "$editor"; then
-                if test "$editor" == "vscode"; then
-                    editor="code"
-                fi
-                git config "$global" core.editor "$editor"
-            fi
+
+    local edpre="n"
+    if test "$(git config $global --list | grep 'core.ui' | awk 'BEGIN { FS = "=" } ;{print $2;}')" == '' ; then
+        edpre="y"
+    fi
+    reade -Q "CYAN" -i "$edpre" -p "Set color.ui? (Global git color behaviour): " "y n" editor ;
+    if test "y" == "$editor"; then
+        reade -Q "CYAN" -i "true" -p "Color.ui (Default: auto): " "true false auto always" editor;
+        if test "$editor" == "auto" || test "$editor" == "false" || test "$editor" == "true" || test "$editor" == "always"; then
+            git config "$global" color.ui "$editor"
         fi
+    fi 
+    unset editor
+
+    local edpre="n"
+    if test "$(git config $global --list | grep 'core.editor' | awk 'BEGIN { FS = "=" } ;{print $2;}')" == '' ; then
+        edpre="y"
+    fi
+    reade -Q "CYAN" -i "$edpre" -p "Set default editor?: " "y n" editor ;
+    if test "y" == "$editor"; then
+        unset editor
+        reade -Q "CYAN" -i "nano" -p "Editor: " "$editors" editor;
+        if ! test -z "$editor"; then
+            if test "$editor" == "vscode"; then
+                editor="code"
+            fi
+            git config "$global" core.editor "$editor"
+        fi
+    fi
     #fi
 
-    #if test "$(git config $global --list | grep 'diff.tool' | awk 'BEGIN { FS = "=" } ;{print $2;}')" == '' ; then
-    reade -Q "CYAN" -i "y" -p "Set difftool and mergetool?: " "y n" difftool;
+    local diffpre="n"
+    if test "$(git config $global --list | grep 'diff.tool' | awk 'BEGIN { FS = "=" } ;{print $2;}')" == '' ; then
+        diffpre="y"
+    fi
+    reade -Q "CYAN" -i "$diffpre" -p "Set difftool and mergetool?: " "y n" difftool;
     if test $difftool == "y"; then
         reade -Q "CYAN" -i "nano" -p "Tool (editor): " "$editors" editor;
         if ! test -z "$editor"; then
@@ -263,34 +705,37 @@ fi
                 git config "$global" merge.tool vscode
             fi
         fi
-    #fi
+    fi
 
-    #if test "$(git config $global --list | grep 'diff.tool' | awk 'BEGIN { FS = "=" } ;{print $2;}')" == '' ; then
-        reade -Q "CYAN" -i "y" -p "Set diff guitool and merge guitool?: " "y n" difftool;
-        if test $difftool == "y"; then
-            reade -Q "CYAN" -i "nano" -p "Tool (editor): " "$editors" editor;
-            if ! test -z "$editor"; then
-                local diff merge
-                if test "$editor" == "vim"; then
-                    git config "$global" diff.guitool vimdiff
-                    git config "$global" merge.guitool vimdiff
-                elif test "$editor" == "gvim"; then 
-                    git config "$global" diff.guitool gvimdiff
-                    git config "$global" merge.guitool gvimdiff
-                elif test "$editor" == "nvim"; then 
-                    git config "$global" diff.guitool nvimdiff
-                    git config "$global" merge.guitool nvimdiff
-                elif test "$editor" == "emacs"; then 
-                    git config "$global" diff.guitool emerge
-                    git config "$global" merge.guitool emerge
-                elif test "$editor" == "vscode"; then 
-                    git config "$global" difftool.vscode.cmd 'code --wait --diff $LOCAL $REMOTE'
-                    git config "$global" diff.guitool vscode
-                    git config "$global" mergetool.vscode.cmd 'code --wait $MERGED'
-                    git config "$global" merge.guitool vscode
-                fi
+    local diffguipre="n"
+    if test "$(git config $global --list | grep 'diff.guitool' | awk 'BEGIN { FS = "=" } ;{print $2;}')" == '' ; then
+        diffguipre="y"
+    fi
+    reade -Q "CYAN" -i "$diffguipre" -p "Set diff guitool and merge guitool?: " "y n" difftool;
+    if test $difftool == "y"; then
+        reade -Q "CYAN" -i "nano" -p "Tool (editor): " "$editors" editor;
+        if ! test -z "$editor"; then
+            local diff merge
+            if test "$editor" == "vim"; then
+                git config "$global" diff.guitool vimdiff
+                git config "$global" merge.guitool vimdiff
+            elif test "$editor" == "gvim"; then 
+                git config "$global" diff.guitool gvimdiff
+                git config "$global" merge.guitool gvimdiff
+            elif test "$editor" == "nvim"; then 
+                git config "$global" diff.guitool nvimdiff
+                git config "$global" merge.guitool nvimdiff
+            elif test "$editor" == "emacs"; then 
+                git config "$global" diff.guitool emerge
+                git config "$global" merge.guitool emerge
+            elif test "$editor" == "vscode"; then 
+                git config "$global" difftool.vscode.cmd 'code --wait --diff $LOCAL $REMOTE'
+                git config "$global" diff.guitool vscode
+                git config "$global" mergetool.vscode.cmd 'code --wait $MERGED'
+                git config "$global" merge.guitool vscode
             fi
         fi
+    fi
     #fi
     reade -Q "CYAN" -i "diff3" -p "Set merge conflictsstyle: " "diff diff1 diff2 diff3" cstyle;
     if ! test -z "$cstyle"; then
@@ -301,88 +746,9 @@ fi
         git config mergetool.prompt "$prompt"
     fi
      
-    local gitpgr pager
 
-    reade -Q "CYAN" -i "y" -p "Install custom diff syntax highlighter / pager? [Y/n]: " "y n" gitpgr ;
-    if test $gitpgr == "y"; then
-        reade -Q "GREEN" -i "moar" -p "Which to install? [Moar/most/delta/diff-so-fancy/ydiff/difftastic]: " "moar most delta diff-so-fancy ydiff difftastic" pager 
-        if test $pager == "bat"; then
-            if ! test -f install_bat.sh; then
-                /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bat.sh)"
-            else
-               ./install_bat.sh
-            fi
-            
-        elif test $pager == "moar"; then
-            if ! test -f install_moar.sh; then
-                /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_moar.sh)"
-            else
-               ./install_moar.sh
-            fi
-        elif test $pager == "most"; then
-            if ! test -f install_most.sh; then
-                /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_most.sh)"
-            else
-               ./install_most.sh
-            fi
-        fi
-        if test $distro_base == "Arch"; then
-            if test $pager == "diff-so-fancy"; then
-                sudo pacman -Su diff-so-fancy
-            elif test $pager == "delta"; then
-                sudo pacman -Su git-delta
-            elif test $pager == "ydiff"; then
-                sudo pacman -Su pipx
-                pipx install --upgrade ydiff
-            elif test $pager == "difftastic"; then
-                sudo pacman -Su difftastic
-            fi
-        elif test $pager == "Debian"; then
-            reade -Q "GREEN" -i "delta" -p "Which diffpager to install? [Delta/diff-so-fancy/ydiff/difftastic]: " "diff-so-fancy delta ydiff difftastic" difftool;
-            if test $pager == "diff-so-fancy"; then
-                sudo apt install npm
-                sudo npm -g install diff-so-fancy 
-            elif test $pager == "delta"; then
-                sudo apt install Debdelta
-            elif test $pager == "ydiff"; then
-                sudo apt install pipx
-                pipx install --upgrade ydiff
-            elif test $pager == "difftastic"; then
-                if [[ $arch =~ "arm" ]]; then
-                    sudo apt install cargo
-                    cargo install --locked difftastic
-                else
-                    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-                    brew install difftastic
-                fi
-            fi
-        fi
-    fi
-    unset gitdiff gitdiff1 difftool pager           
     
     
-    local wpager
-    reade -Q "CYAN" -i "y" -p "Set default pager and wich git commands would use a pager? [Y/n]: " "y n" wpager ;
-    if test "$wpager" == "y"; then
-        git_pager "core.pager" "$global"
-        confs="$(cur="pager." && compgen -F _git_config 2> /dev/null)"
-        reade -Q "CYAN" -i "y" -p "Configure custom diff? [Y/n]: " "y n" gitdiff1 ;
-        if [ "y" == $gitdiff1 ]; then
-            diffs="diff"
-            if type delta &> /dev/null ; then
-                diffs=$diffs" delta"
-            fi
-            if type diff-so-fancy &> /dev/null ; then
-                diffs=$diffs" diff-so-fancy"
-            fi
-            if type ydiff &> /dev/null ; then
-                diffs=$diffs" ydiff"
-            fi
-            if type difft &> /dev/null ; then
-                diffs=$diffs" difftastic"
-            fi
-        fi 
-    fi
 
        # reade -Q "GREEN" -i "y" -p "Configure git difftool? [Y/n]: " "y n" gitdiff ;
        # if [ "y" == "$gitdiff" ]; then
@@ -444,7 +810,7 @@ fi
         unset gitdiff diff gitmerge merge amt rslt gitcnf gitign
         if [ ! -x "$(command -v copy-to)" ]; then
             reade -Q "GREEN" -i "y" -p "Install copy-to? [Y/n]: " "y n" cpcnf;
-            if [ "y" == $cpcnf ] || [ -z $cpcnf ]; then
+            if [ "y" == "$cpcnf" ] || [ -z "$cpcnf" ]; then
                 if ! test -f install_copy-conf.sh; then
                     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_copy-conf.sh)"
                 else
@@ -452,6 +818,5 @@ fi
                 fi
             fi
         fi
-    fi
     }
 gitt

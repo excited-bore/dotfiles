@@ -9,7 +9,7 @@ if [ "$1" == 'local' ] || [ 'global' == "$1" ]; then
 else
     reade -Q "GREEN" -i "y" -p "Download template gitignores, choose and install? [Y/n]: " "y n" gitgn 
     if [ "y" != "$gitgn" ]; then
-        return 0
+        exit 1
     fi
     git clone https://github.com/github/gitignore $TMPDIR/gitignore
     reade -Q "GREEN" -i "local" -p "Install globally or locally? ( ./ vs ~/.config/git/ignore ) [Local/global]: " "global local" globl

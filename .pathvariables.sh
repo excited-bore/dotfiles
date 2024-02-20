@@ -44,7 +44,7 @@ export LESS=" --CLEAR-SCREEN --redraw-on-quit --LINE-NUMBERS --line-num-width=2 
 #export LESSEDIT=$EDITOR
 
 # MOAR
-export MOAR='--statusbar=bold -colors 256 -render-unprintable highlight'
+export MOAR='--style=catppuccin-macchiato --statusbar=bold --colors=auto --render-unprintable=highlight'
 
 # EDITORS
 export EDITOR=/usr/bin/nvim
