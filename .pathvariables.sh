@@ -40,11 +40,11 @@ export MANPAGER='nvim +Man!'
 export PAGER=/usr/bin/moar
 
 # LESS
-export LESS=" --CLEAR-SCREEN --redraw-on-quit --LINE-NUMBERS --line-num-width=2 --window=10 --use-color --color=Ng$ --color=Scb$ --color=Pkg$ --IGNORE-CASE --LONG-PROMPT --chop-long-lines --underline-special --mouse --QUIET --status-line --no-vbell --follow-name --exit-follow-on-close"
+export LESS=" --CLEAR-SCREEN --quit-on-intr --redraw-on-quit --LINE-NUMBERS --line-num-width=2 --window=10 --use-color --color=Ng$ --color=Scb$ --color=Pkg$ --IGNORE-CASE --LONG-PROMPT --chop-long-lines --underline-special --mouse --QUIET --status-line --no-vbell --follow-name --exit-follow-on-close"
 #export LESSEDIT=$EDITOR
 
 # MOAR
-export MOAR='--style=catppuccin-macchiato --statusbar=bold --colors=auto --render-unprintable=highlight'
+export MOAR='--style=catppuccin-macchiato --statusbar=bold --colors=16M --render-unprintable=highlight'
 
 # EDITORS
 export EDITOR=/usr/bin/nvim
@@ -115,6 +115,9 @@ export SYSTEMD_LOG_TARGET="auto"
 
 # Firefox hardware acceleration driver
 #export LIBVA_DRIVER_NAME="mesa"
+
+# RUST
+export PATH=$PATH:~/.cargo/bin
 
 # PYTHON
 #export PYTHONPATH="/usr/bin/python:/usr/bin/python3:/usr/bin/python3.10"

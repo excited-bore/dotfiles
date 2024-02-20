@@ -17,7 +17,6 @@ syntax on
 
 " Complete with keywords
 set complete+=k
-set dictionary+=~/.vim/bash_aliases
 " Enable Omnicomplete features
 set omnifunc=syntaxcomplete#Complete
 
@@ -202,7 +201,6 @@ endif
 " By far, the bashiest answer of them all :) – José Fernández Ramos
 " https://stackoverflow.com/questions/8841116/vim-not-recognizing-aliases-when-in-interactive-mode
 
-
 if (filereadable(expand('~/.bash_aliases')))
     let $BASH_ENV="~/.bash_aliases"
 endif
@@ -283,6 +281,7 @@ Plugin 'ryanoasis/vim-devicons'
 
 " Nerdtree | Left block directory tree
 Plugin 'preservim/nerdtree' 
+
 " Nerdtree git plugin
 Plugin 'Xuyuanp/nerdtree-git-plugin'
 " Nerdtree syntax highlighting / Laggiest plugin
@@ -293,6 +292,8 @@ Plugin 'Xuyuanp/nerdtree-git-plugin'
 " Totally independent OS52 clipboard
 Plugin 'ojroques/vim-oscyank', {'branch': 'main'}
 
+" Diff plugin
+Plug 'sindrets/diffview.nvim'
 
 " Lazygit plugin
 Plugin 'kdheepak/lazygit.nvim'
@@ -1057,16 +1058,20 @@ vnoremap <silent><M-f> y<Esc>:FzfPreviewBufferLines --add-fzf-arg=--query="<C-r>
 " Because that keycombo generates the exact keycode for Backspace, for
 " compatibility reasons (but not in some terminal emulators, like kitty f.ex")
 
-" C-h => Global search
-nnoremap <C-h> :%s,,,gc<Left><Left><Left><Left>
-inoremap <C-h> <C-\><C-o>:%s,,,gc<Left><Left><Left><Left>
-vnoremap <C-h> y:%s,<C-r>",,gc<Left><Left><Left>
+" Esc => Undo highlight
+nnoremap <silent><Esc> :nohl<CR>
+cnoremap <silent><Esc> <Esc>:nohl<CR>
+
+" C-h => Local search and replace
+nnoremap <C-h> :.,$s,,,gc<Left><Left><Left><Left>
+inoremap <C-h> <C-\><C-o>:.,$s,,,gc<Left><Left><Left><Left>
+vnoremap <C-h> y:.,$s,<C-r>",,gc<Left><Left><Left>
 cnoremap <C-h> <C-e><C-u>nohl<CR>:<Esc>
 
-" Different seperator for Ctrl+Shift+h
-nnoremap <M-h> :%s///gc<Left><Left><Left><Left>
-inoremap <M-h> <C-\><C-o>:%s///gc<Left><Left><Left><Left>
-vnoremap <M-h> y:%s/<C-r>"//gc<Left><Left><Left>
+" Alt-h => Global search and replace
+nnoremap <M-h> :%s,,,gc<Left><Left><Left><Left>
+inoremap <M-h> <C-\><C-o>:%s,,,gc<Left><Left><Left><Left>
+vnoremap <M-h> y:%s,<C-r>",,gc<Left><Left><Left>
 cnoremap <M-h> <C-e><C-u>nohl<CR>:<Esc>
 
 

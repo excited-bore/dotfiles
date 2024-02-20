@@ -23,7 +23,11 @@ alias copy="cp"
 
 function cpAllto(){
     local dest
-    reade -Q "GREEN" -i "~/" -p "This will do a recursive copy in the current directory to: " -e dest
+    if [ -z "$1" ] && [ -d "$1" ]; then
+        dest="$1"
+    else
+        reade -Q "GREEN" -i "~/" -p "This will do a recursive copy in the current directory to: " -e dest
+    fi
     if [ ! -z "$dest" ]; then
         cp -rv -t "$dest" .[!.]*;
     fi
