@@ -1,10 +1,16 @@
 if ! test -f checks/check_distro.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_distro)" 
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_distro.sh)" 
 else
     . ./checks/check_distro.sh
 fi
 
-reade -Q "GREEN" -i "y" -p "Install lazygit? (Git gui) [Y/n]:" "y n" nstll
+if ! test -f aliases/rlwrap_scripts.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/rlwrap_scripts.sh)" 
+else
+    . ./aliases/rlwrap_scripts.sh
+fi
+
+reade -Q "GREEN" -i "y" -p "Install lazygit? (Git gui) [Y/n]: " "y n" nstll
 if [ "$nstll" == "y" ]; then
     if [ $distro == "Arch" ] || [ $distro_base == "Arch" ]; then
         yes | sudo pacman -Su lazygit
@@ -27,7 +33,7 @@ if ! type copy-to &> /dev/null; then
     fi
 fi
 
-reade -Q "GREEN" -i "y" -p "Set up an alias so copy-to does a 'run all' when starting up lazygit? [Y/n]:" "y n" nstll
+reade -Q "GREEN" -i "y" -p "Set up an alias so copy-to does a 'run all' when starting up lazygit? [Y/n]: " "y n" nstll
 if [ "$nstll" == "y" ]; then
     if ! test -f checks/check_aliases_dir.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)" 
@@ -35,8 +41,8 @@ if [ "$nstll" == "y" ]; then
        . ./checks/check_aliases_dir.sh
     fi
     if ! test -f ~/.bash_aliases.d/lazygit.sh; then 
-        touch ~/.bash_aliases.d/lazygit.sh        
         printf "alias lazygit=\"copy-to run all && lazygit\"\n" > ~/.bash_aliases.d/lazygit.sh
+        echo "File in ~/.bash_aliases.d/lazygit.sh"
     fi
 fi
-unset nstll 
+unset nstll

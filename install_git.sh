@@ -20,7 +20,7 @@ fi
 
 if ! type fzf > /dev/null ; then
    if ! test -f ./install_fzf.sh; then
-     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/install_fzf.sh)" 
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/install_fzf.sh)" 
     else
         ./install_fzf.sh
     fi 
@@ -590,7 +590,7 @@ fi
 
     if ! [ -x "$(command -v lazygit)" ]; then
         if ! test -f install_lazygit.sh; then
-            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_lazygit.sh)" 
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_lazygit.sh)" 
         else
            ./install_lazygit.sh
         fi 
