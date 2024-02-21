@@ -45,7 +45,7 @@ if [ "$(which fd)" == "" ]; then
     reade -Q "GREEN" -i "y" -p "Install fd and use for fzf? (Faster find) [Y/n]: " "y n" fdr
      if [ -z $fdr ] || [ "Y" == $fdr ] || [ $fdr == "y" ]; then
         if ! test -f install_fd.sh; then
-            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fd.sh)" 
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fd.sh)" 
         else
             ./install_fd.sh
         fi 
@@ -75,7 +75,7 @@ if test "$(which fd)" != ""; then
     reade -Q "GREEN" -i "y" -p "Generate global gitignore?: " "y n" fndgbl
     if [ $fndgbl == 'y' ]; then
         if ! test -f install_gitignore.sh; then
-            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fd.sh "global")" 
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fd.sh "global")" 
         else
             ./install_gitignore.sh "global"
         fi 
@@ -107,7 +107,7 @@ fi
  reade -Q "GREEN" -i "y" -p "Install ripgrep? (Recursive grep, opens possibility for line by line fzf ) [Y/n]: " "y n" rpgrp
  if [ -z $rpgrp ] || [ "Y" == $rpgrp ] || [ $rpgrp == "y" ]; then
     if ! test -f install_ripgrep.sh; then
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ripgrep.sh)" 
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ripgrep.sh)" 
     else
         ./install_ripgrep.sh
     fi
@@ -181,7 +181,7 @@ fi
     reade -Q "GREEN" -i "y" -p "Install bat? (File previews/thumbnails for riflesearch) [Y/n]: " "y n" bat
     if [ "$bat" == "y" ]; then
         if ! test -f install_bat.sh; then
-            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bat.sh)" 
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bat.sh)" 
         else
             ./install_bat.sh
         fi
@@ -192,7 +192,7 @@ fi
     reade -Q "GREEN" -i "y" -p "Install ffmpegthumbnailer? (Video thumbnails for riflesearch) [Y/n]: " "y n" ffmpg
     if [ "$ffmpg" == "y" ]; then
         if ! test -f install_ffmpegthumbnailer.sh; then
-            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ffmpegthumbnailer.sh)" 
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ffmpegthumbnailer.sh)" 
         else
             ./install_ffmpegthumbnailer.sh
         fi 
@@ -221,7 +221,7 @@ fi
         reade -Q "GREEN" -i "y" -p "Install xclip? (Clipboard tool for Ctrl-R/Reverse history shortcut) [Y/n]: " "y n" xclip
         if [ "$xclip" == "y" ]; then
             if ! test -f install_xclip.sh; then
-                /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_xclip.sh)" 
+                eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_xclip.sh)" 
             else
                 ./install_xclip.sh
             fi
@@ -243,7 +243,7 @@ fi
     reade -Q "GREEN" -i "y" -p "Install tree? (Builtin cd shortcut gets a nice directory tree preview ) [Y/n]: " "y n" tree
     if [ "$tree" == "y" ]; then
         if ! test -f install_tree.sh; then
-            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_tree.sh)" 
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_tree.sh)" 
         else
             ./install_tree.sh
         fi
