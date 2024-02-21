@@ -125,7 +125,7 @@ fi
     reade -Q "GREEN" -i "y" -p "Add shortcut for ripgrep files in dir? (Ctrl-g) [Y/n]:" "y n" rpgrpdir
     if [ -z $rpgrp ] || [ "Y" == $rpgrp ] || [ $rpgrp == "y" ]; then
         if ! test -f fzf/ripgrep-directory.sh; then
-            wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/ripgrep-directory.sh -P ~/.bash_aliases.d/ 
+            wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/ripgrep-directory.sh -O ~/.bash_aliases.d/ripgrep-directory.sh 
         else
             cp -fv fzf/ripgrep-directory.sh ~/.bash_aliases.d/
         fi
@@ -165,8 +165,8 @@ fi
             sudo chmod +x /usr/bin/rifle
         fi
         if ! test -f ranger/rifle.conf; then
-            wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/rifle.conf -P ~/.config/ranger/ 
-            wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/keybinds_rifle.sh -P ~/.fzf/shell/ 
+            wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/rifle.conf -O ~/.config/ranger/rifle.conf 
+            wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/keybinds_rifle.sh -O ~/.fzf/shell/keybinds_rifle.sh 
         else
             cp -fv ranger/rifle.conf ~/.config/ranger/
             cp -fv fzf/keybinds_rifle.sh ~/.fzf/shell/

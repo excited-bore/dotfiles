@@ -604,7 +604,7 @@ fi
             else
                . ./checks/check_aliases_dir.sh
             fi
-            wget https://raw.githubusercontent.com/junegunn/fzf-git.sh/main/fzf-git.sh -P ~/.bash_aliases.d/
+            wget https://raw.githubusercontent.com/junegunn/fzf-git.sh/main/fzf-git.sh -O ~/.bash_aliases.d/fzf-git.sh
         fi
     fi
 
@@ -1167,7 +1167,7 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
            . ./checks/check_aliases_dir.sh
         fi
         if ! test -f aliases/git.sh; then
-            wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/git.sh -P ~/.bash_aliases.d/ 
+            wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/git.sh -O ~/.bash_aliases.d/git.sh 
         else
             cp -fv aliases/git.sh ~/.bash_aliases.d/
         fi
