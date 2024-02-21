@@ -26,6 +26,13 @@ Then it helps with installing/configuring:
 
 Also helps configuring global gitconfig and global gitignore, and gives the option to install all kinds of bash-aliases/functions
 
+## Install_git.sh
+Script to automate setting up pagers, syntax highlighters, lazygit and copy-to. Works remotely with
+
+```
+eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_git.sh)"
+```
+
 ## Install_gitignore.sh
 Script to automate setting up local or global gitignore using templates from https://github.com/github/gitignore
 

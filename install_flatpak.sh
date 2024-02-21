@@ -45,7 +45,7 @@ if [ -z $pam ] || [ "y" == $pam ]; then
     fi
     
     if [ ! -f /usr/bin/update_flatpak_cli.py ]; then
-        sudo wget -P /usr/bin/ https://gist.githubusercontent.com/ssokolow/db565fd8a82d6002baada946adb81f68/raw/c23b3292441e01c6287de1b417b9e573bce6a571/update_flatpak_cli.py
+        sudo wget -O /usr/bin/update_flatpak_cli.py https://gist.githubusercontent.com/ssokolow/db565fd8a82d6002baada946adb81f68/raw/c23b3292441e01c6287de1b417b9e573bce6a571/update_flatpak_cli.py
         sudo chmod u+x /usr/bin/update_flatpak_cli.py
         sudo sed -i 's|\[ -a "|\[ -f "|g' /usr/bin/update_flatpak_cli.py
     fi
