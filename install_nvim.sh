@@ -52,7 +52,7 @@ if [[ $distro == "Arch" || $distro_base == "Arch" ]];then
             sudo npm install -g neovim
         fi
     fi
-    if ! type gem &> /dev/null; then
+    if ! gem list | grep neovim &> /dev/null; then
         reade -Q "GREEN" -i "y" -p "Install nvim-ruby? [Y/n]:" "y n" rubyscripts
         if [ -z $rubyscripts ] || [ "y" == $rubyscripts ]; then
             yes | sudo pacman -Su ruby
@@ -68,15 +68,13 @@ if [[ $distro == "Arch" || $distro_base == "Arch" ]];then
             gem install neovim
         fi
     fi
-    if ! type cpan &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Install nvim-perl? [Y/n]:" "y n" perlscripts
-        if [ -z $perlscripts ] || [ "y" == $perlscripts ]; then
-            yes | sudo pacman -Su cpanminus
-            cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
-            sudo cpanm --sudo -n Neovim::Ext
-        fi
+    reade -Q "GREEN" -i "y" -p "Install nvim-perl? [Y/n]:" "y n" perlscripts
+    if [ -z $perlscripts ] || [ "y" == $perlscripts ]; then
+        yes | sudo pacman -Su cpanminus
+        cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+        sudo cpanm --sudo -n Neovim::Ext
     fi
-    if ! [ -x "$(command -v ctags)" ]; then 
+    if ! type ctags &> /dev/null; then 
         reade -Q "GREEN" -i "y" -p "Install ctags? [Y/n]:" "y n" ctags
         if  [ "y" == $ctags ]; then
             yes | sudo pacman -Su ctags
@@ -153,7 +151,7 @@ elif [  $distro_base == "Debian" ];then
             fi
         fi
     fi
-    if ! type pipx &> /dev/null || ! type pylint &> /dev/null; then
+    if ! type pylint &> /dev/null; then
         reade -Q "GREEN" -i "y" -p "Install nvim-python? [Y/n]:" "y n" pyscripts
         if [ -z $pyscripts ] || [ "y" == $pyscripts ]; then
             yes | sudo apt install python3 python3-dev python3-pynvim pipx  
@@ -162,7 +160,7 @@ elif [  $distro_base == "Debian" ];then
         fi
     fi
 
-    if ! type npm &> /dev/null || ! npm list -g | grep neovim  &> /dev/null; then
+    if ! npm list -g | grep neovim  &> /dev/null; then
         reade -Q "GREEN" -i "y" -p "Install nvim-javascript? [Y/n]:" "y n" jsscripts
         if [ -z $jsscripts ] || [ "y" == $jsscripts ]; then
             yes | sudo apt install nodejs npm
@@ -192,7 +190,7 @@ elif [  $distro_base == "Debian" ];then
         fi
     fi
     
-    if ! type gem &> /dev/null || ! gem list | grep neovim &> /dev/null; then
+    if ! gem list | grep neovim &> /dev/null; then
         reade -Q "GREEN" -i "y" -p "Install nvim-ruby? [Y/n]:" "y n" rubyscripts
         if [ -z $rubyscripts ] || [ "y" == $rubyscripts ]; then
             yes | sudo apt install ruby
