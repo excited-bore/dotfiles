@@ -41,7 +41,7 @@ Then it helps with installing/configuring:
     - Nvimpager: https://github.com/lucc/nvimpager  
     - Tmux: https://github.com/tmux/tmux  
     - Kitty: https://sw.kovidgoyal.net/kitty/  
-    - Lazygit: https://github.com/jesseduffield/lazygit?tab=readme-ov-file#amend-an-old-commit  
+    - Lazygit: https://github.com/jesseduffield/lazygit  
     - Diff syntax highlighters:  
 &nbsp;&nbsp;- Difftastic: https://difftastic.wilfred.me.uk/  
 &nbsp;&nbsp;- Delta: https://github.com/delta-io/delta  
