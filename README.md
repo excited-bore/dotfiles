@@ -29,7 +29,7 @@ Then it helps with installing/configuring:
 &nbsp;&nbsp;&nbsp;- Vim-oscyank: https://github.com/ojroques/vim-oscyank  
 &nbsp;&nbsp;&nbsp;- Vim-tmux-kitty-navigator: https://github.com/excited-bore/vim-tmux-kitty-navigator  
 &nbsp;&nbsp;&nbsp;- Suda: https://github.com/lambdalisue/suda.vim  
-&nbsp;&nbsp;&nbsp;- Glow: https://github.com/ellisonleao/glow.nvim
+&nbsp;&nbsp;&nbsp;- Glow: https://github.com/ellisonleao/glow.nvim  
 &nbsp;&nbsp;&nbsp;- Which-key: https://github.com/folke/which-key.nvim  
 &nbsp;&nbsp;&nbsp;- Toggleterm.nvim: https://github.com/akinsho/toggleterm.nvim  
 &nbsp;&nbsp;&nbsp;- Ranger.vim: https://github.com/francoiscabrol/ranger.vim  
