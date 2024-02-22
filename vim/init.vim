@@ -292,14 +292,17 @@ Plugin 'Xuyuanp/nerdtree-git-plugin'
 " Totally independent OS52 clipboard
 Plugin 'ojroques/vim-oscyank', {'branch': 'main'}
 
+" Color codes for pager
+Plugin 'vim-scripts/AnsiEsc.vim'
+ 
 " Diff plugin
-Plug 'sindrets/diffview.nvim'
+Plugin 'sindrets/diffview.nvim'
 
 " Lazygit plugin
 Plugin 'kdheepak/lazygit.nvim'
 
 " Toggle Terminal
-Plugin 'akinsho/toggleterm.nvim', {'tag' : '*'}
+Plugin 'akinsho/toggleterm.nvim'
 
 " Ranger integration
 Plugin 'francoiscabrol/ranger.vim'

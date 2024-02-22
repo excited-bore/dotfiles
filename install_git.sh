@@ -35,6 +35,10 @@ else
     global="--global"
 fi
 
+reade -Q "YELLOW" -i "n" -p "Turn off pager? [Y/n]: " "y n" pipepager1
+if test "$pipepager1" == 'y'; then 
+     git config $global "$cpager" false  
+else
 #reade -Q "CYAN" -i "n" -p "Set $cpager to prevent paging? [N/y]: " "y n" regpager ;
 #regpager="$(printf "yes\nno\n" | fzf --border --border-label="Set pager instead of output only?" --reverse)"
 #if test "$regpager" == "n"; then
@@ -97,463 +101,476 @@ fi
         pager="delta"
     fi
     
-    reade -Q "GREEN" -i "$pager" -p "Pager: " "$pagers" pager;
-    #pager="$(printf "$pagersf" | fzf --border --border-label="Pager" --reverse)"
     
-    if test $pager == 'less'; then
-        local ln="-R"
-        reade -Q "CYAN" -i "y" -p "You selected $pager. Quit if one screen? [Y/n]: " "y n" pager1
-        if test $pager1 == 'y'; then
-            ln=$ln"--quit-if-one-screen"
-        fi
-        reade -Q "CYAN" -i "n" -p "Set linenumbers for pager? [Y/n]: " "y n" lne 
-        if test "$lne" == 'n'; then
-           ln=$ln"-n"
-        else
-           ln=$ln"-N"
-        fi
-    elif [ "$pager" == "moar" ]; then
-        reade -Q "CYAN" -i "y" -p "You chose $pager. Quit if on one screen? [Y/n]: " "y n" pager1
-        if test $pager1 == 'y'; then
-            pager=$pager' --quit-if-one-screen'
-        fi
-        reade -Q "CYAN" -i "y" -p "You selected $pager. Set style? [Y/n]: " "y n" pager1
-        if test $pager1 == 'y'; then
-            local theme
-            local styles="abap\nalgol\nalgol_nu\napi\narduino\nautumn\naverage\nbase16-snazzy\nborland\nbw\ncatppuccin-frappe\ncatppuccin-latte\ncatppuccin-macchiato\ncatppuccin-mocha\ncolorful\ncompat\ndoom-one\ndoom-one2\ndracula\nemacs\nfriendly\nfruity\ngithub-dark\ngithub\ngruvbox-light\ngruvbox\nhr_high_contrast\nhrdark\nigor\nlovelace\nmanni\nmodus-operandi\nmodus-vivendi\nmonokai\nmonokailight\nmurphy\nnative\nnord\nonedark\nonesenterprise\nparaiso-dark\nparaiso-light\npastie\nperldoc\npygments\nrainbow_dash\nrose-pine-dawn\nrose-pine-moon\nrose-pine\nrrt\nsolarized-dark\nsolarized-dark256\nsolarized-light\nswapoff\ntango\ntrac\nvim\nvs\nvulcan\nwitchhazel\nxcode-dark\nxcode"
-            echo "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Sollicitudin nibh sit amet commodo nulla facilisi. Sed cras ornare arcu dui vivamus arcu. Non quam lacus suspendisse faucibus interdum posuere lorem. Consequat ac felis donec et odio pellentesque. Elementum tempus egestas sed sed risus pretium quam. Neque viverra justo nec ultrices dui sapien eget mi proin. Varius vel pharetra vel turpis nunc eget lorem dolor sed. Mauris in aliquam sem fringilla ut morbi tincidunt augue. Cursus euismod quis viverra nibh cras. Diam sollicitudin tempor id eu. Lectus arcu bibendum at varius vel. Posuere morbi leo urna molestie at elementum eu facilisis. Condimentum lacinia quis vel eros. Dolor magna eget est lorem ipsum dolor sit amet consectetur. Ultrices dui sapien eget mi. A arcu cursus vitae congue mauris.
+        reade -Q "GREEN" -i "$pager" -p "Pager: " "$pagers" pager;
+        #pager="$(printf "$pagersf" | fzf --border --border-label="Pager" --reverse)"
+        
+        if test $pager == 'less'; then
+            local ln="-R"
+            reade -Q "CYAN" -i "y" -p "You selected $pager. Quit if one screen? [Y/n]: " "y n" pager1
+            if test $pager1 == 'y'; then
+                ln=$ln"--quit-if-one-screen"
+            fi
+            reade -Q "CYAN" -i "n" -p "Set linenumbers for pager? [Y/n]: " "y n" lne 
+            if test "$lne" == 'n'; then
+               ln=$ln"-n"
+            else
+               ln=$ln"-N"
+            fi
+            git config $global "$cpager" "$pager"  
+        elif [ "$pager" == "moar" ]; then
+            reade -Q "CYAN" -i "y" -p "You chose $pager. Quit if on one screen? [Y/n]: " "y n" pager1
+            if test $pager1 == 'y'; then
+                pager=$pager' --quit-if-one-screen'
+            fi
+            reade -Q "CYAN" -i "y" -p "You selected $pager. Set style? [Y/n]: " "y n" pager1
+            if test $pager1 == 'y'; then
+                local theme
+                local styles="abap\nalgol\nalgol_nu\napi\narduino\nautumn\naverage\nbase16-snazzy\nborland\nbw\ncatppuccin-frappe\ncatppuccin-latte\ncatppuccin-macchiato\ncatppuccin-mocha\ncolorful\ncompat\ndoom-one\ndoom-one2\ndracula\nemacs\nfriendly\nfruity\ngithub-dark\ngithub\ngruvbox-light\ngruvbox\nhr_high_contrast\nhrdark\nigor\nlovelace\nmanni\nmodus-operandi\nmodus-vivendi\nmonokai\nmonokailight\nmurphy\nnative\nnord\nonedark\nonesenterprise\nparaiso-dark\nparaiso-light\npastie\nperldoc\npygments\nrainbow_dash\nrose-pine-dawn\nrose-pine-moon\nrose-pine\nrrt\nsolarized-dark\nsolarized-dark256\nsolarized-light\nswapoff\ntango\ntrac\nvim\nvs\nvulcan\nwitchhazel\nxcode-dark\nxcode"
+                echo "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Sollicitudin nibh sit amet commodo nulla facilisi. Sed cras ornare arcu dui vivamus arcu. Non quam lacus suspendisse faucibus interdum posuere lorem. Consequat ac felis donec et odio pellentesque. Elementum tempus egestas sed sed risus pretium quam. Neque viverra justo nec ultrices dui sapien eget mi proin. Varius vel pharetra vel turpis nunc eget lorem dolor sed. Mauris in aliquam sem fringilla ut morbi tincidunt augue. Cursus euismod quis viverra nibh cras. Diam sollicitudin tempor id eu. Lectus arcu bibendum at varius vel. Posuere morbi leo urna molestie at elementum eu facilisis. Condimentum lacinia quis vel eros. Dolor magna eget est lorem ipsum dolor sit amet consectetur. Ultrices dui sapien eget mi. A arcu cursus vitae congue mauris.
 
-In pellentesque massa placerat duis ultricies lacus sed turpis tincidunt. Dignissim diam quis enim lobortis scelerisque fermentum. Faucibus purus in massa tempor nec. Enim neque volutpat ac tincidunt. Penatibus et magnis dis parturient montes nascetur ridiculus. Ornare aenean euismod elementum nisi quis eleifend quam adipiscing. Elementum pulvinar etiam non quam lacus suspendisse faucibus interdum. Vel eros donec ac odio tempor orci dapibus ultrices. Tempus imperdiet nulla malesuada pellentesque elit eget gravida. In ante metus dictum at tempor commodo ullamcorper.
+    In pellentesque massa placerat duis ultricies lacus sed turpis tincidunt. Dignissim diam quis enim lobortis scelerisque fermentum. Faucibus purus in massa tempor nec. Enim neque volutpat ac tincidunt. Penatibus et magnis dis parturient montes nascetur ridiculus. Ornare aenean euismod elementum nisi quis eleifend quam adipiscing. Elementum pulvinar etiam non quam lacus suspendisse faucibus interdum. Vel eros donec ac odio tempor orci dapibus ultrices. Tempus imperdiet nulla malesuada pellentesque elit eget gravida. In ante metus dictum at tempor commodo ullamcorper.
 
-Feugiat sed lectus vestibulum mattis ullamcorper velit sed ullamcorper. Aliquet nibh praesent tristique magna sit amet purus. Dignissim diam quis enim lobortis scelerisque. Turpis egestas sed tempus urna et. Est sit amet facilisis magna. At tellus at urna condimentum mattis pellentesque. Bibendum ut tristique et egestas quis ipsum suspendisse ultrices. Diam sollicitudin tempor id eu. Vulputate sapien nec sagittis aliquam malesuada bibendum arcu vitae elementum. Aliquet nibh praesent tristique magna sit. Dictum fusce ut placerat orci nulla pellentesque dignissim enim. Laoreet sit amet cursus sit amet dictum. Amet consectetur adipiscing elit duis tristique. Phasellus vestibulum lorem sed risus ultricies tristique nulla aliquet.
+    Feugiat sed lectus vestibulum mattis ullamcorper velit sed ullamcorper. Aliquet nibh praesent tristique magna sit amet purus. Dignissim diam quis enim lobortis scelerisque. Turpis egestas sed tempus urna et. Est sit amet facilisis magna. At tellus at urna condimentum mattis pellentesque. Bibendum ut tristique et egestas quis ipsum suspendisse ultrices. Diam sollicitudin tempor id eu. Vulputate sapien nec sagittis aliquam malesuada bibendum arcu vitae elementum. Aliquet nibh praesent tristique magna sit. Dictum fusce ut placerat orci nulla pellentesque dignissim enim. Laoreet sit amet cursus sit amet dictum. Amet consectetur adipiscing elit duis tristique. Phasellus vestibulum lorem sed risus ultricies tristique nulla aliquet.
 
-Eu augue ut lectus arcu bibendum at varius vel pharetra. Urna nunc id cursus metus. Massa eget egestas purus viverra. Ornare quam viverra orci sagittis eu volutpat odio facilisis. Ornare arcu dui vivamus arcu felis bibendum. Sollicitudin aliquam ultrices sagittis orci a. In eu mi bibendum neque egestas congue quisque egestas diam. Consectetur adipiscing elit duis tristique sollicitudin nibh sit amet commodo. Risus in hendrerit gravida rutrum quisque non. Justo eget magna fermentum iaculis eu. Ut consequat semper viverra nam libero justo laoreet sit. Vel pretium lectus quam id leo in vitae turpis. Praesent semper feugiat nibh sed pulvinar.
+    Eu augue ut lectus arcu bibendum at varius vel pharetra. Urna nunc id cursus metus. Massa eget egestas purus viverra. Ornare quam viverra orci sagittis eu volutpat odio facilisis. Ornare arcu dui vivamus arcu felis bibendum. Sollicitudin aliquam ultrices sagittis orci a. In eu mi bibendum neque egestas congue quisque egestas diam. Consectetur adipiscing elit duis tristique sollicitudin nibh sit amet commodo. Risus in hendrerit gravida rutrum quisque non. Justo eget magna fermentum iaculis eu. Ut consequat semper viverra nam libero justo laoreet sit. Vel pretium lectus quam id leo in vitae turpis. Praesent semper feugiat nibh sed pulvinar.
 
-Condimentum lacinia quis vel eros donec ac. Nibh sed pulvinar proin gravida hendrerit lectus a. Volutpat consequat mauris nunc congue nisi vitae suscipit tellus. Mi tempus imperdiet nulla malesuada pellentesque elit eget. Scelerisque in dictum non consectetur. Ac ut consequat semper viverra nam libero justo laoreet sit. Lectus magna fringilla urna porttitor rhoncus. Integer vitae justo eget magna fermentum. Nisl pretium fusce id velit ut. In aliquam sem fringilla ut morbi tincidunt augue. Vitae tempus quam pellentesque nec nam aliquam sem et. Eget mauris pharetra et ultrices neque. At augue eget arcu dictum. Eget duis at tellus at. Mauris ultrices eros in cursus turpis massa tincidunt dui. Aliquet nec ullamcorper sit amet. Eu feugiat pretium nibh ipsum consequat nisl vel pretium lectus." > $TMPDIR/dtest1
-            while test -z "$style"; do
-                style=$(printf "$styles" | fzf --reverse --border --border-label="Moar style")
-                moar --style "$style" $TMPDIR/dtest1
-                stty sane && reade -Q "CYAN" -i "n" -p "Set as style? (Will retry if no) [Y/n]: " thme
-                if test "$thme" == "n"; then
-                   style='' 
+    Condimentum lacinia quis vel eros donec ac. Nibh sed pulvinar proin gravida hendrerit lectus a. Volutpat consequat mauris nunc congue nisi vitae suscipit tellus. Mi tempus imperdiet nulla malesuada pellentesque elit eget. Scelerisque in dictum non consectetur. Ac ut consequat semper viverra nam libero justo laoreet sit. Lectus magna fringilla urna porttitor rhoncus. Integer vitae justo eget magna fermentum. Nisl pretium fusce id velit ut. In aliquam sem fringilla ut morbi tincidunt augue. Vitae tempus quam pellentesque nec nam aliquam sem et. Eget mauris pharetra et ultrices neque. At augue eget arcu dictum. Eget duis at tellus at. Mauris ultrices eros in cursus turpis massa tincidunt dui. Aliquet nec ullamcorper sit amet. Eu feugiat pretium nibh ipsum consequat nisl vel pretium lectus." > $TMPDIR/dtest1
+                while test -z "$style"; do
+                    style=$(printf "$styles" | fzf --reverse --border --border-label="Moar style")
+                    moar --style "$style" $TMPDIR/dtest1
+                    stty sane && reade -Q "CYAN" -i "n" -p "Set as style? (Will retry if no) [Y/n]: " thme
+                    if test "$thme" == "n"; then
+                       style='' 
+                    fi
+                done
+                pager=$pager" $style"
+            fi 
+            reade -Q "CYAN" -i "n" -p "Show linenumber? [Y/n]: " "y n" pager1
+            if test $pager1 == 'n'; then
+                pager=$pager' --no-linenumbers'
+            fi
+            reade -Q "CYAN" -i "n" -p "Wrap long lines? [Y/n]: " "y n" pager1
+            if test $pager1 == 'y'; then
+                pager=$pager' --wrap'
+            fi
+            git config $global "$cpager" "$pager"  
+        elif [ "$pager" == "nvimpager" ] || [ "$pager" == "vimpager" ] ; then
+            echo "You selected $pager."
+            colors="blue darkblue default delek desert elflord evening gruvbox habamax industry koehler lunaperch morning murphy pablo peachpuff quiet ron shine slate torte zellner"
+            if test "$pager" == "vimpager"; then
+               colors=$colors" retrobox sorbet wildcharm zaibatsu" 
+            fi
+            pager="$pager"
+            reade -Q "CYAN" -i "y" -p "Set colorscheme? [Y/n]: " "y n" pager1
+            if [ "$pager1" == "y" ]; then
+                reade -Q "CYAN" -i "default" -p "Colorscheme: " "$colors" color
+                pager="$pager +'colorscheme $color'"
+            fi
+            git config $global "$cpager" "$pager"  
+        elif [ "$pager" == "riff" ]; then
+                pager="riff"
+                reade -Q "CYAN" -i "y" -p "Ignore changes in amount of whitespace? [Y/n]: " riff1
+                if test "$riff1" == 'y'; then
+                    pager=$pager" -b"
                 fi
-            done
-            pager=$pager" $style"
-        fi 
-        reade -Q "CYAN" -i "n" -p "Show linenumber? [Y/n]: " "y n" pager1
-        if test $pager1 == 'n'; then
-            pager=$pager' --no-linenumbers'
-        fi
-        reade -Q "CYAN" -i "n" -p "Wrap long lines? [Y/n]: " "y n" pager1
-        if test $pager1 == 'y'; then
-            pager=$pager' --wrap'
-        fi
-    elif [ "$pager" == "nvimpager" ] || [ "$pager" == "vimpager" ] ; then
-        echo "You selected $pager."
-        colors="blue darkblue default delek desert elflord evening gruvbox habamax industry koehler lunaperch morning murphy pablo peachpuff quiet ron shine slate torte zellner"
-        if test "$pager" == "vimpager"; then
-           colors=$colors" retrobox sorbet wildcharm zaibatsu" 
-        fi
-        pager="$pager"
-        reade -Q "CYAN" -i "y" -p "Set colorscheme? [Y/n]: " "y n" pager1
-        if [ "$pager1" == "y" ]; then
-            reade -Q "CYAN" -i "default" -p "Colorscheme: " "$colors" color
-            pager="$pager +'colorscheme $color'"
-        fi
-    elif [ "$pager" == "riff" ]; then
-            pager="riff"
-            reade -Q "CYAN" -i "y" -p "Ignore changes in amount of whitespace? [Y/n]: " riff1
-            if test "$riff1" == 'y'; then
-                pager=$pager" -b"
+                reade -Q "CYAN" -i "y" -p "No special highlighting for lines that only add content? [Y/n]: " riff1
+                if test "$riff1" == 'y'; then
+                    pager=$pager" --no-adds-only-special"
+                fi
+        elif [ "$pager" == "diff-so-fancy" ] || [ "$pager" == "diffr" ] || [ "$pager" == "ydiff" ] || [ "$pager" == "delta" ] || [ "$pager" == "bat" ] || [ "$pager" == "batdiff" ] ; then
+            local difffancy
+            local pre='y'
+            if (test $pager == 'delta' || test $pager == 'diff-so-fancy') && echo $(git config $global --list --show-origin) | grep -q $pager; then
+                pre='n'
             fi
-            reade -Q "CYAN" -i "y" -p "No special highlighting for lines that only add content? [Y/n]: " riff1
-            if test "$riff1" == 'y'; then
-                pager=$pager" --no-adds-only-special"
-            fi
-    elif [ "$pager" == "diff-so-fancy" ] || [ "$pager" == "diffr" ] || [ "$pager" == "ydiff" ] || [ "$pager" == "delta" ] || [ "$pager" == "bat" ] || [ "$pager" == "batdiff" ] ; then
-        local difffancy
-        local pre='y'
-        if (test $pager == 'delta' || test $pager == 'diff-so-fancy') && echo $(git config $global --list --show-origin) | grep -q $pager; then
-            pre='n'
-        fi
-        reade -Q "CYAN" -i "$pre" -p "You selected $pager. Configure? [Y/n]: " "y n" difffancy
-        if test "y" == "$difffancy"; then
-            if [ "$pager" == "bat" ] || [ "$pager" == "batdiff" ]; then 
-                local opts=""
-                reade -Q "CYAN" -i "y" -p "Set styles? (line numbers/grid) [Y/n]: " "y n" delta2
-                local theme='changes'
-                if test "y" == $delta2; then
-                    while : ; do
-                        local style=''
-                        style=$(printf "full\nauto\nplain\nchanges\nheader\nheader-filename\nheader-filesize\ngrid\nrule\nnumbers\nsnip\n" | fzf --border --border-label="Bat styles")
-                        stty sane && reade -Q "MAGENTA" -i "o" -p "Add to styles/Only use this style/Dont use? (Will retry if add) [A/o/n]: " "a o n" dltthme
-                        if test "$dltthme" == "a" ; then
-                            theme=$theme","$style
-                        elif test "$dltthme" == "o" ; then
-                            theme=$theme","$style
-                            break;
-                        else
-                           break;
-                        fi
-                    done
-                    opts=$opts" --style='$theme'"
-                fi 
-                reade -Q "CYAN" -i "y" -p "Set syntax-theme [Y/n]: " "y n" delta1
-                if test "y" == $delta1; then
-                    echo "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Sollicitudin nibh sit amet commodo nulla facilisi. Sed cras ornare arcu dui vivamus arcu. Non quam lacus suspendisse faucibus interdum posuere lorem. Consequat ac felis donec et odio pellentesque. Elementum tempus egestas sed sed risus pretium quam. Neque viverra justo nec ultrices dui sapien eget mi proin. Varius vel pharetra vel turpis nunc eget lorem dolor sed. Mauris in aliquam sem fringilla ut morbi tincidunt augue. Cursus euismod quis viverra nibh cras. Diam sollicitudin tempor id eu. Lectus arcu bibendum at varius vel. Posuere morbi leo urna molestie at elementum eu facilisis. Condimentum lacinia quis vel eros. Dolor magna eget est lorem ipsum dolor sit amet consectetur. Ultrices dui sapien eget mi. A arcu cursus vitae congue mauris.
+            reade -Q "CYAN" -i "$pre" -p "You selected $pager. Configure? [Y/n]: " "y n" difffancy
+            if test "y" == "$difffancy"; then
+                if [ "$pager" == "bat" ] || [ "$pager" == "batdiff" ]; then 
+                    local opts=""
+                    reade -Q "CYAN" -i "y" -p "Set styles? (line numbers/grid) [Y/n]: " "y n" delta2
+                    local theme='changes'
+                    if test "y" == $delta2; then
+                        while : ; do
+                            local style=''
+                            style=$(printf "full\nauto\nplain\nchanges\nheader\nheader-filename\nheader-filesize\ngrid\nrule\nnumbers\nsnip\n" | fzf --border --border-label="Bat styles")
+                            stty sane && reade -Q "MAGENTA" -i "o" -p "Add to styles/Only use this style/Dont use? (Will retry if add) [A/o/n]: " "a o n" dltthme
+                            if test "$dltthme" == "a" ; then
+                                theme=$theme","$style
+                            elif test "$dltthme" == "o" ; then
+                                theme=$theme","$style
+                                break;
+                            else
+                               break;
+                            fi
+                        done
+                        opts=$opts" --style='$theme'"
+                    fi 
+                    reade -Q "CYAN" -i "y" -p "Set syntax-theme [Y/n]: " "y n" delta1
+                    if test "y" == $delta1; then
+                        echo "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Sollicitudin nibh sit amet commodo nulla facilisi. Sed cras ornare arcu dui vivamus arcu. Non quam lacus suspendisse faucibus interdum posuere lorem. Consequat ac felis donec et odio pellentesque. Elementum tempus egestas sed sed risus pretium quam. Neque viverra justo nec ultrices dui sapien eget mi proin. Varius vel pharetra vel turpis nunc eget lorem dolor sed. Mauris in aliquam sem fringilla ut morbi tincidunt augue. Cursus euismod quis viverra nibh cras. Diam sollicitudin tempor id eu. Lectus arcu bibendum at varius vel. Posuere morbi leo urna molestie at elementum eu facilisis. Condimentum lacinia quis vel eros. Dolor magna eget est lorem ipsum dolor sit amet consectetur. Ultrices dui sapien eget mi. A arcu cursus vitae congue mauris.
 
-In pellentesque massa placerat duis ultricies lacus sed turpis tincidunt. Dignissim diam quis enim lobortis scelerisque fermentum. Faucibus purus in massa tempor nec. Enim neque volutpat ac tincidunt. Penatibus et magnis dis parturient montes nascetur ridiculus. Ornare aenean euismod elementum nisi quis eleifend quam adipiscing. Elementum pulvinar etiam non quam lacus suspendisse faucibus interdum. Vel eros donec ac odio tempor orci dapibus ultrices. Tempus imperdiet nulla malesuada pellentesque elit eget gravida. In ante metus dictum at tempor commodo ullamcorper.
+    In pellentesque massa placerat duis ultricies lacus sed turpis tincidunt. Dignissim diam quis enim lobortis scelerisque fermentum. Faucibus purus in massa tempor nec. Enim neque volutpat ac tincidunt. Penatibus et magnis dis parturient montes nascetur ridiculus. Ornare aenean euismod elementum nisi quis eleifend quam adipiscing. Elementum pulvinar etiam non quam lacus suspendisse faucibus interdum. Vel eros donec ac odio tempor orci dapibus ultrices. Tempus imperdiet nulla malesuada pellentesque elit eget gravida. In ante metus dictum at tempor commodo ullamcorper.
 
-Feugiat sed lectus vestibulum mattis ullamcorper velit sed ullamcorper. Aliquet nibh praesent tristique magna sit amet purus. Dignissim diam quis enim lobortis scelerisque. Turpis egestas sed tempus urna et. Est sit amet facilisis magna. At tellus at urna condimentum mattis pellentesque. Bibendum ut tristique et egestas quis ipsum suspendisse ultrices. Diam sollicitudin tempor id eu. Vulputate sapien nec sagittis aliquam malesuada bibendum arcu vitae elementum. Aliquet nibh praesent tristique magna sit. Dictum fusce ut placerat orci nulla pellentesque dignissim enim. Laoreet sit amet cursus sit amet dictum. Amet consectetur adipiscing elit duis tristique. Phasellus vestibulum lorem sed risus ultricies tristique nulla aliquet.
+    Feugiat sed lectus vestibulum mattis ullamcorper velit sed ullamcorper. Aliquet nibh praesent tristique magna sit amet purus. Dignissim diam quis enim lobortis scelerisque. Turpis egestas sed tempus urna et. Est sit amet facilisis magna. At tellus at urna condimentum mattis pellentesque. Bibendum ut tristique et egestas quis ipsum suspendisse ultrices. Diam sollicitudin tempor id eu. Vulputate sapien nec sagittis aliquam malesuada bibendum arcu vitae elementum. Aliquet nibh praesent tristique magna sit. Dictum fusce ut placerat orci nulla pellentesque dignissim enim. Laoreet sit amet cursus sit amet dictum. Amet consectetur adipiscing elit duis tristique. Phasellus vestibulum lorem sed risus ultricies tristique nulla aliquet.
 
-Eu augue ut lectus arcu bibendum at varius vel pharetra. Urna nunc id cursus metus. Massa eget egestas purus viverra. Ornare quam viverra orci sagittis eu volutpat odio facilisis. Ornare arcu dui vivamus arcu felis bibendum. Sollicitudin aliquam ultrices sagittis orci a. In eu mi bibendum neque egestas congue quisque egestas diam. Consectetur adipiscing elit duis tristique sollicitudin nibh sit amet commodo. Risus in hendrerit gravida rutrum quisque non. Justo eget magna fermentum iaculis eu. Ut consequat semper viverra nam libero justo laoreet sit. Vel pretium lectus quam id leo in vitae turpis. Praesent semper feugiat nibh sed pulvinar.
+    Eu augue ut lectus arcu bibendum at varius vel pharetra. Urna nunc id cursus metus. Massa eget egestas purus viverra. Ornare quam viverra orci sagittis eu volutpat odio facilisis. Ornare arcu dui vivamus arcu felis bibendum. Sollicitudin aliquam ultrices sagittis orci a. In eu mi bibendum neque egestas congue quisque egestas diam. Consectetur adipiscing elit duis tristique sollicitudin nibh sit amet commodo. Risus in hendrerit gravida rutrum quisque non. Justo eget magna fermentum iaculis eu. Ut consequat semper viverra nam libero justo laoreet sit. Vel pretium lectus quam id leo in vitae turpis. Praesent semper feugiat nibh sed pulvinar.
 
-Condimentum lacinia quis vel eros donec ac. Nibh sed pulvinar proin gravida hendrerit lectus a. Volutpat consequat mauris nunc congue nisi vitae suscipit tellus. Mi tempus imperdiet nulla malesuada pellentesque elit eget. Scelerisque in dictum non consectetur. Ac ut consequat semper viverra nam libero justo laoreet sit. Lectus magna fringilla urna porttitor rhoncus. Integer vitae justo eget magna fermentum. Nisl pretium fusce id velit ut. In aliquam sem fringilla ut morbi tincidunt augue. Vitae tempus quam pellentesque nec nam aliquam sem et. Eget mauris pharetra et ultrices neque. At augue eget arcu dictum. Eget duis at tellus at. Mauris ultrices eros in cursus turpis massa tincidunt dui. Aliquet nec ullamcorper sit amet. Eu feugiat pretium nibh ipsum consequat nisl vel pretium lectus." > $TMPDIR/dtest1
-                    local theme=''
+    Condimentum lacinia quis vel eros donec ac. Nibh sed pulvinar proin gravida hendrerit lectus a. Volutpat consequat mauris nunc congue nisi vitae suscipit tellus. Mi tempus imperdiet nulla malesuada pellentesque elit eget. Scelerisque in dictum non consectetur. Ac ut consequat semper viverra nam libero justo laoreet sit. Lectus magna fringilla urna porttitor rhoncus. Integer vitae justo eget magna fermentum. Nisl pretium fusce id velit ut. In aliquam sem fringilla ut morbi tincidunt augue. Vitae tempus quam pellentesque nec nam aliquam sem et. Eget mauris pharetra et ultrices neque. At augue eget arcu dictum. Eget duis at tellus at. Mauris ultrices eros in cursus turpis massa tincidunt dui. Aliquet nec ullamcorper sit amet. Eu feugiat pretium nibh ipsum consequat nisl vel pretium lectus." > $TMPDIR/dtest1
+                        local theme=''
+                        
+                        while test -z "$theme"; do
+                            theme=$(bat --list-themes | fzf --border --border-label="Bat syntax themes" --preview="bat --theme={} --color=always $TMPDIR/dtest1")
+                            stty sane && reade -Q "MAGENTA" -i "n" -p "Set $theme as syntax theme? (Will retry if no) [Y/n]: " "y n" dltthme
+                            if test "$dltthme" == "n"; then
+                               theme='' 
+                            fi
+                        done
+                        opts=$opts" --theme=$theme"
+                    fi
+
+                    reade -Q "CYAN" -i "n" -p "Set to specific language? (Useful if you're using an obscure language that bat can't autodetect) [Y/n]: " "y n" delta2
+                    if test "y" == $delta2; then
+                        local theme=''
+                        
+                        while test -z "$theme"; do
+                            theme=$(bat --list-languages | fzf --border --border-label="Bat coding languages")
+                            stty sane && reade -Q "MAGENTA" -i "n" -p "Set syntax to specifically use $theme as language? (Will retry if no) [Y/n]: " "y n" dltthme
+                            if test "$dltthme" == "n"; then
+                               theme='' 
+                            fi
+                        done
+                        opts=$opts" --language=$theme"
+                    fi
+                    pager=$pager" $opts"
+                elif [ "$pager" == "delta" ]; then
+                    reade -Q "CYAN" -i "n" -p "Set side-by-side view? [Y/n]: " "y n" delta1
+                    if test "y" == $delta1; then
+                        git config $global delta.side-by-side true
+                    fi
+
+                    reade -Q "CYAN" -i "y" -p "Set to navigate? (Move between diff sections using n and N) [Y/n]: " "y n" delta1
+                    if test "y" == $delta1; then
+                        git config $global delta.navigate true
+                    fi 
+
+                    reade -Q "CYAN" -i "y" -p "Set syntax-theme [Y/n]: " "y n" delta1
+                    if test "y" == $delta1; then
+                        echo "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Sollicitudin nibh sit amet commodo nulla facilisi. Sed cras ornare arcu dui vivamus arcu. Non quam lacus suspendisse faucibus interdum posuere lorem. Consequat ac felis donec et odio pellentesque. Elementum tempus egestas sed sed risus pretium quam. Neque viverra justo nec ultrices dui sapien eget mi proin. Varius vel pharetra vel turpis nunc eget lorem dolor sed. Mauris in aliquam sem fringilla ut morbi tincidunt augue. Cursus euismod quis viverra nibh cras. Diam sollicitudin tempor id eu. Lectus arcu bibendum at varius vel. Posuere morbi leo urna molestie at elementum eu facilisis. Condimentum lacinia quis vel eros. Dolor magna eget est lorem ipsum dolor sit amet consectetur. Ultrices dui sapien eget mi. A arcu cursus vitae congue mauris.
+
+    In pellentesque massa placerat duis ultricies lacus sed turpis tincidunt. Dignissim diam quis enim lobortis scelerisque fermentum. Faucibus purus in massa tempor nec. Enim neque volutpat ac tincidunt. Penatibus et magnis dis parturient montes nascetur ridiculus. Ornare aenean euismod elementum nisi quis eleifend quam adipiscing. Elementum pulvinar etiam non quam lacus suspendisse faucibus interdum. Vel eros donec ac odio tempor orci dapibus ultrices. Tempus imperdiet nulla malesuada pellentesque elit eget gravida. In ante metus dictum at tempor commodo ullamcorper.
+
+    Feugiat sed lectus vestibulum mattis ullamcorper velit sed ullamcorper. Aliquet nibh praesent tristique magna sit amet purus. Dignissim diam quis enim lobortis scelerisque. Turpis egestas sed tempus urna et. Est sit amet facilisis magna. At tellus at urna condimentum mattis pellentesque. Bibendum ut tristique et egestas quis ipsum suspendisse ultrices. Diam sollicitudin tempor id eu. Vulputate sapien nec sagittis aliquam malesuada bibendum arcu vitae elementum. Aliquet nibh praesent tristique magna sit. Dictum fusce ut placerat orci nulla pellentesque dignissim enim. Laoreet sit amet cursus sit amet dictum. Amet consectetur adipiscing elit duis tristique. Phasellus vestibulum lorem sed risus ultricies tristique nulla aliquet.
+
+    Eu augue ut lectus arcu bibendum at varius vel pharetra. Urna nunc id cursus metus. Massa eget egestas purus viverra. Ornare quam viverra orci sagittis eu volutpat odio facilisis. Ornare arcu dui vivamus arcu felis bibendum. Sollicitudin aliquam ultrices sagittis orci a. In eu mi bibendum neque egestas congue quisque egestas diam. Consectetur adipiscing elit duis tristique sollicitudin nibh sit amet commodo. Risus in hendrerit gravida rutrum quisque non. Justo eget magna fermentum iaculis eu. Ut consequat semper viverra nam libero justo laoreet sit. Vel pretium lectus quam id leo in vitae turpis. Praesent semper feugiat nibh sed pulvinar.
+
+    Condimentum lacinia quis vel eros donec ac. Nibh sed pulvinar proin gravida hendrerit lectus a. Volutpat consequat mauris nunc congue nisi vitae suscipit tellus. Mi tempus imperdiet nulla malesuada pellentesque elit eget. Scelerisque in dictum non consectetur. Ac ut consequat semper viverra nam libero justo laoreet sit. Lectus magna fringilla urna porttitor rhoncus. Integer vitae justo eget magna fermentum. Nisl pretium fusce id velit ut. In aliquam sem fringilla ut morbi tincidunt augue. Vitae tempus quam pellentesque nec nam aliquam sem et. Eget mauris pharetra et ultrices neque. At augue eget arcu dictum. Eget duis at tellus at. Mauris ultrices eros in cursus turpis massa tincidunt dui. Aliquet nec ullamcorper sit amet. Eu feugiat pretium nibh ipsum consequat nisl vel pretium lectus." > $TMPDIR/dtest1
+                       echo "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Malesuada fames ac turpis egestas sed tempus urna. Maecenas volutpat blandit aliquam etiam erat velit scelerisque in. Cras fermentum odio eu feugiat pretium nibh ipsum consequat. Nam aliquam sem et tortor consequat id. Habitasse platea dictumst vestibulum rhoncus est pellentesque. Pellentesque habitant morbi tristique senectus et netus et malesuada fames. Mattis molestie a iaculis at erat pellentesque adipiscing. Condimentum lacinia quis vel eros donec ac odio. Vitae congue eu consequat ac. Netus et malesuada fames ac. Sed euismod nisi porta lorem mollis aliquam. Rhoncus est pellentesque elit ullamcorper dignissim cras. Aliquet nibh praesent tristique magna sit amet purus. Odio ut sem nulla pharetra diam sit amet nisl. Bibendum est ultricies integer quis auctor elit sed vulputate mi. Viverra ipsum nunc aliquet bibendum enim facilisis gravida neque convallis.
+
+    Sociis natoque penatibus et magnis dis parturient montes. Ornare suspendisse sed nisi lacus sed viverra tellus. Eu augue ut lectus arcu bibendum at varius vel. Morbi leo urna molestie at elementum eu facilisis sed. Integer quis auctor elit sed vulputate mi. At varius vel pharetra vel. Ut consequat semper viverra nam libero. Metus vulputate eu scelerisque felis. In hendrerit gravida rutrum quisque non tellus orci. Eget gravida cum sociis natoque penatibus et magnis. Nec tincidunt praesent semper feugiat nibh sed. Id velit ut tortor pretium. Nibh cras pulvinar mattis nunc sed blandit. Augue neque gravida in fermentum et sollicitudin ac orci phasellus. Ut porttitor leo a diam sollicitudin tempor id. Nec feugiat nisl pretium fusce id velit. Amet purus gravida quis blandit turpis cursus in. Blandit libero volutpat sed cras ornare.
+
+    Vestibulum sed arcu non odio euismod lacinia. Cursus in hac habitasse platea dictumst quisque sagittis. Augue eget arcu dictum varius duis at consectetur. Eget egestas purus viverra accumsan in nisl nisi scelerisque eu. Turpis tincidunt id aliquet risus feugiat. Ultrices gravida dictum fusce ut placerat orci. Ullamcorper a lacus vestibulum sed arcu non odio euismod. Dictum fusce ut placerat orci nulla pellentesque dignissim enim. Arcu cursus vitae congue mauris rhoncus aenean vel elit scelerisque. Ornare quam viverra orci sagittis. Tincidunt nunc pulvinar sapien et ligula. Malesuada pellentesque elit eget gravida cum sociis. Non nisi est sit amet facilisis magna etiam. Mauris cursus mattis molestie a iaculis at erat. Praesent tristique magna sit amet. Blandit aliquam etiam erat velit scelerisque in. Urna et pharetra pharetra massa massa ultricies mi. Ultricies leo integer malesuada nunc vel risus commodo. Pellentesque adipiscing commodo elit at imperdiet dui accumsan sit amet.
+
+    Tortor aliquam nulla facilisi cras fermentum. A arcu cursus vitae congue mauris rhoncus. Ac orci phasellus egestas tellus rutrum tellus. Eget sit amet tellus cras. Ornare lectus sit amet est placerat in egestas erat. Dis parturient montes nascetur ridiculus. Ut eu sem integer vitae. Viverra orci sagittis eu volutpat odio facilisis mauris sit amet. Enim eu turpis egestas pretium aenean pharetra magna ac. Molestie nunc non blandit massa enim. Felis imperdiet proin fermentum leo vel orci porta non. Nibh mauris cursus mattis molestie a iaculis at erat. Elementum nibh tellus molestie nunc non blandit massa enim nec. Fringilla est ullamcorper eget nulla facilisi etiam dignissim diam quis. Lectus magna fringilla urna porttitor. Dictum fusce ut placerat orci nulla pellentesque dignissim enim. Sed id semper risus in. Nascetur ridiculus mus mauris vitae ultricies.
+
+    Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placerat in egestas erat imperdiet sed euismod nisi porta. Nulla aliquet porttitor lacus luctus accumsan. Consequat semper viverra nam libero justo laoreet. Ut diam quam nulla porttitor massa id neque aliquam vestibulum. Cursus metus aliquam eleifend mi. Viverra nam libero justo laoreet sit amet. Malesuada fames ac turpis egestas maecenas pharetra convallis posuere morbi. Orci ac auctor augue mauris augue neque gravida. Sed libero enim sed faucibus turpis in eu mi bibendum. Tellus pellentesque eu tincidunt tortor aliquam nulla facilisi cras fermentum. Scelerisque purus semper eget duis at tellus at urna. Pellentesque habitant morbi tristique senectus. In metus vulputate eu scelerisque felis imperdiet proin fermentum leo. Vulputate mi sit amet mauris commodo quis imperdiet massa tincidunt." > $TMPDIR/dtest2
+                        local theme=''
+                        while test -z "$theme"; do
+                            theme=$(printf "$(delta --list-syntax-themes | tail -n +1)" | fzf --reverse --border --border-label="Syntax theme")
+                            theme=$(echo "$theme" | awk '{print $2;}')
+                            delta --syntax-theme "$theme" $TMPDIR/dtest1 $TMPDIR/dtest2
+                            stty sane && reade -Q "MAGENTA" -i "n" -p "Set as syntax theme? (Will retry if no) [Y/n]: " "y n" dltthme
+                            if test "$dltthme" == "n"; then
+                               theme='' 
+                            fi
+                        done
+                        git config $global delta.syntax-theme "$theme"
+                    fi
+
+                    reade -Q "CYAN" -i "y" -p "Set to dark? [Y/n]: " "y n" delta2
+                    if test "y" == $delta2; then
+                        git config $global delta.dark true
+                    fi
+
+                    reade -Q "CYAN" -i "y" -p "Set linenumbers? [Y/n]: " "y n" delta3
+                    if test "y" == $delta3; then
+                        git config $global delta.linenumbers true
+                    fi
+
+                    reade -Q "CYAN" -i "y" -p "Set hyperlinks? [Y/n]: " "y n" delta1
+                    if test "y" == $delta1; then
+                        git config $global delta.hyperlinks true
+                    fi
                     
-                    while test -z "$theme"; do
-                        theme=$(bat --list-themes | fzf --border --border-label="Bat syntax themes" --preview="bat --theme={} --color=always $TMPDIR/dtest1")
-                        stty sane && reade -Q "MAGENTA" -i "n" -p "Set $theme as syntax theme? (Will retry if no) [Y/n]: " "y n" dltthme
-                        if test "$dltthme" == "n"; then
-                           theme='' 
-                        fi
-                    done
-                    opts=$opts" --theme=$theme"
-                fi
+                elif [ "$pager" == "diff-so-fancy" ]; then
 
-                reade -Q "CYAN" -i "n" -p "Set to specific language? (Useful if you're using an obscure language that bat can't autodetect) [Y/n]: " "y n" delta2
-                if test "y" == $delta2; then
-                    local theme=''
-                    
-                    while test -z "$theme"; do
-                        theme=$(bat --list-languages | fzf --border --border-label="Bat coding languages")
-                        stty sane && reade -Q "MAGENTA" -i "n" -p "Set syntax to specifically use $theme as language? (Will retry if no) [Y/n]: " "y n" dltthme
-                        if test "$dltthme" == "n"; then
-                           theme='' 
-                        fi
-                    done
-                    opts=$opts" --language=$theme"
-                fi
-                pager=$pager" $opts"
-            elif [ "$pager" == "delta" ]; then
-                reade -Q "CYAN" -i "n" -p "Set side-by-side view? [Y/n]: " "y n" delta1
-                if test "y" == $delta1; then
-                    git config $global delta.side-by-side true
-                fi
-
-                reade -Q "CYAN" -i "y" -p "Set to navigate? (Move between diff sections using n and N) [Y/n]: " "y n" delta1
-                if test "y" == $delta1; then
-                    git config $global delta.navigate true
-                fi 
-
-                reade -Q "CYAN" -i "y" -p "Set syntax-theme [Y/n]: " "y n" delta1
-                if test "y" == $delta1; then
-                    echo "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Sollicitudin nibh sit amet commodo nulla facilisi. Sed cras ornare arcu dui vivamus arcu. Non quam lacus suspendisse faucibus interdum posuere lorem. Consequat ac felis donec et odio pellentesque. Elementum tempus egestas sed sed risus pretium quam. Neque viverra justo nec ultrices dui sapien eget mi proin. Varius vel pharetra vel turpis nunc eget lorem dolor sed. Mauris in aliquam sem fringilla ut morbi tincidunt augue. Cursus euismod quis viverra nibh cras. Diam sollicitudin tempor id eu. Lectus arcu bibendum at varius vel. Posuere morbi leo urna molestie at elementum eu facilisis. Condimentum lacinia quis vel eros. Dolor magna eget est lorem ipsum dolor sit amet consectetur. Ultrices dui sapien eget mi. A arcu cursus vitae congue mauris.
-
-In pellentesque massa placerat duis ultricies lacus sed turpis tincidunt. Dignissim diam quis enim lobortis scelerisque fermentum. Faucibus purus in massa tempor nec. Enim neque volutpat ac tincidunt. Penatibus et magnis dis parturient montes nascetur ridiculus. Ornare aenean euismod elementum nisi quis eleifend quam adipiscing. Elementum pulvinar etiam non quam lacus suspendisse faucibus interdum. Vel eros donec ac odio tempor orci dapibus ultrices. Tempus imperdiet nulla malesuada pellentesque elit eget gravida. In ante metus dictum at tempor commodo ullamcorper.
-
-Feugiat sed lectus vestibulum mattis ullamcorper velit sed ullamcorper. Aliquet nibh praesent tristique magna sit amet purus. Dignissim diam quis enim lobortis scelerisque. Turpis egestas sed tempus urna et. Est sit amet facilisis magna. At tellus at urna condimentum mattis pellentesque. Bibendum ut tristique et egestas quis ipsum suspendisse ultrices. Diam sollicitudin tempor id eu. Vulputate sapien nec sagittis aliquam malesuada bibendum arcu vitae elementum. Aliquet nibh praesent tristique magna sit. Dictum fusce ut placerat orci nulla pellentesque dignissim enim. Laoreet sit amet cursus sit amet dictum. Amet consectetur adipiscing elit duis tristique. Phasellus vestibulum lorem sed risus ultricies tristique nulla aliquet.
-
-Eu augue ut lectus arcu bibendum at varius vel pharetra. Urna nunc id cursus metus. Massa eget egestas purus viverra. Ornare quam viverra orci sagittis eu volutpat odio facilisis. Ornare arcu dui vivamus arcu felis bibendum. Sollicitudin aliquam ultrices sagittis orci a. In eu mi bibendum neque egestas congue quisque egestas diam. Consectetur adipiscing elit duis tristique sollicitudin nibh sit amet commodo. Risus in hendrerit gravida rutrum quisque non. Justo eget magna fermentum iaculis eu. Ut consequat semper viverra nam libero justo laoreet sit. Vel pretium lectus quam id leo in vitae turpis. Praesent semper feugiat nibh sed pulvinar.
-
-Condimentum lacinia quis vel eros donec ac. Nibh sed pulvinar proin gravida hendrerit lectus a. Volutpat consequat mauris nunc congue nisi vitae suscipit tellus. Mi tempus imperdiet nulla malesuada pellentesque elit eget. Scelerisque in dictum non consectetur. Ac ut consequat semper viverra nam libero justo laoreet sit. Lectus magna fringilla urna porttitor rhoncus. Integer vitae justo eget magna fermentum. Nisl pretium fusce id velit ut. In aliquam sem fringilla ut morbi tincidunt augue. Vitae tempus quam pellentesque nec nam aliquam sem et. Eget mauris pharetra et ultrices neque. At augue eget arcu dictum. Eget duis at tellus at. Mauris ultrices eros in cursus turpis massa tincidunt dui. Aliquet nec ullamcorper sit amet. Eu feugiat pretium nibh ipsum consequat nisl vel pretium lectus." > $TMPDIR/dtest1
-                   echo "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Malesuada fames ac turpis egestas sed tempus urna. Maecenas volutpat blandit aliquam etiam erat velit scelerisque in. Cras fermentum odio eu feugiat pretium nibh ipsum consequat. Nam aliquam sem et tortor consequat id. Habitasse platea dictumst vestibulum rhoncus est pellentesque. Pellentesque habitant morbi tristique senectus et netus et malesuada fames. Mattis molestie a iaculis at erat pellentesque adipiscing. Condimentum lacinia quis vel eros donec ac odio. Vitae congue eu consequat ac. Netus et malesuada fames ac. Sed euismod nisi porta lorem mollis aliquam. Rhoncus est pellentesque elit ullamcorper dignissim cras. Aliquet nibh praesent tristique magna sit amet purus. Odio ut sem nulla pharetra diam sit amet nisl. Bibendum est ultricies integer quis auctor elit sed vulputate mi. Viverra ipsum nunc aliquet bibendum enim facilisis gravida neque convallis.
-
-Sociis natoque penatibus et magnis dis parturient montes. Ornare suspendisse sed nisi lacus sed viverra tellus. Eu augue ut lectus arcu bibendum at varius vel. Morbi leo urna molestie at elementum eu facilisis sed. Integer quis auctor elit sed vulputate mi. At varius vel pharetra vel. Ut consequat semper viverra nam libero. Metus vulputate eu scelerisque felis. In hendrerit gravida rutrum quisque non tellus orci. Eget gravida cum sociis natoque penatibus et magnis. Nec tincidunt praesent semper feugiat nibh sed. Id velit ut tortor pretium. Nibh cras pulvinar mattis nunc sed blandit. Augue neque gravida in fermentum et sollicitudin ac orci phasellus. Ut porttitor leo a diam sollicitudin tempor id. Nec feugiat nisl pretium fusce id velit. Amet purus gravida quis blandit turpis cursus in. Blandit libero volutpat sed cras ornare.
-
-Vestibulum sed arcu non odio euismod lacinia. Cursus in hac habitasse platea dictumst quisque sagittis. Augue eget arcu dictum varius duis at consectetur. Eget egestas purus viverra accumsan in nisl nisi scelerisque eu. Turpis tincidunt id aliquet risus feugiat. Ultrices gravida dictum fusce ut placerat orci. Ullamcorper a lacus vestibulum sed arcu non odio euismod. Dictum fusce ut placerat orci nulla pellentesque dignissim enim. Arcu cursus vitae congue mauris rhoncus aenean vel elit scelerisque. Ornare quam viverra orci sagittis. Tincidunt nunc pulvinar sapien et ligula. Malesuada pellentesque elit eget gravida cum sociis. Non nisi est sit amet facilisis magna etiam. Mauris cursus mattis molestie a iaculis at erat. Praesent tristique magna sit amet. Blandit aliquam etiam erat velit scelerisque in. Urna et pharetra pharetra massa massa ultricies mi. Ultricies leo integer malesuada nunc vel risus commodo. Pellentesque adipiscing commodo elit at imperdiet dui accumsan sit amet.
-
-Tortor aliquam nulla facilisi cras fermentum. A arcu cursus vitae congue mauris rhoncus. Ac orci phasellus egestas tellus rutrum tellus. Eget sit amet tellus cras. Ornare lectus sit amet est placerat in egestas erat. Dis parturient montes nascetur ridiculus. Ut eu sem integer vitae. Viverra orci sagittis eu volutpat odio facilisis mauris sit amet. Enim eu turpis egestas pretium aenean pharetra magna ac. Molestie nunc non blandit massa enim. Felis imperdiet proin fermentum leo vel orci porta non. Nibh mauris cursus mattis molestie a iaculis at erat. Elementum nibh tellus molestie nunc non blandit massa enim nec. Fringilla est ullamcorper eget nulla facilisi etiam dignissim diam quis. Lectus magna fringilla urna porttitor. Dictum fusce ut placerat orci nulla pellentesque dignissim enim. Sed id semper risus in. Nascetur ridiculus mus mauris vitae ultricies.
-
-Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placerat in egestas erat imperdiet sed euismod nisi porta. Nulla aliquet porttitor lacus luctus accumsan. Consequat semper viverra nam libero justo laoreet. Ut diam quam nulla porttitor massa id neque aliquam vestibulum. Cursus metus aliquam eleifend mi. Viverra nam libero justo laoreet sit amet. Malesuada fames ac turpis egestas maecenas pharetra convallis posuere morbi. Orci ac auctor augue mauris augue neque gravida. Sed libero enim sed faucibus turpis in eu mi bibendum. Tellus pellentesque eu tincidunt tortor aliquam nulla facilisi cras fermentum. Scelerisque purus semper eget duis at tellus at urna. Pellentesque habitant morbi tristique senectus. In metus vulputate eu scelerisque felis imperdiet proin fermentum leo. Vulputate mi sit amet mauris commodo quis imperdiet massa tincidunt." > $TMPDIR/dtest2
-                    local theme=''
-                    while test -z "$theme"; do
-                        theme=$(printf "$(delta --list-syntax-themes | tail -n +1)" | fzf --reverse --border --border-label="Syntax theme")
-                        theme=$(echo "$theme" | awk '{print $2;}')
-                        delta --syntax-theme "$theme" $TMPDIR/dtest1 $TMPDIR/dtest2
-                        stty sane && reade -Q "MAGENTA" -i "n" -p "Set as syntax theme? (Will retry if no) [Y/n]: " "y n" dltthme
-                        if test "$dltthme" == "n"; then
-                           theme='' 
-                        fi
-                    done
-                    git config $global delta.syntax-theme "$theme"
-                fi
-
-                reade -Q "CYAN" -i "y" -p "Set to dark? [Y/n]: " "y n" delta2
-                if test "y" == $delta2; then
-                    git config $global delta.dark true
-                fi
-
-                reade -Q "CYAN" -i "y" -p "Set linenumbers? [Y/n]: " "y n" delta3
-                if test "y" == $delta3; then
-                    git config $global delta.linenumbers true
-                fi
-
-                reade -Q "CYAN" -i "y" -p "Set hyperlinks? [Y/n]: " "y n" delta1
-                if test "y" == $delta1; then
-                    git config $global delta.hyperlinks true
-                fi
-                
-            elif [ "$pager" == "diff-so-fancy" ]; then
-
-                reade -Q "CYAN" -i "y" -p "Should the first block of an empty line be colored. (Default: true)? [Y/n]: " "y n" diffancy
-                if test "y" == $diffancy; then
-                    git config --bool $global diff-so-fancy.markEmptyLines true                    
-                else
-                    git config --bool $global diff-so-fancy.markEmptyLines false                    
-                fi
-                reade -Q "CYAN" -i "y" -p "Simplify git header chunks to a more human readable format. (Default: true) [Y/n]: " "y n" diffancy
-                if test "y" == $diffancy; then
-                    git config --bool $global diff-so-fancy.changeHunkIndicators true
-                else
-                    git config --bool $global diff-so-fancy.changeHunkIndicators false
-                fi
-                reade -Q "CYAN" -i "y" -p "Should the pesky + or - at line-start be removed. (Default: true) [Y/n]: " "y n" diffancy
-                if test "y" == $diffancy; then
-                    git config --bool $global diff-so-fancy.stripLeadingSymbols true
-                else
-                    git config --bool $global diff-so-fancy.stripLeadingSymbols false
-                fi
-                reade -Q "CYAN" -i "y" -p "By default, the separator for the file header uses Unicode line-drawing characters. If this is causing output errors on your terminal, set this to false to use ASCII characters instead. (Default: true) [Y/n]: " "y n" diffancy
-                if test "y" == $diffancy; then
-                    git config --bool $global diff-so-fancy.useUnicodeRuler true
-                else
-                    git config --bool $global diff-so-fancy.useUnicodeRuler false
-                fi
-                reade -Q "CYAN" -i "47" -p "By default, the separator for the file header spans the full width of the terminal. Use this setting to set the width of the file header manually. (Default: 47): " "$(seq 1 100)" diffancy
-                 # git log's commit header width
-                git config --global diff-so-fancy.rulerWidth $diffancy    
-            elif [ "$pager" == "ydiff" ]; then
-                pager=$pager" --color=auto"
-                reade -Q "CYAN" -i "n" -p "Enable side-by-side mode? [Y/n]: " diffr1
-                if test "$diffr1" == 'y'; then
-                    pager=$pager" --side-by-side"
-                    reade -Q "CYAN" -i "y" -p "Wrap long lines in side-by-side view? [Y/n]: " diffr1
-                    if test "$diffr1" == 'y'; then
-                        pager=$pager" --wrap"
-                    fi        
-                fi
-            elif [ "$pager" == "diffr" ]; then
-                reade -Q "CYAN" -i "y" -p "Set linenumber? [Y/n]: " diffr1
-                if test "$diffr1" == 'y'; then
-                    pager="diffr --line-numbers"
-                    reade -Q "CYAN" -i "n" -p "Set linenumber style? [compact/aligned/n]: " diffr1
-                    if test "$diffr1" == 'compact' || test "$diffr1" == 'aligned'; then
-                        pager="diffr --line-numbers $diffr1"
-                    fi
-                fi
-            fi
-            #prompt="$pager can work/works with a pager. Configure? [Y/n]: "
-            #if test $pager == "diff-so-fancy"; then
-            #    prompt=""
-            #fi
-
-            reade -Q "CYAN" -i "y" -p "$pager can work/works with a pager. Configure? [Y/n]: " "y n" pipepager
-            if test "$pipepager" == 'y'; then
-                reade -Q "GREEN" -i "n" -p "Turn off pager? [Y/n]: " "y n" pipepager
-                if test "$pipepager" == 'n'; then
-                    pagers="less more"
-                    pagersf="less\nmore\n"
-                    pager="less"
-                    if type most &> /dev/null ; then
-                        pagers=$pagers" most"
-                        pagersf=$pagersf"most\n"
-                    fi
-                    if type moar &> /dev/null ; then
-                        pagers=$pagers" moar"
-                        pagersf=$pagersf"moar\n"
-                        pager="moar"
-                    fi
-                    if type vimpager &> /dev/null; then
-                        pagers=$pagers" vimpager"
-                        pagersf=$pagersf"vimpager\n"
-                        pager="vimpager"
-                    fi
-                    if type nvimpager &> /dev/null; then
-                        pagers=$pagers" nvimpager"
-                        pagersf=$pagersf"nvimpager\n"
-                        pager="nvimpager"
-                    fi
-
-                    reade -Q "GREEN" -i "$PAGER" -p "Pager: " "$pagers" diffancy
-                    if [[ $diffancy =~ "less" ]]; then
-                        local ln=""
-                        reade -Q "CYAN" -i "y" -p "Quit if one screen? [Y/n]: " "y n" lne 
-                        if test "$lne" == 'y'; then
-                           ln="--quit-if-one-screen"
-                        fi
-                        reade -Q "CYAN" -i "n" -p "Set linenumbers for pager? [Y/n]: " "y n" lne 
-                        if test "$lne" == 'n'; then
-                           ln=$ln"-n"
-                        else
-                           ln=$ln"-N"
-                        fi
-                        if test "$pager" == "ydiff"; then
-                            git config $global "$cpager" "ydiff --pager=less --pager-options=\"-R $ln\""         
-                        elif test "$pager" == "bat" || test "$pager" == "batdiff"; then
-                            reade -Q "CYAN" -i "y" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $PATHVAR? [Y/n]: " "y n" pager1
-                            if test $pager1 == 'y'; then
-                                if grep -q 'BAT_PAGER' $PATHVAR; then
-                                    sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $PATHVAR
-                                    sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='less -R $ln'|g" $PATHVAR                       
-                                else
-                                    printf "# BAT\nexport BAT_PAGER='less -R $ln'\n" >> $PATHVAR
-                                fi
-                                git config $global "$cpager" "$pager"
-                            else
-                                git config $global "$cpager" "$pager --pager='less -R $ln'"
-                            fi
-                        elif test "$pager" == "delta"; then
-                            reade -Q "CYAN" -i "y" -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $PATHVAR? [Y/n]: " "y n" pager1
-                            if test $pager1 == 'y'; then
-                                if grep -q 'DELTA_PAGER' $PATHVAR; then
-                                    sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $PATHVAR
-                                    sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='less -R $ln'|g" $PATHVAR                      
-                                else
-                                    printf "# DELTA\nexport DELTA_PAGER='less -R $ln'\n" >> $PATHVAR
-                                fi
-                                git config $global "$cpager" "delta" 
-                            else 
-                                git config $global "$cpager" "delta --pager=less $ln"  
-                            fi
-                        else
-                            git config $global "$cpager" "$pager | less -RF $ln"
-                        fi
-                    elif [[ $diffancy =~ "moar" ]]; then
-                        local ln=""
-                        reade -Q "CYAN" -i "n" -p "You selected $diffancy. Show linenumber? [Y/n]: " "y n" pager1
-                        if test $pager1 == 'n'; then
-                            ln=$ln' --no-linenumbers'
-                        fi
-
-                        reade -Q "CYAN" -i "y" -p "Quit if one screen? [Y/n]: " "y n" pager1
-                        if test $pager1 == 'y'; then
-                            ln=$ln' --quit-if-one-screen'
-                        fi
-
-                        reade -Q "CYAN" -i "n" -p "Wrap long lines? [Y/n]: " "y n" pager1
-                        if test $pager1 == 'y'; then
-                            ln=$ln' --wrap'
-                        fi
-
-                        if test "$pager" == "ydiff"; then
-                            git config $global "$cpager" "ydiff --pager=moar --pager-options=\"$ln\""
-                        elif test "$pager" == "delta"; then
-                            reade -Q "CYAN" -i "y" -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $PATHVAR? [Y/n]: " "y n" pager1
-                            if test $pager1 == 'y'; then
-                                if grep -q 'DELTA_PAGER' $PATHVAR; then
-                                    sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $PATHVAR
-                                    sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='moar $ln'|g" $PATHVAR                       
-                                else
-                                    printf "# DELTA\nexport DELTA_PAGER='moar $ln'\n" >> $PATHVAR
-                                fi
-                                git config $global "$cpager" "$pager --pager='moar $ln'"
-                            fi
-                            git config $global "$cpager" "delta"
-                            
-                        elif test "$pager" == "bat" || test "$pager" == "batdiff"; then
-                            reade -Q "CYAN" -i "y" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $PATHVAR? [Y/n]: " "y n" pager1
-                            if test $pager1 == 'y'; then
-                                if grep -q 'BAT_PAGER' $PATHVAR; then
-                                    sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $PATHVAR
-                                    sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='moar $ln'|g" $PATHVAR                       
-                                else
-                                    printf "# BAT\nexport BAT_PAGER='moar $ln'\n" >> $PATHVAR
-                                fi
-                                git config $global "$cpager" "$pager"
-                            else
-                                git config $global "$cpager" "$pager --pager=moar $ln"
-                            fi
-                            git config $global "$cpager" "$pager --pager='moar $ln'"
-                        else
-                            git config $global "$cpager" "$pager | moar $ln"
-                        fi
-                    elif [[ "$diffancy" =~ "nvimpager" ]] || [[ "$diffancy" =~ "vimpager" ]]; then
-                        opts=""
-                        colors="blue darkblue default delek desert elflord evening gruvbox habamax industry koehler lunaperch morning murphy pablo peachpuff quiet ron shine slate torte zellner"
-                        if [[ "$pager" =~ "vimpager" ]]; then
-                           colors=$colors" retrobox sorbet wildcharm zaibatsu" 
-                        fi
-                        reade -Q "CYAN" -i "y" -p "Set colorscheme? [Y/n]: " "y n" pager1
-                        if [ "$pager1" == "y" ]; then
-                            reade -Q "CYAN" -i "default" -p "Colorscheme: " "$colors" color
-                            opts="$opts +'colorscheme $color'"
-                        fi
-
-                        if test "$pager" == "ydiff"; then
-                            git config $global "$cpager" "ydiff --pager=nvimpager --pager-options='$opts'"
-                        elif test "$pager" == "delta"; then
-                            reade -Q "CYAN" -i "y" -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $PATHVAR? [Y/n]: " "y n" pager1
-                            if test $pager1 == 'y'; then
-                                if grep -q 'DELTA_PAGER' $PATHVAR; then
-                                    sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $PATHVAR
-                                    sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='nvimpager $opts'|g" $PATHVAR                      
-                                else
-                                    printf "# DELTA\nexport DELTA_PAGER='nvimpager $opts'\n" >> $PATHVAR
-                                fi
-                                git config $global "$cpager" "delta"
-                            else
-                                git config $global "$cpager" "delta --pager=\"nvimpager $opts\""
-                            fi
-                        elif test "$pager" == "bat" || test "$pager" == "batdiff"; then
-                            reade -Q "CYAN" -i "y" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $PATHVAR? [Y/n]: " "y n" pager1
-                            if test $pager1 == 'y'; then
-                                if grep -q 'BAT_PAGER' $PATHVAR; then
-                                    sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $PATHVAR
-                                    sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='nvimpager $opts'|g" $PATHVAR                       
-                                else
-                                    printf "# BAT\nexport BAT_PAGER='nvimpager $opts'\n" >> $PATHVAR
-                                fi
-                                git config $global "$cpager" "$pager"
-                            else
-                                git config $global "$cpager" "$pager --pager=\"nvimpager $opts\""
-                            fi
-                        else
-                            git config $global "$cpager" "$pager | nvimpager $opts"
-                        fi
+                    reade -Q "CYAN" -i "y" -p "Should the first block of an empty line be colored. (Default: true)? [Y/n]: " "y n" diffancy
+                    if test "y" == $diffancy; then
+                        git config --bool $global diff-so-fancy.markEmptyLines true                    
                     else
-                        if test "$pager" == "ydiff"; then
-                            git config $global "$cpager" "ydiff --pager=$diffancy"
-                        elif test "$pager" == "bat" || test "$pager" == "batdiff"; then
-                            reade -Q "CYAN" -i "y" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $PATHVAR? [Y/n]: " "y n" pager1
-                            if test $pager1 == 'y'; then
-                                if grep -q 'BAT_PAGER' $PATHVAR; then
-                                    sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $PATHVAR
-                                    sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='$diffancy'|g" $PATHVAR                       
-                                else
-                                    printf "# BAT\nexport BAT_PAGER='$diffancy'\n" >> $PATHVAR
-                                fi
-                                git config $global "$cpager" "batdiff"
-                            else
-                                git config $global "$cpager" "batdiff --pager='$diffancy'"
-                            fi
-                        elif test "$pager" == "delta"; then
-                            reade -Q "CYAN" -i "y" -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $PATHVAR? [Y/n]: " "y n" pager1
-                            if test $pager1 == 'y'; then
-                                if grep -q 'DELTA_PAGER' $PATHVAR; then
-                                    sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $PATHVAR
-                                    sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='$diffancy'|g" $PATHVAR                       
-                                else
-                                    printf "# DELTA\nexport DELTA_PAGER='$diffancy'\n" >> $PATHVAR
-                                fi
-                                git config $global "$cpager" "delta"
-                            else
-                                git config $global "$cpager" "delta --pager=$diffancy"
-                            fi
-                        else
-                            git config $global "$cpager" "$pager | $diffancy"
+                        git config --bool $global diff-so-fancy.markEmptyLines false                    
+                    fi
+                    reade -Q "CYAN" -i "y" -p "Simplify git header chunks to a more human readable format. (Default: true) [Y/n]: " "y n" diffancy
+                    if test "y" == $diffancy; then
+                        git config --bool $global diff-so-fancy.changeHunkIndicators true
+                    else
+                        git config --bool $global diff-so-fancy.changeHunkIndicators false
+                    fi
+                    reade -Q "CYAN" -i "y" -p "Should the pesky + or - at line-start be removed. (Default: true) [Y/n]: " "y n" diffancy
+                    if test "y" == $diffancy; then
+                        git config --bool $global diff-so-fancy.stripLeadingSymbols true
+                    else
+                        git config --bool $global diff-so-fancy.stripLeadingSymbols false
+                    fi
+                    reade -Q "CYAN" -i "y" -p "By default, the separator for the file header uses Unicode line-drawing characters. If this is causing output errors on your terminal, set this to false to use ASCII characters instead. (Default: true) [Y/n]: " "y n" diffancy
+                    if test "y" == $diffancy; then
+                        git config --bool $global diff-so-fancy.useUnicodeRuler true
+                    else
+                        git config --bool $global diff-so-fancy.useUnicodeRuler false
+                    fi
+                    reade -Q "CYAN" -i "47" -p "By default, the separator for the file header spans the full width of the terminal. Use this setting to set the width of the file header manually. (Default: 47): " "$(seq 1 100)" diffancy
+                     # git log's commit header width
+                    git config $global diff-so-fancy.rulerWidth $diffancy    
+                elif [ "$pager" == "ydiff" ]; then
+                    pager=$pager" --color=auto"
+                    reade -Q "CYAN" -i "n" -p "Enable side-by-side mode? [Y/n]: " diffr1
+                    if test "$diffr1" == 'y'; then
+                        pager=$pager" --side-by-side"
+                        reade -Q "CYAN" -i "y" -p "Wrap long lines in side-by-side view? [Y/n]: " diffr1
+                        if test "$diffr1" == 'y'; then
+                            pager=$pager" --wrap"
+                        fi        
+                    fi
+                elif [ "$pager" == "diffr" ]; then
+                    reade -Q "CYAN" -i "y" -p "Set linenumber? [Y/n]: " diffr1
+                    if test "$diffr1" == 'y'; then
+                        pager="diffr --line-numbers"
+                        reade -Q "CYAN" -i "n" -p "Set linenumber style? [compact/aligned/n]: " diffr1
+                        if test "$diffr1" == 'compact' || test "$diffr1" == 'aligned'; then
+                            pager="diffr --line-numbers $diffr1"
                         fi
                     fi
-                elif [[ $pager =~ 'delta' ]] || [[ $pager =~ 'bat' ]] || [[ $pager =~ 'batdiff' ]]; then
-                    git config $global "$cpager" "$pager --paging=never"  
-                elif [[ $pager =~ 'ydiff' ]]; then
-                    git config $global "$cpager" "$pager --pager=cat"
+                fi
+
+
+            
+                reade -Q "YELLOW" -i "n" -p "Only use syntax highlighting and turn off pager? [Y/n]: " "y n" pipepager1
+                if test "$pipepager1" == 'y'; then 
+                    if [[ $pager =~ 'delta' ]] || [[ $pager =~ 'bat' ]] || [[ $pager =~ 'batdiff' ]]; then
+                        git config $global "$cpager" "$pager --paging=never"  
+                    elif [[ $pager =~ 'ydiff' ]]; then
+                        git config $global "$cpager" "$pager --pager=cat"
+                    else
+                        git config $global "$cpager" "$pager"  
+                    fi
                 else
-                    git config $global "$cpager" "$pager"  
+
+                    prompt="Configure $pager's pager settings? [Y/n]: "
+                    if test $pager == "diff-so-fancy" || test $pager == "diffr"; then
+                        prompt="$pager alone won't page. Configure a pager? [Y/n]: "
+                    fi
+
+                    reade -Q "CYAN" -i "y" -p "$prompt" "y n" pipepager
+                    if test "$pipepager" == 'y'; then
+                    
+                        pagers="less more"
+                        pagersf="less\nmore\n"
+                        pager="less"
+                        if type most &> /dev/null ; then
+                            pagers=$pagers" most"
+                            pagersf=$pagersf"most\n"
+                        fi
+                        if type moar &> /dev/null ; then
+                            pagers=$pagers" moar"
+                            pagersf=$pagersf"moar\n"
+                            pager="moar"
+                        fi
+                        if type vimpager &> /dev/null; then
+                            pagers=$pagers" vimpager"
+                            pagersf=$pagersf"vimpager\n"
+                            pager="vimpager"
+                        fi
+                        if type nvimpager &> /dev/null; then
+                            pagers=$pagers" nvimpager"
+                            pagersf=$pagersf"nvimpager\n"
+                            pager="nvimpager"
+                        fi
+
+                        reade -Q "GREEN" -i "$PAGER" -p "Pager: " "$pagers" diffancy
+                        if [[ $diffancy =~ "less" ]]; then
+                            local ln=""
+                            reade -Q "CYAN" -i "y" -p "Quit if one screen? [Y/n]: " "y n" lne 
+                            if test "$lne" == 'y'; then
+                               ln="--quit-if-one-screen"
+                            fi
+                            reade -Q "CYAN" -i "n" -p "Set linenumbers for pager? [Y/n]: " "y n" lne 
+                            if test "$lne" == 'n'; then
+                               ln=$ln"-n"
+                            else
+                               ln=$ln"-N"
+                            fi
+                            if test "$pager" == "ydiff"; then
+                                git config $global "$cpager" "ydiff --pager=less --pager-options=\"-R $ln\""         
+                            elif test "$pager" == "bat" || test "$pager" == "batdiff"; then
+                                reade -Q "CYAN" -i "y" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $PATHVAR? [Y/n]: " "y n" pager1
+                                if test $pager1 == 'y'; then
+                                    if grep -q 'BAT_PAGER' $PATHVAR; then
+                                        sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $PATHVAR
+                                        sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='less -R $ln'|g" $PATHVAR                       
+                                    else
+                                        printf "# BAT\nexport BAT_PAGER='less -R $ln'\n" >> $PATHVAR
+                                    fi
+                                    git config $global "$cpager" "$pager"
+                                else
+                                    git config $global "$cpager" "$pager --pager='less -R $ln'"
+                                fi
+                            elif test "$pager" == "delta"; then
+                                reade -Q "CYAN" -i "y" -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $PATHVAR? [Y/n]: " "y n" pager1
+                                if test $pager1 == 'y'; then
+                                    if grep -q 'DELTA_PAGER' $PATHVAR; then
+                                        sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $PATHVAR
+                                        sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='less -R $ln'|g" $PATHVAR                      
+                                    else
+                                        printf "# DELTA\nexport DELTA_PAGER='less -R $ln'\n" >> $PATHVAR
+                                    fi
+                                    git config $global "$cpager" "delta" 
+                                else 
+                                    git config $global "$cpager" "delta --pager=less $ln"  
+                                fi
+                            else
+                                git config $global "$cpager" "$pager | less -RF $ln"
+                            fi
+                        elif [[ $diffancy =~ "moar" ]]; then
+                            local ln=""
+                            reade -Q "CYAN" -i "n" -p "You selected $diffancy. Show linenumber? [Y/n]: " "y n" pager1
+                            if test $pager1 == 'n'; then
+                                ln=$ln' --no-linenumbers'
+                            fi
+
+                            reade -Q "CYAN" -i "y" -p "Quit if one screen? [Y/n]: " "y n" pager1
+                            if test $pager1 == 'y'; then
+                                ln=$ln' --quit-if-one-screen'
+                            fi
+
+                            reade -Q "CYAN" -i "n" -p "Wrap long lines? [Y/n]: " "y n" pager1
+                            if test $pager1 == 'y'; then
+                                ln=$ln' --wrap'
+                            fi
+
+                            if test "$pager" == "ydiff"; then
+                                git config $global "$cpager" "ydiff --pager=moar --pager-options=\"$ln\""
+                            elif test "$pager" == "delta"; then
+                                reade -Q "CYAN" -i "y" -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $PATHVAR? [Y/n]: " "y n" pager1
+                                if test $pager1 == 'y'; then
+                                    if grep -q 'DELTA_PAGER' $PATHVAR; then
+                                        sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $PATHVAR
+                                        sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='moar $ln'|g" $PATHVAR                       
+                                    else
+                                        printf "# DELTA\nexport DELTA_PAGER='moar $ln'\n" >> $PATHVAR
+                                    fi
+                                    git config $global "$cpager" "$pager --pager='moar $ln'"
+                                fi
+                                git config $global "$cpager" "delta"
+                                
+                            elif test "$pager" == "bat" || test "$pager" == "batdiff"; then
+                                reade -Q "CYAN" -i "y" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $PATHVAR? [Y/n]: " "y n" pager1
+                                if test $pager1 == 'y'; then
+                                    if grep -q 'BAT_PAGER' $PATHVAR; then
+                                        sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $PATHVAR
+                                        sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='moar $ln'|g" $PATHVAR                       
+                                    else
+                                        printf "# BAT\nexport BAT_PAGER='moar $ln'\n" >> $PATHVAR
+                                    fi
+                                    git config $global "$cpager" "$pager"
+                                else
+                                    git config $global "$cpager" "$pager --pager='moar $ln'"
+                                fi
+                            else
+                                git config $global "$cpager" "$pager | moar $ln"
+                            fi
+                        elif [[ "$diffancy" =~ "nvimpager" ]] || [[ "$diffancy" =~ "vimpager" ]]; then
+                            opts=""
+                            colors="blue darkblue default delek desert elflord evening gruvbox habamax industry koehler lunaperch morning murphy pablo peachpuff quiet ron shine slate torte zellner"
+                            if [[ "$pager" =~ "vimpager" ]]; then
+                               colors=$colors" retrobox sorbet wildcharm zaibatsu" 
+                            fi
+                            reade -Q "CYAN" -i "y" -p "Set colorscheme? [Y/n]: " "y n" pager1
+                            if [ "$pager1" == "y" ]; then
+                                reade -Q "CYAN" -i "default" -p "Colorscheme: " "$colors" color
+                                opts="$opts +'colorscheme $color'"
+                            fi
+
+                            if test "$pager" == "ydiff"; then
+                                git config $global "$cpager" "ydiff --pager=nvimpager --pager-options='$opts'"
+                            elif test "$pager" == "delta"; then
+                                reade -Q "CYAN" -i "y" -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $PATHVAR? [Y/n]: " "y n" pager1
+                                if test $pager1 == 'y'; then
+                                    if grep -q 'DELTA_PAGER' $PATHVAR; then
+                                        sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $PATHVAR
+                                        sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='nvimpager $opts'|g" $PATHVAR                      
+                                    else
+                                        printf "# DELTA\nexport DELTA_PAGER='nvimpager $opts'\n" >> $PATHVAR
+                                    fi
+                                    git config $global "$cpager" "delta"
+                                else
+                                    git config $global "$cpager" "delta --pager=\"nvimpager $opts\""
+                                fi
+                            elif test "$pager" == "bat" || test "$pager" == "batdiff"; then
+                                reade -Q "CYAN" -i "y" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $PATHVAR? [Y/n]: " "y n" pager1
+                                if test $pager1 == 'y'; then
+                                    if grep -q 'BAT_PAGER' $PATHVAR; then
+                                        sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $PATHVAR
+                                        sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='nvimpager $opts'|g" $PATHVAR                       
+                                    else
+                                        printf "# BAT\nexport BAT_PAGER='nvimpager $opts'\n" >> $PATHVAR
+                                    fi
+                                    git config $global "$cpager" "$pager"
+                                else
+                                    git config $global "$cpager" "$pager --pager='nvimpager $opts'"
+                                fi
+                            else
+                                git config $global "$cpager" "$pager | nvimpager $opts"
+                            fi
+                        else
+                            if test "$pager" == "ydiff"; then
+                                git config $global "$cpager" "ydiff --pager=$diffancy"
+                            elif test "$pager" == "bat" || test "$pager" == "batdiff"; then
+                                reade -Q "CYAN" -i "y" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $PATHVAR? [Y/n]: " "y n" pager1
+                                if test $pager1 == 'y'; then
+                                    if grep -q 'BAT_PAGER' $PATHVAR; then
+                                        sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $PATHVAR
+                                        sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='$diffancy'|g" $PATHVAR                       
+                                    else
+                                        printf "# BAT\nexport BAT_PAGER='$diffancy'\n" >> $PATHVAR
+                                    fi
+                                    git config $global "$cpager" "batdiff"
+                                else
+                                    git config $global "$cpager" "batdiff --pager='$diffancy'"
+                                fi
+                            elif test "$pager" == "delta"; then
+                                reade -Q "CYAN" -i "y" -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $PATHVAR? [Y/n]: " "y n" pager1
+                                if test $pager1 == 'y'; then
+                                    if grep -q 'DELTA_PAGER' $PATHVAR; then
+                                        sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $PATHVAR
+                                        sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='$diffancy'|g" $PATHVAR                       
+                                    else
+                                        printf "# DELTA\nexport DELTA_PAGER='$diffancy'\n" >> $PATHVAR
+                                    fi
+                                    git config $global "$cpager" "delta"
+                                else
+                                    git config $global "$cpager" "delta --pager=$diffancy"
+                                fi
+                            else
+                                git config $global "$cpager" "$pager | $diffancy"
+                            fi
+                    fi  
                 fi
             fi
         fi
+
+    fi
 fi
+
     #git config "$global" "$cpager" "$pager" ;
 #elif test "$regpager" == "y"; then
 #    pagers="cat"
@@ -1026,7 +1043,7 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                 git config "$global" diff.tool difftastic
                 git config "$global" difftool.pager true
                 git config "$global" difftool.prompt false
-                git config "$global" difftool.difftastic.cmd 'difft "$LOCAL" "$REMOTE"'
+                git config "$global" difftool.difftastic.cmd 'difft $LOCAL $REMOTE'
             fi
         fi
     fi
@@ -1055,7 +1072,7 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                 git config "$global" diff.guitool difftastic
                 git config "$global" diffguitool.pager true
                 git config "$global" difftool.prompt false
-                git config "$global" difftool.difftastic.cmd 'difft "$LOCAL" "$REMOTE"'
+                git config "$global" difftool.difftastic.cmd 'difft $LOCAL $REMOTE'
             fi
         fi
     fi

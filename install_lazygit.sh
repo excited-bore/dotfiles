@@ -41,7 +41,7 @@ if [ "$nstll" == "y" ]; then
        . ./checks/check_aliases_dir.sh
     fi
     if ! test -f ~/.bash_aliases.d/lazygit.sh; then 
-        printf "alias lazygit=\"copy-to run all && lazygit\"\n" > ~/.bash_aliases.d/lazygit.sh
+        printf "alias lazygit=\"copy-to run all; lazygit\"\n" > ~/.bash_aliases.d/lazygit.sh
         echo "File in ~/.bash_aliases.d/lazygit.sh"
     fi
 fi

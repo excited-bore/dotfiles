@@ -212,14 +212,14 @@ elif test -x "$(command -v xclip)"; then
     bind -m vi-insert      '"\C-v": "\237\225"'
 fi
 
-if test -x "$(command -v autojump)"; then
+if type autojump &> /dev/null; then
     # Ctrl-x Ctrl-j for autojump
     bind -m emacs-standard '"\C-x\C-j": "j \C-i"'
     bind -m vi-command     '"\C-x\C-j": "j \C-i"'
     bind -m vi-insert      '"\C-x\C-j": "j \C-i"'
 fi
 
-if test -x "$(command -v fzf)"; then
+if type fzf &> /dev/null; then
     # (Kitty only) Ctrl-tab for fzf autocompletion
     bind -m emacs-standard '"\e[9;5u": " **\t"'
     bind -m vi-command     '"\e[9;5u": " **\t"'
@@ -227,14 +227,14 @@ if test -x "$(command -v fzf)"; then
 
 
     
-    if [[ "$(type -t ripgrep-dir)" == function ]]; then
+    if type ripgrep-dir &> /dev/null; then
         # Alt-g: Ripgrep function overview
         bind -m emacs-standard -x '"\eg": "ripgrep-dir"'
         bind -m vi-command     -x '"\eg": "ripgrep-dir"' 
         bind -m vi-insert      -x '"\eg": "ripgrep-dir"'
     fi
 
-    if [[ "$(type -t fzf_rifle)" == function ]]; then
+    if type fzf_rifle &> /dev/null; then
         # CTRL-F - Paste the selected file path into the command line
         bind -m emacs-standard -x '"\C-f": fzf_rifle'
         bind -m vi-command -x '"\C-f": fzf_rifle'
