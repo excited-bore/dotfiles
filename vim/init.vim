@@ -336,9 +336,9 @@ let g:suda_smart_edit = 1
 "let g:suda#nopass = 1
 
 " Give passwords prompts in vim
-Plugin 'lambdalisue/askpass.vim'
+"Plugin 'lambdalisue/askpass.vim'
 "" Dependency for askpass, Deno
-Plugin 'vim-denops/denops.vim'
+"Plugin 'vim-denops/denops.vim'
 
 " Nerd commenter
 Plugin 'preservim/nerdcommenter'
