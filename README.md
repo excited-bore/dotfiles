@@ -2,13 +2,13 @@ My Dotfiles
 ===========
 
 Includes all kinds of installers and configurations.  
-Currently only focused on **bash** on **Linux** (On a distro with *Apt* or *Pacman*)
+Currently only focused on **bash** on **Linux** (On a distro with *Apt* or *Pacman*)  
 
 ## Install.sh
 
 Creates `.pathvariables.sh` for global pathvariables (Helps setting up variables for MAN,LESS,PAGER,EDITOR/VISUAL,SYSTEMD,XDG, etc..)  
-Creates `~/.keybinds.d/` and for Bash (readline) keybindings    
-Creates `~/.bash_aliases` and `~/.bash_aliases.d/` for bash-aliases 
+Creates `~/.keybinds.d/` and for Bash (readline) keybindings  
+Creates `~/.bash_aliases` and `~/.bash_aliases.d/` for bash-aliases  
 Creates `~/.bash_completion` and `~/.bash_completion.d/` for bash-completions  
 
 Then it helps with installing/configuring:  
@@ -29,6 +29,7 @@ Then it helps with installing/configuring:
 &nbsp;&nbsp;&nbsp;- Vim-oscyank: https://github.com/ojroques/vim-oscyank  
 &nbsp;&nbsp;&nbsp;- Vim-tmux-kitty-navigator: https://github.com/excited-bore/vim-tmux-kitty-navigator  
 &nbsp;&nbsp;&nbsp;- Suda: https://github.com/lambdalisue/suda.vim  
+&nbsp;&nbsp;&nbsp;- Glow: https://github.com/ellisonleao/glow.nvim
 &nbsp;&nbsp;&nbsp;- Which-key: https://github.com/folke/which-key.nvim  
 &nbsp;&nbsp;&nbsp;- Toggleterm.nvim: https://github.com/akinsho/toggleterm.nvim  
 &nbsp;&nbsp;&nbsp;- Ranger.vim: https://github.com/francoiscabrol/ranger.vim  

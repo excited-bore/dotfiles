@@ -130,13 +130,13 @@ else
 fi
 
 # Alt-Up arrow rotates over directory history
-bind -x '"\277": pushd +1 &>/dev/null'
+bind -x '"\277": pushd &>/dev/null'
 bind -m emacs-standard '"\e[1;3A": "\C-e\C-u\277 _\C-m"'
 bind -m vi-command     '"\e[1;3A": "\C-e\C-u\277 _\C-m"'
 bind -m vi-insert      '"\e[1;3A": "\C-e\C-u\277 _\C-m"'
 
-# Alt-Down -> Go up one directory
-bind -x '"\266": cd .. &>/dev/null'
+# Alt-Down -> Rotate backwards
+bind -x '"\266": pushd +1  &>/dev/null'
 bind -m emacs-standard '"\e[1;3B": "\C-e\C-u\266 _\C-m"'
 bind -m vi-command     '"\e[1;3B": "\C-e\C-u\266 _\C-m"'
 bind -m vi-insert      '"\e[1;3B": "\C-e\C-u\266 _\C-m"'

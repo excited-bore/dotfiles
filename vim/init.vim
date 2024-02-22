@@ -4,7 +4,7 @@
 " Set 'nocompatible' to ward off unexpected things that your distro might
 " have made, as well as sanely reset options when re-sourcing .vimrc
 
-"If you set scrollof to a very large value (999) the cursor line will always be at the middle 
+"If you set scrollof to a very large value (999) the cursor line will always be at the middle
 " set scrolloff=999
 
 " Attempt to determine the type of a file based on its name and possibly its
@@ -272,12 +272,15 @@ let g:coc_global_extensions = [
             \'coc-git',
             \'coc-vimlsp',
             \'coc-webview',
-            \'coc-markdown-preview-enhanced',
             \'coc-markdownlint'
             \]
+            "\'coc-markdown-preview-enhanced',
 
 " Devicons
 Plugin 'ryanoasis/vim-devicons'
+
+" Markdown preview
+Plug 'ellisonleao/glow.nvim'
 
 " Nerdtree | Left block directory tree
 Plugin 'preservim/nerdtree'
@@ -324,6 +327,9 @@ Plugin 'tpope/vim-fugitive'
 
 " Nice keybinds overview for nvim
 Plugin 'folke/which-key.nvim'
+
+" Zenmode style window
+Plugin 'folke/zen-mode.nvim'
 
 " Vim tmux kitty navigator
 Plugin 'excited-bore/vim-tmux-kitty-navigator', { 'build' : 'cd ~/.vim/plugins/vim-tmux-kitty-navigator && cp -f ./pass_keys.py ~/.config/kitty/;'}
@@ -385,7 +391,10 @@ autocmd FileType markdown,text highlight ExtraWhitespace ctermbg=red guibg=red
 autocmd FileType markdown,text match ExtraWhitespace /\s\+$/
 
 
+"au filetype vimwiki silent! iunmap <buffer> <Tab>
+
 lua require("toggleterm").setup()
+lua require('glow').setup()
 
 " this is pseudo code
 let statusline = '%{&ft == "toggleterm" ? "terminal (".b:toggle_number.")" : ""}'
@@ -617,6 +626,7 @@ autocmd TermEnter term://*toggleterm#*
 " For example: 2<C-t> will open terminal 2
 nnoremap <silent><c-`> <Cmd>exe v:count1 . "ToggleTerm"<CR>
 inoremap <silent><c-`> <Esc><Cmd>exe v:count1 . "ToggleTerm"<CR>
+vnoremap <silent><c-`> <Esc><Cmd>exe v:count1 . "ToggleTerm"<CR>
 tnoremap <silent><esc> <C-\><C-n>
 
 
@@ -837,9 +847,9 @@ inoremap <M-c> <C-\><C-o>:CocCommand
 vnoremap <M-c> :CocCommand 
 
 " Leader (\) - m is -> CocCommand markdown-preview-enhanced.openPreview
-nnoremap <leader>m :CocCommand markdown-preview-enhanced.openPreview<cr>
-inoremap <leader>m <C-\><C-o>:CocCommand markdown-preview-enhanced.openPreview<cr> 
-vnoremap <leader>m :CocCommand markdown-preview-enhanced.openPreview<cr>gv
+nnoremap <leader>m :Glow<cr><esc>
+inoremap <leader>m <C-\><C-o>:Glow<cr><esc> 
+vnoremap <leader>m :Glow<cr><esc>gv
 
 
 " Visual mode remaps
@@ -928,18 +938,18 @@ vnoremap    <A-K>   :m '<-2<CR>gv
 " Move one 'word' Left/Right (cursor at end) => Ctrl+Left/Right
 " Move one space seperated word (cursor at end) => Shift+Left/Right
 " Move to beginning/end / cycle lines => Alt+Left/Right
-nnoremap <C-Right>  E
-"nnoremap <S-Right>  E
-nnoremap <C-Left>   B
+nnoremap <C-Left>   Bh
 "nnoremap <S-Left>   B
-inoremap <C-Right>  <C-\><C-o>E
-"inoremap <S-Right>  <C-\><C-o>E
+nnoremap <C-Right>  El
+"nnoremap <S-Right>  E
 inoremap <C-Left>   <C-\><C-o>B
 "inoremap <S-Left>   <C-\><C-o>B
-vnoremap <C-Right>  E
-"vnoremap <S-Right>  E
-vnoremap <C-Left>   B
+inoremap <C-Right>  <C-\><C-o>E
+"inoremap <S-Right>  <C-\><C-o>E
+vnoremap <C-Left>   Bh
 "vnoremap <S-Left>   B
+vnoremap <C-Right>  El
+"vnoremap <S-Right>  E
 
 
 " 0 => beginning of 'column'
@@ -949,14 +959,6 @@ vnoremap <C-Left>   B
 " If at beginning already, go to beginning previous line
 " Else, go up
 " Same for End of line, only you go down
-
-function! LastCheck()
-    if col(".") == col("$") || col('$') == 1
-        return 1
-    else
-        return 0
-    endif
-endfunction
 
 function! LastCheckI()
     if col(".") == col("$") || col('$') == 1 
