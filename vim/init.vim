@@ -26,7 +26,7 @@ set wildmode=longest,full
 set wildoptions=fuzzy
 
 "Enable relative number lines
-set relativenumber 
+set relativenumber
 
 "https://vim.fandom.com/wiki/GNU/Linux_clipboard_copy/paste_with_xclip
 "The 'a' and 'A' options enables copying selected text to system clipboard 
@@ -228,7 +228,6 @@ augroup END
 "Fix python3 interpreter
 let g:python3_host_prog = '/usr/bin/python3'
 let g:ycm_path_to_python_interpreter = '/usr/bin/python3'
-                                                             
 
 "autocmd CursorHold      * echo mode(1) 
 "autocmd CursorHoldI     * echo mode(1)
@@ -363,7 +362,7 @@ Plugin 'preservim/nerdcommenter'
 "set rtp^=/usr/bin/vimpager
 
 " Self documenting vim wiki
-Plugin 'vimwiki/vimwiki'
+"Plugin 'vimwiki/vimwiki'
 
 " Nice and cool themey
 Plugin 'morhetz/gruvbox'

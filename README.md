@@ -7,7 +7,7 @@ Currently only focused on **bash** on **Linux** (On a distro with *Apt* or *Pacm
 ## Install.sh
 
 Creates `.pathvariables.sh` for global pathvariables (Helps setting up variables for MAN,LESS,PAGER,EDITOR/VISUAL,SYSTEMD,XDG, etc..)  
-Creates `~/.keybinds.d/` and for Bash (readline) keybindings  
+Creates `~/.keybinds.d/` and `~/.keybinds.d/keybinds.bash` for Bash (readline) keybindings  
 Creates `~/.bash_aliases` and `~/.bash_aliases.d/` for bash-aliases  
 Creates `~/.bash_completion` and `~/.bash_completion.d/` for bash-completions  
 
@@ -23,6 +23,7 @@ Then it helps with installing/configuring:
     - Ranger: https://github.com/ranger/ranger  
     - Neovim: https://neovim.io/  
 &nbsp;&nbsp;- **Noteworthy plugins**:  
+&nbsp;&nbsp;&nbsp;- Lazy.nvim adapter for vim-plug: https://gist.github.com/BlueDrink9/474b150c44d41b80934990c0acfb00be  
 &nbsp;&nbsp;&nbsp;- Conquer of completion: https://github.com/neoclide/coc.nvim  
 &nbsp;&nbsp;&nbsp;- NERDTree: https://github.com/preservim/nerdtree  
 &nbsp;&nbsp;&nbsp;- NERDCommenter: https://github.com/preservim/nerdcommenter  
@@ -47,6 +48,8 @@ Then it helps with installing/configuring:
 &nbsp;&nbsp;- Riff: https://github.com/walles/riff  
 &nbsp;&nbsp;- Ydiff: https://github.com/ymattw/ydiff  
 &nbsp;&nbsp;- Diff-so-fancy: https://github.com/so-fancy/diff-so-fancy  
+&nbsp;&nbsp;- Diffr: https://github.com/mookid/diffr  
+
 
 Also helps configuring global gitconfig and global gitignore, and gives the option to install all kinds of bash-aliases/functions
 
