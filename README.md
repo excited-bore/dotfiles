@@ -1,8 +1,8 @@
 My Dotfiles
 ===========
 
-Includes all kinds of installers and configurations. 
-Currently only focused on **bash** on **Linux** (On a distro with APT or PACMAN)
+Includes all kinds of installers and configurations.  
+Currently only focused on **bash** on **Linux** (On a distro with *Apt* or *Pacman*)
 
 ## Install.sh
 
@@ -14,38 +14,38 @@ Creates `~/.bash_completion` and `~/.bash_completion.d/` for bash-completions
 Then it helps with installing/configuring:  
     - Bash-completions: https://github.com/cykerway/complete-alias/master/complete_alias  
     - Python-completions: https://github.com/kislyuk/argcomplete  
-    - Osc clipboard: https://github.com/theimpostor/osc   
+    - Osc clipboard: https://github.com/theimpostor/osc  
     - Bat (Cat clone): https://github.com/sharkdp/bat  
     - Fzf: https://github.com/junegunn/fzf  
     - Autojump: https://github.com/wting/autojump  
     - Starship: https://starship.rs/  
     - Moar: https://github.com/walles/moar  
     - Ranger: https://github.com/ranger/ranger  
-    - Neovim: https://neovim.io/ 
-        - **Noteworthy plugins**:
-            - Conquer of completion: https://github.com/neoclide/coc.nvim
-            - NERDTree: https://github.com/preservim/nerdtree
-            - NERDCommenter: https://github.com/preservim/nerdcommenter 
-            - Vim-oscyank: https://github.com/ojroques/vim-oscyank
-            - Vim-tmux-kitty-navigator: https://github.com/excited-bore/vim-tmux-kitty-navigator
-            - Suda: https://github.com/lambdalisue/suda.vim
-            - Which-key: https://github.com/folke/which-key.nvim
-            - Toggleterm.nvim: https://github.com/akinsho/toggleterm.nvim 
-            - Ranger.vim: https://github.com/francoiscabrol/ranger.vim
-            - Lazygit.nvim: https://github.com/kdheepak/lazygit.nvim
-            - Fzf.vim: https://github.com/junegunn/fzf.vim
-            - Fzf-preview: https://github.com/junegunn/fzf-preview.vim
-            - Vim-airline: https://github.com/vim-airline/vim-airline
-    - Nvimpager: https://github.com/lucc/nvimpager
+    - Neovim: https://neovim.io/  
+&nbsp;&nbsp;- **Noteworthy plugins**:  
+&nbsp;&nbsp;&nbsp;- Conquer of completion: https://github.com/neoclide/coc.nvim  
+&nbsp;&nbsp;&nbsp;- NERDTree: https://github.com/preservim/nerdtree  
+&nbsp;&nbsp;&nbsp;- NERDCommenter: https://github.com/preservim/nerdcommenter  
+&nbsp;&nbsp;&nbsp;- Vim-oscyank: https://github.com/ojroques/vim-oscyank  
+&nbsp;&nbsp;&nbsp;- Vim-tmux-kitty-navigator: https://github.com/excited-bore/vim-tmux-kitty-navigator  
+&nbsp;&nbsp;&nbsp;- Suda: https://github.com/lambdalisue/suda.vim  
+&nbsp;&nbsp;&nbsp;- Which-key: https://github.com/folke/which-key.nvim  
+&nbsp;&nbsp;&nbsp;- Toggleterm.nvim: https://github.com/akinsho/toggleterm.nvim  
+&nbsp;&nbsp;&nbsp;- Ranger.vim: https://github.com/francoiscabrol/ranger.vim  
+&nbsp;&nbsp;&nbsp;- Lazygit.nvim: https://github.com/kdheepak/lazygit.nvim  
+&nbsp;&nbsp;&nbsp;- Fzf.vim: https://github.com/junegunn/fzf.vim  
+&nbsp;&nbsp;&nbsp;- Fzf-preview: https://github.com/junegunn/fzf-preview.vim  
+&nbsp;&nbsp;&nbsp;- Vim-airline: https://github.com/vim-airline/vim-airline  
+    - Nvimpager: https://github.com/lucc/nvimpager  
     - Tmux: https://github.com/tmux/tmux  
-    - Kitty: https://sw.kovidgoyal.net/kitty/ 
-    - Lazygit: https://github.com/jesseduffield/lazygit?tab=readme-ov-file#amend-an-old-commit
-    - Diff syntax highlighters: 
-      - Difftastic: https://difftastic.wilfred.me.uk/
-      - Delta: https://github.com/delta-io/delta
-      - Riff: https://github.com/walles/riff
-      - Ydiff: https://github.com/ymattw/ydiff
-      - Diff-so-fancy: https://github.com/so-fancy/diff-so-fancy
+    - Kitty: https://sw.kovidgoyal.net/kitty/  
+    - Lazygit: https://github.com/jesseduffield/lazygit?tab=readme-ov-file#amend-an-old-commit  
+    - Diff syntax highlighters:  
+&nbsp;&nbsp;- Difftastic: https://difftastic.wilfred.me.uk/  
+&nbsp;&nbsp;- Delta: https://github.com/delta-io/delta  
+&nbsp;&nbsp;- Riff: https://github.com/walles/riff  
+&nbsp;&nbsp;- Ydiff: https://github.com/ymattw/ydiff  
+&nbsp;&nbsp;- Diff-so-fancy: https://github.com/so-fancy/diff-so-fancy  
 
 Also helps configuring global gitconfig and global gitignore, and gives the option to install all kinds of bash-aliases/functions
 

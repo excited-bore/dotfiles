@@ -280,7 +280,7 @@ let g:coc_global_extensions = [
 Plugin 'ryanoasis/vim-devicons'
 
 " Nerdtree | Left block directory tree
-Plugin 'preservim/nerdtree' 
+Plugin 'preservim/nerdtree'
 
 " Nerdtree git plugin
 Plugin 'Xuyuanp/nerdtree-git-plugin'
@@ -294,7 +294,7 @@ Plugin 'ojroques/vim-oscyank', {'branch': 'main'}
 
 " Color codes for pager
 Plugin 'vim-scripts/AnsiEsc.vim'
- 
+
 " Diff plugin
 Plugin 'sindrets/diffview.nvim'
 
@@ -308,15 +308,15 @@ Plugin 'akinsho/toggleterm.nvim'
 Plugin 'francoiscabrol/ranger.vim'
 Plugin 'rbgrouleff/bclose.vim'
 let g:ranger_replace_netrw = 1
-let g:NERDTreeHijackNetrw = 0 
+let g:NERDTreeHijackNetrw = 0
 let g:ranger_map_keys = 0
 let g:ranger_command_override = 'ranger --cmd "set show_hidden=true"'
 
 " Fuzzy finder plugin
 Plugin 'junegunn/fzf'
-Plugin 'junegunn/fzf.vim' 
+Plugin 'junegunn/fzf.vim'
 
-" Fuzzy finder preview   
+" Fuzzy finder preview
 Plugin 'yuki-yano/fzf-preview.vim', { 'branch': 'release/remote' }
 
 " Plugin for git
@@ -379,6 +379,12 @@ else
     lua require("lazy")
 endif
 
+
+" Markdown autocmd
+autocmd FileType markdown,text highlight ExtraWhitespace ctermbg=red guibg=red
+autocmd FileType markdown,text match ExtraWhitespace /\s\+$/
+
+
 lua require("toggleterm").setup()
 
 " this is pseudo code
@@ -396,7 +402,7 @@ let g:NERDTreeFileLines = 1
 
 " Exit Vim if NERDTree is the only window remaining in the only tab.
 autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
- 
+
 " Close the tab if NERDTree is the only window remaining in it.
 autocmd BufEnter * if winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
 
