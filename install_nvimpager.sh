@@ -33,12 +33,11 @@ if test "$(which scdoc)" == ''; then
 fi
 
 if test "$(which nvimpager)" == ''; then
-    mkdir $TMPDIR/nvimpager
-    (cd $TMPDIR/nvimpager
+    (cd $TMPDIR
     git clone https://github.com/lucc/nvimpager
     cd nvimpager
     make PREFIX=$HOME/.local install
-    cd ../..
+    cd ..
     rm -fr nvimpager
     )
 fi
@@ -56,13 +55,8 @@ if [ -z "$moar_usr" ] || [ "y" == "$moar_usr" ] || [ "Y" == "$moar_usr" ]; then
     if grep -q "nvimpager" $PATHVAR; then 
         sed -i "s|.export PAGER=|export PAGER=|g" $PATHVAR
         sed -i "s|export PAGER=.*|export PAGER=$(whereis nvimpager | awk '{print $2;}')|g" $PATHVAR
-        sed -i "s|.export SYSTEMD_PAGER=.*|export SYSTEMD_PAGER=\$PAGER|g" $PATHVAR
-        sed -i "s|.export SYSTEMD_PAGERSECURE=.*|export SYSTEMD_PAGERSECURE=1|g" $PATHVAR
     else
-        printf "export MOAR='--statusbar=bold --colors=auto --render-unprintable=highlight'\n" >> $PATHVAR
         printf "export PAGER=$(whereis nvimpager | awk '{print $2;}')\n" >> $PATHVAR
-        printf "export SYSTEMD_PAGER=\$PAGER" >> $PATHVAR
-        printf "export SYSTEMD_PAGERSECURE=1" >> $PATHVAR
     fi
 fi
     
@@ -71,11 +65,7 @@ if [ -z "$moar_root" ] || [ "y" == "$moar_root" ] || [ "Y" == "$moar_root" ]; th
     if sudo grep -q "nvimpager" $PATHVAR_R; then
         sudo sed -i "s|.export PAGER=|export PAGER=|g" $PATHVAR_R
         sudo sed -i "s|export PAGER=.*|export PAGER=$(whereis nvimpager | awk '{print $2;}')|g" $PATHVAR_R
-        sudo sed -i "s|.export SYSTEMD_PAGER=.*|export SYSTEMD_PAGER=$PAGER|g" $PATHVAR_R
-        sudo sed -i "s|.export SYSTEMD_PAGERSECURE=.*|export SYSTEMD_PAGERSECURE=1|g" $PATHVAR_R
     else
         printf "export PAGER=$(whereis nvimpager | awk '{print $2;}')\n" | sudo tee -a $PATHVAR_R
-        printf "export SYSTEMD_PAGER=\$PAGER\n" | sudo tee -a $PATHVAR_R
-        printf "export SYSTEMD_PAGERSECURE=1\n" | sudo tee -a $PATHVAR_R
     fi
 fi

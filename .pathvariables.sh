@@ -37,7 +37,7 @@ export MANOPT='-a'
 export MANPAGER='nvim +Man!'
 
 # PAGER
-export PAGER=/usr/bin/moar
+export PAGER=/usr/local/bin/vimpager
 
 # LESS
 export LESS=" --CLEAR-SCREEN --quit-on-intr --redraw-on-quit --LINE-NUMBERS --line-num-width=2 --window=10 --use-color --color=Ng$ --color=Scb$ --color=Pkg$ --IGNORE-CASE --LONG-PROMPT --chop-long-lines --underline-special --mouse --QUIET --status-line --no-vbell --follow-name --exit-follow-on-close"
@@ -196,3 +196,4 @@ export DELTA_PAGER='moar  --no-linenumbers --quit-if-one-screen --wrap'
 
 # BAT
 export BAT_PAGER='moar  --no-linenumbers --quit-if-one-screen --wrap'
+export VIMPAGER_RC=~/.vimrc
