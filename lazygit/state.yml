@@ -1,6 +1,7 @@
 lastupdatecheck: 0
 recentrepos:
 - /home/burp/dotfiles
+- /home/burp/copy-to
 startuppopupversion: 5
 customcommandshistory:
 - git worktree test

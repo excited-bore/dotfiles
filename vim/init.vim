@@ -55,6 +55,7 @@ set guioptions=aAimrLT
 " crashes.
 set hidden
 
+
 " Note that not everyone likes working this way (with the hidden option).
 " Alternatives include using tabs or split windows instead of re-using the same
 " window as mentioned above, and/or either of the following options:
@@ -274,6 +275,9 @@ let g:coc_global_extensions = [
             \'coc-markdownlint'
             \]
             "\'coc-markdown-preview-enhanced',
+
+" Copilot
+Plugin 'github/copilot.vim'
 
 " Devicons
 Plugin 'ryanoasis/vim-devicons'
