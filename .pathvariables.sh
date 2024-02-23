@@ -190,3 +190,9 @@ export PATH=$KITTY_PATH:$PATH
 
 # LIBVIRT
 export LIBVIRT_DEFAULT_URI=qemu:///system
+
+# DELTA
+export DELTA_PAGER='moar  --no-linenumbers --quit-if-one-screen --wrap'
+
+# BAT
+export BAT_PAGER='moar  --no-linenumbers --quit-if-one-screen --wrap'

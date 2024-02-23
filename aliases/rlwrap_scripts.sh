@@ -47,9 +47,11 @@ reade(){
             return 0
         fi
         
-        args="${@:$#-1:1}"
+        local args="${@:$#-1:1}"
+        args=$(echo $args | tr ' ' '\n')
+        echo "$args" > "$TMPDIR/rlwrap"
         breaklines=''
-        rlwstring="rlwrap -b \"$breaklines\" -f <(echo \"${args[@]}\") -o cat"
+        rlwstring="rlwrap -D 0 -H $TMPDIR/rlwrap -b \"$breaklines\" -f <(echo \"${args[@]}\") -o cat"
         while getopts ':b:e:i:p:Q:s:S:' flag; do
             case "${flag}" in
                 b)  breaklines=${OPTARG};
@@ -162,4 +164,4 @@ function yes_no(){
            $1; 
         fi
     fi
-}
+} 
