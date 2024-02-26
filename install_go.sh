@@ -1,9 +1,24 @@
-. ./checks/check_distro.sh
-. ./aliases/rlwrap_scripts.sh
-. ./checks/check_pathvar.sh
+if ! test -f checks/check_distro.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_distro.sh)" 
+else
+    . ./checks/check_distro.sh
+fi
+
+if ! test -f aliases/rlwrap_scripts.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/rlwrap_scripts.sh)" 
+else
+    . ./aliases/rlwrap_scripts.sh
+fi
+
+if ! test -f aliases/rlwrap_scripts.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pathvar.sh)" 
+else
+    . ./checksum/check_pathvar.sh
+fi
+
 
 if [ $distro_base == "Arch" ]; then
-    yes | sudo pacman -Su go
+    yes | sudo pacman -S go
 elif [ $distro_base == "Debian" ]; then
     if [[ "$arch" =~ "arm"* ]]; then
        arch="armv6l"
@@ -28,15 +43,15 @@ elif [ $distro_base == "Debian" ]; then
             sudo tar -C /usr/local -xzf $file
             rm $file
             )
-            if grep -q "GOROOT" $PATHVAR; then
-                sed -i "s|.export GOROOT=|export GOROOT=|g" $PATHVAR
-                sed -i "s|export GOROOT=.*|export GOROOT=$goroot|g" $PATHVAR
-                sed -i "s|.export PATH=\$PATH:\$GOROOT|export PATH=\$PATH:\$GOROOT|g" $PATHVAR
-                
-            else
-                echo "export GOROOT=$goroot" >> $PATHVAR
-                echo "export PATH=\$PATH:\$GOROOT" >> $PATHVAR
-            fi
+            #if grep -q "GOROOT" $PATHVAR; then
+            #    sed -i "s|.export GOROOT=|export GOROOT=|g" $PATHVAR
+            #    sed -i "s|export GOROOT=.*|export GOROOT=$goroot|g" $PATHVAR
+            #    sed -i "s|.export PATH=\$PATH:\$GOROOT|export PATH=\$PATH:\$GOROOT|g" $PATHVAR
+            #    
+            #else
+            #    echo "export GOROOT=$goroot" >> $PATHVAR
+            #    echo "export PATH=\$PATH:\$GOROOT" >> $PATHVAR
+            #fi
         fi
     else
         yes | sudo apt install go
@@ -44,20 +59,22 @@ elif [ $distro_base == "Debian" ]; then
     
 fi    
 
-reade -Q "GREEN" -i "y" -p "Source installed go binaries? (Set GOPATH):" "y n" gopth
-if [ "y" == "$gopth" ]; then
-    reade -Q "CYAN" -i "$HOME/.local" -p "Set GOPATH (go packages): " -e gopth
-    #echo "${CYAN}Only GOPATH is necessary. Setting GOROOT is usually for development reasons${normal}"
-    #reade -Q "CYAN" -p "Set custom GOROOT? (Go tools, empty means leave default): " -e goroot
-    
-     if grep -q "GOPATH" $PATHVAR; then
-        sed -i "s|.export GOPATH=|export GOPATH=|g" $PATHVAR
-        sed -i "s|export GOPATH=.*|export GOPATH=$gopth|g" $PATHVAR
-        sed -i "s|.export PATH=\$PATH:\$GOPATH|export PATH=\$PATH:\$GOPATH|g" $PATHVAR
-     else
-        echo "export GOPATH=$gopth" >> $PATHVAR
-        echo "export PATH=\$PATH:\$GOPATH" >> $PATHVAR
-     fi
-fi 
-unset gopth goroot
-source ~/.bashrc
+if echo $(go env) | grep -q "GOPATH=$HOME/go"; then
+    reade -Q "GREEN" -i "y" -p "Source installed go outside of $HOME/go? (Set GOPATH):" "y n" gopth
+    if [ "y" == "$gopth" ]; then
+        reade -Q "CYAN" -i "$HOME/.local" -p "GOPATH: " -e gopth
+        #echo "${CYAN}Only GOPATH is necessary. Setting GOROOT is usually for development reasons${normal}"
+        #reade -Q "CYAN" -p "Set custom GOROOT? (Go tools, empty means leave default): " -e goroot
+        
+        go env -w GO111MODULE=auto
+        go env -w GOPATH=$gopth
+         #if grep -q "GOPATH" $PATHVAR; then
+         #   sed -i "s|.export GOPATH=|export GOPATH=|g" $PATHVAR
+         #   sed -i "s|export GOPATH=.*|export GOPATH=$gopth|g" $PATHVAR
+         #   sed -i "s|.export PATH=\$PATH:\$GOPATH|export PATH=\$PATH:\$GOPATH|g" $PATHVAR
+         #else
+         #   echo "export GOPATH=$gopth" >> $PATHVAR
+         #   echo "export PATH=\$PATH:\$GOPATH" >> $PATHVAR
+         #fi
+    fi
+fi

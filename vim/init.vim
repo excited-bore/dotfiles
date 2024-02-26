@@ -835,9 +835,9 @@ nnoremap T :!
 vnoremap T :! 
 
 " Ctrl - T is -> :
-nnoremap <C-t> :tab sb 1<Cr>
-inoremap <C-t> <C-\><C-o>:tab sb 1<Cr>
-vnoremap <C-t> :tab sb 1<Cr>
+"nnoremap <C-t> :tab sb 1<Cr>
+"inoremap <C-t> <C-\><C-o>:tab sb 1<Cr>
+"vnoremap <C-t> :tab sb 1<Cr>
 
 "Alt - M is -> Minimap 
 nnoremap <silent><M-m> <esc>:MinimapToggle<CR>:MinimapUpdateHighlight<cr>
@@ -963,7 +963,7 @@ vnoremap <C-Right>  El
 " Else, go up
 " Same for End of line, only you go down
 
-function! LastCheckI()
+function! LastCheck()
     if col(".") == col("$") || col('$') == 1 
         return 1
     else
@@ -974,7 +974,7 @@ endfunction
 nnoremap <expr> <A-Left>    (col(".") ==? 1 ? '<Up>0' : '0')
 nnoremap <expr> <A-right>   LastCheck() ? '<Down>$<Right>' : '$<Right>'
 inoremap <expr> <A-Left>    (col('.') ==? 1 ? '<Up><C-\><C-o>0' : '<C-\><C-o>0')
-inoremap <expr> <A-Right>   LastCheckI() ? '<C-o><Down><C-\><C-o>$<Right>' : '<C-\><C-o>$<Right>'
+inoremap <expr> <A-Right>   LastCheck() ? '<C-o><Down><C-\><C-o>$<Right>' : '<C-\><C-o>$<Right>'
 vnoremap <expr> <A-Left>    (col(".") ==? 1 ? '<Up>0' : '0')
 vnoremap <expr> <A-Right>   LastCheck() ? '<Down>$<Right>' : '$<Right>'
 
@@ -1098,8 +1098,12 @@ vnoremap y "+y
 vnoremap Y "+Y
 "vnoremap YY "+^Yg_
 
-vnoremap d c
-vnoremap D C
+
+nnoremap d "_d
+nnoremap D "_D
+
+vnoremap d "_c
+vnoremap D "_C
 
 nnoremap c "+y
 nnoremap cc "0yg_
@@ -1165,7 +1169,7 @@ inoremap <expr> <C-d>   (col(".") ==? 1 ? '<C-\><C-o>daw' : '<C-\><C-o>diw')
 "vnoremap <C-c>  "+y
 vnoremap <C-c> <Plug>OSCYankVisual
 vnoremap <silent> <C-v> "+Pl
-vnoremap <C-d>  "*d 
+vnoremap <C-d>  d 
 
 cnoremap <C-c> <C-f>
 cnoremap <C-v>  <C-r><C-o>"

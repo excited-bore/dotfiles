@@ -207,17 +207,17 @@ if [ ! -f ~/.pathvariables.sh ]; then
         fi
         unset dsply
 
-        if [ -x "$(command -v go)" ]; then
+        if type go &> /dev/null; then
             sed -i 's|#export GOPATH|export GOPATH|' .pathvariables.sh 
         fi
         unset snapvrs
 
-        if [ -x "$(command -v snap)" ]; then
+        if type snap &> /dev/null; then
             sed -i 's|#export PATH=/bin/snap|export PATH=/bin/snap|' .pathvariables.sh 
         fi
         unset snapvrs
         
-        if [ -x "$(command -v flatpak)" ]; then
+        if type flatpak &> /dev/null; then
             sed -i 's|#export FLATPAK|export FLATPAK|' .pathvariables.sh 
             sed -i 's|#export \(PATH=$PATH:$HOME/.local/bin/flatpak\)|\1|g' .pathvariables.sh
         fi
@@ -322,10 +322,8 @@ fi
         if [ -f /root/.pathvariables.sh ]; then
            sudo sed -i 's|#export INPUTRC|export INPUTRC|g' /root/.pathvariables.sh
         fi
-        sudo cp -bfv keybinds/keybinds.bash /root/.keybinds.d/;
-        sudo gio trash /root/.keybinds.d/keybinds.bash~
-        sudo cp -bfv keybinds/.inputrc /root/ ;
-        sudo gio trash /root/.inputrc~
+        sudo cp -fv keybinds/keybinds.bash /root/.keybinds.d/;
+        sudo cp -fv keybinds/.inputrc /root/ ;
 
         # X based settings is generally not for root and will throw errors 
         if sudo grep -q '^setxkbmap' /root/.keybinds.d/keybinds.bash; then
@@ -340,7 +338,7 @@ fi
         if [ "$vimde" == "y" ]; then
             sed -i "s|.set editing-mode .*|set editing-mode vi|g" keybinds/.inputrc
         fi
-        reade -Q "GREEN" -i "y" -p "Enable visual que for vi/emacs toggle? (Displayed as '@') [Y/n]: " "y n" vivisual
+        reade -Q "GREEN" -i "y" -p "Enable visual que for vi/emacs toggle? (Displayed as '(ins)/(cmd)/(emacs)') [Y/n]: " "y n" vivisual
         if [ "$vivisual" == "y" ]; then
             sed -i "s|.set show-mode-in-prompt .*|set show-mode-in-prompt on|g" keybinds/.inputrc
         fi
@@ -348,10 +346,8 @@ fi
         if [ "$xtrm" != "y" ] && ! [ -z "$xtrm" ]; then
             sed -i "s|setxkbmap |#setxkbmap |g" keybinds/.inputrc
         fi
-        cp -bfv keybinds/keybinds.bash ~/.keybinds.d/
-        gio trash ~/.keybinds.d/keybinds.bash~
-        cp -bfv keybinds/.inputrc ~/
-        gio trash ~/.inputrc~
+        cp -fv keybinds/keybinds.bash ~/.keybinds.d/
+        cp -fv keybinds/.inputrc ~/
         if [ -f ~/.pathvariables.sh ]; then
            sed -i 's|#export INPUTRC|export INPUTRC|g' ~/.pathvariables.sh
         fi
@@ -363,12 +359,10 @@ fi
     # Xresources
     
     xresources_r(){
-        sudo cp -bfv xterm/.Xresources /root/.Xresources;
-        sudo gio trash /root/.Xresources~
+        sudo cp -fv xterm/.Xresources /root/.Xresources;
         }
     xresources() {
-        cp -bfv xterm/.Xresources ~/.Xresources;
-        gio trash ~/.Xresources~
+        cp -fv xterm/.Xresources ~/.Xresources;
         yes_edit_no xresources_r "xterm/.Xresources" "Install .Xresources at /root/.bash_aliases.d/?" "edit" "RED"; }
     yes_edit_no xresources "xterm/.Xresources" "Install .Xresources at ~/.bash_aliases.d/? (keybinds config)" "edit" "YELLOW"
     
@@ -391,11 +385,11 @@ unset pycomp
 
 
 # Osc
-reade -Q "GREEN" -i "y" -p "Install Osc52 clipboard? (Universal clipboard tool / works natively over ssh) [Y/n]: " "y n" osc
-if [ -z $osc ] || [ "Y" == $osc ] || [ $osc == "y" ]; then
-    ./install_osc.sh 
-fi
-unset osc
+#reade -Q "GREEN" -i "y" -p "Install Osc52 clipboard? (Universal clipboard tool / works natively over ssh) [Y/n]: " "y n" osc
+#if [ -z $osc ] || [ "Y" == $osc ] || [ $osc == "y" ]; then
+#    ./install_osc.sh 
+#fi
+#unset osc
 
 # Bat
 reade -Q "GREEN" -i "y" -p "Install Bat? (Cat clone with syntax highlighting) [Y/n]: " "y n" bat
@@ -472,8 +466,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     ./checks/check_aliases_dir.sh
 
     general_r(){ 
-        sudo cp -bfv aliases/general.sh /root/.bash_aliases.d/;
-        sudo gio trash /root/.bash_aliases.d/general.sh~
+        sudo cp -fv aliases/general.sh /root/.bash_aliases.d/;
     }
     general(){              
         sed -i 's|^export TRASH_BIN_LIMIT=|export TRASH_BIN_LIMIT=|g' ~/.pathvariables.sh
@@ -495,76 +488,63 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
             fi
         fi
         unset cat
-        cp -bfv aliases/general.sh ~/.bash_aliases.d/
-        gio trash ~/.bash_aliases.d/general.sh~
+        cp -fv aliases/general.sh ~/.bash_aliases.d/
         yes_edit_no general_r "aliases/general.sh" "Install general.sh at /root/?" "yes" "GREEN"; }
         yes_edit_no general "aliases/general.sh" "Install general.sh at ~/? (aliases related to general actions - cd/mv/cp/rm + completion script replacement for 'read -e') " "yes" "YELLOW"
 
     systemd_r(){ 
-        sudo cp -bfv aliases/systemctl.sh /root/.bash_aliases.d/;
-        sudo gio trash /root/.bash_aliases.d/systemctl.sh~;
+        sudo cp -fv aliases/systemctl.sh /root/.bash_aliases.d/;
     }
     systemd(){
-        cp -bfv aliases/systemctl.sh ~/.bash_aliases.d/
-        gio trash ~/.bash_aliases.d/systemctl.sh~;
+        cp -fv aliases/systemctl.sh ~/.bash_aliases.d/
         yes_edit_no systemd_r "aliases/systemctl.sh" "Install systemctl.sh at /root/?" "yes" "GREEN"; }
     yes_edit_no systemd "aliases/systemctl.sh" "Install systemctl.sh? ~/.bash_aliases.d/ (systemctl aliases/functions)?" "edit" "GREEN"
         
 
     dosu_r(){ 
-        sudo cp -bfv aliases/sudo.sh /root/.bash_aliases.d/ ;
-        sudo gio trash /root/.bash_aliases.d/sudo.sh~
+        sudo cp -fv aliases/sudo.sh /root/.bash_aliases.d/ ;
     }    
 
     dosu(){ 
-        cp -bfv aliases/sudo.sh ~/.bash_aliases.d/;
-        gio trash ~/.bash_aliases.d/sudo.sh~
+        cp -fv aliases/sudo.sh ~/.bash_aliases.d/;
         yes_edit_no dosu_r "aliases/sudo.sh" "Install sudo.sh at /root/?" "yes" "GREEN"; }
     yes_edit_no dosu "aliases/sudo.sh" "Install sudo.sh at ~/.bash_aliases.d/ (sudo aliases)? " "edit" "GREEN"
 
 
     packman_r(){ 
-        sudo cp -bfv aliases/package_managers.sh /root/.bash_aliases.d/
-        sudo gio trash /root/.bash_aliases.d/package_managers.sh~; 
+        sudo cp -fv aliases/package_managers.sh /root/.bash_aliases.d/
     }
     packman(){
-        cp -bfv aliases/package_managers.sh ~/.bash_aliases.d/
-        gio trash ~/.bash_aliases.d/package_managers.sh~; 
+        cp -fv aliases/package_managers.sh ~/.bash_aliases.d/
         yes_edit_no packman_r "aliases/package_managers.sh" "Install package_managers.sh at /root/?" "edit" "YELLOW" 
     }
     yes_edit_no packman "aliases/package_managers.sh" "Install package_managers.sh at ~/.bash_aliases.d/ (package manager aliases)? " "edit" "GREEN"
     
     ssh_r(){ 
-        sudo cp -bfv aliases/ssh.sh /root/.bash_aliases.d/; 
-        sudo gio trash /root/.bash_aliases.d/ssh.sh~; 
+        sudo cp -fv aliases/ssh.sh /root/.bash_aliases.d/; 
     }
     sshh(){
-        cp -bfv aliases/ssh.sh ~/.bash_aliases.d/
-        gio trash ~/.bash_aliases.d/ssh.sh~; 
+        cp -fv aliases/ssh.sh ~/.bash_aliases.d/
         yes_edit_no ssh_r "aliases/ssh.sh" "Install ssh.sh at /root/?" "edit" "YELLOW" 
     }
     yes_edit_no sshh "aliases/ssh.sh" "Install ssh.sh at ~/.bash_aliases.d/ (ssh aliases)? " "edit" "GREEN"
 
 
     ps1_r(){ 
-        sudo cp -bfv aliases/PS1_colours.sh /root/.bash_aliases.d/; 
-        sudo gio trash /root/.bash_aliases.d/PS1_colours.sh~
+        sudo cp -fv aliases/PS1_colours.sh /root/.bash_aliases.d/; 
     }
     ps11(){
-        cp -bfv aliases/PS1_colours.sh ~/.bash_aliases.d/
-        gio trash ~/.bash_aliases.d/PS1_colours.sh~
+        cp -fv aliases/PS1_colours.sh ~/.bash_aliases.d/
         yes_edit_no ps1_r "aliases/PS1_colours.sh" "Install PS1_colours.sh at /root/?" "yes" "GREEN" 
     }
     yes_edit_no ps11 "aliases/PS1_colours.sh" "Install PS1_colours.sh at ~/.bash_aliases.d/ (Coloured command prompt)? " "yes" "GREEN"
     
     if [ $distro == "Manjaro" ] ; then
         manj_r(){ 
-            sudo cp -bfv aliases/manjaro.sh /root/.bash_aliases.d/; 
-            sudo gio trash /root/.bash_aliases.d/manjaro.sh~
+            sudo cp -fv aliases/manjaro.sh /root/.bash_aliases.d/; 
         }
         manj(){
-            cp -bfv aliases/manjaro.sh ~/.bash_aliases.d/
-            gio trash ~/.bash_aliases.d/manjaro.sh~
+            cp -fv aliases/manjaro.sh ~/.bash_aliases.d/
             yes_edit_no manj_r "aliases/manjaro.sh" "Install manjaro.sh at /root/?" "yes" "GREEN" 
         }
         yes_edit_no manj "aliases/manjaro.sh" "Install manjaro.sh at ~/.bash_aliases.d/ (manjaro specific aliases)? " "yes" "GREEN"
@@ -573,27 +553,26 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     # Variety aliases 
     # 
     variti_r(){ 
-        sudo cp -bfv aliases/variety.sh /root/.bash_aliases.d/; 
-        sudo gio trash /root/.bash_aliases.d/variety.sh~
+        sudo cp -fv aliases/variety.sh /root/.bash_aliases.d/; 
     }
     variti(){
-        cp -bfv aliases/variety.sh ~/.bash_aliases.d/
-        gio trash ~/.bash_aliases.d/variety.sh~
+        cp -fv aliases/variety.sh ~/.bash_aliases.d/
         yes_edit_no variti_r "aliases/variety.sh" "Install variety.sh at /root/?" "no" "YELLOW" 
     }
     yes_edit_no variti "aliases/variety.sh" "Install variety.sh at ~/.bash_aliases.d/ (aliases for a variety of tools)? " "edit" "GREEN" 
     
+    pthon(){
+        cp -fv aliases/python.sh ~/.bash_aliases.d/
+    }
+    yes_edit_no variti "aliases/python.sh" "Install python.sh at ~/.bash_aliases.d/ (aliases for a python development)? " "edit" "GREEN" 
+
+
     # Youtube
     #
-    ytbe_r(){ 
-        sudo cp -bfv aliases/youtube.sh /root/.bash_aliases.d/;
-        sudo gio trash /root/.bash_aliases.d/youtube.sh~
-    }
+
     ytbe(){
         . ./checks/check_youtube.sh
-        cp -fbv aliases/youtube.sh ~/.bash_aliases.d/
-        gio trash ~/.bash_aliases.d/youtube.sh~
-        yes_edit_no ytbe_r "aliases/youtube.sh" "Install youtube.sh at /root/?" "no" "YELLOW"; 
+        cp -fv aliases/youtube.sh ~/.bash_aliases.d/
     }
     yes_edit_no ytbe "aliases/youtube.sh" "Install yt-dlp (youtube cli download) and youtube.sh at ~/.bash_aliases.d/ (yt-dlp aliases)?" "yes" "GREEN"
 fi

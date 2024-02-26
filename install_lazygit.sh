@@ -27,10 +27,10 @@ fi
 if ! type copy-to &> /dev/null; then
     reade -Q "GREEN" -i "y" -p "Install copy-to? [Y/n]: " "y n" cpcnf;
     if [ "y" == "$cpcnf" ] || [ -z "$cpcnf" ]; then
-        if ! test -f install_copy-conf.sh; then
-            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_copy-conf.sh)"
+        if ! test -f install_copy-to.sh; then
+            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_copy-to.sh)"
         else
-            ./install_copy-conf.sh
+            ./install_copy-to.sh
         fi
     fi
 fi

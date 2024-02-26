@@ -1,10 +1,11 @@
-# python virtual env
-#python3 -m venv python3
-#source venv/bin/activate
+#python_install_user(){
+#    python $@ install --user;
+#}
 
-python_install_user(){
-    python $@ install --user;
-}
-alias python-twine-install="if type twine &> /dev/null; then pipx install twine; fi"
-alias python-twine-upload_test="pipx install build && python3 -m build && twine check dist/* && twine upload --repository testpypi dist/* && rm dist/* && echo 'Uploaded to https://test.pypi.org/'"
-alias python-twine-upload="pipx install build && python3 -m build && twine check dist/* && twine upload dist/* && rm dist/* && echo 'Uploaded to https://pypi.org/' "
+alias python-twine-install="if type twine &> /dev/null; then pipx install twine; fi; if type build &> /dev/null; then pipx install build; fi"
+alias python-twine-upload-test="if type deactivate &> /dev/null; then deactivate; fi; python3 -m build && twine check dist/* && twine upload --repository testpypi dist/* && echo ''; rm dist/*"
+alias python-twine-upload="if type deactivate &> /dev/null; then deactivate; fi; python3 -m build && twine check dist/* && twine upload dist/* && echo ''; rm dist/*"
+alias python-venv="python3 -m venv venv; source venv/bin/activate"
+alias python-activate-venv="source venv/bin/activate"
+alias python-deactivate-venv="deactivate"
+alias pip-install-test="pip install -i https://test.pypi.org/simple/ "

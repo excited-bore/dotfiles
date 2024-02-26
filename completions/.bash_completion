@@ -9,3 +9,7 @@ if [ -d ~/.bash_completion.d/ ] && [ "$(ls -A ~/.bash_completion.d/)" ]; then
   done
 fi
 
+
+# Begin added by argcomplete
+source "/home/burp/.local/share/pipx/venvs/argcomplete/lib/python3.11/site-packages/argcomplete/bash_completion.d/_python-argcomplete"
+# End added by argcomplete

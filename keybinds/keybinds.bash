@@ -130,16 +130,16 @@ else
 fi
 
 # Alt-Up arrow rotates over directory history
-bind -x '"\277": pushd &>/dev/null'
-bind -m emacs-standard '"\e[1;3A": "\C-e\C-u\277 _\C-m"'
-bind -m vi-command     '"\e[1;3A": "\C-e\C-u\277 _\C-m"'
-bind -m vi-insert      '"\e[1;3A": "\C-e\C-u\277 _\C-m"'
+bind -x '"\388": pushd &>/dev/null'
+bind -m emacs-standard '"\e[1;3A": "\C-e\C-u\388 _\C-m"'
+bind -m vi-command     '"\e[1;3A": "\C-e\C-u\388 _\C-m"'
+bind -m vi-insert      '"\e[1;3A": "\C-e\C-u\388 _\C-m"'
 
 # Alt-Down -> Rotate backwards
-bind -x '"\266": pushd +1  &>/dev/null'
-bind -m emacs-standard '"\e[1;3B": "\C-e\C-u\266 _\C-m"'
-bind -m vi-command     '"\e[1;3B": "\C-e\C-u\266 _\C-m"'
-bind -m vi-insert      '"\e[1;3B": "\C-e\C-u\266 _\C-m"'
+bind -x '"\399": pushd +1  &>/dev/null'
+bind -m emacs-standard '"\e[1;3B": "\C-e\C-u\399 _\C-m"'
+bind -m vi-command     '"\e[1;3B": "\C-e\C-u\399 _\C-m"'
+bind -m vi-insert      '"\e[1;3B": "\C-e\C-u\399 _\C-m"'
                                          
 
 # Ctrl-w expands aliases
