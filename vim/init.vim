@@ -945,9 +945,9 @@ nnoremap <C-Left>   Bh
 "nnoremap <S-Left>   B
 nnoremap <C-Right>  El
 "nnoremap <S-Right>  E
-inoremap <C-Left>   <C-\><C-o>B
+inoremap <C-Left>   <C-\><C-o>B<C-\><C-o>h
 "inoremap <S-Left>   <C-\><C-o>B
-inoremap <C-Right>  <C-\><C-o>E
+inoremap <C-Right>  <C-\><C-o>E<C-\><C-o>l
 "inoremap <S-Right>  <C-\><C-o>E
 vnoremap <C-Left>   Bh
 "vnoremap <S-Left>   B

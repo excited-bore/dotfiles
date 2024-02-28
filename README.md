@@ -6,7 +6,7 @@ Currently only focused on **bash** on **Linux** (On a distro with *Apt* or *Pacm
 
 ## Install.sh
 
-Creates `.pathvariables.sh` for global pathvariables (Helps setting up variables for MAN,LESS,PAGER,EDITOR/VISUAL,SYSTEMD,XDG, etc..)  
+Creates `.pathvariables.env` for global pathvariables (Helps setting up variables for MAN,LESS,PAGER,EDITOR/VISUAL,SYSTEMD,XDG, etc..)  
 Creates `~/.keybinds.d/` and `~/.keybinds.d/keybinds.bash` for Bash (readline) keybindings  
 Creates `~/.bash_aliases` and `~/.bash_aliases.d/` for bash-aliases  
 Creates `~/.bash_completion` and `~/.bash_completion.d/` for bash-completions  

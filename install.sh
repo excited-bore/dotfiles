@@ -75,15 +75,15 @@ fi
 
 # Pathvariables
 
-if [ ! -f ~/.pathvariables.sh ]; then
-    reade -Q "GREEN" -i "y" -p "Check existence (and create) ~/.pathvariables.sh and link it to .bashrc? [Y/n]:" "y n" pathvars
+if [ ! -f ~/.pathvariables.env ]; then
+    reade -Q "GREEN" -i "y" -p "Check existence (and create) ~/.pathvariables.env and link it to .bashrc? [Y/n]:" "y n" pathvars
     if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         
         #Comment out every export in .pathvariables
-        sed -i -e '/export/ s/^#*/#/' .pathvariables.sh
+        sed -i -e '/export/ s/^#*/#/' .pathvariables.env
 
         # Set tmpdir
-        sed 's|#export TMPDIR|export TMPDIR|' -i .pathvariables.sh
+        sed 's|#export TMPDIR|export TMPDIR|' -i .pathvariables.env
 
         
         # Package Managers
@@ -95,13 +95,13 @@ if [ ! -f ~/.pathvariables.sh ]; then
         # TODO: non ugly values
         reade -Q "YELLOW" -i "n" -p "Set LS_COLORS with some predefined values? (WARNING: ugly values) [Y/n]:" "y n" lsclrs
         if [ "$lsclrs" == "y" ] || [ -z "$lsclrs" ]; then
-            sed 's/^#export LS_COLORS/export LS_COLORS/' -i .pathvariables.sh
+            sed 's/^#export LS_COLORS/export LS_COLORS/' -i .pathvariables.env
         fi
         
         if [ -x $(command -v "nvim") ]; then
             reade -Q "GREEN" -i "y" -p "Set Neovim as MANPAGER? [Y/n]: " "y n" manvim
             if [ "$manvim" == "y" ]; then
-               sed -i 's|.export MANPAGER=.*|export MANPAGER='\''nvim +Man!'\''|g' .pathvariables.sh 
+               sed -i 's|.export MANPAGER=.*|export MANPAGER='\''nvim +Man!'\''|g' .pathvariables.env 
             fi
         fi
         
@@ -109,7 +109,7 @@ if [ ! -f ~/.pathvariables.sh ]; then
         if [ "$pgr" == "y" ] || [ -z "$pgr" ]; then
             
             # Uncomment export PAGER=
-            sed 's/^#export PAGER=/export PAGER=/' -i .pathvariables.sh
+            sed 's/^#export PAGER=/export PAGER=/' -i .pathvariables.env
             
             pagers="less more"
             prmpt="${green} \tless = Default pager - Basic, archaic but very customizable\n\
@@ -125,10 +125,10 @@ if [ ! -f ~/.pathvariables.sh ]; then
             printf "$prmpt"
             reade -Q "GREEN" -i "less" -p "PAGER=" "$pagers" pgr2
             pgr2=$(whereis "$pgr2" | awk '{print $2}')
-            sed -i 's|export PAGER=.*|export PAGER='$pgr2'|' .pathvariables.sh
+            sed -i 's|export PAGER=.*|export PAGER='$pgr2'|' .pathvariables.env
             if grep -q "less" "$pgr2"; then
-                sed -i 's|#export LESS=|export LESS="*"|g' .pathvariables.sh
-                lss=$(cat .pathvariables.sh | grep 'export LESS="*"' | sed 's|export LESS="\(.*\)"|\1|g')
+                sed -i 's|#export LESS=|export LESS="*"|g' .pathvariables.env
+                lss=$(cat .pathvariables.env | grep 'export LESS="*"' | sed 's|export LESS="\(.*\)"|\1|g')
                 lss_n=""
                 for opt in ${lss}; do
                     opt1=$(echo "$opt" | sed 's|--\(\)|\1|g' | sed 's|\(\)\=.*|\1|g')
@@ -136,12 +136,12 @@ if [ ! -f ~/.pathvariables.sh ]; then
                         lss_n="$lss_n $opt"
                     fi
                 done
-                sed -i "s|export LESS=.*|export LESS=\" $lss_n\"|g" .pathvariables.sh
+                sed -i "s|export LESS=.*|export LESS=\" $lss_n\"|g" .pathvariables.env
                 unset lss lss_n opt opt1
-                #sed -i 's/#export LESSEDIT=/export LESSEDIT=/' .pathvariables.sh
+                #sed -i 's/#export LESSEDIT=/export LESSEDIT=/' .pathvariables.env
             fi
             if grep -q "moar" "$pgr2"; then
-                sed -i 's/#export MOAR=/export MOAR=/' .pathvariables.sh
+                sed -i 's/#export MOAR=/export MOAR=/' .pathvariables.env
             fi
 
         fi
@@ -163,14 +163,14 @@ if [ ! -f ~/.pathvariables.sh ]; then
             if [ -x "$(command -v vim)" ]; then
                 editors="$editors vim"
                 prmpt="$prmpt \tVim = The one and only true modal editor - Not userfriendly, but many features (maybe even too many) and greatly customizable\n"
-                sed -i "s|#export MYVIMRC=|export MYVIMRC=|g" .pathvariables.sh
-                sed -i "s|#export MYGVIMRC=|export MYGVIMRC=|g" .pathvariables.sh
+                sed -i "s|#export MYVIMRC=|export MYVIMRC=|g" .pathvariables.env
+                sed -i "s|#export MYGVIMRC=|export MYGVIMRC=|g" .pathvariables.env
             fi
             if [ -x "$(command -v nvim)" ]; then                                  
                 editors="$editors nvim"
                 prmpt="$prmpt \tNeovim = A better vim? - Faster and less buggy then regular vim, even a little userfriendlier\n"
-                sed -i "s|#export MYVIMRC=|export MYVIMRC=|g" .pathvariables.sh
-                sed -i "s|#export MYGVIMRC=|export MYGVIMRC=|g" .pathvariables.sh
+                sed -i "s|#export MYVIMRC=|export MYVIMRC=|g" .pathvariables.env
+                sed -i "s|#export MYGVIMRC=|export MYGVIMRC=|g" .pathvariables.env
             fi
             if [ -x "$(command -v emacs)" ]; then
                 editors="$editors emacs"
@@ -182,7 +182,7 @@ if [ ! -f ~/.pathvariables.sh ]; then
                 edtor="emacs -nw"
             fi
             edtor=$(whereis "$edtor" | awk '{print $2}')
-            sed -i 's|#export EDITOR=.*|export EDITOR='$edtor'|g' .pathvariables.sh
+            sed -i 's|#export EDITOR=.*|export EDITOR='$edtor'|g' .pathvariables.env
             
             # Make .txt file and output file
             touch $TMPDIR/editor-outpt
@@ -192,7 +192,7 @@ if [ ! -f ~/.pathvariables.sh ]; then
             frst="$(echo $compedit | awk '{print $1}')"
             reade -Q "GREEN" -i "$frst" -p "VISUAL (GUI editor)=" "$compedit" vsual
             vsual=$(whereis "$vsual" | awk '{print $2}')
-            sed -i 's|#export VISUAL=.*|export VISUAL='$vsual'|' .pathvariables.sh
+            sed -i 's|#export VISUAL=.*|export VISUAL='$vsual'|' .pathvariables.env
         fi
         unset edtvsl compedit frst editors prmpt
 
@@ -202,24 +202,24 @@ if [ ! -f ~/.pathvariables.sh ]; then
         if [[ $- =~ i ]] && [[ -n "$SSH_TTY" ]]; then
             reade -Q "YELLOW" -i "n" -p "Detected shell is SSH. For X11, it's more reliable performance to dissallow shared clipboard (to prevent constant hanging). Set DISPLAY to 'localhost:10.0'? [Y/n]:" "y n" dsply
             if [ "$dsply" == "y" ] || [ -z "$dsply" ]; then
-                sed -i "s|.export DISPLAY=.*|export DISPLAY=\"localhost:10.0\"|" .pathvariables.sh
+                sed -i "s|.export DISPLAY=.*|export DISPLAY=\"localhost:10.0\"|" .pathvariables.env
             fi
         fi
         unset dsply
 
         if type go &> /dev/null; then
-            sed -i 's|#export GOPATH|export GOPATH|' .pathvariables.sh 
+            sed -i 's|#export GOPATH|export GOPATH|' .pathvariables.env 
         fi
         unset snapvrs
 
         if type snap &> /dev/null; then
-            sed -i 's|#export PATH=/bin/snap|export PATH=/bin/snap|' .pathvariables.sh 
+            sed -i 's|#export PATH=/bin/snap|export PATH=/bin/snap|' .pathvariables.env 
         fi
         unset snapvrs
         
         if type flatpak &> /dev/null; then
-            sed -i 's|#export FLATPAK|export FLATPAK|' .pathvariables.sh 
-            sed -i 's|#export \(PATH=$PATH:$HOME/.local/bin/flatpak\)|\1|g' .pathvariables.sh
+            sed -i 's|#export FLATPAK|export FLATPAK|' .pathvariables.env 
+            sed -i 's|#export \(PATH=$PATH:$HOME/.local/bin/flatpak\)|\1|g' .pathvariables.env
         fi
         unset snapvrs
 
@@ -239,13 +239,13 @@ if [ ! -f ~/.pathvariables.sh ]; then
             printf "$prmpt"
             reade -Q "GREEN" -i "y" -p "Set XDG environment? [Y/n]: " "y n" xdgInst
             if [ -z "$xdgInst" ] || [ "y" == "$xdgInst" ]; then
-                sed 's/^#export XDG_CACHE_HOME=\(.*\)/export XDG_CACHE_HOME=\1/' -i .pathvariables.sh 
-                sed 's/^#export XDG_CONFIG_HOME=\(.*\)/export XDG_CONFIG_HOME=\1/' -i .pathvariables.sh
-                sed 's/^#export XDG_CONFIG_DIRS=\(.*\)/export XDG_CONFIG_DIRS=\1/' -i .pathvariables.sh
-                sed 's/^#export XDG_DATA_HOME=\(.*\)/export XDG_DATA_HOME=\1/' -i .pathvariables.sh    
-                sed 's/^#export XDG_DATA_DIRS=\(.*\)/export XDG_DATA_DIRS=\1/' -i .pathvariables.sh
-                sed 's/^#export XDG_STATE_HOME=\(.*\)/export XDG_STATE_HOME=\1/' -i .pathvariables.sh
-                sed 's/^#export XDG_RUNTIME_DIR=\(.*\)/export XDG_RUNTIME_DIR=\1/' -i .pathvariables.sh
+                sed 's/^#export XDG_CACHE_HOME=\(.*\)/export XDG_CACHE_HOME=\1/' -i .pathvariables.env 
+                sed 's/^#export XDG_CONFIG_HOME=\(.*\)/export XDG_CONFIG_HOME=\1/' -i .pathvariables.env
+                sed 's/^#export XDG_CONFIG_DIRS=\(.*\)/export XDG_CONFIG_DIRS=\1/' -i .pathvariables.env
+                sed 's/^#export XDG_DATA_HOME=\(.*\)/export XDG_DATA_HOME=\1/' -i .pathvariables.env    
+                sed 's/^#export XDG_DATA_DIRS=\(.*\)/export XDG_DATA_DIRS=\1/' -i .pathvariables.env
+                sed 's/^#export XDG_STATE_HOME=\(.*\)/export XDG_STATE_HOME=\1/' -i .pathvariables.env
+                sed 's/^#export XDG_RUNTIME_DIR=\(.*\)/export XDG_RUNTIME_DIR=\1/' -i .pathvariables.env
             fi
         fi
         unset xdgInst
@@ -271,38 +271,38 @@ if [ ! -f ~/.pathvariables.sh ]; then
             printf "$prmpt"
             reade -Q "YELLOW" -i "y" -p "Set systemd environment? [Y/n]: " "y n" xdgInst
             if [ -z "$xdgInst" ] || [ "y" == "$xdgInst" ]; then
-                sed 's/^#export SYSTEMD_PAGER=\(.*\)/export SYSTEMD_PAGER=\1/' -i .pathvariables.sh 
-                sed 's/^#export SYSTEMD_PAGERSECURE=\(.*\)/export SYSTEMD_PAGERSECURE=\1/' -i .pathvariables.sh
-                sed 's/^#export SYSTEMD_COLORS=\(.*\)/export SYSTEMD_COLORS=\1/' -i .pathvariables.sh
-                sed 's/^#export SYSTEMD_LESS=\(.*\)/export SYSTEMD_LESS=\1/' -i .pathvariables.sh    
-                sed 's/^#export SYSTEMD_LOG_LEVEL=\(.*\)/export SYSTEMD_LOG_LEVEL=\1/' -i .pathvariables.sh
-                sed 's/^#export SYSTEMD_LOG_TIME=\(.*\)/export SYSTEMD_LOG_TIME=\1/' -i .pathvariables.sh
-                sed 's/^#export SYSTEMD_LOG_LOCATION=\(.*\)/export SYSTEMD_LOG_LOCATION=\1/' -i .pathvariables.sh
-                sed 's/^#export SYSTEMD_LOG_TID=\(.*\)/export SYSTEMD_LOG_TID=\1/' -i .pathvariables.sh
-                sed 's/^#export SYSTEMD_LOG_TARGET=\(.*\)/export SYSTEMD_LOG_TARGET=\1/' -i .pathvariables.sh
+                sed 's/^#export SYSTEMD_PAGER=\(.*\)/export SYSTEMD_PAGER=\1/' -i .pathvariables.env 
+                sed 's/^#export SYSTEMD_PAGERSECURE=\(.*\)/export SYSTEMD_PAGERSECURE=\1/' -i .pathvariables.env
+                sed 's/^#export SYSTEMD_COLORS=\(.*\)/export SYSTEMD_COLORS=\1/' -i .pathvariables.env
+                sed 's/^#export SYSTEMD_LESS=\(.*\)/export SYSTEMD_LESS=\1/' -i .pathvariables.env    
+                sed 's/^#export SYSTEMD_LOG_LEVEL=\(.*\)/export SYSTEMD_LOG_LEVEL=\1/' -i .pathvariables.env
+                sed 's/^#export SYSTEMD_LOG_TIME=\(.*\)/export SYSTEMD_LOG_TIME=\1/' -i .pathvariables.env
+                sed 's/^#export SYSTEMD_LOG_LOCATION=\(.*\)/export SYSTEMD_LOG_LOCATION=\1/' -i .pathvariables.env
+                sed 's/^#export SYSTEMD_LOG_TID=\(.*\)/export SYSTEMD_LOG_TID=\1/' -i .pathvariables.env
+                sed 's/^#export SYSTEMD_LOG_TARGET=\(.*\)/export SYSTEMD_LOG_TARGET=\1/' -i .pathvariables.env
             fi
         fi
 
         pathvariables_r(){ 
-             if ! sudo grep -q "~/.pathvariables.sh" /root/.bashrc; then
-                printf "if [[ -f ~/.pathvariables.sh ]]; then\n" | sudo tee -a /root/.bashrc
-                printf "  . ~/.pathvariables.sh\n" | sudo tee -a /root/.bashrc
+             if ! sudo grep -q "~/.pathvariables.env" /root/.bashrc; then
+                printf "if [[ -f ~/.pathvariables.env ]]; then\n" | sudo tee -a /root/.bashrc
+                printf "  . ~/.pathvariables.env\n" | sudo tee -a /root/.bashrc
                 printf "fi\n" | sudo tee -a /root/.bashrc
             fi
-            sudo cp -bfv .pathvariables.sh /root/.pathvariables.sh;
-            sudo gio trash /root/.pathvariables.sh~
+            sudo cp -bfv .pathvariables.env /root/.pathvariables.env;
+            sudo gio trash /root/.pathvariables.env~
         }                                            
         pathvariables(){
-            if ! grep -q "~/.pathvariables.sh" ~/.bashrc; then
-                echo "if [[ -f ~/.pathvariables.sh ]]; then" >> ~/.bashrc
-                echo "  . ~/.pathvariables.sh" >> ~/.bashrc
+            if ! grep -q "~/.pathvariables.env" ~/.bashrc; then
+                echo "if [[ -f ~/.pathvariables.env ]]; then" >> ~/.bashrc
+                echo "  . ~/.pathvariables.env" >> ~/.bashrc
                 echo "fi" >> ~/.bashrc
             fi
-            cp -bfv .pathvariables.sh ~/.pathvariables.sh
-            gio trash ~/.pathvariables.sh~
-            yes_edit_no pathvariables_r ".pathvariables.sh" "Install .pathvariables.sh at /root/?" "edit" "YELLOW"; 
+            cp -bfv .pathvariables.env ~/.pathvariables.env
+            gio trash ~/.pathvariables.env~
+            yes_edit_no pathvariables_r ".pathvariables.env" "Install .pathvariables.env at /root/?" "edit" "YELLOW"; 
         }
-        yes_edit_no pathvariables ".pathvariables.sh" "Install .pathvariables.sh at ~/? " "edit" "GREEN"
+        yes_edit_no pathvariables ".pathvariables.env" "Install .pathvariables.env at ~/? " "edit" "GREEN"
     fi
 fi
 
@@ -319,8 +319,8 @@ fi
     fi
 
     shell-keybinds_r(){ 
-        if [ -f /root/.pathvariables.sh ]; then
-           sudo sed -i 's|#export INPUTRC|export INPUTRC|g' /root/.pathvariables.sh
+        if [ -f /root/.pathvariables.env ]; then
+           sudo sed -i 's|#export INPUTRC|export INPUTRC|g' /root/.pathvariables.env
         fi
         sudo cp -fv keybinds/keybinds.bash /root/.keybinds.d/;
         sudo cp -fv keybinds/.inputrc /root/ ;
@@ -348,8 +348,8 @@ fi
         fi
         cp -fv keybinds/keybinds.bash ~/.keybinds.d/
         cp -fv keybinds/.inputrc ~/
-        if [ -f ~/.pathvariables.sh ]; then
-           sed -i 's|#export INPUTRC|export INPUTRC|g' ~/.pathvariables.sh
+        if [ -f ~/.pathvariables.env ]; then
+           sed -i 's|#export INPUTRC|export INPUTRC|g' ~/.pathvariables.env
         fi
         unset vimde vivisual xterm
         yes_edit_no shell-keybinds_r "keybinds/.inputrc keybinds/keybinds.bash" "Install .inputrc and keybinds.bash at /root/ and /root/.keybinds.d/?" "edit" "YELLOW"; 
@@ -469,7 +469,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         sudo cp -fv aliases/general.sh /root/.bash_aliases.d/;
     }
     general(){              
-        sed -i 's|^export TRASH_BIN_LIMIT=|export TRASH_BIN_LIMIT=|g' ~/.pathvariables.sh
+        sed -i 's|^export TRASH_BIN_LIMIT=|export TRASH_BIN_LIMIT=|g' ~/.pathvariables.env
         local ansr
         reade -Q "GREEN" -i "y" -p "Set cp/mv (when overwriting) to backup files? (will also trash backups):" "y n" ansr         
         if [ "$ansr" != "y" ]; then

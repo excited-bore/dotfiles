@@ -11,15 +11,20 @@ set editing-mode vi
 set show-mode-in-prompt on
 
 # You can set a different cursor shape for each mode by using "\1 .. \2" escapes: 
+# Insert mode / Emacs mode have small cursor, command mode has block cursor
+# Different cursor shapes escape sequences for virtual terminal
+# https://wiki.archlinux.org/title/Readline
+# Insert mode / Emacs mode are magenta, command mode is blue
 # https://github.com/calid/bash
+# 
 $if term=linux
-	set vi-ins-mode-string \1\e[35;1m\2(ins)\1\e[?0c\2
-	set vi-cmd-mode-string \1\e[34;1m\2(cmd)\1\e[?8c\2
-	set emacs-mode-string  \1\e[35;1m\2(emacs)\1\e[?0c\2
+	set vi-ins-mode-string \1\e[35;1m\2(ins)\1\e[?0c\2\1\e[0m\2
+	set vi-cmd-mode-string \1\e[34;1m\2(cmd)\1\e[?8c\2\1\e[0m\2
+	set emacs-mode-string  \1\e[35;1m\2(emacs)\1\e[?0c\2\1\e[0m\2
 $else
-	set vi-ins-mode-string \1\e[35;1m\2(ins)\1\e[6 q\2
-	set vi-cmd-mode-string \1\e[34;1m\2(cmd)\1\e[2 q\2
-	set emacs-mode-string  \1\e[35;1m\2(emacs)\1\e[6 q\2
+	set vi-ins-mode-string \1\e[35;1m\2(ins)\1\e[5 q\2\1\e[0m\2
+	set vi-cmd-mode-string \1\e[34;1m\2(cmd)\1\e[2 q\2\1\e[0m\2
+	set emacs-mode-string  \1\e[35;1m\2(emacs)\1\e[5 q\2\1\e[0m\2
 $endif
 
 
