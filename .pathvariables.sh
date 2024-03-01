@@ -137,8 +137,8 @@ export PATH=$PATH:$GEM_PATH
 #export LUA_PATH=""
 
 # GO
-export GOPATH=/home/burp/.local
-export PATH=$PATH:$GOPATH
+#export GOPATH=/home/burp/.local
+#export PATH=$PATH:$GOPATH
 #export PATH=$PATH:/usr/local/go/bin
 
 
@@ -190,3 +190,10 @@ export PATH=$KITTY_PATH:$PATH
 
 # LIBVIRT
 export LIBVIRT_DEFAULT_URI=qemu:///system
+
+# DELTA
+export DELTA_PAGER='moar  --no-linenumbers --quit-if-one-screen --wrap'
+
+# BAT
+export BAT_PAGER='moar  --no-linenumbers --quit-if-one-screen --wrap'
+export VIMPAGER_RC=~/.vimrc

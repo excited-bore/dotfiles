@@ -74,37 +74,25 @@ bind -m emacs-standard  '"\e[B": history-search-forward'
 bind -m vi-command      '"\e[B": history-search-forward'
 bind -m vi-insert       '"\e[B": history-search-forward'
 
-# Control left/right to jump from words instead of chars
-bind -m emacs-standard  '"\e[1;5D": backward-word'
-bind -m vi-command      '"\e[1;5D": backward-word'
-bind -m vi-insert       '"\e[1;5D": backward-word'
+# Control left/right to jump from bigwords (ignore spaces when jumping) instead of chars
+bind -m emacs-standard  '"\e[1;5D": vi-backward-bigword'
+bind -m vi-command      '"\e[1;5D": vi-backward-bigword'
+bind -m vi-insert       '"\e[1;5D": vi-backward-bigword'
 
-bind -m emacs-standard  '"\e[1;5C": forward-word'
-bind -m vi-command      '"\e[1;5C": forward-word'
-bind -m vi-insert       '"\e[1;5C": forward-word'
+bind -m emacs-standard  '"\e[1;5C": vi-forward-bigword'
+bind -m vi-command      '"\e[1;5C": vi-forward-bigword'
+bind -m vi-insert       '"\e[1;5C": vi-forward-bigword'
 
-# Control up/down to change cursor line 
-bind -m emacs-standard -x '"\e[1;5A": clear && let LINE_TPUT=$LINE_TPUT-1 && if [ $LINE_TPUT -lt 0 ];then LINE_TPUT=$LINES;fi && tput cup $LINE_TPUT 0 && tput sc && echo "${PS1@P}" && tput cuu1'
-bind -m vi-command     -x '"\e[1;5A": clear && let LINE_TPUT=$LINE_TPUT-1 && if [ $LINE_TPUT -lt 0 ];then LINE_TPUT=$LINES;fi && tput cup $LINE_TPUT 0 && tput sc && echo "${PS1@P}" && tput cuu1'
-bind -m vi-insert      -x '"\e[1;5A": clear && let LINE_TPUT=$LINE_TPUT-1 && if [ $LINE_TPUT -lt 0 ];then LINE_TPUT=$LINES;fi && tput cup $LINE_TPUT 0 && tput sc && echo "${PS1@P}" && tput cuu1'
-
-bind -m emacs-standard -x '"\e[1;5B": clear && let LINE_TPUT=$LINE_TPUT+1 && if [ $LINE_TPUT -gt $LINES ];then LINE_TPUT=0;fi && tput cup $LINE_TPUT 0 && tput sc && echo "${PS1@P}" && tput cuu1' 
-bind -m vi-command     -x '"\e[1;5B": clear && let LINE_TPUT=$LINE_TPUT+1 && if [ $LINE_TPUT -gt $LINES ];then LINE_TPUT=0;fi && tput cup $LINE_TPUT 0 && tput sc && echo "${PS1@P}" && tput cuu1'
-bind -m vi-insert      -x '"\e[1;5B": clear && let LINE_TPUT=$LINE_TPUT+1 && if [ $LINE_TPUT -gt $LINES ];then LINE_TPUT=0;fi && tput cup $LINE_TPUT 0 && tput sc && echo "${PS1@P}" && tput cuu1'
-
-# Alt left/right to jump from words instead of chars
-bind -m emacs-standard  '"\e[1;3D": beginning-of-line'
-bind -m vi-command      '"\e[1;3D": beginning-of-line'
-bind -m vi-insert       '"\e[1;3D": beginning-of-line'
-
-bind -m emacs-standard  '"\e[1;3C": end-of-line'
-bind -m vi-command      '"\e[1;3C": end-of-line'
-bind -m vi-insert       '"\e[1;3C": end-of-line'
+# Another wrapper (untested)
+# https://superuser.com/questions/299694/is-there-a-directory-history-for-bash
 
 # Cd wrapper
 function cd() {
     local push=1
     local j=0
+    if test "$1" = "--"; then
+        shift;
+    fi 
     for i in $(dirs -l 2>/dev/null); do
         if test "$(realpath ${@: -1:1})" == "$i"; then
             push=0
@@ -121,26 +109,76 @@ complete -F _cd cd
 
 
 #'Silent' clear
-if command -v 'starship' &> /dev/null && (grep -q  '\\n' ~/.config/starship.toml || grep -q 'line_break' ~/.config/starship.toml || ! head -n 1 ~/.config/starship.toml | grep -q 'format' ); then
+if type starship &> /dev/null && (grep -q  '\\n' ~/.config/starship.toml || grep -q 'line_break' ~/.config/starship.toml || ! head -n 1 ~/.config/starship.toml | grep -q 'format' ); then
     alias _="tput cuu1 && tput cuu1 && tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null"
-elif command -v 'starship' &> /dev/null; then
-    alias _="tput cuu1 && tput cuu1 && tput sc && clear && tput rc && history -d -1 &>/dev/null"
+elif type starship &> /dev/null; then
+    alias _="tput cuu1 && tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null"
 else
-    alias _="tput cuu1 && tput sc && clear && tput rc && history -d -1 &>/dev/null"
+    alias _="tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null"
 fi
 
-# Alt-Up arrow rotates over directory history
-bind -x '"\277": pushd +1 &>/dev/null'
-bind -m emacs-standard '"\e[1;3A": "\C-e\C-u\277 _\C-m"'
-bind -m vi-command     '"\e[1;3A": "\C-e\C-u\277 _\C-m"'
-bind -m vi-insert      '"\e[1;3A": "\C-e\C-u\277 _\C-m"'
+# 'dirs' builtins shows all directories in stack
+# Ctrl-Up arrow rotates over directory history
+bind -x '"\e277": pushd +1 &>/dev/null'
+bind -m emacs-standard '"\e[1;5A": "\C-e\C-u\e277 _\C-m"'
+bind -m vi-command     '"\e[1;5A": "i\C-e\C-u\e277 _\C-m"'
+bind -m vi-insert      '"\e[1;5A": "\C-e\C-u\e277 _\C-m"'
 
-# Alt-Down -> Go up one directory
-bind -x '"\266": cd .. &>/dev/null'
-bind -m emacs-standard '"\e[1;3B": "\C-e\C-u\266 _\C-m"'
-bind -m vi-command     '"\e[1;3B": "\C-e\C-u\266 _\C-m"'
-bind -m vi-insert      '"\e[1;3B": "\C-e\C-u\266 _\C-m"'
-                                         
+# Ctrl-Down -> Rotate between 2 last directories
+bind -x '"\e266": pushd &>/dev/null'
+bind -m emacs-standard '"\e[1;5B": "\C-e\C-u\e266 _\C-m"'
+bind -m vi-command     '"\e[1;5B": "i\C-e\C-u\e266 _\C-m"'
+bind -m vi-insert      '"\e[1;5B": "\C-e\C-u\e266 _\C-m"'
+
+# Shift left/right to jump from words instead of chars
+bind -m emacs-standard  '"\e[1;2D": backward-word'
+bind -m vi-command      '"\e[1;2D": backward-word'
+bind -m vi-insert       '"\e[1;2D": backward-word'
+
+bind -m emacs-standard  '"\e[1;2C": forward-word'
+bind -m vi-command      '"\e[1;2C": forward-word'
+bind -m vi-insert       '"\e[1;2C": forward-word'
+
+alias __='clear && tput cup $(($LINE_TPUT+1)) $TPUT_COL && tput sc 1 && tput cuu1 && echo "${PS1@P}" && tput cuu1'
+
+# Shift up => Clean reset
+#bind -x '"\e288": "cd \C-i"'
+bind -x '"\e288": "__"'
+bind -m emacs-standard  '"\e[1;2A": "\C-e\C-u\e288"'
+bind -m vi-command      '"\e[1;2A": "i\C-e\C-u\e288"'
+bind -m vi-insert       '"\e[1;2A": "\C-e\C-u\e288"'
+
+# Shift up => cd shortcut
+bind -m emacs-standard  '"\e[1;2B": "\C-e\C-u\e288cd \C-i"'
+bind -m vi-insert       '"\e[1;2B": "\C-e\C-u\e288cd \C-i"'
+bind -m vi-command      '"\e[1;2B": "i\C-e\C-u\e288cd \C-i"'
+
+# Shift left/right to jump from bigwords (ignore spaces when jumping) instead of chars
+#bind -m emacs-standard -x '"\e[1;2D": clear && let COL_TPUT=$COL_TPUT-1 && if [ $COL_TPUT -lt 0 ];then COL_TPUT=$COLUMNS;fi && tput cup $LINE_TPUT $COL_TPUT && tput sc 1 && echo "${PS1@P}" && tput cuu1'
+#bind -m vi-command     -x '"\e[1;2D": clear && let COL_TPUT=$COL_TPUT-1 && if [ $COL_TPUT -lt 0 ];then COL_TPUT=$COLUMNS;fi && tput cup $LINE_TPUT $COL_TPUT && tput sc 1 && echo "${PS1@P}" && tput cuu1'
+#bind -m vi-insert      -x '"\e[1;2D": clear && let COL_TPUT=$COL_TPUT-1 && if [ $COL_TPUT -lt 0 ];then COL_TPUT=$COLUMNS;fi && tput cup $LINE_TPUT $COL_TPUT && tput sc 1 && echo "${PS1@P}" && tput cuu1'
+#                                                                                 
+#bind -m emacs-standard -x '"\e[1;2C": clear && let COL_TPUT=$COL_TPUT+1 && if [ $COL_TPUT -gt $COLUMNS ];then COL_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && tput sc 1 && echo "${PS1@P}" && tput cuu1' 
+#bind -m vi-command     -x '"\e[1;2C": clear && let COL_TPUT=$COL_TPUT+1 && if [ $COL_TPUT -gt $COLUMNS ];then COL_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && tput sc 1 && echo "${PS1@P}" && tput cuu1'
+#bind -m vi-insert      -x '"\e[1;2C": clear && let COL_TPUT=$COL_TPUT+1 && if [ $COL_TPUT -gt $COLUMNS ];then COL_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && tput sc 1 && echo "${PS1@P}" && tput cuu1'
+
+# Alt left/right to jump to beginning/end line instead of chars
+bind -m emacs-standard  '"\e[1;3D": beginning-of-line'
+bind -m vi-command      '"\e[1;3D": beginning-of-line'
+bind -m vi-insert       '"\e[1;3D": beginning-of-line'
+
+bind -m emacs-standard  '"\e[1;3C": end-of-line'
+bind -m vi-command      '"\e[1;3C": end-of-line'
+bind -m vi-insert       '"\e[1;3C": end-of-line'
+
+# Alt up/down to change cursor line 
+bind -m emacs-standard -x '"\e[1;3A": clear && let LINE_TPUT=$LINE_TPUT-1; if [ $LINE_TPUT -lt 0 ];then let LINE_TPUT=$LINES;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc 1'
+bind -m vi-command     -x '"\e[1;3A": clear && let LINE_TPUT=$LINE_TPUT-1; if [ $LINE_TPUT -lt 0 ];then let LINE_TPUT=$LINES;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc 1'
+bind -m vi-insert      -x '"\e[1;3A": clear && let LINE_TPUT=$LINE_TPUT-1; if [ $LINE_TPUT -lt 0 ];then let LINE_TPUT=$LINES;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc 1'
+                                  
+bind -m emacs-standard -x '"\e[1;3B": clear && let LINE_TPUT=$LINE_TPUT+1; if [ $LINE_TPUT -gt $LINES ];then let LINE_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc 1' 
+bind -m vi-command     -x '"\e[1;3B": clear && let LINE_TPUT=$LINE_TPUT+1; if [ $LINE_TPUT -gt $LINES ];then let LINE_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc 1'
+bind -m vi-insert      -x '"\e[1;3B": clear && let LINE_TPUT=$LINE_TPUT+1; if [ $LINE_TPUT -gt $LINES ];then let LINE_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc 1'
 
 # Ctrl-w expands aliases
 bind -m emacs-standard  '"\C-w": alias-expand-line'
@@ -173,9 +211,9 @@ bind -m vi-command      '"\C-h": backward-kill-word'
 bind -m vi-insert       '"\C-h": backward-kill-word'
 
 # Ctrl-l clears
-bind -m emacs-standard -x '"\C-l": clear && tput cup $(($LINE_TPUT+1)) 0 && tput sc && tput cuu1 && echo "${PS1@P}" && tput cuu1'
-bind -m vi-command     -x '"\C-l": clear && tput cup $(($LINE_TPUT+1)) 0 && tput sc && tput cuu1 && echo "${PS1@P}" && tput cuu1'
-bind -m vi-insert      -x '"\C-l": clear && tput cup $(($LINE_TPUT+1)) 0 && tput sc && tput cuu1 && echo "${PS1@P}" && tput cuu1'
+bind -m emacs-standard -x '"\C-l": __'
+bind -m vi-command     -x '"\C-l": __'
+bind -m vi-insert      -x '"\C-l": __'
 
 # Ctrl-d: Delete first character on line
 bind -m emacs-standard   '"\C-d": "\C-a\e[3~"'
@@ -187,7 +225,25 @@ bind -m emacs-standard -x '"\C-x'\''":_quote_all'
 bind -m vi-command     -x '"\C-x'\''":_quote_all'
 bind -m vi-insert      -x '"\C-x'\''":_quote_all'
 
-if test -x "$(command -v osc)"; then
+# https://unix.stackexchange.com/questions/85391/where-is-the-bash-feature-to-open-a-command-in-editor-documented
+_edit_wo_executing() {
+    local editor="${EDITOR:-nano}"
+    tmpf="$(mktemp).sh"
+    printf "#!$SHELL"'\n%s\n' "$READLINE_LINE" > "$tmpf"
+    $EDITOR "$tmpf"
+    # https://stackoverflow.com/questions/6675492/how-can-i-remove-all-newlines-n-using-sed
+    #[ "$(sed -n '/^#!\/bin\/bash/p;q' "$tmpf")" ] && sed -i 1d "$tmpf"
+    READLINE_LINE="$(<"$tmpf")"
+    READLINE_POINT="${#READLINE_LINE}"
+    rm "$tmpf" &> /dev/null
+}
+
+bind -m vi-insert      -x '"\C-x\C-e":_edit_wo_executing'
+bind -m vi-command     -x '"\C-x\C-e":_edit_wo_executing'
+bind -m vi-command     -x '"v":_edit_wo_executing'
+bind -m emacs-standard -x '"\C-x\C-e":_edit_wo_executing'
+
+if type osc &> /dev/null; then
     bind -m emacs-standard -x '"\C-s" : echo "$READLINE_LINE" | osc copy' 
     bind -m vi-command     -x '"\C-s" : echo "$READLINE_LINE" | osc copy' 
     bind -m vi-insert      -x '"\C-s" : echo "$READLINE_LINE" | osc copy'
@@ -198,7 +254,7 @@ if test -x "$(command -v osc)"; then
     bind -m emacs-standard '"\C-v": "\237\225"'
     bind -m vi-command     '"\C-v": "\237\225"'
     bind -m vi-insert      '"\C-v": "\237\225"'
-elif test -x "$(command -v xclip)"; then
+elif type xclip &> /dev/null; then
     # Ctrl-s: Proper copy
     bind -m emacs-standard -x '"\C-s" : echo "$READLINE_LINE" | xclip -i -sel c' 
     bind -m vi-command     -x '"\C-s" : echo "$READLINE_LINE" | xclip -i -sel c' 
@@ -212,14 +268,14 @@ elif test -x "$(command -v xclip)"; then
     bind -m vi-insert      '"\C-v": "\237\225"'
 fi
 
-if test -x "$(command -v autojump)"; then
+if type autojump &> /dev/null; then
     # Ctrl-x Ctrl-j for autojump
     bind -m emacs-standard '"\C-x\C-j": "j \C-i"'
     bind -m vi-command     '"\C-x\C-j": "j \C-i"'
     bind -m vi-insert      '"\C-x\C-j": "j \C-i"'
 fi
 
-if test -x "$(command -v fzf)"; then
+if type fzf &> /dev/null; then
     # (Kitty only) Ctrl-tab for fzf autocompletion
     bind -m emacs-standard '"\e[9;5u": " **\t"'
     bind -m vi-command     '"\e[9;5u": " **\t"'
@@ -227,14 +283,14 @@ if test -x "$(command -v fzf)"; then
 
 
     
-    if [[ "$(type -t ripgrep-dir)" == function ]]; then
+    if type ripgrep-dir &> /dev/null; then
         # Alt-g: Ripgrep function overview
         bind -m emacs-standard -x '"\eg": "ripgrep-dir"'
         bind -m vi-command     -x '"\eg": "ripgrep-dir"' 
         bind -m vi-insert      -x '"\eg": "ripgrep-dir"'
     fi
 
-    if [[ "$(type -t fzf_rifle)" == function ]]; then
+    if type fzf_rifle &> /dev/null; then
         # CTRL-F - Paste the selected file path into the command line
         bind -m emacs-standard -x '"\C-f": fzf_rifle'
         bind -m vi-command -x '"\C-f": fzf_rifle'

@@ -4,7 +4,7 @@
 " Set 'nocompatible' to ward off unexpected things that your distro might
 " have made, as well as sanely reset options when re-sourcing .vimrc
 
-"If you set scrollof to a very large value (999) the cursor line will always be at the middle 
+"If you set scrollof to a very large value (999) the cursor line will always be at the middle
 " set scrolloff=999
 
 " Attempt to determine the type of a file based on its name and possibly its
@@ -26,7 +26,7 @@ set wildmode=longest,full
 set wildoptions=fuzzy
 
 "Enable relative number lines
-set relativenumber 
+set relativenumber
 
 "https://vim.fandom.com/wiki/GNU/Linux_clipboard_copy/paste_with_xclip
 "The 'a' and 'A' options enables copying selected text to system clipboard 
@@ -54,6 +54,7 @@ set guioptions=aAimrLT
 " try to quit without saving, and swap files will keep you safe if your computer
 " crashes.
 set hidden
+
 
 " Note that not everyone likes working this way (with the hidden option).
 " Alternatives include using tabs or split windows instead of re-using the same
@@ -228,7 +229,6 @@ augroup END
 "Fix python3 interpreter
 let g:python3_host_prog = '/usr/bin/python3'
 let g:ycm_path_to_python_interpreter = '/usr/bin/python3'
-                                                             
 
 "autocmd CursorHold      * echo mode(1) 
 "autocmd CursorHoldI     * echo mode(1)
@@ -272,15 +272,21 @@ let g:coc_global_extensions = [
             \'coc-git',
             \'coc-vimlsp',
             \'coc-webview',
-            \'coc-markdown-preview-enhanced',
             \'coc-markdownlint'
             \]
+            "\'coc-markdown-preview-enhanced',
+
+" Copilot
+Plugin 'github/copilot.vim'
 
 " Devicons
 Plugin 'ryanoasis/vim-devicons'
 
+" Markdown preview
+Plug 'ellisonleao/glow.nvim'
+
 " Nerdtree | Left block directory tree
-Plugin 'preservim/nerdtree' 
+Plugin 'preservim/nerdtree'
 
 " Nerdtree git plugin
 Plugin 'Xuyuanp/nerdtree-git-plugin'
@@ -292,28 +298,31 @@ Plugin 'Xuyuanp/nerdtree-git-plugin'
 " Totally independent OS52 clipboard
 Plugin 'ojroques/vim-oscyank', {'branch': 'main'}
 
+" Color codes for pager
+Plugin 'vim-scripts/AnsiEsc.vim'
+
 " Diff plugin
-Plug 'sindrets/diffview.nvim'
+Plugin 'sindrets/diffview.nvim'
 
 " Lazygit plugin
 Plugin 'kdheepak/lazygit.nvim'
 
 " Toggle Terminal
-Plugin 'akinsho/toggleterm.nvim', {'tag' : '*'}
+Plugin 'akinsho/toggleterm.nvim'
 
 " Ranger integration
 Plugin 'francoiscabrol/ranger.vim'
 Plugin 'rbgrouleff/bclose.vim'
 let g:ranger_replace_netrw = 1
-let g:NERDTreeHijackNetrw = 0 
+let g:NERDTreeHijackNetrw = 0
 let g:ranger_map_keys = 0
 let g:ranger_command_override = 'ranger --cmd "set show_hidden=true"'
 
 " Fuzzy finder plugin
 Plugin 'junegunn/fzf'
-Plugin 'junegunn/fzf.vim' 
+Plugin 'junegunn/fzf.vim'
 
-" Fuzzy finder preview   
+" Fuzzy finder preview
 Plugin 'yuki-yano/fzf-preview.vim', { 'branch': 'release/remote' }
 
 " Plugin for git
@@ -321,6 +330,9 @@ Plugin 'tpope/vim-fugitive'
 
 " Nice keybinds overview for nvim
 Plugin 'folke/which-key.nvim'
+
+" Zenmode style window
+Plugin 'folke/zen-mode.nvim'
 
 " Vim tmux kitty navigator
 Plugin 'excited-bore/vim-tmux-kitty-navigator', { 'build' : 'cd ~/.vim/plugins/vim-tmux-kitty-navigator && cp -f ./pass_keys.py ~/.config/kitty/;'}
@@ -333,9 +345,9 @@ let g:suda_smart_edit = 1
 "let g:suda#nopass = 1
 
 " Give passwords prompts in vim
-Plugin 'lambdalisue/askpass.vim'
+"Plugin 'lambdalisue/askpass.vim'
 "" Dependency for askpass, Deno
-Plugin 'vim-denops/denops.vim'
+"Plugin 'vim-denops/denops.vim'
 
 " Nerd commenter
 Plugin 'preservim/nerdcommenter'
@@ -354,7 +366,7 @@ Plugin 'preservim/nerdcommenter'
 "set rtp^=/usr/bin/vimpager
 
 " Self documenting vim wiki
-Plugin 'vimwiki/vimwiki'
+"Plugin 'vimwiki/vimwiki'
 
 " Nice and cool themey
 Plugin 'morhetz/gruvbox'
@@ -376,7 +388,16 @@ else
     lua require("lazy")
 endif
 
+
+" Markdown autocmd
+autocmd FileType markdown,text highlight ExtraWhitespace ctermbg=red guibg=red
+autocmd FileType markdown,text match ExtraWhitespace /\s\+$/
+
+
+"au filetype vimwiki silent! iunmap <buffer> <Tab>
+
 lua require("toggleterm").setup()
+lua require('glow').setup()
 
 " this is pseudo code
 let statusline = '%{&ft == "toggleterm" ? "terminal (".b:toggle_number.")" : ""}'
@@ -393,7 +414,7 @@ let g:NERDTreeFileLines = 1
 
 " Exit Vim if NERDTree is the only window remaining in the only tab.
 autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
- 
+
 " Close the tab if NERDTree is the only window remaining in it.
 autocmd BufEnter * if winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
 
@@ -608,6 +629,7 @@ autocmd TermEnter term://*toggleterm#*
 " For example: 2<C-t> will open terminal 2
 nnoremap <silent><c-`> <Cmd>exe v:count1 . "ToggleTerm"<CR>
 inoremap <silent><c-`> <Esc><Cmd>exe v:count1 . "ToggleTerm"<CR>
+vnoremap <silent><c-`> <Esc><Cmd>exe v:count1 . "ToggleTerm"<CR>
 tnoremap <silent><esc> <C-\><C-n>
 
 
@@ -813,9 +835,9 @@ nnoremap T :!
 vnoremap T :! 
 
 " Ctrl - T is -> :
-nnoremap <C-t> :tab sb 1<Cr>
-inoremap <C-t> <C-\><C-o>:tab sb 1<Cr>
-vnoremap <C-t> :tab sb 1<Cr>
+"nnoremap <C-t> :tab sb 1<Cr>
+"inoremap <C-t> <C-\><C-o>:tab sb 1<Cr>
+"vnoremap <C-t> :tab sb 1<Cr>
 
 "Alt - M is -> Minimap 
 nnoremap <silent><M-m> <esc>:MinimapToggle<CR>:MinimapUpdateHighlight<cr>
@@ -828,9 +850,9 @@ inoremap <M-c> <C-\><C-o>:CocCommand
 vnoremap <M-c> :CocCommand 
 
 " Leader (\) - m is -> CocCommand markdown-preview-enhanced.openPreview
-nnoremap <leader>m :CocCommand markdown-preview-enhanced.openPreview<cr>
-inoremap <leader>m <C-\><C-o>:CocCommand markdown-preview-enhanced.openPreview<cr> 
-vnoremap <leader>m :CocCommand markdown-preview-enhanced.openPreview<cr>gv
+nnoremap <leader>m :Glow<cr><esc>
+inoremap <leader>m <C-\><C-o>:Glow<cr><esc> 
+vnoremap <leader>m :Glow<cr><esc>gv
 
 
 " Visual mode remaps
@@ -919,18 +941,18 @@ vnoremap    <A-K>   :m '<-2<CR>gv
 " Move one 'word' Left/Right (cursor at end) => Ctrl+Left/Right
 " Move one space seperated word (cursor at end) => Shift+Left/Right
 " Move to beginning/end / cycle lines => Alt+Left/Right
-nnoremap <C-Right>  E
-"nnoremap <S-Right>  E
-nnoremap <C-Left>   B
+nnoremap <C-Left>   Bh
 "nnoremap <S-Left>   B
-inoremap <C-Right>  <C-\><C-o>E
-"inoremap <S-Right>  <C-\><C-o>E
-inoremap <C-Left>   <C-\><C-o>B
+nnoremap <C-Right>  El
+"nnoremap <S-Right>  E
+inoremap <C-Left>   <C-\><C-o>B<C-\><C-o>h
 "inoremap <S-Left>   <C-\><C-o>B
-vnoremap <C-Right>  E
-"vnoremap <S-Right>  E
-vnoremap <C-Left>   B
+inoremap <C-Right>  <C-\><C-o>E<C-\><C-o>l
+"inoremap <S-Right>  <C-\><C-o>E
+vnoremap <C-Left>   Bh
 "vnoremap <S-Left>   B
+vnoremap <C-Right>  El
+"vnoremap <S-Right>  E
 
 
 " 0 => beginning of 'column'
@@ -942,14 +964,6 @@ vnoremap <C-Left>   B
 " Same for End of line, only you go down
 
 function! LastCheck()
-    if col(".") == col("$") || col('$') == 1
-        return 1
-    else
-        return 0
-    endif
-endfunction
-
-function! LastCheckI()
     if col(".") == col("$") || col('$') == 1 
         return 1
     else
@@ -960,7 +974,7 @@ endfunction
 nnoremap <expr> <A-Left>    (col(".") ==? 1 ? '<Up>0' : '0')
 nnoremap <expr> <A-right>   LastCheck() ? '<Down>$<Right>' : '$<Right>'
 inoremap <expr> <A-Left>    (col('.') ==? 1 ? '<Up><C-\><C-o>0' : '<C-\><C-o>0')
-inoremap <expr> <A-Right>   LastCheckI() ? '<C-o><Down><C-\><C-o>$<Right>' : '<C-\><C-o>$<Right>'
+inoremap <expr> <A-Right>   LastCheck() ? '<C-o><Down><C-\><C-o>$<Right>' : '<C-\><C-o>$<Right>'
 vnoremap <expr> <A-Left>    (col(".") ==? 1 ? '<Up>0' : '0')
 vnoremap <expr> <A-Right>   LastCheck() ? '<Down>$<Right>' : '$<Right>'
 
@@ -1084,8 +1098,12 @@ vnoremap y "+y
 vnoremap Y "+Y
 "vnoremap YY "+^Yg_
 
-vnoremap d c
-vnoremap D C
+
+nnoremap d "_d
+nnoremap D "_D
+
+vnoremap d "_c
+vnoremap D "_C
 
 nnoremap c "+y
 nnoremap cc "0yg_
@@ -1151,7 +1169,7 @@ inoremap <expr> <C-d>   (col(".") ==? 1 ? '<C-\><C-o>daw' : '<C-\><C-o>diw')
 "vnoremap <C-c>  "+y
 vnoremap <C-c> <Plug>OSCYankVisual
 vnoremap <silent> <C-v> "+Pl
-vnoremap <C-d>  "*d 
+vnoremap <C-d>  d 
 
 cnoremap <C-c> <C-f>
 cnoremap <C-v>  <C-r><C-o>"

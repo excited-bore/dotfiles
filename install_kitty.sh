@@ -19,16 +19,14 @@ reade -Q "GREEN" -i "y" -p "Install kitty conf? (at ~/.config/kitty/kitty.conf|s
 if [ "y" == "$kittn" ]; then
     mkdir -p ~/.config/kitty
     cp -vf kitty/kitty.conf ~/.config/kitty/kitty.conf
-    gio trash ~/.config/kitty/kitty.conf~
     cp -vf kitty/ssh.conf ~/.config/kitty/ssh.conf
-    gio trash ~/.config/kitty/ssh.conf~
 fi
 unset kittn
 
 # TODO: Get sed warnings gone
-if [ -f ~/.pathvariables.sh ]; then
-    sed -i 's|^.\(export KITTY_PATH=~/.local/bin/:~/.local/kitty.app/bin/\)|\1|g' ~/.pathvariables.sh 2> /dev/null;
-    sed -i 's|^.\(export PATH=$KITTY_PATH:$PATH\)|\1|g' ~/.pathvariables.sh 2> /dev/null;
+if [ -f ~/.pathvariables.env ]; then
+    sed -i 's|^.\(export KITTY_PATH=~/.local/bin/:~/.local/kitty.app/bin/\)|\1|g' ~/.pathvariables.env 2> /dev/null;
+    sed -i 's|^.\(export PATH=$KITTY_PATH:$PATH\)|\1|g' ~/.pathvariables.env 2> /dev/null;
     #sed -i 's|^.\(if \[\[ \$SSH_TTY \]\] .*\)|\1|g' $PATHVAR
     #sed -i 's|^.\(export KITTY_PORT=.*\)|\1|g' $PATHVAR
     #sed -i 's|^.\(fi\)|\1|g' $PATHVAR

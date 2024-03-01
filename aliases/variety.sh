@@ -3,7 +3,6 @@
 # Kdocker is a system tray app
 # thunderbird does not support trays on linux, which why we do this
 alias thunderbird="kdocker thunderbird"
-alias lazygit="copy-to run all && lazygit"
 
 #function ptrace_toggle() {
 #    echo "Has ptrace currently elevated priviliges: $PTRACE_ELEVATED_PRIVILIGE";
@@ -43,17 +42,6 @@ alias pihole_update="cd ~/Applications/docker-pi-hole && docker_update"
 alias ds4LOn="ds4drv --led ff0000"
 alias ds4LOff="ds4drv --led 000000"
 alias ds4="python3 -m ds4drv --hidraw --udp --udp-port 26760"
-
-# python virtual env
-#python3 -m venv python3
-#source venv/bin/activate
-
-python_install_user(){
-    python $@ install --user;
-}
-alias python_twine_install="pipx install twine"
-alias python_twine_upload_test="pipx install build && python3 -m build && twine check dist/* && twine upload --repository testpypi dist/* && rm dist/* && echo 'Uploaded to https://test.pypi.org/'"
-alias python_twine_upload="pipx install build && python3 -m build && twine check dist/* && twine upload dist/* && rm dist/* && echo 'Uploaded to https://pypi.org/' "
 
 
 alias udev_reload="sudo udevadm control --reload-rules && sudo udevadm trigger"

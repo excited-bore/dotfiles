@@ -17,6 +17,18 @@ else
     . ./checks/check_pathvar.sh
 fi
 
+if ! test -f checks/check_aliases_dir.sh; then
+    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)" 
+else
+    . ./checks/check_aliases_dir.sh
+fi
+
+if ! test -f checks/check_completions_dir.sh; then
+    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)" 
+else
+    . ./checks/check_completions_dir.sh
+fi
+
 #. $DIR/setup_git_build_from_source.sh "y" "neovim" "https://github.com" "neovim/neovim" "stable" "sudo apt update; sudo apt install ninja-build gettext libtool libtool-bin cmake g++ pkg-config unzip curl doxygen" "make CMAKE_BUILD_TYPE=RelWithDebInfo; sudo make install" "sudo make uninstall" "make distclean; make deps" "y"
 
 
@@ -52,7 +64,7 @@ if [[ $distro == "Arch" || $distro_base == "Arch" ]];then
             sudo npm install -g neovim
         fi
     fi
-    if ! type gem &> /dev/null; then
+    if ! gem list | grep neovim &> /dev/null; then
         reade -Q "GREEN" -i "y" -p "Install nvim-ruby? [Y/n]:" "y n" rubyscripts
         if [ -z $rubyscripts ] || [ "y" == $rubyscripts ]; then
             yes | sudo pacman -Su ruby
@@ -68,15 +80,13 @@ if [[ $distro == "Arch" || $distro_base == "Arch" ]];then
             gem install neovim
         fi
     fi
-    if ! type cpan &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Install nvim-perl? [Y/n]:" "y n" perlscripts
-        if [ -z $perlscripts ] || [ "y" == $perlscripts ]; then
-            yes | sudo pacman -Su cpanminus
-            cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
-            sudo cpanm --sudo -n Neovim::Ext
-        fi
+    reade -Q "GREEN" -i "y" -p "Install nvim-perl? [Y/n]:" "y n" perlscripts
+    if [ -z $perlscripts ] || [ "y" == $perlscripts ]; then
+        yes | sudo pacman -Su cpanminus
+        cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+        sudo cpanm --sudo -n Neovim::Ext
     fi
-    if ! [ -x "$(command -v ctags)" ]; then 
+    if ! type ctags &> /dev/null; then 
         reade -Q "GREEN" -i "y" -p "Install ctags? [Y/n]:" "y n" ctags
         if  [ "y" == $ctags ]; then
             yes | sudo pacman -Su ctags
@@ -153,7 +163,7 @@ elif [  $distro_base == "Debian" ];then
             fi
         fi
     fi
-    if ! type pipx &> /dev/null || ! type pylint &> /dev/null; then
+    if ! type pylint &> /dev/null; then
         reade -Q "GREEN" -i "y" -p "Install nvim-python? [Y/n]:" "y n" pyscripts
         if [ -z $pyscripts ] || [ "y" == $pyscripts ]; then
             yes | sudo apt install python3 python3-dev python3-pynvim pipx  
@@ -162,7 +172,7 @@ elif [  $distro_base == "Debian" ];then
         fi
     fi
 
-    if ! type npm &> /dev/null || ! npm list -g | grep neovim  &> /dev/null; then
+    if ! npm list -g | grep neovim  &> /dev/null; then
         reade -Q "GREEN" -i "y" -p "Install nvim-javascript? [Y/n]:" "y n" jsscripts
         if [ -z $jsscripts ] || [ "y" == $jsscripts ]; then
             yes | sudo apt install nodejs npm
@@ -192,7 +202,7 @@ elif [  $distro_base == "Debian" ];then
         fi
     fi
     
-    if ! type gem &> /dev/null || ! gem list | grep neovim &> /dev/null; then
+    if ! gem list | grep neovim &> /dev/null; then
         reade -Q "GREEN" -i "y" -p "Install nvim-ruby? [Y/n]:" "y n" rubyscripts
         if [ -z $rubyscripts ] || [ "y" == $rubyscripts ]; then
             yes | sudo apt install ruby
@@ -323,22 +333,20 @@ yes_edit_no instvim "vim/init.vim vim/init.lua.vim vim.plug_lazy_adapter.vim" "I
 nvim +CocUpdate
 nvim +checkhealth
 echo "Install Completion language plugins with ':CocInstall coc-..' / Update with :CocUpdate"
-echo "Check installed nvim plugins with 'Lazy'/ Check installed vim plugins with 'PlugInstalled' (only work on vim and nvim respectively)"
+echo "Check installed nvim plugins with 'Lazy' / Check installed vim plugins with 'PlugInstalled' (only work on nvim and vim respectively)"
 
 
 vimsh_r(){ 
-    sudo mkdir -p /root/.bash_aliases.d/
-    sudo cp -bfv aliases/vim_nvim.sh /root/.bash_aliases.d/; 
-    sudo gio trash /root/.bash_aliases.d/vim_nvim.sh~
+    sudo cp -fv aliases/vim_nvim.sh /root/.bash_aliases.d/; 
+    sudo cp -fv completions/vim_nvim /root/.bash_completion.d/; 
 }
 
 vimsh(){
-    mkdir -p ~/.bash_aliases.d/
-    cp -bfv aliases/vim_nvim.sh ~/.bash_aliases.d/
-    gio trash ~/.bash_aliases.d/vim_nvim.sh~
-    yes_edit_no vimsh_r "vim/vim_nvim.sh" "Install vim aliases at /root/.bash_aliases.d/? " "yes" "GREEN"
+    cp -fv aliases/vim_nvim.sh ~/.bash_aliases.d/
+    cp -fv completions/vim_nvim ~/.bash_completion.d/;
+    yes_edit_no vimsh_r "vim/vim_nvim.sh" "Install vim aliases at /root/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)? " "yes" "GREEN"
 }
-yes_edit_no vimsh "vim/vim_nvim.sh" "Install vim aliases at ~/.bash_aliases.d/? " "edit" "GREEN"
+yes_edit_no vimsh "vim/vim_nvim.sh" "Install vim aliases at ~/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)? " "edit" "GREEN"
 
 reade -Q "GREEN" -i "y" -p "Install nvimpager? [Y/n]:" "y n" vimrc 
 if [ -z "$vimrc" ] || [ "$vimrc" == "y" ]; then

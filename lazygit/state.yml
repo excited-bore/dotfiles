@@ -1,9 +1,0 @@
-lastupdatecheck: 0
-recentrepos:
-- /home/burp/dotfiles
-startuppopupversion: 5
-customcommandshistory:
-- git worktree test
-- git worktree add test
-hidecommandlog: false
-ignorewhitespaceindiffview: true
