@@ -110,11 +110,11 @@ complete -F _cd cd
 
 #'Silent' clear
 if type starship &> /dev/null && (grep -q  '\\n' ~/.config/starship.toml || grep -q 'line_break' ~/.config/starship.toml || ! head -n 1 ~/.config/starship.toml | grep -q 'format' ); then
-    alias _="tput cuu1 && tput cuu1 && tput cuu1 && tput sc 1; clear && tput rc && history -d -1 &>/dev/null"
+    alias _="tput cuu1 && tput cuu1 && tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null"
 elif type starship &> /dev/null; then
-    alias _="tput cuu1 && tput cuu1 && tput sc 1; clear && tput rc && history -d -1 &>/dev/null"
+    alias _="tput cuu1 && tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null"
 else
-    alias _="tput cuu1 && tput sc 1; clear && tput rc && history -d -1 &>/dev/null"
+    alias _="tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null"
 fi
 
 # 'dirs' builtins shows all directories in stack
