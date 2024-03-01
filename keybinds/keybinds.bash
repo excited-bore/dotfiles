@@ -225,6 +225,24 @@ bind -m emacs-standard -x '"\C-x'\''":_quote_all'
 bind -m vi-command     -x '"\C-x'\''":_quote_all'
 bind -m vi-insert      -x '"\C-x'\''":_quote_all'
 
+# https://unix.stackexchange.com/questions/85391/where-is-the-bash-feature-to-open-a-command-in-editor-documented
+_edit_wo_executing() {
+    local editor="${EDITOR:-nano}"
+    tmpf="$(mktemp).sh"
+    printf "#!$SHELL"'\n%s\n' "$READLINE_LINE" > "$tmpf"
+    $EDITOR "$tmpf"
+    # https://stackoverflow.com/questions/6675492/how-can-i-remove-all-newlines-n-using-sed
+    #[ "$(sed -n '/^#!\/bin\/bash/p;q' "$tmpf")" ] && sed -i 1d "$tmpf"
+    READLINE_LINE="$(<"$tmpf")"
+    READLINE_POINT="${#READLINE_LINE}"
+    rm "$tmpf" &> /dev/null
+}
+
+bind -m vi-insert      -x '"\C-x\C-e":_edit_wo_executing'
+bind -m vi-command     -x '"\C-x\C-e":_edit_wo_executing'
+bind -m vi-command     -x '"v":_edit_wo_executing'
+bind -m emacs-standard -x '"\C-x\C-e":_edit_wo_executing'
+
 if type osc &> /dev/null; then
     bind -m emacs-standard -x '"\C-s" : echo "$READLINE_LINE" | osc copy' 
     bind -m vi-command     -x '"\C-s" : echo "$READLINE_LINE" | osc copy' 
