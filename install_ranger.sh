@@ -25,7 +25,7 @@ fi
 
 #ranger --copy-config=all
 ranger --confdir=/home/$USER/.config/ranger --copy-config=all
-if [ "$PATHVAR" == ~/.pathvariables.sh ]; then
+if [ "$PATHVAR" == ~/.pathvariables.env ]; then
     sed -i 's|#export RANGER_LOAD_DEFAULT_RC=|export RANGER_LOAD_DEFAULT_RC=|g' $PATHVAR
     sudo sed -i 's|#export RANGER_LOAD_DEFAULT_RC=|export RANGER_LOAD_DEFAULT_RC=|g' $PATHVAR_R
 else

@@ -1,13 +1,24 @@
-. ./checks/check_distro.sh
-. ./checks/check_pathvar.sh
-. ./aliases/rlwrap_scripts.sh
+if ! test -f checks/check_distro.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_distro.sh)" 
+else
+    . ./checks/check_distro.sh
+fi
+if ! test -f checks/check_pathvar.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pathvar.sh)" 
+else
+    . ./checks/check_pathvar.sh
+fi
+if ! test -f aliases/rlwrap_scripts.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/rlwrap_scripts.sh)" 
+else
+    . ./aliases/rlwrap_scripts.sh
+fi
 
 if [ $distro == "Manjaro" ]; then
     yes | pamac install flatpak libpamac-flatpak-plugin python
 elif [ $distro == "Arch" ]; then
     yes | sudo pacman -Su flatpak python
 elif [[ $distro == "Debian" || $distro_base == "Debian" ]]; then
-    sudo apt update
     if "$XDG_CURRENT_DESKTOP" == "GNOME"; then
         yes | sudo apt install gnome-software-plugin-flatpak gir1.2-xdpgtk* gir1.2-flatpak* python3 
     else 
@@ -16,7 +27,7 @@ elif [[ $distro == "Debian" || $distro_base == "Debian" ]]; then
     flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 fi
 
-if [ -x "$(command -v flatpak)" ]; then
+if type flatpak &> /dev/null; then
     reade -Q "GREEN" -i "y" -p "Add flatpak dirs to path? (XDG_DATA_DIRS) [Y/n]:" "y n" flpkvrs 
     if [ "$flpkvrs" == "y" ]; then
         if grep -q "FLATPAK" $PATHVAR; then
@@ -39,6 +50,12 @@ if [ -z $pam ] || [ "y" == $pam ]; then
     if [ ! -d ~/.local/bin/flatpak/ ]; then
         mkdir -p ~/.local/bin/flatpak/
     fi
+    if ! test -f install_bashalias_completions.sh; then
+         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bashalias_completions.sh)" 
+    else
+         ./install_bashalias_completions.sh
+    fi
+    
     if [ ! -f ~/.bash_aliases.d/flatpacks.sh ]; then
         touch ~/.bash_aliases.d/flatpacks.sh
         printf "function flatpak (){\\n  env -u SESSION_MANAGER flatpak \"\$@\"\\n  if [ \"\$1\" == \"install\" ]; then\\n      python /usr/bin/update_flatpak_cli.py\\n   fi\\n}\\n" >> ~/.bash_aliases.d/flatpacks.sh
@@ -61,15 +78,16 @@ unset pam
 
 reade -Q "GREEN" -i "y" -p "Install GUI for configuring flatpak permissions - flatseal? [Y/n]:" "y n" fltseal
 if [ -z $fltseal ] || [ "y" == $fltseal ]; then
-    flatpak update
     flatpak install flatseal
 fi
 unset fltseal
 
 reade -Q "GREEN" -i "y" -p "Run installer for no password with pam? [Y/n]:" "y n" pam
 if [ -z $pam ] || [ "y" == $pam ]; then
-    ./install_polkit_wheel.sh
+    if ! test -f install_polkit_wheel.sh; then
+         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_polkit_wheel.sh)" 
+    else
+        ./install_polkit_wheel.sh
+    fi
 fi
 unset pam
-
-

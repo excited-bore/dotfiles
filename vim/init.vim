@@ -277,7 +277,7 @@ let g:coc_global_extensions = [
             "\'coc-markdown-preview-enhanced',
 
 " Copilot
-Plugin 'github/copilot.vim'
+"Plugin 'github/copilot.vim'
 
 " Devicons
 Plugin 'ryanoasis/vim-devicons'

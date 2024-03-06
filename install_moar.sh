@@ -1,20 +1,34 @@
  #DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-. ./checks/check_distro.sh
-. ./checks/check_pathvar.sh
-. ./aliases/rlwrap_scripts.sh
+if ! test -f aliases/rlwrap_scripts.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/rlwrap_scripts.sh)" 
+else
+    . ./aliases/rlwrap_scripts.sh
+fi
+
+if ! test -f checks/check_distro.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_distro.sh)" 
+else
+    . ./checks/check_distro.sh
+fi
+
+if ! test -f checks/check_pathvar.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pathvar.sh)" 
+else
+    . ./checks/check_pathvar.sh
+fi
+
 
 answer=""
-if [ ! -x "$(command -v moar)" ]; then
+if ! type moar &> /dev/null; then
     
     if [ $distro == "Manjaro" ]; then
         
         reade -Q "GREEN" -i "y" -p "Install moar from packagemanager (y), github binary (b) or not [Y/b/n]: " "y b n"  answer
         if [ "$answer" == "y" ] || [ -z "$answer" ] || [ "$answer" == "Y" ]; then
-            yes | pamac update;
             yes | pamac install moar;
         fi
     
-    elif [ $distro == "Arch" ] && [ -x "$(command -v yay)" ]; then
+    elif [ $distro == "Arch" ] && type yay &> /dev/null; then
         
         reade -Q "GREEN" -i "y" -p "Install moar from packagemanager (y), github binary (b) or not [Y/b/n]: " "y b n"  answer
         if [ "$answer" == "y" ] || [ -z "$answer" ] || [ "$answer" == "Y" ]; then

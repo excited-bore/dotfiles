@@ -281,8 +281,6 @@ if type fzf &> /dev/null; then
     bind -m vi-command     '"\e[9;5u": " **\t"'
     bind -m vi-insert      '"\e[9;5u": " **\t"'
 
-
-    
     if type ripgrep-dir &> /dev/null; then
         # Alt-g: Ripgrep function overview
         bind -m emacs-standard -x '"\eg": "ripgrep-dir"'
