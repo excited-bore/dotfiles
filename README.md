@@ -53,6 +53,11 @@ Then it helps with installing/configuring:
 
 Also helps configuring global gitconfig and global gitignore, and gives the option to install all kinds of bash-aliases/functions
 
+Try it out with:
+```
+eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install.sh)"
+```
+
 ## Install_git.sh
 Script to automate setting up pagers, syntax highlighters, lazygit and copy-to. Works remotely with
 

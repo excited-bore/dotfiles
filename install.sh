@@ -149,8 +149,7 @@ fi
             sed 's/^#export PAGER=/export PAGER=/' -i $pathvr
             
             pagers="less more"
-            prmpt="${green} \tless = Default pager - Basic, archaic but very customizable\n
-            \tmore = Preinstalled other pager - leaves text by default, less customizable (ironically)\n"
+            prmpt="${green} \tless = Default pager - Basic, archaic but very customizable\n\tmore = Preinstalled other pager - leaves text by default, less customizable (ironically)\n"
             if type most &> /dev/null; then
                 pagers="$pagers most"
                 prmpt="$prmpt \tmost = Installed pager that is very customizable\n"
@@ -575,7 +574,12 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     fi
 
     general_r(){ 
-        sudo cp -fv aliases/general.sh /root/.bash_aliases.d/;
+        if ! test -f checks/check_aliases_dir.sh; then
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)" 
+        else
+            ./checks/check_aliases_dir.sh
+        fi
+        sudo cp -fv $genr /root/.bash_aliases.d/;
     }
     general(){
         if test -f ~/.pathvariables.env; then
@@ -601,91 +605,125 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         unset cat
         cp -fv $genr ~/.bash_aliases.d/
         yes_edit_no general_r "$genr" "Install general.sh at /root/?" "yes" "GREEN"; }
-        yes_edit_no general "$genr" "Install general.sh at ~/? (aliases related to general actions - cd/mv/cp/rm + completion script replacement for 'read -e') " "yes" "YELLOW"
+    yes_edit_no general "$genr" "Install general.sh at ~/? (aliases related to general actions - cd/mv/cp/rm + completion script replacement for 'read -e') " "yes" "YELLOW"
+    
+    systemd=aliases/systemctl.sh
+    dosu=aliases/sudo.sh
+    pacmn=aliases/package_managers.sh
+    sshs=aliases/ssh.sh
+    ps1=aliases/ps1.sh
+    manjaro=aliases/manjaro.sh
+    variti=aliases/variety.sh
+    pthon=aliases/python.sh
+    ytbe=aliases/youtube.sh
+    if ! test -d aliases/; then
+        wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/systemctl.sh -P $TMPDIR/
+        systemd=$TMPDIR/systemctl.sh
+        wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/sudo.sh -P $TMPDIR/
+        dosu=$TMPDIR/sudo.sh
+        wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/package_managers.sh -P $TMPDIR/
+        pacmn=$TMPDIR/package_managers.sh
+        wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/ssh.sh -P $TMPDIR/
+        sshs=$TMPDIR/ssh.sh
+        wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/ps1.sh -P $TMPDIR/
+        ps1=$TMPDIR/ps1.sh
+        wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/manjaro.sh -P $TMPDIR/
+        manjaro=$TMPDIR/manjaro.sh
+        wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/variety.sh -P $TMPDIR/
+        variti=$TMPDIR/variety.sh
+        wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/python.sh -P $TMPDIR/
+        pthon=$TMPDIR/python.sh
+        wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/youtube.sh -P $TMPDIR/
+        ytbe=$TMPDIR/youtube.sh
+    fi 
 
     systemd_r(){ 
-        sudo cp -fv aliases/systemctl.sh /root/.bash_aliases.d/;
+        sudo cp -fv $systemd /root/.bash_aliases.d/;
     }
     systemd(){
-        cp -fv aliases/systemctl.sh ~/.bash_aliases.d/
-        yes_edit_no systemd_r "aliases/systemctl.sh" "Install systemctl.sh at /root/?" "yes" "GREEN"; }
-    yes_edit_no systemd "aliases/systemctl.sh" "Install systemctl.sh? ~/.bash_aliases.d/ (systemctl aliases/functions)?" "edit" "GREEN"
+        cp -fv $systemd ~/.bash_aliases.d/
+        yes_edit_no systemd_r "$systemd" "Install systemctl.sh at /root/?" "yes" "GREEN"; }
+    yes_edit_no systemd "$systemd" "Install systemctl.sh? ~/.bash_aliases.d/ (systemctl aliases/functions)?" "edit" "GREEN"
         
 
     dosu_r(){ 
-        sudo cp -fv aliases/sudo.sh /root/.bash_aliases.d/ ;
+        sudo cp -fv $dosu /root/.bash_aliases.d/ ;
     }    
 
     dosu(){ 
-        cp -fv aliases/sudo.sh ~/.bash_aliases.d/;
-        yes_edit_no dosu_r "aliases/sudo.sh" "Install sudo.sh at /root/?" "yes" "GREEN"; }
-    yes_edit_no dosu "aliases/sudo.sh" "Install sudo.sh at ~/.bash_aliases.d/ (sudo aliases)? " "edit" "GREEN"
+        cp -fv $dosu ~/.bash_aliases.d/;
+        yes_edit_no dosu_r "$dosu" "Install sudo.sh at /root/?" "yes" "GREEN"; }
+    yes_edit_no dosu "$dosu" "Install sudo.sh at ~/.bash_aliases.d/ (sudo aliases)? " "edit" "GREEN"
 
 
     packman_r(){ 
-        sudo cp -fv aliases/package_managers.sh /root/.bash_aliases.d/
+        sudo cp -fv $pacmn /root/.bash_aliases.d/
     }
     packman(){
-        cp -fv aliases/package_managers.sh ~/.bash_aliases.d/
-        yes_edit_no packman_r "aliases/package_managers.sh" "Install package_managers.sh at /root/?" "edit" "YELLOW" 
+        cp -fv $pacmn ~/.bash_aliases.d/
+        yes_edit_no packman_r "$pacmn" "Install package_managers.sh at /root/?" "edit" "YELLOW" 
     }
-    yes_edit_no packman "aliases/package_managers.sh" "Install package_managers.sh at ~/.bash_aliases.d/ (package manager aliases)? " "edit" "GREEN"
+    yes_edit_no packman "$pacmn" "Install package_managers.sh at ~/.bash_aliases.d/ (package manager aliases)? " "edit" "GREEN"
     
     ssh_r(){ 
-        sudo cp -fv aliases/ssh.sh /root/.bash_aliases.d/; 
+        sudo cp -fv $sshs /root/.bash_aliases.d/; 
     }
     sshh(){
-        cp -fv aliases/ssh.sh ~/.bash_aliases.d/
-        yes_edit_no ssh_r "aliases/ssh.sh" "Install ssh.sh at /root/?" "edit" "YELLOW" 
+        cp -fv $sshs ~/.bash_aliases.d/
+        yes_edit_no ssh_r "$sshs" "Install ssh.sh at /root/?" "edit" "YELLOW" 
     }
-    yes_edit_no sshh "aliases/ssh.sh" "Install ssh.sh at ~/.bash_aliases.d/ (ssh aliases)? " "edit" "GREEN"
+    yes_edit_no sshh "$sshs" "Install ssh.sh at ~/.bash_aliases.d/ (ssh aliases)? " "edit" "GREEN"
 
 
     ps1_r(){ 
-        sudo cp -fv aliases/PS1_colours.sh /root/.bash_aliases.d/; 
+        sudo cp -fv $ps1 /root/.bash_aliases.d/; 
     }
     ps11(){
-        cp -fv aliases/PS1_colours.sh ~/.bash_aliases.d/
-        yes_edit_no ps1_r "aliases/PS1_colours.sh" "Install PS1_colours.sh at /root/?" "yes" "GREEN" 
+        cp -fv $ps1 ~/.bash_aliases.d/
+        yes_edit_no ps1_r "$ps1" "Install PS1_colours.sh at /root/?" "yes" "GREEN" 
     }
-    yes_edit_no ps11 "aliases/PS1_colours.sh" "Install PS1_colours.sh at ~/.bash_aliases.d/ (Coloured command prompt)? " "yes" "GREEN"
+    yes_edit_no ps11 "$ps1" "Install PS1_colours.sh at ~/.bash_aliases.d/ (Coloured command prompt)? " "yes" "GREEN"
     
     if [ $distro == "Manjaro" ] ; then
         manj_r(){ 
-            sudo cp -fv aliases/manjaro.sh /root/.bash_aliases.d/; 
+            sudo cp -fv $manjaro /root/.bash_aliases.d/; 
         }
         manj(){
-            cp -fv aliases/manjaro.sh ~/.bash_aliases.d/
-            yes_edit_no manj_r "aliases/manjaro.sh" "Install manjaro.sh at /root/?" "yes" "GREEN" 
+            cp -fv $manjaro ~/.bash_aliases.d/
+            yes_edit_no manj_r "$manjaro" "Install manjaro.sh at /root/?" "yes" "GREEN" 
         }
-        yes_edit_no manj "aliases/manjaro.sh" "Install manjaro.sh at ~/.bash_aliases.d/ (manjaro specific aliases)? " "yes" "GREEN"
+        yes_edit_no manj "$manjaro" "Install manjaro.sh at ~/.bash_aliases.d/ (manjaro specific aliases)? " "yes" "GREEN"
     fi
     
     # Variety aliases 
     # 
     variti_r(){ 
-        sudo cp -fv aliases/variety.sh /root/.bash_aliases.d/; 
+        sudo cp -fv $variti /root/.bash_aliases.d/; 
     }
     variti(){
-        cp -fv aliases/variety.sh ~/.bash_aliases.d/
-        yes_edit_no variti_r "aliases/variety.sh" "Install variety.sh at /root/?" "no" "YELLOW" 
+        cp -fv $variti ~/.bash_aliases.d/
+        yes_edit_no variti_r "$variti" "Install variety.sh at /root/?" "no" "YELLOW" 
     }
-    yes_edit_no variti "aliases/variety.sh" "Install variety.sh at ~/.bash_aliases.d/ (aliases for a variety of tools)? " "edit" "GREEN" 
+    yes_edit_no variti "$variti" "Install variety.sh at ~/.bash_aliases.d/ (aliases for a variety of tools)? " "edit" "GREEN" 
     
     pthon(){
-        cp -fv aliases/python.sh ~/.bash_aliases.d/
+        cp -fv $pthon ~/.bash_aliases.d/
     }
-    yes_edit_no variti "aliases/python.sh" "Install python.sh at ~/.bash_aliases.d/ (aliases for a python development)? " "edit" "GREEN" 
+    yes_edit_no variti "$pthon" "Install python.sh at ~/.bash_aliases.d/ (aliases for a python development)? " "edit" "GREEN" 
 
 
     # Youtube
     #
 
     ytbe(){
-        . ./checks/check_youtube.sh
-        cp -fv aliases/youtube.sh ~/.bash_aliases.d/
+        if ! test -f checks/check_youtube.sh; then
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_youtube.sh)" 
+        else
+            ./checks/check_youtube.sh
+        fi
+        cp -fv $ytbe ~/.bash_aliases.d/
     }
-    yes_edit_no ytbe "aliases/youtube.sh" "Install yt-dlp (youtube cli download) and youtube.sh at ~/.bash_aliases.d/ (yt-dlp aliases)?" "yes" "GREEN"
+    yes_edit_no ytbe "$ytbe" "Install yt-dlp (youtube cli download) and youtube.sh at ~/.bash_aliases.d/ (yt-dlp aliases)?" "yes" "GREEN"
 fi
 
 source ~/.bashrc
