@@ -225,13 +225,10 @@ else
     global="--global"
 fi
 
-<<<<<<< HEAD
-=======
 reade -Q "YELLOW" -i "n" -p "Turn off pager? [Y/n]: " "y n" pipepager1
 if test "$pipepager1" == 'y'; then 
      git config $global "$cpager" false  
 else
->>>>>>> Testing
 #reade -Q "CYAN" -i "n" -p "Set $cpager to prevent paging? [N/y]: " "y n" regpager ;
 #regpager="$(printf "yes\nno\n" | fzf --border --border-label="Set pager instead of output only?" --reverse)"
 #if test "$regpager" == "n"; then

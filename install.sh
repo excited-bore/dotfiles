@@ -186,8 +186,7 @@ fi
         reade -Q "GREEN" -i "y" -p "Set EDITOR and VISUAL? [Y/n]:" "y n" edtvsl
         if [ "$edtvsl" == "y" ] || [ -z "$edtvsl" ]; then
             editors="nano vi"
-            prmpt="${green} \tnano = Default editor - Basic, but userfriendly\n\
-            vi = Other preinstalled editor - Archaic and non-userfriendly editor\n" 
+            prmpt="${green}\tnano = Default editor - Basic, but userfriendly\n\tvi = Other preinstalled editor - Archaic and non-userfriendly editor\n" 
             if type micro &> /dev/null; then
                 editors="$pagers micro"
                 prmpt="$prmpt \tMicro = Relatively good out-of-the-box editor - Decent keybindings, yet no customizations\n"
@@ -471,27 +470,57 @@ if [ "y" == "$findr" ]; then
 fi
 unset findr
 
-# Autojump
-reade -Q "GREEN" -i "y" -p "Install autojump? [Y/n]:" "y n" tojump
-if [ "$tojump" == "y" ]; then
-    if ! test -f install_autojump.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_autojump.sh)" 
-    else
-        ./install_autojump.sh
+# Neofetch
+if ! type neofetch &> /dev/null; then
+    reade -Q "GREEN" -i "y" -p "Install neofetch? (System information tool) [Y/n]:" "y n" tojump
+    if [ "$tojump" == "y" ]; then
+        if ! test -f install_neofetch.sh; then
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_neofetch.sh)" 
+        else
+            ./install_neofetch.sh
+        fi
     fi
+    unset tojump
 fi
-unset tojump
+
+# Bashtop
+if ! type bashtop &> /dev/null; then
+    reade -Q "GREEN" -i "y" -p "Install bashtop? (Python based improved top/htop) [Y/n]:" "y n" tojump
+    if [ "$tojump" == "y" ]; then
+        if ! test -f install_bashtop.sh; then
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bashtop.sh)" 
+        else
+            ./install_bashtop.sh
+        fi
+    fi
+    unset tojump
+fi
+
+# Autojump
+if ! type autojump &> /dev/null; then
+    reade -Q "GREEN" -i "y" -p "Install autojump? (jump to folders using 'bookmarks' - j_ ) [Y/n]:" "y n" tojump
+    if [ "$tojump" == "y" ]; then
+        if ! test -f install_autojump.sh; then
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_autojump.sh)" 
+        else
+            ./install_autojump.sh
+        fi
+    fi
+    unset tojump
+fi
 
 # Starship
-reade -Q "GREEN" -i "y" -p "Install Starship? (Snazzy looking prompt) [Y/n]: " "y n" strshp
-if [ $strshp == "y" ]; then
-    if ! test -f install_starship.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_starship.sh)" 
-    else
-        ./install_starship.sh 
+if ! type starship &> /dev/null; then
+    reade -Q "GREEN" -i "y" -p "Install Starship? (Snazzy looking prompt) [Y/n]: " "y n" strshp
+    if [ $strshp == "y" ]; then
+        if ! test -f install_starship.sh; then
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_starship.sh)" 
+        else
+            ./install_starship.sh 
+        fi
     fi
+    unset strshp
 fi
-unset strshp
 
 
 # Moar (Custom pager instead of less)

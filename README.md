@@ -17,6 +17,8 @@ Then it helps with installing/configuring:
     - Osc clipboard: https://github.com/theimpostor/osc  
     - Bat (Cat clone): https://github.com/sharkdp/bat  
     - Fzf: https://github.com/junegunn/fzf  
+    - Neofetch: https://github.com/dylanaraps/neofetch  
+    - Bashtop: https://github.com/aristocratos/bashtop  
     - Autojump: https://github.com/wting/autojump  
     - Starship: https://starship.rs/  
     - Moar: https://github.com/walles/moar  
