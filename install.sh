@@ -586,6 +586,31 @@ if [ "y" == "$kittn" ]; then
 fi
 unset kittn
 
+# Srm (Secure remove)
+if ! type srm &> /dev/null; then
+    reade -Q "GREEN" -i "y" -p "Install srm? (Secure remove) [Y/n]: " "y n" kittn
+    if [ "y" == "$kittn" ]; then
+        if ! test -f install_srm.sh; then
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_srm.sh)" 
+        else
+            ./install_srm.sh
+        fi
+    fi
+    unset kittn
+fi
+
+# Testdisk (File recovery tool)
+if ! type testdisk &> /dev/null; then
+    reade -Q "GREEN" -i "y" -p "Install testdisk? (File recovery tool) [Y/n]: " "y n" kittn
+    if [ "y" == "$kittn" ]; then
+        if ! test -f install_testdisk.sh; then
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_testdisk.sh)" 
+        else
+            ./install_testdisk.sh
+        fi
+    fi
+    unset kittn
+fi
 
 reade -Q "GREEN" -i "y" -p "Install bash aliases and other config? [Y/n]:" "y n" scripts
 if [ -z $scripts ] || [ "y" == $scripts ]; then
