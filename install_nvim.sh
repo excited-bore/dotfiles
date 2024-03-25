@@ -57,7 +57,7 @@ if [[ $distro == "Arch" || $distro_base == "Arch" ]];then
             pipx install pylint
         fi
     fi
-    if ! npm list -g | grep neovim &> /dev/null; then
+    if ! type npm &> /dev/null || ! npm list -g | grep neovim &> /dev/null; then
         reade -Q "GREEN" -i "y" -p "Install nvim-javascript? [Y/n]:" "y n" jsscripts
         if [ -z $jsscripts ] || [ "y" == $jsscripts ]; then
             yes | sudo pacman -Su npm nodejs

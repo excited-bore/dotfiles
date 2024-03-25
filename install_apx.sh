@@ -1,10 +1,24 @@
 # DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-. ./install_go.sh
-. ./checks/check_distro.sh     
-. ./install_docker.sh
+if ! test -f checks/check_distro.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_distro.sh)" 
+else
+    . ./checks/check_distro.sh
+fi
+if ! test -f checks/check_pathvar.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_go.sh)" 
+else
+    . ./install_go.sh
+fi
+if ! test -f checks/check_rlwrap.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_docker.sh)" 
+else
+    . ./install_docker.sh
+fi
+
 if [ $distro == "Manjaro" ]; then
     yes | pamac install apx
 elif [ $distro == "Arch" ]; then
+    #TODO integrate different AUR launchers
     echo "Install with apx with AUR launcher of choice (f.ex. yay, pamac)"
     return 0
 elif [ $distro == "Debian" ] || [ $distro_base == "Debian" ]; then
