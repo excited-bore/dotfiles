@@ -187,6 +187,10 @@ set updatetime=300
 set signcolumn=yes 
 
 
+" Set tags for use with ctags
+" https://stackoverflow.com/questions/11975316/vim-ctags-tag-not-found
+set tags=./tags,tags;$HOME
+
 "Use 24-bit (true-color) mode in Vim/Neovim when outside tmux.
 "If you're using tmux version 2.2 or later, you can remove the outermost $TMUX check and use tmux's 24-bit color support
 "(see < http://sunaku.github.io/tmux-24bit-color.html#usage > for more information.)
@@ -340,6 +344,7 @@ Plugin 'excited-bore/vim-tmux-kitty-navigator', { 'build' : 'cd ~/.vim/plugins/v
 " Normal file operations
 Plugin 'tpope/vim-eunuch'
 
+"Use sudo on file without opening with sudo (or root)
 Plugin 'lambdalisue/suda.vim'
 let g:suda_smart_edit = 1
 "let g:suda#nopass = 1
@@ -352,6 +357,9 @@ let g:suda_smart_edit = 1
 " Nerd commenter
 Plugin 'preservim/nerdcommenter'
 
+" Gutentags - Automatic Ctags
+Plugin 'ludovicchabant/vim-gutentags'
+
 " Minimap to keep track of where in file
 "Plugin 'wfxr/minimap.vim'
 "let g:minimap_width = 10
@@ -360,10 +368,6 @@ Plugin 'preservim/nerdcommenter'
 ""let g:minimap_auto_start = 1
 "let g:minimap_git_colors = 1
 "let g:minimap_auto_start_win_enter = 1
-
-" Vim pager
-"Plugin 'rkitover/vimpager'
-"set rtp^=/usr/bin/vimpager
 
 " Self documenting vim wiki
 "Plugin 'vimwiki/vimwiki'

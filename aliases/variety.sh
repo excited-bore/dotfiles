@@ -3,7 +3,6 @@
 # Kdocker is a system tray app
 # thunderbird does not support trays on linux, which why we do this
 alias thunderbird="kdocker thunderbird"
-alias ctags-sh="ctags -R --language-force=sh"
 
 
 #function ptrace_toggle() {

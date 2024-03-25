@@ -1,0 +1,6 @@
+# https://vi.stackexchange.com/questions/5619/generate-ctags-for-bash-variables
+--languages=+sh
+--regex-sh=/^[ \t]*(local)?[ \t]*([A-Za-z0-9_-]+)=/\2/v,variable,variables/
+
+--langdef=bash
+--langmap=bash:.sh

@@ -252,6 +252,8 @@ alias mv="mv-trash -v"
 # rm recursively and verbose
 
 alias rm="rm -rv"
+shred_iterates=3
+alias rm-shred="shred -vzn $shred_iterates -u"
 #alias remove="rm"
 alias rmAll="rm -v ./*";
 alias rmAllHiddn="rm -v .[!.]* *";
