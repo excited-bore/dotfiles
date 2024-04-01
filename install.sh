@@ -523,6 +523,7 @@ if ! type starship &> /dev/null; then
 fi
 
 
+
 # Moar (Custom pager instead of less)
 reade -Q "GREEN" -i "y" -p "Install moar? (Custom pager instead of less with linenumbers) [Y/n]: " "y n" moar
 if [ -z $moar ] || [ "Y" == $moar ] || [ $moar == "y" ]; then
@@ -610,6 +611,19 @@ if ! type testdisk &> /dev/null; then
         fi
     fi
     unset kittn
+fi
+
+# Nmap
+if ! type nmap &> /dev/null; then
+    reade -Q "GREEN" -i "y" -p "Install nmap? (Network port scanning tool) [Y/n]:" "y n" tojump
+    if [ "$tojump" == "y" ]; then
+        if ! test -f install_nmap.sh; then
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nmap.sh)" 
+        else
+            ./install_nmap.sh
+        fi
+    fi
+    unset tojump
 fi
 
 reade -Q "GREEN" -i "y" -p "Install bash aliases and other config? [Y/n]:" "y n" scripts
