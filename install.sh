@@ -106,7 +106,7 @@ if ! sudo test -f /etc/polkit/49-nopasswd_global.pkla && ! sudo test -f /etc/pol
     unset plkit
 fi
 
-# Pathvariables
+#  Pathvariables
 
 #if [ ! -f ~/.pathvariables.env ]; then
     pathvr=.pathvariables.env
