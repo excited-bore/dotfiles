@@ -1,6 +1,8 @@
 ### GIT ###                           
 . ~/.bash_aliases.d/rlwrap_scripts.sh
 
+alias columns="git column --mode=column"
+
 alias git-config-pull-rebase-false="git config pull.rebase false"
 alias git-config-global-pull-rebase-false="git config --global pull.rebase false"
 
@@ -9,6 +11,8 @@ alias git-config-global-pull-rebase-true="git config --global pull.rebase true"
 
 alias git-config-global-pull-fastforward-only="git config pull.ff only"
 alias git-config-pull-fastforward-only="git config --global pull.ff only"
+
+alias git-safe-force-push="git push --force-with-lease"
 
 function git-add-ssh-key() { 
     if [ ! -f ~/.ssh/config ]; then
@@ -74,6 +78,17 @@ alias git-add-all="git add -A"
 #alias git-commit-all="git commit -a";
     
 alias git-log-pretty-graph="git log --graph --all --pretty=format:\"%x1b[33m%h%x09%x1b[32m%d%x1b[0m%x20%s\""
+alias git-log-linerange="git log -L "
+alias git-log-grep="git log -S "
+
+
+alias git-blame-linerange="git blame -L "
+# -w => ignore whitespace
+# -C => Detect lines moved or copied in the same commit
+# -C -C => Same thing, but specifically the commit when file in question was created
+# -C -C -C => All commits
+# https://www.youtube.com/watch?v=aolI_Rz0ZqY
+alias git-blame-full-branch="git blame -w -C -C -C "
 
 
 function git-commit() {

@@ -292,7 +292,6 @@ else
     fi
     
     
-<<<<<<< HEAD
     if test $pager == 'less'; then
         local ln="-R"
         reade -Q "CYAN" -i "y" -p "You selected $pager. Quit if one screen? [Y/n]: " "y n" pager1
@@ -747,7 +746,6 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
             fi
         fi
 fi
-=======
         reade -Q "GREEN" -i "$pager" -p "Pager: " "$pagers" pager;
         #pager="$(printf "$pagersf" | fzf --border --border-label="Pager" --reverse)"
         
@@ -1214,7 +1212,6 @@ fi
     fi
 fi
 
->>>>>>> Testing
     #git config "$global" "$cpager" "$pager" ;
 #elif test "$regpager" == "y"; then
 #    pagers="cat"
@@ -1282,6 +1279,16 @@ fi
         fi
     fi
 
+    # https://www.youtube.com/watch?v=aolI_Rz0ZqY
+    local gitrerere rerere
+    local prererere='n'
+    if test "$(git config $global --list | grep 'rerere.enabled' | awk 'BEGIN { FS = "=" } ;{print $2;}')" == '' ; then
+        premail='y'
+    fi
+    reade -Q "CYAN" -i "$prererere" -p "Configure git to remember resolved mergeconflicts for reuse? [Y/n]: " "y n" gitrerere ;
+    if [ "y" == $gitrerere ]; then
+        git config "$global" rerere.enabled true;
+    fi
 
     local gitpgr pager wpager
     reade -Q "CYAN" -i "y" -p "Configure pager for git core, diff, show and log? [Y/n]: " "y n" wpager ;
@@ -1555,11 +1562,7 @@ fi
                 git config "$global" diff.guitool difftastic
                 git config "$global" diffguitool.pager true
                 git config "$global" difftool.prompt false
-<<<<<<< HEAD
                 git config "$global" difftool.difftastic.cmd 'difft "$LOCAL" "$REMOTE"'
-=======
-                git config "$global" difftool.difftastic.cmd 'difft $LOCAL $REMOTE'
->>>>>>> Testing
             fi
         fi
     fi

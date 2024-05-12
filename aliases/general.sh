@@ -270,7 +270,7 @@ alias egrep='egrep --colour=always'
 alias fgrep='fgrep --colour=always'
 alias rg='rg --color=always'
 
-alias cat="bat"
+#alias cat="bat"
 
 # Listen hidden files and permissions
 alias lsall="ls -Al"

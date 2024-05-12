@@ -4,6 +4,7 @@
 # thunderbird does not support trays on linux, which why we do this
 alias thunderbird="kdocker thunderbird"
 
+alias mullvad-sessions="mullvad-exclude thunderbird; mullvad-exclude ferdium; mullvad connect"
 
 #function ptrace_toggle() {
 #    echo "Has ptrace currently elevated priviliges: $PTRACE_ELEVATED_PRIVILIGE";

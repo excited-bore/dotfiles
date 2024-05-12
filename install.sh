@@ -372,11 +372,11 @@ shell-keybinds() {
         binds=$TMPDIR/.inputrc
         binds1=$TMPDIR/keybinds.bash
     fi
-    reade -Q "GREEN" -i "y" -p "Enable vi-mode instead of emacs mode? [Y/n]: " "y n" vimde
+    reade -Q "GREEN" -i "y" -p "Enable vi-mode instead of emacs mode (might cause issues with pasteing - revert with 'Alt-p')? [Y/n]: " "y n" vimde
     if [ "$vimde" == "y" ]; then
         sed -i "s|.set editing-mode .*|set editing-mode vi|g" $binds
     fi
-    reade -Q "GREEN" -i "y" -p "Enable visual que for vi/emacs toggle? (Displayed as '(ins)/(cmd)/(emacs)') [Y/n]: " "y n" vivisual
+    reade -Q "GREEN" -i "y" -p "Enable visual que for vi/emacs toggle? (Displayed as '(ins)/(cmd) - (emacs)') [Y/n]: " "y n" vivisual
     if [ "$vivisual" == "y" ]; then
         sed -i "s|.set show-mode-in-prompt .*|set show-mode-in-prompt on|g" $binds
     fi
@@ -665,7 +665,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
             sed -i 's|alias rm="trash"|#alias rm="trash"|g' $genr
         fi
         if type bat &> /dev/null; then
-            reade -Q "GREEN" -i "y" -p "Set 'cat' as alias for 'bat'? [Y/n]" "y n" cat
+            reade -Q "YELLOW" -i "n" -p "Set 'cat' as alias for 'bat'? [Y/n]" "y n" cat
             if [ "$cat" != "y" ]; then
                 sed -i 's|alias cat="bat"|#alias cat="bat"|g' $genr
             fi

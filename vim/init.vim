@@ -626,14 +626,14 @@ nnoremap <silent><nowait> <C-Tab>k  :<C-u>CocPrev<CR>
 nnoremap <silent><nowait> <C-Tab>p  :<C-u>CocListResume<CR>
 
 autocmd TermEnter term://*toggleterm#*
-      \ tnoremap <silent><C-`> <Cmd>exe v:count1 . "ToggleTerm"<CR>
+      \ tnoremap <silent><C-²> <Cmd>exe v:count1 . "ToggleTerm"<CR>
 
 " By applying the mappings this way you can pass a count to your
 " mapping to open a specific window.
 " For example: 2<C-t> will open terminal 2
-nnoremap <silent><c-`> <Cmd>exe v:count1 . "ToggleTerm"<CR>
-inoremap <silent><c-`> <Esc><Cmd>exe v:count1 . "ToggleTerm"<CR>
-vnoremap <silent><c-`> <Esc><Cmd>exe v:count1 . "ToggleTerm"<CR>
+nnoremap <silent><c-²> <Cmd>exe v:count1 . "ToggleTerm"<CR>
+inoremap <silent><c-²> <Esc><Cmd>exe v:count1 . "ToggleTerm"<CR>
+vnoremap <silent><c-²> <Esc><Cmd>exe v:count1 . "ToggleTerm"<CR>
 tnoremap <silent><esc> <C-\><C-n>
 
 
@@ -1029,8 +1029,8 @@ inoremap <A--> <C-x>
 " Swap case insert
 nnoremap ² ~
 
-nnoremap <C-²> ~
-inoremap <C-²> <Esc>~a
+"nnoremap <C-²> ~
+"inoremap <C-²> <Esc>~a
 
 " Toggle highlight => Ctrl+l
 " https://stackoverflow.com/questions/9054780/how-to-toggle-vims-search-highlight-visibility-without-disabling-it
