@@ -1,5 +1,5 @@
  # !/bin/bash
-. ./checks/check_distro.sh
+. ./checks/check_system.sh
 . ./checks/check_pathvar.sh 
 . ./aliases/rlwrap_scripts.sh
 

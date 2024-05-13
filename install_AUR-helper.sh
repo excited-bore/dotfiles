@@ -1,5 +1,5 @@
 . ./aliases/rlwrap_scripts.sh
-. ./checks/check_distro.sh
+. ./checks/check_system.sh
 
 if [ "$distro_base" == "Arch" ]; then
     if [ ! -x "$(command -v auracle-git)" ] && \

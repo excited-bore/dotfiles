@@ -1,4 +1,4 @@
-. ./checks/check_distro.sh
+. ./checks/check_system.sh
 
 if [ "$distro" == "Manjaro" ]; then
     pamac install pam_autologin

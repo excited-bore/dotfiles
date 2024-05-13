@@ -1,6 +1,6 @@
 #!/bin/bash
 #https://bbs.archlinux.org/viewtopic.php?id=271850
-. ./checks/check_distro.sh
+. ./checks/check_system.sh
 
 if [ $distro == "Manjaro" ]; then
     yes | sudo pacman -Su pipewire pipewire-pulse manjaro-pipewire

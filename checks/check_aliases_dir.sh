@@ -31,10 +31,10 @@ fi
 #    echo "fi" >> ~/.bashrc
 #fi
 
-if ! test -f checks/check_distro.sh; then
-    wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_distro.sh -O ~/.bash_aliases.d/check_distro.sh 
+if ! test -f checks/check_system.sh; then
+    wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh -O ~/.bash_aliases.d/check_system.sh 
 else
-    cp -fv checks/check_distro.sh ~/.bash_aliases.d/
+    cp -fv checks/check_system.sh ~/.bash_aliases.d/
 fi
 
 if ! test -f aliases/bash.sh; then
@@ -56,7 +56,7 @@ if ! sudo test -f /root/.bash_aliases; then
     sudo cp -fv ~/.bash_aliases /root/
     if ! sudo test -d /root/.bash_aliases.d/; then
         sudo mkdir /root/.bash_aliases.d/
-        sudo cp -fv ~/.bash_aliases.d/check_distro.sh /root/.bash_aliases.d/check_distro.sh
+        sudo cp -fv ~/.bash_aliases.d/check_system.sh /root/.bash_aliases.d/check_system.sh
         sudo cp -fv ~/.bash_aliases.d/bash.sh /root/.bash_aliases.d/bash.sh
         sudo cp -fv ~/.bash_aliases.d/rlwrap_scripts.sh /root/.bash_aliases.d/rlwrap_scripts.sh 
     fi

@@ -1,5 +1,5 @@
 #!/bin/bash 
-. ./checks/check_distro.sh
+. ./checks/check_system.sh
 
 if [ $distro_base == "Arch" ];then
     yes | sudo pacman -Su xorg

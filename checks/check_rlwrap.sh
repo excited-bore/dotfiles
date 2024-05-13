@@ -1,10 +1,14 @@
  #DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-. ./checks/check_distro.sh
+if ! test -f checks/check_system.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
+else
+    . ./checks/check_system.sh
+fi
 
 if [ ! -x "$(command -v rlwrap)" ]; then
     read -p "Install rlwrap (better autocompletion, used a lot throughout scripts) [Y/n]:" answr
     if [ "$answr" == "y" ] || [ -z "$answr" ] || [ "Y" == "$answr" ]; then
-        if [ -x $(command -v git) ]; then
+        if [ ! -x $(command -v git) ]; then
             if [[ $distro == "Debian" || $distro_base == "Debian" ]]; then
                 yes | sudo apt install git;
             elif [[ $distro == "Arch" || $distro_base == "Arch" ]]; then

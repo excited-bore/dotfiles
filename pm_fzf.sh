@@ -1,4 +1,4 @@
-. ./checks/check_distro.sh
+. ./checks/check_system.sh
 if [ ! -x "$(command -v fzf)" ]; then
     ./install_fzf.sh
 fi

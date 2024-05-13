@@ -1,9 +1,9 @@
 echo "$(tput setaf 6)This script uses $(tput setaf 2)rlwrap$(tput setaf 6) and $(tput setaf 2)fzf$(tput sgr0).";
 
-if ! test -f checks/check_distro.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_distro.sh)" 
+if ! test -f checks/check_system.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
 else
-    . ./checks/check_distro.sh
+    . ./checks/check_system.sh
 fi
 
 if ! test -f aliases/rlwrap_scripts.sh; then

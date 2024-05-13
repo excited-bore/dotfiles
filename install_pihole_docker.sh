@@ -1,4 +1,4 @@
-. ./checks/check_distro.sh
+. ./checks/check_system.sh
 . ./checks/check_rlwrap.sh
 . ./install_docker.sh
 

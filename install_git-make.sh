@@ -1,5 +1,5 @@
 #DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-. ./checks/check_distro.sh
+. ./checks/check_system.sh
 
 if [[ $distro == "Arch" || $distro_base == "Arch" ]]; then
     sudo pacman -S make cmake

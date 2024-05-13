@@ -1,5 +1,5 @@
 #DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-. ./checks/check_distro.sh
+. ./checks/check_system.sh
 
 if [ ! -x "$(command -v yt-dlp)" ]; then
     if [ ! -x "$(command -v pipx)" ]; then

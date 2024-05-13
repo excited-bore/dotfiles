@@ -1,3 +1,21 @@
+unameOut="$(uname -s)"
+case "${unameOut}" in
+    Linux*)     machine=Linux;;
+    Darwin*)    machine=Mac;;
+    CYGWIN*)    machine=Cygwin;;
+    MINGW*)     machine=MinGw;;
+    *)          machine="UNKNOWN:${unameOut}"
+esac
+
+echo ${machine}
+
+if [ "$machine" == "Mac" ]; then
+    # code for macOS platform        
+elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+    # code for GNU/Linux platform
+fi
+
+
 distro_base=/
 distro=/
 packagemanager=/

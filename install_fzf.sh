@@ -1,9 +1,9 @@
  # !/bin/bash
 
-if ! test -f checks/check_distro.sh.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_distro.sh)" 
+if ! test -f checks/check_system.sh.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
 else
-    . ./checks/check_distro.sh
+    . ./checks/check_system.sh
 fi
 
 if ! test -f checks/check_pathvar.sh; then

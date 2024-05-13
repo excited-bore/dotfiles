@@ -1,4 +1,4 @@
-. ./checks/check_distro.sh
+. ./checks/check_system.sh
 . ./aliases/rlwrap_scripts.sh
 
 if ! command -v samba &> /dev/null; then

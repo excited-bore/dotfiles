@@ -1,9 +1,9 @@
 # !/bin/bash
 
-if ! test -f checks/check_distro.sh; then
+if ! test -f checks/check_system.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_distro)" 
 else
-    . ./checks/check_distro.sh
+    . ./checks/check_system.sh
 fi
 
 if [ "$(which rg)" == "" ]; then 

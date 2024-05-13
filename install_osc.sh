@@ -6,10 +6,10 @@ else
     . ./aliases/rlwrap_scripts.sh
 fi
 
-if ! test -f checks/check_distro.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_distro.sh)" 
+if ! test -f checks/check_system.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
 else
-    . ./checks/check_distro.sh
+    . ./checks/check_system.sh
 fi
 
 if ! type go &> /dev/null; then

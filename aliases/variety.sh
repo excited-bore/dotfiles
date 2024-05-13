@@ -6,6 +6,16 @@ alias thunderbird="kdocker thunderbird"
 
 alias mullvad-sessions="mullvad-exclude thunderbird; mullvad-exclude ferdium; mullvad connect"
 
+function rg-search-and-replace() {
+    if test -z "$1" || test -z "$2"; then
+        echo "rg-search-and-replace needs 2 arguments: "
+        echo "  - the pattern to search for"
+        echo "  - the replacement"
+        return 1
+    fi
+    rg "$1" --color=never --files-with-matches | xargs sed -i "s/$1/$2/g"
+}
+
 #function ptrace_toggle() {
 #    echo "Has ptrace currently elevated priviliges: $PTRACE_ELEVATED_PRIVILIGE";
 #    echo "Change? y/n: ";

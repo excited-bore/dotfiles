@@ -1,4 +1,4 @@
-. ./checks/check_distro.sh
+. ./checks/check_system.sh
 
 #if [ $dist == "Raspbian" ]; then
 #    read -p "Install 64bit kernel before install nix? [Y/n]: " newkrn
