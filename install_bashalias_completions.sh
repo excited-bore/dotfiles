@@ -5,6 +5,12 @@ else
     . ./checks/check_completions_dir.sh
 fi
 
+if ! test -f checks/check_aliases_dir.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)" 
+else
+    . ./checks/check_aliases_dir.sh
+fi
+
 if ! test -f aliases/rlwrap_scripts.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/rlwrap_scripts.sh)" 
 else

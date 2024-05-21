@@ -27,6 +27,14 @@ else
     exit 1
 fi
 
+if test "$type_fs" == "ext4"; then
+    reade -Q "GREEN" -i "y" -p "Set permissions for $mnt to $USER:$USER useing 'sudo chown -R'?: " chown_stff
+    if test "$chown_stff" == "y"; then
+        sudo chown -R $USER:$USER $mnt
+    fi
+fi
+
+
 read -p "Will write \"$uuid $mnt $type_fs $attr\" to /etc/fstab. Ok? [Y/n]: " ok
 if [ -z $ok ] || [ $ok == "y" ]; then
    echo "$uuid $mnt $type_fs $attr" | sudo tee -a /etc/fstab 

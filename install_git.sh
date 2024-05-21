@@ -540,7 +540,7 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
             #    prompt=""
             #fi
 
-            reade -Q "CYAN" -i "y" -p "$pager can work/works with a pager. Configure? [Y/n]: " "y n" pipepager
+            reade -Q "CYAN" -i "n" -p "$pager can work/works with a pager. Configure? [Y/n]: " "y n" pipepager
             if test "$pipepager" == 'y'; then
                 reade -Q "GREEN" -i "n" -p "Turn off pager? [Y/n]: " "y n" pipepager
                 if test "$pipepager" == 'n'; then
@@ -1343,7 +1343,7 @@ fi
                    ./install_nvimpager.sh
                 fi
             fi
-            if test $distro_base == "Arch"; then
+            if test "$distro_base" == "Arch"; then
                 if test $pager == "diff-so-fancy"; then
                     sudo pacman -Su diff-so-fancy
                 elif test $pager == "delta"; then
