@@ -1,11 +1,11 @@
 ### SSH ###                           
 . ~/.bash_aliases.d/rlwrap_scripts.sh
 
-user=
+user="burp"
 user1=
-ip=
+ip="192.168.0.140"
 ip1=
-ssh_file="~/.ssh/id_rsa"
+ssh_file="~/.ssh/id_ed25519"
 ssh_file1="~/.ssh/id_rsa1"
 
 # To prevent 'failed to preserve ownership' errors

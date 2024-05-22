@@ -7,13 +7,13 @@ case "${unameOut}" in
     *)          machine="UNKNOWN:${unameOut}"
 esac
 
-echo ${machine}
+#echo ${machine}
 
-if [ "$machine" == "Mac" ]; then
-    # code for macOS platform        
-elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
-    # code for GNU/Linux platform
-fi
+#if [ "$machine" == "Mac" ]; then
+#    # code for macOS platform        
+#elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+#    # code for GNU/Linux platform
+#fi
 
 
 distro_base=/

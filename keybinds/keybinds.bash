@@ -64,6 +64,11 @@ setxkbmap -option caps:escape
 # Also
 # https://unix.stackexchange.com/questions/548726/bash-readline-inputrc-bind-key-to-a-sequence-of-multiple-commands 
 
+# Same for fzf
+bind -m vi-command '"\C-a": emacs-editing-mode'
+bind -m vi-insert '"\C-a": emacs-editing-mode'
+bind -m emacs-standard '"\C-a": vi-editing-mode'
+
 # Up and down arrow will now intelligently complete partially completed
 # commands by searching through the existing history.
 bind -m emacs-standard  '"\e[A": history-search-backward'
@@ -283,9 +288,9 @@ if type fzf &> /dev/null; then
 
     if type ripgrep-dir &> /dev/null; then
         # Alt-g: Ripgrep function overview
-        bind -m emacs-standard -x '"\eg": "ripgrep-dir"'
-        bind -m vi-command     -x '"\eg": "ripgrep-dir"' 
-        bind -m vi-insert      -x '"\eg": "ripgrep-dir"'
+        bind -m emacs-standard -x '"\C-g": "ripgrep-dir"'
+        bind -m vi-command     -x '"\C-g": "ripgrep-dir"' 
+        bind -m vi-insert      -x '"\C-g": "ripgrep-dir"'
     fi
 
     if type fzf_rifle &> /dev/null; then

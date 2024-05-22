@@ -324,7 +324,7 @@ let g:ranger_command_override = 'ranger --cmd "set show_hidden=true"'
 
 " Fuzzy finder plugin
 Plugin 'junegunn/fzf'
-Plugin 'junegunn/fzf.vim'
+Plugin 'junegunn/fzf.vim', { 'do': { -> fzf#install() } }
 
 " Fuzzy finder preview
 Plugin 'yuki-yano/fzf-preview.vim', { 'branch': 'release/remote' }

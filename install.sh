@@ -106,6 +106,7 @@ if ! sudo test -f /etc/polkit/49-nopasswd_global.pkla && ! sudo test -f /etc/pol
     unset plkit
 fi
 
+
 #  Pathvariables
 
 #if [ ! -f ~/.pathvariables.env ]; then
@@ -228,6 +229,22 @@ fi
             reade -Q "GREEN" -i "$frst" -p "VISUAL (GUI editor)=" "$compedit" vsual
             vsual=$(whereis "$vsual" | awk '{print $2}')
             sed -i 's|#export VISUAL=.*|export VISUAL='$vsual'|' $pathvr
+            
+            if grep -q "#export SUDO_EDITOR" $pathvr; then
+                reade -Q "GREEN" -i "y" -p "Set SUDO_EDITOR to \$EDITOR? [Y/n]: " "y n" sud_edt
+                if test $sud_edt == "y"; then
+                    sed -i 's|#export SUDO_EDITOR.*|export SUDO_EDITOR=$EDITOR|' $pathvr
+                fi
+            fi
+            
+            echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for  'Defaults env_keep += \"VISUAL EDITOR\"' in /etc/sudoers"
+            if ! sudo grep -q "Defaults env_keep += \"VISUAL EDITOR\"" /etc/sudoers; then
+                reade -Q "YELLOW" -i "y" -p "Sudo by default does not respect the user's EDITOR/VISUAL and not every program supports the SUDO_EDITOR environment variables (f.ex. sudo crontab -e ).\n Change this behaviour permanently in /etc/sudoers? [Y/n]: " "y n" sudrs
+                if test "$sudrs" == "y"; then
+                    sudo sed -i '1s/^/Defaults env_keep += "VISUAL EDITOR"\n/' /etc/sudoers
+                    echo "Added 'Defaults env_keep += \"VISUAL EDITOR\"' to /etc/sudoers"
+                fi
+            fi
         fi
         unset edtvsl compedit frst editors prmpt
 
@@ -289,12 +306,18 @@ fi
         # TODO: check around for other systemdvars 
         # Check if systemd installed
         if type systemctl &> /dev/null; then
+            pageSec=1
+            printf "${green} Systemd comes preinstalled with SYSTEMD_PAGERSECURE=1.\n This means any pager without a 'secure mode' (reduced features - only less does this afaik) cant be used for systemctl/journalctl.\n It's a relatively good to be on the safe side, but this does constrain the user.\n"
+            reade -Q "YELLOW" -i "y" -p "${yellow}Set SYSTEMD_PAGERSECURE to 0? [Y/n]: " "y n" page_sec
+            if test "$page_sec" == "y"; then
+               pageSec=0 
+            fi
             prmpt="${yellow}\tThis will set SYSTEMD pathvariables\n\
             When setting a new pager for systemd or changing logging specifics\n\
             Defaults:\n\
             - SYSTEMD_PAGER=$PAGER\n\
             - SYSTEMD_COLORS=256\n\
-            - SYSTEMD_PAGERSECURE=1\n\
+            - SYSTEMD_PAGERSECURE=$pageSec\n\
             - SYSTEMD_LESS=\"FRXMK\"\n\
             - SYSTEMD_LOG_LEVEL=\"warning\"\n\
             - SYSTEMD_LOG_COLOR=\"true\"\n\
@@ -307,7 +330,7 @@ fi
             reade -Q "YELLOW" -i "y" -p "Set systemd environment? [Y/n]: " "y n" xdgInst
             if [ -z "$xdgInst" ] || [ "y" == "$xdgInst" ]; then
                 sed 's/^#export SYSTEMD_PAGER=\(.*\)/export SYSTEMD_PAGER=\1/' -i $pathvr 
-                sed 's/^#export SYSTEMD_PAGERSECURE=\(.*\)/export SYSTEMD_PAGERSECURE=\1/' -i $pathvr
+                sed "s/^#export SYSTEMD_PAGERSECURE=\(.*\)/export SYSTEMD_PAGERSECURE=\\$pageSec/" -i $pathvr
                 sed 's/^#export SYSTEMD_COLORS=\(.*\)/export SYSTEMD_COLORS=\1/' -i $pathvr
                 sed 's/^#export SYSTEMD_LESS=\(.*\)/export SYSTEMD_LESS=\1/' -i $pathvr    
                 sed 's/^#export SYSTEMD_LOG_LEVEL=\(.*\)/export SYSTEMD_LOG_LEVEL=\1/' -i $pathvr

@@ -166,13 +166,13 @@ fi
         fi
         if ! test -f ranger/rifle.conf; then
             wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/rifle.conf -O ~/.config/ranger/rifle.conf 
-            wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/keybinds_rifle.sh -O ~/.fzf/shell/keybinds_rifle.sh 
+            wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/keybinds_rifle.sh -O ~/.bash_aliases.d/keybinds_rifle.sh 
         else
             cp -fv ranger/rifle.conf ~/.config/ranger/
-            cp -fv fzf/keybinds_rifle.sh ~/.fzf/shell/
+            cp -fv fzf/keybinds_rifle.sh ~/.bash_aliases.d/
         fi
         if ! grep -q "keybinds_rifle.sh" ~/.fzf/shell/key-bindings.bash; then
-            sed -i "s|\(# Required to refresh the prompt after fzf\)|. ~\/.fzf\/shell\/keybinds_rifle.sh\n\1|" ~/.fzf/shell/key-bindings.bash;
+            sed -i "s|\(# Required to refresh the prompt after fzf\)|. ~\/.bash_aliases.d\/keybinds_rifle.sh\n\1|" ~/.fzf/shell/key-bindings.bash;
             sed -i "s|: fzf-file-widget|: fzf_rifle|g" ~/.fzf/shell/key-bindings.bash;
         fi
     fi

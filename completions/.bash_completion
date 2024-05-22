@@ -1,15 +1,9 @@
 #!/bin/bash
 # vim: set filetype=bash
 
-shopt -s direxpand
-
 if [ -d ~/.bash_completion.d/ ] && [ "$(ls -A ~/.bash_completion.d/)" ]; then
-  for comp in ~/.bash_completion.d/*; do
-      source "$comp" 
+  for compl in ~/.bash_completion.d/*; do
+      source "$compl" 
   done
 fi
 
-
-# Begin added by argcomplete
-source "/home/burp/.local/share/pipx/venvs/argcomplete/lib/python3.11/site-packages/argcomplete/bash_completion.d/_python-argcomplete"
-# End added by argcomplete
