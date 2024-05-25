@@ -72,7 +72,7 @@ unset fndgbl fndfle fndhiddn
 
 if test "$(which fd)" != ""; then
     echo "${green}Fd can read from global gitignore file${normal}"
-    reade -Q "GREEN" -i "y" -p "Generate global gitignore?: " "y n" fndgbl
+    reade -Q "GREEN" -i "y" -p "Generate global gitignore? [Y/n]: " "y n" fndgbl
     if [ $fndgbl == 'y' ]; then
         if ! test -f install_gitignore.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fd.sh "global")" 
@@ -160,7 +160,7 @@ fi
     reade -Q "GREEN" -i "y" -p "Use rifle (file opener from 'ranger') to open found files and dirs with Ctrl-T filesearch shortcut? [Y/n]:" "y n" fzf_t
     if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ] ; then
         if [ "$(which rifle)" == "" ]; then
-            sudo wget "https://raw.githubusercontent.com/ranger/ranger/master/ranger/ext/rifle.py" /usr/bin/
+            sudo wget "https://raw.githubusercontent.com/ranger/ranger/master/ranger/ext/rifle.py" -P /usr/bin/
             sudo mv -v /usr/bin/rifle.py /usr/bin/rifle
             sudo chmod +x /usr/bin/rifle
         fi
@@ -268,7 +268,19 @@ fi
    #     #sed -i 's|bind -m vi-command '\''"\\ec"|bind -m vi-command '\''"\\es"|g' ~/.fzf/shell/key-bindings.bash
    #     #sed -i 's|bind -m vi-insert  '\''"\\ec"|bind -m vi-insert  '\''"\\es"|g' ~/.fzf/shell/key-bindings.bash
    # fi
-    
     unset fzf_t;
-
+    
+    
+    if ! test -f ~/.bash_aliases.d/docker-fzf.sh; then
+        reade -Q "GREEN" -i "y" -p "Install fzf-docker (fzf aliases for docker)? [Y/n]:" "y n" fzf_d
+        if [ "$fzf_d" == "y" ] || [ -z "$fzf_d" ]; then 
+            if ! test -f checks/check_aliases_dir.sh; then
+                eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)" 
+            else
+                ./checks/check_aliases_dir.sh
+            fi
+            wget https://raw.githubusercontent.com/MartinRamm/fzf-docker/master/docker-fzf -O ~/.bash_aliases.d/docker-fzf.sh
+        fi
+    fi
+    unset fzf_t;
  fi

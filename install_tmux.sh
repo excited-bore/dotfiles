@@ -42,7 +42,7 @@ fi
 
 sed -i 's|^set -g @plugin|#set -g @plugin|g' tmux/.tmux.conf
 sed -i 's|^run '\''~/.tmux/plugins/tpm/tpm'\''|#run '\''~/.tmux/plugins/tpm/tpm'\''|g' tmux/.tmux.conf
-sed -i 's|set -g @continuum-restore '\''on'\''|#set -g @continuum-restore '\''on'\''|g' tmux/.tmux.conf
+sed -i 's|^set -g @continuum-restore '\''on'\''|#set -g @continuum-restore '\''on'\''|g' tmux/.tmux.conf
 
 reade -Q "GREEN" -i "y" -p "Install tmux.conf? (tmux conf at ~/.tmux.conf) [Y/n]:" "y n" tmuxc
 if [ "$tmuxc"  == "y" ] || [ -z "$tmuxc" ]; then

@@ -1,5 +1,13 @@
-. ./aliases/rlwrap_scripts.sh
-. ./checks/check_system.sh
+if ! test -f install_AUR-helper.sh; then
+    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/rlwrap_scripts.sh)" 
+else
+    . ./aliases/rlwrap_scripts.sh
+fi 
+if ! test -f install_AUR-helper.sh; then
+    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
+else
+    . ./checks/check_system.sh
+fi 
 
 if [ "$distro_base" == "Arch" ]; then
     if [ ! -x "$(command -v auracle-git)" ] && \

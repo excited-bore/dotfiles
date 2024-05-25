@@ -28,7 +28,7 @@ else
 fi
 
 if test "$type_fs" == "ext4"; then
-    reade -Q "GREEN" -i "y" -p "Set permissions for $mnt to $USER:$USER useing 'sudo chown -R'?: " chown_stff
+    reade -Q "GREEN" -i "y" -p "Set permissions for $mnt to $USER:$USER using 'sudo chown -R'?: " chown_stff
     if test "$chown_stff" == "y"; then
         sudo chown -R $USER:$USER $mnt
     fi
