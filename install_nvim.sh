@@ -271,9 +271,11 @@ function instvim_r(){
     fi
     unset vimrc
 
-    reade -Q "YELLOW" -i "y" -p "Make symlink for init.vim at /root/.vimrc for user? (Might conflict with nvim +checkhealth) [Y/n]:" "y n"  vimrc_r
-    if [ -z $vimrc_r ] || [ "y" == $vimrc_r ] && [ ! -f /root/.vimrc ]; then
-        sudo ln -s /root/.config/nvim/init.vim /root/.vimrc;
+    if ! sudo test -f /root/.vimrc; then
+        reade -Q "YELLOW" -i "y" -p "Make symlink for init.vim at /root/.vimrc for user? (Might conflict with nvim +checkhealth) [Y/n]:" "y n"  vimrc_r
+        if [ -z $vimrc_r ] || [ "y" == $vimrc_r ] && [ ! -f /root/.vimrc ]; then
+            sudo ln -s /root/.config/nvim/init.vim /root/.vimrc;
+        fi
     fi
 }
 

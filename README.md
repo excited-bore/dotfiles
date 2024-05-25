@@ -6,10 +6,16 @@ Currently only focused on **bash** on **Linux** (On a distro with *Apt* or *Pacm
 
 ## Install.sh
 
+Try it out with:
+```
+eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install.sh)"
+```
+
 Creates `.pathvariables.env` for global pathvariables (Helps setting up variables for MAN,LESS,PAGER,EDITOR/VISUAL,SYSTEMD,XDG, etc..)  
 Creates `~/.keybinds.d/` and `~/.keybinds.d/keybinds.bash` for Bash (readline) keybindings  
 Creates `~/.bash_aliases` and `~/.bash_aliases.d/` for bash-aliases  
 Creates `~/.bash_completion` and `~/.bash_completion.d/` for bash-completions  
+
 
 Then it helps with installing/configuring:  
     - Bash-completions: https://github.com/cykerway/complete-alias/master/complete_alias  
@@ -55,10 +61,6 @@ Then it helps with installing/configuring:
 
 Also helps configuring global gitconfig and global gitignore, and gives the option to install all kinds of bash-aliases/functions
 
-Try it out with:
-```
-eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install.sh)"
-```
 
 ## Install_git.sh
 Script to automate setting up pagers, syntax highlighters, lazygit and copy-to. Works remotely with

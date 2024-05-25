@@ -6,7 +6,7 @@ else
 fi
 
 if [ ! -x "$(command -v rlwrap)" ]; then
-    read -p "Install rlwrap (better autocompletion, used a lot throughout scripts) [Y/n]:" answr
+    read -p "Install rlwrap? (better autocompletion, used a lot throughout scripts) [Y/n]:" answr
     if [ "$answr" == "y" ] || [ -z "$answr" ] || [ "Y" == "$answr" ]; then
         if [ ! -x $(command -v git) ]; then
             if [[ $distro == "Debian" || $distro_base == "Debian" ]]; then
