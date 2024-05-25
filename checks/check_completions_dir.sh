@@ -18,7 +18,7 @@ if [ ! -d ~/.bash_completion.d/ ]; then
 fi
 
 if ! grep -q "~/.bash_completion" ~/.bashrc; then
-    echo "if [ -f ~/.bash_completion ]" >> ~/.bashrc
+    echo "if [ -f ~/.bash_completion ]; then" >> ~/.bashrc
     echo "  . ~/.bash_completion" >> ~/.bashrc
     echo "fi" >> ~/.bashrc
 fi

@@ -14,7 +14,7 @@ else
     . ./checks/check_completions_dir.sh
 fi
 
-if [ -x "$(command -v argcomplete)" ]; then
+if ! [ -x "$(command -v argcomplete)" ]; then
     if [[ $distro == "Debian" || $distro_base == "Debian" ]]; then
         yes | sudo apt install python3 pipx
         pipx install argcomplete
