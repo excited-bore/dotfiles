@@ -1,6 +1,10 @@
 # !/bin/bash
 
-. ./aliases/rlwrap_scripts.sh
+if ! test -f aliases/rlwrap_scripts.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/rlwrap_scripts.sh)" 
+else
+    . ./aliases/rlwrap_scripts.sh
+fi
 
 globl="local"
 if [ "$1" == 'local' ] || [ 'global' == "$1" ]; then

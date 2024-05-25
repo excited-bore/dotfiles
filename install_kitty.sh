@@ -1,7 +1,21 @@
 #!/bin/bash
-. ./checks/check_system.sh
-. ./checks/check_pathvar.sh
-. ./aliases/rlwrap_scripts.sh
+if ! test -f checks/check_system.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
+else
+    . ./checks/check_system.sh
+fi
+
+if ! test -f aliases/rlwrap_scripts.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/rlwrap_scripts.sh)" 
+else
+    . ./aliases/rlwrap_scripts.sh
+fi
+
+if ! test -f checks/check_pathvar.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pathvar.sh)" 
+else
+    . ./checks/check_pathvar.sh
+fi
 
 if ! [ -x "$(command -v kitty)" ]; then
     if [ "$distro" == "Arch" ] || [ "$distro_base" == "Arch" ]; then
@@ -15,7 +29,7 @@ if ! [ -x "$(command -v kitty)" ]; then
     fi
 fi
 
-reade -Q "GREEN" -i "y" -p "Install kitty conf? (at ~/.config/kitty/kitty.conf|ssh.conf) [Y/n]:" "y n" kittn
+reade -Q "GREEN" -i "y" -p "Install kitty conf? (at ~/.config/kitty/kitty.conf\|ssh.conf) [Y/n]:" "y n" kittn
 if [ "y" == "$kittn" ]; then
     mkdir -p ~/.config/kitty
     cp -vf kitty/kitty.conf ~/.config/kitty/kitty.conf

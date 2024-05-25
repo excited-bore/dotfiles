@@ -1,15 +1,22 @@
 # https://stackoverflow.com/questions/5412761/using-colors-with-printf
 # Execute (during printf) for colored prompt
 # printf  "${blue}This text is blue${white}\n"
-red=$(tput setaf 1)
-green=$(tput setaf 2)
-yellow=$(tput setaf 3)
-blue=$(tput setaf 4)
-pink=$(tput setaf 5)
-cyan=$(tput setaf 6)
-white=$(tput setaf 7)
+red=$(tput setaf 9)
+red1=$(tput setaf 1)
+green=$(tput setaf 10)
+green1=$(tput setaf 2)
+yellow=$(tput setaf 11)
+yellow1=$(tput setaf 3)
+blue=$(tput setaf 12)
+blue1=$(tput setaf 4)
+magenta=$(tput setaf 13)
+magenta1=$(tput setaf 5)
+cyan=$(tput setaf 14)
+cyan1=$(tput setaf 6)
+white=$(tput setaf 15)
+white1=$(tput setaf 7)
+black=$(tput setaf 16)
 grey=$(tput setaf 8)
-red1=$(tput setaf 9)
 bold=$(tput bold)
 normal=$(tput sgr0)
 #...
@@ -17,28 +24,60 @@ normal=$(tput sgr0)
 # Arguments: Completions(string with space entries, AWK works too),return value(-a password prompt, -c complete filenames, -p prompt flag, -Q prompt colour, -b break-chars (when does a string break for autocomp), -e change char given for multiple autocompletions)
 # 'man rlwrap' to see all unimplemented options
 
+if test -z $TMPDIR; then
+    TMPDIR=$(mktemp -d)
+fi
 
 reade(){
     if [ ! -x "$(command -v rlwrap)" ]; then 
         readstr="read  ";
+        color=""
         while getopts ':b:e:i:p:Q:s:S:' flag; do
             case "${flag}" in
                 b)  ;;
                 e)  readstr=$(echo "$readstr" | sed "s|read |read \-e |g");
                     ;;
+                #  Even though it's in the read man, -i does not actually work
                 i)  readstr=$(echo "$readstr" | sed "s|read |read \-i \"${OPTARG}\" |g");
+                    pre="${OPTARG}"
                     ;;
-                p)  readstr=$(echo "$readstr" | sed "s|read |read \-p \"${OPTARG}\" |g");
+                Q)  if [[ "${OPTARG}" =~ ^[[:upper:]]+$ ]]; then
+                        color="${bold}"
+                    fi
+                    OPTARG=$(echo ${OPTARG} | awk '{print tolower($0)}')
+                    if [[ "${OPTARG}" =~ "red" ]]; then
+                        color=$color"${red}"
+                    elif [[ "${OPTARG}" =~ "green" ]]; then
+                        color=$color"${green}"
+                    elif [[ "${OPTARG}" =~ "blue" ]]; then
+                        color=$color"${blue}"
+                    elif [[ "${OPTARG}" =~ "yellow" ]]; then
+                        color=$color"${yellow}"
+                    elif [[ "${OPTARG}" =~ "cyan" ]]; then
+                        color=$color"${cyan}"
+                    elif [[ "${OPTARG}" =~ "magenta" ]]; then
+                        color=$color"${magenta}"
+                    elif [[ "${OPTARG}" =~ "black" ]]; then
+                        color=$color"${black}"
+                    elif [[ "${OPTARG}" =~ "white" ]]; then
+                        color=$color"${white}"
+                    fi
                     ;;
-                Q)  ;;
+                p)  readstr=$(echo "$readstr" | sed "s|read |read \-p \"${color}${OPTARG}${normal}\" |g");
+                    ;;
                 s)  readstr=$(echo "$readstr" | sed "s|read |read \-s\"${OPTARG}\" |g");
                     ;;
                 S)  ;;
             esac
         done; 
-        OPTIND=1;
-        value=$(eval "$readstr");
+        #  Even though it's in the read man, -i does not actually work
+        eval "$readstr" value;
+        if ! test -z "$pre" && test -z "$value"; then
+            value="$pre"  
+        fi
+        #black, red, green, yellow, blue, cyan, purple (=magenta) or white
         eval "${@:$#:1}=$value";
+        OPTIND=1;
     else
         if [[ $# < 2 ]]; then
             echo "Give up at least two variables for reade(). "
@@ -77,6 +116,7 @@ reade(){
                     ;;
             esac
         done
+        
         value=$(eval "$rlwstring");
         eval "${@:$#:1}=$value";
         #if [ $OPTIND -eq 1 ]; then

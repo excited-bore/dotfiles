@@ -2,19 +2,14 @@ unameOut="$(uname -s)"
 case "${unameOut}" in
     Linux*)     machine=Linux;;
     Darwin*)    machine=Mac;;
-    CYGWIN*)    machine=Cygwin;;
-    MINGW*)     machine=MinGw;;
+    CYGWIN*)    machine=Windows;;
+    MINGW*)     machine=Windows;;
     *)          machine="UNKNOWN:${unameOut}"
 esac
 
-#echo ${machine}
-
-#if [ "$machine" == "Mac" ]; then
-#    # code for macOS platform        
-#elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
-#    # code for GNU/Linux platform
-#fi
-
+if test -z $TMPDIR; then
+    TMPDIR=$(mktemp -d)
+fi
 
 distro_base=/
 distro=/
@@ -78,4 +73,4 @@ elif lscpu | grep -q "armv"; then
     arch="armv7l"
 elif lscpu | grep -q "aarch"; then
     arch="arm64"
-fi      
+fi

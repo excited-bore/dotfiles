@@ -131,7 +131,7 @@ fi
         fi
         
         # TODO: non ugly values
-        reade -Q "YELLOW" -i "n" -p "Set LS_COLORS with some predefined values? (WARNING: ugly values) [Y/n]:" "y n" lsclrs
+        reade -Q "YELLOW" -i "n" -p "Set LS_COLORS with some predefined values? (WARNING: ugly values) [N/y]:" "y n" lsclrs
         if [ "$lsclrs" == "y" ] || [ -z "$lsclrs" ]; then
             sed 's/^#export LS_COLORS/export LS_COLORS/' -i $pathvr
         fi
@@ -145,7 +145,6 @@ fi
         
         reade -Q "GREEN" -i "y" -p "Set PAGER? (Page reader) [Y/n]:" "y n" pgr
         if [ "$pgr" == "y" ] || [ -z "$pgr" ]; then
-            
             # Uncomment export PAGER=
             sed 's/^#export PAGER=/export PAGER=/' -i $pathvr
             
@@ -165,7 +164,7 @@ fi
             sed -i 's|export PAGER=.*|export PAGER='$pgr2'|' $pathvr
             if grep -q "less" "$pgr2"; then
                 sed -i 's|#export LESS=|export LESS="*"|g' $pathvr
-                lss=$(cat .pathvariables.env | grep 'export LESS="*"' | sed 's|export LESS="\(.*\)"|\1|g')
+                lss=$(cat $pathvr | grep 'export LESS="*"' | sed 's|export LESS="\(.*\)"|\1|g')
                 lss_n=""
                 for opt in ${lss}; do
                     opt1=$(echo "$opt" | sed 's|--\(\)|\1|g' | sed 's|\(\)\=.*|\1|g')
@@ -198,13 +197,13 @@ fi
             fi
             if type vim &> /dev/null; then
                 editors="$editors vim"
-                prmpt="$prmpt \tVim = The one and only true modal editor - Not userfriendly, but many features (maybe even too many) and greatly customizable\n"
+                prmpt="$prmpt \tvim = The one and only true modal editor - Not userfriendly, but many features (maybe even too many) and greatly customizable\n"
                 sed -i "s|#export MYVIMRC=|export MYVIMRC=|g" $pathvr
                 sed -i "s|#export MYGVIMRC=|export MYGVIMRC=|g" $pathvr
             fi
             if type nvim &> /dev/null; then                                  
                 editors="$editors nvim"
-                prmpt="$prmpt \tNeovim = A better vim? - Faster and less buggy then regular vim, even a little userfriendlier\n"
+                prmpt="$prmpt \tnvim (neovim) = A better vim? - Faster and less buggy then regular vim, even a little userfriendlier\n"
                 sed -i "s|#export MYVIMRC=|export MYVIMRC=|g" $pathvr
                 sed -i "s|#export MYGVIMRC=|export MYGVIMRC=|g" $pathvr
             fi
@@ -232,7 +231,7 @@ fi
             
             if grep -q "#export SUDO_EDITOR" $pathvr; then
                 reade -Q "GREEN" -i "y" -p "Set SUDO_EDITOR to \$EDITOR? [Y/n]: " "y n" sud_edt
-                if test $sud_edt == "y"; then
+                if test "$sud_edt" == "y"; then
                     sed -i 's|#export SUDO_EDITOR.*|export SUDO_EDITOR=$EDITOR|' $pathvr
                 fi
             fi
@@ -312,9 +311,9 @@ fi
             if test "$page_sec" == "y"; then
                pageSec=0 
             fi
-            prmpt="${yellow}\tThis will set SYSTEMD pathvariables\n\
+            prmpt="${yellow}This will set SYSTEMD pathvariables\n\
             When setting a new pager for systemd or changing logging specifics\n\
-            Defaults:\n\
+            \tDefaults:\n\
             - SYSTEMD_PAGER=$PAGER\n\
             - SYSTEMD_COLORS=256\n\
             - SYSTEMD_PAGERSECURE=$pageSec\n\
@@ -324,13 +323,16 @@ fi
             - SYSTEMD_LOG_TIME=\"true\"\n\
             - SYSTEMD_LOG_LOCATION=\"true\"\n\
             - SYSTEMD_LOG_TID=\"true\"\n\
-            - SYSTEMD_LOG_TARGET=\"auto\"\n\
-            "
+            - SYSTEMD_LOG_TARGET=\"auto\"\n"
             printf "$prmpt"
             reade -Q "YELLOW" -i "y" -p "Set systemd environment? [Y/n]: " "y n" xdgInst
             if [ -z "$xdgInst" ] || [ "y" == "$xdgInst" ]; then
                 sed 's/^#export SYSTEMD_PAGER=\(.*\)/export SYSTEMD_PAGER=\1/' -i $pathvr 
-                sed "s/^#export SYSTEMD_PAGERSECURE=\(.*\)/export SYSTEMD_PAGERSECURE=\\$pageSec/" -i $pathvr
+                if test "$pageSec" == 0; then
+                    sed 's/^#export SYSTEMD_PAGERSECURE=\(.*\)/export SYSTEMD_PAGERSECURE=0/' -i $pathvr
+                else
+                    sed 's/^#export SYSTEMD_PAGERSECURE=\(.*\)/export SYSTEMD_PAGERSECURE=1/' -i $pathvr
+                fi
                 sed 's/^#export SYSTEMD_COLORS=\(.*\)/export SYSTEMD_COLORS=\1/' -i $pathvr
                 sed 's/^#export SYSTEMD_LESS=\(.*\)/export SYSTEMD_LESS=\1/' -i $pathvr    
                 sed 's/^#export SYSTEMD_LOG_LEVEL=\(.*\)/export SYSTEMD_LOG_LEVEL=\1/' -i $pathvr
@@ -392,6 +394,8 @@ shell-keybinds() {
     binds1=keybinds/keybinds.bash
     if ! test -f keybinds/.inputrc; then
         wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.inputrc -P $TMPDIR/
+        wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/keybinds.bash -P $TMPDIR/
+        
         binds=$TMPDIR/.inputrc
         binds1=$TMPDIR/keybinds.bash
     fi
@@ -431,7 +435,7 @@ xresources_r(){
 xresources() {
     cp -fv $xterm ~/.Xresources;
     yes_edit_no xresources_r "$xterm" "Install .Xresources at /root/.bash_aliases.d/?" "edit" "RED"; }
-yes_edit_no xresources "$xterm" "Install .Xresources at ~/.bash_aliases.d/? (keybinds config)" "edit" "YELLOW"
+yes_edit_no xresources "$xterm" "Install .Xresources at ~/.bash_aliases.d/? (Xterm configuration)" "edit" "YELLOW"
     
 
 if ! test -f checks/check_completions_dir.sh; then
@@ -443,7 +447,7 @@ fi
 
 # Bash alias completions
 reade -Q "GREEN" -i "y" -p "Install bash completions for aliases in ~/.bash_completion.d? [Y/n]:" "y n" compl
-if [ -z $compl ] || [ "y" == $compl ]; then
+if [ -z "$compl" ] || [ "y" == "$compl" ]; then
     if ! test -f install_bashalias_completions.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bashalias_completions.sh)" 
     else
@@ -570,10 +574,13 @@ fi
 unset nvm
 
 # Git
-if ! test -f install_git.sh; then
-    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_git.sh)" 
-else
-    ./install_git.sh
+reade -Q "GREEN" -i "y" -p "Install Git and configure? (Project managing tool) [Y/n]:" "y n" nvm
+if [ "y" == "$nvm" ]; then
+    if ! test -f install_git.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_git.sh)" 
+    else
+        ./install_git.sh
+    fi
 fi
 
 
@@ -589,7 +596,7 @@ fi
 unset rngr
 
 # Tmux (File explorer)
-reade -Q "GREEN" -i "y" -p "Install tmux? (Terminal multiplexer) [Y/n]: " "y n" tmx
+reade -Q "GREEN" -i "y" -p "Install Tmux? (Terminal multiplexer) [Y/n]: " "y n" tmx
 if [ "y" == "$tmx" ]; then
     if ! test -f install_tmux.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_tmux.sh)" 
@@ -677,20 +684,20 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
             sed -i 's|^export TRASH_BIN_LIMIT=|export TRASH_BIN_LIMIT=|g' ~/.pathvariables.env
         fi
         local ansr
-        reade -Q "GREEN" -i "y" -p "Set cp/mv (when overwriting) to backup files? (will also trash backups):" "y n" ansr         
+        reade -Q "GREEN" -i "y" -p "Set cp/mv (when overwriting) to backup files? (will also trash backups) [Y/n]:" "y n" ansr         
         if [ "$ansr" != "y" ]; then
             sed -i 's|alias cp="cp-trash -rv"|#alias cp="cp-trash -rv"|g' $genr
             sed -i 's|alias mv="mv-trash -v"|#alias mv="mv-trash -v"|g' $genr
         fi
         unset ansr
-        reade -Q "YELLOW" -i "n" -p "Set 'gio trash' alias for rm? [Y/n]:" "y n" ansr 
+        reade -Q "YELLOW" -i "n" -p "Set 'gio trash' alias for rm? [N/y]:" "y n" ansr 
         if [ "$ansr" != "y" ]; then
             sed -i 's|alias rm="trash"|#alias rm="trash"|g' $genr
         fi
         if type bat &> /dev/null; then
-            reade -Q "YELLOW" -i "n" -p "Set 'cat' as alias for 'bat'? [Y/n]" "y n" cat
+            reade -Q "YELLOW" -i "n" -p "Set 'cat' as alias for 'bat'? [N/y]:" "y n" cat
             if [ "$cat" != "y" ]; then
-                sed -i 's|alias cat="bat"|#alias cat="bat"|g' $genr
+                sed -i 's|^alias cat="bat"|#alias cat="bat"|g' $genr
             fi
         fi
         unset cat
@@ -702,7 +709,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     dosu=aliases/sudo.sh
     pacmn=aliases/package_managers.sh
     sshs=aliases/ssh.sh
-    ps1=aliases/ps1.sh
+    ps1=aliases/PS1_colours.sh
     manjaro=aliases/manjaro.sh
     variti=aliases/variety.sh
     pthon=aliases/python.sh
@@ -744,7 +751,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     dosu(){ 
         cp -fv $dosu ~/.bash_aliases.d/;
         yes_edit_no dosu_r "$dosu" "Install sudo.sh at /root/?" "yes" "GREEN"; }
-    yes_edit_no dosu "$dosu" "Install sudo.sh at ~/.bash_aliases.d/ (sudo aliases)? " "edit" "GREEN"
+    yes_edit_no dosu "$dosu" "Install sudo.sh at ~/.bash_aliases.d/ (sudo aliases)?" "edit" "GREEN"
 
 
     packman_r(){ 
@@ -810,7 +817,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         if ! test -f checks/check_youtube.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_youtube.sh)" 
         else
-            ./checks/check_youtube.sh
+            . ./checks/check_youtube.sh
         fi
         cp -fv $ytbe ~/.bash_aliases.d/
     }
@@ -819,6 +826,6 @@ fi
 
 source ~/.bashrc
 
-echo "${cyan}${bold}You can check all aliases with 'alias'"
-alias -p
+echo "${cyan}${bold}You can check all aliases with 'alias'";
+alias -p;
 echo "${green}${bold}Done!"

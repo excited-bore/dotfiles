@@ -52,7 +52,7 @@ fi
 
 reade -Q "GREEN" -i "y" -p "Set nvimpager as default pager for $USER? [Y/n]: " "y n" moar_usr
 if [ -z "$moar_usr" ] || [ "y" == "$moar_usr" ] || [ "Y" == "$moar_usr" ]; then
-    if grep -q "nvimpager" $PATHVAR; then 
+    if grep -q "PAGER" $PATHVAR; then 
         sed -i "s|.export PAGER=|export PAGER=|g" $PATHVAR
         sed -i "s|export PAGER=.*|export PAGER=$(whereis nvimpager | awk '{print $2;}')|g" $PATHVAR
     else
@@ -62,7 +62,7 @@ fi
     
 reade -Q "YELLOW" -i "y" -p "Set nvimpager default pager for root? [Y/n]: " "y n" moar_root
 if [ -z "$moar_root" ] || [ "y" == "$moar_root" ] || [ "Y" == "$moar_root" ]; then
-    if sudo grep -q "nvimpager" $PATHVAR_R; then
+    if sudo grep -q "PAGER" $PATHVAR_R; then
         sudo sed -i "s|.export PAGER=|export PAGER=|g" $PATHVAR_R
         sudo sed -i "s|export PAGER=.*|export PAGER=$(whereis nvimpager | awk '{print $2;}')|g" $PATHVAR_R
     else
