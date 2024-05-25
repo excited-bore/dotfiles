@@ -164,7 +164,7 @@ fi
             sed -i 's|export PAGER=.*|export PAGER='$pgr2'|' $pathvr
             if grep -q "less" "$pgr2"; then
                 sed -i 's|#export LESS=|export LESS="*"|g' $pathvr
-                lss=$(cat .pathvariables.env | grep 'export LESS="*"' | sed 's|export LESS="\(.*\)"|\1|g')
+                lss=$(cat $pathvr | grep 'export LESS="*"' | sed 's|export LESS="\(.*\)"|\1|g')
                 lss_n=""
                 for opt in ${lss}; do
                     opt1=$(echo "$opt" | sed 's|--\(\)|\1|g' | sed 's|\(\)\=.*|\1|g')
@@ -394,6 +394,8 @@ shell-keybinds() {
     binds1=keybinds/keybinds.bash
     if ! test -f keybinds/.inputrc; then
         wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.inputrc -P $TMPDIR/
+        wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/keybinds.bash -P $TMPDIR/
+        
         binds=$TMPDIR/.inputrc
         binds1=$TMPDIR/keybinds.bash
     fi

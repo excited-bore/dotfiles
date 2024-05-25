@@ -1,6 +1,18 @@
-. ./checks/check_system.sh
-. ./aliases/rlwrap_scripts.sh
-. ./checks/check_completions_dir.sh
+if ! test -f checks/check_system.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
+else
+    . ./checks/check_system.sh
+fi
+if ! test -f aliases/rlwrap_scripts.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/rlwrap_scripts.sh)" 
+else
+    . ./aliases/rlwrap_scripts.sh
+fi
+if ! test -f checks/check_completions_dir.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)" 
+else
+    . ./checks/check_completions_dir.sh
+fi
 
 if [ -x "$(command -v argcomplete)" ]; then
     if [[ $distro == "Debian" || $distro_base == "Debian" ]]; then
