@@ -160,7 +160,7 @@ fi
     reade -Q "GREEN" -i "y" -p "Use rifle (file opener from 'ranger') to open found files and dirs with Ctrl-T filesearch shortcut? [Y/n]:" "y n" fzf_t
     if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ] ; then
         if [ "$(which rifle)" == "" ]; then
-            sudo wget "https://raw.githubusercontent.com/ranger/ranger/master/ranger/ext/rifle.py" /usr/bin/
+            sudo wget "https://raw.githubusercontent.com/ranger/ranger/master/ranger/ext/rifle.py" -P /usr/bin/
             sudo mv -v /usr/bin/rifle.py /usr/bin/rifle
             sudo chmod +x /usr/bin/rifle
         fi
@@ -271,4 +271,14 @@ fi
     
     unset fzf_t;
 
+    reade -Q "GREEN" -i "y" -p "Install fzf-docker (fzf aliases for docker)? [Y/n]:" "y n" fzf_d
+    if [ "$fzf_d" == "y" ] || [ -z "$fzf_d" ]; then 
+        if ! test -f checks/check_aliases_dir.sh; then
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)" 
+        else
+            ./checks/check_aliases_dir.sh
+        fi
+        wget https://raw.githubusercontent.com/MartinRamm/fzf-docker/master/docker-fzf -P ~/.bash_aliases.d/docker-fzf.sh
+    fi
+    unset fzf_t;
  fi

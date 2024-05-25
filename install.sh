@@ -198,13 +198,13 @@ fi
             fi
             if type vim &> /dev/null; then
                 editors="$editors vim"
-                prmpt="$prmpt \tVim = The one and only true modal editor - Not userfriendly, but many features (maybe even too many) and greatly customizable\n"
+                prmpt="$prmpt \tvim = The one and only true modal editor - Not userfriendly, but many features (maybe even too many) and greatly customizable\n"
                 sed -i "s|#export MYVIMRC=|export MYVIMRC=|g" $pathvr
                 sed -i "s|#export MYGVIMRC=|export MYGVIMRC=|g" $pathvr
             fi
             if type nvim &> /dev/null; then                                  
                 editors="$editors nvim"
-                prmpt="$prmpt \tNeovim = A better vim? - Faster and less buggy then regular vim, even a little userfriendlier\n"
+                prmpt="$prmpt \tnvim (neovim) = A better vim? - Faster and less buggy then regular vim, even a little userfriendlier\n"
                 sed -i "s|#export MYVIMRC=|export MYVIMRC=|g" $pathvr
                 sed -i "s|#export MYGVIMRC=|export MYGVIMRC=|g" $pathvr
             fi
@@ -232,7 +232,7 @@ fi
             
             if grep -q "#export SUDO_EDITOR" $pathvr; then
                 reade -Q "GREEN" -i "y" -p "Set SUDO_EDITOR to \$EDITOR? [Y/n]: " "y n" sud_edt
-                if test $sud_edt == "y"; then
+                if test "$sud_edt" == "y"; then
                     sed -i 's|#export SUDO_EDITOR.*|export SUDO_EDITOR=$EDITOR|' $pathvr
                 fi
             fi
