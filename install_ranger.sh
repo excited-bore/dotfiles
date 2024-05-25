@@ -64,16 +64,18 @@ if [ -z "$rf2" ] || [ "y" == "$rf2" ]; then
     fi 
 fi
 
-reade -Q "GREEN" -i "y" -p "Install ranger (dev)icons? (ranger plugin at ~/.conf/ranger/plugins) [Y/n]:" "y n" rplg
-if [ -z $rplg ] || [ "y" == $rplg ]; then
-    mkdir -p ~/.config/ranger/plugins
-    git clone https://github.com/cdump/ranger-devicons2 ~/.config/ranger/plugins/devicons2
-    if [ "$distro_base" == "Arch" ];then
-        yes | sudo pacman -Su ttf-nerd-fonts-symbols-common ttf-nerd-fonts-symbols ttf-nerd-fonts-symbols-mono
-    elif [ "$distro_base" == "Debian" ]; then    
-        reade -Q "YELLOW" -i "y" -p "Install Nerdfonts from binary - no apt? (Special FontIcons) [Y/n]: " "y n" nrdfnts
-        if [ -z $nrdfnts ] || [ "Y" == $nrdfnts ] || [ $nrdfnts == "y" ]; then
-            ./install_nerdfonts.sh
+if ! test -d ~/.config/ranger/plugins/devicons2; then
+    reade -Q "GREEN" -i "y" -p "Install ranger (dev)icons? (ranger plugin at ~/.conf/ranger/plugins) [Y/n]:" "y n" rplg
+    if [ -z $rplg ] || [ "y" == $rplg ]; then
+        mkdir -p ~/.config/ranger/plugins
+        git clone https://github.com/cdump/ranger-devicons2 ~/.config/ranger/plugins/devicons2
+        if [ "$distro_base" == "Arch" ];then
+            yes | sudo pacman -Su ttf-nerd-fonts-symbols-common ttf-nerd-fonts-symbols ttf-nerd-fonts-symbols-mono
+        elif [ "$distro_base" == "Debian" ]; then    
+            reade -Q "YELLOW" -i "y" -p "Install Nerdfonts from binary - no apt? (Special FontIcons) [Y/n]: " "y n" nrdfnts
+            if [ -z $nrdfnts ] || [ "Y" == $nrdfnts ] || [ $nrdfnts == "y" ]; then
+                ./install_nerdfonts.sh
+            fi
         fi
     fi
 fi
