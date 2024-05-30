@@ -467,6 +467,16 @@ if [ -z $pycomp ] || [ "y" == $pycomp ]; then
 fi
 unset pycomp
 
+# Git
+reade -Q "GREEN" -i "y" -p "Install Git and configure? (Project managing tool) [Y/n]:" "y n" nvm
+if [ "y" == "$nvm" ]; then
+    if ! test -f install_git.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_git.sh)" 
+    else
+        ./install_git.sh
+    fi
+fi
+
 
 # Osc
 #reade -Q "GREEN" -i "y" -p "Install Osc52 clipboard? (Universal clipboard tool / works natively over ssh) [Y/n]: " "y n" osc
@@ -573,15 +583,6 @@ if [ "y" == "$nvm" ]; then
 fi
 unset nvm
 
-# Git
-reade -Q "GREEN" -i "y" -p "Install Git and configure? (Project managing tool) [Y/n]:" "y n" nvm
-if [ "y" == "$nvm" ]; then
-    if ! test -f install_git.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_git.sh)" 
-    else
-        ./install_git.sh
-    fi
-fi
 
 
 # Ranger (File explorer)
