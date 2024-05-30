@@ -18,13 +18,13 @@ else
     . ./checks/check_pathvar.sh
 fi
 
-if ! type fzf > /dev/null ; then
-   if ! test -f ./install_fzf.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/install_fzf.sh)" 
-    else
-        ./install_fzf.sh
-    fi 
-fi
+#if ! type fzf &> /dev/null ; then
+#   if ! test -f ./install_fzf.sh; then
+#        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/install_fzf.sh)" 
+#    else
+#        ./install_fzf.sh
+#    fi 
+#fi
 
 git_hl(){
     if ! test -z "$1"; then
