@@ -66,7 +66,7 @@ Also helps configuring global gitconfig and global gitignore, and gives the opti
 Script to automate setting up pagers, syntax highlighters, lazygit and copy-to. Works remotely with
 
 ```
-eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_git.sh)"
+eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install.sh)"
 ```
 
 ## Install_gitignore.sh
