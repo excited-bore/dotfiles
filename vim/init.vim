@@ -341,6 +341,9 @@ Plugin 'folke/zen-mode.nvim'
 " Vim tmux kitty navigator
 Plugin 'excited-bore/vim-tmux-kitty-navigator', { 'build' : 'cd ~/.vim/plugins/vim-tmux-kitty-navigator && cp -f ./pass_keys.py ~/.config/kitty/;'}
 
+" Codeium (Free Copilot AI Helper) 
+Plug 'Exafunction/codeium.vim', { 'branch': 'main' }
+
 " Normal file operations
 Plugin 'tpope/vim-eunuch'
 
@@ -380,6 +383,7 @@ let g:gruvbox_italic=1
 Plugin 'vim-airline/vim-airline'
 " Gives tabs a nice layout as well
 let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#coc#show_coc_status = 1
 
 " Vim lua plugin
 " Plugin 'svermeulen/vimpeccable'
@@ -605,7 +609,9 @@ command! -nargs=0 OR   :call     CocActionAsync('runCommand', 'editor.action.org
 " Add (Neo)Vim's native statusline support
 " NOTE: Please see `:h coc-status` for integrations with external plugins that
 " provide custom statusline: lightline.vim, vim-airline
-set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
+"set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
+
+
 
 " Mappings for CoCList
 " Show all diagnostics
