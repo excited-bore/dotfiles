@@ -387,6 +387,7 @@ shell-keybinds() {
     
     if ! test -f checks/check_keybinds.sh; then
          eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_keybinds.sh)" 
+         echo "bluj"
     else
         . ./checks/check_keybinds.sh
     fi
@@ -466,6 +467,16 @@ if [ -z $pycomp ] || [ "y" == $pycomp ]; then
     fi
 fi
 unset pycomp
+
+# Git
+reade -Q "GREEN" -i "y" -p "Install Git and configure? (Project managing tool) [Y/n]:" "y n" nvm
+if [ "y" == "$nvm" ]; then
+    if ! test -f install_git.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_git.sh)" 
+    else
+        ./install_git.sh
+    fi
+fi
 
 
 # Osc
@@ -573,15 +584,6 @@ if [ "y" == "$nvm" ]; then
 fi
 unset nvm
 
-# Git
-reade -Q "GREEN" -i "y" -p "Install Git and configure? (Project managing tool) [Y/n]:" "y n" nvm
-if [ "y" == "$nvm" ]; then
-    if ! test -f install_git.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_git.sh)" 
-    else
-        ./install_git.sh
-    fi
-fi
 
 
 # Ranger (File explorer)

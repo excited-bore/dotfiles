@@ -18,13 +18,13 @@ else
     . ./checks/check_pathvar.sh
 fi
 
-if ! type fzf > /dev/null ; then
-   if ! test -f ./install_fzf.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/install_fzf.sh)" 
-    else
-        ./install_fzf.sh
-    fi 
-fi
+#if ! type fzf &> /dev/null ; then
+#   if ! test -f ./install_fzf.sh; then
+#        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/install_fzf.sh)" 
+#    else
+#        ./install_fzf.sh
+#    fi 
+#fi
 
 git_hl(){
     if ! test -z "$1"; then
@@ -225,7 +225,7 @@ else
     global="--global"
 fi
 
-reade -Q "YELLOW" -i "n" -p "Turn off pager? [Y/n]: " "y n" pipepager1
+reade -Q "YELLOW" -i "n" -p "Turn off pager? [N/y]: " "y n" pipepager1
 if test "$pipepager1" == 'y'; then 
      git config $global "$cpager" false  
 else
@@ -298,7 +298,7 @@ else
         if test $pager1 == 'y'; then
             ln=$ln"--quit-if-one-screen"
         fi
-        reade -Q "CYAN" -i "n" -p "Set linenumbers for pager? [Y/n]: " "y n" lne 
+        reade -Q "CYAN" -i "n" -p "Set linenumbers for pager? [N/y]: " "y n" lne 
         if test "$lne" == 'n'; then
            ln=$ln"-n"
         else
@@ -325,18 +325,18 @@ Condimentum lacinia quis vel eros donec ac. Nibh sed pulvinar proin gravida hend
             while test -z "$style"; do
                 style=$(printf "$styles" | fzf --reverse --border --border-label="Moar style")
                 moar --style "$style" $TMPDIR/dtest1
-                stty sane && reade -Q "CYAN" -i "n" -p "Set as style? (Will retry if no) [Y/n]: " thme
+                stty sane && reade -Q "CYAN" -i "n" -p "Set as style? (Will retry if no) [N/y]: " thme
                 if test "$thme" == "n"; then
                    style='' 
                 fi
             done
             pager=$pager" $style"
         fi 
-        reade -Q "CYAN" -i "n" -p "Show linenumber? [Y/n]: " "y n" pager1
+        reade -Q "CYAN" -i "n" -p "Show linenumber? [N/y]: " "y n" pager1
         if test $pager1 == 'n'; then
             pager=$pager' --no-linenumbers'
         fi
-        reade -Q "CYAN" -i "n" -p "Wrap long lines? [Y/n]: " "y n" pager1
+        reade -Q "CYAN" -i "n" -p "Wrap long lines? [N/y]: " "y n" pager1
         if test $pager1 == 'y'; then
             pager=$pager' --wrap'
         fi
@@ -1481,7 +1481,7 @@ fi
     if test "$(git config $global --list | grep 'color.ui' | awk 'BEGIN { FS = "=" } ;{print $2;}')" == '' ; then
         edpre="y"
     fi
-    reade -Q "CYAN" -i "$edpre" -p "Set color.ui? (Git color behaviour): " "y n" editor ;
+    reade -Q "CYAN" -i "$edpre" -p "Set color.ui? (Git color behaviour) [Y/n]: " "y n" editor ;
     if test "y" == "$editor"; then
         reade -Q "CYAN" -i "true" -p "Color.ui (Default: auto): " "true false auto always" editor;
         if test "$editor" == "auto" || test "$editor" == "false" || test "$editor" == "true" || test "$editor" == "always"; then
