@@ -5,7 +5,6 @@ if [ ! -d ~/.keybinds.d/ ]; then
 fi
 
 if ! grep -q "~/.keybinds.d" ~/.bashrc; then
-
     echo "if [ -d ~/.keybinds.d/ ] && [ \"\$(ls -A ~/.keybinds.d/)\" ]; then" >> ~/.bashrc
     echo "  for comp in ~/.keybinds.d/*.bash; do" >> ~/.bashrc
     echo "      . \"\$comp\" " >> ~/.bashrc
