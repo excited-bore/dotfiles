@@ -15,10 +15,13 @@ if ! type lazygit &> /dev/null; then
     if [ "$nstll" == "y" ]; then
         if [ $distro == "Arch" ] || [ $distro_base == "Arch" ]; then
             yes | sudo pacman -Su lazygit
-        elif [ $distro == "Debian" ] || [ $distro_base == "Debian" ]; then
-            yes | sudo apt update
-            yes | sudo apt install lazygit
+        elif [ $distro == "Ubuntu" ]; then
+            LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
+            curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
+            tar xf lazygit.tar.gz lazygit
+            sudo install lazygit /usr/local/bin
         fi
+        lazygit --version
         
     fi
     unset nstll

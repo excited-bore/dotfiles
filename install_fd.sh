@@ -10,5 +10,7 @@ if [ $distro_base == "Arch" ];then
     yes | sudo pacman -Su fd
 elif [ $distro_base == "Debian" ]; then
     yes | sudo apt install fd-find
-    ln -s $(which fdfind) ~/.local/bin/fd
+    if ! test -f ~/.local/bin/fd; then
+        ln -s $(which fdfind) ~/.local/bin/fd
+    fi
 fi

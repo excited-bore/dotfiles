@@ -75,7 +75,7 @@ if test "$(which fd)" != ""; then
     reade -Q "GREEN" -i "y" -p "Generate global gitignore? [Y/n]: " "y n" fndgbl
     if [ $fndgbl == 'y' ]; then
         if ! test -f install_gitignore.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fd.sh "global")" 
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_gitignore.sh)" | bash -s -- "global"
         else
             ./install_gitignore.sh "global"
         fi 
