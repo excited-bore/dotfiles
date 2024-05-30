@@ -385,8 +385,9 @@ shell-keybinds_r(){
 }
 shell-keybinds() {
     
-    if ! test -f checks/check_keybinds.sh; then
+    if ! test -f ./checks/check_keybinds.sh; then
          eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_keybinds.sh)" 
+         echo "bluj"
     else
         . ./checks/check_keybinds.sh
     fi
