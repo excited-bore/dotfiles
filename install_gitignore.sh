@@ -42,7 +42,7 @@ fi
 
 (
 cd $TMPDIR/gitignore
-gitign=""
+gitign=''
 if [ "$globl" == "global" ]; then
     cd Global
 fi
