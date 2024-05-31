@@ -1,5 +1,13 @@
-. ./checks/check_system.sh
-. ./aliases/rlwrap_scripts.sh
+if ! test -f checks/check_system.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
+else
+    . ./checks/check_system.sh
+fi 
+if ! test -f aliases/rlwrap_scripts.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/rlwrap_scripts.sh)" 
+else
+    . ./aliases/rlwrap_scripts.sh
+fi
 
 if ! command -v samba &> /dev/null; then
     if [ $distro_base == "Arch" ];then
@@ -8,6 +16,8 @@ if ! command -v samba &> /dev/null; then
         yes | sudo apt install samba samba-common  
     fi
 fi
+
+sudo usermod -aG sambashare $USER
 
 wordcomp=""
 for i in $(seq 1 7); do
@@ -27,6 +37,7 @@ elif sudo grep -q "$drive" /etc/samba/smb.conf; then
     exit 1
 fi
 reade -Q "GREEN" -i "/mnt" -p "Mount point (path name): " -e mnt
+reade -Q "GREEN" -i "y" -p "Browseable: [Y/n]: " "y n" browse
 reade -Q "GREEN" -i "y" -p "Writeable: [Y/n]: " "y n" write
 reade -Q "GREEN" -i "y" -p "Public [Y/n]: " "y n" public
 reade -Q "GREEN" -i "0777" -p "Create file mask (Default: 0777): " "$wordcomp"  fmask
@@ -59,6 +70,7 @@ fi
 
 printf "\n[$drive]
     Path=$mnt
+    Browseable=$browse
     Writeable=$write
     Public=$public
     Create mask=$fmask
@@ -69,7 +81,7 @@ if test "$edit" == "y"; then
     sudo $EDITOR /etc/samba/smb.conf
 fi
 
-reade -Q "GREEN" -i "$USER" -p "User for login to drive? : " "$USER" usr
+reade -Q "GREEN" -p "User for login to drive? : " "$USER" usr
 reade -Q "GREEN" -i "y" -p "No password? (You will have to set it otherwise) [Y/n]: " "y n" nopswd
 if ! test "$usr" ; then
     usr=$USER

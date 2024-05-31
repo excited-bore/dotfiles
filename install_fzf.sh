@@ -76,7 +76,7 @@ if test "$(which fd)" != ""; then
     if [ $fndgbl == 'y' ]; then
         if ! test -f install_gitignore.sh; then
             b=$(mktemp)
-            curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_gitignore.sh | tee "$b"
+            curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_gitignore.sh | tee "$b" &> /dev/null
             chmod u+x "$b"
             eval "$b" "global"
             unset b
