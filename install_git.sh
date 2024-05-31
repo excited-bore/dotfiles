@@ -1352,7 +1352,7 @@ fi
                     sudo apt install pipx
                     pipx install --upgrade ydiff
                 fi
-            elif test $pager == "Debian"; then
+            elif test "$distro_base" == "Debian"; then
                 if test $pager == "diff-so-fancy"; then
                     sudo apt install npm
                     sudo npm -g install diff-so-fancy 
