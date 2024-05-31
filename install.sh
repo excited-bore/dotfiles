@@ -110,7 +110,7 @@ fi
 #  Pathvariables
 
 #if [ ! -f ~/.pathvariables.env ]; then
-    pathvr=.pathvariables.env
+pathvr=$(pwd)/.pathvariables.env
     if ! test -f .pathvariables.env; then
         wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/.pathvariables.env -P $TMPDIR/
         pathvr=$TMPDIR/.pathvariables.env
@@ -229,7 +229,7 @@ fi
             vsual=$(whereis "$vsual" | awk '{print $2}')
             sed -i 's|#export VISUAL=.*|export VISUAL='$vsual'|' $pathvr
             
-            if grep -q "#export SUDO_EDITOR" $pathvr; then
+            if grep -q "#export SUDO_EDITOR" $PATHVAR; then
                 reade -Q "GREEN" -i "y" -p "Set SUDO_EDITOR to \$EDITOR? [Y/n]: " "y n" sud_edt
                 if test "$sud_edt" == "y"; then
                     sed -i 's|#export SUDO_EDITOR.*|export SUDO_EDITOR=$EDITOR|' $pathvr

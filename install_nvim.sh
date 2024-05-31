@@ -68,15 +68,16 @@ if [[ $distro == "Arch" || $distro_base == "Arch" ]];then
         reade -Q "GREEN" -i "y" -p "Install nvim-ruby? [Y/n]:" "y n" rubyscripts
         if [ -z $rubyscripts ] || [ "y" == $rubyscripts ]; then
             yes | sudo pacman -Su ruby
+            rver=$(echo $(ruby --version) | awk '{print $2}' | cut -d. -f-2)'.0'
             paths=$(gem environment | awk '/- GEM PATH/{flag=1;next}/- GEM CONFIGURATION/{flag=0}flag' | sed 's|     - ||g' | paste -s -d ':')
             if grep -q "GEM" $PATHVAR; then
-                sed -i "s|.export GEM_PATH=.*|GEM_PATH=/usr/lib/ruby/gems/3.0.0:$HOME/.local/share/gem/ruby/3.0.0/bin|g" $PATHVAR
+                sed -i "s|.export GEM_PATH=.*|GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin|g" $PATHVAR
                 sed -i 's|.export PATH=$PATH:$GEM_PATH|export PATH=$PATH:$GEM_PATH|g' $PATHVAR
             else
-                printf "export GEM_PATH=GEM_PATH=/usr/lib/ruby/gems/3.0.0:$HOME/.local/share/gem/ruby/3.0.0/bin\n" >> $PATHVAR
+                printf "export GEM_PATH=GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin\n" >> $PATHVAR
                 printf "export PATH=\$PATH:\$GEM_PATH\n" >> $PATHVAR
             fi
-            . ~/.bashrc
+            source ~/.bashrc
             gem install neovim
         fi
     fi
@@ -206,16 +207,17 @@ elif [  $distro_base == "Debian" ];then
         reade -Q "GREEN" -i "y" -p "Install nvim-ruby? [Y/n]:" "y n" rubyscripts
         if [ -z $rubyscripts ] || [ "y" == $rubyscripts ]; then
             yes | sudo apt install ruby
+            rver=$(echo $(ruby --version) | awk '{print $2}' | cut -d. -f-2)'.0'
             paths=$(gem environment | awk '/- GEM PATH/{flag=1;next}/- GEM CONFIGURATION/{flag=0}flag' | sed 's|     - ||g' | paste -s -d ':')
             if grep -q "GEM" $PATHVAR; then
-                sed -i "s|.export GEM_PATH=.*|GEM_PATH=/usr/lib/ruby/gems/3.0.0:$HOME/.local/share/gem/ruby/3.0.0/bin|g" $PATHVAR
+                sed -i "s|.export GEM_PATH=.*|GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin|g" $PATHVAR
                 sed -i 's|.export PATH=$PATH:$GEM_PATH|export PATH=$PATH:$GEM_PATH|g' $PATHVAR
             else
-                printf "export GEM_PATH=GEM_PATH=/usr/lib/ruby/gems/3.0.0:$HOME/.local/share/gem/ruby/3.0.0/bin\n" >> $PATHVAR
+                printf "export GEM_PATH=GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin\n" >> $PATHVAR
                 printf "export PATH=\$PATH:\$GEM_PATH\n" >> $PATHVAR
             fi
-            . ~/.bashrc
-            gem install neovim
+            source ~/.bashrc
+            gem install neovim 
         fi
     fi
     
@@ -235,7 +237,7 @@ elif [  $distro_base == "Debian" ];then
     fi
 fi
 
-unset clip x11f pyscripts jsscripts ctags rubyscripts perlscripts nvmbin
+unset rver paths clip x11f pyscripts jsscripts ctags rubyscripts perlscripts nvmbin
 
 function instvim_r(){
     if ! sudo test -d /root/.config/nvim/; then

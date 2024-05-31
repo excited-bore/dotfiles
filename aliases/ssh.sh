@@ -38,6 +38,7 @@ alias serber_unmnt="fusermount3 -u /mnt/mount1/"
 alias serber_unmnt1="fusermount3 -u /mnt/mount2/"
 
 ssh_key_and_add_to_agent_by_host() {
+    keytype=''
     if [ ! -f ~/.ssh/config ]; then
         touch ~/.ssh/config;
     fi
@@ -50,8 +51,10 @@ ssh_key_and_add_to_agent_by_host() {
             keytype=$(echo $name | sed 's|id_||g') 
         fi
     fi
-    reade -Q "GREEN" -i "id_ed25519" -p "Give up keytype \(dsa \| ecdsa \| ecdsa-sk \| ed25519 (Default) \| ed25519-sk \| rsa\): " "dsa ecdsa ecdsa-sk ed25519 ed25519-sk rsa" keytype
-    read -p "Give up remote machine (hostname) : " host
+    if test -z $keytype; then
+        reade -Q "GREEN" -i "id_ed25519" -p "Give up keytype \(dsa \| ecdsa \| ecdsa-sk \| ed25519 (Default) \| ed25519-sk \| rsa\): " "dsa ecdsa ecdsa-sk ed25519 ed25519-sk rsa" keytype
+    fi
+    read -p "Give up remote machine (hostname / Ip address) : " host
     if [ -z $host ]; then
         host=$(hostname) 
     fi
