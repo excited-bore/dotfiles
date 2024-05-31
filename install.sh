@@ -383,23 +383,23 @@ shell-keybinds_r(){
         sudo sed -i 's|setxkbmap|#setxkbmap|g' /root/.keybinds.d/keybinds.bash
     fi
 }
+binds=keybinds/.inputrc
+binds1=keybinds/keybinds.bash
+if ! test -f keybinds/.inputrc; then
+    wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.inputrc -P $TMPDIR/
+    wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/keybinds.bash -P $TMPDIR/
+    
+    binds=$TMPDIR/.inputrc
+    binds1=$TMPDIR/keybinds.bash
+fi
 shell-keybinds() {
     
     if ! test -f ./checks/check_keybinds.sh; then
          eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_keybinds.sh)" 
-         echo "bluj"
     else
         . ./checks/check_keybinds.sh
     fi
-    binds=keybinds/.inputrc
-    binds1=keybinds/keybinds.bash
-    if ! test -f keybinds/.inputrc; then
-        wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.inputrc -P $TMPDIR/
-        wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/keybinds.bash -P $TMPDIR/
-        
-        binds=$TMPDIR/.inputrc
-        binds1=$TMPDIR/keybinds.bash
-    fi
+    
     reade -Q "GREEN" -i "y" -p "Enable vi-mode instead of emacs mode (might cause issues with pasteing - revert with 'Alt-p')? [Y/n]: " "y n" vimde
     if [ "$vimde" == "y" ]; then
         sed -i "s|.set editing-mode .*|set editing-mode vi|g" $binds
@@ -418,9 +418,9 @@ shell-keybinds() {
        sed -i 's|#export INPUTRC|export INPUTRC|g' ~/.pathvariables.env
     fi
     unset vimde vivisual xterm
-    yes_edit_no shell-keybinds_r "keybinds/.inputrc keybinds/keybinds.bash" "Install .inputrc and keybinds.bash at /root/ and /root/.keybinds.d/?" "edit" "YELLOW"; 
+    yes_edit_no shell-keybinds_r "$binds $binds1" "Install .inputrc and keybinds.bash at /root/ and /root/.keybinds.d/?" "edit" "YELLOW"; 
 }
-yes_edit_no shell-keybinds "keybinds/.inputrc keybinds/keybinds.bash" "Install .inputrc and keybinds.bash at ~/ and ~/.keybinds.d/? (keybinds configuration)" "edit" "YELLOW"
+yes_edit_no shell-keybinds "$binds $binds1" "Install .inputrc and keybinds.bash at ~/ and ~/.keybinds.d/? (keybinds configuration)" "edit" "YELLOW"
 
 # Xresources
 
@@ -435,8 +435,8 @@ xresources_r(){
     }
 xresources() {
     cp -fv $xterm ~/.Xresources;
-    yes_edit_no xresources_r "$xterm" "Install .Xresources at /root/.bash_aliases.d/?" "edit" "RED"; }
-yes_edit_no xresources "$xterm" "Install .Xresources at ~/.bash_aliases.d/? (Xterm configuration)" "edit" "YELLOW"
+    yes_edit_no xresources_r "$xterm" "Install .Xresources at /root/?" "edit" "RED"; }
+yes_edit_no xresources "$xterm" "Install .Xresources at ~/? (Xterm configuration)" "edit" "YELLOW"
     
 
 if ! test -f checks/check_completions_dir.sh; then
