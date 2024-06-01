@@ -1009,16 +1009,16 @@ vnoremap <A-Enter>      <Esc>`<i<Enter><Esc>gv
 
 
 " BackSpace -> backspace no leave normal mode
-nnoremap <expr><BackSpace>    (col(".") ==? 1 ? 'i<BackSpace><esc>' : 'dh')
-inoremap <expr> <Backspace>    (mode() ==# 'R' && col('.') ==? 1 ? '<esc>dhR' : mode() ==# 'R' ? '<esc>dhR' : '<BackSpace>')
-vnoremap <Backspace>    d
+nnoremap <expr><BackSpace>    (col(".") ==? 1 ? 'i<BackSpace><esc>' : '"_dh')
+inoremap <expr> <Backspace>    (mode() ==# 'R' && col('.') ==? 1 ? '<esc>"_dhR' : mode() ==# 'R' ? '<esc>"_dhR' : '<BackSpace>')
+vnoremap <Backspace>   "_d
 " Ctrl-Backspace => Delete appended 'word'
 " Alt-BackSpace => Delete line 
 " Shift-Backspace => Delete stuff forwards
-nnoremap <expr> <C-Backspace>  (col(".") ==? 1 ? '<BackSpace>' : 'hdge')
-inoremap <expr> <C-Backspace>  (col(".") ==? 1 ? '<BackSpace>' : '<esc>dgei')
-nnoremap <A-Backspace>      dd<Up>$
-inoremap <A-Backspace>      <Esc>dd<Up>$a
+nnoremap <expr> <C-Backspace>  (col(".") ==? 1 ? '<BackSpace>' : 'h"_dge')
+inoremap <expr> <C-Backspace>  (col(".") ==? 1 ? '<BackSpace>' : '<esc>"_dgei')
+nnoremap <A-Backspace>      "_dd<Up>$
+inoremap <A-Backspace>      <Esc>"_dd<Up>$a
 
 
 " ctrl-a  n  ctrl-a	add n to the number at or after the cursor
