@@ -49,6 +49,12 @@ else
     write="no"
 fi
 
+if [[ -z $browse || "y" == $browse ]]; then
+    browse="yes"
+else
+    browse="no"
+fi
+
 if [[ -z $public || "y" == $public ]]; then
     public="yes"
 else

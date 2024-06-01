@@ -110,7 +110,7 @@ fi
 #  Pathvariables
 
 #if [ ! -f ~/.pathvariables.env ]; then
-    pathvr=.pathvariables.env
+pathvr=$(pwd)/.pathvariables.env
     if ! test -f .pathvariables.env; then
         wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/.pathvariables.env -P $TMPDIR/
         pathvr=$TMPDIR/.pathvariables.env

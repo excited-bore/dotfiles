@@ -11,6 +11,17 @@ if test -z $TMPDIR; then
     TMPDIR=$(mktemp -d)
 fi
 
+if test -z $EDITOR; then
+    if type nano &> /dev/null; then
+        EDITOR=nano
+    elif type vi &> /dev/null; then
+        EDITOR=vi
+    else
+        EDITOR=edit
+    fi
+fi
+
+
 distro_base=/
 distro=/
 packagemanager=/
