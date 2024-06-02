@@ -1695,7 +1695,7 @@ fi
             else
                . ./checks/check_aliases_dir.sh
             fi
-            wget https://raw.githubusercontent.com/junegunn/fzf-git.sh/main/fzf-git.sh -O ~/.bash_aliases.d/fzf-git.sh
+            wget -O ~/.bash_aliases.d/fzf-git.sh https://raw.githubusercontent.com/junegunn/fzf-git.sh/main/fzf-git.sh 
         fi
     fi
 
@@ -1708,7 +1708,7 @@ fi
            . ./checks/check_aliases_dir.sh
         fi
         if ! test -f aliases/git.sh; then
-            wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/git.sh -O ~/.bash_aliases.d/git.sh 
+            wget -O ~/.bash_aliases.d/git.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/git.sh  
         else
             cp -fv aliases/git.sh ~/.bash_aliases.d/
         fi

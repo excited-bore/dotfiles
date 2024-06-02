@@ -87,7 +87,7 @@ if test "$edit" == "y"; then
     sudo $EDITOR /etc/samba/smb.conf
 fi
 
-reade -Q "GREEN" -p -i "$USER" "User for login to drive? : " "$USER" usr
+reade -Q "GREEN" -i "$USER" -p "User $USER for login to drive? : " "$USER" usr
 reade -Q "GREEN" -i "y" -p "No password? (You will have to set it otherwise) [Y/n]: " "y n" nopswd
 if ! test "$usr" ; then
     usr=$USER

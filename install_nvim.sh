@@ -114,15 +114,14 @@ elif [  $distro_base == "Debian" ];then
                 if [[ ! "$arch"  =~ "arm" ]] && [ "y" == $nvmappmg ]; then
                     ltstv=$(curl -sL https://api.github.com/repos/neovim/neovim/releases/latest | jq -r ".tag_name")
                     tmpdir=$(mktemp -d -t nvim-XXXXXXXXXX)
-                    (cd $tmpdir
-                    wget https://github.com/neovim/neovim/releases/download/$ltstv/nvim.appimage 
-                    wget https://github.com/neovim/neovim/releases/download/$ltstv/nvim.appimage.sha256sum 
-                    if [ "$(sha256sum nvim.appimage)" != "$(cat nvim.appimage.sha256sum)" ]; then 
+                    wget -P $tmpdir https://github.com/neovim/neovim/releases/download/$ltstv/nvim.appimage 
+                    wget -P $tmpdir https://github.com/neovim/neovim/releases/download/$ltstv/nvim.appimage.sha256sum 
+                    if [ "$(sha256sum $tmpdir/nvim.appimage)" != "$(cat $tmpdir/nvim.appimage.sha256sum)" ]; then 
                            echo "Something went wrong: Sha256sums aren't the same. Try again later"    
                     else
-                        chmod u+x nvim.appimage && ./nvim.appimage
+                        chmod u+x $tmpdir/nvim.appimage
+                        bash $tmpdir/nvim.appimage
                     fi  
-                    )
                 else
                     if [[ "$arch"  =~ "arm" ]]; then
                         echo "Sorry. Actually, it seems Nvim appimages still aren't supported for ${cyan}arm-based processors"
