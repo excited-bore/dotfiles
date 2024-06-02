@@ -305,7 +305,13 @@ function instvim(){
         mkdir ~/.config/nvim/
     fi
     if ! test -d vim/; then
-        wget 
+        tmpdir=$(mktemp -d -t nvim-XXXXXXXXXX)
+        tmpfile=$(mktemp)
+        curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/download_git_directory.sh | tee "$tmpfile" &> /dev/null
+        chmod u+x "$tmpfile"
+        eval $tmpfile https://github.com/excited-bore/dotfiles/tree/main/vim $tmpdir
+        cp -bfv $tmpdir/vim/* ~/.config/nvim/
+        unset tmpdir tmpfile
     else
         cp -bfv vim/* ~/.config/nvim/
     fi

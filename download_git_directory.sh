@@ -47,52 +47,43 @@ function pop_element() {
 
 function url_get_dirs() {
     for i in $(cat "$1" | grep -n --color=never 'dir' | awk '{print $1}' | cut -d: -f-1 ); do
-        echo "$i"
         j=$(($((i))+2))
         b=$(cat "$1" | sed -n ''$j'p' | awk '{print $2}' | cut -d, -f-1 | sed 's,"\(.*\)",\1,g')
         dir="$(echo "$b" | sed 's,.*/contents/\(.*\),\1,g' | cut -d? -f-1)"  
         file="$(mktemp)"
-        curl -- "$b" > "$file"
-        echo $b
-        echo $file
+        curl -- "$b" | tee "$file" &> /dev/null
         file_array+=("$file")
-        echo "$dir"
         dir_array+=("$dir")
     done
 }
 
-git_url=$(echo "$git_url"| sed 's,https://github.com/,https://api.github.com/repos/,g') 
-git_url=$(echo "$git_url" | sed 's,tree/master/,contents/,g')
+git_url=$(echo "$git_url" | sed 's,https://github.com/,https://api.github.com/repos/,g') 
+git_url=$(echo "$git_url" | sed 's,tree/[^/]*/,contents/,g')
 
 main_dir="$(echo $git_url | sed 's,.*/contents/\(.*\),\1,g' | cut -d? -f-1)"  
-
 file="$(mktemp)"
-curl -- "$git_url" > "$file"
+curl -- "$git_url" | tee "$file" &> /dev/null
 
+cat $file
 file_array=("$file") 
 dir_array=("$main_dir")
 current_dir="$target_dir/$main_dir"
-
 
 while ! test -z "$file_array"; do
     set -- "${file_array[@]}"
     for i; do
         mkdir -p $current_dir
+        cat $i
         for j in $(cat "$i" | grep 'download_url' | awk '{print $2}' | cut -d, -f-1 | sed 's,"\(.*\)",\1,g'); do
             if ! test "$j" == "null"; then
-                echo "$j"
-                echo "$current_dir"
+                echo $j
                 wget -P "$current_dir" -- "$j" 
             fi
         done
         dir_array=($(pop_element "${dir_array[@]}" "$main_dir"))
+        file_array=($(pop_element "${file_array[@]}" "$i"))
         url_get_dirs "$i"
-        echo "${dir_array[@]}"
         main_dir="${dir_array[0]}"
         current_dir="$target_dir/$main_dir"
-        #echo "${file_array[@]}"
-        #echo "$i"
-        file_array=($(pop_element "${file_array[@]}" "$i"))
-        echo "${file_array[@]}"
     done
 done
