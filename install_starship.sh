@@ -5,11 +5,7 @@ else
     . ./aliases/rlwrap_scripts.sh
 fi
 
-if ! test -f aliases/starship.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/starship.sh)" 
-else
-    . ./aliases/starship.sh
-fi 
+
 
 curl -sS https://starship.rs/install.sh | sh 
 
@@ -55,4 +51,11 @@ fi
 unset strship
 
 source ~/.bashrc
+if ! test -f aliases/starship.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/starship.sh)" 
+else
+    . ./aliases/starship.sh
+fi 
 starship-presets
+source ~/.bashrc
+
