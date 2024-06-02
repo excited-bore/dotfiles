@@ -5,9 +5,11 @@ else
     . ./aliases/rlwrap_scripts.sh
 fi
 
+
+
 curl -sS https://starship.rs/install.sh | sh 
 
-reade -Q "GREEN" -i "y" -p "Install starship for user? [Y/n]:" "y n" strship
+reade -Q "GREEN" -i "y" -p "Install starship.sh for user? [Y/n]:" "y n" strship
 if [ "y" == "$strship" ]; then
     if ! grep -q "starship" ~/.bashrc; then
         echo "eval \"\$(starship init bash)\"" >> ~/.bashrc
@@ -27,7 +29,7 @@ if [ "y" == "$strship" ]; then
 fi
 unset strship
 
-reade -Q "YELLOW" -i "y" -p "Install starship for root? [Y/n]:" "y n" strship
+reade -Q "YELLOW" -i "y" -p "Install starship.sh for root? [Y/n]:" "y n" strship
 if [ "y" == "$strship" ]; then
     if ! sudo grep -q "starship" /root/.bashrc; then
         printf "eval \"\$(starship init bash)\"\n" | sudo tee -a /root/.bashrc &> /dev/null
@@ -49,4 +51,11 @@ fi
 unset strship
 
 source ~/.bashrc
+if ! test -f aliases/starship.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/starship.sh)" 
+else
+    . ./aliases/starship.sh
+fi 
 starship-presets
+source ~/.bashrc
+
