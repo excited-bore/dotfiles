@@ -47,11 +47,9 @@ if ! type moar &> /dev/null; then
                 arch="386"
             fi
             latest=$(curl -sL "https://github.com/walles/moar/tags" | grep "/walles/moar/releases/tag" | perl -pe 's|.*/walles/moar/releases/tag/(.*?)".*|\1|' | uniq | awk 'NR==1{max=$1;print $0; exit;}')                          
-            (cd /tmp
-            wget "https://github.com/walles/moar/releases/download/$latest/moar-$latest-linux-$arch"
-            chmod a+x moar-*-*-*
-            sudo mv moar-* /usr/bin/moar
-            )
+            wget -P $TMPDIR "https://github.com/walles/moar/releases/download/$latest/moar-$latest-linux-$arch"
+            chmod a+x $TMPDIR/moar-*-*-*
+            sudo mv $TMPDIR/moar-* /usr/bin/moar
             echo "Done!"
         fi
         

@@ -112,7 +112,7 @@ fi
 #if [ ! -f ~/.pathvariables.env ]; then
 pathvr=$(pwd)/.pathvariables.env
     if ! test -f .pathvariables.env; then
-        wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/.pathvariables.env -P $TMPDIR/
+        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/.pathvariables.env
         pathvr=$TMPDIR/.pathvariables.env
     fi
     reade -Q "GREEN" -i "y" -p "Check existence (and create) ~/.pathvariables.env and link it to .bashrc? [Y/n]:" "y n" pathvars
@@ -386,8 +386,8 @@ shell-keybinds_r(){
 binds=keybinds/.inputrc
 binds1=keybinds/keybinds.bash
 if ! test -f keybinds/.inputrc; then
-    wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.inputrc -P $TMPDIR/
-    wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/keybinds.bash -P $TMPDIR/
+    wget -P $TMPDIR/  https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.inputrc
+    wget -P $TMPDIR/  https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/keybinds.bash 
     
     binds=$TMPDIR/.inputrc
     binds1=$TMPDIR/keybinds.bash
@@ -400,7 +400,7 @@ shell-keybinds() {
         . ./checks/check_keybinds.sh
     fi
     
-    reade -Q "GREEN" -i "y" -p "Enable vi-mode instead of emacs mode (might cause issues with pasteing - revert with 'Alt-p')? [Y/n]: " "y n" vimde
+    reade -Q "GREEN" -i "y" -p "Enable vi-mode instead of emacs mode (might cause issues with pasteing - revert with 'Ctrl-z')? [Y/n]: " "y n" vimde
     if [ "$vimde" == "y" ]; then
         sed -i "s|.set editing-mode .*|set editing-mode vi|g" $binds
     fi
@@ -426,7 +426,7 @@ yes_edit_no shell-keybinds "$binds $binds1" "Install .inputrc and keybinds.bash 
 
 xterm=xterm/.Xresources
 if ! test -f keybinds/.inputrc; then
-    wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/xterm/.Xresources -P $TMPDIR/
+    wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/xterm/.Xresources
     xterm=$TMPDIR/.Xresources
 fi
 
@@ -669,7 +669,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     
     genr=aliases/general.sh
     if ! test -f aliases/general.sh; then
-        wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/general.sh -P $TMPDIR/
+        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/general.sh 
         genr=$TMPDIR/general.sh
     fi
 
@@ -717,23 +717,23 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     pthon=aliases/python.sh
     ytbe=aliases/youtube.sh
     if ! test -d aliases/; then
-        wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/systemctl.sh -P $TMPDIR/
+        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/systemctl.sh 
         systemd=$TMPDIR/systemctl.sh
-        wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/sudo.sh -P $TMPDIR/
+        wget -P $TMPDIR/  https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/sudo.sh 
         dosu=$TMPDIR/sudo.sh
-        wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/package_managers.sh -P $TMPDIR/
+        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/package_managers.sh 
         pacmn=$TMPDIR/package_managers.sh
-        wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/ssh.sh -P $TMPDIR/
+        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/ssh.sh 
         sshs=$TMPDIR/ssh.sh
-        wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/ps1.sh -P $TMPDIR/
+        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/ps1.sh 
         ps1=$TMPDIR/ps1.sh
-        wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/manjaro.sh -P $TMPDIR/
+        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/manjaro.sh 
         manjaro=$TMPDIR/manjaro.sh
-        wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/variety.sh -P $TMPDIR/
+        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/variety.sh 
         variti=$TMPDIR/variety.sh
-        wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/python.sh -P $TMPDIR/
+        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/python.sh 
         pthon=$TMPDIR/python.sh
-        wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/youtube.sh -P $TMPDIR/
+        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/youtube.sh 
         ytbe=$TMPDIR/youtube.sh
     fi 
 

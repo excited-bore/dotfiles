@@ -129,7 +129,7 @@ fi
     reade -Q "GREEN" -i "y" -p "Add shortcut for ripgrep files in dir? (Ctrl-g) [Y/n]:" "y n" rpgrpdir
     if [ -z $rpgrp ] || [ "Y" == $rpgrp ] || [ $rpgrp == "y" ]; then
         if ! test -f fzf/ripgrep-directory.sh; then
-            wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/ripgrep-directory.sh -O ~/.bash_aliases.d/ripgrep-directory.sh 
+            wget -O ~/.bash_aliases.d/ripgrep-directory.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/ripgrep-directory.sh
         else
             cp -fv fzf/ripgrep-directory.sh ~/.bash_aliases.d/
         fi
@@ -164,13 +164,13 @@ fi
     reade -Q "GREEN" -i "y" -p "Use rifle (file opener from 'ranger') to open found files and dirs with Ctrl-T filesearch shortcut? [Y/n]:" "y n" fzf_t
     if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ] ; then
         if [ "$(which rifle)" == "" ]; then
-            sudo wget "https://raw.githubusercontent.com/ranger/ranger/master/ranger/ext/rifle.py" -P /usr/bin/
+            sudo wget -P /usr/bin/ https://raw.githubusercontent.com/ranger/ranger/master/ranger/ext/rifle.py 
             sudo mv -v /usr/bin/rifle.py /usr/bin/rifle
             sudo chmod +x /usr/bin/rifle
         fi
         if ! test -f ranger/rifle.conf; then
-            wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/rifle.conf -O ~/.config/ranger/rifle.conf 
-            wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/keybinds_rifle.sh -O ~/.bash_aliases.d/keybinds_rifle.sh 
+            wget -O ~/.config/ranger/rifle.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/rifle.conf  
+            wget -O ~/.bash_aliases.d/keybinds_rifle.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/keybinds_rifle.sh
         else
             mkdir -p ~/.config/ranger
             cp -fv ranger/rifle.conf ~/.config/ranger/
@@ -284,7 +284,7 @@ fi
             else
                 ./checks/check_aliases_dir.sh
             fi
-            wget https://raw.githubusercontent.com/MartinRamm/fzf-docker/master/docker-fzf -O ~/.bash_aliases.d/docker-fzf.sh
+            wget -O ~/.bash_aliases.d/docker-fzf.sh https://raw.githubusercontent.com/MartinRamm/fzf-docker/master/docker-fzf 
         fi
     fi
     unset fzf_t;

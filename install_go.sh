@@ -30,9 +30,8 @@ elif [ $distro_base == "Debian" ]; then
         
         checksum=$(curl -sL "https://golang.google.cn/dl/" | awk 'BEGIN{FS="\n"; RS=""} $0 ~ /'$file'/ &&  $0 ~ /<\/tt>/ {print $0;}' | grep "<tt>" | sed "s,.*<tt>\(.*\)</tt>.*,\1,g")
         if [ ! -x "$(command -v go version)" ] || [[ ! "$(go version)" =~ $latest ]]; then
-            (
-            cd /tmp
-            wget https://golang.google.cn/dl/$file
+            wget -P $TMPDIR https://golang.google.cn/dl/$file
+            file=$TMPDIR/$file
             sum=$(sha256sum $file | awk '{print $1;}')
             echo "Checksum golang website: $checksum"
             echo "Checksum file: $sum"
@@ -42,7 +41,6 @@ elif [ $distro_base == "Debian" ]; then
             fi
             sudo tar -C /usr/local -xzf $file
             rm $file
-            )
             #if grep -q "GOROOT" $PATHVAR; then
             #    sed -i "s|.export GOROOT=|export GOROOT=|g" $PATHVAR
             #    sed -i "s|export GOROOT=.*|export GOROOT=$goroot|g" $PATHVAR

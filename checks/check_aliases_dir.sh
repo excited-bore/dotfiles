@@ -2,7 +2,7 @@
 
 if [ ! -f ~/.bash_aliases ]; then
     if ! test -f aliases/.bash_aliases; then
-        wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases -P ~/ 
+        wget -P ~/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases  
     else
         cp -fv aliases/.bash_aliases ~/
     fi 
@@ -32,19 +32,19 @@ fi
 #fi
 
 if ! test -f checks/check_system.sh; then
-    wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh -O ~/.bash_aliases.d/check_system.sh 
+    wget -O ~/.bash_aliases.d/check_system.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh  
 else
     cp -fv checks/check_system.sh ~/.bash_aliases.d/
 fi
 
 if ! test -f aliases/bash.sh; then
-    wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/bash.sh -O ~/.bash_aliases.d/bash.sh 
+    wget -O ~/.bash_aliases.d/bash.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/bash.sh  
 else
     cp -fv aliases/bash.sh ~/.bash_aliases.d/
 fi
 
 if ! test -f aliases/rlwrap_scripts.sh; then
-    wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/rlwrap_scripts.sh -O ~/.bash_aliases.d/rlwrap_scripts.sh 
+    wget -O ~/.bash_aliases.d/rlwrap_scripts.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/rlwrap_scripts.sh  
 else
     cp -fv aliases/rlwrap_scripts.sh ~/.bash_aliases.d/
 fi
