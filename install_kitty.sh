@@ -25,15 +25,21 @@ if ! [ -x "$(command -v kitty)" ]; then
         if [ ! -x "$(command -v kitten)" ]; then
             sudo ln -s ~/.local/share/kitty-ssh-kitten/kitty/bin/kitten    
         fi
-        kitten update-self 
+        kitty +kitten update-self 
     fi
 fi
 
 reade -Q "GREEN" -i "y" -p "Install kitty conf? (at ~/.config/kitty/kitty.conf\|ssh.conf) [Y/n]:" "y n" kittn
 if [ "y" == "$kittn" ]; then
     mkdir -p ~/.config/kitty
-    cp -vf kitty/kitty.conf ~/.config/kitty/kitty.conf
+    cp -bvf kitty/kitty.conf ~/.config/kitty/kitty.conf
+    if [ ! -f ~/.config/kitty/kitty.conf~ ]; then
+        gio trash ~/.config/kitty/kitty.conf~
+    fi
     cp -vf kitty/ssh.conf ~/.config/kitty/ssh.conf
+    if [ ! -f ~/.config/kitty/ssh.conf~ ]; then
+        gio trash ~/.config/kitty/ssh.conf~
+    fi
 fi
 unset kittn
 

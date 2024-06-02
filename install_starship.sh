@@ -32,14 +32,21 @@ if [ "y" == "$strship" ]; then
     if ! sudo grep -q "starship" /root/.bashrc; then
         printf "eval \"\$(starship init bash)\"\n" | sudo tee -a /root/.bashrc &> /dev/null
     fi
-    . ./checks/check_completions_dir.sh
+    if ! test -f checks/check_completions_dir.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)" 
+    else
+        . ./checks/check_completions_dir.sh
+    fi
     sudo touch /root/.bash_completion.d/starship
     starship completions bash | sudo tee -a /root/.bash_completion.d/starship > /dev/null  
     if [ -d /root/.bash_aliases.d/ ]; then
         sudo cp -bfv aliases/starship.sh /root/.bash_aliases.d/
-        sudo gio trash ~/.bash_aliases.d/starship.sh~
+        if test -f /root/.bash_aliases.d/starship.sh~; then
+            sudo gio trash ~/.bash_aliases.d/starship.sh~
+        fi
     fi
 fi
 unset strship
 
 source ~/.bashrc
+starship-presets

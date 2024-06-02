@@ -1,10 +1,22 @@
  # !/bin/bash
-. ./checks/check_system.sh
-. ./checks/check_pathvar.sh 
-. ./aliases/rlwrap_scripts.sh
+if ! test -f checks/check_system.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
+else
+    . ./checks/check_system.sh
+fi
+if ! test -f checks/check_pathvar.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pathvar.sh)" 
+else
+    . ./checks/check_pathvar.sh
+fi 
+if ! test -f aliases/rlwrap_scripts.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/rlwrap_scripts.sh)" 
+else
+    . ./aliases/rlwrap_scripts.sh
+fi
 
  # Ranger (File explorer)
- if [ -x "$(command -v ranger)" ]; then
+ if ! type ranger &> /dev/null; then
      if [ $distro_base == "Arch" ];then
         yes | sudo pacman -Su ranger python python-pipx
     elif [ $distro_base == "Debian" ]; then    
@@ -34,7 +46,9 @@ else
 fi
 if [ -d ~/.bash_aliases.d/ ]; then
     cp -bfv ./aliases/ranger.sh ~/.bash_aliases.d/ranger.sh
-    gio trash ~/.bash_aliases.d/ranger.sh~
+    if test -f ~/.bash_aliases.d/ranger.sh~; then
+        gio trash ~/.bash_aliases.d/ranger.sh~
+    fi
 fi
 
 
@@ -43,7 +57,15 @@ rangr_cnf() {
         mkdir -p ~/.config/ranger/
     fi
     cp -bfv -t ~/.config/ranger ./ranger/rc.conf ./ranger/rifle.conf ./ranger/scope.sh
-    gio trash ~/.config/ranger/rc.conf~ ~/.config/ranger/rifle.conf~ ~/.config/ranger/scope.sh~
+    if test -f ~/.config/ranger/rc.conf~; then
+        gio trash ~/.config/ranger/rc.conf~ 
+    fi
+    if test -f ~/.config/ranger/rifle.conf~; then
+        gio trash ~/.config/ranger/rifle.conf~ 
+    fi
+    if test -f ~/.config/ranger/scope.sh~; then
+        gio trash ~/.config/ranger/scope.sh~ 
+    fi
 }
 yes_edit_no rangr_cnf "ranger/rc.conf ranger/rifle.conf" "Install predefined configuration (rc.conf,rifle.conf and scope.sh at ~/.config/ranger/)? " "edit" "GREEN"
 
@@ -74,7 +96,11 @@ if ! test -d ~/.config/ranger/plugins/devicons2; then
         elif [ "$distro_base" == "Debian" ]; then    
             reade -Q "YELLOW" -i "y" -p "Install Nerdfonts from binary - no apt? (Special FontIcons) [Y/n]: " "y n" nrdfnts
             if [ -z $nrdfnts ] || [ "Y" == $nrdfnts ] || [ $nrdfnts == "y" ]; then
-                ./install_nerdfonts.sh
+                if ! test -f ./install_nerdfonts.sh; then
+                    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nerdfonts.sh)" 
+                else
+                    ./install_nerdfonts.sh
+                fi
             fi
         fi
     fi

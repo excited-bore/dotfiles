@@ -234,6 +234,9 @@ augroup END
 let g:python3_host_prog = '/usr/bin/python3'
 let g:ycm_path_to_python_interpreter = '/usr/bin/python3'
 
+"Fix Ruby interpreter
+"let g:ruby_host_prog = '$HOME/.gem/ruby/3.0.0/bin/neovim-ruby-host'
+
 "autocmd CursorHold      * echo mode(1) 
 "autocmd CursorHoldI     * echo mode(1)
 autocmd CursorMoved     * set cul
@@ -339,7 +342,7 @@ Plugin 'folke/which-key.nvim'
 Plugin 'folke/zen-mode.nvim'
 
 " Vim tmux kitty navigator
-Plugin 'excited-bore/vim-tmux-kitty-navigator', { 'build' : 'cd ~/.vim/plugins/vim-tmux-kitty-navigator && cp -f ./pass_keys.py ~/.config/kitty/;'}
+Plugin 'excited-bore/vim-tmux-kitty-navigator', { 'build' : 'mkdir -p ~/.config/kitty/ && cd ~/.vim/plugins/vim-tmux-kitty-navigator && cp -f ./pass_keys.py ~/.config/kitty/;'}
 
 " Codeium (Free Copilot AI Helper) 
 Plug 'Exafunction/codeium.vim', { 'branch': 'main' }

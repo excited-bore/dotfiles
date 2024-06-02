@@ -64,18 +64,20 @@ if [[ $distro == "Arch" || $distro_base == "Arch" ]];then
             sudo npm install -g neovim
         fi
     fi
-    if ! gem list | grep neovim &> /dev/null; then
+    if ! type gem &> /dev/null || ! gem list | grep neovim &> /dev/null; then
         reade -Q "GREEN" -i "y" -p "Install nvim-ruby? [Y/n]:" "y n" rubyscripts
         if [ -z $rubyscripts ] || [ "y" == $rubyscripts ]; then
             yes | sudo pacman -Su ruby
             rver=$(echo $(ruby --version) | awk '{print $2}' | cut -d. -f-2)'.0'
             paths=$(gem environment | awk '/- GEM PATH/{flag=1;next}/- GEM CONFIGURATION/{flag=0}flag' | sed 's|     - ||g' | paste -s -d ':')
             if grep -q "GEM" $PATHVAR; then
+                sed -i "s|.export GEM_HOME=.*|export GEM_HOME=$HOME/.gem/ruby/$rver|g" $PATHVAR
                 sed -i "s|.export GEM_PATH=.*|GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin|g" $PATHVAR
-                sed -i 's|.export PATH=$PATH:$GEM_PATH|export PATH=$PATH:$GEM_PATH|g' $PATHVAR
+                sed -i 's|.export PATH=$PATH:$GEM_PATH.*|export PATH=$PATH:$GEM_PATH:$GEM_HOME|g' $PATHVAR
             else
+                printf "export GEM_HOME=$HOME/.gem/ruby/$rver\n" >> $PATHVAR
                 printf "export GEM_PATH=GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin\n" >> $PATHVAR
-                printf "export PATH=\$PATH:\$GEM_PATH\n" >> $PATHVAR
+                printf "export PATH=\$PATH:\$GEM_PATH:\$GEM_HOME\n" >> $PATHVAR
             fi
             source ~/.bashrc
             gem install neovim
@@ -86,6 +88,10 @@ if [[ $distro == "Arch" || $distro_base == "Arch" ]];then
         yes | sudo pacman -Su cpanminus
         cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
         sudo cpanm --sudo -n Neovim::Ext
+        reade -Q "GREEN" -i "y" -p "Perl uses cpan for the installation of modules. Initialize cpan? (Will prevent nvim :checkhealth warning) [Y/n]: " cpn
+        if [ "y" == $cpn ]; then
+            cpan -l
+        fi
     fi
     if ! type ctags &> /dev/null; then 
         reade -Q "GREEN" -i "y" -p "Install ctags? [Y/n]:" "y n" ctags
@@ -100,19 +106,19 @@ elif [  $distro_base == "Debian" ];then
         
         echo "Neovim apt version is below 0.8, wich is needed to run Lazy.nvim (nvim plugin manager)"
         if ! type nvim &> /dev/null; then
-            reade -Q "YELLOW" -i "n" -p "Still wish to install through apt? [Y/n]:" "y n" nvmapt
+            reade -Q "YELLOW" -i "n" -p "Still wish to install through apt? [N/y]:" "y n" nvmapt
             if [ "y" == $nvmapt ]; then
                 yes | sudo apt install neovim
             else
                 reade -Q "GREEN" -i "y" -p "Install nvim through Appimage? [Y/n]:" "y n" nvmappmg
                 if [[ ! "$arch"  =~ "arm" ]] && [ "y" == $nvmappmg ]; then
                     ltstv=$(curl -sL https://api.github.com/repos/neovim/neovim/releases/latest | jq -r ".tag_name")
-                    (mkdir /tmp/neovim
-                    cd /tmp/neovim
+                    tmpdir=$(mktemp -d -t nvim-XXXXXXXXXX)
+                    (cd $tmpdir
                     wget https://github.com/neovim/neovim/releases/download/$ltstv/nvim.appimage 
                     wget https://github.com/neovim/neovim/releases/download/$ltstv/nvim.appimage.sha256sum 
                     if [ "$(sha256sum nvim.appimage)" != "$(cat nvim.appimage.sha256sum)" ]; then 
-                        echo "Something went wrong: Sha256sums aren't the same. Try again later"    
+                           echo "Something went wrong: Sha256sums aren't the same. Try again later"    
                     else
                         chmod u+x nvim.appimage && ./nvim.appimage
                     fi  
@@ -129,8 +135,8 @@ elif [  $distro_base == "Debian" ];then
                         echo "Then, install some necessary buildtools"
                         yes | sudo apt update
                         yes | sudo apt-get install ninja-build gettext libtool libtool-bin autoconf automake cmake g++ pkg-config unzip curl doxygen
-                        (mkdir /tmp/neovim
-                        cd /tmp/neovim
+                        tmpdir=$(mktemp -d -t nvim-XXXXXXXXXX)
+                        (cd $tmpdir
                         git clone https://github.com/neovim/neovim
                         cd neovim && git checkout stable && make CMAKE_BUILD_TYPE=RelWithDebInfo
                         cd build && cpack -G DEB && sudo dpkg -i nvim-linux64.deb 
@@ -138,7 +144,11 @@ elif [  $distro_base == "Debian" ];then
                     elif [ "$nvmflpk" == "y" ]; then 
                        reade -Q "GREEN" -i "y" -p "Install flatpak? [Y/n]:" "y n" insflpk 
                        if [ "y" == "$insflpk" ]; then
-                           ./install_flatpak.sh
+                            if ! test -f install_flatpak.sh; then
+                                eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_flatpak.sh)" 
+                            else
+                                ./install_flatpak.sh 
+                            fi
                        fi
                        flatpak install neovim
                     else
@@ -173,7 +183,7 @@ elif [  $distro_base == "Debian" ];then
         fi
     fi
 
-    if ! npm list -g | grep neovim  &> /dev/null; then
+    if ! type npm &> /dev/null || ! npm list -g | grep neovim  &> /dev/null; then
         reade -Q "GREEN" -i "y" -p "Install nvim-javascript? [Y/n]:" "y n" jsscripts
         if [ -z $jsscripts ] || [ "y" == $jsscripts ]; then
             yes | sudo apt install nodejs npm
@@ -203,18 +213,22 @@ elif [  $distro_base == "Debian" ];then
         fi
     fi
     
-    if ! gem list | grep neovim &> /dev/null; then
+    if ! type gem &> /dev/null || ! gem list | grep neovim &> /dev/null; then
         reade -Q "GREEN" -i "y" -p "Install nvim-ruby? [Y/n]:" "y n" rubyscripts
         if [ -z $rubyscripts ] || [ "y" == $rubyscripts ]; then
-            yes | sudo apt install ruby
+            yes | sudo apt install ruby ruby-dev
             rver=$(echo $(ruby --version) | awk '{print $2}' | cut -d. -f-2)'.0'
             paths=$(gem environment | awk '/- GEM PATH/{flag=1;next}/- GEM CONFIGURATION/{flag=0}flag' | sed 's|     - ||g' | paste -s -d ':')
             if grep -q "GEM" $PATHVAR; then
+                sed -i "s|.export GEM_HOME=.*|export GEM_HOME=$HOME/.gem/ruby/$rver|g" $PATHVAR
+                
                 sed -i "s|.export GEM_PATH=.*|GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin|g" $PATHVAR
-                sed -i 's|.export PATH=$PATH:$GEM_PATH|export PATH=$PATH:$GEM_PATH|g' $PATHVAR
+                sed -i 's|.export PATH=$PATH:$GEM_PATH.*|export PATH=$PATH:$GEM_PATH:$GEM_HOME|g' $PATHVAR
             else
+                printf "export GEM_HOME=$HOME/.gem/ruby/$rver\n" >> $PATHVAR
+                
                 printf "export GEM_PATH=GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin\n" >> $PATHVAR
-                printf "export PATH=\$PATH:\$GEM_PATH\n" >> $PATHVAR
+                printf "export PATH=\$PATH:\$GEM_PATH:\$GEM_HOME\n" >> $PATHVAR
             fi
             source ~/.bashrc
             gem install neovim 
@@ -227,6 +241,10 @@ elif [  $distro_base == "Debian" ];then
             yes | sudo apt install cpanminus
             cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
             sudo cpanm --sudo -n Neovim::Ext
+            reade -Q "GREEN" -i "y" -p "Perl uses cpan for the installation of modules. Initialize cpan? (Will prevent nvim :checkhealth warning) [Y/n]: " cpn
+            if [ "y" == $cpn ]; then
+                cpan -l
+            fi
         fi
     fi
     if [ "$(which ctags)" != "" ]; then
@@ -244,7 +262,9 @@ function instvim_r(){
         sudo mkdir -p /root/.config/nvim/
     fi
     sudo cp -bfv vim/* /root/.config/nvim/
-    sudo bash -c 'gio trash /root/.config/nvim/*~'
+    if sudo test -f /root/.config/nvim/*~; then 
+        sudo bash -c 'gio trash /root/.config/nvim/*~'
+    fi
     if sudo grep -q "MYVIMRC" $PATHVAR_R; then
        sudo sed -i 's|.export MYVIMRC="|export MYVIMRC=~/.config/nvim/init.vim "|g' $PATHVAR_R
         sudo sed -i 's|.export MYGVIMRC="|export MYGVIMRC=~/.config/nvim/init.vim "|g' $PATHVAR_R
@@ -284,9 +304,15 @@ function instvim_r(){
 function instvim(){
     if [[ ! -d ~/.config/nvim/ ]]; then
         mkdir ~/.config/nvim/
-    fi    
-    cp -bfv vim/* ~/.config/nvim/
-    gio trash ~/.config/nvim/*~
+    fi
+    if ! test -d vim/; then
+        wget 
+    else
+        cp -bfv vim/* ~/.config/nvim/
+    fi
+    if test -f ~/.config/nvim/*~; then
+        gio trash ~/.config/nvim/*~
+    fi
 
     # Symlink configs to flatpak dirs for possible flatpak nvim use
     if [ -x "$(command -v flatpak)" ] && echo "$(flatpak list)" | grep -q "neovim"; then
@@ -352,7 +378,7 @@ vimsh(){
 }
 yes_edit_no vimsh "vim/vim_nvim.sh" "Install vim aliases at ~/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)? " "edit" "GREEN"
 
-reade -Q "GREEN" -i "y" -p "Install nvimpager? [Y/n]:" "y n" vimrc 
+reade -Q "GREEN" -i "n" -p "Install nvimpager? [N/y]: " "y n" vimrc 
 if [ -z "$vimrc" ] || [ "$vimrc" == "y" ]; then
     if ! test -f install_nvimpager.sh; then
          eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nvimpager.sh)" 

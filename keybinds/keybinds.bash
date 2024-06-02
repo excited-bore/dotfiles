@@ -332,3 +332,19 @@ bind -x '"\206": source ~/.bashrc'
 bind -m emacs-standard '"\e[15~": "\205\206"'
 bind -m vi-command     '"\e[15~": "\205\206"'
 bind -m vi-insert      '"\e[15~": "\205\206"'
+
+# F6 - Bashtop (Better top/htop)
+if type bashtop &> /dev/null || type btop &> /dev/null || type bpytop &> /dev/null; then
+    if type bpytop &> /dev/null; then
+        bind -x '"\207": stty sane && bpytop'
+    fi
+    if type btop &> /dev/null; then
+        bind -x '"\207": stty sane && btop'
+    fi
+    if type bashtop &> /dev/null; then
+        bind -x '"\207": stty sane && bashtop'
+    fi
+    bind -m emacs-standard '"\e[17~": "\207\n\C-l"'
+    bind -m vi-command     '"\e[17~": "\207\n\C-l"'
+    bind -m vi-insert      '"\e[17~": "\207\n\C-l"'
+fi

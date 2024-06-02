@@ -87,7 +87,7 @@ if test "$edit" == "y"; then
     sudo $EDITOR /etc/samba/smb.conf
 fi
 
-reade -Q "GREEN" -p "User for login to drive? : " "$USER" usr
+reade -Q "GREEN" -p -i "$USER" "User for login to drive? : " "$USER" usr
 reade -Q "GREEN" -i "y" -p "No password? (You will have to set it otherwise) [Y/n]: " "y n" nopswd
 if ! test "$usr" ; then
     usr=$USER
@@ -98,10 +98,11 @@ if test "$nopswd" == "y"; then
         sudo sed -i 's|\(####### Authentication #######\)|\1\n\nnull passwords = yes|g' /etc/samba/smb.conf
     fi
     sudo smbpasswd -na $usr
-    sudo systemctl restart smbd.service
-    sudo systemctl status smbd.service
 else
     sudo smbpasswd -a $usr
-    sudo systemctl restart smbd.service
-    sudo systemctl status smbd.service
 fi
+sudo systemctl restart smbd.service
+sudo systemctl status smbd.service
+
+sudo systemctl restart nmbd.service
+sudo systemctl status nmbd.service

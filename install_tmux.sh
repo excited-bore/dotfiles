@@ -1,6 +1,15 @@
 #!/bin/bash
-. ./checks/check_system.sh
-. ./aliases/rlwrap_scripts.sh
+if ! test -f checks/check_system.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
+else
+    . ./checks/check_system.sh
+fi
+
+if ! test -f aliases/rlwrap_scripts.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/rlwrap_scripts.sh)" 
+else
+    . ./aliases/rlwrap_scripts.sh
+fi
 
 
 if [ ! -x "$(command -v tmux)" ]; then
@@ -47,7 +56,9 @@ sed -i 's|^set -g @continuum-restore '\''on'\''|#set -g @continuum-restore '\''o
 reade -Q "GREEN" -i "y" -p "Install tmux.conf? (tmux conf at ~/.tmux.conf) [Y/n]:" "y n" tmuxc
 if [ "$tmuxc"  == "y" ] || [ -z "$tmuxc" ]; then
     cp -bfv tmux/.tmux.conf ~/
-    gio trash ~/.tmux.conf~
+    if test -f ~/.tmux.conf~; then
+        gio trash ~/.tmux.conf~
+    fi
 fi
 unset tmuxc
 
@@ -187,7 +198,9 @@ unset tmuxx
 reade -Q "GREEN" -i "y" -p "Install tmux.sh at ~/.bash_aliases.d/? (tmux aliases) [Y/n]:" "y n"  tmuxx
 if [ -z "$tmuxx" ] || [ "$tmuxx"  == "y" ]; then 
     cp -bfv tmux/tmux.sh ~/.bash_aliases.d/
-    gio trash ~/.bash_aliases.d/tmux.sh~
+    if test -f ~/.bash_aliases.d/tmux.sh~; then 
+        gio trash ~/.bash_aliases.d/tmux.sh~
+    fi
 fi
 unset tmuxx 
 

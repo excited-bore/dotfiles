@@ -14,9 +14,10 @@ fi
 
 if ! grep -q "autojump" ~/.bashrc; then
     printf "[[ -s /etc/profile.d/autojump.sh ]] && source /etc/profile.d/autojump.sh\n" >> ~/.bashrc
+&> /dev/null
 fi
 if ! sudo grep -q "autojump" /root/.bashrc; then
-    printf "[[ -s /etc/profile.d/autojump.sh ]] && source /etc/profile.d/autojump.sh\n" | sudo tee -a /root/.bashrc
+    printf "[[ -s /etc/profile.d/autojump.sh ]] && source /etc/profile.d/autojump.sh\n" | sudo tee -a /root/.bashrc &> /dev/null
 fi
 
 # If you want Ctrl-j, read this first: 

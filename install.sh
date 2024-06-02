@@ -270,7 +270,7 @@ pathvr=$(pwd)/.pathvariables.env
         
         if type flatpak &> /dev/null; then
             sed -i 's|#export FLATPAK|export FLATPAK|' $pathvr 
-            sed -i 's|#export \(PATH=$PATH:$HOME/.local/bin/flatpak\)|\1|g' $pathvr
+            sed -i 's|#\(export PATH=$PATH:$HOME/.local/bin/flatpak\)|\1|g' $pathvr
         fi
         unset snapvrs
 

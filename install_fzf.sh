@@ -172,6 +172,7 @@ fi
             wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/rifle.conf -O ~/.config/ranger/rifle.conf 
             wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/keybinds_rifle.sh -O ~/.bash_aliases.d/keybinds_rifle.sh 
         else
+            mkdir -p ~/.config/ranger
             cp -fv ranger/rifle.conf ~/.config/ranger/
             cp -fv fzf/keybinds_rifle.sh ~/.bash_aliases.d/
         fi
