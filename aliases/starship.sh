@@ -27,4 +27,4 @@ function starship-presets() {
     fi
 }
 
-alias starship-uninstall="sudo sh -c 'rm \"$(whereis 'starship')\"'"
+alias starship-uninstall="sudo sh -c 'rm \"$(whereis 'starship' | awk '{print $2}')\"'"
