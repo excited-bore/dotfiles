@@ -51,7 +51,7 @@ function url_get_dirs() {
         b=$(cat "$1" | sed -n ''$j'p' | awk '{print $2}' | cut -d, -f-1 | sed 's,"\(.*\)",\1,g')
         dir="$(echo "$b" | sed 's,.*/contents/\(.*\),\1,g' | cut -d? -f-1)"  
         file="$(mktemp)"
-        curl -- "$b" | tee "$file" &> /dev/null
+        curl -- "$b" 2> /dev/null | tee "$file" &> /dev/null
         file_array+=("$file")
         dir_array+=("$dir")
     done
@@ -62,7 +62,7 @@ git_url=$(echo "$git_url" | sed 's,tree/[^/]*/,contents/,g')
 
 main_dir="$(echo $git_url | sed 's,.*/contents/\(.*\),\1,g' | cut -d? -f-1)"  
 file="$(mktemp)"
-curl -- "$git_url" | tee "$file" &> /dev/null
+curl -- "$git_url" 2> /dev/null | tee "$file" &> /dev/null
 
 cat $file
 file_array=("$file") 
