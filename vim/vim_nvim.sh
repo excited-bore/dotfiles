@@ -9,7 +9,6 @@ alias vim-noconf="vim -Nu NONE"
 alias nvim-noconf="nvim -Nu NONE"
 alias nvim-checkhealth="nvim +checkhealth"
 
-
 # All man pages                                                                         
 function man-all-nvim() {                                                               
     local b=()                                                                          
