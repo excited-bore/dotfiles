@@ -83,14 +83,16 @@ if [[ $distro == "Arch" || $distro_base == "Arch" ]];then
             gem install neovim
         fi
     fi
-    reade -Q "GREEN" -i "y" -p "Install nvim-perl? [Y/n]:" "y n" perlscripts
-    if [ -z $perlscripts ] || [ "y" == $perlscripts ]; then
-        yes | sudo pacman -Su cpanminus
-        cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
-        sudo cpanm --sudo -n Neovim::Ext
-        reade -Q "GREEN" -i "y" -p "Perl uses cpan for the installation of modules. Initialize cpan? (Will prevent nvim :checkhealth warning) [Y/n]: " cpn
-        if [ "y" == $cpn ]; then
-            cpan -l
+    if ! type cpan &> /dev/null || ! cpan -l 2> /dev/null | grep Neovim::Ext &> /dev/null; then
+        reade -Q "GREEN" -i "y" -p "Install nvim-perl? [Y/n]:" "y n" perlscripts
+        if [ -z $perlscripts ] || [ "y" == $perlscripts ]; then
+            yes | sudo pacman -Su cpanminus
+            cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+            sudo cpanm --sudo -n Neovim::Ext
+            reade -Q "GREEN" -i "y" -p "Perl uses cpan for the installation of modules. Initialize cpan? (Will prevent nvim :checkhealth warning) [Y/n]: " cpn
+            if [ "y" == $cpn ]; then
+                cpan -l
+            fi
         fi
     fi
     if ! type ctags &> /dev/null; then 
@@ -234,7 +236,7 @@ elif [  $distro_base == "Debian" ];then
         fi
     fi
     
-    if ! type cpan &> /dev/null; then
+    if ! type cpan &> /dev/null || ! cpan -l 2> /dev/null | grep Neovim::Ext &> /dev/null; then
         reade -Q "GREEN" -i "y" -p "Install nvim-perl? [Y/n]:" "y n" perlscripts
         if [ -z $perlscripts ] || [ "y" == $perlscripts ]; then
             yes | sudo apt install cpanminus
@@ -256,11 +258,22 @@ fi
 
 unset rver paths clip x11f pyscripts jsscripts ctags rubyscripts perlscripts nvmbin
 
+if ! test -d vim/; then
+    tmpdir=$(mktemp -d -t nvim-XXXXXXXXXX)
+    tmpfile=$(mktemp)
+    curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/download_git_directory.sh | tee "$tmpfile" &> /dev/null
+    chmod u+x "$tmpfile"
+    eval $tmpfile https://github.com/excited-bore/dotfiles/tree/main/vim $tmpdir
+    dir=$tmpdir/vim
+else
+    dir=vim 
+fi
+
 function instvim_r(){
     if ! sudo test -d /root/.config/nvim/; then
         sudo mkdir -p /root/.config/nvim/
     fi
-    sudo cp -bfv vim/* /root/.config/nvim/
+    sudo cp -bfv $dir/* /root/.config/nvim/
     if sudo test -f /root/.config/nvim/*~; then 
         sudo bash -c 'gio trash /root/.config/nvim/*~'
     fi
@@ -300,21 +313,15 @@ function instvim_r(){
     fi
 }
 
+
 function instvim(){
     if [[ ! -d ~/.config/nvim/ ]]; then
         mkdir ~/.config/nvim/
     fi
-    if ! test -d vim/; then
-        tmpfile=$(mktemp)
-        curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/download_git_directory.sh | tee "$tmpfile" &> /dev/null
-        chmod u+x "$tmpfile"
-        eval $tmpfile https://github.com/excited-bore/dotfiles/tree/main/vim ~/.config/nvim/
-        unset tmpvim
-        
-    else
-        cp -bfv vim/* ~/.config/nvim/
-    fi
-    if test -f ~/.config/nvim/*~; then
+    
+    cp -bfv $dir/* ~/.config/nvim/
+
+    if ! test -z $(~/.config/nvim/*~); then
         gio trash ~/.config/nvim/*~
     fi
 
@@ -360,27 +367,39 @@ function instvim(){
     if [ -z $vimrc ] && [ ! -f ~/.vimrc ]; then
         ln -s ~/.config/nvim/init.vim ~/.vimrc
     fi
-    yes_edit_no instvim_r "vim/init.vim" "Install (neo)vim readconfigs at /root/.config/nvim/ ? (init.vim, init.lua, etc..)" "edit" "YELLOW"
+    yes_edit_no instvim_r "$dir/init.vim $dir/init.lua.vim $dir/plug_lazy_adapter.vim" "Install (neo)vim readconfigs at /root/.config/nvim/ ? (init.vim, init.lua, etc..)" "edit" "YELLOW"
 }
-yes_edit_no instvim "vim/init.vim vim/init.lua.vim vim.plug_lazy_adapter.vim" "Install (neo)vim readconfigs at ~/.config/nvim/ ? (init.vim, init.lua, etc..)" "edit" "GREEN"
+yes_edit_no instvim "$dir/init.vim $dir/init.lua.vim $dir/plug_lazy_adapter.vim" "Install (neo)vim readconfigs at ~/.config/nvim/ ? (init.vim, init.lua, etc..)" "edit" "GREEN"
+
+unset dir tmpdir tmpfile
 
 nvim +CocUpdate
 nvim +checkhealth
 echo "Install Completion language plugins with ':CocInstall coc-..' / Update with :CocUpdate"
 echo "Check installed nvim plugins with 'Lazy' / Check installed vim plugins with 'PlugInstalled' (only work on nvim and vim respectively)"
 
+dir=aliases
+dir=completions
+if ! test -d aliases/ || ! test -d completions/; then
+    tmpdir=$(mktemp -d -t nvim-XXXXXXXXXX)
+    tmpdir1=$(mktemp -d -t nvim-XXXXXXXXXX)
+    wget -P $tmpdir https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/vim_nvim.sh
+    wget -P $tmpdir1 https://raw.githubusercontent.com/excited-bore/dotfiles/main/completions/vim_nvim
+    dir=$tmpdir
+    dir1=$tmpdir1
+fi
 
 vimsh_r(){ 
-    sudo cp -fv aliases/vim_nvim.sh /root/.bash_aliases.d/; 
-    sudo cp -fv completions/vim_nvim /root/.bash_completion.d/; 
+    sudo cp -fv $dir/vim_nvim.sh /root/.bash_aliases.d/; 
+    sudo cp -fv $dir1/vim_nvim /root/.bash_completion.d/; 
 }
 
 vimsh(){
-    cp -fv aliases/vim_nvim.sh ~/.bash_aliases.d/
-    cp -fv completions/vim_nvim ~/.bash_completion.d/;
-    yes_edit_no vimsh_r "vim/vim_nvim.sh" "Install vim aliases at /root/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)? " "yes" "GREEN"
+    cp -fv $dir/vim_nvim.sh ~/.bash_aliases.d/
+    cp -fv $dir1/vim_nvim ~/.bash_completion.d/;
+    yes_edit_no vimsh_r "$dir/vim_nvim.sh $dir1/vim_nvim" "Install vim aliases at /root/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)? " "yes" "GREEN"
 }
-yes_edit_no vimsh "vim/vim_nvim.sh" "Install vim aliases at ~/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)? " "edit" "GREEN"
+yes_edit_no vimsh "$dir/vim_nvim.sh $dir1/vim_nvim" "Install vim aliases at ~/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)? " "edit" "GREEN"
 
 reade -Q "GREEN" -i "n" -p "Install nvimpager? [N/y]: " "y n" vimrc 
 if [ -z "$vimrc" ] || [ "$vimrc" == "y" ]; then
@@ -390,4 +409,4 @@ if [ -z "$vimrc" ] || [ "$vimrc" == "y" ]; then
         ./install_nvimpager.sh
     fi
 fi
-unset vimrc
+unset vimrc dir dir1 tmpdir tmpdir1

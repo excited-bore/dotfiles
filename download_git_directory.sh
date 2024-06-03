@@ -51,7 +51,7 @@ function url_get_dirs() {
         b=$(cat "$1" | sed -n ''$j'p' | awk '{print $2}' | cut -d, -f-1 | sed 's,"\(.*\)",\1,g')
         dir="$(echo "$b" | sed 's,.*/contents/\(.*\),\1,g' | cut -d? -f-1)"  
         file="$(mktemp)"
-        curl -- "$b" > "$file" &> /dev/null
+        curl -- "$b" | tee "$file" &> /dev/null
         file_array+=("$file")
         dir_array+=("$dir")
     done
@@ -61,10 +61,10 @@ git_url=$(echo "$git_url" | sed 's,https://github.com/,https://api.github.com/re
 git_url=$(echo "$git_url" | sed 's,tree/[^/]*/,contents/,g')
 
 main_dir="$(echo $git_url | sed 's,.*/contents/\(.*\),\1,g' | cut -d? -f-1)"  
-
 file="$(mktemp)"
-curl -- "$git_url" > "$file" &> /dev/null
+curl -- "$git_url" | tee "$file" &> /dev/null
 
+cat $file
 file_array=("$file") 
 dir_array=("$main_dir")
 current_dir="$target_dir/$main_dir"
@@ -73,6 +73,7 @@ while ! test -z "$file_array"; do
     set -- "${file_array[@]}"
     for i; do
         mkdir -p $current_dir
+        cat $i
         for j in $(cat "$i" | grep 'download_url' | awk '{print $2}' | cut -d, -f-1 | sed 's,"\(.*\)",\1,g'); do
             if ! test "$j" == "null"; then
                 wget -P "$current_dir" -- "$j" 
