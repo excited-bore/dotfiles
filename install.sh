@@ -10,6 +10,12 @@ if ! test -f checks/check_pathvar.sh; then
 else
     . ./checks/check_pathvar.sh
 fi
+if ! test -f checks/update_system.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/update_system.sh)" 
+else
+    . ./checks/update_system.sh
+fi
+
 if ! test -f checks/check_rlwrap.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_rlwrap.sh)" 
 else
@@ -25,10 +31,6 @@ fi
 printf "${green}If all necessary files are sourced correctly, this text looks green.\nIf not, something went wrong.\n"
 printf "\n${green}Files that get overwritten get backed up and trashed (to prevent clutter).\nRecover using ${cyan}'gio trash --list'${green} and ${cyan}'gio trash --restore' ${normal}\n"
 
-
-if [ -z "$TMPDIR" ]; then
-    TMPDIR=/tmp
-fi
 
 if [ ! -e ~/config ] && test -d ~/.config; then
     reade -Q "BLUE" -i "y" -p "Create ~/.config to ~/config symlink? [Y(es)/n(o)]:" "y n" sym1
@@ -60,13 +62,6 @@ fi
 
 unset sym1 sym2 sym3 beep
 
-if [ "$distro_base" == "Arch" ]; then
-    if ! test -f install_AUR-helper.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_AUR-helper.sh)" 
-    else
-        . ./install_AUR-helper.sh
-    fi 
-fi
 
 if ! type flatpak &> /dev/null; then
     printf "%s\n" "${blue}No flatpak detected. (Independent package manager from Red Hat)${normal}"

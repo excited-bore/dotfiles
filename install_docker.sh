@@ -5,14 +5,13 @@ else
     . ./checks/check_system.sh
 fi
 
-if [[ $distro == "Debian" || $distro_base == "Debian" ]]; then
-    sudo apt update
-    yes | sudo apt install docker.io
-    yes | sudo apt remove docker docker-engine 
+if test $distro_base == "Debian"; then
+    sudo apt install docker.io
+    sudo apt remove docker docker-engine 
     curl -sSL https://get.docker.com | sh
     sudo usermod -aG docker $USER
     echo "You should relogin for docker to work"
-elif [[ $distro == "Arch" || $distro_base == "Arch" ]]; then
-    yes | sudo pacman -Su docker
+elif test $distro == "Arch" || test $distro == "Manjaro"; then
+    sudo pacman -S docker
     sudo usermod -aG docker $USER
 fi

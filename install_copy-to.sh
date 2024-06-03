@@ -14,10 +14,10 @@ fi
 reade -Q "GREEN" -i "y" -p "Install copy-to? (Python tool for copying between 2 maps) [Y/n]:" "y n" cpcnf
 if [ -z $compl ] || [ "y" == $compl ]; then
     if ! type pipx &> /dev/null ; then
-        if [ $distro_base == "Arch" ]; then
-            yes | sudo pacman -S python-pipx
+        if test $distro == "Arch" || test $distro == "Manjaro"; then
+            sudo pacman -S python-pipx
         elif [ $distro_base == "Debian" ]; then
-            yes | sudo apt install pipx
+            sudo apt install pipx
         fi
     fi
 fi

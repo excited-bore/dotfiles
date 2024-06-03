@@ -5,10 +5,9 @@ else
 fi
 
 if [ "$(which xclip)" == "" ]; then 
-    if [ $distro_base == "Arch" ];then
-        yes | sudo pacman -Su xclip
+    if test $distro == "Arch" || test $distro == "Manjaro";then
+        sudo pacman -S xclip
     elif [ $distro_base == "Debian" ]; then
-        yes | sudo apt update
-        yes | sudo apt install xclip 
+        sudo apt install xclip 
     fi
 fi

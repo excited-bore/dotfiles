@@ -17,8 +17,8 @@ else
 fi
 
 
-if [ $distro_base == "Arch" ]; then
-    yes | sudo pacman -S go
+if test $distro == "Arch" || test $distro == "Manjaro"; then
+    sudo pacman -S go
 elif [ $distro_base == "Debian" ]; then
     if [[ "$arch" =~ "arm"* ]]; then
        arch="armv6l"

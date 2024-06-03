@@ -13,8 +13,8 @@ fi
 if ! type lazygit &> /dev/null; then
     reade -Q "GREEN" -i "y" -p "Install lazygit? (Git gui) [Y/n]: " "y n" nstll
     if [ "$nstll" == "y" ]; then
-        if [ $distro == "Arch" ] || [ $distro_base == "Arch" ]; then
-            yes | sudo pacman -Su lazygit
+        if test $distro == "Arch" || test $distro == "Manjaro"; then
+            sudo pacman -S lazygit
         elif [ $distro == "Ubuntu" ]; then
             LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
             curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"

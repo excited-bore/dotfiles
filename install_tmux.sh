@@ -12,12 +12,11 @@ else
 fi
 
 
-if [ ! -x "$(command -v tmux)" ]; then
-    if [ $distro_base == "Arch" ]; then
-        yes | sudo pacman -Syu tmux
-    elif [ $distro_base == "Debian" ]; then
-        yes | sudo apt update
-        yes | sudo apt install tmux
+if ! test -x "$(command -v tmux)"; then
+    if test "$distro" == "Arch" || test "$distro" == "Manjaro"; then
+        sudo pacman -Syu tmux
+    elif test "$distro_base" == "Debian"; then
+        sudo apt install tmux
     fi
 fi
 
@@ -82,11 +81,10 @@ unset tmuxx
 reade -Q "GREEN" -i "y" -p "Install tmux clipboard plugin? (tmux-yank) [Y/n]:" "y n"  tmuxx
 if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
     if [ ! -x "$(command -v xclip)" ] && [ ! -x "$(command -v xsel)" ]; then
-        if [ $distro_base == "Arch" ]; then
-            yes | sudo pacman -Syu xclip xsel
-        elif [ $distro_base == "Debian" ]; then
-            yes | sudo apt update
-            yes | sudo apt install xclip xsel
+        if test "$distro" == "Arch" || test "$distro" == "Manjaro"; then
+            sudo pacman -Syu xclip xsel
+        elif test $distro_base == "Debian"; then
+            sudo apt install xclip xsel
         fi
     fi
     sed -i 's|#set -g @plugin '\''tmux-plugins/tmux-yank'\''|set -g @plugin '\''tmux-plugins/tmux-yank'\''|g' ~/.tmux.conf
@@ -144,11 +142,10 @@ unset tmuxx
 #    reade -Q "GREEN" -i "y" -p "Install ranger tmux plugin? (ranger_tmux) [Y/n]:" "y n"  tmuxx
 #    if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
 #        if [ ! -x "$(command -v pip)" ]; then
-#            if [ $distro_base == "Arch" ]; then
-#                yes | sudo pacman -Syu python-pip
+#            if test $distro == "Arch" || test $distro == "Manjaro"; then
+#                sudo pacman -Syu python-pip
 #            elif [ $distro_base == "Debian" ]; then
-#                yes | sudo apt update
-#                yes | sudo apt install python3-pip
+#                sudo apt install python3-pip
 #            fi
 #        fi
 #        pip install --break-system-packages ranger_tmux

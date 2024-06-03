@@ -6,8 +6,8 @@ fi
 
 if ! type neofetch &> /dev/null; then
     if test $distro_base == "Debian"; then
-       yes | sudo apt install neofetch
-    elif test $distro_base == "Arch"; then
-       yes | sudo pacman -Su neofetch
+       sudo apt install neofetch
+    elif test $distro == "Arch" || test $distro == "Manjaro"; then
+       sudo pacman -S neofetch
     fi
 fi

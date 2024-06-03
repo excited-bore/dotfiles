@@ -6,8 +6,8 @@ fi
 
 if ! type bashtop &> /dev/null; then
     if test $distro_base == "Debian"; then
-       yes | sudo apt install btop
-    elif test $distro_base == "Arch"; then
-       yes | sudo pacman -Su bashtop
+        sudo apt install btop
+    elif test $distro == "Arch" || test $distro == "Manjaro"; then
+        sudo pacman -S bashtop
     fi
 fi 

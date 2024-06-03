@@ -5,10 +5,10 @@ else
     . ./checks/check_system.sh
 fi
 
-if [[ $distro == "Arch" || $distro_base == "Arch" ]]; then
-    yes | sudo pacman -S remmina
-elif [[ $distro == "Debian" || $distro_base == "Debian" ]]; then
-    yes | sudo apt install realvnc-vnc-server realvnc-vnc-viewer
+if test $distro == "Arch" || test $distro == "Manjaro"; then
+    sudo pacman -S remmina
+elif test $distro_base == "Debian"; then
+    sudo apt install realvnc-vnc-server realvnc-vnc-viewer
 fi
 
 if ! sudo grep -q VncAuth /root/.vnc/config.d/vncserver-x11; then

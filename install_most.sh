@@ -17,9 +17,9 @@ fi
 answer=""
 if [ ! -x "$(command -v most)" ]; then
     if test $distro_base == "Debian" ; then
-        yes | sudo apt install most
-    elif test $distro_base == "Arch"; then
-        yes | sudo pacman -Su most
+        sudo apt install most
+    elif test $distro == "Arch" || test $distro == "Manjaro"; then
+        sudo pacman -S most
     fi
 fi
 

@@ -1,11 +1,23 @@
-. ./checks/check_system.sh
-. ./checks/check_rlwrap.sh
-. ./install_docker.sh
+if ! test -f checks/check_system.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
+else
+    . ./checks/check_system.sh
+fi
+if ! test -f checks/check_rlwrap.sh; then
+    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_rlwrap.sh)" 
+else
+    . ./checks/check_rlwrap.sh
+fi
+if ! test -f install_docker.sh; then
+    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_docker.sh)" 
+else
+    . ./install_docker.sh
+fi
 
-if [ $distro_base == "Arch" ]; then
-    yes | sudo pacman -S docker-compose
+if test $distro == "Arch" || test $distro == "Manjaro"; then
+    sudo pacman -S docker-compose
 elif [ $distro_base == "Debian" ]; then
-    yes | sudo apt install docker-compose
+    sudo apt install docker-compose
 fi
 
 last=$(pwd)

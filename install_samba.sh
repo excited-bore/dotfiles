@@ -10,10 +10,10 @@ else
 fi
 
 if ! command -v samba &> /dev/null; then
-    if [ $distro_base == "Arch" ];then
-        yes | sudo pacman -Su samba
+    if test "$distro" == "Arch" || test "$distro" == "Manjaro"; then
+        sudo pacman -S samba
     elif [ $distro_base == "Debian" ];then
-        yes | sudo apt install samba samba-common  
+        sudo apt install samba samba-common  
     fi
 fi
 
