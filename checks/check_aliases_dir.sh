@@ -31,7 +31,7 @@ fi
 #    echo "fi" >> ~/.bashrc
 #fi
 
-if ! test ~/.bash_aliases.d/check_system.sh; then
+if ! test -f ~/.bash_aliases.d/check_system.sh; then
     if ! test -f checks/check_system.sh; then
         wget -O ~/.bash_aliases.d/check_system.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh  
     else
@@ -39,7 +39,7 @@ if ! test ~/.bash_aliases.d/check_system.sh; then
     fi
 fi
 
-if ! test ~/.bash_aliases.d/bash.sh; then
+if ! test -f ~/.bash_aliases.d/bash.sh; then
     if ! test -f aliases/bash.sh; then
         wget -O ~/.bash_aliases.d/bash.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/bash.sh  
     else
@@ -47,7 +47,7 @@ if ! test ~/.bash_aliases.d/bash.sh; then
     fi
 fi
 
-if ! test ~/.bash_aliases.d/rlwrap_scripts.sh; then 
+if ! test -f ~/.bash_aliases.d/rlwrap_scripts.sh; then 
     if ! test -f aliases/rlwrap_scripts.sh; then
         wget -O ~/.bash_aliases.d/rlwrap_scripts.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/rlwrap_scripts.sh  
     else
