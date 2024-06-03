@@ -274,7 +274,7 @@ function instvim_r(){
         sudo mkdir -p /root/.config/nvim/
     fi
     sudo cp -bfv $dir/* /root/.config/nvim/
-    if sudo test -f /root/.config/nvim/*~; then 
+    if ! sudo test -z $(ls /root/.config/nvim/*~ &> /dev/null); then; then 
         sudo bash -c 'gio trash /root/.config/nvim/*~'
     fi
     if sudo grep -q "MYVIMRC" $PATHVAR_R; then
@@ -321,7 +321,7 @@ function instvim(){
     
     cp -bfv $dir/* ~/.config/nvim/
 
-    if ! test -z $(~/.config/nvim/*~); then
+    if ! test -z $(ls ~/.config/nvim/*~ &> /dev/null); then
         gio trash ~/.config/nvim/*~
     fi
 
