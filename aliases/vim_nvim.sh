@@ -4,8 +4,10 @@ alias vim="nvim -u ~/.config/nvim/init.vim"
 alias svim="sudo nvim"
 #alias snvim="sudo nvim"
 function rvim(){ nvr --remote $@; }
-alias vim_noconf="nvim -Nu NONE"
-alias vim_check_health="nvim +checkhealth"
+alias vim-noconf="vim -Nu NONE"
+#alias vim-checkhealth="vim +checkhealth"
+alias nvim-noconf="nvim -Nu NONE"
+alias nvim-checkhealth="nvim +checkhealth"
 
 # All man pages                                                                         
 function man-all-nvim() {                                                               
