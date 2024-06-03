@@ -57,8 +57,8 @@ function url_get_dirs() {
     done
 }
 
-git_url=$(echo "$git_url"| sed 's,https://github.com/,https://api.github.com/repos/,g') 
-git_url=$(echo "$git_url" | sed 's,tree/master/,contents/,g')
+git_url=$(echo "$git_url" | sed 's,https://github.com/,https://api.github.com/repos/,g') 
+git_url=$(echo "$git_url" | sed 's,tree/[^/]*/,contents/,g')
 
 main_dir="$(echo $git_url | sed 's,.*/contents/\(.*\),\1,g' | cut -d? -f-1)"  
 
