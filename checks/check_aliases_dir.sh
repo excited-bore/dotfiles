@@ -31,24 +31,29 @@ fi
 #    echo "fi" >> ~/.bashrc
 #fi
 
-if ! test -f checks/check_system.sh; then
-    wget -O ~/.bash_aliases.d/check_system.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh  
-else
-    cp -fv checks/check_system.sh ~/.bash_aliases.d/
+if ! test -f ~/.bash_aliases.d/check_system.sh; then
+    if ! test -f checks/check_system.sh; then
+        wget -O ~/.bash_aliases.d/check_system.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh  
+    else
+        cp -fv checks/check_system.sh ~/.bash_aliases.d/
+    fi
 fi
 
-if ! test -f aliases/bash.sh; then
-    wget -O ~/.bash_aliases.d/bash.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/bash.sh  
-else
-    cp -fv aliases/bash.sh ~/.bash_aliases.d/
+if ! test -f ~/.bash_aliases.d/bash.sh; then
+    if ! test -f aliases/bash.sh; then
+        wget -O ~/.bash_aliases.d/bash.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/bash.sh  
+    else
+        cp -fv aliases/bash.sh ~/.bash_aliases.d/
+    fi
 fi
 
-if ! test -f aliases/rlwrap_scripts.sh; then
-    wget -O ~/.bash_aliases.d/rlwrap_scripts.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/rlwrap_scripts.sh  
-else
-    cp -fv aliases/rlwrap_scripts.sh ~/.bash_aliases.d/
+if ! test -f ~/.bash_aliases.d/rlwrap_scripts.sh; then 
+    if ! test -f aliases/rlwrap_scripts.sh; then
+        wget -O ~/.bash_aliases.d/rlwrap_scripts.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/rlwrap_scripts.sh  
+    else
+        cp -fv aliases/rlwrap_scripts.sh ~/.bash_aliases.d/
+    fi
 fi
-
 
 
 if ! sudo test -f /root/.bash_aliases; then

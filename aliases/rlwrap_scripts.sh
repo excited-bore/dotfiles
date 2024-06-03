@@ -171,8 +171,9 @@ function yes_edit_no(){
                 "$EDITOR" "$i";
             done;
             deflt=" [y/N]: "
+            pre="n"
             prompt="$3$deflt";
-            reade $clr -i "n" -p "$prompt" "y n" pass2;
+            reade $clr -i "$pre" -p "$prompt" "y n" pass2;
             if [ "$pass2" == "y" ]; then
                 $1;
             fi
