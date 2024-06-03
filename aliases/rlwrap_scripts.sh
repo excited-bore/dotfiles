@@ -125,6 +125,7 @@ reade(){
         #fi
         OPTIND=1
     fi
+    stty sane
 }
 
 #reade -p "Usb ids" $(sudo lsusb | awk 'BEGIN { FS = ":" };{print $1;}')
@@ -169,8 +170,9 @@ function yes_edit_no(){
                 "$EDITOR" "$i";
             done;
             deflt=" [y/N]: "
+            pre="n"
             prompt="$3$deflt";
-            reade $clr -p "$prompt" "y n" pass2;
+            reade $clr -i "$pre" -p "$prompt" "y n" pass2;
             if [ "$pass2" == "y" ]; then
                 $1;
             fi
