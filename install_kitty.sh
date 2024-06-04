@@ -18,10 +18,10 @@ else
 fi
 
 if ! [ -x "$(command -v kitty)" ]; then
-    if [ "$distro" == "Arch" ] || [ "$distro_base" == "Arch" ]; then
-        yes | sudo pacman -Su kitty 
-    elif [ "$distro" == "Debian" ] || [ "$distro_base" == "Debian" ]; then    
-        yes | sudo apt install kitty
+    if test "$distro" == "Arch" || test "$distro" == "Manjaro"; then
+       sudo pacman -S kitty 
+    elif test "$distro_base" == "Debian"; then    
+        sudo apt install kitty
         if [ ! -x "$(command -v kitten)" ]; then
             sudo ln -s ~/.local/share/kitty-ssh-kitten/kitty/bin/kitten    
         fi

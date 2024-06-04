@@ -1,12 +1,20 @@
-. ./checks/check_system.sh
-. ./checks/check_pathvar.sh
+if ! test -f checks/check_pathvar.sh; then
+    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pathvar.sh)" 
+else
+    . ./checks/check_pathvar.sh
+fi
+if ! test -f checks/check_system.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
+else
+    . ./checks/check_system.sh
+fi
 
-if [ "$dist" == "Manjaro" ]; then
+if [ "$distro" == "Manjaro" ]; then
     pamac install virt-manager qemu bridge-utils spice-vdagent
-elif [ "$dist_base" == "Debian" ]; then
+elif [ "$distro_base" == "Debian" ]; then
     sudo apt install -y qemu-kvm libvirt-bin bridge-utils virt-manager qemu virt-viewer spice-vdagent
-elif [ "$dist_base" == "Arch" ]; then
-    sudo pacman -Su virt-manager qemu bridge-utils spice-vdagent
+elif [ "$distro" == "Arch" ]; then
+    sudo pacman -S virt-manager qemu bridge-utils spice-vdagent
 fi
 
 sudo systemctl enable --user libvirtd.service

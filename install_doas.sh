@@ -1,10 +1,13 @@
 #!/bin/bash
-#DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-. ./checks/check_system.sh
+if ! test -f checks/check_system.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
+else
+    . ./checks/check_system.sh
+fi
 
-if [[ $distro == "Arch" || $distro_base == "Arch" ]];then
-    sudo pacman -Su opendoas 
-elif [[ $distro == "Debian" || $distro_base == "Debian" ]];then
+if test $distro == "Arch" || test $distro == "Manjaro"; then
+    sudo pacman -S opendoas 
+elif test $distro_base == "Debian"; then
     sudo apt install doas
 fi 
 

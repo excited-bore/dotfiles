@@ -282,6 +282,9 @@ alias x="cd .."
 # (:
 alias men="man man"
 
+# Pipe column output to a pager
+alias column="column -c $(tput cols)"
+
 alias targz-create="tar -cvf"
 alias targz-unpack="tar -xvf"
 alias targz-list="tar -tvf"

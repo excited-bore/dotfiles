@@ -6,10 +6,10 @@ else
     . ./checks/check_system.sh
 fi
 
-if [ $distro_base == "Arch" ];then
-    yes | sudo pacman -Su fd
+if test $distro == "Arch" || test $distro == "Manjaro"; then
+    sudo pacman -S fd
 elif [ $distro_base == "Debian" ]; then
-    yes | sudo apt install fd-find
+    sudo apt install fd-find
     if ! test -f ~/.local/bin/fd; then
         ln -s $(which fdfind) ~/.local/bin/fd
     fi

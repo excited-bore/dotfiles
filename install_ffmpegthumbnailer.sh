@@ -7,10 +7,9 @@ else
 fi
 
 if [ "$(which ffmpegthumbnailer)" == "" ]; then 
-    if [ $distro_base == "Arch" ];then
-        yes | sudo pacman -Su ffmpegthumbnailer
+    if test $distro == "Arch" || test $distro == "Manjaro"; then
+        sudo pacman -S ffmpegthumbnailer
     elif [ $distro_base == "Debian" ]; then
-        yes | sudo apt update
-        yes | sudo apt install ffmpegthumbnailer 
+        sudo apt install ffmpegthumbnailer 
     fi
 fi

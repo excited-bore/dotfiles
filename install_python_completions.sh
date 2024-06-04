@@ -15,11 +15,11 @@ else
 fi
 
 if ! [ -x "$(command -v argcomplete)" ]; then
-    if [[ $distro == "Debian" || $distro_base == "Debian" ]]; then
-        yes | sudo apt install python3 pipx
+    if test $distro_base == "Debian"; then
+        sudo apt install python3 pipx
         pipx install argcomplete
-    elif [[ $distro == "Arch" || $distro_base == "Arch" ]]; then
-        yes | sudo pacman -Su python pipx
+    elif test $distro == "Arch" || test $distro == "Manjaro"; then
+        sudo pacman -S python pipx
         pipx install argcomplete
     fi
 fi

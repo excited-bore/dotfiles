@@ -13,9 +13,7 @@ if [ ! -d ~/.bash_aliases.d/ ]; then
 fi
 
 if ! grep -q ".bash_aliases" ~/.bashrc; then
-    echo 'if [[ -f ~/.bash_aliases ]]; then' >> ~/.bashrc
-    echo '. ~/.bash_aliases' >> ~/.bashrc
-    echo 'fi' >> ~/.bashrc
+    echo '[ -f ~/.bash_aliases ] && source ~/.bash_aliases' >> ~/.bashrc
 fi
 
 #if ! grep -q "shopt -s expand_aliases" ~/.bashrc; then
@@ -66,9 +64,7 @@ if ! sudo test -f /root/.bash_aliases; then
         sudo cp -fv ~/.bash_aliases.d/rlwrap_scripts.sh /root/.bash_aliases.d/rlwrap_scripts.sh 
     fi
     if ! sudo grep -q ".bash_aliases" /root/.bashrc; then
-        printf "if [[ -f ~/.bash_aliases ]]; then\n" | sudo tee -a /root/.bashrc > /dev/null
-        printf "    . ~/.bash_aliases\n" | sudo tee -a /root/.bashrc > /dev/null
-        printf "fi\n" | sudo tee -a /root/.bashrc > /dev/null
+        printf "[ -f ~/.bash_aliases ] && source ~/.bash_aliases \n" | sudo tee -a /root/.bashrc > /dev/null
     fi
 fi
 

@@ -7,9 +7,9 @@ fi
 
 if ! type testdisk &> /dev/null; then
     echo "This next $(tput setaf 1)sudo$(tput sgr0) will install testdisk"
-    if test $distro_base == "Arch"; then 
-        yes | sudo pacman -Su testdisk
+    if test $distro == "Arch" || test $distro == "Manjaro"; then 
+        sudo pacman -S testdisk
     elif test $distro_base == "Debian"; then
-        yes | sudo apt install testdisk
+        sudo apt install testdisk
     fi
 fi

@@ -1237,11 +1237,10 @@ fi
    if ! [ -x "$(command -v git)" ]; then
         reade -Q "GREEN" -i "y" -p "Install git? [Y/n]:" "y n" nstll
         if [ "$nstll" == "y" ]; then
-            if [ $distro == "Arch" ] || [ $distro_base == "Arch" ]; then
-                yes | sudo pacman -Su git
-            elif [ $distro == "Debian" ] || [ $distro_base == "Debian" ]; then
-                yes | sudo apt update
-                yes | sudo apt install git
+            if test $distro == "Arch" || "$distro" == "Manjaro"; then
+                sudo pacman -S git
+            elif test "$distro_base" == "Debian"; then
+                sudo apt install git
             fi
         fi
     fi
@@ -1343,13 +1342,13 @@ fi
                    ./install_nvimpager.sh
                 fi
             fi
-            if test "$distro_base" == "Arch"; then
+            if test "$distro" == "Arch" || test "$distro" == "Manjaro"; then
                 if test $pager == "diff-so-fancy"; then
-                    sudo pacman -Su diff-so-fancy
+                    sudo pacman -S diff-so-fancy
                 elif test $pager == "delta"; then
-                    sudo pacman -Su git-delta
+                    sudo pacman -S git-delta
                 elif test $pager == "ydiff"; then
-                    sudo apt install pipx
+                    sudo pacman -S pipx
                     pipx install --upgrade ydiff
                 fi
             elif test "$distro_base" == "Debian"; then

@@ -17,10 +17,10 @@ fi
 
  # Ranger (File explorer)
  if ! type ranger &> /dev/null; then
-     if [ $distro_base == "Arch" ];then
-        yes | sudo pacman -Su ranger python python-pipx
+     if test $distro == "Arch" || test $distro == "Manjaro"; then
+        sudo pacman -S ranger python python-pipx
     elif [ $distro_base == "Debian" ]; then    
-        yes | sudo apt install ranger python3 python3-dev pipx
+        sudo apt install ranger python3 python3-dev pipx
     fi
 fi
 
@@ -91,8 +91,8 @@ if ! test -d ~/.config/ranger/plugins/devicons2; then
     if [ -z $rplg ] || [ "y" == $rplg ]; then
         mkdir -p ~/.config/ranger/plugins
         git clone https://github.com/cdump/ranger-devicons2 ~/.config/ranger/plugins/devicons2
-        if [ "$distro_base" == "Arch" ];then
-            yes | sudo pacman -Su ttf-nerd-fonts-symbols-common ttf-nerd-fonts-symbols ttf-nerd-fonts-symbols-mono
+        if test "$distro" == "Arch" || test $distro == "Manjaro" ;then
+            sudo pacman -S ttf-nerd-fonts-symbols-common ttf-nerd-fonts-symbols ttf-nerd-fonts-symbols-mono
         elif [ "$distro_base" == "Debian" ]; then    
             reade -Q "YELLOW" -i "y" -p "Install Nerdfonts from binary - no apt? (Special FontIcons) [Y/n]: " "y n" nrdfnts
             if [ -z $nrdfnts ] || [ "Y" == $nrdfnts ] || [ $nrdfnts == "y" ]; then
@@ -109,10 +109,10 @@ fi
 #reade -Q "GREEN" -i "y" -p "Install and enable ranger image previews? (Installs terminology) [Y/n]:" "y n" rplg
 #sed -i 's|set preview_images false|set preview_images true|g' ~/.config/ranger/rc.conf
 #if [ -z $rplg ] || [ "y" == $rplg ]; then
-#    if [ $distro_base == "Arch" ];then
-#        yes | sudo pacman -Su terminology
-#    elif [ $distro_base == "Debian" ]; then 
-#        yes | sudo apt install terminology
+#    if test $distro == "Arch" || test $distro == "Manjaro";then
+#       sudo pacman -S terminology
+#    elif test $distro_base == "Debian"; then 
+#       sudo apt install terminology
 #    fi
 #fi
 

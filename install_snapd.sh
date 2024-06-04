@@ -1,10 +1,18 @@
-. ./checks/check_system.sh
-. ./checks/check_pathvar.sh
+if ! test -f checks/check_system.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
+else
+    . ./checks/check_system.sh
+fi
+if ! test -f checks/check_pathvar.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pathvar.sh)" 
+else
+    . ./checks/check_pathvar.sh
+fi
 
-if [ "$distro_base" == "Arch" ];then
-    yes | sudo pacman -S snapd
+if test "$distro" == "Arch" || test "$distro" == "Manjaro"; then
+    sudo pacman -S snapd
 elif [ "$distro_base" == "Debian" ]; then
-    yes | sudo apt install snapd
+    sudo apt install snapd
 fi
 
 if grep -q "SNAP" $PATHVAR; then

@@ -1,10 +1,14 @@
 #!/bin/bash 
-. ./checks/check_system.sh
+if ! test -f checks/check_system.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
+else
+    . ./checks/check_system.sh
+fi
 
-if [ $distro_base == "Arch" ];then
-    yes | sudo pacman -Su xorg
+if test $distro == "Arch" || test $distro == "Manjaro"; then
+    sudo pacman -S xorg
 elif [ $distro_base == "Debian" ];then
-    yes | sudo apt install xorg 
+    sudo apt install xorg 
 fi 
 
 #This should create a xorg.conf.new file in /root/ that you can copy over to /etc/X11/xorg.conf

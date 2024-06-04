@@ -26,9 +26,9 @@ fi
 
 if test "$(which scdoc)" == ''; then
     if test $distro_base == "Debian"; then
-       yes | sudo apt install scdoc
-    elif test $distro_base == "Arch"; then
-       yes | sudo pacman -Su scdoc
+       sudo apt install scdoc
+    elif test $distro == "Arch" || test $distro == "Manjaro"; then
+       sudo pacman -S scdoc
     fi
 fi
 

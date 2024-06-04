@@ -32,14 +32,14 @@ fi
 #. $DIR/setup_git_build_from_source.sh "y" "neovim" "https://github.com" "neovim/neovim" "stable" "sudo apt update; sudo apt install ninja-build gettext libtool libtool-bin cmake g++ pkg-config unzip curl doxygen" "make CMAKE_BUILD_TYPE=RelWithDebInfo; sudo make install" "sudo make uninstall" "make distclean; make deps" "y"
 
 
-if [[ $distro == "Arch" || $distro_base == "Arch" ]];then
+if test $distro == "Arch" || test $distro == "Manjaro"; then
     if ! type nvim &> /dev/null; then
-        yes | sudo pacman -Su neovim 
+        sudo pacman -S neovim 
     fi
     if ! type xclip &> /dev/null; then
         reade -Q "GREEN" -i "y" -p "Install nvim clipboard? (xsel xclip) [Y/n]:" "y n" clip
         if [ -z $clip ] || [ "y" == $clip ]; then
-            yes | sudo pacman -Su xsel xclip
+            sudo pacman -S xsel xclip
             echo "${green} If this is for use with ssh on serverside, X11 needs to be forwarded"
             echo "${green} At clientside, 'ForwardX11 yes' also needs to be put in ~/.ssh/config under Host"
             echo "${green} Connection also need to start with -X flag (ssh -X ..@..)"
@@ -52,7 +52,7 @@ if [[ $distro == "Arch" || $distro_base == "Arch" ]];then
     if ! type pylint &> /dev/null; then
         reade -Q "GREEN" -i "y" -p "Install nvim-python? [Y/n]:" "y n" pyscripts
         if [ -z $pyscripts ] || [ "y" == $pyscripts ]; then
-            yes | sudo pacman -Su python python-pynvim python-pipx
+            sudo pacman -S python python-pynvim python-pipx
             pipx install pynvim 
             pipx install pylint
         fi
@@ -60,14 +60,14 @@ if [[ $distro == "Arch" || $distro_base == "Arch" ]];then
     if ! type npm &> /dev/null || ! npm list -g | grep neovim &> /dev/null; then
         reade -Q "GREEN" -i "y" -p "Install nvim-javascript? [Y/n]:" "y n" jsscripts
         if [ -z $jsscripts ] || [ "y" == $jsscripts ]; then
-            yes | sudo pacman -Su npm nodejs
+            sudo pacman -S npm nodejs
             sudo npm install -g neovim
         fi
     fi
     if ! type gem &> /dev/null || ! gem list | grep neovim &> /dev/null; then
         reade -Q "GREEN" -i "y" -p "Install nvim-ruby? [Y/n]:" "y n" rubyscripts
         if [ -z $rubyscripts ] || [ "y" == $rubyscripts ]; then
-            yes | sudo pacman -Su ruby
+            sudo pacman -S ruby
             rver=$(echo $(ruby --version) | awk '{print $2}' | cut -d. -f-2)'.0'
             paths=$(gem environment | awk '/- GEM PATH/{flag=1;next}/- GEM CONFIGURATION/{flag=0}flag' | sed 's|     - ||g' | paste -s -d ':')
             if grep -q "GEM" $PATHVAR; then
@@ -86,7 +86,7 @@ if [[ $distro == "Arch" || $distro_base == "Arch" ]];then
     if ! type cpan &> /dev/null || ! cpan -l 2> /dev/null | grep Neovim::Ext &> /dev/null; then
         reade -Q "GREEN" -i "y" -p "Install nvim-perl? [Y/n]:" "y n" perlscripts
         if [ -z $perlscripts ] || [ "y" == $perlscripts ]; then
-            yes | sudo pacman -Su cpanminus
+            sudo pacman -S cpanminus
             cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
             sudo cpanm --sudo -n Neovim::Ext
             reade -Q "GREEN" -i "y" -p "Perl uses cpan for the installation of modules. Initialize cpan? (Will prevent nvim :checkhealth warning) [Y/n]: " cpn
@@ -98,7 +98,7 @@ if [[ $distro == "Arch" || $distro_base == "Arch" ]];then
     if ! type ctags &> /dev/null; then 
         reade -Q "GREEN" -i "y" -p "Install ctags? [Y/n]:" "y n" ctags
         if  [ "y" == $ctags ]; then
-            yes | sudo pacman -Su ctags
+            sudo pacman -S ctags
         fi
     fi
 elif [  $distro_base == "Debian" ];then
@@ -110,7 +110,7 @@ elif [  $distro_base == "Debian" ];then
         if ! type nvim &> /dev/null; then
             reade -Q "YELLOW" -i "n" -p "Still wish to install through apt? [N/y]:" "y n" nvmapt
             if [ "y" == $nvmapt ]; then
-                yes | sudo apt install neovim
+                sudo apt install neovim
             else
                 reade -Q "GREEN" -i "y" -p "Install nvim through Appimage? [Y/n]:" "y n" nvmappmg
                 if [[ ! "$arch"  =~ "arm" ]] && [ "y" == $nvmappmg ]; then
@@ -132,10 +132,10 @@ elif [  $distro_base == "Debian" ];then
                     if [ "$nvmflpk" == "b" ]; then
                         echo "Make sure you test yourself if branch stable fails. Check 'install_nvim' and checkout different branches"
                         echo "Lets start by removing stuff related to installed 'neovim' packages"
-                        yes | sudo apt autoremove neovim
+                        sudo apt autoremove neovim
                         echo "Then, install some necessary buildtools"
-                        yes | sudo apt update
-                        yes | sudo apt-get install ninja-build gettext libtool libtool-bin autoconf automake cmake g++ pkg-config unzip curl doxygen
+                        sudo apt update
+                        sudo apt-get install ninja-build gettext libtool libtool-bin autoconf automake cmake g++ pkg-config unzip curl doxygen
                         tmpdir=$(mktemp -d -t nvim-XXXXXXXXXX)
                         (cd $tmpdir
                         git clone https://github.com/neovim/neovim
@@ -165,7 +165,7 @@ elif [  $distro_base == "Debian" ];then
     if ! type xclip &> /dev/null; then
         reade -Q "GREEN" -i "y" -p "Install nvim clipboard? (xsel xclip) [Y/n]:" "y n" clip
         if [ -z $clip ] || [ "y" == $clip ]; then
-            yes | sudo apt install xsel xclip 
+            sudo apt install xsel xclip 
             echo "${green} If this is for use with ssh on serverside, X11 needs to be forwarded"
             echo "${green} At clientside, 'ForwardX11 yes' also needs to be put in ~/.ssh/config under Host"
             echo "${green} Connection also need to start with -X flag (ssh -X ..@..)"
@@ -178,7 +178,7 @@ elif [  $distro_base == "Debian" ];then
     if ! type pylint &> /dev/null; then
         reade -Q "GREEN" -i "y" -p "Install nvim-python? [Y/n]:" "y n" pyscripts
         if [ -z $pyscripts ] || [ "y" == $pyscripts ]; then
-            yes | sudo apt install python3 python3-dev python3-pynvim pipx  
+            sudo apt install python3 python3-dev python3-pynvim pipx  
             pipx install pynvim
             pipx install pylint
         fi
@@ -187,7 +187,7 @@ elif [  $distro_base == "Debian" ];then
     if ! type npm &> /dev/null || ! npm list -g | grep neovim  &> /dev/null; then
         reade -Q "GREEN" -i "y" -p "Install nvim-javascript? [Y/n]:" "y n" jsscripts
         if [ -z $jsscripts ] || [ "y" == $jsscripts ]; then
-            yes | sudo apt install nodejs npm
+            sudo apt install nodejs npm
             sudo npm install -g neovim
             if [ $(which nvim) == "$HOME/.local/bin/flatpak/nvim" ]; then
                 qry=$(flatpak list | grep node)           
@@ -217,7 +217,7 @@ elif [  $distro_base == "Debian" ];then
     if ! type gem &> /dev/null || ! gem list | grep neovim &> /dev/null; then
         reade -Q "GREEN" -i "y" -p "Install nvim-ruby? [Y/n]:" "y n" rubyscripts
         if [ -z $rubyscripts ] || [ "y" == $rubyscripts ]; then
-            yes | sudo apt install ruby ruby-dev
+            sudo apt install ruby ruby-dev
             rver=$(echo $(ruby --version) | awk '{print $2}' | cut -d. -f-2)'.0'
             paths=$(gem environment | awk '/- GEM PATH/{flag=1;next}/- GEM CONFIGURATION/{flag=0}flag' | sed 's|     - ||g' | paste -s -d ':')
             if grep -q "GEM" $PATHVAR; then
@@ -239,7 +239,7 @@ elif [  $distro_base == "Debian" ];then
     if ! type cpan &> /dev/null || ! cpan -l 2> /dev/null | grep Neovim::Ext &> /dev/null; then
         reade -Q "GREEN" -i "y" -p "Install nvim-perl? [Y/n]:" "y n" perlscripts
         if [ -z $perlscripts ] || [ "y" == $perlscripts ]; then
-            yes | sudo apt install cpanminus
+            sudo apt install cpanminus
             cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
             sudo cpanm --sudo -n Neovim::Ext
             reade -Q "GREEN" -i "y" -p "Perl uses cpan for the installation of modules. Initialize cpan? (Will prevent nvim :checkhealth warning) [Y/n]: " cpn
@@ -251,7 +251,7 @@ elif [  $distro_base == "Debian" ];then
     if [ "$(which ctags)" == "" ]; then
         reade -Q "GREEN" -i "y" -p "Install ctags? [Y/n]:" "y n" ctags
         if  [ "y" == $ctags ]; then
-            yes | sudo apt install universal-ctags
+            sudo apt install universal-ctags
         fi
     fi
 fi

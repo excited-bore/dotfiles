@@ -1,13 +1,17 @@
 #!/bin/bash
 #https://bbs.archlinux.org/viewtopic.php?id=271850
-. ./checks/check_system.sh
+if ! test -f checks/check_system.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
+else
+    . ./checks/check_system.sh
+fi
 
-if [ $distro == "Manjaro" ]; then
-    yes | sudo pacman -Su pipewire pipewire-pulse manjaro-pipewire
-elif [ $distro == "Arch" ]; then
-    yes | sudo pacman -Su pipewire pipewire-pulse
-elif [ $distro_base == "Debian" ]; then
-    yes | sudo apt install pipewire
+if [ "$distro" == "Manjaro" ]; then
+    sudo pacman -S pipewire pipewire-pulse manjaro-pipewire
+elif [ "$distro" == "Arch" ]; then
+    sudo pacman -S pipewire pipewire-pulse
+elif [ "$distro_base" == "Debian" ]; then
+    sudo apt install pipewire
 fi 
 
 mkdir -p ~/.config/pipewire/pipewire-pulse.conf.d/

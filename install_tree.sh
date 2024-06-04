@@ -5,10 +5,9 @@ else
 fi
 
 if [ "$(which tree)" == "" ]; then 
-    if [ $distro_base == "Arch" ];then
-        yes | sudo pacman -Su tree
-    elif [ $distro_base == "Debian" ]; then
-        yes | sudo apt update
-        yes | sudo apt install tree 
+    if test "$distro" == "Arch" || test "$distro" == "Manjaro" ;then
+        sudo pacman -S tree
+    elif test $distro_base == "Debian"; then
+        sudo apt install tree 
     fi
 fi

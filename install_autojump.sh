@@ -1,14 +1,25 @@
-. ./checks/check_system.sh
-. ./aliases/rlwrap_scripts.sh
-. ./checks/check_keybinds.sh
-./install_AUR-helper.sh
+if ! test -f checks/check_system.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
+else
+    . ./checks/check_system.sh
+fi
+if ! test -f checks/check_pathvar.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pathvar.sh)" 
+else
+    . ./checks/check_pathvar.sh
+fi
+if ! test -f checks/check_keybinds.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_keybinds.sh)" 
+else
+    . ./checks/check_keybinds.sh
+fi
 
 
 if [ ! -x "$(command -v autojump)" ]; then
     if [ $distro == "Manjaro" ]; then
         pamac install autojump
     elif [ $distro_base == "Debian" ]; then
-        yes | sudo apt install autojump
+        sudo apt install autojump                                                              
     fi
 fi
 

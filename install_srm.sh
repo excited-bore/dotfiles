@@ -7,10 +7,8 @@ else
 fi 
 
 if ! type srm &> /dev/null; then
-    if test $distro_base == "Arch"; then
-        if test $distro == "Manjaro"; then
-            yes | pamac install srm
-        fi            
+    if test $distro == "Manjaro"; then
+        pamac install srm
     else
         echo "Install srm from sourceforge"
         echo "Link: https://sourceforge.net/projects/srm/"

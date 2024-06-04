@@ -7,10 +7,10 @@ fi
 
 if ! type npm &> /dev/null; then
     echo "This next $(tput setaf 1)sudo$(tput sgr0) will install npm and nodejs"
-    if test $distro_base == "Arch"; then 
-        yes | sudo pacman -Su npm nodejs
+    if test $distro == "Arch" || test $distro == "Manjaro"; then 
+        sudo pacman -S npm nodejs
     elif test $distro_base == "Debian"; then
-        yes | sudo apt install npm nodejs
+        sudo apt install npm nodejs
     fi
 fi
 

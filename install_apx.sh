@@ -4,32 +4,41 @@ if ! test -f checks/check_system.sh; then
 else
     . ./checks/check_system.sh
 fi
+if ! test -f checks/check_completions_dir.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)" 
+else
+    . ./checks/check_completions_dir.sh
+fi
 if ! test -f checks/check_pathvar.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_go.sh)" 
 else
     . ./install_go.sh
 fi
-if ! test -f checks/check_rlwrap.sh; then
+if ! test -f install_docker.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_docker.sh)" 
 else
     . ./install_docker.sh
 fi
 
 if [ $distro == "Manjaro" ]; then
-    yes | pamac install apx
+    pamac install apx
 elif [ $distro == "Arch" ]; then
     #TODO integrate different AUR launchers
     echo "Install with apx with AUR launcher of choice (f.ex. yay, pamac)"
     return 0
-elif [ $distro == "Debian" ] || [ $distro_base == "Debian" ]; then
-    git clone https://github.com/Vanilla-OS/apx /tmp/apx
-    go build /tmp/apx
-    sudo install -Dm755 "/tmp/apx/apx" "/usr/bin/apx"
-    sudo install -Dm644 "/tmp/apx/man/apx.1" "/usr/share/man/man1/apx.1"
+elif test $distro_base == "Debian"; then
+    git clone https://github.com/Vanilla-OS/apx $TMPDIR/apx
+    go build $TMPDIR/apx
+    sudo install -Dm755 "$TMPDIR/apx/apx" "/usr/bin/apx"
+    sudo install -Dm644 "$TMPDIR/apx/man/apx.1" "/usr/share/man/man1/apx.1"
     #sudo install -Dm644 "./man/es/apx.1" "/usr/share/man/es/man1/apx.1"
-    sudo install -Dm644 "/tmp/apx/config/config.json" "/etc/apx/config.json"
+    sudo install -Dm644 "$TMPDIR/apx/config/config.json" "/etc/apx/config.json"
     sudo sed -i "s,\(\"distroboxpath\": \"\).*,\1/home/$USER/.local/bin/distrobox\",g" /etc/apx/config.json
-    . ./install_distrobox.sh
+    if ! test -f install_distrobox.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_distrobox.sh)" 
+     else
+        . ./install_distrobox.sh
+    fi
     sudo mkdir /usr/lib/apx
     sudo mv ~/.local/bin/distrobox* /usr/lib/apx
 fi

@@ -12,9 +12,9 @@ fi
 
 if test "$(which cargo)" == ''; then
     if test $distro_base == "Debian"; then
-       yes | sudo apt install cargo
-    elif test $distro_base == "Arch"; then
-       yes | sudo pacman -Su cargo
+       sudo apt install cargo
+    elif test $distro == "Arch" || test $distro == "Manjaro"; then
+       sudo pacman -S cargo
     fi
 fi
 

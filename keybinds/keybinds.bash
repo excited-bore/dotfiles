@@ -184,7 +184,7 @@ bind -m vi-insert      -x '"\e[1;3A": clear && let LINE_TPUT=$LINE_TPUT-1; if [ 
 bind -m emacs-standard -x '"\e[1;3B": clear && let LINE_TPUT=$LINE_TPUT+1; if [ $LINE_TPUT -gt $LINES ];then let LINE_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc' 
 bind -m vi-command     -x '"\e[1;3B": clear && let LINE_TPUT=$LINE_TPUT+1; if [ $LINE_TPUT -gt $LINES ];then let LINE_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
 bind -m vi-insert      -x '"\e[1;3B": clear && let LINE_TPUT=$LINE_TPUT+1; if [ $LINE_TPUT -gt $LINES ];then let LINE_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
-
+#
 # Ctrl-w expands aliases
 bind -m emacs-standard  '"\C-w": alias-expand-line'
 bind -m vi-command      '"\C-w": alias-expand-line'
@@ -259,6 +259,7 @@ if type osc &> /dev/null; then
     bind -m emacs-standard '"\C-v": "\237\225"'
     bind -m vi-command     '"\C-v": "\237\225"'
     bind -m vi-insert      '"\C-v": "\237\225"'
+
 elif type xclip &> /dev/null; then
     # Ctrl-s: Proper copy
     bind -m emacs-standard -x '"\C-s" : echo "$READLINE_LINE" | xclip -i -sel c' 
