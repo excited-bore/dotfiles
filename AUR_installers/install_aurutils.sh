@@ -6,14 +6,14 @@ else
     . ./update_system.sh
 fi
 
-if ! type aurman &> /dev/null; then
+if ! type aur &> /dev/null; then
     if ! type git &> /dev/null || ! type makepkg &> /dev/null; then
         sudo pacman -S --needed base-devel git
     fi
-    git clone https://aur.archlinux.org/packages/aurman.git $TMPDIR/aurman
-    (cd $TMPDIR/aurman
+    git clone https://aur.archlinux.org/aurutils.git $TMPDIR/aurutils
+    (cd $TMPDIR/aurutils
     makepkg -fsri)
-    aurman --version && echo "${green}${bold}Aurman installed!"
+    aur --version && echo "${green}${bold}Aurutils installed!"
+    sudo $EDITOR /etc/pacman.d/aur
 fi
-     
 

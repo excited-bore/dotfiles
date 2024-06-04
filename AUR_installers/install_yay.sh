@@ -1,9 +1,9 @@
 #!/bin/bash
 
-if ! test -f checks/update_system.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/update_system.sh)" 
+if ! test -f update_system.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/update_system.sh)" 
 else
-    . ./checks/update_system.sh
+    . ./update_system.sh
 fi
 
 if ! type yay &> /dev/null; then
