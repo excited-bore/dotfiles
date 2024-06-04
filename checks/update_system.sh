@@ -27,7 +27,7 @@ elif test $packmang == "apk"; then
     apk update
 elif test $packmang == "pacman"; then
     sudo pacman -Syu
-    if ! test -z $AUR_helper && ! test -z $AUR_update; then
+    if ! test -z "$AUR_helper" && ! test -z "$AUR_update"; then
         eval "$AUR_update"
     fi
 elif test $distro == "Gentoo"; then

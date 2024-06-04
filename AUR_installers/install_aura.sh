@@ -7,7 +7,7 @@ else
 fi
 
 if ! type aura &> /dev/null; then
-    if ! test -x $(command -v git) || ! test -x $(command -v makepkg); then
+    if ! type git &> /dev/null || ! type makepkg &> /dev/null; then
         sudo pacman -S --needed base-devel git
     fi
     git clone https://aur.archlinux.org/aura-bin.git $TMPDIR/aura-bin

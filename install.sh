@@ -348,9 +348,7 @@ pathvr=$(pwd)/.pathvariables.env
         }                                            
         pathvariables(){
             if ! grep -q "~/.pathvariables.env" ~/.bashrc; then
-                echo "if [[ -f ~/.pathvariables.env ]]; then" >> ~/.bashrc
-                echo "  . ~/.pathvariables.env" >> ~/.bashrc
-                echo "fi" >> ~/.bashrc
+                echo "[ -f ~/.pathvariables.env ] && source ~/.pathvariables.env" >> ~/.bashrc
             fi
             cp -fv $pathvr ~/.pathvariables.env
             yes_edit_no pathvariables_r "$pathvr" "Install .pathvariables.env at /root/?" "edit" "YELLOW"; 

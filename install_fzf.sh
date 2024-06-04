@@ -13,7 +13,7 @@ else
 fi
 
 if ! test -f aliases/rlwrap_scripts.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/rlwrap_scripts.sh)" 
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/rlwrap_scvripts.sh)" 
 else
     . ./aliases/rlwrap_scripts.sh
 fi
@@ -26,12 +26,15 @@ fi
  # Bash completion issue with fzf fix
  # https://github.com/cykerway/complete-alias/issues/46
  
-if grep -q "if \[\[ -f ~/.bash_aliases" ~/.bashrc; then
+if grep -q "[ -f ~/.bash_aliases ]" ~/.bashrc; then
     sed -i 's|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash||g' ~/.bashrc
-    sed -i 's|\(.*if \[\[ -f ~/.bash_aliases.*\)|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\n\n\1|g' ~/.bashrc
- elif grep -q "if \[\[ -f ~/.bash_completion" ~/.bashrc; then
+    sed -i 's|\([ -f ~/.bash_aliases ] &&  && source ~/.bash_aliases)|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\n\n\1|g' ~/.bashrc
+ elif grep -q "[ -f ~/.keybinds ]" ~/.bashrc; then
     sed -i 's|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash||g' ~/.bashrc
-    sed -i 's|\(.*if \[\[ -f ~/.bash_completion.*\)|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\n\n\1|g' ~/.bashrc
+    sed -i 's|\[ -f ~/.keybinds ] && source ~/.keybinds\)|\1\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\n\n|g' ~/.bashrc
+ elif grep -q "[ -f ~/.bash_completion ]" ~/.bashrc; then
+    sed -i 's|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash||g' ~/.bashrc
+    sed -i 's|\[ -f ~/.bash_completion ] && source ~/.bash_completion\)|\1\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\n\n|g' ~/.bashrc
  fi
  . ~/.bashrc
 
@@ -96,6 +99,9 @@ elif ! grep -q "export FZF_DEFAULT_COMMAND" $PATHVAR; then
     printf "\n# FZF\nexport FZF_DEFAULT_COMMAND=\"$fnd\"\nexport FZF_CTRL_T_COMMAND='$FZF_DEFAULT_COMMAND'" >> $PATHVAR
 fi
 
+echo "Next $(tput setaf 1)sudo$(tput sgr0) will FZF pathvariables in /root/.pathvariables.env' "
+
+
 if [ $PATHVAR_R == /root/.pathvariables.env ] ; then
     sudo sed -i 's|#export FZF_DEFAULT_COMMAND|export FZF_DEFAULT_COMMAND |g' $PATHVAR_R
     sudo sed -i "s|export FZF_DEFAULT_COMMAND=.*|export FZF_DEFAULT_COMMAND=\"$fnd\"|g" $PATHVAR_R
@@ -118,7 +124,7 @@ fi
     if [ $PATHVAR == ~/.pathvariables.env ] ; then
         sed -i 's|#export RG_PREFIX|export RG_PREFIX|g' $PATHVAR
     elif ! grep -q "export RG_PREFIX" $PATHVAR; then
-        printf "\n# RIPGREP\nexport RG_PREFIX='rg --column --line-number --no-heading --color=always --smart-case \"" >> $PATHVAR
+        printf "\n# RIPGREP\nexport RG_PREFIX='rg --column --line-number --no-heading --color=always --smart-case \"" >> $PATHVAR &> /dev/null
     fi
     if [ $PATHVAR_R == /root/.pathvariables.env ] ; then
         sudo sed -i 's|#export RG_PREFIX|export RG_PREFIX|g' $PATHVAR_R
@@ -234,7 +240,7 @@ fi
         if [ $PATHVAR == ~/.pathvariables.env ] ; then
             sed -i 's|#export FZF_CTRL_R_OPTS=|export FZF_CTRL_R_OPTS=|g' $PATHVAR
         elif ! grep -q "export FZF_CTRL_R_OPTS=" $PATHVAR; then
-            printf "\nexport FZF_CTRL_R_OPTS=\" --preview 'echo {}' --preview-window up:3:hidden:wrap --bind 'ctrl-t:toggle-preview' --bind 'alt-c:execute-silent(echo -n {2..} | xclip -i -sel c)+abort' --color header:italic --header 'Press ALT-C to copy command into clipboard'\"" >> $PATHVAR
+            printf "\nexport FZF_CTRL_R_OPTS=\" --preview 'echo {}' --preview-window up:3:hidden:wrap --bind 'ctrl-t:toggle-preview' --bind 'alt-c:execute-silent(echo -n {2..} | xclip -i -sel c)+abort' --color header:italic --header 'Press ALT-C to copy command into clipboard'\"" >> $PATHVAR &> /dev/null
         fi
         if [ $PATHVAR_R == /root/.pathvariables.env ] ; then
             sudo sed -i 's|#export FZF_CTRL_R_OPTS==|export FZF_CTRL_R_OPTS=|g' $PATHVAR_R

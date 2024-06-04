@@ -1,0 +1,6 @@
+#!/bin/bash
+if [ -d ~/.keybinds.d/ ] && [ "$(ls -A ~/.keybinds.d/)" ]; then
+  for keybind in ~/.keybinds.d/*.bash; do
+      . "$keybind" 
+  done
+fi
