@@ -19,15 +19,27 @@ fi
 
 echo "This next $(tput setaf 1)sudo$(tput sgr0) will try to update the packages for your system using the package managers it knows";
 
-if test $distro_base == "Debian"; then
+if test $distro == "Raspbian"; then
+    sudo rpi-update
+elif test $packmang == "apt"; then
     sudo apt update
-elif test $distro == "Arch"; then
+elif test $packmang == "apk"; then
+    apk update
+elif test $packmang == "pacman"; then
     sudo pacman -Syu
-elif test $distro == "Manjaro"; then
-    sudo pacman -Syu
-    pamac update
-elif test $distro_base == "Gentoo"; then
+    if ! test -z $AUR_helper && ! test -z $AUR_update; then
+        eval "$AUR_update"
+    fi
+elif test $distro == "Gentoo"; then
     #TODO Add update cycle for Gentoo systems
+    continue
+# https://en.opensuse.org/System_Updates
+elif test $packmang == "zypper_leap"; then
+    sudo zypper up
+elif test $packmang == "zypper_tumble"; then
+    sudo zypper dup
+elif test $packmang == "yum"; then
+    yum update
 fi
 
 if type flatpak &> /dev/null; then
@@ -40,7 +52,7 @@ fi
 
 
 if type pipx &> /dev/null || type npm &> /dev/null || type gem &> /dev/null || type cargo &> /dev/null; then 
-    reade -Q "magenta" -i "n" -p "Update Packages fromdevelopment package-managers? (pipx, npm, gem, cargo... - WARNING: this could take a lot longer relative to regular pm's) [N/y]: " "y n" dev_up
+    reade -Q "MAGENTA" -i "n" -p "Update Packages from development package-managers? (pipx, npm, gem, cargo... - WARNING: this could take a lot longer relative to regular pm's) [N/y]: " "y n" dev_up
     if [ "$dev_up" == "y" ]; then
         
         if type pipx &> /dev/null; then

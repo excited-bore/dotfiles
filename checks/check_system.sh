@@ -1,10 +1,10 @@
-unameOut="$(uname-s)"
+unameOut="$(uname -s)"
 case "${unameOut}" in
     Linux*)     machine=Linux;;
     Darwin*)    machine=Mac;;
     CYGWIN*)    machine=Windows;;
     MINGW*)     machine=Windows;;
-    *)          machine="UNKNOWN:${unameOut}"
+    *)          machine="UNKNOWN:${unameOut}";;
 esac
 
 if test -z $TMPDIR; then
@@ -61,7 +61,7 @@ do
         packmang="apt"
         distro_base="Debian"
         distro="Ubuntu"
-    elif test -f $f && [[ $f == /etc/SuSE-release || $f == /etc/SUSE-brand ]] && test $distro == /;then
+    elif test -f $f && [[ $f == /etc/SuSE-release || $f == /etc/SUSE-brand ]] && test $distro == /; then
         if ! test -z "$(lsb_release -a | grep Leap)"; then
             packmang="zypper_leap"
         else
@@ -69,15 +69,15 @@ do
         fi
         distro_base="Slackware"
         distro="Suse"
-    elif [ -f $f ] && [ $f == /etc/gentoo-release ] && [ $distro == / ];then
+    elif [ -f $f ] && [ $f == /etc/gentoo-release ] && [ $distro == / ]; then
         packmang="emerge"
         distro_base="Slackware"
         distro="Gentoo"
-    elif [ -f $f ] && [ $f == /etc/redhat-release ] && [ $distro == / ];then
+    elif [ -f $f ] && [ $f == /etc/redhat-release ] && [ $distro == / ]; then
         packmang="yum"
         distro_base="Slackware"
         distro="Redhat"
-    elif [ -f $f ] && [ $f == /etc/arch-release ] && [ $distro == / ];then
+    elif [ -f $f ] && [ $f == /etc/arch-release ] && [ $distro == / ]; then
         packmang="pacman"
         # Check every package manager known by archwiki 
         
@@ -85,44 +85,44 @@ do
         # PACMAN WRAPPERS
         # 
         
-        if test -x "$(command -v pamac)"; then
+        if type pamac &> /dev/null; then
             AUR_helper="pamac"
             AUR_update="pamac update"
             AUR_install="pamac install"    
             if ! test -f checks/check_pamac.sh; then
-                 eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pamac.sh)" 
+                eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pamac.sh)" 
             else
                 . ./checks/check_pamac.sh
             fi
-        elif test -x "$(command -v pikaur)"; then
+        elif type pikaur &> /dev/null; then
             AUR_helper="pikaur"
             AUR_update="pikaur -Syu"
             AUR_install="pikaur -S"
-        elif test -x "$(command -v yay)"; then
+        elif type yay &> /dev/null; then
             AUR_helper="yay"
             AUR_update="yay -Syu"
             AUR_install="yay -S"
-        elif test -x "$(command -v aura)"; then
-            AUR_helper="aura"
-            AUR_update="aura -Au"
-            AUR_install="aura -A"
-        elif test -x "$(command -v aurman)"; then
-            AUR_helper="aurman"
-            AUR_update="aurman -Syu"
-            AUR_install="aurman -S"
-        elif test -x "$(command -v pacaur)"; then
+        elif type pacaur &> /dev/null; then
             AUR_helper="pacaur"
             AUR_update="pacaur -Syu"
             AUR_install="pacaur -S"
-        elif test -x "$(command -v pakku)" ; then
+        elif type aura &> /dev/null; then
+            AUR_helper="aura"
+            AUR_update="aura -Au"
+            AUR_install="aura -A"
+        elif type aurman &> /dev/null; then
+            AUR_helper="aurman"
+            AUR_update="aurman -Syu"
+            AUR_install="aurman -S"
+        elif type pakku &> /dev/null ; then
             AUR_helper="pakku"
             AUR_update="pakku -Syu"
             AUR_install="pakku -S"
-        elif test -x "$(command -v paru)"; then
+        elif type paru &> /dev/null; then
             AUR_helper="paru"
             AUR_update="paru -Syua"
             AUR_install="paru -S"
-        elif test -x "$(command -v trizen)"; then
+        elif type trizen &> /dev/null; then
             AUR_helper="trizen"
             AUR_update="trizen -Syu"
             AUR_install="trizen -S"
@@ -131,55 +131,53 @@ do
         # SEARCH AND BUILD
         # 
         
-        elif test -x "$(command -v aur)"; then
+        # Aurutils
+        elif type aur &> /dev/null; then
             AUR_helper="aur"
             AUR_update=""
             AUR_install=
-        elif test -x "$(command -v repoctl)"; then
+        elif type repoctl &> /dev/null; then
             packmang_AUR="repoctl"
-        elif test -x "$(command -v yaah)"; then
+        elif type yaah &> /dev/null; then
             packmang_AUR="yaah"
-        elif test -x "$(command -v bauerbill)"; then
+        elif type bauerbill &> /dev/null; then
             packmang_AUR="bauerbill"
-        elif test -x "$(command -v PKGBUILDer)"; then
+        elif type PKGBUILDer &> /dev/null; then
             packmang_AUR="PKGBUILDer"
-        elif test -x "$(command -v rua)"; then
+        elif type rua &> /dev/null; then
             packmang_AUR="rua"
-        elif test -x "$(command -v pbget)"; then
+        elif type pbget &> /dev/null; then
             packmang_AUR="pbget"
-        elif test -x "$(command -v argon)" ; then
+        elif type argon &> /dev/null ; then
             packmang_AUR="argon"
-        elif test -x "$(command -v cylon)"; then
+        elif type cylon &> /dev/null; then
             packmang_AUR="cylon"
-        elif test -x "$(command -v kalu)"; then
+        elif type kalu &> /dev/null; then
             packmang_AUR="kalu"
-        elif test -x "$(command -v octopi)"; then
+        elif type octopi &> /dev/null; then
             packmang_AUR="octopi"
-        elif test -x "$(command -v pacseek)"; then
+        elif type pacseek &> /dev/null; then
             packmang_AUR="pacseek"
-        elif test -x "$(command -v PkgBrowser)"; then
+        elif type PkgBrowser &> /dev/null; then
             packmang_AUR="PkgBrowser"
-        elif test -x "$(command -v yup)" ; then
+        elif type yup &> /dev/null ; then
             packmang_AUR="yup"
-        elif test -x "$(command -v auracle)"; then
+        elif type auracle &> /dev/null; then
             AUR_helper="auracle"
-        #
-        # PACMAN WRAPPERS
-        # 
             AUR_update="auracle update"
             AUR_install="none"
         else
             printf "Your Arch system seems to have no (known) AUR helper installed\n"
-            reade -Q "GREEN" -i "y" -p "Install yay ( Pacman wrapper )? [Y/n]: " "y n" insyay
+            reade -Q "GREEN" -i "y" -p "Install pikaur ( Pacman wrapper )? [Y/n]: " "y n" insyay
             if [ "y" == "$insyay" ]; then 
-               if ! test -f ../install_yay.sh; then
-                    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_yay.sh)" 
+                if ! test -f ../AUR_installers/install_pikaur.sh; then
+                    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/AUR_installers/install_pikaur.sh)" 
                 else
-                    eval ../install_yay.sh
+                    eval ../AUR_installers/install_pikaur.sh
                 fi
-                AUR_helper="yay"
-                AUR_update="yay -Syu"
-                AUR_install="yay -S"
+                AUR_helper="pikaur"
+                AUR_update="pikaur -Syu"
+                AUR_install="pikaur -S"
             fi
             unset insyay 
         fi

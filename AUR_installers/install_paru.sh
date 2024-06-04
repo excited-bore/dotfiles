@@ -6,13 +6,12 @@ else
     . ./checks/update_system.sh
 fi
 
-if test -x $(command -v yay); then
+if ! type paru &> /dev/null; then
     if ! test -x $(command -v git) || ! test -x $(command -v makepkg); then
         sudo pacman -S --needed base-devel git
     fi
-    git clone https://aur.archlinux.org/yay.git $TMPDIR
-    (cd $TMPDIR/yay
-    makepkg -si)
-    yay --version
-    echo "Yay installed!"
+    git clone https://aur.archlinux.org/paru.git $TMPDIR/paru
+    (cd $TMPDIR/paru
+    makepkg -fsi)
+    paru --version && echo "${green}${bold}Paru installed!"
 fi
