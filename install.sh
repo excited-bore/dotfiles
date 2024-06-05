@@ -221,7 +221,7 @@ pathvr=$(pwd)/.pathvariables.env
             compedit=$(cat $TMPDIR/editor-outpt | awk 'NR > 2' | awk '{if (prev_1_line) print prev_1_line; prev_1_line=prev_line} {prev_line=$NF}' | sed 's|[()]||g' | tr -s [:space:] \\n | uniq | tr '\n' ' ')
             frst="$(echo $compedit | awk '{print $1}')"
             reade -Q "GREEN" -i "$frst" -p "VISUAL (GUI editor)=" "$compedit" vsual
-            vsual=$(whereis "$vsual" | awk '{print $2}')
+            vsual="$edtor$(whereis "$vsual" | awk '{print $2}')"
             sed -i 's|#export VISUAL=.*|export VISUAL='$vsual'|' $pathvr
             
             if grep -q "#export SUDO_EDITOR" $pathvr; then

@@ -10,7 +10,7 @@ else
     . ./checks/check_pathvar.sh
 fi
 
-if test "$(which cargo)" == ''; then
+if ! type cargo &> /dev/null; then
     if test $distro_base == "Debian"; then
        sudo apt install cargo
     elif test $distro == "Arch" || test $distro == "Manjaro"; then

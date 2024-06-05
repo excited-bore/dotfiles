@@ -44,7 +44,8 @@ fi
 
 fnd="find"
 
-if test "$(which fd)" == "" &> /dev/null; then
+# TODO: Make better check: https://github.com/sharkdp/fd
+if type fd-find &> /dev/null || type fd-find &> /dev/null; then
     reade -Q "GREEN" -i "y" -p "Install fd and use for fzf? (Faster find) [Y/n]: " "y n" fdr
      if [ -z $fdr ] || [ "Y" == $fdr ] || [ $fdr == "y" ]; then
         if ! test -f install_fd.sh; then
@@ -73,7 +74,8 @@ else
 fi
 unset fndgbl fndfle fndhiddn
 
-if test "$(which fd)" != "" &> /dev/null; then
+# TODO: Make better check: https://github.com/sharkdp/fd
+if type fd-find &> /dev/null || type fd-find &> /dev/null; then
     echo "${green}Fd can read from global gitignore file${normal}"
     reade -Q "GREEN" -i "y" -p "Generate global gitignore? [Y/n]: " "y n" fndgbl
     if [ $fndgbl == 'y' ]; then
@@ -140,6 +142,7 @@ fi
             cp -fv fzf/ripgrep-directory.sh ~/.bash_aliases.d/
         fi
         if ! grep -q "ripgrep-dir" ~/.fzf/shell/key-bindings.bash; then 
+            # TODO Fix this
             echo "#  Ctrl-g gives a ripgrep function overview" >> ~/.fzf/shell/key-bindings.bash
             echo 'bind -x '\''"\C-g": "ripgrep-dir"'\''' >> ~/.fzf/shell/key-bindings.bash
         fi
@@ -147,7 +150,7 @@ fi
  fi
  unset rpgrp rpgrpdir
 
-if [ "$(which kitty)" != "" ]; then
+if type kitty &> /dev/null; then
     reade -Q "GREEN" -i "y" -p "Add shortcut for fzf-autocompletion? (CTRL-Tab) [Y/n]:" "y n" comp_key
     if [ "$comp_key" == "y" ]; then
         if ! test -f .keybinds.d/keybinds.bash && ! grep -q "(Kitty)" ~/.fzf/shell/key-bindings.bash; then
@@ -169,7 +172,7 @@ fi
     
     reade -Q "GREEN" -i "y" -p "Use rifle (file opener from 'ranger') to open found files and dirs with Ctrl-T filesearch shortcut? [Y/n]:" "y n" fzf_t
     if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ] ; then
-        if [ "$(which rifle)" == "" ]; then
+        if ! type rifle &> /dev/null; then
             sudo wget -P /usr/bin/ https://raw.githubusercontent.com/ranger/ranger/master/ranger/ext/rifle.py 
             sudo mv -v /usr/bin/rifle.py /usr/bin/rifle
             sudo chmod +x /usr/bin/rifle
@@ -228,7 +231,7 @@ fi
         fi
     fi
 
-    if [ "$(which xclip)" == "" ]; then 
+    if ! type xclip &> /dev/null; then 
         reade -Q "GREEN" -i "y" -p "Install xclip? (Clipboard tool for Ctrl-R/Reverse history shortcut) [Y/n]: " "y n" xclip
         if [ "$xclip" == "y" ]; then
             if ! test -f install_xclip.sh; then

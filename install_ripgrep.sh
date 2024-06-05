@@ -5,7 +5,7 @@ else
     . ./checks/check_system.sh
 fi
 
-if [ "$(which rg)" == "" ]; then 
+if ! type rg &> /dev/null; then 
     if test $distro == "Arch" || test $distro == "Manjaro"; then
         sudo pacman -S ripgrep
     elif test $distro_base == "Debian"; then

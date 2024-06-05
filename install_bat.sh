@@ -11,7 +11,7 @@ else
 fi
 
 
-if [ "$(which bat)" == "" ]; then 
+if ! type bat &> /dev/null; then 
     if test $distro == "Arch" || test $distro == "Manjaro";then
         sudo pacman -S bat
     elif [ $distro_base == "Debian" ]; then
@@ -23,7 +23,7 @@ if [ "$(which bat)" == "" ]; then
     fi
 fi 
 
-if [ "$(which batdiff)" == "" ]; then 
+if ! type batdiff &> /dev/null; then 
     reade -Q "GREEN" -i "y" -p "Install bat-extras (includes batdiff/batgrep/batman/bat-modules/batpipe/batwatch) [Y/n]: " "y n" bat
     if test "$bat" == "y"; then
         if test "$distro" == "Arch" || test "$distro" == "Manjaro";then

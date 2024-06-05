@@ -4,7 +4,7 @@ else
     . ./checks/check_system.sh
 fi
 
-if [ "$(which xclip)" == "" ]; then 
+if ! type xclip &> /dev/null; then 
     if test $distro == "Arch" || test $distro == "Manjaro";then
         sudo pacman -S xclip
     elif [ $distro_base == "Debian" ]; then

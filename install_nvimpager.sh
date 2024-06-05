@@ -24,7 +24,7 @@ if ! type nvim > /dev/null ; then
     fi 
 fi
 
-if test "$(which scdoc)" == ''; then
+if ! type scdoc &> /dev/null; then
     if test $distro_base == "Debian"; then
        sudo apt install scdoc
     elif test $distro == "Arch" || test $distro == "Manjaro"; then
@@ -32,7 +32,7 @@ if test "$(which scdoc)" == ''; then
     fi
 fi
 
-if test "$(which nvimpager)" == ''; then
+if ! type nvimpager &> /dev/null; then
     (cd $TMPDIR
     git clone https://github.com/lucc/nvimpager
     cd nvimpager
