@@ -19,7 +19,7 @@ if ! [ -x "$(command -v argcomplete)" ]; then
         sudo apt install python3 pipx
         pipx install argcomplete
     elif test $distro == "Arch" || test $distro == "Manjaro"; then
-        sudo pacman -S python pipx
+        sudo pacman -S python python-pipx
         pipx install argcomplete
     fi
 fi

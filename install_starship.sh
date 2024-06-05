@@ -21,7 +21,12 @@ if [ "y" == "$strship" ]; then
     fi
     starship completions bash > ~/.bash_completion.d/starship
     if [ -d ~/.bash_aliases.d/ ]; then
-        cp -bfv aliases/starship.sh ~/.bash_aliases.d/
+        if test -f aliases/starship.sh; then
+            cp -bfv aliases/starship.sh ~/.bash_aliases.d/
+        else
+            wget -O ~/.bash_aliases.d/starship.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/starship.sh
+        fi
+
         if test -f ~/.bash_aliases.d/starship.sh~; then 
             gio trash ~/.bash_aliases.d/starship.sh~
         fi
@@ -42,7 +47,11 @@ if [ "y" == "$strship" ]; then
     sudo touch /root/.bash_completion.d/starship
     starship completions bash | sudo tee -a /root/.bash_completion.d/starship > /dev/null  
     if [ -d /root/.bash_aliases.d/ ]; then
-        sudo cp -bfv aliases/starship.sh /root/.bash_aliases.d/
+        if test -f aliases/starship.sh; then
+            sudo cp -bfv aliases/starship.sh /root/.bash_aliases.d/
+        else
+            sudo wget -O /root/.bash_aliases.d/starship.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/starship.sh
+        fi 
         if test -f /root/.bash_aliases.d/starship.sh~; then
             sudo gio trash ~/.bash_aliases.d/starship.sh~
         fi
@@ -50,12 +59,10 @@ if [ "y" == "$strship" ]; then
 fi
 unset strship
 
-source ~/.bashrc
+eval "$(starship init bash)"
 if ! test -f aliases/starship.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/starship.sh)" 
 else
     . ./aliases/starship.sh
 fi 
 starship-presets
-source ~/.bashrc
-
