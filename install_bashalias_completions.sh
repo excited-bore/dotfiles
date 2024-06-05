@@ -19,11 +19,12 @@ fi
 
 if [ ! -e ~/.bash_completion.d/complete_alias ]; then
     curl https://raw.githubusercontent.com/cykerway/complete-alias/master/complete_alias > ~/.bash_completion.d/complete_alias 2> /dev/null
-    if test -f ~/.bash_aliases; then
-        echo 'complete -F _complete_alias "${!BASH_ALIASES[@]}"' >> ~/.bash_aliases
-    else
-        echo 'complete -F _complete_alias "${!BASH_ALIASES[@]}"' >> ~/.bashrc
-    fi
+    #if test -f ~/.bash_aliases; then
+    #    echo 'complete -F _complete_alias "${!BASH_ALIASES[@]}"' >> ~/.bash_aliases
+    #else
+    #    echo 'complete -F _complete_alias "${!BASH_ALIASES[@]}"' >> ~/.bashrc
+    #fi
+    echo 'complete -F _complete_alias "${!BASH_ALIASES[@]}"' >> ~/.bashrc
 fi
 
 reade -Q "YELLOW" -i "y" -p "Install bash completions for aliases in /root/.bash_completion.d? [Y/n]:" "y n" rcompl
@@ -34,9 +35,10 @@ if [ -z $rcompl ] || [ "y" == $rcompl ]; then
         curl https://raw.githubusercontent.com/cykerway/complete-alias/master/complete_alias | sudo tee /root/.bash_completion.d/complete_alias 2> /dev/null
         sudo sed -i 's/#complete -F _complete_alias "\(.*\)"/complete -F _complete_alias "\1"/g' /root/.bash_completion.d/complete_alias
     fi
-    if sudo test -f /root/.bash_aliases; then
-        printf "complete -F _complete_alias \"\${!BASH_ALIASES[@]}\"\n" | sudo tee -a /root/.bash_aliases > /dev/null 
-    else
-        printf "complete -F _complete_alias \"\${!BASH_ALIASES[@]}\"\n" | sudo tee -a /root/.bashrc > /dev/null
-    fi
+    #if sudo test -f /root/.bash_aliases; then
+    #    printf "complete -F _complete_alias \"\${!BASH_ALIASES[@]}\"\n" | sudo tee -a /root/.bash_aliases > /dev/null 
+    #else
+    #    printf "complete -F _complete_alias \"\${!BASH_ALIASES[@]}\"\n" | sudo tee -a /root/.bashrc > /dev/null
+    #fi
+    printf "complete -F _complete_alias \"\${!BASH_ALIASES[@]}\"\n" | sudo tee -a /root/.bashrc > /dev/null
 fi

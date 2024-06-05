@@ -27,7 +27,7 @@ fi
  
 if grep -q "[ -f ~/.bash_aliases ]" ~/.bashrc; then
     sed -i 's|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash||g' ~/.bashrc
-    sed -i 's|\([ -f ~/.bash_aliases ] &&  && source ~/.bash_aliases\)|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\n\n\1|g' ~/.bashrc
+    sed -i 's|\(\[ -f ~/.bash_aliases \] && source ~/.bash_aliases\)|\1\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\n\n|g' ~/.bashrc
  elif grep -q "[ -f ~/.keybinds ]" ~/.bashrc; then
     sed -i 's|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash||g' ~/.bashrc
     sed -i 's|\[ -f ~/.keybinds ] && source ~/.keybinds\)|\1\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\n\n|g' ~/.bashrc
@@ -35,6 +35,38 @@ if grep -q "[ -f ~/.bash_aliases ]" ~/.bashrc; then
     sed -i 's|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash||g' ~/.bashrc
     sed -i 's|\[ -f ~/.bash_completion ] && source ~/.bash_completion\)|\1\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\n\n|g' ~/.bashrc
  fi
+ if grep -q "complete -F _complete_alias" ~/.bashrc; then
+    sed -i '/complete -F _complete_alias "${!BASH_ALIASES\[@\]}"/d' ~/.bashrc
+    sed -i 's|\(\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\)|\1\n\ncomplete -F _complete_alias "${!BASH_ALIASES\[@\]}"\n|g' ~/.bashrc
+ fi
+
+ if ! grep -q "bind -m" ~/.fzf.bash; then
+    printf "# (Kitty only) Ctrl-tab for fzf autocompletion
+bind -m emacs-standard '\"\\\e[9;5u\": \" **\\\t\"'
+bind -m vi-command     '\"\\\e[9;5u\": \" **\\\t\"'    
+bind -m vi-insert      '\"\\\e[9;5u\": \" **\\\t\"'
+
+if type ripgrep-dir &> /dev/null; then
+    # Alt-g: Ripgrep function overview
+    bind -m emacs-standard -x '\"\\C-g\": \"ripgrep-dir\"'
+    bind -m vi-command     -x '\"\\C-g\": \"ripgrep-dir\"' 
+    bind -m vi-insert      -x '\"\\C-g\": \"ripgrep-dir\"'
+fi
+
+if type fzf_rifle &> /dev/null; then
+    # CTRL-F - Paste the selected file path into the command line
+    bind -m emacs-standard -x '\"\\C-f\": fzf_rifle'
+    bind -m vi-command -x '\"\\C-f\": fzf_rifle'
+    bind -m vi-insert -x '\"\\C-f\": fzf_rifle'
+
+    # F4 - Rifle search
+    bind -m emacs-standard -x '\"\\\eOS\": \"fzf_rifle\"'
+    bind -m vi-command -x '\"\\\eOS\": \"fzf_rifle\"'
+    bind -m vi-insert -x '\"\\\eOS\": \"fzf_rifle\"'
+fi" >> ~/.fzf.bash
+ fi
+
+
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
  #. ~/.bashrc
 
@@ -44,7 +76,8 @@ fi
 
 fnd="find"
 
-if test "$(which fd)" == "" &> /dev/null; then
+# TODO: Make better check: https://github.com/sharkdp/fd
+if type fd-find &> /dev/null || type fd &> /dev/null; then
     reade -Q "GREEN" -i "y" -p "Install fd and use for fzf? (Faster find) [Y/n]: " "y n" fdr
      if [ -z $fdr ] || [ "Y" == $fdr ] || [ $fdr == "y" ]; then
         if ! test -f install_fd.sh; then
@@ -73,7 +106,8 @@ else
 fi
 unset fndgbl fndfle fndhiddn
 
-if test "$(which fd)" != "" &> /dev/null; then
+# TODO: Make better check: https://github.com/sharkdp/fd
+if type fd-find &> /dev/null || type fd &> /dev/null; then
     echo "${green}Fd can read from global gitignore file${normal}"
     reade -Q "GREEN" -i "y" -p "Generate global gitignore? [Y/n]: " "y n" fndgbl
     if [ $fndgbl == 'y' ]; then
@@ -139,15 +173,17 @@ fi
         else
             cp -fv fzf/ripgrep-directory.sh ~/.bash_aliases.d/
         fi
-        if ! grep -q "ripgrep-dir" ~/.fzf/shell/key-bindings.bash; then 
-            echo "#  Ctrl-g gives a ripgrep function overview" >> ~/.fzf/shell/key-bindings.bash
-            echo 'bind -x '\''"\C-g": "ripgrep-dir"'\''' >> ~/.fzf/shell/key-bindings.bash
-        fi
+        #if ! grep -q "ripgrep-dir" ~/.fzf/shell/key-bindings.bash; then 
+        #    # TODO Fix this
+        #    echo "source ~/.bash_aliases.d/ripgrep-directory.sh" >> ~/.fzf/shell/key-bindings.bash
+        #    echo "#  Ctrl-g gives a ripgrep function overview" >> ~/.fzf/shell/key-bindings.bash
+        #    echo 'bind -x '\''"\C-g": "ripgrep-dir"'\''' >> ~/.fzf/shell/key-bindings.bash
+        #fi
     fi
  fi
  unset rpgrp rpgrpdir
 
-if [ "$(which kitty)" != "" ]; then
+if type kitty &> /dev/null; then
     reade -Q "GREEN" -i "y" -p "Add shortcut for fzf-autocompletion? (CTRL-Tab) [Y/n]:" "y n" comp_key
     if [ "$comp_key" == "y" ]; then
         if ! test -f .keybinds.d/keybinds.bash && ! grep -q "(Kitty)" ~/.fzf/shell/key-bindings.bash; then
@@ -158,18 +194,18 @@ if [ "$(which kitty)" != "" ]; then
 fi
  unset comp_key
 
- if test -f ~/.fzf.bash ; then
-    if test -f ~/keybinds.d/.keybinds.bash && grep -q -w "bind '\"\\\C-z\": vi-undo'" ~/.keybinds.d/keybinds.bash; then
-        sed -i 's|\(\\C-y\\ey\\C-x\\C-x\)\\C-f|\1|g' ~/.fzf/shell/key-bindings.bash
-        sed -i 's|\\C-z|\\ep|g' ~/.fzf/shell/key-bindings.bash
-        #sed -i  's|bind -m emacs-standard '\''"\C-z"|#bind -m emacs-standard '\''"\C-z"|g' ~/.fzf/shell/key-bindings.bash
-        #sed -i  's|bind -m vi-command '\''"\C-z"|#bind -m vi-command '\''"\C-z"|g' ~/.fzf/shell/key-bindings.bash
-        #sed -i  's|bind -m vi-insert '\''"\C-z"|#bind -m vi-insert '\''"\C-z"|g' ~/.fzf/shell/key-bindings.bash
-    fi
+if test -f ~/.fzf.bash ; then
+#    if test -f ~/keybinds.d/.keybinds.bash && grep -q -w "bind '\"\\\C-z\": vi-undo'" ~/.keybinds.d/keybinds.bash; then
+#        sed -i 's|\(\\C-y\\ey\\C-x\\C-x\)\\C-f|\1|g' ~/.fzf/shell/key-bindings.bash
+#        sed -i 's|\\C-z|\\ep|g' ~/.fzf/shell/key-bindings.bash
+#        #sed -i  's|bind -m emacs-standard '\''"\C-z"|#bind -m emacs-standard '\''"\C-z"|g' ~/.fzf/shell/key-bindings.bash
+#        #sed -i  's|bind -m vi-command '\''"\C-z"|#bind -m vi-command '\''"\C-z"|g' ~/.fzf/shell/key-bindings.bash
+#        #sed -i  's|bind -m vi-insert '\''"\C-z"|#bind -m vi-insert '\''"\C-z"|g' ~/.fzf/shell/key-bindings.bash
+#    fi
     
     reade -Q "GREEN" -i "y" -p "Use rifle (file opener from 'ranger') to open found files and dirs with Ctrl-T filesearch shortcut? [Y/n]:" "y n" fzf_t
     if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ] ; then
-        if [ "$(which rifle)" == "" ]; then
+        if ! type rifle &> /dev/null; then
             sudo wget -P /usr/bin/ https://raw.githubusercontent.com/ranger/ranger/master/ranger/ext/rifle.py 
             sudo mv -v /usr/bin/rifle.py /usr/bin/rifle
             sudo chmod +x /usr/bin/rifle
@@ -224,11 +260,12 @@ fi
     reade -Q "GREEN" -i "y" -p "Add shortcut F3 for fzf rifle? [Y/n]:" "y n" fzf_t
     if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ] ; then
         if ! grep -q 'bind -x '\''"\\eOR": "fzf_rifle"'\''' ~/.fzf/shell/key-bindings.bash ;  then              
+            
             sed -i 's|\(# CTRL-S\)|# F3 - Rifle search\n  bind -x '\''"\\eOR\": "fzf_rifle"'\''\n\n  \1|g' ~/.fzf/shell/key-bindings.bash
         fi
     fi
 
-    if [ "$(which xclip)" == "" ]; then 
+    if ! type xclip &> /dev/null; then 
         reade -Q "GREEN" -i "y" -p "Install xclip? (Clipboard tool for Ctrl-R/Reverse history shortcut) [Y/n]: " "y n" xclip
         if [ "$xclip" == "y" ]; then
             if ! test -f install_xclip.sh; then

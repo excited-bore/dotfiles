@@ -16,7 +16,7 @@ else
     . ./checks/check_pathvar.sh
 fi
 
-if test "$(which vimpager)" == ''; then
+if type nvimpager &> /dev/null; then
     if test $distro_base == "Debian"; then
         (cd $TMPDIR
         git clone https://github.com/rkitover/vimpager

@@ -6,7 +6,7 @@ else
     . ./checks/check_system.sh
 fi
 
-if [ "$(which ffmpegthumbnailer)" == "" ]; then 
+if ! type ffmpegthumbnailer &> /dev/null; then 
     if test $distro == "Arch" || test $distro == "Manjaro"; then
         sudo pacman -S ffmpegthumbnailer
     elif [ $distro_base == "Debian" ]; then

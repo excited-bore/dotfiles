@@ -4,7 +4,7 @@ else
     . ./checks/check_system.sh
 fi
 
-if [ "$(which nmap)" == "" ]; then 
+if ! type nmap &> /dev/null ; then 
     if test "$distro" == "Arch" || test "$distro" == "Manjaro"; then
         sudo pacman -S nmap
     elif test "$distro_base" == "Debian"; then

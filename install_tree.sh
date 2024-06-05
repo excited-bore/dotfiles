@@ -4,7 +4,7 @@ else
     . ./checks/check_system.sh
 fi
 
-if [ "$(which tree)" == "" ]; then 
+if ! type tree &> /dev/null; then 
     if test "$distro" == "Arch" || test "$distro" == "Manjaro" ;then
         sudo pacman -S tree
     elif test $distro_base == "Debian"; then

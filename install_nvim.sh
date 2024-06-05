@@ -72,11 +72,11 @@ if test $distro == "Arch" || test $distro == "Manjaro"; then
             paths=$(gem environment | awk '/- GEM PATH/{flag=1;next}/- GEM CONFIGURATION/{flag=0}flag' | sed 's|     - ||g' | paste -s -d ':')
             if grep -q "GEM" $PATHVAR; then
                 sed -i "s|.export GEM_HOME=.*|export GEM_HOME=$HOME/.gem/ruby/$rver|g" $PATHVAR
-                sed -i "s|.export GEM_PATH=.*|GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin|g" $PATHVAR
+                sed -i "s|.export GEM_PATH=.*|export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin|g" $PATHVAR
                 sed -i 's|.export PATH=$PATH:$GEM_PATH.*|export PATH=$PATH:$GEM_PATH:$GEM_HOME|g' $PATHVAR
             else
                 printf "export GEM_HOME=$HOME/.gem/ruby/$rver\n" >> $PATHVAR
-                printf "export GEM_PATH=GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin\n" >> $PATHVAR
+                printf "export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin\n" >> $PATHVAR
                 printf "export PATH=\$PATH:\$GEM_PATH:\$GEM_HOME\n" >> $PATHVAR
             fi
             source ~/.bashrc
@@ -223,12 +223,12 @@ elif [  $distro_base == "Debian" ];then
             if grep -q "GEM" $PATHVAR; then
                 sed -i "s|.export GEM_HOME=.*|export GEM_HOME=$HOME/.gem/ruby/$rver|g" $PATHVAR
                 
-                sed -i "s|.export GEM_PATH=.*|GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin|g" $PATHVAR
+                sed -i "s|.export GEM_PATH=.*|export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin|g" $PATHVAR
                 sed -i 's|.export PATH=$PATH:$GEM_PATH.*|export PATH=$PATH:$GEM_PATH:$GEM_HOME|g' $PATHVAR
             else
                 printf "export GEM_HOME=$HOME/.gem/ruby/$rver\n" >> $PATHVAR
                 
-                printf "export GEM_PATH=GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin\n" >> $PATHVAR
+                printf "export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin\n" >> $PATHVAR
                 printf "export PATH=\$PATH:\$GEM_PATH:\$GEM_HOME\n" >> $PATHVAR
             fi
             source ~/.bashrc
@@ -248,7 +248,7 @@ elif [  $distro_base == "Debian" ];then
             fi
         fi
     fi
-    if [ "$(which ctags)" == "" ]; then
+    if ! type ctags &> /dev/null; then
         reade -Q "GREEN" -i "y" -p "Install ctags? [Y/n]:" "y n" ctags
         if  [ "y" == $ctags ]; then
             sudo apt install universal-ctags
