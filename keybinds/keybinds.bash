@@ -24,13 +24,13 @@ stty rprnt 'undef'
 stty lnext '^b'
 
 # Unset suspend signal shortcut (Ctrl+z)
-stty susp 'undef'
+stty susp undef
 
 # Unset backward word erase shortcut (Ctrl+w)
 stty werase 'undef'
 
 # unbinds ctrl-c and bind the function to ctrl-s
-stty intr '^c'
+#stty intr '^c'
 
 
 # XRESOURCES
@@ -63,8 +63,9 @@ setxkbmap -option caps:escape
 # It's good to use unused keys for complex keybindings since you can't combine readline commands with regular bash expressions in the same bind
 # Also
 # https://unix.stackexchange.com/questions/548726/bash-readline-inputrc-bind-key-to-a-sequence-of-multiple-commands 
-
-# Same for fzf
+#
+#
+# Change editing mode
 bind -m vi-command '"\C-a": emacs-editing-mode'
 bind -m vi-insert '"\C-a": emacs-editing-mode'
 bind -m emacs-standard '"\C-a": vi-editing-mode'
@@ -281,32 +282,7 @@ if type autojump &> /dev/null; then
     bind -m vi-insert      '"\C-x\C-j": "j \C-i"'
 fi
 
-if type fzf &> /dev/null; then
-    # (Kitty only) Ctrl-tab for fzf autocompletion
-    bind -m emacs-standard '"\e[9;5u": " **\t"'
-    bind -m vi-command     '"\e[9;5u": " **\t"'
-    bind -m vi-insert      '"\e[9;5u": " **\t"'
 
-    if type ripgrep-dir &> /dev/null; then
-        # Alt-g: Ripgrep function overview
-        bind -m emacs-standard -x '"\C-g": "ripgrep-dir"'
-        bind -m vi-command     -x '"\C-g": "ripgrep-dir"' 
-        bind -m vi-insert      -x '"\C-g": "ripgrep-dir"'
-    fi
-
-    if type fzf_rifle &> /dev/null; then
-        # CTRL-F - Paste the selected file path into the command line
-        bind -m emacs-standard -x '"\C-f": fzf_rifle'
-        bind -m vi-command -x '"\C-f": fzf_rifle'
-        bind -m vi-insert -x '"\C-f": fzf_rifle'
-
-        # F4 - Rifle search
-        bind -m emacs-standard -x '"\eOS": "fzf_rifle"'
-        bind -m vi-command -x '"\eOS": "fzf_rifle"'
-        bind -m vi-insert -x '"\eOS": "fzf_rifle"'
-    fi
-    
-fi
 
 # F2 - ranger (file explorer)
 if type ranger &> /dev/null; then
