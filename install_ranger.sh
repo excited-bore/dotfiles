@@ -45,7 +45,11 @@ else
     printf "export RANGER_LOAD_DEFAULT_RC=FALSE\n" | sudo tee -a $PATHVAR_R
 fi
 if [ -d ~/.bash_aliases.d/ ]; then
-    cp -bfv ./aliases/ranger.sh ~/.bash_aliases.d/ranger.sh
+    if ! [ -f ~/.bash_aliases.d/ranger.sh ]; then
+        cp -bfv ./aliases/ranger.sh ~/.bash_aliases.d/ranger.sh
+    else
+        wget -O ~/.bash_aliases.d/ranger.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/ranger.sh
+    fi
     if test -f ~/.bash_aliases.d/ranger.sh~; then
         gio trash ~/.bash_aliases.d/ranger.sh~
     fi
@@ -83,7 +87,7 @@ if [ -z "$rf2" ] || [ "y" == "$rf2" ]; then
     elif ! grep -q 'bind -x '\''"\\201": ranger'\''' ~/.bashrc; then
         echo 'bind -x '\''"\\201": ranger'\''' >> ~/.bashrc
         echo 'bind '\''"\\eOQ": \\201\\n\\C-l'\''' >> ~/.bashrc
-    fi 
+     fi 
 fi
 
 if ! test -d ~/.config/ranger/plugins/devicons2; then
@@ -119,11 +123,11 @@ fi
 if [ -x "$(command -v nvim)" ]; then
     reade -Q "GREEN" -i "y" -p "Integrate ranger with nvim? (Install nvim ranger plugins) [Y/n]:" "y n" rangrvim
     if [[ -z $rangrvim || "y" == $rangrvim ]]; then
-        if ! grep -q "Ranger integration" ~/.config/nvim/init.vim; then
-            sed -i 's|"Plug '\''francoiscabrol/ranger.vim'\''|Plug '\''francoiscabrol/ranger.vim'\''|g'
-            sed -i 's|"Plug '\''rbgrouleff/bclose.vim'\''|Plug '\''rbgrouleff/bclose.vim'\''|g'
-            sed -i 's|"let g:ranger_replace_netrw = 1|let g:ranger_replace_netrw = 1|g'
-            sed -i 's|"let g:ranger_map_keys = 0|let g:ranger_map_keys = 0|g'
+        if test -f  ~/.config/nvim/init.vim && ! grep -q "Ranger integration" ~/.config/nvim/init.vim; then
+            sed -i 's|"Plug '\''francoiscabrol/ranger.vim'\''|Plug '\''francoiscabrol/ranger.vim'\''|g' ~/.config/nvim/init.vim
+            sed -i 's|"Plug '\''rbgrouleff/bclose.vim'\''|Plug '\''rbgrouleff/bclose.vim'\''|g' ~/.config/nvim/init.vim
+            sed -i 's|"let g:ranger_replace_netrw = 1|let g:ranger_replace_netrw = 1|g' ~/.config/nvim/init.vim
+            sed -i 's|"let g:ranger_map_keys = 0|let g:ranger_map_keys = 0|g' ~/.config/nvim/init.vim
             nvim +PlugInstall
         fi
     fi

@@ -66,9 +66,9 @@ setxkbmap -option caps:escape
 #
 #
 # Change editing mode
-bind -m vi-command '"\C-a": emacs-editing-mode'
-bind -m vi-insert '"\C-a": emacs-editing-mode'
-bind -m emacs-standard '"\C-a": vi-editing-mode'
+#bind -m vi-command '"\C-a": emacs-editing-mode'
+#bind -m vi-insert '"\C-a": emacs-editing-mode'
+#bind -m emacs-standard '"\C-a": vi-editing-mode'
 
 # Up and down arrow will now intelligently complete partially completed
 # commands by searching through the existing history.
@@ -206,10 +206,10 @@ bind -m emacs-standard -x '"\C-q": exit'
 bind -m vi-command     -x '"\C-q": exit'
 bind -m vi-insert      -x '"\C-q": exit'
 
-# Undo to Ctrl+Z (unbound in tty) instead of only on Ctrl+_
-bind -m emacs-standard  '"\C-z": vi-undo'
-bind -m vi-command      '"\C-z": vi-undo'
-bind -m vi-insert       '"\C-z": vi-undo'
+# Undo to Ctrl+a (unbound in tty) instead of only on Ctrl+_
+bind -m emacs-standard  '"\C-a": vi-undo'
+bind -m vi-command      '"\C-a": vi-undo'
+bind -m vi-insert       '"\C-a": vi-undo'
 
 # Ctrl-backspace deletes (kills) line backward
 bind -m emacs-standard  '"\C-h": backward-kill-word'
