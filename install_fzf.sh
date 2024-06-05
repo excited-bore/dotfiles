@@ -13,7 +13,7 @@ else
 fi
 
 if ! test -f aliases/rlwrap_scripts.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/rlwrap_scvripts.sh)" 
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/rlwrap_scripts.sh)" 
 else
     . ./aliases/rlwrap_scripts.sh
 fi
@@ -22,13 +22,12 @@ fi
 
  git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
  ~/.fzf/install
-
  # Bash completion issue with fzf fix
  # https://github.com/cykerway/complete-alias/issues/46
  
 if grep -q "[ -f ~/.bash_aliases ]" ~/.bashrc; then
     sed -i 's|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash||g' ~/.bashrc
-    sed -i 's|\([ -f ~/.bash_aliases ] &&  && source ~/.bash_aliases)|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\n\n\1|g' ~/.bashrc
+    sed -i 's|\([ -f ~/.bash_aliases ] &&  && source ~/.bash_aliases\)|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\n\n\1|g' ~/.bashrc
  elif grep -q "[ -f ~/.keybinds ]" ~/.bashrc; then
     sed -i 's|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash||g' ~/.bashrc
     sed -i 's|\[ -f ~/.keybinds ] && source ~/.keybinds\)|\1\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\n\n|g' ~/.bashrc
@@ -36,7 +35,8 @@ if grep -q "[ -f ~/.bash_aliases ]" ~/.bashrc; then
     sed -i 's|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash||g' ~/.bashrc
     sed -i 's|\[ -f ~/.bash_completion ] && source ~/.bash_completion\)|\1\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\n\n|g' ~/.bashrc
  fi
- . ~/.bashrc
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+ #. ~/.bashrc
 
 if [ ! -f ~/.fzf_history ]; then
     touch ~/.fzf_history 
@@ -44,7 +44,7 @@ fi
 
 fnd="find"
 
-if [ "$(which fd)" == "" ]; then
+if test "$(which fd)" == "" &> /dev/null; then
     reade -Q "GREEN" -i "y" -p "Install fd and use for fzf? (Faster find) [Y/n]: " "y n" fdr
      if [ -z $fdr ] || [ "Y" == $fdr ] || [ $fdr == "y" ]; then
         if ! test -f install_fd.sh; then
@@ -73,7 +73,7 @@ else
 fi
 unset fndgbl fndfle fndhiddn
 
-if test "$(which fd)" != ""; then
+if test "$(which fd)" != "" &> /dev/null; then
     echo "${green}Fd can read from global gitignore file${normal}"
     reade -Q "GREEN" -i "y" -p "Generate global gitignore? [Y/n]: " "y n" fndgbl
     if [ $fndgbl == 'y' ]; then

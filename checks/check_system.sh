@@ -135,7 +135,7 @@ do
         elif type aur &> /dev/null; then
             AUR_helper="aur"
             AUR_update=""
-            AUR_install=
+            AUR_install=""
         elif type repoctl &> /dev/null; then
             packmang_AUR="repoctl"
         elif type yaah &> /dev/null; then
