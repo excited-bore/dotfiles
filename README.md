@@ -6,7 +6,7 @@ Currently only focused on **bash** on **Linux** (On a distro with *Apt* or *Pacm
 
 ## Install.sh
 
-Try it out with if you have curl installed:
+Try it out with if you have curl installed. Worked and tested for Manjaro and Ubuntu:
 ```
 eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install.sh)"
 ```

@@ -282,7 +282,11 @@ if type autojump &> /dev/null; then
     bind -m vi-insert      '"\C-x\C-j": "j \C-i"'
 fi
 
-
+if type fzf &> /dev/null; then
+    bind -m emacs-standard '"\C-g": "ripgrep-directory"'
+    bind -m vi-command     '"\C-g": "ripgrep-directory"'
+    bind -m vi-insert      '"\C-g": "ripgrep-directory"'
+fi
 
 # F2 - ranger (file explorer)
 if type ranger &> /dev/null; then
