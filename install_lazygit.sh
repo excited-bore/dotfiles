@@ -19,7 +19,7 @@ if ! type lazygit &> /dev/null; then
             if ! type curl &> /dev/null; then
                 sudo apt install curl
             fi
-            LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
+            LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po --color=never '"tag_name": "v\K[^"]*')
             curl -Lo $TMPDIR/lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
             tar -xf $TMPDIR/lazygit.tar.gz $TMPDIR/lazygit
             sudo install $TMPDIR/lazygit /usr/local/bin
