@@ -1356,7 +1356,7 @@ fi
                     sudo apt install npm
                     sudo npm -g install diff-so-fancy 
                 elif test $pager == "delta"; then
-                    sudo apt install Debdelta
+                    sudo apt install debdelta
                 elif test $pager == "ydiff"; then
                     sudo apt install pipx
                     pipx install --upgrade ydiff

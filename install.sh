@@ -221,13 +221,15 @@ pathvr=$(pwd)/.pathvariables.env
             compedit=$(cat $TMPDIR/editor-outpt | awk 'NR > 2' | awk '{if (prev_1_line) print prev_1_line; prev_1_line=prev_line} {prev_line=$NF}' | sed 's|[()]||g' | tr -s [:space:] \\n | uniq | tr '\n' ' ')
             frst="$(echo $compedit | awk '{print $1}')"
             reade -Q "GREEN" -i "$frst" -p "VISUAL (GUI editor)=" "$compedit" vsual
-            vsual="$edtor$(whereis "$vsual" | awk '{print $2}')"
-            sed -i 's|#export VISUAL=.*|export VISUAL='$vsual'|' $pathvr
+            vsual="$editors $(whereis "$vsual" | awk '{print $2}')"
+            vsual="$(echo $editors | uniq)"
+            sed -i 's|#export VISUAL=|export VISUAL=|g' $pathvr
+            sed -i 's|export VISUAL=.*|export VISUAL='"$vsual"'|g' $pathvr
             
             if grep -q "#export SUDO_EDITOR" $pathvr; then
                 reade -Q "GREEN" -i "y" -p "Set SUDO_EDITOR to \$EDITOR? [Y/n]: " "y n" sud_edt
                 if test "$sud_edt" == "y"; then
-                    sed -i 's|#export SUDO_EDITOR.*|export SUDO_EDITOR=$EDITOR|' $pathvr
+                    sed -i 's|#export SUDO_EDITOR.*|export SUDO_EDITOR=$EDITOR|g' $pathvr
                 fi
             fi
             

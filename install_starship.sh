@@ -5,6 +5,17 @@ else
     . ./aliases/rlwrap_scripts.sh
 fi
 
+if ! type curl &> /dev/null; then
+    reade -Q "GREEN" -i "y" -p "Curl necessary for curl. Install curl? [Y/n]:" "y n" tojump
+    if [ "$tojump" == "y" ]; then
+        if test $distro == "Arch" || test $distro == "Manjaro";then
+            sudo pacman -S curl
+        elif test $distro_base == "Debian"; then
+            sudo apt install curl
+        fi
+    fi
+    unset tojump
+fi
 
 
 curl -sS https://starship.rs/install.sh | sh 
