@@ -183,11 +183,11 @@ pathvr=$(pwd)/.pathvariables.env
             editors="nano vi"
             prmpt="${green}\tnano = Default editor - Basic, but userfriendly\n\tvi = Other preinstalled editor - Archaic and non-userfriendly editor\n" 
             if type micro &> /dev/null; then
-                editors="$pagers micro"
+                editors="$editors micro"
                 prmpt="$prmpt \tMicro = Relatively good out-of-the-box editor - Decent keybindings, yet no customizations\n"
             fi
             if type ne &> /dev/null; then
-                editors="$pagers ne"
+                editors="$editors ne"
                 prmpt="$prmpt \tNice editor = Relatively good out-of-the-box editor - Decent keybindings, yet no customizations\n"
             fi
             if type vim &> /dev/null; then
@@ -222,7 +222,7 @@ pathvr=$(pwd)/.pathvariables.env
             frst="$(echo $compedit | awk '{print $1}')"
             reade -Q "GREEN" -i "$frst" -p "VISUAL (GUI editor)=" "$compedit" vsual
             vsual="$editors $(whereis "$vsual" | awk '{print $2}')"
-            vsual="$(echo $editors | uniq)"
+            vsual="$(echo $vsual | uniq)"
             sed -i 's|#export VISUAL=|export VISUAL=|g' $pathvr
             sed -i 's|export VISUAL=.*|export VISUAL='"$vsual"'|g' $pathvr
             
