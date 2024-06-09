@@ -24,7 +24,12 @@ if ! [ -x "$(command -v argcomplete)" ]; then
     fi
 fi
 
-activate-global-python-argcomplete --dest=/home/$USER/.bash_completion.d 
+if type activate-global-python-argcomplete &> /dev/null; then
+    activate-global-python-argcomplete --dest=/home/$USER/.bash_completion.d 
+elif type activate-global-python-argcomplete3 &> /dev/null; then
+    activate-global-python-argcomplete --dest=/home/$USER/.bash_completion.d 
+fi
+    
 #if ! grep -q "python-argcomplete" ~/.bashrc; then
 #    echo ". ~/.bash_completion.d/_python-argcomplete" >> ~/.bashrc
 #fi

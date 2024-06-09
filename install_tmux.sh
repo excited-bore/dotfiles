@@ -48,15 +48,23 @@ fi
 #   echo "fi" >> ~/.profile 
 #fi
 
-sed -i 's|^set -g @plugin|#set -g @plugin|g' tmux/.tmux.conf
-sed -i 's|^run '\''~/.tmux/plugins/tpm/tpm'\''|#run '\''~/.tmux/plugins/tpm/tpm'\''|g' tmux/.tmux.conf
-sed -i 's|^set -g @continuum-restore '\''on'\''|#set -g @continuum-restore '\''on'\''|g' tmux/.tmux.conf
+if test -f tmux/.tmux.conf; then
+    file=tmux/.tmux.conf
+else
+    file1="$(mktemp)/tmux"
+    wget -O $file1/.tmux.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/tmux/.tmux.conf
+    file=$file1/.tmux.conf
+fi
+
+sed -i 's|^set -g @plugin|#set -g @plugin|g' $file
+sed -i 's|^run '\''~/.tmux/plugins/tpm/tpm'\''|#run '\''~/.tmux/plugins/tpm/tpm'\''|g' $file
+sed -i 's|^set -g @continuum-restore '\''on'\''|#set -g @continuum-restore '\''on'\''|g' $file
 
 reade -Q "GREEN" -i "y" -p "Install tmux.conf? (tmux conf at ~/.tmux.conf) [Y/n]:" "y n" tmuxc
 if [ "$tmuxc"  == "y" ] || [ -z "$tmuxc" ]; then
-    cp -bfv tmux/.tmux.conf ~/
-    if test -f ~/.tmux.conf~; then
-        gio trash ~/.tmux.conf~
+    cp -bfv $file ~/
+    if test -f $file~; then
+        gio trash $file~
     fi
 fi
 unset tmuxc
@@ -175,7 +183,13 @@ unset tmuxx
 
 reade -Q "GREEN" -i "y" -p "Install tmux completions? [Y/n]:" "y n"  tmuxx
 if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
-    ./checks/check_completions_dir.sh
+    
+    if ! test -f checks/check_completions_dir.sh; then
+         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)" 
+    else
+        . ./checks/check_completions_dir.sh
+    fi
+
     if [ ! -e ~/.bash_completion.d/tmux ]; then
         curl https://raw.githubusercontent.com/imomaliev/tmux-bash-completion/master/completions/tmux > ~/.bash_completion.d/tmux 2> /dev/null
         . ~/.bashrc
@@ -184,17 +198,21 @@ fi
 
 unset tmuxx
 
-reade -Q "YELLOW" -i "y" -p "Install tmux completions at root? [Y/n]:" "y n"  tmuxx
+reade -Q "YELLOW" -i "y" -p "Install tmux completions at root? [Y/n]:" "y n" tmuxx
 if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
     if [ ! -e /root/.bash_completion.d/tmux ]; then
-       curl https://raw.githubusercontent.com/imomaliev/tmux-bash-completion/master/completions/tmux | sudo tee -a /root/.bash_completion.d/tmux > /dev/null
+       curl https://raw.githubusercontent.com/imomaliev/tmux-bash-completion/master/completions/tmux | sudo tee -a /root/.bash_completion.d/tmux &> /dev/null
     fi
 fi
 unset tmuxx
 
 reade -Q "GREEN" -i "y" -p "Install tmux.sh at ~/.bash_aliases.d/? (tmux aliases) [Y/n]:" "y n"  tmuxx
 if [ -z "$tmuxx" ] || [ "$tmuxx"  == "y" ]; then 
-    cp -bfv tmux/tmux.sh ~/.bash_aliases.d/
+    if test -f tmux/tmux.sh ~/.bash_aliases.d/tmux.sh; then
+        cp -bfv tmux/tmux.sh ~/.bash_aliases.d/
+    else
+        wget -O ~/.bash_aliases.d/tmux.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/.bash_aliases.d/tmux.sh
+    fi
     if test -f ~/.bash_aliases.d/tmux.sh~; then 
         gio trash ~/.bash_aliases.d/tmux.sh~
     fi
