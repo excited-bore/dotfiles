@@ -37,28 +37,28 @@ printf "${green} Will now start with updating system ${normal}\n"
 update_system
 
 if [ ! -e ~/config ] && test -d ~/.config; then
-    reade -Q "BLUE" -i "y" -p "Create ~/.config to ~/config symlink? [Y(es)/n(o)]:" "y n" sym1
+    reade -Q "BLUE" -i "y" -p "Create ~/.config to ~/config symlink? [Y(es)/n(o)]:" "n" sym1
     if [ -z $sym1 ] || [ "y" == $sym1 ]; then
         ln -s ~/.config ~/config
     fi
 fi
 
 if [ ! -e ~/lib_systemd ] && test -d ~/lib/systemd/system; then
-    reade -Q "BLUE" -i "y" -p "Create /lib/systemd/system/ to user directory symlink? [Y/n]:" "y n" sym2
+    reade -Q "BLUE" -i "y" -p "Create /lib/systemd/system/ to user directory symlink? [Y/n]:" "n" sym2
     if [ -z $sym2 ] || [ "y" == $sym2 ]; then
         ln -s /lib/systemd/system/ ~/lib_systemd
     fi
 fi
 
 if [ ! -e ~/etc_systemd ] && test -d ~/etc/systemd/system; then
-    reade -Q "BLUE" -i "y" -p "Create /etc/systemd/system/ to user directory symlink? [Y/n]:" "y n" sym3
+    reade -Q "BLUE" -i "y" -p "Create /etc/systemd/system/ to user directory symlink? [Y/n]:" "n" sym3
     if [ -z $sym3 ] || [ "y" == $sym3 ]; then
         ln -s /etc/systemd/system/ ~/etc_systemd
     fi
 fi
 
 if [ ! -f /etc/modprobe.d/nobeep.conf ]; then
-    reade -Q "GREEN" -i "y" -p "Remove terminal beep? (blacklist pcspkr) [Y/n]:" "y n" beep
+    reade -Q "GREEN" -i "y" -p "Remove terminal beep? (blacklist pcspkr) [Y/n]:" "n" beep
     if [ "$beep" == "y" ] || [ -z "$beep" ]; then
         echo "blacklist pcspkr" | sudo tee /etc/modprobe.d/nobeep.conf
     fi
@@ -69,7 +69,7 @@ unset sym1 sym2 sym3 beep
 
 if ! type flatpak &> /dev/null; then
     printf "%s\n" "${blue}No flatpak detected. (Independent package manager from Red Hat)${normal}"
-    reade -Q "GREEN" -i "y" -p "Install? [Y/n]:" "y n" insflpk 
+    reade -Q "GREEN" -i "y" -p "Install? [Y/n]:" "n" insflpk 
     if [ "y" == "$insflpk" ]; then
         if ! test -f install_flatpak.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_flatpak.sh)" 
@@ -82,7 +82,7 @@ unset insflpk
 
 if ! type snap &> /dev/null; then
     printf "%s\n" "${blue}No snap detected. (Independent package manager from Canonical)${normal}"
-    reade -Q "GREEN" -i "n" -p "Install? [Y/n]:" "y n" inssnap 
+    reade -Q "GREEN" -i "n" -p "Install? [Y/n]:" "y" inssnap 
     if [ "y" == "$inssnap" ]; then
         if ! test -f install_snapd.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_snapd.sh)" 
@@ -94,7 +94,7 @@ fi
 unset inssnap
 
 if ! sudo test -f /etc/polkit/49-nopasswd_global.pkla && ! sudo test -f /etc/polkit-1/rules.d/90-nopasswd_global.rules; then
-    reade -Q "YELLOW" -i "n" -p "Install polkit files for automatic authentication for passwords? [Y/n]:" "y n" plkit
+    reade -Q "YELLOW" -i "n" -p "Install polkit files for automatic authentication for passwords? [Y/n]:" "y" plkit
     if [ "y" == "$plkit" ]; then
         if ! test -f install_polkit_wheel.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_polkit_wheel.sh)" 
@@ -114,7 +114,7 @@ pathvr=$(pwd)/.pathvariables.env
         wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/.pathvariables.env
         pathvr=$TMPDIR/.pathvariables.env
     fi
-    reade -Q "GREEN" -i "y" -p "Check existence (and create) ~/.pathvariables.env and link it to .bashrc? [Y/n]:" "y n" pathvars
+    reade -Q "GREEN" -i "y" -p "Check existence (and create) ~/.pathvariables.env and link it to .bashrc? [Y/n]: " "n" pathvars
     if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         
         #Comment out every export in .pathvariables
@@ -130,7 +130,7 @@ pathvr=$(pwd)/.pathvariables.env
         #fi
         
         # TODO: non ugly values
-        reade -Q "YELLOW" -i "n" -p "Set LS_COLORS with some predefined values? (WARNING: ugly values) [N/y]:" "y n" lsclrs
+        reade -Q "YELLOW" -i "n" -p "Set LS_COLORS with some predefined values? (WARNING: ugly values) [N/y]: " "y" lsclrs
         if [ "$lsclrs" == "y" ] || [ -z "$lsclrs" ]; then
             sed 's/^#export LS_COLORS/export LS_COLORS/' -i $pathvr
         fi
@@ -142,7 +142,7 @@ pathvr=$(pwd)/.pathvariables.env
             fi
         fi
         
-        reade -Q "GREEN" -i "y" -p "Set PAGER? (Page reader) [Y/n]:" "y n" pgr
+        reade -Q "GREEN" -i "y" -p "Set PAGER? (Page reader) [Y/n]: " "n" pgr
         if [ "$pgr" == "y" ] || [ -z "$pgr" ]; then
             # Uncomment export PAGER=
             sed 's/^#export PAGER=/export PAGER=/' -i $pathvr
@@ -175,39 +175,43 @@ pathvr=$(pwd)/.pathvariables.env
                 unset lss lss_n opt opt1
                 #sed -i 's/#export LESSEDIT=/export LESSEDIT=/' .pathvariables.env
             fi
-            if grep -q "moar" "$pgr2"; then
+            if type moar &> /dev/null; then
                 sed -i 's/#export MOAR=/export MOAR=/' $pathvr
             fi
 
         fi
         unset prmpt
 
-        reade -Q "GREEN" -i "y" -p "Set EDITOR and VISUAL? [Y/n]:" "y n" edtvsl
+        reade -Q "GREEN" -i "y" -p "Set EDITOR and VISUAL? [Y/n]: " "n" edtvsl
         if [ "$edtvsl" == "y" ] || [ -z "$edtvsl" ]; then
-            editors="nano vi"
-            prmpt="${green}\tnano = Default editor - Basic, but userfriendly\n\tvi = Other preinstalled editor - Archaic and non-userfriendly editor\n" 
+            editors=""
+            prmpt="${green}\tnano = Default editor - Basic, but userfriendly\n" 
+            if type vi &> /dev/null; then
+                editors="vi $editors"
+                prmpt="$prmpt \tvi = Archaic and non-userfriendly editor\n"
+            fi
             if type micro &> /dev/null; then
-                editors="$editors micro"
+                editors="micro $editors"
                 prmpt="$prmpt \tMicro = Relatively good out-of-the-box editor - Decent keybindings, yet no customizations\n"
             fi
             if type ne &> /dev/null; then
-                editors="$editors ne"
+                editors="ne $editors"
                 prmpt="$prmpt \tNice editor = Relatively good out-of-the-box editor - Decent keybindings, yet no customizations\n"
             fi
             if type vim &> /dev/null; then
-                editors="$editors vim"
+                editors="vim $editors"
                 prmpt="$prmpt \tvim = The one and only true modal editor - Not userfriendly, but many features (maybe even too many) and greatly customizable\n"
                 sed -i "s|#export MYVIMRC=|export MYVIMRC=|g" $pathvr
                 sed -i "s|#export MYGVIMRC=|export MYGVIMRC=|g" $pathvr
             fi
             if type nvim &> /dev/null; then                                  
-                editors="$editors nvim"
+                editors="nvim $editors"
                 prmpt="$prmpt \tnvim (neovim) = A better vim? - Faster and less buggy then regular vim, even a little userfriendlier\n"
                 sed -i "s|#export MYVIMRC=|export MYVIMRC=|g" $pathvr
                 sed -i "s|#export MYGVIMRC=|export MYGVIMRC=|g" $pathvr
             fi
             if type emacs &> /dev/null; then
-                editors="$editors emacs"
+                editors="emacs $editors"
                 prmpt="$prmpt \tEmacs = One of the oldest and versatile editors - Modal and featurerich, but overwhelming as well\n"
             fi
             printf "$prmpt"
@@ -222,11 +226,12 @@ pathvr=$(pwd)/.pathvariables.env
             touch $TMPDIR/editor-outpt
             # Redirect output to file in subshell (mimeopen gives output but also starts read. This cancels read). In tmp because that gets cleaned up
             (echo "" | mimeopen -a editor-check.sh &> $TMPDIR/editor-outpt)
-            compedit=$(cat $TMPDIR/editor-outpt | awk 'NR > 2' | awk '{if (prev_1_line) print prev_1_line; prev_1_line=prev_line} {prev_line=$NF}' | sed 's|[()]||g' | tr -s [:space:] \\n | uniq | tr '\n' ' ')
+            compedit="nano $(cat $TMPDIR/editor-outpt | awk 'NR > 2' | awk '{if (prev_1_line) print prev_1_line; prev_1_line=prev_line} {prev_line=$NF}' | sed 's|[()]||g' | tr -s [:space:] \\n | uniq | tr '\n' ' ') $editors"
             frst="$(echo $compedit | awk '{print $1}')"
+            compedit="$(echo $compedit | sed "s/\<$frst\> //g")"
+            compedit="$(echo $compedit | uniq)"
             reade -Q "GREEN" -i "$frst" -p "VISUAL (GUI editor)=" "$compedit" vsual
-            vsual="$editors $(whereis "$vsual" | awk '{print $2}')"
-            vsual="$(echo $vsual | uniq)"
+            vsual="$(whereis "$vsual" | awk '{print $2}')"
             sed -i 's|#export VISUAL=|export VISUAL=|g' $pathvr
             sed -i 's|export VISUAL=.*|export VISUAL='"$vsual"'|g' $pathvr
             
