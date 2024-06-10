@@ -283,9 +283,35 @@ if type autojump &> /dev/null; then
 fi
 
 if type fzf &> /dev/null; then
-    bind -m emacs-standard '"\C-g": "ripgrep-directory"'
-    bind -m vi-command     '"\C-g": "ripgrep-directory"'
-    bind -m vi-insert      '"\C-g": "ripgrep-directory"'
+    if test -f ~/.bash_aliases.d/keybinds_rifle.sh ; then
+        source ~/.bash_aliases.d/keybinds_rifle.sh  
+    fi
+    if test -f ~/.bash_aliases.d/ripgrep-directory.sh; then
+        source ~/.bash_aliases.d/ripgrep-directory.sh    
+    fi
+    # (Kitty only) Ctrl-tab for fzf autocompletion
+    bind -m emacs-standard '"\e[9;5u": " **\t"'
+    bind -m vi-command     '"\e[9;5u": " **\t"'    
+    bind -m vi-insert      '"\e[9;5u": " **\t"'
+
+    if type ripgrep-dir &> /dev/null; then
+        # Alt-g: Ripgrep function overview
+        bind -m emacs-standard -x '"\C-g": "ripgrep-dir"'
+        bind -m vi-command     -x '"\C-g": "ripgrep-dir"' 
+        bind -m vi-insert      -x '"\C-g": "ripgrep-dir"'
+    fi
+
+    if type fzf_rifle &> /dev/null; then
+        # CTRL-F - Paste the selected file path into the command line
+        bind -m emacs-standard -x '"\C-f": fzf_rifle'
+        bind -m vi-command -x '"\C-f": fzf_rifle'
+        bind -m vi-insert -x '"\C-f": fzf_rifle'
+
+        # F4 - Rifle search
+        bind -m emacs-standard -x '"\eOS": "fzf_rifle"'
+        bind -m vi-command -x '"\eOS": "fzf_rifle"'
+        bind -m vi-insert -x '"\eOS": "fzf_rifle"'
+    fi
 fi
 
 # F2 - ranger (file explorer)

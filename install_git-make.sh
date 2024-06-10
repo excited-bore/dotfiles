@@ -5,15 +5,48 @@ else
     . ./checks/check_system.sh
 fi
 
-if test $distro == "Arch" || test $distro == "Manjaro"; then
-    sudo pacman -S make cmake
-elif test $distro_base == "Debian" ; then
-    sudo apt install make cmake autoconf g++ gettext libncurses5-dev libtool libtool-bin 
+if ! type update_system &> /dev/null; then
+    if ! test -f update_system.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/update_system.sh)" 
+    else
+        . ./update_system.sh
+    fi
 fi
 
-if which pip 2>/dev/null || echo FALSE ; then
-    pip install setuptools
+if test -z $SYSTEM_UPDATED; then
+    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y" updatesysm
+    if test $updatesysm == "y"; then
+        update_system                     
+    fi
 fi
-if which pip3 2>/dev/null || echo FALSE ; then
-    pip3 install setuptools
+
+if ! type git &> /dev/null; then
+    if test $distro == "Arch" || test $distro == "Manjaro"; then
+        sudo pacman -S git
+    elif test $distro_base == "Debian" ; then
+        sudo apt install git
+    fi
 fi
+
+if ! type make &> /dev/null; then
+    if test $distro == "Arch" || test $distro == "Manjaro"; then
+        sudo pacman -S make 
+    elif test $distro_base == "Debian" ; then
+        sudo apt install make 
+    fi 
+fi
+
+if ! type cmake &> /dev/null; then
+    if test $distro == "Arch" || test $distro == "Manjaro"; then
+        sudo pacman -S cmake 
+    elif test $distro_base == "Debian" ; then
+        sudo apt install cmake 
+    fi 
+fi
+
+
+#if test $distro == "Arch" || test $distro == "Manjaro"; then
+#    sudo pacman -S make cmake
+#elif test $distro_base == "Debian" ; then
+#    sudo apt install make cmake autoconf g++ gettext libncurses5-dev libtool libtool-bin 
+#fi

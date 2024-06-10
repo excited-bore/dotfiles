@@ -20,13 +20,14 @@ if ! type update_system &> /dev/null; then
     else
         . ./update_system.sh
     fi
-    update_system
-else
-    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y n" updatesysm
+fi
+
+if test -z $SYSTEM_UPDATED; then
+    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y" updatesysm
     if test $updatesysm == "y"; then
         update_system                     
     fi
-fi 
+fi
 
 if test "$distro" == "Manjaro"; then
     pamac install flatpak libpamac-flatpak-plugin python

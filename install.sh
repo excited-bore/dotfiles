@@ -17,7 +17,6 @@ else
     . ./update_system.sh
 fi
 
-
 if ! test -f checks/check_rlwrap.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_rlwrap.sh)" 
 else
@@ -741,6 +740,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         ytbe=$TMPDIR/youtube.sh
     fi 
 
+    sed -i 'd/SYSTEM_UPDATED="TRUE"' $update_sysm
     update_sysm_r(){ 
         sudo cp -fv $update_sysm /root/.bash_aliases.d/;
     }

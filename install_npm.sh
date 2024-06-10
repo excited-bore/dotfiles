@@ -11,13 +11,14 @@ if ! type update_system &> /dev/null; then
     else
         . ./update_system.sh
     fi
-    update_system
-else
-    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y n" updatesysm
+fi
+
+if test -z $SYSTEM_UPDATED; then
+    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y" updatesysm
     if test $updatesysm == "y"; then
         update_system                     
     fi
-fi 
+fi
 
 if ! type npm &> /dev/null; then
     echo "This next $(tput setaf 1)sudo$(tput sgr0) will install npm and nodejs"
