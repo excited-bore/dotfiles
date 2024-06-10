@@ -5,6 +5,20 @@ else
     . ./aliases/.bash_aliases.d/rlwrap_scripts.sh
 fi
 
+if ! type update_system &> /dev/null; then
+    if ! test -f update_system.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/update_system.sh)" 
+    else
+        . ./update_system.sh
+    fi
+    update_system
+else
+    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y n" updatesysm
+    if test $updatesysm == "y"; then
+        update_system                     
+    fi
+fi
+
 if ! type curl &> /dev/null; then
     reade -Q "GREEN" -i "y" -p "Curl necessary for curl. Install curl? [Y/n]:" "y n" tojump
     if [ "$tojump" == "y" ]; then
@@ -17,8 +31,8 @@ if ! type curl &> /dev/null; then
     unset tojump
 fi
 
-
-curl -sS https://starship.rs/install.sh | sh 
+# https://unix.stackexchange.com/questions/690233/piping-yes-when-running-scripts-from-curl
+sh -c "$(curl -fsSL https://starship.rs/install.sh)" -y -f
 
 reade -Q "GREEN" -i "y" -p "Install starship.sh for user? [Y/n]:" "y n" strship
 if [ "y" == "$strship" ]; then

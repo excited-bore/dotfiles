@@ -1,5 +1,22 @@
-. ./checks/check_system.sh
+if ! test -f checks/check_system.sh.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
+else
+    . ./checks/check_system.sh
+fi 
 
+if ! type update_system &> /dev/null; then
+    if ! test -f update_system.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/update_system.sh)" 
+    else
+        . ./update_system.sh
+    fi
+    update_system
+else
+    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y n" updatesysm
+    if test $updatesysm == "y"; then
+        update_system                     
+    fi
+fi  
 #if [ $dist == "Raspbian" ]; then
 #    read -p "Install 64bit kernel before install nix? [Y/n]: " newkrn
 #    if [[ -z $newkrn || "y" == $newkrn ]]; then

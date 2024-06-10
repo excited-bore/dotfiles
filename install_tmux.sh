@@ -5,6 +5,20 @@ else
     . ./checks/check_system.sh
 fi
 
+if ! type update_system &> /dev/null; then
+    if ! test -f update_system.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/update_system.sh)" 
+    else
+        . ./update_system.sh
+    fi
+    update_system
+else
+    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y n" updatesysm
+    if test $updatesysm == "y"; then
+        update_system                     
+    fi
+fi 
+
 if ! test -f aliases/.bash_aliases.d/rlwrap_scripts.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/rlwrap_scripts.sh)" 
 else
@@ -12,9 +26,9 @@ else
 fi
 
 
-if ! test -x "$(command -v tmux)"; then
+if ! type tmux &> /dev/null; then
     if test "$distro" == "Arch" || test "$distro" == "Manjaro"; then
-        sudo pacman -Syu tmux
+        sudo pacman -S tmux
     elif test "$distro_base" == "Debian"; then
         sudo apt install tmux
     fi
@@ -51,7 +65,7 @@ fi
 if test -f tmux/.tmux.conf; then
     file=tmux/.tmux.conf
 else
-    file1="$(mktemp)/tmux"
+    file1="$(mktemp -d -t tmux-XXXXXXXXXX)"
     wget -O $file1/.tmux.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/tmux/.tmux.conf
     file=$file1/.tmux.conf
 fi

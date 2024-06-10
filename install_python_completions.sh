@@ -3,6 +3,21 @@ if ! test -f checks/check_system.sh; then
 else
     . ./checks/check_system.sh
 fi
+
+if ! type update_system &> /dev/null; then
+    if ! test -f update_system.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/update_system.sh)" 
+    else
+        . ./update_system.sh
+    fi
+    update_system
+else
+    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y n" updatesysm
+    if test $updatesysm == "y"; then
+        update_system                     
+    fi
+fi
+
 if ! test -f aliases/.bash_aliases.d/rlwrap_scripts.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/rlwrap_scripts.sh)" 
 else
@@ -14,7 +29,7 @@ else
     . ./checks/check_completions_dir.sh
 fi
 
-if ! [ -x "$(command -v argcomplete)" ]; then
+if ! type argcomplete &> /dev/null; then
     if test $distro_base == "Debian"; then
         sudo apt install python3 pipx
         pipx install argcomplete
