@@ -22,10 +22,10 @@ else
     . ./checks/check_rlwrap.sh
 fi
 
-if ! test -f aliases/rlwrap_scripts.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/rlwrap_scripts.sh)" 
+if ! test -f aliases/.bash_aliases.d/rlwrap_scripts.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/rlwrap_scripts.sh)" 
 else
-    . ./aliases/rlwrap_scripts.sh
+    . ./aliases/.bash_aliases.d/rlwrap_scripts.sh
 fi
 
 printf "${green}If all necessary files are sourced correctly, this text looks green.\nIf not, something went wrong.\n"
@@ -662,9 +662,9 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         ./checks/check_aliases_dir.sh
     fi
     
-    genr=aliases/general.sh
-    if ! test -f aliases/general.sh; then
-        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/general.sh 
+    genr=aliases/.bash_aliases.d/general.sh
+    if ! test -f aliases/.bash_aliases.d/general.sh; then
+        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/general.sh 
         genr=$TMPDIR/general.sh
     fi
 
@@ -702,33 +702,33 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         yes_edit_no general_r "$genr" "Install general.sh at /root/?" "yes" "GREEN"; }
     yes_edit_no general "$genr" "Install general.sh at ~/? (aliases related to general actions - cd/mv/cp/rm + completion script replacement for 'read -e') " "yes" "YELLOW"
     
-    systemd=aliases/systemctl.sh
-    dosu=aliases/sudo.sh
-    pacmn=aliases/package_managers.sh
-    sshs=aliases/ssh.sh
-    ps1=aliases/PS1_colours.sh
-    manjaro=aliases/manjaro.sh
-    variti=aliases/variety.sh
-    pthon=aliases/python.sh
-    ytbe=aliases/youtube.sh
-    if ! test -d aliases/; then
-        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/systemctl.sh 
+    systemd=aliases/.bash_aliases.d/systemctl.sh
+    dosu=aliases/.bash_aliases.d/sudo.sh
+    pacmn=aliases/.bash_aliases.d/package_managers.sh
+    sshs=aliases/.bash_aliases.d/ssh.sh
+    ps1=aliases/.bash_aliases.d/PS1_colours.sh
+    manjaro=aliases/.bash_aliases.d/manjaro.sh
+    variti=aliases/.bash_aliases.d/variety.sh
+    pthon=aliases/.bash_aliases.d/python.sh
+    ytbe=aliases/.bash_aliases.d/youtube.sh
+    if ! test -d aliases/.bash_aliases.d/; then
+        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/systemctl.sh 
         systemd=$TMPDIR/systemctl.sh
-        wget -P $TMPDIR/  https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/sudo.sh 
+        wget -P $TMPDIR/  https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/sudo.sh 
         dosu=$TMPDIR/sudo.sh
-        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/package_managers.sh 
+        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/package_managers.sh 
         pacmn=$TMPDIR/package_managers.sh
-        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/ssh.sh 
+        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/ssh.sh 
         sshs=$TMPDIR/ssh.sh
-        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/ps1.sh 
+        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/ps1.sh 
         ps1=$TMPDIR/ps1.sh
-        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/manjaro.sh 
+        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/manjaro.sh 
         manjaro=$TMPDIR/manjaro.sh
-        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/variety.sh 
+        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/variety.sh 
         variti=$TMPDIR/variety.sh
-        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/python.sh 
+        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/python.sh 
         pthon=$TMPDIR/python.sh
-        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/youtube.sh 
+        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/youtube.sh 
         ytbe=$TMPDIR/youtube.sh
     fi 
 
@@ -738,7 +738,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     systemd(){
         cp -fv $systemd ~/.bash_aliases.d/
         yes_edit_no systemd_r "$systemd" "Install systemctl.sh at /root/?" "yes" "GREEN"; }
-    yes_edit_no systemd "$systemd" "Install systemctl.sh? ~/.bash_aliases.d/ (systemctl aliases/functions)?" "edit" "GREEN"
+    yes_edit_no systemd "$systemd" "Install systemctl.sh? ~/.bash_aliases.d/ (systemctl aliases/.bash_aliases.d/functions)?" "edit" "GREEN"
         
 
     dosu_r(){ 

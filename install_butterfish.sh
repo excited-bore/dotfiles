@@ -5,9 +5,9 @@
 if ! type go &> /dev/null; then
     echo "Go is not installed. Installing Go..."
     if ! test -f install_go.sh; then
-         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/rlwrap_scripts.sh)" 
+         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/rlwrap_scripts.sh)" 
     else
-        . ./aliases/rlwrap_scripts.sh
+        . ./aliases/.bash_aliases.d/rlwrap_scripts.sh
     fi
 fi
 

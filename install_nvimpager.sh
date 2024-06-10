@@ -4,10 +4,10 @@ else
     . ./checks/check_system.sh
 fi
 
-if ! test -f aliases/rlwrap_scripts.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/rlwrap_scripts.sh)" 
+if ! test -f aliases/.bash_aliases.d/rlwrap_scripts.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/rlwrap_scripts.sh)" 
 else
-    . ./aliases/rlwrap_scripts.sh
+    . ./aliases/.bash_aliases.d/rlwrap_scripts.sh
 fi
 
 if ! test -f checks/check_pathvar.sh; then
@@ -18,7 +18,7 @@ fi
 
 if ! type nvim > /dev/null ; then
    if ! test -f ./install_nvim.sh; then
-     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/install_fzf.sh)" 
+     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/install_fzf.sh)" 
     else
         ./install_nvim.sh
     fi 

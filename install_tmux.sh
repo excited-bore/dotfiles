@@ -5,10 +5,10 @@ else
     . ./checks/check_system.sh
 fi
 
-if ! test -f aliases/rlwrap_scripts.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/rlwrap_scripts.sh)" 
+if ! test -f aliases/.bash_aliases.d/rlwrap_scripts.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/rlwrap_scripts.sh)" 
 else
-    . ./aliases/rlwrap_scripts.sh
+    . ./aliases/.bash_aliases.d/rlwrap_scripts.sh
 fi
 
 
@@ -208,10 +208,10 @@ unset tmuxx
 
 reade -Q "GREEN" -i "y" -p "Install tmux.sh at ~/.bash_aliases.d/? (tmux aliases) [Y/n]:" "y n"  tmuxx
 if [ -z "$tmuxx" ] || [ "$tmuxx"  == "y" ]; then 
-    if test -f tmux/tmux.sh ~/.bash_aliases.d/tmux.sh; then
-        cp -bfv tmux/tmux.sh ~/.bash_aliases.d/
+    if test -f tmux/.bash_aliases.d/tmux.sh; then
+        cp -bfv tmux/.bash_aliases.d/tmux.sh ~/.bash_aliases.d/
     else
-        wget -O ~/.bash_aliases.d/tmux.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/.bash_aliases.d/tmux.sh
+        wget -O ~/.bash_aliases.d/tmux.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/tmux/.bash_aliases.d/tmux.sh
     fi
     if test -f ~/.bash_aliases.d/tmux.sh~; then 
         gio trash ~/.bash_aliases.d/tmux.sh~

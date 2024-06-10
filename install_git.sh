@@ -6,10 +6,10 @@ else
     . ./checks/check_system.sh
 fi
 
-if ! test -f aliases/rlwrap_scripts.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/rlwrap_scripts.sh)" 
+if ! test -f aliases/.bash_aliases.d/rlwrap_scripts.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/rlwrap_scripts.sh)" 
 else
-    . ./aliases/rlwrap_scripts.sh
+    . ./aliases/.bash_aliases.d/rlwrap_scripts.sh
 fi
 
 if ! test -f checks/check_pathvar.sh; then
@@ -20,7 +20,7 @@ fi
 
 #if ! type fzf &> /dev/null ; then
 #   if ! test -f ./install_fzf.sh; then
-#        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/install_fzf.sh)" 
+#        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/install_fzf.sh)" 
 #    else
 #        ./install_fzf.sh
 #    fi 
@@ -1706,10 +1706,10 @@ fi
         else
            . ./checks/check_aliases_dir.sh
         fi
-        if ! test -f aliases/git.sh; then
-            wget -O ~/.bash_aliases.d/git.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/git.sh  
+        if ! test -f aliases/.bash_aliases.d/git.sh; then
+            wget -O ~/.bash_aliases.d/git.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/git.sh  
         else
-            cp -fv aliases/git.sh ~/.bash_aliases.d/
+            cp -fv aliases/.bash_aliases.d/git.sh ~/.bash_aliases.d/
         fi
     fi
 

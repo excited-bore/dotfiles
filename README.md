@@ -59,7 +59,7 @@ Then it helps with installing/configuring:
 &nbsp;&nbsp;- Diffr: https://github.com/mookid/diffr  
 
 
-Also helps configuring global gitconfig and global gitignore, and gives the option to install all kinds of bash-aliases/functions
+Also helps configuring global gitconfig and global gitignore, and gives the option to install all kinds of bash-aliases/.bash_aliases.d/functions
 
 
 ## Install_git.sh

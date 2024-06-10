@@ -5,10 +5,10 @@ else
     . ./checks/check_system.sh
 fi
 
-if ! test -f aliases/rlwrap_scripts.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/rlwrap_scripts.sh)" 
+if ! test -f aliases/.bash_aliases.d/rlwrap_scripts.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/rlwrap_scripts.sh)" 
 else
-    . ./aliases/rlwrap_scripts.sh
+    . ./aliases/.bash_aliases.d/rlwrap_scripts.sh
 fi
 
 if ! test -f checks/check_pathvar.sh; then
@@ -263,10 +263,10 @@ if ! test -d vim/; then
     tmpfile=$(mktemp)
     curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/download_git_directory.sh | tee "$tmpfile" &> /dev/null
     chmod u+x "$tmpfile"
-    eval $tmpfile https://github.com/excited-bore/dotfiles/tree/main/vim $tmpdir
+    eval $tmpfile https://github.com/excited-bore/dotfiles/tree/main/vim/.config/nvim $tmpdir
     dir=$tmpdir/vim
 else
-    dir=vim 
+    dir=vim/.config/nvim 
 fi
 
 function instvim_r(){
@@ -274,7 +274,7 @@ function instvim_r(){
         sudo mkdir -p /root/.config/nvim/
     fi
     sudo cp -bfv $dir/* /root/.config/nvim/
-    if ! sudo test -z $(ls /root/.config/nvim/*~ &> /dev/null); then; then 
+    if ! sudo test -z $(ls /root/.config/nvim/*~ &> /dev/null); then 
         sudo bash -c 'gio trash /root/.config/nvim/*~'
     fi
     if sudo grep -q "MYVIMRC" $PATHVAR_R; then
@@ -378,13 +378,13 @@ nvim +checkhealth
 echo "Install Completion language plugins with ':CocInstall coc-..' / Update with :CocUpdate"
 echo "Check installed nvim plugins with 'Lazy' / Check installed vim plugins with 'PlugInstalled' (only work on nvim and vim respectively)"
 
-dir=aliases
-dir=completions
-if ! test -d aliases/ || ! test -d completions/; then
+dir=vim/.bash_aliases.d
+dir1=vim/.bash_completions.d
+if ! test -d vim/.bash_aliases.d/ || ! test -d vim/.bash_completions.d/; then
     tmpdir=$(mktemp -d -t nvim-XXXXXXXXXX)
     tmpdir1=$(mktemp -d -t nvim-XXXXXXXXXX)
-    wget -P $tmpdir https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/vim_nvim.sh
-    wget -P $tmpdir1 https://raw.githubusercontent.com/excited-bore/dotfiles/main/completions/vim_nvim
+    wget -P $tmpdir https://raw.githubusercontent.com/excited-bore/dotfiles/main/vim/.bash_aliases.d/vim_nvim.sh
+    wget -P $tmpdir1 https://raw.githubusercontent.com/excited-bore/dotfiles/main/vim/.bash_completions.d/vim_nvim
     dir=$tmpdir
     dir1=$tmpdir1
 fi

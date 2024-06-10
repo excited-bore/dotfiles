@@ -5,10 +5,10 @@ else
     . ./checks/check_system.sh
 fi
 
-if ! test -f aliases/rlwrap_scripts.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/rlwrap_scripts.sh)" 
+if ! test -f aliases/.bash_aliases.d/rlwrap_scripts.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/rlwrap_scripts.sh)" 
 else
-    . ./aliases/rlwrap_scripts.sh
+    . ./aliases/.bash_aliases.d/rlwrap_scripts.sh
 fi
 
 if ! test -f checks/check_pathvar.sh; then
@@ -32,16 +32,31 @@ fi
 reade -Q "GREEN" -i "y" -p "Install kitty conf? (at ~/.config/kitty/kitty.conf\|ssh.conf) [Y/n]:" "y n" kittn
 if [ "y" == "$kittn" ]; then
     mkdir -p ~/.config/kitty
-    cp -bvf kitty/kitty.conf ~/.config/kitty/kitty.conf
-    if [ ! -f ~/.config/kitty/kitty.conf~ ]; then
+    cp -bvf kitty/.config/kitty/kitty.conf ~/.config/kitty/kitty.conf
+    if [ -f ~/.config/kitty/kitty.conf~ ]; then
         gio trash ~/.config/kitty/kitty.conf~
     fi
-    cp -vf kitty/ssh.conf ~/.config/kitty/ssh.conf
-    if [ ! -f ~/.config/kitty/ssh.conf~ ]; then
+    cp -vf kitty/.config/kitty/ssh.conf ~/.config/kitty/ssh.conf
+    if [ -f ~/.config/kitty/ssh.conf~ ]; then
         gio trash ~/.config/kitty/ssh.conf~
     fi
 fi
 unset kittn
+
+reade -Q "GREEN" -i "y" -p "Install kitty aliases? (at ~/.bash_aliases.d/kitty.sh) [Y/n]:" "y n" kittn
+if [ "y" == "$kittn" ]; then
+    if ! test -f checks/check_aliases_dir.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)" 
+    else
+        ./checks/check_aliases_dir.sh
+    fi
+    cp -bvf kitty/.bash_aliases.d/kitty.sh ~/.bash_aliases.d/kitty.sh
+    if [ -f ~/.bash_aliases.d/kitty.sh~ ]; then
+        gio trash ~/.bash_aliases.d/kitty.sh~
+    fi 
+fi
+unset kittn
+
 
 # TODO: Get sed warnings gone
 if [ -f ~/.pathvariables.env ]; then

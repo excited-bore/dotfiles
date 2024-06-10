@@ -9,10 +9,10 @@ if ! test -f checks/check_pathvar.sh; then
 else
     . ./checks/check_pathvar.sh
 fi 
-if ! test -f aliases/rlwrap_scripts.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/rlwrap_scripts.sh)" 
+if ! test -f aliases/.bash_aliases.d/rlwrap_scripts.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/rlwrap_scripts.sh)" 
 else
-    . ./aliases/rlwrap_scripts.sh
+    . ./aliases/.bash_aliases.d/rlwrap_scripts.sh
 fi
 
  # Ranger (File explorer)
@@ -45,22 +45,32 @@ else
     printf "export RANGER_LOAD_DEFAULT_RC=FALSE\n" | sudo tee -a $PATHVAR_R
 fi
 if [ -d ~/.bash_aliases.d/ ]; then
-    if ! [ -f ~/.bash_aliases.d/ranger.sh ]; then
-        cp -bfv ./aliases/ranger.sh ~/.bash_aliases.d/ranger.sh
+    if ! test -f ranger/.bash_aliases.d/ranger.sh ; then
+        wget -O ~/.bash_aliases.d/ranger.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/.bash_aliases.d/ranger.sh
     else
-        wget -O ~/.bash_aliases.d/ranger.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/ranger.sh
+        cp -bfv ./ranger/.config/.bash_aliases.d/ranger.sh ~/.bash_aliases.d/ranger.sh
     fi
     if test -f ~/.bash_aliases.d/ranger.sh~; then
         gio trash ~/.bash_aliases.d/ranger.sh~
     fi
 fi
 
+if ! [ -d ranger/.config/ranger/ ]; then
+    tmpdir=$(mktemp -d -t ranger-XXXXXXXXXX)
+    wget -O $tmpdir/rc.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/.config/ranger/rc.conf
+    wget -O $tmpdir/scope.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/.config/ranger/scope.sh
+    wget -O $tmpdir/rifle.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/.config/ranger/rifle.conf
+    dir=$tmpdir
+else
+    dir=ranger/.config/ranger
+fi
 
 rangr_cnf() {
     if ! [ -d ~/.config/ranger/ ]; then 
         mkdir -p ~/.config/ranger/
     fi
-    cp -bfv -t ~/.config/ranger ./ranger/rc.conf ./ranger/rifle.conf ./ranger/scope.sh
+    
+    cp -bfv -t ~/.config/ranger $dir/rc.conf $dir/rifle.conf $dir/scope.sh
     if test -f ~/.config/ranger/rc.conf~; then
         gio trash ~/.config/ranger/rc.conf~ 
     fi
@@ -71,7 +81,7 @@ rangr_cnf() {
         gio trash ~/.config/ranger/scope.sh~ 
     fi
 }
-yes_edit_no rangr_cnf "ranger/rc.conf ranger/rifle.conf" "Install predefined configuration (rc.conf,rifle.conf and scope.sh at ~/.config/ranger/)? " "edit" "GREEN"
+yes_edit_no rangr_cnf "$dir/rc.conf $dir/rifle.conf $dir/scope.sh" "Install predefined configuration (rc.conf,rifle.conf and scope.sh at ~/.config/ranger/)? " "edit" "GREEN"
 
 reade -Q "GREEN" -i "y" -p "F2 for Ranger? [Y/n]:" "y n" rf2
 if [ -z "$rf2" ] || [ "y" == "$rf2" ]; then
