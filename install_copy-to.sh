@@ -17,8 +17,9 @@ if ! type update_system &> /dev/null; then
     else
         . ./update_system.sh
     fi
-    update_system
-else
+fi
+
+if test -z $SYSTEM_UPDATED; then
     reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y n" updatesysm
     if test $updatesysm == "y"; then
         update_system                     

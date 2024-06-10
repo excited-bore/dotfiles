@@ -11,9 +11,10 @@ fi
 
 function update_system() {
     if ! test "$(timedatectl show | grep ^NTP | head -n 1 | awk 'BEGIN { FS = "=" } ; {print $2}')" == "yes"; then 
-        reade -Q "GREEN" -i "y" -p "NTP not set (Network TimeSync). This can cause issues with syncing to repositories. Activate it? [Y/n]: " "y n" set_ntp
+        reade -Q "GREEN" -i "y" -p "Timedate NTP not set (Automatic timesync). This can cause issues with syncing to repositories. Activate it? [Y/n]: " "y n" set_ntp
         if [ "$set_ntp" == "y" ]; then
             timedatectl set-ntp true
+            timedatectl status
         fi
     fi
 
@@ -100,3 +101,4 @@ function update_system() {
         unset dev_up
     fi
 }
+

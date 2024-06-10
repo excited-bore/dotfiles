@@ -11,14 +11,16 @@ if ! test -f checks/check_pathvar.sh; then
 else
     . ./checks/check_pathvar.sh
 fi
+
 if ! type update_system &> /dev/null; then
     if ! test -f update_system.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/update_system.sh)" 
     else
         . ./update_system.sh
     fi
-    update_system
-else
+fi
+
+if test -z $SYSTEM_UPDATED; then
     reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y n" updatesysm
     if test $updatesysm == "y"; then
         update_system                     
@@ -40,45 +42,18 @@ fi
  
 if grep -q "[ -f ~/.bash_aliases ]" ~/.bashrc; then
     sed -i 's|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash||g' ~/.bashrc
-    sed -i 's|\(\[ -f ~/.bash_aliases \] && source ~/.bash_aliases\)|\1\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\n\n|g' ~/.bashrc
- elif grep -q "[ -f ~/.keybinds ]" ~/.bashrc; then
+    sed -i 's|\(\[ -f ~/.bash_aliases \] && source ~/.bash_aliases\)|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\n\n\1\n|g' ~/.bashrc
+elif grep -q "[ -f ~/.keybinds ]" ~/.bashrc; then
     sed -i 's|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash||g' ~/.bashrc
     sed -i 's|\[ -f ~/.keybinds ] && source ~/.keybinds\)|\1\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\n\n|g' ~/.bashrc
- elif grep -q "[ -f ~/.bash_completion ]" ~/.bashrc; then
+elif grep -q "[ -f ~/.bash_completion ]" ~/.bashrc; then
     sed -i 's|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash||g' ~/.bashrc
     sed -i 's|\[ -f ~/.bash_completion ] && source ~/.bash_completion\)|\1\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\n\n|g' ~/.bashrc
- fi
- if grep -q "complete -F _complete_alias" ~/.bashrc; then
+fi
+if grep -q "complete -F _complete_alias" ~/.bashrc; then
     sed -i '/complete -F _complete_alias "${!BASH_ALIASES\[@\]}"/d' ~/.bashrc
     sed -i 's|\(\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\)|\1\n\ncomplete -F _complete_alias "${!BASH_ALIASES\[@\]}"\n|g' ~/.bashrc
- fi
-
- if ! grep -q "bind -m" ~/.fzf.bash; then
-    printf "# (Kitty only) Ctrl-tab for fzf autocompletion
-bind -m emacs-standard '\"\\\e[9;5u\": \" **\\\t\"'
-bind -m vi-command     '\"\\\e[9;5u\": \" **\\\t\"'    
-bind -m vi-insert      '\"\\\e[9;5u\": \" **\\\t\"'
-
-if type ripgrep-dir &> /dev/null; then
-    # Alt-g: Ripgrep function overview
-    bind -m emacs-standard -x '\"\\C-g\": \"ripgrep-dir\"'
-    bind -m vi-command     -x '\"\\C-g\": \"ripgrep-dir\"' 
-    bind -m vi-insert      -x '\"\\C-g\": \"ripgrep-dir\"'
 fi
-
-if type fzf_rifle &> /dev/null; then
-    # CTRL-F - Paste the selected file path into the command line
-    bind -m emacs-standard -x '\"\\C-f\": fzf_rifle'
-    bind -m vi-command -x '\"\\C-f\": fzf_rifle'
-    bind -m vi-insert -x '\"\\C-f\": fzf_rifle'
-
-    # F4 - Rifle search
-    bind -m emacs-standard -x '\"\\\eOS\": \"fzf_rifle\"'
-    bind -m vi-command -x '\"\\\eOS\": \"fzf_rifle\"'
-    bind -m vi-insert -x '\"\\\eOS\": \"fzf_rifle\"'
-fi" >> ~/.fzf.bash
- fi
-
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
  #. ~/.bashrc

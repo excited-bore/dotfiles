@@ -29,6 +29,7 @@ arch=/
 declare -A osInfo;
 osInfo[/etc/alpine-release]=apk
 osInfo[/etc/arch-release]=pacman
+osInfo[/etc/fedora-release]=dnf
 osInfo[/etc/debian_version]=apt
 osInfo[/etc/gentoo-release]=emerge
 osInfo[/etc/manjaro-release]=pamac
@@ -45,6 +46,8 @@ do
         distro="Alpine"
     elif [ -f $f ] && [ $f == /etc/manjaro-release ] && [ $distro == / ]; then
         packmang="pacman"
+        packmang_update="sudo pacman -Su"
+        packmang_install="sudo pacman -S"
         AUR_helper="pamac"
         AUR_update="pamac update"
         AUR_install="pamac install"
@@ -59,6 +62,8 @@ do
           
     elif grep -q "Ubuntu" /etc/issue && [ $distro == / ]; then
         packmang="apt"
+        packmang_update="sudo apt update"
+        packmang_install="sudo apt install"
         distro_base="Debian"
         distro="Ubuntu"
     elif test -f $f && [[ $f == /etc/SuSE-release || $f == /etc/SUSE-brand ]] && test $distro == /; then
@@ -73,6 +78,10 @@ do
         packmang="emerge"
         distro_base="Slackware"
         distro="Gentoo"
+    elif [ -f $f ] && [ $f == /etc/fedora-release ] && [ $distro == / ]; then
+        packmang="dnf"
+        distro_base="Slackware"
+        distro="Fedora"
     elif [ -f $f ] && [ $f == /etc/redhat-release ] && [ $distro == / ]; then
         packmang="yum"
         distro_base="Slackware"
@@ -136,32 +145,32 @@ do
             AUR_helper="aur"
             AUR_update=""
             AUR_install=""
-        elif type repoctl &> /dev/null; then
-            packmang_AUR="repoctl"
-        elif type yaah &> /dev/null; then
-            packmang_AUR="yaah"
-        elif type bauerbill &> /dev/null; then
-            packmang_AUR="bauerbill"
-        elif type PKGBUILDer &> /dev/null; then
-            packmang_AUR="PKGBUILDer"
-        elif type rua &> /dev/null; then
-            packmang_AUR="rua"
-        elif type pbget &> /dev/null; then
-            packmang_AUR="pbget"
-        elif type argon &> /dev/null ; then
-            packmang_AUR="argon"
-        elif type cylon &> /dev/null; then
-            packmang_AUR="cylon"
-        elif type kalu &> /dev/null; then
-            packmang_AUR="kalu"
-        elif type octopi &> /dev/null; then
-            packmang_AUR="octopi"
-        elif type pacseek &> /dev/null; then
-            packmang_AUR="pacseek"
-        elif type PkgBrowser &> /dev/null; then
-            packmang_AUR="PkgBrowser"
-        elif type yup &> /dev/null ; then
-            packmang_AUR="yup"
+        #elif type repoctl &> /dev/null; then
+        #    packmang_AUR="repoctl"
+        #elif type yaah &> /dev/null; then
+        #    packmang_AUR="yaah"
+        #elif type bauerbill &> /dev/null; then
+        #    packmang_AUR="bauerbill"
+        #elif type PKGBUILDer &> /dev/null; then
+        #    packmang_AUR="PKGBUILDer"
+        #elif type rua &> /dev/null; then
+        #    packmang_AUR="rua"
+        #elif type pbget &> /dev/null; then
+        #    packmang_AUR="pbget"
+        #elif type argon &> /dev/null ; then
+        #    packmang_AUR="argon"
+        #elif type cylon &> /dev/null; then
+        #    packmang_AUR="cylon"
+        #elif type kalu &> /dev/null; then
+        #    packmang_AUR="kalu"
+        #elif type octopi &> /dev/null; then
+        #    packmang_AUR="octopi"
+        #elif type pacseek &> /dev/null; then
+        #    packmang_AUR="pacseek"
+        #elif type PkgBrowser &> /dev/null; then
+        #    packmang_AUR="PkgBrowser"
+        #elif type yup &> /dev/null ; then
+        #    packmang_AUR="yup"
         elif type auracle &> /dev/null; then
             AUR_helper="auracle"
             AUR_update="auracle update"

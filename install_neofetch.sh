@@ -10,9 +10,10 @@ if ! type update_system &> /dev/null; then
     else
         . ./update_system.sh
     fi
-    update_system
-else
-    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y n" updatesysm
+fi
+
+if test -z $SYSTEM_UPDATED; then
+    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y" updatesysm
     if test $updatesysm == "y"; then
         update_system                     
     fi
@@ -25,10 +26,10 @@ else
 fi 
 
 if ! type neofetch &> /dev/null && ! type fastfetch &> /dev/null && ! type screenFetch &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Install neofetch/fastfetch/screenFetch? [Y/n]:" "y n" sym2
+    reade -Q "GREEN" -i "y" -p "Install neofetch/fastfetch/screenFetch? [Y/n]: " "y n" sym2
     if test "$sym2" == "y"; then
         
-        reade -Q "GREEN" -i "neofetch" -p "Which fetch? [Neofetch/fastfetch/screenFetch]:" "neofetch fastfetch screenFetch" sym2
+        reade -Q "GREEN" -i "neofetch" -p "Which one? [Neofetch/fastfetch/screenFetch]: " "fastfetch screenFetch" sym2
         if test "$sym2" == "neofetch"; then
             if test $distro_base == "Debian"; then
                sudo apt install neofetch

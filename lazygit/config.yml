@@ -1,5 +1,0 @@
-git:
-  paging:
-    #useConfig: true
-    pager: delta --color-only --paging=never
-    colorArg: always

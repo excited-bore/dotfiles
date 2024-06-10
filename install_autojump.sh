@@ -25,9 +25,10 @@ if ! type update_system &> /dev/null; then
     else
         . ./update_system.sh
     fi
-    update_system
-else
-    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y n" updatesysm
+fi
+
+if test -z $SYSTEM_UPDATED; then
+    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y" updatesysm
     if test $updatesysm == "y"; then
         update_system                     
     fi
@@ -36,7 +37,7 @@ fi
 if type autojump &> /dev/null; then
     if [ "$distro" == "Manjaro" ]; then
         pamac install autojump
-    elif test "$distro" == "Arch" && ! test "$AUR_install" == ""; then
+    elif test "$distro" == "Arch" && ! test -z "$AUR_install"; then
         eval "$AUR_install" autojump
     elif [ $distro_base == "Debian" ]; then
         sudo apt install autojump                                                              
