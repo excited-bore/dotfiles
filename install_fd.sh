@@ -21,11 +21,13 @@ if test -z $SYSTEM_UPDATED; then
     fi
 fi
 
-if test $distro == "Arch" || test $distro == "Manjaro"; then
-    sudo pacman -S fd
-elif [ $distro_base == "Debian" ]; then
-    sudo apt install fd-find
-    if ! test -f ~/.local/bin/fd; then
-        ln -s $(which fdfind) ~/.local/bin/fd
+if ! type fd &> /dev/null; then
+    if test $distro == "Arch" || test $distro == "Manjaro"; then
+        sudo pacman -S fd
+    elif [ $distro_base == "Debian" ]; then
+        sudo apt install fd-find
+        if ! test -f ~/.local/bin/fd; then
+            ln -s $(which fdfind) ~/.local/bin/fd
+        fi
     fi
 fi

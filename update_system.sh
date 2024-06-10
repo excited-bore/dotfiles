@@ -102,3 +102,4 @@ function update_system() {
     fi
 }
 
+SYSTEM_UPDATED="TRUE"

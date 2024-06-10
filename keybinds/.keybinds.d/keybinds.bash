@@ -283,12 +283,6 @@ if type autojump &> /dev/null; then
 fi
 
 if type fzf &> /dev/null; then
-    if test -f ~/.bash_aliases.d/keybinds_rifle.sh ; then
-        source ~/.bash_aliases.d/keybinds_rifle.sh  
-    fi
-    if test -f ~/.bash_aliases.d/ripgrep-directory.sh; then
-        source ~/.bash_aliases.d/ripgrep-directory.sh    
-    fi
     # (Kitty only) Ctrl-tab for fzf autocompletion
     bind -m emacs-standard '"\e[9;5u": " **\t"'
     bind -m vi-command     '"\e[9;5u": " **\t"'    

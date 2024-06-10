@@ -42,13 +42,14 @@ fi
  
 if grep -q "[ -f ~/.bash_aliases ]" ~/.bashrc; then
     sed -i 's|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash||g' ~/.bashrc
-    sed -i 's|\(\[ -f ~/.bash_aliases \] && source ~/.bash_aliases\)|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\n\n\1\n|g' ~/.bashrc
-elif grep -q "[ -f ~/.keybinds ]" ~/.bashrc; then
+    sed -i 's|\(\[ -f ~/.bash_aliases \] && source ~/.bash_aliases\)|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\n\1\n|g' ~/.bashrc
+fi
+if grep -q "[ -f ~/.keybinds ]" ~/.bashrc; then
     sed -i 's|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash||g' ~/.bashrc
-    sed -i 's|\[ -f ~/.keybinds ] && source ~/.keybinds\)|\1\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\n\n|g' ~/.bashrc
+    sed -i 's|\(\[ -f ~/.keybinds \] \&\& source ~/.keybinds\)|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\n\1\n|g' ~/.bashrc
 elif grep -q "[ -f ~/.bash_completion ]" ~/.bashrc; then
     sed -i 's|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash||g' ~/.bashrc
-    sed -i 's|\[ -f ~/.bash_completion ] && source ~/.bash_completion\)|\1\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\n\n|g' ~/.bashrc
+    sed -i 's|\(\[ -f ~/.bash_completion \] \&\& source \~/.bash_completion\)|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\n\1\n|g' ~/.bashrc
 fi
 if grep -q "complete -F _complete_alias" ~/.bashrc; then
     sed -i '/complete -F _complete_alias "${!BASH_ALIASES\[@\]}"/d' ~/.bashrc
@@ -154,7 +155,7 @@ fi
          printf "\n# RIPGREP\nexport RG_PREFIX='rg --column --line-number --no-heading --color=always --smart-case \"" | sudo tee -a $PATHVAR_R
     fi
     
-    reade -Q "GREEN" -i "y" -p "Add shortcut for ripgrep files in dir? (Ctrl-g) [Y/n]:" "y n" rpgrpdir
+    reade -Q "GREEN" -i "y" -p "Add shortcut for ripgrep files in dir? (Ctrl-g) [Y/n]: " "y n" rpgrpdir
     if [ -z $rpgrp ] || [ "Y" == $rpgrp ] || [ $rpgrp == "y" ]; then
         if ! test -f fzf/ripgrep-directory.sh; then
             wget -O ~/.bash_aliases.d/ripgrep-directory.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/ripgrep-directory.sh
@@ -172,7 +173,7 @@ fi
  unset rpgrp rpgrpdir
 
 if type kitty &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Add shortcut for fzf-autocompletion? (CTRL-Tab) [Y/n]:" "y n" comp_key
+    reade -Q "GREEN" -i "y" -p "Add shortcut for fzf-autocompletion? (CTRL-Tab) [Y/n]: " "y n" comp_key
     if [ "$comp_key" == "y" ]; then
         if ! test -f .keybinds.d/keybinds.bash && ! grep -q "(Kitty)" ~/.fzf/shell/key-bindings.bash; then
             printf "\n# (Kitty) Ctrl-tab for fzf autocompletion" >> ~/.fzf/shell/key-bindings.bash
@@ -234,7 +235,7 @@ if test -f ~/.fzf.bash ; then
     fi
     unset ffmpg
 
-    reade -Q "GREEN" -i "y" -p "Change shortcut for riflesearch from Ctrl-T to Ctrl-F? (Fzf and paste in console) [Y/n]:" "y n" fzf_t
+    reade -Q "GREEN" -i "y" -p "Change shortcut for riflesearch from Ctrl-T to Ctrl-F? (Fzf and paste in console) [Y/n]: " "y n" fzf_t
     if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ] ; then 
         sed -i 's|# CTRL-T|# CTRL-F|g' ~/.fzf/shell/key-bindings.bash
         sed -i 's|bind -m emacs-standard '\''"\\C-t": |bind -m emacs-standard '\''"\\C-f": |g' ~/.fzf/shell/key-bindings.bash
@@ -245,7 +246,7 @@ if test -f ~/.fzf.bash ; then
         sed -i 's|bind -m vi-insert -x '\''"\\C-t": |bind -m vi-insert -x '\''"\\C-f": |g' ~/.fzf/shell/key-bindings.bash
     fi
 
-    reade -Q "GREEN" -i "y" -p "Add shortcut F3 for fzf rifle? [Y/n]:" "y n" fzf_t
+    reade -Q "GREEN" -i "y" -p "Add shortcut F3 for fzf rifle? [Y/n]: " "y n" fzf_t
     if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ] ; then
         if ! grep -q 'bind -x '\''"\\eOR": "fzf_rifle"'\''' ~/.fzf/shell/key-bindings.bash ;  then              
             

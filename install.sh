@@ -740,12 +740,13 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         ytbe=$TMPDIR/youtube.sh
     fi 
 
-    sed -i 'd/SYSTEM_UPDATED="TRUE"' $update_sysm
     update_sysm_r(){ 
         sudo cp -fv $update_sysm /root/.bash_aliases.d/;
+        sudo sed -i 'd/SYSTEM_UPDATED="TRUE"' /root/.bash_aliases.d/update_system.sh
     }
     update_sysm(){
         cp -fv $update_sysm ~/.bash_aliases.d/
+        sed -i 'd/SYSTEM_UPDATED="TRUE"' ~/.bash_aliases.d/update_system.sh
         yes_edit_no update_sysm_r "$update_sysm" "Install update_system.sh at /root/?" "yes" "GREEN"; }
     yes_edit_no update_sysm "$update_sysm" "Install update_system.sh at ~/.bash_aliases.d/? (Global system update function)?" "edit" "GREEN"
 
