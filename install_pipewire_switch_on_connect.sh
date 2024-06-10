@@ -6,6 +6,20 @@ else
     . ./checks/check_system.sh
 fi
 
+if ! type update_system &> /dev/null; then
+    if ! test -f update_system.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/update_system.sh)" 
+    else
+        . ./update_system.sh
+    fi
+    update_system
+else
+    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y n" updatesysm
+    if test $updatesysm == "y"; then
+        update_system                     
+    fi
+fi
+
 if [ "$distro" == "Manjaro" ]; then
     sudo pacman -S pipewire pipewire-pulse manjaro-pipewire
 elif [ "$distro" == "Arch" ]; then

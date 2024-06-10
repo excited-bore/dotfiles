@@ -10,11 +10,13 @@ if ! test -f checks/check_pathvar.sh; then
 else
     . ./checks/check_pathvar.sh
 fi
+
 if ! test -f update_system.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/update_system.sh)" 
 else
     . ./update_system.sh
 fi
+
 
 if ! test -f checks/check_rlwrap.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_rlwrap.sh)" 
@@ -28,9 +30,12 @@ else
     . ./aliases/.bash_aliases.d/rlwrap_scripts.sh
 fi
 
+
 printf "${green}If all necessary files are sourced correctly, this text looks green.\nIf not, something went wrong.\n"
 printf "\n${green}Files that get overwritten get backed up and trashed (to prevent clutter).\nRecover using ${cyan}'gio trash --list'${green} and ${cyan}'gio trash --restore' ${normal}\n"
+printf "${green} Will now start with updating system ${normal}\n"
 
+update_system
 
 if [ ! -e ~/config ] && test -d ~/.config; then
     reade -Q "BLUE" -i "y" -p "Create ~/.config to ~/config symlink? [Y(es)/n(o)]:" "y n" sym1
@@ -366,27 +371,28 @@ pathvr=$(pwd)/.pathvariables.env
 #    sed -i 's|bind -x '\''"\\eOR": ctrl-s'\''|#bind -x '\''"\\eOR": ctrl-s'\''|g' ~/keybinds.bash
 #fi
 
+binds=keybinds/.inputrc
+binds1=keybinds/.keybinds.d/keybinds.bash
+if ! test -f keybinds/.inputrc; then
+    wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.inputrc
+    wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds.d/keybinds.bash 
+    
+    binds=$TMPDIR/.inputrc
+    binds1=$TMPDIR/.keybinds.d/keybinds.bash
+fi
+
 shell-keybinds_r(){ 
     if [ -f /root/.pathvariables.env ]; then
        sudo sed -i 's|#export INPUTRC|export INPUTRC|g' /root/.pathvariables.env
     fi
-    sudo cp -fv keybinds/keybinds.bash /root/.keybinds.d/;
-    sudo cp -fv keybinds/.inputrc /root/ ;
+    sudo cp -fv $binds1 /root/.keybinds.d/;
+    sudo cp -fv $binds /root/;
 
     # X based settings is generally not for root and will throw errors 
     if sudo grep -q '^setxkbmap' /root/.keybinds.d/keybinds.bash; then
         sudo sed -i 's|setxkbmap|#setxkbmap|g' /root/.keybinds.d/keybinds.bash
     fi
 }
-binds=keybinds/.inputrc
-binds1=keybinds/keybinds.bash
-if ! test -f keybinds/.inputrc; then
-    wget -P $TMPDIR/  https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.inputrc
-    wget -P $TMPDIR/  https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/keybinds.bash 
-    
-    binds=$TMPDIR/.inputrc
-    binds1=$TMPDIR/keybinds.bash
-fi
 shell-keybinds() {
     
     if ! test -f ./checks/check_keybinds.sh; then
@@ -420,7 +426,7 @@ yes_edit_no shell-keybinds "$binds $binds1" "Install .inputrc and keybinds.bash 
 # Xresources
 
 xterm=xterm/.Xresources
-if ! test -f keybinds/.inputrc; then
+if ! test -f xterm/.Xresources; then
     wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/xterm/.Xresources
     xterm=$TMPDIR/.Xresources
 fi
@@ -702,6 +708,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         yes_edit_no general_r "$genr" "Install general.sh at /root/?" "yes" "GREEN"; }
     yes_edit_no general "$genr" "Install general.sh at ~/? (aliases related to general actions - cd/mv/cp/rm + completion script replacement for 'read -e') " "yes" "YELLOW"
     
+    update_sysm=update_system.sh
     systemd=aliases/.bash_aliases.d/systemctl.sh
     dosu=aliases/.bash_aliases.d/sudo.sh
     pacmn=aliases/.bash_aliases.d/package_managers.sh
@@ -712,6 +719,8 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     pthon=aliases/.bash_aliases.d/python.sh
     ytbe=aliases/.bash_aliases.d/youtube.sh
     if ! test -d aliases/.bash_aliases.d/; then
+        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/update_system.sh 
+        update_sysm=$TMPDIR/update_system.sh
         wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/systemctl.sh 
         systemd=$TMPDIR/systemctl.sh
         wget -P $TMPDIR/  https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/sudo.sh 
@@ -732,13 +741,21 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         ytbe=$TMPDIR/youtube.sh
     fi 
 
+    update_sysm_r(){ 
+        sudo cp -fv $update_sysm /root/.bash_aliases.d/;
+    }
+    update_sysm(){
+        cp -fv $update_sysm ~/.bash_aliases.d/
+        yes_edit_no systemd_r "$update_sysm" "Install update_system.sh at /root/?" "yes" "GREEN"; }
+    yes_edit_no systemd "$update_sysm" "Install update_system.sh at ~/.bash_aliases.d/? (Global system update function)?" "edit" "GREEN"
+
     systemd_r(){ 
         sudo cp -fv $systemd /root/.bash_aliases.d/;
     }
     systemd(){
         cp -fv $systemd ~/.bash_aliases.d/
         yes_edit_no systemd_r "$systemd" "Install systemctl.sh at /root/?" "yes" "GREEN"; }
-    yes_edit_no systemd "$systemd" "Install systemctl.sh? ~/.bash_aliases.d/ (systemctl aliases/.bash_aliases.d/functions)?" "edit" "GREEN"
+    yes_edit_no systemd "$systemd" "Install systemctl.sh at ~/.bash_aliases.d/? (systemctl aliases/functions)?" "edit" "GREEN"
         
 
     dosu_r(){ 

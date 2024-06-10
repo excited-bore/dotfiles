@@ -5,6 +5,20 @@ else
     . ./checks/check_system.sh
 fi
 
+if ! type ../update_system &> /dev/null; then
+    if ! test -f update_system.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/update_system.sh)" 
+    else
+        . ../update_system.sh
+    fi
+    update_system
+else
+    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y n" updatesysm
+    if test $updatesysm == "y"; then
+        update_system                     
+    fi
+fi
+
 if ! test -f aliases/.bash_aliases.d/rlwrap_scripts.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/rlwrap_scripts.sh)" 
 else
@@ -27,6 +41,20 @@ if ! test -f checks/check_completions_dir.sh; then
     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)" 
 else
     . ./checks/check_completions_dir.sh
+fi
+
+if ! type update_system &> /dev/null; then
+    if ! test -f update_system.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/update_system.sh)" 
+    else
+        . ./update_system.sh
+    fi
+    update_system
+else
+    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y n" updatesysm
+    if test $updatesysm == "y"; then
+        update_system                     
+    fi
 fi
 
 #. $DIR/setup_git_build_from_source.sh "y" "neovim" "https://github.com" "neovim/neovim" "stable" "sudo apt update; sudo apt install ninja-build gettext libtool libtool-bin cmake g++ pkg-config unzip curl doxygen" "make CMAKE_BUILD_TYPE=RelWithDebInfo; sudo make install" "sudo make uninstall" "make distclean; make deps" "y"
