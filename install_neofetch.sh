@@ -25,10 +25,10 @@ else
 fi 
 
 if ! type neofetch &> /dev/null && ! type fastfetch &> /dev/null && ! type screenFetch &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Install neofetch/fastfetch/screenFetch? [Y/n]:" "y n" sym2
+    reade -Q "GREEN" -i "y" -p "Install neofetch/fastfetch/screenFetch? [Y/n]: " "y n" sym2
     if test "$sym2" == "y"; then
         
-        reade -Q "GREEN" -i "neofetch" -p "Which fetch? [Neofetch/fastfetch/screenFetch]:" "neofetch fastfetch screenFetch" sym2
+        reade -Q "GREEN" -i "neofetch" -p "Which one? [Neofetch/fastfetch/screenFetch]: " "fastfetch screenFetch" sym2
         if test "$sym2" == "neofetch"; then
             if test $distro_base == "Debian"; then
                sudo apt install neofetch

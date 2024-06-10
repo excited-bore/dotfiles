@@ -1,0 +1,331 @@
+# Bash_aliases at ~/.bash_aliases.d/ 
+# global bashrc -> /etc/bash.bashrc
+# root shell profiles -> /etc/profile
+
+# https://stackoverflow.com/questions/8366450/complex-keybinding-in-bash
+
+alias ls-binds-tty="stty -a"
+alias ls-binds-readline="bind -p | $PAGER"
+alias ls-binds-xterm="xrdb -query -all"
+alias ls-binds-kitty='kitty +kitten show_key -m kitty' 
+
+# TTY
+
+# To see the complete character string sent by a key, you can use this command, and type the key within 2 seconds:
+# stty raw; sleep 2; echo; stty cooked
+# But Ctrl-v, then keycombination still works best
+
+# Turn off flow control and free up Ctrl-s and Ctrl-q
+stty -ixon
+stty -ixoff
+stty start 'undef' 
+stty stop 'undef'
+stty rprnt 'undef'
+stty lnext '^b'
+
+# Unset suspend signal shortcut (Ctrl+z)
+stty susp undef
+
+# Unset backward word erase shortcut (Ctrl+w)
+stty werase 'undef'
+
+# unbinds ctrl-c and bind the function to ctrl-s
+#stty intr '^c'
+
+
+# XRESOURCES
+
+# Install bindings from xterm
+# xrdb -merge ~/.Xresources
+# .Inputrc (readline conf) however has to be compiled, so restart shell
+
+# Set caps to Escape
+setxkbmap -option caps:escape
+
+# Set Shift delete to backspace
+# xmodmap -e "keycode 119 = Delete BackSpace"     
+
+# READLINE
+
+# \C : Ctrl
+# \M : Meta (alt)
+# \e : Escape (alt)
+# \t : Tab
+# \b : Backspace
+# \n : newline
+# nop => no operation, but 'redraw-current-line' might work better
+# https://unix.stackexchange.com/questions/556703/how-to-bind-a-key-combination-to-null-in-inputrc
+# 'bind -l' for all options
+# 'bind -p' for all bindings
+# You can also run 'read' (or 'cat' + Ctrl+v)
+# That way you can read the characters escape sequences
+# The ^[ indicates an escape character in your shell, so this means that your f.ex. Home key has an escape code of [1~ and you End key has an escape code of [4~. Since these escape codes are not listed in the default Readline configuration, you will need to add them: \e[1~ or \e[4~
+# It's good to use unused keys for complex keybindings since you can't combine readline commands with regular bash expressions in the same bind
+# Also
+# https://unix.stackexchange.com/questions/548726/bash-readline-inputrc-bind-key-to-a-sequence-of-multiple-commands 
+#
+#
+# Change editing mode
+#bind -m vi-command '"\C-a": emacs-editing-mode'
+#bind -m vi-insert '"\C-a": emacs-editing-mode'
+#bind -m emacs-standard '"\C-a": vi-editing-mode'
+
+# Up and down arrow will now intelligently complete partially completed
+# commands by searching through the existing history.
+bind -m emacs-standard  '"\e[A": history-search-backward'
+bind -m vi-command      '"\e[A": history-search-backward'
+bind -m vi-insert       '"\e[A": history-search-backward'
+
+bind -m emacs-standard  '"\e[B": history-search-forward'
+bind -m vi-command      '"\e[B": history-search-forward'
+bind -m vi-insert       '"\e[B": history-search-forward'
+
+# Control left/right to jump from bigwords (ignore spaces when jumping) instead of chars
+bind -m emacs-standard  '"\e[1;5D": vi-backward-bigword'
+bind -m vi-command      '"\e[1;5D": vi-backward-bigword'
+bind -m vi-insert       '"\e[1;5D": vi-backward-bigword'
+
+bind -m emacs-standard  '"\e[1;5C": vi-forward-bigword'
+bind -m vi-command      '"\e[1;5C": vi-forward-bigword'
+bind -m vi-insert       '"\e[1;5C": vi-forward-bigword'
+
+# Another wrapper (untested)
+# https://superuser.com/questions/299694/is-there-a-directory-history-for-bash
+
+# Cd wrapper
+function cd() {
+    local push=1
+    local j=0
+    if test "$1" = "--"; then
+        shift;
+    fi 
+    for i in $(dirs -l 2>/dev/null); do
+        if test "$(realpath ${@: -1:1})" == "$i"; then
+            push=0
+            pushd -n +$j &>/dev/null
+        fi
+        j=$(($j+1));
+    done
+    if [ $push == 1 ]; then
+        pushd "$PWD" &>/dev/null;  
+    fi
+    builtin cd -- "$@"; 
+}
+complete -F _cd cd
+
+
+#'Silent' clear
+if type starship &> /dev/null && (grep -q  '\\n' ~/.config/starship.toml || grep -q 'line_break' ~/.config/starship.toml || ! head -n 1 ~/.config/starship.toml | grep -q 'format' ); then
+    alias _="tput cuu1 && tput cuu1 && tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null"
+elif type starship &> /dev/null; then
+    alias _="tput cuu1 && tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null"
+else
+    alias _="tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null"
+fi
+
+# 'dirs' builtins shows all directories in stack
+# Ctrl-Up arrow rotates over directory history
+bind -x '"\e277": pushd +1 &>/dev/null'
+bind -m emacs-standard '"\e[1;5A": "\C-e\C-u\e277 _\C-m"'
+bind -m vi-command     '"\e[1;5A": "i\C-e\C-u\e277 _\C-m"'
+bind -m vi-insert      '"\e[1;5A": "\C-e\C-u\e277 _\C-m"'
+
+# Ctrl-Down -> Rotate between 2 last directories
+bind -x '"\e266": pushd &>/dev/null'
+bind -m emacs-standard '"\e[1;5B": "\C-e\C-u\e266 _\C-m"'
+bind -m vi-command     '"\e[1;5B": "i\C-e\C-u\e266 _\C-m"'
+bind -m vi-insert      '"\e[1;5B": "\C-e\C-u\e266 _\C-m"'
+
+# Shift left/right to jump from words instead of chars
+bind -m emacs-standard  '"\e[1;2D": backward-word'
+bind -m vi-command      '"\e[1;2D": backward-word'
+bind -m vi-insert       '"\e[1;2D": backward-word'
+
+bind -m emacs-standard  '"\e[1;2C": forward-word'
+bind -m vi-command      '"\e[1;2C": forward-word'
+bind -m vi-insert       '"\e[1;2C": forward-word'
+
+alias __='clear && tput cup $(($LINE_TPUT+1)) $TPUT_COL && tput sc 1 && tput cuu1 && echo "${PS1@P}" && tput cuu1'
+
+# Shift up => Clean reset
+#bind -x '"\e288": "cd \C-i"'
+bind -x '"\e288": "__"'
+bind -m emacs-standard  '"\e[1;2A": "\C-e\C-u\e288"'
+bind -m vi-command      '"\e[1;2A": "i\C-e\C-u\e288"'
+bind -m vi-insert       '"\e[1;2A": "\C-e\C-u\e288"'
+
+# Shift up => cd shortcut
+bind -m emacs-standard  '"\e[1;2B": "\C-e\C-u\e288cd \C-i"'
+bind -m vi-insert       '"\e[1;2B": "\C-e\C-u\e288cd \C-i"'
+bind -m vi-command      '"\e[1;2B": "i\C-e\C-u\e288cd \C-i"'
+
+# Shift left/right to jump from bigwords (ignore spaces when jumping) instead of chars
+#bind -m emacs-standard -x '"\e[1;2D": clear && let COL_TPUT=$COL_TPUT-1 && if [ $COL_TPUT -lt 0 ];then COL_TPUT=$COLUMNS;fi && tput cup $LINE_TPUT $COL_TPUT && tput sc 1 && echo "${PS1@P}" && tput cuu1'
+#bind -m vi-command     -x '"\e[1;2D": clear && let COL_TPUT=$COL_TPUT-1 && if [ $COL_TPUT -lt 0 ];then COL_TPUT=$COLUMNS;fi && tput cup $LINE_TPUT $COL_TPUT && tput sc 1 && echo "${PS1@P}" && tput cuu1'
+#bind -m vi-insert      -x '"\e[1;2D": clear && let COL_TPUT=$COL_TPUT-1 && if [ $COL_TPUT -lt 0 ];then COL_TPUT=$COLUMNS;fi && tput cup $LINE_TPUT $COL_TPUT && tput sc 1 && echo "${PS1@P}" && tput cuu1'
+#                                                                                 
+#bind -m emacs-standard -x '"\e[1;2C": clear && let COL_TPUT=$COL_TPUT+1 && if [ $COL_TPUT -gt $COLUMNS ];then COL_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && tput sc 1 && echo "${PS1@P}" && tput cuu1' 
+#bind -m vi-command     -x '"\e[1;2C": clear && let COL_TPUT=$COL_TPUT+1 && if [ $COL_TPUT -gt $COLUMNS ];then COL_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && tput sc 1 && echo "${PS1@P}" && tput cuu1'
+#bind -m vi-insert      -x '"\e[1;2C": clear && let COL_TPUT=$COL_TPUT+1 && if [ $COL_TPUT -gt $COLUMNS ];then COL_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && tput sc 1 && echo "${PS1@P}" && tput cuu1'
+
+# Alt left/right to jump to beginning/end line instead of chars
+bind -m emacs-standard  '"\e[1;3D": beginning-of-line'
+bind -m vi-command      '"\e[1;3D": beginning-of-line'
+bind -m vi-insert       '"\e[1;3D": beginning-of-line'
+
+bind -m emacs-standard  '"\e[1;3C": end-of-line'
+bind -m vi-command      '"\e[1;3C": end-of-line'
+bind -m vi-insert       '"\e[1;3C": end-of-line'
+
+# Alt up/down to change cursor line 
+bind -m emacs-standard -x '"\e[1;3A": clear && let LINE_TPUT=$LINE_TPUT-1; if [ $LINE_TPUT -lt 0 ];then let LINE_TPUT=$LINES;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
+bind -m vi-command     -x '"\e[1;3A": clear && let LINE_TPUT=$LINE_TPUT-1; if [ $LINE_TPUT -lt 0 ];then let LINE_TPUT=$LINES;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
+bind -m vi-insert      -x '"\e[1;3A": clear && let LINE_TPUT=$LINE_TPUT-1; if [ $LINE_TPUT -lt 0 ];then let LINE_TPUT=$LINES;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
+                                  
+bind -m emacs-standard -x '"\e[1;3B": clear && let LINE_TPUT=$LINE_TPUT+1; if [ $LINE_TPUT -gt $LINES ];then let LINE_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc' 
+bind -m vi-command     -x '"\e[1;3B": clear && let LINE_TPUT=$LINE_TPUT+1; if [ $LINE_TPUT -gt $LINES ];then let LINE_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
+bind -m vi-insert      -x '"\e[1;3B": clear && let LINE_TPUT=$LINE_TPUT+1; if [ $LINE_TPUT -gt $LINES ];then let LINE_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
+#
+# Ctrl-w expands aliases
+bind -m emacs-standard  '"\C-w": alias-expand-line'
+bind -m vi-command      '"\C-w": alias-expand-line'
+bind -m vi-insert       '"\C-w": alias-expand-line'
+
+# Expand by looping through options
+bind -m emacs-standard  'Tab: menu-complete'
+bind -m vi-command      'Tab: menu-complete'
+bind -m vi-insert       'Tab: menu-complete'
+
+# Shift+Tab for reverse
+bind -m emacs-standard  '"\e[Z": menu-complete-backward'
+bind -m vi-command      '"\e[Z": menu-complete-backward'
+bind -m vi-insert       '"\e[Z": menu-complete-backward'
+
+# Ctrl-q quits terminal
+bind -m emacs-standard -x '"\C-q": exit'
+bind -m vi-command     -x '"\C-q": exit'
+bind -m vi-insert      -x '"\C-q": exit'
+
+# Undo to Ctrl+a (unbound in tty) instead of only on Ctrl+_
+bind -m emacs-standard  '"\C-a": vi-undo'
+bind -m vi-command      '"\C-a": vi-undo'
+bind -m vi-insert       '"\C-a": vi-undo'
+
+# Ctrl-backspace deletes (kills) line backward
+bind -m emacs-standard  '"\C-h": backward-kill-word'
+bind -m vi-command      '"\C-h": backward-kill-word'
+bind -m vi-insert       '"\C-h": backward-kill-word'
+
+# Ctrl-l clears
+bind -m emacs-standard -x '"\C-l": __'
+bind -m vi-command     -x '"\C-l": __'
+bind -m vi-insert      -x '"\C-l": __'
+
+# Ctrl-d: Delete first character on line
+bind -m emacs-standard   '"\C-d": "\C-a\e[3~"'
+bind -m vi-command       '"\C-d": "\C-a\e[3~"'
+bind -m vi-insert        '"\C-d": "\C-a\e[3~"'
+
+_quote_all() { READLINE_LINE="${READLINE_LINE@Q}"; }
+bind -m emacs-standard -x '"\C-x'\''":_quote_all'
+bind -m vi-command     -x '"\C-x'\''":_quote_all'
+bind -m vi-insert      -x '"\C-x'\''":_quote_all'
+
+# https://unix.stackexchange.com/questions/85391/where-is-the-bash-feature-to-open-a-command-in-editor-documented
+_edit_wo_executing() {
+    local editor="${EDITOR:-nano}"
+    tmpf="$(mktemp).sh"
+    printf "#!$SHELL"'\n%s\n' "$READLINE_LINE" > "$tmpf"
+    $EDITOR "$tmpf"
+    # https://stackoverflow.com/questions/6675492/how-can-i-remove-all-newlines-n-using-sed
+    #[ "$(sed -n '/^#!\/bin\/bash/p;q' "$tmpf")" ] && sed -i 1d "$tmpf"
+    READLINE_LINE="$(<"$tmpf")"
+    READLINE_POINT="${#READLINE_LINE}"
+    rm "$tmpf" &> /dev/null
+}
+
+bind -m vi-insert      -x '"\C-x\C-e":_edit_wo_executing'
+bind -m vi-command     -x '"\C-x\C-e":_edit_wo_executing'
+bind -m vi-command     -x '"v":_edit_wo_executing'
+bind -m emacs-standard -x '"\C-x\C-e":_edit_wo_executing'
+
+if type osc &> /dev/null; then
+    bind -m emacs-standard -x '"\C-s" : echo "$READLINE_LINE" | osc copy' 
+    bind -m vi-command     -x '"\C-s" : echo "$READLINE_LINE" | osc copy' 
+    bind -m vi-insert      -x '"\C-s" : echo "$READLINE_LINE" | osc copy'
+
+    # Ctrl-v: Proper paste
+    Q="'"
+    bind -x $'"\237": echo bind $Q\\"\\\\225\\": \\"$(osc paste)\\"$Q > /tmp/paste.sh && source /tmp/paste.sh'
+    bind -m emacs-standard '"\C-v": "\237\225"'
+    bind -m vi-command     '"\C-v": "\237\225"'
+    bind -m vi-insert      '"\C-v": "\237\225"'
+
+elif type xclip &> /dev/null; then
+    # Ctrl-s: Proper copy
+    bind -m emacs-standard -x '"\C-s" : echo "$READLINE_LINE" | xclip -i -sel c' 
+    bind -m vi-command     -x '"\C-s" : echo "$READLINE_LINE" | xclip -i -sel c' 
+    bind -m vi-insert      -x '"\C-s" : echo "$READLINE_LINE" | xclip -i -sel c'
+
+    # Ctrl-v: Proper paste
+    Q="'"
+    bind -x $'"\237": echo bind $Q\\"\\\\225\\": \\"$(xclip -o -sel c)\\"$Q > /tmp/paste.sh && source /tmp/paste.sh'
+    bind -m emacs-standard '"\C-v": "\237\225"'
+    bind -m vi-command     '"\C-v": "\237\225"'
+    bind -m vi-insert      '"\C-v": "\237\225"'
+fi
+
+if type autojump &> /dev/null; then
+    # Ctrl-x Ctrl-j for autojump
+    bind -m emacs-standard '"\C-x\C-j": "j \C-i"'
+    bind -m vi-command     '"\C-x\C-j": "j \C-i"'
+    bind -m vi-insert      '"\C-x\C-j": "j \C-i"'
+fi
+
+if type fzf &> /dev/null; then
+    bind -m emacs-standard '"\C-g": "ripgrep-directory"'
+    bind -m vi-command     '"\C-g": "ripgrep-directory"'
+    bind -m vi-insert      '"\C-g": "ripgrep-directory"'
+fi
+
+# F2 - ranger (file explorer)
+if type ranger &> /dev/null; then
+    bind -x '"\201": ranger'
+    bind -m emacs-standard '"\eOQ": "\201\n\C-l"'
+    bind -m vi-command     '"\eOQ": "\201\n\C-l"'
+    bind -m vi-insert      '"\eOQ": "\201\n\C-l"'
+fi
+
+# F3 - lazygit (Git helper)
+if type lazygit &> /dev/null; then
+    bind -x '"\202": stty sane && lazygit'
+    bind -m emacs-standard '"\eOR": "\202\n\C-l"'
+    bind -m vi-command     '"\eOR": "\202\n\C-l"'
+    bind -m vi-insert      '"\eOR": "\202\n\C-l"'
+fi
+
+# F3 - FuzzyFinderls -l | fzf --preview="echo user={3} when={-4..-2}; cat {-1}" --header-lines=1 (file explorer)
+#bind -x '"\eOR": ctrl-s'
+
+# F5, Ctrl-r - Reload .bashrc
+bind '"\205": re-read-init-file'
+bind -x '"\206": source ~/.bashrc'
+bind -m emacs-standard '"\e[15~": "\205\206"'
+bind -m vi-command     '"\e[15~": "\205\206"'
+bind -m vi-insert      '"\e[15~": "\205\206"'
+
+# F6 - Bashtop (Better top/htop)
+if type bashtop &> /dev/null || type btop &> /dev/null || type bpytop &> /dev/null; then
+    if type bpytop &> /dev/null; then
+        bind -x '"\207": stty sane && bpytop'
+    fi
+    if type btop &> /dev/null; then
+        bind -x '"\207": stty sane && btop'
+    fi
+    if type bashtop &> /dev/null; then
+        bind -x '"\207": stty sane && bashtop'
+    fi
+    bind -m emacs-standard '"\e[17~": "\207\n\C-l"'
+    bind -m vi-command     '"\e[17~": "\207\n\C-l"'
+    bind -m vi-insert      '"\e[17~": "\207\n\C-l"'
+fi

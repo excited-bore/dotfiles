@@ -1,7 +1,6 @@
 # For Tabcompletion 
 complete -cf doas
 
-
 # A trailing space in VALUE causes the next word to be checked for alias substitution when the alias is expanded.
 alias doas="doas "
 
@@ -14,7 +13,6 @@ alias sudoedit='doasedit '
 alias check_conf_doas="doas doas -C /etc/doas.conf && echo 'config ok' || echo 'config error'"
 
 alias edit_doas_conf="doasedit /etc/doas.conf && check_conf_doas"
-
 # Or, alternatively
 # Preserve env
 #alias sudo="sudo -E"
