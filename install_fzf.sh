@@ -214,15 +214,17 @@ if test -f ~/.fzf.bash ; then
     fi
     unset fzf_t
 
-    reade -Q "GREEN" -i "y" -p "Install bat? (File previews/thumbnails for riflesearch) [Y/n]: " "y n" bat
-    if [ "$bat" == "y" ]; then
-        if ! test -f install_bat.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bat.sh)" 
-        else
-            ./install_bat.sh
+    if ! type bat &> /dev/null; then
+        reade -Q "GREEN" -i "y" -p "Install bat? (File previews/thumbnails for riflesearch) [Y/n]: " "y n" bat
+        if [ "$bat" == "y" ]; then
+            if ! test -f install_bat.sh; then
+                eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bat.sh)" 
+            else
+                ./install_bat.sh
+            fi
         fi
+        unset bat 
     fi
-    unset bat 
 
     #TODO: keybinds-rifle sh still has ffmpegthumbnailer part (could use sed check)
     reade -Q "GREEN" -i "y" -p "Install ffmpegthumbnailer? (Video thumbnails for riflesearch) [Y/n]: " "y n" ffmpg

@@ -45,11 +45,9 @@ if ! type batdiff &> /dev/null; then
         elif [ $distro_base == "Debian" ]; then
             #yes | sudo apt install golang
             #go install mvdan.cc/sh/v3/cmd/shfmt@latest
-            (cd $TMPDIR
-            git clone https://github.com/eth-p/bat-extras
-            chown -R $USER bat-extras
-            cd bat-extras
-            sudo ./build.sh --install --prefix=PATH)
+            git clone https://github.com/eth-p/bat-extras $TMPDIR
+            chown -R $USER $TMPDIR/bat-extras
+            (cd $TMPDIR/bat-extras && sudo ./build.sh --install --prefix=PATH)
         fi 
     fi
 fi

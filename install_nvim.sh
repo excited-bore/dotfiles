@@ -13,7 +13,7 @@ if ! type update_system &> /dev/null; then
     fi
 fi
 
-if test -z $SYSTEM_UPDATED; then
+if test -z "$SYSTEM_UPDATED"; then
     reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y" updatesysm
     if test $updatesysm == "y"; then
         update_system                     
@@ -147,7 +147,7 @@ elif [  $distro_base == "Debian" ];then
                     tmpdir=$(mktemp -d -t nvim-XXXXXXXXXX)
                     wget -P $tmpdir https://github.com/neovim/neovim/releases/download/$ltstv/nvim.appimage 
                     wget -P $tmpdir https://github.com/neovim/neovim/releases/download/$ltstv/nvim.appimage.sha256sum 
-                    if [ "$(sha256sum $tmpdir/nvim.appimage)" != "$(cat $tmpdir/nvim.appimage.sha256sum)" ]; then 
+                    if ! [ "$(sha256sum $tmpdir/nvim.appimage | awk '{print $1}')" == "$(cat $tmpdir/nvim.appimage.sha256sum | awk '{print $1}')" ]; then 
                            echo "Something went wrong: Sha256sums aren't the same. Try again later"    
                     else
                         chmod u+x $tmpdir/nvim.appimage

@@ -90,5 +90,11 @@ if ! test -f aliases/.bash_aliases.d/starship.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/starship.sh)" 
 else
     . ./aliases/.bash_aliases.d/starship.sh
-fi 
-starship-presets
+fi
+
+if type fzf &> /dev/null; then
+    starship-presets
+elif ! type fzf &> /dev/null && test -f ~/.fzf.bash; then
+    [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+    starship-presets
+fi
