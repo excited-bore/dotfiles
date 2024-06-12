@@ -139,14 +139,17 @@ function yes_edit_no(){
         pass="";
         clr="";
         pre="y"
+        choices="e n"
         deflt=" [Y/e/n]: "; 
         prompt="$3$deflt";
         if [ "$4" == "edit" ]; then
             pre="e"
+            choices="y n"
             deflt=" [y/E/n]: ";
             prompt="$3$deflt";
         elif [ "$4" == "no" ]; then
             pre="n"
+            choices="y e"
             deflt=" [y/e/N]: ";
             prompt="$3$deflt";
         fi
@@ -154,7 +157,7 @@ function yes_edit_no(){
             clr="-Q $5"
         fi
         
-        reade $clr -i "$pre" -p "$prompt" " y e n" pass;
+        reade $clr -i "$pre" -p "$prompt" "$choices" pass;
         
         #Undercase only
         pass=$(echo "$pass" | tr '[:upper:]' '[:lower:]')
