@@ -27,7 +27,7 @@ if [ ! -e ~/.bash_completion.d/complete_alias ]; then
     echo 'complete -F _complete_alias "${!BASH_ALIASES[@]}"' >> ~/.bashrc
 fi
 
-reade -Q "YELLOW" -i "y" -p "Install bash completions for aliases in /root/.bash_completion.d? [Y/n]:" "y n" rcompl
+reade -Q "YELLOW" -i "y" -p "Install bash completions for aliases in /root/.bash_completion.d? [Y/n]: " "n" rcompl
 if [ -z $rcompl ] || [ "y" == $rcompl ]; then
     echo "Next $(tput setaf 1)sudo$(tput sgr0) will install 'complete_alias' in /root/.bash_completion.d/' "
     

@@ -99,7 +99,7 @@ rangr_cnf() {
 }
 yes_edit_no rangr_cnf "$dir/rc.conf $dir/rifle.conf $dir/scope.sh" "Install predefined configuration (rc.conf,rifle.conf and scope.sh at ~/.config/ranger/)? " "edit" "GREEN"
 
-reade -Q "GREEN" -i "y" -p "F2 for Ranger? [Y/n]:" "y n" rf2
+reade -Q "GREEN" -i "y" -p "F2 for Ranger? [Y/n]: " "n" rf2
 if [ -z "$rf2" ] || [ "y" == "$rf2" ]; then
     binds=~/.bashrc
     if [ -f ~/.keybinds.d/keybinds.bash ]; then
@@ -117,14 +117,14 @@ if [ -z "$rf2" ] || [ "y" == "$rf2" ]; then
 fi
 
 if ! test -d ~/.config/ranger/plugins/devicons2; then
-    reade -Q "GREEN" -i "y" -p "Install ranger (dev)icons? (ranger plugin at ~/.conf/ranger/plugins) [Y/n]:" "y n" rplg
+    reade -Q "GREEN" -i "y" -p "Install ranger (dev)icons? (ranger plugin at ~/.conf/ranger/plugins) [Y/n]: " "n" rplg
     if [ -z $rplg ] || [ "y" == $rplg ]; then
         mkdir -p ~/.config/ranger/plugins
         git clone https://github.com/cdump/ranger-devicons2 ~/.config/ranger/plugins/devicons2
         if test "$distro" == "Arch" || test $distro == "Manjaro" ;then
             sudo pacman -S ttf-nerd-fonts-symbols-common ttf-nerd-fonts-symbols ttf-nerd-fonts-symbols-mono
         elif [ "$distro_base" == "Debian" ]; then    
-            reade -Q "YELLOW" -i "y" -p "Install Nerdfonts from binary - no apt? (Special FontIcons) [Y/n]: " "y n" nrdfnts
+            reade -Q "YELLOW" -i "y" -p "Install Nerdfonts from binary - no apt? (Special FontIcons) [Y/n]: " "n" nrdfnts
             if [ -z $nrdfnts ] || [ "Y" == $nrdfnts ] || [ $nrdfnts == "y" ]; then
                 if ! test -f ./install_nerdfonts.sh; then
                     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nerdfonts.sh)" 
@@ -147,7 +147,7 @@ fi
 #fi
 
 if [ -x "$(command -v nvim)" ]; then
-    reade -Q "GREEN" -i "y" -p "Integrate ranger with nvim? (Install nvim ranger plugins) [Y/n]:" "y n" rangrvim
+    reade -Q "GREEN" -i "y" -p "Integrate ranger with nvim? (Install nvim ranger plugins) [Y/n]: " "n" rangrvim
     if [[ -z $rangrvim || "y" == $rangrvim ]]; then
         if test -f  ~/.config/nvim/init.vim && ! grep -q "Ranger integration" ~/.config/nvim/init.vim; then
             sed -i 's|"Plug '\''francoiscabrol/ranger.vim'\''|Plug '\''francoiscabrol/ranger.vim'\''|g' ~/.config/nvim/init.vim
