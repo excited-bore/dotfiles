@@ -177,7 +177,7 @@ elif [  $distro_base == "Debian" ];then
                                 . ./checks/check_appimage_ready.sh
                             fi
                             chmod u+x $tmpdir/nvim.appimage
-                            sudo mv "$tmpdir/nvim.appimage" /usr/local/bin/
+                            sudo mv "$tmpdir/nvim.appimage" /usr/local/bin/nvim
                         fi
                     elif test "flatpak" == "$nvmappmg"; then
                         reade -Q "GREEN" -i "y" -p "Install flatpak? [Y/n]: " "n" insflpk 
