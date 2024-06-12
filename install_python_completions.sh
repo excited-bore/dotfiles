@@ -50,7 +50,7 @@ fi
 #    echo ". ~/.bash_completion.d/_python-argcomplete" >> ~/.bashrc
 #fi
 
-reade -Q "YELLOW" -i "y" -p "Install python completion system wide? (/root/.bashrc) [Y/n]:" "y n" arg
+reade -Q "YELLOW" -i "y" -p "Install python completion system wide? (/root/.bashrc) [Y/n]: " "n" arg
 if [ "y" == "$arg" ]; then 
     if type activate-global-python-argcomplete &> /dev/null; then
         sudo activate-global-python-argcomplete --dest=/root/.bash_completion.d
