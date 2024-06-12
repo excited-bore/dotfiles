@@ -317,6 +317,10 @@ alias redirect-tty-output-to="exec 1>/dev/pts/"
 
 alias GPU-list-drivers="inxi -G"
 
+function cron-list-all-user-jobs(){
+mktemp_f=$(mktemp) && for user in $(cut -f1 -d: /etc/passwd); do echo "$(tput setaf 10)User: $(tput bold)$user"; printf "$(tput setaf 12)Crontab: $(tput bold)"; sudo crontab -u "$user" -l; echo; done &> "$mktemp_f"; cat $mktemp_f | $PAGER; rm $mktemp_f &> /dev/null; unset mktemp_f
+}
+alias crontab-list-all-user-jobs="cron-list-all-user-jobs"
 
 function link-soft(){
     if ([[ "$1" = /* ]] || [ -d "$1" ] || [ -f "$1" ]) && ([[ $(readlink -f "$2") ]] || [[ $(readlink -d "$2") ]]); then
@@ -452,3 +456,13 @@ function file_put_quotations_around(){
 }
 
 complete -F _files file_put_quotations_around
+
+function iommu-groups(){
+    shopt -s nullglob
+    for g in $(find /sys/kernel/iommu_groups/* -maxdepth 0 -type d | sort -V); do
+        echo "IOMMU Group ${g##*/}:"
+        for d in $g/devices/*; do
+            echo -e "\t$(lspci -nns ${d##*/})"
+        done;
+    done;
+}

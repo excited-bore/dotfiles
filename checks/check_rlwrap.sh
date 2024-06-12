@@ -11,7 +11,7 @@ else
     . ./aliases/.bash_aliases.d/rlwrap_scripts.sh
 fi 
 
-if ! test -x "$(command -v rlwrap)"; then
+if ! type rlwrap &> /dev/null; then
     reade -Q "GREEN" -i "y" -p "Install rlwrap? (Offers autocompletion for input prompts - keyboard up/down) [Y(es)/n(o)]: " "y n" answr
     if [ "$answr" == "y" ] || [ -z "$answr" ] || [ "Y" == "$answr" ]; then
         if test $distro_base == "Debian"; then

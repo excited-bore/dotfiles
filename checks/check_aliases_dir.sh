@@ -1,10 +1,10 @@
 #!/bin/bash
 
 if [ ! -f ~/.bash_aliases ]; then
-    if ! test -f aliases/.bash_aliases.d/.bash_aliases; then
-        wget -P ~/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/.bash_aliases  
+    if ! test -f aliases/.bash_aliases; then
+        wget -P ~/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases  
     else
-        cp -fv aliases/.bash_aliases.d/.bash_aliases ~/
+        cp -fv aliases/.bash_aliases ~/
     fi 
 fi
 

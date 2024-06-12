@@ -13,8 +13,8 @@ if ! type update_system &> /dev/null; then
     fi
 fi
 
-if test -z "$SYSTEM_UPDATED"; then
-    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y" updatesysm
+if test -z $SYSTEM_UPDATED; then
+    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y n" updatesysm
     if test $updatesysm == "y"; then
         update_system                     
     fi
@@ -44,20 +44,7 @@ else
     . ./checks/check_completions_dir.sh
 fi
 
-if ! type update_system &> /dev/null; then
-    if ! test -f update_system.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/update_system.sh)" 
-    else
-        . ./update_system.sh
-    fi
-fi
 
-if test -z $SYSTEM_UPDATED; then
-    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y n" updatesysm
-    if test $updatesysm == "y"; then
-        update_system                     
-    fi
-fi
 
 #. $DIR/setup_git_build_from_source.sh "y" "neovim" "https://github.com" "neovim/neovim" "stable" "sudo apt update; sudo apt install ninja-build gettext libtool libtool-bin cmake g++ pkg-config unzip curl doxygen" "make CMAKE_BUILD_TYPE=RelWithDebInfo; sudo make install" "sudo make uninstall" "make distclean; make deps" "y"
 
@@ -109,7 +96,7 @@ if test $distro == "Arch" || test $distro == "Manjaro"; then
                 printf "export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin\n" >> $PATHVAR
                 printf "export PATH=\$PATH:\$GEM_PATH:\$GEM_HOME\n" >> $PATHVAR
             fi
-            source ~/.bashrc
+            #source ~/.bashrc
             gem install neovim
         fi
     fi
@@ -177,7 +164,7 @@ elif [  $distro_base == "Debian" ];then
                                 . ./checks/check_appimage_ready.sh
                             fi
                             chmod u+x $tmpdir/nvim.appimage
-                            sudo mv "$tmpdir/nvim.appimage" /usr/local/bin/
+                            sudo mv "$tmpdir/nvim.appimage" /usr/local/bin/nvim
                         fi
                     elif test "flatpak" == "$nvmappmg"; then
                         reade -Q "GREEN" -i "y" -p "Install flatpak? [Y/n]: " "n" insflpk 
