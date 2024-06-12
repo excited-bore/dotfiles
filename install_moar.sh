@@ -72,7 +72,7 @@ if ! type moar &> /dev/null; then
 fi
 
 
-reade -Q "GREEN" -i "y" -p "Set moar as default pager for $USER? [Y/n]: " "y n" moar_usr
+reade -Q "GREEN" -i "y" -p "Set moar as default pager for $USER? [Y/n]: " "n" moar_usr
 if [ -z "$moar_usr" ] || [ "y" == "$moar_usr" ] || [ "Y" == "$moar_usr" ]; then
     
     if grep -q "MOAR" $PATHVAR; then 
@@ -91,7 +91,7 @@ if [ -z "$moar_usr" ] || [ "y" == "$moar_usr" ] || [ "Y" == "$moar_usr" ]; then
     fi
 fi
     
-reade -Q "YELLOW" -i "y" -p "Set moar as default pager for root? [Y/n]: " "y n" moar_root
+reade -Q "YELLOW" -i "y" -p "Set moar as default pager for root? [Y/n]: " "n" moar_root
 if [ -z "$moar_root" ] || [ "y" == "$moar_root" ] || [ "Y" == "$moar_root" ]; then
     if sudo grep -q "MOAR" $PATHVAR_R; then
         sudo sed -i "s|.export MOAR=.*|export MOAR='--statusbar=bold --colors=auto --render-unprintable=highlight --quit-if-one-screen'|g" $PATHVAR_R 

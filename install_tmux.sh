@@ -11,13 +11,14 @@ if ! type update_system &> /dev/null; then
     else
         . ./update_system.sh
     fi
-    update_system
-else
-    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y n" updatesysm
+fi
+
+if test -z $SYSTEM_UPDATED; then
+    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y" updatesysm
     if test $updatesysm == "y"; then
         update_system                     
     fi
-fi 
+fi
 
 if ! test -f aliases/.bash_aliases.d/rlwrap_scripts.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/rlwrap_scripts.sh)" 
@@ -74,7 +75,7 @@ sed -i 's|^set -g @plugin|#set -g @plugin|g' $file
 sed -i 's|^run '\''~/.tmux/plugins/tpm/tpm'\''|#run '\''~/.tmux/plugins/tpm/tpm'\''|g' $file
 sed -i 's|^set -g @continuum-restore '\''on'\''|#set -g @continuum-restore '\''on'\''|g' $file
 
-reade -Q "GREEN" -i "y" -p "Install tmux.conf? (tmux conf at ~/.tmux.conf) [Y/n]:" "y n" tmuxc
+reade -Q "GREEN" -i "y" -p "Install tmux.conf? (tmux conf at ~/.tmux.conf) [Y/n]: " "n" tmuxc
 if [ "$tmuxc"  == "y" ] || [ -z "$tmuxc" ]; then
     cp -bfv $file ~/
     if test -f $file~; then
@@ -84,7 +85,7 @@ fi
 unset tmuxc
 
 
-reade -Q "GREEN" -i "y" -p "Install tmux plugin manager? (tpm) [Y/n]:" "y n"  tmuxx
+reade -Q "GREEN" -i "y" -p "Install tmux plugin manager? (tpm) [Y/n]: " "n"  tmuxx
 if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
     if [ ! -d ~/.tmux/plugins/tpm ]; then
         git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
@@ -100,7 +101,7 @@ fi
 unset tmuxx
 
 
-reade -Q "GREEN" -i "y" -p "Install tmux clipboard plugin? (tmux-yank) [Y/n]:" "y n"  tmuxx
+reade -Q "GREEN" -i "y" -p "Install tmux clipboard plugin? (tmux-yank) [Y/n]: " "n"  tmuxx
 if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
     if [ ! -x "$(command -v xclip)" ] && [ ! -x "$(command -v xsel)" ]; then
         if test "$distro" == "Arch" || test "$distro" == "Manjaro"; then
@@ -117,7 +118,7 @@ if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
 fi
 unset tmuxx
 
-reade -Q "GREEN" -i "y" -p "Install tmux sensible settings plugin? (tmux-sensible) [Y/n]:" "y n"  tmuxx
+reade -Q "GREEN" -i "y" -p "Install tmux sensible settings plugin? (tmux-sensible) [Y/n]: " "n"  tmuxx
 if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
     sed -i 's|#set -g @plugin '\''tmux-plugins/tmux-sensible'\''|set -g @plugin '\''tmux-plugins/tmux-sensible'\''|g' ~/.tmux.conf
     if ! grep -q "set -g @plugin 'tmux-plugins/tmux-sensible'" ~/.tmux.conf; then
@@ -127,14 +128,14 @@ if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
 fi
 unset tmuxx
 
-reade -Q "GREEN" -i "y" -p "Install tmux savepoint plugin? (tmux-resurrect) [Y/n]:" "y n"  tmuxx
+reade -Q "GREEN" -i "y" -p "Install tmux savepoint plugin? (tmux-resurrect) [Y/n]: " "n"  tmuxx
 if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
     sed -i 's|#set -g @plugin '\''tmux-plugins/tmux-resurrect'\''|set -g @plugin '\''tmux-plugins/tmux-resurrect'\''|g' ~/.tmux.conf
     if ! grep -q "set -g @plugin 'tmux-plugins/tmux-resurrect'" ~/.tmux.conf; then
          echo "# Restore tmux environment with savepoints" >> ~/.tmux.conf
          echo "set -g @plugin 'tmux-plugins/tmux-resurrect'" >> ~/.tmux.conf
     fi
-    reade -Q "GREEN" -i "y" -p "Install automatic tmux savepoint plugin? (tmux-continuum) [Y/n]:" "y n"  tmuxx
+    reade -Q "GREEN" -i "y" -p "Install automatic tmux savepoint plugin? (tmux-continuum) [Y/n]: " "n"  tmuxx
     if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
         sed -i 's|#set -g @plugin '\''tmux-plugins/tmux-continuum'\''|set -g @plugin '\''tmux-plugins/tmux-continuum'\''|g' ~/.tmux.conf
         sed -i 's|#set -g @continuum-restore '\''on'\''|set -g @continuum-restore '\''on'\''|g' ~/.tmux.conf
@@ -149,7 +150,7 @@ fi
 unset tmuxx
 
 if [ -x $(command -v nvim) ] && [ -x $(command -v kitty) ]; then
-    reade -Q "GREEN" -i "y" -p "Install vim-tmux-kitty navigator plugin? (tmux-sensible) [Y/n]:" "y n"  tmuxx
+    reade -Q "GREEN" -i "y" -p "Install vim-tmux-kitty navigator plugin? (tmux-sensible) [Y/n]: " "n"  tmuxx
     if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
         sed -i 's|#set -g @plugin '\''excited-bore/vim-tmux-kitty-navigator'\''|set -g @plugin '\''excited-bore/vim-tmux-kitty-navigator'\''|g' ~/.tmux.conf
         if ! grep -q "set -g @plugin 'excited-bore/vim-tmux-kitty-navigator'" ~/.tmux.conf; then
@@ -195,7 +196,7 @@ unset tmuxx
 #fi
 #unset tmuxx
 
-reade -Q "GREEN" -i "y" -p "Install tmux completions? [Y/n]:" "y n"  tmuxx
+reade -Q "GREEN" -i "y" -p "Install tmux completions? [Y/n]: " "n"  tmuxx
 if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
     
     if ! test -f checks/check_completions_dir.sh; then
@@ -212,7 +213,7 @@ fi
 
 unset tmuxx
 
-reade -Q "YELLOW" -i "y" -p "Install tmux completions at root? [Y/n]:" "y n" tmuxx
+reade -Q "YELLOW" -i "y" -p "Install tmux completions at root? [Y/n]: " "n" tmuxx
 if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
     if [ ! -e /root/.bash_completion.d/tmux ]; then
        curl https://raw.githubusercontent.com/imomaliev/tmux-bash-completion/master/completions/tmux | sudo tee -a /root/.bash_completion.d/tmux &> /dev/null
@@ -220,7 +221,7 @@ if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
 fi
 unset tmuxx
 
-reade -Q "GREEN" -i "y" -p "Install tmux.sh at ~/.bash_aliases.d/? (tmux aliases) [Y/n]:" "y n"  tmuxx
+reade -Q "GREEN" -i "y" -p "Install tmux.sh at ~/.bash_aliases.d/? (tmux aliases) [Y/n]: " "n"  tmuxx
 if [ -z "$tmuxx" ] || [ "$tmuxx"  == "y" ]; then 
     if test -f tmux/.bash_aliases.d/tmux.sh; then
         cp -bfv tmux/.bash_aliases.d/tmux.sh ~/.bash_aliases.d/
@@ -234,7 +235,7 @@ fi
 unset tmuxx 
 
 
-reade -Q "YELLOW" -i "n" -p "Set tmux at shell login for SSH? (Conflicts with vim-tmux-kitty navigator) [Y/n]:" "y n"  tmuxx
+reade -Q "YELLOW" -i "n" -p "Set tmux at shell login for SSH? (Conflicts with vim-tmux-kitty navigator) [N/y]: " "y"  tmuxx
 if [ -z "$tmuxx" ] || [ "$tmuxx"  == "y" ]; then 
     touch ~/.bash_aliases.d/tmux_startup.sh
     echo 'if [[ $- =~ i ]] && [[ -z "$TMUX" ]] && [[ -n "$SSH_TTY" ]]; then' >> ~/.bash_aliases.d/tmux_startup.sh
