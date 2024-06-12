@@ -386,12 +386,15 @@ fi
 
 binds=keybinds/.inputrc
 binds1=keybinds/.keybinds.d/keybinds.bash
+binds2=keybinds/.keybinds
 if ! test -f keybinds/.inputrc; then
     wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.inputrc
     wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds.d/keybinds.bash 
+    wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds 
     
     binds=$TMPDIR/.inputrc
     binds1=$TMPDIR/.keybinds.d/keybinds.bash
+    binds2=$TMPDIR/.keybinds
 fi
 
 shell-keybinds_r(){ 
@@ -399,6 +402,7 @@ shell-keybinds_r(){
        sudo sed -i 's|#export INPUTRC.*|export INPUTRC=~/.inputrc|g' /root/.pathvariables.env
     fi
     sudo cp -fv $binds1 /root/.keybinds.d/;
+    sudo cp -fv $binds2 /root/.keybinds
     sudo cp -fv $binds /root/;
 
     # X based settings is generally not for root and will throw errors 
@@ -414,27 +418,28 @@ shell-keybinds() {
         . ./checks/check_keybinds.sh
     fi
     
-    reade -Q "GREEN" -i "y" -p "Enable vi-mode instead of emacs mode (might cause issues with pasteing - revert with 'Ctrl-z')? [Y/n]: " "y n" vimde
+    reade -Q "GREEN" -i "y" -p "Enable vi-mode instead of emacs mode (might cause issues with pasteing - revert with 'Ctrl-z')? [Y/n]: " "n" vimde
     if [ "$vimde" == "y" ]; then
         sed -i "s|.set editing-mode .*|set editing-mode vi|g" $binds
     fi
-    reade -Q "GREEN" -i "y" -p "Enable visual que for vi/emacs toggle? (Displayed as '(ins)/(cmd) - (emacs)') [Y/n]: " "y n" vivisual
+    reade -Q "GREEN" -i "y" -p "Enable visual que for vi/emacs toggle? (Displayed as '(ins)/(cmd) - (emacs)') [Y/n]: " "n" vivisual
     if [ "$vivisual" == "y" ]; then
         sed -i "s|.set show-mode-in-prompt .*|set show-mode-in-prompt on|g" $binds
     fi
-    reade -Q "GREEN" -i "y" -p "Set caps to escape? (Might cause X11 errors with SSH) [Y/n]: " "y n" xtrm
+    reade -Q "GREEN" -i "y" -p "Set caps to escape? (Might cause X11 errors with SSH) [Y/n]: " "n" xtrm
     if [ "$xtrm" != "y" ] && ! [ -z "$xtrm" ]; then
         sed -i "s|setxkbmap |#setxkbmap |g" $binds
     fi
     cp -fv $binds1 ~/.keybinds.d/
+    cp -fv $binds2 ~/.keybinds 
     cp -fv $binds ~/
     if [ -f ~/.pathvariables.env ]; then
        sed -i 's|#export INPUTRC.*|export INPUTRC=~/.inputrc|g' ~/.pathvariables.env
     fi
     unset vimde vivisual xterm
-    yes_edit_no shell-keybinds_r "$binds $binds1" "Install .inputrc and keybinds.bash at /root/ and /root/.keybinds.d/?" "edit" "YELLOW"; 
+    yes_edit_no shell-keybinds_r "$binds $binds2 $binds1" "Install .inputrc and keybinds.bash at /root/ and /root/.keybinds.d/?" "edit" "YELLOW"; 
 }
-yes_edit_no shell-keybinds "$binds $binds1" "Install .inputrc and keybinds.bash at ~/ and ~/.keybinds.d/? (keybinds configuration)" "edit" "YELLOW"
+yes_edit_no shell-keybinds "$binds $binds2 $binds1" "Install .inputrc and keybinds.bash at ~/ and ~/.keybinds.d/? (keybinds configuration)" "edit" "YELLOW"
 
 # Xresources
 
