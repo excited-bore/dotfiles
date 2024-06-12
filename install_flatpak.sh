@@ -43,7 +43,7 @@ elif test "$distro_base" == "Debian"; then
 fi
 
 if type flatpak &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Add flatpak dirs to path? (XDG_DATA_DIRS) [Y/n]:" "y n" flpkvrs 
+    reade -Q "GREEN" -i "y" -p "Add flatpak dirs to path? (XDG_DATA_DIRS) [Y/n]: " "n" flpkvrs 
     if [ "$flpkvrs" == "y" ]; then
         if grep -q "FLATPAK" $PATHVAR; then
             sed -i 's|.export PATH=$PATH:$HOME/.local/bin/flatpak|export PATH=$PATH:$HOME/.local/bin/flatpak|g' $PATHVAR
@@ -60,7 +60,7 @@ if type flatpak &> /dev/null; then
 fi
 unset flpkvrs
 
-reade -Q "GREEN" -i "y" -p "Install flatpackwrapper? (For one-word flatpak apps in terminal) [Y/n]:" "y n" pam
+reade -Q "GREEN" -i "y" -p "Install flatpackwrapper? (For one-word flatpak apps in terminal) [Y/n]: " "n" pam
 if [ -z $pam ] || [ "y" == $pam ]; then
     if [ ! -d ~/.local/bin/flatpak/ ]; then
         mkdir -p ~/.local/bin/flatpak/
@@ -76,6 +76,19 @@ if [ -z $pam ] || [ "y" == $pam ]; then
         printf "function flatpak (){\\n  env -u SESSION_MANAGER flatpak \"\$@\"\\n  if [ \"\$1\" == \"install\" ]; then\\n      python /usr/bin/update_flatpak_cli.py\\n   fi\\n}\\n" >> ~/.bash_aliases.d/flatpacks.sh
     fi
     
+    if ! type python &> /dev/null; then
+        if test $distro_base == "Debian" && type python3 &> /dev/null; then
+            sudo apt install python-is-python3
+        else
+            if test $distro == "Manjaro" || test $distro == "Arch"; then
+                sudo pacman -S python
+            elif test $distro_base == "Debian"; then
+                sudo apt install python3 python3-is-python
+            fi
+        fi
+    fi
+
+
     if ! sudo test -f /usr/bin/update_flatpak_cli.py; then
         sudo wget -O /usr/bin/update_flatpak_cli.py https://gist.githubusercontent.com/ssokolow/db565fd8a82d6002baada946adb81f68/raw/c23b3292441e01c6287de1b417b9e573bce6a571/update_flatpak_cli.py
         sudo chmod u+x /usr/bin/update_flatpak_cli.py
@@ -91,13 +104,13 @@ if [ -z $pam ] || [ "y" == $pam ]; then
 fi
 unset pam
 
-reade -Q "GREEN" -i "y" -p "Install GUI for configuring flatpak permissions - flatseal? [Y/n]:" "y n" fltseal
+reade -Q "GREEN" -i "y" -p "Install GUI for configuring flatpak permissions - flatseal? [Y/n]: " "n" fltseal
 if [ -z $fltseal ] || [ "y" == $fltseal ]; then
     flatpak install flatseal
 fi
 unset fltseal
 
-reade -Q "GREEN" -i "y" -p "Run installer for no password with pam? [Y/n]:" "y n" pam
+reade -Q "GREEN" -i "y" -p "Run installer for no password with pam? [Y/n]: " "n" pam
 if [ -z $pam ] || [ "y" == $pam ]; then
     if ! test -f install_polkit_wheel.sh; then
          eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_polkit_wheel.sh)" 

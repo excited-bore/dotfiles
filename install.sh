@@ -109,8 +109,8 @@ fi
 #  Pathvariables
 
 #if [ ! -f ~/.pathvariables.env ]; then
-pathvr=$(pwd)/.pathvariables.env
-    if ! test -f .pathvariables.env; then
+    pathvr=$(pwd)/.pathvariables.env
+    if ! test -f $pathvr; then
         wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/.pathvariables.env
         pathvr=$TMPDIR/.pathvariables.env
     fi
@@ -349,6 +349,10 @@ pathvr=$(pwd)/.pathvariables.env
             fi
         fi
 
+        if type libvirtd &> /dev/null; then
+            sed -i 's/^#export LIBVIRT_DEFAULT_URI/export LIBVIRT_DEFAULT_URI/' $pathvr
+        fi
+
         pathvariables_r(){ 
              if ! sudo grep -q "~/.pathvariables.env" /root/.bashrc; then
                 printf "if [[ -f ~/.pathvariables.env ]]; then\n" | sudo tee -a /root/.bashrc
@@ -368,6 +372,11 @@ pathvr=$(pwd)/.pathvariables.env
     fi
 #fi
 
+if ! test -f checks/check_pathvar.sh; then
+    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pathvar.sh)" 
+else
+    . ./checks/check_pathvar.sh
+fi
 # Shell-keybinds
 
 #if grep -q 'bind -x '\''"\\C-s": ctrl-s'\''' ~/keybinds.bash && ! grep -q '#bind -x '\''"\\C-s": ctrl-s'\''' ~/keybinds.bash; then
@@ -387,7 +396,7 @@ fi
 
 shell-keybinds_r(){ 
     if [ -f /root/.pathvariables.env ]; then
-       sudo sed -i 's|#export INPUTRC|export INPUTRC|g' /root/.pathvariables.env
+       sudo sed -i 's|#export INPUTRC.*|export INPUTRC.*|g' /root/.pathvariables.env
     fi
     sudo cp -fv $binds1 /root/.keybinds.d/;
     sudo cp -fv $binds /root/;
@@ -420,7 +429,7 @@ shell-keybinds() {
     cp -fv $binds1 ~/.keybinds.d/
     cp -fv $binds ~/
     if [ -f ~/.pathvariables.env ]; then
-       sed -i 's|#export INPUTRC|export INPUTRC|g' ~/.pathvariables.env
+       sed -i 's|#export INPUTRC.*|export INPUTRC.*|g' ~/.pathvariables.env
     fi
     unset vimde vivisual xterm
     yes_edit_no shell-keybinds_r "$binds $binds1" "Install .inputrc and keybinds.bash at /root/ and /root/.keybinds.d/?" "edit" "YELLOW"; 

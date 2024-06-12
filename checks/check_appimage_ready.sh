@@ -29,11 +29,11 @@ if test $distro_base == "Debian"; then
                 sudo apt install libfuse2
             fi
         fi
-        if ! test -z "$(dpkg -l | grep libfuse2)"; then
-            sudo add-apt-repository ppa:appimagelauncher-team/stable
-            sudo apt update
-            sudo apt install appimagelauncher
-        fi
+        #if ! test -z "$(dpkg -l | grep libfuse2)"; then
+        #    sudo add-apt-repository ppa:appimagelauncher-team/stable
+        #    sudo apt update
+        #    sudo apt install appimagelauncher
+        #fi
     fi
 fi
 

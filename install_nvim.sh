@@ -135,10 +135,12 @@ elif [  $distro_base == "Debian" ];then
     b=$(sudo apt search neovim | grep '^neovim/stable' | awk '{print $2}')
     #Minimum version for Lazy plugin manager
     if [[ $b < 0.8 ]]; then
-        
-        echo "Neovim apt version is below 0.8, wich is needed to run Lazy.nvim (nvim plugin manager)"
+        echo "Neovim apt version is below 0.8, wich too low to run Lazy.nvim (nvim plugin manager)"
+        if ! test -z "$(sudo apt list --installed | grep neovim)"; then
+            reade -Q "GREEN" -i "y" -p "Uninstall apt version of neovim? [N/y]: " "n" nvmapt
+        fi
         if ! type nvim &> /dev/null; then
-            reade -Q "YELLOW" -i "n" -p "Still wish to install through apt? [N/y]:" "y" nvmapt
+            reade -Q "YELLOW" -i "n" -p "Still wish to install through apt? [N/y]: " "y" nvmapt
             if [ "y" == $nvmapt ]; then
                 sudo apt install neovim
             else
@@ -155,6 +157,13 @@ elif [  $distro_base == "Debian" ];then
                     fi
                     reade -Q "GREEN" -i "$pre" -p "$prompt" "$choices" nvmappmg
                     if [ "appimage" == "$nvmappmg" ]; then
+                        if ! type jq &> /dev/null; then
+                            if test $distro == "Manjaro" || test $distro == "Arch"; then
+                                sudo pacman -S jq
+                            elif test $distro_base == "Debian"; then
+                                sudo apt install jq
+                            fi
+                        fi
                         ltstv=$(curl -sL https://api.github.com/repos/neovim/neovim/releases/latest | jq -r ".tag_name")
                         tmpdir=$(mktemp -d -t nvim-XXXXXXXXXX)
                         wget -P $tmpdir https://github.com/neovim/neovim/releases/download/$ltstv/nvim.appimage 
@@ -171,7 +180,7 @@ elif [  $distro_base == "Debian" ];then
                             sudo mv "$tmpdir/nvim.appimage" /usr/local/bin/
                         fi
                     elif test "flatpak" == "$nvmappmg"; then
-                        reade -Q "GREEN" -i "y" -p "Install flatpak? [Y/n]:" "n" insflpk 
+                        reade -Q "GREEN" -i "y" -p "Install flatpak? [Y/n]: " "n" insflpk 
                         if [ "y" == "$insflpk" ]; then
                             if ! test -f install_flatpak.sh; then
                                 eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_flatpak.sh)" 
@@ -204,7 +213,7 @@ elif [  $distro_base == "Debian" ];then
     fi
         
     if ! type xclip &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Install nvim clipboard? (xsel xclip) [Y/n]:" "n" clip
+        reade -Q "GREEN" -i "y" -p "Install nvim clipboard? (xsel xclip) [Y/n]: " "n" clip
         if [ -z $clip ] || [ "y" == $clip ]; then
             sudo apt install xsel xclip 
             echo "${green} If this is for use with ssh on serverside, X11 needs to be forwarded"
@@ -217,7 +226,7 @@ elif [  $distro_base == "Debian" ];then
         fi
     fi
     if ! type pylint &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Install nvim-python? [Y/n]:" "y n" pyscripts
+        reade -Q "GREEN" -i "y" -p "Install nvim-python? [Y/n]: " "n" pyscripts
         if [ -z $pyscripts ] || [ "y" == $pyscripts ]; then
             sudo apt install python3 python3-dev python3-pynvim pipx  
             pipx install pynvim
@@ -226,7 +235,7 @@ elif [  $distro_base == "Debian" ];then
     fi
 
     if ! type npm &> /dev/null || ! npm list -g | grep neovim  &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Install nvim-javascript? [Y/n]:" "y n" jsscripts
+        reade -Q "GREEN" -i "y" -p "Install nvim-javascript? [Y/n]: " "n" jsscripts
         if [ -z $jsscripts ] || [ "y" == $jsscripts ]; then
             sudo apt install nodejs npm
             sudo npm install -g neovim
@@ -234,7 +243,7 @@ elif [  $distro_base == "Debian" ];then
                 qry=$(flatpak list | grep node)           
                 if [ ! -z "$qry" ] ; then
                     echo "${green} Flatpak version nvim needs flatpak's SDK for a node provider"
-                    reade -Q "GREEN" -i "y" -p "Install flatpak node SDK and set in environment? [Y/n]:" "y n" flpknode
+                    reade -Q "GREEN" -i "y" -p "Install flatpak node SDK and set in environment? [Y/n]: " "n" flpknode
                     if [ -z $flpknode ] || [ "y" == $flpknode ]; then 
                         flatpak install node18
                         #if grep -q "FLATPAK_ENABLE_SDK_EXT*.*node" $PATHVAR; then
@@ -256,7 +265,7 @@ elif [  $distro_base == "Debian" ];then
     fi
     
     if ! type gem &> /dev/null || ! gem list | grep neovim &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Install nvim-ruby? [Y/n]:" "y n" rubyscripts
+        reade -Q "GREEN" -i "y" -p "Install nvim-ruby? [Y/n]: " "n" rubyscripts
         if [ -z $rubyscripts ] || [ "y" == $rubyscripts ]; then
             sudo apt install ruby ruby-dev
             rver=$(echo $(ruby --version) | awk '{print $2}' | cut -d. -f-2)'.0'
@@ -278,7 +287,7 @@ elif [  $distro_base == "Debian" ];then
     fi
     
     if ! type cpan &> /dev/null || ! cpan -l 2> /dev/null | grep Neovim::Ext &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Install nvim-perl? [Y/n]:" "y n" perlscripts
+        reade -Q "GREEN" -i "y" -p "Install nvim-perl? [Y/n]: " "n" perlscripts
         if [ -z $perlscripts ] || [ "y" == $perlscripts ]; then
             sudo apt install cpanminus
             cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
@@ -290,7 +299,7 @@ elif [  $distro_base == "Debian" ];then
         fi
     fi
     if ! type ctags &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Install ctags? [Y/n]:" "y n" ctags
+        reade -Q "GREEN" -i "y" -p "Install ctags? [Y/n]: " "n" ctags
         if  [ "y" == $ctags ]; then
             sudo apt install universal-ctags
         fi
@@ -326,7 +335,7 @@ function instvim_r(){
         printf "export MYGVIMRC=~/.config/nvim/init.vim\n" | sudo tee -a $PATHVAR_R
     fi
 
-    reade -Q "GREEN" -i "y" -p "Set nvim as default for root EDITOR? [Y/n]:" "y n" vimrc 
+    reade -Q "GREEN" -i "y" -p "Set nvim as default for root EDITOR? [Y/n]: " "n" vimrc 
     if [ -z "$vimrc" ] || [ "$vimrc" == "y" ]; then
         if sudo grep -q "EDITOR" $PATHVAR_R; then
             sudo sed -i "s|.export EDITOR=.*|export EDITOR=~/.config/nvim/init.vim|g" $PATHVAR_R
@@ -336,7 +345,7 @@ function instvim_r(){
     fi
     unset vimrc
     
-    reade -Q "GREEN" -i "y" -p "Set nvim as default for root VISUAL? [Y/n]:" "y n" vimrc 
+    reade -Q "GREEN" -i "y" -p "Set nvim as default for root VISUAL? [Y/n]: " "n" vimrc 
     if [ -z "$vimrc" ] || [ "$vimrc" == "y" ]; then
        if sudo grep -q "VISUAL" $PATHVAR_R; then
             sudo sed -i "s|.export VISUAL=*|export VISUAL=~/.config/nvim/init.vim|g" $PATHVAR_R
@@ -347,7 +356,7 @@ function instvim_r(){
     unset vimrc
 
     if ! sudo test -f /root/.vimrc; then
-        reade -Q "YELLOW" -i "y" -p "Make symlink for init.vim at /root/.vimrc for user? (Might conflict with nvim +checkhealth) [Y/n]:" "y n"  vimrc_r
+        reade -Q "YELLOW" -i "y" -p "Make symlink for init.vim at /root/.vimrc for user? (Might conflict with nvim +checkhealth) [Y/n]: " "n"  vimrc_r
         if [ -z $vimrc_r ] || [ "y" == $vimrc_r ] && [ ! -f /root/.vimrc ]; then
             sudo ln -s /root/.config/nvim/init.vim /root/.vimrc;
         fi
@@ -379,12 +388,12 @@ function instvim(){
         printf "export MYGVIMRC=~/.config/nvim/init.vim\n" >> $PATHVAR
     fi
 
-    reade -Q "GREEN" -i "y" -p "Set Neovim as MANPAGER? [Y/n]: " "y n" manvim
+    reade -Q "GREEN" -i "y" -p "Set Neovim as MANPAGER? [Y/n]: " "n" manvim
     if [ "$manvim" == "y" ]; then
        sed -i 's|.export MANPAGER=.*|export MANPAGER='\''nvim +Man!'\''|g' $PATHVAR
     fi
 
-    reade -Q "GREEN" -i "y" -p "Set Neovim as default for user EDITOR? [Y/n]:" "y n" vimrc 
+    reade -Q "GREEN" -i "y" -p "Set Neovim as default for user EDITOR? [Y/n]: " "n" vimrc 
     if [ -z "$vimrc" ] || [ "$vimrc" == "y" ]; then
         if grep -q "EDITOR" $PATHVAR; then
             sed -i "s|.export EDITOR=.*|export EDITOR=~/.config/nvim/init.vim|g" $PATHVAR
@@ -394,7 +403,7 @@ function instvim(){
     fi
     unset vimrc
     
-    reade -Q "GREEN" -i "y" -p "Set Neovim as default for user VISUAL? [Y/n]:" "y n" vimrc 
+    reade -Q "GREEN" -i "y" -p "Set Neovim as default for user VISUAL? [Y/n]: " "n" vimrc 
     if [ -z "$vimrc" ] || [ "$vimrc" == "y" ]; then
        if grep -q "VISUAL" $PATHVAR; then
             sed -i "s|.export VISUAL=*|export VISUAL=~/.config/nvim/init.vim|g" $PATHVAR
@@ -404,7 +413,7 @@ function instvim(){
     fi
     unset vimrc
     
-    reade -Q "YELLOW" -i "y" -p "Make symlink for init.vim at ~/.vimrc for user? (Might conflict with nvim +checkhealth) [Y/n]:" "y n" vimrc
+    reade -Q "YELLOW" -i "y" -p "Make symlink for init.vim at ~/.vimrc for user? (Might conflict with nvim +checkhealth) [Y/n]: " "n" vimrc
     if [ -z $vimrc ] && [ ! -f ~/.vimrc ]; then
         ln -s ~/.config/nvim/init.vim ~/.vimrc
     fi
