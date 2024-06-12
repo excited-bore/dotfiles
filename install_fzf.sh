@@ -192,7 +192,7 @@ if test -f ~/.fzf.bash ; then
 #        #sed -i  's|bind -m vi-insert '\''"\C-z"|#bind -m vi-insert '\''"\C-z"|g' ~/.fzf/shell/key-bindings.bash
 #    fi
     
-    reade -Q "GREEN" -i "y" -p "Use rifle (file opener from 'ranger') to open found files and dirs with Ctrl-T filesearch shortcut? [Y/n]:" "y n" fzf_t
+    reade -Q "GREEN" -i "y" -p "Use rifle (file opener from 'ranger') to open found files and dirs with Ctrl-T filesearch shortcut? [Y/n]: " "n" fzf_t
     if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ] ; then
         if ! type rifle &> /dev/null; then
             sudo wget -P /usr/bin/ https://raw.githubusercontent.com/ranger/ranger/master/ranger/ext/rifle.py 
@@ -227,7 +227,7 @@ if test -f ~/.fzf.bash ; then
     fi
 
     #TODO: keybinds-rifle sh still has ffmpegthumbnailer part (could use sed check)
-    reade -Q "GREEN" -i "y" -p "Install ffmpegthumbnailer? (Video thumbnails for riflesearch) [Y/n]: " "y n" ffmpg
+    reade -Q "GREEN" -i "y" -p "Install ffmpegthumbnailer? (Video thumbnails for riflesearch) [Y/n]: " "n" ffmpg
     if [ "$ffmpg" == "y" ]; then
         if ! test -f install_ffmpegthumbnailer.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ffmpegthumbnailer.sh)" 
@@ -237,7 +237,7 @@ if test -f ~/.fzf.bash ; then
     fi
     unset ffmpg
 
-    reade -Q "GREEN" -i "y" -p "Change shortcut for riflesearch from Ctrl-T to Ctrl-F? (Fzf and paste in console) [Y/n]: " "y n" fzf_t
+    reade -Q "GREEN" -i "y" -p "Change shortcut for riflesearch from Ctrl-T to Ctrl-F? (Fzf and paste in console) [Y/n]: " "n" fzf_t
     if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ] ; then 
         sed -i 's|# CTRL-T|# CTRL-F|g' ~/.fzf/shell/key-bindings.bash
         sed -i 's|bind -m emacs-standard '\''"\\C-t": |bind -m emacs-standard '\''"\\C-f": |g' ~/.fzf/shell/key-bindings.bash
@@ -248,7 +248,7 @@ if test -f ~/.fzf.bash ; then
         sed -i 's|bind -m vi-insert -x '\''"\\C-t": |bind -m vi-insert -x '\''"\\C-f": |g' ~/.fzf/shell/key-bindings.bash
     fi
 
-    reade -Q "GREEN" -i "y" -p "Add shortcut F3 for fzf rifle? [Y/n]: " "y n" fzf_t
+    reade -Q "GREEN" -i "y" -p "Add shortcut F3 for fzf rifle? [Y/n]: " "n" fzf_t
     if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ] ; then
         if ! grep -q 'bind -x '\''"\\eOR": "fzf_rifle"'\''' ~/.fzf/shell/key-bindings.bash ;  then              
             
@@ -257,7 +257,7 @@ if test -f ~/.fzf.bash ; then
     fi
 
     if ! type xclip &> /dev/null; then 
-        reade -Q "GREEN" -i "y" -p "Install xclip? (Clipboard tool for Ctrl-R/Reverse history shortcut) [Y/n]: " "y n" xclip
+        reade -Q "GREEN" -i "y" -p "Install xclip? (Clipboard tool for Ctrl-R/Reverse history shortcut) [Y/n]: " "n" xclip
         if [ "$xclip" == "y" ]; then
             if ! test -f install_xclip.sh; then
                 eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_xclip.sh)" 
@@ -279,7 +279,7 @@ if test -f ~/.fzf.bash ; then
     unset xclip
 
     
-    reade -Q "GREEN" -i "y" -p "Install tree? (Builtin cd shortcut gets a nice directory tree preview ) [Y/n]: " "y n" tree
+    reade -Q "GREEN" -i "y" -p "Install tree? (Builtin cd shortcut gets a nice directory tree preview ) [Y/n]: " "n" tree
     if [ "$tree" == "y" ]; then
         if ! test -f install_tree.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_tree.sh)" 
@@ -311,7 +311,7 @@ if test -f ~/.fzf.bash ; then
     
     
     if ! test -f ~/.bash_aliases.d/docker-fzf.sh; then
-        reade -Q "GREEN" -i "y" -p "Install fzf-docker (fzf aliases for docker)? [Y/n]:" "y n" fzf_d
+        reade -Q "GREEN" -i "y" -p "Install fzf-docker (fzf aliases for docker)? [Y/n]: " "n" fzf_d
         if [ "$fzf_d" == "y" ] || [ -z "$fzf_d" ]; then 
             if ! test -f checks/check_aliases_dir.sh; then
                 eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)" 

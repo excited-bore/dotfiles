@@ -37,28 +37,28 @@ printf "${green} Will now start with updating system ${normal}\n"
 update_system
 
 if [ ! -e ~/config ] && test -d ~/.config; then
-    reade -Q "BLUE" -i "y" -p "Create ~/.config to ~/config symlink? [Y(es)/n(o)]:" "n" sym1
+    reade -Q "BLUE" -i "y" -p "Create ~/.config to ~/config symlink? [Y(es)/n(o)]: " "n" sym1
     if [ -z $sym1 ] || [ "y" == $sym1 ]; then
         ln -s ~/.config ~/config
     fi
 fi
 
 if [ ! -e ~/lib_systemd ] && test -d ~/lib/systemd/system; then
-    reade -Q "BLUE" -i "y" -p "Create /lib/systemd/system/ to user directory symlink? [Y/n]:" "n" sym2
+    reade -Q "BLUE" -i "y" -p "Create /lib/systemd/system/ to user directory symlink? [Y/n]: " "n" sym2
     if [ -z $sym2 ] || [ "y" == $sym2 ]; then
         ln -s /lib/systemd/system/ ~/lib_systemd
     fi
 fi
 
 if [ ! -e ~/etc_systemd ] && test -d ~/etc/systemd/system; then
-    reade -Q "BLUE" -i "y" -p "Create /etc/systemd/system/ to user directory symlink? [Y/n]:" "n" sym3
+    reade -Q "BLUE" -i "y" -p "Create /etc/systemd/system/ to user directory symlink? [Y/n]: " "n" sym3
     if [ -z $sym3 ] || [ "y" == $sym3 ]; then
         ln -s /etc/systemd/system/ ~/etc_systemd
     fi
 fi
 
 if [ ! -f /etc/modprobe.d/nobeep.conf ]; then
-    reade -Q "GREEN" -i "y" -p "Remove terminal beep? (blacklist pcspkr) [Y/n]:" "n" beep
+    reade -Q "GREEN" -i "y" -p "Remove terminal beep? (blacklist pcspkr) [Y/n]: " "n" beep
     if [ "$beep" == "y" ] || [ -z "$beep" ]; then
         echo "blacklist pcspkr" | sudo tee /etc/modprobe.d/nobeep.conf
     fi
@@ -69,7 +69,7 @@ unset sym1 sym2 sym3 beep
 
 if ! type flatpak &> /dev/null; then
     printf "%s\n" "${blue}No flatpak detected. (Independent package manager from Red Hat)${normal}"
-    reade -Q "GREEN" -i "y" -p "Install? [Y/n]:" "n" insflpk 
+    reade -Q "GREEN" -i "y" -p "Install? [Y/n]: " "n" insflpk 
     if [ "y" == "$insflpk" ]; then
         if ! test -f install_flatpak.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_flatpak.sh)" 
@@ -82,7 +82,7 @@ unset insflpk
 
 if ! type snap &> /dev/null; then
     printf "%s\n" "${blue}No snap detected. (Independent package manager from Canonical)${normal}"
-    reade -Q "GREEN" -i "n" -p "Install? [Y/n]:" "y" inssnap 
+    reade -Q "GREEN" -i "n" -p "Install? [Y/n]: " "y" inssnap 
     if [ "y" == "$inssnap" ]; then
         if ! test -f install_snapd.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_snapd.sh)" 
@@ -94,7 +94,7 @@ fi
 unset inssnap
 
 if ! sudo test -f /etc/polkit/49-nopasswd_global.pkla && ! sudo test -f /etc/polkit-1/rules.d/90-nopasswd_global.rules; then
-    reade -Q "YELLOW" -i "n" -p "Install polkit files for automatic authentication for passwords? [Y/n]:" "y" plkit
+    reade -Q "YELLOW" -i "n" -p "Install polkit files for automatic authentication for passwords? [Y/n]: " "y" plkit
     if [ "y" == "$plkit" ]; then
         if ! test -f install_polkit_wheel.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_polkit_wheel.sh)" 
@@ -396,7 +396,7 @@ fi
 
 shell-keybinds_r(){ 
     if [ -f /root/.pathvariables.env ]; then
-       sudo sed -i 's|#export INPUTRC.*|export INPUTRC.*|g' /root/.pathvariables.env
+       sudo sed -i 's|#export INPUTRC.*|export INPUTRC=~/.inputrc|g' /root/.pathvariables.env
     fi
     sudo cp -fv $binds1 /root/.keybinds.d/;
     sudo cp -fv $binds /root/;
@@ -429,7 +429,7 @@ shell-keybinds() {
     cp -fv $binds1 ~/.keybinds.d/
     cp -fv $binds ~/
     if [ -f ~/.pathvariables.env ]; then
-       sed -i 's|#export INPUTRC.*|export INPUTRC.*|g' ~/.pathvariables.env
+       sed -i 's|#export INPUTRC.*|export INPUTRC=~/.inputrc|g' ~/.pathvariables.env
     fi
     unset vimde vivisual xterm
     yes_edit_no shell-keybinds_r "$binds $binds1" "Install .inputrc and keybinds.bash at /root/ and /root/.keybinds.d/?" "edit" "YELLOW"; 
@@ -461,7 +461,7 @@ fi
 
 
 # Bash alias completions
-reade -Q "GREEN" -i "y" -p "Install bash completions for aliases in ~/.bash_completion.d? [Y/n]:" "y n" compl
+reade -Q "GREEN" -i "y" -p "Install bash completions for aliases in ~/.bash_completion.d? [Y/n]: " "n" compl
 if [ -z "$compl" ] || [ "y" == "$compl" ]; then
     if ! test -f install_bashalias_completions.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bashalias_completions.sh)" 
@@ -472,7 +472,7 @@ fi
 unset compl
 
 # Python completions
-reade -Q "GREEN" -i "y" -p "Install python completions in ~/.bash_completion.d? [Y/n]:" "y n" pycomp
+reade -Q "GREEN" -i "y" -p "Install python completions in ~/.bash_completion.d? [Y/n]: " "n" pycomp
 if [ -z $pycomp ] || [ "y" == $pycomp ]; then
     if ! test -f install_python_completions.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_python_completions.sh)" 
@@ -483,7 +483,7 @@ fi
 unset pycomp
 
 # Git
-reade -Q "GREEN" -i "y" -p "Install Git and configure? (Project managing tool) [Y/n]:" "y n" nvm
+reade -Q "GREEN" -i "y" -p "Install Git and configure? (Project managing tool) [Y/n]: " "n" nvm
 if [ "y" == "$nvm" ]; then
     if ! test -f install_git.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_git.sh)" 
@@ -536,8 +536,8 @@ if ! type neofetch &> /dev/null; then
 fi
 
 # Bashtop
-if ! type bashtop &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Install bashtop? (Python based improved top/htop) [Y/n]:" "y n" tojump
+if ! type bashtop &> /dev/null && ! type bpytop &> /dev/null && ! type btop &> /dev/null; then
+    reade -Q "GREEN" -i "y" -p "Install bashtop? (Python based improved top/htop) [Y/n]: " "n" tojump
     if [ "$tojump" == "y" ]; then
         if ! test -f install_bashtop.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bashtop.sh)" 
@@ -550,7 +550,7 @@ fi
 
 # Autojump
 if ! type autojump &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Install autojump? (jump to folders using 'bookmarks' - j_ ) [Y/n]:" "y n" tojump
+    reade -Q "GREEN" -i "y" -p "Install autojump? (jump to folders using 'bookmarks' - j_ ) [Y/n]: " "n" tojump
     if [ "$tojump" == "y" ]; then
         if ! test -f install_autojump.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_autojump.sh)" 
@@ -672,7 +672,7 @@ if ! type nmap &> /dev/null; then
     unset tojump
 fi
 
-reade -Q "GREEN" -i "y" -p "Install bash aliases and other config? [Y/n]:" "y n" scripts
+reade -Q "GREEN" -i "y" -p "Install bash aliases and other config? [Y/n]: " "n" scripts
 if [ -z $scripts ] || [ "y" == $scripts ]; then
 
     if ! test -f checks/check_aliases_dir.sh; then
@@ -700,18 +700,18 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
             sed -i 's|^export TRASH_BIN_LIMIT=|export TRASH_BIN_LIMIT=|g' ~/.pathvariables.env
         fi
         local ansr
-        reade -Q "GREEN" -i "y" -p "Set cp/mv (when overwriting) to backup files? (will also trash backups) [Y/n]:" "y n" ansr         
+        reade -Q "GREEN" -i "y" -p "Set cp/mv (when overwriting) to backup files? (will also trash backups) [Y/n]: " "n" ansr         
         if [ "$ansr" != "y" ]; then
             sed -i 's|alias cp="cp-trash -rv"|#alias cp="cp-trash -rv"|g' $genr
             sed -i 's|alias mv="mv-trash -v"|#alias mv="mv-trash -v"|g' $genr
         fi
         unset ansr
-        reade -Q "YELLOW" -i "n" -p "Set 'gio trash' alias for rm? [N/y]:" "y n" ansr 
+        reade -Q "YELLOW" -i "n" -p "Set 'gio trash' alias for rm? [N/y]: " "y" ansr 
         if [ "$ansr" != "y" ]; then
             sed -i 's|alias rm="trash"|#alias rm="trash"|g' $genr
         fi
         if type bat &> /dev/null; then
-            reade -Q "YELLOW" -i "n" -p "Set 'cat' as alias for 'bat'? [N/y]:" "y n" cat
+            reade -Q "YELLOW" -i "n" -p "Set 'cat' as alias for 'bat'? [N/y]: " "y" cat
             if [ "$cat" != "y" ]; then
                 sed -i 's|^alias cat="bat"|#alias cat="bat"|g' $genr
             fi
@@ -756,11 +756,11 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
 
     update_sysm_r(){ 
         sudo cp -fv $update_sysm /root/.bash_aliases.d/;
-        sudo sed -i 'd/SYSTEM_UPDATED="TRUE"' /root/.bash_aliases.d/update_system.sh
+        sudo sed -i '/SYSTEM_UPDATED="TRUE"/d' /root/.bash_aliases.d/update_system.sh
     }
     update_sysm(){
         cp -fv $update_sysm ~/.bash_aliases.d/
-        sed -i 'd/SYSTEM_UPDATED="TRUE"' ~/.bash_aliases.d/update_system.sh
+        sed -i '/SYSTEM_UPDATED="TRUE"/d' ~/.bash_aliases.d/update_system.sh
         yes_edit_no update_sysm_r "$update_sysm" "Install update_system.sh at /root/?" "yes" "GREEN"; }
     yes_edit_no update_sysm "$update_sysm" "Install update_system.sh at ~/.bash_aliases.d/? (Global system update function)?" "edit" "GREEN"
 
