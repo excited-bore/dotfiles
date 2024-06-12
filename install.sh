@@ -396,7 +396,7 @@ fi
 
 shell-keybinds_r(){ 
     if [ -f /root/.pathvariables.env ]; then
-       sudo sed -i 's|#export INPUTRC.*|export INPUTRC.*|g' /root/.pathvariables.env
+       sudo sed -i 's|#export INPUTRC.*|export INPUTRC=~/.inputrc|g' /root/.pathvariables.env
     fi
     sudo cp -fv $binds1 /root/.keybinds.d/;
     sudo cp -fv $binds /root/;
@@ -429,7 +429,7 @@ shell-keybinds() {
     cp -fv $binds1 ~/.keybinds.d/
     cp -fv $binds ~/
     if [ -f ~/.pathvariables.env ]; then
-       sed -i 's|#export INPUTRC.*|export INPUTRC.*|g' ~/.pathvariables.env
+       sed -i 's|#export INPUTRC.*|export INPUTRC=~/.inputrc|g' ~/.pathvariables.env
     fi
     unset vimde vivisual xterm
     yes_edit_no shell-keybinds_r "$binds $binds1" "Install .inputrc and keybinds.bash at /root/ and /root/.keybinds.d/?" "edit" "YELLOW"; 
