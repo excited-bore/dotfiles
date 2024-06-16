@@ -17,6 +17,8 @@ else
     . ./update_system.sh
 fi
 
+update_system
+
 if ! test -f checks/check_rlwrap.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_rlwrap.sh)" 
 else
@@ -34,7 +36,6 @@ printf "${green}If all necessary files are sourced correctly, this text looks gr
 printf "\n${green}Files that get overwritten get backed up and trashed (to prevent clutter).\nRecover using ${cyan}'gio trash --list'${green} and ${cyan}'gio trash --restore' ${normal}\n"
 printf "${green} Will now start with updating system ${normal}\n"
 
-update_system
 
 if [ ! -e ~/config ] && test -d ~/.config; then
     reade -Q "BLUE" -i "y" -p "Create ~/.config to ~/config symlink? [Y(es)/n(o)]: " "n" sym1
