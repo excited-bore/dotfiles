@@ -120,6 +120,9 @@ fi
         #Comment out every export in .pathvariables
         sed -i -e '/export/ s/^#*/#/' $pathvr
 
+        #Comment out FZF stuff
+        sed -i 's/   --bind/#   --bind/' $pathvr
+
         # Set tmpdir
         sed 's|#export TMPDIR|export TMPDIR|' -i $pathvr
 
@@ -841,7 +844,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     pthon(){
         cp -fv $pthon ~/.bash_aliases.d/
     }
-    yes_edit_no variti "$pthon" "Install python.sh at ~/.bash_aliases.d/ (aliases for a python development)? " "edit" "GREEN" 
+    yes_edit_no pthon "$pthon" "Install python.sh at ~/.bash_aliases.d/ (aliases for a python development)? " "edit" "GREEN" 
 
 
     # Youtube
@@ -860,6 +863,6 @@ fi
 
 source ~/.bashrc
 
-echo "${cyan}${bold}You can check all aliases with 'alias'";
+echo "${cyan}${bold}Source .bashrc 'source ~/.bashrc' and you can check all aliases with 'alias'";
 alias -p;
 echo "${green}${bold}Done!"
