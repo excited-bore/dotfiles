@@ -31,13 +31,23 @@ else
     . ./aliases/.bash_aliases.d/rlwrap_scripts.sh
 fi
 
- # Ranger (File explorer)
- if ! type ranger &> /dev/null; then
+RIFLE_INS=""
+if type rifle &> /dev/null && ! type ranger &> /dev/null; then
+    RIFLE_INS=$(mktemp -d -t ranger-XXXXXXXXXX)
+    sudo mv /usr/bin/rifle $RIFLE_INS
+fi
+
+# Ranger (File explorer)
+if ! type ranger &> /dev/null; then
      if test $distro == "Arch" || test $distro == "Manjaro"; then
         sudo pacman -S ranger python python-pipx
     elif [ $distro_base == "Debian" ]; then    
         sudo apt install ranger python3 python3-dev pipx
     fi
+fi
+
+if ! test -z $RIFLE_INS; then
+    sudo mv -f $RIFLE_INS/rifle /usr/bin/rifle
 fi
 
 # Remove message ('Removed /tmp/ranger_cd54qzd') after quitting ranger

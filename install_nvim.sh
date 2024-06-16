@@ -124,7 +124,10 @@ elif [  $distro_base == "Debian" ];then
     if [[ $b < 0.8 ]]; then
         echo "Neovim apt version is below 0.8, wich too low to run Lazy.nvim (nvim plugin manager)"
         if ! test -z "$(sudo apt list --installed | grep neovim)"; then
-            reade -Q "GREEN" -i "y" -p "Uninstall apt version of neovim? [N/y]: " "n" nvmapt
+            reade -Q "GREEN" -i "y" -p "Uninstall apt version of neovim? [Y/n]: " "n" nvmapt
+            if [ "y" == $nvmapt ]; then
+                sudo apt remove neovim
+            fi
         fi
         if ! type nvim &> /dev/null; then
             reade -Q "YELLOW" -i "n" -p "Still wish to install through apt? [N/y]: " "y" nvmapt
@@ -347,8 +350,8 @@ else
     dir=vim/.config/nvim 
 fi
 
-if ! grep -q "#Plugin 'Exafunction/codeium.vim'" "$dir/init.vim"; then
-    sed -i "s|Plugin 'Exafunction/codeium.vim'|#Plugin 'Exafunction/codeium.vim'|g" "$dir/init.vim" 
+if ! grep -q "\"Plugin 'Exafunction/codeium.vim'" "$dir/init.vim"; then
+    sed -i "s|Plugin 'Exafunction/codeium.vim'|\"Plugin 'Exafunction/codeium.vim'|g" "$dir/init.vim" 
 fi
 
 function instvim_r(){
