@@ -74,7 +74,7 @@ if [ -d ~/.bash_aliases.d/ ]; then
     if ! test -f ranger/.bash_aliases.d/ranger.sh ; then
         wget -O ~/.bash_aliases.d/ranger.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/.bash_aliases.d/ranger.sh
     else
-        cp -bfv ./ranger/.config/.bash_aliases.d/ranger.sh ~/.bash_aliases.d/ranger.sh
+        cp -bfv ranger/.bash_aliases.d/ranger.sh ~/.bash_aliases.d/ranger.sh
     fi
     if test -f ~/.bash_aliases.d/ranger.sh~; then
         gio trash ~/.bash_aliases.d/ranger.sh~
