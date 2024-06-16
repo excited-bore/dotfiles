@@ -121,7 +121,7 @@ fi
         sed -i -e '/export/ s/^#*/#/' $pathvr
 
         #Comment out FZF stuff
-        sed -i 's/   --bind/#   --bind/' $pathvr
+        sed -i 's/   --/#   --/' $pathvr
 
         # Set tmpdir
         sed 's|#export TMPDIR|export TMPDIR|' -i $pathvr
