@@ -144,6 +144,13 @@ elif [  $distro_base == "Debian" ];then
                     fi
                     reade -Q "GREEN" -i "$pre" -p "$prompt" "$choices" nvmappmg
                     if [ "appimage" == "$nvmappmg" ]; then
+                        if ! type curl &> /dev/null; then
+                            if test $distro == "Manjaro" || test $distro == "Arch"; then
+                                sudo pacman -S curl
+                            elif test $distro_base == "Debian"; then
+                                sudo apt install curl
+                            fi
+                        fi
                         if ! type jq &> /dev/null; then
                             if test $distro == "Manjaro" || test $distro == "Arch"; then
                                 sudo pacman -S jq
