@@ -26,7 +26,7 @@ fi
 if ! sudo test -f /root/.bash_completion; then
     echo "Next $(tput setaf 1)sudo$(tput sgr0) will install '.bash_completion.d' in /root and source it with '/root/.bash_completion"
     if [ ! -f /root/.bash_completion ]; then
-        if ! test -f aliases/.bash_aliases.d/.bash_completion; then
+        if ! test -f completions/.bash_completion; then
             sudo wget -P /root/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/completions/.bash_completion 
         else
             sudo cp -fv completion/.bash_completion /root/
