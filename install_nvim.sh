@@ -313,6 +313,10 @@ else
     dir=vim/.config/nvim 
 fi
 
+if ! grep -q "#Plugin 'Exafunction/codeium.vim'" "$dir/init.vim"; then
+    sed -i "s|Plugin 'Exafunction/codeium.vim'|#Plugin 'Exafunction/codeium.vim'|g" "$dir/init.vim" 
+fi
+
 function instvim_r(){
     if ! sudo test -d /root/.config/nvim/; then
         sudo mkdir -p /root/.config/nvim/
