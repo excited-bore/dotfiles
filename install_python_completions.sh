@@ -30,7 +30,7 @@ else
     . ./checks/check_completions_dir.sh
 fi
 
-if ! type argcomplete &> /dev/null; then
+if ! type activate-global-python-argcomplete &> /dev/null; then
     if test $distro_base == "Debian"; then
         sudo apt install python3 pipx
         pipx install argcomplete

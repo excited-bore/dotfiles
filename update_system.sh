@@ -23,14 +23,36 @@ function update_system() {
 
     if test $distro == "Raspbian"; then
         sudo rpi-update
+        hdrs="linux-headers-$(uname -r)"
+        if test -z "sudo apt list --installed | grep $hdrs"; then
+            reade -Q "GREEN" -i "y" -p "Right linux headers not installed. Install $hdrs? [Y/n]: " "n" hdrs_ins
+            if [ "$hdrs_ins" == "y" ]; then
+                sudo apt install "$hdrs"
+            fi
+        fi
     elif test $packmang == "apt"; then
         sudo apt update
+        hdrs="linux-headers-$(uname -r)"
+        if test -z "sudo apt list --installed | grep $hdrs"; then
+            reade -Q "GREEN" -i "y" -p "Right linux headers not installed. Install $hdrs? [Y/n]: " "n" hdrs_ins
+            if [ "$hdrs_ins" == "y" ]; then
+                sudo apt install "$hdrs"
+            fi
+        fi
     elif test $packmang == "apk"; then
         apk update
     elif test $packmang == "pacman"; then
         sudo pacman -Syu
         if ! test -z "$AUR_helper" && ! test -z "$AUR_update"; then
             eval "$AUR_update"
+        fi
+        hdrs="$(echo $(uname -r) | cut -d. -f-2)"
+        hdrs="linux$(echo $(uname -r) | cut -d. -f-1)${hdrs: -1}-headers"
+        if test -z "sudo pacman -Q $hdrs"; then
+            reade -Q "GREEN" -i "y" -p "Right linux headers not installed. Install $hdrs? [Y/n]: " "n" hdrs_ins
+            if [ "$hdrs_ins" == "y" ]; then
+                sudo pacman -S "$hdrs"
+            fi
         fi
     elif test $distro == "Gentoo"; then
         #TODO Add update cycle for Gentoo systems
@@ -43,6 +65,8 @@ function update_system() {
     elif test $packmang == "yum"; then
         yum update
     fi
+    
+    unset hdrs hdrs_ins 
 
     if type flatpak &> /dev/null; then
         flatpak update

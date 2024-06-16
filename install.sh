@@ -240,7 +240,7 @@ fi
             sed -i 's|export VISUAL=.*|export VISUAL='"$vsual"'|g' $pathvr
             
             if grep -q "#export SUDO_EDITOR" $pathvr; then
-                reade -Q "GREEN" -i "y" -p "Set SUDO_EDITOR to \$EDITOR? [Y/n]: " "y n" sud_edt
+                reade -Q "GREEN" -i "y" -p "Set SUDO_EDITOR to \\$EDITOR? [Y/n]: " "n" sud_edt
                 if test "$sud_edt" == "y"; then
                     sed -i 's|#export SUDO_EDITOR.*|export SUDO_EDITOR=$EDITOR|g' $pathvr
                 fi
@@ -248,7 +248,7 @@ fi
             
             echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for  'Defaults env_keep += \"VISUAL EDITOR\"' in /etc/sudoers"
             if ! sudo grep -q "Defaults env_keep += \"VISUAL EDITOR\"" /etc/sudoers; then
-                reade -Q "YELLOW" -i "y" -p "Sudo by default does not respect the user's EDITOR/VISUAL and not every program supports the SUDO_EDITOR environment variables (f.ex. sudo crontab -e ).\n Change this behaviour permanently in /etc/sudoers? [Y/n]: " "y n" sudrs
+                reade -Q "YELLOW" -i "y" -p "Sudo by default does not respect the user's EDITOR/VISUAL and not every program supports the SUDO_EDITOR environment variables (f.ex. sudo crontab -e ).\n Change this behaviour permanently in /etc/sudoers? [Y/n]: " "n" sudrs
                 if test "$sudrs" == "y"; then
                     sudo sed -i '1s/^/Defaults env_keep += "VISUAL EDITOR"\n/' /etc/sudoers
                     echo "Added 'Defaults env_keep += \"VISUAL EDITOR\"' to /etc/sudoers"
