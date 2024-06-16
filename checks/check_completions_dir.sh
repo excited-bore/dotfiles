@@ -29,7 +29,7 @@ if ! sudo test -f /root/.bash_completion; then
         if ! test -f completions/.bash_completion; then
             sudo wget -P /root/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/completions/.bash_completion 
         else
-            sudo cp -fv completion/.bash_completion /root/
+            sudo cp -fv completions/.bash_completion /root/
         fi 
     fi
     if ! sudo test -d /root/.bash_completion.d/; then
