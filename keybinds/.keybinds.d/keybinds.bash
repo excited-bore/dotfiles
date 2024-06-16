@@ -96,11 +96,11 @@ bind -m vi-insert       '"\e[1;5C": vi-forward-bigword'
 function cd() {
     local push=1
     local j=0
-    if test "$1" = "--"; then
+    if test "$1" == "--"; then
         shift;
     fi 
     for i in $(dirs -l 2>/dev/null); do
-        if test "$(realpath ${@: -1:1})" == "$i"; then
+        if [[ -z "${@}" && "$i" == "$HOME" ]] || test "$(realpath ${@: -1:1})" == "$i"; then
             push=0
             pushd -n +$j &>/dev/null
         fi
@@ -113,28 +113,33 @@ function cd() {
 }
 complete -F _cd cd
 
+# Full path dirs
+alias dirs="dirs -l"
 
 #'Silent' clear
 if type starship &> /dev/null && (grep -q  '\\n' ~/.config/starship.toml || grep -q 'line_break' ~/.config/starship.toml || ! head -n 1 ~/.config/starship.toml | grep -q 'format' ); then
     alias _="tput cuu1 && tput cuu1 && tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null"
+    alias _.="tput cuu1 && tput cuu1 && tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i < $(dirs -v | wc -l) ; i++)); do tput cuu1; done && dirs -v | column -c $COLUMNS && tput rc && history -d -1 &>/dev/null"
 elif type starship &> /dev/null; then
     alias _="tput cuu1 && tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null"
+    alias _.="tput cuu1 && tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i <= $(dirs -v | wc -l) ; i++)); do tput cuu1; done && tput cuu1 && dirs -v | column -c $COLUMNS && tput rc && history -d -1 &>/dev/null"
 else
     alias _="tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null"
+    alias _.="tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i <= $(dirs -v | wc -l) ; i++)); do tput cuu1; done && tput cuu1 && dirs && tput rc && history -d -1 &>/dev/null"
 fi
 
 # 'dirs' builtins shows all directories in stack
 # Ctrl-Up arrow rotates over directory history
 bind -x '"\e277": pushd +1 &>/dev/null'
-bind -m emacs-standard '"\e[1;5A": "\C-e\C-u\e277 _\C-m"'
-bind -m vi-command     '"\e[1;5A": "i\C-e\C-u\e277 _\C-m"'
-bind -m vi-insert      '"\e[1;5A": "\C-e\C-u\e277 _\C-m"'
+bind -m emacs-standard '"\e[1;5A": "\C-e\C-u\e277 _.\C-m"'
+bind -m vi-command     '"\e[1;5A": "i\C-e\C-u\e277 _.\C-m"'
+bind -m vi-insert      '"\e[1;5A": "\C-e\C-u\e277 _.\C-m"'
 
 # Ctrl-Down -> Rotate between 2 last directories
-bind -x '"\e266": pushd &>/dev/null'
-bind -m emacs-standard '"\e[1;5B": "\C-e\C-u\e266 _\C-m"'
-bind -m vi-command     '"\e[1;5B": "i\C-e\C-u\e266 _\C-m"'
-bind -m vi-insert      '"\e[1;5B": "\C-e\C-u\e266 _\C-m"'
+bind -x '"\e266": pushd -1 &>/dev/null'
+bind -m emacs-standard '"\e[1;5B": "\C-e\C-u\e266 _.\C-m"'
+bind -m vi-command     '"\e[1;5B": "i\C-e\C-u\e266 _.\C-m"'
+bind -m vi-insert      '"\e[1;5B": "\C-e\C-u\e266 _.\C-m"'
 
 # Shift left/right to jump from words instead of chars
 bind -m emacs-standard  '"\e[1;2D": backward-word'
@@ -154,7 +159,7 @@ bind -m emacs-standard  '"\e[1;2A": "\C-e\C-u\e288"'
 bind -m vi-command      '"\e[1;2A": "i\C-e\C-u\e288"'
 bind -m vi-insert       '"\e[1;2A": "\C-e\C-u\e288"'
 
-# Shift up => cd shortcut
+# Shift down => cd shortcut
 bind -m emacs-standard  '"\e[1;2B": "\C-e\C-u\e288cd \C-i"'
 bind -m vi-insert       '"\e[1;2B": "\C-e\C-u\e288cd \C-i"'
 bind -m vi-command      '"\e[1;2B": "i\C-e\C-u\e288cd \C-i"'
@@ -349,3 +354,4 @@ if type bashtop &> /dev/null || type btop &> /dev/null || type bpytop &> /dev/nu
     bind -m vi-command     '"\e[17~": "\207\n\C-l"'
     bind -m vi-insert      '"\e[17~": "\207\n\C-l"'
 fi
+
