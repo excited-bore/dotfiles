@@ -345,7 +345,7 @@ Plugin 'folke/zen-mode.nvim'
 Plugin 'excited-bore/vim-tmux-kitty-navigator', { 'build' : 'mkdir -p ~/.config/kitty/ && cd ~/.vim/plugins/vim-tmux-kitty-navigator && cp -f ./pass_keys.py ~/.config/kitty/;'}
 
 " Codeium (Free Copilot AI Helper) 
-Plug 'Exafunction/codeium.vim', { 'branch': 'main' }
+Plugin 'Exafunction/codeium.vim', { 'branch': 'main' }
 
 " Normal file operations
 Plugin 'tpope/vim-eunuch'
@@ -798,9 +798,9 @@ endfunction
 
 function! CloseWindow()
     " https://stackoverflow.com/questions/7069927/in-vimscript-how-to-test-if-a-window-is-the-last-window
-    " if this window isn't the last on screen, just close pane
+    " if this window isn't the last on screen, just quit pane
     if winbufnr(2) != -1
-        close
+        quit
     " then we look at tabs
     elseif tabpagenr() != 1
         tabclose

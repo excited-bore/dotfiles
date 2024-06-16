@@ -5,7 +5,7 @@ if [ ! -d ~/.keybinds.d/ ]; then
 fi
 
 if ! grep -q ".keybinds" ~/.bashrc; then
-    printf "[ -f ~/.keybinds ] && source ~/.keybinds\n" >> ~/.bashrc 
+    printf "[ -f ~/.keybinds ] && source ~/.keybinds\n" >> ~/.bashrc &> /dev/null
 fi
 
 if ! sudo test -d /root/.keybinds.d/ ; then
@@ -13,7 +13,7 @@ if ! sudo test -d /root/.keybinds.d/ ; then
 fi
 
 if ! sudo grep -q ".keybinds" /root/.bashrc; then
-    sudo printf "[ -f ~/.keybinds ] && source ~/.keybinds\n" | sudo tee -a /root/.bashrc 
+    sudo printf "[ -f ~/.keybinds ] && source ~/.keybinds\n" | sudo tee -a /root/.bashrc &> /dev/null
 fi
 
 KEYBIND=~/.bashrc

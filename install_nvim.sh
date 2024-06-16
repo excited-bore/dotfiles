@@ -144,6 +144,13 @@ elif [  $distro_base == "Debian" ];then
                     fi
                     reade -Q "GREEN" -i "$pre" -p "$prompt" "$choices" nvmappmg
                     if [ "appimage" == "$nvmappmg" ]; then
+                        if ! type curl &> /dev/null; then
+                            if test $distro == "Manjaro" || test $distro == "Arch"; then
+                                sudo pacman -S curl
+                            elif test $distro_base == "Debian"; then
+                                sudo apt install curl
+                            fi
+                        fi
                         if ! type jq &> /dev/null; then
                             if test $distro == "Manjaro" || test $distro == "Arch"; then
                                 sudo pacman -S jq
@@ -304,6 +311,10 @@ if ! test -d vim/; then
     dir=$tmpdir/vim
 else
     dir=vim/.config/nvim 
+fi
+
+if ! grep -q "#Plugin 'Exafunction/codeium.vim'" "$dir/init.vim"; then
+    sed -i "s|Plugin 'Exafunction/codeium.vim'|#Plugin 'Exafunction/codeium.vim'|g" "$dir/init.vim" 
 fi
 
 function instvim_r(){
