@@ -814,6 +814,19 @@ if ! type nmap &> /dev/null; then
     unset tojump
 fi
 
+# Yt-dlp
+if ! type yt-dlp &> /dev/null; then
+    reade -Q "GREEN" -i "y" -p "Install yt-dlp? (youtube video downloader) [Y/n]: " "n" tojump
+    if [ "$tojump" == "y" ]; then
+        if ! test -f install_yt-dlp.sh; then
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_yt-dlp.sh)" 
+        else
+            ./install_yt-dlp.sh
+        fi
+    fi
+    unset tojump
+fi
+
 reade -Q "GREEN" -i "y" -p "Install bash aliases and other config? [Y/n]: " "n" scripts
 if [ -z $scripts ] || [ "y" == $scripts ]; then
 
@@ -878,7 +891,6 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     manjaro=aliases/.bash_aliases.d/manjaro.sh
     variti=aliases/.bash_aliases.d/variety.sh
     pthon=aliases/.bash_aliases.d/python.sh
-    ytbe=aliases/.bash_aliases.d/youtube.sh
     if ! test -d aliases/.bash_aliases.d/; then
         wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/update_system.sh 
         update_sysm=$TMPDIR/update_system.sh
@@ -898,8 +910,6 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         variti=$TMPDIR/variety.sh
         wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/python.sh 
         pthon=$TMPDIR/python.sh
-        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/youtube.sh 
-        ytbe=$TMPDIR/youtube.sh
     fi 
 
     update_sysm_r(){ 
@@ -987,19 +997,6 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     }
     yes_edit_no pthon "$pthon" "Install python.sh at ~/.bash_aliases.d/ (aliases for a python development)? " "edit" "GREEN" 
 
-
-    # Youtube
-    #
-
-    ytbe(){
-        if ! test -f checks/check_youtube.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_youtube.sh)" 
-        else
-            . ./checks/check_youtube.sh
-        fi
-        cp -fv $ytbe ~/.bash_aliases.d/
-    }
-    yes_edit_no ytbe "$ytbe" "Install yt-dlp (youtube cli download) and youtube.sh at ~/.bash_aliases.d/ (yt-dlp aliases)?" "yes" "GREEN"
 fi
 
 source ~/.bashrc
