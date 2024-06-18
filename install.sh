@@ -250,7 +250,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         sed -i 's|export VISUAL=.*|export VISUAL='"$vsual"'|g' $pathvr
         
         if grep -q "#export SUDO_EDITOR" $pathvr; then
-            reade -Q "GREEN" -i "y" -p "Set SUDO_EDITOR to \$EDITOR? [Y/n]: " "n" sud_edt
+            reade -Q "GREEN" -i "y" -p 'Set SUDO_EDITOR to $EDITOR? [Y/n]: ' "n" sud_edt
             if test "$sud_edt" == "y"; then
                 sed -i 's|#export SUDO_EDITOR.*|export SUDO_EDITOR=$EDITOR|g' $pathvr
             fi
@@ -398,7 +398,7 @@ fi
 #fi
 
 binds=keybinds/.inputrc
-binds1=keybinds/.keybinds.d/keybinds.bash
+binds1=keybinds/keybinds.bash
 binds2=keybinds/.keybinds
 if ! test -f keybinds/.inputrc; then
     wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.inputrc
@@ -406,7 +406,7 @@ if ! test -f keybinds/.inputrc; then
     wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds 
     
     binds=$TMPDIR/.inputrc
-    binds1=$TMPDIR/.keybinds.d/keybinds.bash
+    binds1=$TMPDIR/keybinds.bash
     binds2=$TMPDIR/.keybinds
 fi
 
@@ -417,7 +417,13 @@ shell-keybinds_r(){
     sudo cp -fv $binds1 /root/.keybinds.d/;
     sudo cp -fv $binds2 /root/.keybinds
     sudo cp -fv $binds /root/;
-
+    if sudo test -f /root/.bashrc && ! sudo grep -q '[ -f /root/.keybinds ]' /root/.bashrc; then
+         if grep -q '[ -f /root/.pathvariables.env ]' /root/.bashrc; then
+                sed -i 's|\(\[ -f \/root/.pathvariables.env \] \&\& source \/root/.pathvariables.env\)|\1\n\[ -f \/root/.keybinds \] \&\& source \/root/.keybinds\n|g' /root/.bashrc
+         else
+               printf '[ -f ~/.keybinds ] && source ~/.keybinds' | sudo tee -a /root/.bashrc &> /dev/null
+         fi
+    fi
     # X based settings is generally not for root and will throw errors 
     if sudo grep -q '^setxkbmap' /root/.keybinds.d/keybinds.bash; then
         sudo sed -i 's|setxkbmap|#setxkbmap|g' /root/.keybinds.d/keybinds.bash
@@ -446,6 +452,14 @@ shell-keybinds() {
     cp -fv $binds1 ~/.keybinds.d/
     cp -fv $binds2 ~/.keybinds 
     cp -fv $binds ~/
+    if test -f ~/.bashrc && ! grep -q '\[ -f ~/.keybinds \]' ~/.bashrc; then
+         if grep -q '\[ -f ~/.pathvariables.env \]' ~/.bashrc; then
+                sed -i 's|\(\[ -f \~/.pathvariables.env \] \&\& source \~/.pathvariables.env\)|\1\n\n\[ -f \~/.keybinds \] \&\& source \~/.keybinds\n|g' ~/.bashrc
+         else
+                echo '[ -f ~/.keybinds ] && source ~/.keybinds' >> ~/.bashrc
+         fi
+    fi
+    
     if [ -f ~/.pathvariables.env ]; then
        sed -i 's|#export INPUTRC.*|export INPUTRC=~/.inputrc|g' ~/.pathvariables.env
     fi
@@ -575,7 +589,7 @@ pre='y'
 othr='n'
 color='GREEN'
 prmpt='[Y/n]: '
-if type fzf &> /dev/null || ! type 'ripgrep-dir'; then
+if type fzf &> /dev/null && type rg &> /dev/null; then
     pre='n' 
     othr='y'
     color='YELLOW'
@@ -596,7 +610,7 @@ pre='y'
 othr='n'
 color='GREEN'
 prmpt='[Y/n]: '
-if type git &> /dev/null || ! test -f ~/.gitconfig; then
+if type git &> /dev/null && test -f ~/.gitconfig; then
     pre='n' 
     othr='y'
     color='YELLOW'
@@ -605,13 +619,36 @@ fi
 reade -Q "$color" -i "$pre" -p "Install Git and configure? (Project managing tool) $prmpt" "$othr" git_ins
 if [ "y" == "$git_ins" ]; then
     if ! test -f install_git.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_git.sh)" 
+        ins_git=$(mktemp)
+        wget -O $ins_git https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_git.sh   
+        chmod u+x "$ins_git"
+        eval "$ins_git" 'global'
     else
-        ./install_git.sh
+        ./install_git.sh 'global'
     fi
 fi
 unset pre color othr git_ins
 
+# Lazygit
+pre='y'
+othr='n'
+color='GREEN'
+prmpt='[Y/n]: '
+if type lazygit &> /dev/null; then
+    pre='n' 
+    othr='y'
+    color='YELLOW'
+    prmpt='[N/y]: '
+fi 
+reade -Q "$color" -i "$pre" -p "Install lazygit? $prmpt" "$othr" git_ins
+if [ "y" == "$git_ins" ]; then
+    if ! test -f install_lazygit.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_lazygit.sh)" 
+    elaylse
+        ./install_lazygit.sh
+    fi
+fi
+unset pre color othr git_ins
 
 # Osc
 #reade -Q "GREEN" -i "y" -p "Install Osc52 clipboard? (Universal clipboard tool / works natively over ssh) [Y/n]: " "y n" osc
@@ -727,7 +764,7 @@ fi
 
 # Starship
 if ! type starship &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Install Starship? (Snazzy looking prompt) [Y/n]: " "y n" strshp
+    reade -Q "GREEN" -i "y" -p "Install Starship? (Snazzy looking prompt) [Y/n]: " "n" strshp
     if [ $strshp == "y" ]; then
         if ! test -f install_starship.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_starship.sh)" 
@@ -740,7 +777,7 @@ fi
 
 # Srm (Secure remove)
 if ! type srm &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Install srm? (Secure remove) [Y/n]: " "y n" kittn
+    reade -Q "GREEN" -i "y" -p "Install srm? (Secure remove) [Y/n]: " "n" kittn
     if [ "y" == "$kittn" ]; then
         if ! test -f install_srm.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_srm.sh)" 
@@ -753,7 +790,7 @@ fi
 
 # Testdisk (File recovery tool)
 if ! type testdisk &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Install testdisk? (File recovery tool) [Y/n]: " "y n" kittn
+    reade -Q "GREEN" -i "y" -p "Install testdisk? (File recovery tool) [Y/n]: " "n" kittn
     if [ "y" == "$kittn" ]; then
         if ! test -f install_testdisk.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_testdisk.sh)" 
@@ -766,7 +803,7 @@ fi
 
 # Nmap
 if ! type nmap &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Install nmap? (Network port scanning tool) [Y/n]:" "y n" tojump
+    reade -Q "GREEN" -i "y" -p "Install nmap? (Network port scanning tool) [Y/n]: " "n" tojump
     if [ "$tojump" == "y" ]; then
         if ! test -f install_nmap.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nmap.sh)" 
