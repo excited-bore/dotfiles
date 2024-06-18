@@ -122,9 +122,7 @@ elif ! grep -q "export FZF_DEFAULT_COMMAND" $PATHVAR; then
     printf "\n# FZF\nexport FZF_DEFAULT_COMMAND=\"$fnd\"\nexport FZF_CTRL_T_COMMAND='$FZF_DEFAULT_COMMAND'" >> $PATHVAR
 fi
 
-echo "Next $(tput setaf 1)sudo$(tput sgr0) will FZF pathvariables in /root/.pathvariables.env' "
-
-
+echo "Next $(tput setaf 1)sudo$(tput sgr0) will update FZF pathvariables in /root/.pathvariables.env' "
 if [ $PATHVAR_R == /root/.pathvariables.env ] ; then
     sudo sed -i 's|#export FZF_DEFAULT_COMMAND|export FZF_DEFAULT_COMMAND |g' $PATHVAR_R
     sudo sed -i "s|export FZF_DEFAULT_COMMAND=.*|export FZF_DEFAULT_COMMAND=\"$fnd\"|g" $PATHVAR_R

@@ -345,7 +345,7 @@ Plugin 'folke/zen-mode.nvim'
 Plugin 'excited-bore/vim-tmux-kitty-navigator', { 'build' : 'mkdir -p ~/.config/kitty/ && cd ~/.vim/plugins/vim-tmux-kitty-navigator && cp -f ./pass_keys.py ~/.config/kitty/;'}
 
 " Codeium (Free Copilot AI Helper) 
-Plugin 'Exafunction/codeium.vim', { 'branch': 'main' }
+"Plugin 'Exafunction/codeium.vim', { 'branch': 'main' }
 
 " Normal file operations
 Plugin 'tpope/vim-eunuch'
@@ -640,9 +640,9 @@ autocmd TermEnter term://*toggleterm#*
 " By applying the mappings this way you can pass a count to your
 " mapping to open a specific window.
 " For example: 2<C-t> will open terminal 2
-nnoremap <silent><c-²> <Cmd>exe v:count1 . "ToggleTerm"<CR>
-inoremap <silent><c-²> <Esc><Cmd>exe v:count1 . "ToggleTerm"<CR>
-vnoremap <silent><c-²> <Esc><Cmd>exe v:count1 . "ToggleTerm"<CR>
+nnoremap <silent><c-`> <Cmd>exe v:count1 . "ToggleTerm"<CR>
+inoremap <silent><c-`> <Esc><Cmd>exe v:count1 . "ToggleTerm"<CR>
+vnoremap <silent><c-`> <Esc><Cmd>exe v:count1 . "ToggleTerm"<CR>
 tnoremap <silent><esc> <C-\><C-n>
 
 
