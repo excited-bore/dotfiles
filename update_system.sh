@@ -27,17 +27,13 @@ function update_system() {
 
     echo "This next $(tput setaf 1)sudo$(tput sgr0) will try to update the packages for your system using the package managers it knows";
 
-    if test "$distro" == "Raspbian"; then
-        sudo rpi-update
-        hdrs="linux-headers-$(uname -r)"
-        if test -z "sudo apt list --installed | grep $hdrs"; then
-            reade -Q "GREEN" -i "y" -p "Right linux headers not installed. Install $hdrs? [Y/n]: " "n" hdrs_ins
-            if [ "$hdrs_ins" == "y" ]; then
-                sudo apt install "$hdrs"
-            fi
+    if test "$packmang" == "apt"; then
+        pac=apt
+        if type nala &> /dev/null; then
+           pac=nala 
         fi
-    elif test "$packmang" == "apt"; then
-        sudo apt update
+        sudo "$pac" update
+        sudo "$pac" upgrade
         hdrs="linux-headers-$(uname -r)"
         if test -z "sudo apt list --installed | grep $hdrs"; then
             reade -Q "GREEN" -i "y" -p "Right linux headers not installed. Install $hdrs? [Y/n]: " "n" hdrs_ins
