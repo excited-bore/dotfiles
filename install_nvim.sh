@@ -345,7 +345,7 @@ if ! test -d vim/; then
     curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/download_git_directory.sh | tee "$tmpfile" &> /dev/null
     chmod u+x "$tmpfile"
     eval $tmpfile https://github.com/excited-bore/dotfiles/tree/main/vim/.config/nvim $tmpdir
-    dir=$tmpdir/vim
+    dir=$tmpdir/vim/.config/nvim
 else
     dir=vim/.config/nvim 
 fi

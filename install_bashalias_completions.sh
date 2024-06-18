@@ -18,7 +18,7 @@ else
 fi
 
 if [ ! -e ~/.bash_completion.d/complete_alias ]; then
-    curl https://raw.githubusercontent.com/cykerway/complete-alias/master/complete_alias > ~/.bash_completion.d/complete_alias &> /dev/null
+    curl https://raw.githubusercontent.com/cykerway/complete-alias/master/complete_alias 1> ~/.bash_completion.d/complete_alias
     if test -f ~/.bash_aliases; then
         if grep -q '!BASH_ALIASES' ~/.bash_aliases; then 
             sed -i 's|.*complete -F|complete -F|g' ~/.bash_aliases
