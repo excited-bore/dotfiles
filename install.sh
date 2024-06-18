@@ -619,9 +619,12 @@ fi
 reade -Q "$color" -i "$pre" -p "Install Git and configure? (Project managing tool) $prmpt" "$othr" git_ins
 if [ "y" == "$git_ins" ]; then
     if ! test -f install_git.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_git.sh)" 
+        ins_git=$(mktemp)
+        wget -O $ins_git https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_git.sh   
+        chmod u+x "$ins_git"
+        eval "$ins_git" 'global'
     else
-        ./install_git.sh
+        ./install_git.sh 'global'
     fi
 fi
 unset pre color othr git_ins
