@@ -32,7 +32,8 @@ else
     . ./checks/check_pathvar.sh
 fi
 
-if ! [ -x "$(command -v kitty)" ]; then
+
+if ! type kitty &> /dev/null; then
     if test "$distro" == "Arch" || test "$distro" == "Manjaro"; then
        sudo pacman -S kitty 
     elif test "$distro_base" == "Debian"; then    
@@ -44,28 +45,42 @@ if ! [ -x "$(command -v kitty)" ]; then
     fi
 fi
 
-reade -Q "GREEN" -i "y" -p "Install kitty conf? (at ~/.config/kitty/kitty.conf\|ssh.conf) [Y/n]:" "y n" kittn
+if ! test -d kitty/.config/kitty; then
+    tmpdir=$(mktemp -d -t kitty-XXXXXXXXXX)
+    tmpfile=$(mktemp)
+    curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/download_git_directory.sh | tee "$tmpfile" &> /dev/null
+    chmod u+x "$tmpfile"
+    eval $tmpfile https://github.com/excited-bore/dotfiles/tree/main/kitty/.config/kitty $tmpdir
+    wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/kitty/.bash_aliases.d/kitty.sh -P $tmpdir
+    dir=$tmpdir/kitty/.config/kitty
+    file=$tmpdir/kitty.sh
+else
+    dir=kitty/.config/kitty
+    file=kitty/.bash_aliases.d/kitty.sh
+fi
+
+reade -Q "GREEN" -i "y" -p "Install kitty conf? (at ~/.config/kitty/kitty.conf\|ssh.conf) [Y/n]:" "n" kittn
 if [ "y" == "$kittn" ]; then
     mkdir -p ~/.config/kitty
-    cp -bvf kitty/.config/kitty/kitty.conf ~/.config/kitty/kitty.conf
+    cp -bvf $dir/kitty.conf $dir/kitty.conf
     if [ -f ~/.config/kitty/kitty.conf~ ]; then
-        gio trash ~/.config/kitty/kitty.conf~
+        gio trash $dir/kitty.conf~
     fi
-    cp -vf kitty/.config/kitty/ssh.conf ~/.config/kitty/ssh.conf
+    cp -vf $dir/ssh.conf $dir/ssh.conf
     if [ -f ~/.config/kitty/ssh.conf~ ]; then
         gio trash ~/.config/kitty/ssh.conf~
     fi
 fi
 unset kittn
 
-reade -Q "GREEN" -i "y" -p "Install kitty aliases? (at ~/.bash_aliases.d/kitty.sh) [Y/n]:" "y n" kittn
+reade -Q "GREEN" -i "y" -p "Install kitty aliases? (at ~/.bash_aliases.d/kitty.sh) [Y/n]:" "n" kittn
 if [ "y" == "$kittn" ]; then
     if ! test -f checks/check_aliases_dir.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)" 
     else
         ./checks/check_aliases_dir.sh
     fi
-    cp -bvf kitty/.bash_aliases.d/kitty.sh ~/.bash_aliases.d/kitty.sh
+    cp -bvf $file ~/.bash_aliases.d/kitty.sh
     if [ -f ~/.bash_aliases.d/kitty.sh~ ]; then
         gio trash ~/.bash_aliases.d/kitty.sh~
     fi 
@@ -75,8 +90,8 @@ unset kittn
 
 # TODO: Get sed warnings gone
 if [ -f ~/.pathvariables.env ]; then
-    sed -i 's|^.\(export KITTY_PATH=~/.local/bin/:~/.local/kitty.app/bin/\)|\1|g' ~/.pathvariables.env 2> /dev/null;
-    sed -i 's|^.\(export PATH=$KITTY_PATH:$PATH\)|\1|g' ~/.pathvariables.env 2> /dev/null;
+    sed -i 's|^.\(export KITTY_PATH=~/.local/bin/:~/.local/kitty.app/bin/\)|\1|g' ~/.pathvariables.env;
+    sed -i 's|^.\(export PATH=$KITTY_PATH:$PATH\)|\1|g' ~/.pathvariables.env;
     #sed -i 's|^.\(if \[\[ \$SSH_TTY \]\] .*\)|\1|g' $PATHVAR
     #sed -i 's|^.\(export KITTY_PORT=.*\)|\1|g' $PATHVAR
     #sed -i 's|^.\(fi\)|\1|g' $PATHVAR

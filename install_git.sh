@@ -1261,11 +1261,15 @@ fi
     fi
 
     local global=""
-    reade -Q "CYAN" -i "y" -p "Set to configure git globally? [Y/n]: " "y n" gitglobal
-    if [ "y" == "$gitglobal" ]; then
-        global="--global"
+    if ! test -z "$1"; then
+        global="--$1"
+    else
+        reade -Q "CYAN" -i "y" -p "Set to configure git globally? [Y/n]: " "n" gitglobal
+        if [ "y" == "$gitglobal" ]; then
+            global="--global"
+        fi
+        unset gitglobal
     fi
-    unset gitglobal
     
     local name gitname
     local prename='n'
@@ -1730,4 +1734,4 @@ fi
 
     unset gitdiff diff gitmerge merge amt rslt gitcnf gitign
 }
-gitt
+gitt "$@"
