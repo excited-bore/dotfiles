@@ -398,7 +398,7 @@ fi
 #fi
 
 binds=keybinds/.inputrc
-binds1=keybinds/.keybinds.d/keybinds.bash
+binds1=keybinds/keybinds.bash
 binds2=keybinds/.keybinds
 if ! test -f keybinds/.inputrc; then
     wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.inputrc
