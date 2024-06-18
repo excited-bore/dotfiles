@@ -28,7 +28,7 @@ function update_system() {
     echo "This next $(tput setaf 1)sudo$(tput sgr0) will try to update the packages for your system using the package managers it knows";
 
     if test "$distro" == "Raspbian"; then
-        sudo rpi-update
+        sudo apt update
         hdrs="linux-headers-$(uname -r)"
         if test -z "sudo apt list --installed | grep $hdrs"; then
             reade -Q "GREEN" -i "y" -p "Right linux headers not installed. Install $hdrs? [Y/n]: " "n" hdrs_ins
