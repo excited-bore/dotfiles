@@ -118,6 +118,10 @@ if [ $PATHVAR == ~/.pathvariables.env ] ; then
     sed -i 's|#export FZF_CTRL_T_COMMAND|export FZF_CTRL_T_COMMAND|g' $PATHVAR
     sed -i 's|#export FZF_CTRL_R_OPTS|export FZF_CTRL_R_OPTS|g' $PATHVAR
     sed -i 's|#export FZF_BIND_TYPES|export FZF_BIND_TYPES|g' $PATHVAR
+    sed -i 's|#\[ type fd &> /dev/null; \]|\[ type fd &> /dev/null; \]|g' $PATHVAR
+    sed -i 's/#--bind/--bind/' $PATHVAR
+    sed -i 's/#--preview-window/--preview-window/' $PATHVAR
+    sed -i 's/#--color/--color/' $PATHVAR
 elif ! grep -q "export FZF_DEFAULT_COMMAND" $PATHVAR; then
     printf "\n# FZF\nexport FZF_DEFAULT_COMMAND=\"$fnd\"\nexport FZF_CTRL_T_COMMAND='$FZF_DEFAULT_COMMAND'" >> $PATHVAR
 fi
@@ -129,6 +133,10 @@ if [ $PATHVAR_R == /root/.pathvariables.env ] ; then
     sudo sed -i 's|#export FZF_CTRL_T_COMMAND|export FZF_CTRL_T_COMMAND|g' $PATHVAR_R
     sudo sed -i 's|#export FZF_CTRL_R_OPTS|export FZF_CTRL_R_OPTS|g' $PATHVAR_R
     sudo sed -i 's|#export FZF_BIND_TYPES|export FZF_BIND_TYPES|g' $PATHVAR_R
+    sudo sed -i 's|#\[ type fd &> /dev/null; \]|\[ type fd &> /dev/null; \]|g' $PATHVAR_R
+    sudo sed -i 's/--bind/#--bind/' $PATHVAR_R
+    sudo sed -i 's/--preview-window/#--preview-window/' $PATHVAR_R
+    sudo sed -i 's/--color/#--color/' $PATHVAR_R
 elif ! sudo grep -q "export FZF_DEFAULT_COMMAND" $PATHVAR_R; then
     printf "\n# FZF\nexport FZF_DEFAULT_COMMAND=\"$fnd\"\nexport FZF_CTRL_T_COMMAND='$FZF_DEFAULT_COMMAND'" | sudo tee -a $PATHVAR_R
 fi
