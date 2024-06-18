@@ -132,7 +132,10 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
     sed -i -e '/export/ s/^#*/#/' $pathvr
 
     #Comment out FZF stuff
-    sed -i 's/   --/#   --/' $pathvr
+    sed -i 's/--bind/#--bind/' $pathvr
+    sed -i 's/--preview-window/#--preview-window/' $pathvr
+    sed -i 's/--color/#--color/' $pathvr
+    sed -i 's|type fd &> /dev/null|#type fd &> /dev/null|g' $pathvr
 
     # Set tmpdir
     sed 's|#export TMPDIR|export TMPDIR|' -i $pathvr
