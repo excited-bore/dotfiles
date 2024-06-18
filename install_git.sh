@@ -1262,7 +1262,7 @@ fi
 
     local global=""
     if ! test -z "$1"; then
-        global="$1"
+        global="--$1"
     else
         reade -Q "CYAN" -i "y" -p "Set to configure git globally? [Y/n]: " "n" gitglobal
         if [ "y" == "$gitglobal" ]; then
