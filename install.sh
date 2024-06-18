@@ -452,9 +452,9 @@ shell-keybinds() {
     cp -fv $binds1 ~/.keybinds.d/
     cp -fv $binds2 ~/.keybinds 
     cp -fv $binds ~/
-    if test -f ~/.bashrc && ! grep -q '[ -f ~/.keybinds ]' ~/.bashrc; then
-         if grep -q '[ -f ~/.pathvariables.env ]' ~/.bashrc; then
-                sed -i 's|\(\[ -f \~/.pathvariables.env \] \&\& source \~/.pathvariables.env\)|\1\n\[ -f \~/.keybinds \] \&\& source \~/.keybinds\n|g' ~/.bashrc
+    if test -f ~/.bashrc && ! grep -q '\[ -f ~/.keybinds \]' ~/.bashrc; then
+         if grep -q '\[ -f ~/.pathvariables.env \]' ~/.bashrc; then
+                sed -i 's|\(\[ -f \~/.pathvariables.env \] \&\& source \~/.pathvariables.env\)|\1\n\n\[ -f \~/.keybinds \] \&\& source \~/.keybinds\n|g' ~/.bashrc
          else
                 echo '[ -f ~/.keybinds ] && source ~/.keybinds' >> ~/.bashrc
          fi
