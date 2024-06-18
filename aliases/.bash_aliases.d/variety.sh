@@ -3,9 +3,13 @@
 # Kdocker is a system tray app
 # thunderbird does not support trays on linux, which why we do this
 
-alias thunderbird="kdocker thunderbird"
+if type kdocker &> /dev/null && type thunderbird &> /dev/null; then
+    alias thunderbird="kdocker thunderbird"
+fi
 
-alias lazygit="copy-to run && lazygit"
+if type lazygit &> /dev/null && type copy-to &> /dev/null; then
+    alias lazygit="copy-to run && lazygit"
+fi
 
 alias mullvad-sessions="mullvad-exclude thunderbird; mullvad-exclude ferdium; mullvad connect"
 

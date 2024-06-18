@@ -184,7 +184,7 @@ function cp-trash(){
     fi
 }
 
-#alias cp="cp-trash -rv"
+##alias cp="cp-trash -rv"
 
 # mv (recursively native) verbose and only ask for interaction when overwriting newer files
 
@@ -247,7 +247,7 @@ function mv-trash(){
 } 
 
 
-#alias mv="mv-trash -v"
+##alias mv="mv-trash -v"
 
 # rm recursively and verbose
 
@@ -255,8 +255,8 @@ alias rm="rm -rv"
 shred_iterates=3
 alias rm-shred="shred -vzn $shred_iterates -u"
 #alias remove="rm"
-alias rmAll="rm -v ./*";
-alias rmAllHiddn="rm -v .[!.]* *";
+alias rm-all-folder="rm -rv ./*";
+alias rm-all-hidden="rm -rv .[!.]* *";
 
 #alias rm="gio trash"
 
@@ -270,7 +270,7 @@ alias egrep='egrep --colour=always'
 alias fgrep='fgrep --colour=always'
 alias rg='rg --color=always'
 
-##alias cat="bat"
+#alias cat="bat"
 
 # Listen hidden files and permissions
 alias lsall="ls -Al"

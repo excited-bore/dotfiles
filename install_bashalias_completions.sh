@@ -24,7 +24,7 @@ if [ ! -e ~/.bash_completion.d/complete_alias ]; then
     #else
     #    echo 'complete -F _complete_alias "${!BASH_ALIASES[@]}"' >> ~/.bashrc
     #fi
-    echo 'complete -F _complete_alias "${!BASH_ALIASES[@]}"' >> ~/.bashrc
+    #echo 'complete -F _complete_alias "${!BASH_ALIASES[@]}"' >> ~/.bashrc
 fi
 
 reade -Q "YELLOW" -i "y" -p "Install bash completions for aliases in /root/.bash_completion.d? [Y/n]: " "n" rcompl
@@ -40,5 +40,5 @@ if [ -z $rcompl ] || [ "y" == $rcompl ]; then
     #else
     #    printf "complete -F _complete_alias \"\${!BASH_ALIASES[@]}\"\n" | sudo tee -a /root/.bashrc > /dev/null
     #fi
-    printf "complete -F _complete_alias \"\${!BASH_ALIASES[@]}\"\n" | sudo tee -a /root/.bashrc > /dev/null
+    #printf "complete -F _complete_alias \"\${!BASH_ALIASES[@]}\"\n" | sudo tee -a /root/.bashrc > /dev/null
 fi
