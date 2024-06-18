@@ -345,7 +345,7 @@ Plugin 'folke/zen-mode.nvim'
 Plugin 'excited-bore/vim-tmux-kitty-navigator', { 'build' : 'mkdir -p ~/.config/kitty/ && cd ~/.vim/plugins/vim-tmux-kitty-navigator && cp -f ./pass_keys.py ~/.config/kitty/;'}
 
 " Codeium (Free Copilot AI Helper) 
-Plugin 'Exafunction/codeium.vim', { 'branch': 'main' }
+"Plugin 'Exafunction/codeium.vim', { 'branch': 'main' }
 
 " Normal file operations
 Plugin 'tpope/vim-eunuch'

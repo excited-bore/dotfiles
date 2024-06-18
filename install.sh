@@ -250,7 +250,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         sed -i 's|export VISUAL=.*|export VISUAL='"$vsual"'|g' $pathvr
         
         if grep -q "#export SUDO_EDITOR" $pathvr; then
-            reade -Q "GREEN" -i "y" -p "Set SUDO_EDITOR to \\$EDITOR? [Y/n]: " "n" sud_edt
+            reade -Q "GREEN" -i "y" -p "Set SUDO_EDITOR to \$EDITOR? [Y/n]: " "n" sud_edt
             if test "$sud_edt" == "y"; then
                 sed -i 's|#export SUDO_EDITOR.*|export SUDO_EDITOR=$EDITOR|g' $pathvr
             fi
@@ -575,7 +575,7 @@ pre='y'
 othr='n'
 color='GREEN'
 prmpt='[Y/n]: '
-if type fzf &> /dev/null; then
+if type fzf &> /dev/null || ! type 'ripgrep-dir'; then
     pre='n' 
     othr='y'
     color='YELLOW'
@@ -596,7 +596,7 @@ pre='y'
 othr='n'
 color='GREEN'
 prmpt='[Y/n]: '
-if type git &> /dev/null; then
+if type git &> /dev/null || ! test -f ~/.gitconfig; then
     pre='n' 
     othr='y'
     color='YELLOW'
