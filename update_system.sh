@@ -5,7 +5,8 @@ if ! type reade &> /dev/null; then
         . ./aliases/.bash_aliases.d/rlwrap_scripts.sh
     fi
 fi
-if test -z $distro; then 
+
+if test -z "$distro"; then 
     if ! test -f checks/check_system.sh; then
          eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
     else
@@ -26,7 +27,7 @@ function update_system() {
 
     echo "This next $(tput setaf 1)sudo$(tput sgr0) will try to update the packages for your system using the package managers it knows";
 
-    if test $distro == "Raspbian"; then
+    if test "$distro" == "Raspbian"; then
         sudo rpi-update
         hdrs="linux-headers-$(uname -r)"
         if test -z "sudo apt list --installed | grep $hdrs"; then
@@ -35,7 +36,7 @@ function update_system() {
                 sudo apt install "$hdrs"
             fi
         fi
-    elif test $packmang == "apt"; then
+    elif test "$packmang" == "apt"; then
         sudo apt update
         hdrs="linux-headers-$(uname -r)"
         if test -z "sudo apt list --installed | grep $hdrs"; then
@@ -44,9 +45,9 @@ function update_system() {
                 sudo apt install "$hdrs"
             fi
         fi
-    elif test $packmang == "apk"; then
+    elif test "$packmang" == "apk"; then
         apk update
-    elif test $packmang == "pacman"; then
+    elif test "$packmang" == "pacman"; then
         sudo pacman -Syu
         if ! test -z "$AUR_helper" && ! test -z "$AUR_update"; then
             eval "$AUR_update"
@@ -59,15 +60,15 @@ function update_system() {
                 sudo pacman -S "$hdrs"
             fi
         fi
-    elif test $distro == "Gentoo"; then
+    elif test "$distro" == "Gentoo"; then
         #TODO Add update cycle for Gentoo systems
         continue
     # https://en.opensuse.org/System_Updates
-    elif test $packmang == "zypper_leap"; then
+    elif test "$packmang" == "zypper_leap"; then
         sudo zypper up
-    elif test $packmang == "zypper_tumble"; then
+    elif test "$packmang" == "zypper_tumble"; then
         sudo zypper dup
-    elif test $packmang == "yum"; then
+    elif test "$packmang" == "yum"; then
         yum update
     fi
     
