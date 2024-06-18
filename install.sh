@@ -695,41 +695,47 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/general.sh 
         genr=$TMPDIR/general.sh
     fi
-
-    general_r(){ 
-        if ! test -f checks/check_aliases_dir.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)" 
-        else
-            ./checks/check_aliases_dir.sh
-        fi
-        sudo cp -fv $genr /root/.bash_aliases.d/;
-    }
-    general(){
+    
+    reade -Q "GREEN" -i "y" -p "Install general.sh at ~/? (aliases related to general actions - cd/mv/cp/rm + completion script replacement for 'read -e') [Y/n]: " "n" ansr         
+    
+    if test $ansr == "y"; then
         if test -f ~/.pathvariables.env; then
             sed -i 's|^export TRASH_BIN_LIMIT=|export TRASH_BIN_LIMIT=|g' ~/.pathvariables.env
         fi
-        local ansr
         reade -Q "GREEN" -i "y" -p "Set cp/mv (when overwriting) to backup files? (will also trash backups) [Y/n]: " "n" ansr         
         if [ "$ansr" != "y" ]; then
-            sed -i 's|alias cp="cp-trash -rv"|#alias cp="cp-trash -rv"|g' $genr
-            sed -i 's|alias mv="mv-trash -v"|#alias mv="mv-trash -v"|g' $genr
+            sed -i 's|^alias cp="cp-trash -rv"|#alias cp="cp-trash -rv"|g' $genr
+            sed -i 's|^alias mv="mv-trash -v"|#alias mv="mv-trash -v"|g' $genr
+        else
+            sed -i 's|.*alias cp="cp-trash -rv"|alias cp="cp-trash -rv"|g' $genr
+            sed -i 's|.*alias mv="mv-trash -v"|alias mv="mv-trash -v"|g' $genr
         fi
         unset ansr
         reade -Q "YELLOW" -i "n" -p "Set 'gio trash' alias for rm? [N/y]: " "y" ansr 
         if [ "$ansr" != "y" ]; then
-            sed -i 's|alias rm="trash"|#alias rm="trash"|g' $genr
+            sed -i 's|^alias rm="gio trash"|#alias rm="gio trash"|g' $genr
+        else
+            sed -i 's|.*alias rm="gio trash"|alias rm="gio trash"|g' $genr
         fi
         if type bat &> /dev/null; then
             reade -Q "YELLOW" -i "n" -p "Set 'cat' as alias for 'bat'? [N/y]: " "y" cat
             if [ "$cat" != "y" ]; then
                 sed -i 's|^alias cat="bat"|#alias cat="bat"|g' $genr
+            else
+                sed -i 's|.*alias cat="bat"|alias cat="bat"|g' $genr
             fi
         fi
         unset cat
-        cp -fv $genr ~/.bash_aliases.d/
-        yes_edit_no general_r "$genr" "Install general.sh at /root/?" "yes" "GREEN"; }
-    yes_edit_no general "$genr" "Install general.sh at ~/? (aliases related to general actions - cd/mv/cp/rm + completion script replacement for 'read -e') " "yes" "YELLOW"
-    
+
+        general_r(){ 
+            sudo cp -fv $genr /root/.bash_aliases.d/;
+        }
+        general(){
+            cp -fv $genr ~/.bash_aliases.d/
+            yes_edit_no general_r "$genr" "Install general.sh at /root/?" "yes" "GREEN"; }
+        yes_edit_no general "$genr" "Install general.sh at ~/?" "edit" "GREEN"
+    fi
+
     update_sysm=update_system.sh
     systemd=aliases/.bash_aliases.d/systemctl.sh
     dosu=aliases/.bash_aliases.d/sudo.sh
@@ -770,7 +776,8 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     update_sysm(){
         cp -fv $update_sysm ~/.bash_aliases.d/
         sed -i '/SYSTEM_UPDATED="TRUE"/d' ~/.bash_aliases.d/update_system.sh
-        yes_edit_no update_sysm_r "$update_sysm" "Install update_system.sh at /root/?" "yes" "GREEN"; }
+        yes_edit_no update_sysm_r "$update_sysm" "Install update_system.sh at /root/?" "yes" "GREEN";
+    }
     yes_edit_no update_sysm "$update_sysm" "Install update_system.sh at ~/.bash_aliases.d/? (Global system update function)?" "edit" "GREEN"
 
     systemd_r(){ 
