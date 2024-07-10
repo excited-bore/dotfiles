@@ -18,7 +18,7 @@ fi
 # cp recursively, verbose ()
 # cpOld same but no files older are overwritten
 alias cp="cp -rv"
-alias cpOld="cp -ruv"
+alias cp-old="cp -ruv"
 alias copy="cp"
 
 function cpAllto(){
@@ -273,7 +273,8 @@ alias rg='rg --color=always'
 #alias cat="bat"
 
 # Listen hidden files and permissions
-alias lsall="ls -Al"
+alias ll="ls -ahl"
+alias ls-all="ls -Ahl"
 alias q="exit"
 alias d="dirs"
 alias c="cd"
@@ -466,3 +467,6 @@ function iommu-groups(){
         done;
     done;
 }
+
+alias regenerate-initrams-all-kernels="sudo mkinitcpio -P"
+alias list-drivers-modules-in-use="lspci -nnk"

@@ -119,13 +119,13 @@ alias dirs="dirs -l"
 #'Silent' clear
 if type starship &> /dev/null && (grep -q  '\\n' ~/.config/starship.toml || grep -q 'line_break' ~/.config/starship.toml || ! head -n 1 ~/.config/starship.toml | grep -q 'format' ); then
     alias _="tput cuu1 && tput cuu1 && tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null"
-    alias _.="tput cuu1 && tput cuu1 && tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i < $(dirs -v | wc -l) ; i++)); do tput cuu1; done && dirs -v | column -c $COLUMNS && tput rc && history -d -1 &>/dev/null"
+    alias _.="tput cuu1 && tput cuu1 && tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i < $(dirs -v | column -c $COLUMNS | wc -l) ; i++)); do tput cuu1; done && dirs -v | column -c $COLUMNS && history -d -1 &>/dev/null"
 elif type starship &> /dev/null; then
     alias _="tput cuu1 && tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null"
-    alias _.="tput cuu1 && tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i <= $(dirs -v | wc -l) ; i++)); do tput cuu1; done && tput cuu1 && dirs -v | column -c $COLUMNS && tput rc && history -d -1 &>/dev/null"
+    alias _.="tput cuu1 && tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i <= $(dirs -v | column -c $COLUMNS | wc -l) ; i++)); do tput cuu1; done && tput cuu1 && dirs -v | column -c $COLUMNS && tput rc && history -d -1 &>/dev/null"
 else
     alias _="tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null"
-    alias _.="tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i <= $(dirs -v | wc -l) ; i++)); do tput cuu1; done && tput cuu1 && dirs && tput rc && history -d -1 &>/dev/null"
+    alias _.="tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i <= $(dirs -v | column -c $COLUMNS | wc -l) ; i++)); do tput cuu1; done && tput cuu1 && dirs && tput rc && history -d -1 &>/dev/null"
 fi
 
 # 'dirs' builtins shows all directories in stack
@@ -212,9 +212,9 @@ bind -m vi-command     -x '"\C-q": exit'
 bind -m vi-insert      -x '"\C-q": exit'
 
 # Undo to Ctrl+a (unbound in tty) instead of only on Ctrl+_
-bind -m emacs-standard  '"\C-a": vi-undo'
-bind -m vi-command      '"\C-a": vi-undo'
-bind -m vi-insert       '"\C-a": vi-undo'
+#bind -m emacs-standard  '"\C-z": vi-undo'
+#bind -m vi-command      '"\C-z": vi-undo'
+#bind -m vi-insert       '"\C-z": vi-undo'
 
 # Ctrl-backspace deletes (kills) line backward
 bind -m emacs-standard  '"\C-h": backward-kill-word'
@@ -353,5 +353,21 @@ if type bashtop &> /dev/null || type btop &> /dev/null || type bpytop &> /dev/nu
     bind -m emacs-standard '"\e[17~": "\207\n\C-l"'
     bind -m vi-command     '"\e[17~": "\207\n\C-l"'
     bind -m vi-insert      '"\e[17~": "\207\n\C-l"'
+fi
+
+# F7 - Bashtop (Better top/htop)
+if type neofetch &> /dev/null || type fastfetch &> /dev/null || type screenfetch &> /dev/null; then
+    if type neofetch &> /dev/null; then
+        bind -x '"\208": stty sane && neofetch'
+    fi
+    if type fastfetch &> /dev/null; then
+        bind -x '"\208": stty sane && fastfetch'
+    fi
+    if type screenfetch &> /dev/null; then
+        bind -x '"\208": stty sane && screenfetch'
+    fi
+    bind -m emacs-standard '"\e[18~": "\208\n"'
+    bind -m vi-command     '"\e[18~": "\208\n"'
+    bind -m vi-insert      '"\e[18~": "\208\n"'
 fi
 

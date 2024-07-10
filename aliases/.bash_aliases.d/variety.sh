@@ -1,5 +1,11 @@
 # !/bin/bash
-#
+
+if [ ! -f ~/.bash_aliases.d/rlwrap_scripts.sh ]; then
+    . ../aliases/rlwrap_scripts.sh
+else
+    . ~/.bash_aliases.d/rlwrap_scripts.sh
+fi 
+
 # Kdocker is a system tray app
 # thunderbird does not support trays on linux, which why we do this
 
@@ -11,17 +17,32 @@ if type lazygit &> /dev/null && type copy-to &> /dev/null; then
     alias lazygit="copy-to run && lazygit"
 fi
 
-alias mullvad-sessions="mullvad-exclude thunderbird; mullvad-exclude ferdium; mullvad connect"
+#alias mullvad-sessions="mullvad-exclude thunderbird; mullvad-exclude ferdium; mullvad connect"
 
-function rg-search-and-replace() {
-    if test -z "$1" || test -z "$2"; then
-        echo "rg-search-and-replace needs 2 arguments: "
-        echo "  - the pattern to search for"
-        echo "  - the replacement"
-        return 1
-    fi
-    rg "$1" --color=never --files-with-matches | xargs sed -i "s/$1/$2/g"
-}
+# Mullvad
+if type fzf &> /dev/null && type mullvad &> /dev/null; then
+    function mullvad-sessions(){
+        mullvad disconnect
+        ssns="$(printf "mullvad-exclude firefox &\nmullvad-exclude thunderbird &\nmullvad-exclude ferdium &\nmullvad-exclude steam &\n" | fzf --multi)"
+        if ! test -z "$(echo "$ssns" | grep -q 'firefox')" && ! test -z "$(ps -aux | grep firefox | awk '{print $2}')"; then
+            pkill -f firefox
+        fi
+        mullvad connect && (eval "$ssns" &> /dev/null) 
+    }
+fi
+
+# rg stuff
+if type rg &> /dev/null; then
+    function rg-search-and-replace() {
+        if test -z "$1" || test -z "$2"; then
+            echo "rg-search-and-replace needs 2 arguments: "
+            echo "  - the pattern to search for"
+            echo "  - the replacement"
+            return 1
+        fi
+        rg "$1" --color=never --files-with-matches | xargs sed -i "s/$1/$2/g"
+    }
+fi
 
 #function ptrace_toggle() {
 #    echo "Has ptrace currently elevated priviliges: $PTRACE_ELEVATED_PRIVILIGE";
@@ -37,7 +58,16 @@ function rg-search-and-replace() {
 #    doas echo $PTRACE_ELEVATED_PRIVILIGE > /proc/sys/kernel/yama/ptrace_scope;   
 #}
 
-alias mp4tomp3="ffmpeg -i \".mp4\" -vn -acodec libmp3lame -ac 2 -ab 160k -ar 48000 \".mp3\""
+
+if type ffmpeg &> /dev/null; then
+    function videotomp3(){
+        reade -Q "GREEN" -i "n" -p "Delete after conversion? [N/y]: " "y" del
+        for var in "$@"
+        do
+            ffmpeg -i "$var" -vn -acodec libmp3lame -ac 2 -ab 160k -ar 48000 "${var%.*}.mp3" && test "$del" == 'y' && test -f "$var" && rm -v "$var" 
+        done
+    }
+fi
 
 vlc_folder(){
     if [ -d $1 ]; then
