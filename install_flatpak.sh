@@ -29,17 +29,19 @@ if test -z $SYSTEM_UPDATED; then
     fi
 fi
 
-if test "$distro" == "Manjaro"; then
-    pamac install flatpak libpamac-flatpak-plugin python
-elif test "$distro" == "Arch"; then
-    sudo pacman -S flatpak python
-elif test "$distro_base" == "Debian"; then
-    if "$XDG_CURRENT_DESKTOP" == "GNOME"; then
-        sudo apt install gnome-software-plugin-flatpak gir1.2-xdpgtk* gir1.2-flatpak* python3 
-    else 
-        sudo apt install flatpak python3 gir1.2-xdpgtk* gir1.2-flatpak*
+if ! type flatpak &> /dev/null; then
+    if test "$distro" == "Manjaro"; then
+        pamac install flatpak libpamac-flatpak-plugin python
+    elif test "$distro" == "Arch"; then
+        sudo pacman -S flatpak python
+    elif test "$distro_base" == "Debian"; then
+        if "$XDG_CURRENT_DESKTOP" == "GNOME"; then
+            sudo apt install gnome-software-plugin-flatpak gir1.2-xdpgtk* gir1.2-flatpak* python3 
+        else 
+            sudo apt install flatpak python3 gir1.2-xdpgtk* gir1.2-flatpak*
+        fi
+        flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
     fi
-    flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 fi
 
 if type flatpak &> /dev/null; then
@@ -104,18 +106,22 @@ if [ -z $pam ] || [ "y" == $pam ]; then
 fi
 unset pam
 
-reade -Q "GREEN" -i "y" -p "Install GUI for configuring flatpak permissions - flatseal? [Y/n]: " "n" fltseal
-if [ -z $fltseal ] || [ "y" == $fltseal ]; then
-    flatpak install flatseal
+if echo $(flatpak list) | grep -q "Flatseal"; then
+    reade -Q "GREEN" -i "y" -p "Install GUI for configuring flatpak permissions - flatseal? [Y/n]: " "n" fltseal
+    if [ -z $fltseal ] || [ "y" == $fltseal ]; then
+        flatpak install flatseal
+    fi
 fi
 unset fltseal
 
-reade -Q "GREEN" -i "y" -p "Run installer for no password with pam? [Y/n]: " "n" pam
-if [ -z $pam ] || [ "y" == $pam ]; then
-    if ! test -f install_polkit_wheel.sh; then
-         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_polkit_wheel.sh)" 
-    else
-        ./install_polkit_wheel.sh
+if ! test -f /etc/polkit-1/localauthority/50-local.d/90-nopasswd_global.pkla; then
+    reade -Q "GREEN" -i "y" -p "Run installer for no password with pam? [Y/n]: " "n" pam
+    if [ -z $pam ] || [ "y" == $pam ]; then
+        if ! test -f install_polkit_wheel.sh; then
+             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_polkit_wheel.sh)" 
+        else
+            ./install_polkit_wheel.sh
+        fi
     fi
 fi
 unset pam
