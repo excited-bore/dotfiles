@@ -68,18 +68,18 @@ fi
 unset sym1 sym2 sym3 beep
 
 
-if ! type flatpak &> /dev/null; then
-    printf "%s\n" "${blue}No flatpak detected. (Independent package manager from Red Hat)${normal}"
-    reade -Q "GREEN" -i "y" -p "Install? [Y/n]: " "n" insflpk 
-    if [ "y" == "$insflpk" ]; then
+#if ! type flatpak &> /dev/null; then
+    #printf "%s\n" "${blue}No flatpak detected. (Independent package manager from Red Hat)${normal}"
+    #reade -Q "GREEN" -i "y" -p "Install? [Y/n]: " "n" insflpk 
+    #if [ "y" == "$insflpk" ]; then
         if ! test -f install_flatpak.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_flatpak.sh)" 
         else
             ./install_flatpak.sh 
         fi 
-    fi
-fi
-unset insflpk
+    #fi
+#fi
+#unset insflpk
 
 if ! type snap &> /dev/null; then
     printf "%s\n" "${blue}No snap detected. (Independent package manager from Canonical)${normal}"
