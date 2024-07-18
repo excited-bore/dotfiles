@@ -41,9 +41,9 @@ if type yt-dlp &> /dev/null || type youtube-dl &> /dev/null; then
         fi
         if [ ! -z "$1" ]; then    
             if [ ! -z "$2" ]; then
-                "$yt_dl" -c -i -R 20 -x "$aud_format" --write-sub --yes-playlist "$1" $start $end;
+                "$yt_dl" -c -i -R 20 -x $aud_format --write-sub --yes-playlist "$1" $start $end;
             else 
-                "$yt_dl" -c -i -R 20 -x "$aud_format" --write-sub --yes-playlist "$1" $start $end;
+                "$yt_dl" -c -i -R 20 -x $aud_format --write-sub --yes-playlist "$1" $start $end;
             fi
         else
             echo "Give up a url, big guy. Know you can do it xoxox" ;
@@ -90,9 +90,9 @@ if type yt-dlp &> /dev/null || type youtube-dl &> /dev/null; then
                 aud_format=" --audio-format $format"
             fi
             if test "$plst_dir" == "y"; then
-                "$yt_dl" -c -i -R 20 -o "%(playlist)s/%(playlist_index)s - %(title)s.%(ext)s" -x "$aud_format" --write-sub --yes-playlist "$1" "$start" "$end";
+                "$yt_dl" -c -i -R 20 -o "%(playlist)s/%(playlist_index)s - %(title)s.%(ext)s" -x $aud_format --write-sub --yes-playlist "$1" "$start" "$end";
             else
-                "$yt_dl" -c -i -R 20 -o "%(playlist_index)s - %(title)s.%(ext)s" -x "$aud_format" --write-sub --yes-playlist "$1" "$start" "$end";
+                "$yt_dl" -c -i -R 20 -o "%(playlist_index)s - %(title)s.%(ext)s" -x $aud_format --write-sub --yes-playlist "$1" "$start" "$end";
             fi
         else
             echo "Give up a url, big guy. Know you can do it xoxox" ;
@@ -114,7 +114,7 @@ if type yt-dlp &> /dev/null || type youtube-dl &> /dev/null; then
                 "$yt_dl" -c -i -R 20 -o "%(playlist)s\%(playlist_index)s - %(title)s.%(ext)s" --write-sub --yes-playlist "$1" "$start" "$end" ; 
             else
                 (cd "$plst_name"
-                "$yt_dl" -c -i -R 20 -o "%(playlist_index)s - %(title)s.%(ext)s" -x "$aud_format" --write-sub --yes-playlist "$1" "$start" "$end")
+                "$yt_dl" -c -i -R 20 -o "%(playlist_index)s - %(title)s.%(ext)s" -x $aud_format --write-sub --yes-playlist "$1" "$start" "$end")
             fi
             
         else
@@ -142,7 +142,7 @@ if type yt-dlp &> /dev/null || type youtube-dl &> /dev/null; then
         else
             mkdir "$2";
             (cd "$2"    
-            "$yt_dl" -c -i -R 20 -o "%(playlist_index)s - %(title)s.%(ext)s" -x "$aud_format" --write-sub --yes-playlist "$1" "$start" "$end";
+            "$yt_dl" -c -i -R 20 -o "%(playlist_index)s - %(title)s.%(ext)s" -x $aud_format --write-sub --yes-playlist "$1" "$start" "$end";
             )
         fi
     }
