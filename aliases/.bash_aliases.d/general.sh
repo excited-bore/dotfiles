@@ -21,7 +21,7 @@ alias cp="cp -rv"
 alias cp-old="cp -ruv"
 alias copy="cp"
 
-function cpAllto(){
+function cp-all-to(){
     local dest
     if [ -z "$1" ] && [ -d "$1" ]; then
         dest="$1"
@@ -33,7 +33,7 @@ function cpAllto(){
     fi
 }
 
-complete -F _filedir cpAllTo
+complete -F _filedir cp-all-to
 
 alias cpf-bckup="cp -f -b"
 
