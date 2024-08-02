@@ -401,7 +401,7 @@ fi
 #fi
 
 binds=keybinds/.inputrc
-binds1=keybinds/keybinds.bash
+binds1=keybinds/.keybinds.d/keybinds.bash
 binds2=keybinds/.keybinds
 if ! test -f keybinds/.inputrc; then
     wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.inputrc
@@ -440,7 +440,7 @@ shell-keybinds() {
         . ./checks/check_keybinds.sh
     fi
     
-    reade -Q "GREEN" -i "y" -p "Enable vi-mode instead of emacs mode (might cause issues with pasteing - revert with 'Ctrl-z')? [Y/n]: " "n" vimde
+    reade -Q "GREEN" -i "y" -p "Enable vi-mode instead of emacs mode (might cause issues with pasteing)? [Y/n]: " "n" vimde
     if [ "$vimde" == "y" ]; then
         sed -i "s|.set editing-mode .*|set editing-mode vi|g" $binds
     fi
