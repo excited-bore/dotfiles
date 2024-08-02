@@ -4,6 +4,7 @@
 " Set 'nocompatible' to ward off unexpected things that your distro might
 " have made, as well as sanely reset options when re-sourcing .vimrc
 
+
 "If you set scrollof to a very large value (999) the cursor line will always be at the middle
 " set scrolloff=999
 
@@ -35,6 +36,8 @@ set guioptions=aAimrLT
 " Set shell and shell cmd flags (-l/--login, -i/--interactive - WARNING: Might break config)
 "set shell=/bin/bash    
 "set shellcmdflag=-i
+
+
 
 "------------------------------------------------------------
 
@@ -134,8 +137,8 @@ set cmdheight=2
 " Display line numbers on the left
 set number
 
-"Always wrap long lines
-set wrap
+"Always wrap long lines and scroll line by line when wrapped
+set wrap smoothscroll
 
 " Quickly time out on keycodes, but never time out on mappings
 set ttimeout ttimeoutlen=200
@@ -273,7 +276,7 @@ let g:coc_global_extensions = [
             \'coc-clangd',
             \'coc-clang-format-style-options',
             \'coc-cmake',
-            \'coc-python',
+            \'coc-pyright', 
             \'coc-sh',
             \'coc-fzf-preview',
             \'coc-git',
@@ -281,6 +284,9 @@ let g:coc_global_extensions = [
             \'coc-webview',
             \'coc-markdownlint'
             \]
+            " from coc-python https://github.com/neoclide/coc-python?tab=readme-ov-file
+            " WARNING: it's recommended to use coc-pyright if you're using python3 or use coc-jedi if you're using jedi, the code of coc-python is too hard to maintain!'
+            "\'coc-python',
             "\'coc-markdown-preview-enhanced',
 
 " Copilot
@@ -387,12 +393,16 @@ Plugin 'vim-airline/vim-airline'
 " Gives tabs a nice layout as well
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#coc#show_coc_status = 1
+let g:airline_exclude_filetypes = ['nerdtree']
 
 " Vim lua plugin
 " Plugin 'svermeulen/vimpeccable'
 
+
 "" All of your Plugins must be added before the following line
 if !has('nvim')
+    " Codeium (Free Copilot AI Helper) 
+    "Plugin 'Exafunction/codeium.vim', { 'branch': 'main' }
     call plug#end()
 else
     source $HOME/.config/nvim/init.lua.vim
@@ -411,7 +421,7 @@ lua require("toggleterm").setup()
 lua require('glow').setup()
 
 " this is pseudo code
-let statusline = '%{&ft == "toggleterm" ? "terminal (".b:toggle_number.")" : ""}'
+"let statusline = '%{&ft == "toggleterm" ? "terminal (".b:toggle_number.")" : ""}'
 
 " Show lines per file
 let g:NERDTreeFileLines = 1
