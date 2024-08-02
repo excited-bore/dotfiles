@@ -66,7 +66,7 @@ fi
 fnd="find"
 
 # TODO: Make better check: https://github.com/sharkdp/fd
-if type fd-find &> /dev/null || type fd &> /dev/null; then
+if ! type fd-find &> /dev/null && ! type fd &> /dev/null; then
     reade -Q "GREEN" -i "y" -p "Install fd and use for fzf? (Faster find) [Y/n]: " "y n" fdr
      if [ -z $fdr ] || [ "Y" == $fdr ] || [ $fdr == "y" ]; then
         if ! test -f install_fd.sh; then
