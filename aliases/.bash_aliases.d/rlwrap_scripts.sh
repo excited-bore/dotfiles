@@ -70,6 +70,7 @@ reade(){
                 S)  ;;
             esac
         done; 
+        OPTIND=1;
         #  Even though it's in the read man, -i does not actually work
         eval "$readstr" value;
         if ! test -z "$pre" && test -z "$value"; then
@@ -77,7 +78,6 @@ reade(){
         fi
         #black, red, green, yellow, blue, cyan, purple (=magenta) or white
         eval "${@:$#:1}=$value";
-        OPTIND=1;
     else
         if [[ $# < 2 ]]; then
             echo "Give up at least two variables for reade(). "
