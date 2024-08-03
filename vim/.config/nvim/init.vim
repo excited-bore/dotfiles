@@ -903,16 +903,20 @@ vnoremap <expr> !   (visualmode() == "\<C-V>" ? ':norm i#<cr>gv' : 'c!!<Esc>hpgv
 
 "nnoremap <C-y> <C-y>
 "nnoremap <C-e> <C-e>
-"
-"nnoremap <Up>   <Up>
-"nnoremap <Down> <Down>
-"nnoremap j      j
-"nnoremap k      k
-"
-"inoremap <expr> <Up> mode(1) == "ic" ?  '<Up>' : '<Up><C-o>' 
-"inoremap <expr> <Down> mode(1) == "ic" ?  '<Down>' : '<Down><C-o>' 
-"vnoremap <Up>   <Up>
-"vnoremap <Down> <Down>
+
+" Moving up/down doesn't skip moving through wrapped lines (soft lines)
+nnoremap <expr> <Up> (getline(".")[col(".")-1] != ""  ? 'g<Up>' : '<Up>')
+nnoremap <expr> <Down> (getline(".")[col(".")-1] != "" ? 'g<Down>' : '<Down>')
+nnoremap <expr> k (getline(".")[col(".")-1] != "" ? 'gk' : 'k')
+nnoremap <expr> j (getline(".")[col(".")-1] != "" ? 'gj' : 'j')
+inoremap <expr> <Up> (getline(".")[col(".")-1] != "" ? '<C-o>g<Up>' : '<Up>')
+inoremap <expr> <Down> (getline(".")[col(".")-1] != "" ? '<C-o>g<Down>' : '<Down>')
+vnoremap <expr> <Up> (getline(".")[col(".")-1] != "" ? 'g<Up>' : '<Up>')
+vnoremap <expr> <Down> (getline(".")[col(".")-1] != "" ? 'g<Down>' : '<Down>')
+vnoremap <expr> k (getline(".")[col(".")-1] != "" ? 'gk' : 'k')
+vnoremap <expr> j (getline(".")[col(".")-1] != "" ? 'gj' : 'j')
+
+
 
 nnoremap    <C-Up> {
 "nnoremap    <C-K> {
