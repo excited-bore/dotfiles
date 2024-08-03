@@ -17,7 +17,7 @@ gui:
   mouseEvents: true
 
   # If true, do not show a warning when discarding changes in the staging view.
-  skipDiscardChangeWarning: false
+  skipDiscardChangeWarning: true
 
   # If true, do not show warning when applying/popping the stash
   skipStashWarning: false
