@@ -78,6 +78,18 @@ function update_system() {
         snap refresh
     fi
 
+    if type gpg &> /dev/null || type gpg2 &> /dev/null; then
+        if type gpg2 &> /dev/null; then
+            up_gpg=gpg2
+        else
+            up_gpg=gpg
+        fi
+        reade -Q "MAGENTA" -i "n" -p "Refresh gpg keys? (Keyservers can be unstable so this might take a while) [N/y]: " "y" gpg_up
+        if test "$gpg_up" == 'y'; then
+           "$up_gpg" --refresh-keys  
+        fi
+    fi
+    unset up_gpg gpg_up
 
     if type pipx &> /dev/null || type npm &> /dev/null || type gem &> /dev/null || type cargo &> /dev/null; then 
         reade -Q "MAGENTA" -i "n" -p "Update Packages from development package-managers? (pipx, npm, gem, cargo... - WARNING: this could take a lot longer relative to regular pm's) [N/y]: " "y" dev_up
