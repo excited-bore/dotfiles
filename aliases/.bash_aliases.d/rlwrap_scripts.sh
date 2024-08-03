@@ -17,6 +17,24 @@ white=$(tput setaf 15)
 white1=$(tput setaf 7)
 black=$(tput setaf 16)
 grey=$(tput setaf 8)
+
+RED=$(tput setaf 9 && tput bold)
+RED1=$(tput setaf 1 && tput bold)
+GREEN=$(tput setaf 10 && tput bold)
+GREEN1=$(tput setaf 2 && tput bold)
+YELLOW=$(tput setaf 11 && tput bold)
+YELLOW1=$(tput setaf 3 && tput bold)
+BLUE=$(tput setaf 12 && tput bold)
+BLUE1=$(tput setaf 4 && tput bold)
+MAGENTA=$(tput setaf 13 && tput bold)
+MAGENTA1=$(tput setaf 5 && tput bold)
+CYAN=$(tput setaf 14 && tput bold)
+CYAN1=$(tput setaf 6 && tput bold)
+WHITE=$(tput setaf 15 && tput bold)
+WHITE1=$(tput setaf 7 && tput bold)
+BLACK=$(tput setaf 16 && tput bold)
+GREY=$(tput setaf 8 && tput bold)
+
 bold=$(tput bold)
 normal=$(tput sgr0)
 #...
@@ -70,6 +88,7 @@ reade(){
                 S)  ;;
             esac
         done; 
+        OPTIND=1;
         #  Even though it's in the read man, -i does not actually work
         eval "$readstr" value;
         if ! test -z "$pre" && test -z "$value"; then
@@ -77,7 +96,6 @@ reade(){
         fi
         #black, red, green, yellow, blue, cyan, purple (=magenta) or white
         eval "${@:$#:1}=$value";
-        OPTIND=1;
     else
         if [[ $# < 2 ]]; then
             echo "Give up at least two variables for reade(). "

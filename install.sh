@@ -133,7 +133,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         
     # Allow if checks
     sed -i 's/^#\[\[/\[\[/' $pathvr
-    sed -i 's/^#type\type/' $pathvr
+    sed -i 's/^#type/type/' $pathvr
     
     # Comment out FZF stuff
     sed -i 's/  --bind/ #--bind/' $pathvr
@@ -182,37 +182,44 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
             prmpt="$prmpt \tnvimpager = The pager that acts and feels like Neovim. Did you guess?\n"
         fi
         printf "$prmpt"
+        
         reade -Q "GREEN" -i "less" -p "PAGER=" "$pagers" pgr2
         pgr2=$(whereis "$pgr2" | awk '{print $2}')
         sed -i 's|export PAGER=.*|export PAGER='$pgr2'|' $pathvr
-        if test "$(basename $pgr2)" == "less"; then
-            sed -i 's|#export LESS=|export LESS="*"|g' $pathvr
-            lss=$(cat $pathvr | grep 'export LESS="*"' | sed 's|export LESS="\(.*\)"|\1|g')
-            lss_n=""
-            for opt in ${lss}; do
-                opt1=$(echo "$opt" | sed 's|--\(\)|\1|g' | sed 's|\(\)\=.*|\1|g')
-                if (man less | grep -Fq "${opt1}") 2> /dev/null; then
-                    lss_n="$lss_n $opt"
-                fi
-            done
-            sed -i "s|export LESS=.*|export LESS=\" $lss_n\"|g" $pathvr
-            unset lss lss_n opt opt1
-            #sed -i 's/#export LESSEDIT=/export LESSEDIT=/' .pathvariables.env
-        elif test "$(basename $pgr2)" == "bat" && type moar &> /dev/null || test "$(basename $pgr2)" == "bat" && type nvimpager &> /dev/null ; then
+
+        # Set less options that system supports 
+        sed -i 's|#export LESS=|export LESS="*"|g' $pathvr
+        lss=$(cat $pathvr | grep 'export LESS="*"' | sed 's|export LESS="\(.*\)"|\1|g')
+        lss_n=""
+        for opt in ${lss}; do
+            opt1=$(echo "$opt" | sed 's|--\(\)|\1|g' | sed 's|\(\)\=.*|\1|g')
+            if (man less | grep -Fq "${opt1}") 2> /dev/null; then
+                lss_n="$lss_n $opt"
+            fi
+        done
+        sed -i "s|export LESS=.*|export LESS=\" $lss_n\"|g" $pathvr
+        #sed -i 's/#export LESSEDIT=/export LESSEDIT=/' .pathvariables.env
+        unset lss lss_n opt opt1
+
+        # Set moar options
+        sed -i 's/#export MOAR=/export MOAR=/' $pathvr
+        
+        if test "$(basename $pgr2)" == "bat" && type moar &> /dev/null || test "$(basename $pgr2)" == "bat" && type nvimpager &> /dev/null ; then
             pagers=""
             prmpt="${cyan}Bat is a pager wrapper that defaults to less except if BAT_PAGER is set\n\t${green}less = Default pager - Basic, archaic but very customizable\n"
+            if type moar &> /dev/null; then
+                pagers="$pagers moar"
+                prmpt="$prmpt \tmoar = Custom pager with an awesome default configuration\n"
+            fi
             if type nvimpager &> /dev/null; then
                 pagers="$pagers nvimpager"
                 prmpt="$prmpt \tnvimpager = The pager that acts and feels like Neovim. Did you guess?\n"
             fi
-            if type moar &> /dev/null; then
-                pagers="$pagers moar"
-                prmpt="$prmpt \tmoar = Custom pager with an awesome default configuration\n"
-                sed -i 's/#export MOAR=/export MOAR=/' $pathvr
-            fi
             printf "$prmpt"
             reade -Q "GREEN" -i "less" -p "BAT_PAGER=" "$pagers" pgr2
             pgr2=$(whereis "$pgr2" | awk '{print $2}')
+            [[ "$pgr2" =~ "less" ]] && pgr2="$pgr2 \$LESS --line-numbers"  
+            [[ "$pgr2" =~ "moar" ]] && pgr2="$pgr2 \$MOAR --no-linenumbers"  
             sed 's/^#export BAT_PAGER=/export BAT_PAGER=/' -i $pathvr
             sed -i 's|^export BAT_PAGER=.*|export BAT_PAGER='$pgr2'|' $pathvr
         fi
@@ -286,12 +293,23 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
             fi
         fi
         
-        echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for  'Defaults env_keep += \"VISUAL EDITOR\"' in /etc/sudoers"
-        if ! sudo grep -q "Defaults env_keep += \"VISUAL EDITOR\"" /etc/sudoers; then
-            reade -Q "YELLOW" -i "y" -p "Sudo by default does not respect the user's EDITOR/VISUAL and not every program supports the SUDO_EDITOR environment variables (f.ex. sudo crontab -e ).\n Change this behaviour permanently in /etc/sudoers? [Y/n]: " "n" sudrs
+        echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for 'Defaults env_keep += \"PAGER\"' in /etc/sudoers"
+        if ! sudo grep -q "Defaults env_keep += \"PAGER\"" /etc/sudoers; then
+            printf "${bold}${yellow}Sudo by default does not respect the user's PAGER environment. If you were to want to keep your userdefined less options or use a custom pager (more on that later) when using sudo ${cyan}systemctl/journalctl${bold}${yellow}, you would need to always pass your environment using 'sudo -E'\n${normal}"
+            reade -Q "YELLOW" -i "y" -p "Change this behaviour permanently in /etc/sudoers? [Y/n]: " "n" sudrs
             if test "$sudrs" == "y"; then
-                sudo sed -i '1s/^/Defaults env_keep += "VISUAL EDITOR"\n/' /etc/sudoers
-                echo "Added 'Defaults env_keep += \"VISUAL EDITOR\"' to /etc/sudoers"
+                sudo sed -i '1s/^/Defaults env_keep += "PAGER"\n/' /etc/sudoers
+                echo "Added ${RED}'Defaults env_keep += \"PAGER\"'${normal} to /etc/sudoers"
+            fi
+        fi
+
+        echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for 'Defaults env_keep += \"EDITOR VISUAL\"' in /etc/sudoers"
+        if ! sudo grep -q "Defaults env_keep += \"EDITOR VISUAL\"" /etc/sudoers; then
+            printf "${bold}${yellow}Sudo by default does not respect the user's EDITOR/VISUAL environment and SUDO_EDITOR is not always checked by programs.\nIf you were to want edit root crontabs (sudo crontab -e), you would get vi (unless using 'sudo -E' to pass your environment)\n"
+            reade -Q "YELLOW" -i "y" -p "Change this behaviour permanently in /etc/sudoers? (Run 'man --pager='less -p ^security' less' if you want to see the potential security holes when using less) [Y/n]: " "n" sudrs
+            if test "$sudrs" == "y"; then
+                sudo sed -i '1s/^/Defaults env_keep += "EDITOR VISUAL"\n/' /etc/sudoers
+                echo "Added ${RED}'Defaults env_keep += \"EDITOR VISUAL\"'${normal} to /etc/sudoers"
             fi
         fi
     fi
@@ -338,7 +356,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         - XDG_DATA_DIRS=/usr/local/share/:/usr/share\n\
         - XDG_STATE_HOME=$HOME/.local/state\n"
         printf "$prmpt"
-        reade -Q "GREEN" -i "y" -p "Set XDG environment? [Y/n]: " "y n" xdgInst
+        reade -Q "GREEN" -i "y" -p "Set XDG environment? [Y/n]: " "n" xdgInst
         if [ -z "$xdgInst" ] || [ "y" == "$xdgInst" ]; then
             sed 's/^#export XDG_CACHE_HOME=\(.*\)/export XDG_CACHE_HOME=\1/' -i $pathvr 
             sed 's/^#export XDG_CONFIG_HOME=\(.*\)/export XDG_CONFIG_HOME=\1/' -i $pathvr
@@ -356,15 +374,15 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
     # Check if systemd installed
     if type systemctl &> /dev/null; then
         pageSec=1
-        printf "${green} Systemd comes preinstalled with SYSTEMD_PAGERSECURE=1.\n This means any pager without a 'secure mode' (reduced features - only less does this afaik) cant be used for systemctl/journalctl.\n It's a relatively good to be on the safe side, but this does constrain the user.\n"
-        reade -Q "YELLOW" -i "y" -p "${yellow}Set SYSTEMD_PAGERSECURE to 0? [Y/n]: " "y n" page_sec
+        printf "${cyan}Systemd comes preinstalled with ${GREEN}SYSTEMD_PAGERSECURE=1${cyan}.\n This means any pager without a 'secure mode' (reduced features - only less does this afaik) cant be used for systemctl/journalctl.\n It's a relatively good to be on the safe side, but this does constrain the user.\n"
+        reade -Q "YELLOW" -i "y" -p "${yellow}Set SYSTEMD_PAGERSECURE to 0? [Y/n]: " "n" page_sec
         if test "$page_sec" == "y"; then
            pageSec=0 
         fi
         prmpt="${yellow}This will set SYSTEMD pathvariables\n\
         When setting a new pager for systemd or changing logging specifics\n\
-        \tDefaults:\n\
-        - SYSTEMD_PAGER=$PAGER\n\
+        Defaults:\n\
+        - SYSTEMD_PAGER=\$PAGER\n\
         - SYSTEMD_COLORS=256\n\
         - SYSTEMD_PAGERSECURE=$pageSec\n\
         - SYSTEMD_LESS=\"FRXMK\"\n\
@@ -375,7 +393,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         - SYSTEMD_LOG_TID=\"true\"\n\
         - SYSTEMD_LOG_TARGET=\"auto\"\n"
         printf "$prmpt"
-        reade -Q "YELLOW" -i "y" -p "Set systemd environment? [Y/n]: " "y n" xdgInst
+        reade -Q "YELLOW" -i "y" -p "Set systemd environment? [Y/n]: " "n" xdgInst
         if [ -z "$xdgInst" ] || [ "y" == "$xdgInst" ]; then
             sed 's/^#export SYSTEMD_PAGER=\(.*\)/export SYSTEMD_PAGER=\1/' -i $pathvr 
             if test "$pageSec" == 0; then
