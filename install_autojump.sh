@@ -34,7 +34,7 @@ if test -z $SYSTEM_UPDATED; then
     fi
 fi 
 
-if type autojump &> /dev/null; then
+if ! type autojump &> /dev/null; then
     if [ "$distro" == "Manjaro" ]; then
         pamac install autojump
     elif test "$distro" == "Arch" && ! test -z "$AUR_install"; then

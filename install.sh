@@ -130,17 +130,20 @@ reade -Q "$color" -i "$pre" -p "Check existence/create .pathvariables.env and li
 if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
     #Comment out every export in .pathvariables
     sed -i -e '/export/ s/^#*/#/' $pathvr
-
-    #Comment out FZF stuff
-    sed -i 's/--bind/#--bind/' $pathvr
-    sed -i 's/--preview-window/#--preview-window/' $pathvr
-    sed -i 's/--color/#--color/' $pathvr
-    sed -i 's|type fd &> /dev/null|#type fd &> /dev/null|g' $pathvr
+        
+    # Allow if checks
+    sed -i 's/^#\[\[/\[\[/' $pathvr
+    sed -i 's/^#type\type/' $pathvr
+    
+    # Comment out FZF stuff
+    sed -i 's/  --bind/ #--bind/' $pathvr
+    sed -i 's/  --preview-window/ #--preview-window/' $pathvr
+    sed -i 's/  --color/ #--color/' $pathvr
 
     # Set tmpdir
     sed 's|#export TMPDIR|export TMPDIR|' -i $pathvr
 
-    ## Package Managers
+    # Package Managers
     #reade -Q "YELLOW" -i "y" -p "Check and create DIST,DIST_BASE,ARCH,PM and WRAPPER? (distro, distro base, architecture, package manager and pm wrapper) [Y/n]:" "y n" Dists
     #if [ "$Dists" == "y" ]; then
     #   printf "NOT YET IMPLEMENTED\n"
@@ -152,12 +155,6 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         sed 's/^#export LS_COLORS/export LS_COLORS/' -i $pathvr
     fi
     
-    if type nvim &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Set Neovim as MANPAGER? [Y/n]: " "y n" manvim
-        if [ "$manvim" == "y" ]; then
-           sed -i 's|.export MANPAGER=.*|export MANPAGER='\''nvim +Man!'\''|g' $pathvr 
-        fi
-    fi
     
     reade -Q "GREEN" -i "y" -p "Set PAGER? (Page reader) [Y/n]: " "n" pgr
     if [ "$pgr" == "y" ] || [ -z "$pgr" ]; then
@@ -170,15 +167,25 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
             pagers="$pagers most"
             prmpt="$prmpt \tmost = Installed pager that is very customizable\n"
         fi
+        if type bat &> /dev/null; then
+            pagers="$pagers bat"
+            prmpt="$prmpt \tbat = Cat clone / pager wrapper with syntax highlighting\n"
+            sed -i 's/#export BAT=/export BAT=/' $pathvr
+        fi
         if type moar &> /dev/null; then
             pagers="$pagers moar"
             prmpt="$prmpt \tmoar = Installed pager with an awesome default configuration\n"
+            sed -i 's/#export MOAR=/export MOAR=/' $pathvr
+        fi
+        if type nvimpager &> /dev/null; then
+            pagers="$pagers nvimpager"
+            prmpt="$prmpt \tnvimpager = The pager that acts and feels like Neovim. Did you guess?\n"
         fi
         printf "$prmpt"
         reade -Q "GREEN" -i "less" -p "PAGER=" "$pagers" pgr2
         pgr2=$(whereis "$pgr2" | awk '{print $2}')
         sed -i 's|export PAGER=.*|export PAGER='$pgr2'|' $pathvr
-        if grep -q "less" "$pgr2"; then
+        if test "$(basename $pgr2)" == "less"; then
             sed -i 's|#export LESS=|export LESS="*"|g' $pathvr
             lss=$(cat $pathvr | grep 'export LESS="*"' | sed 's|export LESS="\(.*\)"|\1|g')
             lss_n=""
@@ -191,13 +198,33 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
             sed -i "s|export LESS=.*|export LESS=\" $lss_n\"|g" $pathvr
             unset lss lss_n opt opt1
             #sed -i 's/#export LESSEDIT=/export LESSEDIT=/' .pathvariables.env
+        elif test "$(basename $pgr2)" == "bat" && type moar &> /dev/null || test "$(basename $pgr2)" == "bat" && type nvimpager &> /dev/null ; then
+            pagers=""
+            prmpt="${cyan}Bat is a pager wrapper that defaults to less except if BAT_PAGER is set\n\t${green}less = Default pager - Basic, archaic but very customizable\n"
+            if type nvimpager &> /dev/null; then
+                pagers="$pagers nvimpager"
+                prmpt="$prmpt \tnvimpager = The pager that acts and feels like Neovim. Did you guess?\n"
+            fi
+            if type moar &> /dev/null; then
+                pagers="$pagers moar"
+                prmpt="$prmpt \tmoar = Custom pager with an awesome default configuration\n"
+                sed -i 's/#export MOAR=/export MOAR=/' $pathvr
+            fi
+            printf "$prmpt"
+            reade -Q "GREEN" -i "less" -p "BAT_PAGER=" "$pagers" pgr2
+            pgr2=$(whereis "$pgr2" | awk '{print $2}')
+            sed 's/^#export BAT_PAGER=/export BAT_PAGER=/' -i $pathvr
+            sed -i 's|^export BAT_PAGER=.*|export BAT_PAGER='$pgr2'|' $pathvr
         fi
-        if type moar &> /dev/null; then
-            sed -i 's/#export MOAR=/export MOAR=/' $pathvr
-        fi
-
     fi
     unset prmpt
+    
+    if type nvim &> /dev/null; then
+        reade -Q "GREEN" -i "y" -p "Set Neovim as MANPAGER? [Y/n]: " "y n" manvim
+        if [ "$manvim" == "y" ]; then
+           sed -i 's|.export MANPAGER=.*|export MANPAGER='\''nvim +Man!'\''|g' $pathvr 
+        fi
+    fi
 
     reade -Q "GREEN" -i "y" -p "Set EDITOR and VISUAL? [Y/n]: " "n" edtvsl
     if [ "$edtvsl" == "y" ] || [ -z "$edtvsl" ]; then

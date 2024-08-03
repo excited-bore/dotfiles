@@ -29,7 +29,6 @@ if test -z $TMPDIR; then
 fi
 
 reade(){
-    stty sane
     if [ ! -x "$(command -v rlwrap)" ]; then 
         readstr="read  ";
         color=""
@@ -88,10 +87,16 @@ reade(){
         fi
         
         local args="${@:$#-1:1}"
+        # Reverse wordlist order (last -> first) because ???
+        args=$(echo $args | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }')
         args=$(echo $args | tr ' ' '\n')
         echo "$args" > "$TMPDIR/rlwrap"
+        if test "$args" == ''; then
+            rlwstring="rlwrap -D 0 -b \"$breaklines\" -o cat"
+        else
+            rlwstring="rlwrap -D 0 -H $TMPDIR/rlwrap -b \"$breaklines\" -f <(echo \"${args[@]}\") -o cat"
+        fi
         breaklines=''
-        rlwstring="rlwrap -D 0 -H $TMPDIR/rlwrap -b \"$breaklines\" -f <(echo \"${args[@]}\") -o cat"
         while getopts ':b:e:i:p:Q:s:S:' flag; do
             case "${flag}" in
                 b)  breaklines=${OPTARG};
@@ -117,16 +122,10 @@ reade(){
                     ;;
             esac
         done
-        
-        value=$(eval "$rlwstring");
-        eval "${@:$#:1}=$value";
-        #if [ $OPTIND -eq 1 ]; then
-        #    value=$(rlwrap -b '' -f <(echo "${args[@]}") -o cat);
-        #    eval "${@:2}=$value";
-        #fi
         OPTIND=1
+        value=$(eval $rlwstring);
+        eval "${@:$#:1}=$value";
     fi
-    stty sane
 }
 
 #reade -p "Usb ids" $(sudo lsusb | awk 'BEGIN { FS = ":" };{print $1;}')
