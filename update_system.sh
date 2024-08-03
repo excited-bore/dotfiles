@@ -17,7 +17,7 @@ fi
 # https://www.explainxkcd.com/wiki/index.php/1654:_Universal_Install_Script
 function update_system() {
     if ! test "$(timedatectl show | grep ^NTP | head -n 1 | awk 'BEGIN { FS = "=" } ; {print $2}')" == "yes"; then 
-        reade -Q "GREEN" -i "y" -p "Timedate NTP not set (Automatic timesync). This can cause issues with syncing to repositories. Activate it? [Y/n]: " "y n" set_ntp
+        reade -Q "GREEN" -i "y" -p "Timedate NTP not set (Automatic timesync). This can cause issues with syncing to repositories. Activate it? [Y/n]: " "n" set_ntp
         if [ "$set_ntp" == "y" ]; then
             timedatectl set-ntp true
             timedatectl status
@@ -80,11 +80,11 @@ function update_system() {
 
 
     if type pipx &> /dev/null || type npm &> /dev/null || type gem &> /dev/null || type cargo &> /dev/null; then 
-        reade -Q "MAGENTA" -i "n" -p "Update Packages from development package-managers? (pipx, npm, gem, cargo... - WARNING: this could take a lot longer relative to regular pm's) [N/y]: " "y n" dev_up
+        reade -Q "MAGENTA" -i "n" -p "Update Packages from development package-managers? (pipx, npm, gem, cargo... - WARNING: this could take a lot longer relative to regular pm's) [N/y]: " "y" dev_up
         if [ "$dev_up" == "y" ]; then
             
             if type pipx &> /dev/null; then
-                reade -Q "magenta" -i "y" -p "Update pipx? (Python standalone packages) [Y/n]: " "y n" pipx_up
+                reade -Q "magenta" -i "y" -p "Update pipx? (Python standalone packages) [Y/n]: " "n" pipx_up
                 if [ "$pipx_up" == "y" ]; then
                     pipx upgrade-all
                 fi
@@ -92,18 +92,26 @@ function update_system() {
             unset pipx_up
 
             if type npm &> /dev/null; then
-                reade -Q "magenta" -i "y" -p "Update local npm packages? (Javascript) [Y/n]: " "y n" npm_up
+                reade -Q "magenta" -i "y" -p "Update local npm packages? (Javascript) [Y/n]: " "n" npm_up
                 if [ "$npm_up" == "y" ]; then
                     npm update
                 fi
                 unset npm_up
+
+                reade -Q "magenta" -i "y" -p "Update ${red}${bold}global${normal}${magenta1} npm packages? (Javascript) [Y/n]: " "n" npm_up
+                if [ "$npm_up" == "y" ]; then
+                    echo "This next $(tput setaf 1)sudo$(tput sgr0) will update using 'sudo npm -g update'";
+                    sudo npm -g update
+                fi
+                unset npm_up
+                
             fi
             
             if type cargo &> /dev/null; then
-                reade -Q "magenta" -i "y" -p "Update cargo (Rust)? [Y/n]: " "y n" cargo_up
+                reade -Q "magenta" -i "y" -p "Update cargo (Rust)? [Y/n]: " "n" cargo_up
                 if [ "$cargo_up" == "y" ]; then
                     if test -z "$(cargo --list | grep install-update)"; then
-                        reade -Q "MAGENTA" -i "y" -p "To update cargo packages, 'cargo-update' needs to be installed first. Install? [Y/n]: " "y n" carg_ins
+                        reade -Q "MAGENTA" -i "y" -p "To update cargo packages, 'cargo-update' needs to be installed first. Install? [Y/n]: " "n" carg_ins
                         if [ "$carg_ins" == "y" ]; then
                             cargo install cargo-update
                         fi
@@ -117,7 +125,7 @@ function update_system() {
             fi
 
             if type gem &> /dev/null; then
-                reade -Q "magenta" -i "y" -p "Update local gems? (Ruby-on-rails) [Y/n]: " "y n" gem_up
+                reade -Q "magenta" -i "y" -p "Update local gems? (Ruby-on-rails) [Y/n]: " "n" gem_up
                 if [ "$gem_up" == "y" ]; then
                     gem update 
                 fi
