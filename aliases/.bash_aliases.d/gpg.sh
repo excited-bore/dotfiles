@@ -117,35 +117,45 @@ function gpg-get-emails-exported-browserlogins-and-generate-keys(){
         return 1 
     fi
 
+    default_key=''
     reade -Q "CYAN" -i "n" -p "Set custom algorithm? (Default \"ed25519/cert,sign+cv25519/encr\") [N/y]: " "y" algo 
-    if test $algo == 'y'; then
+    if test "$algo" == 'y'; then
         printf "Default suggestions GPG defaults\n"
-        reade -Q "GREEN" -i 'y' -p "Add encryption subkey? (Usefull for primary mails, not for aliases) [Y/n]: " "n" enckeys
         reade -Q "GREEN" -i 'ecc' -p "Public-key algorithm? (Elliptic-curve/Rivest–Shamir–Adleman/Digital Signature Algorithm) [ecc/rsa/dsa]: " "rsa dsa" pubkey
-        if test $pubkey == 'rsa'; then
-            reade -Q "GREEN" -i '3072' -p "Set the length (in bits) for the keys. GPG supports a length inbetween 1024 and 4096 bits for RSA keys: " "4096 2048 1024" length
-            if [[ $length < 1024 ]] || [[ $length > 4096 ]]; then
-                echo "Keylength for RSA keys should be inbetween 1024 and 4096"
-                return 1
-            fi
-        elif test $pubkey == 'dsa'; then
-            reade -Q "GREEN" -i '2048' -p "Set the length (in bits) for the keys. GPG supports a length inbetween 768 and 3072 bits for DSA keys: " "3072 1024 768" length
-            if [[ $length < 768 ]] || [[ $length > 3072 ]]; then
-                echo "Keylength for DSA keys should be inbetween 768 and 3072"
-                return 1
-            fi
-        elif test $pubkey == 'ecc'; then
-            reade -Q "GREEN" -i '3072' -p "Set the length (in bits) for the keys. GPG supports a length inbetween 1024 and 4096 bits for RSA keys: " "4096 2048 1024" length
-            if [[ $length < 1024 ]] || [[ $length > 4096 ]]; then
-                echo "Keylength for RSA keys should be inbetween 1024 and 4096"
-                return 1
-            fi
-        fi
-        #if test $subkeys == 'y'; then
-        #else 
-        #fi
-    fi
+        if test $pubkey == 'rsa' || test $pubkey == 'dsa'; then   
+                reade -Q "GREEN" -i '8192' -p "Set the length (in bits) for the keys. 8192 is given at default because it automatically shifts to the highest amount in bits possible: " "4096 2048 1024" length               
+                pubkey="$pubkey$length"
 
+        elif test $pubkey == 'ecc'; then
+            reade -Q "GREEN" -i 'cv25519' -p "What Elliptic-curve cryptography keyalgorithm would you like? [cv25519/cv488/nistp256/nistp384/nistp521/brainpoolP256r1/brainpoolP384r1/brainpoolP512r1/secp256k1]: " "cv488 nistp256 nistp384 nistp521 brainpoolP256r1 brainpoolP384r1 brainpoolP512r1 secp256k1" pubkey
+        fi
+        reade -Q "GREEN" -i 'y' -p "Add encryption subkey? (Using a different key for signing/verifying and encryption/decryption is good practice) [Y/n]: " "n" enckeys
+        if test $enckeys == 'y' && ! [[ $pubkey =~ 'dsa' ]]; then
+            reade -Q "GREEN" -i 'y' -p "Same algorithm for encryption subkey? [Y/n]: " "n" enckeys
+            if test $enckeys == 'n'; then
+                reade -Q "GREEN" -i 'elg' -p "Wich encryption algorithm? [elg (ElGamal - Default)/rsa/ecc(Elliptic-curve cryptography)]: " "rsa ecc" enckey
+                if test $enckey == 'rsa' || test $enckey == 'elg'; then   
+                    reade -Q "GREEN" -i '8192' -p "Set the length (in bits) for the keys. 8192 is given at default because it automatically shifts to the highest amount in bits possible: " "4096 2048 1024" lengthenc            
+                    enckey="$enckey$lengthenc"
+                elif test $enckey == 'ecc'; then
+                    reade -Q "GREEN" -i 'cv25519' -p "What Elliptic-curve cryptography keyalgorithm would you like? [cv25519/cv488/nistp256/nistp384/nistp521/brainpoolP256r1/brainpoolP384r1/brainpoolP512r1/secp256k1]: " "cv488 nistp256 nistp384 nistp521 brainpoolP256r1 brainpoolP384r1 brainpoolP512r1 secp256k1" enckey
+                fi   
+                default_key="$pubkey/cert,sign+$enckey/encr"
+            fi
+        elif [[ $pubkey =~ 'dsa' ]]; then
+            printf "Need a different algorithm for encryption (Dsa is only for signing)\n"
+            reade -Q "GREEN" -i 'elg' -p "Wich encryption algorithm? [elg (ElGamal - Default)/rsa/ecc(Elliptic-curve cryptography)]: " "rsa ecc" enckey
+            if test $enckey == 'rsa' || test $enckey == 'elg'; then   
+                reade -Q "GREEN" -i '8192' -p "Set the length (in bits) for the keys. 8192 is given at default because it automatically shifts to the highest amount in bits possible: " "4096 2048 1024" lengthenc            
+                enckey="$enckey$lengthenc"
+            elif test $enckey == 'ecc'; then
+                reade -Q "GREEN" -i 'cv25519' -p "What Elliptic-curve cryptography keyalgorithm would you like? [cv25519/cv488/nistp256/nistp384/nistp521/brainpoolP256r1/brainpoolP384r1/brainpoolP512r1/secp256k1]: " "cv488 nistp256 nistp384 nistp521 brainpoolP256r1 brainpoolP384r1 brainpoolP512r1 secp256k1" enckey
+            fi
+            default_key="$pubkey/cert,sign+$enckey/encr"
+        else
+            default_key="$pubkey/cert,sign"
+        fi
+    fi
     reade -Q "YELLOW" -i "n" -p "Never use passwords when generating keys? [N/y]: " 'y' always_no_pw
     if ! test -z $dir;then
         dir="--homedir $dir"
@@ -186,9 +196,17 @@ function gpg-get-emails-exported-browserlogins-and-generate-keys(){
                 fi
 
                 if test $nopw == 'y' ; then
-                    echo '' | $GPG $dir --batch --yes --passphrase-fd 0 --quick-generate-key "$name $comment <$i>"
+                    if ! test -z $default_key; then
+                        echo '' | $GPG $dir  --default-new-key-algo ''$default_key'' --batch --yes --passphrase-fd 0 --quick-generate-key "$name $comment <$i>"
+                    else
+                        echo '' | $GPG $dir  --batch --yes --passphrase-fd 0 --quick-generate-key "$name $comment <$i>"
+                    fi
                 else
-                    $GPG $dir $keygen --quick-generate-key "$name $comment <$i>"  
+                    if ! test -z $default_key; then
+                        $GPG $dir  --default-new-key-algo ''$default_key'' --quick-generate-key "$name $comment <$i>"  
+                    else
+                        $GPG $dir --quick-generate-key "$name $comment <$i>"  
+                    fi 
                 fi
             fi
         fi
