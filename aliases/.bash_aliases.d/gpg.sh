@@ -4,10 +4,15 @@ else
     . ~/.bash_aliases.d/rlwrap_scripts.sh
 fi
 
+type gpg2 &> /dev/null && export GPG='gpg2' || export GPG='gpg'
+if test -z $GNUPGHOME; then
+    GNUPGHOME=$HOME/.gnupg
+fi
+
 publickey_mails=$("$GPG" --list-keys | grep --color=never \< | cut -d'<' -f2- | cut -d'>' -f1)
 privatekey_mails=$("$GPG" --list-secret-keys | grep --color=never \< | cut -d'<' -f2- | cut -d'>' -f1)
 
-keyservers_all=$(grep --color=never "keyserver" ~/.gnupg/gpg.conf | awk '{print $2}' | tr '\n' ' ')
+keyservers_all=$(grep --color=never "^keyserver" $GNUPGHOME/gpg.conf | grep -v --color=never "keyserver-" | awk '{print $2}' | tr '\n' ' ')
 first_keysrv=$(echo "$keyservers_all" | awk '{print $1;}')
 keyservers=$(echo "$keyservers_all" | cut -d " " -f2-)
 
@@ -15,8 +20,214 @@ fingerprints_all=$("$GPG" --list-keys --list-options show-only-fpr-mbox | awk '{
 first_fgr=$(echo "$fingerprints_all" | awk 'NR==1{print $1}')
 fingerprints=$(echo "$fingerprints_all" | awk 'NR>1{print $1}')
 
-alias gpg-generate-key-only-name-email="$GPG --generate-key"
 
+function gpg-publish-key() {
+    printf "${CYAN}Hint: If rlwrap is installed, tab completion is enabled${normal}\n"
+    if test -z "$1"; then 
+        reade -Q "GREEN" -i "' '" -p "Fingerprint/Keyid(Preferably long, separate by spaces and add quotation marks around if using multiple fingerprints)?: " "all $fingerprints_all" keyid
+    else
+        keyid="$1"
+    fi
+    if ! test -z "$2"; then 
+        dir="--homedir $2"
+    else
+        reade -Q "GREEN" -p "Homedirectory where gpg-files are stored? (could be thunderbird profilefolder f.ex. / leave empty for $GNUPGHOME): " -e dir 
+        if ! test -d $dir; then
+            printf "$dir not a dir!\n"
+            return 1 
+        else
+            dir="--homedir $dir"
+        fi
+    fi 
+    reade -Q "GREEN" -i "n" -p "Set keyserver? (Otherwise looks for last defined keyserver in \$GNUPGHOME/.gnupg/gpg.conf) [N/y]: " "y" c_srv
+    if test "$c_srv" == "y"; then
+        printf "Known keyservers from \$GNUPGHOME/gpg.conf: \n"
+        for i in $keyservers_all; do
+            printf "\t- ${CYAN}$i${normal}\n"
+        done
+        reade -Q "GREEN" -i "' '" -p "Keyserver? (separate by spaces and add quotation marks around if using multiple servers; f.ex. 'keys.openpgp.org keys.mailvelope.com' ): " "all $keyservers_all" serv 
+        if test "$serv" == "all"; then
+            for srv in $keyservers_all; do
+                succeeded=0
+                while test $succeeded == 0; do
+                    printf "Trying to send ${bold}${magenta}$srv${normal} fingerprint(s)/keyid(s)\n ${CYAN}$keyid${normal}\n"
+                    "$GPG" $dir --verbose --keyserver "$srv" --send-key $keyid  
+                    if [[ $? > 0 ]]; then
+                        reade -Q "YELLOW" -i "y" -p "Failed sending key to server. Retry? [Y/n]: " "n" retry 
+                        if test $retry == 'n'; then
+                            succeeded=1    
+                        fi
+                    else
+                        succeeded=1
+                    fi
+                done
+            done
+        else
+            for s in $serv; do
+                succeeded=0
+                echo $keyid
+                while test $succeeded == 0; do
+                    printf "Trying to send ${bold}${magenta}$s${normal} fingerprint(s)/keyid(s):\n ${CYAN}$keyid${normal}\n"
+                    "$GPG" $dir --verbose --keyserver "$s" --send-key $keyid  
+                    if [[ $? > 0 ]]; then
+                        reade -Q "YELLOW" -i "y" -p "Failed sending key to server. Retry? [Y/n]: " "n" retry 
+                        if test $retry == 'n'; then
+                            succeeded=1    
+                        fi
+                    else
+                        succeeded=1
+                    fi
+                done
+            done
+        fi
+    else 
+        succeeded=0
+        while test $succeeded == 0; do
+            printf "Trying to send fingerprint(s)/keyid(s):\n ${CYAN}$keyid${normal}\n"
+            "$GPG" $dir --verbose --send-key $keyid  
+            if [[ $? > 0 ]]; then
+                reade -Q "YELLOW" -i "y" -p "Failed sending key to server. Retry? [Y/n]: " "n" retry 
+                if test $retry == 'n'; then
+                    succeeded=1    
+                fi
+            else
+                succeeded=1
+            fi
+        done
+    fi
+    unset c_serv keyid serv srv i s
+}
+
+
+function gpg-get-emails-exported-browserslogins-and-generate-keys(){
+    printf "Make sure to check ${cyan}$HOME/.gnupg/gpg.conf${normal} for algorithm preferences.\n"
+    printf "At default ECC (Elliptic-curve cryptography) is used for both signing and encryption:\n - ${GREEN}the public-private keypair${normal} is made using ed25519, used for certification and signing\n - ${CYAN}the subkeys for both keys in the pair${normal} are generated use cv25519, used for encryption - these are generated because it would be bad a idea to use the same key for both signing and encryption. So, GPG uses a separate subkey for at least encryption.\nMore on why GPG also generates ${CYAN}subkeys${normal}:\nhttps://rgoulter.com/blog/posts/programming/2022-06-10-a-visual-explanation-of-gpg-subkeys.html\nhttps://serverfault.com/questions/397973/gpg-why-am-i-encrypting-with-subkey-instead-of-primary-key\n"
+    #When hashes for fingerprints are generated they are based on your OpenPGP fingerprint Version, wich most likely is V4 and thus are generated using the SHA-1 hashing algorithm. More on how safe this is here: https://security.stackexchange.com/questions/68105/gpg-keys-sha-1)
+    printf "${CYAN}Hint: If rlwrap is installed, tab completion is enabled${normal}\n"
+
+    reade -Q "GREEN" -p "Passwords.csv file?: " -e file 
+    if ! test -f $file; then
+        printf "File doesnt't exist!\n"
+        return 1
+    fi
+
+    reade -Q "GREEN" -p "Homedirectory where gpg-files are stored? (could be thunderbird profilefolder f.ex. / leave empty for $GNUPGHOME): " -e dir 
+    if ! test -d $dir; then
+        printf "$dir not a dir!\n"
+        return 1 
+    fi
+
+    reade -Q "CYAN" -i "n" -p "Set custom algorithm? (Default \"ed25519/cert,sign+cv25519/encr\") [N/y]: " "y" algo 
+    if test $algo == 'y'; then
+        printf "Default suggestions GPG defaults\n"
+        reade -Q "GREEN" -i 'y' -p "Add encryption subkey? (Usefull for primary mails, not for aliases) [Y/n]: " "n" enckeys
+        reade -Q "GREEN" -i 'ecc' -p "Public-key algorithm? (Elliptic-curve/Rivest–Shamir–Adleman/Digital Signature Algorithm) [ecc/rsa/dsa]: " "rsa dsa" pubkey
+        if test $pubkey == 'rsa'; then
+            reade -Q "GREEN" -i '3072' -p "Set the length (in bits) for the keys. GPG supports a length inbetween 1024 and 4096 bits for RSA keys: " "4096 2048 1024" length
+            if [[ $length < 1024 ]] || [[ $length > 4096 ]]; then
+                echo "Keylength for RSA keys should be inbetween 1024 and 4096"
+                return 1
+            fi
+        elif test $pubkey == 'dsa'; then
+            reade -Q "GREEN" -i '2048' -p "Set the length (in bits) for the keys. GPG supports a length inbetween 768 and 3072 bits for DSA keys: " "3072 1024 768" length
+            if [[ $length < 768 ]] || [[ $length > 3072 ]]; then
+                echo "Keylength for DSA keys should be inbetween 768 and 3072"
+                return 1
+            fi
+        elif test $pubkey == 'ecc'; then
+            reade -Q "GREEN" -i '3072' -p "Set the length (in bits) for the keys. GPG supports a length inbetween 1024 and 4096 bits for RSA keys: " "4096 2048 1024" length
+            if [[ $length < 1024 ]] || [[ $length > 4096 ]]; then
+                echo "Keylength for RSA keys should be inbetween 1024 and 4096"
+                return 1
+            fi
+        fi
+        #if test $subkeys == 'y'; then
+        #else 
+        #fi
+    fi
+
+    reade -Q "YELLOW" -i "n" -p "Never use passwords when generating keys? [N/y]: " 'y' always_no_pw
+    if ! test -z $dir;then
+        dir="--homedir $dir"
+    fi
+
+    private_mails=$("$GPG" $dir --list-secret-keys | grep --color=never \< | cut -d'<' -f2- | cut -d'>' -f1)
+    
+    regex="^[a-z0-9!#\$%&'*+/=?^_\`{|}~-]+(\.[a-z0-9!#$%&'*+/=?^_\`{|}~-]+)*@([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z0-9]([a-z0-9-]*[a-z0-9])?\$"
+    b=$(cat $file | tr ',' ' '| awk '{print $2;}')
+    b=$(echo -e "$b" | sort -u)
+
+    mails_with_gen_keys=""
+    for i in $b; do
+        
+        # Remove " before and after mail (i)
+        i=${i#"\""}
+        i=${i%"\""}
+        
+        # Get name by printing mail with any numbers, cutting away the part after @, replace _/-/. with spaces and then uppercase first letter of each space seperated word
+        i_name="$(printf '%s\n' ${i//[[:digit:]]/} | cut -d@ -f1 | sed 's|_| |g' | sed 's|-| |g' | sed 's|\.| |' | sed -r 's/[^[:space:]]*[0-9][^[:space:]]* ?//g' | sed -e 's/\b\(.\)/\u\1/g')"
+
+        if [[ $i =~ $regex ]] && ! echo "$private_mails" | grep $i; then
+            reade -Q "GREEN" -i "y" -p "No secret key found for ${CYAN}$i${GREEN}. Generate key? [Y/n]: " "n" gen
+            #if ! $same_way; then
+            if test $gen == 'y'; then
+                mails_with_gen_keys="$mails_with_gen_keys $i"
+                reade -Q "GREEN" -i "'$i_name'" -p "Name? (Can remain empty, use 'John Doe' when using spaces): " "" name
+                reade -Q "GREEN" -p "Comment? (Can remain empty): " "" comment
+
+                if test $always_no_pw == 'n'; then
+                    reade -Q "YELLOW" -i "n" -p "No password? [N/y]: " 'y' nopw
+                else
+                    nopw="$always_no_pw"
+                fi
+
+                if ! test -z $comment; then
+                    comment="($comment)"
+                fi
+
+                if test $nopw == 'y' ; then
+                    echo '' | $GPG $dir --batch --yes --passphrase-fd 0 --quick-generate-key "$name $comment <$i>"
+                else
+                    $GPG $dir $keygen --quick-generate-key "$name $comment <$i>"  
+                fi
+            fi
+        fi
+    done
+    $GPG $dir --list-secret-keys
+    
+    reade -Q "CYAN" -i "n" -p "Publish keys to keyserver(s)? [N/y]: " "y" publish
+    if test $publish == 'y'; then
+        printf "Generated keys for these mails:\n ${CYAN}$mails_with_gen_keys${normal}\n"
+        reade -Q "GREEN" -i 'y' -p "Add keys from these emails? [Y/n]: " "n" add_mail
+        if test $add_mail == 'n'; then
+            privatekey_mails=$("$GPG" $dir --list-secret-keys | grep --color=never \< | cut -d'<' -f2- | cut -d'>' -f1)
+            printf "Known mails: \n$privatekey_mails\n"
+            reade -Q "GREEN" -i "' '" -p "Which mails ? (tab completion enabled - leave quotation marks when giving multiple - remove for all): " "all $privatekey_mails" mails_with_gen_keys
+            if test "$mails_with_gen_keys" == 'all'; then
+                mails_with_gen_keys=''
+                for m in $privatekey_mails; do
+                    mails_with_gen_keys="$mails_with_gen_keys $m"
+                done
+            fi
+        fi
+        printf "Using the key from these mails to send to keyserver(s):\n ${BLUE}$mails_with_gen_keys\n"
+        gpg-publish-key "$($GPG $dir --list-keys --list-options show-only-fpr-mbox $mails_with_gen_keys | awk '{print $1;}')" 
+    fi
+
+    printf "${GREEN}Done!\n"
+
+    reade -Q "GREEN" -i "n" -p "Remove ${CYAN}$file? [N/y]: " "y" rm_file
+    if test $rm_file == 'y'; then
+        rm -v $file
+    fi
+    
+    printf "If using thunderbird, don't forget to restart and/or reload keycache! ('Tools->OpenPGP KeyManager->File->Reload KeyCache')\n"
+
+    unset b i m regex private_mails rm_file publish add_mail mails_with_gen_keys
+}
+
+
+alias gpg-generate-key-only-name-email="$GPG --generate-key"
 alias gpg-generate-key-full="$GPG --full-generate-key"
 
 function gpg-generate-key-full(){
@@ -30,7 +241,7 @@ function gpg-generate-key-full(){
 
 alias gpg-list-public-keys="$GPG --list-public-keys" 
 alias gpg-list-secret-keys="$GPG --list-secret-keys"
-
+alias gpg-list-config="$GPG --list-config --with-colons"
 alias gpg-edit-key="$GPG --edit-key"
 
 function gpg-list-packets-from-key(){
@@ -76,10 +287,14 @@ function gpg-search-keys-and-import() {
     else
         mail="$1"
     fi
-    reade -Q "GREEN" -i "n" -p "Set keyserver? (Otherwise looks for last defined keyserver in ~/.gnupg/gpg.conf) [N/y]: " "y" c_srv
+    reade -Q "GREEN" -i "n" -p "Set keyserver? (Otherwise looks for last defined keyserver in \$GNUPGHOME/.gnupg/gpg.conf) [N/y]: " "y" c_srv
     if test "$c_srv" == "y"; then
         #reade -Q "GREEN" -i "hkp://keys.openpgp.org" -p "Keyserver?: " "hkp://keyserver.ubuntu.com hkp://pgp.mit.edu hkp://pool.sks-keyservers.net hkps://keys.mailvelope.com hkps://api.protonmail.ch" serv 
-        reade -Q "GREEN" -i "all" -p "Keyserver?: " "$keyservers_all" serv 
+        printf "Known keyservers from \$GNUPGHOME/gpg.conf: \n"
+        for i in $keyservers_all; do
+            printf "\t- ${CYAN}$i${normal}\n"
+        done
+        reade -Q "GREEN" -i "all" -p "Keyserver? (Default: all known): " "$keyservers_all" serv 
         if test "$serv" == "all"; then
             for srv in $keyservers_all; do
                 echo "Searching ${bold}${magenta}$srv${normal}"
@@ -100,10 +315,14 @@ function gpg-receive-keys-using-fingerprint() {
         fingrprnt="$1"
     fi
     #$GPG --list-keys --list-options show-only-fpr-mbox
-    reade -Q "GREEN" -i "n" -p "Set keyserver? (Otherwise looks for last defined keyserver in ~/.gnupg/gpg.conf) [N/y]: " "y" c_srv
+    reade -Q "GREEN" -i "n" -p "Set keyserver? (Otherwise looks for last defined keyserver in \$GNUPGHOME/.gnupg/gpg.conf) [N/y]: " "y" c_srv
     if test "$c_srv" == 'y'; then
         #reade -Q "GREEN" -i "hkp://keys.openpgp.org" -p "Keyserver?: " "hkp://keyserver.ubuntu.com hkp://pgp.mit.edu hkp://pool.sks-keyservers.net hkps://keys.mailvelope.com hkps://api.protonmail.ch" serv 
-        reade -Q "GREEN" -i "all" -p "Keyserver?: " "$keyservers_all" serv 
+        printf "Known keyservers from \$GNUPGHOME/gpg.conf: \n"
+        for i in $keyservers_all; do
+            printf "\t- ${CYAN}$i${normal}\n"
+        done
+        reade -Q "GREEN" -i "all" -p "Keyserver? (Default: all known): " "$keyservers_all" serv 
         if test "$serv" == 'all'; then
             for srv in $keyservers_all; do
                 echo "Searching ${bold}${magenta}$srv${normal}"
@@ -116,3 +335,4 @@ function gpg-receive-keys-using-fingerprint() {
         "$GPG" --verbose --receive-keys "$fingrprnt"  
     fi
 }
+#unset publickey_mails privatekey_mails keyservers_all first_keysrv keyservers
