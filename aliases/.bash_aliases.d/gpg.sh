@@ -99,7 +99,7 @@ function gpg-publish-key() {
 }
 
 
-function gpg-get-emails-exported-browserslogins-and-generate-keys(){
+function gpg-get-emails-exported-browserlogins-and-generate-keys(){
     printf "Make sure to check ${cyan}$HOME/.gnupg/gpg.conf${normal} for algorithm preferences.\n"
     printf "At default ECC (Elliptic-curve cryptography) is used for both signing and encryption:\n - ${GREEN}the public-private keypair${normal} is made using ed25519, used for certification and signing\n - ${CYAN}the subkeys for both keys in the pair${normal} are generated use cv25519, used for encryption - these are generated because it would be bad a idea to use the same key for both signing and encryption. So, GPG uses a separate subkey for at least encryption.\nMore on why GPG also generates ${CYAN}subkeys${normal}:\nhttps://rgoulter.com/blog/posts/programming/2022-06-10-a-visual-explanation-of-gpg-subkeys.html\nhttps://serverfault.com/questions/397973/gpg-why-am-i-encrypting-with-subkey-instead-of-primary-key\n"
     #When hashes for fingerprints are generated they are based on your OpenPGP fingerprint Version, wich most likely is V4 and thus are generated using the SHA-1 hashing algorithm. More on how safe this is here: https://security.stackexchange.com/questions/68105/gpg-keys-sha-1)
@@ -230,6 +230,7 @@ function gpg-get-emails-exported-browserslogins-and-generate-keys(){
 alias gpg-generate-key-only-name-email="$GPG --generate-key"
 alias gpg-generate-key-full="$GPG --full-generate-key"
 
+
 function gpg-generate-key-full(){
      reade -Q "CYAN" -i "n" -p "Expert mode (allow things like generating unusual keytypes)? [N/y]: " "y" xprt
      if test "$xprt" == "y"; then
@@ -238,6 +239,7 @@ function gpg-generate-key-full(){
          $GPG --full-generate-key
      fi
 }
+
 
 alias gpg-list-public-keys="$GPG --list-public-keys" 
 alias gpg-list-secret-keys="$GPG --list-secret-keys"
