@@ -1,6 +1,8 @@
 #!/bin/bash
 
- #TODO : FIX FOR CHROMIUM BASED BROWSERS
+printf " Based on: ${CYAN} https://github.com/mailvelope/mailvelope/wiki/Creating-the-app-manifest-file-on-macOS-and-Linux
+"
+ # TODO : FIX FOR CHROMIUM BASED BROWSERS
  # https://github.com/mailvelope/mailvelope/wiki/Creating-the-app-manifest-file-on-macOS-and-Linux
  # No idea what im doing wrong?
 
