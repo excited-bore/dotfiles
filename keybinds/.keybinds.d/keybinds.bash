@@ -115,31 +115,33 @@ complete -F _cd cd
 
 # Full path dirs
 alias dirs="dirs -l"
+alias dirs-col="dirs -v | column -c $COLUMNS"
+alias dirs-col-pretty="dirs -v | column -c $COLUMNS | sed -e 's/ 0 \\([^\t]*\\)/'\${GREEN}' 0 \\1'\${normal}'/'"
 
 #'Silent' clear
 if type starship &> /dev/null && (grep -q  '\\n' ~/.config/starship.toml || grep -q 'line_break' ~/.config/starship.toml || ! head -n 1 ~/.config/starship.toml | grep -q 'format' ); then
     alias _="tput cuu1 && tput cuu1 && tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null"
-    alias _.="tput cuu1 && tput cuu1 && tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i < $(dirs -v | column -c $COLUMNS | wc -l) ; i++)); do tput cuu1; done && dirs -v | column -c $COLUMNS && history -d -1 &>/dev/null"
+    alias _.="tput cuu1 && tput cuu1 && tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i < $(dirs -v | column -c ${COLUMNS} | wc -l) ; i++)); do tput cuu1; done && dirs-col-pretty && history -d -1 &>/dev/null"
 elif type starship &> /dev/null; then
     alias _="tput cuu1 && tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null"
-    alias _.="tput cuu1 && tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i <= $(dirs -v | column -c $COLUMNS | wc -l) ; i++)); do tput cuu1; done && tput cuu1 && dirs -v | column -c $COLUMNS && tput rc && history -d -1 &>/dev/null"
+    alias _.="tput cuu1 && tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i <= $(dirs -v | column -c ${COLUMNS} | wc -l) ; i++)); do tput cuu1; done && tput cuu1 && dirs-col-pretty && tput rc && history -d -1 &>/dev/null"
 else
     alias _="tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null"
-    alias _.="tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i <= $(dirs -v | column -c $COLUMNS | wc -l) ; i++)); do tput cuu1; done && tput cuu1 && dirs && tput rc && history -d -1 &>/dev/null"
+    alias _.="tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i <= $(dirs -v | column -c ${COLUMNS} | wc -l) ; i++)); do tput cuu1; done && tput cuu1 && dirs-col-pretty && tput rc && history -d -1 &>/dev/null"
 fi
 
 # 'dirs' builtins shows all directories in stack
 # Ctrl-Up arrow rotates over directory history
 bind -x '"\e277": pushd +1 &>/dev/null'
 bind -m emacs-standard '"\e[1;5A": "\C-e\C-u\e277 _.\C-m"'
-bind -m vi-command     '"\e[1;5A": "i\C-e\C-u\e277 _.\C-m"'
-bind -m vi-insert      '"\e[1;5A": "\C-e\C-u\e277 _.\C-m"'
+bind -m vi-command     '"\e[1;5A": "ddi\e277 _.\C-m"'
+bind -m vi-insert      '"\e[1;5A": "\eddi\e277 _.\C-m"'
 
 # Ctrl-Down -> Rotate between 2 last directories
 bind -x '"\e266": pushd -1 &>/dev/null'
 bind -m emacs-standard '"\e[1;5B": "\C-e\C-u\e266 _.\C-m"'
-bind -m vi-command     '"\e[1;5B": "i\C-e\C-u\e266 _.\C-m"'
-bind -m vi-insert      '"\e[1;5B": "\C-e\C-u\e266 _.\C-m"'
+bind -m vi-command     '"\e[1;5B": "ddi\C-u\e266 _.\C-m"'
+bind -m vi-insert      '"\e[1;5B": "\eddi\e266 _.\C-m"'
 
 # Shift left/right to jump from words instead of chars
 bind -m emacs-standard  '"\e[1;2D": backward-word'
@@ -156,13 +158,13 @@ alias __='clear && tput cup $(($LINE_TPUT+1)) $TPUT_COL && tput sc 1 && tput cuu
 #bind -x '"\e288": "cd \C-i"'
 bind -x '"\e288": "__"'
 bind -m emacs-standard  '"\e[1;2A": "\C-e\C-u\e288"'
-bind -m vi-command      '"\e[1;2A": "i\C-e\C-u\e288"'
-bind -m vi-insert       '"\e[1;2A": "\C-e\C-u\e288"'
+bind -m vi-command      '"\e[1;2A": "ddi\e288"'
+bind -m vi-insert       '"\e[1;2A": "\eddi\e288"'
 
 # Shift down => cd shortcut
 bind -m emacs-standard  '"\e[1;2B": "\C-e\C-u\e288cd \C-i"'
-bind -m vi-insert       '"\e[1;2B": "\C-e\C-u\e288cd \C-i"'
-bind -m vi-command      '"\e[1;2B": "i\C-e\C-u\e288cd \C-i"'
+bind -m vi-insert       '"\e[1;2B": "\eddi\e288cd \C-i"'
+bind -m vi-command      '"\e[1;2B": "\eddi\e288cd \C-i"'
 
 # Shift left/right to jump from bigwords (ignore spaces when jumping) instead of chars
 #bind -m emacs-standard -x '"\e[1;2D": clear && let COL_TPUT=$COL_TPUT-1 && if [ $COL_TPUT -lt 0 ];then COL_TPUT=$COLUMNS;fi && tput cup $LINE_TPUT $COL_TPUT && tput sc 1 && echo "${PS1@P}" && tput cuu1'
@@ -249,10 +251,18 @@ _edit_wo_executing() {
     rm "$tmpf" &> /dev/null
 }
 
-bind -m vi-insert      -x '"\C-x\C-e":_edit_wo_executing'
-bind -m vi-command     -x '"\C-x\C-e":_edit_wo_executing'
+bind -m vi-insert      -x '"\C-e":_edit_wo_executing'
 bind -m vi-command     -x '"v":_edit_wo_executing'
+bind -m vi-command     -x '"\C-e":_edit_wo_executing'
 bind -m emacs-standard -x '"\C-x\C-e":_edit_wo_executing'
+
+# RLWRAP 
+
+#if type rlwrap &> /dev/null; then
+#    bind -m emacs-standard '"\C-x\C-e" : rlwrap-call-editor' 
+#    bind -m vi-command '"\C-e" : rlwrap-call-editor' 
+#    bind -m vi-insert '"\C-e" : rlwrap-call-editor' 
+#fi
 
 if type osc &> /dev/null; then
     bind -m emacs-standard -x '"\C-s" : echo "$READLINE_LINE" | osc copy' 

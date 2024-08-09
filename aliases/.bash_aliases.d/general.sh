@@ -21,6 +21,7 @@ alias cp="cp -rv"
 alias cp-old="cp -ruv"
 alias copy="cp"
 
+
 function cp-all-to(){
     local dest
     if [ -z "$1" ] && [ -d "$1" ]; then
@@ -282,6 +283,8 @@ alias x="cd .."
 
 # (:
 alias men="man man"
+
+alias word2line="tr ' ' '\n'"
 
 # Pipe column output to a pager
 alias column="column -c $(tput cols)"

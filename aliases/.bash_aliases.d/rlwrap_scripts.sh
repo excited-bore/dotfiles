@@ -47,13 +47,14 @@ if test -z $TMPDIR; then
 fi
 
 reade(){
-    if [ ! -x "$(command -v rlwrap)" ]; then 
+    if [ ! -x "$(command -v rlwrap)" ] || [[ "$@" =~ ' -e ' ]] ; then 
         readstr="read  ";
+        fcomp="n"
         color=""
         while getopts ':b:e:i:p:Q:s:S:' flag; do
             case "${flag}" in
                 b)  ;;
-                e)  readstr=$(echo "$readstr" | sed "s|read |read \-e |g");
+                e)  readstr=$(echo "$readstr" | sed "s|read |read \-e \-r |g");
                     ;;
                 #  Even though it's in the read man, -i does not actually work
                 i)  readstr=$(echo "$readstr" | sed "s|read |read \-i \"${OPTARG}\" |g");
@@ -96,6 +97,7 @@ reade(){
         fi
         #black, red, green, yellow, blue, cyan, purple (=magenta) or white
         eval "${@:$#:1}=$value";
+        unset fcomp
     else
         if [[ $# < 2 ]]; then
             echo "Give up at least two variables for reade(). "

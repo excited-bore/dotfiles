@@ -20,6 +20,38 @@ fingerprints_all=$("$GPG" --list-keys --list-options show-only-fpr-mbox | awk '{
 first_fgr=$(echo "$fingerprints_all" | awk 'NR==1{print $1}')
 fingerprints=$(echo "$fingerprints_all" | awk 'NR>1{print $1}')
 
+mailregex="^[a-z0-9!#\$%&'*+/=?^_\`{|}~-]+(\.[a-z0-9!#$%&'*+/=?^_\`{|}~-]+)*@([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z0-9]([a-z0-9-]*[a-z0-9])?\$"
+
+function receive-mails-csv-file(){
+
+        if test -z $1; then
+            reade -Q "GREEN"  -p "Passwords.csv file?: " -e file 
+            if ! test -f "$file"; then
+                printf "File doesnt't exist!\n"
+                return 1
+            fi
+        elif test -f $1; then
+            mail=$1
+        fi
+
+        reade -Q "GREEN" -i "firefox" -p "Chrome or firefox based? [Firefox/chrome]: " "chrome" based
+        
+        if test $based == 'firefox'; then
+            b=$(cat "$file" | tr ',' ' '| awk '{print $2;}')
+        else
+            b=$(cat "$file" | tr ',' ' '| awk '{print $3;}')
+        fi
+        b=$(echo -e "$b" | sort -u)
+        o=''
+        for i in $b ; do
+            if [[ $i =~ $mailregex ]]; then
+                o="$o $i"
+            fi
+        done
+        echo $o
+        unset b o i
+}
+
 
 function gpg-publish-key() {
     printf "${CYAN}Hint: If rlwrap is installed, tab completion is enabled${normal}\n"
@@ -30,7 +62,7 @@ function gpg-publish-key() {
         if ! test -d $dir; then
             printf "$dir not a dir!\n"
             return 1 
-        else
+        elif ! test -z $dir; then
             dir="--homedir $dir"
         fi
     fi 
@@ -106,11 +138,11 @@ function gpg-get-emails-exported-browserlogins-and-generate-keys(){
     printf "At default ECC (Elliptic-curve cryptography) is used for both signing and encryption:\n - ${GREEN}the public-private keypair${normal} is made using ed25519, used for certification and signing\n - ${CYAN}the subkeys for both keys in the pair${normal} are generated use cv25519, used for encryption - these are generated because it would be bad a idea to use the same key for both signing and encryption. So, GPG uses a separate subkey for at least encryption.\nMore on why GPG also generates ${CYAN}subkeys${normal}:\nhttps://rgoulter.com/blog/posts/programming/2022-06-10-a-visual-explanation-of-gpg-subkeys.html\nhttps://serverfault.com/questions/397973/gpg-why-am-i-encrypting-with-subkey-instead-of-primary-key\n"
     #When hashes for fingerprints are generated they are based on your OpenPGP fingerprint Version, wich most likely is V4 and thus are generated using the SHA-1 hashing algorithm. More on how safe this is here: https://security.stackexchange.com/questions/68105/gpg-keys-sha-1)
     printf "${CYAN}Hint: If rlwrap is installed, tab completion is enabled${normal}\n"
-
-    reade -Q "GREEN" -p "Passwords.csv file?: " -e file 
-    if ! test -f $file; then
-        printf "File doesnt't exist!\n"
-        return 1
+    
+    if test -z $1; then 
+        file=$(receive-mails-csv-file)
+    else
+        file=$1
     fi
 
     reade -Q "GREEN" -p "Homedirectory where gpg-files are stored? (could be thunderbird profilefolder f.ex. / leave empty for $GNUPGHOME): " -e dir_p 
@@ -268,12 +300,8 @@ function gpg-get-emails-exported-browserlogins-and-generate-keys(){
 
     private_mails=$("$GPG" $dir --list-secret-keys | grep --color=never \< | cut -d'<' -f2- | cut -d'>' -f1)
     
-    regex="^[a-z0-9!#\$%&'*+/=?^_\`{|}~-]+(\.[a-z0-9!#$%&'*+/=?^_\`{|}~-]+)*@([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z0-9]([a-z0-9-]*[a-z0-9])?\$"
-    b=$(cat $file | tr ',' ' '| awk '{print $2;}')
-    b=$(echo -e "$b" | sort -u)
-
     mails_with_gen_keys=""
-    for i in $b; do
+    for i in $mails; do
         
         # Remove " before and after mail (i)
         i=${i#"\""}
@@ -282,7 +310,7 @@ function gpg-get-emails-exported-browserlogins-and-generate-keys(){
         # Get name by printing mail with any numbers, cutting away the part after @, replace _/-/. with spaces and then uppercase first letter of each space seperated word
         i_name="$(printf '%s\n' ${i//[[:digit:]]/} | cut -d@ -f1 | sed 's|_| |g' | sed 's|-| |g' | sed 's|\.| |' | sed -r 's/[^[:space:]]*[0-9][^[:space:]]* ?//g' | sed -e 's/\b\(.\)/\u\1/g')"
 
-        if [[ $i =~ $regex ]] && ! echo "$private_mails" | grep $i; then
+        if ! echo "$private_mails" | grep $i; then
             reade -Q "GREEN" -i "y" -p "No secret key found for ${CYAN}$i${GREEN}. Generate key? [Y/n]: " "n" gen
             #if ! $same_way; then
             if test $gen == 'y'; then
@@ -468,11 +496,19 @@ alias gpg-delete-only-secret-key="$GPG --yes --delete-secret-keys"
 alias gpg-delete-only-public-key="$GPG --yes --delete-keys"
 
 
-function gpg-search-keys-and-import() {
+function gpg-search-keys-keyserver-by-mail() {
     if test -z "$1"; then 
-        reade -Q "GREEN" -p "Name/Email/Fingerprint/Keyid?: " "" mail
+        reade -Q "GREEN" -i "' '" -p "Name/Email/Fingerprint/Keyid?: " "all-mails all-finger $publickey_mails $fingerprints_all" mail
+    elif test -f "$1"; then
+        mail=$(cat "$1" | awk '{print $2;}')  
     else
         mail="$1"
+    fi
+
+    if test "$mail" == 'all-mails'; then
+        mail="$publickey_mails"
+    elif test "$mail" == 'all-finger'; then
+        mail="$fingerprints_all"
     fi
     reade -Q "GREEN" -i "n" -p "Set keyserver? (Otherwise looks for last defined keyserver in \$GNUPGHOME/.gnupg/gpg.conf) [N/y]: " "y" c_srv
     if test "$c_srv" == "y"; then
@@ -495,11 +531,14 @@ function gpg-search-keys-and-import() {
     fi
 }
 
-function gpg-receive-keys-using-fingerprint() {
+function gpg-receive-keys-keyserver-by-fingerprints() {
     if test -z "$1"; then 
-        reade -Q "GREEN" -i "$first_fgr" -p "Fingerprint?: " "$fingerprints" fingrprnt
+        reade -Q "GREEN" -i "' '" -p "Fingerprint(s)?: " "all $fingerprints_all" fingrprnt
     else
         fingrprnt="$1"
+    fi
+    if test $fingrprnt == 'all'; then
+        fingrprnt=$fingerprints_all
     fi
     #$GPG --list-keys --list-options show-only-fpr-mbox
     reade -Q "GREEN" -i "n" -p "Set keyserver? (Otherwise looks for last defined keyserver in \$GNUPGHOME/.gnupg/gpg.conf) [N/y]: " "y" c_srv
@@ -513,13 +552,15 @@ function gpg-receive-keys-using-fingerprint() {
         if test "$serv" == 'all'; then
             for srv in $keyservers_all; do
                 echo "Searching ${bold}${magenta}$srv${normal}"
-                "$GPG" --verbose --keyserver "$srv" --receive-keys "$fingrprnt"  
+                "$GPG" --verbose --keyserver "$srv" --receive-keys $fingrprnt  
             done
         else
-            "$GPG" --verbose --keyserver "$serv" --receive-keys "$fingrprnt"  
+            "$GPG" --verbose --keyserver "$serv" --receive-keys $fingrprnt  
         fi
     else 
-        "$GPG" --verbose --receive-keys "$fingrprnt"  
+        "$GPG" --verbose --receive-keys $fingrprnt  
     fi
 }
+
+
 #unset publickey_mails privatekey_mails keyservers_all first_keysrv keyservers

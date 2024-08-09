@@ -32,6 +32,7 @@ else
 fi
 
 
+
 printf "${green}If all necessary files are sourced correctly, this text looks green.\nIf not, something went wrong.\n"
 printf "\n${green}Files that get overwritten get backed up and trashed (to prevent clutter).\nRecover using ${cyan}'gio trash --list'${green} and ${cyan}'gio trash --restore' ${normal}\n"
 printf "${green} Will now start with updating system ${normal}\n"
@@ -67,6 +68,18 @@ fi
 
 unset sym1 sym2 sym3 beep
 
+
+if ! type AppImageLauncher &> /dev/null; then
+    printf "${GREEN}If you want to install applications using appimages, there is a helper called 'appimagelauncher'\n"
+     reade -Q "GREEN" -i "y" -p "Check if appimage ready and install appimagelauncher? [Y/n]: " "n" appimage_install
+     if test $appimage_install == 'y'; then
+         if ! test -f ./install_appimagelauncher.sh; then
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_appimagelauncher.sh)" 
+         else
+            ./install_appimagelauncher.sh
+         fi
+     fi
+fi
 
 #if ! type flatpak &> /dev/null; then
     #printf "%s\n" "${blue}No flatpak detected. (Independent package manager from Red Hat)${normal}"
