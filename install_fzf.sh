@@ -21,7 +21,7 @@ if ! type update_system &> /dev/null; then
 fi
 
 if test -z $SYSTEM_UPDATED; then
-    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y n" updatesysm
+    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "n" updatesysm
     if test $updatesysm == "y"; then
         update_system                     
     fi
@@ -67,7 +67,7 @@ fnd="find"
 
 # TODO: Make better check: https://github.com/sharkdp/fd
 if ! type fd-find &> /dev/null && ! type fd &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Install fd and use for fzf? (Faster find) [Y/n]: " "y n" fdr
+    reade -Q "GREEN" -i "y" -p "Install fd and use for fzf? (Faster find) [Y/n]: " "n" fdr
      if [ -z $fdr ] || [ "Y" == $fdr ] || [ $fdr == "y" ]; then
         if ! test -f install_fd.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fd.sh)" 
@@ -80,10 +80,10 @@ else
     fnd="fd"
 fi
 
-echo "${green}Fzf uses 'find'. Set default find options for fzf to:${normal}"
-reade -Q "GREEN" -i "y" -p "    Search globally instead of in current folder? [Y/n]: " "y n" fndgbl
-reade -Q "GREEN" -i "y" -p "    Search only files? [Y/n]: " "y n" fndfle
-reade -Q "GREEN" -i "y" -p "    Include hidden files? [Y/n]: " "y n" fndhiddn
+echo "${green}Fzf will use '${CYAN}$fnd${normal}${green}'. Set default options that are fzf related to:${normal}"
+reade -Q "GREEN" -i "y" -p "    Search globally instead of in current folder? [Y/n]: " "n" fndgbl
+reade -Q "GREEN" -i "y" -p "    Search only files? [Y/n]: " "n" fndfle
+reade -Q "GREEN" -i "y" -p "    Include hidden files? [Y/n]: " "n" fndhiddn
 if [ $fnd == "find" ]; then
    test "$fndgbl" == "y" && fnd="find /"
    test "$fndfle" == "y" && fnd="$fnd -type f"
@@ -98,7 +98,7 @@ unset fndgbl fndfle fndhiddn
 # TODO: Make better check: https://github.com/sharkdp/fd
 if type fd-find &> /dev/null || type fd &> /dev/null; then
     echo "${green}Fd can read from global gitignore file${normal}"
-    reade -Q "GREEN" -i "y" -p "Generate global gitignore? [Y/n]: " "y n" fndgbl
+    reade -Q "GREEN" -i "y" -p "Generate global gitignore? [Y/n]: " "n" fndgbl
     if [ $fndgbl == 'y' ]; then
         if ! test -f install_gitignore.sh; then
             b=$(mktemp)
@@ -143,7 +143,7 @@ fi
  
  # TODO: Check export for ripgrep
  # TODO: Do more with ripgrep
- reade -Q "GREEN" -i "y" -p "Install ripgrep? (Recursive grep, opens possibility for line by line fzf ) [Y/n]: " "y n" rpgrp
+ reade -Q "GREEN" -i "y" -p "Install ripgrep? (Recursive grep, opens possibility for line by line fzf ) [Y/n]: " "n" rpgrp
  if [ -z $rpgrp ] || [ "Y" == $rpgrp ] || [ $rpgrp == "y" ]; then
     if ! test -f install_ripgrep.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ripgrep.sh)" 
@@ -161,12 +161,12 @@ fi
          printf "\n# RIPGREP\nexport RG_PREFIX='rg --column --line-number --no-heading --color=always --smart-case \"" | sudo tee -a $PATHVAR_R
     fi
     
-    reade -Q "GREEN" -i "y" -p "Add shortcut for ripgrep files in dir? (Ctrl-g) [Y/n]: " "y n" rpgrpdir
+    reade -Q "GREEN" -i "y" -p "Add shortcut for ripgrep files in dir? (Ctrl-g) [Y/n]: " "n" rpgrpdir
     if [ -z $rpgrp ] || [ "Y" == $rpgrp ] || [ $rpgrp == "y" ]; then
-        if ! test -f fzf/ripgrep-directory.sh; then
+        if ! test -f fzf/.bash_aliases.d/ripgrep-directory.sh; then
             wget -O ~/.bash_aliases.d/ripgrep-directory.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/ripgrep-directory.sh
         else
-            cp -fv fzf/ripgrep-directory.sh ~/.bash_aliases.d/
+            cp -fv fzf/.bash_aliases.d/ripgrep-directory.sh ~/.bash_aliases.d/
         fi
         #if ! grep -q "ripgrep-dir" ~/.fzf/shell/key-bindings.bash; then 
         #    # TODO Fix this
@@ -179,7 +179,7 @@ fi
  unset rpgrp rpgrpdir
 
 if type kitty &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Add shortcut for fzf-autocompletion? (CTRL-Tab) [Y/n]: " "y n" comp_key
+    reade -Q "GREEN" -i "y" -p "Add shortcut for fzf-autocompletion? (CTRL-Tab) [Y/n]: " "n" comp_key
     if [ "$comp_key" == "y" ]; then
         if ! test -f .keybinds.d/keybinds.bash && ! grep -q "(Kitty)" ~/.fzf/shell/key-bindings.bash; then
             printf "\n# (Kitty) Ctrl-tab for fzf autocompletion" >> ~/.fzf/shell/key-bindings.bash
@@ -205,13 +205,13 @@ if test -f ~/.fzf.bash ; then
             sudo mv -v /usr/bin/rifle.py /usr/bin/rifle
             sudo chmod +x /usr/bin/rifle
         fi
-        if ! test -f ranger/rifle.conf; then
+        if ! test -f ranger/.config/ranger/rifle.conf; then
             wget -O ~/.config/ranger/rifle.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/rifle.conf  
             wget -O ~/.bash_aliases.d/keybinds_rifle.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/keybinds_rifle.sh
         else
             mkdir -p ~/.config/ranger
-            cp -fv ranger/rifle.conf ~/.config/ranger/
-            cp -fv fzf/keybinds_rifle.sh ~/.bash_aliases.d/
+            cp -fv ranger/.config/ranger/rifle.conf ~/.config/ranger/
+            cp -fv fzf/.bash_aliases.d/keybinds_rifle.sh ~/.bash_aliases.d/
         fi
         if ! grep -q "keybinds_rifle.sh" ~/.fzf/shell/key-bindings.bash; then
             sed -i "s|\(# Required to refresh the prompt after fzf\)|. ~\/.bash_aliases.d\/keybinds_rifle.sh\n\1|" ~/.fzf/shell/key-bindings.bash;
@@ -221,7 +221,7 @@ if test -f ~/.fzf.bash ; then
     unset fzf_t
 
     if ! type bat &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Install bat? (File previews/thumbnails for riflesearch) [Y/n]: " "y n" bat
+        reade -Q "GREEN" -i "y" -p "Install bat? (File previews/thumbnails for riflesearch) [Y/n]: " "n" bat
         if [ "$bat" == "y" ]; then
             if ! test -f install_bat.sh; then
                 eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bat.sh)" 

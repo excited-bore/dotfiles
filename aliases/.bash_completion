@@ -1,9 +1,0 @@
-#!/bin/bash
-# vim: set filetype=bash
-
-if [ -d ~/.bash_completion.d/ ] && [ "$(ls -A ~/.bash_completion.d/)" ]; then
-  for compl in ~/.bash_completion.d/*; do
-      source "$compl" 
-  done
-fi
-

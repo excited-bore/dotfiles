@@ -44,6 +44,9 @@ if type rg &> /dev/null; then
     }
 fi
 
+# Stow
+alias stow-adopt="stow ./ -t ~/ --adopt"
+
 #function ptrace_toggle() {
 #    echo "Has ptrace currently elevated priviliges: $PTRACE_ELEVATED_PRIVILIGE";
 #    echo "Change? y/n: ";

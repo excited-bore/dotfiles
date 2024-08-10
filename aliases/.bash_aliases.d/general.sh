@@ -275,7 +275,10 @@ alias rg='rg --color=always'
 
 # Listen hidden files and permissions
 alias ll="ls -ahl"
-alias ls-all="ls -Ahl"
+
+# Listen only directories, including that are hidden
+alias lsdr="ls -Ap | grep \".*/$\""
+alias lall="ls -Ahl"
 alias q="exit"
 alias d="dirs"
 alias c="cd"

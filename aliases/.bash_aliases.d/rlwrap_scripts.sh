@@ -1,6 +1,13 @@
 # https://stackoverflow.com/questions/5412761/using-colors-with-printf
 # Execute (during printf) for colored prompt
 # printf  "${blue}This text is blue${white}\n"
+function compare_tput_escape_color(){
+    for (( ansi=0; ansi <= 120; ansi++)); do
+        printf "$ansi $(tput setaf $ansi) tput foreground $(tput sgr0) $(tput setab $ansi) tput background $(tput sgr0)"; echo -e " \033[$ansi;mEscape\033[0m"
+    done | $PAGER
+    unset ansi
+}
+
 red=$(tput setaf 1)
 red1=$(tput setaf 9)
 green=$(tput setaf 2)
@@ -36,8 +43,23 @@ BLACK=$(tput setaf 16 && tput bold)
 GREY=$(tput setaf 8 && tput bold)
 
 bold=$(tput bold)
+underline_on=$(tput smul)
+underline_off=$(tput rmul)
+bold_on=$(tput smso)
+bold_off=$(tput rmso)
+half_bright=$(tput dim)
+reverse_color=$(tput rev)
+
+# Reset
 normal=$(tput sgr0)
-#...
+
+# Broken !! (Or im dumb?)
+blink=$(tput blink)
+underline=$(tput ul)
+italic=$(tput it)
+
+# ...
+# https://ss64.com/bash/tput.html
 
 # Arguments: Completions(string with space entries, AWK works too),return value(-a password prompt, -c complete filenames, -p prompt flag, -Q prompt colour, -b break-chars (when does a string break for autocomp), -e change char given for multiple autocompletions)
 # 'man rlwrap' to see all unimplemented options
@@ -46,8 +68,16 @@ if test -z $TMPDIR; then
     TMPDIR=$(mktemp -d)
 fi
 
+# reade because its rlwrap with read -e for file completions
+# The upside is that files with spaces are backslashed
+# The downside is that prompts with colour break when using arrow keys (accidently)
+# This goes for both tput and escape codes
+#
+# read -e -r -p $'\e[31mFoobar\e[0m: ' foo  for example
+# printf "${CYAN}bluh"; read -e -r foo  is also problematic because prompt disappears when arrow up and back down
+
 reade(){
-    if [ ! -x "$(command -v rlwrap)" ] || [[ "$@" =~ ' -e ' ]] ; then 
+    if [ ! -x "$(command -v rlwrap)" ] || [[ "$@" =~ ' -e' ]] ; then 
         readstr="read  ";
         fcomp="n"
         color=""
@@ -55,6 +85,7 @@ reade(){
             case "${flag}" in
                 b)  ;;
                 e)  readstr=$(echo "$readstr" | sed "s|read |read \-e \-r |g");
+                    fcomp='y'
                     ;;
                 #  Even though it's in the read man, -i does not actually work
                 i)  readstr=$(echo "$readstr" | sed "s|read |read \-i \"${OPTARG}\" |g");
@@ -82,7 +113,7 @@ reade(){
                         color=$color"${white}"
                     fi
                     ;;
-                p)  readstr=$(echo "$readstr" | sed "s|read |read \-p \"${color}${OPTARG}${normal}\" |g");
+                p)  readstr=$(echo "$readstr" | sed "s|read |read -p \"${color}${OPTARG}${normal}\"|g");
                     ;;
                 s)  readstr=$(echo "$readstr" | sed "s|read |read \-s\"${OPTARG}\" |g");
                     ;;
@@ -90,11 +121,18 @@ reade(){
             esac
         done; 
         OPTIND=1;
-        #  Even though it's in the read man, -i does not actually work
+
         eval "$readstr" value;
+
+        if test $fcomp == 'y'; then
+            echo $value >> ~/.bash_history
+            history -n
+        fi
+
         if ! test -z "$pre" && test -z "$value"; then
             value="$pre"  
         fi
+    
         #black, red, green, yellow, blue, cyan, purple (=magenta) or white
         eval "${@:$#:1}=$value";
         unset fcomp
