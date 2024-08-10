@@ -77,15 +77,20 @@ fi
 # printf "${CYAN}bluh"; read -e -r foo  is also problematic because prompt disappears when arrow up and back down
 
 reade(){
-    if [ ! -x "$(command -v rlwrap)" ] || [[ "$@" =~ ' -e' ]] ; then 
+    fcomp="n"
+    while getopts ':e' flag; do
+        case "${flag}" in
+            e)  fcomp='y'
+            ;;
+        esac
+    done && OPTIND=1; 
+    if [ ! -x "$(command -v rlwrap)" ] || [[ "$fcomp" == 'y' ]] ; then 
         readstr="read  ";
-        fcomp="n"
         color=""
         while getopts ':b:e:i:p:Q:s:S:' flag; do
             case "${flag}" in
                 b)  ;;
                 e)  readstr=$(echo "$readstr" | sed "s|read |read \-e \-r |g");
-                    fcomp='y'
                     ;;
                 #  Even though it's in the read man, -i does not actually work
                 i)  readstr=$(echo "$readstr" | sed "s|read |read \-i \"${OPTARG}\" |g");
