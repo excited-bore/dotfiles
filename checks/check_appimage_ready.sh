@@ -21,19 +21,24 @@ if test -z $SYSTEM_UPDATED; then
 fi
 
 if test $distro_base == "Debian"; then
-    # Libfuse2 has a lot of CVE errors
-    if test $distro == "Ubuntu"; then
-        if test -z "$(dpkg -l | grep libfuse2)"; then
-            reade -Q "YELLOW" -i "n" -p "A package called 'libfuse2' is necessary for Appimages, but it has been removed because it is outdated and vulnerable to a bunch of CVE's\n Still install libfuse2? [N/y]: " "y" inslibfuse
-            if [ "$inslibfuse" == "y" ]; then
-                sudo apt install libfuse2
-            fi
+    # Libfuse2 has a lot of CVE errors so not all systems have it installed by default
+    if test -z "$(dpkg -l | grep libfuse2)"; then
+        reade -Q "YELLOW" -i "n" -p "A package called 'libfuse2' is necessary for Appimages, but it has been removed because it is outdated and vulnerable to a bunch of CVE's\n Still install libfuse2? [N/y]: " "y" inslibfuse
+        if [ "$inslibfuse" == "y" ]; then
+            sudo apt install libfuse2
         fi
-        #if ! test -z "$(dpkg -l | grep libfuse2)"; then
-        #    sudo add-apt-repository ppa:appimagelauncher-team/stable
-        #    sudo apt update
-        #    sudo apt install appimagelauncher
-        #fi
+    fi
+    #if ! test -z "$(dpkg -l | grep libfuse2)"; then
+    #    sudo add-apt-repository ppa:appimagelauncher-team/stable
+    #    sudo apt update
+    #    sudo apt install appimagelauncher
+    #fi
+elif test $distro_base == "Arch"; then
+    if test -z "$(dpkg -l | grep libfuse2)"; then
+        reade -Q "YELLOW" -i "n" -p "A package called 'libfuse2' is necessary for Appimages, but it has been removed because it is outdated and vulnerable to a bunch of CVE's\n Still install libfuse2? [N/y]: " "y" inslibfuse
+        if [ "$inslibfuse" == "y" ]; then
+            sudo pacman -S libfuse2
+        fi
     fi
 fi
 

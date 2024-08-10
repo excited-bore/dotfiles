@@ -445,7 +445,7 @@ function gpg-list-packets-from-key(){
 }
 
 alias gpg-edit-key="$GPG --edit-key"
-
+alias gpg-import="$GPG --import"
 
 function gpg-export-public-keys(){
     reade -Q "GREEN" -i "keys" -p "File name? (Script will add file-extension .asc): " "" name
@@ -540,14 +540,27 @@ function gpg-search-keys-keyserver-by-mail() {
 
 function gpg-receive-keys-keyserver-by-fingerprints() {
     if test -z "$1"; then 
-        reade -Q "GREEN" -i "' '" -p "Fingerprint(s)?: " "all $fingerprints_all" fingrprnt
+        reade -Q "GREEN" -i "mail" -p "Lookup fingerprint by mail or select fingerprint directly? [Mail/fingerprint]: " "fingerprint" fingrprnt_mail
+        if test $fingrprnt_mail == 'mail' ; then
+            reade -Q "GREEN" -i "' '" -p "Mail(s)?: " "all $publickey_mails" mails
+            if test $mails == all; then
+                mails="$publickey_mails"
+            fi
+            $GPG --list-keys --list-options show-only-fpr-mbox $mails
+            fingerprints_some=$($GPG --list-keys --list-options show-only-fpr-mbox $mails | awk '{print $1;}')
+            reade -Q "GREEN" -i "' '" -p "Fingerprint(s)?: " "all $fingerprints_some" fingrprnt
+            if test $fingrprnt == all; then
+                fingrprnt="$fingerprints_some"
+            fi 
+        else
+            reade -Q "GREEN" -i "' '" -p "Fingerprint(s)?: " "all $fingerprints_all" fingrprnt
+        fi
     else
         fingrprnt="$1"
     fi
-    if test $fingrprnt == 'all'; then
-        fingrprnt=$fingerprints_all
+    if test "$fingrprnt" == 'all'; then
+        fingrprnt="$fingerprints_all"
     fi
-    #$GPG --list-keys --list-options show-only-fpr-mbox
     reade -Q "GREEN" -i "n" -p "Set keyserver? (Otherwise looks for last defined keyserver in \$GNUPGHOME/.gnupg/gpg.conf) [N/y]: " "y" c_srv
     if test "$c_srv" == 'y'; then
         #reade -Q "GREEN" -i "hkp://keys.openpgp.org" -p "Keyserver?: " "hkp://keyserver.ubuntu.com hkp://pgp.mit.edu hkp://pool.sks-keyservers.net hkps://keys.mailvelope.com hkps://api.protonmail.ch" serv 

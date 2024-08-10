@@ -42,7 +42,7 @@ for f in ${!osInfo[@]};
 do
     if [ -f $f ] && [ $f == /etc/alpine-release ] && [ $distro == / ]; then
         packmang="apk"
-        distro_base="Slackware"
+        distro_base="BSD"
         distro="Alpine"
     elif [ -f $f ] && [ $f == /etc/manjaro-release ] && [ $distro == / ]; then
         packmang="pacman"
@@ -56,7 +56,7 @@ do
         else
             . ./checks/check_pamac.sh
         fi 
-        distro_base="Slackware"
+        distro_base="Arch"
         distro="Manjaro"
         # Check for AUR
           
@@ -80,11 +80,11 @@ do
         distro="Gentoo"
     elif [ -f $f ] && [ $f == /etc/fedora-release ] && [ $distro == / ]; then
         packmang="dnf"
-        distro_base="Slackware"
+        distro_base="RedHat"
         distro="Fedora"
     elif [ -f $f ] && [ $f == /etc/redhat-release ] && [ $distro == / ]; then
         packmang="yum"
-        distro_base="Slackware"
+        distro_base="RedHat"
         distro="Redhat"
     elif [ -f $f ] && [ $f == /etc/arch-release ] && [ $distro == / ]; then
         packmang="pacman"
@@ -190,7 +190,7 @@ do
             fi
             unset insyay 
         fi
-        distro_base="Slackware"
+        distro_base="Arch"
         distro="Arch"
     elif [ -f $f ] && [ $f == /etc/rpi-issue ] && [ $distro == / ];then
         packmang="apt"
