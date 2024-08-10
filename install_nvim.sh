@@ -139,7 +139,7 @@ elif [  $distro_base == "Debian" ];then
                     pre="appimage"
                     choices="flatpak build"
                     prompt="Which one (Appimage/flatpak/build from source)? [Flatpak/appimage/build]: "
-                    if [[ "$arch"  == "arm" ]]; then
+                    if [[ "$arch" =~ "arm" ]]; then
                         echo "${cyan}Arm architecture${normal} sadly still does not support ${red}appimages${normal}"  
                         pre="flatpak"
                         choices="build"
@@ -362,8 +362,14 @@ function instvim_r(){
     if ! sudo test -z $(ls /root/.config/nvim/*~ &> /dev/null); then 
         sudo bash -c 'gio trash /root/.config/nvim/*~'
     fi
+    # Symlink configs to flatpak dirs for possible flatpak nvim use
+    if [ -x "$(command -v flatpak)" ] && echo "$(flatpak list)" | grep -q "neovim"; then
+        sudo mkdir -p /root/.var/app/io.neovim.nvim/config/nvim/
+        sudo ln -s /root/.config/nvim/* /root/.var/app/io.neovim.nvim/config/nvim/
+    fi
+
     if sudo grep -q "MYVIMRC" $PATHVAR_R; then
-       sudo sed -i 's|.export MYVIMRC="|export MYVIMRC=~/.config/nvim/init.vim "|g' $PATHVAR_R
+        sudo sed -i 's|.export MYVIMRC="|export MYVIMRC=~/.config/nvim/init.vim "|g' $PATHVAR_R
         sudo sed -i 's|.export MYGVIMRC="|export MYGVIMRC=~/.config/nvim/init.vim "|g' $PATHVAR_R
     else
         printf "export MYVIMRC=~/.config/nvim/init.vim\n" | sudo tee -a $PATHVAR_R
@@ -412,6 +418,7 @@ function instvim(){
 
     # Symlink configs to flatpak dirs for possible flatpak nvim use
     if [ -x "$(command -v flatpak)" ] && echo "$(flatpak list)" | grep -q "neovim"; then
+        mkdir -p ~/.var/app/io.neovim.nvim/config/nvim/
         ln -s ~/.config/nvim/* ~/.var/app/io.neovim.nvim/config/nvim/
     fi
 
