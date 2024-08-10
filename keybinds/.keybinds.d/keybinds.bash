@@ -4,8 +4,8 @@
 
 # https://stackoverflow.com/questions/8366450/complex-keybinding-in-bash
 
-alias ls-binds-tty="stty -a"
-alias ls-binds-readline="bind -p | $PAGER"
+alias ls-binds-stty="stty -a"
+alias ls-binds-readline="{ printf \"\nList commands bound to keys\n\n\n\" ; bind -X ; echo; echo \"List key sequences that invoke macros and their values\"; echo; bind -S ; echo ;  echo \"List readline functions (possibly) bound to keys\"; bind -P; } | $PAGER"
 alias ls-binds-xterm="xrdb -query -all"
 alias ls-binds-kitty='kitty +kitten show_key -m kitty' 
 
@@ -20,13 +20,17 @@ stty -ixon
 stty -ixoff
 stty start 'undef' 
 stty stop 'undef'
-stty rprnt 'undef'
-stty lnext '^b'
 
-# Unset suspend signal shortcut (Ctrl+z)
-stty susp undef
+# Unset redraw current line (Default C-r).  
+# stty rprnt 'undef'
 
-# Unset backward word erase shortcut (Ctrl+w)
+# Unset quoted insert from (Default C-v) 
+stty lnext 'undef'
+
+# Unset suspend signal shortcut (Default Ctrl+z)
+stty susp 'undef'
+
+# Unset backward word erase shortcut (Default Ctrl+w)
 stty werase 'undef'
 
 # unbinds ctrl-c and bind the function to ctrl-s
@@ -121,13 +125,13 @@ alias dirs-col-pretty="dirs -v | column -c $COLUMNS | sed -e 's/ 0 \\([^\t]*\\)/
 #'Silent' clear
 if type starship &> /dev/null && (grep -q  '\\n' ~/.config/starship.toml || grep -q 'line_break' ~/.config/starship.toml || ! head -n 1 ~/.config/starship.toml | grep -q 'format' ); then
     alias _="tput cuu1 && tput cuu1 && tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null"
-    alias _.="tput cuu1 && tput cuu1 && tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i < $(dirs -v | column -c ${COLUMNS} | wc -l) ; i++)); do tput cuu1; done && dirs-col-pretty && history -d -1 &>/dev/null"
+    alias _.="tput cuu1 && tput cuu1 && tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i < \$(dirs -v | column -c \${COLUMNS} | wc -l) ; i++)); do tput cuu1; done && dirs-col-pretty && history -d -1 &>/dev/null"
 elif type starship &> /dev/null; then
     alias _="tput cuu1 && tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null"
-    alias _.="tput cuu1 && tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i <= $(dirs -v | column -c ${COLUMNS} | wc -l) ; i++)); do tput cuu1; done && tput cuu1 && dirs-col-pretty && tput rc && history -d -1 &>/dev/null"
+    alias _.="tput cuu1 && tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i <= \$(dirs -v | column -c \${COLUMNS} | wc -l) ; i++)); do tput cuu1; done && tput cuu1 && dirs-col-pretty && tput rc && history -d -1 &>/dev/null"
 else
     alias _="tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null"
-    alias _.="tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i <= $(dirs -v | column -c ${COLUMNS} | wc -l) ; i++)); do tput cuu1; done && tput cuu1 && dirs-col-pretty && tput rc && history -d -1 &>/dev/null"
+    alias _.="tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i <= \$(dirs -v | column -c \${COLUMNS} | wc -l) ; i++)); do tput cuu1; done && tput cuu1 && dirs-col-pretty && tput rc && history -d -1 &>/dev/null"
 fi
 
 # 'dirs' builtins shows all directories in stack
@@ -213,10 +217,10 @@ bind -m emacs-standard -x '"\C-q": exit'
 bind -m vi-command     -x '"\C-q": exit'
 bind -m vi-insert      -x '"\C-q": exit'
 
-# Undo to Ctrl+a (unbound in tty) instead of only on Ctrl+_
-#bind -m emacs-standard  '"\C-z": vi-undo'
-#bind -m vi-command      '"\C-z": vi-undo'
-#bind -m vi-insert       '"\C-z": vi-undo'
+# Ctrl+z is vi-undo (after being unbound in stty) instead of only on Ctrl+_
+bind -m emacs-standard  '"\C-z": vi-undo'
+bind -m vi-command      '"\C-z": vi-undo'
+bind -m vi-insert       '"\C-z": vi-undo'
 
 # Ctrl-backspace deletes (kills) line backward
 bind -m emacs-standard  '"\C-h": backward-kill-word'
@@ -230,13 +234,24 @@ bind -m vi-insert      -x '"\C-l": __'
 
 # Ctrl-d: Delete first character on line
 bind -m emacs-standard   '"\C-d": "\C-a\e[3~"'
-bind -m vi-command       '"\C-d": "\C-a\e[3~"'
-bind -m vi-insert        '"\C-d": "\C-a\e[3~"'
+bind -m vi-command       '"\C-d": "\e[1;3D\e[3~"'
+bind -m vi-insert        '"\C-d": "\e[1;3D\e[3~"'
 
+# Ctrl+b: (Ctrl+x Ctrl+b emacs mode) is quoted insert - Default Ctrl+v - Gives (f.ex. 'Ctrl-a') back as '^A'
+bind -m emacs-standard  '"\C-x\C-b": quoted-insert'
+bind -m vi-command      '"\C-b": quoted-insert'
+bind -m vi-insert       '"\C-b": quoted-insert'
+
+# Ctrl+o: Change from vi-mode to emacs mode and back
+bind -m vi-command '"\C-o": emacs-editing-mode'
+bind -m vi-insert '"\C-o": emacs-editing-mode'
+bind -m emacs-standard '"\C-o": vi-editing-mode'
+
+# vi-command ' / emacs C-x ' helps with adding quotes to bash strings
 _quote_all() { READLINE_LINE="${READLINE_LINE@Q}"; }
 bind -m emacs-standard -x '"\C-x'\''":_quote_all'
-bind -m vi-command     -x '"\C-x'\''":_quote_all'
-bind -m vi-insert      -x '"\C-x'\''":_quote_all'
+bind -m vi-command     -x '"'\''":_quote_all'
+#bind -m vi-insert      -x '"\C-x'\''":_quote_all'
 
 # https://unix.stackexchange.com/questions/85391/where-is-the-bash-feature-to-open-a-command-in-editor-documented
 _edit_wo_executing() {

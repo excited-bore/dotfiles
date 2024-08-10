@@ -190,13 +190,18 @@ fi
  unset comp_key
 
 if test -f ~/.fzf.bash ; then
-#    if test -f ~/keybinds.d/.keybinds.bash && grep -q -w "bind '\"\\\C-z\": vi-undo'" ~/.keybinds.d/keybinds.bash; then
-#        sed -i 's|\(\\C-y\\ey\\C-x\\C-x\)\\C-f|\1|g' ~/.fzf/shell/key-bindings.bash
-#        sed -i 's|\\C-z|\\ep|g' ~/.fzf/shell/key-bindings.bash
-#        #sed -i  's|bind -m emacs-standard '\''"\C-z"|#bind -m emacs-standard '\''"\C-z"|g' ~/.fzf/shell/key-bindings.bash
-#        #sed -i  's|bind -m vi-command '\''"\C-z"|#bind -m vi-command '\''"\C-z"|g' ~/.fzf/shell/key-bindings.bash
-#        #sed -i  's|bind -m vi-insert '\''"\C-z"|#bind -m vi-insert '\''"\C-z"|g' ~/.fzf/shell/key-bindings.bash
-#    fi
+    if ! grep -q '#eval' ~/.fzf.bash; then
+        #eval "$(fzf --bash)"
+        sed -i 's|^eval "$(fzf --bash)"|#eval "$(fzf --bash)"|g' ~/.fzf.bash 
+        echo 'source ~/.fzf/shell/key-bindings.bash' >> ~/.fzf.bash 
+    fi
+    if test -f ~/keybinds.d/.keybinds.bash && grep -q -w "bind '\"\\\C-z\": vi-undo'" ~/.keybinds.d/keybinds.bash; then
+        #sed -i 's|\(\\C-y\\ey\\C-x\\C-x\)\\C-f|\1|g' ~/.fzf/shell/key-bindings.bash
+        sed -i 's|\\C-z|\\C-o|g' ~/.fzf/shell/key-bindings.bash
+        #sed -i  's|bind -m emacs-standard '\''"\C-z"|#bind -m emacs-standard '\''"\C-z"|g' ~/.fzf/shell/key-bindings.bash
+        #sed -i  's|bind -m vi-command '\''"\C-z"|#bind -m vi-command '\''"\C-z"|g' ~/.fzf/shell/key-bindings.bash
+        #sed -i  's|bind -m vi-insert '\''"\C-z"|#bind -m vi-insert '\''"\C-z"|g' ~/.fzf/shell/key-bindings.bash
+    fi
     
     reade -Q "GREEN" -i "y" -p "Use rifle (file opener from 'ranger') to open found files and dirs with Ctrl-T filesearch shortcut? [Y/n]: " "n" fzf_t
     if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ] ; then

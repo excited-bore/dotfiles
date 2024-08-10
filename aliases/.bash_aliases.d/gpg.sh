@@ -9,13 +9,18 @@ if test -z $GNUPGHOME; then
     GNUPGHOME=$HOME/.gnupg
 fi
 
+#publickey_mails=$("$GPG" --list-keys 2>/dev/null | grep --color=never \< | cut -d'<' -f2- | cut -d'>' -f1)
+#privatekey_mails=$("$GPG" --list-secret-keys 2>/dev/null | grep --color=never \< | cut -d'<' -f2- | cut -d'>' -f1)
 publickey_mails=$("$GPG" --list-keys | grep --color=never \< | cut -d'<' -f2- | cut -d'>' -f1)
 privatekey_mails=$("$GPG" --list-secret-keys | grep --color=never \< | cut -d'<' -f2- | cut -d'>' -f1)
+
 
 keyservers_all=$(grep --color=never "^keyserver" $GNUPGHOME/gpg.conf | grep -v --color=never "keyserver-" | awk '{print $2}' | tr '\n' ' ')
 first_keysrv=$(echo "$keyservers_all" | awk '{print $1;}')
 keyservers=$(echo "$keyservers_all" | cut -d " " -f2-)
 
+
+#fingerprints_all=$("$GPG" --list-keys --list-options show-only-fpr-mbox 2>/dev/null | awk '{print $1;}')
 fingerprints_all=$("$GPG" --list-keys --list-options show-only-fpr-mbox | awk '{print $1;}')
 first_fgr=$(echo "$fingerprints_all" | awk 'NR==1{print $1}')
 fingerprints=$(echo "$fingerprints_all" | awk 'NR>1{print $1}')
@@ -583,4 +588,4 @@ function gpg-receive-keys-keyserver-by-fingerprints() {
 }
 
 
-#unset publickey_mails privatekey_mails keyservers_all first_keysrv keyservers
+unset publickey_mails privatekey_mails keyservers_all first_keysrv keyservers fingrprnt fingerprints_some mail mails mailregex
