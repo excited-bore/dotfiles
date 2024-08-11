@@ -6,10 +6,16 @@ else
     . ./checks/check_system.sh
 fi
 
-if ! test -f checks/check_pathvar.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pathvar.sh)" 
+if ! test -f checks/check_pathvar_aliases_completions_keybinds.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pathvar_aliases_completions_keybinds.sh)" 
 else
-    . ./checks/check_pathvar.sh
+    . ./checks/check_pathvar_aliases_completions_keybinds.sh
+fi
+
+if ! test -f aliases/.bash_aliases.d/rlwrap_scripts.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/rlwrap_scripts.sh)" 
+else
+    . ./aliases/.bash_aliases.d/rlwrap_scripts.sh
 fi
 
 if ! type update_system &> /dev/null; then
@@ -27,37 +33,36 @@ if test -z $SYSTEM_UPDATED; then
     fi
 fi
 
-if ! test -f aliases/.bash_aliases.d/rlwrap_scripts.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/rlwrap_scripts.sh)" 
-else
-    . ./aliases/.bash_aliases.d/rlwrap_scripts.sh
-fi
 
 # Fzf (Fuzzy Finder)
 
- git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
- ~/.fzf/install
  # Bash completion issue with fzf fix
  # https://github.com/cykerway/complete-alias/issues/46
- 
-if grep -q "[ -f ~/.bash_aliases ]" ~/.bashrc; then
-    sed -i 's|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash||g' ~/.bashrc
-    sed -i 's|\(\[ -f ~/.bash_aliases \] && source ~/.bash_aliases\)|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\n\1\n|g' ~/.bashrc
-fi
-if grep -q "[ -f ~/.keybinds ]" ~/.bashrc; then
-    sed -i 's|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash||g' ~/.bashrc
-    sed -i 's|\(\[ -f ~/.keybinds \] \&\& source ~/.keybinds\)|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\n\1\n|g' ~/.bashrc
-elif grep -q "[ -f ~/.bash_completion ]" ~/.bashrc; then
-    sed -i 's|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash||g' ~/.bashrc
-    sed -i 's|\(\[ -f ~/.bash_completion \] \&\& source \~/.bash_completion\)|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\n\1\n|g' ~/.bashrc
-fi
-if grep -q "complete -F _complete_alias" ~/.bashrc; then
-    sed -i '/complete -F _complete_alias "${!BASH_ALIASES\[@\]}"/d' ~/.bashrc
-    sed -i 's|\(\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\)|\1\n\ncomplete -F _complete_alias "${!BASH_ALIASES\[@\]}"\n|g' ~/.bashrc
+
+if ! test -d ~/.fzf ; then
+    git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+    ~/.fzf/install
+    if [[ $PATHVAR =~ '.pathvariables.env' ]]; then 
+        sed -i 's|.*export PATH=$PATH:$HOME/.fzf/bin|export PATH=$PATH:$HOME/.fzf/bin|g' $PATHVAR
+    elif ! grep -q '.fzf/bin' $PATHVAR; then
+        echo 'export PATH="$PATH:$HOME/.fzf/bin"' >> $PATHVAR
+    fi
+    rm -v ~/.fzf.bash
+    sed -i '/\[ -f \~\/.fzf.bash \] \&\& source \~\/.fzf.bash/d' ~/.bashrc
+    [ ! -f ~/.bash_completion.d/fzf-completion.bash ] && ln -s ~/.fzf/shell/completion.bash ~/.bash_completion.d/fzf-completion.bash
+    
+    printf "${cyan}Fzf${normal} keybinds:\n\t - Fzf history on Ctrl-R (replaces reverse-search-history)\n\t - Filepath retriever on Ctrl-T\n\t - Directory navigator on Alt-C\n\t - **<TAB> for fzf completion on some commands\n"
+    reade -Q "GREEN" -i "y" -p "Use fzf keybinds? [Y/n]: " "n" fzf_key
+    if test $fzf_key == 'y' ; then 
+        [ ! -f ~/.keybinds.d/fzf-bindings.bash ] && ln -s ~/.fzf/shell/key-bindings.bash ~/.keybinds.d/fzf-bindings.bash
+        if test -f ~/keybinds.d/.keybinds.bash && grep -q -w "bind '\"\\\C-z\": vi-undo'" ~/.keybinds.d/keybinds.bash; then
+            sed -i 's|\\C-z|\\C-o|g' ~/.fzf/shell/key-bindings.bash
+        fi 
+    fi
 fi
 
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
- #. ~/.bashrc
+unset fzf_key
+source ~/.bashrc
 
 if [ ! -f ~/.fzf_history ]; then
     touch ~/.fzf_history 
@@ -68,13 +73,13 @@ fnd="find"
 # TODO: Make better check: https://github.com/sharkdp/fd
 if ! type fd-find &> /dev/null && ! type fd &> /dev/null; then
     reade -Q "GREEN" -i "y" -p "Install fd and use for fzf? (Faster find) [Y/n]: " "n" fdr
-     if [ -z $fdr ] || [ "Y" == $fdr ] || [ $fdr == "y" ]; then
+    if [ -z $fdr ] || [ "Y" == $fdr ] || [ $fdr == "y" ]; then
         if ! test -f install_fd.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fd.sh)" 
         else
             ./install_fd.sh
         fi 
-     fi
+    fi
      fnd="fd"
 else
     fnd="fd"
@@ -114,7 +119,6 @@ fi
 
 if [ $PATHVAR == ~/.pathvariables.env ] ; then
     sed -i 's|#export FZF_DEFAULT_COMMAND|export FZF_DEFAULT_COMMAND|g' $PATHVAR
-    sed -i "s|export FZF_DEFAULT_COMMAND=.*|export FZF_DEFAULT_COMMAND=\"$fnd\"|g" $PATHVAR
     sed -i 's|#export FZF_CTRL_T_COMMAND|export FZF_CTRL_T_COMMAND|g' $PATHVAR
     sed -i 's|#export FZF_CTRL_R_OPTS|export FZF_CTRL_R_OPTS|g' $PATHVAR
     sed -i 's|#export FZF_BIND_TYPES|export FZF_BIND_TYPES|g' $PATHVAR
@@ -129,7 +133,6 @@ fi
 echo "Next $(tput setaf 1)sudo$(tput sgr0) will update FZF pathvariables in /root/.pathvariables.env' "
 if [ $PATHVAR_R == /root/.pathvariables.env ] ; then
     sudo sed -i 's|#export FZF_DEFAULT_COMMAND|export FZF_DEFAULT_COMMAND |g' $PATHVAR_R
-    sudo sed -i "s|export FZF_DEFAULT_COMMAND=.*|export FZF_DEFAULT_COMMAND=\"$fnd\"|g" $PATHVAR_R
     sudo sed -i 's|#export FZF_CTRL_T_COMMAND|export FZF_CTRL_T_COMMAND|g' $PATHVAR_R
     sudo sed -i 's|#export FZF_CTRL_R_OPTS|export FZF_CTRL_R_OPTS|g' $PATHVAR_R
     sudo sed -i 's|#export FZF_BIND_TYPES|export FZF_BIND_TYPES|g' $PATHVAR_R
@@ -189,148 +192,135 @@ if type kitty &> /dev/null; then
 fi
  unset comp_key
 
-if test -f ~/.fzf.bash ; then
-    if ! grep -q '#eval' ~/.fzf.bash; then
-        #eval "$(fzf --bash)"
-        sed -i 's|^eval "$(fzf --bash)"|#eval "$(fzf --bash)"|g' ~/.fzf.bash 
-        echo 'source ~/.fzf/shell/key-bindings.bash' >> ~/.fzf.bash 
-    fi
-    if test -f ~/keybinds.d/.keybinds.bash && grep -q -w "bind '\"\\\C-z\": vi-undo'" ~/.keybinds.d/keybinds.bash; then
-        #sed -i 's|\(\\C-y\\ey\\C-x\\C-x\)\\C-f|\1|g' ~/.fzf/shell/key-bindings.bash
-        sed -i 's|\\C-z|\\C-o|g' ~/.fzf/shell/key-bindings.bash
-        #sed -i  's|bind -m emacs-standard '\''"\C-z"|#bind -m emacs-standard '\''"\C-z"|g' ~/.fzf/shell/key-bindings.bash
-        #sed -i  's|bind -m vi-command '\''"\C-z"|#bind -m vi-command '\''"\C-z"|g' ~/.fzf/shell/key-bindings.bash
-        #sed -i  's|bind -m vi-insert '\''"\C-z"|#bind -m vi-insert '\''"\C-z"|g' ~/.fzf/shell/key-bindings.bash
-    fi
+
     
-    reade -Q "GREEN" -i "y" -p "Use rifle (file opener from 'ranger') to open found files and dirs with Ctrl-T filesearch shortcut? [Y/n]: " "n" fzf_t
-    if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ] ; then
-        if ! type rifle &> /dev/null; then
-            sudo wget -P /usr/bin/ https://raw.githubusercontent.com/ranger/ranger/master/ranger/ext/rifle.py 
-            sudo mv -v /usr/bin/rifle.py /usr/bin/rifle
-            sudo chmod +x /usr/bin/rifle
-        fi
-        if ! test -f ranger/.config/ranger/rifle.conf; then
-            wget -O ~/.config/ranger/rifle.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/rifle.conf  
-            wget -O ~/.bash_aliases.d/keybinds_rifle.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/keybinds_rifle.sh
+reade -Q "GREEN" -i "y" -p "Use rifle (file opener from 'ranger') to open found files and dirs with Ctrl-T filesearch shortcut? [Y/n]: " "n" fzf_t
+if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ] ; then
+    if ! type rifle &> /dev/null; then
+        sudo wget -P /usr/bin/ https://raw.githubusercontent.com/ranger/ranger/master/ranger/ext/rifle.py 
+        sudo mv -v /usr/bin/rifle.py /usr/bin/rifle
+        sudo chmod +x /usr/bin/rifle
+    fi
+    if ! test -f ranger/.config/ranger/rifle.conf; then
+        wget -O ~/.config/ranger/rifle.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/rifle.conf  
+        wget -O ~/.bash_aliases.d/keybinds_rifle.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/keybinds_rifle.sh
+    else
+        mkdir -p ~/.config/ranger
+        cp -fv ranger/.config/ranger/rifle.conf ~/.config/ranger/
+        cp -fv fzf/.bash_aliases.d/keybinds_rifle.sh ~/.bash_aliases.d/
+    fi
+    if ! grep -q "keybinds_rifle.sh" ~/.fzf/shell/key-bindings.bash; then
+        sed -i "s|\(# Required to refresh the prompt after fzf\)|. ~\/.bash_aliases.d\/keybinds_rifle.sh\n\1|" ~/.fzf/shell/key-bindings.bash;
+        sed -i "s|: fzf-file-widget|: fzf_rifle|g" ~/.fzf/shell/key-bindings.bash;
+    fi
+fi
+unset fzf_t
+
+if ! type bat &> /dev/null; then
+    reade -Q "GREEN" -i "y" -p "Install bat? (File previews/thumbnails for riflesearch) [Y/n]: " "n" bat
+    if [ "$bat" == "y" ]; then
+        if ! test -f install_bat.sh; then
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bat.sh)" 
         else
-            mkdir -p ~/.config/ranger
-            cp -fv ranger/.config/ranger/rifle.conf ~/.config/ranger/
-            cp -fv fzf/.bash_aliases.d/keybinds_rifle.sh ~/.bash_aliases.d/
-        fi
-        if ! grep -q "keybinds_rifle.sh" ~/.fzf/shell/key-bindings.bash; then
-            sed -i "s|\(# Required to refresh the prompt after fzf\)|. ~\/.bash_aliases.d\/keybinds_rifle.sh\n\1|" ~/.fzf/shell/key-bindings.bash;
-            sed -i "s|: fzf-file-widget|: fzf_rifle|g" ~/.fzf/shell/key-bindings.bash;
+            ./install_bat.sh
         fi
     fi
-    unset fzf_t
+    unset bat 
+fi
 
-    if ! type bat &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Install bat? (File previews/thumbnails for riflesearch) [Y/n]: " "n" bat
-        if [ "$bat" == "y" ]; then
-            if ! test -f install_bat.sh; then
-                eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bat.sh)" 
-            else
-                ./install_bat.sh
-            fi
-        fi
-        unset bat 
+#TODO: keybinds-rifle sh still has ffmpegthumbnailer part (could use sed check)
+reade -Q "GREEN" -i "y" -p "Install ffmpegthumbnailer? (Video thumbnails for riflesearch) [Y/n]: " "n" ffmpg
+if [ "$ffmpg" == "y" ]; then
+    if ! test -f install_ffmpegthumbnailer.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ffmpegthumbnailer.sh)" 
+    else
+        ./install_ffmpegthumbnailer.sh
+    fi 
+fi
+unset ffmpg
+
+reade -Q "GREEN" -i "y" -p "Change shortcut for riflesearch from Ctrl-T to Ctrl-F? (Fzf and paste in console) [Y/n]: " "n" fzf_t
+if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ] ; then 
+    sed -i 's|# CTRL-T|# CTRL-F|g' ~/.fzf/shell/key-bindings.bash
+    sed -i 's|bind -m emacs-standard '\''"\\C-t": |bind -m emacs-standard '\''"\\C-f": |g' ~/.fzf/shell/key-bindings.bash
+    sed -i 's|bind -m vi-command '\''"\\C-t": |bind -m vi-command '\''"\\C-f": |g' ~/.fzf/shell/key-bindings.bash
+    sed -i 's|bind -m vi-insert '\''"\\C-t": |bind -m vi-insert '\''"\\C-f": |g' ~/.fzf/shell/key-bindings.bash
+    sed -i 's|bind -m emacs-standard -x '\''"\\C-t": |bind -m emacs-standard -x '\''"\\C-f": |g' ~/.fzf/shell/key-bindings.bash
+    sed -i 's|bind -m vi-command -x '\''"\\C-t": |bind -m vi-command -x '\''"\\C-f": |g' ~/.fzf/shell/key-bindings.bash
+    sed -i 's|bind -m vi-insert -x '\''"\\C-t": |bind -m vi-insert -x '\''"\\C-f": |g' ~/.fzf/shell/key-bindings.bash
+fi
+
+reade -Q "GREEN" -i "y" -p "Add shortcut F3 for fzf rifle? [Y/n]: " "n" fzf_t
+if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ] ; then
+    if ! grep -q 'bind -x '\''"\\eOR": "fzf_rifle"'\''' ~/.fzf/shell/key-bindings.bash ;  then              
+        
+        sed -i 's|\(# CTRL-S\)|# F3 - Rifle search\n  bind -x '\''"\\eOR\": "fzf_rifle"'\''\n\n  \1|g' ~/.fzf/shell/key-bindings.bash
     fi
+fi
 
-    #TODO: keybinds-rifle sh still has ffmpegthumbnailer part (could use sed check)
-    reade -Q "GREEN" -i "y" -p "Install ffmpegthumbnailer? (Video thumbnails for riflesearch) [Y/n]: " "n" ffmpg
-    if [ "$ffmpg" == "y" ]; then
-        if ! test -f install_ffmpegthumbnailer.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ffmpegthumbnailer.sh)" 
+if ! type xclip &> /dev/null; then 
+    reade -Q "GREEN" -i "y" -p "Install xclip? (Clipboard tool for Ctrl-R/Reverse history shortcut) [Y/n]: " "n" xclip
+    if [ "$xclip" == "y" ]; then
+        if ! test -f install_xclip.sh; then
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_xclip.sh)" 
         else
-            ./install_ffmpegthumbnailer.sh
-        fi 
-    fi
-    unset ffmpg
-
-    reade -Q "GREEN" -i "y" -p "Change shortcut for riflesearch from Ctrl-T to Ctrl-F? (Fzf and paste in console) [Y/n]: " "n" fzf_t
-    if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ] ; then 
-        sed -i 's|# CTRL-T|# CTRL-F|g' ~/.fzf/shell/key-bindings.bash
-        sed -i 's|bind -m emacs-standard '\''"\\C-t": |bind -m emacs-standard '\''"\\C-f": |g' ~/.fzf/shell/key-bindings.bash
-        sed -i 's|bind -m vi-command '\''"\\C-t": |bind -m vi-command '\''"\\C-f": |g' ~/.fzf/shell/key-bindings.bash
-        sed -i 's|bind -m vi-insert '\''"\\C-t": |bind -m vi-insert '\''"\\C-f": |g' ~/.fzf/shell/key-bindings.bash
-        sed -i 's|bind -m emacs-standard -x '\''"\\C-t": |bind -m emacs-standard -x '\''"\\C-f": |g' ~/.fzf/shell/key-bindings.bash
-        sed -i 's|bind -m vi-command -x '\''"\\C-t": |bind -m vi-command -x '\''"\\C-f": |g' ~/.fzf/shell/key-bindings.bash
-        sed -i 's|bind -m vi-insert -x '\''"\\C-t": |bind -m vi-insert -x '\''"\\C-f": |g' ~/.fzf/shell/key-bindings.bash
-    fi
-
-    reade -Q "GREEN" -i "y" -p "Add shortcut F3 for fzf rifle? [Y/n]: " "n" fzf_t
-    if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ] ; then
-        if ! grep -q 'bind -x '\''"\\eOR": "fzf_rifle"'\''' ~/.fzf/shell/key-bindings.bash ;  then              
-            
-            sed -i 's|\(# CTRL-S\)|# F3 - Rifle search\n  bind -x '\''"\\eOR\": "fzf_rifle"'\''\n\n  \1|g' ~/.fzf/shell/key-bindings.bash
+            ./install_xclip.sh
         fi
     fi
-
-    if ! type xclip &> /dev/null; then 
-        reade -Q "GREEN" -i "y" -p "Install xclip? (Clipboard tool for Ctrl-R/Reverse history shortcut) [Y/n]: " "n" xclip
-        if [ "$xclip" == "y" ]; then
-            if ! test -f install_xclip.sh; then
-                eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_xclip.sh)" 
-            else
-                ./install_xclip.sh
-            fi
-        fi
-        if [ $PATHVAR == ~/.pathvariables.env ] ; then
-            sed -i 's|#export FZF_CTRL_R_OPTS=|export FZF_CTRL_R_OPTS=|g' $PATHVAR
-        elif ! grep -q "export FZF_CTRL_R_OPTS=" $PATHVAR; then
-            printf "\nexport FZF_CTRL_R_OPTS=\" --preview 'echo {}' --preview-window up:3:hidden:wrap --bind 'ctrl-t:toggle-preview' --bind 'alt-c:execute-silent(echo -n {2..} | xclip -i -sel c)+abort' --color header:italic --header 'Press ALT-C to copy command into clipboard'\"" >> $PATHVAR &> /dev/null
-        fi
-        if [ $PATHVAR_R == /root/.pathvariables.env ] ; then
-            sudo sed -i 's|#export FZF_CTRL_R_OPTS==|export FZF_CTRL_R_OPTS=|g' $PATHVAR_R
-        elif ! sudo grep -q "export FZF_CTRL_R_OPTS" $PATHVAR_R; then
-            printf "\nexport FZF_CTRL_R_OPTS=\" --preview 'echo {}' --preview-window up:3:hidden:wrap --bind 'ctrl-t:toggle-preview' --bind 'alt-c:execute-silent(echo -n {2..} | xclip -i -sel c)+abort' --color header:italic --header 'Press ALT-C to copy command into clipboard'\"" | sudo tee -a $PATHVAR_R
-        fi 
+    if [ $PATHVAR == ~/.pathvariables.env ] ; then
+        sed -i 's|#export FZF_CTRL_R_OPTS=|export FZF_CTRL_R_OPTS=|g' $PATHVAR
+    elif ! grep -q "export FZF_CTRL_R_OPTS=" $PATHVAR; then
+        printf "\nexport FZF_CTRL_R_OPTS=\" --preview 'echo {}' --preview-window up:3:hidden:wrap --bind 'ctrl-t:toggle-preview' --bind 'alt-c:execute-silent(echo -n {2..} | xclip -i -sel c)+abort' --color header:italic --header 'Press ALT-C to copy command into clipboard'\"" >> $PATHVAR &> /dev/null
     fi
-    unset xclip
+    if [ $PATHVAR_R == /root/.pathvariables.env ] ; then
+        sudo sed -i 's|#export FZF_CTRL_R_OPTS==|export FZF_CTRL_R_OPTS=|g' $PATHVAR_R
+    elif ! sudo grep -q "export FZF_CTRL_R_OPTS" $PATHVAR_R; then
+        printf "\nexport FZF_CTRL_R_OPTS=\" --preview 'echo {}' --preview-window up:3:hidden:wrap --bind 'ctrl-t:toggle-preview' --bind 'alt-c:execute-silent(echo -n {2..} | xclip -i -sel c)+abort' --color header:italic --header 'Press ALT-C to copy command into clipboard'\"" | sudo tee -a $PATHVAR_R
+    fi 
+fi
+unset xclip
 
-    
-    reade -Q "GREEN" -i "y" -p "Install tree? (Builtin cd shortcut gets a nice directory tree preview ) [Y/n]: " "n" tree
-    if [ "$tree" == "y" ]; then
-        if ! test -f install_tree.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_tree.sh)" 
+
+reade -Q "GREEN" -i "y" -p "Install tree? (Builtin cd shortcut gets a nice directory tree preview ) [Y/n]: " "n" tree
+if [ "$tree" == "y" ]; then
+    if ! test -f install_tree.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_tree.sh)" 
+    else
+        ./install_tree.sh
+    fi
+    if [ $PATHVAR == ~/.pathvariables.env ] ; then
+        sed -i 's|#export FZF_ALT_C_OPTS=|export FZF_ALT_C_OPTS=|g' $PATHVAR
+    elif ! grep -q "export FZF_ALT_C_OPTS" $PATHVAR; then
+        printf "\nexport FZF_ALT_C_OPTS=\"--preview 'tree -C {}\"" >> $PATHVAR
+    fi
+    if [ $PATHVAR_R == /root/.pathvariables.env ] ; then
+        sudo sed -i 's|#export FZF_ALT_C_OPTS=|export FZF_ALT_C_OPTS=|g' $PATHVAR_R
+    elif ! sudo grep -q "export FZF_ALT_C_OPTS" $PATHVAR_R; then
+        printf "\nexport FZF_ALT_C_OPTS=\"--preview 'tree -C {}\"" | sudo tee -a $PATHVAR_R
+    fi 
+fi
+unset tree
+
+# reade -Q "GREEN" -i "y" -p "Change Alt-C shortcut to Ctrl-S for fzf cd? [Y/n]:" "y n" fzf_t
+# if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ]; then 
+#     sed -i 's|# ALT-C - cd into the selected directory|# CTRL-S - cd into the selected directory|g' ~/.fzf/shell/key-bindings.bash
+#     sed -i 's|\\ec|\\C-s|g'  ~/.fzf/shell/key-bindings.bash
+#     #sed -i 's|bind -m emacs-standard '\''"\\ec"|bind -m emacs-standard '\''"\\es"|g'  ~/.fzf/shell/key-bindings.bash
+#     #sed -i 's|bind -m vi-command '\''"\\ec"|bind -m vi-command '\''"\\es"|g' ~/.fzf/shell/key-bindings.bash
+#     #sed -i 's|bind -m vi-insert  '\''"\\ec"|bind -m vi-insert  '\''"\\es"|g' ~/.fzf/shell/key-bindings.bash
+# fi
+unset fzf_t;
+
+
+if ! test -f ~/.bash_aliases.d/docker-fzf.sh; then
+    reade -Q "GREEN" -i "y" -p "Install fzf-docker (fzf aliases for docker)? [Y/n]: " "n" fzf_d
+    if [ "$fzf_d" == "y" ] || [ -z "$fzf_d" ]; then 
+        if ! test -f checks/check_aliases_dir.sh; then
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)" 
         else
-            ./install_tree.sh
+            ./checks/check_aliases_dir.sh
         fi
-        if [ $PATHVAR == ~/.pathvariables.env ] ; then
-            sed -i 's|#export FZF_ALT_C_OPTS=|export FZF_ALT_C_OPTS=|g' $PATHVAR
-        elif ! grep -q "export FZF_ALT_C_OPTS" $PATHVAR; then
-            printf "\nexport FZF_ALT_C_OPTS=\"--preview 'tree -C {}\"" >> $PATHVAR
-        fi
-        if [ $PATHVAR_R == /root/.pathvariables.env ] ; then
-            sudo sed -i 's|#export FZF_ALT_C_OPTS=|export FZF_ALT_C_OPTS=|g' $PATHVAR_R
-        elif ! sudo grep -q "export FZF_ALT_C_OPTS" $PATHVAR_R; then
-            printf "\nexport FZF_ALT_C_OPTS=\"--preview 'tree -C {}\"" | sudo tee -a $PATHVAR_R
-        fi 
+        wget -O ~/.bash_aliases.d/docker-fzf.sh https://raw.githubusercontent.com/MartinRamm/fzf-docker/master/docker-fzf 
     fi
-    unset tree
-
-   # reade -Q "GREEN" -i "y" -p "Change Alt-C shortcut to Ctrl-S for fzf cd? [Y/n]:" "y n" fzf_t
-   # if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ]; then 
-   #     sed -i 's|# ALT-C - cd into the selected directory|# CTRL-S - cd into the selected directory|g' ~/.fzf/shell/key-bindings.bash
-   #     sed -i 's|\\ec|\\C-s|g'  ~/.fzf/shell/key-bindings.bash
-   #     #sed -i 's|bind -m emacs-standard '\''"\\ec"|bind -m emacs-standard '\''"\\es"|g'  ~/.fzf/shell/key-bindings.bash
-   #     #sed -i 's|bind -m vi-command '\''"\\ec"|bind -m vi-command '\''"\\es"|g' ~/.fzf/shell/key-bindings.bash
-   #     #sed -i 's|bind -m vi-insert  '\''"\\ec"|bind -m vi-insert  '\''"\\es"|g' ~/.fzf/shell/key-bindings.bash
-   # fi
-    unset fzf_t;
-    
-    
-    if ! test -f ~/.bash_aliases.d/docker-fzf.sh; then
-        reade -Q "GREEN" -i "y" -p "Install fzf-docker (fzf aliases for docker)? [Y/n]: " "n" fzf_d
-        if [ "$fzf_d" == "y" ] || [ -z "$fzf_d" ]; then 
-            if ! test -f checks/check_aliases_dir.sh; then
-                eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)" 
-            else
-                ./checks/check_aliases_dir.sh
-            fi
-            wget -O ~/.bash_aliases.d/docker-fzf.sh https://raw.githubusercontent.com/MartinRamm/fzf-docker/master/docker-fzf 
-        fi
-    fi
-    unset fzf_t;
- fi
+fi
+unset fzf_t;

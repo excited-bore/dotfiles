@@ -18,8 +18,7 @@ if [ ! -d ~/.bash_completion.d/ ]; then
 fi
 
 if ! grep -q "~/.bash_completion" ~/.bashrc; then
-    echo "[ -f ~/.bash_completion ] && source ~/.bash_completion" >> ~/.bashrc
-    echo "  " >> ~/.bashrc
+    printf "\n[ -f ~/.bash_completion ] && source ~/.bash_completion\n\n" >> ~/.bashrc
 fi
 
 
@@ -36,6 +35,6 @@ if ! sudo test -f /root/.bash_completion; then
         sudo mkdir /root/.bash_completion.d/
     fi
     if ! sudo grep -q "~/.bash_completion" /root/.bashrc; then
-        printf "\n[ -f ~/.bash_completion/ ] && source ~/.bash_completion\n" | sudo tee -a /root/.bashrc > /dev/null
+        printf "\n[ -f ~/.bash_completion/ ] && source ~/.bash_completion\n\n" | sudo tee -a /root/.bashrc > /dev/null
     fi
 fi 

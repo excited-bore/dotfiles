@@ -1,11 +1,19 @@
 #!/bin/bash
 
+if [ ! -f ~/.keybinds ]; then
+    if ! test -f keybinds/.keybinds; then
+        wget -P ~/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds  
+    else
+        cp -fv keybinds/.keybinds ~/
+    fi 
+fi 
+
 if [ ! -d ~/.keybinds.d/ ]; then
     mkdir ~/.keybinds.d/
 fi
 
 if ! grep -q ".keybinds" ~/.bashrc; then
-    printf "[ -f ~/.keybinds ] && source ~/.keybinds\n" >> ~/.bashrc &> /dev/null
+    printf "\n[ -f ~/.keybinds ] && source ~/.keybinds\n\n" >> ~/.bashrc 
 fi
 
 if ! sudo test -d /root/.keybinds.d/ ; then
@@ -13,17 +21,5 @@ if ! sudo test -d /root/.keybinds.d/ ; then
 fi
 
 if ! sudo grep -q ".keybinds" /root/.bashrc; then
-    sudo printf "[ -f ~/.keybinds ] && source ~/.keybinds\n" | sudo tee -a /root/.bashrc &> /dev/null
+    sudo printf "\n[ -f ~/.keybinds ] && source ~/.keybinds\n\n" | sudo tee -a /root/.bashrc &> /dev/null
 fi
-
-KEYBIND=~/.bashrc
-
-if [ -f ~/.keybinds.d/keybinds.bash ]; then
-    KEYBIND=~/.keybinds.d/keybinds.bash
-fi
-
-KEYBIND_R=/root/.bashrc
-
-if sudo test -f /root/.keybinds.d/keybinds.bash; then
-    KEYBIND_R=/root/.keybinds.d/keybinds.bash
-fi 
