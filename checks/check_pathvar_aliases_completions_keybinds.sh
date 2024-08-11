@@ -83,6 +83,10 @@ fi
 #    fi
 #
 
+if test -f ~/.pathvariables.env && ! grep -q "~/.pathvariables.env" ~/.bashrc; then
+    printf "\n[ -f ~/.pathvariables.env ] && source ~/.pathvariables.env\n\n" >> ~/.bashrc
+fi
+
 if ! grep -q "~/.bash_completion" ~/.bashrc; then
     if grep -q "~/.bash_aliases" ~/.bashrc; then
         sed -i 's|\(\[ -f ~/.bash_aliases \] && source ~/.bash_aliases\)|\[ -f \~/.bash_completion \] \&\& source \~/.bash_completion\n\1\n|g' ~/.bashrc
@@ -117,6 +121,9 @@ fi
 
 echo "This next $(tput setaf 1)sudo$(tput sgr0) is checks for the pathvariable, bash_alias, bash_completion and keybind files and dirs in '/root/'.";
 
+if sudo test -f /root/.pathvariables.env && ! sudo grep -q "~/.pathvariables.env" /root/.bashrc; then
+    printf "\n[ -f ~/.pathvariables.env ] && source ~/.pathvariables.env\n\n" | sudo tee -a /root/.bashrc
+fi 
 
 if ! sudo test -f /root/.bash_aliases; then
     echo "Next $(tput setaf 1)sudo$(tput sgr0) will install '.bash_aliases.d' in /root and source files in it with '/root/.bash_aliases' "
