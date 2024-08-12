@@ -1,8 +1,6 @@
 # !/bin/bash
 
-if [ ! -f ~/.bash_aliases.d/rlwrap_scripts.sh ]; then
-    . ../aliases/rlwrap_scripts.sh
-else
+if ! type reade &> /dev/null; then
     . ~/.bash_aliases.d/rlwrap_scripts.sh
 fi 
 

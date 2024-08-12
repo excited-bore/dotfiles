@@ -1,7 +1,5 @@
-if [ ! -f ~/.bash_aliases.d/rlwrap_scripts.sh ]; then
-    . ../aliases/rlwrap_scripts.sh
-else
-    . ~/.bash_aliases.d/rlwrap_scripts.sh
+if ! type reade &> /dev/null ; then
+    source ~/.bash_aliases.d/rlwrap_scripts.sh
 fi
 
 type gpg2 &> /dev/null && export GPG='gpg2' || export GPG='gpg'
@@ -11,19 +9,13 @@ fi
 
 #publickey_mails=$("$GPG" --list-keys 2>/dev/null | grep --color=never \< | cut -d'<' -f2- | cut -d'>' -f1)
 #privatekey_mails=$("$GPG" --list-secret-keys 2>/dev/null | grep --color=never \< | cut -d'<' -f2- | cut -d'>' -f1)
-publickey_mails=$("$GPG" --list-keys | grep --color=never \< | cut -d'<' -f2- | cut -d'>' -f1)
-privatekey_mails=$("$GPG" --list-secret-keys | grep --color=never \< | cut -d'<' -f2- | cut -d'>' -f1)
-
-
-keyservers_all=$(grep --color=never "^keyserver" $GNUPGHOME/gpg.conf | grep -v --color=never "keyserver-" | awk '{print $2}' | tr '\n' ' ')
-first_keysrv=$(echo "$keyservers_all" | awk '{print $1;}')
-keyservers=$(echo "$keyservers_all" | cut -d " " -f2-)
+alias gpg-list-publickey-mails="$GPG --list-keys | grep --color=never \< | cut -d'<' -f2- | cut -d'>' -f1"
+alias gpg-list-privatekey-mails="$GPG --list-secret-keys | grep --color=never \< | cut -d'<' -f2- | cut -d'>' -f1"
+alias gpg-list-known-keyservers="grep --color=never "^keyserver" $GNUPGHOME/gpg.conf | grep -v --color=never "keyserver-" | awk '{print $2}' | tr '\n' ' '"
 
 
 #fingerprints_all=$("$GPG" --list-keys --list-options show-only-fpr-mbox 2>/dev/null | awk '{print $1;}')
-fingerprints_all=$("$GPG" --list-keys --list-options show-only-fpr-mbox | awk '{print $1;}')
-first_fgr=$(echo "$fingerprints_all" | awk 'NR==1{print $1}')
-fingerprints=$(echo "$fingerprints_all" | awk 'NR>1{print $1}')
+alias gpg-list-key-fingerprints="$GPG --list-keys --list-options show-only-fpr-mbox | awk '{print $1;}'"
 
 mailregex="^[a-z0-9!#\$%&'*+/=?^_\`{|}~-]+(\.[a-z0-9!#$%&'*+/=?^_\`{|}~-]+)*@([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z0-9]([a-z0-9-]*[a-z0-9])?\$"
 
@@ -63,6 +55,7 @@ function receive-mails-csv-file(){
 
 
 function gpg-publish-key() {
+    keyservers_all=$(grep --color=never "^keyserver" $GNUPGHOME/gpg.conf | grep -v --color=never "keyserver-" | awk '{print $2}' | tr '\n' ' ')
     printf "${CYAN}Hint: If rlwrap is installed, tab completion is enabled${normal}\n"
     if ! test -z "$1"; then 
         dir="--homedir $1"
@@ -138,7 +131,7 @@ function gpg-publish-key() {
             fi
         done
     fi
-    unset c_serv keyid serv srv i s
+    unset c_serv keyid serv srv i s keyservers_all succeeded retry keyid dir mails
 }
 
 
@@ -426,6 +419,8 @@ alias gpg-list-public-keyid-long="$GPG --list-public-keys --list-options show-on
 alias gpg-list-public-keyid-short="$GPG --list-public-keys --list-options show-only-fpr-mbox | awk '{ \$1 = substr(\$1, 33, 40) } 1' | awk '{print \$1;}'"
 
 function gpg-list-packets-from-key(){
+    publickey_mails=$("$GPG" --list-keys | grep --color=never \< | cut -d'<' -f2- | cut -d'>' -f1)
+    privatekey_mails=$("$GPG" --list-secret-keys | grep --color=never \< | cut -d'<' -f2- | cut -d'>' -f1)
     if test -z "$@"; then
         reade -Q "GREEN" -i "public" -p "Public keys, Private (Secret) keys or Private Subkeys? [Public/private/private-sub]: " "private private-sub" keytype
         if test "$keytype" == "public"; then
@@ -447,6 +442,7 @@ function gpg-list-packets-from-key(){
     else
         "$GPG" --list-packets "$@" 
     fi
+    unset publickey_mails privatekey_mails export_keys 
 }
 
 alias gpg-edit-key="$GPG --edit-key"
@@ -509,6 +505,10 @@ alias gpg-delete-only-public-key="$GPG --yes --delete-keys"
 
 
 function gpg-search-keys-keyserver-by-mail() {
+    publickey_mails=$("$GPG" --list-keys | grep --color=never \< | cut -d'<' -f2- | cut -d'>' -f1)
+    keyservers_all=$(grep --color=never "^keyserver" $GNUPGHOME/gpg.conf | grep -v --color=never "keyserver-" | awk '{print $2}' | tr '\n' ' ')
+    fingerprints_all=$("$GPG" --list-keys --list-options show-only-fpr-mbox | awk '{print $1;}')
+
     if test -z "$1"; then 
         reade -Q "GREEN" -i "' '" -p "Name/Email/Fingerprint/Keyid?: " "all-mails all-finger $publickey_mails $fingerprints_all" mail
     elif test -f "$1"; then
@@ -541,9 +541,14 @@ function gpg-search-keys-keyserver-by-mail() {
     else 
         "$GPG" --verbose --search "$mail"  
     fi
+    unset publickey_mails fingerprints_all mail keyservers_all srv i
 }
 
 function gpg-receive-keys-keyserver-by-fingerprints() {
+    publickey_mails=$("$GPG" --list-keys | grep --color=never \< | cut -d'<' -f2- | cut -d'>' -f1)
+    keyservers_all=$(grep --color=never "^keyserver" $GNUPGHOME/gpg.conf | grep -v --color=never "keyserver-" | awk '{print $2}' | tr '\n' ' ')
+    fingerprints_all=$("$GPG" --list-keys --list-options show-only-fpr-mbox | awk '{print $1;}')
+    
     if test -z "$1"; then 
         reade -Q "GREEN" -i "mail" -p "Lookup fingerprint by mail or select fingerprint directly? [Mail/fingerprint]: " "fingerprint" fingrprnt_mail
         if test $fingrprnt_mail == 'mail' ; then
@@ -585,6 +590,7 @@ function gpg-receive-keys-keyserver-by-fingerprints() {
     else 
         "$GPG" --verbose --receive-keys $fingrprnt  
     fi
+    unset publickey_mails fingrprnt fingrprnt_mail fingerprints_all mails fingerprints_some mails srv c_srv keyservers_all 
 }
 
 

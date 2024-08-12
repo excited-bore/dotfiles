@@ -1,18 +1,18 @@
-if ! type reade &> /dev/null; then
-    if ! test -f aliases/.bash_aliases.d/rlwrap_scripts.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/rlwrap_scripts.sh)" 
-    else
-        . ./aliases/.bash_aliases.d/rlwrap_scripts.sh
-    fi
-fi
-
-if test -z "$distro"; then 
-    if ! test -f checks/check_system.sh; then
-         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
-    else
-        . ./checks/check_system.sh
-    fi
-fi
+#if ! type reade &> /dev/null; then
+#    if ! test -f aliases/.bash_aliases.d/rlwrap_scripts.sh; then
+#        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/rlwrap_scripts.sh)" 
+#    else
+#        . ./aliases/.bash_aliases.d/rlwrap_scripts.sh
+#    fi
+#fi
+#
+#if test -z "$distro"; then 
+#    if ! test -f checks/check_system.sh; then
+#         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
+#    else
+#        . ./checks/check_system.sh
+#    fi
+#fi
 
 # https://www.explainxkcd.com/wiki/index.php/1654:_Universal_Install_Script
 function update_system() {

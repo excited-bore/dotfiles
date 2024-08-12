@@ -1,13 +1,50 @@
+#!/bin/bash
 
-alias GPU_list_drivers="sudo mhwd -l -d"
-alias GPU_list_installed_drivers="sudo mhwd -li -d" 
-alias GPU_install_driver_free="sudo mhwd -a pci free 0300"
-alias GPU_install_driver_proprietary="sudo mhwd -a pci nonfree 0300"
-alias GPU_check_driver="sudo mhwd-gpu --check"
-alias GPU_status_driver="sudo mhwd-gpu --status"
-alias GPU_set_module_driver="sudo mhwd-gpu --setmod"
+if ! type reade &> /dev/null; then
+    source ~/.bash_aliases.d/rlwrap_scripts.sh
+fi
+
+#linux_curr=$(sudo mhwd-kernel --listinstalled | awk 'NR==1{print $4;}' | cut -d\( -f2- | cut -d\) -f1)
+linux_lts='linux66'
+
+alias manjaro-GPU-list-drivers="sudo mhwd -l -d"
+alias manjaro-GPU-list-installed-drivers="sudo mhwd -li -d" 
+alias manjaro-GPU-install-driver-free="sudo mhwd -a pci free 0300"
+alias manjaro-GPU-install-driver-proprietary="sudo mhwd -a pci nonfree 0300"
+alias manjaro-GPU-check-driver="sudo mhwd-gpu --check"
+alias manjaro-GPU-status-driver="sudo mhwd-gpu --status"
+alias manjaro-GPU-set-module-driver="sudo mhwd-gpu --setmod"
 # sudo mhwd-gpu --setxorg /etc/x11/xorg.conf
 
-GPU_remove_driver_by_name(){
+function manjaro-GPU-remove-driver-by-name(){
     sudo mhwd -r pci "$1";
 }
+
+function manjaro-install-kernel(){
+    kernels="$(sudo mhwd-kernel --list | awk 'NR>1{print $2;}')"
+    kernels="$(echo $kernels | sed "s/\<$linux_lts\> //g")"
+    reade -Q 'GREEN' -i "y" -p "Remove current kernel after installation? [Y/n]: " "n" rm_af
+    rm_af="$(test $rm_af == 'y' && echo 'rmc' || echo '')"    
+    kernels_p=$(echo $kernels | tr " " '/')
+    linux_lts_p="$(echo $linux_lts | tr '[:lower:]' '[:upper:]')"
+    reade -Q 'GREEN' -i "$linux_lts" -p "Install which one [$linux_lts_p/$kernels_p]: " "$kernels" kern
+    sudo mhwd-kernel -i $kern $rm_af
+    sudo mhwd-kernel --listinstalled
+    unset kern kernels rm_af linux_lts_p kernels_p 
+}
+
+function manjaro-remove-kernel(){
+    kernels="$(sudo mhwd-kernel --listinstalled | awk 'NR>2{print $2;}')"
+    frst="$(echo $kernels | awk '{print $1}')"
+    frst_p="$(echo $frst | tr '[:lower:]' '[:upper:]')"
+    kernels="$(echo $kernels | sed "s/\<$frst\>//g")"
+    if ! test -z $kernels; then
+        kernels_p="/$(echo $kernels | tr " " '/')"
+    else
+        kernels_p=''
+    fi
+    reade -Q 'GREEN' -i "$frst" -p "Remove which one [$frst_p$kernels_p]: " "$kernels" kern
+    sudo mhwd-kernel -r $kern
+    sudo mhwd-kernel --listinstalled
+    unset kern kernels frst frst_p kernels_p 
+} 
