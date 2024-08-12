@@ -190,9 +190,19 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         # Redirect output to file in subshell (mimeopen gives output but also starts read. This cancels read). In tmp because that gets cleaned up
         (echo "" | mimeopen -a editor-check.sh &> $TMPDIR/editor-outpt)
         compedit="nano $(cat $TMPDIR/editor-outpt | awk 'NR > 2' | awk '{if (prev_1_line) print prev_1_line; prev_1_line=prev_line} {prev_line=$NF}' | sed 's|[()]||g' | tr -s [:space:] \\n | uniq | tr '\n' ' ') $editors"
+        compedit="$(echo $compedit | tr ' ' '\n' | sort -u)"
+
+        prmpt="Found visual editors using ${CYAN}mimeopen${normal} (non definitive list): ${GREEN}\n"
+        for i in $compedit; do
+            prmpt="$prmpt\t - $i\n"
+        done
+        prmpt="$prmpt${normal}"
+
         frst="$(echo $compedit | awk '{print $1}')"
         compedit="$(echo $compedit | sed "s/\<$frst\> //g")"
-        compedit="$(echo $compedit | uniq)"
+
+        printf "$prmpt"
+
         reade -Q "GREEN" -i "$frst" -p "VISUAL (GUI editor)=" "$compedit" vsual
         vsual="$(whereis "$vsual" | awk '{print $2}')"
         sed -i 's|#export VISUAL=|export VISUAL=|g' $pathvr
@@ -286,7 +296,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
     # Check if systemd installed
     if type systemctl &> /dev/null; then
         pageSec=1
-        printf "${cyan}Systemd comes preinstalled with ${GREEN}SYSTEMD_PAGERSECURE=1${cyan}.\n This means any pager without a 'secure mode' (reduced features - only less does this afaik) cant be used for systemctl/journalctl.\n It's a relatively good to be on the safe side, but this does constrain the user.${normal}\n"
+        printf "${cyan}Systemd comes preinstalled with ${GREEN}SYSTEMD_PAGERSECURE=1${normal}.\n This means any pager without a 'secure mode' cant be used for ${CYAN}systemctl/journalctl${normal}.\n(Features that are fairly obscure and mostly less-specific in the first place -\n No editing (v), no examining (:e), no pipeing (|)...)\n It's an understandable concern to be better safe and sound, but this does constrain the user to ${CYAN}only using less.${normal}\n"
         reade -Q "YELLOW" -i "y" -p "${yellow}Set SYSTEMD_PAGERSECURE to 0? [Y/n]: " "n" page_sec
         if test "$page_sec" == "y"; then
            pageSec=0 
@@ -348,3 +358,4 @@ if ! test -f checks/check_pathvar.sh; then
 else
     . ./checks/check_pathvar.sh
 fi
+#unset prmpt pathvr xdgInst

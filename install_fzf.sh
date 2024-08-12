@@ -1,4 +1,4 @@
- # !/bin/bash
+# !/bin/bash
 
 if ! test -f checks/check_system.sh.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
@@ -55,11 +55,12 @@ if ! test -d ~/.fzf ; then
     reade -Q "GREEN" -i "y" -p "Use fzf keybinds? [Y/n]: " "n" fzf_key
     if test $fzf_key == 'y' ; then 
         [ ! -f ~/.keybinds.d/fzf-bindings.bash ] && ln -s ~/.fzf/shell/key-bindings.bash ~/.keybinds.d/fzf-bindings.bash
-        if test -f ~/keybinds.d/.keybinds.bash && grep -q -w "bind '\"\\\C-z\": vi-undo'" ~/.keybinds.d/keybinds.bash; then
-            sed -i 's|\\C-z|\\C-o|g' ~/.fzf/shell/key-bindings.bash
-        fi 
     fi
 fi
+
+if test -f ~/.keybinds.d/.keybinds.bash && grep -q -w "bind '\"\\\C-z\": vi-undo'" ~/.keybinds.d/keybinds.bash; then
+    sed -i 's|\\C-z|\\C-o|g' ~/.fzf/shell/key-bindings.bash
+fi 
 
 unset fzf_key
 source ~/.bashrc
@@ -103,7 +104,7 @@ unset fndgbl fndfle fndhiddn
 # TODO: Make better check: https://github.com/sharkdp/fd
 if type fd-find &> /dev/null || type fd &> /dev/null; then
     echo "${green}Fd can read from global gitignore file${normal}"
-    reade -Q "GREEN" -i "y" -p "Generate global gitignore? [Y/n]: " "n" fndgbl
+    reade -Q "GREEN" -i "n" -p "Generate global gitignore using 'themed' templates? (https://github.com/github/gitignore) [N/y]: " "y" fndgbl
     if [ $fndgbl == 'y' ]; then
         if ! test -f install_gitignore.sh; then
             b=$(mktemp)
@@ -167,22 +168,16 @@ fi
     reade -Q "GREEN" -i "y" -p "Add shortcut for ripgrep files in dir? (Ctrl-g) [Y/n]: " "n" rpgrpdir
     if [ -z $rpgrp ] || [ "Y" == $rpgrp ] || [ $rpgrp == "y" ]; then
         if ! test -f fzf/.bash_aliases.d/ripgrep-directory.sh; then
-            wget -O ~/.bash_aliases.d/ripgrep-directory.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/ripgrep-directory.sh
+            wget -O ~/.bash_aliases.d/ripgrep-directory.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/.bash_aliases.d/ripgrep-directory.sh
         else
             cp -fv fzf/.bash_aliases.d/ripgrep-directory.sh ~/.bash_aliases.d/
         fi
-        #if ! grep -q "ripgrep-dir" ~/.fzf/shell/key-bindings.bash; then 
-        #    # TODO Fix this
-        #    echo "source ~/.bash_aliases.d/ripgrep-directory.sh" >> ~/.fzf/shell/key-bindings.bash
-        #    echo "#  Ctrl-g gives a ripgrep function overview" >> ~/.fzf/shell/key-bindings.bash
-        #    echo 'bind -x '\''"\C-g": "ripgrep-dir"'\''' >> ~/.fzf/shell/key-bindings.bash
-        #fi
     fi
  fi
  unset rpgrp rpgrpdir
 
 if type kitty &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Add shortcut for fzf-autocompletion? (CTRL-Tab) [Y/n]: " "n" comp_key
+    reade -Q "GREEN" -i "y" -p "Add shortcut for fzf-autocompletion? (Ctrl-Tab) [Y/n]: " "n" comp_key
     if [ "$comp_key" == "y" ]; then
         if ! test -f .keybinds.d/keybinds.bash && ! grep -q "(Kitty)" ~/.fzf/shell/key-bindings.bash; then
             printf "\n# (Kitty) Ctrl-tab for fzf autocompletion" >> ~/.fzf/shell/key-bindings.bash
@@ -202,15 +197,14 @@ if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ] ; then
         sudo chmod +x /usr/bin/rifle
     fi
     if ! test -f ranger/.config/ranger/rifle.conf; then
-        wget -O ~/.config/ranger/rifle.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/rifle.conf  
-        wget -O ~/.bash_aliases.d/keybinds_rifle.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/keybinds_rifle.sh
+        wget -O ~/.config/ranger/rifle.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/.config/ranger/rifle.conf  
+        wget -O ~/.bash_aliases.d/fzf-rifle.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/.bash_aliases.d/fzf-rifle.sh
     else
         mkdir -p ~/.config/ranger
         cp -fv ranger/.config/ranger/rifle.conf ~/.config/ranger/
-        cp -fv fzf/.bash_aliases.d/keybinds_rifle.sh ~/.bash_aliases.d/
+        cp -fv fzf/.bash_aliases.d/fzf-rifle.sh ~/.bash_aliases.d/
     fi
-    if ! grep -q "keybinds_rifle.sh" ~/.fzf/shell/key-bindings.bash; then
-        sed -i "s|\(# Required to refresh the prompt after fzf\)|. ~\/.bash_aliases.d\/keybinds_rifle.sh\n\1|" ~/.fzf/shell/key-bindings.bash;
+    if ! grep -q "fzf-rifle.sh" ~/.fzf/shell/key-bindings.bash; then
         sed -i "s|: fzf-file-widget|: fzf_rifle|g" ~/.fzf/shell/key-bindings.bash;
     fi
 fi
@@ -228,7 +222,7 @@ if ! type bat &> /dev/null; then
     unset bat 
 fi
 
-#TODO: keybinds-rifle sh still has ffmpegthumbnailer part (could use sed check)
+#TODO: fzf-rifle.sh still has ffmpegthumbnailer part (could use sed check)
 reade -Q "GREEN" -i "y" -p "Install ffmpegthumbnailer? (Video thumbnails for riflesearch) [Y/n]: " "n" ffmpg
 if [ "$ffmpg" == "y" ]; then
     if ! test -f install_ffmpegthumbnailer.sh; then
