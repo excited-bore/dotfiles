@@ -15,7 +15,7 @@
 #fi
 
 # https://www.explainxkcd.com/wiki/index.php/1654:_Universal_Install_Script
-function update_system() {
+function update-system() {
     if ! test "$(timedatectl show | grep ^NTP | head -n 1 | awk 'BEGIN { FS = "=" } ; {print $2}')" == "yes"; then 
         reade -Q "GREEN" -i "y" -p "Timedate NTP not set (Automatic timesync). This can cause issues with syncing to repositories. Activate it? [Y/n]: " "n" set_ntp
         if [ "$set_ntp" == "y" ]; then

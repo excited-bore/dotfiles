@@ -6,12 +6,13 @@ alias list-builtins-bash="compgen -b | $PAGER"
 alias list-aliases-bash="compgen -a | $PAGER"
 alias list-users-bash="compgen -u | $PAGER"
 alias list-functions-bash="compgen -A function | $PAGER"
+alias list-function-content-bash="declare -f"
 alias list-directory-bash="compgen -d | $PAGER"
 alias list-groups-bash="compgen -g | $PAGER"
 alias list-services-bash="compgen -s | $PAGER"
 alias list-exports-bash="compgen -e | $PAGER"
 alias list-shellvars-bash="compgen -v | $PAGER"
-alias list-file-and-functions-bash="compgen -f | $PAGER"
+alias list-file-and-dirs-bash="compgen -f | $PAGER"
 
 _commands(){
     COMPREPLY=($(compgen -c $2))

@@ -1,10 +1,6 @@
-if [ ! -f ~/.bash_aliases.d/rlwrap_scripts.sh ]; then
-    . ../aliases/rlwrap_scripts.sh
-else
+if ! type reade &> /dev/null; then
     . ~/.bash_aliases.d/rlwrap_scripts.sh
 fi
-
-shopt -s expand_aliases  
 
 if [ -z $TRASHBIN_LIMIT ]; then
    TRASHBIN_LIMIT=100 
@@ -278,6 +274,12 @@ alias rg='rg --color=always'
 # Show open ports
 alias openports='netstat -nape --inet'
 
+# Wifi enable/disable
+if type nmcli &> /dev/null; then
+    alias wifi-enable='nmcli radio wifi on'
+    alias wifi-disable='nmcli radio wifi off'
+fi
+
 # Listen hidden files and permissions
 alias lsall="ls -Ahl"
 
@@ -297,6 +299,7 @@ alias men="man man"
 
 # Space seperated words to newline
 alias word2line="tr ' ' '\n'"
+alias line2word="tr '\n' ' '"
 
 # Pipe column output to a pager
 alias column="column -c $(tput cols)"
