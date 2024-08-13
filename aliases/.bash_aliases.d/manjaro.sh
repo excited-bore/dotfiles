@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if ! type reade &> /dev/null; then
-    source ~/.bash_aliases.d/rlwrap_scripts.sh
+    source ~/.bash_aliases.d/00-rlwrap_scripts.sh
 fi
 
 #linux_curr=$(sudo mhwd-kernel --listinstalled | awk 'NR==1{print $4;}' | cut -d\( -f2- | cut -d\) -f1)

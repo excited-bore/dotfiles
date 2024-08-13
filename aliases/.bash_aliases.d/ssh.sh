@@ -1,5 +1,7 @@
 ### SSH ###                           
-. ~/.bash_aliases.d/rlwrap_scripts.sh
+if ! type reade &> /dev/null; then
+    . ~/.bash_aliases.d/00-rlwrap_scripts.sh
+fi
 
 user="burp"
 user1=

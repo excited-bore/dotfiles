@@ -32,11 +32,11 @@ if ! test -f ~/.bash_aliases.d/bash.sh; then
     fi
 fi
 
-if ! test -f ~/.bash_aliases.d/rlwrap_scripts.sh; then 
-    if ! test -f aliases/.bash_aliases.d/rlwrap_scripts.sh; then
-        wget -O ~/.bash_aliases.d/rlwrap_scripts.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/rlwrap_scripts.sh  
+if ! test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh; then 
+    if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
+        wget -O ~/.bash_aliases.d/00-rlwrap_scripts.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh  
     else
-        cp -fv aliases/.bash_aliases.d/rlwrap_scripts.sh ~/.bash_aliases.d/
+        cp -fv aliases/.bash_aliases.d/00-rlwrap_scripts.sh ~/.bash_aliases.d/
     fi
 fi
 
@@ -132,7 +132,7 @@ if ! sudo test -f /root/.bash_aliases; then
         sudo mkdir /root/.bash_aliases.d/
         sudo cp -fv ~/.bash_aliases.d/check_system.sh /root/.bash_aliases.d/check_system.sh
         sudo cp -fv ~/.bash_aliases.d/bash.sh /root/.bash_aliases.d/bash.sh
-        sudo cp -fv ~/.bash_aliases.d/rlwrap_scripts.sh /root/.bash_aliases.d/rlwrap_scripts.sh 
+        sudo cp -fv ~/.bash_aliases.d/00-rlwrap_scripts.sh /root/.bash_aliases.d/00-rlwrap_scripts.sh 
     fi
     if ! sudo grep -q "~/.bash_aliases" ~/.bashrc; then
         printf "\n[ -f ~/.bash_aliases ] && source ~/.bash_aliases\n\n" | sudo tee -a /root/.bashrc &> /dev/null 

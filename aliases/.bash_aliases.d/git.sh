@@ -1,6 +1,6 @@
 ### GIT ###                           
 if ! type reade &> /dev/null; then
-    source ~/.bash_aliases.d/rlwrap_scripts.sh
+    source ~/.bash_aliases.d/00-rlwrap_scripts.sh
 fi
 
 alias columns="git column --mode=column"

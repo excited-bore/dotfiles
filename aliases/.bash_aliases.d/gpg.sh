@@ -1,5 +1,5 @@
 if ! type reade &> /dev/null ; then
-    source ~/.bash_aliases.d/rlwrap_scripts.sh
+    source ~/.bash_aliases.d/00-rlwrap_scripts.sh
 fi
 
 type gpg2 &> /dev/null && export GPG='gpg2' || export GPG='gpg'

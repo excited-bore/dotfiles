@@ -51,11 +51,11 @@ do
         AUR_helper="pamac"
         AUR_update="pamac update"
         AUR_install="pamac install"
-        if ! test -f checks/check_pamac.sh; then
-             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pamac.sh)" 
-        else
-            . ./checks/check_pamac.sh
-        fi 
+#        if ! test -f checks/check_pamac.sh; then
+#             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pamac.sh)" 
+#        else
+#            . ./checks/check_pamac.sh
+#        fi 
         distro_base="Arch"
         distro="Manjaro"
         # Check for AUR

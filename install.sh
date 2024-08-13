@@ -12,13 +12,13 @@ else
     . ./checks/check_pathvar.sh
 fi
 
-if ! test -f update_system.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/update_system.sh)" 
+if ! test -f aliases/.bash_aliases.d/update-system.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)" 
 else
-    . ./update_system.sh
+    . ./aliases/.bash_aliases.d/update-system.sh
 fi
 
-update_system
+update-system
 
 if ! test -f checks/check_rlwrap.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_rlwrap.sh)" 
@@ -26,10 +26,10 @@ else
     . ./checks/check_rlwrap.sh
 fi
 
-if ! test -f aliases/.bash_aliases.d/rlwrap_scripts.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/rlwrap_scripts.sh)" 
+if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
 else
-    . ./aliases/.bash_aliases.d/rlwrap_scripts.sh
+    . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
 fi
 
 
@@ -624,7 +624,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         yes_edit_no general "$genr" "Install general.sh at ~/?" "edit" "GREEN"
     fi
 
-    update_sysm=update_system.sh
+    update_sysm=aliases/.bash_aliases.d/update-system.sh
     systemd=aliases/.bash_aliases.d/systemctl.sh
     dosu=aliases/.bash_aliases.d/sudo.sh
     pacmn=aliases/.bash_aliases.d/package_managers.sh
@@ -634,8 +634,8 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     variti=aliases/.bash_aliases.d/variety.sh
     pthon=aliases/.bash_aliases.d/python.sh
     if ! test -d aliases/.bash_aliases.d/; then
-        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/update_system.sh 
-        update_sysm=$TMPDIR/update_system.sh
+        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh 
+        update_sysm=$TMPDIR/update-system.sh
         wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/systemctl.sh 
         systemd=$TMPDIR/systemctl.sh
         wget -P $TMPDIR/  https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/sudo.sh 
@@ -656,14 +656,14 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
 
     update_sysm_r(){ 
         sudo cp -fv $update_sysm /root/.bash_aliases.d/;
-        sudo sed -i '/SYSTEM_UPDATED="TRUE"/d' /root/.bash_aliases.d/update_system.sh
+        sudo sed -i '/SYSTEM_UPDATED="TRUE"/d' /root/.bash_aliases.d/update-system.sh
     }
     update_sysm(){
         cp -fv $update_sysm ~/.bash_aliases.d/
-        sed -i '/SYSTEM_UPDATED="TRUE"/d' ~/.bash_aliases.d/update_system.sh
-        yes_edit_no update_sysm_r "$update_sysm" "Install update_system.sh at /root/?" "yes" "GREEN";
+        sed -i '/SYSTEM_UPDATED="TRUE"/d' ~/.bash_aliases.d/update-system.sh
+        yes_edit_no update_sysm_r "$update_sysm" "Install update-system.sh at /root/?" "yes" "GREEN";
     }
-    yes_edit_no update_sysm "$update_sysm" "Install update_system.sh at ~/.bash_aliases.d/? (Global system update function)?" "edit" "GREEN"
+    yes_edit_no update_sysm "$update_sysm" "Install update-system.sh at ~/.bash_aliases.d/? (Global system update function)?" "edit" "GREEN"
 
     systemd_r(){ 
         sudo cp -fv $systemd /root/.bash_aliases.d/;

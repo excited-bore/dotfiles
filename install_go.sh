@@ -4,28 +4,28 @@ else
     . ./checks/check_system.sh
 fi
 
-if ! type update_system &> /dev/null; then
-    if ! test -f update_system.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/update_system.sh)" 
+if ! type update-system &> /dev/null; then
+    if ! test -f aliases/.bash_aliases.d/update-system.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)" 
     else
-        . ./update_system.sh
+        . ./aliases/.bash_aliases.d/update-system.sh
     fi
 fi
 
 if test -z $SYSTEM_UPDATED; then
     reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y" updatesysm
     if test $updatesysm == "y"; then
-        update_system                     
+        update-system                     
     fi
 fi
 
-if ! test -f aliases/.bash_aliases.d/rlwrap_scripts.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/rlwrap_scripts.sh)" 
+if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
 else
-    . ./aliases/.bash_aliases.d/rlwrap_scripts.sh
+    . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
 fi
 
-if ! test -f aliases/.bash_aliases.d/rlwrap_scripts.sh; then
+if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pathvar.sh)" 
 else
     . ./checksum/check_pathvar.sh

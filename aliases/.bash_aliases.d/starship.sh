@@ -1,4 +1,6 @@
-. ~/.bash_aliases.d/rlwrap_scripts.sh
+if ! type reade &> /dev/null; then
+    . ~/.bash_aliases.d/00-rlwrap_scripts.sh
+fi
 
 function starship-presets() {
     ansr=$(starship preset --list | head -n -1 | fzf --reverse);
