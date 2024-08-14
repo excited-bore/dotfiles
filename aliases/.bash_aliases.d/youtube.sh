@@ -5,53 +5,90 @@ fi
 alias check_songs='serber "cd /mnt/MyStuff/Files/Audio/ && ls | xargs -0"'
 alias check_youtubes='serber "cd /mnt/MyStuff/Files/Videos/YouTubes/ && ls | xargs -0 "'
 
-if type yt-dlp &> /dev/null || type youtube-dl &> /dev/null; then
-    if type youtube-dl &> /dev/null; then
-        yt_dl='youtube-dl'
-    elif type yt-dlp &> /dev/null; then
+if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null; then
+    if type yt-dlp &> /dev/null; then
         yt_dl='yt-dlp'
+    elif type youtube-dl &> /dev/null; then
+        yt_dl='youtube-dl'
     fi
 
     function yt-dl(){
-        if [ ! -z "$1" ]; then                                
-            format=""
-            format_sub=""
-            format_sub_auto=""
-            test $yt_dl == 'yt_dlp' && form_pre="mp4 flv ogg webm mkv avi" || form_pre="mp4 flv ogg webm mkv avi gif mp3 wav vorbis mov mka aac aiff alac flac m4a" 
-            reade -Q "green" -i "best" -p "Video Format? [Best(default)/avi/flv/gif/mkv/mov/mp4/webm/aac/aiff/alac/flac/m4a/mka/mp3/ogg/opus/vorbis/wav]: " "avi flv gif mkv mov mp4 webm aac aiff alac flac m4a mka mp3 ogg opus vorbis wav" format
-            if ! test $format == 'best'; then
-                format=" --recode-video $format"
-            fi
-            reade -Q "GREEN" -i "y" -p "Include subtitles? [Y/n]: " "n" format_sub
-            if test $format_sub == 'y'; then
+        if [ -z "$1" ]; then                                
+            reade -Q "GREEN" -p "Link to youtube video (Go to browser -> Ctrl-L + Ctrl-C): " "" url
+        else
+            url=$1
+        fi
+        format=""
+        format_sub=""
+        format_sub_auto=""
+        test $yt_dl == 'yt_dlp' && form_pre="mp4 flv ogg webm mkv avi" || form_pre="mp4 flv ogg webm mkv avi gif mp3 wav vorbis mov mka aac aiff alac flac m4a" 
+        reade -Q "green" -i "best" -p "Video Format? [Best(default)/avi/flv/gif/mkv/mov/mp4/webm/aac/aiff/alac/flac/m4a/mka/mp3/ogg/opus/vorbis/wav]: " "avi flv gif mkv mov mp4 webm aac aiff alac flac m4a mka mp3 ogg opus vorbis wav" format
+        if ! test $format == 'best'; then
+            format=" --recode-video $format"
+        else
+            format=''
+        fi
+        reade -Q "GREEN" -i "y" -p "Include subtitles and auto captions? [Y/n/sub(only)/cap(only)]: " "n sub cap" format_sub
+        if test $format_sub == 'y' || test $format_sub == 'sub' || test $format_sub == 'cap' ; then
+            sub=''
+            sub_auto=''
+            if test $format_sub == 'y' || test $format_sub == 'sub'; then
                 test $yt_dl == 'yt_dlp' && sub=" --write-subs" || sub=" --write-sub" 
-
-                # youtube-dl --list-subs --simulate $1 | awk '/subtitles/,EOF'
-                # yt-dlp --list-subs --simulate $1 | awk '/subtitle/{flag=1;next}/\[info\]/{flag=0}flag'
-                
-                # https://stackoverflow.com/questions/17988756/how-to-select-lines-between-two-marker-patterns-which-may-occur-multiple-times-w
-                
-                reade -Q "cyan" -i "n" -p "Set subtitle format? [N/y]: " format_sub
+                reade -Q "CYAN" -i "n" -p "Set subtitle format? [N/y]: " "y" format_sub
                 if test $format_sub == 'n'; then
                     format_sub=" "
                 else
-                    format_sub=" --sub-format $format_sub"
-                fi
-                sub="$sub $format_sub"
-                reade -Q "cyan" -i "n" -p "Also include auto generated subtitles? [N/y]: " "n" sub_auto
-                if test $sub_auto == 'y'; then
-                    test $yt_dl == 'yt_dlp' && sub_auto=" --write-auto-subs" || sub_auto=" --write-auto-sub" 
-                else
-                    sub_auto=''
-                    # youtube-dl --list-subs --simulate $1 | awk '/automatic/,EOF'
-                    # $yt_dl --list-subs --simulate $1 | awk '/automatic/{flag=1;next}/\[info\]/{flag=0}flag'
+                    echo "Fetching possible formats"
+                    if test "$yt_dl" == 'yt-dlp'; then
+                        list_sub="$(yt-dlp --list-subs --simulate $url )" 
+                        sub_list="$(echo "$list_sub" | awk '/subtitle/{flag=1;next}/\[info\]/{flag=0}flag')"
+                        subs=$(echo "$sub_list" | awk 'NR>2 {$1=$2="";  print}' | sed 's/(.*) //g' | sed 's/,/\n/g' | sed '/^[[:space:]]*$/d' | sort -u)
+                    else
+                        list_sub="$(youtube-dl --list-subs --simulate $url)"
+                        sub_list="$(echo "$list_sub" | awk '/subtitles/,EOF')"
+                        subs=$(echo "$sub_list" | awk 'NR>2 {$1="";  print $0}' | sed 's/,//g' | sed 's/,/\n/g' | sed '/^[[:space:]]*$/d' | sort -u)
+                    fi
+                    #all_formats="$(echo $list_sub | awk 'f;/formats/,EOF{f=1}')"
+                    sub_langs=$(echo "$sub_list" | awk 'NR>1{;print $1;}' | sed '/live_chat/d')
+                    frst_frm=$(echo $subs | awk '{print $1}')
+                    frst_frm_p=$(echo "$frst_frm" | tr '[:lower:]' '[:upper:]')
+                    subs=$(echo "$subs" | sed "s/$frst_frm//g" )
+                    subs_pre=$(echo "$subs" | tr '\n' ' ' | tr -s ' ' | tr ' ' '/' | sed 's/.$//')
+                    
+
+                    if test -z "$sub_list" || [[ "$sub_list" =~ 'no subtitles' ]] ; then
+                        echo 'No subtitles available for this video'
+                        format_sub=''
+                    else 
+                        echo "$sub_list"
+                        reade -Q "cyan" -i "all" -p "Languages?: " "$sub_langs" lang
+                        if ! test -z $lang; then
+                            lang="--sub-lang $lang"
+                        fi
+                        reade -Q "cyan" -i "$frst_frm" -p "Format [$frst_frm_p$subs_pre]: " "$subs" format_sub
+                        format_sub="--sub-format $format_sub"
+                        live_chat=""
+                        if test $yt_dl == 'yt-dlp' && [[ "$sub_list" =~ 'live_chat' ]]; then
+                            reade -Q 'cyan' -i 'n' -p 'Subtitles include live chat. Explicitly exclude from subtitles? [N/y]: ' "y" live_chat_no
+                            if test "$live_chat_no" == 'y'; then
+                                live_chat="--compat-options no-live-chat"
+                            fi
+                        fi
+                    fi
+                    format_sub=" $format_sub $lang $live_chat"
                 fi
             fi
-            "$yt_dl" -c -i -R 20 $format $sub $sub_auto "$1" ;
-        else
-            echo "Give up a url, big guy. Know you can do it xoxox" ;
+            #if test "$format_sub" == 'y' || test "$format_sub" == 'cap'; then
+            #    test $yt_dl == 'yt_dlp' && sub_auto=" --write-auto-subs" || sub_auto=" --write-auto-sub" 
+            #fi
+            sub="$sub $format_sub"
+            # https://stackoverflow.com/questions/17988756/how-to-select-lines-between-two-marker-patterns-which-may-occur-multiple-times-w
+            
         fi
+        "$yt_dl" -c -i -R 20 $format $sub $sub_auto "$url" ;
     }
+
+    alias youtube-download="yt-dl"
 
     function yt-dl-dir(){
         if [ ! -z "$1" ] && [ ! -z "$2" ]; then                                
@@ -68,6 +105,8 @@ if type yt-dlp &> /dev/null || type youtube-dl &> /dev/null; then
         fi
     }
     
+    alias youtube-download-dir="yt-dl-dir"
+
     function yt-dl-audio-only(){
         reade -Q "green" -i "best" -p "Audio Format? [Best(default)/aac/alac/flac/m4a/mp3/opus/vorbis/wav]: " "aac alac flac m4a mp3 opus vorbis wav" format
         if test "$format" == 'best'; then
@@ -85,6 +124,9 @@ if type yt-dlp &> /dev/null || type youtube-dl &> /dev/null; then
             echo "Give up a url, big guy. Know you can do it xoxox" ;
         fi
     }
+    
+    alias youtube-download-audio-only="yt-dl-audio-only"
+    
     # Numbered tracks => -o "%(playlist)s\%(playlist_index)s - %(title)s.%(ext)s"
 
     function yt-dl-playlist(){
@@ -113,6 +155,8 @@ if type yt-dlp &> /dev/null || type youtube-dl &> /dev/null; then
             echo "Give up a url, big guy. Know you can do it xoxox" ;
         fi
     }
+        
+    alias youtube-download-playlist="yt-dl-playlist"
 
     function yt-dl-playlist-audio-only(){
         start=" "
@@ -140,6 +184,9 @@ if type yt-dlp &> /dev/null || type youtube-dl &> /dev/null; then
             echo "Give up a url, big guy. Know you can do it xoxox" ;
         fi
     }
+
+    alias youtube-download-playlist-audio-only="yt-dl-playlist-audio-only"
+
 
     function yt-dl-playlist-dir(){
         start=" "
@@ -170,6 +217,8 @@ if type yt-dlp &> /dev/null || type youtube-dl &> /dev/null; then
         fi
     }
 
+    alias youtube-download-playlist-dir="yt-dl-playlist"
+    
     function yt-dl-playlist-audio-only-dir(){
         start=" "
         end=" " 
@@ -194,4 +243,7 @@ if type yt-dlp &> /dev/null || type youtube-dl &> /dev/null; then
             )
         fi
     }
+    alias youtube-download-playlist-dir="yt-dl-playlist-yt-dl-playlist-audio-only-dir"
 fi
+
+

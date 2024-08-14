@@ -201,9 +201,9 @@ bind -m vi-command     -x '"\e[1;3B": clear && let LINE_TPUT=$LINE_TPUT+1; if [ 
 bind -m vi-insert      -x '"\e[1;3B": clear && let LINE_TPUT=$LINE_TPUT+1; if [ $LINE_TPUT -gt $LINES ];then let LINE_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
 #
 # Ctrl-w expands aliases
-bind -m emacs-standard  '"\C-w": alias-expand-line'
-bind -m vi-command      '"\C-w": alias-expand-line'
-bind -m vi-insert       '"\C-w": alias-expand-line'
+bind -m emacs-standard  '"\C-w": history-and-alias-expand-line'
+bind -m vi-command      '"\C-w": history-and-alias-expand-line'
+bind -m vi-insert       '"\C-w": history-and-alias-expand-line'
 
 # Expand by looping through options
 bind -m emacs-standard  'Tab: menu-complete'

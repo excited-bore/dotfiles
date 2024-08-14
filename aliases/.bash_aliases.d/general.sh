@@ -300,6 +300,9 @@ alias men="man man"
 # Space seperated words to newline
 alias word2line="tr ' ' '\n'"
 alias line2word="tr '\n' ' '"
+alias tab2space="tr -s ' '"
+alias only1space="tr -s ' '"
+
 
 # Pipe column output to a pager
 alias column="column -c $(tput cols)"
