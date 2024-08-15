@@ -41,6 +41,17 @@ if ! type yt-dlp &> /dev/null; then
     python2 -m pipx install yt-dlp
 fi
 
+if ! type ffmpeg &> /dev/null; then
+    reade -Q 'GREEN' -i 'y' -p 'Install ffmpeg (usefull for video/audio conversion)? [Y/n]:' '' ffmpeg
+    if test $ffmpeg == 'y' ;then
+        if ! test -f install_ffmpeg.sh; then
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/install_ffmpeg.sh)" 
+        else
+            ./install_ffmpeg.sh
+        fi
+    fi
+fi
+
 ytbe=aliases/.bash_aliases.d/youtube.sh
 if ! test -d aliases/.bash_aliases.d/; then 
     wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/youtube.sh 
