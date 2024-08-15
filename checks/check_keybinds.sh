@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [ ! -f ~/.keybinds ]; then
     if ! test -f keybinds/.keybinds; then

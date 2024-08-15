@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 printf " Based on: ${CYAN} https://github.com/mailvelope/mailvelope/wiki/Creating-the-app-manifest-file-on-macOS-and-Linux
 "

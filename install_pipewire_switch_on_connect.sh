@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #https://bbs.archlinux.org/viewtopic.php?id=271850
 if ! test -f checks/check_system.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
