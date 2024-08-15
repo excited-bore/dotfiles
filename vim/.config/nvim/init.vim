@@ -170,7 +170,7 @@ set expandtab
 set diffopt+=iwhite 
 
 " Different visual block mode
-set virtualedit=all    
+" set virtualedit=all    
 
 " COC settings 
 
