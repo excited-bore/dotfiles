@@ -21,12 +21,16 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
 
         [[ $yt_dl =~ 'yt_dlp' ]] && form_pre="mp4 flv ogg webm mkv avi" || form_pre="mp4 flv ogg webm mkv avi gif mp3 wav vorbis mov mka aac aiff alac flac m4a" 
         
+        less_=''
+        if type less &> /dev/null; then
+            less_='| less --quit-if-one-screen'
+        fi
         playlist='--no-playlist'
         start=" "
         end=" "
         plst_frm=''
-        
-        reade -Q 'GREEN' -i 'n' -p 'Download playlist if url directs to one? [N/y]: ' 'y' plslt
+
+    reade -Q 'GREEN' -i 'n' -p 'Download playlist if url directs to one? [N/y]: ' 'y' plslt
         if test $plslt == 'y' ; then
             playlist="--yes-playlist"
             reade -Q 'cyan' -i '' -p 'Start playlist? (In numbers, leave empty will start here): ' '' start
@@ -50,6 +54,8 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
                     plst_frm="%(playlist)s/%(title)s.%(ext)s"
                 fi
             fi
+        else
+            playlist="--no-playlist"
         fi
 
 
@@ -75,20 +81,20 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
             fi
         fi
 
-        reade -Q "GREEN" -i "y" -p "Include subtitles and auto captions? [Y/n/sub(only)/cap(only)]: " "n sub cap" sub_cap
+        reade -Q "GREEN" -i "y" -p "Include subtitles and auto captions? [Y(Both)/n/sub/cap]: " "n sub cap" sub_cap
 
         if test "$sub_cap" == 'y' || test "$sub_cap" == 'sub' || test "$sub_cap" == 'cap' ; then
             sub=''
             cap=''
             echo "Fetching possible formats"
             if [[ "$yt_dl" =~ 'yt-dlp' ]]; then
-                list_sub="$(yt-dlp --list-subs --simulate -- $url)" 
+                list_sub="$(yt-dlp --skip-download --list-subs --simulate $playlist -- $url)" 
                 sub_list="$(echo "$list_sub" | awk '/subtitles/{flag=1;next}/\[info\]/{flag=0}flag')"
                 subs=$(echo "$sub_list" | awk 'NR>1 {$1=$2="";  print}' | sed 's/(.*) //g' | sed 's/,/\n/g' | sed '/^[[:space:]]*$/d' | sort -u)
                 cap_list=$(echo "$list_sub" | awk '/captions/{flag=1;next}/subtitles/{flag=0}flag')
                 cap_frm=$(echo "$cap_list" | awk 'NR>2 {$1=$2="";  print}'  | sed 's/(.*) //g' | sed 's/[[:upper:]].*$//g' | sed 's/,/\n/g' | sed '/^[[:space:]]*$/d' | sed '/from/d' | sort -u)
             else
-                list_sub="$(youtube-dl --list-subs --simulate -- $url)"
+                list_sub="$(youtube-dl --skip-download --list-subs --simulate $playlist -- $url)"
                 sub_list="$(echo "$list_sub" | awk '/subtitles/,EOF')"
                 subs=$(echo "$sub_list" | awk 'NR>2 {$1="";  print $0}' | sed 's/,//g' | sed 's/,/\n/g' | sed '/^[[:space:]]*$/d' | sort -u)
                 cap_list=$(echo "$list_sub" | awk '/captions/{flag=1;next}/subtitles/{flag=0}flag')
@@ -145,7 +151,7 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
             sub="$sub $format_sub"
             if test "$sub_cap" == 'y' || test "$sub_cap" == 'cap'; then
                 sub_auto=" "
-                if test -z "$sub_list" || [[ "$sub_list" =~ 'no subtitles' ]] ; then
+                if test -z "$cap_list" || [[ "$cap_list" =~ 'no auto captions' ]] ; then
                     echo 'No auto captions available for this video'
                 else
                     reade -Q "CYAN" -i "n" -p "Set auto captions format? [N/y]: " "y" sub_auto
@@ -157,10 +163,6 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
                         frst_frm_p=$(echo "$frst_frm" | tr '[:lower:]' '[:upper:]')
                         cap_frm=$(echo $cap_frm | sed 's/'"$frst_frm "'//g')
                         cap_frm_p=$(echo "$cap_frm" | tr '\n' ' ' | tr -s ' ' | tr ' ' '/' | sed 's/.$//')
-                        less_=''
-                        if type less &> /dev/null; then
-                            less_='| less --quit-if-one-screen --redraw-on-quit'
-                        fi
                         eval 'echo "$cap_list"'" $less_"
                         if ! test -z "$cap_langs" ; then
                             reade -Q "cyan" -i "all" -p "Languages?: " "$cap_langs" caplang
@@ -183,7 +185,7 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
         reade -Q "magenta" -i "n" -p "Set ${bold}minimum${normal}${magenta} resolution? (Will always try to the get best available) [N/y]: " "y" min_res 
         if test $min_res == 'y'; then
             echo 'Fetching available formats'
-            $yt_dl --color always --list-formats $url | awk '/\[info\]/,EOF' | less -R --redraw-on-quit   
+            $yt_dl --color always --list-formats $url | awk '/\[info\]/,EOF' $less_   
             reade -Q 'GREEN' -i '1080' -p 'Minimum resolution: ' '720 480 360 240 144' res
             [[ $yt_dl =~ 'yt_dlp' ]] && format_all="-f 'bv[res>=$res]*+ba/b'" || format_all="-f 'bestvideo[resolution>=$res]+bestaudio/best'" 
         fi
@@ -193,7 +195,7 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
         else
             "$yt_dl" -c -i -R 20 $playlist $start $end $format $format_all $sub $cap -- "$url" ;
         fi
-        #unset plslt plst_frm plst_dir plst_rank playlist start end plst_dir cap sub format format_sub form_pre format_cap format_all formats url cap_list sub_list frst_frm_p frst_frm caplang sub_auto live_chat cap_langs sub_lang sub_langs less_
+        unset plslt plst_frm plst_dir plst_rank playlist start end plst_dir cap sub format format_sub form_pre format_cap format_all formats url cap_list sub_list frst_frm_p frst_frm caplang sub_auto live_chat cap_langs sub_lang sub_langs less_
     }
 
     alias youtube-download="yt-dl"
