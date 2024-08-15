@@ -49,6 +49,7 @@ if type brew &> /dev/null; then
     if test $machine == 'Mac'; then
         echo "This next $(tput setaf 1)sudo$(tput sgr0) will make $USER the owner of the folder '/usr/local' and '/Library/Caches/Homebrew' to mitigate permission errors when installing apps";
         sudo chown -R "$USER":admin /usr/local
+        sudo mkdir -p /Library/Caches/Homebrew
         sudo chown -R "$USER":admin /Library/Caches/Homebrew
     fi
     if ! grep -q -- '--no-quarantine' $PATHVAR || grep -q '#export HOMEBREW_CASK_OPTS="--no-quarantine"' $PATHVAR; then
