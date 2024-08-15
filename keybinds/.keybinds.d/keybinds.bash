@@ -4,10 +4,10 @@
 
 # https://stackoverflow.com/questions/8366450/complex-keybinding-in-bash
 
-alias ls-binds-stty="stty -a"
-alias ls-binds-readline="{ printf \"\nList commands bound to keys\n\n\n\" ; bind -X ; echo; echo \"List key sequences that invoke macros and their values\"; echo; bind -S ; echo ;  echo \"List readline functions (possibly) bound to keys\"; bind -P; } | $PAGER"
-alias ls-binds-xterm="xrdb -query -all"
-alias ls-binds-kitty='kitty +kitten show_key -m kitty' 
+alias list-binds-stty="stty -a"
+alias list-binds-readline="{ printf \"\nList commands bound to keys\n\n\n\" ; bind -X ; echo; echo \"List key sequences that invoke macros and their values\"; echo; bind -S ; echo ;  echo \"List readline functions (possibly) bound to keys\"; bind -P; } | $PAGER"
+alias list-binds-xterm="xrdb -query -all"
+alias list-binds-kitty='kitty +kitten show_key -m kitty' 
 
 # TTY
 
@@ -116,6 +116,9 @@ function cd() {
     builtin cd -- "$@"; 
 }
 complete -F _cd cd
+if type _fzf_dir_completion &> /dev/null; then
+    complete -F _fzf_dir_completion cd
+fi
 
 # Full path dirs
 alias dirs="dirs -l"
@@ -198,9 +201,9 @@ bind -m vi-command     -x '"\e[1;3B": clear && let LINE_TPUT=$LINE_TPUT+1; if [ 
 bind -m vi-insert      -x '"\e[1;3B": clear && let LINE_TPUT=$LINE_TPUT+1; if [ $LINE_TPUT -gt $LINES ];then let LINE_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
 #
 # Ctrl-w expands aliases
-bind -m emacs-standard  '"\C-w": alias-expand-line'
-bind -m vi-command      '"\C-w": alias-expand-line'
-bind -m vi-insert       '"\C-w": alias-expand-line'
+bind -m emacs-standard  '"\C-w": history-and-alias-expand-line'
+bind -m vi-command      '"\C-w": history-and-alias-expand-line'
+bind -m vi-insert       '"\C-w": history-and-alias-expand-line'
 
 # Expand by looping through options
 bind -m emacs-standard  'Tab: menu-complete'

@@ -6,10 +6,10 @@ else
     . ./checks/check_system.sh
 fi
 
-if ! test -f aliases/.bash_aliases.d/rlwrap_scripts.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/rlwrap_scripts.sh)" 
+if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
 else
-    . ./aliases/.bash_aliases.d/rlwrap_scripts.sh
+    . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
 fi
 
 globl="local"

@@ -19,10 +19,21 @@ if test -z $SYSTEM_UPDATED; then
     fi
 fi
 
-if ! type tree &> /dev/null; then 
+if ! type gdb &> /dev/null; then 
     if test "$distro" == "Arch" || test "$distro" == "Manjaro" ;then
-        sudo pacman -S tree
+        sudo pacman -S gdb
     elif test $distro_base == "Debian"; then
-        sudo apt install tree 
+        sudo apt install gdb 
     fi
 fi
+
+if ! test -d ~/.config/gdb; then
+    mkdir -p ~/.config/gdb
+fi
+
+if ! test -f ~/.config/gdb/gdbinit; then
+    echo 'set history save on' >> ~/.config/gdb/gdbinit
+    echo 'set history size 256' >> ~/.config/gdb/gdbinit
+    echo 'set history remove-duplicates 1' >> ~/.config/gdb/gdbinit 
+fi
+

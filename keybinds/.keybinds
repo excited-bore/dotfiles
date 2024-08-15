@@ -1,10 +1,5 @@
 #!/bin/bash
-if test -f ~/.bash_aliases.d/keybinds_rifle.sh; then
-    source ~/.bash_aliases.d/keybinds_rifle.sh  
-fi
-if test -f ~/.bash_aliases.d/ripgrep-directory.sh; then
-    source ~/.bash_aliases.d/ripgrep-directory.sh    
-fi
+
 if [ -d ~/.keybinds.d/ ] && [ "$(ls -A ~/.keybinds.d/)" ]; then
   for keybind in ~/.keybinds.d/*.bash; do
       . "$keybind" 

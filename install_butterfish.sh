@@ -2,27 +2,27 @@
 # Install Butterfish
 # Author: Peter Bakkum
 
-if ! type update_system &> /dev/null; then
-    if ! test -f update_system.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/update_system.sh)" 
+if ! type update-system &> /dev/null; then
+    if ! test -f aliases/.bash_aliases.d/update-system.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)" 
     else
-        . ./update_system.sh
+        . ./aliases/.bash_aliases.d/update-system.sh
     fi
 fi
 
 if test -z $SYSTEM_UPDATED; then
     reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y n" updatesysm
     if test $updatesysm == "y"; then
-        update_system                     
+        update-system                     
     fi
 fi
 
 if ! type go &> /dev/null; then
     echo "Go is not installed. Installing Go..."
     if ! test -f install_go.sh; then
-         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/rlwrap_scripts.sh)" 
+         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
     else
-        . ./aliases/.bash_aliases.d/rlwrap_scripts.sh
+        . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
     fi
 fi
 

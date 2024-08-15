@@ -1,10 +1,6 @@
-if [ ! -f ~/.bash_aliases.d/rlwrap_scripts.sh ]; then
-    . ../aliases/rlwrap_scripts.sh
-else
-    . ~/.bash_aliases.d/rlwrap_scripts.sh
+if ! type reade &> /dev/null; then
+    . ~/.bash_aliases.d/00-rlwrap_scripts.sh
 fi
-
-shopt -s expand_aliases  
 
 if [ -z $TRASHBIN_LIMIT ]; then
    TRASHBIN_LIMIT=100 
@@ -250,6 +246,7 @@ function mv-trash(){
 
 ##alias mv="mv-trash -v"
 
+
 # rm recursively and verbose
 
 alias rm="rm -rv"
@@ -273,12 +270,21 @@ alias rg='rg --color=always'
 
 #alias cat="bat"
 
+
+# Show open ports
+alias openports='netstat -nape --inet'
+
+# Wifi enable/disable
+if type nmcli &> /dev/null; then
+    alias wifi-enable='nmcli radio wifi on'
+    alias wifi-disable='nmcli radio wifi off'
+fi
+
 # Listen hidden files and permissions
-alias ll="ls -ahl"
+alias lsall="ls -Ahl"
 
 # Listen only directories, including that are hidden
-alias lsdr="ls -Ap | grep \".*/$\""
-alias lall="ls -Ahl"
+alias lsdir="ls -Ap | grep \".*/$\""
 alias q="exit"
 alias d="dirs"
 alias c="cd"
@@ -287,14 +293,32 @@ alias x="cd .."
 # (:
 alias men="man man"
 
+# :(
+# No alias starting with = 
+# alias =>="|"
+
+# Space seperated words to newline
 alias word2line="tr ' ' '\n'"
+alias line2word="tr '\n' ' '"
+alias tab2space="tr -s ' '"
+alias only1space="tr -s ' '"
+
 
 # Pipe column output to a pager
 alias column="column -c $(tput cols)"
 
-alias targz-create="tar -cvf"
-alias targz-unpack="tar -xvf"
-alias targz-list="tar -tvf"
+alias tar-create="tar -cvf"
+alias tar-unpack="tar -xvf"
+alias tar-list="tar -tvf"
+
+# Alias's for archives
+alias mktar='tar -cvf'
+alias mkbz2='tar -cvjf'
+alias mkgz='tar -cvzf'
+alias untar='tar -xvf'
+alias unbz2='tar -xvjf'
+alias ungz='tar -xvzf'
+
 
 extract-archive(){  
     if [ -f $1 ] ; then
@@ -319,6 +343,9 @@ extract-archive(){
 
 complete -F _files extract
 
+# eur and us format date
+alias date-us='date "+%Y-%m-%d %A %T %Z"'
+alias date-eu='date "+%d-%m-%Y %A %T %Z"'
 
 alias redirect-tty-output-to="exec 1>/dev/pts/"
 
@@ -329,7 +356,7 @@ mktemp_f=$(mktemp) && for user in $(cut -f1 -d: /etc/passwd); do echo "$(tput se
 }
 alias crontab-list-all-user-jobs="cron-list-all-user-jobs"
 
-function link-soft(){
+function ln-soft(){
     if ([[ "$1" = /* ]] || [ -d "$1" ] || [ -f "$1" ]) && ([[ $(readlink -f "$2") ]] || [[ $(readlink -d "$2") ]]); then
         if [[ "$1" = /* ]]; then  
             ln -s "$1" "$2";
@@ -341,10 +368,10 @@ function link-soft(){
     fi
 }
 
-complete -F _files link_soft
+complete -F _files ln-soft
 
 
-function link-hard(){
+function ln-hard(){
     if ([[ "$0" = /* ]] || [ -d "$1" ] || [ -f "$1" ]) && ([[ $(readlink -f "$2") ]] || [[ $(readlink -d "$2") ]]); then
         if [[ "$1" = /* ]]; then  
             ln "$1" "$2";
@@ -356,7 +383,7 @@ function link-hard(){
     fi
 }
 
-complete -F _files link_hard
+complete -F _files ln-hard
 
 function trash(){
     for arg in $@ ; do
@@ -424,7 +451,7 @@ function set-user-executable() {
 
 complete -F _files mark_user_executable
 
-alias ls_enabled_locales="locale -a"
+alias locales-list-enabled="locale -a"
 
 # https://askubuntu.com/questions/76808/how-do-i-use-variables-in-a-sed-command
 # https://stackoverflow.com/questions/18439528/sed-insert-line-with-spaces-to-a-specific-line    
@@ -453,7 +480,7 @@ function file_insert_after_line(){
 
 complete -F _files file_insert_after_line
 
-function file_put_quotations_around(){
+function file-put-quotations-around(){
     if [ -f "$1" ]; then
         var1=$(sed 's/ /\\ /g' <<< $2);
        sed -i "s/${var1}/\"&\"/" "$1";

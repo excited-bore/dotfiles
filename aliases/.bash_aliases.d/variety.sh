@@ -1,9 +1,7 @@
 # !/bin/bash
 
-if [ ! -f ~/.bash_aliases.d/rlwrap_scripts.sh ]; then
-    . ../aliases/rlwrap_scripts.sh
-else
-    . ~/.bash_aliases.d/rlwrap_scripts.sh
+if ! type reade &> /dev/null; then
+    . ~/.bash_aliases.d/00-rlwrap_scripts.sh
 fi 
 
 # Kdocker is a system tray app
