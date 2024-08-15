@@ -28,7 +28,7 @@ fi
 if ! test -f checks/check_aliases_dir.sh; then
     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)" 
 else
-    ./checks/check_aliases_dir.sh
+    . ./checks/check_aliases_dir.sh
 fi 
 
 if ! type yt-dlp &> /dev/null; then
@@ -41,7 +41,7 @@ if ! type yt-dlp &> /dev/null; then
             sudo apt install pipx
         fi
     fi
-    python2 -m pipx install yt-dlp
+    pipx install yt-dlp
 fi
 
 if ! type ffmpeg &> /dev/null; then
