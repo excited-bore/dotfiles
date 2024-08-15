@@ -1,8 +1,11 @@
- #DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+#!/usr/bin/env bash
+ 
+#DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
 if ! test -f checks/check_system.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
 else
-    . ./checks/check_system.sh
+    . checks/check_system.sh
 fi
 
 if ! type update-system &> /dev/null; then
