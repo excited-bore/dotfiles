@@ -14,41 +14,81 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
 
     function yt-dl(){
         if [ -z "$1" ]; then                                
-            reade -Q "GREEN" -p "Link to youtube video (Go to browser -> Ctrl-L + Ctrl-C): " "" url
+            reade -Q "GREEN" -i "''" -p "Link to youtube video (Go to browser -> Ctrl-L + Ctrl-C): " "" url
         else
             url=$1
         fi
+
+        [[ $yt_dl =~ 'yt_dlp' ]] && form_pre="mp4 flv ogg webm mkv avi" || form_pre="mp4 flv ogg webm mkv avi gif mp3 wav vorbis mov mka aac aiff alac flac m4a" 
+        
+        playlist='--no-playlist'
+        start=" "
+        end=" "
+        plst_frm=''
+        
+        reade -Q 'GREEN' -i 'n' -p 'Download playlist if url directs to one? [N/y]: ' 'y' plslt
+        if test $plslt == 'y' ; then
+            playlist="--yes-playlist"
+            reade -Q 'cyan' -i '' -p 'Start playlist? (In numbers, leave empty will start here): ' '' start
+            if [ ! -z "$start" ]; then
+                start=" --playlist-start $start";
+            fi
+            reade -Q 'cyan' -i '' -p 'End playlist? (In numbers, leave empty will download until end): ' '' end
+            if [ ! -z "$end" ]; then
+                end=" --playlist-end $end";
+            fi
+            reade -Q "green" -i "y" -p "Give each videotitle the index according how it's ordered in the playlist? (f.ex. '4) Lofi Mix.mp3') [Y/n]: " "n" plst_rank
+            if test "$plst_rank" == "y"; then
+                plst_frm="%(playlist_index)s - %(title)s.%(ext)s"
+            fi
+            
+            reade -Q "green" -i "y" -p "Make directory using playlist name and put songs in said dir? [Y/n]: " "n" plst_dir
+            if test "$plst_dir" == "y"; then
+                if ! test -z $plst_rank; then
+                    plst_frm="%(playlist)s/%(playlist_index)s - %(title)s.%(ext)s"
+                else
+                    plst_frm="%(playlist)s/%(title)s.%(ext)s"
+                fi
+            fi
+        fi
+
+
         format=""
         format_sub=""
         format_cap=""
         format_all=""
-        [[ $yt_dl =~ 'yt_dlp' ]] && form_pre="mp4 flv ogg webm mkv avi" || form_pre="mp4 flv ogg webm mkv avi gif mp3 wav vorbis mov mka aac aiff alac flac m4a" 
-        reade -Q "green" -i "best" -p "Video Format? [Best(default)/mp4/mkv/avi/flv/gif/mov/mp4/webm/aac/aiff/alac/flac/m4a/mka/mp3/ogg/opus/vorbis/wav]: " "mp4 mkv avi flv gif mov webm aac aiff alac flac m4a mka mp3 ogg opus vorbis wav" format
-        if ! test $format == 'best'; then
-            format=" --recode-video $format"
+
+        reade -Q 'CYAN' -i 'n' -p 'Audio only? [N/y]: ' 'y' aud_only
+        if test $aud_only == 'y'; then
+            reade -Q "green" -i "best" -p "Audio Format? [Best(default)/mp3/opus/aac/alac/flac/m4a/vorbis/wav]: " "mp3 opus aac alac flac m4a  vorbis wav" format
+            if test "$format" == 'best'; then
+                format='-x'
+            else
+                format="-x --audio-format $format"
+            fi
         else
-            format=''
+            reade -Q "green" -i "best" -p "Video Format? [Best(default)/mp4/mkv/avi/flv/gif/mov/mp4/webm/aac/aiff/alac/flac/m4a/mka/mp3/ogg/opus/vorbis/wav]: " "mp4 mkv avi flv gif mov webm aac aiff alac flac m4a mka mp3 ogg opus vorbis wav" format
+            if ! test $format == 'best'; then
+                format=" --recode-video $format"
+            else
+                format=''
+            fi
         fi
-        reade -Q "magenta" -i "n" -p "Set ${bold}minimum${normal}${magenta} resolution? (Will always try to the get best available) [N/y]: " "y" min_res 
-        if test $min_res == 'y'; then
-            echo 'Fetching available formats'
-            $yt_dl --color always --list-formats $url | awk '/\[info\]/,EOF' | less -R --redraw-on-quit   
-            reade -Q 'GREEN' -i '1080' -p 'Minimum resolution: ' '720 480 360 240 144' res
-            [[ $yt_dl =~ 'yt_dlp' ]] && format_all="-f 'bv[res>=$res]*+ba/b'" || format_all="-f 'bestvideo[resolution>=$res]+bestaudio/best'" 
-        fi
+
         reade -Q "GREEN" -i "y" -p "Include subtitles and auto captions? [Y/n/sub(only)/cap(only)]: " "n sub cap" sub_cap
+
         if test "$sub_cap" == 'y' || test "$sub_cap" == 'sub' || test "$sub_cap" == 'cap' ; then
             sub=''
             cap=''
             echo "Fetching possible formats"
             if [[ "$yt_dl" =~ 'yt-dlp' ]]; then
-                list_sub="$(yt-dlp --list-subs --simulate $url)" 
+                list_sub="$(yt-dlp --list-subs --simulate -- $url)" 
                 sub_list="$(echo "$list_sub" | awk '/subtitles/{flag=1;next}/\[info\]/{flag=0}flag')"
                 subs=$(echo "$sub_list" | awk 'NR>1 {$1=$2="";  print}' | sed 's/(.*) //g' | sed 's/,/\n/g' | sed '/^[[:space:]]*$/d' | sort -u)
                 cap_list=$(echo "$list_sub" | awk '/captions/{flag=1;next}/subtitles/{flag=0}flag')
                 cap_frm=$(echo "$cap_list" | awk 'NR>2 {$1=$2="";  print}'  | sed 's/(.*) //g' | sed 's/[[:upper:]].*$//g' | sed 's/,/\n/g' | sed '/^[[:space:]]*$/d' | sed '/from/d' | sort -u)
             else
-                list_sub="$(youtube-dl --list-subs --simulate $url)"
+                list_sub="$(youtube-dl --list-subs --simulate -- $url)"
                 sub_list="$(echo "$list_sub" | awk '/subtitles/,EOF')"
                 subs=$(echo "$sub_list" | awk 'NR>2 {$1="";  print $0}' | sed 's/,//g' | sed 's/,/\n/g' | sed '/^[[:space:]]*$/d' | sort -u)
                 cap_list=$(echo "$list_sub" | awk '/captions/{flag=1;next}/subtitles/{flag=0}flag')
@@ -57,15 +97,13 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
             [[ $yt_dl =~ 'yt_dlp' ]] && sub=" --write-subs" || sub=" --write-sub" 
             [[ $yt_dl =~ 'yt_dlp' ]] && sub_lang=" --sub-langs" || sub_lang=" --sub-lang" 
             if test $sub_cap == 'y' || test $sub_cap == 'sub'; then
-                reade -Q "CYAN" -i "n" -p "Set subtitle format? [N/y]: " "y" format_sub
-                if test "$format_sub" == 'n'; then
-                    format_sub=" "
-                else
-                    if test -z "$sub_list" || [[ "$sub_list" =~ 'no subtitles' ]] ; then
-
-                        echo 'No subtitles available for this video'
-                        format_sub=''
-                    else 
+                format_sub=''
+                if test -z "$sub_list" || [[ "$sub_list" =~ 'no subtitles' ]] ; then
+                    echo 'No subtitles available for this video'
+                    format_sub=''
+                else 
+                    reade -Q "CYAN" -i "n" -p "Set subtitle format? [N/y]: " "y" format_sub
+                    if test "$format_sub" == 'y'; then
                         sub_langs=$(echo "$sub_list" | awk 'NR>1{print $1;}' | sed '/live_chat/d')
                         frst_frm=$(echo $subs | awk '{print $1}')
                         frst_frm_p=$(echo "$frst_frm" | tr '[:lower:]' '[:upper:]')
@@ -106,15 +144,14 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
             fi
             sub="$sub $format_sub"
             if test "$sub_cap" == 'y' || test "$sub_cap" == 'cap'; then
-                [[ $yt_dl =~ 'yt_dlp' ]] && sub_auto=" --write-auto-subs" || sub_auto=" --write-auto-sub" 
-                reade -Q "CYAN" -i "n" -p "Set auto captions format? [N/y]: " "y" sub_auto
-                if test $sub_auto == 'n'; then
-                    sub_auto=" "
+                sub_auto=" "
+                if test -z "$sub_list" || [[ "$sub_list" =~ 'no subtitles' ]] ; then
+                    echo 'No auto captions available for this video'
                 else
-                    if test -z "$sub_list" || [[ "$sub_list" =~ 'no subtitles' ]] ; then
-                        echo 'No auto captions available for this video'
+                    reade -Q "CYAN" -i "n" -p "Set auto captions format? [N/y]: " "y" sub_auto
+                    if test $sub_auto == 'y'; then
+                        [[ $yt_dl =~ 'yt_dlp' ]] && sub_auto=" --write-auto-subs" || sub_auto=" --write-auto-sub" 
                         format_sub=''
-                    else 
                         cap_langs=$(echo "$cap_list" | awk 'NR>1{print $1;}')
                         frst_frm=$(echo $cap_frm | awk '{print $1}')
                         frst_frm_p=$(echo "$frst_frm" | tr '[:lower:]' '[:upper:]')
@@ -139,167 +176,159 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
                 fi
                 cap="$cap $format_cap"
             fi
+            
             # https://stackoverflow.com/questions/17988756/how-to-select-lines-between-two-marker-patterns-which-may-occur-multiple-times-w
         fi
-        "$yt_dl" --no-playlist -c -i -R 20 $format $format_all $sub $cap "$url" ;
+        
+        reade -Q "magenta" -i "n" -p "Set ${bold}minimum${normal}${magenta} resolution? (Will always try to the get best available) [N/y]: " "y" min_res 
+        if test $min_res == 'y'; then
+            echo 'Fetching available formats'
+            $yt_dl --color always --list-formats $url | awk '/\[info\]/,EOF' | less -R --redraw-on-quit   
+            reade -Q 'GREEN' -i '1080' -p 'Minimum resolution: ' '720 480 360 240 144' res
+            [[ $yt_dl =~ 'yt_dlp' ]] && format_all="-f 'bv[res>=$res]*+ba/b'" || format_all="-f 'bestvideo[resolution>=$res]+bestaudio/best'" 
+        fi
+                                                   
+        if ! test -z "$plst_frm"; then
+            "$yt_dl" -c -i -R 20 $playlist $start $end -o "$plst_frm" $format $format_all $sub $cap -- "$url" ;
+        else
+            "$yt_dl" -c -i -R 20 $playlist $start $end $format $format_all $sub $cap -- "$url" ;
+        fi
+        #unset plslt plst_frm plst_dir plst_rank playlist start end plst_dir cap sub format format_sub form_pre format_cap format_all formats url cap_list sub_list frst_frm_p frst_frm caplang sub_auto live_chat cap_langs sub_lang sub_langs less_
     }
 
     alias youtube-download="yt-dl"
+    #alias yt-dl-dir="reade -Q 'GREEN' -p \"Dir? : \" -e dir && mkdir "$dir" && cd "$dir" && yt-dl && unset dir"
+    #alias youtube-download-dir="reade -Q 'GREEN' -p \"Dir? : \" -e dir && mkdir "$dir" && cd "$dir" && yt-dl && unset dir"
 
-    function yt-dl-dir(){
-        if [ ! -z "$1" ] && [ ! -z "$2" ]; then                                
-            (mkdir "$2" && cd "$2";
-            reade -Q "green" -i "best" -p "Video Format? [Best(default)/avi/flv/gif/mkv/mov/mp4/webm/aac/aiff/alac/flac/m4a/mka/mp3/ogg/opus/vorbis/wav]: " "avi flv gif mkv mov mp4 webm aac aiff alac flac m4a mka mp3 ogg opus vorbis wav" format
-            if test $format == 'best'; then
-                format=""
-            else
-                format=" --remux-video $format"
-            fi
-            "$yt_dl" -c -i -R 20 $format --write-sub --yes-playlist "$1" ;)
-        else
-            echo "Give up a url and a dir, big guy. Know you can do it xoxox" ;
-        fi
-    }
-    
-    alias youtube-download-dir="yt-dl-dir"
-
-    function yt-dl-audio-only(){
-        reade -Q "green" -i "best" -p "Audio Format? [Best(default)/aac/alac/flac/m4a/mp3/opus/vorbis/wav]: " "aac alac flac m4a mp3 opus vorbis wav" format
-        if test "$format" == 'best'; then
-            aud_format=''
-        else
-            aud_format=" --audio-format $format"
-        fi
-        if [ ! -z "$1" ]; then    
-            if [ ! -z "$2" ]; then
-                "$yt_dl" -c -i -R 20 -x $aud_format --write-sub --yes-playlist "$1" $start $end;
-            else 
-                "$yt_dl" -c -i -R 20 -x $aud_format --write-sub --yes-playlist "$1" $start $end;
-            fi
-        else
-            echo "Give up a url, big guy. Know you can do it xoxox" ;
-        fi
-    }
-    
-    alias youtube-download-audio-only="yt-dl-audio-only"
+    #function yt-dl-audio-only(){
+    #    reade -Q "green" -i "best" -p "Audio Format? [Best(default)/aac/alac/flac/m4a/mp3/opus/vorbis/wav]: " "aac alac flac m4a mp3 opus vorbis wav" format
+    #    if test "$format" == 'best'; then
+    #        aud_format=''
+    #    else
+    #        aud_format=" --audio-format $format"
+    #    fi
+    #    if [ ! -z "$1" ]; then    
+    #        if [ ! -z "$2" ]; then
+    #            "$yt_dl" -c -i -R 20 -x $aud_format --write-sub "$1" $start $end;
+    #        else 
+    #            "$yt_dl" -c -i -R 20 -x $aud_format --write-sub "$1" $start $end;
+    #        fi
+    #    else
+    #        echo "Give up a url, big guy. Know you can do it xoxox" ;
+    #    fi
+    #}
+    #
+    #alias youtube-download-audio-only="yt-dl-audio-only"
     
     # Numbered tracks => -o "%(playlist)s\%(playlist_index)s - %(title)s.%(ext)s"
 
-    function yt-dl-playlist(){
-        start=" "
-        end=" " 
-        if [ ! -z "$2" ]; then
-            start=" --playlist-start $2";
-        fi
-        if [ ! -z "$3" ]; then
-            end=" --playlist-end $3";
-        fi
-        if [ ! -z "$1" ]; then                                
-            reade -Q "green" -i "best" -p "Video Format? [Best(default)/avi/flv/gif/mkv/mov/mp4/webm/aac/aiff/alac/flac/m4a/mka/mp3/ogg/opus/vorbis/wav]: " "avi flv gif mkv mov mp4 webm aac aiff alac flac m4a mka mp3 ogg opus vorbis wav" format
-            if test $format == 'best'; then
-                format=""
-            else
-                format=" --remux-video $format"
-            fi
-            reade -Q "green" -i "y" -p "Make directory using playlist name and put songs in said dir? [Y/n]: " "n" plst_dir
-            if test "$plst_dir" == "y"; then
-                "$yt_dl" -c -i -R 20 $format -o "%(playlist)s/%(playlist_index)s - %(title)s.%(ext)s" --write-sub --yes-playlist "$1" "$start" "$end";
-            else
-                "$yt_dl" -c -i -R 20 $format -o "%(playlist_index)s - %(title)s.%(ext)s" --write-sub --yes-playlist "$1" "$start" "$end";
-            fi
-        else
-            echo "Give up a url, big guy. Know you can do it xoxox" ;
-        fi
-    }
-        
-    alias youtube-download-playlist="yt-dl-playlist"
+    #function yt-dl-playlist(){
+    #    if [ ! -z "$1" ]; then                                
+    #        reade -Q "green" -i "best" -p "Video Format? [Best(default)/avi/flv/gif/mkv/mov/mp4/webm/aac/aiff/alac/flac/m4a/mka/mp3/ogg/opus/vorbis/wav]: " "avi flv gif mkv mov mp4 webm aac aiff alac flac m4a mka mp3 ogg opus vorbis wav" format
+    #        if test $format == 'best'; then
+    #            format=""
+    #        else
+    #            format=" --remux-video $format"
+    #        fi
+    #        reade -Q "green" -i "y" -p "Make directory using playlist name and put songs in said dir? [Y/n]: " "n" plst_dir
+    #        if test "$plst_dir" == "y"; then
+    #            "$yt_dl" -c -i -R 20 $format -o "%(playlist)s/%(playlist_index)s - %(title)s.%(ext)s" --write-sub --yes-playlist "$1" "$start" "$end";
+    #        else
+    #            "$yt_dl" -c -i -R 20 $format -o "%(playlist_index)s - %(title)s.%(ext)s" --write-sub --yes-playlist "$1" "$start" "$end";
+    #        fi
+    #    else
+    #        echo "Give up a url, big guy. Know you can do it xoxox" ;
+    #    fi
+    #}
+    #    
+    #alias youtube-download-playlist="yt-dl-playlist"
 
-    function yt-dl-playlist-audio-only(){
-        start=" "
-        end=" " 
-        if [ ! -z "$3" ]; then
-            start=" --playlist-start $3";
-        fi
-        if [ ! -z "$4" ]; then
-            end=" --playlist-end $4";
-        fi
-        if [ ! -z "$1" ]; then                                
-            reade -Q "green" -i "best" -p "Audio Format? [Best(default)/aac/alac/flac/m4a/mp3/opus/vorbis/wav]: " "aac alac flac m4a mp3 opus vorbis wav" format
-            reade -Q "green" -i "y" -p "Make directory using playlist name and put songs in said dir? [Y/n]: " "n" plst_dir
-            if test "$format" == 'best'; then
-                aud_format=''
-            else
-                aud_format=" --audio-format $format"
-            fi
-            if test "$plst_dir" == "y"; then
-                "$yt_dl" -c -i -R 20 -o "%(playlist)s/%(playlist_index)s - %(title)s.%(ext)s" -x $aud_format --write-sub --yes-playlist "$1" "$start" "$end";
-            else
-                "$yt_dl" -c -i -R 20 -o "%(playlist_index)s - %(title)s.%(ext)s" -x $aud_format --write-sub --yes-playlist "$1" "$start" "$end";
-            fi
-        else
-            echo "Give up a url, big guy. Know you can do it xoxox" ;
-        fi
-    }
+    #function yt-dl-playlist-audio-only(){
+    #    start=" "
+    #    end=" " 
+    #    if [ ! -z "$3" ]; then
+    #        start=" --playlist-start $3";
+    #    fi
+    #    if [ ! -z "$4" ]; then
+    #        end=" --playlist-end $4";
+    #    fi
+    #    if [ ! -z "$1" ]; then                                
+    #        reade -Q "green" -i "best" -p "Audio Format? [Best(default)/aac/alac/flac/m4a/mp3/opus/vorbis/wav]: " "aac alac flac m4a mp3 opus vorbis wav" format
+    #        reade -Q "green" -i "y" -p "Make directory using playlist name and put songs in said dir? [Y/n]: " "n" plst_dir
+    #        if test "$format" == 'best'; then
+    #            aud_format=''
+    #        else
+    #            aud_format=" --audio-format $format"
+    #        fi
+    #        if test "$plst_dir" == "y"; then
+    #            "$yt_dl" -c -i -R 20 -o "%(playlist)s/%(playlist_index)s - %(title)s.%(ext)s" -x $aud_format --write-sub --yes-playlist "$1" "$start" "$end";
+    #        else
+    #            "$yt_dl" -c -i -R 20 -o "%(playlist_index)s - %(title)s.%(ext)s" -x $aud_format --write-sub --yes-playlist "$1" "$start" "$end";
+    #        fi
+    #    else
+    #        echo "Give up a url, big guy. Know you can do it xoxox" ;
+    #    fi
+    #}
 
-    alias youtube-download-playlist-audio-only="yt-dl-playlist-audio-only"
+    #alias youtube-download-playlist-audio-only="yt-dl-playlist-audio-only"
 
 
-    function yt-dl-playlist-dir(){
-        start=" "
-        end=" " 
-        if [ ! -z "$3" ]; then
-            start=" --playlist-start $3";
-        fi
-        if [ ! -z "$4" ]; then
-            end=" --playlist-end $4";
-        fi
-        if [ ! -z "$1" ]; then
-            reade -Q "green" -i "best" -p "Video Format? [Best(default)/avi/flv/gif/mkv/mov/mp4/webm/aac/aiff/alac/flac/m4a/mka/mp3/ogg/opus/vorbis/wav]: " "avi flv gif mkv mov mp4 webm aac aiff alac flac m4a mka mp3 ogg opus vorbis wav" format
-            if test $format == 'best'; then
-                format=""
-            else
-                format=" --remux-video $format"
-            fi
-            reade -Q "green" -p "Name directory? (default - playlist name)" "" plst_name
-            if test "$plst_name" == ""; then
-                "$yt_dl" -c -i -R 20 $format -o "%(playlist)s\%(playlist_index)s - %(title)s.%(ext)s" --write-sub --yes-playlist "$1" "$start" "$end" ; 
-            else
-                (cd "$plst_name"
-                "$yt_dl" -c -i -R 20 $format -o "%(playlist_index)s - %(title)s.%(ext)s" -x $aud_format --write-sub --yes-playlist "$1" "$start" "$end")
-            fi
-            
-        else
-            echo "Give up a url, big guy. Know you can do it xoxox" ;
-        fi
-    }
+    #function yt-dl-playlist-dir(){
+    #    start=" "
+    #    end=" " 
+    #    if [ ! -z "$3" ]; then
+    #        start=" --playlist-start $3";
+    #    fi
+    #    if [ ! -z "$4" ]; then
+    #        end=" --playlist-end $4";
+    #    fi
+    #    if [ ! -z "$1" ]; then
+    #        reade -Q "green" -i "best" -p "Video Format? [Best(default)/avi/flv/gif/mkv/mov/mp4/webm/aac/aiff/alac/flac/m4a/mka/mp3/ogg/opus/vorbis/wav]: " "avi flv gif mkv mov mp4 webm aac aiff alac flac m4a mka mp3 ogg opus vorbis wav" format
+    #        if test $format == 'best'; then
+    #            format=""
+    #        else
+    #            format=" --remux-video $format"
+    #        fi
+    #        reade -Q "green" -p "Name directory? (default - playlist name)" "" plst_name
+    #        if test "$plst_name" == ""; then
+    #            "$yt_dl" -c -i -R 20 $format -o "%(playlist)s\%(playlist_index)s - %(title)s.%(ext)s" --write-sub --yes-playlist "$1" "$start" "$end" ; 
+    #        else
+    #            (cd "$plst_name"
+    #            "$yt_dl" -c -i -R 20 $format -o "%(playlist_index)s - %(title)s.%(ext)s" -x $aud_format --write-sub --yes-playlist "$1" "$start" "$end")
+    #        fi
+    #        
+    #    else
+    #        echo "Give up a url, big guy. Know you can do it xoxox" ;
+    #    fi
+    #}
 
-    alias youtube-download-playlist-dir="yt-dl-playlist"
-    
-    function yt-dl-playlist-audio-only-dir(){
-        start=" "
-        end=" " 
-        if [ ! -z "$3" ]; then
-            start="--playlist-start $3";
-        fi
-        if [ ! -z "$4" ]; then
-            end=" --playlist-end $4";
-        fi
-        reade -Q "green" -i "best" -p "Audio Format? [Best(default)/aac/alac/flac/m4a/mp3/opus/vorbis/wav]: " "aac alac flac m4a mp3 opus vorbis wav" format
-        if test "$format" == 'best'; then
-            aud_format=''
-        else
-            aud_format=" --audio-format $format"
-        fi
-        if test -z "$1" || test -z "$2"; then
-            echo "Give up a url and a dir, big guy. Know you can do it xoxox";
-        else
-            mkdir "$2";
-            (cd "$2"    
-            "$yt_dl" -c -i -R 20 -o "%(playlist_index)s - %(title)s.%(ext)s" -x $aud_format --write-sub --yes-playlist "$1" "$start" "$end";
-            )
-        fi
-    }
-    alias youtube-download-playlist-dir="yt-dl-playlist-yt-dl-playlist-audio-only-dir"
+    #alias youtube-download-playlist-dir="yt-dl-playlist"
+    #
+    #function yt-dl-playlist-audio-only-dir(){
+    #    start=" "
+    #    end=" " 
+    #    if [ ! -z "$3" ]; then
+    #        start="--playlist-start $3";
+    #    fi
+    #    if [ ! -z "$4" ]; then
+    #        end=" --playlist-end $4";
+    #    fi
+    #    reade -Q "green" -i "best" -p "Audio Format? [Best(default)/aac/alac/flac/m4a/mp3/opus/vorbis/wav]: " "aac alac flac m4a mp3 opus vorbis wav" format
+    #    if test "$format" == 'best'; then
+    #        aud_format=''
+    #    else
+    #        aud_format=" --audio-format $format"
+    #    fi
+    #    if test -z "$1" || test -z "$2"; then
+    #        echo "Give up a url and a dir, big guy. Know you can do it xoxox";
+    #    else
+    #        mkdir "$2";
+    #        (cd "$2"    
+    #        "$yt_dl" -c -i -R 20 -o "%(playlist_index)s - %(title)s.%(ext)s" -x $aud_format --write-sub --yes-playlist "$1" "$start" "$end";
+    #        )
+    #    fi
+    #}
+    #alias youtube-download-playlist-dir="yt-dl-playlist-yt-dl-playlist-audio-only-dir"
 fi
 
 
