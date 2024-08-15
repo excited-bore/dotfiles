@@ -96,7 +96,7 @@ fi
 
 if ! type snap &> /dev/null; then
     printf "%s\n" "${blue}No snap detected. (Independent package manager from Canonical)${normal}"
-    reade -Q "GREEN" -i "n" -p "Install? [Y/n]: " "y" inssnap 
+    reade -Q "MAGENTA" -i "n" -p "Install? [N/y]: " "y" inssnap 
     if [ "y" == "$inssnap" ]; then
         if ! test -f install_snapd.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_snapd.sh)" 

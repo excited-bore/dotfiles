@@ -24,10 +24,29 @@ function update-system() {
         fi
     fi
 
+    if test $machine == 'Mac' && ! type brew &> /dev/null; then
+        printf "${GREEN}Homebrew is a commandline package manager (like the Appstore) thatworks as an opensource alternative to the Appstore\nGui applications are available for it as well\n${normal}"
+        reade -Q 'CYAN' -i 'y' -p 'Install brew? [Y/n]: ' 'n' brew
+        if test $brew == 'y'; then
+            if ! test -f install_brew.sh; then
+                 eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_brew.sh)" 
+            else
+                ./install_brew.sh
+            fi
+        fi
+    fi
+
 
     echo "This next $(tput setaf 1)sudo$(tput sgr0) will try to update the packages for your system using the package managers it knows";
 
-    if test "$packmang" == "apt"; then
+    if test $machine == 'Mac'; then
+        pac=softwareupdate
+        sudo softwareupdate -i -a
+        if type brew &> /dev/null; then
+            pac=brew       
+            brew upgrade 
+        fi
+    elif test "$packmang" == "apt"; then
         pac=apt
         if type nala &> /dev/null; then
            pac=nala 
