@@ -45,7 +45,7 @@ if ! type brew &> /dev/null; then
 fi
 
 
-if type brew &> /dev/null &&  then
+if type brew &> /dev/null; then
     if test $machine == 'Mac'; then
         echo "This next $(tput setaf 1)sudo$(tput sgr0) will make $USER the owner of the folder '/usr/local' and '/Library/Caches/Homebrew' to mitigate permission errors when installing apps";
         sudo chown -R "$USER":admin /usr/local
