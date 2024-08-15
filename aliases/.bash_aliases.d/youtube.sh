@@ -21,7 +21,7 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
         format=""
         format_sub=""
         format_cap=""
-        format_all="bv*+ba/b"
+        format_all=""
         [[ $yt_dl =~ 'yt_dlp' ]] && form_pre="mp4 flv ogg webm mkv avi" || form_pre="mp4 flv ogg webm mkv avi gif mp3 wav vorbis mov mka aac aiff alac flac m4a" 
         reade -Q "green" -i "best" -p "Video Format? [Best(default)/mp4/mkv/avi/flv/gif/mov/mp4/webm/aac/aiff/alac/flac/m4a/mka/mp3/ogg/opus/vorbis/wav]: " "mp4 mkv avi flv gif mov webm aac aiff alac flac m4a mka mp3 ogg opus vorbis wav" format
         if ! test $format == 'best'; then
@@ -29,13 +29,13 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
         else
             format=''
         fi
-        #reade -Q "magenta" -i "n" -p "Set ${bold}minimum${cyan} resolution? (Will always try to the get best) [N/y]: " "y" min_res 
-        #if test $min_res == 'y'; then
-        #    echo 'Fetching available formats'
-        #    $yt_dl --list-formats $url | awk '/\[info\]/,EOF' | less -R --redraw-on-quit   
-        #    reade -Q 'GREEN'
-        #    format_all=''
-        #fi
+        reade -Q "magenta" -i "n" -p "Set ${bold}minimum${normal}${magenta} resolution? (Will always try to the get best available) [N/y]: " "y" min_res 
+        if test $min_res == 'y'; then
+            echo 'Fetching available formats'
+            $yt_dl --color always --list-formats $url | awk '/\[info\]/,EOF' | less -R --redraw-on-quit   
+            reade -Q 'GREEN' -i '1080' -p 'Minimum resolution: ' '720 480 360 240 144' res
+            [[ $yt_dl =~ 'yt_dlp' ]] && format_all="-f 'bv[res>=$res]*+ba/b'" || format_all="-f 'bestvideo[resolution>=$res]+bestaudio/best'" 
+        fi
         reade -Q "GREEN" -i "y" -p "Include subtitles and auto captions? [Y/n/sub(only)/cap(only)]: " "n sub cap" sub_cap
         if test "$sub_cap" == 'y' || test "$sub_cap" == 'sub' || test "$sub_cap" == 'cap' ; then
             sub=''
@@ -97,14 +97,6 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
                                     else
                                         lang="$sub_lang live_chat"
                                     fi
-                                    #chat_frm="$(echo "$sub_list" | grep --color=never live_chat | awk '{$1=""; print}' | sed 's/(.*) //g' | sed 's/,/\n/g' | sed '/^[[:space:]]*$/d' | sort -u)"
-                                    #if ! test $(echo "$chat_frm" | wc -l) == 1; then
-                                    #    frst_frm=$(echo "$chat_frm" | awk '{print $1}')   
-                                    #    frst_frm_p=$(echo "$frst_frm" | tr '[:lower:]' '[:upper:]')
-                                    #    subs=$(echo "$subs" | sed "s/$frst_frm//g" )
-                                    #    reade -Q 'cyan' -i "$frst_frm" -p "Live chat format? [$frst_frm_p]: " "y" live_chat_no
-
-                                    #fi
                                 fi
                             fi
                         fi
@@ -149,7 +141,7 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
             fi
             # https://stackoverflow.com/questions/17988756/how-to-select-lines-between-two-marker-patterns-which-may-occur-multiple-times-w
         fi
-        "$yt_dl" -c -i -R 20 $format $sub $cap "$url" ;
+        "$yt_dl" --no-playlist -c -i -R 20 $format $format_all $sub $cap "$url" ;
     }
 
     alias youtube-download="yt-dl"
