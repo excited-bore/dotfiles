@@ -20,20 +20,28 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
         fi
         format=""
         format_sub=""
-        format_sub_auto=""
-        test $yt_dl == 'yt_dlp' && form_pre="mp4 flv ogg webm mkv avi" || form_pre="mp4 flv ogg webm mkv avi gif mp3 wav vorbis mov mka aac aiff alac flac m4a" 
-        reade -Q "green" -i "best" -p "Video Format? [Best(default)/avi/flv/gif/mkv/mov/mp4/webm/aac/aiff/alac/flac/m4a/mka/mp3/ogg/opus/vorbis/wav]: " "avi flv gif mkv mov mp4 webm aac aiff alac flac m4a mka mp3 ogg opus vorbis wav" format
+        format_cap=""
+        format_all=""
+        [[ $yt_dl =~ 'yt_dlp' ]] && form_pre="mp4 flv ogg webm mkv avi" || form_pre="mp4 flv ogg webm mkv avi gif mp3 wav vorbis mov mka aac aiff alac flac m4a" 
+        reade -Q "green" -i "best" -p "Video Format? [Best(default)/mp4/mkv/avi/flv/gif/mov/mp4/webm/aac/aiff/alac/flac/m4a/mka/mp3/ogg/opus/vorbis/wav]: " "mp4 mkv avi flv gif mov webm aac aiff alac flac m4a mka mp3 ogg opus vorbis wav" format
         if ! test $format == 'best'; then
             format=" --recode-video $format"
         else
             format=''
+        fi
+        reade -Q "magenta" -i "n" -p "Set ${bold}minimum${normal}${magenta} resolution? (Will always try to the get best available) [N/y]: " "y" min_res 
+        if test $min_res == 'y'; then
+            echo 'Fetching available formats'
+            $yt_dl --color always --list-formats $url | awk '/\[info\]/,EOF' | less -R --redraw-on-quit   
+            reade -Q 'GREEN' -i '1080' -p 'Minimum resolution: ' '720 480 360 240 144' res
+            [[ $yt_dl =~ 'yt_dlp' ]] && format_all="-f 'bv[res>=$res]*+ba/b'" || format_all="-f 'bestvideo[resolution>=$res]+bestaudio/best'" 
         fi
         reade -Q "GREEN" -i "y" -p "Include subtitles and auto captions? [Y/n/sub(only)/cap(only)]: " "n sub cap" sub_cap
         if test "$sub_cap" == 'y' || test "$sub_cap" == 'sub' || test "$sub_cap" == 'cap' ; then
             sub=''
             cap=''
             echo "Fetching possible formats"
-            if test "$yt_dl" == 'yt-dlp'; then
+            if [[ "$yt_dl" =~ 'yt-dlp' ]]; then
                 list_sub="$(yt-dlp --list-subs --simulate $url)" 
                 sub_list="$(echo "$list_sub" | awk '/subtitles/{flag=1;next}/\[info\]/{flag=0}flag')"
                 subs=$(echo "$sub_list" | awk 'NR>1 {$1=$2="";  print}' | sed 's/(.*) //g' | sed 's/,/\n/g' | sed '/^[[:space:]]*$/d' | sort -u)
@@ -46,8 +54,8 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
                 cap_list=$(echo "$list_sub" | awk '/captions/{flag=1;next}/subtitles/{flag=0}flag')
                 cap_frm=$(echo "$cap_list" | awk 'NR>2 {$1=$2="";  print}'  | sed 's/(.*) //g' | sed 's/[[:upper:]].*$//g' | sed 's/,/\n/g' | sed '/^[[:space:]]*$/d' | sed '/from/d' | sort -u)
             fi
-            test $yt_dl == 'yt_dlp' && sub=" --write-subs" || sub=" --write-sub" 
-            test $yt_dl == 'yt_dlp' && sub_lang=" --sub-langs" || sub_lang=" --sub-lang" 
+            [[ $yt_dl =~ 'yt_dlp' ]] && sub=" --write-subs" || sub=" --write-sub" 
+            [[ $yt_dl =~ 'yt_dlp' ]] && sub_lang=" --sub-langs" || sub_lang=" --sub-lang" 
             if test $sub_cap == 'y' || test $sub_cap == 'sub'; then
                 reade -Q "CYAN" -i "n" -p "Set subtitle format? [N/y]: " "y" format_sub
                 if test "$format_sub" == 'n'; then
@@ -75,7 +83,7 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
                             format_sub="--sub-format $format_sub"
                         fi
                         live_chat=""
-                        if test $yt_dl == 'yt-dlp' && [[ "$sub_list" =~ 'live_chat' ]]; then 
+                        if [[ $yt_dl =~ 'yt-dlp' ]] && [[ "$sub_list" =~ 'live_chat' ]]; then 
                             if test "$subs" == 'all'; then
                                 reade -Q 'cyan' -i 'n' -p 'Subtitles include live chat. Explicitly exclude from subtitles? [N/y]: ' "y" live_chat_no
                                 if test "$live_chat_no" == 'y'; then
@@ -89,14 +97,6 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
                                     else
                                         lang="$sub_lang live_chat"
                                     fi
-                                    #chat_frm="$(echo "$sub_list" | grep --color=never live_chat | awk '{$1=""; print}' | sed 's/(.*) //g' | sed 's/,/\n/g' | sed '/^[[:space:]]*$/d' | sort -u)"
-                                    #if ! test $(echo "$chat_frm" | wc -l) == 1; then
-                                    #    frst_frm=$(echo "$chat_frm" | awk '{print $1}')   
-                                    #    frst_frm_p=$(echo "$frst_frm" | tr '[:lower:]' '[:upper:]')
-                                    #    subs=$(echo "$subs" | sed "s/$frst_frm//g" )
-                                    #    reade -Q 'cyan' -i "$frst_frm" -p "Live chat format? [$frst_frm_p]: " "y" live_chat_no
-
-                                    #fi
                                 fi
                             fi
                         fi
@@ -106,7 +106,7 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
             fi
             sub="$sub $format_sub"
             if test "$sub_cap" == 'y' || test "$sub_cap" == 'cap'; then
-                test $yt_dl == 'yt_dlp' && sub_auto=" --write-auto-subs" || sub_auto=" --write-auto-sub" 
+                [[ $yt_dl =~ 'yt_dlp' ]] && sub_auto=" --write-auto-subs" || sub_auto=" --write-auto-sub" 
                 reade -Q "CYAN" -i "n" -p "Set auto captions format? [N/y]: " "y" sub_auto
                 if test $sub_auto == 'n'; then
                     sub_auto=" "
@@ -122,7 +122,7 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
                         cap_frm_p=$(echo "$cap_frm" | tr '\n' ' ' | tr -s ' ' | tr ' ' '/' | sed 's/.$//')
                         less_=''
                         if type less &> /dev/null; then
-                            less_='| less --quit-if-one-screen'
+                            less_='| less --quit-if-one-screen --redraw-on-quit'
                         fi
                         eval 'echo "$cap_list"'" $less_"
                         if ! test -z "$cap_langs" ; then
@@ -141,7 +141,7 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
             fi
             # https://stackoverflow.com/questions/17988756/how-to-select-lines-between-two-marker-patterns-which-may-occur-multiple-times-w
         fi
-        "$yt_dl" -c -i -R 20 $format $sub $cap "$url" ;
+        "$yt_dl" --no-playlist -c -i -R 20 $format $format_all $sub $cap "$url" ;
     }
 
     alias youtube-download="yt-dl"
