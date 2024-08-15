@@ -20,35 +20,43 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
         fi
         format=""
         format_sub=""
-        format_sub_auto=""
-        test $yt_dl == 'yt_dlp' && form_pre="mp4 flv ogg webm mkv avi" || form_pre="mp4 flv ogg webm mkv avi gif mp3 wav vorbis mov mka aac aiff alac flac m4a" 
-        reade -Q "green" -i "best" -p "Video Format? [Best(default)/avi/flv/gif/mkv/mov/mp4/webm/aac/aiff/alac/flac/m4a/mka/mp3/ogg/opus/vorbis/wav]: " "avi flv gif mkv mov mp4 webm aac aiff alac flac m4a mka mp3 ogg opus vorbis wav" format
+        format_cap=""
+        format_all="bv*+ba/b"
+        [[ $yt_dl =~ 'yt_dlp' ]] && form_pre="mp4 flv ogg webm mkv avi" || form_pre="mp4 flv ogg webm mkv avi gif mp3 wav vorbis mov mka aac aiff alac flac m4a" 
+        reade -Q "green" -i "best" -p "Video Format? [Best(default)/mp4/mkv/avi/flv/gif/mov/mp4/webm/aac/aiff/alac/flac/m4a/mka/mp3/ogg/opus/vorbis/wav]: " "mp4 mkv avi flv gif mov webm aac aiff alac flac m4a mka mp3 ogg opus vorbis wav" format
         if ! test $format == 'best'; then
             format=" --recode-video $format"
         else
             format=''
         fi
+        #reade -Q "magenta" -i "n" -p "Set ${bold}minimum${cyan} resolution? (Will always try to the get best) [N/y]: " "y" min_res 
+        #if test $min_res == 'y'; then
+        #    echo 'Fetching available formats'
+        #    $yt_dl --list-formats $url | awk '/\[info\]/,EOF' | less -R --redraw-on-quit   
+        #    reade -Q 'GREEN'
+        #    format_all=''
+        #fi
         reade -Q "GREEN" -i "y" -p "Include subtitles and auto captions? [Y/n/sub(only)/cap(only)]: " "n sub cap" sub_cap
         if test "$sub_cap" == 'y' || test "$sub_cap" == 'sub' || test "$sub_cap" == 'cap' ; then
             sub=''
-            sub_auto=''
+            cap=''
             echo "Fetching possible formats"
-            if test "$yt_dl" == 'yt-dlp'; then
+            if [[ "$yt_dl" =~ 'yt-dlp' ]]; then
                 list_sub="$(yt-dlp --list-subs --simulate $url)" 
-                sub_list="$(echo "$list_sub" | awk '/subtitle/{flag=1;next}/\[info\]/{flag=0}flag')"
-                subs=$(echo "$sub_list" | awk 'NR>2 {$1=$2="";  print}' | sed 's/(.*) //g' | sed 's/,/\n/g' | sed '/^[[:space:]]*$/d' | sort -u)
-                cap_list="$(echo "$list_sub" | awk '/captions/{flag=1;next}/subtitles/{flag=0}flag')"
-                cap_frm=$(echo "$sub_list" | awk 'NR>2 {$1=$2="";  print}' | sed 's/(.*) //g' | sed 's/,/\n/g' | sed '/^[[:space:]]*$/d' | sort -u)
+                sub_list="$(echo "$list_sub" | awk '/subtitles/{flag=1;next}/\[info\]/{flag=0}flag')"
+                subs=$(echo "$sub_list" | awk 'NR>1 {$1=$2="";  print}' | sed 's/(.*) //g' | sed 's/,/\n/g' | sed '/^[[:space:]]*$/d' | sort -u)
+                cap_list=$(echo "$list_sub" | awk '/captions/{flag=1;next}/subtitles/{flag=0}flag')
+                cap_frm=$(echo "$cap_list" | awk 'NR>2 {$1=$2="";  print}'  | sed 's/(.*) //g' | sed 's/[[:upper:]].*$//g' | sed 's/,/\n/g' | sed '/^[[:space:]]*$/d' | sed '/from/d' | sort -u)
             else
                 list_sub="$(youtube-dl --list-subs --simulate $url)"
                 sub_list="$(echo "$list_sub" | awk '/subtitles/,EOF')"
                 subs=$(echo "$sub_list" | awk 'NR>2 {$1="";  print $0}' | sed 's/,//g' | sed 's/,/\n/g' | sed '/^[[:space:]]*$/d' | sort -u)
-                cap_list="$(echo "$list_sub" | awk '/captions/{flag=1;next}/subtitles/{flag=0}flag')"
-                cap_frm=$(echo "$sub_list" | awk 'NR>2 {$1=$2="";  print}' | sed 's/(.*) //g' | sed 's/,/\n/g' | sed '/^[[:space:]]*$/d' | sort -u)
+                cap_list=$(echo "$list_sub" | awk '/captions/{flag=1;next}/subtitles/{flag=0}flag')
+                cap_frm=$(echo "$cap_list" | awk 'NR>2 {$1=$2="";  print}'  | sed 's/(.*) //g' | sed 's/[[:upper:]].*$//g' | sed 's/,/\n/g' | sed '/^[[:space:]]*$/d' | sed '/from/d' | sort -u)
             fi
+            [[ $yt_dl =~ 'yt_dlp' ]] && sub=" --write-subs" || sub=" --write-sub" 
+            [[ $yt_dl =~ 'yt_dlp' ]] && sub_lang=" --sub-langs" || sub_lang=" --sub-lang" 
             if test $sub_cap == 'y' || test $sub_cap == 'sub'; then
-                test $yt_dl == 'yt_dlp' && sub=" --write-subs" || sub=" --write-sub" 
-                test $yt_dl == 'yt_dlp' && sub_lang=" --sub-langs" || sub=" --sub-lang" 
                 reade -Q "CYAN" -i "n" -p "Set subtitle format? [N/y]: " "y" format_sub
                 if test "$format_sub" == 'n'; then
                     format_sub=" "
@@ -59,18 +67,23 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
                         format_sub=''
                     else 
                         sub_langs=$(echo "$sub_list" | awk 'NR>1{print $1;}' | sed '/live_chat/d')
-                        frst_frm=$(echo "$subs" | awk '{print $1}')
+                        frst_frm=$(echo $subs | awk '{print $1}')
                         frst_frm_p=$(echo "$frst_frm" | tr '[:lower:]' '[:upper:]')
-                        subs=$(echo "$subs" | sed $'s/$frst_frm//g' )
+                        subs=$(echo $subs | sed 's/'"$frst_frm "'//g')
+                        frm_pre=$(echo "$subs" | tr '\n' ' ' | tr -s ' ' | tr ' ' '/' | sed 's/.$//')
                         echo "$sub_list"
-                        reade -Q "cyan" -i "all" -p "Languages?: " "$sub_langs" lang
-                        if ! test -z $lang; then
-                            lang="$sub_lang $lang"
+                        if ! test -z "$sub_langs"; then
+                            reade -Q "cyan" -i "all" -p "Languages?: " "$sub_langs" lang
+                            if ! test -z $lang; then
+                                lang="$sub_lang $lang"
+                            fi
                         fi
-                        reade -Q "cyan" -i "$frst_frm" -p "Format [$frst_frm_p$subs_pre]: " "$subs" format_sub
-                        format_sub="--sub-format $format_sub"
+                        if ! test -z "$sub_langs"; then
+                            reade -Q "cyan" -i "$frst_frm" -p "Format [$frst_frm_p/$frm_pre]: " "$subs" format_sub
+                            format_sub="--sub-format $format_sub"
+                        fi
                         live_chat=""
-                        if test $yt_dl == 'yt-dlp' && [[ "$sub_list" =~ 'live_chat' ]]; then 
+                        if [[ $yt_dl =~ 'yt-dlp' ]] && [[ "$sub_list" =~ 'live_chat' ]]; then 
                             if test "$subs" == 'all'; then
                                 reade -Q 'cyan' -i 'n' -p 'Subtitles include live chat. Explicitly exclude from subtitles? [N/y]: ' "y" live_chat_no
                                 if test "$live_chat_no" == 'y'; then
@@ -79,13 +92,16 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
                             else
                                 reade -Q 'cyan' -i 'n' -p 'Subtitles include live chat. Write subtitles for? [N/y]: ' "y" live_chat
                                 if test "$live_chat" == 'y'; then
-                                    lang="$lang,live_chat"
+                                    if ! test -z "$lang"; then
+                                        lang="$lang,live_chat"
+                                    else
+                                        lang="$sub_lang live_chat"
+                                    fi
                                     #chat_frm="$(echo "$sub_list" | grep --color=never live_chat | awk '{$1=""; print}' | sed 's/(.*) //g' | sed 's/,/\n/g' | sed '/^[[:space:]]*$/d' | sort -u)"
                                     #if ! test $(echo "$chat_frm" | wc -l) == 1; then
                                     #    frst_frm=$(echo "$chat_frm" | awk '{print $1}')   
                                     #    frst_frm_p=$(echo "$frst_frm" | tr '[:lower:]' '[:upper:]')
                                     #    subs=$(echo "$subs" | sed "s/$frst_frm//g" )
-                                    #    subs_pre=$(echo "$subs" | tr '\n' ' ' | tr -s ' ' | tr ' ' '/' | sed 's/.$//')
                                     #    reade -Q 'cyan' -i "$frst_frm" -p "Live chat format? [$frst_frm_p]: " "y" live_chat_no
 
                                     #fi
@@ -98,7 +114,7 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
             fi
             sub="$sub $format_sub"
             if test "$sub_cap" == 'y' || test "$sub_cap" == 'cap'; then
-                test $yt_dl == 'yt_dlp' && sub_auto=" --write-auto-subs" || sub_auto=" --write-auto-sub" 
+                [[ $yt_dl =~ 'yt_dlp' ]] && sub_auto=" --write-auto-subs" || sub_auto=" --write-auto-sub" 
                 reade -Q "CYAN" -i "n" -p "Set auto captions format? [N/y]: " "y" sub_auto
                 if test $sub_auto == 'n'; then
                     sub_auto=" "
@@ -107,32 +123,33 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
                         echo 'No auto captions available for this video'
                         format_sub=''
                     else 
-                        subs_pre=$(echo "$subs" | tr '\n' ' ' | tr -s ' ' | tr ' ' '/' | sed 's/.$//')          
-                        cap_langs=$(echo "$cap_list" | awk 'NR>1{;print $1;}')
-                        frst_frm=$(echo "$cap_list" | awk '{print $1}')
+                        cap_langs=$(echo "$cap_list" | awk 'NR>1{print $1;}')
+                        frst_frm=$(echo $cap_frm | awk '{print $1}')
                         frst_frm_p=$(echo "$frst_frm" | tr '[:lower:]' '[:upper:]')
-                        subs=$(echo "$subs" | sed $'s/$frst_frm//g' )
-                        echo "$sub_list"
-                        reade -Q "cyan" -i "all" -p "Languages?: " "$sub_langs" lang
-                        if ! test -z $lang; then
-                            lang="--sub-lang $lang"
+                        cap_frm=$(echo $cap_frm | sed 's/'"$frst_frm "'//g')
+                        cap_frm_p=$(echo "$cap_frm" | tr '\n' ' ' | tr -s ' ' | tr ' ' '/' | sed 's/.$//')
+                        less_=''
+                        if type less &> /dev/null; then
+                            less_='| less --quit-if-one-screen --redraw-on-quit'
                         fi
-                        reade -Q "cyan" -i "$frst_frm" -p "Format [$frst_frm_p$subs_pre]: " "$subs" format_sub
-                        format_sub="--sub-format $format_sub"
-                        live_chat=""
-                        if test $yt_dl == 'yt-dlp' && [[ "$sub_list" =~ 'live_chat' ]]; then
-                            reade -Q 'cyan' -i 'n' -p 'Subtitles include live chat. Explicitly exclude from subtitles? [N/y]: ' "y" live_chat_no
-                            if test "$live_chat_no" == 'y'; then
-                                live_chat="--compat-options no-live-chat"
-                            fi
+                        eval 'echo "$cap_list"'" $less_"
+                        if ! test -z "$cap_langs" ; then
+                            reade -Q "cyan" -i "all" -p "Languages?: " "$cap_langs" caplang
+                            cap_lang="$sub_lang $caplang"
+                            reade -Q "cyan" -i "$frst_frm" -p "Format [$frst_frm_p/$cap_frm_p]: " "$cap_frm" format_cap
+                            format_cap="--sub-format $format_cap"
+                        else
+                            format_cap=''
+                            cap_lang=''
                         fi
                     fi
-                    format_sub=" $format_sub $lang $live_chat"
+                    format_cap=" $format_cap $cap_lang"
                 fi
+                cap="$cap $format_cap"
             fi
             # https://stackoverflow.com/questions/17988756/how-to-select-lines-between-two-marker-patterns-which-may-occur-multiple-times-w
         fi
-        "$yt_dl" -c -i -R 20 $format $sub $sub_auto "$url" ;
+        "$yt_dl" -c -i -R 20 $format $sub $cap "$url" ;
     }
 
     alias youtube-download="yt-dl"
