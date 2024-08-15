@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 if ! test -f checks/check_system.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
 else
@@ -32,7 +33,9 @@ fi
 
 if ! type yt-dlp &> /dev/null; then
     if ! test pipx &> /dev/null; then
-        if test $distro == "Arch" || $distro == "Manjaro"; then
+        if test $machine == 'Mac' && type brew &> /dev/null; then
+            brew install pipx
+        elif test $distro == "Arch" || $distro == "Manjaro"; then
             sudo pacman -S python-pipx
         elif test $distro_base == "Debian"; then
             sudo apt install pipx
