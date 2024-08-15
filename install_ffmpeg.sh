@@ -22,7 +22,9 @@ if test -z $SYSTEM_UPDATED; then
 fi
 
 if ! type ffmpeg &> /dev/null; then 
-    if test $distro == "Arch" || test $distro == "Manjaro"; then
+    if test $machine == 'Mac' && type brew &> /dev/null; then
+        brew install ffmpeg
+    elif test $distro == "Arch" || test $distro == "Manjaro"; then
         sudo pacman -S ffmpeg
     elif [ $distro_base == "Debian" ]; then
         sudo apt install ffmpeg 
