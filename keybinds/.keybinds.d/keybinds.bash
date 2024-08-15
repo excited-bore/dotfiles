@@ -1,3 +1,5 @@
+# !/usr/bin/env bash
+
 # Bash_aliases at ~/.bash_aliases.d/ 
 # global bashrc -> /etc/bash.bashrc
 # root shell profiles -> /etc/profile

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if ! test -f checks/check_system.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
@@ -62,7 +62,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
     #fi
     
     # TODO: non ugly values
-    reade -Q "YELLOW" -i "n" -p "Set LS_COLORS with some predefined values? (WARNING: ugly values) [N/y]: " "y" lsclrs
+    reade -Q "GREEN" -i "y" -p "Set LS_COLORS with some predefined values? [Y/n]: " "n" lsclrs
     if [ "$lsclrs" == "y" ] || [ -z "$lsclrs" ]; then
         sed 's/^#export LS_COLORS/export LS_COLORS/' -i $pathvr
     fi

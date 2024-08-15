@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [ ! -f ~/.bash_aliases ]; then
     if ! test -f aliases/.bash_aliases; then

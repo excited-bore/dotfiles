@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 unameOut="$(uname -s)"
 case "${unameOut}" in
     Linux*)     machine=Linux;;
@@ -60,7 +61,7 @@ do
         distro="Manjaro"
         # Check for AUR
           
-    elif grep -q "Ubuntu" /etc/issue && [ $distro == / ]; then
+    elif test -f /etc/issue && grep -q "Ubuntu" /etc/issue && [ $distro == / ]; then
         packmang="apt"
         packmang_update="sudo apt update"
         packmang_install="sudo apt install"
@@ -203,16 +204,22 @@ do
     fi 
 done
 
-if lscpu | grep -q "Intel"; then
+if test $machine == 'Linux'; then
+    arch_cmd="lscpu"
+elif test $machine == 'Mac'; then
+    arch_cmd="sysctl -n machdep.cpu.brand_string"
+fi
+
+if eval "$arch_cmd" | grep -q "Intel"; then
     arch="386"
-elif lscpu | grep -q "AMD"; then
+elif eval "$arch_cmd" | grep -q "AMD"; then
     if lscpu | grep -q "x86_64"; then 
         arch="amd64"
     else
         arch="amd32"
     fi
-elif lscpu | grep -q "armv"; then
+elif eval "$arch_cmd" | grep -q "armv"; then
     arch="armv7l"
-elif lscpu | grep -q "aarch"; then
+elif eval "$arch_cmd" | grep -q "aarch"; then
     arch="arm64"
 fi

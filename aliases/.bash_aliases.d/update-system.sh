@@ -1,22 +1,22 @@
-#if ! type reade &> /dev/null; then
-#    if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
-#        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
-#    else
-#        . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
-#    fi
-#fi
-#
-#if test -z "$distro"; then 
-#    if ! test -f checks/check_system.sh; then
-#         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
-#    else
-#        . ./checks/check_system.sh
-#    fi
-#fi
+if ! type reade &> /dev/null; then
+    if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
+    else
+        . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
+    fi
+fi
+
+if test -z "$distro"; then 
+    if ! test -f checks/check_system.sh; then
+         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
+    else
+        . ./checks/check_system.sh
+    fi
+fi
 
 # https://www.explainxkcd.com/wiki/index.php/1654:_Universal_Install_Script
 function update-system() {
-    if ! test "$(timedatectl show | grep ^NTP | head -n 1 | awk 'BEGIN { FS = "=" } ; {print $2}')" == "yes"; then 
+    if type timedatectl &> /dev/null && ! test "$(timedatectl show | grep ^NTP | head -n 1 | awk 'BEGIN { FS = "=" } ; {print $2}')" == "yes"; then 
         reade -Q "GREEN" -i "y" -p "Timedate NTP not set (Automatic timesync). This can cause issues with syncing to repositories. Activate it? [Y/n]: " "n" set_ntp
         if [ "$set_ntp" == "y" ]; then
             timedatectl set-ntp true
@@ -24,10 +24,29 @@ function update-system() {
         fi
     fi
 
+    if test $machine == 'Mac' && ! type brew &> /dev/null; then
+        printf "${GREEN}Homebrew is a commandline package manager (like the Appstore) thatworks as an opensource alternative to the Appstore\nGui applications are available for it as well\n${normal}"
+        reade -Q 'CYAN' -i 'y' -p 'Install brew? [Y/n]: ' 'n' brew
+        if test $brew == 'y'; then
+            if ! test -f install_brew.sh; then
+                 eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_brew.sh)" 
+            else
+                ./install_brew.sh
+            fi
+        fi
+    fi
+
 
     echo "This next $(tput setaf 1)sudo$(tput sgr0) will try to update the packages for your system using the package managers it knows";
 
-    if test "$packmang" == "apt"; then
+    if test $machine == 'Mac'; then
+        pac=softwareupdate
+        sudo softwareupdate -i -a
+        if type brew &> /dev/null; then
+            pac=brew       
+            brew upgrade 
+        fi
+    elif test "$packmang" == "apt"; then
         pac=apt
         if type nala &> /dev/null; then
            pac=nala 
