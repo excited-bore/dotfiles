@@ -48,8 +48,75 @@ fi
 
 #. $DIR/setup_git_build_from_source.sh "y" "neovim" "https://github.com" "neovim/neovim" "stable" "sudo apt update; sudo apt install ninja-build gettext libtool libtool-bin cmake g++ pkg-config unzip curl doxygen" "make CMAKE_BUILD_TYPE=RelWithDebInfo; sudo make install" "sudo make uninstall" "make distclean; make deps" "y"
 
-
-if test $distro == "Arch" || test $distro == "Manjaro"; then
+if test $machine == 'Mac' && type brew &> /dev/null; then
+    brew install neovim
+    if ! type xclip &> /dev/null; then
+        reade -Q "GREEN" -i "y" -p "Install nvim clipboard? (xsel xclip) [Y/n]:" "y n" clip
+        if [ -z $clip ] || [ "y" == $clip ]; then
+            brew install xsel xclip
+            echo "${green} If this is for use with ssh on serverside, X11 needs to be forwarded"
+            echo "${green} At clientside, 'ForwardX11 yes' also needs to be put in ~/.ssh/config under Host"
+            echo "${green} Connection also need to start with -X flag (ssh -X ..@..)"
+            reade -Q "GREEN" -i "n" -p "Forward X11 in /etc/ssh/sshd.config? [Y/n]:" "y n" x11f
+            if [ -z $x11f ] || [ "y" == $x11f ]; then
+               sudo sed -i 's|.X11Forwarding yes|X11Forwarding yes|g' /etc/ssh/sshd_config
+            fi
+        fi
+    fi
+    if ! type pylint &> /dev/null; then
+        reade -Q "GREEN" -i "y" -p "Install nvim-python? [Y/n]:" "y n" pyscripts
+        if [ -z $pyscripts ] || [ "y" == $pyscripts ]; then
+            brew install python python-pynvim python-pipx
+            pipx install pynvim 
+            pipx install pylint
+        fi
+    fi
+    if ! type npm &> /dev/null || ! npm list -g | grep neovim &> /dev/null; then
+        reade -Q "GREEN" -i "y" -p "Install nvim-javascript? [Y/n]:" "y n" jsscripts
+        if [ -z $jsscripts ] || [ "y" == $jsscripts ]; then
+            brew install npm nodejs
+            sudo npm install -g neovim
+        fi
+    fi
+    if ! type gem &> /dev/null || ! gem list | grep neovim &> /dev/null; then
+        reade -Q "GREEN" -i "y" -p "Install nvim-ruby? [Y/n]:" "y n" rubyscripts
+        if [ -z $rubyscripts ] || [ "y" == $rubyscripts ]; then
+            brew install ruby
+            rver=$(echo $(ruby --version) | awk '{print $2}' | cut -d. -f-2)'.0'
+            paths=$(gem environment | awk '/- GEM PATH/{flag=1;next}/- GEM CONFIGURATION/{flag=0}flag' | sed 's|     - ||g' | paste -s -d ':')
+            if grep -q "GEM" $PATHVAR; then
+                sed -i "s|.export GEM_HOME=.*|export GEM_HOME=$HOME/.gem/ruby/$rver|g" $PATHVAR
+                sed -i "s|.export GEM_PATH=.*|export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin|g" $PATHVAR
+                sed -i 's|.export PATH=$PATH:$GEM_PATH.*|export PATH=$PATH:$GEM_PATH:$GEM_HOME|g' $PATHVAR
+            else
+                printf "export GEM_HOME=$HOME/.gem/ruby/$rver\n" >> $PATHVAR
+                printf "export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin\n" >> $PATHVAR
+                printf "export PATH=\$PATH:\$GEM_PATH:\$GEM_HOME\n" >> $PATHVAR
+            fi
+            #source ~/.bashrc
+            gem install neovim
+        fi
+    fi
+    if ! type cpan &> /dev/null || ! cpan -l 2> /dev/null | grep Neovim::Ext &> /dev/null; then
+        reade -Q "GREEN" -i "y" -p "Install nvim-perl? [Y/n]:" "y n" perlscripts
+        if [ -z $perlscripts ] || [ "y" == $perlscripts ]; then
+            brew install cpanminus
+            cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+            sudo cpanm --sudo -n Neovim::Ext
+            reade -Q "GREEN" -i "y" -p "Perl uses cpan for the installation of modules. Initialize cpan? (Will prevent nvim :checkhealth warning) [Y/n]: " cpn
+            if [ "y" == $cpn ]; then
+                cpan -l
+            fi
+        fi
+    fi
+    if ! type ctags &> /dev/null; then 
+        reade -Q "GREEN" -i "y" -p "Install ctags? [Y/n]:" "y n" ctags
+        if  [ "y" == $ctags ]; then
+            brew install ctags
+        fi
+    fi
+    
+elif test $distro == "Arch" || test $distro == "Manjaro"; then
     if ! type nvim &> /dev/null; then
         sudo pacman -S neovim 
     fi
