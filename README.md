@@ -4,6 +4,8 @@ My Dotfiles
 Includes all kinds of installers and configurations.  
 Currently only focused on **bash** on **Linux** (On a distro with *Apt* or *Pacman*)  
 
+![showoff](dotfiles-showoff.gif)
+
 ## Install.sh
 
 Try it out with if you have curl installed. Worked and tested for Manjaro and Ubuntu:
