@@ -1,7 +1,7 @@
 # https://stackoverflow.com/questions/5412761/using-colors-with-printf
 # Execute (during printf) for colored prompt
 # printf  "${blue}This text is blue${white}\n"
-function compare_tput_escape_color(){
+function compare-tput-escape_color(){
     for (( ansi=0; ansi <= 120; ansi++)); do
         printf "$ansi $(tput setaf $ansi) tput foreground $(tput sgr0) $(tput setab $ansi) tput background $(tput sgr0)"; echo -e " \033[$ansi;mEscape\033[0m"
     done | $PAGER
@@ -78,13 +78,13 @@ fi
 
 reade(){
     fcomp="n"
-    while getopts ':e' flag; do
+    while getopts ':b:e:i:p:Q:s:S:' flag; do
         case "${flag}" in
             e)  fcomp='y'
             ;;
         esac
-    done && OPTIND=1; 
-    if [ ! -x "$(command -v rlwrap)" ] || [[ "$fcomp" == 'y' ]] ; then 
+    done && OPTIND=1;
+    if [ ! -x "$(command -v rlwrap)" ] || test "$fcomp" == 'y' ; then 
         readstr="read  ";
         color=""
         while getopts ':b:e:i:p:Q:s:S:' flag; do
@@ -93,9 +93,9 @@ reade(){
                 e)  readstr=$(echo "$readstr" | sed "s|read |read \-e \-r |g");
                     ;;
                 #  Even though it's in the read man, -i does not actually work
-                i)  readstr=$(echo "$readstr" | sed "s|read |read \-i \"${OPTARG}\" |g");
-                    pre="${OPTARG}"
-                    ;;
+               # i)  readstr=$(echo "$readstr" | sed "s|read |read \-i \"${OPTARG}\" |g");
+               #     pre="${OPTARG}"
+               #     ;;
                 Q)  if [[ "${OPTARG}" =~ ^[[:upper:]]+$ ]]; then
                         color="${bold}"
                     fi
@@ -118,7 +118,7 @@ reade(){
                         color=$color"${white}"
                     fi
                     ;;
-                p)  readstr=$(echo "$readstr" | sed "s|read |read -p \"${color}${OPTARG}${normal}\"|g");
+                p)  readstr=$(echo "$readstr" | sed "s|read |printf \"${color}${OPTARG}${normal}\n\"; read|g");
                     ;;
                 s)  readstr=$(echo "$readstr" | sed "s|read |read \-s\"${OPTARG}\" |g");
                     ;;
