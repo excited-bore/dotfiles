@@ -338,14 +338,20 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
     fi
 
     pathvariables_r(){ 
-        if ! sudo grep -q "~/.pathvariables.env" /root/.bashrc; then
-            printf "\n[ -f ~/.pathvariables.env ] && source ~/.pathvariables.env\n\n" | sudo tee -a /root/.bashrc
+        if sudo ! test -f /root/.profile; then
+            sudo touch /root/.profile
+        fi
+        if ! sudo grep -q "~/.pathvariables.env" /root/.profile; then
+            printf "\n[ -f ~/.pathvariables.env ] && source ~/.pathvariables.env\n\n" | sudo tee -a /root/.profile
         fi
         sudo cp -fv $pathvr /root/.pathvariables.env;
     }                                            
     pathvariables(){
-        if ! grep -q "~/.pathvariables.env" ~/.bashrc; then
-            printf "\n[ -f ~/.pathvariables.env ] && source ~/.pathvariables.env\n\n" >> ~/.bashrc
+        if ! test -f ~/.profile; then
+            touch ~/.profile
+        fi
+        if ! grep -q "~/.pathvariables.env" ~/.profile; then
+            printf "\n[ -f ~/.pathvariables.env ] && source ~/.pathvariables.env\n\n" >> ~/.profile
         fi
         cp -fv $pathvr ~/.pathvariables.env
         yes_edit_no pathvariables_r "$pathvr" "Install .pathvariables.env at /root/?" "edit" "YELLOW"; 

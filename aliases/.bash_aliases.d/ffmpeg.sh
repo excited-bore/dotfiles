@@ -37,7 +37,12 @@ if type ffmpeg &> /dev/null; then
                 echo 'No subtitle file found'
                 return 1
             fi
-            ffmpeg -i "$var" -vf subtitles="'$sub'" "${var%.*}.mkv" && test "$del" == 'y' && test -f "$var" && rm -v "$var"
+            if [[ $var =~ '.mkv' ]]; then
+               var_o="${var%.*}1.mkv"
+            else
+               var_o="${var%.*}.mkv"
+            fi
+            ffmpeg -i "$var" -vf subtitles="'$sub'" "$var_o" && test "$del" == 'y' && test -f "$var" && rm -v "$var"
             test "$del" == 'y' && test -f $sub && rm -v $sub  
         done
     }

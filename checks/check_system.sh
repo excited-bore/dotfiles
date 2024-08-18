@@ -12,6 +12,10 @@ if test -z $TMPDIR; then
     TMPDIR=$(mktemp -d)
 fi
 
+if test $machine == 'Windows' && ! type sudo &> /dev/null; then
+   sudo='runas administrator' 
+fi
+
 if test -z $EDITOR; then
     if type nano &> /dev/null; then
         EDITOR=nano
