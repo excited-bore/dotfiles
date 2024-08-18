@@ -338,12 +338,18 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
     fi
 
     pathvariables_r(){ 
+        if sudo ! test -f /root/.profile; then
+            sudo touch /root/.profile
+        fi
         if ! sudo grep -q "~/.pathvariables.env" /root/.profile; then
             printf "\n[ -f ~/.pathvariables.env ] && source ~/.pathvariables.env\n\n" | sudo tee -a /root/.profile
         fi
         sudo cp -fv $pathvr /root/.pathvariables.env;
     }                                            
     pathvariables(){
+        if ! test -f ~/.profile; then
+            touch ~/.profile
+        fi
         if ! grep -q "~/.pathvariables.env" ~/.profile; then
             printf "\n[ -f ~/.pathvariables.env ] && source ~/.pathvariables.env\n\n" >> ~/.profile
         fi
