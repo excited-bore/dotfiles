@@ -6,6 +6,8 @@ if [ -z $TRASHBIN_LIMIT ]; then
    TRASHBIN_LIMIT=100 
 fi
 
+alias r="stty sane && source ~/.profile && source ~/.bashrc"
+
 # TRY and keep command line at bottom
 #alias b="tput cup $(tput lines) 0" 
 
@@ -318,10 +320,10 @@ alias mkgz='tar -cvzf'
 alias untar='tar -xvf'
 alias unbz2='tar -xvjf'
 alias ungz='tar -xvzf'
-
+alias un7z="7z x"
 
 extract-archive(){  
-    if [ -f $1 ] ; then
+    if [ -f" $1" ] ; then
     case $1 in
       *.tar.bz2)   tar xjf $1   ;;
       *.tar.gz)    tar xzf $1   ;;
