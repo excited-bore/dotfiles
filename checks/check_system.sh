@@ -13,7 +13,10 @@ if test -z $TMPDIR; then
 fi
 
 if test $machine == 'Windows' && ! type sudo &> /dev/null; then
-   reade -Q 'GREEN' -i 'y' 
+   reade -Q 'GREEN' -i 'y' -p 'Install gsudo? [Y/n]: ' 'n' gsdn
+   if test $gsdn == 'y'; then
+        ./../install_gsudo.sh
+   fi
 fi
 
 if test -z $EDITOR; then
