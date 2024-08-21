@@ -6,7 +6,7 @@ if [ -z $TRASHBIN_LIMIT ]; then
    TRASHBIN_LIMIT=100 
 fi
 
-alias r="stty sane && source ~/.profile && source ~/.bashrc"
+alias r="stty sane && source $PROFILE && source ~/.bashrc"
 
 # TRY and keep command line at bottom
 #alias b="tput cup $(tput lines) 0" 
@@ -270,6 +270,9 @@ alias egrep='egrep --colour=always'
 alias fgrep='fgrep --colour=always'
 alias rg='rg --color=always'
 
+alias grep-no-color='grep --color=never'
+alias grep-no-case-sensitivwe='grep -i'
+
 #alias cat="bat"
 
 
@@ -351,12 +354,89 @@ alias date-eu='date "+%d-%m-%Y %A %T %Z"'
 
 alias redirect-tty-output-to="exec 1>/dev/pts/"
 
-alias GPU-list-drivers="inxi -G"
+alias list-GPU-drivers="inxi -G"
 
+# crontab
+# 
 function cron-list-all-user-jobs(){
-mktemp_f=$(mktemp) && for user in $(cut -f1 -d: /etc/passwd); do echo "$(tput setaf 10)User: $(tput bold)$user"; printf "$(tput setaf 12)Crontab: $(tput bold)"; sudo crontab -u "$user" -l; echo; done &> "$mktemp_f"; cat $mktemp_f | $PAGER; rm $mktemp_f &> /dev/null; unset mktemp_f
+    mktemp_f=$(mktemp) && for user in $(cut -f1 -d: /etc/passwd); do echo "$(tput setaf 10)User: $(tput bold)$user"; printf "$(tput setaf 12)Crontab: $(tput bold)"; sudo crontab -u "$user" -l; echo; done &> "$mktemp_f"; cat $mktemp_f | $PAGER; rm $mktemp_f &> /dev/null; unset mktemp_f
 }
 alias crontab-list-all-user-jobs="cron-list-all-user-jobs"
+
+alias crontab-edit="env VISUAL=$CRONEDITOR crontab -e"
+alias cron-edit="env VISUAL=$CRONEDITOR crontab -e"
+
+alias crontab-add-example-edit="(crontab -l; echo '#* * * * * $USER command') | awk '!x[$0]++' | crontab -; env VISUAL=$CRONEDITOR crontab -e"
+alias cron-add-example-edit-="crontab-edit-new"
+
+
+function crontab-new(){
+    reade -Q 'GREEN' -i 'n' -p "Use ${MAGENTA}https://crontab.guru${GREEN} to get period? (site with explanation around crontabs) [N/y]: " 'y' guru
+    if test $guru == 'y'; then
+        xdg-open https://crontab.guru/     
+    fi
+    reade -Q 'GREEN' -i 'custom' -p 'When? [Custom/@yearly/@annually/@monthly/@weekly/@daily/@hourly/@reboot]: ' '@yearly @annually @monthly @weekly @daily @hourly @reboot' when
+    if test "$when" == 'custom'; then
+        printf "\t * means any value/not applicable\n\t , for multiple values\n\t - for a range in values\n\t / for step values (f.ex */2 every 2nd of)\n\tFor weekdays mon/tue/wed/thur/fri/sat/sun are alternatives to numeric values\n" 
+        reade -Q 'GREEN' -i '*' -p 'Minutes? (0-59): ' '0 5 10 15 25 30 35 40 45 50 55 0,5,10,15,25,30,35,40,45,5,55' min
+        reade -Q 'GREEN' -i '*' -p 'Hours? (0-23): ' '0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23' hour
+        reade -Q 'GREEN' -i '*' -p 'Days?: (1-31): ' '0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31' days
+        reade -Q 'GREEN' -i '*' -p 'Month? (1-12): ' '0 1 2 3 4 5 6 7 8 9 10 11 12' month
+        reade -Q 'GREEN' -i '*' -p 'Day of week? (0-6 (7 non-standard),mon/tue/wed/thur/fri/sat/sun): ' 'sun 0 mon 1 tue 2 wed 3 thur 4 fri 5 sat 6 sun 1-2 1-3 1-4 1-5 1-6 1-7 2-3 2-4 2-5 2-6 2-7 3-4 3-5 3-6 3-7 4-5 4-6 4-7 5-6 5-7 6-7' week
+        format="$min $hour $days $month $week" 
+    else
+        format=$when 
+    fi
+    users=$(compgen -u) 
+    reade -Q 'GREEN' -i "$USER" -p 'User: ' "$users" user
+    reade -Q 'GREEN' -i "command" -p 'Script file or command? [Command/file]: ' 'file' cmd_file
+    if test $cmd_file == 'file'; then
+        reade -Q 'GREEN' -p 'File to script: ' -e file
+        reade -Q 'GREEN' -i 'bash' -p 'Language: ' ' python php zsh dash fish' cmd
+        cmd="$cmd $file" 
+    else
+        reade -Q 'GREEN' -i "''" -p 'Command: ' "" cmd
+    fi
+    if test 'root' == $user || test $user == 'system'; then
+        if test $format == '@daily'; then
+            if ! test -f /etc/cron.daily/schedule; then
+                sudo touch /etc/cron.daily/schedule
+            fi
+            sudo echo "$format root $cmd" >> /etc/cron.daily/schedule
+            sudo chmod 600 /etc/cron.daily/schedule 
+        elif test $format == '@hourly'; then 
+            if ! test -f /etc/cron.hourly/schedule; then
+                sudo touch /etc/cron.hourly/schedule
+            fi
+            sudo echo "$format root $cmd" >> /etc/cron.hourly/schedule
+            sudo chmod 600 /etc/cron.hourly/schedule 
+        elif test $format == '@monthly'; then 
+            if ! test -f /etc/cron.monthly/schedule; then
+                sudo touch /etc/cron.monthly/schedule
+            fi
+            sudo echo "$format root $cmd" >> /etc/cron.monthly/schedule
+            sudo chmod 600 /etc/cron.monthly/schedule 
+        elif test $format == '@weekly'; then 
+            if ! test -f /etc/cron.weekly/schedule; then
+                sudo touch /etc/cron.weekly/schedule
+            fi
+            sudo echo "$format root $cmd" >> /etc/cron.weekly/schedule
+            sudo chmod 600 /etc/cron.weekly/schedule 
+        else
+            if ! test -f /etc/cron.d/schedule; then
+                sudo touch /etc/cron.d/schedule
+            fi
+            sudo echo "$format root $cmd" >> /etc/cron.d/schedule
+            sudo chmod 600 /etc/cron.d/schedule 
+        fi
+    else
+        (crontab -l; echo "$format $USER $cmd") | awk '!x[$0]++' | crontab -; env VISUAL=$CRONEDITOR crontab -e 
+
+    fi
+    unset cmd cmd_file file user days month week minutes hour guru users
+}
+
+alias cron-new='crontab-new'
 
 function ln-soft(){
     if ([[ "$1" = /* ]] || [ -d "$1" ] || [ -f "$1" ]) && ([[ $(readlink -f "$2") ]] || [[ $(readlink -d "$2") ]]); then
