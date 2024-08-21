@@ -13,7 +13,7 @@ if test -z $TMPDIR; then
 fi
 
 if test $machine == 'Windows' && ! type sudo &> /dev/null; then
-   sudo='runas administrator' 
+   alias sudo='runas /user:Administrator' 
 fi
 
 if test -z $EDITOR; then
