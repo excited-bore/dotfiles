@@ -7,6 +7,7 @@ fi
 #linux_curr=$(sudo mhwd-kernel --listinstalled | awk 'NR==1{print $4;}' | cut -d\( -f2- | cut -d\) -f1)
 linux_lts='linux66'
 
+alias pamac-list-installed="pamac list --installed "
 alias manjaro-GPU-list-drivers="sudo mhwd -l -d"
 alias manjaro-GPU-list-installed-drivers="sudo mhwd -li -d" 
 alias manjaro-GPU-install-driver-free="sudo mhwd -a pci free 0300"

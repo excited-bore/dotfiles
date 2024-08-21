@@ -45,6 +45,14 @@ if ! type kitty &> /dev/null; then
     fi
 fi
 
+if test $distro_base == 'Arch' && ! ls /usr/share/fonts/noto | grep -i -q emoji; then
+    reade -Q 'GREEN' -i 'Install noto-emoji font for kitty? [Y/n]: ' 'n' emoji
+    if test $emoji == 'y'; then
+        sudo pacman -S noto-fonts-emoji
+    fi
+    unset emoji
+fi
+
 if ! test -d kitty/.config/kitty; then
     tmpdir=$(mktemp -d -t kitty-XXXXXXXXXX)
     tmpfile=$(mktemp)
