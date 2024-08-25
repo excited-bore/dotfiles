@@ -3,8 +3,10 @@ unameOut="$(uname -s)"
 case "${unameOut}" in
     Linux*)     machine=Linux;;
     Darwin*)    machine=Mac;;
-    CYGWIN*)    machine=Windows;;
-    MINGW*)     machine=Windows;;
+    CYGWIN*)    machine=Windows
+                win_bash_shell=Cygwin;;
+    MINGW*)     machine=Windows
+                win_bash_shell=Git;;
     *)          machine="UNKNOWN:${unameOut}";;
 esac
 
