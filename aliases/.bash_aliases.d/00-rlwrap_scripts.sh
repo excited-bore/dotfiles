@@ -64,9 +64,6 @@ italic=$(tput it)
 # Arguments: Completions(string with space entries, AWK works too),return value(-a password prompt, -c complete filenames, -p prompt flag, -Q prompt colour, -b break-chars (when does a string break for autocomp), -e change char given for multiple autocompletions)
 # 'man rlwrap' to see all unimplemented options
 
-if test -z $TMPDIR; then
-    TMPDIR=$(mktemp -d)
-fi
 
 # reade because its rlwrap with read -e for file completions
 # The upside is that files with spaces are backslashed
@@ -153,11 +150,12 @@ reade(){
         # Reverse wordlist order (last -> first) because ???
         args=$(echo $args | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }')
         args=$(echo $args | tr ' ' '\n')
-        echo "$args" > "$TMPDIR/rlwrap"
+        tmpf=$(mktemp)
+        echo "$args" > "$tmpf"
         if test "$args" == ''; then
             rlwstring="rlwrap -D 0 -b \"$breaklines\" -o cat"
         else
-            rlwstring="rlwrap -D 0 -H $TMPDIR/rlwrap -b \"$breaklines\" -f <(echo \"${args[@]}\") -o cat"
+            rlwstring="rlwrap -D 0 -H $tmpf -b \"$breaklines\" -f <(echo \"${args[@]}\") -o cat"
         fi
         breaklines=''
         while getopts ':b:e:i:p:Q:s:S:' flag; do
@@ -185,9 +183,9 @@ reade(){
                     ;;
             esac
         done
-        OPTIND=1
+        OPTIND=1;
         value=$(eval $rlwstring);
-        eval "${@:$#:1}=$value";
+        eval "${@:$#:1}=$value" && rm $tmpf;
     fi
 }
 

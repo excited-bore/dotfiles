@@ -34,6 +34,17 @@ function update-system() {
                 ./install_brew.sh
             fi
         fi
+    elif test $machine == 'Windows' && test $win_bash_shell == 'Git' && ! echo $PATH | grep -q '/c/cygwin64/bin'; then
+        # export PATH=$PATH:/c/cygwin64/bin
+        printf "${GREEN}Cygwin is a collection of UNIX related tools. From git bash there's no way to see if you have default Cygwin installed\n${normal}"
+        reade -Q 'CYAN' -i 'y' -p 'Install Cygwin? [Y/n]: ' 'n' cyg
+        if test $cyg == 'y'; then
+            if ! test -f install_brew.sh; then
+                 eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cygwin.sh)" 
+            else
+                ./install_cygwin.sh
+            fi
+        fi
     fi
 
 
