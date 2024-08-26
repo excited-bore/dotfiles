@@ -17,9 +17,9 @@ fi
 if test $machine == 'Windows'; then 
    wmic=$(wmic os get OSArchitecture | awk 'NR>1 {print}')
    if [[ $wmic =~ '64' ]]; then
-       ARCH_WIN='64'
+       export ARCH_WIN='64'
    else
-       ARCH_WIN='32'
+       export ARCH_WIN='32'
    fi
    if ! type winget &> /dev/null; then
        #win_ver=$(cmd /c ver)

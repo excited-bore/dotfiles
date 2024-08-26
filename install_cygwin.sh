@@ -3,6 +3,7 @@ if ! test -f checks/check_system.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
 else
     . ./checks/check_system.sh
+
 fi
 
 if ! test -f checks/check_pathvar.sh.sh; then
@@ -30,7 +31,7 @@ if test $machine == 'Windows'; then
     if ! type winget &> /dev/null; then
         pwsh install_winget.ps1 
     fi
-    if ! test $win_bash_shell == 'Cygwin' && ! test -d /c/cygwin; then
+    if ! test $win_bash_shell == 'Cygwin' && ! test -d /c/cygwin$ARCH_WIN; then
         winget install Cygwin.Cygwin
     fi
     
