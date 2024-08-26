@@ -12,11 +12,20 @@ if test -z $TMPDIR; then
     TMPDIR=$(mktemp -d)
 fi
 
-if test $machine == 'Windows' && ! type sudo &> /dev/null; then
-   reade -Q 'GREEN' -i 'y' -p 'Install gsudo? [Y/n]: ' 'n' gsdn
-   if test $gsdn == 'y'; then
-        ./../install_gsudo.sh
+if test $machine == 'Windows'; then 
+   wmic=$(wmic os get OSArchitecture | awk 'NR>1 {print}')
+   if [[ $wmic =~ '64' ]]; then
+       ARCH_WIN='64'
+   else
+       ARCH_WIN='32'
    fi
+   if ! type sudo &> /dev/null; then
+       reade -Q 'GREEN' -i 'y' -p 'Install gsudo? [Y/n]: ' 'n' gsdn
+       if test $gsdn == 'y'; then
+            ./../install_gsudo.sh
+       fi
+   fi
+   unset wmic 
 fi
 
 if test -z $EDITOR; then
