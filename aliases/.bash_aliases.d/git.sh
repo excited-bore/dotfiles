@@ -69,8 +69,8 @@ git-ssh-to-https(){
 
 alias git-list-remotes="git remote -v"
 
-git-test-conn-github() { ssh -vT git@github.com; }
-git-status() { git status; }
+alias git-test-conn-github="ssh -vT git@github.com;"
+alias git-status="git status"
 #git-config-using-vars() { git config --global user.email \"$EMAIL\" && git config --global user.name \"$GITNAME\"; }
 git-add-remote-url() { git remote -v add "$1" "$2"; }
 #git-add-remote-ssh() { git remote -v add "$1" git@github.com:$GITNAME/"$2.git"; }

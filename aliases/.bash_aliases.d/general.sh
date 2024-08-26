@@ -371,10 +371,10 @@ alias cron-add-example-edit-="crontab-edit-new"
 
 
 function crontab-new(){
-    reade -Q 'GREEN' -i 'n' -p "Use ${MAGENTA}https://crontab.guru${GREEN} to get period? (site with explanation around crontabs) [N/y]: " 'y' guru
-    if test $guru == 'y'; then
-        xdg-open https://crontab.guru/     
-    fi
+    #reade -Q 'GREEN' -i 'n' -p "Use ${MAGENTA}https://crontab.guru${GREEN} to get period? (site with explanation around crontabs) [N/y]: " 'y' guru
+    #if test $guru == 'y'; then
+    #    xdg-open https://crontab.guru/     
+    #fi
     reade -Q 'GREEN' -i 'custom' -p 'When? [Custom/@yearly/@annually/@monthly/@weekly/@daily/@hourly/@reboot]: ' '@yearly @annually @monthly @weekly @daily @hourly @reboot' when
     if test "$when" == 'custom'; then
         printf "\t * means any value/not applicable\n\t , for multiple values\n\t - for a range in values\n\t / for step values (f.ex */2 every 2nd of)\n\tFor weekdays mon/tue/wed/thur/fri/sat/sun are alternatives to numeric values\n" 
