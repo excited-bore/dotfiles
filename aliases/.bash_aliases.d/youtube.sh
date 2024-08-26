@@ -182,7 +182,7 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
             # https://stackoverflow.com/questions/17988756/how-to-select-lines-between-two-marker-patterns-which-may-occur-multiple-times-w
         fi
         
-        reade -Q "magenta" -i "n" -p "Set ${bold}minimum${normal}${magenta} resolution? (Will always try to the get best available) [N/y]: " "y" min_res 
+        reade -Q "magenta" -i "n" -p "Set ${bold}minimum${normal}${magenta} resolution? (Will always try to the get best available by default) [N/y]: " "y" min_res 
         if test $min_res == 'y'; then
             echo 'Fetching available formats'
             $yt_dl --color always --list-formats $url | awk '/\[info\]/,EOF' $less_   
