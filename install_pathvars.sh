@@ -20,11 +20,12 @@ if ! test -f $pathvr; then
     pathvr=$TMPDIR/.pathvariables.env
 fi
 
+pthcvrt=""
+if test $machine == 'Windows'; then
+    pthcvrt="| sed 's/\\/\//g' | sed 's/://' | tr '[:upper:]' '[:lower:]' | sed 's/^/\//g'"
+fi
+
 if type whereis &> /dev/null; then
-    pthcvrt=""
-    if test $machine == 'Windows'; then
-        pthcvrt="| sed 's/\\/\//g' | sed 's/://' | tr '[:upper:]' '[:lower:]' | sed 's/^/\//g'"
-    fi
     function where_cmd() { 
         whereis "$1" | awk '{print $2}' "$pthcvrt"; 
     } 
