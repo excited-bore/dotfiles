@@ -44,12 +44,17 @@ function update-system() {
             else
                 ./install_cygwin.sh
             fi
+            printf "${CYAN}Don't forget to open up Cygwin terminal and restart this script (cd /cygdrive/c to go to C:/ drive and navigate to dotfiles repo)${normal}\n"
         elif test $cyg == 'sdk'; then
             if ! test -f install_git_sdk.sh; then
                  eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_git_sdk.sh)" 
             else
                 ./install_git_sdk.sh
             fi
+            printf "${CYAN}Don't forget to open up git SDK and restart this script${normal}\n"
+        else
+            printf "${RED}Can't install script on git bash alone. Exiting..${normal}\n"
+            exit 1
         fi
     fi
 
