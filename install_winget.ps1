@@ -1,3 +1,5 @@
+# Blatantly stolen from Chris Titus's winutil script
+# Check out here: https://github.com/ChrisTitusTech/winutil
 function Test-WinUtilPackageManager {
     <#
 
