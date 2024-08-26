@@ -22,11 +22,13 @@ if test $machine == 'Windows'; then
        ARCH_WIN='32'
    fi
    if ! type winget &> /dev/null; then
-       printf "${RED}Winget (official window package manager) not installed - can't install programs without${normal}\n" 
-       reade -Q 'GREEN' -i 'y' -p 'Install winget? [Y/n]: ' 'n' wngt
+       #win_ver=$(cmd /c ver)
+       printf "${RED}Winget (official window package manager) not installed - can't run scripts without install programs through it${normal}\n" 
+       reade -Q 'GREEN' -i 'y' -p "(Attempt to) Install winget? ${CYAN}(Windows 10 - version 1809 required at mimimum for winget)${GREEN} [Y/n]: " 'n' wngt
        if test $wngt == 'y'; then
-            pwsh ../install_gsudo.sh
+            pwsh ../install_winget.ps1
        else
+            printf "${RED}Can't install scripts without winget${normal}\n" 
             exit 1 
        fi
    fi
