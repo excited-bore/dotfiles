@@ -30,7 +30,7 @@ if test $machine == 'Windows'; then
     if ! type winget &> /dev/null; then
         pwsh install_winget.ps1 
     fi
-    if ! type cygpath.exe &> /dev/null; then
+    if ! test $win_bash_shell == 'Cygwin' && ! test -d /c/cygwin; then
         winget install Cygwin.Cygwin
     fi
     
