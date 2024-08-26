@@ -129,7 +129,7 @@ function Install-WinUtilWinget {
 
         if (($ComputerInfo.WindowsVersion) -lt "1809") {
             # Checks if Windows Version is too old for Winget
-            Write-Host "Winget is not supported on this version of Windows (Pre-1809)" -ForegroundColor Red
+            Write-Host "Winget is not supported on this version of Windows (Pre-1809) - Can't Install scripts...." -ForegroundColor Red
             return
         }
 
