@@ -87,12 +87,12 @@ reade(){
         while getopts ':b:e:i:p:Q:s:S:' flag; do
             case "${flag}" in
                 b)  ;;
-                e)  readstr=$(echo "$readstr" | sed "s|read |read \-e \-r |g");
+                e)  readstr=$(echo "$readstr" | sed 's|read |read -e -r |g');
                     ;;
                 #  Even though it's in the read man, -i does not actually work
-               # i)  readstr=$(echo "$readstr" | sed "s|read |read \-i \"${OPTARG}\" |g");
-               #     pre="${OPTARG}"
-               #     ;;
+                i)  readstr=$(echo "$readstr" | sed 's|read |read -i '"${OPTARG}"' |g');
+                    pre="${OPTARG}"
+                    ;;
                 Q)  if [[ "${OPTARG}" =~ ^[[:upper:]]+$ ]]; then
                         color="${bold}"
                     fi
@@ -115,9 +115,9 @@ reade(){
                         color=$color"${white}"
                     fi
                     ;;
-                p)  readstr=$(echo "$readstr" | sed "s|read |printf \"${color}${OPTARG}${normal}\n\"; read|g");
+                p)  readstr=$(echo "$readstr" | sed 's|read |printf '"${color}${OPTARG}${normal}"'\n; read|g');
                     ;;
-                s)  readstr=$(echo "$readstr" | sed "s|read |read \-s\"${OPTARG}\" |g");
+                s)  readstr=$(echo "$readstr" | sed 's|read |read -s '"${OPTARG}"' |g');
                     ;;
                 S)  ;;
             esac
@@ -131,7 +131,7 @@ reade(){
             history -n
         fi
 
-        if ! test -z "$pre" && test -z "$value"; then
+        if ! test -z "$pre" && test -z "$value" || test "$value" == ""; then
             value="$pre"  
         fi
     
