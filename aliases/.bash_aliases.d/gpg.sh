@@ -21,7 +21,7 @@ mailregex="^[a-z0-9!#\$%&'*+/=?^_\`{|}~-]+(\.[a-z0-9!#$%&'*+/=?^_\`{|}~-]+)*@([a
 
 function receive-mails-csv-file(){
         if test -z $1; then
-            reade -Q "GREEN"  -p "Passwords.csv file?: " -e file 
+            reade -Q "GREEN" -p "Passwords.csv file?: " -e file 
             if ! test -f "$file"; then
                 printf "File doesnt't exist!\n"
                 return 1
