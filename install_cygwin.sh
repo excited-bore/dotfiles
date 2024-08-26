@@ -23,8 +23,9 @@ if test $machine == 'Windows'; then
         cyg_bashr=~/.bashrc 
         cyg_home=~/ 
     elif test $win_bash_shell == 'Git'; then
-        cyg_bash=/c/cygwin$ARCH_WIN/home/$USER/.bashrc 
-        cyg_home=/c/cygwin$ARCH_WIN/home/$USER/ 
+        USER="$(basename $(cd ~ && pwd))"
+        cyg_bash="/c/cygwin$ARCH_WIN/home/$USER/.bashrc" 
+        cyg_home="/c/cygwin$ARCH_WIN/home/$USER/"
     fi
     
     # Install Cygwin
@@ -33,6 +34,7 @@ if test $machine == 'Windows'; then
     fi
     if ! test $win_bash_shell == 'Cygwin' && ! test -d /c/cygwin$ARCH_WIN; then
         winget install Cygwin.Cygwin
+        #/c/cygwin$ARCH_WIN/bin/mintty.exe -i /c/cygwin$ARCH_WIN/Cygwin-Terminal.ico - 
     fi
     
     # Install dos2unix 
@@ -46,6 +48,11 @@ if test $machine == 'Windows'; then
         fi 
         unset dos2unx 
     fi
+    
+    if test -d /c/cygwin$ARCH_WIN && ! test -d /c/cygwin$ARCH_WIN/home/$USER; then
+        printf "Test run Cygwin terminal first before executing the rest of this script\n Don't worry, it won't reinstall\n" 
+        exit 1
+    fi
 
     # Dos2unix preexec hook
     if type dos2unix &> /dev/null && ! grep -q '.bash-preexec.sh' $cyg_bash; then
@@ -53,7 +60,7 @@ if test $machine == 'Windows'; then
        tmpd=$(mktemp -d) 
        curl.exe https://raw.githubusercontent.com/rcaloras/bash-preexec/master/bash-preexec.sh -P $tmpd 
        mv $tmpd/bash-preexec.sh $cyg_home/.bash_preexec.sh 
-       printf "[[ -f ~/.bash-preexec.sh ]] && source ~/.bash-preexec.sh\npreexec() { dos2unix $1; }\n" >> $cyg_bash         
+       printf "[[ -f ~/.bash-preexec.sh ]] && source ~/.bash-preexec.sh\npreexec() { dos2unix \$1; }\n" >> $cyg_bash         
        unset tmpd 
     fi
     if test $win_bash_shell == 'Cygwin'; then
