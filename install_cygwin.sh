@@ -1,4 +1,3 @@
-#!/bin/bash
 
 if ! test -f checks/check_system.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
@@ -22,9 +21,9 @@ if test $machine == 'Windows' && ! type cygpath.exe &> /dev/null; then
     winget install Cygwin.Cygwin
 fi
 
-if test $win_bash_shell == 'Cygwin' && ! type apt-cyg &> /dev/null || test $win_bash_shell == 'Git' && ! echo $PATH | grep -q '/c/cygwin64/bin'; then
+if test $win_bash_shell == 'Cygwin' && ! type apt-cyg &> /dev/null; then
     printf "${green}Even though cygwin comes preinstalled with a lot of tools, it does not come with a package manager.. ${normal}\n"
-    read -p 'Install apt-cyg? (Package manager for Cygwin) [Y/n]: ' apt_cyg
+    reade -Q 'GREEN' -i 'y' -p 'Install apt-cyg? (Package manager for Cygwin) [Y/n]: ' 'n' apt_cyg
     if test "$apt_cyg" == '' || test "$apt_cyg" == "y" || test "$apt_cyg" == 'Y'; then
         tmpd=$(mktemp -d)
         curl.exe https://raw.githubusercontent.com/transcode-open/apt-cyg/master/apt-cyg > $tmpd/apt-cyg
