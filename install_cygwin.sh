@@ -23,8 +23,9 @@ if test $machine == 'Windows'; then
         cyg_bashr=~/.bashrc 
         cyg_home=~/ 
     elif test $win_bash_shell == 'Git'; then
-        cyg_bash=/c/cygwin$ARCH_WIN/home/$USER/.bashrc 
-        cyg_home=/c/cygwin$ARCH_WIN/home/$USER/ 
+        USER="$(basename $(cd ~ && pwd))"
+        cyg_bash="/c/cygwin$ARCH_WIN/home/$USER/.bashrc" 
+        cyg_home="/c/cygwin$ARCH_WIN/home/$USER/"
     fi
     
     # Install Cygwin
@@ -33,6 +34,7 @@ if test $machine == 'Windows'; then
     fi
     if ! test $win_bash_shell == 'Cygwin' && ! test -d /c/cygwin$ARCH_WIN; then
         winget install Cygwin.Cygwin
+        #/c/cygwin$ARCH_WIN/bin/mintty.exe -i /c/cygwin$ARCH_WIN/Cygwin-Terminal.ico - 
     fi
     
     # Install dos2unix 
@@ -46,31 +48,48 @@ if test $machine == 'Windows'; then
         fi 
         unset dos2unx 
     fi
+    
+    if test -d /c/cygwin$ARCH_WIN && ! test -d $cyg_home; then
+        printf "${RED}Test run Cygwin terminal first and then run 'install_cygwin.sh' before executing the rest of this script${normal}\nThe script checks if something what it already has installed and what not so you won't have to reconfigure.\n" 
+        exit 1
+    fi
 
     # Dos2unix preexec hook
-    if type dos2unix &> /dev/null && ! grep -q '.bash-preexec.sh' $cyg_bash; then
+    if type dos2unix &> /dev/null && ! test -f $cyg_home/.bash-preexec.sh && ! grep -q '~/.bash-preexec.sh' $cyg_bash; then
        printf "${CYAN}Installing preexecuting hook for dos2unix${normal}\n" 
-       tmpd=$(mktemp -d) 
-       curl.exe https://raw.githubusercontent.com/rcaloras/bash-preexec/master/bash-preexec.sh -P $tmpd 
-       mv $tmpd/bash-preexec.sh $cyg_home/.bash_preexec.sh 
-       printf "[[ -f ~/.bash-preexec.sh ]] && source ~/.bash-preexec.sh\npreexec() { dos2unix $1; }\n" >> $cyg_bash         
-       unset tmpd 
+       wget https://raw.githubusercontent.com/rcaloras/bash-preexec/master/bash-preexec.sh -P $cyg_home 
+       mv $cyg_home/bash-preexec.sh $cyg_home/.bash-preexec.sh 
+       prmpt="[[ -f ~/.bash-preexec.sh ]] && source ~/.bash-preexec.sh
+       preexec() {
+        if [[ \"\$1\" =~ './' ]] && [[ \"\$1\" =~ '.sh' ]]; then
+                if grep -q './' \"\$(realpath \$(basename \$1))\"; then
+                        dos2unix < \$1 | sed 's/.*\.\/\(.*\)/dos2unix \1 \&\& \.\/\1/g' | sed 's/.*\.\ \(.*\)/dos2unix \1 \&\& . \1/g' | /bin/bash;
+                else
+                        dos2unix < \$1 | /bin/bash
+                fi
+            fi
+       }\n"
+       printf "$prmpt" >> $cyg_bash  
+       #printf "[[ -f ~/.bash-preexec.sh ]] && source ~/.bash-preexec.sh\npreexec() { test -f \$1 && dos2unix \$1; }\n" >> $cyg_bash         
     fi
+
     if test $win_bash_shell == 'Cygwin'; then
         source ~/.bashrc 
     fi
 
     # Install apt-cyg 
-    if test $win_bash_shell == 'Cygwin' && ! type apt-cyg &> /dev/null || ! test -f /c/cygwin$ARCH_WIN/bin/apt-cyg; then
+    if ! type apt-cyg &> /dev/null || test $win_bash_shell == 'Git' && ! test -f /c/cygwin$ARCH_WIN/bin/apt-cyg; then
         printf "${green}Even though cygwin comes preinstalled with a lot of tools, it does not come with a package manager.. ${normal}\n"
         reade -Q 'GREEN' -i 'y' -p 'Install apt-cyg? (Package manager for Cygwin) [Y/n]: ' 'n' apt_cyg
         if test "$apt_cyg" == '' || test "$apt_cyg" == "y" || test "$apt_cyg" == 'Y'; then
-            tmpd=$(mktemp -d)
+            tmpd=$(mktemp -d) 
             curl.exe https://raw.githubusercontent.com/transcode-open/apt-cyg/master/apt-cyg > $tmpd/apt-cyg
             if test $win_bash_shell == 'Cygwin'; then
                 install $tmpd/apt-cyg /bin
             elif test $win_bash_shell == 'Git'; then
-                /c/cygwin$ARCH_WIN/bin/bash.exe "install $tmpd/apt-cyg"
+                #/c/cygwin$ARCH_WIN/bin/bash.exe "install $tmpd/apt-cyg /bin"
+                cp -v $tmp/apt-cyg $cyg_home 
+                printf "Open up Cygwin terminal and type 'install apt-cyg /bin' to finish installing apt-cyg\n"
             else
                 printf "Dont know how to install using this shell\nFile downloaded at '$tmpd/apt-cyg' and should install using 'C:\cygwin64\bin\bash.exe install $tmpd/apt-cyg'\n"
                 exit 1
