@@ -116,7 +116,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         reade -Q "GREEN" -i "less" -p "PAGER(less default)=" "$pagers" pgr2
         
         pgr2="$(where_cmd $pgr2)"
-        sed -i 's|export PAGER=.*|export PAGER='$pgr2'|' $pathvr
+        sed -i 's|export PAGER=.*|export PAGER='"$pgr2"'|' $pathvr
 
         # Set less options that system supports 
         sed -i 's|#export LESS=|export LESS="*"|g' $pathvr
