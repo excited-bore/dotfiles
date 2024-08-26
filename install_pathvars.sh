@@ -22,16 +22,16 @@ fi
 
 pthcvrt=""
 if test $machine == 'Windows'; then
-    pthcvrt="| sed 's/\\/\//g' | sed 's/://' | tr '[:upper:]' '[:lower:]' | sed 's/^/\//g'"
+    pthcvrt="| sed 's/\\\/\\//g' | sed 's/://' | tr '[:upper:]' '[:lower:]' | sed 's/^/\\//g'"
 fi
 
 if type whereis &> /dev/null; then
     function where_cmd() { 
-        whereis "$1" | awk '{print $2}' "$pthcvrt"; 
+        eval "whereis $1 | awk '{print $2}' $pthcvrt"; 
     } 
 elif type where &> /dev/null; then
     function where_cmd() { 
-        where "$1" "$pthcvrt"; 
+        eval "where $1 $pthcvrt"; 
     } 
 else
     printf "Can't find a 'where' command (whereis/where)\n"
