@@ -78,7 +78,7 @@ if test $machine == 'Windows'; then
     fi
 
     # Install apt-cyg 
-    if ! type apt-cyg &> /dev/null || ! test -f /c/cygwin$ARCH_WIN/bin/apt-cyg; then
+    if ! type apt-cyg &> /dev/null || test $win_bash_shell == 'Git' && ! test -f /c/cygwin$ARCH_WIN/bin/apt-cyg; then
         printf "${green}Even though cygwin comes preinstalled with a lot of tools, it does not come with a package manager.. ${normal}\n"
         reade -Q 'GREEN' -i 'y' -p 'Install apt-cyg? (Package manager for Cygwin) [Y/n]: ' 'n' apt_cyg
         if test "$apt_cyg" == '' || test "$apt_cyg" == "y" || test "$apt_cyg" == 'Y'; then
@@ -87,7 +87,9 @@ if test $machine == 'Windows'; then
             if test $win_bash_shell == 'Cygwin'; then
                 install $tmpd/apt-cyg /bin
             elif test $win_bash_shell == 'Git'; then
-                /c/cygwin$ARCH_WIN/bin/bash.exe "install $tmpd/apt-cyg"
+                #/c/cygwin$ARCH_WIN/bin/bash.exe "install $tmpd/apt-cyg /bin"
+                cp -v $tmp/apt-cyg $cyg_home 
+                printf "Open up Cygwin terminal and type 'install apt-cyg /bin' to finish installing apt-cyg\n"
             else
                 printf "Dont know how to install using this shell\nFile downloaded at '$tmpd/apt-cyg' and should install using 'C:\cygwin64\bin\bash.exe install $tmpd/apt-cyg'\n"
                 exit 1
