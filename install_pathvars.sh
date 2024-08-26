@@ -22,7 +22,7 @@ fi
 
 where_cmd=""
 if type whereis &> /dev/null; then
-    function where_cmd() { whereis "$1" | awk '{print $2}'); } 
+    function where_cmd() { whereis "$1" | awk '{print $2}'; } 
 elif type where &> /dev/null; then
     function where_cmd() { where "$1"; } 
 else
