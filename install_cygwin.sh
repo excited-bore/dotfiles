@@ -28,12 +28,11 @@ if test $win_bash_shell == 'Cygwin' && ! type apt-cyg &> /dev/null || test $win_
     if test "$apt_cyg" == '' || test "$apt_cyg" == "y" || test "$apt_cyg" == 'Y'; then
         tmpd=$(mktemp -d)
         curl.exe https://raw.githubusercontent.com/transcode-open/apt-cyg/master/apt-cyg > $tmpd/apt-cyg
-        if test $win_bash_shell == 'Cygwin'; then
-            sudo mv $tmpd/apt-cyg /bin
-        else
-            sudo mv $tmpd/apt-cyg /c/cygwin64/bin
-        fi
-        tmpf=$(mktemp)
-        echo '! [[ $(uname -s) =~ "CYGWIN" ]] && export PATH=$PATH:/c/cygwin64/bin' | cat - ~/.bashrc > $tmpf && mv $tmpf ~/.bashrc && rm $tmpf && rm -r $tmpd
+        sudo mv $tmpd/apt-cyg /bin
+        #if test $win_bash_shell == 'Cygwin'; then
+        #else
+            #sudo mv $tmpd/apt-cyg /c/cygwin64/bin
+        #fi
+        #echo '! [[ $(uname -s) =~ "CYGWIN" ]] && export PATH=$PATH:/c/cygwin64/bin' | cat - ~/.bashrc > $tmpf && mv $tmpf ~/.bashrc && rm $tmpf && rm -r $tmpd
     fi
 fi
