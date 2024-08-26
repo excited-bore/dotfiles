@@ -20,7 +20,6 @@ if ! test -f $pathvr; then
     pathvr=$TMPDIR/.pathvariables.env
 fi
 
-where_cmd=""
 if type whereis &> /dev/null; then
     function where_cmd() { whereis "$1" | awk '{print $2}'; } 
 elif type where &> /dev/null; then
@@ -107,7 +106,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         
         reade -Q "GREEN" -i "less" -p "PAGER=" "$pagers" pgr2
         
-        pgr2=$($where_cmd "$pgr2")
+        pgr2=$(where_cmd "$pgr2")
         sed -i 's|export PAGER=.*|export PAGER='$pgr2'|' $pathvr
 
         # Set less options that system supports 
@@ -140,7 +139,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
             fi
             printf "$prmpt${normal}"
             reade -Q "GREEN" -i "less" -p "BAT_PAGER=" "$pagers" pgr2
-            pgr2=$($where_cmd "$pgr2")
+            pgr2=$(where_cmd "$pgr2")
             [[ "$pgr2" =~ "less" ]] && pgr2="$pgr2 \$LESS --line-numbers"  
             [[ "$pgr2" =~ "moar" ]] && pgr2="$pgr2 \$MOAR --no-linenumbers"  
             sed 's/^#export BAT_PAGER=/export BAT_PAGER=/' -i $pathvr
@@ -193,7 +192,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         if [ "$edtor" == "emacs" ]; then
             edtor="emacs -nw"
         fi
-        edtor=$($where_cmd "$edtor")
+        edtor=$(where_cmd "$edtor")
         sed -i 's|#export EDITOR=.*|export EDITOR='$edtor'|g' $pathvr
         
         # Make .txt file and output file
@@ -215,7 +214,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         printf "$prmpt"
 
         reade -Q "GREEN" -i "$frst" -p "VISUAL (GUI editor)=" "$compedit" vsual
-        vsual=$($where_cmd "$vsual")
+        vsual=$(where_cmd "$vsual")
         sed -i 's|#export VISUAL=|export VISUAL=|g' $pathvr
         sed -i 's|export VISUAL=.*|export VISUAL='"$vsual"'|g' $pathvr
         
