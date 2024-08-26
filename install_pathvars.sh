@@ -198,10 +198,10 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         fi
         printf "$prmpt${normal}"
         reade -Q "GREEN" -i "nano" -p "EDITOR (Terminal - nano default)=" "$editors" edtor
-        if [ "$edtor" == "emacs" ]; then
-            edtor="emacs -nw"
-        fi
         edtor="$(where_cmd $edtor)"
+        if [[ "$edtor" =~ "emacs" ]]; then
+            edtor="$edtor -nw"
+        fi
         sed -i 's|#export EDITOR=.*|export EDITOR='$edtor'|g' $pathvr
         
         # Make .txt file and output file
