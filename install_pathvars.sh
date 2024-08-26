@@ -21,19 +21,15 @@ if ! test -f $pathvr; then
 fi
 
 if type whereis &> /dev/null; then
+    pthcvrt=""
+    if test $machine == 'Windows'; then
+        pthcvrt="| sed 's/\\/\//g' | sed 's/://' | tr '[:upper:]' '[:lower:]' | sed 's/^/\//g'"
+    fi
     function where_cmd() { 
-        pthcvrt=""
-        if test $machine == 'Windows'; then
-            pthcvrt="| sed 's/\\/\//g' | sed 's/://' | tr '[:upper:]' '[:lower:]' | sed 's/^/\//'"
-        fi
         whereis "$1" | awk '{print $2}' "$pthcvrt"; 
     } 
 elif type where &> /dev/null; then
     function where_cmd() { 
-        pthcvrt=""
-        if test $machine == 'Windows'; then
-            pthcvrt="| sed 's/\\/\//g' | sed 's/://' | tr '[:upper:]' '[:lower:]' | sed 's/^/\//'"
-        fi
         where "$1" "$pthcvrt"; 
     } 
 else
