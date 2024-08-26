@@ -21,10 +21,22 @@ if test $machine == 'Windows'; then
    else
        ARCH_WIN='32'
    fi
+   if ! type winget &> /dev/null; then
+       printf "${RED}Winget (official window package manager) not installed - can't install programs without${normal}\n" 
+       reade -Q 'GREEN' -i 'y' -p 'Install winget? [Y/n]: ' 'n' wngt
+       if test $wngt == 'y'; then
+            pwsh ../install_gsudo.sh
+       else
+            exit 1 
+       fi
+   fi
    if ! type sudo &> /dev/null; then
-       reade -Q 'GREEN' -i 'y' -p 'Install (g)sudo? [Y/n]: ' 'n' gsdn
+       printf "${RED}Sudo (Commandline tool to install/modify files at higher privilige, as root/admin) not installed - most of the script won't run without without${normal}\n" 
+       reade -Q 'GREEN' -i 'y' -p 'Install (g)sudo (unofficial sudo)? [Y/n]: ' 'n' gsdn
        if test $gsdn == 'y'; then
             ./../install_gsudo.sh
+       else
+           exit 1
        fi
    fi
    if ! type jq &> /dev/null; then
@@ -33,7 +45,7 @@ if test $machine == 'Windows'; then
             winget install jqlang.jq
        fi
    fi
-   unset wmic gsdn jqin
+   unset wngt wmic gsdn jqin
 fi
 
 if test -z $EDITOR; then
