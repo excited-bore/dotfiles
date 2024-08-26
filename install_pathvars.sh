@@ -20,6 +20,16 @@ if ! test -f $pathvr; then
     pathvr=$TMPDIR/.pathvariables.env
 fi
 
+where_cmd=""
+if type whereis &> /dev/null; then
+    where_cmd="whereis"
+elif type where &> /dev/null; then
+    where_cmd="where"
+else
+    printf "Can't find a 'where' command (whereis/where)\n"
+    exit 1 
+fi
+
 pre='y'
 othr='n'
 color='GREEN'
@@ -96,7 +106,8 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         printf "$prmpt${normal}"
         
         reade -Q "GREEN" -i "less" -p "PAGER=" "$pagers" pgr2
-        pgr2=$(whereis "$pgr2" | awk '{print $2}')
+        
+        pgr2=$($where_cmd "$pgr2" | awk '{print $2}')
         sed -i 's|export PAGER=.*|export PAGER='$pgr2'|' $pathvr
 
         # Set less options that system supports 
@@ -129,7 +140,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
             fi
             printf "$prmpt${normal}"
             reade -Q "GREEN" -i "less" -p "BAT_PAGER=" "$pagers" pgr2
-            pgr2=$(whereis "$pgr2" | awk '{print $2}')
+            pgr2=$($where_cmd "$pgr2" | awk '{print $2}')
             [[ "$pgr2" =~ "less" ]] && pgr2="$pgr2 \$LESS --line-numbers"  
             [[ "$pgr2" =~ "moar" ]] && pgr2="$pgr2 \$MOAR --no-linenumbers"  
             sed 's/^#export BAT_PAGER=/export BAT_PAGER=/' -i $pathvr
@@ -182,7 +193,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         if [ "$edtor" == "emacs" ]; then
             edtor="emacs -nw"
         fi
-        edtor=$(whereis "$edtor" | awk '{print $2}')
+        edtor=$($where_cmd "$edtor" | awk '{print $2}')
         sed -i 's|#export EDITOR=.*|export EDITOR='$edtor'|g' $pathvr
         
         # Make .txt file and output file
@@ -204,7 +215,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         printf "$prmpt"
 
         reade -Q "GREEN" -i "$frst" -p "VISUAL (GUI editor)=" "$compedit" vsual
-        vsual="$(whereis "$vsual" | awk '{print $2}')"
+        vsual="$($where_cmd "$vsual" | awk '{print $2}')"
         sed -i 's|#export VISUAL=|export VISUAL=|g' $pathvr
         sed -i 's|export VISUAL=.*|export VISUAL='"$vsual"'|g' $pathvr
         
