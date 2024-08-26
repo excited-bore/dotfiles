@@ -34,8 +34,7 @@ function update-system() {
                 ./install_brew.sh
             fi
         fi
-    elif test $machine == 'Windows' && test $win_bash_shell == 'Git' && ! test -d '/c/cygwin64' && ! test -d '/c/git-sdk-32'; then
-        # export PATH=$PATH:/c/cygwin64/bin
+    elif test $machine == 'Windows' && test $win_bash_shell == 'Git' && ! test -d "/c/cygwin$ARCH_WIN" && ! test -d '/c/git-sdk-32'; then
         printf "${GREEN}Git bash is an environment without a package manager.\n\t - Cygwin is a collection of UNIX related tools (with a pm if you install 'apt-cyg')\n\t- Git SDK for windows comes with pacman (arch package manager)\n${normal}"
         reade -Q 'CYAN' -i 'sdk' -p 'Install git SDK or Cygwin? [Sdk/cyg/n]: ' 'cyg n' cyg
         if test $cyg == 'cyg'; then
