@@ -81,16 +81,16 @@ reade(){
             ;;
         esac
     done && OPTIND=1;
-    if ! type rlwrap &> /dev/null || test "$fcomp" == 'y' || [[ $(uname -s) =~ 'MINGW' ]] && ! type pacman &> /dev/null; then 
+    if ! type rlwrap &> /dev/null || test "$fcomp" == 'y' || [ [[ $(uname -s) =~ 'MINGW' ]] && ! type pacman &> /dev/null ]; then 
         readstr="read  ";
         color=""
         while getopts ':b:e:i:p:Q:s:S:' flag; do
             case "${flag}" in
                 b)  ;;
-                e)  readstr=$(echo "$readstr" | sed 's|read |read -e -r |g');
+                e)  readstr=$(echo "$readstr" | sed 's|read |read\ -e\ -r |g');
                     ;;
                 #  Even though it's in the read man, -i does not actually work
-                i)  readstr=$(echo "$readstr" | sed 's|read |read -i '"${OPTARG}"' |g');
+                i)  readstr=$(echo "$readstr" | sed 's|read |read\ -i '"${OPTARG}"' |g');
                     pre="${OPTARG}"
                     ;;
                 Q)  if [[ "${OPTARG}" =~ ^[[:upper:]]+$ ]]; then
@@ -117,7 +117,7 @@ reade(){
                     ;;
                 p)  readstr=$(echo "$readstr" | sed 's|read |printf '"${color}${OPTARG}${normal}"'\n; read|g');
                     ;;
-                s)  readstr=$(echo "$readstr" | sed 's|read |read -s '"${OPTARG}"' |g');
+                s)  readstr=$(echo "$readstr" | sed 's|read |read\ -s '"${OPTARG}"' |g');
                     ;;
                 S)  ;;
             esac
