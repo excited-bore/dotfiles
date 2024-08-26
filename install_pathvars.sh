@@ -24,7 +24,7 @@ if type whereis &> /dev/null; then
     function where_cmd() { 
         pthcvrt=""
         if test $machine == 'Windows'; then
-            pthcvrt="| sed 's/\\/\//g' | sed 's/://'"
+            pthcvrt="| sed 's/\\/\//g' | sed 's/://' | tr '[:upper:]' '[:lower:]' | sed 's/^/\//'"
         fi
         whereis "$1" | awk '{print $2}' "$pthcvrt"; 
     } 
@@ -32,7 +32,7 @@ elif type where &> /dev/null; then
     function where_cmd() { 
         pthcvrt=""
         if test $machine == 'Windows'; then
-            pthcvrt="| sed 's/\\/\//g' | sed 's/://'"
+            pthcvrt="| sed 's/\\/\//g' | sed 's/://' | tr '[:upper:]' '[:lower:]' | sed 's/^/\//'"
         fi
         where "$1" "$pthcvrt"; 
     } 
