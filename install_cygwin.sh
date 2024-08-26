@@ -40,21 +40,23 @@ if test $machine == 'Windows'; then
         reade -Q "GREEN" -i "y" -p "Install dos2unix? [Y/n]: " "n" dos2unx
         if test $dos2unx == 'y' ; then 
             winget install dos2unix
-            printf "${CYAN}Installing preexecuting hook for dos2unix${normal}\n" 
-            if ! grep -q '.bash-preexec.sh' $cyg_bash; then
-               tmpd=$(mktemp -d) 
-               curl.exe https://raw.githubusercontent.com/rcaloras/bash-preexec/master/bash-preexec.sh -P $tmpd 
-               mv $tmpd/bash-preexec.sh $cyg_home/.bash_preexec.sh 
-               printf "[[ -f ~/.bash-preexec.sh ]] && source ~/.bash-preexec.sh\npreexec() { dos2unix $1; }\n" >> $cyg_bash         
-               unset tmpd 
-            fi
-            if test $win_bash_shell == 'Cygwin'; then
-                source ~/.bashrc 
-            fi
         else
             exit 1
-        fi
+        fi 
         unset dos2unx 
+    fi
+
+    # Dos2unix preexec hook
+    if type dos2unix &> /dev/null && ! grep -q '.bash-preexec.sh' $cyg_bash; then
+       printf "${CYAN}Installing preexecuting hook for dos2unix${normal}\n" 
+       tmpd=$(mktemp -d) 
+       curl.exe https://raw.githubusercontent.com/rcaloras/bash-preexec/master/bash-preexec.sh -P $tmpd 
+       mv $tmpd/bash-preexec.sh $cyg_home/.bash_preexec.sh 
+       printf "[[ -f ~/.bash-preexec.sh ]] && source ~/.bash-preexec.sh\npreexec() { dos2unix $1; }\n" >> $cyg_bash         
+       unset tmpd 
+    fi
+    if test $win_bash_shell == 'Cygwin'; then
+        source ~/.bashrc 
     fi
 
     # Install apt-cyg 
