@@ -148,11 +148,18 @@ bind -m emacs-standard '"\e[1;5A": "\C-e\C-u\e277 _.\C-m"'
 bind -m vi-command     '"\e[1;5A": "ddi\e277 _.\C-m"'
 bind -m vi-insert      '"\e[1;5A": "\eddi\e277 _.\C-m"'
 
-# Ctrl-Down -> Rotate between 2 last directories
-bind -x '"\e266": pushd -1 &>/dev/null'
+# Ctrl-Down -> Dir Down
+bind -x '"\e266": cd ..'
 bind -m emacs-standard '"\e[1;5B": "\C-e\C-u\e266 _.\C-m"'
 bind -m vi-command     '"\e[1;5B": "ddi\C-u\e266 _.\C-m"'
 bind -m vi-insert      '"\e[1;5B": "\eddi\e266 _.\C-m"'
+
+
+# Ctrl-Down -> Rotate between 2 last directories
+#bind -x '"\e266": pushd -1 &>/dev/null'
+#bind -m emacs-standard '"\e[1;5B": "\C-e\C-u\e266 _.\C-m"'
+#bind -m vi-command     '"\e[1;5B": "ddi\C-u\e266 _.\C-m"'
+#bind -m vi-insert      '"\e[1;5B": "\eddi\e266 _.\C-m"'
 
 # Shift left/right to jump from words instead of chars
 bind -m emacs-standard  '"\e[1;2D": backward-word'
