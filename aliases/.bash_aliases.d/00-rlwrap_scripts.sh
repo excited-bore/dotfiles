@@ -90,9 +90,9 @@ reade(){
                 e)  readstr=$(echo "$readstr" | sed "s|read |read \-e \-r |g");
                     ;;
                 #  Even though it's in the read man, -i does not actually work
-               # i)  readstr=$(echo "$readstr" | sed "s|read |read \-i \"${OPTARG}\" |g");
-               #     pre="${OPTARG}"
-               #     ;;
+                i)  readstr=$(echo "$readstr" | sed "s|read |read \-i \"${OPTARG}\" |g");
+                    pre="${OPTARG}"
+                    ;;
                 Q)  if [[ "${OPTARG}" =~ ^[[:upper:]]+$ ]]; then
                         color="${bold}"
                     fi
@@ -131,7 +131,7 @@ reade(){
             history -n
         fi
 
-        if ! test -z "$pre" && test -z "$value"; then
+        if ! test -z "$pre" && test -z "$value" || test "$value" == ""; then
             value="$pre"  
         fi
     
