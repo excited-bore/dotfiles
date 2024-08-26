@@ -51,7 +51,7 @@ function update-system() {
             else
                 ./install_git_sdk.sh
             fi
-            printf "${CYAN}Don't forget to open up git SDK and restart this script${normal}\n"
+            printf "${CYAN}Don't forget to open up Git SDK and restart this script${normal}\n"
         else
             printf "${RED}Can't install script on git bash alone. Exiting..${normal}\n"
             exit 1
