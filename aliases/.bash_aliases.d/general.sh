@@ -6,6 +6,10 @@ if [ -z $TRASHBIN_LIMIT ]; then
    TRASHBIN_LIMIT=100 
 fi
 
+if test $machine == 'Windows' && test $win_bash_shell == 'Cygwin'; then
+    alias cd-home-="cd /cygdrive/c/Users/$USER"
+fi
+
 alias r="stty sane && source $PROFILE && source ~/.bashrc"
 
 # TRY and keep command line at bottom
