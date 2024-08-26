@@ -22,12 +22,18 @@ if test $machine == 'Windows'; then
        ARCH_WIN='32'
    fi
    if ! type sudo &> /dev/null; then
-       reade -Q 'GREEN' -i 'y' -p 'Install gsudo? [Y/n]: ' 'n' gsdn
+       reade -Q 'GREEN' -i 'y' -p 'Install (g)sudo? [Y/n]: ' 'n' gsdn
        if test $gsdn == 'y'; then
             ./../install_gsudo.sh
        fi
    fi
-   unset wmic 
+   if ! type jq &> /dev/null; then
+       reade -Q 'GREEN' -i 'y' -p 'Install jq? (Json parser - used in scripts to get latest releases from github) [Y/n]: ' 'n' jqin 
+       if test $jqin == 'y'; then
+            winget install jqlang.jq
+       fi
+   fi
+   unset wmic gsdn jqin
 fi
 
 if test -z $EDITOR; then

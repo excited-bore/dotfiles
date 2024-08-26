@@ -14,7 +14,9 @@ fi
 if ! type rlwrap &> /dev/null; then
     reade -Q "GREEN" -i "y" -p "Install rlwrap? (Offers autocompletion for input prompts - keyboard up/down) [Y(es)/n(o)]: " "y n" answr
     if [ "$answr" == "y" ] || [ -z "$answr" ] || [ "Y" == "$answr" ]; then
-        if test $machine == 'Windows' && type apt-cyg &> /dev/null; then
+        if test $machine == 'Windows' && type pacman &> /dev/null; then
+            pacman -S rlwrap
+        elif [[ $(uname -s) =~ 'CYGWIN' ]] && type apt-cyg &> /dev/null; then
             apt-cyg install rlwrap
         elif test $distro_base == "Debian"; then
             sudo apt install rlwrap;
