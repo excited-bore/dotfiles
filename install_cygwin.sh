@@ -23,8 +23,9 @@ if test $machine == 'Windows'; then
         cyg_bashr=~/.bashrc 
         cyg_home=~/ 
     elif test $win_bash_shell == 'Git'; then
-        cyg_bash=/c/cygwin$ARCH_WIN/home/$USER/.bashrc 
-        cyg_home=/c/cygwin$ARCH_WIN/home/$USER/ 
+        USER="$(basename $(cd ~ && pwd))"
+        cyg_bash="/c/cygwin$ARCH_WIN/home/.bashrc" 
+        cyg_home="/c/cygwin$ARCH_WIN/home/"
     fi
     
     # Install Cygwin
