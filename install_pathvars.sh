@@ -22,12 +22,12 @@ fi
 
 pthcvrt=""
 if test $machine == 'Windows'; then
-    pthcvrt="| sed 's/\\\/\\//g' | sed 's/://' | tr '[:upper:]' '[:lower:]' | sed 's/^/\\//g'"
+    pthcvrt="| sed 's/\\\/\\//g' | sed 's/://' | sed 's/^/\\//g'"
 fi
 
 if type whereis &> /dev/null; then
     function where_cmd() { 
-        eval "whereis $1 | awk '{print $2}' $pthcvrt"; 
+        eval "whereis $1 $pthcvrt" | awk '{print $2;}'; 
     } 
 elif type where &> /dev/null; then
     function where_cmd() { 
@@ -119,22 +119,23 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         sed -i 's|export PAGER=.*|export PAGER='"$pgr2"'|' $pathvr
 
         # Set less options that system supports 
-        sed -i 's|#export LESS=|export LESS="*"|g' $pathvr
-        lss=$(cat $pathvr | grep 'export LESS="*"' | sed 's|export LESS="\(.*\)"|\1|g')
-        lss_n=""
-        for opt in ${lss}; do
-            opt1=$(echo "$opt" | sed 's|--\(\)|\1|g' | sed 's|\(\)\=.*|\1|g')
-            if (man less | grep -Fq "${opt1}") 2> /dev/null; then
-                lss_n="$lss_n $opt"
-            fi
-        done
-        sed -i "s|export LESS=.*|export LESS=\" $lss_n\"|g" $pathvr
+        sed -i 's|#export LESS=|export LESS=|g' $pathvr
+        if type man &> /dev/null; then
+            lss=$(cat $pathvr | grep 'export LESS="*"' | sed 's|export LESS="\(.*\)"|\1|g')
+            lss_n=""
+            for opt in ${lss}; do
+                opt1=$(echo "$opt" | sed 's|--\(\)|\1|g' | sed 's|\(\)\=.*|\1|g')
+                if (man less | grep -Fq "${opt1}") 2> /dev/null; then
+                    lss_n="$lss_n $opt"
+                fi
+            done
+            sed -i "s|export LESS=.*|export LESS=\" $lss_n\"|g" $pathvr
+            unset lss lss_n opt opt1
+        fi 
         #sed -i 's/#export LESSEDIT=/export LESSEDIT=/' .pathvariables.env
-        unset lss lss_n opt opt1
 
         # Set moar options
         sed -i 's/#export MOAR=/export MOAR=/' $pathvr
-        
         if test "$(basename ""$pgr2"")" == "bat" && type moar &> /dev/null || test "$(basename ""$pgr2"")" == "bat" && type nvimpager &> /dev/null ; then
             pagers=""
             prmpt="${cyan}Bat is a pager wrapper that defaults to less except if BAT_PAGER is set\n\t${green}less = Default pager - Basic, archaic but very customizable\n"
@@ -234,25 +235,27 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
             fi
         fi
         
-        echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for 'Defaults env_keep += \"PAGER\"' in /etc/sudoers"
-        if ! sudo grep -q "Defaults env_keep += \"PAGER\"" /etc/sudoers; then
-            printf "${bold}${yellow}Sudo by default does not respect the user's PAGER environment. If you were to want to keep your userdefined less options or use a custom pager (more on that later) when using sudo ${cyan}systemctl/journalctl${bold}${yellow}, you would need to always pass your environment using 'sudo -E'\n${normal}"
-            reade -Q "YELLOW" -i "y" -p "Change this behaviour permanently in /etc/sudoers? [Y/n]: " "n" sudrs
-            if test "$sudrs" == "y"; then
-                sudo sed -i '1s/^/Defaults env_keep += "PAGER"\n/' /etc/sudoers
-                echo "Added ${RED}'Defaults env_keep += \"PAGER\"'${normal} to /etc/sudoers"
+        if test -f /etc/sudoers; then 
+            echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for 'Defaults env_keep += \"PAGER\"' in /etc/sudoers"
+            if ! sudo grep -q "Defaults env_keep += \"PAGER\"" /etc/sudoers; then
+                printf "${bold}${yellow}Sudo by default does not respect the user's PAGER environment. If you were to want to keep your userdefined less options or use a custom pager (more on that later) when using sudo ${cyan}systemctl/journalctl${bold}${yellow}, you would need to always pass your environment using 'sudo -E'\n${normal}"
+                reade -Q "YELLOW" -i "y" -p "Change this behaviour permanently in /etc/sudoers? [Y/n]: " "n" sudrs
+                if test "$sudrs" == "y"; then
+                    sudo sed -i '1s/^/Defaults env_keep += "PAGER"\n/' /etc/sudoers
+                    echo "Added ${RED}'Defaults env_keep += \"PAGER\"'${normal} to /etc/sudoers"
+                fi
             fi
-        fi
 
-        echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for 'Defaults env_keep += \"EDITOR VISUAL\"' in /etc/sudoers"
-        if ! sudo grep -q "Defaults env_keep += \"EDITOR VISUAL\"" /etc/sudoers; then
-            printf "${bold}${yellow}Sudo by default does not respect the user's EDITOR/VISUAL environment and SUDO_EDITOR is not always checked by programs.\nIf you were to want edit root crontabs (sudo crontab -e), you would get vi (unless using 'sudo -E' to pass your environment)\n"
-            reade -Q "YELLOW" -i "y" -p "Change this behaviour permanently in /etc/sudoers? (Run 'man --pager='less -p ^security' less' if you want to see the potential security holes when using less) [Y/n]: " "n" sudrs
-            if test "$sudrs" == "y"; then
-                sudo sed -i '1s/^/Defaults env_keep += "EDITOR VISUAL"\n/' /etc/sudoers
-                echo "Added ${RED}'Defaults env_keep += \"EDITOR VISUAL\"'${normal} to /etc/sudoers"
+            echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for 'Defaults env_keep += \"EDITOR VISUAL\"' in /etc/sudoers"
+            if ! sudo grep -q "Defaults env_keep += \"EDITOR VISUAL\"" /etc/sudoers; then
+                printf "${bold}${yellow}Sudo by default does not respect the user's EDITOR/VISUAL environment and SUDO_EDITOR is not always checked by programs.\nIf you were to want edit root crontabs (sudo crontab -e), you would get vi (unless using 'sudo -E' to pass your environment)\n"
+                reade -Q "YELLOW" -i "y" -p "Change this behaviour permanently in /etc/sudoers? (Run 'man --pager='less -p ^security' less' if you want to see the potential security holes when using less) [Y/n]: " "n" sudrs
+                if test "$sudrs" == "y"; then
+                    sudo sed -i '1s/^/Defaults env_keep += "EDITOR VISUAL"\n/' /etc/sudoers
+                    echo "Added ${RED}'Defaults env_keep += \"EDITOR VISUAL\"'${normal} to /etc/sudoers"
+                fi
             fi
-        fi
+        fi 
     fi
     unset edtvsl compedit frst editors prmpt
 
