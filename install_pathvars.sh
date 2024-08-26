@@ -22,12 +22,12 @@ fi
 
 pthcvrt=""
 if test $machine == 'Windows'; then
-    pthcvrt="| sed 's/\\\/\\//g' | sed 's/://' | tr '[:upper:]' '[:lower:]' | sed 's/^/\\//g'"
+    pthcvrt="| sed 's/\\\/\\//g' | sed 's/://' | sed 's/^/\\//g'"
 fi
 
 if type whereis &> /dev/null; then
     function where_cmd() { 
-        eval "whereis $1 | awk '{print $2}' $pthcvrt"; 
+        eval "whereis $1 $pthcvrt" | awk '{print $2;}'; 
     } 
 elif type where &> /dev/null; then
     function where_cmd() { 
