@@ -22,12 +22,12 @@ fi
 
 pthcvrt=""
 if test $machine == 'Windows'; then
-    pthcvrt="| sed 's/\\\/\\//g' | sed 's/://' | tr '[:upper:]' '[:lower:]' | sed 's/^/\\//g'"
+    pthcvrt="| sed 's/\\\/\\//g' | sed 's/://' | sed 's/^/\\//g'"
 fi
 
 if type whereis &> /dev/null; then
     function where_cmd() { 
-        eval "whereis $1 | awk '{print $2}' $pthcvrt"; 
+        eval "whereis $1 $pthcvrt" | awk '{print $2;}'; 
     } 
 elif type where &> /dev/null; then
     function where_cmd() { 
@@ -134,7 +134,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
 
         # Set moar options
         sed -i 's/#export MOAR=/export MOAR=/' $pathvr
-        
+        echo $pgr2 
         if test "$(basename ""$pgr2"")" == "bat" && type moar &> /dev/null || test "$(basename ""$pgr2"")" == "bat" && type nvimpager &> /dev/null ; then
             pagers=""
             prmpt="${cyan}Bat is a pager wrapper that defaults to less except if BAT_PAGER is set\n\t${green}less = Default pager - Basic, archaic but very customizable\n"

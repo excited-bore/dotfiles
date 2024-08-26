@@ -81,7 +81,8 @@ reade(){
             ;;
         esac
     done && OPTIND=1;
-    if ! type rlwrap &> /dev/null || test "$fcomp" == 'y' || test [[ $(uname -s) =~ 'MINGW' ]] -a ! type pacman &> /dev/null ; then 
+    git_bash=[[ $(uname -s) =~ 'MINGW' ]] && ! type pacman &> /dev/null
+    if ! type rlwrap &> /dev/null || test "$fcomp" == 'y' || $git_bash ; then 
         readstr="read  ";
         color=""
         while getopts ':b:e:i:p:Q:s:S:' flag; do
@@ -187,6 +188,8 @@ reade(){
         eval "${@:$#:1}=$value" && rm $tmpf;
     fi
 }
+
+unset git_bash
 
 #reade -p "Usb ids" $(sudo lsusb | awk 'BEGIN { FS = ":" };{print $1;}')
 
