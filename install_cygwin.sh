@@ -55,7 +55,7 @@ if test $machine == 'Windows'; then
     fi
 
     # Dos2unix preexec hook
-    if type dos2unix &> /dev/null && ! test -f $cyg_home/.bash-preexec.sh ! grep -q '~/.bash-preexec.sh' $cyg_bash; then
+    if type dos2unix &> /dev/null && ! test -f $cyg_home/.bash-preexec.sh && ! grep -q '~/.bash-preexec.sh' $cyg_bash; then
        printf "${CYAN}Installing preexecuting hook for dos2unix${normal}\n" 
        wget https://raw.githubusercontent.com/rcaloras/bash-preexec/master/bash-preexec.sh -P $cyg_home 
        mv $cyg_home/bash-preexec.sh $cyg_home/.bash-preexec.sh 
