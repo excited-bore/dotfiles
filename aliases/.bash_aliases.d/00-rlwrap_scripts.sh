@@ -81,7 +81,7 @@ reade(){
             ;;
         esac
     done && OPTIND=1;
-    if [ ! -x "$(command -v rlwrap)" ] || test "$fcomp" == 'y' ; then 
+    if ! type rlwrap &> /dev/null || test "$fcomp" == 'y' || [[ $(uname -s) =~ 'MINGW' ]] && ! type pacman &> /dev/null; then 
         readstr="read  ";
         color=""
         while getopts ':b:e:i:p:Q:s:S:' flag; do
