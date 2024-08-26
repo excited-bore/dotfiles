@@ -21,9 +21,21 @@ if ! test -f $pathvr; then
 fi
 
 if type whereis &> /dev/null; then
-    function where_cmd() { whereis "$1" | awk '{print $2}'; } 
+    function where_cmd() { 
+        pthcvrt=""
+        if test $machine == 'Windows'; then
+            pthcvrt="| sed 's/\\/\//g' | sed 's/://'"
+        fi
+        whereis "$1" | awk '{print $2}' "$pthcvrt"; 
+    } 
 elif type where &> /dev/null; then
-    function where_cmd() { where "$1"; } 
+    function where_cmd() { 
+        pthcvrt=""
+        if test $machine == 'Windows'; then
+            pthcvrt="| sed 's/\\/\//g' | sed 's/://'"
+        fi
+        where "$1" "$pthcvrt"; 
+    } 
 else
     printf "Can't find a 'where' command (whereis/where)\n"
     exit 1 
@@ -104,7 +116,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         fi
         printf "$prmpt${normal}"
         
-        reade -Q "GREEN" -i "less" -p "PAGER=" "$pagers" pgr2
+        reade -Q "GREEN" -i "less" -p "PAGER(less default)=" "$pagers" pgr2
         
         pgr2="$(where_cmd $pgr2)"
         sed -i 's|export PAGER=.*|export PAGER='$pgr2'|' $pathvr
@@ -138,7 +150,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
                 prmpt="$prmpt \tnvimpager = The pager that acts and feels like Neovim. Did you guess?\n"
             fi
             printf "$prmpt${normal}"
-            reade -Q "GREEN" -i "less" -p "BAT_PAGER=" "$pagers" pgr2
+            reade -Q "GREEN" -i "less" -p "BAT_PAGER(less default)=" "$pagers" pgr2
             pgr2="$(where_cmd $pgr2)"
             [[ "$pgr2" =~ "less" ]] && pgr2="$pgr2 \$LESS --line-numbers"  
             [[ "$pgr2" =~ "moar" ]] && pgr2="$pgr2 \$MOAR --no-linenumbers"  
@@ -188,7 +200,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
             prmpt="$prmpt \tEmacs = One of the oldest and versatile editors - Modal and featurerich, but overwhelming as well\n"
         fi
         printf "$prmpt${normal}"
-        reade -Q "GREEN" -i "nano" -p "EDITOR (Terminal)=" "$editors" edtor
+        reade -Q "GREEN" -i "nano" -p "EDITOR (Terminal - nano default)=" "$editors" edtor
         if [ "$edtor" == "emacs" ]; then
             edtor="emacs -nw"
         fi
@@ -213,7 +225,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
 
         printf "$prmpt"
 
-        reade -Q "GREEN" -i "$frst" -p "VISUAL (GUI editor)=" "$compedit" vsual
+        reade -Q "GREEN" -i "$frst" -p "VISUAL (GUI editor - default $frst)=" "$compedit" vsual
         vsual="$(where_cmd $vsual)"
         sed -i 's|#export VISUAL=|export VISUAL=|g' $pathvr
         sed -i 's|export VISUAL=.*|export VISUAL='"$vsual"'|g' $pathvr
