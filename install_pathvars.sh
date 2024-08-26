@@ -238,7 +238,9 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
     unset edtvsl compedit frst editors prmpt
 
     # Set DISPLAY
-    addr=$(nmcli device show | grep IP4.ADDR | awk 'NR==1{print $2}'| sed 's|\(.*\)/.*|\1|')
+    if type nmcli &> /dev/null; then
+        addr=$(nmcli device show | grep IP4.ADDR | awk 'NR==1{print $2}'| sed 's|\(.*\)/.*|\1|')
+    fi
     #reade -Q "GREEN" -i "n" -p "Set DISPLAY to ':$(addr).0'? [Y/n]:" "y n" dsply
     if [[ $- =~ i ]] && [[ -n "$SSH_TTY" ]]; then
         reade -Q "YELLOW" -i "n" -p "Detected shell is SSH. For X11, it's more reliable performance to dissallow shared clipboard (to prevent constant hanging). Set DISPLAY to 'localhost:10.0'? [Y/n]:" "y n" dsply
