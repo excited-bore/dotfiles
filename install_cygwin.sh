@@ -49,16 +49,16 @@ if test $machine == 'Windows'; then
         unset dos2unx 
     fi
     
-    if test -d /c/cygwin$ARCH_WIN && ! test -d /c/cygwin$ARCH_WIN/home/$USER; then
-        printf "Test run Cygwin terminal first before executing the rest of this script\n Don't worry, it won't reinstall\n" 
+    if test -d /c/cygwin$ARCH_WIN && ! test -d $cyg_home; then
+        printf "${RED}Test run Cygwin terminal first and then run 'install_cygwin.sh' before executing the rest of this script${normal}\nThe script checks if something what it already has installed and what not so you won't have to reconfigure.\n" 
         exit 1
     fi
 
     # Dos2unix preexec hook
-    if type dos2unix &> /dev/null && ! grep -q '.bash-preexec.sh' $cyg_bash; then
+    if type dos2unix &> /dev/null && ! test -f $cyg_home/.bash-preexec.sh ! grep -q '.bash-preexec.sh' $cyg_bash; then
        printf "${CYAN}Installing preexecuting hook for dos2unix${normal}\n" 
        tmpd=$(mktemp -d) 
-       curl.exe https://raw.githubusercontent.com/rcaloras/bash-preexec/master/bash-preexec.sh -P $tmpd 
+       wget https://raw.githubusercontent.com/rcaloras/bash-preexec/master/bash-preexec.sh -P $tmpd 
        mv $tmpd/bash-preexec.sh $cyg_home/.bash_preexec.sh 
        printf "[[ -f ~/.bash-preexec.sh ]] && source ~/.bash-preexec.sh\npreexec() { dos2unix \$1; }\n" >> $cyg_bash         
        unset tmpd 
