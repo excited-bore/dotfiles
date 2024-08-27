@@ -543,6 +543,13 @@ alias locales-list-enabled="locale -a"
 # https://stackoverflow.com/questions/18439528/sed-insert-line-with-spaces-to-a-specific-line    
 
 # Set an escape character \ before each space
+
+function print-path-to-prompt(){
+    fls=$(echo "$@" | sed 's/ /\\ /g') 
+    READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$fls${READLINE_LINE:$READLINE_POINT}"
+    READLINE_POINT=$(( READLINE_POINT + ${#fls} ))
+}
+
 function escape_spaces(){
      sed 's/ /\\ /g' <<< $@; 
 }

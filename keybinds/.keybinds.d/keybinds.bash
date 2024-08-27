@@ -297,26 +297,42 @@ if type osc &> /dev/null; then
     bind -m emacs-standard -x '"\C-s" : echo "$READLINE_LINE" | osc copy' 
     bind -m vi-command     -x '"\C-s" : echo "$READLINE_LINE" | osc copy' 
     bind -m vi-insert      -x '"\C-s" : echo "$READLINE_LINE" | osc copy'
-
+   
+    function osc-print-to-prompt(){
+        pasters="$(osc paste)"
+        READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$pasters${READLINE_LINE:$READLINE_POINT}"
+        READLINE_POINT=$(( READLINE_POINT + ${#pasters} ))
+    }
+     
     # Ctrl-v: Proper paste
-    Q="'"
-    bind -x $'"\237": echo bind $Q\\"\\\\225\\": \\"$(osc paste)\\"$Q > /tmp/paste.sh && source /tmp/paste.sh'
-    bind -m emacs-standard '"\C-v": "\237\225"'
-    bind -m vi-command     '"\C-v": "\237\225"'
-    bind -m vi-insert      '"\C-v": "\237\225"'
+    #Q="'"
+    #bind -x $'"\237": echo bind $Q\\"\\\\225\\": \\"$(osc paste)\\"$Q > /tmp/paste.sh && source /tmp/paste.sh'
+    bind -m emacs-standard -x '"\C-v": osc-print-to-prompt'
+    bind -m vi-command     -x '"\C-v": osc-print-to-prompt'
+    bind -m vi-insert      -x '"\C-v": osc-print-to-prompt'
 
 elif type xclip &> /dev/null; then
     # Ctrl-s: Proper copy
     bind -m emacs-standard -x '"\C-s" : echo "$READLINE_LINE" | xclip -i -sel c' 
     bind -m vi-command     -x '"\C-s" : echo "$READLINE_LINE" | xclip -i -sel c' 
     bind -m vi-insert      -x '"\C-s" : echo "$READLINE_LINE" | xclip -i -sel c'
-
+   
+    function xclip-print-to-prompt(){
+        pasters="$(xclip -o -sel c)"
+        READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$pasters${READLINE_LINE:$READLINE_POINT}"
+        READLINE_POINT=$(( READLINE_POINT + ${#pasters} ))
+    }
+    
     # Ctrl-v: Proper paste
-    Q="'"
-    bind -x $'"\237": echo bind $Q\\"\\\\225\\": \\"$(xclip -o -sel c)\\"$Q > /tmp/paste.sh && source /tmp/paste.sh'
-    bind -m emacs-standard '"\C-v": "\237\225"'
-    bind -m vi-command     '"\C-v": "\237\225"'
-    bind -m vi-insert      '"\C-v": "\237\225"'
+    bind -m emacs-standard -x '"\C-v": xclip-print-to-prompt'
+    bind -m vi-command     -x '"\C-v": xclip-print-to-prompt'
+    bind -m vi-insert      -x '"\C-v": xclip-print-to-prompt'
+     
+    #Q="'"
+    #bind -x $'"\237": echo bind $Q\\"\\\\225\\": \\"$(xclip -o -sel c)\\"$Q > /tmp/paste.sh && source /tmp/paste.sh'
+    #bind -m emacs-standard '"\C-v": "\237\225"'
+    #bind -m vi-command     '"\C-v": "\237\225"'
+    #bind -m vi-insert      '"\C-v": "\237\225"'
 fi
 
 if type autojump &> /dev/null; then

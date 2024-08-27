@@ -1,10 +1,26 @@
 #~/.fzf/shell/vid_viewer.sh
+
 if [ ! -f ~/.fdignore ]; then
    touch ~/.fdignore             
 fi
+
 if [ ! -f ~/.fzf_history ]; then
     touch ~/.fzf_history 
 fi
+
+#if ! type print-path-to-prompt &> /dev/null; then
+    function print-path-to-prompt(){
+        #fls='' 
+        #for i in ${@}; do
+        #    fls=$fls$(echo "$i" | sed 's/ /\\ /g') 
+        #     echo $fls
+        #done
+        fls=$(echo "$i" | sed 's/ /\\ /g') 
+        READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$fls${READLINE_LINE:$READLINE_POINT}"
+        READLINE_POINT=$(( READLINE_POINT + ${#fls} ))
+    }
+#fi
+
 fzf_rifle(){
     #EXTERNAL_COLUMNS=$COLUMNS
     #file="$(fzf -m --height 66% --reverse --preview='
@@ -57,6 +73,7 @@ fzf_rifle(){
         bat --color always --style numbers --line-range :200 {};
     fi;');
     #--bind 'focus:transform-preview-label:file --brief {}'
+    
     if [ -z "$fle" ]; then
         return 0;
     else
@@ -69,14 +86,24 @@ fzf_rifle(){
                     return 0;
                 fi
             else
-                result=$(rifle -l "$fle" | fzf --height 50% --reverse);
-                rifle -p "${result::1}" "$fle";
+                opts="$(rifle -l "$files")"
+                result="$(printf "Put items in prompt\n$opts" | fzf --height 50% --reverse)";
+                if test "$result" == 'Put items in prompt'; then
+                    print-path-to-prompt "${files}" 
+                else
+                    rifle -p "${result::1}" "$fle";
+                fi
                 return 0;
             fi
         else
             IFS=$'\n' read -d "\034" -r -a files <<<"${fle}\034";
-            result=$(rifle -l "$files" | fzf --height 50% --reverse );
-            rifle -p "${result::1}" "${files[@]}"
+            opts="$(rifle -l "$files")"
+            result="$(printf "Put items in prompt\n$opts" | fzf --height 50% --reverse)";
+            if test "$result" == 'Put items in prompt'; then
+                print-path-to-prompt "${files[@]}" 
+            else
+                rifle -p "${result::1}" "$fle";
+            fi
             return 0;
         fi    
     fi

@@ -246,9 +246,7 @@ fi
 
 reade -Q "GREEN" -i "y" -p "Add shortcut F3 for fzf rifle? [Y/n]: " "n" fzf_t
 if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ] ; then
-    if ! grep -q 'bind -x '\''"\\eOR": "fzf_rifle"'\''' ~/.fzf/shell/key-bindings.bash ;  then              
-        
-        sed -i 's|\(# CTRL-S\)|# F3 - Rifle search\n  bind -x '\''"\\eOR\": "fzf_rifle"'\''\n\n  \1|g' ~/.fzf/shell/key-bindings.bash
+    if ! grep -q 'bind -x '\''"\\eOR": "fzf_rifle"'\''' ~/.fzf/shell/key-bindings.bash ;  then              sed -i 's|\(# CTRL-S\)|# F3 - Rifle search\n  bind -x '\''"\\eOR\": "fzf_rifle"'\''\n\n  \1|g' ~/.fzf/shell/key-bindings.bash
     fi
 fi
 
