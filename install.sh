@@ -152,6 +152,10 @@ if ! test -f keybinds/.inputrc; then
     binds2=$TMPDIR/.keybinds
 fi
 
+if ! test -f /etc/inputrc; then
+    sed -i 's/^$include \/etc\/inputrc/#$include \/etc\/inputrc/g' $binds
+fi
+
 shell-keybinds_r(){ 
     if [ -f /root/.pathvariables.env ]; then
        sudo sed -i 's|#export INPUTRC.*|export INPUTRC=~/.inputrc|g' /root/.pathvariables.env
