@@ -5,6 +5,12 @@ else
     . ./checks/check_system.sh
 fi
 
+if ! test -f checks/check_pathvar.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pathvar.sh)" 
+else
+    . ./checks/check_pathvar.sh
+fi
+
 if ! type update-system &> /dev/null; then
     if ! test -f aliases/.bash_aliases.d/update-system.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)" 
@@ -24,12 +30,6 @@ if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
 else
     . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
-fi
-
-if ! test -f checks/check_pathvar.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pathvar.sh)" 
-else
-    . ./checks/check_pathvar.sh
 fi
 
 
@@ -106,7 +106,7 @@ if [ -f ~/.pathvariables.env ]; then
 fi              
 
 #if [ -x "$(command -v xdg-open)" ]; then
-#    reade -Q "GREEN" -p -i "y" "Set kitty as default terminal? [Y/n]:" "y n" kittn
+#    reade -Q "GREEN" -p -i "y" "Set kitty as default terminal? [Y/n]:" "n" kittn
 #    if [ "y" == "$kittn" ]; then
 #        
 #    fi

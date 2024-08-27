@@ -21,7 +21,7 @@ if test -z $SYSTEM_UPDATED; then
 fi
 
 if ! type curl &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Curl necessary for curl. Install curl? [Y/n]:" "y n" tojump
+    reade -Q "GREEN" -i "y" -p "Curl necessary for curl. Install curl? [Y/n]:" "n" tojump
     if [ "$tojump" == "y" ]; then
         if test $distro == "Arch" || test $distro == "Manjaro";then
             sudo pacman -S curl

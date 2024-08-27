@@ -20,13 +20,13 @@ if ! type update-system &> /dev/null; then
 fi
 
 if test -z $SYSTEM_UPDATED; then
-    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y n" updatesysm
+    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "n" updatesysm
     if test $updatesysm == "y"; then
         update-system                     
     fi
 fi
 
-reade -Q "GREEN" -i "y" -p "Install copy-to? (Python tool for copying between 2 maps) [Y/n]:" "y n" cpcnf
+reade -Q "GREEN" -i "y" -p "Install copy-to? (Python tool for copying between 2 maps) [Y/n]:" "n" cpcnf
 if [ -z $compl ] || [ "y" == $compl ]; then
     if ! type pipx &> /dev/null ; then
         if test $distro == "Arch" || test $distro == "Manjaro"; then

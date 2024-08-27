@@ -12,7 +12,7 @@ else
 fi 
 
 if ! type rlwrap &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Install rlwrap? (Offers autocompletion for input prompts - keyboard up/down) [Y(es)/n(o)]: " "y n" answr
+    reade -Q "GREEN" -i "y" -p "Install rlwrap? (Offers autocompletion for input prompts - keyboard up/down) [Y(es)/n(o)]: " "n" answr
     if [ "$answr" == "y" ] || [ -z "$answr" ] || [ "Y" == "$answr" ]; then
         if test $machine == 'Windows' && type pacman &> /dev/null; then
             pacman -S rlwrap

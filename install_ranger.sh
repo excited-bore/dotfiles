@@ -146,7 +146,7 @@ if ! test -d ~/.config/ranger/plugins/devicons2; then
     fi
 fi
 
-#reade -Q "GREEN" -i "y" -p "Install and enable ranger image previews? (Installs terminology) [Y/n]:" "y n" rplg
+#reade -Q "GREEN" -i "y" -p "Install and enable ranger image previews? (Installs terminology) [Y/n]:" "n" rplg
 #sed -i 's|set preview_images false|set preview_images true|g' ~/.config/ranger/rc.conf
 #if [ -z $rplg ] || [ "y" == $rplg ]; then
 #    if test $distro == "Arch" || test $distro == "Manjaro";then

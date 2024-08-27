@@ -55,23 +55,25 @@ if test $machine == 'Windows'; then
     fi
 
     # Dos2unix preexec hook
-    if type dos2unix &> /dev/null && ! test -f $cyg_home/.bash-preexec.sh && ! grep -q '~/.bash-preexec.sh' $cyg_bash; then
-       printf "${CYAN}Installing preexecuting hook for dos2unix${normal}\n" 
-       wget https://raw.githubusercontent.com/rcaloras/bash-preexec/master/bash-preexec.sh -P $cyg_home 
-       mv $cyg_home/bash-preexec.sh $cyg_home/.bash-preexec.sh 
-       prmpt="[[ -f ~/.bash-preexec.sh ]] && source ~/.bash-preexec.sh
-       preexec() {
-        if [[ \"\$1\" =~ './' ]] && [[ \"\$1\" =~ '.sh' ]]; then
-                if grep -q './' \"\$(realpath \$(basename \$1))\"; then
-                        dos2unix < \$1 | sed 's/.*\.\/\(.*\)/dos2unix \1 \&\& \.\/\1/g' | sed 's/.*\.\ \(.*\)/dos2unix \1 \&\& . \1/g' | /bin/bash;
-                else
-                        dos2unix < \$1 | /bin/bash
-                fi
-            fi
-       }\n"
-       printf "$prmpt" >> $cyg_bash  
-       #printf "[[ -f ~/.bash-preexec.sh ]] && source ~/.bash-preexec.sh\npreexec() { test -f \$1 && dos2unix \$1; }\n" >> $cyg_bash         
-    fi
+    # 'Sort of' works, not the most elegant solution
+    #
+    #if type dos2unix &> /dev/null && ! test -f $cyg_home/.bash-preexec.sh && ! grep -q '~/.bash-preexec.sh' $cyg_bash; then
+    #   printf "${CYAN}Installing preexecuting hook for dos2unix${normal}\n" 
+    #   wget https://raw.githubusercontent.com/rcaloras/bash-preexec/master/bash-preexec.sh -P $cyg_home 
+    #   mv $cyg_home/bash-preexec.sh $cyg_home/.bash-preexec.sh 
+    #   prmpt="[[ -f ~/.bash-preexec.sh ]] && source ~/.bash-preexec.sh
+    #   preexec() {
+    #    if [[ \"\$1\" =~ './' ]] && [[ \"\$1\" =~ '.sh' ]]; then
+    #            if grep -q './' \"\$(realpath \$(basename \$1))\"; then
+    #                    dos2unix < \$1 | sed 's/.*\.\/\(.*\)/dos2unix \1 \&\& \.\/\1/g' | sed 's/.*\.\ \(.*\)/dos2unix \1 \&\& . \1/g' | /bin/bash;
+    #            else
+    #                    dos2unix < \$1 | /bin/bash
+    #            fi
+    #        fi
+    #   }\n"
+    #   printf "$prmpt" >> $cyg_bash  
+    #   #printf "[[ -f ~/.bash-preexec.sh ]] && source ~/.bash-preexec.sh\npreexec() { test -f \$1 && dos2unix \$1; }\n" >> $cyg_bash         
+    #fi
 
     if test $win_bash_shell == 'Cygwin'; then
         source ~/.bashrc 

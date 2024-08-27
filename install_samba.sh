@@ -52,9 +52,9 @@ elif sudo grep -q "$drive" /etc/samba/smb.conf; then
     exit 1
 fi
 reade -Q "GREEN" -i "/mnt" -p "Mount point (path name): " -e mnt
-reade -Q "GREEN" -i "y" -p "Browseable: [Y/n]: " "y n" browse
-reade -Q "GREEN" -i "y" -p "Writeable: [Y/n]: " "y n" write
-reade -Q "GREEN" -i "y" -p "Public [Y/n]: " "y n" public
+reade -Q "GREEN" -i "y" -p "Browseable: [Y/n]: " "n" browse
+reade -Q "GREEN" -i "y" -p "Writeable: [Y/n]: " "n" write
+reade -Q "GREEN" -i "y" -p "Public [Y/n]: " "n" public
 reade -Q "GREEN" -i "0777" -p "Create file mask (Default: 0777): " "$wordcomp"  fmask
 reade -Q "GREEN" -i "0777" -p "Directory mask (Default: 0777): " "$wordcomp" dmask
 
@@ -97,13 +97,13 @@ printf "\n[$drive]
     Create mask=$fmask
     Directory mask=$dmask" | sudo tee -a /etc/samba/smb.conf &> /dev/null
 
-reade -Q "YELLOW" -i "y" -p "Edit /etc/samba/smb.conf [Y/n]: " "y n" edit
+reade -Q "YELLOW" -i "y" -p "Edit /etc/samba/smb.conf [Y/n]: " "n" edit
 if test "$edit" == "y"; then
     sudo $EDITOR /etc/samba/smb.conf
 fi
 
 reade -Q "GREEN" -i "$USER" -p "User $USER for login to drive? : " "$USER" usr
-reade -Q "GREEN" -i "y" -p "No password? (You will have to set it otherwise) [Y/n]: " "y n" nopswd
+reade -Q "GREEN" -i "y" -p "No password? (You will have to set it otherwise) [Y/n]: " "n" nopswd
 if ! test "$usr" ; then
     usr=$USER
 fi

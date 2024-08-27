@@ -17,7 +17,7 @@ if ! type update-system &> /dev/null; then
 fi
 
 if test -z $SYSTEM_UPDATED; then
-    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y n" updatesysm
+    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "n" updatesysm
     if test $updatesysm == "y"; then
         update-system                     
     fi
@@ -54,20 +54,20 @@ fi
 if test $machine == 'Mac' && type brew &> /dev/null; then
     brew install neovim
     if ! type xclip &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Install nvim clipboard? (xsel xclip) [Y/n]:" "y n" clip
+        reade -Q "GREEN" -i "y" -p "Install nvim clipboard? (xsel xclip) [Y/n]:" "n" clip
         if [ -z $clip ] || [ "y" == $clip ]; then
             brew install xsel xclip
             echo "${green} If this is for use with ssh on serverside, X11 needs to be forwarded"
             echo "${green} At clientside, 'ForwardX11 yes' also needs to be put in ~/.ssh/config under Host"
             echo "${green} Connection also need to start with -X flag (ssh -X ..@..)"
-            reade -Q "GREEN" -i "n" -p "Forward X11 in /etc/ssh/sshd.config? [Y/n]:" "y n" x11f
+            reade -Q "GREEN" -i "n" -p "Forward X11 in /etc/ssh/sshd.config? [Y/n]:" "n" x11f
             if [ -z $x11f ] || [ "y" == $x11f ]; then
                sudo sed -i 's|.X11Forwarding yes|X11Forwarding yes|g' /etc/ssh/sshd_config
             fi
         fi
     fi
     if ! type pylint &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Install nvim-python? [Y/n]:" "y n" pyscripts
+        reade -Q "GREEN" -i "y" -p "Install nvim-python? [Y/n]:" "n" pyscripts
         if [ -z $pyscripts ] || [ "y" == $pyscripts ]; then
             brew install python python-pynvim python-pipx
             pipx install pynvim 
@@ -75,14 +75,14 @@ if test $machine == 'Mac' && type brew &> /dev/null; then
         fi
     fi
     if ! type npm &> /dev/null || ! npm list -g | grep neovim &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Install nvim-javascript? [Y/n]:" "y n" jsscripts
+        reade -Q "GREEN" -i "y" -p "Install nvim-javascript? [Y/n]:" "n" jsscripts
         if [ -z $jsscripts ] || [ "y" == $jsscripts ]; then
             brew install npm nodejs
             sudo npm install -g neovim
         fi
     fi
     if ! type gem &> /dev/null || ! gem list | grep neovim &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Install nvim-ruby? [Y/n]:" "y n" rubyscripts
+        reade -Q "GREEN" -i "y" -p "Install nvim-ruby? [Y/n]:" "n" rubyscripts
         if [ -z $rubyscripts ] || [ "y" == $rubyscripts ]; then
             brew install ruby
             rver=$(echo $(ruby --version) | awk '{print $2}' | cut -d. -f-2)'.0'
@@ -101,7 +101,7 @@ if test $machine == 'Mac' && type brew &> /dev/null; then
         fi
     fi
     if ! type cpan &> /dev/null || ! cpan -l 2> /dev/null | grep Neovim::Ext &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Install nvim-perl? [Y/n]:" "y n" perlscripts
+        reade -Q "GREEN" -i "y" -p "Install nvim-perl? [Y/n]:" "n" perlscripts
         if [ -z $perlscripts ] || [ "y" == $perlscripts ]; then
             brew install cpanminus
             cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
@@ -113,7 +113,7 @@ if test $machine == 'Mac' && type brew &> /dev/null; then
         fi
     fi
     if ! type ctags &> /dev/null; then 
-        reade -Q "GREEN" -i "y" -p "Install ctags? [Y/n]:" "y n" ctags
+        reade -Q "GREEN" -i "y" -p "Install ctags? [Y/n]:" "n" ctags
         if  [ "y" == $ctags ]; then
             brew install ctags
         fi
@@ -124,20 +124,20 @@ elif test $distro == "Arch" || test $distro == "Manjaro"; then
         sudo pacman -S neovim 
     fi
     if ! type xclip &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Install nvim clipboard? (xsel xclip) [Y/n]:" "y n" clip
+        reade -Q "GREEN" -i "y" -p "Install nvim clipboard? (xsel xclip) [Y/n]:" "n" clip
         if [ -z $clip ] || [ "y" == $clip ]; then
             sudo pacman -S xsel xclip
             echo "${green} If this is for use with ssh on serverside, X11 needs to be forwarded"
             echo "${green} At clientside, 'ForwardX11 yes' also needs to be put in ~/.ssh/config under Host"
             echo "${green} Connection also need to start with -X flag (ssh -X ..@..)"
-            reade -Q "GREEN" -i "n" -p "Forward X11 in /etc/ssh/sshd.config? [Y/n]:" "y n" x11f
+            reade -Q "GREEN" -i "n" -p "Forward X11 in /etc/ssh/sshd.config? [Y/n]:" "n" x11f
             if [ -z $x11f ] || [ "y" == $x11f ]; then
                sudo sed -i 's|.X11Forwarding yes|X11Forwarding yes|g' /etc/ssh/sshd_config
             fi
         fi
     fi
     if ! type pylint &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Install nvim-python? [Y/n]:" "y n" pyscripts
+        reade -Q "GREEN" -i "y" -p "Install nvim-python? [Y/n]:" "n" pyscripts
         if [ -z $pyscripts ] || [ "y" == $pyscripts ]; then
             sudo pacman -S python python-pynvim python-pipx
             pipx install pynvim 
@@ -145,14 +145,14 @@ elif test $distro == "Arch" || test $distro == "Manjaro"; then
         fi
     fi
     if ! type npm &> /dev/null || ! npm list -g | grep neovim &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Install nvim-javascript? [Y/n]:" "y n" jsscripts
+        reade -Q "GREEN" -i "y" -p "Install nvim-javascript? [Y/n]:" "n" jsscripts
         if [ -z $jsscripts ] || [ "y" == $jsscripts ]; then
             sudo pacman -S npm nodejs
             sudo npm install -g neovim
         fi
     fi
     if ! type gem &> /dev/null || ! gem list | grep neovim &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Install nvim-ruby? [Y/n]:" "y n" rubyscripts
+        reade -Q "GREEN" -i "y" -p "Install nvim-ruby? [Y/n]:" "n" rubyscripts
         if [ -z $rubyscripts ] || [ "y" == $rubyscripts ]; then
             sudo pacman -S ruby
             rver=$(echo $(ruby --version) | awk '{print $2}' | cut -d. -f-2)'.0'
@@ -171,7 +171,7 @@ elif test $distro == "Arch" || test $distro == "Manjaro"; then
         fi
     fi
     if ! type cpan &> /dev/null || ! cpan -l 2> /dev/null | grep Neovim::Ext &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Install nvim-perl? [Y/n]:" "y n" perlscripts
+        reade -Q "GREEN" -i "y" -p "Install nvim-perl? [Y/n]:" "n" perlscripts
         if [ -z $perlscripts ] || [ "y" == $perlscripts ]; then
             sudo pacman -S cpanminus
             cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
@@ -183,7 +183,7 @@ elif test $distro == "Arch" || test $distro == "Manjaro"; then
         fi
     fi
     if ! type ctags &> /dev/null; then 
-        reade -Q "GREEN" -i "y" -p "Install ctags? [Y/n]:" "y n" ctags
+        reade -Q "GREEN" -i "y" -p "Install ctags? [Y/n]:" "n" ctags
         if  [ "y" == $ctags ]; then
             sudo pacman -S ctags
         fi
@@ -320,7 +320,7 @@ elif [  $distro_base == "Debian" ];then
             echo "${green} If this is for use with ssh on serverside, X11 needs to be forwarded"
             echo "${green} At clientside, 'ForwardX11 yes' also needs to be put in ~/.ssh/config under Host"
             echo "${green} Connection also need to start with -X flag (ssh -X ..@..)"
-            reade -Q "GREEN" -i "n" -p "Forward X11 in /etc/ssh/sshd.config? [Y/n]:" "y n" x11f
+            reade -Q "GREEN" -i "n" -p "Forward X11 in /etc/ssh/sshd.config? [Y/n]:" "n" x11f
             if [ -z $x11f ] || [ "y" == $x11f ]; then
                sudo sed -i 's|.X11Forwarding yes|X11Forwarding yes|g' /etc/ssh/sshd_config
             fi
@@ -563,7 +563,7 @@ vimsh(){
 }
 yes_edit_no vimsh "$dir/vim_nvim.sh $dir1/vim_nvim" "Install vim aliases at ~/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)? " "edit" "GREEN"
 
-reade -Q "GREEN" -i "n" -p "Install nvimpager? [N/y]: " "y n" vimrc 
+reade -Q "GREEN" -i "n" -p "Install nvimpager? [N/y]: " "n" vimrc 
 if [ -z "$vimrc" ] || [ "$vimrc" == "y" ]; then
     if ! test -f install_nvimpager.sh; then
          eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nvimpager.sh)" 

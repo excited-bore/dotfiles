@@ -14,7 +14,10 @@ if test -z $TMPDIR; then
     TMPDIR=$(mktemp -d)
 fi
 
+pthdos2unix=""
 if test $machine == 'Windows'; then 
+   # https://stackoverflow.com/questions/13701218/windows-path-to-posix-path-conversion-in-bash 
+   pthdos2unix="| sed 's/\\\/\\//g' | sed 's/://' | sed 's/^/\\//g'"
    wmic=$(wmic os get OSArchitecture | awk 'NR>1 {print}')
    if [[ $wmic =~ '64' ]]; then
        export ARCH_WIN='64'
@@ -58,6 +61,19 @@ if test -z $EDITOR; then
     else
         EDITOR=edit
     fi
+fi
+
+if type whereis &> /dev/null; then
+    function where_cmd() { 
+        eval "whereis $1 $pthdos2unix" | awk '{print $2;}'; 
+    } 
+elif type where &> /dev/null; then
+    function where_cmd() { 
+        eval "where $1 $pthdos2unix"; 
+    } 
+else
+    printf "Can't find a 'where' command (whereis/where)\n"
+    exit 1 
 fi
 
 
@@ -216,7 +232,7 @@ do
             AUR_install="none"
         else
             printf "Your Arch system seems to have no (known) AUR helper installed\n"
-            reade -Q "GREEN" -i "y" -p "Install pikaur ( Pacman wrapper )? [Y/n]: " "y n" insyay
+            reade -Q "GREEN" -i "y" -p "Install pikaur ( Pacman wrapper )? [Y/n]: " "n" insyay
             if [ "y" == "$insyay" ]; then 
                 if ! test -f ../AUR_installers/install_pikaur.sh; then
                     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/AUR_installers/install_pikaur.sh)" 

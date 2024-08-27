@@ -13,14 +13,14 @@ if ! type update-system &> /dev/null; then
 fi
 
 if test -z $SYSTEM_UPDATED; then
-    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y n" updatesysm
+    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "n" updatesysm
     if test $updatesysm == "y"; then
         update-system                     
     fi
 fi
 
 if ! type bashtop &> /dev/null && ! type bpytop &> /dev/null && ! type btop &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Install bashtop / btop / bpytop? [Y/n]: " "y n" sym2
+    reade -Q "GREEN" -i "y" -p "Install bashtop / btop / bpytop? [Y/n]: " "n" sym2
     if test "$sym2" == "y"; then
         reade -Q "GREEN" -i "btop" -p "Which one? [Btop/bpytop/bashtop]: " "bpytop bashtop" sym2
         if test "$sym2" == "btop"; then
