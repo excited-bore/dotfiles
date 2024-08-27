@@ -542,14 +542,26 @@ alias locales-list-enabled="locale -a"
 # https://askubuntu.com/questions/76808/how-do-i-use-variables-in-a-sed-command
 # https://stackoverflow.com/questions/18439528/sed-insert-line-with-spaces-to-a-specific-line    
 
-# Set an escape character \ before each space
-
+# Escape pathnames to files and dirs properly before putting them on the prompt
 function print-path-to-prompt(){
-    fls=$(echo "$@" | sed 's/ /\\ /g') 
+    lines="n"
+    while getopts ':l' flag; do
+        case "${flag}" in
+            l)  lines="y"
+                shift 
+                ;;
+        esac
+    done && OPTIND=1;
+    fls=$(echo "$@" | sed 's| |\\ |g' | sed 's|\[|\\\[|g' | sed 's|\]|\\\]|g' | sed 's|(|\\(|g' | sed 's|)|\\)|g' | sed 's|{|\\{|g' | sed 's|}|\\}|g')
+    if test $lines == 'n'; then
+        fls="$(echo $fls | tr "\n" ' ')"
+    fi
     READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$fls${READLINE_LINE:$READLINE_POINT}"
     READLINE_POINT=$(( READLINE_POINT + ${#fls} ))
+    unset lines fls 
 }
 
+# Set an escape character \ before each space
 function escape_spaces(){
      sed 's/ /\\ /g' <<< $@; 
 }
