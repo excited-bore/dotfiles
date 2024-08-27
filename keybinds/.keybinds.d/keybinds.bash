@@ -384,9 +384,6 @@ if type lazygit &> /dev/null; then
     bind -m vi-insert      '"\eOR": "\202\n\C-l"'
 fi
 
-# F3 - FuzzyFinderls -l | fzf --preview="echo user={3} when={-4..-2}; cat {-1}" --header-lines=1 (file explorer)
-#bind -x '"\eOR": ctrl-s'
-
 # F5, Ctrl-r - Reload .bashrc
 bind '"\205": re-read-init-file'
 bind -x '"\206": source ~/.profile && source ~/.bashrc'

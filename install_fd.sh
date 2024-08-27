@@ -31,3 +31,22 @@ if ! type fd &> /dev/null; then
         fi
     fi
 fi
+
+# TODO: Make better check: https://github.com/sharkdp/fd
+if type fd-find &> /dev/null || type fd &> /dev/null; then
+    echo "${green}Fd can read from global gitignore file${normal}"
+    reade -Q "GREEN" -i "n" -p "Generate global gitignore using 'themed' templates? (https://github.com/github/gitignore) [N/y]: " "y" fndgbl
+    if [ $fndgbl == 'y' ]; then
+        if ! test -f install_gitignore.sh; then
+            b=$(mktemp)
+            curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_gitignore.sh | tee "$b" &> /dev/null
+            chmod u+x "$b"
+            eval "$b" "global"
+            unset b
+        else
+            ./install_gitignore.sh "global"
+        fi 
+    fi
+fi
+
+
