@@ -32,25 +32,26 @@ if grep -q '~/.pathvariables.env' ~/.bashrc; then
     else
         printf "\n[ -f ~/.pathvariables.env ] && source ~/.pathvariables.env\n\n" >> ~/.bashrc
     fi
-    printf '\[\[ \-f \~/.bash_preexec \]\] \&\& source ~/.bash_preexec' >> ~/.bashrc 
 fi
 
 if test -d /root/; then
     reade -Q 'GREEN' -i 'y' -p 'Install pre-execution hooks for /root as well? [Y/n]: ' bash_r
     if test $bash_r == 'y'; then
+        if ! test -f /root/.bash_preexec.sh; then
+            sudo wget https://raw.githubusercontent.com/rcaloras/bash-preexec/master/bash-preexec.sh -o /root/.bash_preexec 
+        fi
         if sudo grep -q '/root/.pathvariables.env' /root/.bashrc; then
             if sudo grep -q "[ -f /root/.pathvariables.env ]" /root/.bashrc; then
-                 sed -i 's|\(\[ -f /root/.pathvariables.env \] \&\& source \/root/.pathvariables.env\)|\[ -f /root/.bash_preexec \] \&\& source /root/.bash_preexec\n\1\n\n|g' /root/.bashrc
-            elif grep -q "[ -f /root/.bash_completion ]" /root/.bashrc; then
-                 sed -i 's|\(\[ -f /root/.bash_completion \] \&\& source \/root/.bash_completion\)|\[ -f /root/.bash_preexec \] \&\& source /root/.bash_preexec\n\n\1\n|g' /root/.bashrc
-            elif grep -q "[ -f /root/.bash_aliases ]" /root/.bashrc; then
-                 sed -i 's|\(\[ -f /root/.bash_aliases \] \&\& source \/root/.bash_aliases\)|\[ -f /root/.bash_preexec \] \&\& source /root/.bash_preexec\n\n\1\n|g' /root/.bashrc
-            elif grep -q "[ -f /root/.keybinds ]" /root/.bashrc; then
-                 sed -i 's|\(\[ -f /root/.keybinds \] \&\& source \/root/.keybinds\)|\[ -f /root/.bash_preexec \] \&\& source /root/.bash_preexec\n\n\1\n|g' /root/.bashrc
+               sudo sed -i 's|\(\[ -f /root/.pathvariables.env \] \&\& source \/root/.pathvariables.env\)|\[ -f /root/.bash_preexec \] \&\& source /root/.bash_preexec\n\1\n\n|g' /root/.bashrc
+            elif sudo grep -q "[ -f /root/.bash_completion ]" /root/.bashrc; then
+                 sudo sed -i 's|\(\[ -f /root/.bash_completion \] \&\& source \/root/.bash_completion\)|\[ -f /root/.bash_preexec \] \&\& source /root/.bash_preexec\n\n\1\n|g' /root/.bashrc
+            elif sudo grep -q "[ -f /root/.bash_aliases ]" /root/.bashrc; then
+                 sudo sed -i 's|\(\[ -f /root/.bash_aliases \] \&\& source \/root/.bash_aliases\)|\[ -f /root/.bash_preexec \] \&\& source /root/.bash_preexec\n\n\1\n|g' /root/.bashrc
+            elif sudo grep -q "[ -f /root/.keybinds ]" /root/.bashrc; then
+                 sudo sed -i 's|\(\[ -f /root/.keybinds \] \&\& source \/root/.keybinds\)|\[ -f /root/.bash_preexec \] \&\& source /root/.bash_preexec\n\n\1\n|g' /root/.bashrc
             else
-                printf "\n[ -f /root/.pathvariables.env ] && source /root/.pathvariables.env\n\n" >> /root/.bashrc
+                printf "\n[ -f /root/.pathvariables.env ] && source /root/.pathvariables.env\n\n" | sudo tee -a /root/.bashrc
             fi
-            printf '\[\[ \-f \/root/.bash_preexec \]\] \&\& source /root/.bash_preexec' >> /root/.bashrc 
         fi
     fi
     unset bash_r 
