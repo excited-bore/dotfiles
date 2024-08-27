@@ -81,8 +81,7 @@ reade(){
             ;;
         esac
     done && OPTIND=1;
-    git_bash=[[ $(uname -s) =~ 'MINGW' ]] && ! type pacman &> /dev/null
-    if ! type rlwrap &> /dev/null || test "$fcomp" == 'y' || $git_bash ; then 
+    if ! type rlwrap &> /dev/null || test "$fcomp" == 'y' || [[ $(uname -s) =~ 'MINGW' ]] && ! type pacman &> /dev/null; then
         readstr="read  ";
         color=""
         while getopts ':b:e:i:p:Q:s:S:' flag; do
