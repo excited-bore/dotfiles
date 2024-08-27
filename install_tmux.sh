@@ -162,7 +162,7 @@ unset tmuxx
 
 
 #if [ "$(which ranger)" != "" ]; then
-#    reade -Q "GREEN" -i "y" -p "Install ranger tmux plugin? (ranger_tmux) [Y/n]:" "y n"  tmuxx
+#    reade -Q "GREEN" -i "y" -p "Install ranger tmux plugin? (ranger_tmux) [Y/n]:" "n"  tmuxx
 #    if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
 #        if [ ! -x "$(command -v pip)" ]; then
 #            if test $distro == "Arch" || test $distro == "Manjaro"; then
@@ -188,7 +188,7 @@ unset tmuxx
 #            echo "set tmux_cwd_track true" >> ~/.config/ranger/rc.conf
 #        fi
 #        
-#        reade -Q "GREEN" -i "y" -p 'Set ranger-tmux shortcut from  Bspace  to  \\`  ?  [Y/n]:' "y n"  tmuxx
+#        reade -Q "GREEN" -i "y" -p 'Set ranger-tmux shortcut from  Bspace  to  \\`  ?  [Y/n]:' "n"  tmuxx
 #        if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
 #            sed -i 's|Bspace run-shell -b|\` run-shell -b|g'  ~/.tmux.conf 
 #        fi

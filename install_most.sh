@@ -40,7 +40,7 @@ if [ ! -x "$(command -v most)" ]; then
 fi
 
 most=$(whereis most)
-reade -Q "GREEN" -i "y" -p "Set most default pager for $USER? [Y/n]: " "y n" most_usr
+reade -Q "GREEN" -i "y" -p "Set most default pager for $USER? [Y/n]: " "n" most_usr
 if [ "y" == "$most_usr" ]; then
     if grep -q "MOST" $PATHVAR; then 
         sed -i "s|.export MOST_SWITCHES=|export MOST_SWITCHES=|g" $PATHVAR 
@@ -55,7 +55,7 @@ if [ "y" == "$most_usr" ]; then
     fi
 fi
     
-reade -Q "YELLOW" -i "y" -p "Set most default pager for root? [Y/n]: " "y n" most_root
+reade -Q "YELLOW" -i "y" -p "Set most default pager for root? [Y/n]: " "n" most_root
 if [ "y" == "$most_root" ]; then
     if sudo grep -q "MOST" $PATHVAR_R; then
         sudo sed -i "s|.export MOST_SWITCHES=.*|export MOST_SWITCHES=.*|g" $PATHVAR_R 

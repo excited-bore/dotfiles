@@ -12,7 +12,7 @@ if ! type update-system &> /dev/null; then
     fi
     update-system
 else
-    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y n" updatesysm
+    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "n" updatesysm
     if test $updatesysm == "y"; then
         update-system                     
     fi

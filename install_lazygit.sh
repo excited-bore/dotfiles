@@ -20,7 +20,7 @@ if ! type update-system &> /dev/null; then
 fi
 
 if test -z $SYSTEM_UPDATED; then
-    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y n" updatesysm
+    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "n" updatesysm
     if test $updatesysm == "y"; then
         update-system                     
     fi
@@ -28,7 +28,7 @@ fi
 
 
 if ! type lazygit &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Install lazygit? (Git gui) [Y/n]: " "y n" nstll
+    reade -Q "GREEN" -i "y" -p "Install lazygit? (Git gui) [Y/n]: " "n" nstll
     if [ "$nstll" == "y" ]; then
         if test $distro == "Arch" || test $distro == "Manjaro"; then
             sudo pacman -S lazygit
@@ -48,7 +48,7 @@ if ! type lazygit &> /dev/null; then
 fi
 
 if ! type copy-to &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Install copy-to? [Y/n]: " "y n" cpcnf;
+    reade -Q "GREEN" -i "y" -p "Install copy-to? [Y/n]: " "n" cpcnf;
     if [ "y" == "$cpcnf" ] || [ -z "$cpcnf" ]; then
         if ! test -f install_copy-to.sh; then
             /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_copy-to.sh)"
@@ -59,7 +59,7 @@ if ! type copy-to &> /dev/null; then
 fi
 
 if ! test -d ~/.bash_aliases.d/ || ! test -f ~/.bash_aliases.d/lazygit.sh || (test -f ~/.bash_aliases.d/lazygit.sh && ! grep -q "copy-to" ~/.bash_aliases.d/lazygit.sh); then
-    reade -Q "GREEN" -i "y" -p "Set up an alias so copy-to does a 'run all' when starting up lazygit? [Y/n]: " "y n" nstll
+    reade -Q "GREEN" -i "y" -p "Set up an alias so copy-to does a 'run all' when starting up lazygit? [Y/n]: " "n" nstll
     if [ "$nstll" == "y" ]; then
         if ! test -f checks/check_aliases_dir.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)" 

@@ -295,7 +295,7 @@ if [ "$tree" == "y" ]; then
 fi
 unset tree
 
-# reade -Q "GREEN" -i "y" -p "Change Alt-C shortcut to Ctrl-S for fzf cd? [Y/n]:" "y n" fzf_t
+# reade -Q "GREEN" -i "y" -p "Change Alt-C shortcut to Ctrl-S for fzf cd? [Y/n]:" "n" fzf_t
 # if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ]; then 
 #     sed -i 's|# ALT-C - cd into the selected directory|# CTRL-S - cd into the selected directory|g' ~/.fzf/shell/key-bindings.bash
 #     sed -i 's|\\ec|\\C-s|g'  ~/.fzf/shell/key-bindings.bash

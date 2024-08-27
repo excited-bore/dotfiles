@@ -20,24 +20,6 @@ if ! test -f $pathvr; then
     pathvr=$TMPDIR/.pathvariables.env
 fi
 
-pthcvrt=""
-if test $machine == 'Windows'; then
-    pthcvrt="| sed 's/\\\/\\//g' | sed 's/://' | sed 's/^/\\//g'"
-fi
-
-if type whereis &> /dev/null; then
-    function where_cmd() { 
-        eval "whereis $1 $pthcvrt" | awk '{print $2;}'; 
-    } 
-elif type where &> /dev/null; then
-    function where_cmd() { 
-        eval "where $1 $pthcvrt"; 
-    } 
-else
-    printf "Can't find a 'where' command (whereis/where)\n"
-    exit 1 
-fi
-
 pre='y'
 othr='n'
 color='GREEN'
@@ -74,7 +56,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
     sed 's|#export TMPDIR|export TMPDIR|' -i $pathvr
 
     # Package Managers
-    #reade -Q "YELLOW" -i "y" -p "Check and create DIST,DIST_BASE,ARCH,PM and WRAPPER? (distro, distro base, architecture, package manager and pm wrapper) [Y/n]:" "y n" Dists
+    #reade -Q "YELLOW" -i "y" -p "Check and create DIST,DIST_BASE,ARCH,PM and WRAPPER? (distro, distro base, architecture, package manager and pm wrapper) [Y/n]:" "n" Dists
     #if [ "$Dists" == "y" ]; then
     #   printf "NOT YET IMPLEMENTED\n"
     #fi
@@ -159,7 +141,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
     unset prmpt
     
     if type nvim &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Set Neovim as MANPAGER? [Y/n]: " "y n" manvim
+        reade -Q "GREEN" -i "y" -p "Set Neovim as MANPAGER? [Y/n]: " "n" manvim
         if [ "$manvim" == "y" ]; then
            sed -i 's|.export MANPAGER=.*|export MANPAGER='\''nvim +Man!'\''|g' $pathvr 
         fi
@@ -210,6 +192,9 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         # Redirect output to file in subshell (mimeopen gives output but also starts read. This cancels read). In tmp because that gets cleaned up
         (echo "" | mimeopen -a editor-check.sh &> $TMPDIR/editor-outpt)
         compedit="nano $(cat $TMPDIR/editor-outpt | awk 'NR > 2' | awk '{if (prev_1_line) print prev_1_line; prev_1_line=prev_line} {prev_line=$NF}' | sed 's|[()]||g' | tr -s [:space:] \\n | uniq | tr '\n' ' ') $editors"
+        if type code &> /dev/null; then
+            compedit="$compedit code"
+        fi
         compedit="$(echo $compedit | tr ' ' '\n' | sort -u)"
 
         prmpt="Found visual editors using ${CYAN}mimeopen${normal} (non definitive list): ${GREEN}\n"
@@ -263,9 +248,9 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
     if type nmcli &> /dev/null; then
         addr=$(nmcli device show | grep IP4.ADDR | awk 'NR==1{print $2}'| sed 's|\(.*\)/.*|\1|')
     fi
-    #reade -Q "GREEN" -i "n" -p "Set DISPLAY to ':$(addr).0'? [Y/n]:" "y n" dsply
+    #reade -Q "GREEN" -i "n" -p "Set DISPLAY to ':$(addr).0'? [Y/n]:" "n" dsply
     if [[ $- =~ i ]] && [[ -n "$SSH_TTY" ]]; then
-        reade -Q "YELLOW" -i "n" -p "Detected shell is SSH. For X11, it's more reliable performance to dissallow shared clipboard (to prevent constant hanging). Set DISPLAY to 'localhost:10.0'? [Y/n]:" "y n" dsply
+        reade -Q "YELLOW" -i "n" -p "Detected shell is SSH. For X11, it's more reliable performance to dissallow shared clipboard (to prevent constant hanging). Set DISPLAY to 'localhost:10.0'? [Y/n]:" "n" dsply
         if [ "$dsply" == "y" ] || [ -z "$dsply" ]; then
             sed -i "s|.export DISPLAY=.*|export DISPLAY=\"localhost:10.0\"|" $pathvr
         fi
@@ -466,7 +451,9 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
             if test -f ~/.bashrc && ! grep -q "~/.pathvariables.env" ~/.bashrc; then
                 reade -Q 'GREEN' -i 'y' -p "Source $HOME/.pathvariables.env in $HOME/.bashrc? [Y/n]: " 'n' bashrc
                 if test $bashrc == 'y'; then 
-                    if grep -q "[ -f ~/.bash_completion ]" ~/.bashrc; then
+                    if grep -q "[ -f ~/.bash_preexec ]" ~/.bashrc; then
+                         sed -i 's|\(\[ -f ~/.bash_preexec \] \&\& source \~/.bash_preexec\)|\n\1\n\[ -f \~/.pathvariables.env \] \&\& source \~/.pathvariables.env\n|g' ~/.bashrc
+                    elif grep -q "[ -f ~/.bash_completion ]" ~/.bashrc; then
                          sed -i 's|\(\[ -f ~/.bash_completion \] \&\& source \~/.bash_completion\)|\[ -f \~/.pathvariables.env \] \&\& source \~/.pathvariables.env\n\n\1\n|g' ~/.bashrc
                     elif grep -q "[ -f ~/.bash_aliases ]" ~/.bashrc; then
                          sed -i 's|\(\[ -f ~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\[ -f \~/.pathvariables.env \] \&\& source \~/.pathvariables.env\n\n\1\n|g' ~/.bashrc

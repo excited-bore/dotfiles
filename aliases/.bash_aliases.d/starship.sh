@@ -3,7 +3,7 @@ if ! type reade &> /dev/null && test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh; 
 fi
 
 function starship-presets() {
-    ansr=$(starship preset --list | head -n -1 | fzf --reverse);
+    ansr=$(starship preset --list | head -n -1 | fzf --reverse --height 30%);
     starship preset "$ansr" -o ~/.config/starship.toml
     local hmdir
     reade -Q 'GREEN' -i 'y' -p "Set '~' to '$HOME'? [Y/n]: " "y n" hmdir

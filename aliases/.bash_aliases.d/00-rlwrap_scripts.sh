@@ -81,7 +81,11 @@ reade(){
             ;;
         esac
     done && OPTIND=1;
-    if ! type rlwrap &> /dev/null || test "$fcomp" == 'y' || [[ $(uname -s) =~ 'MINGW' ]] && ! type pacman &> /dev/null; then
+    bash_rlwrap='y'
+    if [[ $(uname -s) =~ 'MINGW' ]] && ! type pacman &> /dev/null; then
+        bash_rlwrap='n'
+    fi
+    if ! type rlwrap &> /dev/null || test "$fcomp" == 'y' || test $bash_rlwrap == 'n' ; then
         readstr="read  ";
         color=""
         while getopts ':b:e:i:p:Q:s:S:' flag; do
@@ -184,8 +188,9 @@ reade(){
         done
         OPTIND=1;
         value=$(eval $rlwstring);
-        eval "${@:$#:1}=$value" && rm $tmpf;
+        eval "${@:$#:1}=$value" && rm $tmpf &> /dev/null;
     fi
+    unset bash_rlwrap 
 }
 
 #reade -p "Usb ids" $(sudo lsusb | awk 'BEGIN { FS = ":" };{print $1;}')

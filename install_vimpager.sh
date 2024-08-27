@@ -12,7 +12,7 @@ if ! type update-system &> /dev/null; then
     fi
     update-system
 else
-    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y n" updatesysm
+    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "n" updatesysm
     if test $updatesysm == "y"; then
         update-system                     
     fi
@@ -50,7 +50,7 @@ if type nvimpager &> /dev/null; then
     fi
 fi
 
-reade -Q 'GREEN' -i 'y' -p "Set .vimrc as default vimpager read config for $USER? [Y/n]: " "y n" conf
+reade -Q 'GREEN' -i 'y' -p "Set .vimrc as default vimpager read config for $USER? [Y/n]: " "n" conf
 if test "$conf" == "y"; then
     if grep -q "VIMPAGER_RC" $PATHVAR; then 
         sed -i "s|.export VIMPAGER_RC=|export VIMPAGER_RC=|g" $PATHVAR
@@ -60,7 +60,7 @@ if test "$conf" == "y"; then
     fi
 fi
 
-reade -Q "GREEN" -i "y" -p "Set vimpager as default pager for $USER? [Y/n]: " "y n" moar_usr
+reade -Q "GREEN" -i "y" -p "Set vimpager as default pager for $USER? [Y/n]: " "n" moar_usr
 if [ -z "$moar_usr" ] || [ "y" == "$moar_usr" ] || [ "Y" == "$moar_usr" ]; then
     if grep -q " PAGER=" $PATHVAR; then 
         sed -i "s|.export PAGER=|export PAGER=|g" $PATHVAR
@@ -70,7 +70,7 @@ if [ -z "$moar_usr" ] || [ "y" == "$moar_usr" ] || [ "Y" == "$moar_usr" ]; then
     fi
 fi
 
-reade -Q 'YELLOW' -i 'y' -p "Set .vimrc as default vimpager read config for root? [Y/n]: " "y n" conf
+reade -Q 'YELLOW' -i 'y' -p "Set .vimrc as default vimpager read config for root? [Y/n]: " "n" conf
 if test "$conf" == "y"; then
     if sudo grep -q "VIMPAGER_RC" $PATHVAR_R; then 
         sudo sed -i "s|.export VIMPAGER_RC=|export VIMPAGER_RC=|g" $PATHVAR_R
@@ -81,7 +81,7 @@ if test "$conf" == "y"; then
 fi
 
     
-reade -Q "YELLOW" -i "y" -p "Set vimpager default pager for root? [Y/n]: " "y n" moar_root
+reade -Q "YELLOW" -i "y" -p "Set vimpager default pager for root? [Y/n]: " "n" moar_root
 if [ -z "$moar_root" ] || [ "y" == "$moar_root" ] || [ "Y" == "$moar_root" ]; then
     if sudo grep -q " PAGER=" $PATHVAR_R; then
         sudo sed -i "s|.export PAGER=|export PAGER=|g" $PATHVAR_R

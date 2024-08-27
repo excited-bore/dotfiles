@@ -229,7 +229,19 @@ xresources() {
     cp -fv $xterm ~/.Xresources;
     yes_edit_no xresources_r "$xterm" "Install .Xresources at /root/?" "edit" "RED"; }
 yes_edit_no xresources "$xterm" "Install .Xresources at ~/? (Xterm configuration)" "edit" "YELLOW"
-    
+
+# Bash Preexec
+if ! test -f ~/.bash_preexec || ! test -f /root/.bash_preexec; then
+    reade -Q "GREEN" -i "y" -p "Install pre-execution hooks for bash in ~/.bash_preexec? [Y/n]: " "n" bash_preexec
+    if [ -z "$bash_preexec" ] || [ "y" == "$bash_preexec" ]; then
+        if ! test -f install_bash_preexec.sh; then
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bash_preexec.sh)" 
+        else
+            ./install_bash_preexec.sh
+        fi 
+    fi
+    unset bash_preexec
+fi
 
 if ! test -f checks/check_completions_dir.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)" 
@@ -239,7 +251,7 @@ fi
 
 
 # Bash alias completions
-if ! test -f ~/.bash_completion.d/complete_alias && ! test -f /root/.bash_completion.d/complete_alias; then
+if ! test -f ~/.bash_completion.d/complete_alias || ! test -f /root/.bash_completion.d/complete_alias; then
     reade -Q "GREEN" -i "y" -p "Install bash completions for aliases in ~/.bash_completion.d? [Y/n]: " "n" compl
     if [ -z "$compl" ] || [ "y" == "$compl" ]; then
         if ! test -f install_bashalias_completions.sh; then
@@ -397,7 +409,7 @@ fi
 unset pre color othr git_ins
 
 # Osc
-#reade -Q "GREEN" -i "y" -p "Install Osc52 clipboard? (Universal clipboard tool / works natively over ssh) [Y/n]: " "y n" osc
+#reade -Q "GREEN" -i "y" -p "Install Osc52 clipboard? (Universal clipboard tool / works natively over ssh) [Y/n]: " "n" osc
 #if [ -z $osc ] || [ "Y" == $osc ] || [ $osc == "y" ]; then
 #    ./install_osc.sh 
 #fi

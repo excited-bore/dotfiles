@@ -57,7 +57,7 @@ if ! type nvimpager &> /dev/null; then
     )
 fi
 
-reade -Q 'GREEN' -i 'y' -p 'Copy configuration from ~/.config/nvim/ to ~/.config/nvimpager/ ? [Y/n]: ' "y n" conf
+reade -Q 'GREEN' -i 'y' -p 'Copy configuration from ~/.config/nvim/ to ~/.config/nvimpager/ ? [Y/n]: ' "n" conf
 if test "$conf" == "y"; then
     if ! test -d ~/.config/nvimpager; then
         mkdir ~/.config/nvimpager
@@ -65,7 +65,7 @@ if test "$conf" == "y"; then
     cp -fv ~/.config/nvim/* ~/.config/nvimpager/ 
 fi
 
-reade -Q "GREEN" -i "y" -p "Set nvimpager as default pager for $USER? [Y/n]: " "y n" moar_usr
+reade -Q "GREEN" -i "y" -p "Set nvimpager as default pager for $USER? [Y/n]: " "n" moar_usr
 if [ -z "$moar_usr" ] || [ "y" == "$moar_usr" ] || [ "Y" == "$moar_usr" ]; then
     if grep -q "PAGER" $PATHVAR; then 
         sed -i "s|.export PAGER=|export PAGER=|g" $PATHVAR
@@ -75,7 +75,7 @@ if [ -z "$moar_usr" ] || [ "y" == "$moar_usr" ] || [ "Y" == "$moar_usr" ]; then
     fi
 fi
     
-reade -Q "YELLOW" -i "y" -p "Set nvimpager default pager for root? [Y/n]: " "y n" moar_root
+reade -Q "YELLOW" -i "y" -p "Set nvimpager default pager for root? [Y/n]: " "n" moar_root
 if [ -z "$moar_root" ] || [ "y" == "$moar_root" ] || [ "Y" == "$moar_root" ]; then
     if sudo grep -q "PAGER" $PATHVAR_R; then
         sudo sed -i "s|.export PAGER=|export PAGER=|g" $PATHVAR_R
