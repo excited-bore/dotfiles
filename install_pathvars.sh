@@ -134,7 +134,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
 
         # Set moar options
         sed -i 's/#export MOAR=/export MOAR=/' $pathvr
-        
+        echo $pgr2 
         if test "$(basename ""$pgr2"")" == "bat" && type moar &> /dev/null || test "$(basename ""$pgr2"")" == "bat" && type nvimpager &> /dev/null ; then
             pagers=""
             prmpt="${cyan}Bat is a pager wrapper that defaults to less except if BAT_PAGER is set\n\t${green}less = Default pager - Basic, archaic but very customizable\n"
