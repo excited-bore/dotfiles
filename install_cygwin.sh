@@ -51,7 +51,7 @@ if test $machine == 'Windows'; then
     printf "${GREEN}Done! ${normal} Don't forget ${cyan}right-click${normal} the terminal window, then ${MAGENTA}Options->Keys${magenta}(left bar)${normal} and check ${CYAN}'Ctrl+Shift+letter shortcuts'${normal} for ${GREEN}Ctrl+Shift+C for Copy and Ctrl+Shift+V for paste (after selecting with mouse)${normal} instead of ${YELLOW}Shift+Insert/Ctrl+Insert for Copy/Paste${normal}\n" 
      
     if test -d /c/cygwin$ARCH_WIN && ! test -d $cyg_home; then
-        printf "${RED}Test run Cygwin terminal first before running 'install_cygwin.sh' again because as for now there's no /c/cygwin$ARCH_WIN/home/$USER folder with cygwin generated bash-related files, so bash cannot be configured as of yet (there's also).${normal}\n${GREEN} It's wise to run(still need to run dos2unix on all files before we can use them and (potentially) install apt-cyg)${normal}\nThe script checks if something what it already has been installed and what not so you won't have to reconfigure.\n" 
+        printf "${RED}Test run Cygwin terminal first before running 'install_cygwin.sh' again (still need to install dos2unix and apt-cyg)${normal}\nThe script checks if something what it already has been installed and what not so you won't have to reconfigure.\n" 
         exit 1
     fi
 
