@@ -84,9 +84,10 @@ function update-system() {
     elif test "$packmang" == "apk"; then
         apk update
     elif test "$packmang" == "pacman"; then
-        sudo pacman -Syu
         if ! test -z "$AUR_helper" && ! test -z "$AUR_update"; then
             eval "$AUR_update"
+        else
+            sudo pacman -Syu
         fi
         hdrs="$(echo $(uname -r) | cut -d. -f-2)"
         hdrs="linux$(echo $(uname -r) | cut -d. -f-1)${hdrs: -1}-headers"
