@@ -33,12 +33,12 @@ if test $distro_base == "Debian"; then
     #    sudo apt update
     #    sudo apt install appimagelauncher
     #fi
-elif test $distro_base == "Arch"; then
-    if test -z "$(pacman -Q | grep libfuse2)"; then
-        reade -Q "YELLOW" -i "n" -p "A package called 'libfuse2' is necessary for Appimages, but it has been removed because it is outdated and vulnerable to a bunch of CVE's\n Still install libfuse2? [N/y]: " "y" inslibfuse
-        if [ "$inslibfuse" == "y" ]; then
-            sudo pacman -S libfuse2
-        fi
-    fi
+#elif test $distro_base == "Arch"; then
+#    if test -z "$(pacman -Q | grep libfuse2)"; then
+#        reade -Q "YELLOW" -i "n" -p "A package called 'libfuse2' is necessary for Appimages, but it has been removed because it is outdated and vulnerable to a bunch of CVE's\n Still install libfuse2? [N/y]: " "y" inslibfuse
+#        if [ "$inslibfuse" == "y" ]; then
+#            sudo pacman -S libfuse2
+#        fi
+#    fi
 fi
 
