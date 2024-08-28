@@ -20,6 +20,13 @@ fi
 
 update-system
 
+if ! test -f checks/check_pamac.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pamac.sh)" 
+else
+    . ./checks/check_pamac.sh
+fi
+
+
 if ! test -f checks/check_rlwrap.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_rlwrap.sh)" 
 else
@@ -81,9 +88,9 @@ if ! type AppImageLauncher &> /dev/null; then
      fi
 fi
 
-if ! type flatpak &> /dev/null; then
-   printf "%s\n" "${blue}No flatpak detected. (Independent package manager from Red Hat)${normal}"
-   reade -Q "GREEN" -i "y" -p "Install? [Y/n]: " "n" insflpk 
+#if ! type flatpak &> /dev/null; then
+   #printf "%s\n" "${blue}No flatpak detected. (Independent package manager from Red Hat)${normal}"
+   reade -Q "GREEN" -i "y" -p "Install (or just configure) Flatpak? [Y/n]: " "n" insflpk 
    if [ "y" == "$insflpk" ]; then
        if ! test -f install_flatpak.sh; then
            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_flatpak.sh)" 
@@ -91,7 +98,7 @@ if ! type flatpak &> /dev/null; then
            ./install_flatpak.sh 
        fi 
    fi
-fi
+#fi
 unset insflpk
 
 if ! type snap &> /dev/null; then
