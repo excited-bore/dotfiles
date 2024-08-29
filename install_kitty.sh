@@ -70,7 +70,7 @@ fi
 reade -Q "GREEN" -i "y" -p "Install kitty conf? (at ~/.config/kitty/kitty.conf\|ssh.conf) [Y/n]:" "n" kittn
 if [ "y" == "$kittn" ]; then
     mkdir -p ~/.config/kitty
-    cp -bvf $dir/kitty.conf $dir/kitty.conf
+    cp -bvf $dir/kitty.conf ~/.config/kitty/kitty.conf
     if [ -f ~/.config/kitty/kitty.conf~ ]; then
         gio trash $dir/kitty.conf~
     fi

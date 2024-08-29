@@ -563,12 +563,14 @@ vimsh(){
 }
 yes_edit_no vimsh "$dir/vim_nvim.sh $dir1/vim_nvim" "Install vim aliases at ~/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)? " "edit" "GREEN"
 
-reade -Q "GREEN" -i "n" -p "Install nvimpager? [N/y]: " "n" vimrc 
-if [ -z "$vimrc" ] || [ "$vimrc" == "y" ]; then
-    if ! test -f install_nvimpager.sh; then
-         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nvimpager.sh)" 
-    else
-        ./install_nvimpager.sh
+if ! type nvimpager &> /dev/null; then
+    reade -Q "YELLOW" -i "n" -p "Install nvimpager? [N/y]: " "n" vimrc 
+    if [ -z "$vimrc" ] || [ "$vimrc" == "y" ]; then
+        if ! test -f install_nvimpager.sh; then
+             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nvimpager.sh)" 
+        else
+            ./install_nvimpager.sh
+        fi
     fi
 fi
 unset vimrc dir dir1 tmpdir tmpdir1
