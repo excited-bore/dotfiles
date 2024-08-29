@@ -25,6 +25,11 @@ if type lazygit &> /dev/null && type copy-to &> /dev/null; then
     alias lazygit="copy-to run && lazygit"
 fi
 
+# Discord and discord overlay
+if type discord &> /dev/null && type discover-overlay &> /dev/null; then
+    alias discord="discover-overlay && discord"
+fi
+
 #alias mullvad-sessions="mullvad-exclude thunderbird; mullvad-exclude ferdium; mullvad connect"
 
 # Mullvad

@@ -87,6 +87,104 @@ if type fd-find &> /dev/null || type fd &> /dev/null; then
     fnd="fd"
 fi
 
+# BAT
+if ! type bat &> /dev/null; then
+    reade -Q "GREEN" -i "y" -p "Install bat? (File previews/thumbnails for riflesearch) [Y/n]: " "n" bat
+    if [ "$bat" == "y" ]; then
+        if ! test -f install_bat.sh; then
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bat.sh)" 
+        else
+            ./install_bat.sh
+        fi
+    fi
+    unset bat 
+fi
+
+# TREE
+if ! type tree &> /dev/null; then
+    reade -Q "GREEN" -i "y" -p "Install tree? (Builtin cd shortcut gets a nice directory tree preview ) [Y/n]: " "n" tree
+    if [ "$tree" == "y" ]; then
+        if ! test -f install_tree.sh; then
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_tree.sh)" 
+        else
+            ./install_tree.sh
+        fi
+    fi
+    unset tree
+fi
+
+#TODO: fzf-rifle.sh still has ffmpegthumbnailer part (could use sed check)
+if ! type ffmpegthumbnailer &> /dev/null; then 
+    reade -Q "GREEN" -i "y" -p "Install ffmpegthumbnailer? (Video thumbnails for riflesearch) [Y/n]: " "n" ffmpg
+    if [ "$ffmpg" == "y" ]; then
+        if ! test -f install_ffmpegthumbnailer.sh; then
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ffmpegthumbnailer.sh)" 
+        else
+            ./install_ffmpegthumbnailer.sh
+        fi 
+    fi
+    unset ffmpg
+fi
+
+# RIPGREP
+# TODO: Check export for ripgrep
+# TODO: Do more with ripgrep
+if ! type rg &> /dev/null; then
+     reade -Q "GREEN" -i "y" -p "Install ripgrep? (Recursive grep, opens possibility for line by line fzf ) [Y/n]: " "n" rpgrp
+     if [ -z $rpgrp ] || [ "Y" == $rpgrp ] || [ $rpgrp == "y" ]; then
+        if ! test -f install_ripgrep.sh; then
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ripgrep.sh)" 
+        else
+            ./install_ripgrep.sh
+        fi
+        if [ $PATHVAR == ~/.pathvariables.env ] ; then
+            sed -i 's|#export RG_PREFIX|export RG_PREFIX|g' $PATHVAR
+        elif ! grep -q "export RG_PREFIX" $PATHVAR; then
+            printf "\n# RIPGREP\nexport RG_PREFIX='rg --column --line-number --no-heading --color=always --smart-case \"" >> $PATHVAR &> /dev/null
+        fi
+        if [ $PATHVAR_R == /root/.pathvariables.env ] ; then
+            sudo sed -i 's|#export RG_PREFIX|export RG_PREFIX|g' $PATHVAR_R
+        elif ! sudo grep -q "export RG_PREFIX" $PATHVAR_R; then
+             printf "\n# RIPGREP\nexport RG_PREFIX='rg --column --line-number --no-heading --color=always --smart-case \"" | sudo tee -a $PATHVAR_R
+        fi
+        
+        reade -Q "GREEN" -i "y" -p "Add shortcut for ripgrep files in dir? (Ctrl-g) [Y/n]: " "n" rpgrpdir
+        if [ -z $rpgrp ] || [ "Y" == $rpgrp ] || [ $rpgrp == "y" ]; then
+            if ! test -f fzf/.bash_aliases.d/ripgrep-directory.sh; then
+                wget -O ~/.bash_aliases.d/ripgrep-directory.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/.bash_aliases.d/ripgrep-directory.sh
+            else
+                cp -fv fzf/.bash_aliases.d/ripgrep-directory.sh ~/.bash_aliases.d/
+            fi
+        fi
+     fi
+    unset rpgrp rpgrpdir
+fi
+
+
+# XCLIP
+if ! type xclip &> /dev/null; then 
+    reade -Q "GREEN" -i "y" -p "Install xclip? (Clipboard tool for Ctrl-R/Reverse history shortcut) [Y/n]: " "n" xclip
+    if [ "$xclip" == "y" ]; then
+        if ! test -f install_xclip.sh; then
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_xclip.sh)" 
+        else
+            ./install_xclip.sh
+        fi
+    fi
+    if [ $PATHVAR == ~/.pathvariables.env ] ; then
+        sed -i 's|#export FZF_CTRL_R_OPTS=|export FZF_CTRL_R_OPTS=|g' $PATHVAR
+    elif ! grep -q "export FZF_CTRL_R_OPTS=" $PATHVAR; then
+        printf "\nexport FZF_CTRL_R_OPTS=\" --preview 'echo {}' --preview-window up:3:hidden:wrap --bind 'ctrl-t:toggle-preview' --bind 'alt-c:execute-silent(echo -n {2..} | xclip -i -sel c)+abort' --color header:italic --header 'Press ALT-C to copy command into clipboard'\"" >> $PATHVAR &> /dev/null
+    fi
+    if [ $PATHVAR_R == /root/.pathvariables.env ] ; then
+        sudo sed -i 's|#export FZF_CTRL_R_OPTS==|export FZF_CTRL_R_OPTS=|g' $PATHVAR_R
+    elif ! sudo grep -q "export FZF_CTRL_R_OPTS" $PATHVAR_R; then
+        printf "\nexport FZF_CTRL_R_OPTS=\" --preview 'echo {}' --preview-window up:3:hidden:wrap --bind 'ctrl-t:toggle-preview' --bind 'alt-c:execute-silent(echo -n {2..} | xclip -i -sel c)+abort' --color header:italic --header 'Press ALT-C to copy command into clipboard'\"" | sudo tee -a $PATHVAR_R
+    fi 
+fi
+unset xclip
+
+
 #echo "${green}Fzf will use '${CYAN}$fnd${normal}${green}'. Set default options that are fzf related to:${normal}"
 #reade -Q "GREEN" -i "y" -p "    Search globally instead of in current folder? [Y/n]: " "n" fndgbl
 #reade -Q "GREEN" -i "y" -p "    Search only files? [Y/n]: " "n" fndfle
@@ -141,38 +239,6 @@ elif ! sudo grep -q "export FZF_DEFAULT_COMMAND" $PATHVAR_R; then
     fi
 fi
  
-# TODO: Check export for ripgrep
-# TODO: Do more with ripgrep
-if ! type rg &> /dev/null; then
-     reade -Q "GREEN" -i "y" -p "Install ripgrep? (Recursive grep, opens possibility for line by line fzf ) [Y/n]: " "n" rpgrp
-     if [ -z $rpgrp ] || [ "Y" == $rpgrp ] || [ $rpgrp == "y" ]; then
-        if ! test -f install_ripgrep.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ripgrep.sh)" 
-        else
-            ./install_ripgrep.sh
-        fi
-        if [ $PATHVAR == ~/.pathvariables.env ] ; then
-            sed -i 's|#export RG_PREFIX|export RG_PREFIX|g' $PATHVAR
-        elif ! grep -q "export RG_PREFIX" $PATHVAR; then
-            printf "\n# RIPGREP\nexport RG_PREFIX='rg --column --line-number --no-heading --color=always --smart-case \"" >> $PATHVAR &> /dev/null
-        fi
-        if [ $PATHVAR_R == /root/.pathvariables.env ] ; then
-            sudo sed -i 's|#export RG_PREFIX|export RG_PREFIX|g' $PATHVAR_R
-        elif ! sudo grep -q "export RG_PREFIX" $PATHVAR_R; then
-             printf "\n# RIPGREP\nexport RG_PREFIX='rg --column --line-number --no-heading --color=always --smart-case \"" | sudo tee -a $PATHVAR_R
-        fi
-        
-        reade -Q "GREEN" -i "y" -p "Add shortcut for ripgrep files in dir? (Ctrl-g) [Y/n]: " "n" rpgrpdir
-        if [ -z $rpgrp ] || [ "Y" == $rpgrp ] || [ $rpgrp == "y" ]; then
-            if ! test -f fzf/.bash_aliases.d/ripgrep-directory.sh; then
-                wget -O ~/.bash_aliases.d/ripgrep-directory.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/.bash_aliases.d/ripgrep-directory.sh
-            else
-                cp -fv fzf/.bash_aliases.d/ripgrep-directory.sh ~/.bash_aliases.d/
-            fi
-        fi
-     fi
-    unset rpgrp rpgrpdir
-fi
 
 #if type kitty &> /dev/null; then
 #    reade -Q "GREEN" -i "y" -p "Add shortcut for fzf-autocompletion? (Ctrl-Tab) [Y/n]: " "n" comp_key
@@ -210,44 +276,6 @@ fi
 unset fzf_f
 
 
-# BAT
-if ! type bat &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Install bat? (File previews/thumbnails for riflesearch) [Y/n]: " "n" bat
-    if [ "$bat" == "y" ]; then
-        if ! test -f install_bat.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bat.sh)" 
-        else
-            ./install_bat.sh
-        fi
-    fi
-    unset bat 
-fi
-
-# TREE
-if ! type tree &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Install tree? (Builtin cd shortcut gets a nice directory tree preview ) [Y/n]: " "n" tree
-    if [ "$tree" == "y" ]; then
-        if ! test -f install_tree.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_tree.sh)" 
-        else
-            ./install_tree.sh
-        fi
-    fi
-    unset tree
-fi
-
-#TODO: fzf-rifle.sh still has ffmpegthumbnailer part (could use sed check)
-if ! type ffmpegthumbnailer &> /dev/null; then 
-    reade -Q "GREEN" -i "y" -p "Install ffmpegthumbnailer? (Video thumbnails for riflesearch) [Y/n]: " "n" ffmpg
-    if [ "$ffmpg" == "y" ]; then
-        if ! test -f install_ffmpegthumbnailer.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ffmpegthumbnailer.sh)" 
-        else
-            ./install_ffmpegthumbnailer.sh
-        fi 
-    fi
-    unset ffmpg
-fi
 
 #reade -Q "GREEN" -i "y" -p "Add shortcut for riflesearch on Ctrl-F? (Fzf and paste in console) [Y/n]: " "n" fzf_t
 #if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ] ; then 
@@ -260,28 +288,6 @@ fi
 #    #sed -i 's|bind -m vi-insert -x '\''"\\C-t": |bind -m vi-insert -x '\''"\\C-f": |g' ~/.fzf/shell/key-bindings.bash
 #fi
 
-# XCLIP
-if ! type xclip &> /dev/null; then 
-    reade -Q "GREEN" -i "y" -p "Install xclip? (Clipboard tool for Ctrl-R/Reverse history shortcut) [Y/n]: " "n" xclip
-    if [ "$xclip" == "y" ]; then
-        if ! test -f install_xclip.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_xclip.sh)" 
-        else
-            ./install_xclip.sh
-        fi
-    fi
-    if [ $PATHVAR == ~/.pathvariables.env ] ; then
-        sed -i 's|#export FZF_CTRL_R_OPTS=|export FZF_CTRL_R_OPTS=|g' $PATHVAR
-    elif ! grep -q "export FZF_CTRL_R_OPTS=" $PATHVAR; then
-        printf "\nexport FZF_CTRL_R_OPTS=\" --preview 'echo {}' --preview-window up:3:hidden:wrap --bind 'ctrl-t:toggle-preview' --bind 'alt-c:execute-silent(echo -n {2..} | xclip -i -sel c)+abort' --color header:italic --header 'Press ALT-C to copy command into clipboard'\"" >> $PATHVAR &> /dev/null
-    fi
-    if [ $PATHVAR_R == /root/.pathvariables.env ] ; then
-        sudo sed -i 's|#export FZF_CTRL_R_OPTS==|export FZF_CTRL_R_OPTS=|g' $PATHVAR_R
-    elif ! sudo grep -q "export FZF_CTRL_R_OPTS" $PATHVAR_R; then
-        printf "\nexport FZF_CTRL_R_OPTS=\" --preview 'echo {}' --preview-window up:3:hidden:wrap --bind 'ctrl-t:toggle-preview' --bind 'alt-c:execute-silent(echo -n {2..} | xclip -i -sel c)+abort' --color header:italic --header 'Press ALT-C to copy command into clipboard'\"" | sudo tee -a $PATHVAR_R
-    fi 
-fi
-unset xclip
 
 # reade -Q "GREEN" -i "y" -p "Change Alt-C shortcut to Ctrl-S for fzf cd? [Y/n]:" "n" fzf_t
 # if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ]; then 
