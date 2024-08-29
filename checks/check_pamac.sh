@@ -38,7 +38,7 @@ if grep -q "#CheckAURVCSUpdates" /etc/pamac.conf; then
     fi
     unset aurset1
 fi
-if test -x "$(command -v flatpak)" && grep -q "#EnableFlatpak" /etc/pamac.conf; then
+if type flatpak &> /dev/null && grep -q "#EnableFlatpak" /etc/pamac.conf; then
     reade -Q "GREEN" -i "y" -p "Enable flatpak in pamac? [Y/n]: " "n" fltpak
     if [ "$fltpak" == "y" ]; then
         sudo pacman -S libpamac-flatpak-plugin
@@ -55,7 +55,7 @@ if test -x "$(command -v flatpak)" && grep -q "#EnableFlatpak" /etc/pamac.conf; 
     fi
 fi
 
-if test -x "$(command -v snap)" && grep -q "#EnableSnap" /etc/pamac.conf; then
+if type snap &> /dev/null && grep -q "#EnableSnap" /etc/pamac.conf; then
     reade -Q "GREEN" -i "y" -p "Enable snap in pamac? [Y/n]:" "n" snap
     if [ "$snap" == "y" ]; then
         sudo pacman -S libpamac-snap-plugin

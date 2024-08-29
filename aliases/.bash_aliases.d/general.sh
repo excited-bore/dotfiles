@@ -1,3 +1,4 @@
+### GENERAL ###
 if ! type reade &> /dev/null && test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh; then
     . ~/.bash_aliases.d/00-rlwrap_scripts.sh
 fi
@@ -10,7 +11,29 @@ if test $machine == 'Windows' && test $win_bash_shell == 'Cygwin'; then
     alias cd-home-="cd /cygdrive/c/Users/$USER"
 fi
 
-alias r="stty sane && source $PROFILE && source ~/.bashrc"
+source_profile=""
+if test -z $PROFILE; then
+    if test -f ~/.profile; then
+        #PROFILE=~/.profile 
+        #source_profile="source ~/.profile" 
+        alias r="stty sane && source ~/.profile && source ~/.bashrc"
+    fi
+    if test -f ~/.bash_profile; then
+        #PROFILE=~/.bash_profile 
+        #source_profile="source ~/.bash_profile" 
+        alias r="stty sane && source ~/.bash_profile && source ~/.bashrc"
+    fi
+elif ! test -z $PROFILE; then
+    alias r="stty sane && source $PROFILE && source ~/.bashrc"
+else
+    alias r="stty sane && source ~/.bashrc"
+fi
+
+#if test -z $PAGER; then
+#    PAGER=less
+#fi
+#alias pager=" | $PAGER"
+
 
 # TRY and keep command line at bottom
 #alias b="tput cup $(tput lines) 0" 
@@ -279,6 +302,12 @@ alias grep-no-case-sensitivwe='grep -i'
 
 #alias cat="bat"
 
+# Redirects to /dev/null 
+alias output-null="> /dev/null"
+alias error-null="2> /dev/null"
+alias no-error="2> /dev/null"
+alias all-null="&> /dev/null"
+alias no-output="&> /dev/null"
 
 # Show open ports
 alias openports='netstat -nape --inet'
@@ -311,6 +340,9 @@ alias word2line="tr ' ' '\n'"
 alias line2word="tr '\n' ' '"
 alias tab2space="tr -s ' '"
 alias only1space="tr -s ' '"
+alias upper2lower="tr '[:upper:]' '[:lower:]'"
+alias lower2upper="tr '[:lower:]' '[:upper:]'"
+
 
 
 # Pipe column output to a pager

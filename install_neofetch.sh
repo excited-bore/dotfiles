@@ -26,17 +26,17 @@ else
 fi 
 
 if ! type neofetch &> /dev/null && ! type fastfetch &> /dev/null && ! type screenFetch &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Install neofetch/fastfetch/screenFetch? [Y/n]: " "n" sym2
-    if test "$sym2" == "y"; then
+    #reade -Q "GREEN" -i "y" -p "Install neofetch/fastfetch/screenFetch? [Y/n]: " "n" sym2
+    #if test "$sym2" == "y"; then
         
-        reade -Q "GREEN" -i "neofetch" -p "Which one? [Neofetch/fastfetch/screenFetch]: " "fastfetch screenFetch" sym2
-        if test "$sym2" == "neofetch"; then
+        reade -Q "CYAN" -i "fast" -p "Which one? [Fast/neo/screen]: " "neo screen" sym2
+        if test "$sym2" == "neo"; then
             if test $distro_base == "Debian"; then
                sudo apt install neofetch
             elif test $distro == "Arch" || test $distro == "Manjaro"; then
                sudo pacman -S neofetch
             fi
-        elif test "$sym2" == "fastfetch"; then 
+        elif test "$sym2" == "fast"; then 
             if test $distro_base == "Debian"; then
                 if ! type jq &> /dev/null; then
                     sudo apt install jq
@@ -55,12 +55,12 @@ if ! type neofetch &> /dev/null && ! type fastfetch &> /dev/null && ! type scree
             elif test $distro == "Arch" || test $distro == "Manjaro"; then
                sudo pacman -S fastfetch
             fi
-        elif  test "$sym2" == "screenFetch"; then      
+        elif  test "$sym2" == "screen"; then      
             if test $distro_base == "Debian"; then
                sudo apt install screenfetch
             elif test $distro == "Arch" || test $distro == "Manjaro"; then
                sudo pacman -S screenFetch
             fi
         fi
-    fi
+    #fi
 fi

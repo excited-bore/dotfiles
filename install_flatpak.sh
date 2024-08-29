@@ -62,11 +62,11 @@ if type flatpak &> /dev/null; then
 fi
 unset flpkvrs
 
-reade -Q "GREEN" -i "y" -p "Install flatpackwrapper? (For one-word flatpak apps in terminal) [Y/n]: " "n" pam
+reade -Q "GREEN" -i "y" -p "Install flatpackwrapper? (For one-word flatpak aliases in terminal) [Y/n]: " "n" pam
 if [ -z $pam ] || [ "y" == $pam ]; then
-    if [ ! -d ~/.local/bin/flatpak/ ]; then
-        mkdir -p ~/.local/bin/flatpak/
-    fi
+    #if [ ! -d ~/.local/bin/flatpak/ ]; then
+    #    mkdir -p ~/.local/bin/flatpak/
+    #fi
     if ! test -f install_bashalias_completions.sh; then
          eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bashalias_completions.sh)" 
     else
@@ -74,35 +74,36 @@ if [ -z $pam ] || [ "y" == $pam ]; then
     fi
     
     if [ ! -f ~/.bash_aliases.d/flatpacks.sh ]; then
-        touch ~/.bash_aliases.d/flatpacks.sh
-        printf "function flatpak (){\\n  env -u SESSION_MANAGER flatpak \"\$@\"\\n  if [ \"\$1\" == \"install\" ]; then\\n      python /usr/bin/update_flatpak_cli.py\\n   fi\\n}\\n" >> ~/.bash_aliases.d/flatpacks.sh
+        cp -bfv flatpak/.bash_aliases.d/flatpacks.sh ~/.bash_aliases.d/ 
+        #touch ~/.bash_aliases.d/flatpacks.sh
+        #printf "function flatpak (){\\n  env -u SESSION_MANAGER flatpak \"\$@\"\\n  if [ \"\$1\" == \"install\" ]; then\\n      python /usr/bin/update_flatpak_cli.py\\n   fi\\n}\\n" >> ~/.bash_aliases.d/flatpacks.sh
     fi
     
-    if ! type python &> /dev/null; then
-        if test $distro_base == "Debian" && type python3 &> /dev/null; then
-            sudo apt install python-is-python3
-        else
-            if test $distro == "Manjaro" || test $distro == "Arch"; then
-                sudo pacman -S python
-            elif test $distro_base == "Debian"; then
-                sudo apt install python3 python3-is-python
-            fi
-        fi
-    fi
+    #if ! type python &> /dev/null; then
+    #    if test $distro_base == "Debian" && type python3 &> /dev/null; then
+    #        sudo apt install python-is-python3
+    #    else
+    #        if test $distro == "Manjaro" || test $distro == "Arch"; then
+    #            sudo pacman -S python
+    #        elif test $distro_base == "Debian"; then
+    #            sudo apt install python3 python3-is-python
+    #        fi
+    #    fi
+    #fi
 
 
-    if ! sudo test -f /usr/bin/update_flatpak_cli.py; then
-        sudo wget -O /usr/bin/update_flatpak_cli.py https://gist.githubusercontent.com/ssokolow/db565fd8a82d6002baada946adb81f68/raw/c23b3292441e01c6287de1b417b9e573bce6a571/update_flatpak_cli.py
-        sudo chmod u+x /usr/bin/update_flatpak_cli.py
-        sudo sed -i 's|\[ -a "|\[ -f "|g' /usr/bin/update_flatpak_cli.py
-    fi
-      
-    if grep -q "FLATPAK" "$PATHVAR"; then
-        sed -i 's|^export PATH=$PATH:$HOME/.local/bin/flatpak|export PATH=$PATH:$HOME/.local/bin/flatpak|g' $PATHVAR
-    else
-        echo 'export PATH=$PATH:$HOME/.local/bin/flatpak' >> $PATHVAR
-    fi
-    echo "Wrapper script are bash-based and installed under '~/.local/bin/flatpak/' "
+    #if ! sudo test -f /usr/bin/update_flatpak_cli.py; then
+    #    sudo wget -O /usr/bin/update_flatpak_cli.py https://gist.githubusercontent.com/ssokolow/db565fd8a82d6002baada946adb81f68/raw/c23b3292441e01c6287de1b417b9e573bce6a571/update_flatpak_cli.py
+    #    sudo chmod u+x /usr/bin/update_flatpak_cli.py
+    #    sudo sed -i 's|\[ -a "|\[ -f "|g' /usr/bin/update_flatpak_cli.py
+    #fi
+    #  
+    #if grep -q "FLATPAK" "$PATHVAR"; then
+    #    sed -i 's|^export PATH=$PATH:$HOME/.local/bin/flatpak|export PATH=$PATH:$HOME/.local/bin/flatpak|g' $PATHVAR
+    #else
+    #    echo 'export PATH=$PATH:$HOME/.local/bin/flatpak' >> $PATHVAR
+    #fi
+    #echo "Wrapper script are bash-based and installed under '~/.local/bin/flatpak/' "
 fi
 unset pam
 
