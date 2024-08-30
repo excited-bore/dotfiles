@@ -107,7 +107,7 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                     theme=$(printf "$(delta --list-syntax-themes | tail -n +1)" | fzf --reverse --border --border-label="Syntax theme")
                     theme=$(echo "$theme" | awk '{print $2;}')
                     delta --syntax-theme "$theme" $TMPDIR/dtest1 $TMPDIR/dtest2
-                    stty sane && reade -Q "MAGENTA" -i "n" -p "Set as syntax theme? (Will retry if no) [Y/n]: " dltthme
+                    stty sane && reade -Q "MAGENTA" -i "n" -p "Set as syntax theme? (Will retry if no) [Y/n]: " "y" dltthme
                     if test "$dltthme" == "n"; then
                        theme='' 
                     fi
@@ -119,7 +119,7 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                     git config $global delta.linenumbers true
                 fi
                 
-                reade -Q "CYAN" -i "n" -p "Side-by-side view? [Y/n]: " "n" delta3
+                reade -Q "CYAN" -i "y" -p "Side-by-side view? [Y/n]: " "n" delta3
                 if test "y" == $delta3; then
                     git config $global delta.side-by-side true
                 fi
@@ -1301,7 +1301,7 @@ fi
     local gitrerere rerere
     local prererere='n'
     if test "$(git config $global --list | grep 'rerere.enabled' | awk 'BEGIN { FS = "=" } ;{print $2;}')" == '' ; then
-        premail='y'
+        prererere='y'
     fi
     reade -Q "CYAN" -i "$prererere" -p "Configure git to remember resolved mergeconflicts for reuse? [Y/n]: " "n" gitrerere ;
     if [ "y" == $gitrerere ]; then
@@ -1311,9 +1311,9 @@ fi
     local gitpgr pager wpager
     reade -Q "CYAN" -i "y" -p "Configure pager for git core, diff, show and log? [Y/n]: " "n" wpager ;
     if test "$wpager" == "y"; then
-        reade -Q "YELLOW" -i "n" -p "Install custom diff syntax highlighter / pager? [N/y]: " "n" gitpgr ;
+        reade -Q "YELLOW" -i "n" -p "Install custom diff syntax highlighter? [N/y]: " "y" gitpgr ;
         if test "$gitpgr" == "y"; then
-            reade -Q "GREEN" -i "nvimpager" -p "Which to install? [Nvimpager/moar/most/delta/diff-so-fancy/riff/ydiff/difftastic/diffr]: " "nvimpager moar most delta diff-so-fancy riff ydiff diffr difftastic" pager 
+            reade -Q "GREEN" -i "delta" -p "Which to install? [Delta/diff-so-fancy/riff/ydiff/difftastic/diffr]: " "diff-so-fancy riff ydiff diffr difftastic" pager 
             if test $pager == "bat"; then
                 if ! test -f install_bat.sh; then
                     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bat.sh)"

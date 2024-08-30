@@ -65,6 +65,7 @@ fi
 unset fzf_key
 source ~/.bashrc
 
+
 if [ ! -f ~/.fzf_history ]; then
     touch ~/.fzf_history 
 fi

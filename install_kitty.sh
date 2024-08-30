@@ -67,7 +67,7 @@ else
     file=kitty/.bash_aliases.d/kitty.sh
 fi
 
-reade -Q "GREEN" -i "y" -p "Install kitty conf? (at ~/.config/kitty/kitty.conf\|ssh.conf) [Y/n]:" "n" kittn
+reade -Q "GREEN" -i "y" -p "Install kitty conf? (at ~/.config/kitty/kitty.conf\|ssh.conf) [Y/n]: " "n" kittn
 if [ "y" == "$kittn" ]; then
     mkdir -p ~/.config/kitty
     cp -bvf $dir/kitty.conf ~/.config/kitty/kitty.conf
@@ -81,7 +81,7 @@ if [ "y" == "$kittn" ]; then
 fi
 unset kittn
 
-reade -Q "GREEN" -i "y" -p "Install kitty aliases? (at ~/.bash_aliases.d/kitty.sh) [Y/n]:" "n" kittn
+reade -Q "GREEN" -i "y" -p "Install kitty aliases? (at ~/.bash_aliases.d/kitty.sh) [Y/n]: " "n" kittn
 if [ "y" == "$kittn" ]; then
     if ! test -f checks/check_aliases_dir.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)" 
@@ -106,7 +106,7 @@ if [ -f ~/.pathvariables.env ]; then
 fi              
 
 #if [ -x "$(command -v xdg-open)" ]; then
-#    reade -Q "GREEN" -p -i "y" "Set kitty as default terminal? [Y/n]:" "n" kittn
+#    reade -Q "GREEN" -p -i "y" "Set kitty as default terminal? [Y/n]: " "n" kittn
 #    if [ "y" == "$kittn" ]; then
 #        
 #    fi

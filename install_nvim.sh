@@ -67,7 +67,7 @@ if test $machine == 'Mac' && type brew &> /dev/null; then
         fi
     fi
     reade -Q "GREEN" -i "y" -p "Install nvim code language support (python, javascript, ruby, perl, ..)? [Y/n]: " "n" langs
-    if type $langs == 'y'; then
+    if test "$langs" == 'y'; then
         if ! type pylint &> /dev/null; then
             reade -Q "GREEN" -i "y" -p "Install nvim-python? [Y/n]: " "n" pyscripts
             if [ -z $pyscripts ] || [ "y" == $pyscripts ]; then
@@ -140,8 +140,7 @@ elif test $distro == "Arch" || test $distro == "Manjaro"; then
         fi
     fi
     reade -Q "GREEN" -i "y" -p "Install nvim code language support (python, javascript, ruby, perl, ..)? [Y/n]: " "n" langs
-    if type $langs == 'y'; then
-     
+    if test "$langs" == 'y'; then
         if ! type pylint &> /dev/null; then
             reade -Q "GREEN" -i "y" -p "Install nvim-python? [Y/n]: " "n" pyscripts
             if [ -z $pyscripts ] || [ "y" == $pyscripts ]; then
@@ -334,8 +333,7 @@ elif [  $distro_base == "Debian" ];then
         fi
     fi
     reade -Q "GREEN" -i "y" -p "Install nvim code language support (python, javascript, ruby, perl, ..)? [Y/n]: " "n" langs
-    if type $langs == 'y'; then
-     
+    if test "$langs" == 'y'; then
         if ! type pylint &> /dev/null; then
             reade -Q "GREEN" -i "y" -p "Install nvim-python? [Y/n]: " "n" pyscripts
             if [ -z $pyscripts ] || [ "y" == $pyscripts ]; then
@@ -576,7 +574,7 @@ vimsh(){
 yes_edit_no vimsh "$dir/vim_nvim.sh $dir1/vim_nvim" "Install vim aliases at ~/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)? " "edit" "GREEN"
 
 if ! type nvimpager &> /dev/null; then
-    reade -Q "YELLOW" -i "n" -p "Install nvimpager? [N/y]: " "n" vimrc 
+    reade -Q "YELLOW" -i "n" -p "Install nvimpager? [N/y]: " "y" vimrc 
     if [ -z "$vimrc" ] || [ "$vimrc" == "y" ]; then
         if ! test -f install_nvimpager.sh; then
              eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nvimpager.sh)" 
