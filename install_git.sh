@@ -107,7 +107,7 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                     theme=$(printf "$(delta --list-syntax-themes | tail -n +1)" | fzf --reverse --border --border-label="Syntax theme")
                     theme=$(echo "$theme" | awk '{print $2;}')
                     delta --syntax-theme "$theme" $TMPDIR/dtest1 $TMPDIR/dtest2
-                    stty sane && reade -Q "MAGENTA" -i "n" -p "Set as syntax theme? (Will retry if no) [Y/n]: " dltthme
+                    stty sane && reade -Q "MAGENTA" -i "n" -p "Set as syntax theme? (Will retry if no) [Y/n]: " "y" dltthme
                     if test "$dltthme" == "n"; then
                        theme='' 
                     fi
@@ -119,7 +119,7 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                     git config $global delta.linenumbers true
                 fi
                 
-                reade -Q "CYAN" -i "n" -p "Side-by-side view? [Y/n]: " "n" delta3
+                reade -Q "CYAN" -i "y" -p "Side-by-side view? [Y/n]: " "n" delta3
                 if test "y" == $delta3; then
                     git config $global delta.side-by-side true
                 fi
@@ -380,10 +380,14 @@ Condimentum lacinia quis vel eros donec ac. Nibh sed pulvinar proin gravida hend
     elif [ "$pager" == "diff-so-fancy" ] || [ "$pager" == "diffr" ] || [ "$pager" == "ydiff" ] || [ "$pager" == "delta" ] || [ "$pager" == "bat" ] || [ "$pager" == "batdiff" ] ; then
         local difffancy
         local pre='y'
+        local prmpt='[Y/n]: ' 
+        local othr='n' 
         if (test $pager == 'delta' || test $pager == 'diff-so-fancy') && echo $(git config $global --list --show-origin) | grep -q $pager; then
             pre='n'
+            prmpt='[N/y]: ' 
+            othr='y' 
         fi
-        reade -Q "CYAN" -i "$pre" -p "You selected $pager. Configure? [Y/n]: " "n" difffancy
+        reade -Q "CYAN" -i "$pre" -p "You selected $pager. Configure? $prmpt" "$othr" difffancy
         if test "y" == "$difffancy"; then
             if [ "$pager" == "bat" ] || [ "$pager" == "batdiff" ]; then 
                 local opts=""
@@ -840,10 +844,16 @@ fi
         elif [ "$pager" == "diff-so-fancy" ] || [ "$pager" == "diffr" ] || [ "$pager" == "ydiff" ] || [ "$pager" == "delta" ] || [ "$pager" == "bat" ] || [ "$pager" == "batdiff" ] ; then
             local difffancy
             local pre='y'
+            othr='n'
+            prmpt='[Y/n]: '
+            color='CYAN' 
             if (test $pager == 'delta' || test $pager == 'diff-so-fancy') && echo $(git config $global --list --show-origin) | grep -q $pager; then
                 pre='n'
+                othr='y'
+                prmpt='[N/y]: '
+                color='YELLOW' 
             fi
-            reade -Q "CYAN" -i "$pre" -p "You selected $pager. Configure? [Y/n]: " "n" difffancy
+            reade -Q "$color" -i "$pre" -p "You selected $pager. Configure? $prmpt" "$othr" difffancy
             if test "y" == "$difffancy"; then
                 if [ "$pager" == "bat" ] || [ "$pager" == "batdiff" ]; then 
                     local opts=""
@@ -903,7 +913,7 @@ fi
                     fi
                     pager=$pager" $opts"
                 elif [ "$pager" == "delta" ]; then
-                    reade -Q "CYAN" -i "n" -p "Set side-by-side view? [Y/n]: " "n" delta1
+                    reade -Q "CYAN" -i "y" -p "Set side-by-side view? [Y/n]: " "n" delta1
                     if test "y" == $delta1; then
                         git config $global delta.side-by-side true
                     fi
@@ -1273,10 +1283,16 @@ fi
     
     local name gitname
     local prename='n'
+    color="YELLOW" 
+    othr='y'
+    prmpt='[N/y]: '
     if test "$(git config $global --list | grep 'user.name' | awk 'BEGIN { FS = "=" } ;{print $2;}')" == '' ; then
         prename='y'
+        color="CYAN" 
+        othr='n'
+        prmpt='[Y/n]: '
     fi
-    reade -Q "CYAN" -i "$prename" -p "Configure git name? [Y/n]: " "n" gitname
+    reade -Q "$color" -i "$prename" -p "Configure git name? $prmpt" "$othr" gitname
     if [ "y" == $gitname ]; then
         reade -Q "CYAN" -p "Name: " name
         if [ ! -z $name ]; then
@@ -1285,11 +1301,17 @@ fi
     fi
 
     local gitmail mail
-    local premail='n'
+    local prename='n'
+    color="YELLOW" 
+    othr='y'
+    prmpt='[N/y]: '
     if test "$(git config $global --list | grep 'user.email' | awk 'BEGIN { FS = "=" } ;{print $2;}')" == '' ; then
-        premail='y'
+        prename='y'
+        color="CYAN" 
+        othr='n'
+        prmpt='[Y/n]: '
     fi
-    reade -Q "CYAN" -i "$premail" -p "Configure git email? [Y/n]: " "n" gitmail ;
+    reade -Q "$color" -i "$premail" -p "Configure git email? $prmpt" "$othr" gitmail ;
     if [ "y" == $gitmail ]; then
         reade -Q "CYAN" -p "Email: " mail ;
         if [ ! -z $mail ]; then
@@ -1300,10 +1322,16 @@ fi
     # https://www.youtube.com/watch?v=aolI_Rz0ZqY
     local gitrerere rerere
     local prererere='n'
+    color="YELLOW" 
+    othr='y'
+    prmpt='[Y/n]: ' 
     if test "$(git config $global --list | grep 'rerere.enabled' | awk 'BEGIN { FS = "=" } ;{print $2;}')" == '' ; then
-        premail='y'
+        prererere='y'
+        color="CYAN" 
+        othr='n'
+        prmpt='[N/y]: ' 
     fi
-    reade -Q "CYAN" -i "$prererere" -p "Configure git to remember resolved mergeconflicts for reuse? [Y/n]: " "n" gitrerere ;
+    reade -Q "$color" -i "$prererere" -p "Configure git to remember resolved mergeconflicts for reuse? $prmpt" "$othr" gitrerere ;
     if [ "y" == $gitrerere ]; then
         git config "$global" rerere.enabled true;
     fi
@@ -1311,9 +1339,9 @@ fi
     local gitpgr pager wpager
     reade -Q "CYAN" -i "y" -p "Configure pager for git core, diff, show and log? [Y/n]: " "n" wpager ;
     if test "$wpager" == "y"; then
-        reade -Q "YELLOW" -i "n" -p "Install custom diff syntax highlighter / pager? [N/y]: " "n" gitpgr ;
+        reade -Q "YELLOW" -i "n" -p "Install custom diff syntax highlighter? [N/y]: " "y" gitpgr ;
         if test "$gitpgr" == "y"; then
-            reade -Q "GREEN" -i "nvimpager" -p "Which to install? [Nvimpager/moar/most/delta/diff-so-fancy/riff/ydiff/difftastic/diffr]: " "nvimpager moar most delta diff-so-fancy riff ydiff diffr difftastic" pager 
+            reade -Q "GREEN" -i "delta" -p "Which to install? [Delta/diff-so-fancy/riff/ydiff/difftastic/diffr]: " "diff-so-fancy riff ydiff diffr difftastic" pager 
             if test $pager == "bat"; then
                 if ! test -f install_bat.sh; then
                     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bat.sh)"

@@ -296,12 +296,14 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
             sed -i 's|.*alias mv="mv-trash -v"|alias mv="mv-trash -v"|g' $genr
         fi
         unset ansr
-        reade -Q "YELLOW" -i "n" -p "Set 'gio trash' alias for rm? [N/y]: " "y" ansr 
-        if [ "$ansr" != "y" ]; then
-            sed -i 's|^alias rm="gio trash"|#alias rm="gio trash"|g' $genr
-        else
-            sed -i 's|.*alias rm="gio trash"|alias rm="gio trash"|g' $genr
-        fi
+        if type gio &> /dev/null; then 
+            reade -Q "YELLOW" -i "n" -p "Set 'gio trash' alias for rm? [N/y]: " "y" ansr 
+            if [ "$ansr" != "y" ]; then
+                sed -i 's|^alias rm="gio trash"|#alias rm="gio trash"|g' $genr
+            else
+                sed -i 's|.*alias rm="gio trash"|alias rm="gio trash"|g' $genr
+            fi
+        fi 
         if type bat &> /dev/null; then
             reade -Q "YELLOW" -i "n" -p "Set 'cat' as alias for 'bat'? [N/y]: " "y" cat
             if [ "$cat" != "y" ]; then
