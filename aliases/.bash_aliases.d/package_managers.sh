@@ -125,22 +125,22 @@ if type pamac &> /dev/null; then
     alias manjaro-update-packages="pamac-update"
     alias manjaro-upgrade="pamac upgrade"
     
-    function pamac-fzf-install(){ 
-        pre='' 
-        if ! test -z "$@"; then
-            if ! test -z "$2"; then
-                printf "Only give 1 argument\n"
-                exit 1
-            else
-                pre="--query $@"
-            fi
-        fi 
-        nstall="$(pamac list | fzf $pre --ansi --multi --select-1 --reverse --sync --height 33%  | awk '{print $1}')" 
-        if ! test -z "$nstall"; then
-            pamac install "$nstall" 
-        fi
-        unset nstall
-    }
+    #function pamac-fzf-install(){ 
+    #    pre='' 
+    #    if ! test -z "$@"; then
+    #        if ! test -z "$2"; then
+    #            printf "Only give 1 argument\n"
+    #            exit 1
+    #        else
+    #            pre="--query $@"
+    #        fi
+    #    fi 
+    #    nstall="$(pamac list | fzf $pre --ansi --multi --select-1 --reverse --sync --height 33%  | awk '{print $1}')" 
+    #    if ! test -z "$nstall"; then
+    #        pamac install "$nstall" 
+    #    fi
+    #    unset nstall
+    #}
     
     function pamac-fzf-list-files(){ 
         pre='' 
