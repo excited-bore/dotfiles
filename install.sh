@@ -126,23 +126,6 @@ if ! sudo test -f /etc/polkit/49-nopasswd_global.pkla && ! sudo test -f /etc/pol
     unset plkit
 fi
 
-pre='y'
-othr='n'
-color='GREEN'
-prmpt='[Y/n]: '
-echo "Next $(tput setaf 1)sudo$(tput sgr0) check for /root/.pathvariables.env' "
-if test -f ~/.pathvariables.env && sudo test -f /root/.pathvariables.env; then
-    pre='n' 
-    othr='y'
-    color='YELLOW'
-    prmpt='[N/y]: '
-fi 
-
-reade -Q "$color" -i "$pre" -p "Check existence/create .pathvariables.env and link it to .bashrc in $HOME/ and /root/? $prmpt" "$othr" pathvars
-if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
-    ./install_pathvars.sh $pathvars 
-fi
-
 
 # Shell-keybinds
 
@@ -282,6 +265,181 @@ if ! type activate-global-python-argcomplete &> /dev/null; then
     fi
     unset pycomp
 fi
+
+reade -Q "GREEN" -i "y" -p "Install bash aliases and other config? [Y/n]: " "n" scripts
+if [ -z $scripts ] || [ "y" == $scripts ]; then
+
+    if ! test -f checks/check_aliases_dir.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)" 
+    else
+        ./checks/check_aliases_dir.sh
+    fi
+    
+    genr=aliases/.bash_aliases.d/general.sh
+    if ! test -f aliases/.bash_aliases.d/general.sh; then
+        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/general.sh 
+        genr=$TMPDIR/general.sh
+    fi
+    
+    reade -Q "GREEN" -i "y" -p "Install general.sh at ~/? (aliases related to general actions - cd/mv/cp/rm + completion script replacement for 'read -e') [Y/n]: " "n" ansr         
+    
+    if test $ansr == "y"; then
+        if test -f ~/.pathvariables.env; then
+            sed -i 's|^export TRASH_BIN_LIMIT=|export TRASH_BIN_LIMIT=|g' ~/.pathvariables.env
+        fi
+        reade -Q "GREEN" -i "y" -p "Set cp/mv (when overwriting) to backup files? (will also trash backups) [Y/n]: " "n" ansr         
+        if [ "$ansr" != "y" ]; then
+            sed -i 's|^alias cp="cp-trash -rv"|#alias cp="cp-trash -rv"|g' $genr
+            sed -i 's|^alias mv="mv-trash -v"|#alias mv="mv-trash -v"|g' $genr
+        else
+            sed -i 's|.*alias cp="cp-trash -rv"|alias cp="cp-trash -rv"|g' $genr
+            sed -i 's|.*alias mv="mv-trash -v"|alias mv="mv-trash -v"|g' $genr
+        fi
+        unset ansr
+        reade -Q "YELLOW" -i "n" -p "Set 'gio trash' alias for rm? [N/y]: " "y" ansr 
+        if [ "$ansr" != "y" ]; then
+            sed -i 's|^alias rm="gio trash"|#alias rm="gio trash"|g' $genr
+        else
+            sed -i 's|.*alias rm="gio trash"|alias rm="gio trash"|g' $genr
+        fi
+        if type bat &> /dev/null; then
+            reade -Q "YELLOW" -i "n" -p "Set 'cat' as alias for 'bat'? [N/y]: " "y" cat
+            if [ "$cat" != "y" ]; then
+                sed -i 's|^alias cat="bat"|#alias cat="bat"|g' $genr
+            else
+                sed -i 's|.*alias cat="bat"|alias cat="bat"|g' $genr
+            fi
+        fi
+        unset cat
+
+        general_r(){ 
+            sudo cp -fv $genr /root/.bash_aliases.d/;
+        }
+        general(){
+            cp -fv $genr ~/.bash_aliases.d/
+            yes_edit_no general_r "$genr" "Install general.sh at /root/?" "yes" "GREEN"; }
+        yes_edit_no general "$genr" "Install general.sh at ~/?" "edit" "GREEN"
+    fi
+
+    update_sysm=aliases/.bash_aliases.d/update-system.sh
+    systemd=aliases/.bash_aliases.d/systemctl.sh
+    dosu=aliases/.bash_aliases.d/sudo.sh
+    pacmn=aliases/.bash_aliases.d/package_managers.sh
+    sshs=aliases/.bash_aliases.d/ssh.sh
+    ps1=aliases/.bash_aliases.d/PS1_colours.sh
+    manjaro=aliases/.bash_aliases.d/manjaro.sh
+    variti=aliases/.bash_aliases.d/variety.sh
+    pthon=aliases/.bash_aliases.d/python.sh
+    if ! test -d aliases/.bash_aliases.d/; then
+        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh 
+        update_sysm=$TMPDIR/update-system.sh
+        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/systemctl.sh 
+        systemd=$TMPDIR/systemctl.sh
+        wget -P $TMPDIR/  https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/sudo.sh 
+        dosu=$TMPDIR/sudo.sh
+        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/package_managers.sh 
+        pacmn=$TMPDIR/package_managers.sh
+        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/ssh.sh 
+        sshs=$TMPDIR/ssh.sh
+        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/ps1.sh 
+        ps1=$TMPDIR/ps1.sh
+        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/manjaro.sh 
+        manjaro=$TMPDIR/manjaro.sh
+        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/variety.sh 
+        variti=$TMPDIR/variety.sh
+        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/python.sh 
+        pthon=$TMPDIR/python.sh
+    fi 
+
+    update_sysm_r(){ 
+        sudo cp -fv $update_sysm /root/.bash_aliases.d/;
+        sudo sed -i '/SYSTEM_UPDATED="TRUE"/d' /root/.bash_aliases.d/update-system.sh
+    }
+    update_sysm(){
+        cp -fv $update_sysm ~/.bash_aliases.d/
+        sed -i '/SYSTEM_UPDATED="TRUE"/d' ~/.bash_aliases.d/update-system.sh
+        yes_edit_no update_sysm_r "$update_sysm" "Install update-system.sh at /root/?" "yes" "GREEN";
+    }
+    yes_edit_no update_sysm "$update_sysm" "Install update-system.sh at ~/.bash_aliases.d/? (Global system update function)?" "edit" "GREEN"
+
+    systemd_r(){ 
+        sudo cp -fv $systemd /root/.bash_aliases.d/;
+    }
+    systemd(){
+        cp -fv $systemd ~/.bash_aliases.d/
+        yes_edit_no systemd_r "$systemd" "Install systemctl.sh at /root/?" "yes" "GREEN"; }
+    yes_edit_no systemd "$systemd" "Install systemctl.sh at ~/.bash_aliases.d/? (systemctl aliases/functions)?" "edit" "GREEN"
+        
+
+    dosu_r(){ 
+        sudo cp -fv $dosu /root/.bash_aliases.d/ ;
+    }    
+
+    dosu(){ 
+        cp -fv $dosu ~/.bash_aliases.d/;
+        yes_edit_no dosu_r "$dosu" "Install sudo.sh at /root/?" "yes" "GREEN"; }
+    yes_edit_no dosu "$dosu" "Install sudo.sh at ~/.bash_aliases.d/ (sudo aliases)?" "edit" "GREEN"
+
+
+    packman_r(){ 
+        sudo cp -fv $pacmn /root/.bash_aliases.d/
+    }
+    packman(){
+        cp -fv $pacmn ~/.bash_aliases.d/
+        yes_edit_no packman_r "$pacmn" "Install package_managers.sh at /root/?" "edit" "YELLOW" 
+    }
+    yes_edit_no packman "$pacmn" "Install package_managers.sh at ~/.bash_aliases.d/ (package manager aliases)? " "edit" "GREEN"
+    
+    ssh_r(){ 
+        sudo cp -fv $sshs /root/.bash_aliases.d/; 
+    }
+    sshh(){
+        cp -fv $sshs ~/.bash_aliases.d/
+        yes_edit_no ssh_r "$sshs" "Install ssh.sh at /root/?" "edit" "YELLOW" 
+    }
+    yes_edit_no sshh "$sshs" "Install ssh.sh at ~/.bash_aliases.d/ (ssh aliases)? " "edit" "GREEN"
+
+
+    ps1_r(){ 
+        sudo cp -fv $ps1 /root/.bash_aliases.d/; 
+    }
+    ps11(){
+        cp -fv $ps1 ~/.bash_aliases.d/
+        yes_edit_no ps1_r "$ps1" "Install PS1_colours.sh at /root/?" "yes" "GREEN" 
+    }
+    yes_edit_no ps11 "$ps1" "Install PS1_colours.sh at ~/.bash_aliases.d/ (Coloured command prompt)? " "yes" "GREEN"
+    
+    if [ $distro == "Manjaro" ] ; then
+        manj_r(){ 
+            sudo cp -fv $manjaro /root/.bash_aliases.d/; 
+        }
+        manj(){
+            cp -fv $manjaro ~/.bash_aliases.d/
+            yes_edit_no manj_r "$manjaro" "Install manjaro.sh at /root/?" "yes" "GREEN" 
+        }
+        yes_edit_no manj "$manjaro" "Install manjaro.sh at ~/.bash_aliases.d/ (manjaro specific aliases)? " "yes" "GREEN"
+    fi
+    
+    # Variety aliases 
+    # 
+    variti_r(){ 
+        sudo cp -fv $variti /root/.bash_aliases.d/; 
+    }
+    variti(){
+        cp -fv $variti ~/.bash_aliases.d/
+        yes_edit_no variti_r "$variti" "Install variety.sh at /root/?" "no" "YELLOW" 
+    }
+    yes_edit_no variti "$variti" "Install variety.sh at ~/.bash_aliases.d/ (aliases for a variety of tools)? " "edit" "GREEN" 
+    
+    pthon(){
+        cp -fv $pthon ~/.bash_aliases.d/
+    }
+    yes_edit_no pthon "$pthon" "Install python.sh at ~/.bash_aliases.d/ (aliases for a python development)? " "edit" "GREEN" 
+
+fi
+
+source ~/.bashrc
+
 
 # Nvim (Editor)
 pre='y'
@@ -463,7 +621,7 @@ if [ "y" == "$tmx" ]; then
         ./install_tmux.sh
     fi
 fi
-unset pre color othr tmx
+unset pre color othr prmpt tmx
 
 # Bat
 pre='y'
@@ -486,11 +644,22 @@ if [ -z $bat ] || [ "Y" == $bat ] || [ $bat == "y" ]; then
     fi
 fi
 unset bat
+unset pre color othr prmpt 
 
 
 # Neofetch
+pre='y'
+othr='n'
+color='GREEN'
+prmpt='[Y/n]: '
 if ! type neofetch &> /dev/null && ! type fastfetch &> /dev/null && ! type screenfetch &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Install neofetch/fastfetch/screenFetch)? (Terminal taskmanager - system information tool) [Y/n]:" "n" tojump
+    pre='n' 
+    othr='y'
+    color='YELLOW'
+    prmpt='[N/y]: '
+fi 
+#if ! type neofetch &> /dev/null && ! type fastfetch &> /dev/null && ! type screenfetch &> /dev/null; then
+    reade -Q "$color" -i "$pre" -p "Install neofetch/fastfetch/screenFetch)? (Terminal taskmanager - system information tool) $prmpt" "$othr" tojump
     if [ "$tojump" == "y" ]; then
         if ! test -f install_neofetch.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_neofetch.sh)" 
@@ -499,11 +668,23 @@ if ! type neofetch &> /dev/null && ! type fastfetch &> /dev/null && ! type scree
         fi
     fi
     unset tojump
-fi
+    unset pre color othr prmpt 
+
+#fi
 
 # Bashtop
+pre='y'
+othr='n'
+color='GREEN'
+prmpt='[Y/n]: '
 if ! type bashtop &> /dev/null && ! type bpytop &> /dev/null && ! type btop &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Install bashtop? (Python based improved top/htop) [Y/n]: " "n" tojump
+    pre='n' 
+    othr='y'
+    color='YELLOW'
+    prmpt='[N/y]: '
+fi 
+#if ! type bashtop &> /dev/null && ! type bpytop &> /dev/null && ! type btop &> /dev/null; then
+    reade -Q "$color" -i "$pre" -p "Install bashtop? (Python based improved top/htop) $prmpt" "$othr" tojump
     if [ "$tojump" == "y" ]; then
         if ! test -f install_bashtop.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bashtop.sh)" 
@@ -512,13 +693,24 @@ if ! type bashtop &> /dev/null && ! type bpytop &> /dev/null && ! type btop &> /
         fi
     fi
     unset tojump
-fi
+    unset pre color othr prmpt 
+#fi
 
 
 
 # Autojump
+pre='y'
+othr='n'
+color='GREEN'
+prmpt='[Y/n]: '
 if ! type autojump &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Install autojump? (jump to folders using 'bookmarks' - j_ ) [Y/n]: " "n" tojump
+    pre='n' 
+    othr='y'
+    color='YELLOW'
+    prmpt='[N/y]: '
+fi 
+#if ! type autojump &> /dev/null; then
+    reade -Q "$color" -i "$pre" -p "Install autojump? (jump to folders using 'bookmarks' - j_ ) $prmpt" "$othr" tojump
     if [ "$tojump" == "y" ]; then
         if ! test -f install_autojump.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_autojump.sh)" 
@@ -527,11 +719,22 @@ if ! type autojump &> /dev/null; then
         fi
     fi
     unset tojump
-fi
+    unset pre color othr prmpt 
+#fi
 
 # Starship
+pre='y'
+othr='n'
+color='GREEN'
+prmpt='[Y/n]: '
 if ! type starship &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Install Starship? (Snazzy looking prompt) [Y/n]: " "n" strshp
+    pre='n' 
+    othr='y'
+    color='YELLOW'
+    prmpt='[N/y]: '
+fi 
+#if ! type starship &> /dev/null; then
+    reade -Q "$color" -i "$pre" -p "Install Starship? (Snazzy looking prompt) $prmpt" "$othr" strshp
     if [ $strshp == "y" ]; then
         if ! test -f install_starship.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_starship.sh)" 
@@ -540,9 +743,21 @@ if ! type starship &> /dev/null; then
         fi
     fi
     unset strshp
-fi
+    unset pre color othr prmpt 
+#fi
 
 # Nmap
+pre='y'
+othr='n'
+color='GREEN'
+prmpt='[Y/n]: '
+if ! type nmap &> /dev/null; then
+    pre='n' 
+    othr='y'
+    color='YELLOW'
+    prmpt='[N/y]: '
+fi 
+#
 if ! type nmap &> /dev/null; then
     reade -Q "GREEN" -i "y" -p "Install nmap? (Network port scanning tool) [Y/n]: " "n" tojump
     if [ "$tojump" == "y" ]; then
@@ -553,10 +768,21 @@ if ! type nmap &> /dev/null; then
         fi
     fi
     unset tojump
+    unset pre color othr prmpt 
 fi
 
 # Netstat
+pre='y'
+othr='n'
+color='GREEN'
+prmpt='[Y/n]: '
 if ! type netstat &> /dev/null; then
+    pre='n' 
+    othr='y'
+    color='YELLOW'
+    prmpt='[N/y]: '
+fi 
+#if ! type netstat &> /dev/null; then
     reade -Q "GREEN" -i "y" -p "Install netstat? (Also port scanning tool) [Y/n]: " "n" tojump
     if [ "$tojump" == "y" ]; then
         if ! test -f install_netstat.sh; then
@@ -566,12 +792,23 @@ if ! type netstat &> /dev/null; then
         fi
     fi
     unset tojump
-fi
+    unset pre color othr prmpt 
+#fi
 
 
 # Testdisk (File recovery tool)
+pre='y'
+othr='n'
+color='GREEN'
+prmpt='[Y/n]: '
 if ! type testdisk &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Install testdisk? (File recovery tool) [Y/n]: " "n" kittn
+    pre='n' 
+    othr='y'
+    color='YELLOW'
+    prmpt='[N/y]: '
+fi 
+#if ! type testdisk &> /dev/null; then
+    reade -Q "$color" -i "$pre" -p "Install testdisk? (File recovery tool) $prmpt" "$othr" kittn
     if [ "y" == "$kittn" ]; then
         if ! test -f install_testdisk.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_testdisk.sh)" 
@@ -580,7 +817,8 @@ if ! type testdisk &> /dev/null; then
         fi
     fi
     unset kittn
-fi
+    unset pre color othr prmpt 
+#fi
 
 # Exiftool (Metadata wiper)
 pre='y'
@@ -601,12 +839,22 @@ if [ -z $moar ] || [ "Y" == $moar ] || [ $moar == "y" ]; then
         ./install_exiftool.sh 
     fi
 fi
-unset pre color othr moar
+unset pre color othr prmpt moar
 
 
 # Yt-dlp
+pre='y'
+othr='n'
+color='GREEN'
+prmpt='[Y/n]: '
 if ! type yt-dlp &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Install yt-dlp? (youtube video downloader) [Y/n]: " "n" tojump
+    pre='n' 
+    othr='y'
+    color='YELLOW'
+    prmpt='[N/y]: '
+fi 
+#if ! type yt-dlp &> /dev/null; then
+    reade -Q "$color" -i "$pre" -p "Install yt-dlp? (youtube video downloader) $prmpt" "$othr" tojump
     if [ "$tojump" == "y" ]; then
         if ! test -f install_yt-dlp.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_yt-dlp.sh)" 
@@ -615,181 +863,26 @@ if ! type yt-dlp &> /dev/null; then
         fi
     fi
     unset tojump
+    unset pre color othr prmpt 
+#fi
+
+pre='y'
+othr='n'
+color='GREEN'
+prmpt='[Y/n]: '
+echo "Next $(tput setaf 1)sudo$(tput sgr0) check for /root/.pathvariables.env' "
+if test -f ~/.pathvariables.env && sudo test -f /root/.pathvariables.env; then
+    pre='n' 
+    othr='y'
+    color='YELLOW'
+    prmpt='[N/y]: '
+fi 
+
+reade -Q "$color" -i "$pre" -p "Check existence/create .pathvariables.env and link it to .bashrc in $HOME/ and /root/? $prmpt" "$othr" pathvars
+if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
+    ./install_pathvars.sh $pathvars 
 fi
 
-reade -Q "GREEN" -i "y" -p "Install bash aliases and other config? [Y/n]: " "n" scripts
-if [ -z $scripts ] || [ "y" == $scripts ]; then
-
-    if ! test -f checks/check_aliases_dir.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)" 
-    else
-        ./checks/check_aliases_dir.sh
-    fi
-    
-    genr=aliases/.bash_aliases.d/general.sh
-    if ! test -f aliases/.bash_aliases.d/general.sh; then
-        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/general.sh 
-        genr=$TMPDIR/general.sh
-    fi
-    
-    reade -Q "GREEN" -i "y" -p "Install general.sh at ~/? (aliases related to general actions - cd/mv/cp/rm + completion script replacement for 'read -e') [Y/n]: " "n" ansr         
-    
-    if test $ansr == "y"; then
-        if test -f ~/.pathvariables.env; then
-            sed -i 's|^export TRASH_BIN_LIMIT=|export TRASH_BIN_LIMIT=|g' ~/.pathvariables.env
-        fi
-        reade -Q "GREEN" -i "y" -p "Set cp/mv (when overwriting) to backup files? (will also trash backups) [Y/n]: " "n" ansr         
-        if [ "$ansr" != "y" ]; then
-            sed -i 's|^alias cp="cp-trash -rv"|#alias cp="cp-trash -rv"|g' $genr
-            sed -i 's|^alias mv="mv-trash -v"|#alias mv="mv-trash -v"|g' $genr
-        else
-            sed -i 's|.*alias cp="cp-trash -rv"|alias cp="cp-trash -rv"|g' $genr
-            sed -i 's|.*alias mv="mv-trash -v"|alias mv="mv-trash -v"|g' $genr
-        fi
-        unset ansr
-        reade -Q "YELLOW" -i "n" -p "Set 'gio trash' alias for rm? [N/y]: " "y" ansr 
-        if [ "$ansr" != "y" ]; then
-            sed -i 's|^alias rm="gio trash"|#alias rm="gio trash"|g' $genr
-        else
-            sed -i 's|.*alias rm="gio trash"|alias rm="gio trash"|g' $genr
-        fi
-        if type bat &> /dev/null; then
-            reade -Q "YELLOW" -i "n" -p "Set 'cat' as alias for 'bat'? [N/y]: " "y" cat
-            if [ "$cat" != "y" ]; then
-                sed -i 's|^alias cat="bat"|#alias cat="bat"|g' $genr
-            else
-                sed -i 's|.*alias cat="bat"|alias cat="bat"|g' $genr
-            fi
-        fi
-        unset cat
-
-        general_r(){ 
-            sudo cp -fv $genr /root/.bash_aliases.d/;
-        }
-        general(){
-            cp -fv $genr ~/.bash_aliases.d/
-            yes_edit_no general_r "$genr" "Install general.sh at /root/?" "yes" "GREEN"; }
-        yes_edit_no general "$genr" "Install general.sh at ~/?" "edit" "GREEN"
-    fi
-
-    update_sysm=aliases/.bash_aliases.d/update-system.sh
-    systemd=aliases/.bash_aliases.d/systemctl.sh
-    dosu=aliases/.bash_aliases.d/sudo.sh
-    pacmn=aliases/.bash_aliases.d/package_managers.sh
-    sshs=aliases/.bash_aliases.d/ssh.sh
-    ps1=aliases/.bash_aliases.d/PS1_colours.sh
-    manjaro=aliases/.bash_aliases.d/manjaro.sh
-    variti=aliases/.bash_aliases.d/variety.sh
-    pthon=aliases/.bash_aliases.d/python.sh
-    if ! test -d aliases/.bash_aliases.d/; then
-        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh 
-        update_sysm=$TMPDIR/update-system.sh
-        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/systemctl.sh 
-        systemd=$TMPDIR/systemctl.sh
-        wget -P $TMPDIR/  https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/sudo.sh 
-        dosu=$TMPDIR/sudo.sh
-        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/package_managers.sh 
-        pacmn=$TMPDIR/package_managers.sh
-        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/ssh.sh 
-        sshs=$TMPDIR/ssh.sh
-        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/ps1.sh 
-        ps1=$TMPDIR/ps1.sh
-        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/manjaro.sh 
-        manjaro=$TMPDIR/manjaro.sh
-        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/variety.sh 
-        variti=$TMPDIR/variety.sh
-        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/python.sh 
-        pthon=$TMPDIR/python.sh
-    fi 
-
-    update_sysm_r(){ 
-        sudo cp -fv $update_sysm /root/.bash_aliases.d/;
-        sudo sed -i '/SYSTEM_UPDATED="TRUE"/d' /root/.bash_aliases.d/update-system.sh
-    }
-    update_sysm(){
-        cp -fv $update_sysm ~/.bash_aliases.d/
-        sed -i '/SYSTEM_UPDATED="TRUE"/d' ~/.bash_aliases.d/update-system.sh
-        yes_edit_no update_sysm_r "$update_sysm" "Install update-system.sh at /root/?" "yes" "GREEN";
-    }
-    yes_edit_no update_sysm "$update_sysm" "Install update-system.sh at ~/.bash_aliases.d/? (Global system update function)?" "edit" "GREEN"
-
-    systemd_r(){ 
-        sudo cp -fv $systemd /root/.bash_aliases.d/;
-    }
-    systemd(){
-        cp -fv $systemd ~/.bash_aliases.d/
-        yes_edit_no systemd_r "$systemd" "Install systemctl.sh at /root/?" "yes" "GREEN"; }
-    yes_edit_no systemd "$systemd" "Install systemctl.sh at ~/.bash_aliases.d/? (systemctl aliases/functions)?" "edit" "GREEN"
-        
-
-    dosu_r(){ 
-        sudo cp -fv $dosu /root/.bash_aliases.d/ ;
-    }    
-
-    dosu(){ 
-        cp -fv $dosu ~/.bash_aliases.d/;
-        yes_edit_no dosu_r "$dosu" "Install sudo.sh at /root/?" "yes" "GREEN"; }
-    yes_edit_no dosu "$dosu" "Install sudo.sh at ~/.bash_aliases.d/ (sudo aliases)?" "edit" "GREEN"
-
-
-    packman_r(){ 
-        sudo cp -fv $pacmn /root/.bash_aliases.d/
-    }
-    packman(){
-        cp -fv $pacmn ~/.bash_aliases.d/
-        yes_edit_no packman_r "$pacmn" "Install package_managers.sh at /root/?" "edit" "YELLOW" 
-    }
-    yes_edit_no packman "$pacmn" "Install package_managers.sh at ~/.bash_aliases.d/ (package manager aliases)? " "edit" "GREEN"
-    
-    ssh_r(){ 
-        sudo cp -fv $sshs /root/.bash_aliases.d/; 
-    }
-    sshh(){
-        cp -fv $sshs ~/.bash_aliases.d/
-        yes_edit_no ssh_r "$sshs" "Install ssh.sh at /root/?" "edit" "YELLOW" 
-    }
-    yes_edit_no sshh "$sshs" "Install ssh.sh at ~/.bash_aliases.d/ (ssh aliases)? " "edit" "GREEN"
-
-
-    ps1_r(){ 
-        sudo cp -fv $ps1 /root/.bash_aliases.d/; 
-    }
-    ps11(){
-        cp -fv $ps1 ~/.bash_aliases.d/
-        yes_edit_no ps1_r "$ps1" "Install PS1_colours.sh at /root/?" "yes" "GREEN" 
-    }
-    yes_edit_no ps11 "$ps1" "Install PS1_colours.sh at ~/.bash_aliases.d/ (Coloured command prompt)? " "yes" "GREEN"
-    
-    if [ $distro == "Manjaro" ] ; then
-        manj_r(){ 
-            sudo cp -fv $manjaro /root/.bash_aliases.d/; 
-        }
-        manj(){
-            cp -fv $manjaro ~/.bash_aliases.d/
-            yes_edit_no manj_r "$manjaro" "Install manjaro.sh at /root/?" "yes" "GREEN" 
-        }
-        yes_edit_no manj "$manjaro" "Install manjaro.sh at ~/.bash_aliases.d/ (manjaro specific aliases)? " "yes" "GREEN"
-    fi
-    
-    # Variety aliases 
-    # 
-    variti_r(){ 
-        sudo cp -fv $variti /root/.bash_aliases.d/; 
-    }
-    variti(){
-        cp -fv $variti ~/.bash_aliases.d/
-        yes_edit_no variti_r "$variti" "Install variety.sh at /root/?" "no" "YELLOW" 
-    }
-    yes_edit_no variti "$variti" "Install variety.sh at ~/.bash_aliases.d/ (aliases for a variety of tools)? " "edit" "GREEN" 
-    
-    pthon(){
-        cp -fv $pthon ~/.bash_aliases.d/
-    }
-    yes_edit_no pthon "$pthon" "Install python.sh at ~/.bash_aliases.d/ (aliases for a python development)? " "edit" "GREEN" 
-
-fi
-
-source ~/.bashrc
 
 echo "${cyan}${bold}Source .bashrc 'source ~/.bashrc' and you can check all aliases with 'alias'";
 alias -p;
