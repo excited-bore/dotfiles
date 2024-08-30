@@ -9,8 +9,8 @@ fi
 if ! type update-system &> /dev/null; then
     if ! test -f aliases/.bash_aliases.d/update-system.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)" 
-    else
         . ./aliases/.bash_aliases.d/update-system.sh
+    else
     fi
 fi
 
@@ -481,7 +481,7 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                     while test -z "$theme"; do
                         theme=$(printf "$(delta --list-syntax-themes | tail -n +1)" | fzf --reverse --border --border-label="Syntax theme")
                         theme=$(echo "$theme" | awk '{$1=""; print $0;}')
-                        delta --syntax-theme "$theme" $TMPDIR/dtest1 $TMPDIR/dtest2
+                        delta --syntax-theme "${theme:1}" $TMPDIR/dtest1 $TMPDIR/dtest2
                         stty sane && reade -Q "MAGENTA" -i "n" -p "Set as syntax theme? (Will retry if no) [N/y]: " "y" dltthme
                         if test "$dltthme" == "n"; then
                            theme='' 
@@ -947,7 +947,7 @@ fi
                         while test -z "$theme"; do
                             theme=$(printf "$(delta --list-syntax-themes | tail -n +1)" | fzf --reverse --border --border-label="Syntax theme")
                             theme=$(echo "$theme" | awk '{$1=""; print $0;}')
-                            delta --syntax-theme "$theme" $TMPDIR/dtest1 $TMPDIR/dtest2
+                            delta --syntax-theme "${theme:1}" $TMPDIR/dtest1 $TMPDIR/dtest2
                             stty sane && reade -Q "MAGENTA" -i "n" -p "Set as syntax theme? (Will retry if no) [N/y]: " "y" dltthme
                             if test "$dltthme" == "n"; then
                                theme='' 
