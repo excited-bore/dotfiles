@@ -54,66 +54,69 @@ fi
 if test $machine == 'Mac' && type brew &> /dev/null; then
     brew install neovim
     if ! type xclip &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Install nvim clipboard? (xsel xclip) [Y/n]:" "n" clip
+        reade -Q "GREEN" -i "y" -p "Install nvim clipboard? (xsel xclip) [Y/n]: " "n" clip
         if [ -z $clip ] || [ "y" == $clip ]; then
             brew install xsel xclip
             echo "${green} If this is for use with ssh on serverside, X11 needs to be forwarded"
             echo "${green} At clientside, 'ForwardX11 yes' also needs to be put in ~/.ssh/config under Host"
             echo "${green} Connection also need to start with -X flag (ssh -X ..@..)"
-            reade -Q "GREEN" -i "n" -p "Forward X11 in /etc/ssh/sshd.config? [Y/n]:" "n" x11f
+            reade -Q "GREEN" -i "n" -p "Forward X11 in /etc/ssh/sshd.config? [Y/n]: " "n" x11f
             if [ -z $x11f ] || [ "y" == $x11f ]; then
                sudo sed -i 's|.X11Forwarding yes|X11Forwarding yes|g' /etc/ssh/sshd_config
             fi
         fi
     fi
-    if ! type pylint &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Install nvim-python? [Y/n]:" "n" pyscripts
-        if [ -z $pyscripts ] || [ "y" == $pyscripts ]; then
-            brew install python python-pynvim python-pipx
-            pipx install pynvim 
-            pipx install pylint
-        fi
-    fi
-    if ! type npm &> /dev/null || ! npm list -g | grep neovim &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Install nvim-javascript? [Y/n]:" "n" jsscripts
-        if [ -z $jsscripts ] || [ "y" == $jsscripts ]; then
-            brew install npm nodejs
-            sudo npm install -g neovim
-        fi
-    fi
-    if ! type gem &> /dev/null || ! gem list | grep neovim &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Install nvim-ruby? [Y/n]:" "n" rubyscripts
-        if [ -z $rubyscripts ] || [ "y" == $rubyscripts ]; then
-            brew install ruby
-            rver=$(echo $(ruby --version) | awk '{print $2}' | cut -d. -f-2)'.0'
-            paths=$(gem environment | awk '/- GEM PATH/{flag=1;next}/- GEM CONFIGURATION/{flag=0}flag' | sed 's|     - ||g' | paste -s -d ':')
-            if grep -q "GEM" $PATHVAR; then
-                sed -i "s|.export GEM_HOME=.*|export GEM_HOME=$HOME/.gem/ruby/$rver|g" $PATHVAR
-                sed -i "s|.export GEM_PATH=.*|export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin|g" $PATHVAR
-                sed -i 's|.export PATH=$PATH:$GEM_PATH.*|export PATH=$PATH:$GEM_PATH:$GEM_HOME|g' $PATHVAR
-            else
-                printf "export GEM_HOME=$HOME/.gem/ruby/$rver\n" >> $PATHVAR
-                printf "export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin\n" >> $PATHVAR
-                printf "export PATH=\$PATH:\$GEM_PATH:\$GEM_HOME\n" >> $PATHVAR
+    reade -Q "GREEN" -i "y" -p "Install nvim code language support (python, javascript, ruby, perl, ..)? [Y/n]: " "n" langs
+    if type $langs == 'y'; then
+        if ! type pylint &> /dev/null; then
+            reade -Q "GREEN" -i "y" -p "Install nvim-python? [Y/n]: " "n" pyscripts
+            if [ -z $pyscripts ] || [ "y" == $pyscripts ]; then
+                brew install python python-pynvim python-pipx
+                pipx install pynvim 
+                pipx install pylint
             fi
-            #source ~/.bashrc
-            gem install neovim
         fi
-    fi
-    if ! type cpan &> /dev/null || ! cpan -l 2> /dev/null | grep Neovim::Ext &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Install nvim-perl? [Y/n]:" "n" perlscripts
-        if [ -z $perlscripts ] || [ "y" == $perlscripts ]; then
-            brew install cpanminus
-            cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
-            sudo cpanm --sudo -n Neovim::Ext
-            reade -Q "GREEN" -i "y" -p "Perl uses cpan for the installation of modules. Initialize cpan? (Will prevent nvim :checkhealth warning) [Y/n]: " cpn
-            if [ "y" == $cpn ]; then
-                cpan -l
+        if ! type npm &> /dev/null || ! npm list -g | grep neovim &> /dev/null; then
+            reade -Q "GREEN" -i "y" -p "Install nvim-javascript? [Y/n]: " "n" jsscripts
+            if [ -z $jsscripts ] || [ "y" == $jsscripts ]; then
+                brew install npm nodejs
+                sudo npm install -g neovim
+            fi
+        fi
+        if ! type gem &> /dev/null || ! gem list | grep neovim &> /dev/null; then
+            reade -Q "GREEN" -i "y" -p "Install nvim-ruby? [Y/n]: " "n" rubyscripts
+            if [ -z $rubyscripts ] || [ "y" == $rubyscripts ]; then
+                brew install ruby
+                rver=$(echo $(ruby --version) | awk '{print $2}' | cut -d. -f-2)'.0'
+                paths=$(gem environment | awk '/- GEM PATH/{flag=1;next}/- GEM CONFIGURATION/{flag=0}flag' | sed 's|     - ||g' | paste -s -d ':')
+                if grep -q "GEM" $PATHVAR; then
+                    sed -i "s|.export GEM_HOME=.*|export GEM_HOME=$HOME/.gem/ruby/$rver|g" $PATHVAR
+                    sed -i "s|.export GEM_PATH=.*|export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin|g" $PATHVAR
+                    sed -i 's|.export PATH=$PATH:$GEM_PATH.*|export PATH=$PATH:$GEM_PATH:$GEM_HOME|g' $PATHVAR
+                else
+                    printf "export GEM_HOME=$HOME/.gem/ruby/$rver\n" >> $PATHVAR
+                    printf "export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin\n" >> $PATHVAR
+                    printf "export PATH=\$PATH:\$GEM_PATH:\$GEM_HOME\n" >> $PATHVAR
+                fi
+                #source ~/.bashrc
+                gem install neovim
+            fi
+        fi
+        if ! type cpan &> /dev/null || ! cpan -l 2> /dev/null | grep Neovim::Ext &> /dev/null; then
+            reade -Q "GREEN" -i "y" -p "Install nvim-perl? [Y/n]: " "n" perlscripts
+            if [ -z $perlscripts ] || [ "y" == $perlscripts ]; then
+                brew install cpanminus
+                cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+                sudo cpanm --sudo -n Neovim::Ext
+                reade -Q "GREEN" -i "y" -p "Perl uses cpan for the installation of modules. Initialize cpan? (Will prevent nvim :checkhealth warning) [Y/n]: " cpn
+                if [ "y" == $cpn ]; then
+                    cpan -l
+                fi
             fi
         fi
     fi
     if ! type ctags &> /dev/null; then 
-        reade -Q "GREEN" -i "y" -p "Install ctags? [Y/n]:" "n" ctags
+        reade -Q "GREEN" -i "y" -p "Install ctags? [Y/n]: " "n" ctags
         if  [ "y" == $ctags ]; then
             brew install ctags
         fi
@@ -124,66 +127,70 @@ elif test $distro == "Arch" || test $distro == "Manjaro"; then
         sudo pacman -S neovim 
     fi
     if ! type xclip &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Install nvim clipboard? (xsel xclip) [Y/n]:" "n" clip
+        reade -Q "GREEN" -i "y" -p "Install nvim clipboard? (xsel xclip) [Y/n]: " "n" clip
         if [ -z $clip ] || [ "y" == $clip ]; then
             sudo pacman -S xsel xclip
             echo "${green} If this is for use with ssh on serverside, X11 needs to be forwarded"
             echo "${green} At clientside, 'ForwardX11 yes' also needs to be put in ~/.ssh/config under Host"
             echo "${green} Connection also need to start with -X flag (ssh -X ..@..)"
-            reade -Q "GREEN" -i "n" -p "Forward X11 in /etc/ssh/sshd.config? [Y/n]:" "n" x11f
+            reade -Q "GREEN" -i "n" -p "Forward X11 in /etc/ssh/sshd.config? [Y/n]: " "n" x11f
             if [ -z $x11f ] || [ "y" == $x11f ]; then
                sudo sed -i 's|.X11Forwarding yes|X11Forwarding yes|g' /etc/ssh/sshd_config
             fi
         fi
     fi
-    if ! type pylint &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Install nvim-python? [Y/n]:" "n" pyscripts
-        if [ -z $pyscripts ] || [ "y" == $pyscripts ]; then
-            sudo pacman -S python python-pynvim python-pipx
-            pipx install pynvim 
-            pipx install pylint
-        fi
-    fi
-    if ! type npm &> /dev/null || ! npm list -g | grep neovim &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Install nvim-javascript? [Y/n]:" "n" jsscripts
-        if [ -z $jsscripts ] || [ "y" == $jsscripts ]; then
-            sudo pacman -S npm nodejs
-            sudo npm install -g neovim
-        fi
-    fi
-    if ! type gem &> /dev/null || ! gem list | grep neovim &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Install nvim-ruby? [Y/n]:" "n" rubyscripts
-        if [ -z $rubyscripts ] || [ "y" == $rubyscripts ]; then
-            sudo pacman -S ruby
-            rver=$(echo $(ruby --version) | awk '{print $2}' | cut -d. -f-2)'.0'
-            paths=$(gem environment | awk '/- GEM PATH/{flag=1;next}/- GEM CONFIGURATION/{flag=0}flag' | sed 's|     - ||g' | paste -s -d ':')
-            if grep -q "GEM" $PATHVAR; then
-                sed -i "s|.export GEM_HOME=.*|export GEM_HOME=$HOME/.gem/ruby/$rver|g" $PATHVAR
-                sed -i "s|.export GEM_PATH=.*|export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin|g" $PATHVAR
-                sed -i 's|.export PATH=$PATH:$GEM_PATH.*|export PATH=$PATH:$GEM_PATH:$GEM_HOME|g' $PATHVAR
-            else
-                printf "export GEM_HOME=$HOME/.gem/ruby/$rver\n" >> $PATHVAR
-                printf "export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin\n" >> $PATHVAR
-                printf "export PATH=\$PATH:\$GEM_PATH:\$GEM_HOME\n" >> $PATHVAR
-            fi
-            #source ~/.bashrc
-            gem install neovim
-        fi
-    fi
-    if ! type cpan &> /dev/null || ! cpan -l 2> /dev/null | grep Neovim::Ext &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Install nvim-perl? [Y/n]:" "n" perlscripts
-        if [ -z $perlscripts ] || [ "y" == $perlscripts ]; then
-            sudo pacman -S cpanminus
-            cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
-            sudo cpanm --sudo -n Neovim::Ext
-            reade -Q "GREEN" -i "y" -p "Perl uses cpan for the installation of modules. Initialize cpan? (Will prevent nvim :checkhealth warning) [Y/n]: " cpn
-            if [ "y" == $cpn ]; then
-                cpan -l
+    reade -Q "GREEN" -i "y" -p "Install nvim code language support (python, javascript, ruby, perl, ..)? [Y/n]: " "n" langs
+    if type $langs == 'y'; then
+     
+        if ! type pylint &> /dev/null; then
+            reade -Q "GREEN" -i "y" -p "Install nvim-python? [Y/n]: " "n" pyscripts
+            if [ -z $pyscripts ] || [ "y" == $pyscripts ]; then
+                sudo pacman -S python python-pynvim python-pipx
+                pipx install pynvim 
+                pipx install pylint
             fi
         fi
-    fi
+        if ! type npm &> /dev/null || ! npm list -g | grep neovim &> /dev/null; then
+            reade -Q "GREEN" -i "y" -p "Install nvim-javascript? [Y/n]: " "n" jsscripts
+            if [ -z $jsscripts ] || [ "y" == $jsscripts ]; then
+                sudo pacman -S npm nodejs
+                sudo npm install -g neovim
+            fi
+        fi
+        if ! type gem &> /dev/null || ! gem list | grep neovim &> /dev/null; then
+            reade -Q "GREEN" -i "y" -p "Install nvim-ruby? [Y/n]: " "n" rubyscripts
+            if [ -z $rubyscripts ] || [ "y" == $rubyscripts ]; then
+                sudo pacman -S ruby
+                rver=$(echo $(ruby --version) | awk '{print $2}' | cut -d. -f-2)'.0'
+                paths=$(gem environment | awk '/- GEM PATH/{flag=1;next}/- GEM CONFIGURATION/{flag=0}flag' | sed 's|     - ||g' | paste -s -d ':')
+                if grep -q "GEM" $PATHVAR; then
+                    sed -i "s|.export GEM_HOME=.*|export GEM_HOME=$HOME/.gem/ruby/$rver|g" $PATHVAR
+                    sed -i "s|.export GEM_PATH=.*|export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin|g" $PATHVAR
+                    sed -i 's|.export PATH=$PATH:$GEM_PATH.*|export PATH=$PATH:$GEM_PATH:$GEM_HOME|g' $PATHVAR
+                else
+                    printf "export GEM_HOME=$HOME/.gem/ruby/$rver\n" >> $PATHVAR
+                    printf "export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin\n" >> $PATHVAR
+                    printf "export PATH=\$PATH:\$GEM_PATH:\$GEM_HOME\n" >> $PATHVAR
+                fi
+                #source ~/.bashrc
+                gem install neovim
+            fi
+        fi
+        if ! type cpan &> /dev/null || ! cpan -l 2> /dev/null | grep Neovim::Ext &> /dev/null; then
+            reade -Q "GREEN" -i "y" -p "Install nvim-perl? [Y/n]: " "n" perlscripts
+            if [ -z $perlscripts ] || [ "y" == $perlscripts ]; then
+                sudo pacman -S cpanminus
+                cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+                sudo cpanm --sudo -n Neovim::Ext
+                reade -Q "GREEN" -i "y" -p "Perl uses cpan for the installation of modules. Initialize cpan? (Will prevent nvim :checkhealth warning) [Y/n]: " cpn
+                if [ "y" == $cpn ]; then
+                    cpan -l
+                fi
+            fi
+        fi
+    fi 
     if ! type ctags &> /dev/null; then 
-        reade -Q "GREEN" -i "y" -p "Install ctags? [Y/n]:" "n" ctags
+        reade -Q "GREEN" -i "y" -p "Install ctags? [Y/n]: " "n" ctags
         if  [ "y" == $ctags ]; then
             sudo pacman -S ctags
         fi
@@ -320,85 +327,90 @@ elif [  $distro_base == "Debian" ];then
             echo "${green} If this is for use with ssh on serverside, X11 needs to be forwarded"
             echo "${green} At clientside, 'ForwardX11 yes' also needs to be put in ~/.ssh/config under Host"
             echo "${green} Connection also need to start with -X flag (ssh -X ..@..)"
-            reade -Q "GREEN" -i "n" -p "Forward X11 in /etc/ssh/sshd.config? [Y/n]:" "n" x11f
+            reade -Q "GREEN" -i "n" -p "Forward X11 in /etc/ssh/sshd.config? [Y/n]: " "n" x11f
             if [ -z $x11f ] || [ "y" == $x11f ]; then
                sudo sed -i 's|.X11Forwarding yes|X11Forwarding yes|g' /etc/ssh/sshd_config
             fi
         fi
     fi
-    if ! type pylint &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Install nvim-python? [Y/n]: " "n" pyscripts
-        if [ -z $pyscripts ] || [ "y" == $pyscripts ]; then
-            sudo apt install python3 python3-dev python3-pynvim pipx  
-            pipx install pynvim
-            pipx install pylint
+    reade -Q "GREEN" -i "y" -p "Install nvim code language support (python, javascript, ruby, perl, ..)? [Y/n]: " "n" langs
+    if type $langs == 'y'; then
+     
+        if ! type pylint &> /dev/null; then
+            reade -Q "GREEN" -i "y" -p "Install nvim-python? [Y/n]: " "n" pyscripts
+            if [ -z $pyscripts ] || [ "y" == $pyscripts ]; then
+                sudo apt install python3 python3-dev python3-pynvim pipx  
+                pipx install pynvim
+                pipx install pylint
+            fi
         fi
-    fi
 
-    if ! type npm &> /dev/null || ! npm list -g | grep neovim  &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Install nvim-javascript? [Y/n]: " "n" jsscripts
-        if [ -z $jsscripts ] || [ "y" == $jsscripts ]; then
-            sudo apt install nodejs npm
-            sudo npm install -g neovim
-            if [ $(which nvim) == "$HOME/.local/bin/flatpak/nvim" ]; then
-                qry=$(flatpak list | grep node)           
-                if [ ! -z "$qry" ] ; then
-                    echo "${green} Flatpak version nvim needs flatpak's SDK for a node provider"
-                    reade -Q "GREEN" -i "y" -p "Install flatpak node SDK and set in environment? [Y/n]: " "n" flpknode
-                    if [ -z $flpknode ] || [ "y" == $flpknode ]; then 
-                        flatpak install node18
-                        #if grep -q "FLATPAK_ENABLE_SDK_EXT*.*node" $PATHVAR; then
-                        #    sed -i "s|.export FLATPAK_ENABLE_SDK_EXT=|export FLATPAK_ENABLE_SDK_EXT=|g" $PATHVAR  
-                        #    sed -i 's|export FLATPAK_ENABLE_SDK_EXT=\(.*\)node..\(.*\)|export FLATPAK_ENABLE_SDK_EXT=\1node18\2|g' $PATHVAR
-                        #elif grep -q "FLATPAK_ENABLE_SDK_EXT" $PATHVAR; then
-                        #    sed -i 's|.export FLATPAK_ENABLE_SDK_EXT=|export FLATPAK_ENABLE_SDK_EXT=|g' $PATHVAR
-                        #    sed -i 's|export FLATPAK_ENABLE_SDK_EXT=\(.*\)|export FLATPAK_ENABLE_SDK_EXT=\1,node18|g' $PATHVAR
-                        #else
-                        #    echo 'export FLATPAK_ENABLE_SDK_EXT=node18' $PATHVAR
-                        #fi
-                        
+        if ! type npm &> /dev/null || ! npm list -g | grep neovim  &> /dev/null; then
+            reade -Q "GREEN" -i "y" -p "Install nvim-javascript? [Y/n]: " "n" jsscripts
+            if [ -z $jsscripts ] || [ "y" == $jsscripts ]; then
+                sudo apt install nodejs npm
+                sudo npm install -g neovim
+                if [ $(which nvim) == "$HOME/.local/bin/flatpak/nvim" ]; then
+                    qry=$(flatpak list | grep node)           
+                    if [ ! -z "$qry" ] ; then
+                        echo "${green} Flatpak version nvim needs flatpak's SDK for a node provider"
+                        reade -Q "GREEN" -i "y" -p "Install flatpak node SDK and set in environment? [Y/n]: " "n" flpknode
+                        if [ -z $flpknode ] || [ "y" == $flpknode ]; then 
+                            flatpak install node18
+                            #if grep -q "FLATPAK_ENABLE_SDK_EXT*.*node" $PATHVAR; then
+                            #    sed -i "s|.export FLATPAK_ENABLE_SDK_EXT=|export FLATPAK_ENABLE_SDK_EXT=|g" $PATHVAR  
+                            #    sed -i 's|export FLATPAK_ENABLE_SDK_EXT=\(.*\)node..\(.*\)|export FLATPAK_ENABLE_SDK_EXT=\1node18\2|g' $PATHVAR
+                            #elif grep -q "FLATPAK_ENABLE_SDK_EXT" $PATHVAR; then
+                            #    sed -i 's|.export FLATPAK_ENABLE_SDK_EXT=|export FLATPAK_ENABLE_SDK_EXT=|g' $PATHVAR
+                            #    sed -i 's|export FLATPAK_ENABLE_SDK_EXT=\(.*\)|export FLATPAK_ENABLE_SDK_EXT=\1,node18|g' $PATHVAR
+                            #else
+                            #    echo 'export FLATPAK_ENABLE_SDK_EXT=node18' $PATHVAR
+                            #fi
+                            
+                        fi
                     fi
+                    unset flpknode qry
+                    
                 fi
-                unset flpknode qry
-                
             fi
         fi
-    fi
-    
-    if ! type gem &> /dev/null || ! gem list | grep neovim &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Install nvim-ruby? [Y/n]: " "n" rubyscripts
-        if [ -z $rubyscripts ] || [ "y" == $rubyscripts ]; then
-            sudo apt install ruby ruby-dev
-            rver=$(echo $(ruby --version) | awk '{print $2}' | cut -d. -f-2)'.0'
-            paths=$(gem environment | awk '/- GEM PATH/{flag=1;next}/- GEM CONFIGURATION/{flag=0}flag' | sed 's|     - ||g' | paste -s -d ':')
-            if grep -q "GEM" $PATHVAR; then
-                sed -i "s|.export GEM_HOME=.*|export GEM_HOME=$HOME/.gem/ruby/$rver|g" $PATHVAR
-                
-                sed -i "s|.export GEM_PATH=.*|export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin|g" $PATHVAR
-                sed -i 's|.export PATH=$PATH:$GEM_PATH.*|export PATH=$PATH:$GEM_PATH:$GEM_HOME|g' $PATHVAR
-            else
-                printf "export GEM_HOME=$HOME/.gem/ruby/$rver\n" >> $PATHVAR
-                
-                printf "export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin\n" >> $PATHVAR
-                printf "export PATH=\$PATH:\$GEM_PATH:\$GEM_HOME\n" >> $PATHVAR
-            fi
-            source ~/.bashrc
-            gem install neovim 
-        fi
-    fi
-    
-    if ! type cpan &> /dev/null || ! cpan -l 2> /dev/null | grep Neovim::Ext &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Install nvim-perl? [Y/n]: " "n" perlscripts
-        if [ -z $perlscripts ] || [ "y" == $perlscripts ]; then
-            sudo apt install cpanminus
-            cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
-            sudo cpanm --sudo -n Neovim::Ext
-            reade -Q "GREEN" -i "y" -p "Perl uses cpan for the installation of modules. Initialize cpan? (Will prevent nvim :checkhealth warning) [Y/n]: " cpn
-            if [ "y" == $cpn ]; then
-                cpan -l
+        
+        if ! type gem &> /dev/null || ! gem list | grep neovim &> /dev/null; then
+            reade -Q "GREEN" -i "y" -p "Install nvim-ruby? [Y/n]: " "n" rubyscripts
+            if [ -z $rubyscripts ] || [ "y" == $rubyscripts ]; then
+                sudo apt install ruby ruby-dev
+                rver=$(echo $(ruby --version) | awk '{print $2}' | cut -d. -f-2)'.0'
+                paths=$(gem environment | awk '/- GEM PATH/{flag=1;next}/- GEM CONFIGURATION/{flag=0}flag' | sed 's|     - ||g' | paste -s -d ':')
+                if grep -q "GEM" $PATHVAR; then
+                    sed -i "s|.export GEM_HOME=.*|export GEM_HOME=$HOME/.gem/ruby/$rver|g" $PATHVAR
+                    
+                    sed -i "s|.export GEM_PATH=.*|export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin|g" $PATHVAR
+                    sed -i 's|.export PATH=$PATH:$GEM_PATH.*|export PATH=$PATH:$GEM_PATH:$GEM_HOME|g' $PATHVAR
+                else
+                    printf "export GEM_HOME=$HOME/.gem/ruby/$rver\n" >> $PATHVAR
+                    
+                    printf "export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin\n" >> $PATHVAR
+                    printf "export PATH=\$PATH:\$GEM_PATH:\$GEM_HOME\n" >> $PATHVAR
+                fi
+                source ~/.bashrc
+                gem install neovim 
             fi
         fi
-    fi
+        
+        if ! type cpan &> /dev/null || ! cpan -l 2> /dev/null | grep Neovim::Ext &> /dev/null; then
+            reade -Q "GREEN" -i "y" -p "Install nvim-perl? [Y/n]: " "n" perlscripts
+            if [ -z $perlscripts ] || [ "y" == $perlscripts ]; then
+                sudo apt install cpanminus
+                cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+                sudo cpanm --sudo -n Neovim::Ext
+                reade -Q "GREEN" -i "y" -p "Perl uses cpan for the installation of modules. Initialize cpan? (Will prevent nvim :checkhealth warning) [Y/n]: " cpn
+                if [ "y" == $cpn ]; then
+                    cpan -l
+                fi
+            fi
+        fi
+    fi 
+
     if ! type ctags &> /dev/null; then
         reade -Q "GREEN" -i "y" -p "Install ctags? [Y/n]: " "n" ctags
         if  [ "y" == $ctags ]; then
