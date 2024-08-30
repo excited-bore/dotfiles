@@ -126,6 +126,11 @@ if ! sudo test -f /etc/polkit/49-nopasswd_global.pkla && ! sudo test -f /etc/pol
     unset plkit
 fi
 
+if ! test -f checks/check_pathvar.sh; then
+    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pathvar.sh)" 
+else
+    . ./checks/check_pathvar.sh
+fi
 
 # Shell-keybinds
 
@@ -725,9 +730,22 @@ fi
 
 reade -Q "$color" -i "$pre" -p "Check existence/create .pathvariables.env and link it to .bashrc in $HOME/ and /root/? $prmpt" "$othr" pathvars
 if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
-    ./install_pathvars.sh $pathvars 
+    if ! test -f install_pathvars.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pathvars.sh)" 
+    else
+        ./install_pathvars.sh  
+    fi 
 fi
 
+echo "Next $(tput setaf 1)sudo$(tput sgr0) will check whether root account is enabled"
+if ! $(sudo passwd -S | awk '{print $2}') == 'L'; then
+    printf "${CYAN}One more thing before finishing off${normal}: the ${RED}root${normal} account is still enabled.\n${RED1}This can be considered a security risk!!${normal}\n"
+    reade -Q 'YELLOW' -i 'y' -p 'Disable root account? (Enable again by giving up a password with \\"sudo passwd root\\") [Y/n]: ' 'n' root_dis
+    if test $root_dis == 'y'; then
+       sudo passwd -l root 
+    fi
+    unset root_dis
+fi
 
 echo "${cyan}${bold}Source .bashrc 'source ~/.bashrc' and you can check all aliases with 'alias'";
 alias -p;

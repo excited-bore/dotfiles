@@ -343,7 +343,8 @@ alias only1space="tr -s ' '"
 alias upper2lower="tr '[:upper:]' '[:lower:]'"
 alias lower2upper="tr '[:lower:]' '[:upper:]'"
 
-
+alias remove-empty-lines="sed '/^[[:space:]]*$/d'"
+alias get-first-stringwords="frst=\"$(echo $words | awk '{print $1}')\" && words=\"$(echo $words | sed "s/\<$frst\> //g")\""
 
 # Pipe column output to a pager
 alias column="column -c $(tput cols)"
