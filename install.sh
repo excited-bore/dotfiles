@@ -126,23 +126,6 @@ if ! sudo test -f /etc/polkit/49-nopasswd_global.pkla && ! sudo test -f /etc/pol
     unset plkit
 fi
 
-pre='y'
-othr='n'
-color='GREEN'
-prmpt='[Y/n]: '
-echo "Next $(tput setaf 1)sudo$(tput sgr0) check for /root/.pathvariables.env' "
-if test -f ~/.pathvariables.env && sudo test -f /root/.pathvariables.env; then
-    pre='n' 
-    othr='y'
-    color='YELLOW'
-    prmpt='[N/y]: '
-fi 
-
-reade -Q "$color" -i "$pre" -p "Check existence/create .pathvariables.env and link it to .bashrc in $HOME/ and /root/? $prmpt" "$othr" pathvars
-if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
-    ./install_pathvars.sh $pathvars 
-fi
-
 
 # Shell-keybinds
 
@@ -882,6 +865,24 @@ fi
     unset tojump
     unset pre color othr prmpt 
 #fi
+
+pre='y'
+othr='n'
+color='GREEN'
+prmpt='[Y/n]: '
+echo "Next $(tput setaf 1)sudo$(tput sgr0) check for /root/.pathvariables.env' "
+if test -f ~/.pathvariables.env && sudo test -f /root/.pathvariables.env; then
+    pre='n' 
+    othr='y'
+    color='YELLOW'
+    prmpt='[N/y]: '
+fi 
+
+reade -Q "$color" -i "$pre" -p "Check existence/create .pathvariables.env and link it to .bashrc in $HOME/ and /root/? $prmpt" "$othr" pathvars
+if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
+    ./install_pathvars.sh $pathvars 
+fi
+
 
 echo "${cyan}${bold}Source .bashrc 'source ~/.bashrc' and you can check all aliases with 'alias'";
 alias -p;
