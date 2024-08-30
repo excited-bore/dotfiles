@@ -181,73 +181,73 @@ if ! sudo test -f /root/.keybinds; then
     fi
 fi
 
-PATHVAR=~/.bashrc
+export PATHVAR=~/.bashrc
 
 if [ -f ~/.pathvariables.env ]; then
-    PATHVAR=~/.pathvariables.env
+     export PATHVAR=~/.pathvariables.env
 fi
 
-ALIAS=~/.bashrc
+export ALIAS=~/.bashrc
 
 if [ -f ~/.bash_aliases ]; then
-    ALIAS=~/.bash_aliases
+    export ALIAS=~/.bash_aliases
 fi
 
 if [ -d ~/.bash_aliases.d/ ]; then
-    ALIAS_FILEDIR=~/.bash_aliases.d/
+    export ALIAS_FILEDIR=~/.bash_aliases.d/
 fi
 
 
-COMPLETION=~/.bashrc
+export COMPLETION=~/.bashrc
 
 if [ -f ~/.bash_completion ]; then
-    COMPLETION==~/.bash_completion
+    export COMPLETION==~/.bash_completion
 fi
 
 if [ -d ~/.bash_completion.d/ ]; then
-    COMPLETION_FILEDIR=~/.bash_completion.d/
+    export COMPLETION_FILEDIR=~/.bash_completion.d/
 fi
 
 
-KEYBIND=~/.bashrc
+export KEYBIND=~/.bashrc
 
 if [ -f ~/.keybinds ]; then
-    KEYBIND=~/.keybinds
+    export KEYBIND=~/.keybinds
 fi
 
 if [ -d ~/.keybinds.d/ ]; then
-    KEYBIND_FILEDIR=~/.keybinds.d/
+    export KEYBIND_FILEDIR=~/.keybinds.d/
 fi
 
-ALIAS_R=/root/.bashrc
-COMPLETION_R=/root/.bashrc
-KEYBIND_R=/root/.bashrc
-PATHVAR_R=/root/.bashrc
+export ALIAS_R=/root/.bashrc
+export COMPLETION_R=/root/.bashrc
+export KEYBIND_R=/root/.bashrc
+export PATHVAR_R=/root/.bashrc
 
 
 if sudo test -f /root/.pathvariables.env; then
-    PATHVAR_R=/root/.pathvariables.env
+    export PATHVAR_R=/root/.pathvariables.env
 fi
 
 if sudo test -f /root/.bash_aliases; then
-    ALIAS_R=/root/.bash_aliases
+    export ALIAS_R=/root/.bash_aliases
 fi
 if sudo test -d /root/.bash_aliases.d/; then
-    ALIAS_FILEDIR_R=/root/.bash_aliases.d/
+    export ALIAS_FILEDIR_R=/root/.bash_aliases.d/
 fi
 
 if sudo test -f /root/.bash_completion; then
-    COMPLETION_R=/root/.bash_completion
+    export COMPLETION_R=/root/.bash_completion
 fi
 
 if sudo test -d /root/.bash_completion.d/; then
-    COMPLETION_FILEDIR_R=/root/.bash_completion.d/
+    export COMPLETION_FILEDIR_R=/root/.bash_completion.d/
 fi
 if sudo test -f /root/.keybinds  ; then
-    KEYBIND_R=/root/.keybinds
+    export KEYBIND_R=/root/.keybinds
 fi
 
 if sudo test -d /root/.keybinds.d/  ; then
-    KEYBIND_FILEDIR_R=/root/.keybindsd.d/
+    export KEYBIND_FILEDIR_R=/root/.keybindsd.d/
 fi
 
