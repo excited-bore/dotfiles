@@ -5,3 +5,4 @@
 # Preserve environment, for running stuff like custom pagers (moar) really necessary
 alias sudo-keep-env="sudo -E"
 alias sudo-shell="sudo -i"
+alias sudo-edit-sudoers="sudo visudo"

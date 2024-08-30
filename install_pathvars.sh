@@ -183,7 +183,24 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
             editors="emacs $editors"
             prmpt="$prmpt \tEmacs = One of the oldest and versatile editors - Modal and featurerich, but overwhelming as well\n"
         fi
+        if type code &> /dev/null; then
+            editors="$compedit code"
+            prmpt="$prmpt \tCode = Visual Studio Code - Modern standard for most when it comes to text editors (Warning: does not work well when paired with sudo)\n"
+        fi
         printf "$prmpt${normal}"
+        touch $TMPDIR/editor-outpt
+        # Redirect output to file in subshell (mimeopen gives output but also starts read. This cancels read). In tmp because that gets cleaned up
+        (echo "" | mimeopen -a editor-check.sh &> $TMPDIR/editor-outpt)
+        editors="$(cat $TMPDIR/editor-outpt | awk 'NR > 2' | awk '{if (prev_1_line) print prev_1_line; prev_1_line=prev_line} {prev_line=$NF}' | sed 's|[()]||g' | tr -s [:space:] \\n | uniq | tr '\n' ' ') $editors"
+        editors="$(echo $editors | tr ' ' '\n' | sort -u)"
+        prmpt="Found visual editors using ${CYAN}mimeopen${normal} (non definitive list): ${GREEN}\n"
+        for i in $editors; do
+            prmpt="$prmpt\t - $i\n"
+        done
+        prmpt="$prmpt${normal}"
+        #frst="$(echo $compedit | awk '{print $1}')"
+        #compedit="$(echo $compedit | sed "s/\<$frst\> //g")"
+        printf "$prmpt"
         reade -Q "GREEN" -i "nano" -p "EDITOR (Terminal - nano default)=" "$editors" edtor
         edtor="$(where_cmd $edtor)"
         if [[ "$edtor" =~ "emacs" ]]; then
@@ -192,31 +209,20 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         sed -i 's|#export EDITOR=.*|export EDITOR='$edtor'|g' $pathvr
         
         # Make .txt file and output file
-        touch $TMPDIR/editor-outpt
-        # Redirect output to file in subshell (mimeopen gives output but also starts read. This cancels read). In tmp because that gets cleaned up
-        (echo "" | mimeopen -a editor-check.sh &> $TMPDIR/editor-outpt)
-        compedit="nano $(cat $TMPDIR/editor-outpt | awk 'NR > 2' | awk '{if (prev_1_line) print prev_1_line; prev_1_line=prev_line} {prev_line=$NF}' | sed 's|[()]||g' | tr -s [:space:] \\n | uniq | tr '\n' ' ') $editors"
-        if type code &> /dev/null; then
-            compedit="$compedit code"
+         
+        reade -Q 'GREEN' -i 'y' -p "Set \\\\\$EDITOR for VISUAL [Y/n]: " 'n' vis_ed
+        if test $vis_ed == 'y'; then
+            sed -i 's|#export VISUAL=|export VISUAL=|g' $pathvr
+            sed -i 's|export VISUAL=.*|export VISUAL=$EDITOR|g' $pathvr
+        else
+            reade -Q "GREEN" -i "nano" -p "VISUAL (GUI editor - default nano)=" "$editors" vsual
+            vsual="$(where_cmd $vsual)"
+            sed -i 's|#export VISUAL=|export VISUAL=|g' $pathvr
+            sed -i 's|export VISUAL=.*|export VISUAL='"$vsual"'|g' $pathvr
         fi
-        compedit="$(echo $compedit | tr ' ' '\n' | sort -u)"
-
-        prmpt="Found visual editors using ${CYAN}mimeopen${normal} (non definitive list): ${GREEN}\n"
-        for i in $compedit; do
-            prmpt="$prmpt\t - $i\n"
-        done
-        prmpt="$prmpt${normal}"
-
-        frst="$(echo $compedit | awk '{print $1}')"
-        compedit="$(echo $compedit | sed "s/\<$frst\> //g")"
-
-        printf "$prmpt"
-
-        reade -Q "GREEN" -i "$frst" -p "VISUAL (GUI editor - default $frst)=" "$compedit" vsual
-        vsual="$(where_cmd $vsual)"
-        sed -i 's|#export VISUAL=|export VISUAL=|g' $pathvr
-        sed -i 's|export VISUAL=.*|export VISUAL='"$vsual"'|g' $pathvr
         
+        unset vis_ed
+
         if grep -q "#export SUDO_EDITOR" $pathvr; then
             reade -Q "GREEN" -i "y" -p "Set SUDO_EDITOR to $edtor? [Y/n]: " "n" sud_edt
             if test "$sud_edt" == "y"; then
@@ -225,9 +231,9 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         fi
         
         if test -f /etc/sudoers; then 
-            echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for 'Defaults env_keep += \"PAGER SYSTEMD_PAGERSECURE\"' in /etc/sudoers"
-            if ! sudo grep -q "Defaults env_keep += \"PAGER SYSTEMD_PAGERSECURE\"" /etc/sudoers; then
-                printf "${bold}${yellow}Sudo by default does not respect the user's PAGER environment. If you were to want to keep your userdefined less options or use a custom pager (more on that later) when using sudo ${cyan}systemctl/journalctl${bold}${yellow}, you would need to always pass your environment using 'sudo -E'\n${normal}"
+            echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for 'Defaults env_keep += \"PAGER\"' in /etc/sudoers"
+            if ! sudo grep -q "Defaults env_keep += \"PAGER\"" /etc/sudoers; then
+                printf "${bold}${yellow}Sudo by default does not respect the user's PAGER environment. If you were to want to use a custom pager with sudo (except with ${cyan}systemctl/journalctl${bold}${yellow}, more on that later) you would need to always pass your environment using 'sudo -E'\n${normal}"
                 reade -Q "YELLOW" -i "y" -p "Change this behaviour permanently in /etc/sudoers? [Y/n]: " "n" sudrs
                 if test "$sudrs" == "y"; then
                     sudo sed -i '1s/^/Defaults env_keep += "PAGER SYSTEMD_PAGERSECURE"\n/' /etc/sudoers
@@ -312,7 +318,18 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         printf "${cyan}Systemd comes preinstalled with ${GREEN}SYSTEMD_PAGERSECURE=1${normal}.\n This means any pager without a 'secure mode' cant be used for ${CYAN}systemctl/journalctl${normal}.\n(Features that are fairly obscure and mostly less-specific in the first place -\n No editing (v), no examining (:e), no pipeing (|)...)\n It's an understandable concern to be better safe and sound, but this does constrain the user to ${CYAN}only using less.${normal}\n"
         reade -Q "YELLOW" -i "y" -p "${yellow}Set SYSTEMD_PAGERSECURE to 0? [Y/n]: " "n" page_sec
         if test "$page_sec" == "y"; then
-           pageSec=0 
+            pageSec=0 
+            if test -f /etc/sudoers; then 
+                echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for 'Defaults env_keep += \"SYSTEMD_PAGERSECURE\"' in /etc/sudoers"
+                if ! sudo grep -q "Defaults env_keep += \"SYSTEMD_PAGERSECURE\"" /etc/sudoers; then
+                    printf "${bold}${yellow}Sudo won't respect the user's SYSTEMD_PAGERSECURE environment. If you were to want to keep your userdefined less options or use a custom pager when using sudo with ${cyan}systemctl/journalctl${bold}${yellow}, you would need to always pass your environment using 'sudo -E'\n${normal}"
+                    reade -Q "YELLOW" -i "y" -p "Change this behaviour permanently in /etc/sudoers? [Y/n]: " "n" sudrs
+                    if test "$sudrs" == "y"; then
+                        sudo sed -i '1s/^/Defaults env_keep += "SYSTEMD_PAGERSECURE"\n/' /etc/sudoers
+                        echo "Added ${RED}'Defaults env_keep += \"SYSTEMD_PAGERSECURE\"'${normal} to /etc/sudoers"
+                    fi
+                fi
+            fi     
         fi
         prmpt="${yellow}This will set SYSTEMD pathvariables\n\
         When setting a new pager for systemd or changing logging specifics\n\
