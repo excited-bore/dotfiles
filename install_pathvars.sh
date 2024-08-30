@@ -75,6 +75,10 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         
         pagers="more"
         prmpt="${green} \tless = Default pager - Basic, archaic but very customizable\n\tmore = Preinstalled other pager - leaves text by default, less customizable (ironically)\n"
+        if type pg &> /dev/null; then
+            pagers="$pagers pg"
+            prmpt="$prmpt \tpg = Archaic and unintuitive like vi\n"
+        fi
         if type most &> /dev/null; then
             pagers="$pagers most"
             prmpt="$prmpt \tmost = Installed pager that is very customizable\n"
@@ -221,13 +225,13 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         fi
         
         if test -f /etc/sudoers; then 
-            echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for 'Defaults env_keep += \"PAGER\"' in /etc/sudoers"
-            if ! sudo grep -q "Defaults env_keep += \"PAGER\"" /etc/sudoers; then
+            echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for 'Defaults env_keep += \"PAGER SYSTEMD_PAGERSECURE\"' in /etc/sudoers"
+            if ! sudo grep -q "Defaults env_keep += \"PAGER SYSTEMD_PAGERSECURE\"" /etc/sudoers; then
                 printf "${bold}${yellow}Sudo by default does not respect the user's PAGER environment. If you were to want to keep your userdefined less options or use a custom pager (more on that later) when using sudo ${cyan}systemctl/journalctl${bold}${yellow}, you would need to always pass your environment using 'sudo -E'\n${normal}"
                 reade -Q "YELLOW" -i "y" -p "Change this behaviour permanently in /etc/sudoers? [Y/n]: " "n" sudrs
                 if test "$sudrs" == "y"; then
-                    sudo sed -i '1s/^/Defaults env_keep += "PAGER"\n/' /etc/sudoers
-                    echo "Added ${RED}'Defaults env_keep += \"PAGER\"'${normal} to /etc/sudoers"
+                    sudo sed -i '1s/^/Defaults env_keep += "PAGER SYSTEMD_PAGERSECURE"\n/' /etc/sudoers
+                    echo "Added ${RED}'Defaults env_keep += \"PAGER SYSTEMD_PAGERSECURE\"'${normal} to /etc/sudoers"
                 fi
             fi
 
