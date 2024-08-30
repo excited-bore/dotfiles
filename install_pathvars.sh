@@ -184,7 +184,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
             prmpt="$prmpt \tEmacs = One of the oldest and versatile editors - Modal and featurerich, but overwhelming as well\n"
         fi
         if type code &> /dev/null; then
-            editors="$compedit code"
+            editors="$editors code"
             prmpt="$prmpt \tCode = Visual Studio Code - Modern standard for most when it comes to text editors (Warning: does not work well when paired with sudo)\n"
         fi
         printf "$prmpt${normal}"
@@ -241,13 +241,20 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
                 fi
             fi
 
-            echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for 'Defaults env_keep += \"EDITOR VISUAL\"' in /etc/sudoers"
-            if ! sudo grep -q "Defaults env_keep += \"EDITOR VISUAL\"" /etc/sudoers; then
+            echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for 'Defaults env_keep += \"EDITOR\"' and 'Defaults env_keep += \"EDITOR\"' in /etc/sudoers"
+            if ! sudo grep -q "Defaults env_keep += \"EDITOR\"" /etc/sudoers || ! sudo grep -q "Defaults env_keep += \"VISUAL\""  /etc/sudoers; then
                 printf "${bold}${yellow}Sudo by default does not respect the user's EDITOR/VISUAL environment and SUDO_EDITOR is not always checked by programs.\nIf you were to want edit root crontabs (sudo crontab -e), you would get vi (unless using 'sudo -E' to pass your environment)\n"
                 reade -Q "YELLOW" -i "y" -p "Change this behaviour permanently in /etc/sudoers? (Run 'man --pager='less -p ^security' less' if you want to see the potential security holes when using less) [Y/n]: " "n" sudrs
                 if test "$sudrs" == "y"; then
-                    sudo sed -i '1s/^/Defaults env_keep += "EDITOR VISUAL"\n/' /etc/sudoers
-                    echo "Added ${RED}'Defaults env_keep += \"EDITOR VISUAL\"'${normal} to /etc/sudoers"
+                    if ! sudo grep -q "Defaults env_keep += \"EDITOR\""; then 
+                        sudo sed -i '1s/^/Defaults env_keep += "EDITOR"\n/' /etc/sudoers
+                        echo "Added ${RED}'Defaults env_keep += \"EDITOR\"'${normal} to /etc/sudoers"
+                    fi
+                    if ! sudo grep -q "Defaults env_keep += \"VISUAL\""; then 
+                        sudo sed -i '1s/^/Defaults env_keep += "VISUAL"\n/' /etc/sudoers
+                        echo "Added ${RED}'Defaults env_keep += \"VISUAL\"'${normal} to /etc/sudoers"
+                    fi
+                     
                 fi
             fi
         fi 
@@ -493,9 +500,4 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
     printf "It's recommended to logout and login again to notice a change for ${MAGENTA}.profile${normal} and any ${CYAN}.*shelltype*_profiles\n${normal}" 
 fi
 
-if ! test -f checks/check_pathvar.sh; then
-    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pathvar.sh)" 
-else
-    . ./checks/check_pathvar.sh
-fi
 #unset prmpt pathvr xdgInst
