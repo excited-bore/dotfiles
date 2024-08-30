@@ -380,10 +380,14 @@ Condimentum lacinia quis vel eros donec ac. Nibh sed pulvinar proin gravida hend
     elif [ "$pager" == "diff-so-fancy" ] || [ "$pager" == "diffr" ] || [ "$pager" == "ydiff" ] || [ "$pager" == "delta" ] || [ "$pager" == "bat" ] || [ "$pager" == "batdiff" ] ; then
         local difffancy
         local pre='y'
+        local prmpt='[Y/n]: ' 
+        local othr='n' 
         if (test $pager == 'delta' || test $pager == 'diff-so-fancy') && echo $(git config $global --list --show-origin) | grep -q $pager; then
             pre='n'
+            prmpt='[N/y]: ' 
+            othr='y' 
         fi
-        reade -Q "CYAN" -i "$pre" -p "You selected $pager. Configure? [Y/n]: " "n" difffancy
+        reade -Q "CYAN" -i "$pre" -p "You selected $pager. Configure? $prmpt" "$othr" difffancy
         if test "y" == "$difffancy"; then
             if [ "$pager" == "bat" ] || [ "$pager" == "batdiff" ]; then 
                 local opts=""
@@ -840,10 +844,16 @@ fi
         elif [ "$pager" == "diff-so-fancy" ] || [ "$pager" == "diffr" ] || [ "$pager" == "ydiff" ] || [ "$pager" == "delta" ] || [ "$pager" == "bat" ] || [ "$pager" == "batdiff" ] ; then
             local difffancy
             local pre='y'
+            othr='n'
+            prmpt='[Y/n]: '
+            color='CYAN' 
             if (test $pager == 'delta' || test $pager == 'diff-so-fancy') && echo $(git config $global --list --show-origin) | grep -q $pager; then
                 pre='n'
+                othr='y'
+                prmpt='[N/y]: '
+                color='YELLOW' 
             fi
-            reade -Q "CYAN" -i "$pre" -p "You selected $pager. Configure? [Y/n]: " "n" difffancy
+            reade -Q "$color" -i "$pre" -p "You selected $pager. Configure? $prmpt" "$othr" difffancy
             if test "y" == "$difffancy"; then
                 if [ "$pager" == "bat" ] || [ "$pager" == "batdiff" ]; then 
                     local opts=""
@@ -903,7 +913,7 @@ fi
                     fi
                     pager=$pager" $opts"
                 elif [ "$pager" == "delta" ]; then
-                    reade -Q "CYAN" -i "n" -p "Set side-by-side view? [Y/n]: " "n" delta1
+                    reade -Q "CYAN" -i "y" -p "Set side-by-side view? [Y/n]: " "n" delta1
                     if test "y" == $delta1; then
                         git config $global delta.side-by-side true
                     fi
@@ -1273,10 +1283,16 @@ fi
     
     local name gitname
     local prename='n'
+    color="YELLOW" 
+    othr='y'
+    prmpt='[N/y]: '
     if test "$(git config $global --list | grep 'user.name' | awk 'BEGIN { FS = "=" } ;{print $2;}')" == '' ; then
         prename='y'
+        color="CYAN" 
+        othr='n'
+        prmpt='[Y/n]: '
     fi
-    reade -Q "CYAN" -i "$prename" -p "Configure git name? [Y/n]: " "n" gitname
+    reade -Q "$color" -i "$prename" -p "Configure git name? $prmpt" "$othr" gitname
     if [ "y" == $gitname ]; then
         reade -Q "CYAN" -p "Name: " name
         if [ ! -z $name ]; then
@@ -1285,11 +1301,17 @@ fi
     fi
 
     local gitmail mail
-    local premail='n'
+    local prename='n'
+    color="YELLOW" 
+    othr='y'
+    prmpt='[N/y]: '
     if test "$(git config $global --list | grep 'user.email' | awk 'BEGIN { FS = "=" } ;{print $2;}')" == '' ; then
-        premail='y'
+        prename='y'
+        color="CYAN" 
+        othr='n'
+        prmpt='[Y/n]: '
     fi
-    reade -Q "CYAN" -i "$premail" -p "Configure git email? [Y/n]: " "n" gitmail ;
+    reade -Q "$color" -i "$premail" -p "Configure git email? $prmpt" "$othr" gitmail ;
     if [ "y" == $gitmail ]; then
         reade -Q "CYAN" -p "Email: " mail ;
         if [ ! -z $mail ]; then
@@ -1300,10 +1322,16 @@ fi
     # https://www.youtube.com/watch?v=aolI_Rz0ZqY
     local gitrerere rerere
     local prererere='n'
+    color="YELLOW" 
+    othr='y'
+    prmpt='[Y/n]: ' 
     if test "$(git config $global --list | grep 'rerere.enabled' | awk 'BEGIN { FS = "=" } ;{print $2;}')" == '' ; then
         prererere='y'
+        color="CYAN" 
+        othr='n'
+        prmpt='[N/y]: ' 
     fi
-    reade -Q "CYAN" -i "$prererere" -p "Configure git to remember resolved mergeconflicts for reuse? [Y/n]: " "n" gitrerere ;
+    reade -Q "$color" -i "$prererere" -p "Configure git to remember resolved mergeconflicts for reuse? $prmpt" "$othr" gitrerere ;
     if [ "y" == $gitrerere ]; then
         git config "$global" rerere.enabled true;
     fi

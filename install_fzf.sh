@@ -63,7 +63,8 @@ if test -f ~/.keybinds.d/keybinds.bash && grep -q '^bind -m emacs-standard  '\''
 fi
 
 unset fzf_key
-source ~/.bashrc
+source $PATHVAR
+
 
 
 if [ ! -f ~/.fzf_history ]; then
