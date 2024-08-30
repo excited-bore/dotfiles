@@ -105,7 +105,7 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                 local theme=''
                 while test -z "$theme"; do
                     theme=$(printf "$(delta --list-syntax-themes | tail -n +1)" | fzf --reverse --border --border-label="Syntax theme")
-                    theme=$(echo "$theme" | awk '{print $2;}')
+                    theme=$(echo "$theme" | awk '{$1=""; print $0;}')
                     delta --syntax-theme "$theme" $TMPDIR/dtest1 $TMPDIR/dtest2
                     stty sane && reade -Q "MAGENTA" -i "n" -p "Set as syntax theme? (Will retry if no) [N/y]: " "y" dltthme
                     if test "$dltthme" == "n"; then
@@ -240,7 +240,7 @@ else
     global="--global"
 fi
 
-reade -Q "YELLOW" -i "n" -p "Turn off pager? [N/y]: " "n" pipepager1
+reade -Q "YELLOW" -i "n" -p "Turn off pager? [N/y]: " "y" pipepager1
 if test "$pipepager1" == 'y'; then 
      git config $global "$cpager" false  
 else
@@ -480,7 +480,7 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                     local theme=''
                     while test -z "$theme"; do
                         theme=$(printf "$(delta --list-syntax-themes | tail -n +1)" | fzf --reverse --border --border-label="Syntax theme")
-                        theme=$(echo "$theme" | awk '{print $2;}')
+                        theme=$(echo "$theme" | awk '{$1=""; print $0;}')
                         delta --syntax-theme "$theme" $TMPDIR/dtest1 $TMPDIR/dtest2
                         stty sane && reade -Q "MAGENTA" -i "n" -p "Set as syntax theme? (Will retry if no) [N/y]: " "y" dltthme
                         if test "$dltthme" == "n"; then
@@ -946,7 +946,7 @@ fi
                         local theme=''
                         while test -z "$theme"; do
                             theme=$(printf "$(delta --list-syntax-themes | tail -n +1)" | fzf --reverse --border --border-label="Syntax theme")
-                            theme=$(echo "$theme" | awk '{print $2;}')
+                            theme=$(echo "$theme" | awk '{$1=""; print $0;}')
                             delta --syntax-theme "$theme" $TMPDIR/dtest1 $TMPDIR/dtest2
                             stty sane && reade -Q "MAGENTA" -i "n" -p "Set as syntax theme? (Will retry if no) [N/y]: " "y" dltthme
                             if test "$dltthme" == "n"; then
