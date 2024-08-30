@@ -39,3 +39,6 @@ fi
 if flatpak list --columns=name | grep "Firefox" &> /dev/null; then
     alias firefox='flatpak run --file-forwarding org.mozilla.firefox'
 fi
+if flatpak list --columns=name | grep "discord-screenaudio" &> /dev/null; then
+	alias discord-screenaudio='flatpak run --file-forwarding de.shorsh.discord-screenaudio'
+fi

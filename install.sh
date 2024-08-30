@@ -514,6 +514,8 @@ if ! type bashtop &> /dev/null && ! type bpytop &> /dev/null && ! type btop &> /
     unset tojump
 fi
 
+
+
 # Autojump
 if ! type autojump &> /dev/null; then
     reade -Q "GREEN" -i "y" -p "Install autojump? (jump to folders using 'bookmarks' - j_ ) [Y/n]: " "n" tojump
@@ -540,18 +542,32 @@ if ! type starship &> /dev/null; then
     unset strshp
 fi
 
-# Srm (Secure remove)
-if ! type srm &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Install srm? (Secure remove) [Y/n]: " "n" kittn
-    if [ "y" == "$kittn" ]; then
-        if ! test -f install_srm.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_srm.sh)" 
+# Nmap
+if ! type nmap &> /dev/null; then
+    reade -Q "GREEN" -i "y" -p "Install nmap? (Network port scanning tool) [Y/n]: " "n" tojump
+    if [ "$tojump" == "y" ]; then
+        if ! test -f install_nmap.sh; then
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nmap.sh)" 
         else
-            ./install_srm.sh
+            ./install_nmap.sh
         fi
     fi
-    unset kittn
+    unset tojump
 fi
+
+# Netstat
+if ! type netstat &> /dev/null; then
+    reade -Q "GREEN" -i "y" -p "Install netstat? (Also port scanning tool) [Y/n]: " "n" tojump
+    if [ "$tojump" == "y" ]; then
+        if ! test -f install_netstat.sh; then
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_netstat.sh)" 
+        else
+            ./install_netstat.sh
+        fi
+    fi
+    unset tojump
+fi
+
 
 # Testdisk (File recovery tool)
 if ! type testdisk &> /dev/null; then
@@ -566,18 +582,27 @@ if ! type testdisk &> /dev/null; then
     unset kittn
 fi
 
-# Nmap
-if ! type nmap &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Install nmap? (Network port scanning tool) [Y/n]: " "n" tojump
-    if [ "$tojump" == "y" ]; then
-        if ! test -f install_nmap.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nmap.sh)" 
-        else
-            ./install_nmap.sh
-        fi
+# Exiftool (Metadata wiper)
+pre='y'
+othr='n'
+color='GREEN'
+prmpt='[Y/n]: '
+if type exiftool &> /dev/null; then
+    pre='n' 
+    othr='y'
+    color='YELLOW'
+    prmpt='[N/y]: '
+fi 
+reade -Q "$color" -i "$pre" -p "Install exiftool? (Metadata wiper for files) $prmpt" "$othr" moar
+if [ -z $moar ] || [ "Y" == $moar ] || [ $moar == "y" ]; then
+    if ! test -f install_exiftool.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_exiftool.sh)" 
+    else
+        ./install_exiftool.sh 
     fi
-    unset tojump
 fi
+unset pre color othr moar
+
 
 # Yt-dlp
 if ! type yt-dlp &> /dev/null; then

@@ -18,7 +18,7 @@ if type apt &> /dev/null; then
     alias apt-full-upgrade="sudo apt update && sudo apt full-upgrade && sudo apt autoremove"
 
     if type fzf &> /dev/null; then
-        function apt-fzf-search-and-install(){ 
+        function apt-fzf-install(){ 
             nstall='' 
             if ! test -z "$@"; then
                 nstall="$@"
@@ -66,7 +66,7 @@ if type pacman &> /dev/null; then
     
     if type fzf &> /dev/null; then
 
-        function pacman-fzf-search-and-install(){ 
+        function pacman-fzf-install(){ 
             if ! test -z "$@"; then
                 nstall="$@"
             fi
@@ -116,12 +116,97 @@ if type pamac &> /dev/null; then
     alias pamac-update-yes="yes | pamac update"
     alias pamac-upgrade="pamac upgrade"
     alias pamac-upgrade-yes="yes | pamac upgrade"
+    alias pamac-list-installed="pamac list --installed" 
+    alias pamac-list-groups="pamac list --groups" 
     alias pamac-search-aur="pamac search --aur"
     alias pamac-forcerefresh="pamac update --force-refresh && pamac upgrade --force-refresh"
     alias pamac-clean="pamac clean"
-    alias pamac-checkupdates="checkupdates -a"
+    alias pamac-checkupdates="pamac checkupdates -a"
     alias manjaro-update-packages="pamac-update"
     alias manjaro-upgrade="pamac upgrade"
+    
+    function pamac-fzf-install(){ 
+        pre='' 
+        if ! test -z "$@"; then
+            if ! test -z "$2"; then
+                printf "Only give 1 argument\n"
+                exit 1
+            else
+                pre="--query $@"
+            fi
+        fi 
+        nstall="$(pamac list | fzf $pre --ansi --multi --select-1 --reverse --sync --height 33%  | awk '{print $1}')" 
+        if ! test -z "$nstall"; then
+            pamac install "$nstall" 
+        fi
+        unset nstall
+    }
+    
+    function pamac-fzf-list-files(){ 
+        pre='' 
+        if ! test -z "$@"; then
+            if ! test -z "$2"; then
+                printf "Only give 1 argument\n"
+                exit 1
+            else
+                pre="--query $@"
+            fi
+        fi 
+        nstall="$(pamac list | fzf $pre --ansi --multi --select-1 --reverse --sync --height 33%  | awk '{print $1}')" 
+        if ! test -z "$nstall"; then
+            pamac list --files $nstall  
+        fi
+        unset nstall
+    }
+    
+    function pamac-fzf-list-files-installed(){ 
+        pre='' 
+        if ! test -z "$@"; then
+            if ! test -z "$2"; then
+                printf "Only give 1 argument\n"
+                exit 1
+            else
+                pre="--query $@"
+            fi
+        fi 
+        nstall="$(pamac list -i | fzf $pre --ansi --multi --select-1 --reverse --sync --height 33%  | awk '{print $1}')" 
+        if ! test -z "$nstall"; then
+            pamac list --files $nstall  
+        fi
+        unset nstall
+    }
+     
+
+    function pamac-fzf-install-by-group(){ 
+        if ! test -z "$@"; then
+            group="$@"
+        else 
+            group="$(pamac list --groups | sort -u | fzf --select-1 --reverse --sync --height 33%)" 
+        fi
+        nstall="$(pamac list --groups $group | fzf --ansi --multi --select-1 --reverse --sync --height 33%  | awk '{print $1}')" 
+        if ! test -z "$nstall"; then
+            pamac install "$nstall" 
+        fi
+        unset group nstall
+    }
+
+    function pamac-fzf-remove(){ 
+        pre=""
+        if ! test -z "$@"; then
+            if ! test -z "$2"; then
+                printf "Only give 1 argument\n"
+                exit 1
+            else
+                pre="--query $@"
+            fi
+        fi 
+        nstall="$(pamac list -i | fzf $pre --ansi --multi --select-1 --reverse --sync --height 33%  | awk '{print $1}')"      
+        if ! test -z "$nstall"; then
+            pamac remove "$nstall" 
+        fi 
+        unset nstall
+    }
+     
 fi
 
 ### NPM ###

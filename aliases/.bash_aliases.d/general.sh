@@ -29,6 +29,10 @@ else
     alias r="stty sane && source ~/.bashrc"
 fi
 
+#if test -z $PAGER; then
+#    PAGER=less
+#fi
+#alias pager=" | $PAGER"
 
 
 # TRY and keep command line at bottom
