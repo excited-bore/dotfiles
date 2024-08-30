@@ -184,7 +184,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
             prmpt="$prmpt \tEmacs = One of the oldest and versatile editors - Modal and featurerich, but overwhelming as well\n"
         fi
         if type code &> /dev/null; then
-            editors="$compedit code"
+            editors="$editors code"
             prmpt="$prmpt \tCode = Visual Studio Code - Modern standard for most when it comes to text editors (Warning: does not work well when paired with sudo)\n"
         fi
         printf "$prmpt${normal}"
@@ -493,9 +493,4 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
     printf "It's recommended to logout and login again to notice a change for ${MAGENTA}.profile${normal} and any ${CYAN}.*shelltype*_profiles\n${normal}" 
 fi
 
-if ! test -f checks/check_pathvar.sh; then
-    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pathvar.sh)" 
-else
-    . ./checks/check_pathvar.sh
-fi
 #unset prmpt pathvr xdgInst
