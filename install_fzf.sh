@@ -43,7 +43,7 @@ if ! test -d ~/.fzf ; then
     git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
     ~/.fzf/install
     if [[ $PATHVAR =~ '.pathvariables.env' ]]; then 
-        sed -i 's|.*export PATH=$PATH:$HOME/.fzf/bin|export PATH=$PATH:$HOME/.fzf/bin|g' $PATHVAR
+        sed -i 's|.export PATH=$PATH:$HOME/.fzf/bin|export PATH=$PATH:$HOME/.fzf/bin|g' $PATHVAR
     elif ! grep -q '.fzf/bin' $PATHVAR; then
         echo 'export PATH="$PATH:$HOME/.fzf/bin"' >> $PATHVAR
     fi
