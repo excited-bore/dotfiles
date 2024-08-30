@@ -3,5 +3,6 @@
 #Set $EDITOR to change what editor is being used
 
 # Preserve environment, for running stuff like custom pagers (moar) really necessary
-#alias sudo="sudo -E"
-alias sudo_shell="sudo -i"
+alias sudo-keep-env="sudo -E"
+alias sudo-shell="sudo -i"
+alias sudo-edit-sudoers="sudo visudo"

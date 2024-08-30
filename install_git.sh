@@ -105,9 +105,9 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                 local theme=''
                 while test -z "$theme"; do
                     theme=$(printf "$(delta --list-syntax-themes | tail -n +1)" | fzf --reverse --border --border-label="Syntax theme")
-                    theme=$(echo "$theme" | awk '{print $2;}')
-                    delta --syntax-theme "$theme" $TMPDIR/dtest1 $TMPDIR/dtest2
-                    stty sane && reade -Q "MAGENTA" -i "n" -p "Set as syntax theme? (Will retry if no) [Y/n]: " "y" dltthme
+                    theme=$(echo "$theme" | awk '{$1=""; print $0;}')
+                    delta --syntax-theme "${theme:1}" $TMPDIR/dtest1 $TMPDIR/dtest2
+                    stty sane && reade -Q "MAGENTA" -i "n" -p "Set as syntax theme? (Will retry if no) [N/y]: " "y" dltthme
                     if test "$dltthme" == "n"; then
                        theme='' 
                     fi
@@ -186,10 +186,10 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
             diff=$diff" --color=auto"
             reade -Q "CYAN" -i "y" -p "You selected $diff. Configure? [Y/n]: " "n" conf
             if test "y" == "$conf"; then
-                reade -Q "CYAN" -i "y" -p "Enable side-by-side mode? [Y/n]: " diffr1
+                reade -Q "CYAN" -i "y" -p "Enable side-by-side mode? [Y/n]: " 'n' diffr1
                 if test "$diffr1" == 'y'; then
                     diff=$diff" --side-by-side"
-                    reade -Q "CYAN" -i "y" -p "Wrap long lines in side-by-side view? [Y/n]: " diffr1
+                    reade -Q "CYAN" -i "y" -p "Wrap long lines in side-by-side view? [Y/n]: " 'n' diffr1
                     if test "$diffr1" == 'y'; then
                         diff=$diff" --wrap"
                     fi        
@@ -240,7 +240,7 @@ else
     global="--global"
 fi
 
-reade -Q "YELLOW" -i "n" -p "Turn off pager? [N/y]: " "n" pipepager1
+reade -Q "YELLOW" -i "n" -p "Turn off pager? [N/y]: " "y" pipepager1
 if test "$pipepager1" == 'y'; then 
      git config $global "$cpager" false  
 else
@@ -340,18 +340,18 @@ Condimentum lacinia quis vel eros donec ac. Nibh sed pulvinar proin gravida hend
             while test -z "$style"; do
                 style=$(printf "$styles" | fzf --reverse --border --border-label="Moar style")
                 moar --style "$style" $TMPDIR/dtest1
-                stty sane && reade -Q "CYAN" -i "n" -p "Set as style? (Will retry if no) [N/y]: " thme
+                stty sane && reade -Q "CYAN" -i "n" -p "Set as style? (Will retry if no) [N/y]: " 'y' thme
                 if test "$thme" == "n"; then
                    style='' 
                 fi
             done
             pager=$pager" $style"
         fi 
-        reade -Q "CYAN" -i "n" -p "Show linenumber? [N/y]: " "n" pager1
+        reade -Q "CYAN" -i "y" -p "Show linenumber? [Y/n]: " "n" pager1
         if test $pager1 == 'n'; then
             pager=$pager' --no-linenumbers'
         fi
-        reade -Q "CYAN" -i "n" -p "Wrap long lines? [N/y]: " "n" pager1
+        reade -Q "CYAN" -i "n" -p "Wrap long lines? [N/y]: " "y" pager1
         if test $pager1 == 'y'; then
             pager=$pager' --wrap'
         fi
@@ -447,7 +447,7 @@ Condimentum lacinia quis vel eros donec ac. Nibh sed pulvinar proin gravida hend
                 fi
                 pager=$pager" $opts"
             elif [ "$pager" == "delta" ]; then
-                reade -Q "CYAN" -i "n" -p "Set side-by-side view? [Y/n]: " "n" delta1
+                reade -Q "CYAN" -i "y" -p "Set side-by-side view? [Y/n]: " "n" delta1
                 if test "y" == $delta1; then
                     git config $global delta.side-by-side true
                 fi
@@ -480,9 +480,9 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                     local theme=''
                     while test -z "$theme"; do
                         theme=$(printf "$(delta --list-syntax-themes | tail -n +1)" | fzf --reverse --border --border-label="Syntax theme")
-                        theme=$(echo "$theme" | awk '{print $2;}')
-                        delta --syntax-theme "$theme" $TMPDIR/dtest1 $TMPDIR/dtest2
-                        stty sane && reade -Q "MAGENTA" -i "n" -p "Set as syntax theme? (Will retry if no) [Y/n]: " "n" dltthme
+                        theme=$(echo "$theme" | awk '{$1=""; print $0;}')
+                        delta --syntax-theme "${theme:1}" $TMPDIR/dtest1 $TMPDIR/dtest2
+                        stty sane && reade -Q "MAGENTA" -i "n" -p "Set as syntax theme? (Will retry if no) [N/y]: " "y" dltthme
                         if test "$dltthme" == "n"; then
                            theme='' 
                         fi
@@ -536,16 +536,16 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                 git config --global diff-so-fancy.rulerWidth $diffancy    
             elif [ "$pager" == "ydiff" ]; then
                 pager=$pager" --color=auto"
-                reade -Q "CYAN" -i "n" -p "Enable side-by-side mode? [Y/n]: " diffr1
+                reade -Q "CYAN" -i "y" -p "Enable side-by-side mode? [Y/n]: " "n" diffr1
                 if test "$diffr1" == 'y'; then
                     pager=$pager" --side-by-side"
-                    reade -Q "CYAN" -i "y" -p "Wrap long lines in side-by-side view? [Y/n]: " diffr1
+                    reade -Q "CYAN" -i "y" -p "Wrap long lines in side-by-side view? [Y/n]: " 'n' diffr1
                     if test "$diffr1" == 'y'; then
                         pager=$pager" --wrap"
                     fi        
                 fi
             elif [ "$pager" == "diffr" ]; then
-                reade -Q "CYAN" -i "y" -p "Set linenumber? [Y/n]: " diffr1
+                reade -Q "CYAN" -i "y" -p "Set linenumber? [Y/n]: " 'n' diffr1
                 if test "$diffr1" == 'y'; then
                     pager="diffr --line-numbers"
                     reade -Q "CYAN" -i "n" -p "Set linenumber style? [compact/aligned/n]: " diffr1
@@ -559,9 +559,9 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
             #    prompt=""
             #fi
 
-            reade -Q "CYAN" -i "n" -p "$pager can work/works with a pager. Configure? [Y/n]: " "n" pipepager
+            reade -Q "CYAN" -i "y" -p "$pager can work/works with a pager. Configure? [Y/n]: " "n" pipepager
             if test "$pipepager" == 'y'; then
-                reade -Q "GREEN" -i "n" -p "Turn off pager? [Y/n]: " "n" pipepager
+                reade -Q "GREEN" -i "n" -p "Turn off pager? [N/y]: " "y" pipepager
                 if test "$pipepager" == 'n'; then
                     pagers="less more"
                     pagersf="less\nmore\n"
@@ -632,7 +632,7 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                         fi
                     elif [[ $diffancy =~ "moar" ]]; then
                         local ln=""
-                        reade -Q "CYAN" -i "n" -p "You selected $diffancy. Show linenumber? [Y/n]: " "n" pager1
+                        reade -Q "CYAN" -i "y" -p "You selected $diffancy. Show linenumber? [Y/n]: " "n" pager1
                         if test $pager1 == 'n'; then
                             ln=$ln' --no-linenumbers'
                         fi
@@ -642,7 +642,7 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                             ln=$ln' --quit-if-one-screen'
                         fi
 
-                        reade -Q "CYAN" -i "n" -p "Wrap long lines? [Y/n]: " "n" pager1
+                        reade -Q "CYAN" -i "n" -p "Wrap long lines? [N/y]: " "y" pager1
                         if test $pager1 == 'y'; then
                             ln=$ln' --wrap'
                         fi
@@ -774,7 +774,7 @@ fi
             if test $pager1 == 'y'; then
                 ln=$ln"--quit-if-one-screen"
             fi
-            reade -Q "CYAN" -i "n" -p "Set linenumbers for pager? [Y/n]: " "n" lne 
+            reade -Q "CYAN" -i "n" -p "Set linenumbers for pager? [N/y]: " "y" lne 
             if test "$lne" == 'n'; then
                ln=$ln"-n"
             else
@@ -802,14 +802,14 @@ fi
                 while test -z "$style"; do
                     style=$(printf "$styles" | fzf --reverse --border --border-label="Moar style")
                     moar --style "$style" $TMPDIR/dtest1
-                    stty sane && reade -Q "CYAN" -i "n" -p "Set as style? (Will retry if no) [Y/n]: " thme
+                    stty sane && reade -Q "CYAN" -i "n" -p "Set as style? (Will retry if no) [N/y]: " 'y' thme
                     if test "$thme" == "n"; then
                        style='' 
                     fi
                 done
                 pager=$pager" $style"
             fi 
-            reade -Q "CYAN" -i "n" -p "Show linenumber? [Y/n]: " "n" pager1
+            reade -Q "CYAN" -i "n" -p "Show linenumber? [Y/n]: " "y" pager1
             if test $pager1 == 'n'; then
                 pager=$pager' --no-linenumbers'
             fi
@@ -946,9 +946,9 @@ fi
                         local theme=''
                         while test -z "$theme"; do
                             theme=$(printf "$(delta --list-syntax-themes | tail -n +1)" | fzf --reverse --border --border-label="Syntax theme")
-                            theme=$(echo "$theme" | awk '{print $2;}')
-                            delta --syntax-theme "$theme" $TMPDIR/dtest1 $TMPDIR/dtest2
-                            stty sane && reade -Q "MAGENTA" -i "n" -p "Set as syntax theme? (Will retry if no) [Y/n]: " "n" dltthme
+                            theme=$(echo "$theme" | awk '{$1=""; print $0;}')
+                            delta --syntax-theme "${theme:1}" $TMPDIR/dtest1 $TMPDIR/dtest2
+                            stty sane && reade -Q "MAGENTA" -i "n" -p "Set as syntax theme? (Will retry if no) [N/y]: " "y" dltthme
                             if test "$dltthme" == "n"; then
                                theme='' 
                             fi
@@ -1002,16 +1002,16 @@ fi
                     git config $global diff-so-fancy.rulerWidth $diffancy    
                 elif [ "$pager" == "ydiff" ]; then
                     pager=$pager" --color=auto"
-                    reade -Q "CYAN" -i "n" -p "Enable side-by-side mode? [Y/n]: " diffr1
+                    reade -Q "CYAN" -i "y" -p "Enable side-by-side mode? [Y/n]: " 'n'  diffr1
                     if test "$diffr1" == 'y'; then
                         pager=$pager" --side-by-side"
-                        reade -Q "CYAN" -i "y" -p "Wrap long lines in side-by-side view? [Y/n]: " diffr1
+                        reade -Q "CYAN" -i "y" -p "Wrap long lines in side-by-side view? [Y/n]: " 'n' diffr1
                         if test "$diffr1" == 'y'; then
                             pager=$pager" --wrap"
                         fi        
                     fi
                 elif [ "$pager" == "diffr" ]; then
-                    reade -Q "CYAN" -i "y" -p "Set linenumber? [Y/n]: " diffr1
+                    reade -Q "CYAN" -i "y" -p "Set linenumber? [Y/n]: " 'n' diffr1
                     if test "$diffr1" == 'y'; then
                         pager="diffr --line-numbers"
                         reade -Q "CYAN" -i "n" -p "Set linenumber style? [compact/aligned/n]: " diffr1
@@ -1108,7 +1108,7 @@ fi
                             fi
                         elif [[ "$diffancy" =~ "moar" ]]; then
                             local ln=""
-                            reade -Q "CYAN" -i "n" -p "You selected $diffancy. Show linenumber? [Y/n]: " "n" pager1
+                            reade -Q "CYAN" -i "y" -p "You selected $diffancy. Show linenumber? [Y/n]: " "n" pager1
                             if test $pager1 == 'n'; then
                                 ln=$ln' --no-linenumbers'
                             fi
@@ -1301,12 +1301,12 @@ fi
     fi
 
     local gitmail mail
-    local prename='n'
+    local premail='n'
     color="YELLOW" 
     othr='y'
     prmpt='[N/y]: '
     if test "$(git config $global --list | grep 'user.email' | awk 'BEGIN { FS = "=" } ;{print $2;}')" == '' ; then
-        prename='y'
+        premail='y'
         color="CYAN" 
         othr='n'
         prmpt='[Y/n]: '
