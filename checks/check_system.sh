@@ -258,6 +258,7 @@ do
     fi 
 done
 
+# TODO: Change this to uname -sm?
 if test $machine == 'Linux'; then
     arch_cmd="lscpu"
 elif test $machine == 'Mac'; then

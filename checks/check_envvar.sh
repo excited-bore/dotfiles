@@ -1,13 +1,13 @@
-# !/bin/bash
+# VARS
 
 export PROFILE=~/.profile
 
-if test -f ~/.bash_profile; then
-    export PROFILE=~/.bash_profile
+if ! [ -f ~/.profile ]; then
+    touch ~/.profile
 fi
 
-if ! test -f $PROFILE; then
-    touch $PROFILE
+if [ -f ~/.bash_profile ]; then
+    export PROFILE=~/.bash_profile
 fi
 
 export ENVVAR=~/.bashrc
@@ -41,12 +41,18 @@ fi
 export KEYBIND=~/.bashrc
 
 if [ -f ~/.keybinds ]; then
-   export KEYBIND=~/.keybinds
+    export KEYBIND=~/.keybinds
 fi
 
 if [ -d ~/.keybinds.d/ ]; then
     export KEYBIND_FILEDIR=~/.keybinds.d/
 fi
+
+
+if [ -f ~/.bash_profile ]; then
+    export PROFILE=~/.bash_profile
+fi
+
 
 export PROFILE_R=/root/.profile
 export ALIAS_R=/root/.bashrc
@@ -56,12 +62,12 @@ export ENVVAR_R=/root/.bashrc
 
 echo "This next $(tput setaf 1)sudo$(tput sgr0) checks for the profile, environment, bash_alias, bash_completion and keybind files and dirs in '/root/' to generate global variables.";
 
-if sudo test -f /root/.bash_profile; then
-    export PROFILE_R=/root/.bash_profile
+if ! sudo test -f /root/.profile; then
+    sudo touch /root/.profile
 fi
 
-if ! sudo test -f $PROFILE_R; then
-    sudo touch $PROFILE_R
+if ! sudo test -f /root/.bash_profile; then
+    export PROFILE_R=/root/.bash_profile
 fi
 
 if sudo test -f /root/.environment.env; then
@@ -89,3 +95,4 @@ fi
 if sudo test -d /root/.keybinds.d/  ; then
     export KEYBIND_FILEDIR_R=/root/.keybindsd.d/
 fi
+
