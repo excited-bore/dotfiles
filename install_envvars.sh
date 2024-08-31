@@ -12,7 +12,7 @@ else
     . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
 fi
 
-#  Pathvariables
+# Environment variables
 
 pathvr=$(pwd)/envvars/.environment.env
 if ! test -f $pathvr; then
