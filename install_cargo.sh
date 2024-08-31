@@ -4,10 +4,10 @@ else
     . ./checks/check_system.sh
 fi
 
-if ! test -f checks/check_pathvar.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pathvar.sh)" 
+if ! test -f checks/check_envvar.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)" 
 else
-    . ./checks/check_pathvar.sh
+    . ./checks/check_envvar.sh
 fi
 
 if ! type update-system &> /dev/null; then
@@ -33,18 +33,18 @@ if ! type cargo &> /dev/null; then
     fi
 fi
 
-if grep -q "cargo" $PATHVAR; then
-    sed -i 's|.export PATH=$PATH:~/.cargo/bin|export PATH=$PATH:~/.cargo/bin|g' $PATHVAR  
+if grep -q "cargo" $ENVVAR; then
+    sed -i 's|.export PATH=$PATH:~/.cargo/bin|export PATH=$PATH:~/.cargo/bin|g' $ENVVAR  
 else
-    printf "# RUST\nexport PATH=$PATH:~/.cargo/bin\n" >> $PATHVAR 
+    printf "# RUST\nexport PATH=$PATH:~/.cargo/bin\n" >> $ENVVAR 
 fi
 
-echo "This next $(tput setaf 1)sudo$(tput sgr0) will set pathvariable for cargo in $PATHVAR_R";
+echo "This next $(tput setaf 1)sudo$(tput sgr0) will set envvariable for cargo in $ENVVAR_R";
 
-if sudo grep -q "cargo" $PATHVAR_R; then
-    sudo sed -i 's|.export PATH=$PATH:~/.cargo/bin|export PATH=$PATH:~/.cargo/bin|g' $PATHVAR_R  
+if sudo grep -q "cargo" $ENVVAR_R; then
+    sudo sed -i 's|.export PATH=$PATH:~/.cargo/bin|export PATH=$PATH:~/.cargo/bin|g' $ENVVAR_R  
 else
-   printf "# RUST\nexport PATH=$PATH:~/.cargo/bin\n" | sudo tee -a $PATHVAR_R &> /dev/null 
+   printf "# RUST\nexport PATH=$PATH:~/.cargo/bin\n" | sudo tee -a $ENVVAR_R &> /dev/null 
 fi
 
 

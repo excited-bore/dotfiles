@@ -3,10 +3,10 @@ if ! test -f checks/check_system.sh; then
 else
     . ./checks/check_system.sh
 fi
-if ! test -f checks/check_pathvar.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pathvar.sh)" 
+if ! test -f checks/check_envvar.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)" 
 else
-    . ./checks/check_pathvar.sh
+    . ./checks/check_envvar.sh
 fi
 if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
@@ -47,16 +47,16 @@ fi
 if type flatpak &> /dev/null; then
     reade -Q "GREEN" -i "y" -p "Add flatpak dirs to path? (XDG_DATA_DIRS) [Y/n]: " "n" flpkvrs 
     if [ "$flpkvrs" == "y" ]; then
-        if grep -q "FLATPAK" $PATHVAR; then
-            sed -i 's|.export PATH=$PATH:$HOME/.local/bin/flatpak|export PATH=$PATH:$HOME/.local/bin/flatpak|g' $PATHVAR
-            sed -i 's|.export FLATPAK=|export FLATPAK=$HOME/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share|'  $PATHVAR 
-            sed -i 's|.export FLATPAK_ENABLE_SDK_EXT=|export FLATPAK_ENABLE_SDK_EXT=*|' $PATHVAR
-            if ! grep -q 'XDG_DATA_DIRS*.*:$FLATPAK' $PATHVAR; then
-                sed -i 's|.export XDG_DATA_DIRS=\(.*\) |export XDG_DATA_DIRS=\1:$FLATPAK|' $PATHVAR
+        if grep -q "FLATPAK" $ENVVAR; then
+            sed -i 's|.export PATH=$PATH:$HOME/.local/bin/flatpak|export PATH=$PATH:$HOME/.local/bin/flatpak|g' $ENVVAR
+            sed -i 's|.export FLATPAK=|export FLATPAK=$HOME/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share|'  $ENVVAR 
+            sed -i 's|.export FLATPAK_ENABLE_SDK_EXT=|export FLATPAK_ENABLE_SDK_EXT=*|' $ENVVAR
+            if ! grep -q 'XDG_DATA_DIRS*.*:$FLATPAK' $ENVVAR; then
+                sed -i 's|.export XDG_DATA_DIRS=\(.*\) |export XDG_DATA_DIRS=\1:$FLATPAK|' $ENVVAR
             fi
         else
-            echo 'export PATH=$PATH:$HOME/.local/bin/flatpak' >> $PATHVAR
-            echo 'export XDG_DATA_DIRS=$XDG_DATA_DIRS:$HOME/.local/bin/flatpak:$HOME/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share' >> $PATHVAR
+            echo 'export PATH=$PATH:$HOME/.local/bin/flatpak' >> $ENVVAR
+            echo 'export XDG_DATA_DIRS=$XDG_DATA_DIRS:$HOME/.local/bin/flatpak:$HOME/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share' >> $ENVVAR
         fi
     fi
 fi
@@ -98,10 +98,10 @@ if [ -z $pam ] || [ "y" == $pam ]; then
     #    sudo sed -i 's|\[ -a "|\[ -f "|g' /usr/bin/update_flatpak_cli.py
     #fi
     #  
-    #if grep -q "FLATPAK" "$PATHVAR"; then
-    #    sed -i 's|^export PATH=$PATH:$HOME/.local/bin/flatpak|export PATH=$PATH:$HOME/.local/bin/flatpak|g' $PATHVAR
+    #if grep -q "FLATPAK" "$ENVVAR"; then
+    #    sed -i 's|^export PATH=$PATH:$HOME/.local/bin/flatpak|export PATH=$PATH:$HOME/.local/bin/flatpak|g' $ENVVAR
     #else
-    #    echo 'export PATH=$PATH:$HOME/.local/bin/flatpak' >> $PATHVAR
+    #    echo 'export PATH=$PATH:$HOME/.local/bin/flatpak' >> $ENVVAR
     #fi
     #echo "Wrapper script are bash-based and installed under '~/.local/bin/flatpak/' "
 fi

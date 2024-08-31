@@ -24,7 +24,7 @@ else
     fi
 fi  
 
-if ! test -f checks/check_pathvar.sh; then
+if ! test -f checks/check_envvar.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_go.sh)" 
 else
     . ./install_go.sh

@@ -29,10 +29,10 @@ else
     . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
 fi
 
-if ! test -f checks/check_pathvar.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pathvar.sh)" 
+if ! test -f checks/check_envvar.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)" 
 else
-    . ./checks/check_pathvar.sh
+    . ./checks/check_envvar.sh
 fi
 
 if ! test -f checks/check_aliases_dir.sh; then
@@ -89,14 +89,14 @@ if test $machine == 'Mac' && type brew &> /dev/null; then
                 brew install ruby
                 rver=$(echo $(ruby --version) | awk '{print $2}' | cut -d. -f-2)'.0'
                 paths=$(gem environment | awk '/- GEM PATH/{flag=1;next}/- GEM CONFIGURATION/{flag=0}flag' | sed 's|     - ||g' | paste -s -d ':')
-                if grep -q "GEM" $PATHVAR; then
-                    sed -i "s|.export GEM_HOME=.*|export GEM_HOME=$HOME/.gem/ruby/$rver|g" $PATHVAR
-                    sed -i "s|.export GEM_PATH=.*|export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin|g" $PATHVAR
-                    sed -i 's|.export PATH=$PATH:$GEM_PATH.*|export PATH=$PATH:$GEM_PATH:$GEM_HOME|g' $PATHVAR
+                if grep -q "GEM" $ENVVAR; then
+                    sed -i "s|.export GEM_HOME=.*|export GEM_HOME=$HOME/.gem/ruby/$rver|g" $ENVVAR
+                    sed -i "s|.export GEM_PATH=.*|export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin|g" $ENVVAR
+                    sed -i 's|.export PATH=$PATH:$GEM_PATH.*|export PATH=$PATH:$GEM_PATH:$GEM_HOME|g' $ENVVAR
                 else
-                    printf "export GEM_HOME=$HOME/.gem/ruby/$rver\n" >> $PATHVAR
-                    printf "export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin\n" >> $PATHVAR
-                    printf "export PATH=\$PATH:\$GEM_PATH:\$GEM_HOME\n" >> $PATHVAR
+                    printf "export GEM_HOME=$HOME/.gem/ruby/$rver\n" >> $ENVVAR
+                    printf "export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin\n" >> $ENVVAR
+                    printf "export PATH=\$PATH:\$GEM_PATH:\$GEM_HOME\n" >> $ENVVAR
                 fi
                 #source ~/.bashrc
                 gem install neovim
@@ -162,14 +162,14 @@ elif test $distro == "Arch" || test $distro == "Manjaro"; then
                 sudo pacman -S ruby
                 rver=$(echo $(ruby --version) | awk '{print $2}' | cut -d. -f-2)'.0'
                 paths=$(gem environment | awk '/- GEM PATH/{flag=1;next}/- GEM CONFIGURATION/{flag=0}flag' | sed 's|     - ||g' | paste -s -d ':')
-                if grep -q "GEM" $PATHVAR; then
-                    sed -i "s|.export GEM_HOME=.*|export GEM_HOME=$HOME/.gem/ruby/$rver|g" $PATHVAR
-                    sed -i "s|.export GEM_PATH=.*|export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin|g" $PATHVAR
-                    sed -i 's|.export PATH=$PATH:$GEM_PATH.*|export PATH=$PATH:$GEM_PATH:$GEM_HOME|g' $PATHVAR
+                if grep -q "GEM" $ENVVAR; then
+                    sed -i "s|.export GEM_HOME=.*|export GEM_HOME=$HOME/.gem/ruby/$rver|g" $ENVVAR
+                    sed -i "s|.export GEM_PATH=.*|export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin|g" $ENVVAR
+                    sed -i 's|.export PATH=$PATH:$GEM_PATH.*|export PATH=$PATH:$GEM_PATH:$GEM_HOME|g' $ENVVAR
                 else
-                    printf "export GEM_HOME=$HOME/.gem/ruby/$rver\n" >> $PATHVAR
-                    printf "export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin\n" >> $PATHVAR
-                    printf "export PATH=\$PATH:\$GEM_PATH:\$GEM_HOME\n" >> $PATHVAR
+                    printf "export GEM_HOME=$HOME/.gem/ruby/$rver\n" >> $ENVVAR
+                    printf "export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin\n" >> $ENVVAR
+                    printf "export PATH=\$PATH:\$GEM_PATH:\$GEM_HOME\n" >> $ENVVAR
                 fi
                 #source ~/.bashrc
                 gem install neovim
@@ -355,14 +355,14 @@ elif [  $distro_base == "Debian" ];then
                         reade -Q "GREEN" -i "y" -p "Install flatpak node SDK and set in environment? [Y/n]: " "n" flpknode
                         if [ -z $flpknode ] || [ "y" == $flpknode ]; then 
                             flatpak install node18
-                            #if grep -q "FLATPAK_ENABLE_SDK_EXT*.*node" $PATHVAR; then
-                            #    sed -i "s|.export FLATPAK_ENABLE_SDK_EXT=|export FLATPAK_ENABLE_SDK_EXT=|g" $PATHVAR  
-                            #    sed -i 's|export FLATPAK_ENABLE_SDK_EXT=\(.*\)node..\(.*\)|export FLATPAK_ENABLE_SDK_EXT=\1node18\2|g' $PATHVAR
-                            #elif grep -q "FLATPAK_ENABLE_SDK_EXT" $PATHVAR; then
-                            #    sed -i 's|.export FLATPAK_ENABLE_SDK_EXT=|export FLATPAK_ENABLE_SDK_EXT=|g' $PATHVAR
-                            #    sed -i 's|export FLATPAK_ENABLE_SDK_EXT=\(.*\)|export FLATPAK_ENABLE_SDK_EXT=\1,node18|g' $PATHVAR
+                            #if grep -q "FLATPAK_ENABLE_SDK_EXT*.*node" $ENVVAR; then
+                            #    sed -i "s|.export FLATPAK_ENABLE_SDK_EXT=|export FLATPAK_ENABLE_SDK_EXT=|g" $ENVVAR  
+                            #    sed -i 's|export FLATPAK_ENABLE_SDK_EXT=\(.*\)node..\(.*\)|export FLATPAK_ENABLE_SDK_EXT=\1node18\2|g' $ENVVAR
+                            #elif grep -q "FLATPAK_ENABLE_SDK_EXT" $ENVVAR; then
+                            #    sed -i 's|.export FLATPAK_ENABLE_SDK_EXT=|export FLATPAK_ENABLE_SDK_EXT=|g' $ENVVAR
+                            #    sed -i 's|export FLATPAK_ENABLE_SDK_EXT=\(.*\)|export FLATPAK_ENABLE_SDK_EXT=\1,node18|g' $ENVVAR
                             #else
-                            #    echo 'export FLATPAK_ENABLE_SDK_EXT=node18' $PATHVAR
+                            #    echo 'export FLATPAK_ENABLE_SDK_EXT=node18' $ENVVAR
                             #fi
                             
                         fi
@@ -379,16 +379,16 @@ elif [  $distro_base == "Debian" ];then
                 sudo apt install ruby ruby-dev
                 rver=$(echo $(ruby --version) | awk '{print $2}' | cut -d. -f-2)'.0'
                 paths=$(gem environment | awk '/- GEM PATH/{flag=1;next}/- GEM CONFIGURATION/{flag=0}flag' | sed 's|     - ||g' | paste -s -d ':')
-                if grep -q "GEM" $PATHVAR; then
-                    sed -i "s|.export GEM_HOME=.*|export GEM_HOME=$HOME/.gem/ruby/$rver|g" $PATHVAR
+                if grep -q "GEM" $ENVVAR; then
+                    sed -i "s|.export GEM_HOME=.*|export GEM_HOME=$HOME/.gem/ruby/$rver|g" $ENVVAR
                     
-                    sed -i "s|.export GEM_PATH=.*|export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin|g" $PATHVAR
-                    sed -i 's|.export PATH=$PATH:$GEM_PATH.*|export PATH=$PATH:$GEM_PATH:$GEM_HOME|g' $PATHVAR
+                    sed -i "s|.export GEM_PATH=.*|export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin|g" $ENVVAR
+                    sed -i 's|.export PATH=$PATH:$GEM_PATH.*|export PATH=$PATH:$GEM_PATH:$GEM_HOME|g' $ENVVAR
                 else
-                    printf "export GEM_HOME=$HOME/.gem/ruby/$rver\n" >> $PATHVAR
+                    printf "export GEM_HOME=$HOME/.gem/ruby/$rver\n" >> $ENVVAR
                     
-                    printf "export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin\n" >> $PATHVAR
-                    printf "export PATH=\$PATH:\$GEM_PATH:\$GEM_HOME\n" >> $PATHVAR
+                    printf "export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin\n" >> $ENVVAR
+                    printf "export PATH=\$PATH:\$GEM_PATH:\$GEM_HOME\n" >> $ENVVAR
                 fi
                 source ~/.bashrc
                 gem install neovim 
@@ -448,30 +448,30 @@ function instvim_r(){
         sudo ln -s /root/.config/nvim/* /root/.var/app/io.neovim.nvim/config/nvim/
     fi
 
-    if sudo grep -q "MYVIMRC" $PATHVAR_R; then
-        sudo sed -i 's|.export MYVIMRC="|export MYVIMRC=~/.config/nvim/init.vim "|g' $PATHVAR_R
-        sudo sed -i 's|.export MYGVIMRC="|export MYGVIMRC=~/.config/nvim/init.vim "|g' $PATHVAR_R
+    if sudo grep -q "MYVIMRC" $ENVVAR_R; then
+        sudo sed -i 's|.export MYVIMRC="|export MYVIMRC=~/.config/nvim/init.vim "|g' $ENVVAR_R
+        sudo sed -i 's|.export MYGVIMRC="|export MYGVIMRC=~/.config/nvim/init.vim "|g' $ENVVAR_R
     else
-        printf "export MYVIMRC=~/.config/nvim/init.vim\n" | sudo tee -a $PATHVAR_R
-        printf "export MYGVIMRC=~/.config/nvim/init.vim\n" | sudo tee -a $PATHVAR_R
+        printf "export MYVIMRC=~/.config/nvim/init.vim\n" | sudo tee -a $ENVVAR_R
+        printf "export MYGVIMRC=~/.config/nvim/init.vim\n" | sudo tee -a $ENVVAR_R
     fi
 
     reade -Q "GREEN" -i "y" -p "Set nvim as default for root EDITOR? [Y/n]: " "n" vimrc 
     if [ -z "$vimrc" ] || [ "$vimrc" == "y" ]; then
-        if sudo grep -q "EDITOR" $PATHVAR_R; then
-            sudo sed -i "s|.export EDITOR=.*|export EDITOR=~/.config/nvim/init.vim|g" $PATHVAR_R
+        if sudo grep -q "EDITOR" $ENVVAR_R; then
+            sudo sed -i "s|.export EDITOR=.*|export EDITOR=~/.config/nvim/init.vim|g" $ENVVAR_R
         else
-            printf "export EDITOR=~/.config/nvim/init.vim\n" | sudo tee -a $PATHVAR_R
+            printf "export EDITOR=~/.config/nvim/init.vim\n" | sudo tee -a $ENVVAR_R
         fi
     fi
     unset vimrc
     
     reade -Q "GREEN" -i "y" -p "Set nvim as default for root VISUAL? [Y/n]: " "n" vimrc 
     if [ -z "$vimrc" ] || [ "$vimrc" == "y" ]; then
-       if sudo grep -q "VISUAL" $PATHVAR_R; then
-            sudo sed -i "s|.export VISUAL=*|export VISUAL=~/.config/nvim/init.vim|g" $PATHVAR_R
+       if sudo grep -q "VISUAL" $ENVVAR_R; then
+            sudo sed -i "s|.export VISUAL=*|export VISUAL=~/.config/nvim/init.vim|g" $ENVVAR_R
         else
-            printf "export VISUAL=~/.config/nvim/init.vim\n" | sudo tee -a $PATHVAR_R
+            printf "export VISUAL=~/.config/nvim/init.vim\n" | sudo tee -a $ENVVAR_R
         fi
     fi
     unset vimrc
@@ -502,35 +502,35 @@ function instvim(){
         ln -s ~/.config/nvim/* ~/.var/app/io.neovim.nvim/config/nvim/
     fi
 
-    if grep -q "MYVIMRC" $PATHVAR; then
-        sed -i "s|.export MYVIMRC=.*|export MYVIMRC=~/.config/nvim/init.vim|g" $PATHVAR
-        sed -i "s|.export MYGVIMRC=*|export MYGVIMRC=~/.config/nvim/init.vim|g" $PATHVAR
+    if grep -q "MYVIMRC" $ENVVAR; then
+        sed -i "s|.export MYVIMRC=.*|export MYVIMRC=~/.config/nvim/init.vim|g" $ENVVAR
+        sed -i "s|.export MYGVIMRC=*|export MYGVIMRC=~/.config/nvim/init.vim|g" $ENVVAR
     else
-        printf "export MYVIMRC=~/.config/nvim/init.vim\n" >> $PATHVAR
-        printf "export MYGVIMRC=~/.config/nvim/init.vim\n" >> $PATHVAR
+        printf "export MYVIMRC=~/.config/nvim/init.vim\n" >> $ENVVAR
+        printf "export MYGVIMRC=~/.config/nvim/init.vim\n" >> $ENVVAR
     fi
 
     reade -Q "GREEN" -i "y" -p "Set Neovim as MANPAGER? [Y/n]: " "n" manvim
     if [ "$manvim" == "y" ]; then
-       sed -i 's|.export MANPAGER=.*|export MANPAGER='\''nvim +Man!'\''|g' $PATHVAR
+       sed -i 's|.export MANPAGER=.*|export MANPAGER='\''nvim +Man!'\''|g' $ENVVAR
     fi
 
     reade -Q "GREEN" -i "y" -p "Set Neovim as default for user EDITOR? [Y/n]: " "n" vimrc 
     if [ -z "$vimrc" ] || [ "$vimrc" == "y" ]; then
-        if grep -q "EDITOR" $PATHVAR; then
-            sed -i "s|.export EDITOR=.*|export EDITOR=~/.config/nvim/init.vim|g" $PATHVAR
+        if grep -q "EDITOR" $ENVVAR; then
+            sed -i "s|.export EDITOR=.*|export EDITOR=~/.config/nvim/init.vim|g" $ENVVAR
         else
-            printf "export EDITOR=~/.config/nvim/init.vim\n" >> $PATHVAR
+            printf "export EDITOR=~/.config/nvim/init.vim\n" >> $ENVVAR
         fi
     fi
     unset vimrc
     
     reade -Q "GREEN" -i "y" -p "Set Neovim as default for user VISUAL? [Y/n]: " "n" vimrc 
     if [ -z "$vimrc" ] || [ "$vimrc" == "y" ]; then
-       if grep -q "VISUAL" $PATHVAR; then
-            sed -i "s|.export VISUAL=*|export VISUAL=~/.config/nvim/init.vim|g" $PATHVAR
+       if grep -q "VISUAL" $ENVVAR; then
+            sed -i "s|.export VISUAL=*|export VISUAL=~/.config/nvim/init.vim|g" $ENVVAR
         else
-            printf "export VISUAL=~/.config/nvim/init.vim\n" >> $PATHVAR
+            printf "export VISUAL=~/.config/nvim/init.vim\n" >> $ENVVAR
         fi
     fi
     unset vimrc

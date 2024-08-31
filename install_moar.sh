@@ -26,10 +26,10 @@ if test -z $SYSTEM_UPDATED; then
     fi
 fi
 
-if ! test -f checks/check_pathvar.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pathvar.sh)" 
+if ! test -f checks/check_envvar.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)" 
 else
-    . ./checks/check_pathvar.sh
+    . ./checks/check_envvar.sh
 fi
 
 
@@ -75,34 +75,34 @@ fi
 reade -Q "GREEN" -i "y" -p "Set moar as default pager for $USER? [Y/n]: " "n" moar_usr
 if [ -z "$moar_usr" ] || [ "y" == "$moar_usr" ] || [ "Y" == "$moar_usr" ]; then
     
-    if grep -q "MOAR" $PATHVAR; then 
-        sed -i "s|.export MOAR=|export MOAR=|g" $PATHVAR 
+    if grep -q "MOAR" $ENVVAR; then 
+        sed -i "s|.export MOAR=|export MOAR=|g" $ENVVAR 
         
-        sed -i "s|export MOAR=.*|export MOAR='--statusbar=bold --colors=auto --render-unprintable=highlight --quit-if-one-screen'|g" $PATHVAR 
-        sed -i "s|.export PAGER=|export PAGER=|g" $PATHVAR
-        sed -i "s|export PAGER=.*|export PAGER=/usr/bin/moar|g" $PATHVAR
-        sed -i "s|.export SYSTEMD_PAGER=.*|export SYSTEMD_PAGER=\$PAGER|g" $PATHVAR
-        sed -i "s|.export SYSTEMD_PAGERSECURE=.*|export SYSTEMD_PAGERSECURE=1|g" $PATHVAR
+        sed -i "s|export MOAR=.*|export MOAR='--statusbar=bold --colors=auto --render-unprintable=highlight --quit-if-one-screen'|g" $ENVVAR 
+        sed -i "s|.export PAGER=|export PAGER=|g" $ENVVAR
+        sed -i "s|export PAGER=.*|export PAGER=/usr/bin/moar|g" $ENVVAR
+        sed -i "s|.export SYSTEMD_PAGER=.*|export SYSTEMD_PAGER=\$PAGER|g" $ENVVAR
+        sed -i "s|.export SYSTEMD_PAGERSECURE=.*|export SYSTEMD_PAGERSECURE=1|g" $ENVVAR
     else
-        printf "export MOAR='--statusbar=bold --colors=auto --render-unprintable=highlight --quit-if-one-screen'\n" >> $PATHVAR
-        printf "export PAGER=/usr/bin/moar\n" >> $PATHVAR
-        printf "export SYSTEMD_PAGER=\$PAGER" >> $PATHVAR
-        printf "export SYSTEMD_PAGERSECURE=1" >> $PATHVAR
+        printf "export MOAR='--statusbar=bold --colors=auto --render-unprintable=highlight --quit-if-one-screen'\n" >> $ENVVAR
+        printf "export PAGER=/usr/bin/moar\n" >> $ENVVAR
+        printf "export SYSTEMD_PAGER=\$PAGER" >> $ENVVAR
+        printf "export SYSTEMD_PAGERSECURE=1" >> $ENVVAR
     fi
 fi
     
 reade -Q "YELLOW" -i "y" -p "Set moar as default pager for root? [Y/n]: " "n" moar_root
 if [ -z "$moar_root" ] || [ "y" == "$moar_root" ] || [ "Y" == "$moar_root" ]; then
-    if sudo grep -q "MOAR" $PATHVAR_R; then
-        sudo sed -i "s|.export MOAR=.*|export MOAR='--statusbar=bold --colors=auto --render-unprintable=highlight --quit-if-one-screen'|g" $PATHVAR_R 
-        sudo sed -i "s|.export PAGER=.*|export PAGER=/usr/bin/moar|g" $PATHVAR_R
-        sudo sed -i "s|.export SYSTEMD_PAGER=.*|export SYSTEMD_PAGER=$PAGER|g" $PATHVAR_R
-        sudo sed -i "s|.export SYSTEMD_PAGERSECURE=.*|export SYSTEMD_PAGERSECURE=1|g" $PATHVAR_R
+    if sudo grep -q "MOAR" $ENVVAR_R; then
+        sudo sed -i "s|.export MOAR=.*|export MOAR='--statusbar=bold --colors=auto --render-unprintable=highlight --quit-if-one-screen'|g" $ENVVAR_R 
+        sudo sed -i "s|.export PAGER=.*|export PAGER=/usr/bin/moar|g" $ENVVAR_R
+        sudo sed -i "s|.export SYSTEMD_PAGER=.*|export SYSTEMD_PAGER=$PAGER|g" $ENVVAR_R
+        sudo sed -i "s|.export SYSTEMD_PAGERSECURE=.*|export SYSTEMD_PAGERSECURE=1|g" $ENVVAR_R
     else
-        printf "export MOAR='--statusbar=bold --colors=auto --render-unprintable=highlight --quit-if-one-screen'\n" | sudo tee -a $PATHVAR_R
-        printf "export PAGER=/usr/bin/moar\n" | sudo tee -a $PATHVAR_R
-        printf "export SYSTEMD_PAGER=\$PAGER\n" | sudo tee -a $PATHVAR_R
-        printf "export SYSTEMD_PAGERSECURE=1\n" | sudo tee -a $PATHVAR_R
+        printf "export MOAR='--statusbar=bold --colors=auto --render-unprintable=highlight --quit-if-one-screen'\n" | sudo tee -a $ENVVAR_R
+        printf "export PAGER=/usr/bin/moar\n" | sudo tee -a $ENVVAR_R
+        printf "export SYSTEMD_PAGER=\$PAGER\n" | sudo tee -a $ENVVAR_R
+        printf "export SYSTEMD_PAGERSECURE=1\n" | sudo tee -a $ENVVAR_R
     fi
 fi
 

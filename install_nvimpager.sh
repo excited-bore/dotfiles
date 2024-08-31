@@ -25,10 +25,10 @@ else
     . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
 fi
 
-if ! test -f checks/check_pathvar.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pathvar.sh)" 
+if ! test -f checks/check_envvar.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)" 
 else
-    . ./checks/check_pathvar.sh
+    . ./checks/check_envvar.sh
 fi
 
 if ! type nvim > /dev/null ; then
@@ -67,20 +67,20 @@ fi
 
 reade -Q "GREEN" -i "y" -p "Set nvimpager as default pager for $USER? [Y/n]: " "n" moar_usr
 if [ -z "$moar_usr" ] || [ "y" == "$moar_usr" ] || [ "Y" == "$moar_usr" ]; then
-    if grep -q "PAGER" $PATHVAR; then 
-        sed -i "s|.export PAGER=|export PAGER=|g" $PATHVAR
-        sed -i "s|export PAGER=.*|export PAGER=$(whereis nvimpager | awk '{print $2;}')|g" $PATHVAR
+    if grep -q "PAGER" $ENVVAR; then 
+        sed -i "s|.export PAGER=|export PAGER=|g" $ENVVAR
+        sed -i "s|export PAGER=.*|export PAGER=$(whereis nvimpager | awk '{print $2;}')|g" $ENVVAR
     else
-        printf "export PAGER=$(whereis nvimpager | awk '{print $2;}')\n" >> $PATHVAR
+        printf "export PAGER=$(whereis nvimpager | awk '{print $2;}')\n" >> $ENVVAR
     fi
 fi
     
 reade -Q "YELLOW" -i "y" -p "Set nvimpager default pager for root? [Y/n]: " "n" moar_root
 if [ -z "$moar_root" ] || [ "y" == "$moar_root" ] || [ "Y" == "$moar_root" ]; then
-    if sudo grep -q "PAGER" $PATHVAR_R; then
-        sudo sed -i "s|.export PAGER=|export PAGER=|g" $PATHVAR_R
-        sudo sed -i "s|export PAGER=.*|export PAGER=$(whereis nvimpager | awk '{print $2;}')|g" $PATHVAR_R
+    if sudo grep -q "PAGER" $ENVVAR_R; then
+        sudo sed -i "s|.export PAGER=|export PAGER=|g" $ENVVAR_R
+        sudo sed -i "s|export PAGER=.*|export PAGER=$(whereis nvimpager | awk '{print $2;}')|g" $ENVVAR_R
     else
-        printf "export PAGER=$(whereis nvimpager | awk '{print $2;}')\n" | sudo tee -a $PATHVAR_R
+        printf "export PAGER=$(whereis nvimpager | awk '{print $2;}')\n" | sudo tee -a $ENVVAR_R
     fi
 fi

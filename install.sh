@@ -6,10 +6,10 @@ else
     . checks/check_system.sh
 fi
 
-if ! test -f checks/check_pathvar.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pathvar.sh)" 
+if ! test -f checks/check_envvar.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)" 
 else
-    . ./checks/check_pathvar.sh
+    . ./checks/check_envvar.sh
 fi
 
 if ! test -f aliases/.bash_aliases.d/update-system.sh; then
@@ -126,10 +126,10 @@ if ! sudo test -f /etc/polkit/49-nopasswd_global.pkla && ! sudo test -f /etc/pol
     unset plkit
 fi
 
-if ! test -f checks/check_pathvar.sh; then
-    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pathvar.sh)" 
+if ! test -f checks/check_envvar.sh; then
+    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)" 
 else
-    . ./checks/check_pathvar.sh
+    . ./checks/check_envvar.sh
 fi
 
 # Shell-keybinds
@@ -728,12 +728,12 @@ if test -f ~/.environment.env && sudo test -f /root/.environment.env; then
     prmpt='[N/y]: '
 fi 
 
-reade -Q "$color" -i "$pre" -p "Check existence/create .environment.env and link it to .bashrc in $HOME/ and /root/? $prmpt" "$othr" pathvars
-if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
-    if ! test -f install_pathvars.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pathvars.sh)" 
+reade -Q "$color" -i "$pre" -p "Check existence/create .environment.env and link it to .bashrc in $HOME/ and /root/? $prmpt" "$othr" envvars
+if [ "$envvars" == "y" ] || [ -z "$envvars" ]; then
+    if ! test -f install_envvars.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_envvars.sh)" 
     else
-        ./install_pathvars.sh  
+        ./install_envvars.sh  
     fi 
 fi
 
