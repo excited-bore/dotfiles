@@ -14,10 +14,10 @@ fi
 
 #  Pathvariables
 
-pathvr=$(pwd)/pathvars/.envvars.env
+pathvr=$(pwd)/pathvars/.environment.env
 if ! test -f $pathvr; then
-    wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/pathvars/.envvars.env
-    pathvr=$TMPDIR/.envvars.env
+    wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/pathvars/.environment.env
+    pathvr=$TMPDIR/.environment.env
 fi
 
 pre='y'
@@ -25,18 +25,18 @@ othr='n'
 color='GREEN'
 prmpt='[Y/n]: '
 
-echo "Next $(tput setaf 1)sudo$(tput sgr0) check for /root/.envvars.env' "
+echo "Next $(tput setaf 1)sudo$(tput sgr0) check for /root/.environment.env' "
 
 if ! test -z $1; then
     pathvars=$!
-    if test -f ~/.envvars.env && sudo test -f /root/.envvars.env; then
+    if test -f ~/.environment.env && sudo test -f /root/.environment.env; then
         pre='n' 
         othr='y'
         color='YELLOW'
         prmpt='[N/y]: '
     fi
 else
-    reade -Q "$color" -i "$pre" -p "Check existence/create .envvars.env and link it to .bashrc in $HOME/ and /root/? $prmpt" "$othr" pathvars
+    reade -Q "$color" -i "$pre" -p "Check existence/create .environment.env and link it to .bashrc in $HOME/ and /root/? $prmpt" "$othr" pathvars
 fi
 
 if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
@@ -118,7 +118,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
             sed -i "s|export LESS=.*|export LESS=\" $lss_n\"|g" $pathvr
             unset lss lss_n opt opt1
         fi 
-        #sed -i 's/#export LESSEDIT=/export LESSEDIT=/' .envvars.env
+        #sed -i 's/#export LESSEDIT=/export LESSEDIT=/' .environment.env
 
         # Set moar options
         sed -i 's/#export MOAR=/export MOAR=/' $pathvr
@@ -379,7 +379,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
     fi
 
     pathvariables_r(){ 
-        sudo cp -fv $pathvr /root/.envvars.env;
+        sudo cp -fv $pathvr /root/.environment.env;
         if ! sudo test -f /root/.profile; then
             sudo touch /root/.profile
         fi
@@ -394,41 +394,41 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         prmpt="File(s):\n$shell_profiles${normal} get sourced at login\nFile ${MAGENTA}.profile${RED} won't get sourced at login${normal} if ${CYAN}.*shelltype*_profile${normal} exists\nFile(s):\n${CYAN}$shell_rcs${normal} get sourced when starting a new *shelltype* shell\n"
         printf "$prmpt" 
         
-        if ! sudo grep -q "~/.envvars.env" /root/.profile; then
-            reade -Q 'GREEN' -i 'y' -p "Link .envvars.env in ~/.profile? [Y/n]: " 'n' prof
+        if ! sudo grep -q "~/.environment.env" /root/.profile; then
+            reade -Q 'GREEN' -i 'y' -p "Link .environment.env in ~/.profile? [Y/n]: " 'n' prof
             if test $prof == 'y'; then
-                printf "\n[ -f ~/.envvars.env ] && source ~/.envvars.env\n\n" | sudo tee -a /root/.profile
+                printf "\n[ -f ~/.environment.env ] && source ~/.environment.env\n\n" | sudo tee -a /root/.profile
             fi
         fi
         if sudo test -f /root/.bash_profile; then
             printf "\n${GREEN}Since file ${cyan}/root/.bash_profile${green} exists, ${cyan}bash${green} won't source ${magenta}/root/.profile${green} natively at login.\n${normal}"
-            reade -Q 'GREEN' -i 'prof' -p "Source $HOME/.profile in $HOME/.bash_profile or source $HOME/.envvars.env directly in $HOME/.bash_profile? [Prof/path/none]: " 'path none' bash_prof
+            reade -Q 'GREEN' -i 'prof' -p "Source $HOME/.profile in $HOME/.bash_profile or source $HOME/.environment.env directly in $HOME/.bash_profile? [Prof/path/none]: " 'path none' bash_prof
             if [[ $bash_prof =~ 'prof' ]]; then
                 if sudo grep -q '.bashrc' /root/.bash_profile && ! sudo  grep -q "~/.profile" /root/.bash_profile; then
                     sudo sed -i 's|\(\[ -f ~/.bashrc \] && source ~/.bashrc\)|\[ -f \~/.profile \] \&\& source \~/.profile\n\n\1\n|g' /root/.bash_profile
                     sudo sed -i 's|\(\[\[ -f ~/.bashrc \]\] && . ~/.bashrc\)|\[ -f \~/.profile \] \&\& source \~/.profile\n\n\1\n|g' /root/.bash_profile
                 else 
-                    printf "\n[ -f ~/.envvars.env ] && source ~/.profile\n\n" | sudo tee -a /root/.bash_profile
+                    printf "\n[ -f ~/.environment.env ] && source ~/.profile\n\n" | sudo tee -a /root/.bash_profile
                 fi
             elif test $bash_prof == 'path'; then
-                if sudo grep -q '.bashrc' /root/.bash_profile && ! sudo  grep -q "~/.envvars.env" /root/.bash_profile; then
-                    sudo sed -i 's|\(\[ -f ~/.bashrc \] && source ~/.bashrc\)|\[ -f \~/.envvars.env \] \&\& source \~/.envvars.env\n\n\1\n|g' /root/.bash_profile
-                    sudo sed -i 's|\(\[\[ -f ~/.bashrc \]\] && . ~/.bashrc\)|\[ -f \~/.envvars.env \] \&\& source \~/.envvars.env\n\n\1\n|g' /root/.bash_profile
+                if sudo grep -q '.bashrc' /root/.bash_profile && ! sudo  grep -q "~/.environment.env" /root/.bash_profile; then
+                    sudo sed -i 's|\(\[ -f ~/.bashrc \] && source ~/.bashrc\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' /root/.bash_profile
+                    sudo sed -i 's|\(\[\[ -f ~/.bashrc \]\] && . ~/.bashrc\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' /root/.bash_profile
                 else 
-                    printf "\n[ -f ~/.envvars.env ] && source ~/.envvars.env\n\n" | sudo tee -a /root/.bash_profile
+                    printf "\n[ -f ~/.environment.env ] && source ~/.environment.env\n\n" | sudo tee -a /root/.bash_profile
                 fi
             fi
-            if sudo test -f /root/.bashrc && ! sudo grep -q "~/.envvars.env" /root/.bashrc; then
-                reade -Q 'GREEN' -i 'y' -p "Source /root/.envvars.env in /root/.bashrc? [Y/n]: " 'n' bashrc
+            if sudo test -f /root/.bashrc && ! sudo grep -q "~/.environment.env" /root/.bashrc; then
+                reade -Q 'GREEN' -i 'y' -p "Source /root/.environment.env in /root/.bashrc? [Y/n]: " 'n' bashrc
                 if test $bashrc == 'y'; then 
                     if sudo grep -q "[ -f ~/.bash_completion ]" /root/.bashrc; then
-                        sudo sed -i 's|\(\[ -f ~/.bash_completion \] \&\& source \~/.bash_completion\)|\[ -f \~/.envvars.env \] \&\& source \~/.envvars.env\n\n\1\n|g' /root/.bashrc
+                        sudo sed -i 's|\(\[ -f ~/.bash_completion \] \&\& source \~/.bash_completion\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' /root/.bashrc
                     elif sudo grep -q "[ -f ~/.bash_aliases ]" /root/.bashrc; then
-                        sudo sed -i 's|\(\[ -f ~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\[ -f \~/.envvars.env \] \&\& source \~/.envvars.env\n\n\1\n|g' /root/.bashrc
+                        sudo sed -i 's|\(\[ -f ~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' /root/.bashrc
                     elif sudo grep -q "[ -f ~/.keybinds ]" /root/.bashrc; then
-                        sudo sed -i 's|\(\[ -f ~/.keybinds \] \&\& source \~/.keybinds\)|\[ -f \~/.envvars.env \] \&\& source \~/.envvars.env\n\n\1\n|g' /root/.bashrc
+                        sudo sed -i 's|\(\[ -f ~/.keybinds \] \&\& source \~/.keybinds\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' /root/.bashrc
                     else 
-                        printf "\n[ -f ~/.envvars.env ] && source ~/.envvars.env\n\n" | sudo tee -a /root/.bashrc
+                        printf "\n[ -f ~/.environment.env ] && source ~/.environment.env\n\n" | sudo tee -a /root/.bashrc
                     fi 
                 fi
             fi  
@@ -437,7 +437,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
          
     }                                            
     pathvariables(){
-        cp -fv $pathvr ~/.envvars.env
+        cp -fv $pathvr ~/.environment.env
         if ! test -f ~/.profile; then
             touch ~/.profile
         fi
@@ -452,51 +452,51 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         prmpt="File(s):\n$shell_profiles${normal} get sourced at login\nFile ${MAGENTA}.profile${RED} won't get sourced at login${normal} if ${CYAN}.*shelltype*_profile${normal} exists\nFile(s):\n${CYAN}$shell_rcs${normal} get sourced when starting a new *shelltype* shell\n"
         printf "$prmpt" 
         
-        if ! grep -q "~/.envvars.env" ~/.profile; then
-            reade -Q 'GREEN' -i 'y' -p "Link .envvars.env in ~/.profile? [Y/n]: " 'n' prof
+        if ! grep -q "~/.environment.env" ~/.profile; then
+            reade -Q 'GREEN' -i 'y' -p "Link .environment.env in ~/.profile? [Y/n]: " 'n' prof
             if test $prof == 'y'; then
-                printf "\n[ -f ~/.envvars.env ] && source ~/.envvars.env\n\n" >> ~/.profile
+                printf "\n[ -f ~/.environment.env ] && source ~/.environment.env\n\n" >> ~/.profile
             fi
         fi
         if test -f ~/.bash_profile; then
             printf "\n${GREEN}Since file ${cyan}$HOME/.bash_profile${green} exists, ${cyan}bash${green} won't source ${magenta}$HOME/.profile${green} natively at login.\n${normal}"
-            reade -Q 'GREEN' -i 'prof' -p "Source $HOME/.profile in $HOME/.bash_profile or source $HOME/.envvars.env directly in $HOME/.bash_profile? [Prof/path/none]: " 'path none' bash_prof
+            reade -Q 'GREEN' -i 'prof' -p "Source $HOME/.profile in $HOME/.bash_profile or source $HOME/.environment.env directly in $HOME/.bash_profile? [Prof/path/none]: " 'path none' bash_prof
             if [[ $bash_prof =~ 'prof' ]]; then
                 if grep -q '.bashrc' ~/.bash_profile && ! grep -q "~/.profile" ~/.bash_profile; then
                     sed -i 's|\(\[ -f ~/.bashrc \] && source ~/.bashrc\)|\[ -f \~/.profile \] \&\& source \~/.profile\n\n\1\n|g' ~/.bash_profile
                     sed -i 's|\(\[\[ -f ~/.bashrc \]\] && . ~/.bashrc\)|\[ -f \~/.profile \] \&\& source \~/.profile\n\n\1\n|g' ~/.bash_profile
                 else 
-                    printf "\n[ -f ~/.envvars.env ] && source ~/.profile\n\n" >> ~/.bash_profile
+                    printf "\n[ -f ~/.environment.env ] && source ~/.profile\n\n" >> ~/.bash_profile
                 fi
             elif test $bash_prof == 'path'; then
-                if grep -q '.bashrc' ~/.bash_profile && ! grep -q "~/.envvars.env" ~/.bash_profile; then
-                    sed -i 's|\(\[ -f ~/.bashrc \] && source ~/.bashrc\)|\[ -f \~/.envvars.env \] \&\& source \~/.envvars.env\n\n\1\n|g' ~/.bash_profile
-                    sed -i 's|\(\[\[ -f ~/.bashrc \]\] && . ~/.bashrc\)|\[ -f \~/.envvars.env \] \&\& source \~/.envvars.env\n\n\1\n|g' ~/.bash_profile
+                if grep -q '.bashrc' ~/.bash_profile && ! grep -q "~/.environment.env" ~/.bash_profile; then
+                    sed -i 's|\(\[ -f ~/.bashrc \] && source ~/.bashrc\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' ~/.bash_profile
+                    sed -i 's|\(\[\[ -f ~/.bashrc \]\] && . ~/.bashrc\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' ~/.bash_profile
                 else 
-                    printf "\n[ -f ~/.envvars.env ] && source ~/.envvars.env\n\n" >> ~/.bash_profile
+                    printf "\n[ -f ~/.environment.env ] && source ~/.environment.env\n\n" >> ~/.bash_profile
                 fi
             fi
-            if test -f ~/.bashrc && ! grep -q "~/.envvars.env" ~/.bashrc; then
-                reade -Q 'GREEN' -i 'y' -p "Source $HOME/.envvars.env in $HOME/.bashrc? [Y/n]: " 'n' bashrc
+            if test -f ~/.bashrc && ! grep -q "~/.environment.env" ~/.bashrc; then
+                reade -Q 'GREEN' -i 'y' -p "Source $HOME/.environment.env in $HOME/.bashrc? [Y/n]: " 'n' bashrc
                 if test $bashrc == 'y'; then 
                     if grep -q "[ -f ~/.bash_preexec ]" ~/.bashrc; then
-                         sed -i 's|\(\[ -f ~/.bash_preexec \] \&\& source \~/.bash_preexec\)|\n\1\n\[ -f \~/.envvars.env \] \&\& source \~/.envvars.env\n|g' ~/.bashrc
+                         sed -i 's|\(\[ -f ~/.bash_preexec \] \&\& source \~/.bash_preexec\)|\n\1\n\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n|g' ~/.bashrc
                     elif grep -q "[ -f ~/.bash_completion ]" ~/.bashrc; then
-                         sed -i 's|\(\[ -f ~/.bash_completion \] \&\& source \~/.bash_completion\)|\[ -f \~/.envvars.env \] \&\& source \~/.envvars.env\n\n\1\n|g' ~/.bashrc
+                         sed -i 's|\(\[ -f ~/.bash_completion \] \&\& source \~/.bash_completion\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' ~/.bashrc
                     elif grep -q "[ -f ~/.bash_aliases ]" ~/.bashrc; then
-                         sed -i 's|\(\[ -f ~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\[ -f \~/.envvars.env \] \&\& source \~/.envvars.env\n\n\1\n|g' ~/.bashrc
+                         sed -i 's|\(\[ -f ~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' ~/.bashrc
                     elif grep -q "[ -f ~/.keybinds ]" ~/.bashrc; then
-                         sed -i 's|\(\[ -f ~/.keybinds \] \&\& source \~/.keybinds\)|\[ -f \~/.envvars.env \] \&\& source \~/.envvars.env\n\n\1\n|g' ~/.bashrc
+                         sed -i 's|\(\[ -f ~/.keybinds \] \&\& source \~/.keybinds\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' ~/.bashrc
                     else
-                        printf "\n[ -f ~/.envvars.env ] && source ~/.envvars.env\n\n" >> ~/.bashrc
+                        printf "\n[ -f ~/.environment.env ] && source ~/.environment.env\n\n" >> ~/.bashrc
                     fi
                 fi
             fi  
             unset bash_prof_ex prmpt shell_profiles shell_rcs prof bashrc 
         fi
-        yes_edit_no pathvariables_r "$pathvr" "Install .envvars.env in /root/?" "edit" "YELLOW"; 
+        yes_edit_no pathvariables_r "$pathvr" "Install .environment.env in /root/?" "edit" "YELLOW"; 
     }
-    yes_edit_no pathvariables "$pathvr" "Install .envvars.env in $HOME?" "edit" "GREEN"
+    yes_edit_no pathvariables "$pathvr" "Install .environment.env in $HOME?" "edit" "GREEN"
     printf "It's recommended to logout and login again to notice a change for ${MAGENTA}.profile${normal} and any ${CYAN}.*shelltype*_profiles\n${normal}" 
 fi
 

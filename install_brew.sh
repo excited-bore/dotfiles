@@ -55,7 +55,7 @@ if type brew &> /dev/null; then
     if ! grep -q -- '--no-quarantine' $PATHVAR || grep -q '#export HOMEBREW_CASK_OPTS="--no-quarantine"' $PATHVAR; then
         reade -Q 'GREEN' -i 'y' -p "Unblock Homebrew apps from Gatekeeper (No more popups each time when you install from homebrew) by setting HOMEBREW_CASK_OPTS=\"--no-quarantine\" in $PATHVAR? [Y/n]: " 'n' unblock_hb
         if test $unblock_hb == 'y' ;then
-           if [[ $PATHVAR =~ '.envvars.env' ]]; then
+           if [[ $PATHVAR =~ '.environment.env' ]]; then
                 sed -i='s/^#export HOMEBREW_CASK_OPTS/export HOMEBREW_CASK_OPTS/g' $PATHVAR
            else
                 echo 'export HOMEBREW_CASK_OPTS=" --no-quarantine"' >> $PATHVAR
