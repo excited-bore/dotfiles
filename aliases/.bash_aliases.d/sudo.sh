@@ -37,7 +37,7 @@ function sudo-remove-user-from-sudo-groups(){
     unset users_ vars frst usr
 }
 
-function sudo-add-pathvar-exception(){
+function sudo-add-envvar-exception(){
     vars=$(printenv | cut -d= -f1 | sed 's/--.*//g' | sed '/^[[:space:]]*$/d') 
     frst="$(echo $vars| awk '{print $1}')"
     vars="$(echo $vars | sed "s/\<$frst\> //g")"
@@ -46,21 +46,23 @@ function sudo-add-pathvar-exception(){
         reade -Q 'GREEN' -i "$frst" -p "Pathvariable?: " "$vars" pathvr
     else
         if [[ "$@" =~ '$' ]]; then
-            pathvar="$(sed 's/$//g')"
+            pathvr="$(sed 's/$//g')"
         else   
-            pathvar="$@"
+            pathvr="$@"
         fi
     fi
     if ! sudo grep -q "Defaults env_keep += \"$pathvr\"" /etc/sudoers; then
-        sudo sed -i "1s/^/Defaults env_keep += \"$pathvr\"\n/" /etc/sudoers
+        sudo sed -i "1s/^/Defaults env_keep += \"$path\"\n/" /etc/sudoers
         printf "Added ${RED}Defaults env_keep += \"$pathvr\"${normal} to /etc/sudoers\n" 
     else
         printf "Defaults env_keep += \"$pathvr\" already in /etc/sudoers\n"
     fi
-    unset vars frst  
+    unset vars pathvr frst  
 }
 
-function sudo-remove-pathvar-exception(){
+complete -W "$(printenv | cut -d= -f1 | sed 's/--.*//g' | sed '/^[[:space:]]*$/d')" sudo-add-pathvar-exception
+
+function sudo-remove-envvar-exception(){
     vars=$(sudo grep --color=never '^Defaults env_keep' /etc/sudoers | sed 's/Defaults env_keep += "\(.*\)"/\1/g') 
     frst="$(echo $vars| awk '{print $1}')"
     vars="$(echo $vars | sed "s/\<$frst\> //g")"
@@ -69,9 +71,9 @@ function sudo-remove-pathvar-exception(){
         reade -Q 'GREEN' -i "$frst" -p "Which vars should be removed?: " "$vars" pathvr
     else
         if [[ "$@" =~ '$' ]]; then
-            pathvar="$(sed 's/$//g')"
+            pathvr="$(sed 's/$//g')"
         else   
-            pathvar="$@"
+            pathvr="$@"
         fi
     fi
     if sudo grep -q "Defaults env_keep += \"$pathvr\"" /etc/sudoers; then
@@ -80,6 +82,5 @@ function sudo-remove-pathvar-exception(){
     else
         printf "Defaults env_keep += \"$pathvr\" not in /etc/sudoers\n"
     fi
-    unset vars frst  
+    unset vars frst pathvr  
 }
-
