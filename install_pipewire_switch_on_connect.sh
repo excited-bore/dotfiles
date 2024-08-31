@@ -22,9 +22,9 @@ if test -z $SYSTEM_UPDATED; then
 fi
 
 if [ "$distro" == "Manjaro" ]; then
-    sudo pacman -S pipewire pipewire-pulse manjaro-pipewire
+    sudo pacman -S pipewire pipewire-jack pipewire-pulse manjaro-pipewire
 elif [ "$distro" == "Arch" ]; then
-    sudo pacman -S pipewire pipewire-pulse
+    sudo pacman -S pipewire pipewire-jack pipewire-pulse
 elif [ "$distro_base" == "Debian" ]; then
     sudo apt install pipewire
 fi 
