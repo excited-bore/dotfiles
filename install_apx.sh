@@ -24,15 +24,15 @@ else
     fi
 fi  
 
-if ! test -f checks/check_envvar.sh; then
+if ! test -f install_go.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_go.sh)" 
 else
-    . ./install_go.sh
+    ./install_go.sh
 fi
 if ! test -f install_docker.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_docker.sh)" 
 else
-    . ./install_docker.sh
+    ./install_docker.sh
 fi
 
 if [ $distro == "Manjaro" ]; then

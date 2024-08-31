@@ -66,6 +66,7 @@ unset fzf_key
 source $ENVVAR
 
 
+
 if [ ! -f ~/.fzf_history ]; then
     touch ~/.fzf_history 
 fi

@@ -236,8 +236,8 @@ if [ "$envvars" == "y" ] || [ -z "$envvars" ]; then
                 printf "${bold}${yellow}Sudo by default does not respect the user's PAGER environment. If you were to want to use a custom pager with sudo (except with ${cyan}systemctl/journalctl${bold}${yellow}, more on that later) you would need to always pass your environment using 'sudo -E'\n${normal}"
                 reade -Q "YELLOW" -i "y" -p "Change this behaviour permanently in /etc/sudoers? [Y/n]: " "n" sudrs
                 if test "$sudrs" == "y"; then
-                    sudo sed -i '1s/^/Defaults env_keep += "PAGER"\n/' /etc/sudoers
-                    echo "Added ${RED}'Defaults env_keep += \"PAGER\"'${normal} to /etc/sudoers"
+                    sudo sed -i '1s/^/Defaults env_keep += "PAGER SYSTEMD_PAGERSECURE"\n/' /etc/sudoers
+                    echo "Added ${RED}'Defaults env_keep += \"PAGER SYSTEMD_PAGERSECURE\"'${normal} to /etc/sudoers"
                 fi
             fi
 

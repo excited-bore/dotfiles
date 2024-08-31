@@ -59,28 +59,3 @@ function sudo-add-envvar-exception(){
     fi
     unset vars pathvr frst  
 }
-
-complete -W "$(printenv | cut -d= -f1 | sed 's/--.*//g' | sed '/^[[:space:]]*$/d')" sudo-add-pathvar-exception
-
-function sudo-remove-envvar-exception(){
-    vars=$(sudo grep --color=never '^Defaults env_keep' /etc/sudoers | sed 's/Defaults env_keep += "\(.*\)"/\1/g') 
-    frst="$(echo $vars| awk '{print $1}')"
-    vars="$(echo $vars | sed "s/\<$frst\> //g")"
-    if test -z "$@"; then
-        printf "${RED}Found variables:\n${normal}$vars\n" 
-        reade -Q 'GREEN' -i "$frst" -p "Which vars should be removed?: " "$vars" pathvr
-    else
-        if [[ "$@" =~ '$' ]]; then
-            pathvr="$(sed 's/$//g')"
-        else   
-            pathvr="$@"
-        fi
-    fi
-    if sudo grep -q "Defaults env_keep += \"$pathvr\"" /etc/sudoers; then
-        sudo sed -i "/^Defaults env_keep += \"$pathvr\"/d" /etc/sudoers
-        printf "Removed ${RED}Defaults env_keep += \"$pathvr\"${normal} from /etc/sudoers\n" 
-    else
-        printf "Defaults env_keep += \"$pathvr\" not in /etc/sudoers\n"
-    fi
-    unset vars frst pathvr  
-}

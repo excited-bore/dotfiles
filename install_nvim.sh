@@ -87,18 +87,11 @@ if test $machine == 'Mac' && type brew &> /dev/null; then
             reade -Q "GREEN" -i "y" -p "Install nvim-ruby? [Y/n]: " "n" rubyscripts
             if [ -z $rubyscripts ] || [ "y" == $rubyscripts ]; then
                 brew install ruby
-                rver=$(echo $(ruby --version) | awk '{print $2}' | cut -d. -f-2)'.0'
-                paths=$(gem environment | awk '/- GEM PATH/{flag=1;next}/- GEM CONFIGURATION/{flag=0}flag' | sed 's|     - ||g' | paste -s -d ':')
-                if grep -q "GEM" $ENVVAR; then
-                    sed -i "s|.export GEM_HOME=.*|export GEM_HOME=$HOME/.gem/ruby/$rver|g" $ENVVAR
-                    sed -i "s|.export GEM_PATH=.*|export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin|g" $ENVVAR
-                    sed -i 's|.export PATH=$PATH:$GEM_PATH.*|export PATH=$PATH:$GEM_PATH:$GEM_HOME|g' $ENVVAR
+                if ! test -f install_ruby.sh; then
+                     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ruby.sh)" 
                 else
-                    printf "export GEM_HOME=$HOME/.gem/ruby/$rver\n" >> $ENVVAR
-                    printf "export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin\n" >> $ENVVAR
-                    printf "export PATH=\$PATH:\$GEM_PATH:\$GEM_HOME\n" >> $ENVVAR
+                    ./install_ruby.sh
                 fi
-                #source ~/.bashrc
                 gem install neovim
             fi
         fi
@@ -160,18 +153,11 @@ elif test $distro == "Arch" || test $distro == "Manjaro"; then
             reade -Q "GREEN" -i "y" -p "Install nvim-ruby? [Y/n]: " "n" rubyscripts
             if [ -z $rubyscripts ] || [ "y" == $rubyscripts ]; then
                 sudo pacman -S ruby
-                rver=$(echo $(ruby --version) | awk '{print $2}' | cut -d. -f-2)'.0'
-                paths=$(gem environment | awk '/- GEM PATH/{flag=1;next}/- GEM CONFIGURATION/{flag=0}flag' | sed 's|     - ||g' | paste -s -d ':')
-                if grep -q "GEM" $ENVVAR; then
-                    sed -i "s|.export GEM_HOME=.*|export GEM_HOME=$HOME/.gem/ruby/$rver|g" $ENVVAR
-                    sed -i "s|.export GEM_PATH=.*|export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin|g" $ENVVAR
-                    sed -i 's|.export PATH=$PATH:$GEM_PATH.*|export PATH=$PATH:$GEM_PATH:$GEM_HOME|g' $ENVVAR
+                if ! test -f install_ruby.sh; then
+                     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ruby.sh)" 
                 else
-                    printf "export GEM_HOME=$HOME/.gem/ruby/$rver\n" >> $ENVVAR
-                    printf "export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin\n" >> $ENVVAR
-                    printf "export PATH=\$PATH:\$GEM_PATH:\$GEM_HOME\n" >> $ENVVAR
+                    ./install_ruby.sh
                 fi
-                #source ~/.bashrc
                 gem install neovim
             fi
         fi
@@ -377,20 +363,11 @@ elif [  $distro_base == "Debian" ];then
             reade -Q "GREEN" -i "y" -p "Install nvim-ruby? [Y/n]: " "n" rubyscripts
             if [ -z $rubyscripts ] || [ "y" == $rubyscripts ]; then
                 sudo apt install ruby ruby-dev
-                rver=$(echo $(ruby --version) | awk '{print $2}' | cut -d. -f-2)'.0'
-                paths=$(gem environment | awk '/- GEM PATH/{flag=1;next}/- GEM CONFIGURATION/{flag=0}flag' | sed 's|     - ||g' | paste -s -d ':')
-                if grep -q "GEM" $ENVVAR; then
-                    sed -i "s|.export GEM_HOME=.*|export GEM_HOME=$HOME/.gem/ruby/$rver|g" $ENVVAR
-                    
-                    sed -i "s|.export GEM_PATH=.*|export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin|g" $ENVVAR
-                    sed -i 's|.export PATH=$PATH:$GEM_PATH.*|export PATH=$PATH:$GEM_PATH:$GEM_HOME|g' $ENVVAR
+                if ! test -f install_ruby.sh; then
+                     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ruby.sh)" 
                 else
-                    printf "export GEM_HOME=$HOME/.gem/ruby/$rver\n" >> $ENVVAR
-                    
-                    printf "export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin\n" >> $ENVVAR
-                    printf "export PATH=\$PATH:\$GEM_PATH:\$GEM_HOME\n" >> $ENVVAR
+                    ./install_ruby.sh
                 fi
-                source ~/.bashrc
                 gem install neovim 
             fi
         fi
