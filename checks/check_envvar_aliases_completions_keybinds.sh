@@ -119,7 +119,7 @@ fi
 #    echo "fi" >> ~/.bashrc
 #fi
 
-echo "This next $(tput setaf 1)sudo$(tput sgr0) is checks for the envvariable, bash_alias, bash_completion and keybind files and dirs in '/root/'.";
+echo "This next $(tput setaf 1)sudo$(tput sgr0) is checks for the envvar, bash_alias, bash_completion and keybind files and dirs in '/root/'.";
 
 if sudo test -f /root/.environment.env && ! sudo grep -q "~/.environment.env" /root/.bashrc; then
     printf "\n[ -f ~/.environment.env ] && source ~/.environment.env\n\n" | sudo tee -a /root/.bashrc
@@ -181,6 +181,16 @@ if ! sudo test -f /root/.keybinds; then
     fi
 fi
 
+export PROFILE=~/.profile
+
+if test -f ~/.bash_profile; then
+    export PROFILE=~/.bash_profile
+fi
+
+if ! test -f $PROFILE; then
+    touch $PROFILE
+fi
+
 export ENVVAR=~/.bashrc
 
 if [ -f ~/.environment.env ]; then
@@ -219,11 +229,21 @@ if [ -d ~/.keybinds.d/ ]; then
     export KEYBIND_FILEDIR=~/.keybinds.d/
 fi
 
+export PROFILE_R=/root/.profile
 export ALIAS_R=/root/.bashrc
 export COMPLETION_R=/root/.bashrc
 export KEYBIND_R=/root/.bashrc
 export ENVVAR_R=/root/.bashrc
 
+echo "This next $(tput setaf 1)sudo$(tput sgr0) checks for the profile, environment, bash_alias, bash_completion and keybind files and dirs in '/root/' to generate global variables.";
+
+if sudo test -f /root/.bash_profile; then
+    PROFILE_R=/root/.bash_profile
+fi
+
+if ! sudo test -f $PROFILE_R; then
+    sudo touch $PROFILE_R
+fi
 
 if sudo test -f /root/.environment.env; then
     export ENVVAR_R=/root/.environment.env

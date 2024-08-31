@@ -210,11 +210,20 @@ if [ "$envvars" == "y" ] || [ -z "$envvars" ]; then
         
         # Make .txt file and output file
          
-        reade -Q 'GREEN' -i 'y' -p "Set \\\\\$EDITOR for VISUAL [Y/n]: " 'n' vis_ed
+        reade -Q 'CYAN' -i 'n' -p "Set VISUAL to '\\\\\$EDITOR'? (otherwise set manually again) [N/y]: " 'y' vis_ed
         if test $vis_ed == 'y'; then
             sed -i 's|#export VISUAL=|export VISUAL=|g' $pathvr
             sed -i 's|export VISUAL=.*|export VISUAL=$EDITOR|g' $pathvr
         else
+            prmpt="Found visual editors using ${CYAN}mimeopen${normal} (non definitive list): ${GREEN}\n"
+            for i in $editors; do
+                prmpt="$prmpt\t - $i\n"
+            done
+            prmpt="$prmpt${normal}"
+            #frst="$(echo $compedit | awk '{print $1}')"
+            #compedit="$(echo $compedit | sed "s/\<$frst\> //g")"
+            printf "$prmpt"
+
             reade -Q "GREEN" -i "nano" -p "VISUAL (GUI editor - default nano)=" "$editors" vsual
             vsual="$(where_cmd $vsual)"
             sed -i 's|#export VISUAL=|export VISUAL=|g' $pathvr
@@ -224,12 +233,21 @@ if [ "$envvars" == "y" ] || [ -z "$envvars" ]; then
         unset vis_ed
 
         if grep -q "#export SUDO_EDITOR" $pathvr; then
-            reade -Q "GREEN" -i "y" -p "Set SUDO_EDITOR to $edtor? [Y/n]: " "n" sud_edt
+            reade -Q "GREEN" -i "y" -p "Set SUDO_EDITOR to \\\\\$EDITOR? [Y/n]: " "n" sud_edt
             if test "$sud_edt" == "y"; then
-                sed -i "s|#export SUDO_EDITOR.*|export SUDO_EDITOR=$edtor|g" $pathvr
+                sed -i 's|#export SUDO_EDITOR.*|export SUDO_EDITOR=$EDITOR|g' $pathvr
             fi
         fi
         
+        if grep -q "#export SUDO_VISUAL" $pathvr; then
+            printf "!! Commands like ${RED}sudo visudo${normal} look for \$VISUAL and ${red}can't${normal} use visual programs like 'Visual studio code'\n"
+            reade -Q "GREEN" -i "y" -p "Set SUDO_VISUAL to \\\\\$EDITOR? [Y/n]: " "n" sud_edt
+            if test "$sud_edt" == "y"; then
+                sed -i 's|#export SUDO_VISUAL.*|export SUDO_VISUAL=$EDITOR|g' $pathvr
+            fi
+        fi
+
+
         if test -f /etc/sudoers; then 
             echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for 'Defaults env_keep += \"PAGER\"' in /etc/sudoers"
             if ! sudo grep -q "Defaults env_keep += \"PAGER\"" /etc/sudoers; then
@@ -241,7 +259,7 @@ if [ "$envvars" == "y" ] || [ -z "$envvars" ]; then
                 fi
             fi
 
-            echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for 'Defaults env_keep += \"EDITOR\"' and 'Defaults env_keep += \"EDITOR\"' in /etc/sudoers"
+            echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for 'Defaults env_keep += \"EDITOR\"' and 'Defaults env_keep += \"VISUAL\"' in /etc/sudoers"
             if ! sudo grep -q "Defaults env_keep += \"EDITOR\"" /etc/sudoers || ! sudo grep -q "Defaults env_keep += \"VISUAL\""  /etc/sudoers; then
                 printf "${bold}${yellow}Sudo by default does not respect the user's EDITOR/VISUAL environment and SUDO_EDITOR is not always checked by programs.\nIf you were to want edit root crontabs (sudo crontab -e), you would get vi (unless using 'sudo -E' to pass your environment)\n"
                 reade -Q "YELLOW" -i "y" -p "Change this behaviour permanently in /etc/sudoers? (Run 'man --pager='less -p ^security' less' if you want to see the potential security holes when using less) [Y/n]: " "n" sudrs
