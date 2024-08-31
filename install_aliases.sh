@@ -19,8 +19,8 @@ fi
 reade -Q "GREEN" -i "y" -p "Install general.sh at ~/? (aliases related to general actions - cd/mv/cp/rm + completion script replacement for 'read -e') [Y/n]: " "n" ansr         
 
 if test $ansr == "y"; then
-    if test -f ~/.pathvariables.env; then
-        sed -i 's|^export TRASH_BIN_LIMIT=|export TRASH_BIN_LIMIT=|g' ~/.pathvariables.env
+    if test -f ~/.envvars.env; then
+        sed -i 's|^export TRASH_BIN_LIMIT=|export TRASH_BIN_LIMIT=|g' ~/.envvars.env
     fi
     reade -Q "GREEN" -i "y" -p "Set cp/mv (when overwriting) to backup files? (will also trash backups) [Y/n]: " "n" ansr         
     if [ "$ansr" != "y" ]; then

@@ -13,7 +13,7 @@ Try it out with if you have curl installed. Worked and tested for Manjaro and Ub
 eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install.sh)"
 ```
 
-Creates `.pathvariables.env` for global pathvariables (Helps setting up variables for MAN,LESS,PAGER,EDITOR/VISUAL,SYSTEMD,XDG, etc..)  
+Creates `.envvars.env` for global pathvariables (Helps setting up variables for MAN,LESS,PAGER,EDITOR/VISUAL,SYSTEMD,XDG, etc..)  
 Creates `~/.keybinds.d/` and `~/.keybinds.d/keybinds.bash` for Bash (readline) keybindings  
 Creates `~/.bash_aliases` and `~/.bash_aliases.d/` for bash-aliases  
 Creates `~/.bash_completion` and `~/.bash_completion.d/` for bash-completions  

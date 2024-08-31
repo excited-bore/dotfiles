@@ -83,8 +83,8 @@ fi
 #    fi
 #
 
-if test -f ~/.pathvariables.env && ! grep -q "~/.pathvariables.env" ~/.bashrc; then
-    printf "\n[ -f ~/.pathvariables.env ] && source ~/.pathvariables.env\n\n" >> ~/.bashrc
+if test -f ~/.envvars.env && ! grep -q "~/.envvars.env" ~/.bashrc; then
+    printf "\n[ -f ~/.envvars.env ] && source ~/.envvars.env\n\n" >> ~/.bashrc
 fi
 
 if ! grep -q "~/.bash_completion" ~/.bashrc; then
@@ -121,8 +121,8 @@ fi
 
 echo "This next $(tput setaf 1)sudo$(tput sgr0) is checks for the pathvariable, bash_alias, bash_completion and keybind files and dirs in '/root/'.";
 
-if sudo test -f /root/.pathvariables.env && ! sudo grep -q "~/.pathvariables.env" /root/.bashrc; then
-    printf "\n[ -f ~/.pathvariables.env ] && source ~/.pathvariables.env\n\n" | sudo tee -a /root/.bashrc
+if sudo test -f /root/.envvars.env && ! sudo grep -q "~/.envvars.env" /root/.bashrc; then
+    printf "\n[ -f ~/.envvars.env ] && source ~/.envvars.env\n\n" | sudo tee -a /root/.bashrc
 fi 
 
 if ! sudo test -f /root/.bash_aliases; then
@@ -183,8 +183,8 @@ fi
 
 export PATHVAR=~/.bashrc
 
-if [ -f ~/.pathvariables.env ]; then
-     export PATHVAR=~/.pathvariables.env
+if [ -f ~/.envvars.env ]; then
+     export PATHVAR=~/.envvars.env
 fi
 
 export ALIAS=~/.bashrc
@@ -225,8 +225,8 @@ export KEYBIND_R=/root/.bashrc
 export PATHVAR_R=/root/.bashrc
 
 
-if sudo test -f /root/.pathvariables.env; then
-    export PATHVAR_R=/root/.pathvariables.env
+if sudo test -f /root/.envvars.env; then
+    export PATHVAR_R=/root/.envvars.env
 fi
 
 if sudo test -f /root/.bash_aliases; then
