@@ -294,6 +294,7 @@ let g:coc_global_extensions = [
 
 " Devicons
 Plugin 'ryanoasis/vim-devicons'
+Plugin 'nvim-tree/nvim-web-devicons'
 
 " Markdown preview
 Plug 'ellisonleao/glow.nvim'
