@@ -5,10 +5,10 @@ else
     . ./checks/check_system.sh
 fi
 
-if ! test -f checks/check_pathvar.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pathvar.sh)" 
+if ! test -f checks/check_envvar.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)" 
 else
-    . ./checks/check_pathvar.sh
+    . ./checks/check_envvar.sh
 fi
 
 if ! type update-system &> /dev/null; then
@@ -100,9 +100,9 @@ unset kittn
 if [ -f ~/.environment.env ]; then
     sed -i 's|^.\(export KITTY_PATH=~/.local/bin/:~/.local/kitty.app/bin/\)|\1|g' ~/.environment.env;
     sed -i 's|^.\(export PATH=$KITTY_PATH:$PATH\)|\1|g' ~/.environment.env;
-    #sed -i 's|^.\(if \[\[ \$SSH_TTY \]\] .*\)|\1|g' $PATHVAR
-    #sed -i 's|^.\(export KITTY_PORT=.*\)|\1|g' $PATHVAR
-    #sed -i 's|^.\(fi\)|\1|g' $PATHVAR
+    #sed -i 's|^.\(if \[\[ \$SSH_TTY \]\] .*\)|\1|g' $ENVVAR
+    #sed -i 's|^.\(export KITTY_PORT=.*\)|\1|g' $ENVVAR
+    #sed -i 's|^.\(fi\)|\1|g' $ENVVAR
 fi              
 
 #if [ -x "$(command -v xdg-open)" ]; then

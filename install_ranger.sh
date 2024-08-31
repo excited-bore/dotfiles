@@ -20,10 +20,10 @@ if test -z $SYSTEM_UPDATED; then
     fi
 fi
 
-if ! test -f checks/check_pathvar.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pathvar.sh)" 
+if ! test -f checks/check_envvar.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)" 
 else
-    . ./checks/check_pathvar.sh
+    . ./checks/check_envvar.sh
 fi 
 if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
@@ -63,12 +63,12 @@ fi
 
 #ranger --copy-config=all
 ranger --confdir=/home/$USER/.config/ranger --copy-config=all
-if [ "$PATHVAR" == ~/.environment.env ]; then
-    sed -i 's|#export RANGER_LOAD_DEFAULT_RC=|export RANGER_LOAD_DEFAULT_RC=|g' $PATHVAR
-    sudo sed -i 's|#export RANGER_LOAD_DEFAULT_RC=|export RANGER_LOAD_DEFAULT_RC=|g' $PATHVAR_R
+if [ "$ENVVAR" == ~/.environment.env ]; then
+    sed -i 's|#export RANGER_LOAD_DEFAULT_RC=|export RANGER_LOAD_DEFAULT_RC=|g' $ENVVAR
+    sudo sed -i 's|#export RANGER_LOAD_DEFAULT_RC=|export RANGER_LOAD_DEFAULT_RC=|g' $ENVVAR_R
 else
-    echo "export RANGER_LOAD_DEFAULT_RC=FALSE" >> $PATHVAR
-    printf "export RANGER_LOAD_DEFAULT_RC=FALSE\n" | sudo tee -a $PATHVAR_R
+    echo "export RANGER_LOAD_DEFAULT_RC=FALSE" >> $ENVVAR
+    printf "export RANGER_LOAD_DEFAULT_RC=FALSE\n" | sudo tee -a $ENVVAR_R
 fi
 if [ -d ~/.bash_aliases.d/ ]; then
     if ! test -f ranger/.bash_aliases.d/ranger.sh ; then

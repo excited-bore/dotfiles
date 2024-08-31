@@ -27,10 +27,10 @@ else
     . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
 fi
 
-if ! test -f checks/check_pathvar.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pathvar.sh)" 
+if ! test -f checks/check_envvar.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)" 
 else
-    . ./checks/check_pathvar.sh
+    . ./checks/check_envvar.sh
 fi
 
 #if ! type fzf &> /dev/null ; then
@@ -602,26 +602,26 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                         if test "$pager" == "ydiff"; then
                             git config $global "$cpager" "ydiff --pager=less --pager-options=\"-R $ln\""         
                         elif test "$pager" == "bat" || test "$pager" == "batdiff"; then
-                            reade -Q "CYAN" -i "y" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $PATHVAR? [Y/n]: " "n" pager1
+                            reade -Q "CYAN" -i "y" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $ENVVAR? [Y/n]: " "n" pager1
                             if test $pager1 == 'y'; then
-                                if grep -q 'BAT_PAGER' $PATHVAR; then
-                                    sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $PATHVAR
-                                    sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='less -R $ln'|g" $PATHVAR                       
+                                if grep -q 'BAT_PAGER' $ENVVAR; then
+                                    sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $ENVVAR
+                                    sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='less -R $ln'|g" $ENVVAR                       
                                 else
-                                    printf "# BAT\nexport BAT_PAGER='less -R $ln'\n" >> $PATHVAR
+                                    printf "# BAT\nexport BAT_PAGER='less -R $ln'\n" >> $ENVVAR
                                 fi
                                 git config $global "$cpager" "$pager"
                             else
                                 git config $global "$cpager" "$pager --pager='less -R $ln'"
                             fi
                         elif test "$pager" == "delta"; then
-                            reade -Q "CYAN" -i "y" -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $PATHVAR? [Y/n]: " "n" pager1
+                            reade -Q "CYAN" -i "y" -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $ENVVAR? [Y/n]: " "n" pager1
                             if test $pager1 == 'y'; then
-                                if grep -q 'DELTA_PAGER' $PATHVAR; then
-                                    sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $PATHVAR
-                                    sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='less -R $ln'|g" $PATHVAR                      
+                                if grep -q 'DELTA_PAGER' $ENVVAR; then
+                                    sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $ENVVAR
+                                    sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='less -R $ln'|g" $ENVVAR                      
                                 else
-                                    printf "# DELTA\nexport DELTA_PAGER='less -R $ln'\n" >> $PATHVAR
+                                    printf "# DELTA\nexport DELTA_PAGER='less -R $ln'\n" >> $ENVVAR
                                 fi
                                 git config $global "$cpager" "delta" 
                             else 
@@ -650,26 +650,26 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                         if test "$pager" == "ydiff"; then
                             git config $global "$cpager" "ydiff --pager=moar --pager-options=\"$ln\""
                         elif test "$pager" == "delta"; then
-                            reade -Q "CYAN" -i "y" -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $PATHVAR? [Y/n]: " "n" pager1
+                            reade -Q "CYAN" -i "y" -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $ENVVAR? [Y/n]: " "n" pager1
                             if test $pager1 == 'y'; then
-                                if grep -q 'DELTA_PAGER' $PATHVAR; then
-                                    sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $PATHVAR
-                                    sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='moar $ln'|g" $PATHVAR                       
+                                if grep -q 'DELTA_PAGER' $ENVVAR; then
+                                    sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $ENVVAR
+                                    sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='moar $ln'|g" $ENVVAR                       
                                 else
-                                    printf "# DELTA\nexport DELTA_PAGER='moar $ln'\n" >> $PATHVAR
+                                    printf "# DELTA\nexport DELTA_PAGER='moar $ln'\n" >> $ENVVAR
                                 fi
                                 git config $global "$cpager" "$pager --pager='moar $ln'"
                             fi
                             git config $global "$cpager" "delta"
                             
                         elif test "$pager" == "bat" || test "$pager" == "batdiff"; then
-                            reade -Q "CYAN" -i "y" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $PATHVAR? [Y/n]: " "n" pager1
+                            reade -Q "CYAN" -i "y" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $ENVVAR? [Y/n]: " "n" pager1
                             if test $pager1 == 'y'; then
-                                if grep -q 'BAT_PAGER' $PATHVAR; then
-                                    sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $PATHVAR
-                                    sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='moar $ln'|g" $PATHVAR                       
+                                if grep -q 'BAT_PAGER' $ENVVAR; then
+                                    sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $ENVVAR
+                                    sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='moar $ln'|g" $ENVVAR                       
                                 else
-                                    printf "# BAT\nexport BAT_PAGER='moar $ln'\n" >> $PATHVAR
+                                    printf "# BAT\nexport BAT_PAGER='moar $ln'\n" >> $ENVVAR
                                 fi
                                 git config $global "$cpager" "$pager"
                             else
@@ -694,26 +694,26 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                         if test "$pager" == "ydiff"; then
                             git config $global "$cpager" "ydiff --pager=nvimpager --pager-options='$opts'"
                         elif test "$pager" == "delta"; then
-                            reade -Q "CYAN" -i "y" -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $PATHVAR? [Y/n]: " "n" pager1
+                            reade -Q "CYAN" -i "y" -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $ENVVAR? [Y/n]: " "n" pager1
                             if test $pager1 == 'y'; then
-                                if grep -q 'DELTA_PAGER' $PATHVAR; then
-                                    sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $PATHVAR
-                                    sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='nvimpager $opts'|g" $PATHVAR                      
+                                if grep -q 'DELTA_PAGER' $ENVVAR; then
+                                    sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $ENVVAR
+                                    sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='nvimpager $opts'|g" $ENVVAR                      
                                 else
-                                    printf "# DELTA\nexport DELTA_PAGER='nvimpager $opts'\n" >> $PATHVAR
+                                    printf "# DELTA\nexport DELTA_PAGER='nvimpager $opts'\n" >> $ENVVAR
                                 fi
                                 git config $global "$cpager" "delta"
                             else
                                 git config $global "$cpager" "delta --pager=\"nvimpager $opts\""
                             fi
                         elif test "$pager" == "bat" || test "$pager" == "batdiff"; then
-                            reade -Q "CYAN" -i "y" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $PATHVAR? [Y/n]: " "n" pager1
+                            reade -Q "CYAN" -i "y" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $ENVVAR? [Y/n]: " "n" pager1
                             if test $pager1 == 'y'; then
-                                if grep -q 'BAT_PAGER' $PATHVAR; then
-                                    sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $PATHVAR
-                                    sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='nvimpager $opts'|g" $PATHVAR                       
+                                if grep -q 'BAT_PAGER' $ENVVAR; then
+                                    sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $ENVVAR
+                                    sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='nvimpager $opts'|g" $ENVVAR                       
                                 else
-                                    printf "# BAT\nexport BAT_PAGER='nvimpager $opts'\n" >> $PATHVAR
+                                    printf "# BAT\nexport BAT_PAGER='nvimpager $opts'\n" >> $ENVVAR
                                 fi
                                 git config $global "$cpager" "$pager"
                             else
@@ -726,26 +726,26 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                         if test "$pager" == "ydiff"; then
                             git config $global "$cpager" "ydiff --pager=$diffancy"
                         elif test "$pager" == "bat" || test "$pager" == "batdiff"; then
-                            reade -Q "CYAN" -i "y" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $PATHVAR? [Y/n]: " "n" pager1
+                            reade -Q "CYAN" -i "y" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $ENVVAR? [Y/n]: " "n" pager1
                             if test $pager1 == 'y'; then
-                                if grep -q 'BAT_PAGER' $PATHVAR; then
-                                    sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $PATHVAR
-                                    sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='$diffancy'|g" $PATHVAR                       
+                                if grep -q 'BAT_PAGER' $ENVVAR; then
+                                    sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $ENVVAR
+                                    sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='$diffancy'|g" $ENVVAR                       
                                 else
-                                    printf "# BAT\nexport BAT_PAGER='$diffancy'\n" >> $PATHVAR
+                                    printf "# BAT\nexport BAT_PAGER='$diffancy'\n" >> $ENVVAR
                                 fi
                                 git config $global "$cpager" "batdiff"
                             else
                                 git config $global "$cpager" "batdiff --pager='$diffancy'"
                             fi
                         elif test "$pager" == "delta"; then
-                            reade -Q "CYAN" -i "y" -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $PATHVAR? [Y/n]: " "n" pager1
+                            reade -Q "CYAN" -i "y" -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $ENVVAR? [Y/n]: " "n" pager1
                             if test $pager1 == 'y'; then
-                                if grep -q 'DELTA_PAGER' $PATHVAR; then
-                                    sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $PATHVAR
-                                    sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='$diffancy'|g" $PATHVAR                       
+                                if grep -q 'DELTA_PAGER' $ENVVAR; then
+                                    sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $ENVVAR
+                                    sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='$diffancy'|g" $ENVVAR                       
                                 else
-                                    printf "# DELTA\nexport DELTA_PAGER='$diffancy'\n" >> $PATHVAR
+                                    printf "# DELTA\nexport DELTA_PAGER='$diffancy'\n" >> $ENVVAR
                                 fi
                                 git config $global "$cpager" "delta"
                             else
@@ -1078,26 +1078,26 @@ fi
                             if [[ "$pager" =~ "ydiff" ]]; then
                                 git config $global "$cpager" "ydiff --pager=less --pager-options=\"-R $ln\""         
                             elif [[ "$pager" =~ "bat" || "$pager" =~ "batdiff" ]]; then
-                                reade -Q "CYAN" -i "y" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $PATHVAR? [Y/n]: " "n" pager1
+                                reade -Q "CYAN" -i "y" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $ENVVAR? [Y/n]: " "n" pager1
                                 if test $pager1 == 'y'; then
-                                    if grep -q 'BAT_PAGER' $PATHVAR; then
-                                        sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $PATHVAR
-                                        sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='less -R $ln'|g" $PATHVAR                       
+                                    if grep -q 'BAT_PAGER' $ENVVAR; then
+                                        sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $ENVVAR
+                                        sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='less -R $ln'|g" $ENVVAR                       
                                     else
-                                        printf "\n# BAT\nexport BAT_PAGER='less -R $ln'\n" >> $PATHVAR
+                                        printf "\n# BAT\nexport BAT_PAGER='less -R $ln'\n" >> $ENVVAR
                                     fi
                                     git config $global "$cpager" "$pager"
                                 else
                                     git config $global "$cpager" "$pager --pager='less -R $ln'"
                                 fi
                             elif [[ "$pager" =~ "delta" ]]; then
-                                reade -Q "CYAN" -i "y" -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $PATHVAR? [Y/n]: " "n" pager1
+                                reade -Q "CYAN" -i "y" -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $ENVVAR? [Y/n]: " "n" pager1
                                 if test $pager1 == 'y'; then
-                                    if grep -q 'DELTA_PAGER' $PATHVAR; then
-                                        sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $PATHVAR
-                                        sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='less -R $ln'|g" $PATHVAR                      
+                                    if grep -q 'DELTA_PAGER' $ENVVAR; then
+                                        sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $ENVVAR
+                                        sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='less -R $ln'|g" $ENVVAR                      
                                     else
-                                        printf "\n# DELTA\nexport DELTA_PAGER='less -R $ln'\n" >> $PATHVAR
+                                        printf "\n# DELTA\nexport DELTA_PAGER='less -R $ln'\n" >> $ENVVAR
                                     fi
                                     git config $global "$cpager" "delta" 
                                 else 
@@ -1126,26 +1126,26 @@ fi
                             if [[ "$pager" =~ "ydiff" ]]; then
                                 git config $global "$cpager" "ydiff --pager=moar --pager-options=\"$ln\""
                             elif [[ "$pager" =~ "delta" ]]; then
-                                reade -Q "CYAN" -i "y" -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $PATHVAR? [Y/n]: " "n" pager1
+                                reade -Q "CYAN" -i "y" -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $ENVVAR? [Y/n]: " "n" pager1
                                 if test $pager1 == 'y'; then
-                                    if grep -q 'DELTA_PAGER' $PATHVAR; then
-                                        sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $PATHVAR
-                                        sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='moar $ln'|g" $PATHVAR                       
+                                    if grep -q 'DELTA_PAGER' $ENVVAR; then
+                                        sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $ENVVAR
+                                        sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='moar $ln'|g" $ENVVAR                       
                                     else
-                                        printf "\n# DELTA\nexport DELTA_PAGER='moar $ln'\n" >> $PATHVAR
+                                        printf "\n# DELTA\nexport DELTA_PAGER='moar $ln'\n" >> $ENVVAR
                                     fi
                                     git config $global "$cpager" "$pager --pager='moar $ln'"
                                 fi
                                 git config $global "$cpager" "delta"
                                 
                             elif [[ "$pager" =~ "bat" || "$pager" =~ "batdiff" ]]; then
-                                reade -Q "CYAN" -i "y" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $PATHVAR? [Y/n]: " "n" pager1
+                                reade -Q "CYAN" -i "y" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $ENVVAR? [Y/n]: " "n" pager1
                                 if test $pager1 == 'y'; then
-                                    if grep -q 'BAT_PAGER' $PATHVAR; then
-                                        sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $PATHVAR
-                                        sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='moar $ln'|g" $PATHVAR                       
+                                    if grep -q 'BAT_PAGER' $ENVVAR; then
+                                        sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $ENVVAR
+                                        sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='moar $ln'|g" $ENVVAR                       
                                     else
-                                        printf "\n# BAT\nexport BAT_PAGER='moar $ln'\n" >> $PATHVAR
+                                        printf "\n# BAT\nexport BAT_PAGER='moar $ln'\n" >> $ENVVAR
                                     fi
                                     git config $global "$cpager" "$pager"
                                 else
@@ -1169,26 +1169,26 @@ fi
                             if [[ "$pager" =~ "ydiff" ]]; then
                                 git config $global "$cpager" "ydiff --pager=nvimpager --pager-options='$opts'"
                             elif [[ "$pager" =~ "delta" ]]; then
-                                reade -Q "CYAN" -i "y" -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $PATHVAR? [Y/n]: " "n" pager1
+                                reade -Q "CYAN" -i "y" -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $ENVVAR? [Y/n]: " "n" pager1
                                 if test $pager1 == 'y'; then
-                                    if grep -q 'DELTA_PAGER' $PATHVAR; then
-                                        sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $PATHVAR
-                                        sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='nvimpager $opts'|g" $PATHVAR                      
+                                    if grep -q 'DELTA_PAGER' $ENVVAR; then
+                                        sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $ENVVAR
+                                        sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='nvimpager $opts'|g" $ENVVAR                      
                                     else
-                                        printf "\n# DELTA\nexport DELTA_PAGER='nvimpager $opts'\n" >> $PATHVAR
+                                        printf "\n# DELTA\nexport DELTA_PAGER='nvimpager $opts'\n" >> $ENVVAR
                                     fi
                                     git config $global "$cpager" "delta"
                                 else
                                     git config $global "$cpager" "delta --pager=\"nvimpager $opts\""
                                 fi
                             elif [[ "$pager" =~ "bat" || "$pager" =~ "batdiff" ]]; then
-                                reade -Q "CYAN" -i "y" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $PATHVAR? [Y/n]: " "n" pager1
+                                reade -Q "CYAN" -i "y" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $ENVVAR? [Y/n]: " "n" pager1
                                 if test $pager1 == 'y'; then
-                                    if grep -q 'BAT_PAGER' $PATHVAR; then
-                                        sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $PATHVAR
-                                        sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='nvimpager $opts'|g" $PATHVAR                       
+                                    if grep -q 'BAT_PAGER' $ENVVAR; then
+                                        sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $ENVVAR
+                                        sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='nvimpager $opts'|g" $ENVVAR                       
                                     else
-                                        printf "\n# BAT\nexport BAT_PAGER='nvimpager $opts'\n" >> $PATHVAR
+                                        printf "\n# BAT\nexport BAT_PAGER='nvimpager $opts'\n" >> $ENVVAR
                                     fi
                                     git config $global "$cpager" "$pager"
                                 else
@@ -1201,26 +1201,26 @@ fi
                             if [[ "$pager" =~ "ydiff" ]]; then
                                 git config $global "$cpager" "ydiff --pager=$diffancy"
                             elif [[ "$pager" =~ "bat" || "$pager" =~ "batdiff" ]]; then
-                                reade -Q "CYAN" -i "y" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $PATHVAR? [Y/n]: " "n" pager1
+                                reade -Q "CYAN" -i "y" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $ENVVAR? [Y/n]: " "n" pager1
                                 if test $pager1 == 'y'; then
-                                    if grep -q 'BAT_PAGER' $PATHVAR; then
-                                        sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $PATHVAR
-                                        sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='$diffancy'|g" $PATHVAR                       
+                                    if grep -q 'BAT_PAGER' $ENVVAR; then
+                                        sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $ENVVAR
+                                        sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='$diffancy'|g" $ENVVAR                       
                                     else
-                                        printf "\n# BAT\nexport BAT_PAGER='$diffancy'\n" >> $PATHVAR
+                                        printf "\n# BAT\nexport BAT_PAGER='$diffancy'\n" >> $ENVVAR
                                     fi
                                     git config $global "$cpager" "batdiff"
                                 else
                                     git config $global "$cpager" "batdiff --pager='$diffancy'"
                                 fi
                             elif [[ "$pager" =~ "delta" ]]; then
-                                reade -Q "CYAN" -i "y" -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $PATHVAR? [Y/n]: " "n" pager1
+                                reade -Q "CYAN" -i "y" -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $ENVVAR? [Y/n]: " "n" pager1
                                 if test $pager1 == 'y'; then
-                                    if grep -q 'DELTA_PAGER' $PATHVAR; then
-                                        sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $PATHVAR
-                                        sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='$diffancy'|g" $PATHVAR                       
+                                    if grep -q 'DELTA_PAGER' $ENVVAR; then
+                                        sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $ENVVAR
+                                        sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='$diffancy'|g" $ENVVAR                       
                                     else
-                                        printf "\n# DELTA\nexport DELTA_PAGER='$diffancy'\n" >> $PATHVAR
+                                        printf "\n# DELTA\nexport DELTA_PAGER='$diffancy'\n" >> $ENVVAR
                                     fi
                                     git config $global "$cpager" "delta"
                                 else

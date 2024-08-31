@@ -45,13 +45,13 @@ fi
 #        
 #        reade -Q "CYAN" -i "$HOME/.local" -p "Set GOPATH (go packages): " -e gopth
 #        
-#        if grep -q "GOPATH" $PATHVAR; then
-#            sed -i "s|.export GOPATH=|export GOPATH=|g" $PATHVAR
-#            sed -i "s|export GOPATH=.*|export GOPATH=$gopth|g" $PATHVAR
-#            sed -i "s|.export PATH=\$PATH:\$GOPATH|export PATH=\$PATH:\$GOPATH|g" $PATHVAR
+#        if grep -q "GOPATH" $ENVVAR; then
+#            sed -i "s|.export GOPATH=|export GOPATH=|g" $ENVVAR
+#            sed -i "s|export GOPATH=.*|export GOPATH=$gopth|g" $ENVVAR
+#            sed -i "s|.export PATH=\$PATH:\$GOPATH|export PATH=\$PATH:\$GOPATH|g" $ENVVAR
 #        else
-#            echo "export GOPATH=$gopth" >> $PATHVAR
-#            echo "export PATH=\$PATH:\$GOPATH" >> $PATHVAR
+#            echo "export GOPATH=$gopth" >> $ENVVAR
+#            echo "export PATH=\$PATH:\$GOPATH" >> $ENVVAR
 #        fi     
 #        unset gopth goroot
 #    fi

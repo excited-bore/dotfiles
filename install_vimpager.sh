@@ -24,10 +24,10 @@ else
     . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
 fi
 
-if ! test -f checks/check_pathvar.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pathvar.sh)" 
+if ! test -f checks/check_envvar.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)" 
 else
-    . ./checks/check_pathvar.sh
+    . ./checks/check_envvar.sh
 fi
 
 if type nvimpager &> /dev/null; then
@@ -52,42 +52,42 @@ fi
 
 reade -Q 'GREEN' -i 'y' -p "Set .vimrc as default vimpager read config for $USER? [Y/n]: " "n" conf
 if test "$conf" == "y"; then
-    if grep -q "VIMPAGER_RC" $PATHVAR; then 
-        sed -i "s|.export VIMPAGER_RC=|export VIMPAGER_RC=|g" $PATHVAR
-        sed -i "s|export VIMPAGER_RC=.*|export VIMPAGER_RC=~/.vimrc|g" $PATHVAR
+    if grep -q "VIMPAGER_RC" $ENVVAR; then 
+        sed -i "s|.export VIMPAGER_RC=|export VIMPAGER_RC=|g" $ENVVAR
+        sed -i "s|export VIMPAGER_RC=.*|export VIMPAGER_RC=~/.vimrc|g" $ENVVAR
     else
-        printf "\n# VIMPAGER\nexport VIMPAGER_RC=~/.vimrc\n" >> $PATHVAR
+        printf "\n# VIMPAGER\nexport VIMPAGER_RC=~/.vimrc\n" >> $ENVVAR
     fi
 fi
 
 reade -Q "GREEN" -i "y" -p "Set vimpager as default pager for $USER? [Y/n]: " "n" moar_usr
 if [ -z "$moar_usr" ] || [ "y" == "$moar_usr" ] || [ "Y" == "$moar_usr" ]; then
-    if grep -q " PAGER=" $PATHVAR; then 
-        sed -i "s|.export PAGER=|export PAGER=|g" $PATHVAR
-        sed -i "s|export PAGER=.*|export PAGER=$(whereis vimpager | awk '{print $2;}')|g" $PATHVAR
+    if grep -q " PAGER=" $ENVVAR; then 
+        sed -i "s|.export PAGER=|export PAGER=|g" $ENVVAR
+        sed -i "s|export PAGER=.*|export PAGER=$(whereis vimpager | awk '{print $2;}')|g" $ENVVAR
     else
-        printf "export PAGER=$(whereis vimpager | awk '{print $2;}')\n" >> $PATHVAR
+        printf "export PAGER=$(whereis vimpager | awk '{print $2;}')\n" >> $ENVVAR
     fi
 fi
 
 reade -Q 'YELLOW' -i 'y' -p "Set .vimrc as default vimpager read config for root? [Y/n]: " "n" conf
 if test "$conf" == "y"; then
-    if sudo grep -q "VIMPAGER_RC" $PATHVAR_R; then 
-        sudo sed -i "s|.export VIMPAGER_RC=|export VIMPAGER_RC=|g" $PATHVAR_R
-        sudo sed -i "s|export VIMPAGER_RC=.*|export VIMPAGER_RC=~/.vimrc|g" $PATHVAR_R
+    if sudo grep -q "VIMPAGER_RC" $ENVVAR_R; then 
+        sudo sed -i "s|.export VIMPAGER_RC=|export VIMPAGER_RC=|g" $ENVVAR_R
+        sudo sed -i "s|export VIMPAGER_RC=.*|export VIMPAGER_RC=~/.vimrc|g" $ENVVAR_R
     else
-        printf "\n# VIMPAGER\nexport VIMPAGER_RC=~/.vimrc\n" | sudo tee -a $PATHVAR_R &> /dev/null
+        printf "\n# VIMPAGER\nexport VIMPAGER_RC=~/.vimrc\n" | sudo tee -a $ENVVAR_R &> /dev/null
     fi
 fi
 
     
 reade -Q "YELLOW" -i "y" -p "Set vimpager default pager for root? [Y/n]: " "n" moar_root
 if [ -z "$moar_root" ] || [ "y" == "$moar_root" ] || [ "Y" == "$moar_root" ]; then
-    if sudo grep -q " PAGER=" $PATHVAR_R; then
-        sudo sed -i "s|.export PAGER=|export PAGER=|g" $PATHVAR_R
-        sudo sed -i "s|export PAGER=.*|export PAGER=$(whereis vimpager | awk '{print $2;}')|g" $PATHVAR_R
+    if sudo grep -q " PAGER=" $ENVVAR_R; then
+        sudo sed -i "s|.export PAGER=|export PAGER=|g" $ENVVAR_R
+        sudo sed -i "s|export PAGER=.*|export PAGER=$(whereis vimpager | awk '{print $2;}')|g" $ENVVAR_R
     else
-        printf "export PAGER=$(whereis vimpager | awk '{print $2;}')\n" | sudo tee -a $PATHVAR_R &> /dev/null
+        printf "export PAGER=$(whereis vimpager | awk '{print $2;}')\n" | sudo tee -a $ENVVAR_R &> /dev/null
     fi
 fi
 

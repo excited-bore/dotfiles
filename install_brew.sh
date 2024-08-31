@@ -5,10 +5,10 @@ else
     . ./checks/check_system.sh
 fi
 
-if ! test -f checks/check_pathvar.sh.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pathvar.sh)" 
+if ! test -f checks/check_envvar.sh.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)" 
 else
-    . ./checks/check_pathvar.sh
+    . ./checks/check_envvar.sh
 fi
 
 
@@ -52,15 +52,15 @@ if type brew &> /dev/null; then
         sudo mkdir -p /Library/Caches/Homebrew
         sudo chown -R "$USER":admin /Library/Caches/Homebrew
     fi
-    if ! grep -q -- '--no-quarantine' $PATHVAR || grep -q '#export HOMEBREW_CASK_OPTS="--no-quarantine"' $PATHVAR; then
-        reade -Q 'GREEN' -i 'y' -p "Unblock Homebrew apps from Gatekeeper (No more popups each time when you install from homebrew) by setting HOMEBREW_CASK_OPTS=\"--no-quarantine\" in $PATHVAR? [Y/n]: " 'n' unblock_hb
+    if ! grep -q -- '--no-quarantine' $ENVVAR || grep -q '#export HOMEBREW_CASK_OPTS="--no-quarantine"' $ENVVAR; then
+        reade -Q 'GREEN' -i 'y' -p "Unblock Homebrew apps from Gatekeeper (No more popups each time when you install from homebrew) by setting HOMEBREW_CASK_OPTS=\"--no-quarantine\" in $ENVVAR? [Y/n]: " 'n' unblock_hb
         if test $unblock_hb == 'y' ;then
-           if [[ $PATHVAR =~ '.environment.env' ]]; then
-                sed -i='s/^#export HOMEBREW_CASK_OPTS/export HOMEBREW_CASK_OPTS/g' $PATHVAR
+           if [[ $ENVVAR =~ '.environment.env' ]]; then
+                sed -i='s/^#export HOMEBREW_CASK_OPTS/export HOMEBREW_CASK_OPTS/g' $ENVVAR
            else
-                echo 'export HOMEBREW_CASK_OPTS=" --no-quarantine"' >> $PATHVAR
+                echo 'export HOMEBREW_CASK_OPTS=" --no-quarantine"' >> $ENVVAR
            fi
-           source $PATHVAR
+           source $ENVVAR
         fi
         unset unblock_hb
     fi

@@ -14,9 +14,9 @@ fi
 
 #  Pathvariables
 
-pathvr=$(pwd)/pathvars/.environment.env
+pathvr=$(pwd)/envvars/.environment.env
 if ! test -f $pathvr; then
-    wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/pathvars/.environment.env
+    wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/envvars/.environment.env
     pathvr=$TMPDIR/.environment.env
 fi
 
@@ -28,7 +28,7 @@ prmpt='[Y/n]: '
 echo "Next $(tput setaf 1)sudo$(tput sgr0) check for /root/.environment.env' "
 
 if ! test -z $1; then
-    pathvars=$!
+    envvars=$!
     if test -f ~/.environment.env && sudo test -f /root/.environment.env; then
         pre='n' 
         othr='y'
@@ -36,11 +36,11 @@ if ! test -z $1; then
         prmpt='[N/y]: '
     fi
 else
-    reade -Q "$color" -i "$pre" -p "Check existence/create .environment.env and link it to .bashrc in $HOME/ and /root/? $prmpt" "$othr" pathvars
+    reade -Q "$color" -i "$pre" -p "Check existence/create .environment.env and link it to .bashrc in $HOME/ and /root/? $prmpt" "$othr" envvars
 fi
 
-if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
-    #Comment out every export in .pathvariables
+if [ "$envvars" == "y" ] || [ -z "$envvars" ]; then
+    #Comment out every export in .environment
     sed -i -e '/export/ s/^#*/#/' $pathvr
         
     # Allow if checks
@@ -293,7 +293,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
     # TODO do something for flatpak  (XDG_DATA_DIRS)
     # Check if xdg installed
     if type xdg-open &> /dev/null ; then
-        prmpt="${green}This will set XDG pathvariables to their respective defaults\n\
+        prmpt="${green}This will set XDG environment variables to their respective defaults\n\
         XDG is related to default applications\n\
         Setting these could be usefull when installing certain programs \n\
         Defaults:\n\
@@ -338,7 +338,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
                 fi
             fi     
         fi
-        prmpt="${yellow}This will set SYSTEMD pathvariables\n\
+        prmpt="${yellow}This will set SYSTEMD environment-variables\n\
         When setting a new pager for systemd or changing logging specifics\n\
         Defaults:\n\
         - SYSTEMD_PAGER=\$PAGER\n\
@@ -378,7 +378,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         sed -i 's/^#export LIBVIRT_DEFAULT_URI/export LIBVIRT_DEFAULT_URI/' $pathvr
     fi
 
-    pathvariables_r(){ 
+    environment-variables_r(){ 
         sudo cp -fv $pathvr /root/.environment.env;
         if ! sudo test -f /root/.profile; then
             sudo touch /root/.profile
@@ -436,7 +436,7 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
         fi 
          
     }                                            
-    pathvariables(){
+    environment-variables(){
         cp -fv $pathvr ~/.environment.env
         if ! test -f ~/.profile; then
             touch ~/.profile
@@ -494,9 +494,9 @@ if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
             fi  
             unset bash_prof_ex prmpt shell_profiles shell_rcs prof bashrc 
         fi
-        yes_edit_no pathvariables_r "$pathvr" "Install .environment.env in /root/?" "edit" "YELLOW"; 
+        yes_edit_no environment-variables_r "$pathvr" "Install .environment.env in /root/?" "edit" "YELLOW"; 
     }
-    yes_edit_no pathvariables "$pathvr" "Install .environment.env in $HOME?" "edit" "GREEN"
+    yes_edit_no environment-variables "$pathvr" "Install .environment.env in $HOME?" "edit" "GREEN"
     printf "It's recommended to logout and login again to notice a change for ${MAGENTA}.profile${normal} and any ${CYAN}.*shelltype*_profiles\n${normal}" 
 fi
 

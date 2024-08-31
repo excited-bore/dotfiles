@@ -1,9 +1,9 @@
 # !/bin/bash
 
-PATHVAR=~/.bashrc
+ENVVAR=~/.bashrc
 
 if [ -f ~/.environment.env ]; then
-    PATHVAR=~/.environment.env
+    ENVVAR=~/.environment.env
 fi
 
 ALIAS=~/.bashrc
@@ -41,12 +41,12 @@ fi
 ALIAS_R=/root/.bashrc
 COMPLETION_R=/root/.bashrc
 KEYBIND_R=/root/.bashrc
-PATHVAR_R=/root/.bashrc
+ENVVAR_R=/root/.bashrc
 
-echo "This next $(tput setaf 1)sudo$(tput sgr0) checks for the pathvariable, bash_alias, bash_completion and keybind files and dirs in '/root/' to generate global variables.";
+echo "This next $(tput setaf 1)sudo$(tput sgr0) checks for the envvariable, bash_alias, bash_completion and keybind files and dirs in '/root/' to generate global variables.";
 
 if sudo test -f /root/.environment.env; then
-    PATHVAR_R=/root/.environment.env
+    ENVVAR_R=/root/.environment.env
 fi
 
 if sudo test -f /root/.bash_aliases; then

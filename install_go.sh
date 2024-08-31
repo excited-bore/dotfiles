@@ -26,9 +26,9 @@ else
 fi
 
 if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pathvar.sh)" 
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)" 
 else
-    . ./checksum/check_pathvar.sh
+    . ./checksum/check_envvar.sh
 fi
 
 
@@ -56,14 +56,14 @@ elif [ $distro_base == "Debian" ]; then
             fi
             sudo tar -C /usr/local -xzf $file
             rm $file
-            #if grep -q "GOROOT" $PATHVAR; then
-            #    sed -i "s|.export GOROOT=|export GOROOT=|g" $PATHVAR
-            #    sed -i "s|export GOROOT=.*|export GOROOT=$goroot|g" $PATHVAR
-            #    sed -i "s|.export PATH=\$PATH:\$GOROOT|export PATH=\$PATH:\$GOROOT|g" $PATHVAR
+            #if grep -q "GOROOT" $ENVVAR; then
+            #    sed -i "s|.export GOROOT=|export GOROOT=|g" $ENVVAR
+            #    sed -i "s|export GOROOT=.*|export GOROOT=$goroot|g" $ENVVAR
+            #    sed -i "s|.export PATH=\$PATH:\$GOROOT|export PATH=\$PATH:\$GOROOT|g" $ENVVAR
             #    
             #else
-            #    echo "export GOROOT=$goroot" >> $PATHVAR
-            #    echo "export PATH=\$PATH:\$GOROOT" >> $PATHVAR
+            #    echo "export GOROOT=$goroot" >> $ENVVAR
+            #    echo "export PATH=\$PATH:\$GOROOT" >> $ENVVAR
             #fi
         fi
     else
@@ -81,13 +81,13 @@ if echo $(go env) | grep -q "GOPATH=$HOME/go"; then
         
         go env -w GO111MODULE=auto
         go env -w GOPATH=$gopth
-         #if grep -q "GOPATH" $PATHVAR; then
-         #   sed -i "s|.export GOPATH=|export GOPATH=|g" $PATHVAR
-         #   sed -i "s|export GOPATH=.*|export GOPATH=$gopth|g" $PATHVAR
-         #   sed -i "s|.export PATH=\$PATH:\$GOPATH|export PATH=\$PATH:\$GOPATH|g" $PATHVAR
+         #if grep -q "GOPATH" $ENVVAR; then
+         #   sed -i "s|.export GOPATH=|export GOPATH=|g" $ENVVAR
+         #   sed -i "s|export GOPATH=.*|export GOPATH=$gopth|g" $ENVVAR
+         #   sed -i "s|.export PATH=\$PATH:\$GOPATH|export PATH=\$PATH:\$GOPATH|g" $ENVVAR
          #else
-         #   echo "export GOPATH=$gopth" >> $PATHVAR
-         #   echo "export PATH=\$PATH:\$GOPATH" >> $PATHVAR
+         #   echo "export GOPATH=$gopth" >> $ENVVAR
+         #   echo "export PATH=\$PATH:\$GOPATH" >> $ENVVAR
          #fi
     fi
 fi

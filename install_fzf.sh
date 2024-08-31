@@ -6,10 +6,10 @@ else
     . ./checks/check_system.sh
 fi
 
-if ! test -f checks/check_pathvar_aliases_completions_keybinds.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pathvar_aliases_completions_keybinds.sh)" 
+if ! test -f checks/check_envvar_aliases_completions_keybinds.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar_aliases_completions_keybinds.sh)" 
 else
-    . ./checks/check_pathvar_aliases_completions_keybinds.sh
+    . ./checks/check_envvar_aliases_completions_keybinds.sh
 fi
 
 if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
@@ -42,10 +42,10 @@ fi
 if ! test -d ~/.fzf ; then
     git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
     ~/.fzf/install
-    if [[ $PATHVAR =~ '.environment.env' ]]; then 
-        sed -i 's|.export PATH=$PATH:$HOME/.fzf/bin|export PATH=$PATH:$HOME/.fzf/bin|g' $PATHVAR
-    elif ! grep -q '.fzf/bin' $PATHVAR; then
-        echo 'export PATH="$PATH:$HOME/.fzf/bin"' >> $PATHVAR
+    if [[ $ENVVAR =~ '.environment.env' ]]; then 
+        sed -i 's|.export PATH=$PATH:$HOME/.fzf/bin|export PATH=$PATH:$HOME/.fzf/bin|g' $ENVVAR
+    elif ! grep -q '.fzf/bin' $ENVVAR; then
+        echo 'export PATH="$PATH:$HOME/.fzf/bin"' >> $ENVVAR
     fi
     rm -v ~/.fzf.bash
     sed -i '/\[ -f \~\/.fzf.bash \] \&\& source \~\/.fzf.bash/d' ~/.bashrc
@@ -63,7 +63,7 @@ if test -f ~/.keybinds.d/keybinds.bash && grep -q '^bind -m emacs-standard  '\''
 fi
 
 unset fzf_key
-source $PATHVAR
+source $ENVVAR
 
 
 
@@ -139,15 +139,15 @@ if ! type rg &> /dev/null; then
         else
             ./install_ripgrep.sh
         fi
-        if [ $PATHVAR == ~/.environment.env ] ; then
-            sed -i 's|#export RG_PREFIX|export RG_PREFIX|g' $PATHVAR
-        elif ! grep -q "export RG_PREFIX" $PATHVAR; then
-            printf "\n# RIPGREP\nexport RG_PREFIX='rg --column --line-number --no-heading --color=always --smart-case \"" >> $PATHVAR &> /dev/null
+        if [ $ENVVAR == ~/.environment.env ] ; then
+            sed -i 's|#export RG_PREFIX|export RG_PREFIX|g' $ENVVAR
+        elif ! grep -q "export RG_PREFIX" $ENVVAR; then
+            printf "\n# RIPGREP\nexport RG_PREFIX='rg --column --line-number --no-heading --color=always --smart-case \"" >> $ENVVAR &> /dev/null
         fi
-        if [ $PATHVAR_R == /root/.environment.env ] ; then
-            sudo sed -i 's|#export RG_PREFIX|export RG_PREFIX|g' $PATHVAR_R
-        elif ! sudo grep -q "export RG_PREFIX" $PATHVAR_R; then
-             printf "\n# RIPGREP\nexport RG_PREFIX='rg --column --line-number --no-heading --color=always --smart-case \"" | sudo tee -a $PATHVAR_R
+        if [ $ENVVAR_R == /root/.environment.env ] ; then
+            sudo sed -i 's|#export RG_PREFIX|export RG_PREFIX|g' $ENVVAR_R
+        elif ! sudo grep -q "export RG_PREFIX" $ENVVAR_R; then
+             printf "\n# RIPGREP\nexport RG_PREFIX='rg --column --line-number --no-heading --color=always --smart-case \"" | sudo tee -a $ENVVAR_R
         fi
         
         reade -Q "GREEN" -i "y" -p "Add shortcut for ripgrep files in dir? (Ctrl-g) [Y/n]: " "n" rpgrpdir
@@ -173,15 +173,15 @@ if ! type xclip &> /dev/null; then
             ./install_xclip.sh
         fi
     fi
-    if [ $PATHVAR == ~/.environment.env ] ; then
-        sed -i 's|#export FZF_CTRL_R_OPTS=|export FZF_CTRL_R_OPTS=|g' $PATHVAR
-    elif ! grep -q "export FZF_CTRL_R_OPTS=" $PATHVAR; then
-        printf "\nexport FZF_CTRL_R_OPTS=\" --preview 'echo {}' --preview-window up:3:hidden:wrap --bind 'ctrl-t:toggle-preview' --bind 'alt-c:execute-silent(echo -n {2..} | xclip -i -sel c)+abort' --color header:italic --header 'Press ALT-C to copy command into clipboard'\"" >> $PATHVAR &> /dev/null
+    if [ $ENVVAR == ~/.environment.env ] ; then
+        sed -i 's|#export FZF_CTRL_R_OPTS=|export FZF_CTRL_R_OPTS=|g' $ENVVAR
+    elif ! grep -q "export FZF_CTRL_R_OPTS=" $ENVVAR; then
+        printf "\nexport FZF_CTRL_R_OPTS=\" --preview 'echo {}' --preview-window up:3:hidden:wrap --bind 'ctrl-t:toggle-preview' --bind 'alt-c:execute-silent(echo -n {2..} | xclip -i -sel c)+abort' --color header:italic --header 'Press ALT-C to copy command into clipboard'\"" >> $ENVVAR &> /dev/null
     fi
-    if [ $PATHVAR_R == /root/.environment.env ] ; then
-        sudo sed -i 's|#export FZF_CTRL_R_OPTS==|export FZF_CTRL_R_OPTS=|g' $PATHVAR_R
-    elif ! sudo grep -q "export FZF_CTRL_R_OPTS" $PATHVAR_R; then
-        printf "\nexport FZF_CTRL_R_OPTS=\" --preview 'echo {}' --preview-window up:3:hidden:wrap --bind 'ctrl-t:toggle-preview' --bind 'alt-c:execute-silent(echo -n {2..} | xclip -i -sel c)+abort' --color header:italic --header 'Press ALT-C to copy command into clipboard'\"" | sudo tee -a $PATHVAR_R
+    if [ $ENVVAR_R == /root/.environment.env ] ; then
+        sudo sed -i 's|#export FZF_CTRL_R_OPTS==|export FZF_CTRL_R_OPTS=|g' $ENVVAR_R
+    elif ! sudo grep -q "export FZF_CTRL_R_OPTS" $ENVVAR_R; then
+        printf "\nexport FZF_CTRL_R_OPTS=\" --preview 'echo {}' --preview-window up:3:hidden:wrap --bind 'ctrl-t:toggle-preview' --bind 'alt-c:execute-silent(echo -n {2..} | xclip -i -sel c)+abort' --color header:italic --header 'Press ALT-C to copy command into clipboard'\"" | sudo tee -a $ENVVAR_R
     fi 
 fi
 unset xclip
@@ -202,42 +202,42 @@ unset xclip
 #fi
 #unset fndgbl fndfle fndhiddn
 
-if [ $PATHVAR == ~/.environment.env ] ; then
-    sed -i 's|#export FZF_DEFAULT_COMMAND|export FZF_DEFAULT_COMMAND|g' $PATHVAR
-    sed -i 's|#export FZF_CTRL_T_COMMAND|export FZF_CTRL_T_COMMAND|g' $PATHVAR
-    sed -i 's|#export FZF_CTRL_R_OPTS|export FZF_CTRL_R_OPTS|g' $PATHVAR
-    sed -i 's|#export FZF_BIND_TYPES|export FZF_BIND_TYPES|g' $PATHVAR
-    sed -i 's|#type fd &> /dev/null|type fd &> /dev/null|g' $PATHVAR
-    sed -i 's/#--bind/--bind/' $PATHVAR
-    sed -i 's/#--preview-window/--preview-window/' $PATHVAR
-    sed -i 's/#--color/--color/' $PATHVAR
+if [ $ENVVAR == ~/.environment.env ] ; then
+    sed -i 's|#export FZF_DEFAULT_COMMAND|export FZF_DEFAULT_COMMAND|g' $ENVVAR
+    sed -i 's|#export FZF_CTRL_T_COMMAND|export FZF_CTRL_T_COMMAND|g' $ENVVAR
+    sed -i 's|#export FZF_CTRL_R_OPTS|export FZF_CTRL_R_OPTS|g' $ENVVAR
+    sed -i 's|#export FZF_BIND_TYPES|export FZF_BIND_TYPES|g' $ENVVAR
+    sed -i 's|#type fd &> /dev/null|type fd &> /dev/null|g' $ENVVAR
+    sed -i 's/#--bind/--bind/' $ENVVAR
+    sed -i 's/#--preview-window/--preview-window/' $ENVVAR
+    sed -i 's/#--color/--color/' $ENVVAR
     if type tree &> /dev/null && type vlc &> /dev/null; then
-        sed -i 's|#export FZF_ALT_C_OPTS=|export FZF_ALT_C_OPTS=|g' $PATHVAR
+        sed -i 's|#export FZF_ALT_C_OPTS=|export FZF_ALT_C_OPTS=|g' $ENVVAR
     fi
-elif ! grep -q "export FZF_DEFAULT_COMMAND" $PATHVAR; then
-    printf "\n# FZF\nexport FZF_DEFAULT_COMMAND=\"$fnd\"\nexport FZF_CTRL_T_COMMAND='$FZF_DEFAULT_COMMAND'\n" >> $PATHVAR
+elif ! grep -q "export FZF_DEFAULT_COMMAND" $ENVVAR; then
+    printf "\n# FZF\nexport FZF_DEFAULT_COMMAND=\"$fnd\"\nexport FZF_CTRL_T_COMMAND='$FZF_DEFAULT_COMMAND'\n" >> $ENVVAR
     if type tree &> /dev/null && type vlc &> /dev/null; then
-        printf "export FZF_ALT_C_OPTS=\"--preview 'tree -C {}\"\n" >> $PATHVAR 
+        printf "export FZF_ALT_C_OPTS=\"--preview 'tree -C {}\"\n" >> $ENVVAR 
     fi
 fi
 
-echo "Next $(tput setaf 1)sudo$(tput sgr0) will update FZF pathvariables in /root/.environment.env' "
-if [ $PATHVAR_R == /root/.environment.env ] ; then
-    sudo sed -i 's|#export FZF_DEFAULT_COMMAND|export FZF_DEFAULT_COMMAND |g' $PATHVAR_R
-    sudo sed -i 's|#export FZF_CTRL_T_COMMAND|export FZF_CTRL_T_COMMAND|g' $PATHVAR_R
-    sudo sed -i 's|#export FZF_CTRL_R_OPTS|export FZF_CTRL_R_OPTS|g' $PATHVAR_R
-    sudo sed -i 's|#export FZF_BIND_TYPES|export FZF_BIND_TYPES|g' $PATHVAR_R
-    sudo sed -i 's|#type fd &> /dev/null|type fd &> /dev/null|g' $PATHVAR_R
-    sudo sed -i 's/--bind/#--bind/' $PATHVAR_R
-    sudo sed -i 's/--preview-window/#--preview-window/' $PATHVAR_R
-    sudo sed -i 's/--color/#--color/' $PATHVAR_R
+echo "Next $(tput setaf 1)sudo$(tput sgr0) will update FZF environment variables in /root/.environment.env' "
+if [ $ENVVAR_R == /root/.environment.env ] ; then
+    sudo sed -i 's|#export FZF_DEFAULT_COMMAND|export FZF_DEFAULT_COMMAND |g' $ENVVAR_R
+    sudo sed -i 's|#export FZF_CTRL_T_COMMAND|export FZF_CTRL_T_COMMAND|g' $ENVVAR_R
+    sudo sed -i 's|#export FZF_CTRL_R_OPTS|export FZF_CTRL_R_OPTS|g' $ENVVAR_R
+    sudo sed -i 's|#export FZF_BIND_TYPES|export FZF_BIND_TYPES|g' $ENVVAR_R
+    sudo sed -i 's|#type fd &> /dev/null|type fd &> /dev/null|g' $ENVVAR_R
+    sudo sed -i 's/--bind/#--bind/' $ENVVAR_R
+    sudo sed -i 's/--preview-window/#--preview-window/' $ENVVAR_R
+    sudo sed -i 's/--color/#--color/' $ENVVAR_R
     if type tree &> /dev/null && type vlc &> /dev/null; then
-       sudo sed -i 's|#export FZF_ALT_C_OPTS=|export FZF_ALT_C_OPTS=|g' $PATHVAR_R
+       sudo sed -i 's|#export FZF_ALT_C_OPTS=|export FZF_ALT_C_OPTS=|g' $ENVVAR_R
     fi 
-elif ! sudo grep -q "export FZF_DEFAULT_COMMAND" $PATHVAR_R; then
-    printf "\n# FZF\nexport FZF_DEFAULT_COMMAND=\"$fnd\"\nexport FZF_CTRL_T_COMMAND='$FZF_DEFAULT_COMMAND'" | sudo tee -a $PATHVAR_R
+elif ! sudo grep -q "export FZF_DEFAULT_COMMAND" $ENVVAR_R; then
+    printf "\n# FZF\nexport FZF_DEFAULT_COMMAND=\"$fnd\"\nexport FZF_CTRL_T_COMMAND='$FZF_DEFAULT_COMMAND'" | sudo tee -a $ENVVAR_R
     if type tree &> /dev/null && type vlc &> /dev/null; then
-        printf "\nexport FZF_ALT_C_OPTS=\"--preview 'tree -C {}\"" | sudo tee -a $PATHVAR_R
+        printf "\nexport FZF_ALT_C_OPTS=\"--preview 'tree -C {}\"" | sudo tee -a $ENVVAR_R
     fi
 fi
  
