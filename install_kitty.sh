@@ -97,9 +97,9 @@ unset kittn
 
 
 # TODO: Get sed warnings gone
-if [ -f ~/.pathvariables.env ]; then
-    sed -i 's|^.\(export KITTY_PATH=~/.local/bin/:~/.local/kitty.app/bin/\)|\1|g' ~/.pathvariables.env;
-    sed -i 's|^.\(export PATH=$KITTY_PATH:$PATH\)|\1|g' ~/.pathvariables.env;
+if [ -f ~/.environment.env ]; then
+    sed -i 's|^.\(export KITTY_PATH=~/.local/bin/:~/.local/kitty.app/bin/\)|\1|g' ~/.environment.env;
+    sed -i 's|^.\(export PATH=$KITTY_PATH:$PATH\)|\1|g' ~/.environment.env;
     #sed -i 's|^.\(if \[\[ \$SSH_TTY \]\] .*\)|\1|g' $PATHVAR
     #sed -i 's|^.\(export KITTY_PORT=.*\)|\1|g' $PATHVAR
     #sed -i 's|^.\(fi\)|\1|g' $PATHVAR
