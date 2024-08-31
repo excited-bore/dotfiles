@@ -417,7 +417,7 @@ reade -Q "$color" -i "$pre" -p "Install lazygit? $prmpt" "$othr" git_ins
 if [ "y" == "$git_ins" ]; then
     if ! test -f install_lazygit.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_lazygit.sh)" 
-    elaylse
+    else
         ./install_lazygit.sh
     fi
 fi
@@ -502,7 +502,7 @@ pre='y'
 othr='n'
 color='GREEN'
 prmpt='[Y/n]: '
-if ! type neofetch &> /dev/null && ! type fastfetch &> /dev/null && ! type screenfetch &> /dev/null; then
+if type neofetch &> /dev/null || type fastfetch &> /dev/null || type screenfetch &> /dev/null; then
     pre='n' 
     othr='y'
     color='YELLOW'

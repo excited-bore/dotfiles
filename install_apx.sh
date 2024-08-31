@@ -4,6 +4,13 @@ if ! test -f checks/check_system.sh; then
 else
     . ./checks/check_system.sh
 fi
+
+if ! test -f checks/check_envvar.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
+else
+    . ./checks/check_system.sh
+fi
+
 if ! test -f checks/check_completions_dir.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)" 
 else
@@ -37,10 +44,11 @@ fi
 
 if [ $distro == "Manjaro" ]; then
     pamac install apx
-elif [ $distro == "Arch" ]; then
+elif test $distro_base == "Arch"; then
     #TODO integrate different AUR launchers
-    echo "Install with apx with AUR launcher of choice (f.ex. yay, pamac)"
-    return 0
+    eval "$AUR_install apx" 
+    #echo "Install with apx with AUR launcher of choice (f.ex. yay, pamac)"
+    #return 0
 elif test $distro_base == "Debian"; then
     git clone https://github.com/Vanilla-OS/apx $TMPDIR/apx
     go build $TMPDIR/apx
@@ -58,10 +66,13 @@ elif test $distro_base == "Debian"; then
     sudo mv ~/.local/bin/distrobox* /usr/lib/apx
 fi
 
+if type systemctl &> /dev/null && systemctl status docker | grep -q dead; then
+    systemctl start docker.service
+fi
+
 apx completion bash > ~/.bash_completion.d/complete-apx
 #if ! grep -q "~/.bash_completion.d/complete_apx" ~/.bashrc; then
 #    echo ". ~/.bash_completion.d/complete_apx" >> ~/.bashrc
 #fi
 
 source ~/.bashrc
- 

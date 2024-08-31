@@ -224,12 +224,27 @@ if [ "$envvars" == "y" ] || [ -z "$envvars" ]; then
         unset vis_ed
 
         if grep -q "#export SUDO_EDITOR" $pathvr; then
-            reade -Q "GREEN" -i "y" -p "Set SUDO_EDITOR to $edtor? [Y/n]: " "n" sud_edt
+            reade -Q "GREEN" -i "y" -p "Set SUDO_EDITOR to \\\\\$EDITOR? [Y/n]: " "n" sud_edt
             if test "$sud_edt" == "y"; then
-                sed -i "s|#export SUDO_EDITOR.*|export SUDO_EDITOR=$edtor|g" $pathvr
+                sed -i 's|#export SUDO_EDITOR.*|export SUDO_EDITOR=$EDITOR|g' $pathvr
             fi
         fi
-        
+        unset sud_edit
+
+        if grep -q "#export SUDO_VISUAL" $pathvr; then
+            printf "!! Warning: Certain visual code editors (like ${CYAN}'Visual Studio Code'${normal}) don't work properly when using ${RED}sudo${normal}\nIt might be better to keep using \$EDITOR depending on what \$VISUAL is configured as\n" 
+            reade -Q "GREEN" -i "y" -p "Set SUDO_VISUAL to \\\\\$EDITOR? [Y/n]: " "n" sud_vis
+            if test "$sud_vis" == "y"; then
+                sed -i 's|#export SUDO_VISUAL.*|export SUDO_VISUAL=$EDITOR|g' $pathvr
+            else 
+                reade -Q "GREEN" -i "y" -p "Set SUDO_VISUAL to \\\\\$VISUAL? [Y/n]: " "n" sud_edt
+                if test "$sud_vis" == "y"; then
+                    sed -i 's|#export SUDO_VISUAL.*|export SUDO_VISUAL=$VISUAL|g' $pathvr
+                fi     
+            fi
+        fi
+        unset sud_vis
+
         if test -f /etc/sudoers; then 
             echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for 'Defaults env_keep += \"PAGER\"' in /etc/sudoers"
             if ! sudo grep -q "Defaults env_keep += \"PAGER\"" /etc/sudoers; then
