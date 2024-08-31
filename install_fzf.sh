@@ -42,7 +42,7 @@ fi
 if ! test -d ~/.fzf ; then
     git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
     ~/.fzf/install
-    if [[ $PATHVAR =~ '.pathvariables.env' ]]; then 
+    if [[ $PATHVAR =~ '.envvars.env' ]]; then 
         sed -i 's|.export PATH=$PATH:$HOME/.fzf/bin|export PATH=$PATH:$HOME/.fzf/bin|g' $PATHVAR
     elif ! grep -q '.fzf/bin' $PATHVAR; then
         echo 'export PATH="$PATH:$HOME/.fzf/bin"' >> $PATHVAR
@@ -138,12 +138,12 @@ if ! type rg &> /dev/null; then
         else
             ./install_ripgrep.sh
         fi
-        if [ $PATHVAR == ~/.pathvariables.env ] ; then
+        if [ $PATHVAR == ~/.envvars.env ] ; then
             sed -i 's|#export RG_PREFIX|export RG_PREFIX|g' $PATHVAR
         elif ! grep -q "export RG_PREFIX" $PATHVAR; then
             printf "\n# RIPGREP\nexport RG_PREFIX='rg --column --line-number --no-heading --color=always --smart-case \"" >> $PATHVAR &> /dev/null
         fi
-        if [ $PATHVAR_R == /root/.pathvariables.env ] ; then
+        if [ $PATHVAR_R == /root/.envvars.env ] ; then
             sudo sed -i 's|#export RG_PREFIX|export RG_PREFIX|g' $PATHVAR_R
         elif ! sudo grep -q "export RG_PREFIX" $PATHVAR_R; then
              printf "\n# RIPGREP\nexport RG_PREFIX='rg --column --line-number --no-heading --color=always --smart-case \"" | sudo tee -a $PATHVAR_R
@@ -172,12 +172,12 @@ if ! type xclip &> /dev/null; then
             ./install_xclip.sh
         fi
     fi
-    if [ $PATHVAR == ~/.pathvariables.env ] ; then
+    if [ $PATHVAR == ~/.envvars.env ] ; then
         sed -i 's|#export FZF_CTRL_R_OPTS=|export FZF_CTRL_R_OPTS=|g' $PATHVAR
     elif ! grep -q "export FZF_CTRL_R_OPTS=" $PATHVAR; then
         printf "\nexport FZF_CTRL_R_OPTS=\" --preview 'echo {}' --preview-window up:3:hidden:wrap --bind 'ctrl-t:toggle-preview' --bind 'alt-c:execute-silent(echo -n {2..} | xclip -i -sel c)+abort' --color header:italic --header 'Press ALT-C to copy command into clipboard'\"" >> $PATHVAR &> /dev/null
     fi
-    if [ $PATHVAR_R == /root/.pathvariables.env ] ; then
+    if [ $PATHVAR_R == /root/.envvars.env ] ; then
         sudo sed -i 's|#export FZF_CTRL_R_OPTS==|export FZF_CTRL_R_OPTS=|g' $PATHVAR_R
     elif ! sudo grep -q "export FZF_CTRL_R_OPTS" $PATHVAR_R; then
         printf "\nexport FZF_CTRL_R_OPTS=\" --preview 'echo {}' --preview-window up:3:hidden:wrap --bind 'ctrl-t:toggle-preview' --bind 'alt-c:execute-silent(echo -n {2..} | xclip -i -sel c)+abort' --color header:italic --header 'Press ALT-C to copy command into clipboard'\"" | sudo tee -a $PATHVAR_R
@@ -201,7 +201,7 @@ unset xclip
 #fi
 #unset fndgbl fndfle fndhiddn
 
-if [ $PATHVAR == ~/.pathvariables.env ] ; then
+if [ $PATHVAR == ~/.envvars.env ] ; then
     sed -i 's|#export FZF_DEFAULT_COMMAND|export FZF_DEFAULT_COMMAND|g' $PATHVAR
     sed -i 's|#export FZF_CTRL_T_COMMAND|export FZF_CTRL_T_COMMAND|g' $PATHVAR
     sed -i 's|#export FZF_CTRL_R_OPTS|export FZF_CTRL_R_OPTS|g' $PATHVAR
@@ -220,8 +220,8 @@ elif ! grep -q "export FZF_DEFAULT_COMMAND" $PATHVAR; then
     fi
 fi
 
-echo "Next $(tput setaf 1)sudo$(tput sgr0) will update FZF pathvariables in /root/.pathvariables.env' "
-if [ $PATHVAR_R == /root/.pathvariables.env ] ; then
+echo "Next $(tput setaf 1)sudo$(tput sgr0) will update FZF pathvariables in /root/.envvars.env' "
+if [ $PATHVAR_R == /root/.envvars.env ] ; then
     sudo sed -i 's|#export FZF_DEFAULT_COMMAND|export FZF_DEFAULT_COMMAND |g' $PATHVAR_R
     sudo sed -i 's|#export FZF_CTRL_T_COMMAND|export FZF_CTRL_T_COMMAND|g' $PATHVAR_R
     sudo sed -i 's|#export FZF_CTRL_R_OPTS|export FZF_CTRL_R_OPTS|g' $PATHVAR_R

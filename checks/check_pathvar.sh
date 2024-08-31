@@ -2,8 +2,8 @@
 
 PATHVAR=~/.bashrc
 
-if [ -f ~/.pathvariables.env ]; then
-    PATHVAR=~/.pathvariables.env
+if [ -f ~/.envvars.env ]; then
+    PATHVAR=~/.envvars.env
 fi
 
 ALIAS=~/.bashrc
@@ -45,8 +45,8 @@ PATHVAR_R=/root/.bashrc
 
 echo "This next $(tput setaf 1)sudo$(tput sgr0) checks for the pathvariable, bash_alias, bash_completion and keybind files and dirs in '/root/' to generate global variables.";
 
-if sudo test -f /root/.pathvariables.env; then
-    PATHVAR_R=/root/.pathvariables.env
+if sudo test -f /root/.envvars.env; then
+    PATHVAR_R=/root/.envvars.env
 fi
 
 if sudo test -f /root/.bash_aliases; then

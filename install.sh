@@ -152,15 +152,15 @@ if ! test -f /etc/inputrc; then
 fi
 
 shell-keybinds_r(){ 
-    if [ -f /root/.pathvariables.env ]; then
-       sudo sed -i 's|#export INPUTRC.*|export INPUTRC=~/.inputrc|g' /root/.pathvariables.env
+    if [ -f /root/.envvars.env ]; then
+       sudo sed -i 's|#export INPUTRC.*|export INPUTRC=~/.inputrc|g' /root/.envvars.env
     fi
     sudo cp -fv $binds1 /root/.keybinds.d/;
     sudo cp -fv $binds2 /root/.keybinds
     sudo cp -fv $binds /root/;
     if sudo test -f /root/.bashrc && ! sudo grep -q '[ -f /root/.keybinds ]' /root/.bashrc; then
-         if grep -q '[ -f /root/.pathvariables.env ]' /root/.bashrc; then
-                sed -i 's|\(\[ -f \/root/.pathvariables.env \] \&\& source \/root/.pathvariables.env\)|\1\n\[ -f \/root/.keybinds \] \&\& source \/root/.keybinds\n|g' /root/.bashrc
+         if grep -q '[ -f /root/.envvars.env ]' /root/.bashrc; then
+                sed -i 's|\(\[ -f \/root/.envvars.env \] \&\& source \/root/.envvars.env\)|\1\n\[ -f \/root/.keybinds \] \&\& source \/root/.keybinds\n|g' /root/.bashrc
          else
                printf '[ -f ~/.keybinds ] && source ~/.keybinds' | sudo tee -a /root/.bashrc &> /dev/null
          fi
@@ -194,15 +194,15 @@ shell-keybinds() {
     cp -fv $binds2 ~/.keybinds 
     cp -fv $binds ~/
     if test -f ~/.bashrc && ! grep -q '\[ -f ~/.keybinds \]' ~/.bashrc; then
-         if grep -q '\[ -f ~/.pathvariables.env \]' ~/.bashrc; then
-                sed -i 's|\(\[ -f \~/.pathvariables.env \] \&\& source \~/.pathvariables.env\)|\1\n\n\[ -f \~/.keybinds \] \&\& source \~/.keybinds\n|g' ~/.bashrc
+         if grep -q '\[ -f ~/.envvars.env \]' ~/.bashrc; then
+                sed -i 's|\(\[ -f \~/.envvars.env \] \&\& source \~/.envvars.env\)|\1\n\n\[ -f \~/.keybinds \] \&\& source \~/.keybinds\n|g' ~/.bashrc
          else
                 echo '[ -f ~/.keybinds ] && source ~/.keybinds' >> ~/.bashrc
          fi
     fi
     
-    if [ -f ~/.pathvariables.env ]; then
-       sed -i 's|#export INPUTRC.*|export INPUTRC=~/.inputrc|g' ~/.pathvariables.env
+    if [ -f ~/.envvars.env ]; then
+       sed -i 's|#export INPUTRC.*|export INPUTRC=~/.inputrc|g' ~/.envvars.env
     fi
     unset vimde vivisual xterm
     yes_edit_no shell-keybinds_r "$binds $binds2 $binds1" "Install .inputrc and keybinds.bash at /root/ and /root/.keybinds.d/?" "edit" "YELLOW"; 
@@ -720,15 +720,15 @@ pre='y'
 othr='n'
 color='GREEN'
 prmpt='[Y/n]: '
-echo "Next $(tput setaf 1)sudo$(tput sgr0) check for /root/.pathvariables.env' "
-if test -f ~/.pathvariables.env && sudo test -f /root/.pathvariables.env; then
+echo "Next $(tput setaf 1)sudo$(tput sgr0) check for /root/.envvars.env' "
+if test -f ~/.envvars.env && sudo test -f /root/.envvars.env; then
     pre='n' 
     othr='y'
     color='YELLOW'
     prmpt='[N/y]: '
 fi 
 
-reade -Q "$color" -i "$pre" -p "Check existence/create .pathvariables.env and link it to .bashrc in $HOME/ and /root/? $prmpt" "$othr" pathvars
+reade -Q "$color" -i "$pre" -p "Check existence/create .envvars.env and link it to .bashrc in $HOME/ and /root/? $prmpt" "$othr" pathvars
 if [ "$pathvars" == "y" ] || [ -z "$pathvars" ]; then
     if ! test -f install_pathvars.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pathvars.sh)" 
