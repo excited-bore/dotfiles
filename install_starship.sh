@@ -46,6 +46,10 @@ if [ "y" == "$strship" ]; then
         . ./checks/check_completions_dir.sh
     fi
     starship completions bash > ~/.bash_completion.d/starship
+    #if grep -q '[ -f .bash_preexec ]' ~/.bashrc; then
+    #    sed -i '/eval "$(starship init bash)"/d' ~/.bashrc
+    #    sed -i 's|\(\[ -f ~/.bash_preexec \] \&\& source \~/.bash_preexec\)|\neval "$(starship init bash)"\n\1\n|g' ~/.bashrc 
+    #fi
     if [ -d ~/.bash_aliases.d/ ]; then
         if test -f aliases/.bash_aliases.d/starship.sh; then
             cp -bfv aliases/.bash_aliases.d/starship.sh ~/.bash_aliases.d/
@@ -53,7 +57,7 @@ if [ "y" == "$strship" ]; then
             wget -O ~/.bash_aliases.d/starship.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/starship.sh
         fi
 
-        if test -f ~/.bash_aliases.d/starship.sh~; then 
+        if type gio &> /dev/null && test -f ~/.bash_aliases.d/starship.sh~; then 
             gio trash ~/.bash_aliases.d/starship.sh~
         fi
     fi
@@ -64,7 +68,13 @@ reade -Q "YELLOW" -i "y" -p "Install starship.sh for root? [Y/n]: " "n" strship
 if [ "y" == "$strship" ]; then
     if ! sudo grep -q "starship" /root/.bashrc; then
         printf "eval \"\$(starship init bash)\"\n" | sudo tee -a /root/.bashrc &> /dev/null
+        #if sudo grep -q '[ -f .bash_preexec ]' /root/.bashrc; then
+            #sudo sed -i '/eval "$(starship init bash)"/d' /root/.bashrc
+            #sudo sed -i 's|\(\[ -f ~/.bash_preexec \] \&\& source \~/.bash_preexec\)|\neval "$(starship init bash)"\n\1\n|g' /root/.bashrc 
+        #else
+        #fi
     fi
+    
     if ! test -f checks/check_completions_dir.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)" 
     else

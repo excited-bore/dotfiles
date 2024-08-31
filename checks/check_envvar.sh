@@ -1,72 +1,91 @@
 # !/bin/bash
 
-ENVVAR=~/.bashrc
+export PROFILE=~/.profile
 
-if [ -f ~/.environment.env ]; then
-    ENVVAR=~/.environment.env
+if test -f ~/.bash_profile; then
+    export PROFILE=~/.bash_profile
 fi
 
-ALIAS=~/.bashrc
+if ! test -f $PROFILE; then
+    touch $PROFILE
+fi
+
+export ENVVAR=~/.bashrc
+
+if [ -f ~/.environment.env ]; then
+    export ENVVAR=~/.environment.env
+fi
+
+export ALIAS=~/.bashrc
 
 if [ -f ~/.bash_aliases ]; then
-    ALIAS=~/.bash_aliases
+    export ALIAS=~/.bash_aliases
 fi
 
 if [ -d ~/.bash_aliases.d/ ]; then
-    ALIAS_FILEDIR=~/.bash_aliases.d/
+    export ALIAS_FILEDIR=~/.bash_aliases.d/
 fi
 
 
-COMPLETION=~/.bashrc
+export COMPLETION=~/.bashrc
 
 if [ -f ~/.bash_completion ]; then
-    COMPLETION==~/.bash_completion
+    export COMPLETION=~/.bash_completion
 fi
 
 if [ -d ~/.bash_completion.d/ ]; then
-    COMPLETION_FILEDIR=~/.bash_completion.d/
+    export COMPLETION_FILEDIR=~/.bash_completion.d/
 fi
 
 
-KEYBIND=~/.bashrc
+export KEYBIND=~/.bashrc
 
 if [ -f ~/.keybinds ]; then
-    KEYBIND=~/.keybinds
+   export KEYBIND=~/.keybinds
 fi
 
 if [ -d ~/.keybinds.d/ ]; then
-    KEYBIND_FILEDIR=~/.keybinds.d/
+    export KEYBIND_FILEDIR=~/.keybinds.d/
 fi
 
-ALIAS_R=/root/.bashrc
-COMPLETION_R=/root/.bashrc
-KEYBIND_R=/root/.bashrc
-ENVVAR_R=/root/.bashrc
+export PROFILE_R=/root/.profile
+export ALIAS_R=/root/.bashrc
+export COMPLETION_R=/root/.bashrc
+export KEYBIND_R=/root/.bashrc
+export ENVVAR_R=/root/.bashrc
 
-echo "This next $(tput setaf 1)sudo$(tput sgr0) checks for the envvariable, bash_alias, bash_completion and keybind files and dirs in '/root/' to generate global variables.";
+echo "This next $(tput setaf 1)sudo$(tput sgr0) checks for the profile, environment, bash_alias, bash_completion and keybind files and dirs in '/root/' to generate global variables.";
+
+if sudo test -f /root/.bash_profile; then
+    export PROFILE_R=/root/.bash_profile
+fi
+
+if ! sudo test -f $PROFILE_R; then
+    sudo touch $PROFILE_R
+fi
 
 if sudo test -f /root/.environment.env; then
-    ENVVAR_R=/root/.environment.env
+    export ENVVAR_R=/root/.environment.env
 fi
 
 if sudo test -f /root/.bash_aliases; then
-    ALIAS_R=/root/.bash_aliases
+    export ALIAS_R=/root/.bash_aliases
 fi
 if sudo test -d /root/.bash_aliases.d/; then
-    ALIAS_FILEDIR_R=/root/.bash_aliases.d/
+    export ALIAS_FILEDIR_R=/root/.bash_aliases.d/
 fi
 
 if sudo test -f /root/.bash_completion; then
-    COMPLETION_R=/root/.bash_completion
+    export COMPLETION_R=/root/.bash_completion
 fi
 
 if sudo test -d /root/.bash_completion.d/; then
-    COMPLETION_FILEDIR_R=/root/.bash_completion.d/
+    export COMPLETION_FILEDIR_R=/root/.bash_completion.d/
 fi
 if sudo test -f /root/.keybinds  ; then
-    KEYBIND_R=/root/.keybinds
+    export KEYBIND_R=/root/.keybinds
 fi
 
 if sudo test -d /root/.keybinds.d/  ; then
-    KEYBIND_FILEDIR_R=/root/.keybindsd.d/
+    export KEYBIND_FILEDIR_R=/root/.keybindsd.d/
 fi

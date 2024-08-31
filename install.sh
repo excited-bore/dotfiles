@@ -132,112 +132,6 @@ else
     . ./checks/check_envvar.sh
 fi
 
-# Shell-keybinds
-
-binds=keybinds/.inputrc
-binds1=keybinds/.keybinds.d/keybinds.bash
-binds2=keybinds/.keybinds
-if ! test -f keybinds/.inputrc; then
-    wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.inputrc
-    wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds.d/keybinds.bash 
-    wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds 
-    
-    binds=$TMPDIR/.inputrc
-    binds1=$TMPDIR/keybinds.bash
-    binds2=$TMPDIR/.keybinds
-fi
-
-if ! test -f /etc/inputrc; then
-    sed -i 's/^$include \/etc\/inputrc/#$include \/etc\/inputrc/g' $binds
-fi
-
-shell-keybinds_r(){ 
-    if [ -f /root/.environment.env ]; then
-       sudo sed -i 's|#export INPUTRC.*|export INPUTRC=~/.inputrc|g' /root/.environment.env
-    fi
-    sudo cp -fv $binds1 /root/.keybinds.d/;
-    sudo cp -fv $binds2 /root/.keybinds
-    sudo cp -fv $binds /root/;
-    if sudo test -f /root/.bashrc && ! sudo grep -q '[ -f /root/.keybinds ]' /root/.bashrc; then
-         if grep -q '[ -f /root/.environment.env ]' /root/.bashrc; then
-                sed -i 's|\(\[ -f \/root/.environment.env \] \&\& source \/root/.environment.env\)|\1\n\[ -f \/root/.keybinds \] \&\& source \/root/.keybinds\n|g' /root/.bashrc
-         else
-               printf '[ -f ~/.keybinds ] && source ~/.keybinds' | sudo tee -a /root/.bashrc &> /dev/null
-         fi
-    fi
-    # X based settings is generally not for root and will throw errors 
-    if sudo grep -q '^setxkbmap' /root/.keybinds.d/keybinds.bash; then
-        sudo sed -i 's|setxkbmap|#setxkbmap|g' /root/.keybinds.d/keybinds.bash
-    fi
-}
-
-shell-keybinds() {
-    if ! test -f ./checks/check_keybinds.sh; then
-         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_keybinds.sh)" 
-    else
-        . ./checks/check_keybinds.sh
-    fi
-    
-    reade -Q "GREEN" -i "y" -p "Enable vi-mode instead of emacs mode (might cause issues with pasteing)? [Y/n]: " "n" vimde
-    if [ "$vimde" == "y" ]; then
-        sed -i "s|.set editing-mode .*|set editing-mode vi|g" $binds
-    fi
-    reade -Q "GREEN" -i "y" -p "Enable visual que for vi/emacs toggle? (Displayed as '(ins)/(cmd) - (emacs)') [Y/n]: " "n" vivisual
-    if [ "$vivisual" == "y" ]; then
-        sed -i "s|.set show-mode-in-prompt .*|set show-mode-in-prompt on|g" $binds
-    fi
-    reade -Q "GREEN" -i "y" -p "Set caps to escape? (Might cause X11 errors with SSH) [Y/n]: " "n" xtrm
-    if [ "$xtrm" != "y" ] && ! [ -z "$xtrm" ]; then
-        sed -i "s|setxkbmap |#setxkbmap |g" $binds
-    fi
-    cp -fv $binds1 ~/.keybinds.d/
-    cp -fv $binds2 ~/.keybinds 
-    cp -fv $binds ~/
-    if test -f ~/.bashrc && ! grep -q '\[ -f ~/.keybinds \]' ~/.bashrc; then
-         if grep -q '\[ -f ~/.environment.env \]' ~/.bashrc; then
-                sed -i 's|\(\[ -f \~/.environment.env \] \&\& source \~/.environment.env\)|\1\n\n\[ -f \~/.keybinds \] \&\& source \~/.keybinds\n|g' ~/.bashrc
-         else
-                echo '[ -f ~/.keybinds ] && source ~/.keybinds' >> ~/.bashrc
-         fi
-    fi
-    
-    if [ -f ~/.environment.env ]; then
-       sed -i 's|#export INPUTRC.*|export INPUTRC=~/.inputrc|g' ~/.environment.env
-    fi
-    unset vimde vivisual xterm
-    yes_edit_no shell-keybinds_r "$binds $binds2 $binds1" "Install .inputrc and keybinds.bash at /root/ and /root/.keybinds.d/?" "edit" "YELLOW"; 
-}
-yes_edit_no shell-keybinds "$binds $binds2 $binds1" "Install .inputrc and keybinds.bash at ~/ and ~/.keybinds.d/? (keybinds configuration)" "edit" "YELLOW"
-
-# Xresources
-
-xterm=xterm/.Xresources
-if ! test -f xterm/.Xresources; then
-    wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/xterm/.Xresources
-    xterm=$TMPDIR/.Xresources
-fi
-
-xresources_r(){
-    sudo cp -fv $xterm /root/.Xresources;
-    }
-xresources() {
-    cp -fv $xterm ~/.Xresources;
-    yes_edit_no xresources_r "$xterm" "Install .Xresources at /root/?" "edit" "RED"; }
-yes_edit_no xresources "$xterm" "Install .Xresources at ~/? (Xterm configuration)" "edit" "YELLOW"
-
-# Bash Preexec
-if ! test -f ~/.bash_preexec || ! test -f /root/.bash_preexec; then
-    reade -Q "GREEN" -i "y" -p "Install pre-execution hooks for bash in ~/.bash_preexec? [Y/n]: " "n" bash_preexec
-    if [ -z "$bash_preexec" ] || [ "y" == "$bash_preexec" ]; then
-        if ! test -f install_bash_preexec.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bash_preexec.sh)" 
-        else
-            ./install_bash_preexec.sh
-        fi 
-    fi
-    unset bash_preexec
-fi
-
 if ! test -f checks/check_completions_dir.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)" 
 else
@@ -289,6 +183,113 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
 fi
 
 source ~/.bashrc
+
+
+# Shell-keybinds
+
+binds=keybinds/.inputrc
+binds1=keybinds/.keybinds.d/keybinds.bash
+binds2=keybinds/.keybinds
+if ! test -f keybinds/.inputrc; then
+    wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.inputrc
+    wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds.d/keybinds.bash 
+    wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds 
+    
+    binds=$TMPDIR/.inputrc
+    binds1=$TMPDIR/keybinds.bash
+    binds2=$TMPDIR/.keybinds
+fi
+
+if ! test -f /etc/inputrc; then
+    sed -i 's/^$include \/etc\/inputrc/#$include \/etc\/inputrc/g' $binds
+fi
+
+shell-keybinds_r(){ 
+    if [ -f /root/.environment.env ]; then
+       sudo sed -i 's|#export INPUTRC.*|export INPUTRC=~/.inputrc|g' /root/.environment.env
+    fi
+    sudo cp -fv $binds1 /root/.keybinds.d/;
+    sudo cp -fv $binds2 /root/.keybinds
+    sudo cp -fv $binds /root/;
+    if sudo test -f /root/.bashrc && ! sudo grep -q '[ -f /root/.keybinds ]' /root/.bashrc; then
+         if grep -q '[ -f /root/.bash_aliases ]' /root/.bashrc; then
+                sed -i 's|\(\[ -f \/root/.bash_aliases \] \&\& source \/root/.bash_aliases\)|\1\n\[ -f \/root/.keybinds \] \&\& source \/root/.keybinds\n|g' /root/.bashrc
+         else
+               printf '[ -f ~/.keybinds ] && source ~/.keybinds' | sudo tee -a /root/.bashrc &> /dev/null
+         fi
+    fi
+    # X based settings is generally not for root and will throw errors 
+    if sudo grep -q '^setxkbmap' /root/.keybinds.d/keybinds.bash; then
+        sudo sed -i 's|setxkbmap|#setxkbmap|g' /root/.keybinds.d/keybinds.bash
+    fi
+}
+
+shell-keybinds() {
+    if ! test -f ./checks/check_keybinds.sh; then
+         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_keybinds.sh)" 
+    else
+        . ./checks/check_keybinds.sh
+    fi
+    
+    reade -Q "GREEN" -i "y" -p "Enable vi-mode instead of emacs mode (might cause issues with pasteing)? [Y/n]: " "n" vimde
+    if [ "$vimde" == "y" ]; then
+        sed -i "s|.set editing-mode .*|set editing-mode vi|g" $binds
+    fi
+    reade -Q "GREEN" -i "y" -p "Enable visual que for vi/emacs toggle? (Displayed as '(ins)/(cmd) - (emacs)') [Y/n]: " "n" vivisual
+    if [ "$vivisual" == "y" ]; then
+        sed -i "s|.set show-mode-in-prompt .*|set show-mode-in-prompt on|g" $binds
+    fi
+    reade -Q "GREEN" -i "y" -p "Set caps to escape? (Might cause X11 errors with SSH) [Y/n]: " "n" xtrm
+    if [ "$xtrm" != "y" ] && ! [ -z "$xtrm" ]; then
+        sed -i "s|setxkbmap |#setxkbmap |g" $binds
+    fi
+    cp -fv $binds1 ~/.keybinds.d/
+    cp -fv $binds2 ~/.keybinds 
+    cp -fv $binds ~/
+    if test -f ~/.bashrc && ! grep -q '\[ -f ~/.keybinds \]' ~/.bashrc; then
+         if grep -q '\[ -f ~/.bash_aliases \]' ~/.bashrc; then
+                sed -i 's|\(\[ -f \~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\1\n\n\[ -f \~/.keybinds \] \&\& source \~/.keybinds\n|g' ~/.bashrc
+         else
+                echo '[ -f ~/.keybinds ] && source ~/.keybinds' >> ~/.bashrc
+         fi
+    fi
+    
+    if [ -f ~/.environment.env ]; then
+       sed -i 's|#export INPUTRC.*|export INPUTRC=~/.inputrc|g' ~/.environment.env
+    fi
+    unset vimde vivisual xterm
+    yes_edit_no shell-keybinds_r "$binds $binds2 $binds1" "Install .inputrc and keybinds.bash at /root/ and /root/.keybinds.d/?" "edit" "YELLOW"; 
+}
+yes_edit_no shell-keybinds "$binds $binds2 $binds1" "Install .inputrc and keybinds.bash at ~/ and ~/.keybinds.d/? (keybinds configuration)" "edit" "YELLOW"
+
+# Xresources
+
+xterm=xterm/.Xresources
+if ! test -f xterm/.Xresources; then
+    wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/xterm/.Xresources
+    xterm=$TMPDIR/.Xresources
+fi
+
+xresources_r(){
+    sudo cp -fv $xterm /root/.Xresources;
+    }
+xresources() {
+    cp -fv $xterm ~/.Xresources;
+    yes_edit_no xresources_r "$xterm" "Install .Xresources at /root/?" "edit" "RED"; }
+yes_edit_no xresources "$xterm" "Install .Xresources at ~/? (Xterm configuration)" "edit" "YELLOW"
+
+# Bash Preexec
+if ! test -f ~/.bash_preexec || ! test -f /root/.bash_preexec; then
+    reade -Q "GREEN" -i "y" -p "Install pre-execution hooks for bash in ~/.bash_preexec? [Y/n]: " "n" bash_preexec
+    if [ -z "$bash_preexec" ] || [ "y" == "$bash_preexec" ]; then
+        if ! test -f install_bash_preexec.sh; then
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bash_preexec.sh)" 
+        else
+            ./install_bash_preexec.sh
+        fi 
+    fi
+    unset bash_preexec
+fi
 
 
 # Nvim (Editor)
