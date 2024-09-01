@@ -35,7 +35,7 @@ if ! type flatpak &> /dev/null; then
     elif test "$distro" == "Arch"; then
         sudo pacman -S flatpak python
     elif test "$distro_base" == "Debian"; then
-        if [[ "$XDG_CURRENT_DESKTOP" =~ "GNOME"]]; then
+        if [[ "$XDG_CURRENT_DESKTOP" =~ "GNOME" ]]; then
             sudo apt install gnome-software-plugin-flatpak gir1.2-xdpgtk* gir1.2-flatpak* python3 
         else 
             sudo apt install flatpak python3 gir1.2-xdpgtk* gir1.2-flatpak*
