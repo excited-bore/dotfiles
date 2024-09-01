@@ -35,16 +35,33 @@ if test -z $SYSTEM_UPDATED; then
 fi 
 
 if ! type ruby &> /dev/null; then
-    if test $machine == 'Mac'; then
-        brew install ruby 
-    elif [ "$distro" == "Manjaro" ]; then
-        pamac install ruby
-    elif test "$distro" == "Arch"; then
-        sudo pacman -S ruby 
+    if test $machine == 'Mac' && type brew &> /dev/null; then
+        brew install rbenv 
+    elif test "$distro_base" == "Arch"; then
+        if test -z "$AUR_install"; then 
+            sudo pacman -S ruby 
+        else
+            eval "$AUR_install ruby-build rbenv"
+            if ! grep -q 'eval "$(rbenv init -)' ~/.bashrc; then 
+                printf "eval \"$(rbenv init -)\"\n" >> ~/.bashrc 
+            fi
+        fi
     elif [ $distro_base == "Debian" ]; then
-        sudo apt install ruby ruby-dev                 
+        sudo apt install rbenv                 
+    fi 
+fi
+
+if type rbenv &> /dev/null; then
+    all="$(rbenv install -l)" 
+    latest="$(rbenv install -l | grep -v - | tail -1)" 
+    printf "Ruby versions:\n${CYAN}$all${normal}\n" 
+    reade -Q 'GREEN' -i "$latest" -p "Which version to install? : " "$all" vers  
+    if ! test -z $vers; then
+        rbenv install $vers 
+        rbenv global $latest 
     fi
 fi
+unset latest vers all
 
 rver=$(echo $(ruby --version) | awk '{print $2}' | cut -d. -f-2)'.0'
 paths=$(gem environment | awk '/- GEM PATH/{flag=1;next}/- GEM CONFIGURATION/{flag=0}flag' | sed 's|     - ||g' | paste -s -d ':')

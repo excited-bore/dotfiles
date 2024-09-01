@@ -76,6 +76,8 @@ else
     exit 1 
 fi
 
+# https://unix.stackexchange.com/questions/202891/how-to-know-whether-wayland-or-x11-is-being-used
+export X11_WAY="$(loginctl show-session $(awk '/tty/ {print $1}' <(loginctl)) -p Type | awk -F= '{print $2}')"
 
 distro_base=/
 distro=/

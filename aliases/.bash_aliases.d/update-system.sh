@@ -14,6 +14,14 @@ if test -z "$distro"; then
     fi
 fi
 
+if type pamac &> /dev/null && grep -q '#EnableAUR' /etc/pamac.conf; then
+    if ! test -f checks/check_pamac.sh; then
+         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pamac.sh)" 
+    else
+        . ./checks/check_pamac.sh
+    fi
+fi
+
 # https://www.explainxkcd.com/wiki/index.php/1654:_Universal_Install_Script
 function update-system() {
     if type timedatectl &> /dev/null && ! test "$(timedatectl show | grep ^NTP | head -n 1 | awk 'BEGIN { FS = "=" } ; {print $2}')" == "yes"; then 
