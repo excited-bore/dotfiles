@@ -258,6 +258,13 @@ if grep -q "fzf_rifle" ~/.fzf/shell/key-bindings.bash; then
     reade -Q "GREEN" -i "y" -p "Use rifle (file opener from 'ranger') to open found files and dirs with a custom Ctrl-F filesearch shortcut? [Y/n]: " "n" fzf_f
     if [ "$fzf_f" == "y" ] || [ -z "$fzf_f" ] ; then
         if ! type rifle &> /dev/null; then
+            if ! type python &> /dev/null; then
+                if test $distro_base == 'Debian'; then
+                    sudo apt install python3 python-is-python3
+                elif test $distro_base == 'Arch'; then  
+                    sudo pacman -S python
+                fi
+            fi
             sudo wget -P /usr/bin/ https://raw.githubusercontent.com/ranger/ranger/master/ranger/ext/rifle.py 
             sudo mv -v /usr/bin/rifle.py /usr/bin/rifle
             sudo chmod +x /usr/bin/rifle
