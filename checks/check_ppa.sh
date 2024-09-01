@@ -1,4 +1,8 @@
 #! /bin/bash
+
+# Stolen from:
+# https://codereview.stackexchange.com/questions/45445/script-for-handling-ppas-on-ubuntu
+
 SCRIPT="ppa-tool"
 VERSION="200_success"
 DATE="2014-03-26"

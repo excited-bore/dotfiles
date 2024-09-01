@@ -211,9 +211,18 @@ elif [  $distro_base == "Debian" ];then
                     choices="flatpak build"
                     prompt="Which one (Appimage/flatpak/build from source)? [Flatpak/appimage/build]: "
                     if test $distro == 'Ubuntu'; then
-                        pre="ppa-unstable"                        
-                        choices="appimage flatpak build"
-                        prompt="Which one (Ppa-unstable/appimage/flatpak/build from source)? [Ppa-unstable/appimage/flatpak/build]: "
+                        if ! test -f checks/check_ppa.sh; then
+                             tmpd=$(mktmp -d)
+                             wget -O $tmpd/check_ppa.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_ppa.sh 
+                             file=$tmpd/check_ppa.sh 
+                        else
+                             file=checks/check_ppa.sh
+                        fi
+                        if ! echo $(. $file -c ppa:neovim-ppa/unstable) | grep -q 'NOT'; then
+                            pre="ppa-unstable"                        
+                            choices="appimage flatpak build"
+                            prompt="Which one (Ppa-unstable/appimage/flatpak/build from source)? [Ppa-unstable/appimage/flatpak/build]: "
+                        fi
                     fi
                     if [[ "$arch" =~ "arm" ]]; then
                         echo "${cyan}Arm architecture${normal} sadly still does not support ${red}appimages${normal}"  
