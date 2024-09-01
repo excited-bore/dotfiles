@@ -9,8 +9,9 @@ fi
 if ! type update-system &> /dev/null; then
     if ! test -f aliases/.bash_aliases.d/update-system.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)" 
-        . ./aliases/.bash_aliases.d/update-system.sh
     else
+        . ./aliases/.bash_aliases.d/update-system.sh
+         
     fi
 fi
 

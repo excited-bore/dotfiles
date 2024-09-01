@@ -20,13 +20,6 @@ fi
 
 update-system
 
-if ! test -f checks/check_pamac.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pamac.sh)" 
-else
-    . ./checks/check_pamac.sh
-fi
-
-
 if ! test -f checks/check_rlwrap.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_rlwrap.sh)" 
 else
@@ -527,7 +520,7 @@ pre='y'
 othr='n'
 color='GREEN'
 prmpt='[Y/n]: '
-if type bashtop &> /dev/null || ! type bpytop &> /dev/null || ! type btop &> /dev/null; then
+if type bashtop &> /dev/null || type bpytop &> /dev/null || type btop &> /dev/null; then
     pre='n' 
     othr='y'
     color='YELLOW'
@@ -551,7 +544,7 @@ pre='y'
 othr='n'
 color='GREEN'
 prmpt='[Y/n]: '
-if ! type autojump &> /dev/null; then
+if type autojump &> /dev/null; then
     pre='n' 
     othr='y'
     color='YELLOW'
@@ -693,7 +686,7 @@ pre='y'
 othr='n'
 color='GREEN'
 prmpt='[Y/n]: '
-if ! type yt-dlp &> /dev/null; then
+if type yt-dlp &> /dev/null; then
     pre='n' 
     othr='y'
     color='YELLOW'
@@ -734,7 +727,7 @@ if [ "$envvars" == "y" ] || [ -z "$envvars" ]; then
 fi
 
 echo "Next $(tput setaf 1)sudo$(tput sgr0) will check whether root account is enabled"
-if ! $(sudo passwd -S | awk '{print $2}') == 'L'; then
+if ! test $(sudo passwd -S | awk '{print $2}') == 'L'; then
     printf "${CYAN}One more thing before finishing off${normal}: the ${RED}root${normal} account is still enabled.\n${RED1}This can be considered a security risk!!${normal}\n"
     reade -Q 'YELLOW' -i 'y' -p 'Disable root account? (Enable again by giving up a password with \\"sudo passwd root\\") [Y/n]: ' 'n' root_dis
     if test $root_dis == 'y'; then

@@ -46,7 +46,8 @@ stty werase 'undef'
 # .Inputrc (readline conf) however has to be compiled, so restart shell
 
 # Set caps to Escape
-if type setxkbmap &> /dev/null; then
+X11_WAY="$(loginctl show-session $(awk '/tty/ {print $1}' <(loginctl)) -p Type | awk -F= '{print $2}')"
+if test $X11_WAY == 'x11' && type setxkbmap &> /dev/null; then
     setxkbmap -option caps:escape
 fi
 

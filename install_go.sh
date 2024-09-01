@@ -55,7 +55,9 @@ if ! type go &> /dev/null; then
                     echo "Checksums are different; Aborting"
                     exit
                 fi
-                sudo tar -C /usr/local -xzf $file
+                if ! type tar &> /dev/null; then
+                    sudo tar -C /usr/local -xzf $file
+                fi
                 rm $file
                 #if grep -q "GOROOT" $ENVVAR; then
                 #    sed -i "s|.export GOROOT=|export GOROOT=|g" $ENVVAR

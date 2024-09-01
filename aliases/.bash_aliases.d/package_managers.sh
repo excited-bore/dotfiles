@@ -51,6 +51,7 @@ if type pacman &> /dev/null; then
     alias pacman-install="sudo pacman -S"
     alias pacman-search="pacman -Ss"
     alias pacman-list-installed="pacman -Q"
+    alias pacman-list-groups="pacman -Sg" 
     alias pacman-list-installed-grouped="pacman -Q --groups" 
     alias pacman-list-installed-native="pacman -Qn" 
     alias pacman-refresh-update="sudo pacman -Syu"
@@ -120,7 +121,27 @@ if type pamac &> /dev/null; then
     alias pamac-list-groups="pamac list --groups" 
     alias pamac-search-aur="pamac search --aur"
     alias pamac-forcerefresh="pamac update --force-refresh && pamac upgrade --force-refresh"
-    alias pamac-clean="pamac clean"
+    alias pamac-clear-cache="pamac clean"
+    alias pamac-remove-orphans="pamac remove -o" 
+    
+    function pamac-fzf-remove-package(){
+        if test -z "$@"; then
+            compedit="$(pamac list | awk '{print $1}')" 
+             if ! type fzf &> /dev/null; then  
+                frst="$(echo $compedit | awk '{print $1}')"
+                compedit="$(echo $compedit | sed "s/\<$frst\> //g")"
+                reade -Q 'GREEN' -i "$frst" -p "Give up package: " "$compedit" packg
+             else
+                 packg="$(echo "$compedit" | fzf --reverse --multi --height 50%)"
+             fi
+        else
+            packg="$@"     
+        fi
+        if ! test -z $packg; then
+            pamac remove $packg
+        fi
+        unset packg
+    }
     alias pamac-checkupdates="pamac checkupdates -a"
     alias manjaro-update-packages="pamac-update"
     alias manjaro-upgrade="pamac upgrade"
@@ -208,6 +229,103 @@ if type pamac &> /dev/null; then
     }
      
 fi
+
+### YAY ###
+
+
+if type yay &> /dev/null; then
+    alias yay-update="yay -Su"
+    alias yay-update-yes="yes | yay -Su"
+    alias yay-list-installed="yay -Q" 
+    alias yay-list-groups="yay -Ssq" 
+    alias yay-list-all-aur="yay -Slaq"
+    alias yay-clear-cache="yay -Sc"
+
+    
+    #function yay-fzf-install(){ 
+    #    pre='' 
+    #    if ! test -z "$@"; then
+    #        if ! test -z "$2"; then
+    #            printf "Only give 1 argument\n"
+    #            exit 1
+    #        else
+    #            pre="--query $@"
+    #        fi
+    #    fi 
+    #    nstall="$(yay list | fzf $pre --ansi --multi --select-1 --reverse --sync --height 33%  | awk '{print $1}')" 
+    #    if ! test -z "$nstall"; then
+    #        yay install "$nstall" 
+    #    fi
+    #    unset nstall
+    #}
+    
+    function yay-fzf-list-files(){ 
+        pre='' 
+        if ! test -z "$@"; then
+            if ! test -z "$2"; then
+                printf "Only give 1 argument\n"
+                exit 1
+            else
+                pre="--query $@"
+            fi
+        fi 
+        nstall="$(yay list | fzf $pre --ansi --multi --select-1 --reverse --sync --height 33%  | awk '{print $1}')" 
+        if ! test -z "$nstall"; then
+            yay list --files $nstall  
+        fi
+        unset nstall
+    }
+    
+    #function yay-fzf-list-files-installed(){ 
+    #    pre='' 
+    #    if ! test -z "$@"; then
+    #        if ! test -z "$2"; then
+    #            printf "Only give 1 argument\n"
+    #            exit 1
+    #        else
+    #            pre="--query $@"
+    #        fi
+    #    fi 
+    #    nstall="$(yay list -i | fzf $pre --ansi --multi --select-1 --reverse --sync --height 33%  | awk '{print $1}')" 
+    #    if ! test -z "$nstall"; then
+    #        yay list --files $nstall  
+    #    fi
+    #    unset nstall
+    #}
+    # 
+
+    #function yay-fzf-install-by-group(){ 
+    #    if ! test -z "$@"; then
+    #        group="$@"
+    #    else 
+    #        group="$(yay list --groups | sort -u | fzf --select-1 --reverse --sync --height 33%)" 
+    #    fi
+    #    nstall="$(yay list --groups $group | fzf --ansi --multi --select-1 --reverse --sync --height 33%  | awk '{print $1}')" 
+    #    if ! test -z "$nstall"; then
+    #        yay install "$nstall" 
+    #    fi
+    #    unset group nstall
+    #}
+
+    #function yay-fzf-remove(){ 
+    #    pre=""
+    #    if ! test -z "$@"; then
+    #        if ! test -z "$2"; then
+    #            printf "Only give 1 argument\n"
+    #            exit 1
+    #        else
+    #            pre="--query $@"
+    #        fi
+    #    fi 
+    #    nstall="$(yay list -i | fzf $pre --ansi --multi --select-1 --reverse --sync --height 33%  | awk '{print $1}')"      
+    #    if ! test -z "$nstall"; then
+    #        yay remove "$nstall" 
+    #    fi 
+    #    unset nstall
+    #}
+     
+fi
+
 
 ### NPM ###
 
