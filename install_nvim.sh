@@ -205,7 +205,7 @@ elif [  $distro_base == "Debian" ];then
             if [ "y" == $nvmapt ]; then
                 sudo apt install neovim
             else
-                reade -Q "GREEN" -i "y" -p "Install nvim through alternative means (appimage - flatpak - build from source)? [Y/n]: " "n" nvmappmg
+                reade -Q "GREEN" -i "y" -p "Install nvim through alternative means (appimage - flatpak - build from source ( - Ubuntu: ppa))? [Y/n]: " "n" nvmappmg
                 if ! test -z $nvmappmg || [ "y" == $nvmappmg ]; then
                     pre="appimage"
                     choices="flatpak build"

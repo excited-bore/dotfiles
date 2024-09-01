@@ -254,7 +254,7 @@ fi
 #unset comp_key
 
     
-if grep -q "fzf_rifle" ~/.fzf/shell/key-bindings.bash; then
+if ! test -f /usr/bin/rifle || ! test -f ~/.bash_aliases.d/fzf-rifle.sh && grep -q "fzf_rifle" ~/.keybinds.d/keybinds.bash; then
     reade -Q "GREEN" -i "y" -p "Use rifle (file opener from 'ranger') to open found files and dirs with a custom Ctrl-F filesearch shortcut? [Y/n]: " "n" fzf_f
     if [ "$fzf_f" == "y" ] || [ -z "$fzf_f" ] ; then
         if ! type rifle &> /dev/null; then
