@@ -33,10 +33,9 @@ if ! type AppImageLauncher &> /dev/null; then
                 tag=$(curl -sL https://api.github.com/repos/TheAssassin/AppImageLauncher/releases/latest | jq -r ".tag_name") 
                 ltstv=$(curl -sL https://api.github.com/repos/TheAssassin/AppImageLauncher/releases/latest | jq -r ".assets" | grep --color=never "name" | sed 's/"name"://g' | tr '"' ' ' | tr ',' ' ' | sed 's/[[:space:]]//g')
                 code_name='bionic' 
-                #code_name='xenial'
-                #if [[ $release < 16.04 ]] || [[ $release == 16.04 ]]; then
-                #    code_name='bionic'
-                #fi
+                if [[ $release < 16.04 ]] || [[ $release == 16.04 ]]; then
+                    code_name='xenial'
+                fi
                 file=$(echo "$ltstv" | grep --color=never $code_name"_"$arch) 
                 wget -O $tmpd/appimagelauncher.deb https://github.com/TheAssassin/AppImageLauncher/releases/download/$tag/$file
                 sudo dpkg -i $tmpd/appimagelauncher.deb 
