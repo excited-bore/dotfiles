@@ -34,16 +34,16 @@ if ! type pipx &> /dev/null; then
             pipx ensurepath
             reade -Q "GREEN" -i "y" -p "Set to install packages globally (including for root)? [Y/n]:" "n" insppxgl
             if test $insppxgl == "y"; then 
-                sudo pipx ensurepath --global
+                sudo pipx --global ensurepath 
             fi
         elif test $distro_base == "Debian"; then
             echo "This next $(tput setaf 1)sudo$(tput sgr0) will install pipx"
             sudo apt install pipx
             pipx ensurepath
-            sudo pipx ensurepath --global
+            sudo pipx --global ensurepath 
             reade -Q "GREEN" -i "y" -p "Set to install packages globally (including for root)? [Y/n]:" "n" insppxgl
             if test $insppxgl == "y"; then 
-                sudo pipx ensurepath --global
+                sudo pipx --global ensurepath 
             fi
         fi
     fi

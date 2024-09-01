@@ -502,12 +502,11 @@ if [ "$envvars" == "y" ] || [ -z "$envvars" ]; then
             if test -f ~/.bashrc && ! grep -q "~/.environment.env" ~/.bashrc; then
                 reade -Q 'GREEN' -i 'y' -p "Source $HOME/.environment.env in $HOME/.bashrc? [Y/n]: " 'n' bashrc
                 if test $bashrc == 'y'; then 
-                    if grep -q "[ -f ~/.bash_preexec ]" ~/.bashrc; then
-                         sed -i 's|\(\[ -f ~/.bash_preexec \] \&\& source \~/.bash_preexec\)|\n\1\n\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n|g' ~/.bashrc
-                    elif grep -q "[ -f ~/.bash_completion ]" ~/.bashrc; then
+                    if grep -q "[ -f ~/.bash_completion ]" ~/.bashrc; then
                          sed -i 's|\(\[ -f ~/.bash_completion \] \&\& source \~/.bash_completion\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' ~/.bashrc
-                    elif grep -q "[ -f ~/.bash_aliases ]" ~/.bashrc; then
+                    elif grep -q "[ -f ~/.bash_aliases ]" ~/.bashrc || grep -q "~/.bash_aliases" ~/.bashrc; then
                          sed -i 's|\(\[ -f ~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' ~/.bashrc
+                         sed -i 's|\(if \[ -f ~/.bash_aliases \]; then\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' ~/.bashrc
                     elif grep -q "[ -f ~/.keybinds ]" ~/.bashrc; then
                          sed -i 's|\(\[ -f ~/.keybinds \] \&\& source \~/.keybinds\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' ~/.bashrc
                     else
