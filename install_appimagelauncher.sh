@@ -25,9 +25,9 @@ if ! type AppImageLauncher &> /dev/null; then
                 sudo apt-get update
                 sudo apt-get install appimagelauncher 
             else
-                if ! $(apt search libfuse2t64 &> /dev/null); then
-                    sudo apt install libfuse2t64 -y 
-                fi
+                #if ! $(apt search libfuse2t64 &> /dev/null); then
+                #    sudo apt install libfuse2t64 -y 
+                #fi
                 if ! $(apt search jq &> /dev/null); then
                     sudo apt install jq -y 
                 fi
