@@ -5,12 +5,10 @@ else
     . ./checks/check_system.sh
 fi
 
-if ! type checks/check_appimage_ready.sh &> /dev/null; then
-    if ! test -f checks/check_appimage_ready.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_appimage_ready.sh)" 
-    else
-        . ./checks/check_appimage_ready.sh
-    fi
+if ! test -f checks/check_appimage_ready.sh; then
+    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_appimage_ready.sh)" 
+else
+    . ./checks/check_appimage_ready.sh
 fi
 
 if ! type AppImageLauncher &> /dev/null; then
@@ -34,10 +32,11 @@ if ! type AppImageLauncher &> /dev/null; then
                 tmpd=$(mktemp -d)
                 tag=$(curl -sL https://api.github.com/repos/TheAssassin/AppImageLauncher/releases/latest | jq -r ".tag_name") 
                 ltstv=$(curl -sL https://api.github.com/repos/TheAssassin/AppImageLauncher/releases/latest | jq -r ".assets" | grep --color=never "name" | sed 's/"name"://g' | tr '"' ' ' | tr ',' ' ' | sed 's/[[:space:]]//g')
-                code_name='xenial'
-                if [[ $release < 16.04 ]] || [[ $release == 16.04 ]]; then
-                    code_name='bionic'
-                fi
+                code_name='bionic' 
+                #code_name='xenial'
+                #if [[ $release < 16.04 ]] || [[ $release == 16.04 ]]; then
+                #    code_name='bionic'
+                #fi
                 file=$(echo "$ltstv" | grep --color=never $code_name"_"$arch) 
                 wget -O $tmpd/appimagelauncher.deb https://github.com/TheAssassin/AppImageLauncher/releases/download/$tag/$file
                 sudo dpkg -i $tmpd/appimagelauncher.deb 
