@@ -270,15 +270,14 @@ if [ "$envvars" == "y" ] || [ -z "$envvars" ]; then
                 printf "${bold}${yellow}Sudo by default does not respect the user's EDITOR/VISUAL environment and SUDO_EDITOR is not always checked by programs.\nIf you were to want edit root crontabs (sudo crontab -e), you would get vi (unless using 'sudo -E' to pass your environment)\n"
                 reade -Q "YELLOW" -i "y" -p "Change this behaviour permanently in /etc/sudoers? (Run 'man --pager='less -p ^security' less' if you want to see the potential security holes when using less) [Y/n]: " "n" sudrs
                 if test "$sudrs" == "y"; then
-                    if ! sudo grep -q "Defaults env_keep += \"EDITOR\""; then 
+                    if ! sudo grep -q "Defaults env_keep += \"EDITOR\"" /etc/sudoers ; then 
                         sudo sed -i '1s/^/Defaults env_keep += "EDITOR"\n/' /etc/sudoers
                         echo "Added ${RED}'Defaults env_keep += \"EDITOR\"'${normal} to /etc/sudoers"
                     fi
-                    if ! sudo grep -q "Defaults env_keep += \"VISUAL\""; then 
+                    if ! sudo grep -q "Defaults env_keep += \"VISUAL\"" /etc/sudoers; then 
                         sudo sed -i '1s/^/Defaults env_keep += "VISUAL"\n/' /etc/sudoers
                         echo "Added ${RED}'Defaults env_keep += \"VISUAL\"'${normal} to /etc/sudoers"
                     fi
-                     
                 fi
             fi
         fi 
