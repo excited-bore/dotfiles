@@ -86,7 +86,7 @@ if [ -z $pam ] || [ "y" == $pam ]; then
     #        if test $distro == "Manjaro" || test $distro == "Arch"; then
     #            sudo pacman -S python
     #        elif test $distro_base == "Debian"; then
-    #            sudo apt install python3 python3-is-python
+    #            sudo apt install python3 python-is-python3
     #        fi
     #    fi
     #fi

@@ -32,13 +32,20 @@ fi
 
 if ! type activate-global-python-argcomplete &> /dev/null; then
     if test $distro_base == "Debian"; then
-        sudo apt install python3 pipx
-        pipx install argcomplete
+        sudo apt install python3 python-is-python3
     elif test $distro == "Arch" || test $distro == "Manjaro"; then
-        sudo pacman -S python python-pipx
-        pipx install argcomplete
+        sudo pacman -S python
     fi
 fi
+
+if ! type pipx &> /dev/null; then
+   if ! test -f install_pipx.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)" 
+    else
+        ./install_pipx.sh
+    fi 
+fi
+pipx install argcomplete
 
 if type activate-global-python-argcomplete &> /dev/null; then
     activate-global-python-argcomplete --dest=/home/$USER/.bash_completion.d 
