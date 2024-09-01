@@ -238,7 +238,9 @@ elif [  $distro_base == "Debian" ];then
                     fi
                     reade -Q "GREEN" -i "$pre" -p "$prompt" "$choices" nvmappmg
                     if test "$nvmappmg" == 'ppa-unstable'; then
-                        
+                        sudo add-apt-repository ppa:neovim-ppa/unstable
+                        sudo apt update
+                        sudo apt install neovim
                     elif [ "appimage" == "$nvmappmg" ]; then
                         if ! test -f checks/check_appimage_ready.sh; then
                              eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_appimage_ready.sh)" 
