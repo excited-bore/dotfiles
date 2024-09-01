@@ -59,10 +59,10 @@ if test $machine == 'Mac' && type brew &> /dev/null; then
             brew install xsel xclip
             echo "${green} If this is for use with ssh on serverside, X11 needs to be forwarded"
             echo "${green} At clientside, 'ForwardX11 yes' also needs to be put in ~/.ssh/config under Host"
-            echo "${green} Connection also need to start with -X flag (ssh -X ..@..)"
-            reade -Q "GREEN" -i "n" -p "Forward X11 in /etc/ssh/sshd.config? [Y/n]: " "n" x11f
+            echo "${green} Connection also need to start with -X flag (ssh -X ..@..)${normal}"
+            reade -Q "GREEN" -i "y" -p "Forward X11 in /etc/ssh/sshd.config? [Y/n]: " "n" x11f
             if [ -z $x11f ] || [ "y" == $x11f ]; then
-               sudo sed -i 's|.X11Forwarding yes|X11Forwarding yes|g' /etc/ssh/sshd_config
+               sudo sed -i 's|.X11Forwarding yes|X11Forwarding yes|g' /etc/ssh/sshd.config
             fi
         fi
     fi
@@ -71,7 +71,11 @@ if test $machine == 'Mac' && type brew &> /dev/null; then
         if ! type pylint &> /dev/null; then
             reade -Q "GREEN" -i "y" -p "Install nvim-python? [Y/n]: " "n" pyscripts
             if [ -z $pyscripts ] || [ "y" == $pyscripts ]; then
-                brew install python python-pynvim python-pipx
+                if ! test -f install_pipx.sh; then
+                     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)" 
+                else
+                    ./install_pipx.sh
+                fi
                 pipx install pynvim 
                 pipx install pylint
             fi
@@ -137,7 +141,12 @@ elif test $distro == "Arch" || test $distro == "Manjaro"; then
         if ! type pylint &> /dev/null; then
             reade -Q "GREEN" -i "y" -p "Install nvim-python? [Y/n]: " "n" pyscripts
             if [ -z $pyscripts ] || [ "y" == $pyscripts ]; then
-                sudo pacman -S python python-pynvim python-pipx
+                if ! test -f install_pipx.sh; then
+                     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)" 
+                else
+                    ./install_pipx.sh
+                fi
+                sudo pacman -S python-pynvim
                 pipx install pynvim 
                 pipx install pylint
             fi
@@ -181,11 +190,11 @@ elif test $distro == "Arch" || test $distro == "Manjaro"; then
         fi
     fi
 elif [  $distro_base == "Debian" ];then
-    b=$(sudo apt search neovim | grep '^neovim/stable' | awk '{print $2}')
+    b=$(sudo apt search neovim 2> /dev/null | grep '^neovim/stable' | awk '{print $2}')
     #Minimum version for Lazy plugin manager
     if [[ $b < 0.8 ]]; then
         echo "Neovim apt version is below 0.8, wich too low to run Lazy.nvim (nvim plugin manager)"
-        if ! test -z "$(sudo apt list --installed | grep neovim)"; then
+        if ! test -z "$(sudo apt list --installed 2> /dev/null | grep neovim)"; then
             reade -Q "GREEN" -i "y" -p "Uninstall apt version of neovim? [Y/n]: " "n" nvmapt
             if [ "y" == $nvmapt ]; then
                 sudo apt remove neovim
@@ -214,7 +223,7 @@ elif [  $distro_base == "Debian" ];then
                         else
                             . ./checks/check_appimage_ready.sh
                         fi
-                        if ! test -z "$(sudo apt list --installed | grep libfuse2)"; then
+                        if ! test -z "$(sudo apt list --installed 2> /dev/null | grep libfuse2)"; then
                             if ! type curl &> /dev/null; then
                                 if test $distro == "Manjaro" || test $distro == "Arch"; then
                                     sudo pacman -S curl
@@ -284,7 +293,7 @@ elif [  $distro_base == "Debian" ];then
                         flatpak install neovim 
                     elif test "build" == "$nvmappmg"; then
                         echo "Make sure you test yourself if branch stable fails. Check 'install_nvim.sh' and checkout different branches"
-                        if ! test -z "$(sudo apt list --installed | grep neovim)" &> /dev/null; then
+                        if ! test -z "$(sudo apt list --installed 2> /dev/null | grep neovim)" &> /dev/null; then
                             echo "Lets start by removing stuff related to installed 'neovim' packages"
                             sudo apt autoremove neovim
                             echo "Then, install some necessary buildtools"
@@ -323,7 +332,11 @@ elif [  $distro_base == "Debian" ];then
         if ! type pylint &> /dev/null; then
             reade -Q "GREEN" -i "y" -p "Install nvim-python? [Y/n]: " "n" pyscripts
             if [ -z $pyscripts ] || [ "y" == $pyscripts ]; then
-                sudo apt install python3 python3-dev python3-pynvim pipx  
+                if ! test -f install_pipx.sh; then
+                     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)" 
+                else
+                    ./install_pipx.sh
+                fi
                 pipx install pynvim
                 pipx install pylint
             fi
@@ -436,9 +449,9 @@ function instvim_r(){
     reade -Q "GREEN" -i "y" -p "Set nvim as default for root EDITOR? [Y/n]: " "n" vimrc 
     if [ -z "$vimrc" ] || [ "$vimrc" == "y" ]; then
         if sudo grep -q "EDITOR" $ENVVAR_R; then
-            sudo sed -i "s|.export EDITOR=.*|export EDITOR=~/.config/nvim/init.vim|g" $ENVVAR_R
+            sudo sed -i "s|.export EDITOR=.*|export EDITOR=$(where_cmd nvim)|g" $ENVVAR_R
         else
-            printf "export EDITOR=~/.config/nvim/init.vim\n" | sudo tee -a $ENVVAR_R
+            printf "export EDITOR=$(where_cmd nvim)\n" | sudo tee -a $ENVVAR_R
         fi
     fi
     unset vimrc
@@ -446,9 +459,9 @@ function instvim_r(){
     reade -Q "GREEN" -i "y" -p "Set nvim as default for root VISUAL? [Y/n]: " "n" vimrc 
     if [ -z "$vimrc" ] || [ "$vimrc" == "y" ]; then
        if sudo grep -q "VISUAL" $ENVVAR_R; then
-            sudo sed -i "s|.export VISUAL=*|export VISUAL=~/.config/nvim/init.vim|g" $ENVVAR_R
+            sudo sed -i "s|.export VISUAL=*|export VISUAL=$(where_cmd nvim)|g" $ENVVAR_R
         else
-            printf "export VISUAL=~/.config/nvim/init.vim\n" | sudo tee -a $ENVVAR_R
+            printf "export VISUAL=$(where_cmd nvim)\n" | sudo tee -a $ENVVAR_R
         fi
     fi
     unset vimrc

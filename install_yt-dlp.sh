@@ -45,7 +45,7 @@ if ! type yt-dlp &> /dev/null; then
 fi
 
 if ! type ffmpeg &> /dev/null; then
-    reade -Q 'GREEN' -i 'y' -p 'Install ffmpeg (usefull for video/audio conversion)? [Y/n]:' '' ffmpeg
+    reade -Q 'GREEN' -i 'y' -p 'Install ffmpeg (usefull for video/audio conversion)? [Y/n]: ' '' ffmpeg
     if test $ffmpeg == 'y' ;then
         if ! test -f install_ffmpeg.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/install_ffmpeg.sh)" 

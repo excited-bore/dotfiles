@@ -47,7 +47,7 @@ if ! type batdiff &> /dev/null; then
             #go install mvdan.cc/sh/v3/cmd/shfmt@latest
             git clone https://github.com/eth-p/bat-extras $TMPDIR/bat-extras
             chown -R $USER $TMPDIR/bat-extras
-            (cd $TMPDIR/bat-extras && sudo ./build.sh --install --prefix=PATH)
+            (cd $TMPDIR/bat-extras && sudo ./build.sh --install --prefix=/usr)
         fi 
     fi
 fi
