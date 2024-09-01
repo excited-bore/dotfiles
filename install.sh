@@ -418,7 +418,7 @@ reade -Q "$color" -i "$pre" -p "Install lazygit? $prmpt" "$othr" git_ins
 if [ "y" == "$git_ins" ]; then
     if ! test -f install_lazygit.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_lazygit.sh)" 
-    elaylse
+    else
         ./install_lazygit.sh
     fi
 fi
@@ -503,50 +503,47 @@ pre='y'
 othr='n'
 color='GREEN'
 prmpt='[Y/n]: '
-if ! type neofetch &> /dev/null && ! type fastfetch &> /dev/null && ! type screenfetch &> /dev/null; then
+if type neofetch &> /dev/null || type fastfetch &> /dev/null || type screenfetch &> /dev/null; then
     pre='n' 
     othr='y'
     color='YELLOW'
     prmpt='[N/y]: '
 fi 
-#if ! type neofetch &> /dev/null && ! type fastfetch &> /dev/null && ! type screenfetch &> /dev/null; then
-    reade -Q "$color" -i "$pre" -p "Install neofetch/fastfetch/screenFetch)? (Terminal taskmanager - system information tool) $prmpt" "$othr" tojump
-    if [ "$tojump" == "y" ]; then
-        if ! test -f install_neofetch.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_neofetch.sh)" 
-        else
-            ./install_neofetch.sh
-        fi
-    fi
-    unset tojump
-    unset pre color othr prmpt 
 
-#fi
+reade -Q "$color" -i "$pre" -p "Install neofetch/fastfetch/screenFetch)? (Terminal taskmanager - system information tool) $prmpt" "$othr" tojump
+if [ "$tojump" == "y" ]; then
+    if ! test -f install_neofetch.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_neofetch.sh)" 
+    else
+        ./install_neofetch.sh
+    fi
+fi
+unset tojump
+unset pre color othr prmpt 
+
 
 # Bashtop
 pre='y'
 othr='n'
 color='GREEN'
 prmpt='[Y/n]: '
-if ! type bashtop &> /dev/null && ! type bpytop &> /dev/null && ! type btop &> /dev/null; then
+if type bashtop &> /dev/null || ! type bpytop &> /dev/null || ! type btop &> /dev/null; then
     pre='n' 
     othr='y'
     color='YELLOW'
     prmpt='[N/y]: '
 fi 
-#if ! type bashtop &> /dev/null && ! type bpytop &> /dev/null && ! type btop &> /dev/null; then
-    reade -Q "$color" -i "$pre" -p "Install bashtop? (Python based improved top/htop) $prmpt" "$othr" tojump
-    if [ "$tojump" == "y" ]; then
-        if ! test -f install_bashtop.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bashtop.sh)" 
-        else
-            ./install_bashtop.sh
-        fi
-    fi
-    unset tojump
-    unset pre color othr prmpt 
-#fi
 
+reade -Q "$color" -i "$pre" -p "Install bashtop? (Python based improved top/htop) $prmpt" "$othr" tojump
+if [ "$tojump" == "y" ]; then
+    if ! test -f install_bashtop.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bashtop.sh)" 
+    else
+        ./install_bashtop.sh
+    fi
+fi
+unset tojump
+unset pre color othr prmpt 
 
 
 # Autojump
@@ -578,24 +575,23 @@ pre='y'
 othr='n'
 color='GREEN'
 prmpt='[Y/n]: '
-if ! type starship &> /dev/null; then
+if type starship &> /dev/null; then
     pre='n' 
     othr='y'
     color='YELLOW'
     prmpt='[N/y]: '
 fi 
-#if ! type starship &> /dev/null; then
-    reade -Q "$color" -i "$pre" -p "Install Starship? (Snazzy looking prompt) $prmpt" "$othr" strshp
-    if [ $strshp == "y" ]; then
-        if ! test -f install_starship.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_starship.sh)" 
-        else
-            ./install_starship.sh 
-        fi
+
+reade -Q "$color" -i "$pre" -p "Install Starship? (Snazzy looking prompt) $prmpt" "$othr" strshp
+if [ $strshp == "y" ]; then
+    if ! test -f install_starship.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_starship.sh)" 
+    else
+        ./install_starship.sh 
     fi
-    unset strshp
-    unset pre color othr prmpt 
-#fi
+fi
+unset strshp
+unset pre color othr prmpt 
 
 # Nmap
 pre='y'
@@ -627,24 +623,23 @@ pre='y'
 othr='n'
 color='GREEN'
 prmpt='[Y/n]: '
-if ! type netstat &> /dev/null; then
+if type netstat &> /dev/null; then
     pre='n' 
     othr='y'
     color='YELLOW'
     prmpt='[N/y]: '
 fi 
-#if ! type netstat &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Install netstat? (Also port scanning tool) [Y/n]: " "n" tojump
-    if [ "$tojump" == "y" ]; then
-        if ! test -f install_netstat.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_netstat.sh)" 
-        else
-            ./install_netstat.sh
-        fi
+
+reade -Q "GREEN" -i "y" -p "Install netstat? (Also port scanning tool) [Y/n]: " "n" tojump
+if [ "$tojump" == "y" ]; then
+    if ! test -f install_netstat.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_netstat.sh)" 
+    else
+        ./install_netstat.sh
     fi
-    unset tojump
-    unset pre color othr prmpt 
-#fi
+fi
+unset tojump
+unset pre color othr prmpt 
 
 
 # Testdisk (File recovery tool)
@@ -652,24 +647,23 @@ pre='y'
 othr='n'
 color='GREEN'
 prmpt='[Y/n]: '
-if ! type testdisk &> /dev/null; then
+if type testdisk &> /dev/null; then
     pre='n' 
     othr='y'
     color='YELLOW'
     prmpt='[N/y]: '
 fi 
-#if ! type testdisk &> /dev/null; then
-    reade -Q "$color" -i "$pre" -p "Install testdisk? (File recovery tool) $prmpt" "$othr" kittn
-    if [ "y" == "$kittn" ]; then
-        if ! test -f install_testdisk.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_testdisk.sh)" 
-        else
-            ./install_testdisk.sh
-        fi
+
+reade -Q "$color" -i "$pre" -p "Install testdisk? (File recovery tool) $prmpt" "$othr" kittn
+if [ "y" == "$kittn" ]; then
+    if ! test -f install_testdisk.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_testdisk.sh)" 
+    else
+        ./install_testdisk.sh
     fi
-    unset kittn
-    unset pre color othr prmpt 
-#fi
+fi
+unset kittn
+unset pre color othr prmpt 
 
 # Exiftool (Metadata wiper)
 pre='y'
@@ -682,6 +676,7 @@ if type exiftool &> /dev/null; then
     color='YELLOW'
     prmpt='[N/y]: '
 fi 
+
 reade -Q "$color" -i "$pre" -p "Install exiftool? (Metadata wiper for files) $prmpt" "$othr" moar
 if [ -z $moar ] || [ "Y" == $moar ] || [ $moar == "y" ]; then
     if ! test -f install_exiftool.sh; then

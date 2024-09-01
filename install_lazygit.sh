@@ -42,7 +42,6 @@ if ! type lazygit &> /dev/null; then
             sudo install $TMPDIR/lazygit /usr/local/bin
         fi
         lazygit --version
-        
     fi
     unset nstll
 fi
