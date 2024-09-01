@@ -16,6 +16,26 @@ if type apt &> /dev/null; then
     alias apt-search="sudo apt search" 
     alias apt-list-installed="sudo apt list --installed" 
     alias apt-full-upgrade="sudo apt update && sudo apt full-upgrade && sudo apt autoremove"
+    
+    if type apt-add-repository &> /dev/null; then
+        # https://askubuntu.com/questions/148932/how-can-i-get-a-list-of-all-repositories-and-ppas-from-the-command-line-into-an 
+        # Script to get all the PPAs which are installed on a system
+
+        for APT in `find /etc/apt/ -name \*.list`; do
+            grep -Po "(?<=^deb\s).*?(?=#|$)" $APT | while read ENTRY ; do
+                HOST=`echo $ENTRY | cut -d/ -f3`
+                USER=`echo $ENTRY | cut -d/ -f4`
+                PPA=`echo $ENTRY | cut -d/ -f5`
+                #echo sudo apt-add-repository ppa:$USER/$PPA
+                if [ "ppa.launchpad.net" = "$HOST" ]; then
+                    echo sudo apt-add-repository ppa:$USER/$PPA
+                else
+                    echo sudo apt-add-repository \'${ENTRY}\'
+                fi
+            done
+        done
+        
+    fi
 
     if type fzf &> /dev/null; then
         function apt-fzf-install(){ 
@@ -69,9 +89,9 @@ if type pacman &> /dev/null; then
 
         function pacman-fzf-install(){ 
             if ! test -z "$@"; then
-                nstall="$@"
+                nstall="--query $@"
             fi
-            nstall="$(pacman -Ss $nstall | paste -d "\t"  - - | fzf --ansi --multi --select-1 --reverse --sync --delimiter '\t' --with-nth 1 --height 33% --preview='echo {2}' --preview-window='down,10%,follow' | awk '{print $1}')" 
+            nstall="$(pacman -Ss | paste -d "\t"  - - | fzf $nstall --ansi --multi --select-1 --reverse --sync --delimiter '\t' --with-nth 1 --height 33% --preview='echo {2}' --preview-window='down,10%,follow' | awk '{print $1}')" 
             if ! test -z "$nstall"; then
                 sudo pacman -S "$nstall" 
             fi
@@ -81,10 +101,10 @@ if type pacman &> /dev/null; then
         function pacman-fzf-install-by-group(){ 
             nstall="" 
             if ! test -z "$@"; then
-                nstall="$@"
+                nstall="--query $@"
             fi
             group="$(pacman -S --groups $nstall | sort -u | fzf --select-1 --reverse --sync --height 33%)" 
-            nstall="$(pacman -Ss $group | paste -d "\t"  - - | fzf --select-1 --multi --reverse --ansi --sync --delimiter '\t' --with-nth 1 --height 33% --preview='echo {2}' --preview-window='down,10%,follow' | awk '{print $1}')" 
+            nstall="$(pacman -Ss $group | paste -d "\t"  - - | fzf $nstall --select-1 --multi --reverse --ansi --sync --delimiter '\t' --with-nth 1 --height 33% --preview='echo {2}' --preview-window='down,10%,follow' | awk '{print $1}')" 
             if ! test -z "$nstall"; then
                 sudo pacman -S "$nstall" 
             fi
