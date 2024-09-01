@@ -205,19 +205,43 @@ elif [  $distro_base == "Debian" ];then
             if [ "y" == $nvmapt ]; then
                 sudo apt install neovim
             else
-                reade -Q "GREEN" -i "y" -p "Install nvim through alternative means (appimage - flatpak - build from source)? [Y/n]: " "n" nvmappmg
+                reade -Q "GREEN" -i "y" -p "Install nvim through alternative means (appimage - flatpak - build from source ( - Ubuntu: ppa))? [Y/n]: " "n" nvmappmg
                 if ! test -z $nvmappmg || [ "y" == $nvmappmg ]; then
                     pre="appimage"
                     choices="flatpak build"
                     prompt="Which one (Appimage/flatpak/build from source)? [Flatpak/appimage/build]: "
+                    if test $distro == 'Ubuntu'; then
+                        if ! test -f checks/check_ppa.sh; then
+                             tmpd=$(mktmp -d)
+                             wget -O $tmpd/check_ppa.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_ppa.sh 
+                             file=$tmpd/check_ppa.sh 
+                        else
+                             file=checks/check_ppa.sh
+                        fi
+                        if ! echo $(. $file -c ppa:neovim-ppa/unstable) | grep -q 'NOT'; then
+                            pre="ppa-unstable"                        
+                            choices="appimage flatpak build"
+                            prompt="Which one (Ppa-unstable/appimage/flatpak/build from source)? [Ppa-unstable/appimage/flatpak/build]: "
+                        fi
+                    fi
                     if [[ "$arch" =~ "arm" ]]; then
                         echo "${cyan}Arm architecture${normal} sadly still does not support ${red}appimages${normal}"  
-                        pre="flatpak"
-                        choices="build"
-                        prompt="Which one (Flatpak/build from source)? [Flatpak/build]: "
+                        if ! test $pre == 'ppa-unstable'; then 
+                            pre="flatpak"
+                            choices="build"
+                            prompt="Which one (Flatpak/build from source)? [Flatpak/build]: "
+                        else
+                            pre="ppa-unstable"
+                            choices="flatpak build"
+                            prompt="Which one (Ppa-unstable/flatpak/build from source)? [Ppa-unstable/flatpak/build]: "
+                        fi
                     fi
                     reade -Q "GREEN" -i "$pre" -p "$prompt" "$choices" nvmappmg
-                    if [ "appimage" == "$nvmappmg" ]; then
+                    if test "$nvmappmg" == 'ppa-unstable'; then
+                        sudo add-apt-repository ppa:neovim-ppa/unstable
+                        sudo apt update
+                        sudo apt install neovim
+                    elif [ "appimage" == "$nvmappmg" ]; then
                         if ! test -f checks/check_appimage_ready.sh; then
                              eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_appimage_ready.sh)" 
                         else
