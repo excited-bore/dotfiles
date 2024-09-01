@@ -20,8 +20,10 @@ if ! type AppImageLauncher &> /dev/null; then
     elif test $distro_base == "Debian"; then
         if test $distro == 'Ubuntu'; then
             stable="devel disco eoan focal groovy hirsuite impish jammy kinetic" 
-            if "[[ $(lsb_release -a)" =~ "$stable" ]]; then
+            if [[ "$(lsb_release -a)" =~ "$stable" ]]; then
                 sudo add-apt-repository ppa:appimagelauncher-team/stable
+                sudo apt-get update
+                sudo apt-get install appimagelauncher 
             else
                 if ! $(apt search libfuse2t64 &> /dev/null); then
                     sudo apt install libfuse2t64 -y 
@@ -44,8 +46,6 @@ if ! type AppImageLauncher &> /dev/null; then
                 #sudo add-apt-repository ppa:appimagelauncher-team/daily
                 unset tmpd tag ltstv code_name file 
             fi
-            sudo apt-get update
-            sudo apt-get install appimagelauncher 
         fi 
     fi
 fi
