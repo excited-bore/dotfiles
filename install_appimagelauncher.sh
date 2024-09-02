@@ -16,7 +16,7 @@ if ! type AppImageLauncher &> /dev/null; then
     if test $distro == "Arch" || test $distro == "Manjaro"; then 
         sudo pacman -S appimagelauncher
     elif test $distro_base == "Debian"; then
-        if test $distro == 'Ubuntu'; then
+        if type add-apt-repository &> /dev/null; then
             stable="devel disco eoan focal groovy hirsuite impish jammy kinetic" 
             if [[ "$(lsb_release -a)" =~ "$stable" ]]; then
                 sudo add-apt-repository ppa:appimagelauncher-team/stable
@@ -37,7 +37,7 @@ if ! type AppImageLauncher &> /dev/null; then
                     code_name='xenial'
                 fi
                 file=$(echo "$ltstv" | grep --color=never $code_name"_"$arch) 
-                wget -O $tmpd/appimagelauncher.deb https://github.com/TheAssassin/AppImageLauncher/releases/download/$tag/$file
+                curl -o $tmpd/appimagelauncher.deb https://github.com/TheAssassin/AppImageLauncher/releases/download/$tag/$file
                 sudo dpkg -i $tmpd/appimagelauncher.deb 
                 sudo apt --fix-broken install -y
                 sudo systemctl restart systemd-binfmt 

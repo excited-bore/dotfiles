@@ -205,15 +205,15 @@ elif [  $distro_base == "Debian" ];then
             if [ "y" == $nvmapt ]; then
                 sudo apt install neovim
             else
-                reade -Q "GREEN" -i "y" -p "Install nvim through alternative means (appimage - flatpak - build from source ( - Ubuntu: ppa))? [Y/n]: " "n" nvmappmg
+                reade -Q "GREEN" -i "y" -p "Install nvim through alternative means (appimage - flatpak - build from source (+ Ubuntu: ppa))? [Y/n]: " "n" nvmappmg
                 if ! test -z $nvmappmg || [ "y" == $nvmappmg ]; then
                     pre="appimage"
                     choices="flatpak build"
                     prompt="Which one (Appimage/flatpak/build from source)? [Flatpak/appimage/build]: "
-                    if test $distro == 'Ubuntu'; then
+                    if type add-apt-repository &> /dev/null; then
                         if ! test -f checks/check_ppa.sh; then
                              tmpd=$(mktmp -d)
-                             wget -O $tmpd/check_ppa.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_ppa.sh 
+                             curl -o $tmpd/check_ppa.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_ppa.sh 
                              file=$tmpd/check_ppa.sh 
                         else
                              file=checks/check_ppa.sh
@@ -264,8 +264,8 @@ elif [  $distro_base == "Debian" ];then
                             fi
                             ltstv=$(curl -sL https://api.github.com/repos/neovim/neovim/releases/latest | jq -r ".tag_name")
                             tmpdir=$(mktemp -d -t nvim-XXXXXXXXXX)
-                            wget -P $tmpdir https://github.com/neovim/neovim/releases/download/$ltstv/nvim.appimage 
-                            wget -P $tmpdir https://github.com/neovim/neovim/releases/download/$ltstv/nvim.appimage.sha256sum 
+                            curl -o $tmpdir/nvim.appimage https://github.com/neovim/neovim/releases/download/$ltstv/nvim.appimage 
+                            curl -o $tmpdir/nvim.appimage.sha256sum https://github.com/neovim/neovim/releases/download/$ltstv/nvim.appimage.sha256sum 
                             if ! [ "$(sha256sum $tmpdir/nvim.appimage | awk '{print $1}')" == "$(cat $tmpdir/nvim.appimage.sha256sum | awk '{print $1}')" ]; then 
                                    echo "Something went wrong: Sha256sums aren't the same. Try again later"    
                             else
@@ -344,7 +344,7 @@ elif [  $distro_base == "Debian" ];then
             sudo apt install xsel xclip 
             echo "${green} If this is for use with ssh on serverside, X11 needs to be forwarded"
             echo "${green} At clientside, 'ForwardX11 yes' also needs to be put in ~/.ssh/config under Host"
-            echo "${green} Connection also need to start with -X flag (ssh -X ..@..)"
+            echo "${green} Connection also need to start with -X flag (ssh -X ..@..)${normal}"
             reade -Q "GREEN" -i "n" -p "Forward X11 in /etc/ssh/sshd.config? [Y/n]: " "n" x11f
             if [ -z $x11f ] || [ "y" == $x11f ]; then
                sudo sed -i 's|.X11Forwarding yes|X11Forwarding yes|g' /etc/ssh/sshd_config
@@ -564,25 +564,23 @@ nvim +checkhealth
 echo "Install Completion language plugins with ':CocInstall coc-..' / Update with :CocUpdate"
 echo "Check installed nvim plugins with 'Lazy' / Check installed vim plugins with 'PlugInstalled' (only work on nvim and vim respectively)"
 
-dir=vim/.bash_aliases.d
-dir1=vim/.bash_completions.d
+file=vim/.bash_aliases.d
+file1=vim/.bash_completions.d
 if ! test -d vim/.bash_aliases.d/ || ! test -d vim/.bash_completions.d/; then
-    tmpdir=$(mktemp -d -t nvim-XXXXXXXXXX)
-    tmpdir1=$(mktemp -d -t nvim-XXXXXXXXXX)
-    wget -P $tmpdir https://raw.githubusercontent.com/excited-bore/dotfiles/main/vim/.bash_aliases.d/vim_nvim.sh
-    wget -P $tmpdir1 https://raw.githubusercontent.com/excited-bore/dotfiles/main/vim/.bash_completions.d/vim_nvim
-    dir=$tmpdir
-    dir1=$tmpdir1
+    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/vim/.bash_aliases.d/vim_nvim.sh
+    tmp1=$(mktemp) && curl -o $tmp1 https://raw.githubusercontent.com/excited-bore/dotfiles/main/vim/.bash_completions.d/vim_nvim
+    file=$tmp
+    file1=$tmp1
 fi
 
 vimsh_r(){ 
-    sudo cp -fv $dir/vim_nvim.sh /root/.bash_aliases.d/; 
-    sudo cp -fv $dir1/vim_nvim /root/.bash_completion.d/; 
+    sudo cp -fv $file /root/.bash_aliases.d/; 
+    sudo cp -fv $file1 /root/.bash_completion.d/; 
 }
 
 vimsh(){
-    cp -fv $dir/vim_nvim.sh ~/.bash_aliases.d/
-    cp -fv $dir1/vim_nvim ~/.bash_completion.d/;
+    cp -fv $file ~/.bash_aliases.d/
+    cp -fv $file1 ~/.bash_completion.d/;
     yes_edit_no vimsh_r "$dir/vim_nvim.sh $dir1/vim_nvim" "Install vim aliases at /root/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)? " "yes" "GREEN"
 }
 yes_edit_no vimsh "$dir/vim_nvim.sh $dir1/vim_nvim" "Install vim aliases at ~/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)? " "edit" "GREEN"

@@ -1282,6 +1282,12 @@ fi
         unset gitglobal
     fi
     
+    if test $global == '--global' && ! test -f ~/.gitconfig; then
+        touch ~/.gitconfig 
+    elif ! test -f .gitconfig; then
+        touch .gitconfig
+    fi
+
     local name gitname
     local prename='n'
     color="YELLOW" 
@@ -1750,7 +1756,7 @@ fi
             else
                . ./checks/check_aliases_dir.sh
             fi
-            wget -O ~/.bash_aliases.d/fzf-git.sh https://raw.githubusercontent.com/junegunn/fzf-git.sh/main/fzf-git.sh 
+            curl -o ~/.bash_aliases.d/fzf-git.sh https://raw.githubusercontent.com/junegunn/fzf-git.sh/main/fzf-git.sh 
         fi
     fi
 
@@ -1763,7 +1769,7 @@ fi
            . ./checks/check_aliases_dir.sh
         fi
         if ! test -f aliases/.bash_aliases.d/git.sh; then
-            wget -O ~/.bash_aliases.d/git.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/git.sh  
+            curl -o ~/.bash_aliases.d/git.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/git.sh  
         else
             cp -fv aliases/.bash_aliases.d/git.sh ~/.bash_aliases.d/
         fi

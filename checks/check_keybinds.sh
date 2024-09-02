@@ -2,7 +2,7 @@
 
 if [ ! -f ~/.keybinds ]; then
     if ! test -f keybinds/.keybinds; then
-        wget -P ~/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds  
+        curl -o ~/.keybinds https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds  
     else
         cp -fv keybinds/.keybinds ~/
     fi 

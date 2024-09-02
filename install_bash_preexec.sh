@@ -17,7 +17,7 @@ else
 fi
 
 if ! test -f ~/.bash_preexec; then
-    wget https://raw.githubusercontent.com/rcaloras/bash-preexec/master/bash-preexec.sh -O ~/.bash_preexec 
+    curl -o ~/.bash_preexec https://raw.githubusercontent.com/rcaloras/bash-preexec/master/bash-preexec.sh 
 fi
 
 if grep -q '~/.bash_preexec' $PROFILE; then
@@ -37,7 +37,7 @@ if test -d /root/; then
     reade -Q 'GREEN' -i 'y' -p '(Check and) Install pre-execution hooks for /root as well? [Y/n]: ' bash_r
     if test $bash_r == 'y'; then
         if ! test -f /root/.bash_preexec; then
-            sudo wget https://raw.githubusercontent.com/rcaloras/bash-preexec/master/bash-preexec.sh -O /root/.bash_preexec 
+            sudo curl -o /root/.bash_preexec https://raw.githubusercontent.com/rcaloras/bash-preexec/master/bash-preexec.sh
         fi
         if ! sudo grep -q '~/.bash_preexec' $PROFILE_R; then
             printf "\n[ -f ~/.bash_preexec ] && source ~/.bash_preexec\n\n" | sudo tee -a $PROFILE_R

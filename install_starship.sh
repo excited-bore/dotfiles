@@ -21,7 +21,7 @@ if test -z $SYSTEM_UPDATED; then
 fi
 
 if ! type curl &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Curl necessary for curl. Install curl? [Y/n]:" "n" tojump
+    reade -Q "GREEN" -i "y" -p "Curl necessary for curl. Install curl? [Y/n]: " "n" tojump
     if [ "$tojump" == "y" ]; then
         if test $distro == "Arch" || test $distro == "Manjaro";then
             sudo pacman -S curl
@@ -54,7 +54,7 @@ if [ "y" == "$strship" ]; then
         if test -f aliases/.bash_aliases.d/starship.sh; then
             cp -bfv aliases/.bash_aliases.d/starship.sh ~/.bash_aliases.d/
         else
-            wget -O ~/.bash_aliases.d/starship.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/starship.sh
+            curl -o ~/.bash_aliases.d/starship.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/starship.sh
         fi
 
         if type gio &> /dev/null && test -f ~/.bash_aliases.d/starship.sh~; then 
@@ -86,9 +86,9 @@ if [ "y" == "$strship" ]; then
         if test -f aliases/.bash_aliases.d/starship.sh; then
             sudo cp -bfv aliases/.bash_aliases.d/starship.sh /root/.bash_aliases.d/
         else
-            sudo wget -O /root/.bash_aliases.d/starship.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/starship.sh
+            sudo curl -o /root/.bash_aliases.d/starship.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/starship.sh
         fi 
-        if test -f /root/.bash_aliases.d/starship.sh~; then
+        if type gio &> /dev/null && test -f /root/.bash_aliases.d/starship.sh~; then
             sudo gio trash ~/.bash_aliases.d/starship.sh~
         fi
     fi
@@ -96,6 +96,7 @@ fi
 unset strship
 
 eval "$(starship init bash)"
+
 if ! test -f aliases/.bash_aliases.d/starship.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/starship.sh)" 
 else
@@ -105,6 +106,7 @@ fi
 if type fzf &> /dev/null; then
     starship-presets
 elif ! type fzf &> /dev/null && test -f ~/.fzf.bash; then
+    echo "No fzf found!!" 
     [ -f ~/.fzf.bash ] && source ~/.fzf.bash
     starship-presets
 fi
