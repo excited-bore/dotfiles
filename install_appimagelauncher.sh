@@ -11,14 +11,20 @@ else
     . ./checks/check_appimage_ready.sh
 fi
 
+if ! test -f aliases/.bash_aliases.d/package_managers.sh; then
+    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/package_managers.sh)" 
+else
+    source aliases/.bash_aliases.d/package_managers.sh
+fi
+
+
 if ! type AppImageLauncher &> /dev/null; then
     echo "This next $(tput setaf 1)sudo$(tput sgr0) will install Appimagelauncher"
     if test $distro == "Arch" || test $distro == "Manjaro"; then 
         sudo pacman -S appimagelauncher
     elif test $distro_base == "Debian"; then
         if type add-apt-repository &> /dev/null; then
-            stable="devel disco eoan focal groovy hirsuite impish jammy kinetic" 
-            if [[ "$(lsb_release -a)" =~ "$stable" ]]; then
+            if [[ $(check-ppa -c ppa:lakinduakash/lwh) =~ 'OK' ]]; then
                 sudo add-apt-repository ppa:appimagelauncher-team/stable
                 sudo apt-get update
                 sudo apt-get install appimagelauncher 
@@ -41,7 +47,6 @@ if ! type AppImageLauncher &> /dev/null; then
                 sudo dpkg -i $tmpd/appimagelauncher.deb 
                 sudo apt --fix-broken install -y
                 sudo systemctl restart systemd-binfmt 
-                #sudo add-apt-repository ppa:appimagelauncher-team/daily
                 unset tmpd tag ltstv code_name file 
             fi
         fi 
