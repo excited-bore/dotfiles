@@ -53,11 +53,6 @@ if test $machine == 'Windows'; then
    unset wngt wmic gsdn jqin
 fi
 
-if ! type curl &> /dev/null; then
-   if test $distro == 'Ubuntu'; then
-       sudo apt install curl -y
-   fi
-fi
 
 if test -z $EDITOR; then
     if type nano &> /dev/null; then
@@ -286,6 +281,12 @@ do
         distro="Debian"
     fi 
 done
+
+if ! type curl &> /dev/null; then
+   if test $distro == 'Ubuntu'; then
+       sudo apt install curl -y
+   fi
+fi
 
 # TODO: Change this to uname -sm?
 if test $machine == 'Linux'; then
