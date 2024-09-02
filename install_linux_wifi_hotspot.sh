@@ -30,7 +30,6 @@ if ! type wihotspot &> /dev/null; then
             eval "$AUR_install" linux-wifi-hotspot
         else
             echo "Install linux-wifi-hotspot from the AUR. If you have an AUR Helper that is not an AUR wrapper, try installing it manually"
-            exit 1
         fi
     elif [ $distro == "Manjaro" ]; then
         pamac install linux-wifi-hotspot

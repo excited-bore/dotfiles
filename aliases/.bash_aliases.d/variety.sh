@@ -25,24 +25,6 @@ if type lazygit &> /dev/null && type copy-to &> /dev/null; then
     alias lazygit="copy-to run && lazygit"
 fi
 
-if type jq &> /dev/null; then
-    function get-latest-releases-github(){
-        if test -z "$@"; then
-            reade -Q 'GREEN' -i 'y' -p 'Github link: ' '' gtb_link
-        else
-            gtb_link="$@"
-        fi
-        if ! [[ "$gtb_link" =~ 'https://github.com' ]]; then
-            echo "Not a valid github link"
-            exit 1
-        fi
-        new_url="$(echo "$(echo "https://github.com/TheAssassin/AppImageLauncher" | sed 's|https://github.com|https://api.github.com/repos|g')/releases/latest")" 
-        ltstv=$(curl -sL https://api.github.com/repos/TheAssassin/AppImageLauncher/releases/latest | jq -r ".assets" | grep --color=never "name" | sed 's/"name"://g' | tr '"' ' ' | tr ',' ' ' | sed 's/[[:space:]]//g')
-        echo "$ltstv"
-    }
-fi
-
-
 # Discord and discord overlay
 if type discord &> /dev/null && type discover-overlay &> /dev/null; then
     alias discord="discover-overlay && discord"

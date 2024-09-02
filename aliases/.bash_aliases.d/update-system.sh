@@ -119,6 +119,10 @@ function update-system() {
     
     unset hdrs hdrs_ins 
 
+    if type nix-env &> /dev/null; then
+        nix-env -u '*'
+    fi
+
     if type flatpak &> /dev/null; then
         flatpak update
     fi
