@@ -11,23 +11,23 @@ if test $machine == 'Windows' && test $win_bash_shell == 'Cygwin'; then
     alias cd-home-="cd /cygdrive/c/Users/$USER"
 fi
 
-source_profile=""
-if test -z $PROFILE; then
-    if test -f ~/.profile; then
-        #PROFILE=~/.profile 
-        #source_profile="source ~/.profile" 
-        alias r="stty sane && source ~/.profile && source ~/.bashrc"
-    fi
-    if test -f ~/.bash_profile; then
-        #PROFILE=~/.bash_profile 
-        #source_profile="source ~/.bash_profile" 
-        alias r="stty sane && source ~/.bash_profile && source ~/.bashrc"
-    fi
-elif ! test -z $PROFILE; then
-    alias r="stty sane && source $PROFILE && source ~/.bashrc"
-else
+#source_profile=""
+#if test -z $PROFILE; then
+#    if test -f ~/.profile; then
+#        #PROFILE=~/.profile 
+#        #source_profile="source ~/.profile" 
+#        alias r="stty sane && source ~/.profile && source ~/.bashrc"
+#    fi
+#    if test -f ~/.bash_profile; then
+#        #PROFILE=~/.bash_profile 
+#        #source_profile="source ~/.bash_profile" 
+#        alias r="stty sane && source ~/.bash_profile && source ~/.bashrc"
+#    fi
+#elif ! test -z $PROFILE; then
+#    alias r="stty sane && source $PROFILE && source ~/.bashrc"
+#else
     alias r="stty sane && source ~/.bashrc"
-fi
+#fi
 
 #if test -z $PAGER; then
 #    PAGER=less
