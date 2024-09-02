@@ -26,10 +26,8 @@ if ! type docker &> /dev/null; then
         sudo apt remove docker docker-engine 
         curl -sSL https://get.docker.com | sh
         printf "${cyan}Log out and log in again${normal}, execute ${cyan}'groups'${normal} and check if ${cyan}'docker'${normal} in there.\n Else, execute ${GREEN}'sudo usermod -aG docker $USER'${normal}\n"
-        exit 1 
     elif test $distro == "Arch" || test $distro == "Manjaro"; then
         sudo pacman -S docker
         printf "${cyan}Log out and log in again${normal}, execute ${cyan}'groups'${normal} and check if ${cyan}'docker'${normal} in there.\n Else, execute ${GREEN}'sudo usermod -aG docker $USER'${normal}\n"
-        exit 1 
     fi
 fi

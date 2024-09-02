@@ -29,7 +29,7 @@ elif [[ $type_fs == "exfat" || $type_fs == "ext4" ]]; then
     attr="nosuid,nodev,nofail,auto,x-gvfs-show 0 0"
 else
     echo "Unrecognized filetype"
-    exit 1
+    #exit 1
 fi
 
 if test "$type_fs" == "ext4"; then
