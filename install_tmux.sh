@@ -67,7 +67,7 @@ if test -f tmux/.tmux.conf; then
     file=tmux/.tmux.conf
 else
     file1="$(mktemp -d -t tmux-XXXXXXXXXX)"
-    wget -O $file1/.tmux.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/tmux/.tmux.conf
+    curl -o $file1/.tmux.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/tmux/.tmux.conf
     file=$file1/.tmux.conf
 fi
 
@@ -226,7 +226,7 @@ if [ -z "$tmuxx" ] || [ "$tmuxx"  == "y" ]; then
     if test -f tmux/.bash_aliases.d/tmux.sh; then
         cp -bfv tmux/.bash_aliases.d/tmux.sh ~/.bash_aliases.d/
     else
-        wget -O ~/.bash_aliases.d/tmux.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/tmux/.bash_aliases.d/tmux.sh
+        curl -o ~/.bash_aliases.d/tmux.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/tmux/.bash_aliases.d/tmux.sh
     fi
     if test -f ~/.bash_aliases.d/tmux.sh~; then 
         gio trash ~/.bash_aliases.d/tmux.sh~
@@ -248,4 +248,4 @@ tmux source-file ~/.tmux.conf
 . ~/.tmux/plugins/tpm/bin/install_plugins
 . ~/.tmux/plugins/tpm/bin/update_plugins all
 
-echo "${green}Install plugins in tmux with 'C-b + I' / Update with 'C-b + U'"
+echo "${green}Install plugins in tmux with 'C-b + I' / Update with 'C-b + U'${normal}"

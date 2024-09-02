@@ -23,7 +23,7 @@ fi
 
 
 if ! type pipx &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Install pipx? (for installing packages outside of virtual environments) [Y/n]:" "n" insppx
+    reade -Q "GREEN" -i "y" -p "Install pipx? (for installing packages outside of virtual environments) [Y/n]: " "n" insppx
     if test $insppx == "y"; then
         if test $machine == 'Mac' && type brew &> /dev/null; then
             echo "This next $(tput setaf 1)sudo$(tput sgr0) will install pipx"
@@ -32,7 +32,7 @@ if ! type pipx &> /dev/null; then
             echo "This next $(tput setaf 1)sudo$(tput sgr0) will install pipx"
             sudo pacman -S python-pipx
             pipx ensurepath
-            reade -Q "GREEN" -i "y" -p "Set to install packages globally (including for root)? [Y/n]:" "n" insppxgl
+            reade -Q "GREEN" -i "y" -p "Set to install packages globally (including for root)? [Y/n]: " "n" insppxgl
             if test $insppxgl == "y"; then 
                 sudo pipx --global ensurepath 
             fi

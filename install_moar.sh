@@ -38,22 +38,22 @@ if ! type moar &> /dev/null; then
     
     if [ $distro == "Manjaro" ]; then
         
-        reade -Q "GREEN" -i "y" -p "Install moar from packagemanager (y), github binary (b) or not [Y/b/n]: " "y b n"  answer
+        reade -Q "GREEN" -i "y" -p "Install moar from packagemanager (y), github binary (b) or not [Y/b/n]: " "b n"  answer
         if [ "$answer" == "y" ] || [ -z "$answer" ] || [ "$answer" == "Y" ]; then
             yes | pamac install moar;
         fi
     
-    elif [ $distro == "Arch" ] && type yay &> /dev/null; then
+    elif [ $distro == "Arch" ] && ! test -z "$AUR_install"; then
         
-        reade -Q "GREEN" -i "y" -p "Install moar from packagemanager (y), github binary (b) or not [Y/b/n]: " "y b n"  answer
+        reade -Q "GREEN" -i "y" -p "Install moar from packagemanager (y), github binary (b) or not [Y/b/n]: " "b n"  answer
         if [ "$answer" == "y" ] || [ -z "$answer" ] || [ "$answer" == "Y" ]; then
-            yes | yay -Su moar-git;
+            eval "$AUR_install moar-git";
         fi
     
     else
         
         printf "Package manager unknown or PM doesn't offer moar (f.ex. apt).\n"; 
-        reade -Q "YELLOW" -i "b" -p "Install moar from github binary (b) or not (anything but empty or b) [B/n]: " "b n"  answer
+        reade -Q "YELLOW" -i "b" -p "Install moar from github binary (b) or not (anything but empty or b) [B/n]: " "n"  answer
         if [ -z "$answer" ] || [ "B" == "$answer" ] || [ "b" == "$answer" ]; then
             if [ $arch == "armv7l" ] || [ $arch == "arm64" ]; then
                 arch="arm"
@@ -62,7 +62,7 @@ if ! type moar &> /dev/null; then
                 arch="386"
             fi
             latest=$(curl -sL "https://github.com/walles/moar/tags" | grep "/walles/moar/releases/tag" | perl -pe 's|.*/walles/moar/releases/tag/(.*?)".*|\1|' | uniq | awk 'NR==1{max=$1;print $0; exit;}')                          
-            wget -P $TMPDIR "https://github.com/walles/moar/releases/download/$latest/moar-$latest-linux-$arch"
+            tmp=$(mktemp) && curl -o $tmp "https://github.com/walles/moar/releases/download/$latest/moar-$latest-linux-$arch"
             chmod a+x $TMPDIR/moar-*-*-*
             sudo mv $TMPDIR/moar-* /usr/bin/moar
             echo "Done!"
