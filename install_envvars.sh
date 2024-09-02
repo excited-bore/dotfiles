@@ -153,12 +153,14 @@ if [ "$envvars" == "y" ] || [ -z "$envvars" ]; then
 
     reade -Q "GREEN" -i "y" -p "Set EDITOR and VISUAL? [Y/n]: " "n" edtvsl
     if [ "$edtvsl" == "y" ] || [ -z "$edtvsl" ]; then
-        editors=""
-        prmpt="${green}\tnano = Default editor - Basic, but userfriendly\n" 
         if type vi &> /dev/null; then
             editors="vi $editors"
             prmpt="$prmpt \tvi = Archaic and non-userfriendly editor\n"
         fi
+        if type nano &> /dev/null; then 
+            editors="nano"
+            prmpt="${green}\tnano = Default editor - Basic, but userfriendly\n" 
+        fi 
         if type micro &> /dev/null; then
             editors="micro $editors"
             prmpt="$prmpt \tMicro = Relatively good out-of-the-box editor - Decent keybindings, yet no customizations\n"
@@ -198,10 +200,13 @@ if [ "$envvars" == "y" ] || [ -z "$envvars" ]; then
             prmpt="$prmpt\t - $i\n"
         done
         prmpt="$prmpt${normal}"
+
+        frst="$(echo $editors | awk '{print $1}')" 
+        editors="$(echo $editors | sed "s/\<$frst\> //g")" 
         #frst="$(echo $compedit | awk '{print $1}')"
         #compedit="$(echo $compedit | sed "s/\<$frst\> //g")"
         printf "$prmpt"
-        reade -Q "GREEN" -i "nano" -p "EDITOR (Terminal - nano default)=" "$editors" edtor
+        reade -Q "GREEN" -i "$frst" -p "EDITOR (Terminal - $frst default)=" "$editors" edtor
         edtor="$(where_cmd $edtor)"
         if [[ "$edtor" =~ "emacs" ]]; then
             edtor="$edtor -nw"

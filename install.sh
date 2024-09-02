@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-if ! type curl &> /dev/null; then
-   if test $distro == 'Ubuntu'; then
-       sudo apt install curl -y
-   fi
+if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
+else
+    . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
 fi
 
 if ! test -f checks/check_system.sh; then
@@ -32,11 +32,6 @@ else
     . ./checks/check_rlwrap.sh
 fi
 
-if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
-else
-    . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
-fi
 
 
 printf "${green}If all necessary files are sourced correctly, this text looks green.\nIf not, something went wrong.\n"
@@ -134,8 +129,8 @@ fi
 if ! test -f checks/check_completions_dir.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)" 
 else
-fi
     . ./checks/check_completions_dir.sh
+fi
 
 
 # Environment variables

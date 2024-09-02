@@ -11,23 +11,23 @@ if test $machine == 'Windows' && test $win_bash_shell == 'Cygwin'; then
     alias cd-home-="cd /cygdrive/c/Users/$USER"
 fi
 
-source_profile=""
-if test -z $PROFILE; then
-    if test -f ~/.profile; then
-        #PROFILE=~/.profile 
-        #source_profile="source ~/.profile" 
-        alias r="stty sane && source ~/.profile && source ~/.bashrc"
-    fi
-    if test -f ~/.bash_profile; then
-        #PROFILE=~/.bash_profile 
-        #source_profile="source ~/.bash_profile" 
-        alias r="stty sane && source ~/.bash_profile && source ~/.bashrc"
-    fi
-elif ! test -z $PROFILE; then
-    alias r="stty sane && source $PROFILE && source ~/.bashrc"
-else
+#source_profile=""
+#if test -z $PROFILE; then
+#    if test -f ~/.profile; then
+#        #PROFILE=~/.profile 
+#        #source_profile="source ~/.profile" 
+#        alias r="stty sane && source ~/.profile && source ~/.bashrc"
+#    fi
+#    if test -f ~/.bash_profile; then
+#        #PROFILE=~/.bash_profile 
+#        #source_profile="source ~/.bash_profile" 
+#        alias r="stty sane && source ~/.bash_profile && source ~/.bashrc"
+#    fi
+#elif ! test -z $PROFILE; then
+#    alias r="stty sane && source $PROFILE && source ~/.bashrc"
+#else
     alias r="stty sane && source ~/.bashrc"
-fi
+#fi
 
 #if test -z $PAGER; then
 #    PAGER=less
@@ -344,7 +344,7 @@ alias upper2lower="tr '[:upper:]' '[:lower:]'"
 alias lower2upper="tr '[:lower:]' '[:upper:]'"
 
 alias remove-empty-lines="sed '/^[[:space:]]*$/d'"
-alias get-first-stringwords="frst=\"$(echo $words | awk '{print $1}')\" && words=\"$(echo $words | sed "s/\<$frst\> //g")\""
+alias get-first-stringwords="frst=\"\$(echo \$words | awk '{print \$1}')\" && words=\"\$(echo \$words | sed \"s/\<\$frst\> //g\")\""
 
 # Pipe column output to a pager
 alias column="column -c $(tput cols)"
