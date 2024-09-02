@@ -26,19 +26,19 @@ color='GREEN'
 prmpt='[Y/n]: '
 
 echo "Next $(tput setaf 1)sudo$(tput sgr0) check for /root/.environment.env' "
-
-if ! test -z $1; then
-    envvars=$!
-    if test -f ~/.environment.env && sudo test -f /root/.environment.env; then
-        pre='n' 
-        othr='y'
-        color='YELLOW'
-        prmpt='[N/y]: '
-    fi
-else
-    reade -Q "$color" -i "$pre" -p "Check existence/create .environment.env and link it to .bashrc in $HOME/ and /root/? $prmpt" "$othr" envvars
+if test -f ~/.environment.env && sudo test -f /root/.environment.env; then
+				pre='n' 
+				othr='y'
+				color='YELLOW'
+				prmpt='[N/y]: '
 fi
 
+#if ! test -z $1; then
+    envvars=$1
+#else
+#fi
+
+reade -Q "$color" -i "$pre" -p "Check existence/create .environment.env and link it to .bashrc in $HOME/ and /root/? $prmpt" "$othr" envvars
 if [ "$envvars" == "y" ] || [ -z "$envvars" ]; then
     #Comment out every export in .environment
     sed -i -e '/export/ s/^#*/#/' $pathvr
