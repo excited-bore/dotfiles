@@ -209,12 +209,12 @@ if [ $ENVVAR == ~/.environment.env ] ; then
     sed -i 's/#--bind/--bind/' $ENVVAR
     sed -i 's/#--preview-window/--preview-window/' $ENVVAR
     sed -i 's/#--color/--color/' $ENVVAR
-    if type tree &> /dev/null && type vlc &> /dev/null; then
+    if type tree &> /dev/null; then
         sed -i 's|#export FZF_ALT_C_OPTS=|export FZF_ALT_C_OPTS=|g' $ENVVAR
     fi
 elif ! grep -q "export FZF_DEFAULT_COMMAND" $ENVVAR; then
     printf "\n# FZF\nexport FZF_DEFAULT_COMMAND=\"$fnd\"\nexport FZF_CTRL_T_COMMAND='$FZF_DEFAULT_COMMAND'\n" >> $ENVVAR
-    if type tree &> /dev/null && type vlc &> /dev/null; then
+    if type tree &> /dev/null; then
         printf "export FZF_ALT_C_OPTS=\"--preview 'tree -C {}\"\n" >> $ENVVAR 
     fi
 fi
@@ -229,12 +229,12 @@ if [ $ENVVAR_R == /root/.environment.env ] ; then
     sudo sed -i 's/--bind/#--bind/' $ENVVAR_R
     sudo sed -i 's/--preview-window/#--preview-window/' $ENVVAR_R
     sudo sed -i 's/--color/#--color/' $ENVVAR_R
-    if type tree &> /dev/null && type vlc &> /dev/null; then
+    if type tree &> /dev/null; then
        sudo sed -i 's|#export FZF_ALT_C_OPTS=|export FZF_ALT_C_OPTS=|g' $ENVVAR_R
     fi 
 elif ! sudo grep -q "export FZF_DEFAULT_COMMAND" $ENVVAR_R; then
     printf "\n# FZF\nexport FZF_DEFAULT_COMMAND=\"$fnd\"\nexport FZF_CTRL_T_COMMAND='$FZF_DEFAULT_COMMAND'" | sudo tee -a $ENVVAR_R
-    if type tree &> /dev/null && type vlc &> /dev/null; then
+    if type tree &> /dev/null; then
         printf "\nexport FZF_ALT_C_OPTS=\"--preview 'tree -C {}\"" | sudo tee -a $ENVVAR_R
     fi
 fi

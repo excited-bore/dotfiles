@@ -136,9 +136,9 @@ fi
 
 if ! test -f install_envvars.sh; then
     tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_envvars.sh
-    . $tmp  
+    . $tmp 'n' 
 else
-    ./install_envvars.sh  
+    ./install_envvars.sh 'n'  
 fi 
 
 # Bash alias completions
@@ -671,7 +671,7 @@ pre='y'
 othr='n'
 color='GREEN'
 prmpt='[Y/n]: '
-if type netstat &> /dev/null; then
+if type netstat &> /dev/null || type netstat-nat &> /dev/null; then
     pre='n' 
     othr='y'
     color='YELLOW'
@@ -780,7 +780,7 @@ fi
     if ! test -f install_envvars.sh; then
         tmp=$(mktemp) 
         curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_envvars.sh
-        . $tmp 'n' 
+        . $tmp  
     else
         ./install_envvars.sh  
     fi 

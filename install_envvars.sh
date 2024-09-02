@@ -185,7 +185,7 @@ if [ "$envvars" == "y" ] || [ -z "$envvars" ]; then
 fi
 
 
-if test $1 -z || test $1 == 'y' then
+if test -z $1 || test $1 == 'y'; then
 
     # Package Managers
     #reade -Q "YELLOW" -i "y" -p "Check and create DIST,DIST_BASE,ARCH,PM and WRAPPER? (distro, distro base, architecture, package manager and pm wrapper) [Y/n]:" "n" Dists
