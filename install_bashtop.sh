@@ -12,6 +12,13 @@ if ! type update-system &> /dev/null; then
     fi
 fi
 
+if ! test -f aliases/.bash_aliases.d/package_managers.sh; then
+    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/package_managers.sh)" 
+else
+    source aliases/.bash_aliases.d/package_managers.sh
+fi
+
+
 if test -z $SYSTEM_UPDATED; then
     reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "n" updatesysm
     if test $updatesysm == "y"; then
@@ -36,7 +43,7 @@ if ! type bashtop &> /dev/null && ! type bpytop &> /dev/null && ! type btop &> /
                sudo pacman -S bpytop
             fi
         elif test "$sym2" == "bashtop"; then      
-            if type add-apt-repository &> /dev/null; then
+            if type add-apt-repository &> /dev/null && [[ $(check-ppa -c ppa:bashtop-monitor/bashtop) =~ 'OK' ]]; then
                 sudo add-apt-repository ppa:bashtop-monitor/bashtop
                 sudo apt update
                 sudo apt install bashtop
