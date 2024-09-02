@@ -32,7 +32,7 @@ if test $machine == 'Windows'; then
             pwsh ../install_winget.ps1
        else
             printf "${RED}Can't install scripts without winget${normal}\n" 
-            exit 1 
+            #exit 1 
        fi
    fi
    if ! type sudo &> /dev/null; then
@@ -40,8 +40,8 @@ if test $machine == 'Windows'; then
        reade -Q 'GREEN' -i 'y' -p 'Install (g)sudo (unofficial sudo)? [Y/n]: ' 'n' gsdn
        if test $gsdn == 'y'; then
             ./../install_gsudo.sh
-       else
-           exit 1
+       #else
+           #exit 1
        fi
    fi
    if ! type jq &> /dev/null; then
@@ -52,6 +52,7 @@ if test $machine == 'Windows'; then
    fi
    unset wngt wmic gsdn jqin
 fi
+
 
 if test -z $EDITOR; then
     if type nano &> /dev/null; then
@@ -73,7 +74,7 @@ elif type where &> /dev/null; then
     } 
 else
     printf "Can't find a 'where' command (whereis/where)\n"
-    exit 1 
+    #exit 1 
 fi
 
 # https://unix.stackexchange.com/questions/202891/how-to-know-whether-wayland-or-x11-is-being-used
@@ -280,6 +281,12 @@ do
         distro="Debian"
     fi 
 done
+
+if ! type curl &> /dev/null; then
+   if test $distro == 'Ubuntu'; then
+       sudo apt install curl -y
+   fi
+fi
 
 # TODO: Change this to uname -sm?
 if test $machine == 'Linux'; then

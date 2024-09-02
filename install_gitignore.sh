@@ -18,13 +18,12 @@ if [ "$1" == 'local' ] || [ 'global' == "$1" ]; then
     globl="$1"
 else
     reade -Q "GREEN" -i "y" -p "Download template gitignores, choose and install? [Y/n]: " "n" gitgn 
-    if [ "y" != "$gitgn" ]; then
-        exit 1
+    if [ "y" == "$gitgn" ]; then
+        git clone https://github.com/github/gitignore $TMPDIR/gitignore
+        reade -Q "GREEN" -i "local" -p "Install globally or locally? ( ./ vs ~/.config/git/ignore ) [Local/global]: " "global local" globl
     fi
-    git clone https://github.com/github/gitignore $TMPDIR/gitignore
-    reade -Q "GREEN" -i "local" -p "Install globally or locally? ( ./ vs ~/.config/git/ignore ) [Local/global]: " "global local" globl
-    
 fi
+
 if [ "$globl" == "global" ]; then
    if [ ! -d ~/.config/git/ ]; then
        mkdir ~/.config/git/ 
@@ -40,8 +39,7 @@ else
     ignfl=.gitignore
 fi
 
-(
-cd $TMPDIR/gitignore
+(cd $TMPDIR/gitignore
 gitign=''
 if [ "$globl" == "global" ]; then
     cd Global
