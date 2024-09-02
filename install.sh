@@ -129,8 +129,8 @@ fi
 if ! test -f checks/check_completions_dir.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)" 
 else
-fi
     . ./checks/check_completions_dir.sh
+fi
 
 
 # Environment variables
