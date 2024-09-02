@@ -47,6 +47,12 @@ else
     . ./checks/check_completions_dir.sh
 fi
 
+if ! test -f aliases/.bash_aliases.d/package_managers.sh; then
+    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/package_managers.sh)" 
+else
+    source aliases/.bash_aliases.d/package_managers.sh
+fi
+
 
 
 #. $DIR/setup_git_build_from_source.sh "y" "neovim" "https://github.com" "neovim/neovim" "stable" "sudo apt update; sudo apt install ninja-build gettext libtool libtool-bin cmake g++ pkg-config unzip curl doxygen" "make CMAKE_BUILD_TYPE=RelWithDebInfo; sudo make install" "sudo make uninstall" "make distclean; make deps" "y"
@@ -211,14 +217,7 @@ elif [  $distro_base == "Debian" ];then
                     choices="flatpak build"
                     prompt="Which one (Appimage/flatpak/build from source)? [Flatpak/appimage/build]: "
                     if type add-apt-repository &> /dev/null; then
-                        if ! test -f checks/check_ppa.sh; then
-                             tmpd=$(mktmp -d)
-                             curl -o $tmpd/check_ppa.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_ppa.sh 
-                             file=$tmpd/check_ppa.sh 
-                        else
-                             file=checks/check_ppa.sh
-                        fi
-                        if ! echo $(. $file -c ppa:neovim-ppa/unstable) | grep -q 'NOT'; then
+                        if ! echo $(check-ppa -c ppa:neovim-ppa/unstable) | grep -q 'NOT'; then
                             pre="ppa-unstable"                        
                             choices="appimage flatpak build"
                             prompt="Which one (Ppa-unstable/appimage/flatpak/build from source)? [Ppa-unstable/appimage/flatpak/build]: "

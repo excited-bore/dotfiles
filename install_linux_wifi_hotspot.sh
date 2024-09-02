@@ -13,6 +13,13 @@ if ! type update-system &> /dev/null; then
     fi
 fi
 
+if ! test -f aliases/.bash_aliases.d/package_managers.sh; then
+    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/package_managers.sh)" 
+else
+    source aliases/.bash_aliases.d/package_managers.sh
+fi
+
+
 if test -z $SYSTEM_UPDATED; then
     reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y" updatesysm
     if test $updatesysm == "y"; then
@@ -21,7 +28,7 @@ if test -z $SYSTEM_UPDATED; then
 fi
 
 if ! type wihotspot &> /dev/null; then
-    if [ $distro == "Ubuntu" ]; then
+    if [ $distro == "Ubuntu" ] && [[ $(check-ppa -c ppa:lakinduakash/lwh) =~ 'OK' ]]; then
         sudo add-apt-repository ppa:lakinduakash/lwh
         sudo apt update
         sudo apt install linux-wifi-hotspot
