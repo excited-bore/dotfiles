@@ -134,9 +134,45 @@ fi
 if ! test -f checks/check_completions_dir.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)" 
 else
-    . ./checks/check_completions_dir.sh
 fi
+    . ./checks/check_completions_dir.sh
 
+
+# Environment variables
+
+echo "Next $(tput setaf 1)sudo$(tput sgr0) check for /root/.environment.env' "
+if ! test -f ~/.environment.env || ! sudo test -f /root/.environment.env; then
+				pathvr=$(pwd)/envvars/.environment.env
+				if ! test -f $pathvr; then
+								wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/envvars/.environment.env
+								pathvr=$TMPDIR/.environment.env
+				fi
+
+				reade -Q "GREEN" -i "y" -p "Put sample environment.env file in $HOME folder and link it to ~/.bashrc? [Y/n]: " "n" envvars
+				if [ "$envvars" == "y" ] || [ -z "$envvars" ]; then
+								#Comment out every export in .environment
+								sed -i -e '/export/ s/^#*/#/' $pathvr
+												
+								# Allow if checks
+								sed -i 's/^#\[\[/\[\[/' $pathvr
+								sed -i 's/^#type/type/' $pathvr
+								
+								# Comment out FZF stuff
+								sed -i 's/  --bind/ #--bind/' $pathvr
+								sed -i 's/  --preview-window/ #--preview-window/' $pathvr
+								sed -i 's/  --color/ #--color/' $pathvr
+        
+								cp -fv $pathvr ~/.environment.env
+								
+								if ! sudo test -f /root/.environment.env; then
+													reade -Q "GREEN" -i "y" -p "Also put sample '.environment.env' file in /root folder and link it to /root/.bashrc? [Y/n]: " "n" envvars
+													if [ "$envvars" == "y" ] || [ -z "$envvars" ]; then
+																	sudo cp -fv $pathvr /root/.environment.env;
+													fi	
+								fi
+								unset envvars	
+				fi
+fi
 
 # Bash alias completions
 if ! test -f ~/.bash_completion.d/complete_alias || ! test -f /root/.bash_completion.d/complete_alias; then
@@ -613,6 +649,31 @@ if [ $strshp == "y" ]; then
 fi
 unset strshp
 unset pre color othr prmpt 
+
+# Ffmpeg
+pre='y'
+othr='n'
+color='GREEN'
+prmpt='[Y/n]: '
+if type ffmpeg &> /dev/null; then
+    pre='n' 
+    othr='y'
+    color='YELLOW'
+    prmpt='[N/y]: '
+fi 
+#if ! type yt-dlp &> /dev/null; then
+reade -Q "$color" -i "$pre" -p "Install ffmpeg? (video/audio/image file converter) $prmpt" "$othr" ffmpg
+if [ "$ffmpg" == "y" ]; then
+				if ! test -f install_ffmpeg.sh; then
+								eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ffmpeg.sh)" 
+				else
+								./install_ffmpeg.sh
+				fi
+fi
+unset ffmpg
+unset pre color othr prmpt 
+
+
 
 # Nmap
 pre='y'

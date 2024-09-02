@@ -1,32 +1,32 @@
-!!
-! Includes
-!!
-#include ".xresources.d/colors"
-#include ".xresources.d/apps"
-
-!!
-! XWindow Stuffs
-!!
-*imLocale: en_US.UTF-8
-*lookAndFeel: motif
-
-!!
-! Font Rendering Stuffs
-!!
-Xft.dpi: 96
-Xft.rgba: rgb
-Xft.antialias: true
-Xft.autohint: false
-Xft.hintstyle: hintfull
-Xft.lcdfilter: lcddefault
-*faceName: Spleen
-*faceSize: 12
-
-!!
-! Pointer Stuffs
-!!
-Xcursor.size: 16
-Xcursor.theme: Capitaine Cursors (Gruvbox) - White
+!!!
+!! Includes
+!!!
+!#include ".xresources.d/colors"
+!#include ".xresources.d/apps"
+!
+!!!
+!! XWindow Stuffs
+!!!
+!*imLocale: en_US.UTF-8
+!*lookAndFeel: motif
+!
+!!!
+!! Font Rendering Stuffs
+!!!
+!Xft.dpi: 96
+!Xft.rgba: rgb
+!Xft.antialias: true
+!Xft.autohint: false
+!Xft.hintstyle: hintfull
+!Xft.lcdfilter: lcddefault
+!*faceName: Spleen
+!*faceSize: 12
+!
+!!!
+!! Pointer Stuffs
+!!!
+!Xcursor.size: 16
+!Xcursor.theme: Capitaine Cursors (Gruvbox) - White
 
 
 ! https://addy-dclxvi.github.io/post/configuring-urxvt/

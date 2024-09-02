@@ -2,6 +2,7 @@
 # https://search.nixos.org/packages# for packages
 
 alias nix-list="nix-env -q"
+alias nix-list-all-packages="nix-env -qaP"
 alias nix-install_="nix-env -iA nixpkgs."
 alias nix-uninstall="nix-env -e"
 alias nix-upgrade_="nix-env --upgrade -A nixpkgs."

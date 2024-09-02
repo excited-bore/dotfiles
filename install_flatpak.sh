@@ -3,11 +3,13 @@ if ! test -f checks/check_system.sh; then
 else
     . ./checks/check_system.sh
 fi
-if ! test -f checks/check_envvar.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)" 
+
+if ! test -f checks/check_envvar_aliases_completions_keybinds.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar_aliases_completions_keybinds.sh)" 
 else
-    . ./checks/check_envvar.sh
+    . ./checks/check_envvar_aliases_completions_keybinds.sh
 fi
+
 if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
 else
