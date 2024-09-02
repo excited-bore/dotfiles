@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
 
-if ! type curl &> /dev/null; then
-   if test $distro == 'Ubuntu'; then
-       sudo apt install curl -y
-   fi
-fi
 
 if ! test -f checks/check_system.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
