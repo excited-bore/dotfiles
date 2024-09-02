@@ -6,7 +6,7 @@ fi
 
 if [ ! -f ~/.bash_aliases ]; then
     if ! test -f aliases/.bash_aliases; then
-        wget -P ~/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases  
+        curl -o ~/.bash_aliases https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases  
     else
         cp -fv aliases/.bash_aliases ~/
     fi 
@@ -18,7 +18,7 @@ fi
 
 if ! test -f ~/.bash_aliases.d/check_system.sh; then
     if ! test -f checks/check_system.sh; then
-        wget -O ~/.bash_aliases.d/check_system.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh  
+        curl -o ~/.bash_aliases.d/check_system.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh  
     else
         cp -fv checks/check_system.sh ~/.bash_aliases.d/
     fi
@@ -26,7 +26,7 @@ fi
 
 if ! test -f ~/.bash_aliases.d/bash.sh; then
     if ! test -f aliases/.bash_aliases.d/bash.sh; then
-        wget -O ~/.bash_aliases.d/bash.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/bash.sh  
+        curl -o ~/.bash_aliases.d/bash.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/bash.sh  
     else
         cp -fv aliases/.bash_aliases.d/bash.sh ~/.bash_aliases.d/
     fi
@@ -34,7 +34,7 @@ fi
 
 if ! test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh; then 
     if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
-        wget -O ~/.bash_aliases.d/00-rlwrap_scripts.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh  
+        curl -o ~/.bash_aliases.d/00-rlwrap_scripts.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh  
     else
         cp -fv aliases/.bash_aliases.d/00-rlwrap_scripts.sh ~/.bash_aliases.d/
     fi
@@ -43,7 +43,7 @@ fi
 
 if [ ! -f ~/.bash_completion ]; then
     if ! test -f completions/.bash_completion; then
-        wget -P ~/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/completions/.bash_completion
+        curl -o ~/.bash_aliases https://raw.githubusercontent.com/excited-bore/dotfiles/main/completions/.bash_completion
     else
         cp -fv completions/.bash_completion ~/
     fi 
@@ -55,7 +55,7 @@ fi
 
 if [ ! -f ~/.keybinds ]; then
     if ! test -f keybinds/.keybinds; then
-        wget -P ~/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds
+        curl -o ~/.bash_aliases https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds
     else
         cp -fv keybinds/.keybinds ~/
     fi 
@@ -146,7 +146,7 @@ if ! sudo test -f /root/.bash_completion; then
     echo "Next $(tput setaf 1)sudo$(tput sgr0) will install '.bash_completion.d' in /root and source files in it with '/root/.bash_completion"
     if [ ! -f /root/.bash_completion ]; then
         if ! test -f completions/.bash_completion; then
-            sudo wget -P /root/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/completions/.bash_completion 
+            sudo curl -o /root/.bash_aliases https://raw.githubusercontent.com/excited-bore/dotfiles/main/completions/.bash_completion 
         else
             sudo cp -fv completions/.bash_completion /root/
         fi 
@@ -168,7 +168,7 @@ if ! sudo test -f /root/.keybinds; then
     echo "Next $(tput setaf 1)sudo$(tput sgr0) will install '.keybinds.d' in /root and source files in it with '/root/.keybinds"
     if [ ! -f /root/.keybinds ]; then
         if ! test -f keybinds/.keybinds; then
-            sudo wget -P /root/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds 
+            sudo curl -o /root/.bash_aliases https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds 
         else
             sudo cp -fv keybinds/.keybinds /root/
         fi 

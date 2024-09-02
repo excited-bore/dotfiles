@@ -50,8 +50,9 @@ if ! type neofetch &> /dev/null && ! type fastfetch &> /dev/null && ! type scree
                 fi
                 os="linux"
                 ltstv=$(curl -sL https://api.github.com/repos/fastfetch-cli/fastfetch/releases/latest | jq -r ".tag_name")
-                tmpdir=$(mktemp -d -t fast-XXXXXXXXXX)
-                wget -P $tmpdir https://github.com/fastfetch-cli/fastfetch/releases/download/$ltstv/fastfetch-$os-$fetch_arch.deb
+                tmp=$(mktemp)
+                curl -o $tmp https://github.com/fastfetch-cli/fastfetch/releases/download/$ltstv/fastfetch-$os-$fetch_arch.deb
+                sudo dpkg -i $tmp 
             elif test $distro == "Arch" || test $distro == "Manjaro"; then
                sudo pacman -S fastfetch
             fi

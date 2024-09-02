@@ -65,8 +65,6 @@ fi
 unset fzf_key
 source $ENVVAR
 
-
-
 if [ ! -f ~/.fzf_history ]; then
     touch ~/.fzf_history 
 fi
@@ -153,7 +151,7 @@ if ! type rg &> /dev/null; then
         reade -Q "GREEN" -i "y" -p "Add shortcut for ripgrep files in dir? (Ctrl-g) [Y/n]: " "n" rpgrpdir
         if [ -z $rpgrp ] || [ "Y" == $rpgrp ] || [ $rpgrp == "y" ]; then
             if ! test -f fzf/.bash_aliases.d/ripgrep-directory.sh; then
-                wget -O ~/.bash_aliases.d/ripgrep-directory.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/.bash_aliases.d/ripgrep-directory.sh
+                curl -o ~/.bash_aliases.d/ripgrep-directory.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/.bash_aliases.d/ripgrep-directory.sh
             else
                 cp -fv fzf/.bash_aliases.d/ripgrep-directory.sh ~/.bash_aliases.d/
             fi
@@ -211,12 +209,12 @@ if [ $ENVVAR == ~/.environment.env ] ; then
     sed -i 's/#--bind/--bind/' $ENVVAR
     sed -i 's/#--preview-window/--preview-window/' $ENVVAR
     sed -i 's/#--color/--color/' $ENVVAR
-    if type tree &> /dev/null && type vlc &> /dev/null; then
+    if type tree &> /dev/null; then
         sed -i 's|#export FZF_ALT_C_OPTS=|export FZF_ALT_C_OPTS=|g' $ENVVAR
     fi
 elif ! grep -q "export FZF_DEFAULT_COMMAND" $ENVVAR; then
     printf "\n# FZF\nexport FZF_DEFAULT_COMMAND=\"$fnd\"\nexport FZF_CTRL_T_COMMAND='$FZF_DEFAULT_COMMAND'\n" >> $ENVVAR
-    if type tree &> /dev/null && type vlc &> /dev/null; then
+    if type tree &> /dev/null; then
         printf "export FZF_ALT_C_OPTS=\"--preview 'tree -C {}\"\n" >> $ENVVAR 
     fi
 fi
@@ -231,12 +229,12 @@ if [ $ENVVAR_R == /root/.environment.env ] ; then
     sudo sed -i 's/--bind/#--bind/' $ENVVAR_R
     sudo sed -i 's/--preview-window/#--preview-window/' $ENVVAR_R
     sudo sed -i 's/--color/#--color/' $ENVVAR_R
-    if type tree &> /dev/null && type vlc &> /dev/null; then
+    if type tree &> /dev/null; then
        sudo sed -i 's|#export FZF_ALT_C_OPTS=|export FZF_ALT_C_OPTS=|g' $ENVVAR_R
     fi 
 elif ! sudo grep -q "export FZF_DEFAULT_COMMAND" $ENVVAR_R; then
     printf "\n# FZF\nexport FZF_DEFAULT_COMMAND=\"$fnd\"\nexport FZF_CTRL_T_COMMAND='$FZF_DEFAULT_COMMAND'" | sudo tee -a $ENVVAR_R
-    if type tree &> /dev/null && type vlc &> /dev/null; then
+    if type tree &> /dev/null; then
         printf "\nexport FZF_ALT_C_OPTS=\"--preview 'tree -C {}\"" | sudo tee -a $ENVVAR_R
     fi
 fi
@@ -270,8 +268,8 @@ if ! test -f /usr/bin/rifle || ! test -f ~/.bash_aliases.d/fzf-rifle.sh && grep 
             sudo chmod +x /usr/bin/rifle
         fi
         if ! test -f ranger/.config/ranger/rifle.conf; then
-            wget -O ~/.config/ranger/rifle.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/.config/ranger/rifle.conf  
-            wget -O ~/.bash_aliases.d/fzf-rifle.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/.bash_aliases.d/fzf-rifle.sh
+            curl -o ~/.config/ranger/rifle.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/.config/ranger/rifle.conf  
+            curl -o ~/.bash_aliases.d/fzf-rifle.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/.bash_aliases.d/fzf-rifle.sh
         else
             mkdir -p ~/.config/ranger
             cp -fv ranger/.config/ranger/rifle.conf ~/.config/ranger/
@@ -317,7 +315,7 @@ if ! test -f ~/.bash_aliases.d/docker-fzf.sh; then
         else
             ./checks/check_aliases_dir.sh
         fi
-        wget -O ~/.bash_aliases.d/docker-fzf.sh https://raw.githubusercontent.com/MartinRamm/fzf-docker/master/docker-fzf 
+        curl -o ~/.bash_aliases.d/docker-fzf.sh https://raw.githubusercontent.com/MartinRamm/fzf-docker/master/docker-fzf 
     fi
 fi
 unset fzf_t;

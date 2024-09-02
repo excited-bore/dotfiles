@@ -33,7 +33,6 @@ else
 fi
 
 
-
 printf "${green}If all necessary files are sourced correctly, this text looks green.\nIf not, something went wrong.\n"
 printf "\n${green}Files that get overwritten get backed up and trashed (to prevent clutter).\nRecover using ${cyan}'gio trash --list'${green} and ${cyan}'gio trash --restore' ${normal}\n"
 printf "${green} Will now start with updating system ${normal}\n"
@@ -135,41 +134,15 @@ fi
 
 # Environment variables
 
-echo "Next $(tput setaf 1)sudo$(tput sgr0) check for /root/.environment.env' "
-if ! test -f ~/.environment.env || ! sudo test -f /root/.environment.env; then
-				pathvr=$(pwd)/envvars/.environment.env
-				if ! test -f $pathvr; then
-								wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/envvars/.environment.env
-								pathvr=$TMPDIR/.environment.env
-				fi
-
-				reade -Q "GREEN" -i "y" -p "Put sample environment.env file in $HOME folder and link it to ~/.bashrc? [Y/n]: " "n" envvars
-				if [ "$envvars" == "y" ] || [ -z "$envvars" ]; then
-								#Comment out every export in .environment
-								sed -i -e '/export/ s/^#*/#/' $pathvr
-												
-								# Allow if checks
-								sed -i 's/^#\[\[/\[\[/' $pathvr
-								sed -i 's/^#type/type/' $pathvr
-								
-								# Comment out FZF stuff
-								sed -i 's/  --bind/ #--bind/' $pathvr
-								sed -i 's/  --preview-window/ #--preview-window/' $pathvr
-								sed -i 's/  --color/ #--color/' $pathvr
-        
-								cp -fv $pathvr ~/.environment.env
-								
-								if ! sudo test -f /root/.environment.env; then
-													reade -Q "GREEN" -i "y" -p "Also put sample '.environment.env' file in /root folder and link it to /root/.bashrc? [Y/n]: " "n" envvars
-													if [ "$envvars" == "y" ] || [ -z "$envvars" ]; then
-																	sudo cp -fv $pathvr /root/.environment.env;
-													fi	
-								fi
-								unset envvars	
-				fi
-fi
+if ! test -f install_envvars.sh; then
+    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_envvars.sh
+    . $tmp 'n' 
+else
+    ./install_envvars.sh 'n'  
+fi 
 
 # Bash alias completions
+
 if ! test -f ~/.bash_completion.d/complete_alias || ! test -f /root/.bash_completion.d/complete_alias; then
     reade -Q "GREEN" -i "y" -p "Install bash completions for aliases in ~/.bash_completion.d? [Y/n]: " "n" compl
     if [ -z "$compl" ] || [ "y" == "$compl" ]; then
@@ -208,8 +181,6 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     else
         ./install_aliases.sh
     fi
-        
-
 fi
 
 source ~/.bashrc
@@ -221,13 +192,13 @@ binds=keybinds/.inputrc
 binds1=keybinds/.keybinds.d/keybinds.bash
 binds2=keybinds/.keybinds
 if ! test -f keybinds/.inputrc; then
-    wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.inputrc
-    wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds.d/keybinds.bash 
-    wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds 
+    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.inputrc
+    tmp1=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds.d/keybinds.bash 
+    tmp2=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds 
     
-    binds=$TMPDIR/.inputrc
-    binds1=$TMPDIR/keybinds.bash
-    binds2=$TMPDIR/.keybinds
+    binds=$tmp
+    binds1=$tmp1
+    binds2=$tmp2
 fi
 
 if ! test -f /etc/inputrc; then
@@ -296,8 +267,8 @@ yes_edit_no shell-keybinds "$binds $binds2 $binds1" "Install .inputrc and keybin
 
 xterm=xterm/.Xresources
 if ! test -f xterm/.Xresources; then
-    wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/xterm/.Xresources
-    xterm=$TMPDIR/.Xresources
+    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/xterm/.Xresources
+    xterm=$tmp
 fi
 
 xresources_r(){
@@ -446,7 +417,7 @@ reade -Q "$color" -i "$pre" -p "Install Git and configure? (Project managing too
 if [ "y" == "$git_ins" ]; then
     if ! test -f install_git.sh; then
         ins_git=$(mktemp)
-        wget -O $ins_git https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_git.sh   
+        curl -o $ins_git https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_git.sh   
         chmod u+x "$ins_git"
         eval "$ins_git" 'global'
     else
@@ -700,7 +671,7 @@ pre='y'
 othr='n'
 color='GREEN'
 prmpt='[Y/n]: '
-if type netstat &> /dev/null; then
+if type netstat &> /dev/null || type netstat-nat &> /dev/null; then
     pre='n' 
     othr='y'
     color='YELLOW'
@@ -789,26 +760,31 @@ fi
     unset pre color othr prmpt 
 #fi
 
-pre='y'
-othr='n'
-color='GREEN'
-prmpt='[Y/n]: '
-echo "Next $(tput setaf 1)sudo$(tput sgr0) check for /root/.environment.env' "
-if test -f ~/.environment.env && sudo test -f /root/.environment.env; then
-    pre='n' 
-    othr='y'
-    color='YELLOW'
-    prmpt='[N/y]: '
-fi 
 
-reade -Q "$color" -i "$pre" -p "Check existence/create .environment.env and link it to .bashrc in $HOME/ and /root/? $prmpt" "$othr" envvars
-if [ "$envvars" == "y" ] || [ -z "$envvars" ]; then
+# Environment.env
+
+#pre='y'
+#othr='n'
+#color='GREEN'
+#prmpt='[Y/n]: '
+#echo "Next $(tput setaf 1)sudo$(tput sgr0) check for /root/.environment.env' "
+#if test -f ~/.environment.env && sudo test -f /root/.environment.env; then
+#    pre='n' 
+#    othr='y'
+#    color='YELLOW'
+#    prmpt='[N/y]: '
+#fi 
+
+#reade -Q "$color" -i "$pre" -p "Check existence/create .environment.env and link it to .bashrc in $HOME/ and /root/? $prmpt" "$othr" envvars
+#if [ "$envvars" == "y" ] || [ -z "$envvars" ]; then
     if ! test -f install_envvars.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_envvars.sh)" 
+        tmp=$(mktemp) 
+        curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_envvars.sh
+        . $tmp  
     else
         ./install_envvars.sh  
     fi 
-fi
+#fi
 
 echo "Next $(tput setaf 1)sudo$(tput sgr0) will check whether root account is enabled"
 if ! test $(sudo passwd -S | awk '{print $2}') == 'L'; then

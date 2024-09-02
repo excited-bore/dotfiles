@@ -22,7 +22,7 @@ fi
 if ! type bashtop &> /dev/null && ! type bpytop &> /dev/null && ! type btop &> /dev/null; then
     reade -Q "GREEN" -i "y" -p "Install bashtop / btop / bpytop? [Y/n]: " "n" sym2
     if test "$sym2" == "y"; then
-        reade -Q "GREEN" -i "btop" -p "Which one? [Btop/bpytop/bashtop]: " "bpytop bashtop" sym2
+        reade -Q "CYAN" -i "btop" -p "Which one? [Btop/bpytop/bashtop]: " "bpytop bashtop" sym2
         if test "$sym2" == "btop"; then
             if test $distro_base == "Debian"; then
                sudo apt install btop
@@ -36,7 +36,7 @@ if ! type bashtop &> /dev/null && ! type bpytop &> /dev/null && ! type btop &> /
                sudo pacman -S bpytop
             fi
         elif test "$sym2" == "bashtop"; then      
-            if test "$distro" == "Ubuntu"; then
+            if type add-apt-repository &> /dev/null; then
                 sudo add-apt-repository ppa:bashtop-monitor/bashtop
                 sudo apt update
                 sudo apt install bashtop
