@@ -20,21 +20,22 @@ if type apt &> /dev/null; then
     if type apt-add-repository &> /dev/null; then
         # https://askubuntu.com/questions/148932/how-can-i-get-a-list-of-all-repositories-and-ppas-from-the-command-line-into-an 
         # Script to get all the PPAs which are installed on a system
-
-        for APT in `find /etc/apt/ -name \*.list`; do
-            grep -Po "(?<=^deb\s).*?(?=#|$)" $APT | while read ENTRY ; do
-                HOST=`echo $ENTRY | cut -d/ -f3`
-                USER=`echo $ENTRY | cut -d/ -f4`
-                PPA=`echo $ENTRY | cut -d/ -f5`
-                #echo sudo apt-add-repository ppa:$USER/$PPA
-                if [ "ppa.launchpad.net" = "$HOST" ]; then
-                    echo sudo apt-add-repository ppa:$USER/$PPA
-                else
-                    echo sudo apt-add-repository \'${ENTRY}\'
-                fi
-            done
-        done
-        
+	
+								function apt-list-ppa()	{
+												for APT in `find /etc/apt/ -name \*.list`; do
+															grep -Po "(?<=^deb\s).*?(?=#|$)" $APT | while read ENTRY ; do
+																			HOST=`echo $ENTRY | cut -d/ -f3`
+																			USER=`echo $ENTRY | cut -d/ -f4`
+																			PPA=`echo $ENTRY | cut -d/ -f5`
+																			#echo sudo apt-add-repository ppa:$USER/$PPA
+																			if [ "ppa.launchpad.net" = "$HOST" ]; then
+																							echo sudo apt-add-repository ppa:$USER/$PPA
+																			else
+																							echo sudo apt-add-repository \'${ENTRY}\'
+																			fi
+															done
+											done
+							}
     fi
 
     if type fzf &> /dev/null; then

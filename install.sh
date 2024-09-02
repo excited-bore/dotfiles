@@ -290,6 +290,49 @@ if ! test -f ~/.bash_preexec || ! test -f /root/.bash_preexec; then
     unset bash_preexec
 fi
 
+# Moar (Custom pager instead of less)
+pre='y'
+othr='n'
+color='GREEN'
+prmpt='[Y/n]: '
+if type moar &> /dev/null; then
+    pre='n' 
+    othr='y'
+    color='YELLOW'
+    prmpt='[N/y]: '
+fi 
+reade -Q "$color" -i "$pre" -p "Install moar? (Custom pager/less replacement - awesome default options) $prmpt" "$othr" moar
+if [ -z $moar ] || [ "Y" == $moar ] || [ $moar == "y" ]; then
+    if ! test -f install_moar.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_moar.sh)" 
+    else
+        ./install_moar.sh 
+    fi
+fi
+unset pre color othr moar
+
+
+# Nano (Editor)
+pre='y'
+othr='n'
+color='GREEN'
+prmpt='[Y/n]: '
+if type nano &> /dev/null; then
+    pre='n' 
+    othr='y'
+    color='YELLOW'
+    prmpt='[N/y]: '
+fi
+reade -Q "$color" -i "$pre" -p "Install nano + config? (Simple terminal editor) $prmpt" "$othr" nno
+if [ "y" == "$nno" ]; then
+    if ! test -f install_nano.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nano.sh)" 
+    else
+        ./install_nano.sh
+    fi
+fi
+unset pre color othr nno
+
 
 # Nvim (Editor)
 pre='y'
@@ -302,7 +345,7 @@ if type nvim &> /dev/null; then
     color='YELLOW'
     prmpt='[N/y]: '
 fi
-reade -Q "$color" -i "$pre" -p "Install Neovim? (Terminal editor) $prmpt" "$othr" nvm
+reade -Q "$color" -i "$pre" -p "Install neovim + config? (Complex terminal editor) $prmpt" "$othr" nvm
 if [ "y" == "$nvm" ]; then
     if ! test -f install_nvim.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nvim.sh)" 
@@ -335,27 +378,6 @@ if [ "y" == "$kittn" ]; then
 fi
 unset pre color othr kittn
 
-
-# Moar (Custom pager instead of less)
-pre='y'
-othr='n'
-color='GREEN'
-prmpt='[Y/n]: '
-if type moar &> /dev/null; then
-    pre='n' 
-    othr='y'
-    color='YELLOW'
-    prmpt='[N/y]: '
-fi 
-reade -Q "$color" -i "$pre" -p "Install moar? (Custom pager with userfriendly default options - less replacement) $prmpt" "$othr" moar
-if [ -z $moar ] || [ "Y" == $moar ] || [ $moar == "y" ]; then
-    if ! test -f install_moar.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_moar.sh)" 
-    else
-        ./install_moar.sh 
-    fi
-fi
-unset pre color othr moar
 
 # Fzf (Fuzzy Finder)
 pre='y'
