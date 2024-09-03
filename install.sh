@@ -107,24 +107,49 @@ if ! type snap &> /dev/null; then
 fi
 unset inssnap
 
-if test $distro == 'Ubuntu'; then
-    if ! type ppa-purge &> /dev/null; then
-        printf "${CYAN}ppa-purge${normal} not installed (cmd tool for removing ppa repositories)\n"
-        reade -Q 'GREEN' -i 'y' -p "Install ppa-purge? [Y/n]: " 'n' ppa_ins
-        if test $ppa_ins == 'y'; then
-            sudo apt install ppa-purge -y
+
+if test $distro_base == 'Debian'; then
+    
+    if test -z $(apt list --installed groff 2> /dev/null); then
+        printf "${CYAN}groff${normal} is not installed (Necessary for 'man' (manual) command)\n"
+        reade -Q 'GREEN' -i 'y' -p "Install groff? [Y/n]: " 'n' groff_ins
+        if test $groff_ins == 'y'; then
+            sudo apt install groff -y
+            printf "Logout and login (or reboot) to take effect\n" 
         fi
-        unset ppa_ins 
+        unset groff_ins 
     fi
-        
-    if ! type synaptic &> /dev/null; then
-        printf "${CYAN}synaptic${normal} not installed (Better GUI for package management)\n"
-        reade -Q 'GREEN' -i 'y' -p "Install synaptic? [Y/n]: " 'n' ins_curl
-        if test $ins_curl == 'y'; then
-           sudo apt install synaptic -y
+    
+    if test -z $(apt list --installed manpages-posix 2> /dev/null); then
+        printf "${CYAN}manpages-posix${normal} is not installed (Manpages for posix-compliant (f.ex. bash) commands (f.ex. alias, test, type, etc...))\n"
+        reade -Q 'GREEN' -i 'y' -p "Install manpages-posix? [Y/n]: " 'n' posixman_ins
+        if test $posixman_ins == 'y'; then
+            sudo apt install manpages-posix -y
         fi
-        unset ins_curl
+        unset posixman_ins 
     fi
+    
+    if type add-apt-repository &> /dev/null; then
+        if ! type ppa-purge &> /dev/null; then
+            printf "${CYAN}ppa-purge${normal} is not installed (cmd tool for removing ppa repositories)\n"
+            reade -Q 'GREEN' -i 'y' -p "Install ppa-purge? [Y/n]: " 'n' ppa_ins
+            if test $ppa_ins == 'y'; then
+                sudo apt install ppa-purge -y
+            fi
+            unset ppa_ins 
+        fi
+    fi 
+    
+    if test $distro == "Ubuntu"; then 
+        if ! type synaptic &> /dev/null; then
+            printf "${CYAN}synaptic${normal} is not installed (Better GUI for package management)\n"
+            reade -Q 'GREEN' -i 'y' -p "Install synaptic? [Y/n]: " 'n' ins_curl
+            if test $ins_curl == 'y'; then
+               sudo apt install synaptic -y
+            fi
+            unset ins_curl
+        fi
+    fi 
 fi
 
 
