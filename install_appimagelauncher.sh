@@ -24,7 +24,7 @@ if ! type AppImageLauncher &> /dev/null; then
         sudo pacman -S appimagelauncher
     elif test $distro_base == "Debian"; then
         if type add-apt-repository &> /dev/null; then
-            if [[ $(check-ppa -c ppa:lakinduakash/lwh) =~ 'OK' ]];; then
+            if [[ $(check-ppa -c ppa:lakinduakash/lwh) =~ 'OK' ]]; then
                 sudo add-apt-repository ppa:appimagelauncher-team/stable
                 sudo apt-get update
                 sudo apt-get install appimagelauncher 
