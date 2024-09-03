@@ -168,9 +168,9 @@ environment-variables(){
     fi 
 }
 
-if test $1 == 'n'; then
-    reade -Q "$color" -i "$pre" -p "Check existence/Create '.environment.env' and link it to '.bashrc' in $HOME/ and /root/? $prmpt" "$othr" envvars
-    if [ "$envvars" == "y" ] || [ -z "$envvars" ]; then
+reade -Q "$color" -i "$pre" -p "Check existence/Create '.environment.env' and link it to '.bashrc' in $HOME/ and /root/? $prmpt" "$othr" envvars
+if [ "$envvars" == "y" ] || [ -z "$envvars" ] && test $1 == 'n'; then
+
         #Comment out every export in .environment
         sed -i -e '/export/ s/^#*/#/' $pathvr
             
@@ -186,12 +186,32 @@ if test $1 == 'n'; then
         # Set tmpdir
         sed 's|#export TMPDIR|export TMPDIR|' -i $pathvr
 
-
         if ! grep '.environment.env' ~/.bashrc && ! grep '.environment.env' $PROFILE; then
             yes_edit_no environment-variables "$pathvr" "Install .environment.env in $HOME?" "edit" "GREEN"
             printf "It's recommended to logout and login again to notice a change for ${MAGENTA}.profile${normal} and any ${CYAN}.*shelltype*_profiles\n${normal}" 
         fi
-else
+elif [ "$envvars" == "y" ] || [ -z "$envvars" ]; then 
+    
+    #Comment out every export in .environment
+    sed -i -e '/export/ s/^#*/#/' $pathvr
+        
+    # Allow if checks
+    sed -i 's/^#\[\[/\[\[/' $pathvr
+    sed -i 's/^#type/type/' $pathvr
+    
+    # Comment out FZF stuff
+    sed -i 's/  --bind/ #--bind/' $pathvr
+    sed -i 's/  --preview-window/ #--preview-window/' $pathvr
+    sed -i 's/  --color/ #--color/' $pathvr
+
+    # Set tmpdir
+    sed 's|#export TMPDIR|export TMPDIR|' -i $pathvr
+
+    if ! grep '.environment.env' ~/.bashrc && ! grep '.environment.env' $PROFILE; then
+        yes_edit_no environment-variables "$pathvr" "Install .environment.env in $HOME?" "edit" "GREEN"
+        printf "It's recommended to logout and login again to notice a change for ${MAGENTA}.profile${normal} and any ${CYAN}.*shelltype*_profiles\n${normal}" 
+    fi
+    
     # Package Managers
     #reade -Q "YELLOW" -i "y" -p "Check and create DIST,DIST_BASE,ARCH,PM and WRAPPER? (distro, distro base, architecture, package manager and pm wrapper) [Y/n]:" "n" Dists
     #if [ "$Dists" == "y" ]; then
@@ -203,7 +223,6 @@ else
     if [ "$lsclrs" == "y" ] || [ -z "$lsclrs" ]; then
         sed 's/^#export LS_COLORS/export LS_COLORS/' -i $pathvr
     fi
-    
     
     reade -Q "GREEN" -i "y" -p "Set PAGER? (Page reader) [Y/n]: " "n" pgr
     if [ "$pgr" == "y" ] || [ -z "$pgr" ]; then
