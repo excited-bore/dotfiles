@@ -531,9 +531,9 @@ function instvim(){
     reade -Q "GREEN" -i "y" -p "Set Neovim as default for user EDITOR? [Y/n]: " "n" vimrc 
     if [ -z "$vimrc" ] || [ "$vimrc" == "y" ]; then
         if grep -q "EDITOR" $ENVVAR; then
-            sed -i "s|.export EDITOR=.*|export EDITOR=~/.config/nvim/init.vim|g" $ENVVAR
+            sed -i "s|.export EDITOR=.*|export EDITOR=$(where_cmd nvim)|g" $ENVVAR
         else
-            printf "export EDITOR=~/.config/nvim/init.vim\n" >> $ENVVAR
+            printf "export EDITOR=$(where_cmd nvim)\n" >> $ENVVAR
         fi
     fi
     unset vimrc
@@ -541,9 +541,9 @@ function instvim(){
     reade -Q "GREEN" -i "y" -p "Set Neovim as default for user VISUAL? [Y/n]: " "n" vimrc 
     if [ -z "$vimrc" ] || [ "$vimrc" == "y" ]; then
        if grep -q "VISUAL" $ENVVAR; then
-            sed -i "s|.export VISUAL=*|export VISUAL=~/.config/nvim/init.vim|g" $ENVVAR
+            sed -i "s|.export VISUAL=*|export VISUAL=$(where_cmd nvim)|g" $ENVVAR
         else
-            printf "export VISUAL=~/.config/nvim/init.vim\n" >> $ENVVAR
+            printf "export VISUAL=$(where_cmd nvim)\n" >> $ENVVAR
         fi
     fi
     unset vimrc
@@ -563,8 +563,8 @@ nvim +checkhealth
 echo "Install Completion language plugins with ':CocInstall coc-..' / Update with :CocUpdate"
 echo "Check installed nvim plugins with 'Lazy' / Check installed vim plugins with 'PlugInstalled' (only work on nvim and vim respectively)"
 
-file=vim/.bash_aliases.d
-file1=vim/.bash_completions.d
+file=vim/.bash_aliases.d/vim_nvim.sh
+file1=vim/.bash_completions.d/vim_nvim
 if ! test -d vim/.bash_aliases.d/ || ! test -d vim/.bash_completions.d/; then
     tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/vim/.bash_aliases.d/vim_nvim.sh
     tmp1=$(mktemp) && curl -o $tmp1 https://raw.githubusercontent.com/excited-bore/dotfiles/main/vim/.bash_completions.d/vim_nvim

@@ -135,16 +135,6 @@ do
             fi
             unset ins_curl
         fi
-         
-        if ! type ppa-purge &> /dev/null; then
-            printf "${CYAN}ppa-purge${normal} not installed (cmd tool for removing ppa repositories)\n"
-            reade -Q 'GREEN' -i 'y' -p "Install ppa-purge? [Y/n]: " 'n' ppa_ins
-            if test $ppa_ins == 'y'; then
-                sudo apt update
-                sudo apt install ppa-purge -y
-            fi
-            unset ppa_ins 
-        fi
     elif test -f $f && [[ $f == /etc/SuSE-release || $f == /etc/SUSE-brand ]] && test $distro == /; then
         if ! test -z "$(lsb_release -a | grep Leap)"; then
             packmang="zypper_leap"
