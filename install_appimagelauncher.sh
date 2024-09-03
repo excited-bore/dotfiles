@@ -23,7 +23,7 @@ if ! type AppImageLauncher &> /dev/null; then
     if test $distro == "Arch" || test $distro == "Manjaro"; then 
         sudo pacman -S appimagelauncher
     elif test $distro_base == "Debian"; then
-        if type add-apt-repository &> /dev/null && [[ $(check-ppa -c ppa:lakinduakash/lwh) =~ 'OK' ]]; then
+        if type add-apt-repository &> /dev/null && [[ $(check-ppa -c ppa:appimagelauncher-team/stable) =~ 'OK' ]]; then
             sudo add-apt-repository ppa:appimagelauncher-team/stable
             sudo apt-get update
             sudo apt-get install appimagelauncher 
