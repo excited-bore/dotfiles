@@ -102,6 +102,7 @@ if [ "$envvars" == "y" ] || [ -z "$envvars" ]; then
                         sudo sed -i 's|\(\[ -f ~/.bash_completion \] \&\& source \~/.bash_completion\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' /root/.bashrc
                     elif sudo grep -q "[ -f ~/.bash_aliases ]" /root/.bashrc; then
                         sudo sed -i 's|\(\[ -f ~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' /root/.bashrc
+                        sudo sed -i 's|\(if \[ -f ~/.bash_aliases \]; then\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' /root/.bashrc
                     elif sudo grep -q "[ -f ~/.keybinds ]" /root/.bashrc; then
                         sudo sed -i 's|\(\[ -f ~/.keybinds \] \&\& source \~/.keybinds\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' /root/.bashrc
                     else 

@@ -237,12 +237,12 @@ export ENVVAR_R=/root/.bashrc
 
 echo "This next $(tput setaf 1)sudo$(tput sgr0) checks for the profile, environment, bash_alias, bash_completion and keybind files and dirs in '/root/' to generate global variables.";
 
-if sudo test -f /root/.bash_profile; then
-    PROFILE_R=/root/.bash_profile
-fi
-
 if ! sudo test -f $PROFILE_R; then
     sudo touch $PROFILE_R
+fi
+
+if sudo test -f /root/.bash_profile; then
+    PROFILE_R=/root/.bash_profile
 fi
 
 if sudo test -f /root/.environment.env; then

@@ -43,8 +43,8 @@ if ! type AppImageLauncher &> /dev/null; then
                     code_name='xenial'
                 fi
                 file=$(echo "$ltstv" | grep --color=never $code_name"_"$arch) 
-                curl -o $tmpd/appimagelauncher.deb https://github.com/TheAssassin/AppImageLauncher/releases/download/$tag/$file
-                sudo dpkg -i $tmpd/appimagelauncher.deb 
+                wget -P $tmpd https://github.com/TheAssassin/AppImageLauncher/releases/download/$tag/$file
+                sudo dpkg -i $tmpd/$file 
                 sudo apt --fix-broken install -y
                 sudo systemctl restart systemd-binfmt 
                 unset tmpd tag ltstv code_name file 
