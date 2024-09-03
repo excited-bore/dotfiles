@@ -45,7 +45,14 @@ if ! test -d ~/.fzf ; then
     if [[ $ENVVAR =~ '.environment.env' ]]; then 
         sed -i 's|.export PATH=$PATH:$HOME/.fzf/bin|export PATH=$PATH:$HOME/.fzf/bin|g' $ENVVAR
     elif ! grep -q '.fzf/bin' $ENVVAR; then
-        echo 'export PATH="$PATH:$HOME/.fzf/bin"' >> $ENVVAR
+        if grep -q '~/.environment.env' $ENVVAR; then
+            sed -i 's|\(\[ -f ~/.environment.env\] \&\& source \~/.environment.env\)|\export PATH=$PATH:$HOME/.fzf/bin\n\n\1\n|g' ~/.bashrc
+        elif grep -q '~/.bash_aliases' $ENVVAR; then
+            sed -i 's|\(\[ -f ~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\export PATH=$PATH:$HOME/.fzf/bin\n\n\1\n|g' ~/.bashrc
+            sed -i 's|\(if \[ -f ~/.bash_aliases \]; then\)|export PATH=$PATH:$HOME/.fzf/bin\n\n\1\n|g' ~/.bashrc 
+        else 
+            echo 'export PATH="$PATH:$HOME/.fzf/bin"' >> $ENVVAR
+        fi
     fi
     rm -v ~/.fzf.bash
     sed -i '/\[ -f \~\/.fzf.bash \] \&\& source \~\/.fzf.bash/d' ~/.bashrc
@@ -63,7 +70,7 @@ if test -f ~/.keybinds.d/keybinds.bash && grep -q '^bind -m emacs-standard  '\''
 fi
 
 unset fzf_key
-source $ENVVAR
+export PATH="$PATH:$HOME/.fzf/bin"
 
 if [ ! -f ~/.fzf_history ]; then
     touch ~/.fzf_history 
