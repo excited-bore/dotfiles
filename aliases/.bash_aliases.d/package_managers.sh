@@ -80,14 +80,14 @@ if type apt &> /dev/null; then
                 ######################################################################
                 case $? in
                   0) # Success
-                    echo "$SCRIPT : '$ppa' is ${GREEN}OK${normal} for $RELEASE"
+                    echo "'$ppa' is ${GREEN}OK${normal} for $RELEASE"
                     ;;
                   8) # HTTP 404 (Not Found) would result in wget returning 8
-                    echo "$SCRIPT : '$ppa' is ${RED}UNAVAILABLE${normal} for $RELEASE"
+                    echo "'$ppa' is ${RED}UNAVAILABLE${normal} for $RELEASE"
                     return 1
                     ;;
                   *)
-                    echo "$SCRIPT : Error fetching $url" >&2
+                    echo "Error fetching $url" >&2
                     return 3
                 esac
             }

@@ -319,12 +319,13 @@ pre='y'
 othr='n'
 color='GREEN'
 prmpt='[Y/n]: '
-if type nano &> /dev/null; then
+if type nano &> /dev/null && test -f ~/.nanorc &> /dev/null; then
     pre='n' 
     othr='y'
     color='YELLOW'
     prmpt='[N/y]: '
 fi
+
 reade -Q "$color" -i "$pre" -p "Install nano + config? (Simple terminal editor) $prmpt" "$othr" nno
 if [ "y" == "$nno" ]; then
     if ! test -f install_nano.sh; then

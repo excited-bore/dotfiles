@@ -66,7 +66,7 @@ if ! sudo test -f /root/.profile; then
     sudo touch /root/.profile
 fi
 
-if ! sudo test -f /root/.bash_profile; then
+if sudo test -f /root/.bash_profile; then
     export PROFILE_R=/root/.bash_profile
 fi
 

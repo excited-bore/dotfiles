@@ -212,7 +212,7 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
               reade -Q "CYAN" -i "y" -p "You selected $diff. Configure? [Y/n]: " "n" conf
               if test "y" == "$conf"; then 
                   diff="batdiff --staged --paging=never"
-                  reade -Q "CYAN" -i "n" -p "Use delta config? [Y/n]: " diffr1
+                  reade -Q "CYAN" -i "y" -p "Use delta config? [Y/n]: " 'n' diffr1
                   if test "$diffr1" == 'y'; then
                         diff=$diff" --delta"
                   fi
@@ -1736,29 +1736,31 @@ fi
         fi 
     fi
     
-    local diffpre="n"
-    if ! grep -q 'pager:' ~/.config/lazygit/config.yml ; then
-        diffpre="y"
-    fi 
-    if type lazygit &> /dev/null; then
-        reade -Q "CYAN" -i "$diffpre" -p "Configure custom interactive diff filter for Lazygit? [Y/n]: " "n" gitdiff1 ;     
+    #local diffpre="n"
+    #if ! grep -q 'pager:' ~/.config/lazygit/config.yml ; then
+    #    diffpre="y"
+    #fi 
+    
+    if ! type lazygit &> /dev/null || ! grep -q 'pager:' ~/.config/lazygit/config.yml; then
+        reade -Q "CYAN" -i "y" -p "Configure custom interactive diff filter for Lazygit? [Y/n]: " "n" gitdiff1 ;     
         if [ "y" == "$gitdiff1" ]; then
             git_hl "lazygit"
         fi 
     fi
     
-    
-    if ! test -f ~/.bash_aliases.d/fzf-git.sh; then
-        reade -Q "GREEN" -i "y" -p "Install fzf-git? (Extra fzf stuff on leader-key C-g): [Y/n]: " "n" gitfzf
-        if [ "$fzfgit" == "y" ]; then
-            if ! test -f checks/check_aliases_dir.sh; then
-                eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)" 
-            else
-               . ./checks/check_aliases_dir.sh
-            fi
-            curl -o ~/.bash_aliases.d/fzf-git.sh https://raw.githubusercontent.com/junegunn/fzf-git.sh/main/fzf-git.sh 
-        fi
-    fi
+    # FZF is cool but ripgrep-dir is cooler
+
+    #if ! test -f ~/.bash_aliases.d/fzf-git.sh; then
+    #    reade -Q "GREEN" -i "y" -p "Install fzf-git? (Extra fzf stuff on leader-key C-g): [Y/n]: " "n" gitfzf
+    #    if [ "$fzfgit" == "y" ]; then
+    #        if ! test -f checks/check_aliases_dir.sh; then
+    #            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)" 
+    #        else
+    #           . ./checks/check_aliases_dir.sh
+    #        fi
+    #        curl -o ~/.bash_aliases.d/fzf-git.sh https://raw.githubusercontent.com/junegunn/fzf-git.sh/main/fzf-git.sh 
+    #    fi
+    #fi
 
     local gitals
     reade -Q "GREEN" -i "y" -p "Install git.sh? (Git aliases) [Y/n]: " "n" gitals
