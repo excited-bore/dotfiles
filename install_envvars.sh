@@ -21,25 +21,6 @@ fi
 
 # Environment variables
 
-pathvr=$(pwd)/envvars/.environment.env
-if ! test -f $pathvr; then
-    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/envvars/.environment.env
-    pathvr=$tmp
-fi
-
-pre='y'
-othr='n'
-color='GREEN'
-prmpt='[Y/n]: '
-
-#echo "Next $(tput setaf 1)sudo$(tput sgr0) check for /root/.environment.env' "
-#if test -f ~/.environment.env && sudo test -f /root/.environment.env; then
-#				pre='n' 
-#				othr='y'
-#				color='YELLOW'
-#				prmpt='[N/y]: '
-#fi
-
 #if ! test -z $1; then
     #envvars=$1
 #else
@@ -163,34 +144,56 @@ environment-variables(){
         unset bash_prof_ex prmpt shell_profiles shell_rcs prof bashrc 
     fi
     
-    if ! sudo grep '.environment.env' /root/.bashrc && ! sudo grep '.environment.env' $PROFILE_R; then
+    if ! sudo grep -q '.environment.env' /root/.bashrc && ! sudo grep -q '.environment.env' $PROFILE_R; then
         yes_edit_no environment-variables_r "$pathvr" "Install .environment.env in /root/?" "edit" "YELLOW"; 
     fi 
 }
 
+pathvr=$(pwd)/envvars/.environment.env
+if ! test -f $pathvr; then
+    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/envvars/.environment.env
+    pathvr=$tmp
+fi
+
+pre='y'
+othr='n'
+color='GREEN'
+prmpt='[Y/n]: '
+
+#echo "Next $(tput setaf 1)sudo$(tput sgr0) check for /root/.environment.env' "
+#if test -f ~/.environment.env && sudo test -f /root/.environment.env; then
+#    pre='n' 
+#    othr='y'
+#    color='YELLOW'
+#    prmpt='[N/y]: '
+#fi
+
+
 reade -Q "$color" -i "$pre" -p "Check existence/Create '.environment.env' and link it to '.bashrc' in $HOME/ and /root/? $prmpt" "$othr" envvars
-if [ "$envvars" == "y" ] || [ -z "$envvars" ] && test $1 == 'n'; then
 
-        #Comment out every export in .environment
-        sed -i -e '/export/ s/^#*/#/' $pathvr
-            
-        # Allow if checks
-        sed -i 's/^#\[\[/\[\[/' $pathvr
-        sed -i 's/^#type/type/' $pathvr
+if [ "$envvars" == "y" ] && test "$1" == 'n'; then
+
+    #Comment out every export in .environment
+    sed -i -e '/export/ s/^#*/#/' $pathvr
         
-        # Comment out FZF stuff
-        sed -i 's/  --bind/ #--bind/' $pathvr
-        sed -i 's/  --preview-window/ #--preview-window/' $pathvr
-        sed -i 's/  --color/ #--color/' $pathvr
+    # Allow if checks
+    sed -i 's/^#\[\[/\[\[/' $pathvr
+    sed -i 's/^#type/type/' $pathvr
 
-        # Set tmpdir
-        sed 's|#export TMPDIR|export TMPDIR|' -i $pathvr
+    # Comment out FZF stuff
+    sed -i 's/  --bind/ #--bind/' $pathvr
+    sed -i 's/  --preview-window/ #--preview-window/' $pathvr
+    sed -i 's/  --color/ #--color/' $pathvr
 
-        if ! grep '.environment.env' ~/.bashrc && ! grep '.environment.env' $PROFILE; then
-            yes_edit_no environment-variables "$pathvr" "Install .environment.env in $HOME?" "edit" "GREEN"
-            printf "It's recommended to logout and login again to notice a change for ${MAGENTA}.profile${normal} and any ${CYAN}.*shelltype*_profiles\n${normal}" 
-        fi
-elif [ "$envvars" == "y" ] || [ -z "$envvars" ]; then 
+    # Set tmpdir
+    sed 's|#export TMPDIR|export TMPDIR|' -i $pathvr
+
+    if ! grep -q '.environment.env' ~/.bashrc && ! grep -q '.environment.env' $PROFILE; then
+        yes_edit_no environment-variables "$pathvr" "Install .environment.env in $HOME?" "edit" "GREEN"
+        printf "It's recommended to logout and login again to notice a change for ${MAGENTA}.profile${normal} and any ${CYAN}.*shelltype*_profiles\n${normal}" 
+    fi
+
+elif [ "$envvars" == "y" ]; then 
     
     #Comment out every export in .environment
     sed -i -e '/export/ s/^#*/#/' $pathvr
@@ -207,7 +210,7 @@ elif [ "$envvars" == "y" ] || [ -z "$envvars" ]; then
     # Set tmpdir
     sed 's|#export TMPDIR|export TMPDIR|' -i $pathvr
 
-    if ! grep '.environment.env' ~/.bashrc && ! grep '.environment.env' $PROFILE; then
+    if ! grep -q '.environment.env' ~/.bashrc && ! grep -q '.environment.env' $PROFILE; then
         yes_edit_no environment-variables "$pathvr" "Install .environment.env in $HOME?" "edit" "GREEN"
         printf "It's recommended to logout and login again to notice a change for ${MAGENTA}.profile${normal} and any ${CYAN}.*shelltype*_profiles\n${normal}" 
     fi
