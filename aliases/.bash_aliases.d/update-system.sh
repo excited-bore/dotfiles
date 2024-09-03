@@ -81,12 +81,18 @@ function update-system() {
            pac=nala 
         fi
         sudo "$pac" update
-        sudo "$pac" upgrade
         hdrs="linux-headers-$(uname -r)"
         if test -z "sudo apt list --installed | grep $hdrs"; then
             reade -Q "GREEN" -i "y" -p "Right linux headers not installed. Install $hdrs? [Y/n]: " "n" hdrs_ins
             if [ "$hdrs_ins" == "y" ]; then
-                sudo apt install "$hdrs"
+                sudo "$pac" install "$hdrs"
+            fi
+        fi
+        sudo "$pac" upgrade
+        if apt --dry-run autoremove | grep -Po '^Remv \K[^ ]+'; then
+            reade -Q 'GREEN' -i 'y' -p 'Autoremove unneccesary packages? [Y/n]: '  'n' remove
+            if test $remove == 'y'; then
+                sudo "$pac" autoremove
             fi
         fi
     elif test "$packmang" == "apk"; then
