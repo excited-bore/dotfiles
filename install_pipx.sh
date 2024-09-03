@@ -32,19 +32,22 @@ if ! type pipx &> /dev/null; then
             echo "This next $(tput setaf 1)sudo$(tput sgr0) will install pipx"
             sudo pacman -S python-pipx
             pipx ensurepath
-            reade -Q "GREEN" -i "y" -p "Set to install packages globally (including for root)? [Y/n]: " "n" insppxgl
-            if test $insppxgl == "y"; then 
-                sudo pipx --global ensurepath 
+            if ! [[ $(pipx --version) < 1.6.0 ]]; then 
+                reade -Q "GREEN" -i "y" -p "Set to install packages globally (including for root)? [Y/n]: " "n" insppxgl
+                if test $insppxgl == "y"; then 
+                    sudo pipx --global ensurepath 
+                fi
             fi
         elif test $distro_base == "Debian"; then
             echo "This next $(tput setaf 1)sudo$(tput sgr0) will install pipx"
             sudo apt install pipx
             pipx ensurepath
-            sudo pipx --global ensurepath 
-            reade -Q "GREEN" -i "y" -p "Set to install packages globally (including for root)? [Y/n]:" "n" insppxgl
-            if test $insppxgl == "y"; then 
-                sudo pipx --global ensurepath 
-            fi
+            if ! [[ $(pipx --version) < 1.6.0 ]]; then 
+                reade -Q "GREEN" -i "y" -p "Set to install packages globally (including for root)? [Y/n]: " "n" insppxgl
+                if test $insppxgl == "y"; then 
+                    sudo pipx --global ensurepath 
+                fi
+            fi 
         fi
     fi
 fi

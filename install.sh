@@ -107,6 +107,27 @@ if ! type snap &> /dev/null; then
 fi
 unset inssnap
 
+if test $distro == 'Ubuntu'; then
+    if ! type ppa-purge &> /dev/null; then
+        printf "${CYAN}ppa-purge${normal} not installed (cmd tool for removing ppa repositories)\n"
+        reade -Q 'GREEN' -i 'y' -p "Install ppa-purge? [Y/n]: " 'n' ppa_ins
+        if test $ppa_ins == 'y'; then
+            sudo apt install ppa-purge -y
+        fi
+        unset ppa_ins 
+    fi
+        
+    if ! type synaptic &> /dev/null; then
+        printf "${CYAN}synaptic${normal} not installed (Better GUI for package management)\n"
+        reade -Q 'GREEN' -i 'y' -p "Install synaptic? [Y/n]: " 'n' ins_curl
+        if test $ins_curl == 'y'; then
+           sudo apt install synaptic -y
+        fi
+        unset ins_curl
+    fi
+fi
+
+
 if ! sudo test -f /etc/polkit/49-nopasswd_global.pkla && ! sudo test -f /etc/polkit-1/rules.d/90-nopasswd_global.rules; then
     reade -Q "YELLOW" -i "n" -p "Install polkit files for automatic authentication for passwords? [N/y]: " "y" plkit
     if [ "y" == "$plkit" ]; then
@@ -319,12 +340,13 @@ pre='y'
 othr='n'
 color='GREEN'
 prmpt='[Y/n]: '
-if type nano &> /dev/null; then
+if type nano &> /dev/null && test -f ~/.nanorc &> /dev/null; then
     pre='n' 
     othr='y'
     color='YELLOW'
     prmpt='[N/y]: '
 fi
+
 reade -Q "$color" -i "$pre" -p "Install nano + config? (Simple terminal editor) $prmpt" "$othr" nno
 if [ "y" == "$nno" ]; then
     if ! test -f install_nano.sh; then
