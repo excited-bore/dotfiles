@@ -156,12 +156,12 @@ fi
 #    fi
 #fi
 
-if [ -x "$(command -v nvim)" ]; then
+if type nvim &> /dev/null; then
     reade -Q "GREEN" -i "y" -p "Integrate ranger with nvim? (Install nvim ranger plugins) [Y/n]: " "n" rangrvim
     if [[ -z $rangrvim || "y" == $rangrvim ]]; then
         if test -f  ~/.config/nvim/init.vim && ! grep -q "Ranger integration" ~/.config/nvim/init.vim; then
-            sed -i 's|"Plug '\''francoiscabrol/ranger.vim'\''|Plug '\''francoiscabrol/ranger.vim'\''|g' ~/.config/nvim/init.vim
-            sed -i 's|"Plug '\''rbgrouleff/bclose.vim'\''|Plug '\''rbgrouleff/bclose.vim'\''|g' ~/.config/nvim/init.vim
+            sed -i 's|"Plugin '\''francoiscabrol/ranger.vim'\''|Plugin '\''francoiscabrol/ranger.vim'\''|g' ~/.config/nvim/init.vim
+            sed -i 's|"Plugin '\''rbgrouleff/bclose.vim'\''|Plugin '\''rbgrouleff/bclose.vim'\''|g' ~/.config/nvim/init.vim
             sed -i 's|"let g:ranger_replace_netrw = 1|let g:ranger_replace_netrw = 1|g' ~/.config/nvim/init.vim
             sed -i 's|"let g:ranger_map_keys = 0|let g:ranger_map_keys = 0|g' ~/.config/nvim/init.vim
             nvim +PlugInstall
