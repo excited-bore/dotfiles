@@ -196,7 +196,7 @@ elif test $distro == "Arch" || test $distro == "Manjaro"; then
         fi
     fi
 elif [  $distro_base == "Debian" ];then
-    b=$(sudo apt search neovim 2> /dev/null | grep '^neovim/stable' | awk '{print $2}')
+    b=$(apt search neovim 2> /dev/null | grep '^neovim/' | awk '{print $2}' | sed 's/~.*//g' | sed 's|\(.*\..*\)\..*|\1|g')
     #Minimum version for Lazy plugin manager
     if [[ $b < 0.8 ]]; then
         echo "Neovim apt version is below 0.8, wich too low to run Lazy.nvim (nvim plugin manager)"
