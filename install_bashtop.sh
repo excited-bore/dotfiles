@@ -43,7 +43,7 @@ if ! type bashtop &> /dev/null && ! type bpytop &> /dev/null && ! type btop &> /
                sudo pacman -S bpytop
             fi
         elif test "$sym2" == "bashtop"; then      
-            if type add-apt-repository &> /dev/null && [[ $(check-ppa -c ppa:bashtop-monitor/bashtop) =~ 'OK' ]]; then
+            if type add-apt-repository &> /dev/null && [[ $(check-ppa ppa:bashtop-monitor/bashtop) =~ 'OK' ]]; then
                 sudo add-apt-repository ppa:bashtop-monitor/bashtop
                 sudo apt update
                 sudo apt install bashtop
