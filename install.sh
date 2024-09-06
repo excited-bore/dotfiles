@@ -34,7 +34,9 @@ fi
 
 
 printf "${green}If all necessary files are sourced correctly, this text looks green.\nIf not, something went wrong.\n"
-printf "\n${green}Files that get overwritten get backed up and trashed (to prevent clutter).\nRecover using ${cyan}'gio trash --list'${green} and ${cyan}'gio trash --restore' ${normal}\n"
+if type gio &> /dev/null; then
+    printf "\n${green}Files that get overwritten get backed up and trashed (to prevent clutter).\nRecover using ${cyan}'gio trash --list'${green} and ${cyan}'gio trash --restore' ${normal}\n"
+fi
 printf "${green} Will now start with updating system ${normal}\n"
 
 
@@ -59,7 +61,7 @@ if [ ! -e ~/etc_systemd ] && test -d ~/etc/systemd/system; then
     fi
 fi
 
-if [ ! -f /etc/modprobe.d/nobeep.conf ]; then
+if test -d /etc/modprobe.d && [ ! -f /etc/modprobe.d/nobeep.conf ]; then
     reade -Q "GREEN" -i "y" -p "Remove terminal beep? (blacklist pcspkr) [Y/n]: " "n" beep
     if [ "$beep" == "y" ] || [ -z "$beep" ]; then
         echo "blacklist pcspkr" | sudo tee /etc/modprobe.d/nobeep.conf
