@@ -392,33 +392,43 @@ bind -m emacs-standard '"\e[15~": "\205\206"'
 bind -m vi-command     '"\e[15~": "\205\206"'
 bind -m vi-insert      '"\e[15~": "\205\206"'
 
-# F6 - Bashtop (Better top/htop)
+# F6 - (bash/b/bpy)top (Better top/htop)
 if type bashtop &> /dev/null || type btop &> /dev/null || type bpytop &> /dev/null; then
+     
+    # Last one loaded is the winner
     if type bpytop &> /dev/null; then
         bind -x '"\207": stty sane && bpytop'
     fi
+    
     if type btop &> /dev/null; then
         bind -x '"\207": stty sane && btop'
     fi
+    
     if type bashtop &> /dev/null; then
         bind -x '"\207": stty sane && bashtop'
     fi
+    
     bind -m emacs-standard '"\e[17~": "\207\n\C-l"'
     bind -m vi-command     '"\e[17~": "\207\n\C-l"'
     bind -m vi-insert      '"\e[17~": "\207\n\C-l"'
 fi
 
-# F7 - Bashtop (Better top/htop)
+# F7 - (neo/fast/screen)fetch (System overview)
 if type neofetch &> /dev/null || type fastfetch &> /dev/null || type screenfetch &> /dev/null; then
-    if type neofetch &> /dev/null; then
-        bind -x '"\208": stty sane && neofetch'
-    fi
+    
+    # Last one loaded is the winner
     if type fastfetch &> /dev/null; then
         bind -x '"\208": stty sane && fastfetch'
     fi
+    
     if type screenfetch &> /dev/null; then
         bind -x '"\208": stty sane && screenfetch'
     fi
+    
+    if type neofetch &> /dev/null; then
+        bind -x '"\208": stty sane && neofetch'
+    fi
+    
     bind -m emacs-standard '"\e[18~": "\208\n"'
     bind -m vi-command     '"\e[18~": "\208\n"'
     bind -m vi-insert      '"\e[18~": "\208\n"'
