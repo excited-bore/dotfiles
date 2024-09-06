@@ -67,7 +67,7 @@ if test -f tmux/.tmux.conf; then
     file=tmux/.tmux.conf
 else
     file1="$(mktemp -d -t tmux-XXXXXXXXXX)"
-    curl -o $file1/.tmux.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/tmux/.tmux.conf
+    curl -s -o $file1/.tmux.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/tmux/.tmux.conf
     file=$file1/.tmux.conf
 fi
 
