@@ -39,9 +39,9 @@ fi
 
 # Ranger (File explorer)
 if ! type ranger &> /dev/null; then
-     if test $distro == "Arch" || test $distro == "Manjaro"; then
+     if test $distro_base == "Arch"; then
         sudo pacman -S ranger python python-pipx
-    elif [ $distro_base == "Debian" ]; then    
+    elif test $distro_base == "Debian"; then    
         sudo apt install ranger python3 python3-dev pipx
     fi
 fi
@@ -76,7 +76,7 @@ if [ -d ~/.bash_aliases.d/ ]; then
     else
         cp -bfv ranger/.bash_aliases.d/ranger.sh ~/.bash_aliases.d/ranger.sh
     fi
-    if test -f ~/.bash_aliases.d/ranger.sh~; then
+    if type gio &> /dev/null && test -f ~/.bash_aliases.d/ranger.sh~; then
         gio trash ~/.bash_aliases.d/ranger.sh~
     fi
 fi
@@ -97,14 +97,16 @@ rangr_cnf() {
     fi
     
     cp -bfv -t ~/.config/ranger $dir/rc.conf $dir/rifle.conf $dir/scope.sh
-    if test -f ~/.config/ranger/rc.conf~; then
-        gio trash ~/.config/ranger/rc.conf~ 
-    fi
-    if test -f ~/.config/ranger/rifle.conf~; then
-        gio trash ~/.config/ranger/rifle.conf~ 
-    fi
-    if test -f ~/.config/ranger/scope.sh~; then
-        gio trash ~/.config/ranger/scope.sh~ 
+    if type gio &> /dev/null; then 
+        if test -f ~/.config/ranger/rc.conf~; then
+            gio trash ~/.config/ranger/rc.conf~ 
+        fi
+        if test -f ~/.config/ranger/rifle.conf~; then
+            gio trash ~/.config/ranger/rifle.conf~ 
+        fi
+        if test -f ~/.config/ranger/scope.sh~; then
+            gio trash ~/.config/ranger/scope.sh~ 
+        fi
     fi
 }
 yes_edit_no rangr_cnf "$dir/rc.conf $dir/rifle.conf $dir/scope.sh" "Install predefined configuration (rc.conf,rifle.conf and scope.sh at ~/.config/ranger/)? " "edit" "GREEN"

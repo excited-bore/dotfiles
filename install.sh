@@ -276,7 +276,7 @@ shell-keybinds_r(){
     sudo cp -fv $binds /root/;
     if sudo test -f /root/.bashrc && ! sudo grep -q '[ -f /root/.keybinds ]' /root/.bashrc; then
          if grep -q '[ -f /root/.bash_aliases ]' /root/.bashrc; then
-                sed -i 's|\(\[ -f \/root/.bash_aliases \] \&\& source \/root/.bash_aliases\)|\1\n\[ -f \/root/.keybinds \] \&\& source \/root/.keybinds\n|g' /root/.bashrc
+               sed -i 's|\(\[ -f \/root/.bash_aliases \] \&\& source \/root/.bash_aliases\)|\1\n\[ -f \/root/.keybinds \] \&\& source \/root/.keybinds\n|g' /root/.bashrc
          else
                printf '[ -f ~/.keybinds ] && source ~/.keybinds' | sudo tee -a /root/.bashrc &> /dev/null
          fi
@@ -693,11 +693,11 @@ fi
 #if ! type yt-dlp &> /dev/null; then
 reade -Q "$color" -i "$pre" -p "Install ffmpeg? (video/audio/image file converter) $prmpt" "$othr" ffmpg
 if [ "$ffmpg" == "y" ]; then
-				if ! test -f install_ffmpeg.sh; then
-								eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ffmpeg.sh)" 
-				else
-								./install_ffmpeg.sh
-				fi
+    if ! test -f install_ffmpeg.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ffmpeg.sh)" 
+    else
+        ./install_ffmpeg.sh
+    fi
 fi
 unset ffmpg
 unset pre color othr prmpt 
