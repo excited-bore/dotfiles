@@ -49,9 +49,8 @@ if type apt &> /dev/null; then
             
             helpsection() 
             { 
-                echo "Usage : $SCRIPT [OPTION]... [PPA]... 
+                echo "Usage : $SCRIPT [PPA]... 
             -h, --help     shows this help
-            -c, --check    check if [PPA] is available for your release
 
             Version $VERSION - $DATE"
             }
@@ -99,16 +98,8 @@ if type apt &> /dev/null; then
                     helpsection
                     return 0
                     ;;
-                  --check=*)
-                    PPA="${1#*=}"
-                    ;;
-                  -c|--check|check)
-                    PPA="$2"
-                    shift
-                    ;;
                   *)
-                    helpsection >&2
-                    return 2
+                    PPA="$@"
                     ;;
                 esac
                 shift
@@ -122,7 +113,7 @@ if type apt &> /dev/null; then
             ppa_verification "$PPA"
         }
 
-        complete -W "-h --help -c --check" check-ppa
+        complete -W "-h --help" check-ppa
          
      fi
 
