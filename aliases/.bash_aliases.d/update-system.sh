@@ -125,10 +125,6 @@ function update-system() {
     
     unset hdrs hdrs_ins 
 
-    if type nix-env &> /dev/null; then
-        nix-env -u '*'
-    fi
-
     if type flatpak &> /dev/null; then
         flatpak update
     fi
@@ -137,13 +133,22 @@ function update-system() {
         snap refresh
     fi
 
+    if type nix-env &> /dev/null; then
+        reade -i "n" -p "Update ${CYAN}nix packages?${normal} ${MAGENTA}(Fetching updated list could take a long time) [N/y]:${normal} " "y" nix_up
+        if test "$nix_up" == 'y'; then
+            printf "Updating all ${MAGENTA}nix packages${normal} using 'nix-env -u *'\n" && nix-env -u * 2> /dev/null
+        fi 
+        unset nix_up 
+    fi
+     
+
     if type gpg &> /dev/null || type gpg2 &> /dev/null; then
         if type gpg2 &> /dev/null; then
             up_gpg=gpg2
         else
             up_gpg=gpg
         fi
-        reade -Q "MAGENTA" -i "n" -p "Refresh gpg keys? (Keyservers can be unstable so this might take a while) [N/y]: " "y" gpg_up
+        reade -i "n" -p "Refresh ${CYAN}gpg keys?${normal} ${MAGENTA}(Keyservers can be unstable so this might take a while) [N/y]:${normal} " "y" gpg_up
         if test "$gpg_up" == 'y'; then
            "$up_gpg" --refresh-keys  
         fi
@@ -151,7 +156,7 @@ function update-system() {
     unset up_gpg gpg_up
 
     if type pipx &> /dev/null || type npm &> /dev/null || type gem &> /dev/null || type cargo &> /dev/null; then 
-        reade -Q "MAGENTA" -i "n" -p "Update Packages from development package-managers? (pipx, npm, gem, cargo... - WARNING: this could take a lot longer relative to regular pm's) [N/y]: " "y" dev_up
+        reade -i "n" -p "Update ${CYAN}packages for development package-managers - pipx, npm, gem, cargo...${normal} ${MAGENTA}(WARNING: this could take a lot longer relative to regular pm's) [N/y]:${normal} " "y" dev_up
         if [ "$dev_up" == "y" ]; then
             
             if type pipx &> /dev/null; then
