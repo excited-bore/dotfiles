@@ -39,7 +39,7 @@ if ! type pipx &> /dev/null; then
             if [[ $(pipx --version) < 1.6.0 ]]; then 
                 pipx install pipx
                 sudo pacman -Rs pipx 
-                source ~/.local/bin/ 
+                source ~/.local/bin/pipx 
             fi
         elif test $distro_base == "Debian"; then
             echo "This next $(tput setaf 1)sudo$(tput sgr0) will install pipx"
@@ -47,7 +47,7 @@ if ! type pipx &> /dev/null; then
             if [[ $(pipx --version) < 1.6.0 ]]; then 
                 pipx install pipx
                 sudo apt purge --autoremove pipx 
-                source ~/.local/bin/ 
+                source ~/.local/bin/pipx 
             fi 
         fi
         pipx ensurepath
