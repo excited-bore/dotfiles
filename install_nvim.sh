@@ -217,7 +217,7 @@ elif [  $distro_base == "Debian" ];then
                     choices="flatpak build"
                     prompt="Which one (Appimage/flatpak/build from source)? [Flatpak/appimage/build]: "
                     if type add-apt-repository &> /dev/null; then
-                        if ! echo $(check-ppa -c ppa:neovim-ppa/unstable) | grep -q 'NOT'; then
+                        if ! echo $(check-ppa ppa:neovim-ppa/unstable) | grep -q 'NOT'; then
                             pre="ppa-unstable"                        
                             choices="appimage flatpak build"
                             prompt="Which one (Ppa-unstable/appimage/flatpak/build from source)? [Ppa-unstable/appimage/flatpak/build]: "

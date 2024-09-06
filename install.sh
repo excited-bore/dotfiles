@@ -130,6 +130,22 @@ if test $distro_base == 'Debian'; then
     fi
     
     if type add-apt-repository &> /dev/null; then
+        if ! type list-ppa &> /dev/null; then
+            printf "${CYAN}list-ppa${normal} is not installed (python cmd tool for listing ppas from 'launchpad.net')\n"
+            reade -Q 'GREEN' -i 'y' -p "Install list-ppa? [Y/n]: " 'n' ppa_ins
+            if test $ppa_ins == 'y'; then
+                if ! type pipx &> /dev/null; then
+                    if ! test -f install_pipx.sh; then
+                        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)" 
+                    else
+                        ./install_pipx.sh
+                    fi  
+                fi
+                pipx install list-ppa
+            fi
+            unset ppa_ins 
+        fi
+
         if ! type ppa-purge &> /dev/null; then
             printf "${CYAN}ppa-purge${normal} is not installed (cmd tool for removing ppa repositories)\n"
             reade -Q 'GREEN' -i 'y' -p "Install ppa-purge? [Y/n]: " 'n' ppa_ins
