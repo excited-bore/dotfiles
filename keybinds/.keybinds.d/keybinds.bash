@@ -295,9 +295,9 @@ bind -m emacs-standard -x '"\C-x\C-e":_edit_wo_executing'
 #fi
 
 if type osc &> /dev/null; then
-    bind -m emacs-standard -x '"\C-s" : echo "$READLINE_LINE" | osc copy' 
-    bind -m vi-command     -x '"\C-s" : echo "$READLINE_LINE" | osc copy' 
-    bind -m vi-insert      -x '"\C-s" : echo "$READLINE_LINE" | osc copy'
+    bind -m emacs-standard -x '"\C-s" : printf "$READLINE_LINE" | osc copy' 
+    bind -m vi-command     -x '"\C-s" : printf "$READLINE_LINE" | osc copy' 
+    bind -m vi-insert      -x '"\C-s" : printf "$READLINE_LINE" | osc copy'
    
     function osc-print-to-prompt(){
         pasters="$(osc paste)"
@@ -314,9 +314,9 @@ if type osc &> /dev/null; then
 
 elif type xclip &> /dev/null; then
     # Ctrl-s: Proper copy
-    bind -m emacs-standard -x '"\C-s" : echo "$READLINE_LINE" | xclip -i -sel c' 
-    bind -m vi-command     -x '"\C-s" : echo "$READLINE_LINE" | xclip -i -sel c' 
-    bind -m vi-insert      -x '"\C-s" : echo "$READLINE_LINE" | xclip -i -sel c'
+    bind -m emacs-standard -x '"\C-s" : printf "$READLINE_LINE" | xclip -i -sel c' 
+    bind -m vi-command     -x '"\C-s" : printf "$READLINE_LINE" | xclip -i -sel c' 
+    bind -m vi-insert      -x '"\C-s" : printf "$READLINE_LINE" | xclip -i -sel c'
    
     function xclip-print-to-prompt(){
         pasters="$(xclip -o -sel c)"

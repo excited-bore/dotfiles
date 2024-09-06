@@ -174,7 +174,9 @@ if type pacman &> /dev/null; then
     alias pacman-create-default-mirrors-and-refresh="sudo pacman-mirrors -f 5 && sudo pacman -Sy"
     alias pacman-list-AUR-installed="pacman -Qm"
     alias pacman-rm-lock="sudo rm /var/lib/pacman/db.lck"
-    
+    alias pacman-remove="sudo pacman -R"
+    alias pacman-remove-dependencies="sudo pacman -Rs"
+
     if type fzf &> /dev/null; then
 
         function pacman-fzf-install(){ 
