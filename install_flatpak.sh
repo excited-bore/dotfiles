@@ -34,7 +34,7 @@ fi
 if ! type flatpak &> /dev/null; then
     if test "$distro" == "Manjaro"; then
         pamac install flatpak libpamac-flatpak-plugin python
-    elif test "$distro" == "Arch"; then
+    elif test "$distro_base" == "Arch"; then
         sudo pacman -S flatpak python
     elif test "$distro_base" == "Debian"; then
         if [[ "$XDG_CURRENT_DESKTOP" =~ "GNOME" ]]; then
@@ -64,52 +64,32 @@ if type flatpak &> /dev/null; then
 fi
 unset flpkvrs
 
-reade -Q "GREEN" -i "y" -p "Install flatpackwrapper? (For one-word flatpak aliases in terminal) [Y/n]: " "n" pam
-if [ -z $pam ] || [ "y" == $pam ]; then
-    #if [ ! -d ~/.local/bin/flatpak/ ]; then
-    #    mkdir -p ~/.local/bin/flatpak/
-    #fi
-    if ! test -f install_bashalias_completions.sh; then
-         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bashalias_completions.sh)" 
-    else
-         ./install_bashalias_completions.sh
-    fi
-    
-    if [ ! -f ~/.bash_aliases.d/flatpacks.sh ]; then
-        cp -bfv flatpak/.bash_aliases.d/flatpacks.sh ~/.bash_aliases.d/ 
-        #touch ~/.bash_aliases.d/flatpacks.sh
-        #printf "function flatpak (){\\n  env -u SESSION_MANAGER flatpak \"\$@\"\\n  if [ \"\$1\" == \"install\" ]; then\\n      python /usr/bin/update_flatpak_cli.py\\n   fi\\n}\\n" >> ~/.bash_aliases.d/flatpacks.sh
-    fi
-    
-    #if ! type python &> /dev/null; then
-    #    if test $distro_base == "Debian" && type python3 &> /dev/null; then
-    #        sudo apt install python-is-python3
-    #    else
-    #        if test $distro == "Manjaro" || test $distro == "Arch"; then
-    #            sudo pacman -S python
-    #        elif test $distro_base == "Debian"; then
-    #            sudo apt install python3 python-is-python3
-    #        fi
-    #    fi
-    #fi
+if ! test -f ~/.bash_aliases.d/flatpacks.sh; then
+    reade -Q "GREEN" -i "y" -p "Install flatpackwrapper? (For one-word flatpak aliases in terminal) [Y/n]: " "n" pam
+    if [ -z $pam ] || [ "y" == $pam ]; then
+        if ! test -f install_bashalias_completions.sh; then
+             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bashalias_completions.sh)" 
+        else
+             ./install_bashalias_completions.sh
+        fi
 
-
-    #if ! sudo test -f /usr/bin/update_flatpak_cli.py; then
-    #    sudo curl -o /usr/bin/update_flatpak_cli.py https://gist.githubusercontent.com/ssokolow/db565fd8a82d6002baada946adb81f68/raw/c23b3292441e01c6287de1b417b9e573bce6a571/update_flatpak_cli.py
-    #    sudo chmod u+x /usr/bin/update_flatpak_cli.py
-    #    sudo sed -i 's|\[ -a "|\[ -f "|g' /usr/bin/update_flatpak_cli.py
-    #fi
-    #  
-    #if grep -q "FLATPAK" "$ENVVAR"; then
-    #    sed -i 's|^export PATH=$PATH:$HOME/.local/bin/flatpak|export PATH=$PATH:$HOME/.local/bin/flatpak|g' $ENVVAR
-    #else
-    #    echo 'export PATH=$PATH:$HOME/.local/bin/flatpak' >> $ENVVAR
-    #fi
-    #echo "Wrapper script are bash-based and installed under '~/.local/bin/flatpak/' "
+        if test -f flatpak/.bash_aliases.d/flatpacks.sh; then
+            file=flatpak/.bash_aliases.d/flatpacks.sh
+        else
+            dir1="$(mktemp -d -t tmux-XXXXXXXXXX)"
+            curl -s -o $file1/flatpacks.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/flatpak/.bash_aliases.d/flatpacks.sh
+            file=$dir1/flatpacks.sh
+        fi
+         
+        if [ ! -f ~/.bash_aliases.d/flatpacks.sh ]; then
+            cp -bfv $file ~/.bash_aliases.d/ 
+            source ~/.bash_aliases.d/flatpacks.sh 
+        fi
+    fi    
 fi
-unset pam
+unset pam file
 
-if echo $(flatpak list) | grep -q "Flatseal"; then
+if ! echo $(flatpak list --columns=name) | grep -q "Flatseal"; then
     reade -Q "GREEN" -i "y" -p "Install GUI for configuring flatpak permissions - flatseal? [Y/n]: " "n" fltseal
     if [ -z $fltseal ] || [ "y" == $fltseal ]; then
         flatpak install flatseal

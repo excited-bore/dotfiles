@@ -51,3 +51,6 @@ fi
 if flatpak list --columns=name | grep "microsoft-edge" &> /dev/null; then
 	alias microsoft-edge='flatpak run --file-forwarding com.microsoft.Edge'
 fi
+if flatpak list --columns=name | grep "flatseal" &> /dev/null; then
+	alias flatseal='flatpak run --file-forwarding com.github.tchx84.Flatseal'
+fi
