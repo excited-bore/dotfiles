@@ -116,6 +116,52 @@ if type apt &> /dev/null; then
         complete -W "-h --help" check-ppa
          
      fi
+    
+     if type list-ppa &> /dev/null && type fzf &> /dev/null; then
+        
+        #function list-and-check-ppa-fzf(){
+        #    pre=''
+        #    if ! test -z $@; then
+        #        pre="--query $@"
+        #    fi
+        #    
+        #    if test -f ~/.config/list-ppa; then 
+        #        ppa="$(cat ~/.config/list-ppa | fzf --reverse)"
+        #    else
+        #        ppa="$(list-ppa 2> /dev/null | fzf --reverse)"
+        #    fi
+
+        #    if ! test -z $ppa; then
+        #        check-ppa $ppa
+        #    fi
+        #    unset ppa
+        #}
+        
+        function add-apt-ppa-fzf-install(){
+            pre=''
+            if ! test -z $@; then
+                pre="--query $@"
+            fi
+            
+            if test -f ~/.config/list-ppa; then 
+                ppa="$(cat ~/.config/list-ppa | fzf --reverse)"
+            else
+                ppa="$(list-ppa 2> /dev/null | fzf --reverse)"
+            fi 
+            
+            if ! test -z $ppa; then
+                check-ppa $ppa
+ 
+                if [[ $(check-ppa $ppa) =~ 'OK' ]]; then
+                    sudo add-apt-repository ppa:$ppa
+                    sudo apt update         
+                else
+                    return 2
+                fi
+            fi
+            unset ppa
+        } 
+     fi
 
      if type fzf &> /dev/null; then
 
