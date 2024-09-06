@@ -116,6 +116,27 @@ if type apt &> /dev/null; then
         complete -W "-h --help" check-ppa
          
      fi
+    
+     if type list-ppa &> /dev/null && type fzf &> /dev/null; then
+        
+        alias list-and-check-ppa-fzf="check-ppa $(list-ppa 2> /dev/null | fzf --reverse)"
+        
+        function list-and-install-ppa(){
+            pre=''
+            if ! test -z $@; then
+                pre="--query $@"
+            fi
+            ppa="$(list-ppa 2> /dev/null | fzf $pre --reverse)" 
+            check-ppa $ppa 
+            if [[ $(check-ppa $ppa) =~ 'OK' ]]; then
+                sudo add-apt-repository ppa:$ppa
+                sudo apt update         
+            else
+                return 2
+            fi
+        } 
+
+     fi
 
      if type fzf &> /dev/null; then
 

@@ -28,7 +28,7 @@ if test -z $SYSTEM_UPDATED; then
 fi
 
 if ! type wihotspot &> /dev/null; then
-    if [ $distro == "Ubuntu" ] && [[ $(check-ppa -c ppa:lakinduakash/lwh) =~ 'OK' ]]; then
+    if [ $distro == "Ubuntu" ] && [[ $(check-ppa ppa:lakinduakash/lwh) =~ 'OK' ]]; then
         sudo add-apt-repository ppa:lakinduakash/lwh
         sudo apt update
         sudo apt install linux-wifi-hotspot
