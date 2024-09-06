@@ -5,7 +5,7 @@
 # 3. Open the file in Vim
 
 ripgrep-dir(){
-    RG_PREFIX="rg --column --line-number --hidden --no-heading --color=always --smart-case"
+    RG_PREFIX="rg --column --line-number --hidden --no-heading --color=always --smart-case -g '!{**/node_modules/*,**/.git/*}'"
     INITIAL_QUERY="${*:-}"
     : | fzf --height 80% --ansi --disabled --query "$INITIAL_QUERY" \
         --bind "start:reload:$RG_PREFIX {q}" \
