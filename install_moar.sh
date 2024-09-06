@@ -55,6 +55,13 @@ if ! type moar &> /dev/null; then
         printf "Package manager unknown or PM doesn't offer moar (f.ex. apt).\n"; 
         reade -Q "YELLOW" -i "b" -p "Install moar from github binary (b) or not (anything but empty or b) [B/n]: " "n"  answer
         if [ -z "$answer" ] || [ "B" == "$answer" ] || [ "b" == "$answer" ]; then
+            if ! type wget &> /dev/null; then
+                reade -Q "GREEN" -i "y" -p "Need wget for this to work (tool to fetch file from the internet). Install wget? [Y/n]: " "n"  ins_wget
+                if test $ins_wget == 'y'; then
+                    sudo apt install wget
+                fi
+                unset ins_wget 
+            fi
             if [ $arch == "armv7l" ] || [ $arch == "arm64" ]; then
                 arch="arm"
             fi
@@ -62,9 +69,10 @@ if ! type moar &> /dev/null; then
                 arch="386"
             fi
             latest=$(curl -sL "https://github.com/walles/moar/tags" | grep "/walles/moar/releases/tag" | perl -pe 's|.*/walles/moar/releases/tag/(.*?)".*|\1|' | uniq | awk 'NR==1{max=$1;print $0; exit;}')                          
-            tmp=$(mktemp) && curl -o $tmp "https://github.com/walles/moar/releases/download/$latest/moar-$latest-linux-$arch"
-            chmod a+x $tmp
-            sudo mv $tmp /usr/bin/moar
+            tmpd=$(mktemp -d) 
+            wget -P $tmpd https://github.com/walles/moar/releases/download/$latest/moar-$latest-linux-$arch
+            chmod a+x $tmpd/moar-*
+            sudo mv $tmpd/moar-* /usr/bin/moar
             echo "Done!"
         fi
     fi

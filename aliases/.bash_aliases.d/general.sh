@@ -385,6 +385,26 @@ extract-archive(){
 
 complete -F _files extract
 
+# whereis    
+if type whereis &> /dev/null; then
+     function edit-whereis(){
+        if test -z $EDITOR && type nano &> /dev/null; then
+            EDITOR=nano 
+        fi
+        if test -z $EDITOR && type vim &> /dev/null; then
+            EDITOR=vim
+        fi
+        if test -z $EDITOR && type nvim &> /dev/null; then
+            EDITOR=nvim 
+        fi
+        $EDITOR $(whereis $1 | awk '{print $2;}')
+     } 
+    
+     complete -F _commands edit-whereis  
+fi
+
+
+
 # eur and us format date
 alias date-us='date "+%Y-%m-%d %A %T %Z"'
 alias date-eu='date "+%d-%m-%Y %A %T %Z"'

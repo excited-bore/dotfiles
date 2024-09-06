@@ -28,27 +28,38 @@ if ! type pipx &> /dev/null; then
         if test $machine == 'Mac' && type brew &> /dev/null; then
             echo "This next $(tput setaf 1)sudo$(tput sgr0) will install pipx"
             brew install python python-pipx
-        elif test $distro == "Arch" || test $distro == "Manjaro"; then 
+            if [[ $(pipx --version) < 1.6.0 ]]; then 
+                pipx install pipx
+                brew uninstall pipx 
+                source ~/.local/bin/ 
+            fi
+        elif test $distro_base == "Arch"; then 
             echo "This next $(tput setaf 1)sudo$(tput sgr0) will install pipx"
             sudo pacman -S python-pipx
-            pipx ensurepath
-            if ! [[ $(pipx --version) < 1.6.0 ]]; then 
-                reade -Q "GREEN" -i "y" -p "Set to install packages globally (including for root)? [Y/n]: " "n" insppxgl
-                if test $insppxgl == "y"; then 
-                    sudo pipx --global ensurepath 
-                fi
+            if [[ $(pipx --version) < 1.6.0 ]]; then 
+                pipx install pipx
+                sudo pacman -Rs pipx 
+                source ~/.local/bin/ 
             fi
         elif test $distro_base == "Debian"; then
             echo "This next $(tput setaf 1)sudo$(tput sgr0) will install pipx"
             sudo apt install pipx
-            pipx ensurepath
-            if ! [[ $(pipx --version) < 1.6.0 ]]; then 
-                reade -Q "GREEN" -i "y" -p "Set to install packages globally (including for root)? [Y/n]: " "n" insppxgl
-                if test $insppxgl == "y"; then 
-                    sudo pipx --global ensurepath 
-                fi
+            if [[ $(pipx --version) < 1.6.0 ]]; then 
+                pipx install pipx
+                sudo apt purge --autoremove pipx 
+                source ~/.local/bin/ 
             fi 
         fi
+        pipx ensurepath
+        if ! test $machine == 'Windows'; then 
+            reade -Q "GREEN" -i "y" -p "Set to install packages globally (including for root)? [Y/n]: " "n" insppxgl
+            if test $insppxgl == "y"; then 
+                if [[ $(whereis pipx) =~ $HOME/.local/bin ]]; then
+                    sudo env PATH=$PATH:$HOME/.local/bin pipx ensurepath --global
+                fi
+                sudo pipx --global ensurepath 
+            fi
+        fi 
     fi
 fi
 
