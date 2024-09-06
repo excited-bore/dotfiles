@@ -33,8 +33,25 @@ if ! type neofetch &> /dev/null && ! type fastfetch &> /dev/null && ! type scree
         if test "$sym2" == "neo"; then
             if test $distro_base == "Debian"; then
                sudo apt install neofetch
-            elif test $distro == "Arch" || test $distro == "Manjaro"; then
+            elif test $distro_base == "Arch"; then
                sudo pacman -S neofetch
+            fi
+            
+            if ! test -f ~/.config/neofetch/config.conf; then
+
+                if test -f neofetch/.config/neofetch/config.conf; then
+                    file=neofetch/.config/neofetch/config.conf
+                else
+                    dir1="$(mktemp -d -t tmux-XXXXXXXXXX)"
+                    curl -s -o $dir1/config.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/neofetch/.config/neofetch/config.conf
+                    file=$dir1/config.conf
+                fi
+                 
+                function neofetch_conf() {
+                    mkdir -p ~/.config/neofetch 
+                    cp -fbv $file ~/.config/neofetch/ 
+                }
+                yes_edit_no neofetch_conf "$file" "Install neofetch config.conf at $HOME/.config/neofetch/?" "yes" "GREEN"; 
             fi
         elif test "$sym2" == "fast"; then 
             if test $distro_base == "Debian"; then
@@ -53,13 +70,13 @@ if ! type neofetch &> /dev/null && ! type fastfetch &> /dev/null && ! type scree
                 tmp=$(mktemp -d)
                 wget -P $tmp https://github.com/fastfetch-cli/fastfetch/releases/download/$ltstv/fastfetch-$os-$fetch_arch.deb
                 sudo dpkg -i $tmp/fastfetch-$os-$fetch_arch.deb 
-            elif test $distro == "Arch" || test $distro == "Manjaro"; then
+            elif test $distro_base == "Arch"; then
                sudo pacman -S fastfetch
             fi
-        elif  test "$sym2" == "screen"; then      
+        elif test "$sym2" == "screen"; then      
             if test $distro_base == "Debian"; then
                sudo apt install screenfetch
-            elif test $distro == "Arch" || test $distro == "Manjaro"; then
+            elif test $distro_base == "Arch"; then
                sudo pacman -S screenFetch
             fi
         fi
