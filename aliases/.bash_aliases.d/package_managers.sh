@@ -119,23 +119,48 @@ if type apt &> /dev/null; then
     
      if type list-ppa &> /dev/null && type fzf &> /dev/null; then
         
-        alias list-and-check-ppa-fzf="check-ppa $(list-ppa 2> /dev/null | fzf --reverse)"
+        #function list-and-check-ppa-fzf(){
+        #    pre=''
+        #    if ! test -z $@; then
+        #        pre="--query $@"
+        #    fi
+        #    
+        #    if test -f ~/.config/list-ppa; then 
+        #        ppa="$(cat ~/.config/list-ppa | fzf --reverse)"
+        #    else
+        #        ppa="$(list-ppa 2> /dev/null | fzf --reverse)"
+        #    fi
+
+        #    if ! test -z $ppa; then
+        #        check-ppa $ppa
+        #    fi
+        #    unset ppa
+        #}
         
-        function list-and-install-ppa(){
+        function add-apt-ppa-fzf-install(){
             pre=''
             if ! test -z $@; then
                 pre="--query $@"
             fi
-            ppa="$(list-ppa 2> /dev/null | fzf $pre --reverse)" 
-            check-ppa $ppa 
-            if [[ $(check-ppa $ppa) =~ 'OK' ]]; then
-                sudo add-apt-repository ppa:$ppa
-                sudo apt update         
+            
+            if test -f ~/.config/list-ppa; then 
+                ppa="$(cat ~/.config/list-ppa | fzf --reverse)"
             else
-                return 2
+                ppa="$(list-ppa 2> /dev/null | fzf --reverse)"
+            fi 
+            
+            if ! test -z $ppa; then
+                check-ppa $ppa
+ 
+                if [[ $(check-ppa $ppa) =~ 'OK' ]]; then
+                    sudo add-apt-repository ppa:$ppa
+                    sudo apt update         
+                else
+                    return 2
+                fi
             fi
+            unset ppa
         } 
-
      fi
 
      if type fzf &> /dev/null; then
