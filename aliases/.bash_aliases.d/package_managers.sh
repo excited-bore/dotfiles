@@ -22,19 +22,18 @@ if type apt &> /dev/null; then
         # Script to get all the PPAs which are installed on a system
 	
         function apt-list-ppa()	{
-
-            for APT in `find /etc/apt/ -name \*.list`; do
-                grep -Po "(?<=^deb\s).*?(?=#|$)" $APT | while read ENTRY ; do
-                    HOST=`echo $ENTRY | cut -d/ -f3`
-                    USER=`echo $ENTRY | cut -d/ -f4`
-                    PPA=`echo $ENTRY | cut -d/ -f5`
-                    #echo sudo apt-add-repository ppa:$USER/$PPA
-                                                                                                                        if [ "ppa.launchpad.net" = "$HOST" ]; then
-                        echo sudo apt-add-repository ppa:$USER/$PPA
-                    else
-                        echo sudo apt-add-repository \'${ENTRY}\'
-                    fi
-                done
+            if test -d /etc/apt/sources.list.d/ ;then
+                first=/etc/apt/sources.list.d/
+                second=\*.sources
+            else
+                first=/etc/apt/
+                second=\*.list
+            fi
+            for APT in `find $first -name $second`; do
+                ppa=$(grep "URIs" $APT | grep 'ppa' | awk '{print $2;}' | sed 's|https://ppa.launchpadcontent\.net/|ppa:|g' | sed 's|/ubuntu/||g')
+                if ! test -z $ppa; then 
+                    printf "$ppa\n" 
+                fi
             done
         }
         
