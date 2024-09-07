@@ -30,9 +30,7 @@ if test -z $SYSTEM_UPDATED; then
 fi 
 
 if ! type nano &> /dev/null; then
-    if [ "$distro" == "Manjaro" ]; then
-        pamac install nano
-    elif test "$distro" == "Arch" && ! test -z "$AUR_install"; then
+    if test "$distro" == "Arch"; then
         sudo pacman -S nano
     elif [ $distro_base == "Debian" ]; then
         sudo apt install nano                                                             
