@@ -28,11 +28,15 @@ fi
 
 
 if ! type lazygit &> /dev/null; then
-    if test $distro == "Arch" || test $distro == "Manjaro"; then
+    if test $distro_base == "Arch"; then
         sudo pacman -S lazygit
-    elif [ $distro == "Ubuntu" ]; then
+    else; then
         if ! type curl &> /dev/null; then
-            sudo apt install curl
+            if test $distro_base == 'Debian'; then
+                sudo apt install curl
+            elif test $distro_base == 'Arch'; then
+                sudo pacman -S curl  
+            fi
         fi
         LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po --color=never '"tag_name": "v\K[^"]*')
         curl -Lo $TMPDIR/lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
