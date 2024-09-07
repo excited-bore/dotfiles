@@ -37,6 +37,21 @@ if type apt &> /dev/null; then
             done
         }
         
+        _ppa_purge(){
+            #WORD_ORIG=$COMP_WORDBREAKS
+            #COMP_WORDBREAKS=${COMP_WORDBREAKS/:/}
+            _get_comp_words_by_ref -n : cur
+            COMPREPLY=($(compgen -W "-p -o -s -d -y -i -h $(apt-list-ppa)" -- "$cur") )
+            __ltrim_colon_completions "$cur"
+            #COMP_WORDBREAKS=$WORD_ORIG
+            return 0
+        } 
+       
+        if type ppa-purge &> /dev/null; then
+            complete -F _ppa_purge ppa-purge 
+        fi
+         
+
         # Stolen from:
         # https://codereview.stackexchange.com/questions/45445/script-for-handling-ppas-on-ubuntu
 
@@ -145,21 +160,33 @@ if type apt &> /dev/null; then
             if test -f ~/.config/list-ppa; then 
                 ppa="$(cat ~/.config/list-ppa | fzf --reverse)"
             else
-                ppa="$(list-ppa 2> /dev/null | fzf --reverse)"
+                printf "${cyan}No 'ppa-list' file found${normal}\n" 
+                reade -Q 'GREEN' -i 'y' -p 'Generate list of known ppas (faster then constantly pining launchpad.net)? [Y/n]: ' 'n' res
+                if test $res == 'y'; then
+                   list-ppa --file ~/.config/list-ppa 
+                else 
+                    ppa="$(list-ppa 2> /dev/null | fzf --reverse)"
+                fi
+                 
             fi 
             
             if ! test -z $ppa; then
                 check-ppa $ppa
- 
                 if [[ $(check-ppa $ppa) =~ 'OK' ]]; then
                     sudo add-apt-repository ppa:$ppa
                     sudo apt update         
                 else
                     return 2
                 fi
+            elif test -z $ppa && test -f ~/.config/list-ppa; then
+                printf "${cyan}No package selected. Maybe list is incomplete?${normal}\n" 
+                reade -Q 'GREEN' -i 'y' -p 'Regenerate list of known ppas? [Y/n]: ' 'n' res
+                if test $res == 'y'; then
+                   list-ppa --file ~/.config/list-ppa 
+                fi
             fi
             unset ppa
-        } 
+        }
      fi
 
      if type fzf &> /dev/null; then

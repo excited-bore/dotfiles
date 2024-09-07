@@ -755,6 +755,28 @@ unset tojump
 unset pre color othr prmpt 
 
 
+# Lazydocker
+pre='y'
+othr='n'
+color='GREEN'
+prmpt='[Y/n]: '
+if type lazydocker &> /dev/null; then
+    pre='n' 
+    othr='y'
+    color='YELLOW'
+    prmpt='[N/y]: '
+fi 
+reade -Q "$color" -i "$pre" -p "Install lazydocker? $prmpt" "$othr" git_ins
+if [ "y" == "$git_ins" ]; then
+    if ! test -f install_lazydocker.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_lazydocker.sh)" 
+    else
+        ./install_lazydocker.sh
+    fi
+fi
+unset pre color othr git_ins
+
+
 # Testdisk (File recovery tool)
 pre='y'
 othr='n'

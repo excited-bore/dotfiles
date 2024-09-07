@@ -84,6 +84,7 @@ if test $machine == 'Mac' && type brew &> /dev/null; then
                 fi
                 pipx install pynvim 
                 pipx install pylint
+                pipx install jedi
             fi
         fi
         if ! type npm &> /dev/null || ! npm list -g | grep neovim &> /dev/null; then
@@ -155,6 +156,7 @@ elif test $distro == "Arch" || test $distro == "Manjaro"; then
                 sudo pacman -S python-pynvim
                 pipx install pynvim 
                 pipx install pylint
+                pipx install jedi
             fi
         fi
         if ! type npm &> /dev/null || ! npm list -g | grep neovim &> /dev/null; then
@@ -362,6 +364,7 @@ elif [  $distro_base == "Debian" ];then
                 fi
                 pipx install pynvim
                 pipx install pylint
+                pipx install jedi
             fi
         fi
 
