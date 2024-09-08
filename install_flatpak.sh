@@ -97,7 +97,7 @@ if ! echo $(flatpak list --columns=name) | grep -q "Flatseal"; then
 fi
 unset fltseal
 
-localauth=$(test -d /etc/polkit-1/localauthority/50-local.d && ! test -f /etc/polkit-1/localauthority/50-local.d/90-nopasswd_global.pkla)=
+localauth=$(test -d /etc/polkit-1/localauthority/50-local.d && ! test -f /etc/polkit-1/localauthority/50-local.d/90-nopasswd_global.pkla)
 localauth_conf=$(test -d /etc/polkit-1/localauthority.conf.d/ && ! test -f /etc/polkit-1/localauthority.conf.d/90-nopasswd_global.conf)
 rules_d=$(test -d /etc/polkit-1/rules.d/ && ! test -f /etc/polkit-1/rules.d/90-nopasswd_global.rules)
 

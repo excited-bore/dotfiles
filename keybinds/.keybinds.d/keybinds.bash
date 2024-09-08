@@ -434,3 +434,11 @@ if type neofetch &> /dev/null || type fastfetch &> /dev/null || type screenfetch
     bind -m vi-insert      '"\e[18~": "\208\n"'
 fi
 
+# F8 - Lazydocker (Docker TUI)
+if type lazydocker &> /dev/null; then
+    
+    bind -x '"\209": stty sane && neofetch'#
+    bind -m emacs-standard '"\e[19~": "\209\n"'
+    bind -m vi-command     '"\e[19~": "\209\n"'
+    bind -m vi-insert      '"\e[19~": "\209\n"'
+fi
