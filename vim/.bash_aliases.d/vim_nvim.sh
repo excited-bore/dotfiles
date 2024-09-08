@@ -8,9 +8,19 @@ if type vim &> /dev/null || type nvim &> /dev/null; then
     alias vim="$VIM -u ~/.config/nvim/init.vim" 
     alias svim="sudo $VIM"
     alias vim-noconf="$VIM -Nu NONE"
-    alias vim-noconf="$VIM -Nu NONE"
+    alias vim-dir="$VIM ./"
     alias vim-checkhealth="$VIM +checkhealth"
     alias vim-diff="$VIM -d" 
+    if type fzf &> /dev/null; then 
+        function vim-fzf(){
+        query=''
+        if ! test -z $@; then
+            query="--query $@"
+        fi
+            "$VIM $(fzf --multi $query)"
+        }  
+        complete -F _files vim-fzf 
+    fi 
 fi
 
 if type nvim &> /dev/null; then

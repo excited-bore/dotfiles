@@ -8,6 +8,7 @@ if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
 else
     . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
 fi 
+
 if ! test -f checks/check_envvar.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)" 
 else

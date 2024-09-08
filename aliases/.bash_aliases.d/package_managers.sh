@@ -173,8 +173,13 @@ if type apt &> /dev/null; then
             if ! test -z $ppa; then
                 check-ppa $ppa
                 if [[ $(check-ppa $ppa) =~ 'OK' ]]; then
-                    sudo add-apt-repository ppa:$ppa
-                    sudo apt update         
+                    if [[ $(apt-list-ppa) =~ "$ppa" ]]; then 
+                        printf "${cyan}$ppa${normal} is already added to the repos list\n" 
+                        return 2 
+                    else     
+                        sudo add-apt-repository ppa:$ppa
+                        sudo apt update         
+                    fi 
                 else
                     return 2
                 fi

@@ -89,7 +89,7 @@ function update-system() {
             fi
         fi
         sudo "$pac" upgrade
-        if apt --dry-run autoremove | grep -Po '^Remv \K[^ ]+'; then
+        if apt --dry-run autoremove 2> /dev/null | grep -Po '^Remv \K[^ ]+'; then
             reade -Q 'GREEN' -i 'y' -p 'Autoremove unneccesary packages? [Y/n]: '  'n' remove
             if test $remove == 'y'; then
                 sudo "$pac" autoremove
@@ -168,16 +168,17 @@ function update-system() {
             unset pipx_up
 
             if type npm &> /dev/null; then
-                reade -Q "magenta" -i "y" -p "Update local npm packages? (Javascript) [Y/n]: " "n" npm_up
-                if [ "$npm_up" == "y" ]; then
-                    npm update
-                fi
-                unset npm_up
+                #reade -Q "magenta" -i "y" -p "Update local npm packages? (Javascript) [Y/n]: " "n" npm_up
+                #if [ "$npm_up" == "y" ]; then
+                #    npm update
+                #fi
+                #unset npm_up
 
                 reade -Q "magenta" -i "y" -p "Update ${red}${bold}global${normal}${magenta1} npm packages? (Javascript) [Y/n]: " "n" npm_up
                 if [ "$npm_up" == "y" ]; then
                     echo "This next $(tput setaf 1)sudo$(tput sgr0) will update using 'sudo npm -g update'";
                     sudo npm -g update
+                    sudo npm -g upgrade
                 fi
                 unset npm_up
                 

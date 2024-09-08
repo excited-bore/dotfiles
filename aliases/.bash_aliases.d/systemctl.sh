@@ -212,6 +212,10 @@ function service-user-create(){
     fi
 }
 
+#if test $XDG_SESSION_TYPE == 'x11'; then
+   alias restart-display="sudo systemctl restart display-manager"  
+#fi
+
 #function systemctl_create_multi_user_system_daemon(){
 #    read -p "Give up a '*.conf' name (script adds file extension .conf): " inpt;
 #    if [ -z "$inpt" ]; then

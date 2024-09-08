@@ -743,7 +743,7 @@ if type netstat &> /dev/null || type netstat-nat &> /dev/null; then
     prmpt='[N/y]: '
 fi 
 
-reade -Q "GREEN" -i "y" -p "Install netstat? (Also port scanning tool) [Y/n]: " "n" tojump
+reade -Q "$color" -i "$pre" -p "Install netstat? (Also port scanning tool) $prmpt" "$othr" tojump
 if [ "$tojump" == "y" ]; then
     if ! test -f install_netstat.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_netstat.sh)" 
