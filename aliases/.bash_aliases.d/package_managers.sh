@@ -157,13 +157,13 @@ if type apt &> /dev/null; then
                 pre="--query $@"
             fi
             
-            if test -f ~/.config/list-ppa; then 
-                ppa="$(cat ~/.config/list-ppa | fzf --reverse)"
+            if test -f ~/.config/ppas; then 
+                ppa="$(cat ~/.config/ppas | fzf --reverse)"
             else
                 printf "${cyan}No 'ppa-list' file found${normal}\n" 
                 reade -Q 'GREEN' -i 'y' -p 'Generate list of known ppas (faster then constantly pining launchpad.net)? [Y/n]: ' 'n' res
                 if test $res == 'y'; then
-                   list-ppa --file ~/.config/list-ppa 
+                   list-ppa --file ~/.config/ppas 
                 else 
                     ppa="$(list-ppa 2> /dev/null | fzf --reverse)"
                 fi
@@ -178,11 +178,11 @@ if type apt &> /dev/null; then
                 else
                     return 2
                 fi
-            elif test -z $ppa && test -f ~/.config/list-ppa; then
+            elif test -z $ppa && test -f ~/.config/ppas; then
                 printf "${cyan}No package selected. Maybe list is incomplete?${normal}\n" 
                 reade -Q 'GREEN' -i 'y' -p 'Regenerate list of known ppas? [Y/n]: ' 'n' res
                 if test $res == 'y'; then
-                   list-ppa --file ~/.config/list-ppa 
+                   list-ppa --file ~/.config/ppas 
                 fi
             fi
             unset ppa
