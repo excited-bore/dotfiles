@@ -11,6 +11,10 @@ if type kdocker &> /dev/null && type thunderbird &> /dev/null; then
     alias thunderbird="kdocker thunderbird"
 fi
 
+if type lowfi &> /dev/null; then
+    alias lowfi-play="lowfi play"
+fi
+
 if type exiftool &> /dev/null; then
     function exiftool-add-cron-wipe-all-metadata-rec-dir(){
         reade -Q 'GREEN' -i '0,5,10,15,25,30,35,40,45,5,55' -p 'Minutes? (0-59): ' '0 5 10 15 25 30 35 40 45 50 55' min
