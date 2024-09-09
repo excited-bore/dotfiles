@@ -1,3 +1,5 @@
+##### GPG ####
+
 if ! type reade &> /dev/null ; then
     source ~/.bash_aliases.d/00-rlwrap_scripts.sh
 fi
@@ -7,8 +9,15 @@ if test -z $GNUPGHOME; then
     GNUPGHOME=$HOME/.gnupg
 fi
 
+# Arch specific issue
+# https://forum.gnupg.org/t/problem-with-socket-connection-refused/4669/2
+if grep -q '^log-file socket://' $GNUPGHOME/gpg.conf; then
+    sed -i 's|^log-file socket://|#log-file socket://|g' $GNUPGHOME/gpg.conf
+fi
+
 #publickey_mails=$("$GPG" --list-keys 2>/dev/null | grep --color=never \< | cut -d'<' -f2- | cut -d'>' -f1)
 #privatekey_mails=$("$GPG" --list-secret-keys 2>/dev/null | grep --color=never \< | cut -d'<' -f2- | cut -d'>' -f1)
+alias gpg-refresh-keys='gpg --refresh-keys'
 alias gpg-list-publickey-mails="$GPG --list-keys | grep --color=never \< | cut -d'<' -f2- | cut -d'>' -f1"
 alias gpg-list-privatekey-mails="$GPG --list-secret-keys | grep --color=never \< | cut -d'<' -f2- | cut -d'>' -f1"
 alias gpg-list-known-keyservers="grep --color=never "^keyserver" $GNUPGHOME/gpg.conf | grep -v --color=never "keyserver-" | awk '{print $2}' | tr '\n' ' '"
