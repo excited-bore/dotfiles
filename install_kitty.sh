@@ -154,7 +154,7 @@ reade -Q "GREEN" -i "y" -p "Install kitty.conf and ssh.conf at ~/.config/kitty/ 
 
 if test $ktty_cnf == 'y'; then 
     sed -i 's|enabled_layouts .*|enabled_layouts \*|g' $dir/kitty.conf
-    sed -i 's|map kitty_mod+enter .*|map kitty_mod+enter new_window|g' $dir/kitty.conf 
+    sed -i 's|map kitty_mod+enter[^+].*|map kitty_mod+enter new_window|g' $dir/kitty.conf 
     sed -i 's|background_opacity [0-9]\.[0-9]|background_opacity 1.0|g' $dir/kitty.conf 
     printf "${green}Layouts in kitty that are presets that dictate position, size and placement of new windows - you can cycle through them with ctrl+shift+l${normal}\n" 
     reade -Q "GREEN" -i "y" -p "Configure kitty layout(s)? (and cycle order) [Y/n]: " "n" ktty_initial          
@@ -205,11 +205,18 @@ if test $ktty_cnf == 'y'; then
             if test $ktty_splt == 'splits'; then
                 enbld="$enbld splits" 
                 lays=$(echo "$lays" | sed "s/splits //g")  
-                reade -Q "GREEN" -i "y" -p "Set position new window [Y/n]: " "n" ktty_splt1         
+                reade -Q "GREEN" -i "y" -p "Set position new window? [Y/n]: " "n" ktty_splt1 
+
                 if test $ktty_splt1 == 'y' ; then
                     reade -Q "GREEN" -i "default" -p "Position new window: [Default/hsplit/vsplit/before/after]: " "hsplit vsplit before after" ktty_pos         
-                    sed -i "s|map kitty_mod+enter.*|map kitty_mod+enter launch --location=$ktty_pos|g" $dir/kitty.conf 
+                    sed -i "s|map kitty_mod+enter[^+].*|map kitty_mod+enter launch --location=$ktty_pos|g" $dir/kitty.conf 
                 fi
+                reade -Q "GREEN" -i "y" -p "Add shortcut for new window pos on ctrl+shift+alt+enter? [Y/n]: " "n" ktty_splt2         
+                if test $ktty_splt2 == 'y' ; then
+                    reade -Q "GREEN" -i "hsplit" -p "Position new window: [Hsplit/vsplit/before/after]: " "vsplit before after" ktty_pos         
+                    sed -i "s|map kitty_mod+alt+enter.*|map kitty_mod+alt+enter launch --location=$ktty_pos|g" $dir/kitty.conf 
+                fi
+                 
             elif test $ktty_splt == 'horizontal'; then
                 enbld="$enbld horizontal" 
                 lays=$(echo "$lays" | sed "s/horizontal //g")  
@@ -235,7 +242,14 @@ if test $ktty_cnf == 'y'; then
     if test $ktty_cwd == 'y'; then
         sed -i 's|map kitty_mod+enter launch|map kitty_mod+enter launch --cwd=current|g' $dir/kitty.conf 
     fi
-             
+    
+    reade -Q "GREEN" -i "y" -p "Set background opacity? (transparency) [Y/n]: " "n" ktty_trns
+    if test $ktty_trns == 'y'; then
+        reade -Q "GREEN" -i "1.0" -p "Opacity : " "0.9 0.8 0.7 0.6 0.5 .4 0.3 0.2 0.1" ktty_trns
+        sed -i "s|background_opacity [0-9]\.[0-9]|background_opacity $ktty_trns|g" $dir/kitty.conf 
+    fi
+     
+
     function kitty_conf(){
         mkdir -p ~/.config/kitty
         cp -bvf $dir/kitty.conf ~/.config/kitty/kitty.conf
@@ -247,7 +261,7 @@ if test $ktty_cnf == 'y'; then
             gio trash ~/.config/kitty/ssh.conf~
         fi 
     }
-    yes_edit_no kitty_conf "$dir/kitty.conf $dir/ssh.conf" "Install kitty.conf/ssh.conf at ~/ ?" "edit" "GREEN"
+    yes_edit_no kitty_conf "$dir/kitty.conf $dir/ssh.conf" "Install kitty.conf and ssh.conf at ~/.config/kitty ?" "edit" "GREEN"
 fi
 unset ktty_conf
 
