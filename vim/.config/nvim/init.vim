@@ -278,15 +278,13 @@ endif
 
 " Autocomplete engine (Conquer of completions)
 " https://github.com/neoclide/coc.nvim/wiki/Using-coc-extensions#implemented-coc-extensions
-"Plugin 'neoclide/coc.nvim', {'branch': 'release'}
-" let g:airline#extensions#coc#show_coc_status = 1
 
-" Normal file operations
-Plugin 'tpope/vim-eunuch'
 
-" Vim-lsp
+" Autocompletion 
 if !has('nvim')
     Plugin 'prabirshrestha/vim-lsp'
+    Plugin 'neoclide/coc.nvim', {'branch': 'release'}
+    let g:airline#extensions#coc#show_coc_status = 1
 else
     Plugin 'neovim/nvim-lspconfig'
     Plugin 'hrsh7th/cmp-nvim-lsp'
@@ -308,11 +306,13 @@ endif
 
 " Lua function as nvim functions
 if has('nvim')
-    Plugin 'nvim-lua/plenary.nvim'
-
     " Telescope
+    Plugin 'nvim-lua/plenary.nvim'
     Plugin 'nvim-telescope/telescope.nvim', { 'tag': '0.1.8' }
 endif
+
+" Normal file operations
+Plugin 'tpope/vim-eunuch'
 
 " Copilot
 "Plugin 'github/copilot.vim'
@@ -439,10 +439,8 @@ else
 endif
 
 
+
 " Post plugin load
-if exists(':CmpStatus')
-    "nnoremap <c-tab> i<tab><esc>
-endif
 
 if exists(':CocInfo')
     " https://github.com/neoclide/coc.nvim 
@@ -703,7 +701,7 @@ if exists(':FzfPreview')
     vnoremap <S-F7> :FzfPreviewGitFiles<CR>gv 
 
     "List buffers
-    nnoremap <silent><C-S-Space> :<C-u>FzfPreviewAllBuffers<CR> 
+    nnoremap <silent><C-S-Space> :<C-u>FzfPrevieimport_moduleBuffers<CR> 
     inoremap <silent><C-S-Space> <C-\><C-o><C-u>FzfPreviewAllBuffers<CR>
     vnoremap <silent><C-S-Space> <esc>:<C-u>FzfPreviewAllBuffers<CR>gv
 
@@ -840,9 +838,9 @@ inoremap <silent><C-Tab> <C-\><C-o>:bnext<cr>
 vnoremap <silent><C-Tab> <esc>:bnext<cr>
 
 " Open previous buffer
-nnoremap <silent><C-S-Tab> :bprevious<cr>
-inoremap <silent><C-S-Tab> <C-\><C-o>:bprevious<cr>
-vnoremap <silent><C-S-Tab> <esc>:bprevious<cr>
+nnoremap <silent><C-S-Tab> :bprev<cr>
+inoremap <silent><C-S-Tab> <C-\><C-o>:bprev<cr>
+vnoremap <silent><C-S-Tab> <esc>:bprev<cr>
 
 " Open Horizontal buffer
 nnoremap <silent><C-w>h :split<cr>
@@ -939,7 +937,7 @@ vnoremap <C-z> u
 " Ctrl - E is -> Set to edit file in buffer  
 nnoremap <C-e> :e 
 inoremap <C-e> <C-\><C-o>:e 
-vnoremap <C-e> :e 
+vnoremap <C-e> y:e<C-r>"
 
 " t => : (open cmdline)
 nnoremap t :
@@ -1269,6 +1267,10 @@ inoremap <expr> <C-d>   (col(".") ==? 1 ? '<C-\><C-o>daw' : '<C-\><C-o>diw')
 vnoremap <C-c> <Plug>OSCYankVisual
 vnoremap <silent> <C-v> "+Pl
 vnoremap <C-d>  d 
+
+vnoremap w iW
+vnoremap W aW
+
 
 cnoremap <C-c> <C-f>
 cnoremap <C-v> <C-r><C-o>"
