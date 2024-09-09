@@ -68,11 +68,11 @@ paths=$(gem environment | awk '/- GEM PATH/{flag=1;next}/- GEM CONFIGURATION/{fl
 if grep -q "GEM" $ENVVAR; then
     sed -i "s|.export GEM_HOME=.*|export GEM_HOME=$HOME/.gem/ruby/$rver|g" $ENVVAR
     sed -i "s|.export GEM_PATH=.*|export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin|g" $ENVVAR
-    sed -i 's|.export PATH=$PATH:$GEM_PATH.*|export PATH=$PATH:$GEM_PATH:$GEM_HOME|g' $ENVVAR
+    sed -i 's|.export PATH=$PATH:$GEM_PATH.*|export PATH=$PATH:$GEM_PATH:$GEM_HOME/bin|g' $ENVVAR
 else
     printf "export GEM_HOME=$HOME/.gem/ruby/$rver\n" >> $ENVVAR
     printf "export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin\n" >> $ENVVAR
-    printf "export PATH=\$PATH:\$GEM_PATH:\$GEM_HOME\n" >> $ENVVAR
+    printf "export PATH=\$PATH:\$GEM_PATH:\$GEM_HOME/bin\n" >> $ENVVAR
 fi
 
 source $ENVVAR

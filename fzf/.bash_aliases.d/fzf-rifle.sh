@@ -95,8 +95,6 @@ fzf_rifle(){
                 fi
             else
                 opts=$(rifle -l "$fle")
-                echo $fle 
-                echo "$opts" 
                 result="$(printf "Put item in prompt\n$opts" | fzf --height 50% --reverse)";
                 if test "$result" == 'Put item in prompt'; then
                     print-path-to-prompt "$fle" 
@@ -114,7 +112,7 @@ fzf_rifle(){
             elif test "$result" == 'Put items in prompt (words)'; then 
                 print-path-to-prompt "$fle" 
             else
-                rifle -p "${result::1}" "$fle";
+                rifle -p ${result::1} $fle;
             fi
             return 0;
         fi    

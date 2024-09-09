@@ -341,6 +341,7 @@ alias line2word="tr '\n' ' '"
 alias tab2space="tr -s ' '"
 alias only1space="tr -s ' '"
 alias upper2lower="tr '[:upper:]' '[:lower:]'"
+alias upper1stletter="\${var^}"
 alias lower2upper="tr '[:lower:]' '[:upper:]'"
 
 alias remove-empty-lines="sed '/^[[:space:]]*$/d'"
@@ -648,6 +649,8 @@ function file-put-quotations-around(){
 }
 
 complete -F _files file_put_quotations_around
+
+alias shutdown-now='shutdown now'
 
 function iommu-groups(){
     shopt -s nullglob

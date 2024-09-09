@@ -59,7 +59,7 @@ if ! test -d kitty/.config/kitty; then
     curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/download_git_directory.sh | tee "$tmpfile" &> /dev/null
     chmod u+x "$tmpfile"
     eval $tmpfile https://github.com/excited-bore/dotfiles/tree/main/kitty/.config/kitty $tmpdir
-    wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/kitty/.bash_aliases.d/kitty.sh -P $tmpdir
+    wget -P $tmpdir https://raw.githubusercontent.com/excited-bore/dotfiles/main/kitty/.bash_aliases.d/kitty.sh 
     dir=$tmpdir/kitty/.config/kitty
     file=$tmpdir/kitty.sh
 else
@@ -67,19 +67,189 @@ else
     file=kitty/.bash_aliases.d/kitty.sh
 fi
 
-reade -Q "GREEN" -i "y" -p "Install kitty conf? (at ~/.config/kitty/kitty.conf\|ssh.conf) [Y/n]: " "n" kittn
-if [ "y" == "$kittn" ]; then
-    mkdir -p ~/.config/kitty
-    cp -bvf $dir/kitty.conf ~/.config/kitty/kitty.conf
-    if [ -f ~/.config/kitty/kitty.conf~ ]; then
-        gio trash $dir/kitty.conf~
+splits_lay="\t  ${bold}Splits${normal}
+(Customizable preset that extends keybindings related to launching windows)
+┌──────────────┬───────────────┐
+│              │               │
+│              │               │
+│              │               │
+│              ├───────┬───────┤
+│              │       │       │
+│              │       │       │
+│              │       │       │
+│              ├───────┴───────┤
+│              │               │
+│              │               │
+│              │               │
+└──────────────┴───────────────┘\n" 
+hor_lay="\t  ${bold}Horizontal${normal}
+┌─────────┬──────────┬─────────┐
+│         │          │         │
+│         │          │         │
+│         │          │         │
+│         │          │         │
+│         │          │         │
+│         │          │         │
+│         │          │         │
+│         │          │         │
+│         │          │         │
+└─────────┴──────────┴─────────┘\n"
+ver_lay="\t  ${bold}Vertical${normal}
+┌──────────────────────────────┐
+│                              │
+│                              │
+│                              │
+├──────────────────────────────┤
+│                              │
+│                              │
+│                              │
+├──────────────────────────────┤
+│                              │
+│                              │
+│                              │
+└──────────────────────────────┘\n"
+tall_lay="\t  ${bold}Tall${normal}
+┌──────────────┬───────────────┐
+│              │               │
+│              │               │
+│              │               │
+│              ├───────────────┤
+│              │               │
+│              │               │
+│              │               │
+│              ├───────────────┤
+│              │               │
+│              │               │
+│              │               │
+└──────────────┴───────────────┘\n"
+fat_lay="\t  ${bold}Fat${normal}
+┌──────────────────────────────┐
+│                              │
+│                              │
+│                              │
+│                              │
+├─────────┬──────────┬─────────┤
+│         │          │         │
+│         │          │         │
+│         │          │         │
+│         │          │         │
+│         │          │         │
+└─────────┴──────────┴─────────┘\n" 
+grid_lay="\t  ${bold}Grid${normal}
+┌─────────┬──────────┬─────────┐
+│         │          │         │
+│         │          │         │
+│         │          │         │
+│         │          │         │
+├─────────┼──────────┼─────────┤
+│         │          │         │
+│         │          │         │
+│         │          │         │
+│         │          │         │
+└─────────┴──────────┴─────────┘\n"
+
+lays="splits horizontal vertical tall fat grid"
+
+reade -Q "GREEN" -i "y" -p "Install kitty.conf and ssh.conf at ~/.config/kitty/ (kitty config)? [Y/n]: " "n" ktty_cnf          
+
+if test $ktty_cnf == 'y'; then 
+    sed -i 's|enabled_layouts .*|enabled_layouts \*|g' $dir/kitty.conf
+    sed -i 's|map kitty_mod+enter .*|map kitty_mod+enter new_window|g' $dir/kitty.conf 
+    sed -i 's|background_opacity [0-9]\.[0-9]|background_opacity 1.0|g' $dir/kitty.conf 
+    printf "${green}Layouts in kitty that are presets that dictate position, size and placement of new windows - you can cycle through them with ctrl+shift+l${normal}\n" 
+    reade -Q "GREEN" -i "y" -p "Configure kitty layout(s)? (and cycle order) [Y/n]: " "n" ktty_initial          
+    if test $ktty_initial == 'y'; then
+        j=0 
+        enbld='' 
+        for i in ${lays[@]}; do 
+            j=$(($j+1)) 
+            layouts=""
+            if [[ $lays =~ 'split' ]]; then
+                layouts="$splits_lay"
+            fi
+            if [[ $lays =~ 'horizontal' ]]; then
+                layouts="$layouts $hor_lay"
+            fi
+            if [[ $lays =~ 'vertical' ]]; then
+                layouts="$layouts $ver_lay"
+            fi
+            if [[ $lays =~ 'tall' ]]; then
+                layouts="$layouts $tall_lay"
+            fi
+            if [[ $lays =~ 'fat' ]]; then
+                layouts="$layouts $fat_lay"
+            fi
+            if [[ $lays =~ 'grid' ]]; then
+                layouts="$layouts $grid_lay"
+            fi
+             
+            printf "Layouts: \n"
+            for lay in "${layouts[@]}"; do
+                printf "$lay"; 
+            done 
+
+            prompt='Initial layout in list? '
+            if test $j == 2; then
+                prompt='2nd layout in list? '
+            elif [[ $j > 2 ]]; then
+                prompt="$j-th layout in list? "
+            fi
+             
+            printf "$lays\n" 
+            frst="$(echo "$lays" | awk '{print $1}')"  
+            layouts1=$(echo "$lays" | sed "s/\<"$frst"\> //g")  
+            layout_p=$(echo "$lays" | tr ' ' '/') 
+            layout_p="${layout_p^}" 
+
+            reade -Q "GREEN" -i "$frst" -p "$prompt? [$layout_p]: " "$layouts1" ktty_splt         
+            if test $ktty_splt == 'splits'; then
+                enbld="$enbld splits" 
+                lays=$(echo "$lays" | sed "s/splits //g")  
+                reade -Q "GREEN" -i "y" -p "Set position new window [Y/n]: " "n" ktty_splt1         
+                if test $ktty_splt1 == 'y' ; then
+                    reade -Q "GREEN" -i "default" -p "Position new window: [Default/hsplit/vsplit/before/after]: " "hsplit vsplit before after" ktty_pos         
+                    sed -i "s|map kitty_mod+enter.*|map kitty_mod+enter launch --location=$ktty_pos|g" $dir/kitty.conf 
+                fi
+            elif test $ktty_splt == 'horizontal'; then
+                enbld="$enbld horizontal" 
+                lays=$(echo "$lays" | sed "s/horizontal //g")  
+            elif test $ktty_splt == 'vertical'; then
+                enbld="$enbld vertical" 
+                lays=$(echo "$lays" | sed "s/vertical //g")  
+            elif test $ktty_splt == 'fat'; then
+                enbld="$enbld fat" 
+                lays=$(echo "$lays" | sed "s/fat //g")  
+            elif test $ktty_splt == 'tall'; then
+                enbld="$enbld tall" 
+                lays=$(echo "$lays" | sed "s/tall //g")  
+            elif test $ktty_splt == 'grid'; then
+                enbld="$enbld grid" 
+                lays=$(echo "$lays" | sed "s/grid //g")  
+            fi
+        done 
+        enbld=$(echo $enbld | tr ' ' ',') 
+        sed -i "s|enabled_layouts.*|enabled_layouts $enbld|g" $dir/kitty.conf         
     fi
-    cp -vf $dir/ssh.conf $dir/ssh.conf
-    if [ -f ~/.config/kitty/ssh.conf~ ]; then
-        gio trash ~/.config/kitty/ssh.conf~
+
+    reade -Q "GREEN" -i "y" -p "When opening a new window/pane inside kitty, keep the current directory (instead of $HOME)? [Y/n]: " "n" ktty_cwd          
+    if test $ktty_cwd == 'y'; then
+        sed -i 's|map kitty_mod+enter launch|map kitty_mod+enter launch --cwd=current|g' $dir/kitty.conf 
     fi
+             
+    function kitty_conf(){
+        mkdir -p ~/.config/kitty
+        cp -bvf $dir/kitty.conf ~/.config/kitty/kitty.conf
+        cp -vbf $dir/ssh.conf ~/.config/kitty/ssh.conf
+        if type gio &> /dev/null && [ -f ~/.config/kitty/kitty.conf~ ]; then
+            gio trash ~/.config/kitty/kitty.conf~
+        fi
+        if type gio &> /dev/null && [ -f ~/.config/kitty/ssh.conf~ ]; then
+            gio trash ~/.config/kitty/ssh.conf~
+        fi 
+    }
+    yes_edit_no kitty_conf "$dir/kitty.conf $dir/ssh.conf" "Install kitty.conf/ssh.conf at ~/ ?" "edit" "GREEN"
 fi
-unset kittn
+unset ktty_conf
 
 reade -Q "GREEN" -i "y" -p "Install kitty aliases? (at ~/.bash_aliases.d/kitty.sh) [Y/n]: " "n" kittn
 if [ "y" == "$kittn" ]; then
@@ -89,7 +259,7 @@ if [ "y" == "$kittn" ]; then
         ./checks/check_aliases_dir.sh
     fi
     cp -bvf $file ~/.bash_aliases.d/kitty.sh
-    if [ -f ~/.bash_aliases.d/kitty.sh~ ]; then
+    if type gio &> /dev/null && [ -f ~/.bash_aliases.d/kitty.sh~ ]; then
         gio trash ~/.bash_aliases.d/kitty.sh~
     fi 
 fi
