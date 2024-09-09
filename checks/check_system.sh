@@ -41,7 +41,7 @@ if test $machine == 'Windows'; then
        if test $wngt == 'y'; then
         tmpd=$(mktemp -d)
         wget -P $tmpd https://raw.githubusercontent.com/asheroto/winget-install/master/winget-install.ps1  
-        sudo $tmpd/winget-install.ps1
+        sudo pwsh $tmpd/winget-install.ps1
        else
             printf "${RED}Can't install scripts without winget${normal}\n" 
             #exit 1 
