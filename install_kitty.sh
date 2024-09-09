@@ -245,10 +245,14 @@ if test $ktty_cnf == 'y'; then
     
     reade -Q "GREEN" -i "y" -p "Set background opacity? (transparency) [Y/n]: " "n" ktty_trns
     if test $ktty_trns == 'y'; then
-        reade -Q "GREEN" -i "1.0" -p "Opacity : " "0.9 0.8 0.7 0.6 0.5 .4 0.3 0.2 0.1" ktty_trns
-        sed -i "s|background_opacity [0-9]\.[0-9]|background_opacity $ktty_trns|g" $dir/kitty.conf 
+        reade -Q "GREEN" -i "1.0" -p "Opacity : " "0.9 0.8 0.7 0.6 0.5 .4 0.3 0.2 0.1" ktty_trns1
+        sed -i "s|background_opacity [0-9]\.[0-9]|background_opacity $ktty_trns1|g" $dir/kitty.conf 
     fi
-     
+    printf "${cyan}kitty.conf:${normal} \n" 
+    grep --color=always -n 'enabled_layouts' $dir/kitty.conf
+    test $ktty_splt1 == 'y' && grep --color=always -n 'map kitty_mod+enter ' $dir/kitty.conf
+    test $ktty_splt2 == 'y' && grep --color=always -n 'map kitty_mod+alt+enter' $dir/kitty.conf
+    test $ktty_trns == 'y' && grep --color=always -n '^ background_opacity' $dir/kitty.conf
 
     function kitty_conf(){
         mkdir -p ~/.config/kitty

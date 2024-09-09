@@ -278,15 +278,13 @@ endif
 
 " Autocomplete engine (Conquer of completions)
 " https://github.com/neoclide/coc.nvim/wiki/Using-coc-extensions#implemented-coc-extensions
-Plugin 'neoclide/coc.nvim', {'branch': 'release'}
-let g:airline#extensions#coc#show_coc_status = 1
 
-" Normal file operations
-Plugin 'tpope/vim-eunuch'
 
-" Vim-lsp
+" Autocompletion 
 if !has('nvim')
     Plugin 'prabirshrestha/vim-lsp'
+    Plugin 'neoclide/coc.nvim', {'branch': 'release'}
+    let g:airline#extensions#coc#show_coc_status = 1
 else
     Plugin 'neovim/nvim-lspconfig'
     Plugin 'hrsh7th/cmp-nvim-lsp'
@@ -308,8 +306,13 @@ endif
 
 " Lua function as nvim functions
 if has('nvim')
+    " Telescope
     Plugin 'nvim-lua/plenary.nvim'
+    Plugin 'nvim-telescope/telescope.nvim', { 'tag': '0.1.8' }
 endif
+
+" Normal file operations
+Plugin 'tpope/vim-eunuch'
 
 " Copilot
 "Plugin 'github/copilot.vim'
@@ -398,6 +401,7 @@ Plugin 'preservim/nerdcommenter'
 " Gutentags - Automatic Ctags
 Plugin 'ludovicchabant/vim-gutentags'
 
+
 " Minimap to keep track of where in file
 "Plugin 'wfxr/minimap.vim'
 "let g:minimap_width = 10
@@ -435,7 +439,9 @@ else
 endif
 
 
+
 " Post plugin load
+
 if exists(':CocInfo')
     " https://github.com/neoclide/coc.nvim 
     " coc-lsp settings 
@@ -675,13 +681,14 @@ if exists(':MinimapToggle')
     vnoremap <silent><M-m> <esc>:MinimapToggle<CR>:MinimapUpdateHighlight<cr>
 endif
 
-if exists(':FzfPreview')
+if exists(':Telescope')
+    " Telescope F4
+    nnoremap <F4>   :Telescope<CR>
+    inoremap <F4>   <Esc>:Telescope<CR>a
+    vnoremap <F4>   :Telescope<CR>gv
+endif
 
-    " Git status F4
-    nnoremap <F4>   :FzfPreviewChanges<CR>
-    inoremap <F4>   <Esc>:FzfPreviewChanges<CR>a
-    vnoremap <F4>   :FzfPreviewChanges<CR>gv
-     
+if exists(':FzfPreview')
 
     " Checkout Files in current dir F7
     nnoremap <F7> :FzfPreviewDirectoryFiles<CR>
@@ -694,7 +701,7 @@ if exists(':FzfPreview')
     vnoremap <S-F7> :FzfPreviewGitFiles<CR>gv 
 
     "List buffers
-    nnoremap <silent><C-S-Space> :<C-u>FzfPreviewAllBuffers<CR> 
+    nnoremap <silent><C-S-Space> :<C-u>FzfPrevieimport_moduleBuffers<CR> 
     inoremap <silent><C-S-Space> <C-\><C-o><C-u>FzfPreviewAllBuffers<CR>
     vnoremap <silent><C-S-Space> <esc>:<C-u>FzfPreviewAllBuffers<CR>gv
 
@@ -826,14 +833,14 @@ vnoremap <F6> :e $MYVIMRC<CR>gv
 " Buffers
 
 " Open next buffer
-nnoremap <silent><C-A-Right> :bnext<cr>
-inoremap <silent><C-A-Right> <C-\><C-o>:bnext<cr>
-vnoremap <silent><C-A-Right> <esc>:bnext<cr>
+nnoremap <silent><C-Tab> :bnext<cr>
+inoremap <silent><C-Tab> <C-\><C-o>:bnext<cr>
+vnoremap <silent><C-Tab> <esc>:bnext<cr>
 
 " Open previous buffer
-nnoremap <silent><C-A-Left> :bprevious<cr>
-inoremap <silent><C-A-Left> <C-\><C-o>:bprevious<cr>
-vnoremap <silent><C-A-Left> <esc>:bprevious<cr>
+nnoremap <silent><C-S-Tab> :bprev<cr>
+inoremap <silent><C-S-Tab> <C-\><C-o>:bprev<cr>
+vnoremap <silent><C-S-Tab> <esc>:bprev<cr>
 
 " Open Horizontal buffer
 nnoremap <silent><C-w>h :split<cr>
@@ -930,7 +937,7 @@ vnoremap <C-z> u
 " Ctrl - E is -> Set to edit file in buffer  
 nnoremap <C-e> :e 
 inoremap <C-e> <C-\><C-o>:e 
-vnoremap <C-e> :e 
+vnoremap <C-e> y:e<C-r>"
 
 " t => : (open cmdline)
 nnoremap t :
@@ -1260,6 +1267,10 @@ inoremap <expr> <C-d>   (col(".") ==? 1 ? '<C-\><C-o>daw' : '<C-\><C-o>diw')
 vnoremap <C-c> <Plug>OSCYankVisual
 vnoremap <silent> <C-v> "+Pl
 vnoremap <C-d>  d 
+
+vnoremap w iW
+vnoremap W aW
+
 
 cnoremap <C-c> <C-f>
 cnoremap <C-v> <C-r><C-o>"
