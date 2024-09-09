@@ -278,8 +278,8 @@ endif
 
 " Autocomplete engine (Conquer of completions)
 " https://github.com/neoclide/coc.nvim/wiki/Using-coc-extensions#implemented-coc-extensions
-Plugin 'neoclide/coc.nvim', {'branch': 'release'}
-let g:airline#extensions#coc#show_coc_status = 1
+"Plugin 'neoclide/coc.nvim', {'branch': 'release'}
+" let g:airline#extensions#coc#show_coc_status = 1
 
 " Normal file operations
 Plugin 'tpope/vim-eunuch'
@@ -309,6 +309,9 @@ endif
 " Lua function as nvim functions
 if has('nvim')
     Plugin 'nvim-lua/plenary.nvim'
+
+    " Telescope
+    Plugin 'nvim-telescope/telescope.nvim', { 'tag': '0.1.8' }
 endif
 
 " Copilot
@@ -398,6 +401,7 @@ Plugin 'preservim/nerdcommenter'
 " Gutentags - Automatic Ctags
 Plugin 'ludovicchabant/vim-gutentags'
 
+
 " Minimap to keep track of where in file
 "Plugin 'wfxr/minimap.vim'
 "let g:minimap_width = 10
@@ -436,6 +440,10 @@ endif
 
 
 " Post plugin load
+if exists(':CmpStatus')
+    "nnoremap <c-tab> i<tab><esc>
+endif
+
 if exists(':CocInfo')
     " https://github.com/neoclide/coc.nvim 
     " coc-lsp settings 
@@ -675,13 +683,14 @@ if exists(':MinimapToggle')
     vnoremap <silent><M-m> <esc>:MinimapToggle<CR>:MinimapUpdateHighlight<cr>
 endif
 
-if exists(':FzfPreview')
+if exists(':Telescope')
+    " Telescope F4
+    nnoremap <F4>   :Telescope<CR>
+    inoremap <F4>   <Esc>:Telescope<CR>a
+    vnoremap <F4>   :Telescope<CR>gv
+endif
 
-    " Git status F4
-    nnoremap <F4>   :FzfPreviewChanges<CR>
-    inoremap <F4>   <Esc>:FzfPreviewChanges<CR>a
-    vnoremap <F4>   :FzfPreviewChanges<CR>gv
-     
+if exists(':FzfPreview')
 
     " Checkout Files in current dir F7
     nnoremap <F7> :FzfPreviewDirectoryFiles<CR>
@@ -826,14 +835,14 @@ vnoremap <F6> :e $MYVIMRC<CR>gv
 " Buffers
 
 " Open next buffer
-nnoremap <silent><C-A-Right> :bnext<cr>
-inoremap <silent><C-A-Right> <C-\><C-o>:bnext<cr>
-vnoremap <silent><C-A-Right> <esc>:bnext<cr>
+nnoremap <silent><C-Tab> :bnext<cr>
+inoremap <silent><C-Tab> <C-\><C-o>:bnext<cr>
+vnoremap <silent><C-Tab> <esc>:bnext<cr>
 
 " Open previous buffer
-nnoremap <silent><C-A-Left> :bprevious<cr>
-inoremap <silent><C-A-Left> <C-\><C-o>:bprevious<cr>
-vnoremap <silent><C-A-Left> <esc>:bprevious<cr>
+nnoremap <silent><C-S-Tab> :bprevious<cr>
+inoremap <silent><C-S-Tab> <C-\><C-o>:bprevious<cr>
+vnoremap <silent><C-S-Tab> <esc>:bprevious<cr>
 
 " Open Horizontal buffer
 nnoremap <silent><C-w>h :split<cr>
