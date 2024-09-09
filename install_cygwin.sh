@@ -33,7 +33,7 @@ if test $machine == 'Windows'; then
     if ! type winget &> /dev/null; then
         tmpd=$(mktemp -d)
         wget -P $tmpd https://raw.githubusercontent.com/asheroto/winget-install/master/winget-install.ps1  
-        sudo $tmpd/winget-install.ps1
+        sudo pwsh $tmpd/winget-install.ps1
     fi
     if ! test $win_bash_shell == 'Cygwin' && ! test -d /c/cygwin$ARCH_WIN; then
         winget install Cygwin.Cygwin

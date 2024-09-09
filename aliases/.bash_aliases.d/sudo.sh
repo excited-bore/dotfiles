@@ -9,6 +9,7 @@ fi
 #Set $EDITOR to change what editor is being used
 
 # Preserve environment, for running stuff like custom pagers (moar) really necessary
+alias sudo-reset-cooldown="faillock --user $USER --reset"
 alias sudo-keep-env="sudo -E"
 alias sudo-shell="sudo -i"
 alias sudo-edit-sudoers="sudo visudo"

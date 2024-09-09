@@ -8,7 +8,6 @@
 " Set 'nocompatible' to ward off unexpected things that your distro might
 " have made, as well as sanely reset options when re-sourcing .vimrc
 
-
 "If you set scrollof to a very large value (999) the cursor line will always be at the middle
 " set scrolloff=999
 
@@ -420,6 +419,7 @@ let g:gruvbox_italic=1
 
 " Nice and cool status bar thingy
 Plugin 'vim-airline/vim-airline'
+Plugin 'vim-airline/vim-airline-themes'
 let g:airline#extensions#tabline#enabled = 1
 let g:airline_exclude_filetypes = ['nerdtree']
 
