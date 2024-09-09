@@ -24,6 +24,8 @@ fi
 
 pthdos2unix=""
 if test $machine == 'Windows'; then 
+    alias wget='wget.exe' 
+    alias curl='curl.exe' 
    # https://stackoverflow.com/questions/13701218/windows-path-to-posix-path-conversion-in-bash 
    pthdos2unix="| sed 's/\\\/\\//g' | sed 's/://' | sed 's/^/\\//g'"
    wmic=$(wmic os get OSArchitecture | awk 'NR>1 {print}')
@@ -37,7 +39,9 @@ if test $machine == 'Windows'; then
        printf "${RED}Winget (official window package manager) not installed - can't run scripts without install programs through it${normal}\n" 
        reade -Q 'GREEN' -i 'y' -p "(Attempt to) Install winget? ${CYAN}(Windows 10 - version 1809 required at mimimum for winget)${GREEN} [Y/n]: " 'n' wngt
        if test $wngt == 'y'; then
-            pwsh ../install_winget.ps1
+        tmpd=$(mktemp -d)
+        wget -P $tmpd https://raw.githubusercontent.com/asheroto/winget-install/master/winget-install.ps1  
+        sudo $tmpd/winget-install.ps1
        else
             printf "${RED}Can't install scripts without winget${normal}\n" 
             #exit 1 

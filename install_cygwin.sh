@@ -2,7 +2,6 @@ if ! test -f checks/check_system.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
 else
     . ./checks/check_system.sh
-
 fi
 
 if ! test -f checks/check_envvar.sh.sh; then
@@ -17,7 +16,10 @@ else
     . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
 fi
 
+
 if test $machine == 'Windows'; then
+    alias wget='wget.exe' 
+    alias curl='curl.exe' 
     if test $win_bash_shell == 'Cygwin'; then
         cyg_bashr=~/.bashrc 
         cyg_home=~/ 
@@ -29,7 +31,9 @@ if test $machine == 'Windows'; then
     
     # Install Cygwin
     if ! type winget &> /dev/null; then
-        pwsh install_winget.ps1 
+        tmpd=$(mktemp -d)
+        wget -P $tmpd https://raw.githubusercontent.com/asheroto/winget-install/master/winget-install.ps1  
+        sudo $tmpd/winget-install.ps1
     fi
     if ! test $win_bash_shell == 'Cygwin' && ! test -d /c/cygwin$ARCH_WIN; then
         winget install Cygwin.Cygwin
