@@ -561,7 +561,7 @@ yes_edit_no instvim "$dir/init.vim $dir/init.lua.vim $dir/plug_lazy_adapter.vim"
 
 unset dir tmpdir tmpfile
 
-nvim +CocUpdate
+#nvim +CocUpdate
 nvim +checkhealth
 echo "Install Completion language plugins with ':CocInstall coc-..' / Update with :CocUpdate"
 echo "Check installed nvim plugins with 'Lazy' / Check installed vim plugins with 'PlugInstalled' (only work on nvim and vim respectively)"
