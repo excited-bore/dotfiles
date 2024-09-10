@@ -133,7 +133,7 @@ if test $distro_base == 'Debian'; then
     
     if type add-apt-repository &> /dev/null; then
         if ! type list-ppa &> /dev/null; then
-            printf "${CYAN}list-ppa${normal} is not installed (python cmd tool for listing ppas from 'launchpad.net')\n"
+            printf "${CYAN}list-ppa${normal} is not installed (python cmd tool for listing ppas from 'launchpad.net'\n"
             reade -Q 'GREEN' -i 'y' -p "Install list-ppa? [Y/n]: " 'n' ppa_ins
             if test $ppa_ins == 'y'; then
                 if ! type pipx &> /dev/null; then
@@ -144,6 +144,10 @@ if test $distro_base == 'Debian'; then
                     fi  
                 fi
                 pipx install list-ppa
+                reade -Q 'GREEN' -i 'y' -p "Run list-ppa (generates file containing ppas in ~/.config/ppas)? [Y/n]: " 'n' ppa_ins
+                if test $ppa_ins == 'y'; then
+                    list-ppa --file ~/.config/ppas
+                fi 
             fi
             unset ppa_ins 
         fi
