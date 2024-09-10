@@ -144,7 +144,7 @@ if test $distro_base == 'Debian'; then
                     fi  
                 fi
                 pipx install list-ppa
-                reade -Q 'GREEN' -i 'y' -p "Run list-ppa (generates file containing ppas in ~/.config/ppas)? [Y/n]: " 'n' ppa_ins
+                reade -Q 'GREEN' -i 'y' -p "Run list-ppa (generates file containin ppas that have a release file for your version in ~/.config/ppas - !! Can take a while - can be rerun)? [Y/n]: " 'n' ppa_ins
                 if test $ppa_ins == 'y'; then
                     list-ppa --file ~/.config/ppas
                 fi 
