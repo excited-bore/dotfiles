@@ -195,7 +195,6 @@ if test $ktty_cnf == 'y'; then
                 prompt="$j-th layout in list? "
             fi
              
-            printf "$lays\n" 
             frst="$(echo "$lays" | awk '{print $1}')"  
             layouts1=$(echo "$lays" | sed "s/\<"$frst"\> //g")  
             layout_p=$(echo "$lays" | tr ' ' '/') 

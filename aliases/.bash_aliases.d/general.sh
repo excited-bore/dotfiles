@@ -210,7 +210,7 @@ function cp-trash(){
     fi
 }
 
-##alias cp="cp-trash -rv"
+alias cp="cp-trash -rv"
 
 # mv (recursively native) verbose and only ask for interaction when overwriting newer files
 
@@ -273,7 +273,7 @@ function mv-trash(){
 } 
 
 
-##alias mv="mv-trash -v"
+alias mv="mv-trash -v"
 
 
 # rm recursively and verbose
