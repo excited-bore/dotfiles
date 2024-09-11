@@ -49,7 +49,7 @@ if ! type pipx &> /dev/null; then
             if [[ $(pipx --version) < 1.6.0 ]]; then 
                 pipx install pipx
                 pipx upgrade pipx
-                sudo apt uninstall pipx 
+                sudo apt remove pipx 
                 source ~/.bashrc 
             fi 
         fi
@@ -57,9 +57,9 @@ if ! type pipx &> /dev/null; then
         if ! test $machine == 'Windows'; then 
             reade -Q "GREEN" -i "y" -p "Set to install packages globally (including for root)? [Y/n]: " "n" insppxgl
             if test $insppxgl == "y"; then 
-                if [[ $(whereis pipx) =~ $HOME/.local/bin ]]; then
-                    sudo env PATH=$PATH:$HOME/.local/bin pipx ensurepath --global
-                fi
+                #if [[ $(whereis pipx) =~ $HOME/.local/bin ]]; then
+                #    sudo env PATH=$PATH:$HOME/.local/bin pipx ensurepath --global
+                #fi
                 sudo pipx --global ensurepath 
             fi
         fi 
