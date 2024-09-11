@@ -21,7 +21,7 @@ if type apt &> /dev/null; then
         # https://askubuntu.com/questions/148932/how-can-i-get-a-list-of-all-repositories-and-ppas-from-the-command-line-into-an 
         # Script to get all the PPAs which are installed on a system
 	
-        function apt-list-ppa()	{
+        function apt-list-ppa-installed()	{
             if test -d /etc/apt/sources.list.d/ ;then
                 first=/etc/apt/sources.list.d/
                 second=\*.sources
@@ -41,7 +41,7 @@ if type apt &> /dev/null; then
             #WORD_ORIG=$COMP_WORDBREAKS
             #COMP_WORDBREAKS=${COMP_WORDBREAKS/:/}
             _get_comp_words_by_ref -n : cur
-            COMPREPLY=($(compgen -W "-p -o -s -d -y -i -h $(apt-list-ppa)" -- "$cur") )
+            COMPREPLY=($(compgen -W "-p -o -s -d -y -i -h $(apt-list-ppa-installed)" -- "$cur") )
             __ltrim_colon_completions "$cur"
             #COMP_WORDBREAKS=$WORD_ORIG
             return 0
@@ -151,7 +151,7 @@ if type apt &> /dev/null; then
         #    unset ppa
         #}
         
-        function add-apt-ppa-fzf-install(){
+        function apt-add-ppa-fzf-install(){
             pre=''
             if ! test -z $@; then
                 pre="--query $@"
@@ -173,7 +173,7 @@ if type apt &> /dev/null; then
             if ! test -z $ppa; then
                 check-ppa $ppa
                 if [[ $(check-ppa $ppa) =~ 'OK' ]]; then
-                    if [[ $(apt-list-ppa) =~ "$ppa" ]]; then 
+                    if [[ $(apt-list-ppa-installed) =~ "$ppa" ]]; then 
                         printf "${cyan}$ppa${normal} is already added to the repos list\n" 
                         return 2 
                     else     
@@ -192,6 +192,14 @@ if type apt &> /dev/null; then
             fi
             unset ppa
         }
+     fi
+
+     alias add-apt-fzf-install-ppa="apt-add-ppa-fzf-install"  
+    
+     if test -f ~/.config/ppas; then
+         complete -W "$(cat ~/.config/ppas | tr '\n' ' ' )" apt-add-repository 
+         complete -W "$(cat ~/.config/ppas | tr '\n' ' ' )" add-apt-repository 
+         complete -W "$(cat ~/.config/ppas | tr '\n' ' ' )" apt-add-ppa-fzf-install 
      fi
 
      if type fzf &> /dev/null; then

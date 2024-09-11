@@ -144,9 +144,11 @@ if test $distro_base == 'Debian'; then
                     fi  
                 fi
                 pipx install list-ppa
-                reade -Q 'GREEN' -i 'y' -p "Run list-ppa (generates file containin ppas that have a release file for your version in ~/.config/ppas - !! Can take a while - can be rerun)? [Y/n]: " 'n' ppa_ins
-                if test $ppa_ins == 'y'; then
-                    list-ppa --file ~/.config/ppas
+                if ! test -f ~/.config/ppas; then 
+                    reade -Q 'GREEN' -i 'y' -p "Run list-ppa (generates file containin ppas that have a release file for your version in ~/.config/ppas - !! Can take a while - can be rerun)? [Y/n]: " 'n' ppa_ins
+                    if test $ppa_ins == 'y'; then
+                        list-ppa --file ~/.config/ppas
+                    fi 
                 fi 
             fi
             unset ppa_ins 
@@ -685,30 +687,29 @@ fi
 unset strshp
 unset pre color othr prmpt 
 
-# Ffmpeg
+
+# Ufw / Gufw
 pre='y'
 othr='n'
 color='GREEN'
 prmpt='[Y/n]: '
-if type ffmpeg &> /dev/null; then
+if type ufw &> /dev/null; then
     pre='n' 
     othr='y'
     color='YELLOW'
     prmpt='[N/y]: '
 fi 
-#if ! type yt-dlp &> /dev/null; then
-reade -Q "$color" -i "$pre" -p "Install ffmpeg? (video/audio/image file converter) $prmpt" "$othr" ffmpg
-if [ "$ffmpg" == "y" ]; then
-    if ! test -f install_ffmpeg.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ffmpeg.sh)" 
+
+reade -Q "$color" -i "$pre" -p "Install ufw? (Uncomplicated firewall - Iptables wrapper) $prmpt" "$othr" ins_ufw
+if [ $inst_ufw == "y" ]; then
+    if ! test -f install_ufw.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ufw.sh)" 
     else
-        ./install_ffmpeg.sh
+        ./install_ufw.sh 
     fi
 fi
-unset ffmpg
+unset ins_ufw
 unset pre color othr prmpt 
-
-
 
 # Nmap
 pre='y'
@@ -735,6 +736,8 @@ if ! type nmap &> /dev/null; then
     unset pre color othr prmpt 
 fi
 
+
+
 # Netstat
 pre='y'
 othr='n'
@@ -759,6 +762,8 @@ unset tojump
 unset pre color othr prmpt 
 
 
+
+
 # Lazydocker
 pre='y'
 othr='n'
@@ -780,6 +785,28 @@ if [ "y" == "$git_ins" ]; then
 fi
 unset pre color othr git_ins
 
+
+# Exiftool (Metadata wiper)
+pre='y'
+othr='n'
+color='GREEN'
+prmpt='[Y/n]: '
+if type exiftool &> /dev/null; then
+    pre='n' 
+    othr='y'
+    color='YELLOW'
+    prmpt='[N/y]: '
+fi 
+
+reade -Q "$color" -i "$pre" -p "Install exiftool? (Metadata wiper for files) $prmpt" "$othr" exif_t
+if [ -z $exif_t ] || [ "Y" == $exif_t ] || [ $exif_t == "y" ]; then
+    if ! test -f install_exiftool.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_exiftool.sh)" 
+    else
+        ./install_exiftool.sh 
+    fi
+fi
+unset pre color othr prmpt exif_t
 
 # Testdisk (File recovery tool)
 pre='y'
@@ -804,27 +831,29 @@ fi
 unset kittn
 unset pre color othr prmpt 
 
-# Exiftool (Metadata wiper)
+
+# Ffmpeg
 pre='y'
 othr='n'
 color='GREEN'
 prmpt='[Y/n]: '
-if type exiftool &> /dev/null; then
+if type ffmpeg &> /dev/null; then
     pre='n' 
     othr='y'
     color='YELLOW'
     prmpt='[N/y]: '
 fi 
-
-reade -Q "$color" -i "$pre" -p "Install exiftool? (Metadata wiper for files) $prmpt" "$othr" moar
-if [ -z $moar ] || [ "Y" == $moar ] || [ $moar == "y" ]; then
-    if ! test -f install_exiftool.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_exiftool.sh)" 
+#if ! type yt-dlp &> /dev/null; then
+reade -Q "$color" -i "$pre" -p "Install ffmpeg? (video/audio/image file converter) $prmpt" "$othr" ffmpg
+if [ "$ffmpg" == "y" ]; then
+    if ! test -f install_ffmpeg.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ffmpeg.sh)" 
     else
-        ./install_exiftool.sh 
+        ./install_ffmpeg.sh
     fi
 fi
-unset pre color othr prmpt moar
+unset ffmpg
+unset pre color othr prmpt 
 
 
 # Yt-dlp
