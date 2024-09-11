@@ -32,7 +32,7 @@ if ! type pipx &> /dev/null; then
                 pipx install pipx
                 pipx upgrade pipx
                 brew uninstall pipx 
-                source ~/.bashrc 
+                export PATH=$PATH:$HOME/.local/bin/pipx 
             fi
         elif test $distro_base == "Arch"; then 
             echo "This next $(tput setaf 1)sudo$(tput sgr0) will install pipx"
@@ -41,7 +41,7 @@ if ! type pipx &> /dev/null; then
                 pipx install pipx
                 pipx upgrade pipx
                 sudo pacman -Rs pipx 
-                source ~/.bashrc 
+                export PATH=$PATH:$HOME/.local/bin/pipx 
             fi
         elif test $distro_base == "Debian"; then
             echo "This next $(tput setaf 1)sudo$(tput sgr0) will install pipx"
@@ -50,7 +50,7 @@ if ! type pipx &> /dev/null; then
                 pipx install pipx
                 pipx upgrade pipx
                 sudo apt remove pipx 
-                source ~/.bashrc 
+                export PATH=$PATH:$HOME/.local/bin/pipx 
             fi 
         fi
         pipx ensurepath
