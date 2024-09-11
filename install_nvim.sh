@@ -94,6 +94,7 @@ if test $machine == 'Mac' && type brew &> /dev/null; then
                 sudo npm install -g neovim
             fi
         fi
+        printf "${red}This next prompt might take a while to load since it might initialize cpan (perl)${normal}\n" 
         if ! type gem &> /dev/null || ! gem list | grep neovim &> /dev/null; then
             reade -Q "GREEN" -i "y" -p "Install nvim-ruby? [Y/n]: " "n" rubyscripts
             if [ -z $rubyscripts ] || [ "y" == $rubyscripts ]; then
@@ -106,6 +107,8 @@ if test $machine == 'Mac' && type brew &> /dev/null; then
                 gem install neovim
             fi
         fi
+        printf "${red}This next prompt might take a while to load since it might initialize cpan (perl)${normal}\n" 
+         
         if ! type cpan &> /dev/null || ! cpan -l 2> /dev/null | grep Neovim::Ext &> /dev/null; then
             reade -Q "GREEN" -i "y" -p "Install nvim-perl? [Y/n]: " "n" perlscripts
             if [ -z $perlscripts ] || [ "y" == $perlscripts ]; then
@@ -178,6 +181,7 @@ elif test $distro == "Arch" || test $distro == "Manjaro"; then
                 gem install neovim
             fi
         fi
+        printf "${red}This next prompt might take a while to load since it might initialize cpan (perl)${normal}\n" 
         if ! type cpan &> /dev/null || ! cpan -l 2> /dev/null | grep Neovim::Ext &> /dev/null; then
             reade -Q "GREEN" -i "y" -p "Install nvim-perl? [Y/n]: " "n" perlscripts
             if [ -z $perlscripts ] || [ "y" == $perlscripts ]; then
@@ -424,7 +428,7 @@ elif [  $distro_base == "Debian" ];then
             fi
         fi
     fi 
-
+    
     if ! type ctags &> /dev/null; then
         reade -Q "GREEN" -i "y" -p "Install ctags? [Y/n]: " "n" ctags
         if  [ "y" == $ctags ]; then
@@ -434,6 +438,19 @@ elif [  $distro_base == "Debian" ];then
 fi
 
 unset rver paths clip x11f pyscripts jsscripts ctags rubyscripts perlscripts nvmbin
+
+if ! type rg &> /dev/null; then
+    reade -Q "GREEN" -i "y" -p "Install ripgrep (recursive grep)? [Y/n]: " "n" rg_ins
+    if  [ "y" == $rg_ins ]; then
+        if ! test -f install_ripgrep.sh; then
+             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ripgrep.sh)" 
+        else
+            ./install_ripgrep.sh
+        fi
+    fi
+fi
+
+unset rg_ins
 
 if ! test -d vim/; then
     tmpdir=$(mktemp -d -t nvim-XXXXXXXXXX)

@@ -30,18 +30,22 @@ fi
 if ! type lazygit &> /dev/null; then
     if test $distro_base == "Arch"; then
         sudo pacman -S lazygit
-    else; then
-        if ! type curl &> /dev/null; then
-            if test $distro_base == 'Debian'; then
-                sudo apt install curl
-            elif test $distro_base == 'Arch'; then
-                sudo pacman -S curl  
+    elif test $distro_base == "Debian"; then
+        if $(apt search lazygit 2> /dev/null); then 
+            sudo apt install lazygit 
+        else
+            if ! type curl &> /dev/null; then
+                if test $distro_base == 'Debian'; then
+                    sudo apt install curl
+                elif test $distro_base == 'Arch'; then
+                    sudo pacman -S curl  
+                fi
             fi
+            LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po --color=never '"tag_name": "v\K[^"]*')
+            curl -Lo $TMPDIR/lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
+            (cd $TMPDIR && tar xf $TMPDIR/lazygit.tar.gz) 
+            sudo install $TMPDIR/lazygit /usr/local/bin
         fi
-        LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po --color=never '"tag_name": "v\K[^"]*')
-        curl -Lo $TMPDIR/lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
-        (cd $TMPDIR && tar xf $TMPDIR/lazygit.tar.gz) 
-        sudo install $TMPDIR/lazygit /usr/local/bin
     fi
     lazygit --version
     unset nstll
