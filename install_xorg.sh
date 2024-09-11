@@ -20,7 +20,7 @@ if test -z $SYSTEM_UPDATED; then
     fi
 fi
 
-if test $distro == "Arch" || test $distro == "Manjaro"; then
+if test $distro_base == "Arch"; then
     sudo pacman -S xorg
 elif [ $distro_base == "Debian" ];then
     sudo apt install xorg 
