@@ -33,7 +33,7 @@ fi
 if ! type activate-global-python-argcomplete &> /dev/null; then
     if test $distro_base == "Debian"; then
         sudo apt install python3 python-is-python3
-    elif test $distro == "Arch" || test $distro == "Manjaro"; then
+    elif test $distro_base == "Arch"; then
         sudo pacman -S python
     fi
 fi

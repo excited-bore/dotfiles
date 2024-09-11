@@ -74,6 +74,20 @@ if ! type pipx &> /dev/null; then
                 fi
             fi
         fi 
+        
+        if ! type activate-global-python-argcomplete &> /dev/null; then
+            if test $upgrade_ver == 'y'; then
+                $HOME/.local/bin/pipx install argcomplete
+            else
+                pipx install argcomplete 
+            fi
+
+            if type activate-global-python-argcomplete &> /dev/null; then
+                activate-global-python-argcomplete --dest=/home/$USER/.bash_completion.d 
+            elif type activate-global-python-argcomplete3 &> /dev/null; then
+                activate-global-python-argcomplete3 --dest=/home/$USER/.bash_completion.d 
+            fi
+        fi
     fi
 fi
 
