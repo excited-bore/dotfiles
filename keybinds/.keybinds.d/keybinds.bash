@@ -392,52 +392,54 @@ bind -m emacs-standard '"\e[15~": "\205\206"'
 bind -m vi-command     '"\e[15~": "\205\206"'
 bind -m vi-insert      '"\e[15~": "\205\206"'
 
-# F6 - (bash/b/bpy)top (Better top/htop)
-if type bashtop &> /dev/null || type btop &> /dev/null || type bpytop &> /dev/null; then
-     
-    # Last one loaded is the winner
-    if type bpytop &> /dev/null; then
-        bind -x '"\207": stty sane && bpytop'
-    fi
-    
-    if type btop &> /dev/null; then
-        bind -x '"\207": stty sane && btop'
-    fi
-    
-    if type bashtop &> /dev/null; then
-        bind -x '"\207": stty sane && bashtop'
-    fi
-    
-    bind -m emacs-standard '"\e[17~": "\207\n\C-l"'
-    bind -m vi-command     '"\e[17~": "\207\n\C-l"'
-    bind -m vi-insert      '"\e[17~": "\207\n\C-l"'
-fi
-
-# F7 - (neo/fast/screen)fetch (System overview)
+# F6 - (neo/fast/screen)fetch (System overview)
 if type neofetch &> /dev/null || type fastfetch &> /dev/null || type screenfetch &> /dev/null; then
     
     # Last one loaded is the winner
     if type fastfetch &> /dev/null; then
-        bind -x '"\208": stty sane && fastfetch'
+        bind -x '"\207": stty sane && fastfetch'
     fi
     
     if type screenfetch &> /dev/null; then
-        bind -x '"\208": stty sane && screenfetch'
+        bind -x '"\207": stty sane && screenfetch'
     fi
     
     if type neofetch &> /dev/null; then
-        bind -x '"\208": stty sane && neofetch'
+        bind -x '"\207": stty sane && neofetch'
     fi
     
-    bind -m emacs-standard '"\e[18~": "\208\n"'
-    bind -m vi-command     '"\e[18~": "\208\n"'
-    bind -m vi-insert      '"\e[18~": "\208\n"'
+    bind -m emacs-standard '"\e[17~": "\207\n"'
+    bind -m vi-command     '"\e[17~": "\207\n"'
+    bind -m vi-insert      '"\e[17~": "\207\n"'
 fi
+
+
+# F7 - (bash/b/bpy)top (Better top/htop)
+if type bashtop &> /dev/null || type btop &> /dev/null || type bpytop &> /dev/null; then
+     
+    # Last one loaded is the winner
+    if type bpytop &> /dev/null; then
+        bind -x '"\208": stty sane && bpytop'
+    fi
+    
+    if type btop &> /dev/null; then
+        bind -x '"\208": stty sane && btop'
+    fi
+    
+    if type bashtop &> /dev/null; then
+        bind -x '"\208": stty sane && bashtop'
+    fi
+    
+    bind -m emacs-standard '"\e[18~": "\208\n\C-l"'
+    bind -m vi-command     '"\e[18~": "\208\n\C-l"'
+    bind -m vi-insert      '"\e[18~": "\208\n\C-l"'
+fi
+
 
 # F8 - Lazydocker (Docker TUI)
 if type lazydocker &> /dev/null; then
     
-    bind -x '"\209": stty sane && neofetch'#
+    bind -x '"\209": stty sane && lazydocker'
     bind -m emacs-standard '"\e[19~": "\209\n"'
     bind -m vi-command     '"\e[19~": "\209\n"'
     bind -m vi-insert      '"\e[19~": "\209\n"'

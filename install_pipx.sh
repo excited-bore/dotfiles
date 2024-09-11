@@ -29,25 +29,28 @@ if ! type pipx &> /dev/null; then
             echo "This next $(tput setaf 1)sudo$(tput sgr0) will install pipx"
             brew install python python-pipx
             if [[ $(pipx --version) < 1.6.0 ]]; then 
+                pipx install pipx
                 pipx upgrade pipx
-                #brew uninstall pipx 
-                #source ~/.local/bin/ 
+                brew uninstall pipx 
+                source ~/.bashrc 
             fi
         elif test $distro_base == "Arch"; then 
             echo "This next $(tput setaf 1)sudo$(tput sgr0) will install pipx"
             sudo pacman -S python-pipx
             if [[ $(pipx --version) < 1.6.0 ]]; then 
+                pipx install pipx
                 pipx upgrade pipx
-                #sudo pacman -Rs pipx 
-                #source ~/.local/bin/pipx 
+                sudo pacman -Rs pipx 
+                source ~/.bashrc 
             fi
         elif test $distro_base == "Debian"; then
             echo "This next $(tput setaf 1)sudo$(tput sgr0) will install pipx"
             sudo apt install pipx
             if [[ $(pipx --version) < 1.6.0 ]]; then 
+                pipx install pipx
                 pipx upgrade pipx
-                #sudo apt purge --autoremove pipx 
-                #source ~/.local/bin/pipx 
+                sudo apt uninstall pipx 
+                source ~/.bashrc 
             fi 
         fi
         pipx ensurepath
