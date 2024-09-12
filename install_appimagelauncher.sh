@@ -20,7 +20,7 @@ fi
 
 if ! type AppImageLauncher &> /dev/null; then
     echo "This next $(tput setaf 1)sudo$(tput sgr0) will install Appimagelauncher"
-    if test $distro == "Arch" || test $distro == "Manjaro"; then 
+    if test $distro_base == "Arch" ; then 
         sudo pacman -S appimagelauncher
     elif test $distro_base == "Debian"; then
         if type add-apt-repository &> /dev/null && [[ $(check-ppa ppa:appimagelauncher-team/stable) =~ 'OK' ]]; then
@@ -28,10 +28,10 @@ if ! type AppImageLauncher &> /dev/null; then
             sudo apt-get update
             sudo apt-get install appimagelauncher 
         else
-            #if ! $(apt search libfuse2t64 &> /dev/null); then
+            #if ! $(apt search libfuse2t64 &> /dev/null | awk 'NR>2 {print;}'); then
             #    sudo apt install libfuse2t64 -y 
             #fi
-            if ! $(apt search jq &> /dev/null); then
+            if ! $(apt search jq &> /dev/null | awk 'NR>2 {print;}'); then
                 sudo apt install jq -y 
             fi
             tmpd=$(mktemp -d)
