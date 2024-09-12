@@ -42,7 +42,7 @@ fi
 #    fi 
 #fi
 
-git_hl(){
+function git_hl(){
     if ! test -z "$1"; then
         cmd="$1"
     else
@@ -1674,7 +1674,7 @@ fi
     local b="$(git config $global --list | grep 'merge.guitool' | awk 'BEGIN { FS = "=" } ;{print $2;}')"
 
     local diffguipre="n"
-    if test "$b" == '' && ! test "$b" == false ; then
+    if test "$b" == '' && ! test "$b" == false ;then
         diffguipre="y"
     fi
     reade -Q "CYAN" -i "$diffguipre" -p "Set merge guitool?: " "n" difftool;
