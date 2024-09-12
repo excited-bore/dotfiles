@@ -54,12 +54,21 @@ if ! type pipx &> /dev/null; then
             fi 
         fi
 
-        pipx ensurepath
+        if ! type pipx &> /dev/null; then
+            $HOME/.local/bin/pipx ensurepath
+        else
+            pipx ensurepath
+        fi 
+        source ~/.bashrc 
 
         if ! test $machine == 'Windows'; then 
             reade -Q "GREEN" -i "y" -p "Set to install packages globally (including for root)? [Y/n]: " "n" insppxgl
             if test $insppxgl == "y"; then 
-                sudo pipx --global ensurepath 
+                if ! type pipx &> /dev/null; then
+                    sudo $HOME/.local/bin/pipx --global ensurepath
+                else
+                    sudo pipx --global ensurepath 
+                fi
             fi
         fi 
         
@@ -67,8 +76,11 @@ if ! type pipx &> /dev/null; then
             reade -Q "GREEN" -i "y" -p "Install argcomplete with pipx? (autocompletion for python scripts) [Y/n]: " "n" pycomp
              
             if test $pycomp == 'y'; then
-
-                pipx install argcomplete 
+                if ! type pipx &> /dev/null; then
+                    $HOME/.local/bin/pipx install argcomplete
+                else
+                    pipx install argcomplete 
+                fi 
 
                 if type activate-global-python-argcomplete &> /dev/null; then
                     activate-global-python-argcomplete --dest=/home/$USER/.bash_completion.d 
