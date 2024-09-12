@@ -725,7 +725,7 @@ if type ufw &> /dev/null; then
 fi 
 
 reade -Q "$color" -i "$pre" -p "Install ufw? (Uncomplicated firewall - Iptables wrapper) $prmpt" "$othr" ins_ufw
-if [ $inst_ufw == "y" ]; then
+if [ $ins_ufw == "y" ]; then
     if ! test -f install_ufw.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ufw.sh)" 
     else
