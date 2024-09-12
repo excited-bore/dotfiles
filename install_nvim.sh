@@ -58,7 +58,9 @@ fi
 #. $DIR/setup_git_build_from_source.sh "y" "neovim" "https://github.com" "neovim/neovim" "stable" "sudo apt update; sudo apt install ninja-build gettext libtool libtool-bin cmake g++ pkg-config unzip curl doxygen" "make CMAKE_BUILD_TYPE=RelWithDebInfo; sudo make install" "sudo make uninstall" "make distclean; make deps" "y"
 
 if test $machine == 'Mac' && type brew &> /dev/null; then
-    brew install neovim
+    if ! type nvim &> /dev/null; then
+        brew install neovim
+    fi
     if ! type xclip &> /dev/null; then
         reade -Q "GREEN" -i "y" -p "Install nvim clipboard? (xsel xclip) [Y/n]: " "n" clip
         if [ -z $clip ] || [ "y" == $clip ]; then
@@ -129,7 +131,7 @@ if test $machine == 'Mac' && type brew &> /dev/null; then
         fi
     fi
     
-elif test $distro == "Arch" || test $distro == "Manjaro"; then
+elif test $distro_base == "Arch"; then
     if ! type nvim &> /dev/null; then
         sudo pacman -S neovim 
     fi
@@ -201,7 +203,7 @@ elif test $distro == "Arch" || test $distro == "Manjaro"; then
             sudo pacman -S ctags
         fi
     fi
-elif [  $distro_base == "Debian" ];then
+elif [ $distro_base == "Debian" ];then
     b=$(apt search neovim 2> /dev/null | grep '^neovim/' | awk '{print $2}' | sed 's/~.*//g' | sed 's|\(.*\..*\)\..*|\1|g')
     #Minimum version for Lazy plugin manager
     if [[ $b < 0.8 ]]; then
@@ -212,135 +214,136 @@ elif [  $distro_base == "Debian" ];then
                 sudo apt remove neovim
             fi
         fi
-        if ! type nvim &> /dev/null; then
-            reade -Q "YELLOW" -i "n" -p "Still wish to install through apt? [N/y]: " "y" nvmapt
-            if [ "y" == $nvmapt ]; then
-                sudo apt install neovim
-            else
-                reade -Q "GREEN" -i "y" -p "Install nvim through alternative means (appimage - flatpak - build from source (+ Ubuntu: ppa))? [Y/n]: " "n" nvmappmg
-                if ! test -z $nvmappmg || [ "y" == $nvmappmg ]; then
-                    pre="appimage"
-                    choices="flatpak build"
-                    prompt="Which one (Appimage/flatpak/build from source)? [Flatpak/appimage/build]: "
-                    if type add-apt-repository &> /dev/null; then
-                        if ! echo $(check-ppa ppa:neovim-ppa/unstable) | grep -q 'NOT'; then
-                            pre="ppa-unstable"                        
-                            choices="appimage flatpak build"
-                            prompt="Which one (Ppa-unstable/appimage/flatpak/build from source)? [Ppa-unstable/appimage/flatpak/build]: "
-                        fi
-                    fi
-                    if [[ "$arch" =~ "arm" ]]; then
-                        echo "${cyan}Arm architecture${normal} sadly still does not support ${red}appimages${normal}"  
-                        if ! test $pre == 'ppa-unstable'; then 
-                            pre="flatpak"
-                            choices="build"
-                            prompt="Which one (Flatpak/build from source)? [Flatpak/build]: "
-                        else
-                            pre="ppa-unstable"
-                            choices="flatpak build"
-                            prompt="Which one (Ppa-unstable/flatpak/build from source)? [Ppa-unstable/flatpak/build]: "
-                        fi
-                    fi
-                    reade -Q "GREEN" -i "$pre" -p "$prompt" "$choices" nvmappmg
-                    if test "$nvmappmg" == 'ppa-unstable'; then
-                        sudo add-apt-repository ppa:neovim-ppa/unstable
-                        sudo apt update
-                        sudo apt install neovim
-                    elif [ "appimage" == "$nvmappmg" ]; then
-                        if ! test -f checks/check_appimage_ready.sh; then
-                             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_appimage_ready.sh)" 
-                        else
-                            . ./checks/check_appimage_ready.sh
-                        fi
-                        if ! test -z "$(sudo apt list --installed 2> /dev/null | grep libfuse2)"; then
-                            if ! type curl &> /dev/null; then
-                                if test $distro == "Manjaro" || test $distro == "Arch"; then
-                                    sudo pacman -S curl
-                                elif test $distro_base == "Debian"; then
-                                    sudo apt install curl
-                                fi
-                            fi
-                            if ! type jq &> /dev/null; then
-                                if test $distro == "Manjaro" || test $distro == "Arch"; then
-                                    sudo pacman -S jq
-                                elif test $distro_base == "Debian"; then
-                                    sudo apt install jq
-                                fi
-                            fi
-                            ltstv=$(curl -sL https://api.github.com/repos/neovim/neovim/releases/latest | jq -r ".tag_name")
-                            tmpdir=$(mktemp -d -t nvim-XXXXXXXXXX)
-                            curl -o $tmpdir/nvim.appimage https://github.com/neovim/neovim/releases/download/$ltstv/nvim.appimage 
-                            curl -o $tmpdir/nvim.appimage.sha256sum https://github.com/neovim/neovim/releases/download/$ltstv/nvim.appimage.sha256sum 
-                            if ! [ "$(sha256sum $tmpdir/nvim.appimage | awk '{print $1}')" == "$(cat $tmpdir/nvim.appimage.sha256sum | awk '{print $1}')" ]; then 
-                                   echo "Something went wrong: Sha256sums aren't the same. Try again later"    
-                            else
-                                chmod u+x $tmpdir/nvim.appimage
-                                sudo mv "$tmpdir/nvim.appimage" /usr/local/bin/nvim
-                            fi
-                        else
-                            pre="flatpak"
-                            choices="build"
-                            prompt="Can't use appimages without libfuse2. What other method to install neovim would you try? (Flatpak/build from source)? [Flatpak/build]: "
-                            reade -Q "GREEN" -i "$pre" -p "$prompt" "$choices" nvmappmg 
-                            if test "flatpak" == "$nvmappmg"; then
-                                reade -Q "GREEN" -i "y" -p "Install flatpak? [Y/n]: " "n" insflpk 
-                                if [ "y" == "$insflpk" ]; then
-                                    if ! test -f install_flatpak.sh; then
-                                        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_flatpak.sh)" 
-                                    else
-                                        ./install_flatpak.sh 
-                                    fi
-                                fi
-                                flatpak install neovim 
-                            elif test "build" == "$nvmappmg"; then
-                                echo "Make sure you test yourself if branch stable fails. Check 'install_nvim.sh' and checkout different branches"
-                                if ! test -z "$(sudo apt list --installed | grep neovim)" &> /dev/null; then
-                                    echo "Lets start by removing stuff related to installed 'neovim' packages"
-                                    sudo apt autoremove neovim
-                                    echo "Then, install some necessary buildtools"
-                                fi
-                                sudo apt update
-                                sudo apt-get install git ninja-build gettext libtool libtool-bin autoconf automake cmake g++ pkg-config unzip curl doxygen
-                                tmpdir=$(mktemp -d -t nvim-XXXXXXXXXX)
-                                git clone https://github.com/neovim/neovim $tmpdir
-                                (cd $tmpdir/neovim && git checkout neovim && git checkout stable && make CMAKE_BUILD_TYPE=RelWithDebInfo
-                                cd build && cpack -G DEB && sudo dpkg -i nvim-linux64.deb)   
-                            else
-                                echo "FYI: There's also snap (package manager) wich you could try"
-                                return 1
-                            fi
-                        fi
-                    elif test "flatpak" == "$nvmappmg"; then
-                        reade -Q "GREEN" -i "y" -p "Install flatpak? [Y/n]: " "n" insflpk 
-                        if [ "y" == "$insflpk" ]; then
-                            if ! test -f install_flatpak.sh; then
-                                eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_flatpak.sh)" 
-                            else
-                                ./install_flatpak.sh 
-                            fi
-                        fi
-                        flatpak install neovim 
-                    elif test "build" == "$nvmappmg"; then
-                        echo "Make sure you test yourself if branch stable fails. Check 'install_nvim.sh' and checkout different branches"
-                        if ! test -z "$(sudo apt list --installed 2> /dev/null | grep neovim)" &> /dev/null; then
-                            echo "Lets start by removing stuff related to installed 'neovim' packages"
-                            sudo apt autoremove neovim
-                            echo "Then, install some necessary buildtools"
-                        fi
-                        sudo apt update
-                        sudo apt-get install git ninja-build gettext libtool libtool-bin autoconf automake cmake g++ pkg-config unzip curl doxygen
-                        tmpdir=$(mktemp -d -t nvim-XXXXXXXXXX)
-                        git clone https://github.com/neovim/neovim $tmpdir
-                        (cd $tmpdir/neovim && git checkout neovim && git checkout stable && make CMAKE_BUILD_TYPE=RelWithDebInfo
-                        cd build && cpack -G DEB && sudo dpkg -i nvim-linux64.deb)   
-                    else
-                        echo "FYI: There's also snap (package manager) wich you could try"
-                        return 1
+        #if ! type nvim &> /dev/null; then
+         reade -Q "YELLOW" -i "n" -p "Still wish to install through apt? [N/y]: " "y" nvmapt
+         if [ "y" == $nvmapt ]; then
+            sudo apt install neovim
+         else
+            reade -Q "GREEN" -i "y" -p "Install nvim through alternative means (appimage - flatpak - build from source (+ Ubuntu: ppa))? [Y/n]: " "n" nvmappmg
+            if ! test -z $nvmappmg || [ "y" == $nvmappmg ]; then
+                pre="appimage"
+                choices="flatpak build"
+                prompt="Which one (Appimage/flatpak/build from source)? [Flatpak/appimage/build]: "
+                if type add-apt-repository &> /dev/null; then
+                    if ! echo $(check-ppa ppa:neovim-ppa/unstable) | grep -q 'NOT'; then
+                        pre="ppa-unstable"                        
+                        choices="appimage flatpak build"
+                        prompt="Which one (Ppa-unstable/appimage/flatpak/build from source)? [Ppa-unstable/appimage/flatpak/build]: "
                     fi
                 fi
+                if [[ "$arch" =~ "arm" ]]; then
+                    echo "${cyan}Arm architecture${normal} sadly still does not support ${red}appimages${normal}"  
+                    if ! test $pre == 'ppa-unstable'; then 
+                        pre="flatpak"
+                        choices="build"
+                        prompt="Which one (Flatpak/build from source)? [Flatpak/build]: "
+                    else
+                        pre="ppa-unstable"
+                        choices="flatpak build"
+                        prompt="Which one (Ppa-unstable/flatpak/build from source)? [Ppa-unstable/flatpak/build]: "
+                    fi
+                fi
+                reade -Q "GREEN" -i "$pre" -p "$prompt" "$choices" nvmappmg
+                if test "$nvmappmg" == 'ppa-unstable'; then
+                    sudo add-apt-repository ppa:neovim-ppa/unstable
+                    sudo apt update
+                    sudo apt install neovim
+                elif [ "appimage" == "$nvmappmg" ]; then
+                    if ! test -f checks/check_appimage_ready.sh; then
+                         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_appimage_ready.sh)" 
+                    else
+                        . ./checks/check_appimage_ready.sh
+                    fi
+                    if ! test -z "$(sudo apt list --installed 2> /dev/null | grep libfuse2)"; then
+                        if ! type curl &> /dev/null; then
+                            if test $distro == "Manjaro" || test $distro == "Arch"; then
+                                sudo pacman -S curl
+                            elif test $distro_base == "Debian"; then
+                                sudo apt install curl
+                            fi
+                        fi
+                        if ! type jq &> /dev/null; then
+                            if test $distro == "Manjaro" || test $distro == "Arch"; then
+                                sudo pacman -S jq
+                            elif test $distro_base == "Debian"; then
+                                sudo apt install jq
+                            fi
+                        fi
+                        ltstv=$(curl -sL https://api.github.com/repos/neovim/neovim/releases/latest | jq -r ".tag_name")
+                        tmpdir=$(mktemp -d -t nvim-XXXXXXXXXX)
+                        curl -o $tmpdir/nvim.appimage https://github.com/neovim/neovim/releases/download/$ltstv/nvim.appimage 
+                        curl -o $tmpdir/nvim.appimage.sha256sum https://github.com/neovim/neovim/releases/download/$ltstv/nvim.appimage.sha256sum 
+                        if ! [ "$(sha256sum $tmpdir/nvim.appimage | awk '{print $1}')" == "$(cat $tmpdir/nvim.appimage.sha256sum | awk '{print $1}')" ]; then 
+                               echo "Something went wrong: Sha256sums aren't the same. Try again later"    
+                        else
+                            chmod u+x $tmpdir/nvim.appimage
+                            sudo mv "$tmpdir/nvim.appimage" /usr/local/bin/nvim
+                        fi
+                    else
+                        pre="flatpak"
+                        choices="build"
+                        prompt="Can't use appimages without libfuse2. What other method to install neovim would you try? (Flatpak/build from source)? [Flatpak/build]: "
+                        reade -Q "GREEN" -i "$pre" -p "$prompt" "$choices" nvmappmg 
+                        if test "flatpak" == "$nvmappmg"; then
+                            reade -Q "GREEN" -i "y" -p "Install flatpak? [Y/n]: " "n" insflpk 
+                            if [ "y" == "$insflpk" ]; then
+                                if ! test -f install_flatpak.sh; then
+                                    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_flatpak.sh)" 
+                                else
+                                    ./install_flatpak.sh 
+                                fi
+                            fi
+                            flatpak install neovim 
+                        elif test "build" == "$nvmappmg"; then
+                            echo "Make sure you test yourself if branch stable fails. Check 'install_nvim.sh' and checkout different branches"
+                            if ! test -z "$(sudo apt list --installed | grep neovim)" &> /dev/null; then
+                                echo "Lets start by removing stuff related to installed 'neovim' packages"
+                                sudo apt autoremove neovim
+                                echo "Then, install some necessary buildtools"
+                            fi
+                            sudo apt update
+                            sudo apt-get install git ninja-build gettext libtool libtool-bin autoconf automake cmake g++ pkg-config unzip curl doxygen
+                            tmpdir=$(mktemp -d -t nvim-XXXXXXXXXX)
+                            git clone https://github.com/neovim/neovim $tmpdir
+                            (cd $tmpdir/neovim && git checkout neovim && git checkout stable && make CMAKE_BUILD_TYPE=RelWithDebInfo
+                            cd build && cpack -G DEB && sudo dpkg -i nvim-linux64.deb)   
+                        else
+                            echo "FYI: There's also snap (package manager) wich you could try"
+                            return 1
+                        fi
+                    fi
+                elif test "flatpak" == "$nvmappmg"; then
+                    reade -Q "GREEN" -i "y" -p "Install flatpak? [Y/n]: " "n" insflpk 
+                    if [ "y" == "$insflpk" ]; then
+                        if ! test -f install_flatpak.sh; then
+                            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_flatpak.sh)" 
+                        else
+                            ./install_flatpak.sh 
+                        fi
+                    fi
+                    flatpak install neovim 
+                elif test "build" == "$nvmappmg"; then
+                    echo "Make sure you test yourself if branch stable fails. Check 'install_nvim.sh' and checkout different branches"
+                    if ! test -z "$(sudo apt list --installed 2> /dev/null | grep neovim)" &> /dev/null; then
+                        echo "Lets start by removing stuff related to installed 'neovim' packages"
+                        sudo apt autoremove neovim
+                        echo "Then, install some necessary buildtools"
+                    fi
+                    sudo apt update
+                    sudo apt-get install git ninja-build gettext libtool libtool-bin autoconf automake cmake g++ pkg-config unzip curl doxygen
+                    tmpdir=$(mktemp -d -t nvim-XXXXXXXXXX)
+                    git clone https://github.com/neovim/neovim $tmpdir
+                    (cd $tmpdir/neovim && git checkout neovim && git checkout stable && make CMAKE_BUILD_TYPE=RelWithDebInfo
+                    cd build && cpack -G DEB && sudo dpkg -i nvim-linux64.deb)   
+                else
+                    echo "FYI: There's also snap (package manager) wich you could try"
+                    return 1
+                fi
             fi
-            unset nvmapt nvmappmg insflpk nvmflpk
-        fi
+         fi
+         unset nvmapt nvmappmg insflpk nvmflpk
+    else 
+        sudo apt install -y neovim 
     fi
         
     if ! type xclip &> /dev/null; then
