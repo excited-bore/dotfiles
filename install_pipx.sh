@@ -33,7 +33,7 @@ if ! type pipx &> /dev/null; then
                 pipx install pipx
                 pipx upgrade pipx
                 brew uninstall pipx 
-                export PATH=$PATH:$HOME/.local/bin/ 
+                export PATH=$PATH:$HOME/.local/bin 
                 upg_pipx='y' 
             fi
         elif test $distro_base == "Arch"; then 
@@ -43,7 +43,7 @@ if ! type pipx &> /dev/null; then
                 pipx install pipx
                 pipx upgrade pipx
                 sudo pacman -Rs pipx 
-                export PATH=$PATH:$HOME/.local/bin/ 
+                export PATH=$PATH:$HOME/.local/bin 
                 upg_pipx='y' 
             fi
         elif test $distro_base == "Debian"; then
@@ -52,8 +52,8 @@ if ! type pipx &> /dev/null; then
             if [[ $(pipx --version) < 1.6.0 ]]; then 
                 pipx install pipx
                 pipx upgrade pipx
-                sudo apt purge --autoremove pipx 
-                export PATH=$PATH:$HOME/.local/bin/ 
+                sudo apt purge --autoremove -y pipx 
+                export PATH=$PATH:$HOME/.local/bin 
                 upg_pipx='y' 
             fi 
         fi
@@ -78,9 +78,8 @@ if ! type pipx &> /dev/null; then
         
         if ! type activate-global-python-argcomplete &> /dev/null; then
             reade -Q "GREEN" -i "y" -p "Install argcomplete with pipx? (autocompletion for python scripts) [Y/n]: " "n" pycomp
-             
             if test $pycomp == 'y'; then
-                if ! type pipx &> /dev/null; then
+                if test $upg_pipx == 'y'; then
                     $HOME/.local/bin/pipx install argcomplete
                 else
                     pipx install argcomplete 
