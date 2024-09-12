@@ -25,6 +25,7 @@ if ! test -f checks/check_envvar.sh; then
 else
     . ./checks/check_envvar.sh
 fi 
+
 if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
 else
@@ -40,9 +41,9 @@ fi
 # Ranger (File explorer)
 if ! type ranger &> /dev/null; then
      if test $distro_base == "Arch"; then
-        sudo pacman -S ranger python python-pipx
+        sudo pacman -S ranger
     elif test $distro_base == "Debian"; then    
-        sudo apt install ranger python3 python3-dev pipx
+        sudo apt install ranger
     fi
 fi
 
