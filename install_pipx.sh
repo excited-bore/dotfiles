@@ -25,6 +25,7 @@ fi
 if ! type pipx &> /dev/null; then
     reade -Q "GREEN" -i "y" -p "Install pipx? (for installing packages outside of virtual environments) [Y/n]: " "n" insppx
     if test $insppx == "y"; then
+        upg_pipx='n' 
         if test $machine == 'Mac' && type brew &> /dev/null; then
             echo "This next $(tput setaf 1)sudo$(tput sgr0) will install pipx"
             brew install python python-pipx
@@ -32,7 +33,8 @@ if ! type pipx &> /dev/null; then
                 pipx install pipx
                 pipx upgrade pipx
                 brew uninstall pipx 
-               export PATH=$PATH:$HOME/.local/bin/ 
+                export PATH=$PATH:$HOME/.local/bin/ 
+                upg_pipx='y' 
             fi
         elif test $distro_base == "Arch"; then 
             echo "This next $(tput setaf 1)sudo$(tput sgr0) will install pipx"
@@ -42,6 +44,7 @@ if ! type pipx &> /dev/null; then
                 pipx upgrade pipx
                 sudo pacman -Rs pipx 
                 export PATH=$PATH:$HOME/.local/bin/ 
+                upg_pipx='y' 
             fi
         elif test $distro_base == "Debian"; then
             echo "This next $(tput setaf 1)sudo$(tput sgr0) will install pipx"
@@ -51,10 +54,11 @@ if ! type pipx &> /dev/null; then
                 pipx upgrade pipx
                 sudo apt purge --autoremove pipx 
                 export PATH=$PATH:$HOME/.local/bin/ 
+                upg_pipx='y' 
             fi 
         fi
 
-        if ! type pipx &> /dev/null; then
+        if test $upg_pipx == 'y'; then 
             $HOME/.local/bin/pipx ensurepath
         else
             pipx ensurepath
@@ -64,7 +68,7 @@ if ! type pipx &> /dev/null; then
         if ! test $machine == 'Windows'; then 
             reade -Q "GREEN" -i "y" -p "Set to install packages globally (including for root)? [Y/n]: " "n" insppxgl
             if test $insppxgl == "y"; then 
-                if ! type pipx &> /dev/null; then
+                if test $upg_pipx == 'y'; then 
                     sudo $HOME/.local/bin/pipx --global ensurepath
                 else
                     sudo pipx --global ensurepath 
