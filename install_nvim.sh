@@ -79,6 +79,14 @@ if test $machine == 'Mac' && type brew &> /dev/null; then
         if ! type pylint &> /dev/null; then
             reade -Q "GREEN" -i "y" -p "Install nvim-python? [Y/n]: " "n" pyscripts
             if [ -z $pyscripts ] || [ "y" == $pyscripts ]; then
+                if ! type pyenv &> /dev/null; then 
+                    if ! test -f install_pyenv.sh; then
+                         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pyenv.sh)" 
+                    else
+                        ./install_pyenv.sh
+                    fi
+                fi 
+
                 if ! test -f install_pipx.sh; then
                      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)" 
                 else
@@ -160,7 +168,14 @@ elif test $distro_base == "Arch"; then
         if ! type pylint &> /dev/null; then
             reade -Q "GREEN" -i "y" -p "Install nvim-python? [Y/n]: " "n" pyscripts
             if [ -z $pyscripts ] || [ "y" == $pyscripts ]; then
-                sudo pacman -S python-pynvim
+                if ! type pyenv &> /dev/null; then 
+                    if ! test -f install_pyenv.sh; then
+                         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pyenv.sh)" 
+                    else
+                        ./install_pyenv.sh
+                    fi
+                fi 
+                 
                 if ! test -f install_pipx.sh; then
                      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)" 
                 else
@@ -379,6 +394,13 @@ elif [ $distro_base == "Debian" ];then
         if ! type pylint &> /dev/null; then
             reade -Q "GREEN" -i "y" -p "Install nvim-python? [Y/n]: " "n" pyscripts
             if [ -z $pyscripts ] || [ "y" == $pyscripts ]; then
+                if ! type pyenv &> /dev/null; then 
+                    if ! test -f install_pyenv.sh; then
+                         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pyenv.sh)" 
+                    else
+                        ./install_pyenv.sh
+                    fi
+                fi 
                 if ! test -f install_pipx.sh; then
                      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)" 
                 else

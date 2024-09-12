@@ -158,7 +158,7 @@ reade(){
         if test "$args" == ''; then
             rlwstring="rlwrap -D 0 -b \"$breaklines\" -o cat"
         else
-            rlwstring="rlwrap -D 0 -H $tmpf -b \"$breaklines\" -f <(echo \"${args[@]}\") -o cat"
+            rlwstring="rlwrap -s 1000 -D 0 -H $tmpf -b \"$breaklines\" -f <(echo \"${args[@]}\") -o cat"
         fi
         breaklines=''
         while getopts ':b:e:i:p:Q:s:S:' flag; do

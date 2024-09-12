@@ -47,9 +47,9 @@ stty werase 'undef'
 
 # Set caps to Escape
 X11_WAY="$(loginctl show-session $(awk '/tty/ {print $1}' <(loginctl)) -p Type | awk -F= '{print $2}')"
-if test "$X11_WAY" == 'x11'; then
-    setxkbmap -option caps:escape
-fi
+#if test "$X11_WAY" == 'x11'; then
+#    #setxkbmap -option caps:escape
+#fi
 
 # Set Shift delete to backspace
 # xmodmap -e "keycode 119 = Delete BackSpace"     

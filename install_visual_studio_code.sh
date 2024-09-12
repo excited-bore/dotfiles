@@ -39,6 +39,7 @@ if ! type code &> /dev/null; then
                 fi 
             fi
             unset ins_yay 
+            yay -S visual-studio-code-bin 
         fi
     elif [ $distro_base == "Debian" ]; then
         if ! type wget &> /dev/null; then
