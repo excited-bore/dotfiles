@@ -25,7 +25,6 @@ fi
 if ! type pipx &> /dev/null; then
     reade -Q "GREEN" -i "y" -p "Install pipx? (for installing packages outside of virtual environments) [Y/n]: " "n" insppx
     if test $insppx == "y"; then
-        upgrade_ver='n' 
         if test $machine == 'Mac' && type brew &> /dev/null; then
             echo "This next $(tput setaf 1)sudo$(tput sgr0) will install pipx"
             brew install python python-pipx
@@ -33,7 +32,7 @@ if ! type pipx &> /dev/null; then
                 pipx install pipx
                 pipx upgrade pipx
                 brew uninstall pipx 
-                upgrade_ver='y' 
+               export PATH=$PATH:$HOME/.local/bin/ 
             fi
         elif test $distro_base == "Arch"; then 
             echo "This next $(tput setaf 1)sudo$(tput sgr0) will install pipx"
@@ -42,7 +41,7 @@ if ! type pipx &> /dev/null; then
                 pipx install pipx
                 pipx upgrade pipx
                 sudo pacman -Rs pipx 
-                upgrade_ver='y' 
+                export PATH=$PATH:$HOME/.local/bin/ 
             fi
         elif test $distro_base == "Debian"; then
             echo "This next $(tput setaf 1)sudo$(tput sgr0) will install pipx"
@@ -50,28 +49,17 @@ if ! type pipx &> /dev/null; then
             if [[ $(pipx --version) < 1.6.0 ]]; then 
                 pipx install pipx
                 pipx upgrade pipx
-                sudo apt remove pipx 
-                upgrade_ver='y' 
+                sudo apt purge --autoremove pipx 
+                export PATH=$PATH:$HOME/.local/bin/ 
             fi 
         fi
 
-        if test $upgrade_ver == 'y'; then
-            $HOME/.local/bin/pipx ensurepath
-        else
-            pipx ensurepath
-        fi
+        pipx ensurepath
 
         if ! test $machine == 'Windows'; then 
             reade -Q "GREEN" -i "y" -p "Set to install packages globally (including for root)? [Y/n]: " "n" insppxgl
             if test $insppxgl == "y"; then 
-                #if [[ $(whereis pipx) =~ $HOME/.local/bin ]]; then
-                #    sudo env PATH=$PATH:$HOME/.local/bin pipx ensurepath --global
-                #fi
-                if test $upgrade_ver == 'y'; then
-                    sudo $HOME/.local/bin/pipx --global ensurepath
-                else
-                    sudo pipx --global ensurepath 
-                fi
+                sudo pipx --global ensurepath 
             fi
         fi 
         
@@ -79,11 +67,8 @@ if ! type pipx &> /dev/null; then
             reade -Q "GREEN" -i "y" -p "Install argcomplete with pipx? (autocompletion for python scripts) [Y/n]: " "n" pycomp
              
             if test $pycomp == 'y'; then
-                if test $upgrade_ver == 'y'; then
-                    $HOME/.local/bin/pipx install argcomplete
-                else
-                    pipx install argcomplete 
-                fi
+
+                pipx install argcomplete 
 
                 if type activate-global-python-argcomplete &> /dev/null; then
                     activate-global-python-argcomplete --dest=/home/$USER/.bash_completion.d 
