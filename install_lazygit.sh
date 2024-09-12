@@ -31,7 +31,7 @@ if ! type lazygit &> /dev/null; then
     if test $distro_base == "Arch"; then
         sudo pacman -S lazygit
     elif test $distro_base == "Debian"; then
-        if $(apt search lazygit 2> /dev/null); then 
+        if ! test -z $(apt search lazygit 2> /dev/null | awk 'NR>2 {print;}'); then 
             sudo apt install lazygit 
         else
             if ! type curl &> /dev/null; then
