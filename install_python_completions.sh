@@ -45,7 +45,12 @@ if ! type pipx &> /dev/null; then
         ./install_pipx.sh
     fi 
 fi
-pipx install argcomplete
+
+if ! test -z $upg_pipx && test $upg_pipx == 'y'; then
+    $HOME/.local/bin/pipx install argcomplete
+else
+    pipx install argcomplete
+fi
 
 if type activate-global-python-argcomplete &> /dev/null; then
     activate-global-python-argcomplete --dest=/home/$USER/.bash_completion.d 

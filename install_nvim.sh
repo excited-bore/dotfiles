@@ -82,9 +82,16 @@ if test $machine == 'Mac' && type brew &> /dev/null; then
                 else
                     ./install_pipx.sh
                 fi
-                pipx install pynvim 
-                pipx install pylint
-                pipx install jedi
+
+                if ! test -z $upg_pipx && test $upg_pipx == 'y'; then
+                    $HOME/.local/bin/pipx install pynvim
+                    $HOME/.local/bin/pipx install pylint 
+                    $HOME/.local/bin/pipx install jedi 
+                else
+                    pipx install pynvim 
+                    pipx install pylint
+                    pipx install jedi
+                fi
             fi
         fi
         if ! type npm &> /dev/null || ! npm list -g | grep neovim &> /dev/null; then
@@ -151,15 +158,23 @@ elif test $distro == "Arch" || test $distro == "Manjaro"; then
         if ! type pylint &> /dev/null; then
             reade -Q "GREEN" -i "y" -p "Install nvim-python? [Y/n]: " "n" pyscripts
             if [ -z $pyscripts ] || [ "y" == $pyscripts ]; then
+                sudo pacman -S python-pynvim
                 if ! test -f install_pipx.sh; then
                      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)" 
                 else
                     ./install_pipx.sh
                 fi
-                sudo pacman -S python-pynvim
-                pipx install pynvim 
-                pipx install pylint
-                pipx install jedi
+
+                if ! test -z $upg_pipx && test $upg_pipx == 'y'; then
+                    $HOME/.local/bin/pipx install pynvim
+                    $HOME/.local/bin/pipx install pylint 
+                    $HOME/.local/bin/pipx install jedi 
+                else
+                    pipx install pynvim 
+                    pipx install pylint
+                    pipx install jedi
+                fi
+                 
             fi
         fi
         if ! type npm &> /dev/null || ! npm list -g | grep neovim &> /dev/null; then
@@ -366,9 +381,16 @@ elif [  $distro_base == "Debian" ];then
                 else
                     ./install_pipx.sh
                 fi
-                pipx install pynvim
-                pipx install pylint
-                pipx install jedi
+
+                if ! test -z $upg_pipx && test $upg_pipx == 'y'; then
+                    $HOME/.local/bin/pipx install pynvim
+                    $HOME/.local/bin/pipx install pylint 
+                    $HOME/.local/bin/pipx install jedi 
+                else
+                    pipx install pynvim 
+                    pipx install pylint
+                    pipx install jedi
+                fi
             fi
         fi
 

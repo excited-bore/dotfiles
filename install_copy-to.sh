@@ -34,8 +34,14 @@ if ! type copy-to &> /dev/null; then
             ./install_pipx.sh
         fi
     fi
+
+    if ! test -z $upg_pipx && test $upg_pipx == 'y'; then
+        $HOME/.local/bin/pipx install copy-to
+    else
+        pipx install copy-to
+    fi
 fi
-pipx install copy-to
+
 
 if type copy-to &> /dev/null; then
     copy-to -h
