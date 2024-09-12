@@ -184,9 +184,9 @@ if test $ktty_cnf == 'y'; then
             fi
              
             printf "Layouts: \n"
-            for lay in "${layouts[@]}"; do
-                printf "$lay"; 
-            done 
+            #for lay in "${layouts[@]}"; do
+                printf "$layouts"; 
+            #done 
 
             prompt='Initial layout in list? '
             if test $j == 2; then

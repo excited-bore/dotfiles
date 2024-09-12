@@ -23,12 +23,13 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
         
         less_=''
         if type less &> /dev/null; then
-            less_='| less --quit-if-one-screen'
+            less_="| less --quit-if-one-screen"
         fi
         playlist='--no-playlist'
         start=" "
         end=" "
         plst_frm=''
+        rror='' 
 
     reade -Q 'GREEN' -i 'n' -p 'Download playlist if url directs to one? [N/y]: ' 'y' plslt
         if test $plslt == 'y' ; then
@@ -41,11 +42,15 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
             if [ ! -z "$end" ]; then
                 end=" --playlist-end $end";
             fi
+
             reade -Q "green" -i "y" -p "Give each videotitle the index according how it's ordered in the playlist? (f.ex. '4) Lofi Mix.mp3') [Y/n]: " "n" plst_rank
             if test "$plst_rank" == "y"; then
                 plst_frm="%(playlist_index)s - %(title)s.%(ext)s"
             fi
             
+            reade -Q "green" -i "3" -p "How many errors for a video in list is skipped? : " "1 2 4 5 6 7 8 9 10" rror
+            rror=" --skip-playlist-after-error $rror"
+
             reade -Q "green" -i "y" -p "Make directory using playlist name and put songs in said dir? [Y/n]: " "n" plst_dir
             if test "$plst_dir" == "y"; then
                 if ! test -z $plst_rank; then
@@ -185,15 +190,15 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
         reade -Q "magenta" -i "n" -p "Set ${bold}minimum${normal}${magenta} resolution? (Will always try to the get best available by default) [N/y]: " "y" min_res 
         if test $min_res == 'y'; then
             echo 'Fetching available formats'
-            $yt_dl --color always --list-formats $url | awk '/\[info\]/,EOF' $less_   
+            eval "$yt_dl --color always --list-formats $url | awk '/\[info\]/,EOF' $less_"   
             reade -Q 'GREEN' -i '1080' -p 'Minimum resolution: ' '720 480 360 240 144' res
             [[ $yt_dl =~ 'yt_dlp' ]] && format_all="-f 'bv[res>=$res]*+ba/b'" || format_all="-f 'bestvideo[resolution>=$res]+bestaudio/best'" 
         fi
-                                                   
+            
         if ! test -z "$plst_frm"; then
-            "$yt_dl" -c -i -R 20 $playlist $start $end -o "$plst_frm" $format $format_all $sub $cap -- "$url" ;
+            "$yt_dl" -c -i -R 20 $playlist $start $end $rror -o "$plst_frm" $format $format_all $sub $cap -- "$url" ;
         else
-            "$yt_dl" -c -i -R 20 $playlist $start $end $format $format_all $sub $cap -- "$url" ;
+            "$yt_dl" -c -i -R 20 $playlist $start $end $rror $format $format_all $sub $cap -- "$url" ;
         fi
         unset plslt plst_frm plst_dir plst_rank playlist start end plst_dir cap sub format format_sub form_pre format_cap format_all formats url cap_list sub_list frst_frm_p frst_frm caplang sub_auto live_chat cap_langs sub_lang sub_langs less_
     }

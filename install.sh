@@ -155,30 +155,11 @@ if test $distro_base == 'Debian'; then
     fi
     
     if type add-apt-repository &> /dev/null; then
-        if ! type list-ppa &> /dev/null; then
-            printf "${CYAN}list-ppa${normal} is not installed (python cmd tool for listing ppas from 'launchpad.net'\n"
-            reade -Q 'GREEN' -i 'y' -p "Install list-ppa? [Y/n]: " 'n' ppa_ins
-            if test $ppa_ins == 'y'; then
-                if ! type pipx &> /dev/null; then
-                    if ! test -f install_pipx.sh; then
-                        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)" 
-                    else
-                        ./install_pipx.sh
-                    fi  
-                fi
-                pipx install list-ppa
-                if ! test -f ~/.config/ppas; then 
-                    reade -Q 'GREEN' -i 'y' -p "Run list-ppa (generates file containin ppas that have a release file for your version in ~/.config/ppas - !! Can take a while - can be rerun)? [Y/n]: " 'n' ppa_ins
-                    if test $ppa_ins == 'y'; then
-                        if ! type list-ppa &> /dev/null; then
-                            $HOME/.local/bin/list-ppa --file ~/.config/ppas 
-                        else
-                            list-ppa --file ~/.config/ppas
-                        fi
-                    fi 
-                fi 
-            fi
-            unset ppa_ins 
+        if ! test -f install_list-ppa.sh; then
+                eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_list-ppa.sh)" 
+             
+        else
+            ./install_list-ppa.sh
         fi
 
         if ! type ppa-purge &> /dev/null; then

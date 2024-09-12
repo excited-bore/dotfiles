@@ -36,9 +36,21 @@ if test -z $SYSTEM_UPDATED; then
 fi 
 
 if ! type autojump &> /dev/null; then
-    if [ "$distro" == "Manjaro" ]; then
-        pamac install autojump
-    elif test "$distro" == "Arch" && ! test -z "$AUR_install"; then
+    if test "$distro_base" == "Arch"; then
+        if ! test -z "$AUR_install"; then 
+            eval "$AUR_install" visual-studio-code-bin
+        else
+            reade -Q 'GREEN' -i 'y' -p 'No AUR helper found. Install yay? [Y/n]: ' 'n' ins_yay
+            if test $ins_yay == 'y'; then
+                if ! test -f AUR_installers/install_yay.sh ; then
+                     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/AUR_installers/install_yay.sh )" 
+                else
+                    . ./AUR_installers/install_yay.sh 
+                fi 
+            fi
+            unset ins_yay
+            yay -S visual-studio-code-bin 
+        fi
         eval "$AUR_install" autojump
     elif [ $distro_base == "Debian" ]; then
         sudo apt install autojump                                                              

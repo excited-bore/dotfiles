@@ -343,6 +343,7 @@ alias only1space="tr -s ' '"
 alias upper2lower="tr '[:upper:]' '[:lower:]'"
 alias upper1stletter="\${var^}"
 alias lower2upper="tr '[:lower:]' '[:upper:]'"
+alias remove-whitespace='| xargs'
 
 alias remove-empty-lines="sed '/^[[:space:]]*$/d'"
 alias get-first-stringwords="frst=\"\$(echo \$words | awk '{print \$1}')\" && words=\"\$(echo \$words | sed \"s/\<\$frst\> //g\")\""

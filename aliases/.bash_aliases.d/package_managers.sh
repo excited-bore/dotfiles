@@ -306,6 +306,7 @@ if type pamac &> /dev/null; then
     alias pamac-upgrade="pamac upgrade"
     alias pamac-upgrade-yes="yes | pamac upgrade"
     alias pamac-list-installed="pamac list --installed" 
+    alias pamac-list-installed-AUR="pamac list --foreign" 
     alias pamac-list-groups="pamac list --groups" 
     alias pamac-search-aur="pamac search --aur"
     alias pamac-forcerefresh="pamac update --force-refresh && pamac upgrade --force-refresh"

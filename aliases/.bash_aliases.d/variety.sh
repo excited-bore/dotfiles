@@ -15,6 +15,17 @@ if type lowfi &> /dev/null; then
     alias lowfi-play="lowfi play"
 fi
 
+if type nmap &> /dev/null; then
+    function open-ports-outgoing(){
+        if test -z $@; then
+            time nmap -p- portquiz.net | grep -i open 
+        else 
+            time nmap -p $@ portquiz.net 
+        fi
+    }
+    complete -W "$(seq 1 10000)" open-ports-outgoing 
+fi
+
 if type exiftool &> /dev/null; then
     alias exiftool-folder="exiftool -r -all=$(pwd)"
     function exiftool-add-cron-wipe-all-metadata-rec-dir(){

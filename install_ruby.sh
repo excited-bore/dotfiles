@@ -13,11 +13,6 @@ if ! test -f checks/check_envvar.sh; then
 else
     . ./checks/check_envvar.sh
 fi
-if ! test -f checks/check_keybinds.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_keybinds.sh)" 
-else
-    . ./checks/check_keybinds.sh
-fi
 
 if ! type update-system &> /dev/null; then
     if ! test -f aliases/.bash_aliases.d/update-system.sh; then
@@ -50,13 +45,13 @@ if ! type rbenv &> /dev/null; then
         fi 
 
         eval "$AUR_install ruby-build rbenv"
-        if ! grep -q 'eval "$(rbenv init -)' ~/.bashrc; then 
-            printf "eval \"$(rbenv init -)\"\n" >> ~/.bashrc 
-        fi
-
     elif [ $distro_base == "Debian" ]; then
         sudo apt install rbenv                 
     fi 
+
+    if ! grep -q 'eval "$(rbenv init -)' ~/.bashrc; then 
+        printf "eval \"$(rbenv init -)\"\n" >> ~/.bashrc 
+    fi
 fi
 
 if type rbenv &> /dev/null; then
