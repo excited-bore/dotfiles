@@ -166,6 +166,7 @@ if test $distro_base == 'Debian'; then
                         ./install_pipx.sh
                     fi  
                 fi
+
                 if ! test -z $upg_pipx && test $upg_pipx == 'y'; then
                     $HOME/.local/bin/pipx install list-ppa
                 else

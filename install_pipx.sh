@@ -25,7 +25,7 @@ fi
 if ! type pipx &> /dev/null; then
     reade -Q "GREEN" -i "y" -p "Install pipx? (for installing packages outside of virtual environments) [Y/n]: " "n" insppx
     if test $insppx == "y"; then
-        upg_pipx='n' 
+        export upg_pipx='n' 
         if test $machine == 'Mac' && type brew &> /dev/null; then
             echo "This next $(tput setaf 1)sudo$(tput sgr0) will install pipx"
             brew install python python-pipx
