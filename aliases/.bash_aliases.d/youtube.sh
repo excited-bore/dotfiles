@@ -123,8 +123,8 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
                             fi
                         fi
                         if ! test -z "$sub_langs"; then
-                            reade -Q "cyan" -i "$frst_frm" -p "Format [$frst_frm_p/$frm_pre]: " "$subs" format_sub
-                            format_sub="--sub-format $format_sub"
+                            reade -Q "cyan" -i "$frst_frm" -p "Format [$frst_frm_p/$frm_pre]: " "$subs" format
+                            format_sub="--sub-format $format"
                         fi
                         live_chat=""
                         if [[ $yt_dl =~ 'yt-dlp' ]] && [[ "$sub_list" =~ 'live_chat' ]]; then 
