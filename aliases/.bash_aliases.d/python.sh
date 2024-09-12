@@ -2,7 +2,7 @@
 #    python $@ install --user;
 #}
 
-build='python -m build'
+#build='python -m build'
 #if type python-build &> /dev/null; then
 #    build='python-build'
 #fi
@@ -13,4 +13,14 @@ alias python-twine-upload="if type deactivate &> /dev/null; then deactivate; fi;
 alias python-venv="python3 -m venv venv; source venv/bin/activate"
 alias python-activate-venv="source venv/bin/activate"
 alias python-deactivate-venv="deactivate"
+
+alias pip-install-project="pip install ."
+alias pip-clear-cache-all="pip cache purge"
 alias pip-install-test="pip install -i https://test.pypi.org/simple/ "
+alias pip-freeze-version="pip freeze"
+
+
+alias python-pip-install-project="pip install ."
+alias python-pip-clear-cache-all="pip cache purge"
+alias python-pip-install-test="pip install -i https://test.pypi.org/simple/ "
+
