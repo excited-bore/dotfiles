@@ -1,4 +1,14 @@
-#!/usr/bin/env bash
+#!/bin/bash
+
+if ! type curl &> /dev/null; then
+    printf "$(tput setaf 6 && tput bold)curl${normal} not installed (cmd tool for interacting with urls)\n$(tput sgr0)"
+    printf "$(tput setaf 2 && tput bold)Install curl? [Y/n]: $(tput sgr0)" ins_curl
+    read ins_curl 
+    if test $ins_curl == 'y' || test $ins_curl == '' || test $ins_curl == 'Y'; then
+       sudo apt install curl -y
+    fi
+fi
+unset ins_curl
 
 if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
@@ -70,6 +80,16 @@ fi
 
 unset sym1 sym2 sym3 beep
 
+# Environment variables
+
+if ! test -f install_envvars.sh; then
+    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_envvars.sh
+    . $tmp 'n' 
+else
+    ./install_envvars.sh 'n'  
+fi 
+
+# Appimagelauncher
 
 if ! type AppImageLauncher &> /dev/null; then
     printf "${GREEN}If you want to install applications using appimages, there is a helper called 'appimagelauncher'\n"
@@ -82,6 +102,9 @@ if ! type AppImageLauncher &> /dev/null; then
          fi
      fi
 fi
+
+
+# Flatpak
 
 #if ! type flatpak &> /dev/null; then
    #printf "%s\n" "${blue}No flatpak detected. (Independent package manager from Red Hat)${normal}"
@@ -143,7 +166,12 @@ if test $distro_base == 'Debian'; then
                         ./install_pipx.sh
                     fi  
                 fi
-                pipx install list-ppa
+                if ! test -z $upg_pipx && test $upg_pipx == 'y'; then
+                    $HOME/.local/bin/pipx install list-ppa
+                else
+                    pipx install list-ppa
+                fi
+                 
                 if ! test -f ~/.config/ppas; then 
                     reade -Q 'GREEN' -i 'y' -p "Run list-ppa (generates file containin ppas that have a release file for your version in ~/.config/ppas - !! Can take a while - can be rerun)? [Y/n]: " 'n' ppa_ins
                     if test $ppa_ins == 'y'; then
@@ -201,15 +229,6 @@ else
     . ./checks/check_completions_dir.sh
 fi
 
-
-# Environment variables
-
-if ! test -f install_envvars.sh; then
-    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_envvars.sh
-    . $tmp 'n' 
-else
-    ./install_envvars.sh 'n'  
-fi 
 
 # Bash alias completions
 

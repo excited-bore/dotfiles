@@ -1402,13 +1402,16 @@ fi
                 elif test $pager == "delta"; then
                     sudo pacman -S git-delta
                 elif test $pager == "ydiff"; then
-                    if ! test -f install_pipx.sh; then
+                    if ! test -z $upg_pipx && ! test -f install_pipx.sh; then
                         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)"
                     else
                         ./install_pipx.sh
                     fi
-                    pipx install --upgrade ydiff
-                fi
+                    if test $upg_pipx == 'y'; then
+                        $HOME/.local/bin/pipx install --upgrade ydiff
+                    else
+                        pipx install --upgrade ydiff
+                    fi
             elif test "$distro_base" == "Debian"; then
                 if test $pager == "diff-so-fancy"; then
                     sudo apt install npm
@@ -1421,7 +1424,11 @@ fi
                     else
                         ./install_pipx.sh
                     fi
-                    pipx install --upgrade ydiff
+                    if ! test -z $upg_pipx && test $upg_pipx == 'y'; then
+                        $HOME/.local/bin/pipx install --upgrade ydiff
+                    else
+                        pipx install --upgrade ydiff
+                    fi
                 fi
             fi
         fi
