@@ -176,7 +176,11 @@ if test $distro_base == 'Debian'; then
                 if ! test -f ~/.config/ppas; then 
                     reade -Q 'GREEN' -i 'y' -p "Run list-ppa (generates file containin ppas that have a release file for your version in ~/.config/ppas - !! Can take a while - can be rerun)? [Y/n]: " 'n' ppa_ins
                     if test $ppa_ins == 'y'; then
-                        list-ppa --file ~/.config/ppas
+                        if ! type list-ppa &> /dev/null; then
+                            $HOME/.local/bin/list-ppa --file ~/.config/ppas 
+                        else
+                            list-ppa --file ~/.config/ppas
+                        fi
                     fi 
                 fi 
             fi
