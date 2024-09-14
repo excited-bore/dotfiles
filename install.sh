@@ -5,7 +5,7 @@ if ! type curl &> /dev/null; then
     printf "$(tput setaf 2 && tput bold)Install curl? [Y/n]: $(tput sgr0)" ins_curl
     read ins_curl 
     if test $ins_curl == 'y' || test $ins_curl == '' || test $ins_curl == 'Y'; then
-       sudo apt install curl -y
+       eval "$pac_ins curl -y"
     fi
 fi
 unset ins_curl
@@ -139,7 +139,7 @@ if test $distro_base == 'Debian'; then
         printf "${CYAN}groff${normal} is not installed (Necessary for 'man' (manual) command)\n"
         reade -Q 'GREEN' -i 'y' -p "Install groff? [Y/n]: " 'n' groff_ins
         if test $groff_ins == 'y'; then
-            sudo apt install groff -y
+            eval "$pac_ins groff -y"
             printf "Logout and login (or reboot) to take effect\n" 
         fi
         unset groff_ins 
@@ -149,7 +149,7 @@ if test $distro_base == 'Debian'; then
         printf "${CYAN}manpages-posix${normal} is not installed (Manpages for posix-compliant (f.ex. bash) commands (f.ex. alias, test, type, etc...))\n"
         reade -Q 'GREEN' -i 'y' -p "Install manpages-posix? [Y/n]: " 'n' posixman_ins
         if test $posixman_ins == 'y'; then
-            sudo apt install manpages-posix -y
+            eval "$pac_ins manpages-posix -y"
         fi
         unset posixman_ins 
     fi
@@ -166,7 +166,7 @@ if test $distro_base == 'Debian'; then
             printf "${CYAN}ppa-purge${normal} is not installed (cmd tool for removing ppa repositories)\n"
             reade -Q 'GREEN' -i 'y' -p "Install ppa-purge? [Y/n]: " 'n' ppa_ins
             if test $ppa_ins == 'y'; then
-                sudo apt install ppa-purge -y
+                eval "$pac_ins ppa-purge -y"
             fi
             unset ppa_ins 
         fi
@@ -177,7 +177,7 @@ if test $distro_base == 'Debian'; then
             printf "${CYAN}synaptic${normal} is not installed (Better GUI for package management)\n"
             reade -Q 'GREEN' -i 'y' -p "Install synaptic? [Y/n]: " 'n' ins_curl
             if test $ins_curl == 'y'; then
-               sudo apt install synaptic -y
+               eval "$pac_ins synaptic -y"
             fi
             unset ins_curl
         fi

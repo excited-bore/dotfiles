@@ -34,7 +34,7 @@ fi
 
 if ! type go &> /dev/null; then 
     if test $distro == "Arch" || test $distro == "Manjaro"; then
-        sudo pacman -S go
+        eval "$pac_ins go"
     elif [ $distro_base == "Debian" ]; then
         if [[ "$arch" =~ "arm"* ]]; then
            arch="armv6l"
@@ -70,7 +70,7 @@ if ! type go &> /dev/null; then
                 #fi
             fi
         else
-            sudo apt install go
+            eval "$pac_ins go"
         fi
         
     fi    

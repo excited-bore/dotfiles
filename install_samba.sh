@@ -26,9 +26,9 @@ fi
 
 if ! command -v samba &> /dev/null; then
     if test "$distro" == "Arch" || test "$distro" == "Manjaro"; then
-        sudo pacman -S samba
+        eval "$pac_ins samba"
     elif [ $distro_base == "Debian" ];then
-        sudo apt install samba samba-common  
+        eval "$pac_ins samba samba-common  "
     fi
 fi
 

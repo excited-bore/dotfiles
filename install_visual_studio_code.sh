@@ -43,18 +43,18 @@ if ! type code &> /dev/null; then
         fi
     elif [ $distro_base == "Debian" ]; then
         if ! type wget &> /dev/null; then
-           sudo apt install wget -y 
+           eval "$pac_ins wget -y "
         fi
         if test -z $(apt list --installed software-properties-common 2> /dev/null); then
-            sudo apt install -y software-properties-common 
+            eval "$pac_ins -y software-properties-common "
         fi
         if test -z $(apt list --installed apt-transport-https 2> /dev/null); then
-            sudo apt install -y apt-transport-https 
+            eval "$pac_ins -y apt-transport-https "
         fi
         wget -q https://packages.microsoft.com/keys/microsoft.asc -O- | sudo apt-key add - 
         sudo add-apt-repository "deb [arch=$arch] https://packages.microsoft.com/repos/vscode stable main" 
         sudo apt update 
-        sudo apt install code 
+        eval "$pac_ins code "
     fi
 fi
 

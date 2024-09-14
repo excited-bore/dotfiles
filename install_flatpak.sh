@@ -35,12 +35,12 @@ if ! type flatpak &> /dev/null; then
     if test "$distro" == "Manjaro"; then
         pamac install flatpak libpamac-flatpak-plugin python
     elif test "$distro_base" == "Arch"; then
-        sudo pacman -S flatpak python
+        eval "$pac_ins flatpak python"
     elif test "$distro_base" == "Debian"; then
         if [[ "$XDG_CURRENT_DESKTOP" =~ "GNOME" ]]; then
-            sudo apt install gnome-software-plugin-flatpak gir1.2-xdpgtk* gir1.2-flatpak* python3 
+            eval "$pac_ins gnome-software-plugin-flatpak gir1.2-xdpgtk* gir1.2-flatpak* python3 "
         else 
-            sudo apt install flatpak python3 gir1.2-xdpgtk* gir1.2-flatpak*
+            eval "$pac_ins flatpak python3 gir1.2-xdpgtk* gir1.2-flatpak*"
         fi
         flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
     fi

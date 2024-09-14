@@ -29,16 +29,16 @@ fi
 
 if ! type lazygit &> /dev/null; then
     if test $distro_base == "Arch"; then
-        sudo pacman -S lazygit
+        eval "$pac_ins lazygit"
     elif test $distro_base == "Debian"; then
         if ! test -z $(apt search lazygit 2> /dev/null | awk 'NR>2 {print;}'); then 
-            sudo apt install lazygit 
+            eval "$pac_ins lazygit "
         else
             if ! type curl &> /dev/null; then
                 if test $distro_base == 'Debian'; then
-                    sudo apt install curl
+                    eval "$pac_ins curl"
                 elif test $distro_base == 'Arch'; then
-                    sudo pacman -S curl  
+                    eval "$pac_ins curl  "
                 fi
             fi
             LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po --color=never '"tag_name": "v\K[^"]*')

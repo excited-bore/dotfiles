@@ -21,9 +21,9 @@ fi
 
 if ! type gdb &> /dev/null; then 
     if test "$distro" == "Arch" || test "$distro" == "Manjaro" ;then
-        sudo pacman -S gdb
+        eval "$pac_ins gdb"
     elif test $distro_base == "Debian"; then
-        sudo apt install gdb 
+        eval "$pac_ins gdb "
     fi
 fi
 

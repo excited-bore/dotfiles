@@ -21,8 +21,8 @@ fi
 
 if ! type tree &> /dev/null; then 
     if test "$distro" == "Arch" || test "$distro" == "Manjaro" ;then
-        sudo pacman -S tree
+        eval "$pac_ins tree"
     elif test $distro_base == "Debian"; then
-        sudo apt install tree 
+        eval "$pac_ins tree "
     fi
 fi

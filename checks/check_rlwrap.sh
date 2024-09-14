@@ -19,17 +19,17 @@ if ! type rlwrap &> /dev/null; then
         elif [[ $(uname -s) =~ 'CYGWIN' ]] && type apt-cyg &> /dev/null; then
             apt-cyg install rlwrap
         elif test $distro_base == "Debian"; then
-            sudo apt install rlwrap;
-        elif test $distro == "Arch" || test $distro == "Manjaro"; then
-            sudo pacman -S rlwrap;
+            eval "$pac_ins rlwrap"
+        elif test $distro_base == "Arch"; then
+            eval "$pac_ins rlwrap"
         else
-            if test -x $(command -v git) && test -x $(command -v make); then
+            if type git &> /dev/null && type make &> /dev/null; then
                 (cd $TMPDIR
                 git clone https://github.com/hanslub42/rlwrap
                 cd rlwrap
                 ./configure
                 make
-                if [ -x $(command -v sudo) ]; then
+                if type sudo &> /dev/null; then
                     sudo make install
                 else
                     make install

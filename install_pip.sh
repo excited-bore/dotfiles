@@ -31,9 +31,9 @@ fi
 if ! type pip &> /dev/null; then
     echo "This next $(tput setaf 1)sudo$(tput sgr0) will install pip"
     if test $distro == "Arch" || test $distro == "Manjaro"; then 
-        sudo pacman -S python-pip
+        eval "$pac_ins python-pip"
     elif test $distro_base == "Debian"; then
-        sudo apt install python3-pip
+        eval "$pac_ins python3-pip"
     fi
 fi
 

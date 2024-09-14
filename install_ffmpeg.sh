@@ -31,9 +31,9 @@ if ! type ffmpeg &> /dev/null; then
     if test $machine == 'Mac' && type brew &> /dev/null; then
         brew install ffmpeg
     elif test $distro == "Arch" || test $distro == "Manjaro"; then
-        sudo pacman -S ffmpeg
+        eval "$pac_ins ffmpeg"
     elif [ $distro_base == "Debian" ]; then
-        sudo apt install ffmpeg 
+        eval "$pac_ins ffmpeg "
     fi
 fi
 

@@ -12,9 +12,9 @@ fi
 if [ "$distro" == "Manjaro" ]; then
     pamac install virt-manager qemu bridge-utils spice-vdagent
 elif [ "$distro_base" == "Debian" ]; then
-    sudo apt install -y qemu-kvm libvirt-bin bridge-utils virt-manager qemu virt-viewer spice-vdagent
+    eval "$pac_ins -y qemu-kvm libvirt-bin bridge-utils virt-manager qemu virt-viewer spice-vdagent"
 elif [ "$distro" == "Arch" ]; then
-    sudo pacman -S virt-manager qemu bridge-utils spice-vdagent
+    eval "$pac_ins virt-manager qemu bridge-utils spice-vdagent"
 fi
 
 sudo systemctl enable --user libvirtd.service

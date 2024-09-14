@@ -58,7 +58,7 @@ if ! type moar &> /dev/null; then
             if ! type wget &> /dev/null; then
                 reade -Q "GREEN" -i "y" -p "Need wget for this to work (tool to fetch file from the internet). Install wget? [Y/n]: " "n"  ins_wget
                 if test $ins_wget == 'y'; then
-                    sudo apt install wget
+                    eval "$pac_ins wget"
                 fi
                 unset ins_wget 
             fi
@@ -113,6 +113,6 @@ if [ -z "$moar_root" ] || [ "y" == "$moar_root" ] || [ "Y" == "$moar_root" ]; th
     fi
 fi
 
-    #./setup_git_build_from_source.sh "y" "" "https://github.com" "neovim/neovim" "stable" "sudo apt update; sudo apt install ninja-build gettext libtool libtool-bin cmake g++ pkg-config unzip curl doxygen" "make CMAKE_BUILD_TYPE=RelWithDebInfo; sudo make install" "sudo make uninstall" "make distclean; make deps" "y"
+    #./setup_git_build_from_source.sh "y" "" "https://github.com" "neovim/neovim" "stable" "sudo apt update; eval "$pac_ins ninja-build gettext libtool libtool-bin cmake g++ pkg-config unzip curl doxygen" "make CMAKE_BUILD_TYPE=RelWithDebInfo; sudo make install" "sudo make uninstall" "make distclean; make deps" "y""
 
 

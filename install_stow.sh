@@ -36,9 +36,9 @@ fi
 
 if ! type stow &> /dev/null; then
     if test "$distro_base" == "Arch"; then
-        sudo pacman -S stow
+        eval "$pac_ins stow"
     elif [ $distro_base == "Debian" ]; then
-        sudo apt install stow                                                              
+        eval "$pac_ins stow                                                              "
     fi
 fi
 

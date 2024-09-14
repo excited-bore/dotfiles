@@ -27,9 +27,9 @@ fi
 
 if ! type cargo &> /dev/null; then
     if test $distro_base == "Debian"; then
-       sudo apt install cargo
+       eval "$pac_ins cargo"
     elif test $distro == "Arch" || test $distro == "Manjaro"; then
-       sudo pacman -S cargo
+       eval "$pac_ins cargo"
     fi
 fi
 

@@ -22,8 +22,8 @@ fi
 if ! type testdisk &> /dev/null; then
     echo "This next $(tput setaf 1)sudo$(tput sgr0) will install testdisk"
     if test $distro == "Arch" || test $distro == "Manjaro"; then 
-        sudo pacman -S testdisk
+        eval "$pac_ins testdisk"
     elif test $distro_base == "Debian"; then
-        sudo apt install testdisk
+        eval "$pac_ins testdisk"
     fi
 fi

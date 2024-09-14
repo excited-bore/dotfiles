@@ -28,9 +28,9 @@ fi
 
 if ! type rg &> /dev/null; then 
     if test $distro_base == "Arch"; then
-        sudo pacman -S ripgrep
+        eval "$pac_ins ripgrep"
     elif test $distro_base == "Debian"; then
-        sudo apt install ripgrep 
+        eval "$pac_ins ripgrep "
     fi
 fi
 

@@ -31,9 +31,9 @@ fi
 
 if ! type nano &> /dev/null; then
     if test "$distro" == "Arch"; then
-        sudo pacman -S nano
+        eval "$pac_ins nano"
     elif [ $distro_base == "Debian" ]; then
-        sudo apt install nano                                                             
+        eval "$pac_ins nano"
     fi
 fi
 

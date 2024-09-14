@@ -1264,9 +1264,9 @@ fi
         reade -Q "GREEN" -i "y" -p "Install git? [Y/n]:" "n" nstll
         if [ "$nstll" == "y" ]; then
             if test $distro == "Arch" || "$distro" == "Manjaro"; then
-                sudo pacman -S git
+                eval "$pac_ins git"
             elif test "$distro_base" == "Debian"; then
-                sudo apt install git
+                eval "$pac_ins git"
             fi
         fi
     fi
@@ -1398,9 +1398,9 @@ fi
             fi
             if test "$distro" == "Arch" || test "$distro" == "Manjaro"; then
                 if test $pager == "diff-so-fancy"; then
-                    sudo pacman -S diff-so-fancy
+                    eval "$pac_ins diff-so-fancy"
                 elif test $pager == "delta"; then
-                    sudo pacman -S git-delta
+                    eval "$pac_ins git-delta"
                 elif test $pager == "ydiff"; then
                     if ! test -f install_pipx.sh; then
                         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)"
@@ -1411,10 +1411,10 @@ fi
                 fi
             elif test "$distro_base" == "Debian"; then
                 if test $pager == "diff-so-fancy"; then
-                    sudo apt install npm
+                    eval "$pac_ins npm"
                     sudo npm -g install diff-so-fancy 
                 elif test $pager == "delta"; then
-                    sudo apt install git-delta
+                    eval "$pac_ins git-delta"
                 elif test $pager == "ydiff"; then
                     if ! test -f install_pipx.sh; then
                         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)"

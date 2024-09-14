@@ -33,9 +33,9 @@ if ! type pyenv &> /dev/null; then
     if test $machine == 'Mac' && type brew &> /dev/null; then
         brew install pyenv 
     elif test "$distro_base" == "Arch"; then
-        sudo pacman -S pyenv
+        eval "$pac_ins pyenv"
     elif [ $distro_base == "Debian" ]; then
-        sudo apt install pyenv                 
+        eval "$pac_ins pyenv                 "
     fi 
 fi
 

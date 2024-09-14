@@ -113,7 +113,7 @@ if type rg &> /dev/null; then
             echo "  - the replacement"
             return 1
         fi
-        rg "$1" --color=never --files-with-matches | xargs sed -i "s/$1/$2/g"
+        rg "$1" --multiline --color=never --files-with-matches | xargs sed -i "s/$1/$2/g"
     }
 fi
 

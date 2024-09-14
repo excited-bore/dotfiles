@@ -29,7 +29,7 @@ fi
 
 
 #if test $distro_base == "Debian"; then
-#   sudo apt install neofetch
+#   eval "$pac_ins neofetch"
 #
 if test $distro == "Manjaro"; then
    pamac install manjaro-settings-samba

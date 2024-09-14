@@ -26,9 +26,9 @@ fi
 
 if ! type jq &> /dev/null; then
     if test $distro == "Manjaro" || test $distro == "Arch"; then
-        sudo pacman -S jq
+        eval "$pac_ins jq"
     elif test $distro_base == "Debian"; then
-        sudo apt install jq
+        eval "$pac_ins jq"
     fi
 fi
 fonts=$(mktemp -d)

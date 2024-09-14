@@ -29,9 +29,9 @@ fi
 
 if ! type tmux &> /dev/null; then
     if test "$distro_base" == "Arch"; then
-        sudo pacman -S tmux
+        eval "$pac_ins tmux"
     elif test "$distro_base" == "Debian"; then
-        sudo apt install tmux
+        eval "$pac_ins tmux"
     fi
 fi
 
@@ -109,9 +109,9 @@ reade -Q "GREEN" -i "y" -p "Install tmux clipboard plugin? (tmux-yank) [Y/n]: " 
 if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
     if ! type xclip &> /dev/null || ! type xsel &> /dev/null; then
         if test "$distro_base" == "Arch"; then
-            sudo pacman -S xclip xsel
+            eval "$pac_ins xclip xsel"
         elif test $distro_base == "Debian"; then
-            sudo apt install xclip xsel
+            eval "$pac_ins xclip xsel"
         fi
     fi
     sed -i 's|#set -g @plugin '\''tmux-plugins/tmux-yank'\''|set -g @plugin '\''tmux-plugins/tmux-yank'\''|g' ~/.tmux.conf
@@ -170,9 +170,9 @@ unset tmuxx
 #    if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
 #        if [ ! -x "$(command -v pip)" ]; then
 #            if test $distro == "Arch" || test $distro == "Manjaro"; then
-#                sudo pacman -Syu python-pip
+#                eval "$pac_insyu python-pip"
 #            elif [ $distro_base == "Debian" ]; then
-#                sudo apt install python3-pip
+#                eval "$pac_ins python3-pip"
 #            fi
 #        fi
 #        pip install --break-system-packages ranger_tmux

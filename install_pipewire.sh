@@ -30,11 +30,11 @@ if test -z $SYSTEM_UPDATED; then
 fi
 
 if [ "$distro" == "Manjaro" ]; then
-    sudo pacman -S pipewire pipewire-jack wireplumber pipewire-pulse manjaro-pipewire
+    eval "$pac_ins pipewire pipewire-jack wireplumber pipewire-pulse manjaro-pipewire"
 elif [ "$distro_base" == "Arch" ]; then
-    sudo pacman -S pipewire pipewire-jack wireplumber pipewire-pulse
+    eval "$pac_ins pipewire pipewire-jack wireplumber pipewire-pulse"
 elif [ "$distro_base" == "Debian" ]; then
-    sudo apt install pipewire pipewire-pulse pipewire-jack wireplumber
+    eval "$pac_ins pipewire pipewire-pulse pipewire-jack wireplumber"
 fi 
 
 if ! test -f ~/.bash_completion.d/pipewire; then

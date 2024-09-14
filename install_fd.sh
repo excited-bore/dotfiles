@@ -23,9 +23,9 @@ fi
 
 if ! type fd &> /dev/null; then
     if test $distro == "Arch" || test $distro == "Manjaro"; then
-        sudo pacman -S fd
+        eval "$pac_ins fd"
     elif [ $distro_base == "Debian" ]; then
-        sudo apt install fd-find
+        eval "$pac_ins fd-find"
         if ! test -f ~/.local/bin/fd; then
             ln -s $(which fdfind) ~/.local/bin/fd
         fi

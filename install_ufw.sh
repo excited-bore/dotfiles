@@ -27,9 +27,9 @@ fi
 
 if ! type ufw &> /dev/null; then
     if test "$distro_base" == "Arch"; then
-        sudo pacman -S ufw
+        eval "$pac_ins ufw"
     elif [ $distro_base == "Debian" ]; then
-        sudo apt install ufw                                                              
+        eval "$pac_ins ufw"
     fi
 fi
 
@@ -37,9 +37,9 @@ if ! type gufw &> /dev/null; then
     reade -Q 'GREEN' -i 'y' -p 'Also install GUI for uncomplicated firewall? [Y/n]: ' 'n' ins_gui
     if test $ins_gui == 'y'; then
         if test "$distro_base" == "Arch"; then
-            sudo pacman -S gufw
+            eval "$pac_ins gufw"
         elif [ $distro_base == "Debian" ]; then
-            sudo apt install gufw                                                              
+            eval "$pac_ins gufw"
         fi
     fi 
 fi
