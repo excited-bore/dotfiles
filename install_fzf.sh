@@ -156,7 +156,7 @@ if ! type rg &> /dev/null; then
         fi
         
         reade -Q "GREEN" -i "y" -p "Add shortcut for ripgrep files in dir? (Ctrl-g) [Y/n]: " "n" rpgrpdir
-        if [ -z $rpgrp ] || [ "Y" == $rpgrp ] || [ $rpgrp == "y" ]; then
+        if [ $rpgrpdir == "y" ]; then
             if ! test -f fzf/.bash_aliases.d/ripgrep-directory.sh; then
                 curl -o ~/.bash_aliases.d/ripgrep-directory.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/.bash_aliases.d/ripgrep-directory.sh
             else
