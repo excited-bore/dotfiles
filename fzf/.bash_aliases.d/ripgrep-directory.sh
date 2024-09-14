@@ -8,6 +8,7 @@
 # 4. Select and open the file in EDITOR
 
 ripgrep-dir() {
+  RG_PREFIX="rg --follow --column --line-number --no-heading --color=always --smart-case" 
   INITIAL_QUERY="${*:-}"
   DEFAULT_PROMPT="Dir > "
   fzf \
