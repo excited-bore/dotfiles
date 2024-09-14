@@ -75,17 +75,13 @@ function update-system() {
             pac=brew       
             brew upgrade 
         fi
-    elif test "$packmang" == "apt"; then
-        pac=apt
-        if type nala &> /dev/null; then
-           pac=nala 
-        fi
-        sudo "$pac" update
+    elif test "$pac" == "apt"; then
+        eval "$pac_up"
         hdrs="linux-headers-$(uname -r)"
-        if test -z "sudo apt list --installed | grep $hdrs"; then
+        if test -z "$(apt list --installed 2> /dev/null | grep $hdrs)"; then
             reade -Q "GREEN" -i "y" -p "Right linux headers not installed. Install $hdrs? [Y/n]: " "n" hdrs_ins
             if [ "$hdrs_ins" == "y" ]; then
-                sudo "$pac" install "$hdrs"
+                eval "$pac_ins $hdrs"
             fi
         fi
         sudo "$pac" upgrade
@@ -95,31 +91,31 @@ function update-system() {
                 sudo "$pac" -y autoremove
             fi
         fi
-    elif test "$packmang" == "apk"; then
+    elif test "$pac" == "apk"; then
         apk update
-    elif test "$packmang" == "pacman"; then
-        if ! test -z "$AUR_helper" && ! test -z "$AUR_update"; then
-            eval "$AUR_update"
+    elif test "$pac" == "pacman"; then
+        if ! test -z "$AUR_up"; then
+            eval "$AUR_up"
         else
-            sudo pacman -Syu
+            eval "$pac_up"
         fi
         hdrs="$(echo $(uname -r) | cut -d. -f-2)"
         hdrs="linux$(echo $(uname -r) | cut -d. -f-1)${hdrs: -1}-headers"
-        if test -z "sudo pacman -Q $hdrs"; then
+        if test -z "$(pacman -Q $hdrs)"; then
             reade -Q "GREEN" -i "y" -p "Right linux headers not installed. Install $hdrs? [Y/n]: " "n" hdrs_ins
             if [ "$hdrs_ins" == "y" ]; then
-                sudo pacman -S "$hdrs"
+                eval "$pac_ins $hdrs"
             fi
         fi
     elif test "$distro" == "Gentoo"; then
         #TODO Add update cycle for Gentoo systems
         continue
     # https://en.opensuse.org/System_Updates
-    elif test "$packmang" == "zypper_leap"; then
+    elif test "$pac" == "zypper_leap"; then
         sudo zypper up
-    elif test "$packmang" == "zypper_tumble"; then
+    elif test "$pac" == "zypper_tumble"; then
         sudo zypper dup
-    elif test "$packmang" == "yum"; then
+    elif test "$pac" == "yum"; then
         yum update
     fi
     
