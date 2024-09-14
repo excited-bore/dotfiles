@@ -251,8 +251,8 @@ if test $ktty_cnf == 'y'; then
     fi
     printf "${cyan}kitty.conf:${normal} \n" 
     grep --color=always -n 'enabled_layouts' $dir/kitty.conf
-    test $ktty_splt1 == 'y' && grep --color=always -n 'map kitty_mod+enter ' $dir/kitty.conf
-    test $ktty_splt2 == 'y' && grep --color=always -n 'map kitty_mod+alt+enter' $dir/kitty.conf
+    ! test -z $ktty_splt1 && test $ktty_splt1 == 'y' && grep --color=always -n 'map kitty_mod+enter ' $dir/kitty.conf
+    ! test -z $ktty_splt2 && test $ktty_splt2 == 'y' && grep --color=always -n 'map kitty_mod+alt+enter' $dir/kitty.conf
     test $ktty_trns == 'y' && grep --color=always -n '^ background_opacity' $dir/kitty.conf
 
     function kitty_conf(){

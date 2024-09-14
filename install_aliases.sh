@@ -31,6 +31,7 @@ if test $ansr == "y"; then
         sed -i 's|.*alias mv="mv-trash -v"|alias mv="mv-trash -v"|g' $genr
     fi
     unset ansr
+
     if type gio &> /dev/null; then 
         reade -Q "YELLOW" -i "n" -p "Set 'gio trash' alias for rm? [N/y]: " "y" ansr 
         if [ "$ansr" != "y" ]; then
@@ -59,33 +60,26 @@ if test $ansr == "y"; then
 fi
 
 update_sysm=aliases/.bash_aliases.d/update-system.sh
-systemd=aliases/.bash_aliases.d/systemctl.sh
-dosu=aliases/.bash_aliases.d/sudo.sh
 pacmn=aliases/.bash_aliases.d/package_managers.sh
-sshs=aliases/.bash_aliases.d/ssh.sh
+test $distro == "Manjaro" && && manjaro=aliases/.bash_aliases.d/manjaro.sh
+type systemctl &> /dev/null && systemd=aliases/.bash_aliases.d/systemctl.sh
+type sudo &> /dev/null && dosu=aliases/.bash_aliases.d/sudo.sh
+type git &> /dev/null && gits=aliases/.bash_aliases.d/git.sh
+type ssh &> /dev/null && sshs=aliases/.bash_aliases.d/ssh.sh
 ps1=aliases/.bash_aliases.d/PS1_colours.sh
-manjaro=aliases/.bash_aliases.d/manjaro.sh
 variti=aliases/.bash_aliases.d/variety.sh
-pthon=aliases/.bash_aliases.d/python.sh
+type python &> /dev/null && pthon=aliases/.bash_aliases.d/python.sh
 if ! test -d aliases/.bash_aliases.d/; then
-    tmp1=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh 
-    update_sysm=$tmp1
-    tmp2=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/systemctl.sh 
-    systemd=$tmp2
-    tmp3=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/sudo.sh 
-    dosu=$tmp3
-    tmp4=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/package_managers.sh 
-    pacmn=$tmp4
-    tmp5=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/ssh.sh 
-    sshs=$tmp5
-    tmp6=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/ps1.sh 
-    ps1=$tmp6
-    tmp7=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/manjaro.sh 
-    manjaro=$tmp7
-    tmp8=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/variety.sh 
-    variti=$tmp8
-    tmp9=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/python.sh 
-    pthon=$tmp9
+    tmp1=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh && update_sysm=$tmp1
+    tmp4=$(mktemp) && curl -o $tmp4 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/package_managers.sh && pacmn=$tmp4
+    test $distro == "Manjaro" && tmp7=$(mktemp) && curl -o $tmp7 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/manjaro.sh && manjaro=$tmp7
+    type systemctl &> /dev/null && tmp2=$(mktemp) && curl -o $tmp2 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/systemctl.sh && systemd=$tmp2
+    type sudo &> /dev/null && tmp3=$(mktemp) && curl -o $tmp3 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/sudo.sh && dosu=$tmp3
+    type git &> /dev/null && tmp10=$(mktemp) && curl -o $tmp10 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/git.sh && gits=$tmp5
+    type ssh &> /dev/null && tmp5=$(mktemp) && curl -o $tmp5 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/ssh.sh && sshs=$tmp5
+    tmp6=$(mktemp) && curl -o $tmp6 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/ps1.sh && ps1=$tmp6
+    tmp8=$(mktemp) && curl -o $tmp8 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/variety.sh && variti=$tmp8
+    type python &> /dev/null && tmp9=$(mktemp) && curl -o $tmp9 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/python.sh && pthon=$tmp9
 fi 
 
 update_sysm_r(){ 
@@ -98,6 +92,27 @@ update_sysm(){
     yes_edit_no update_sysm_r "$update_sysm" "Install update-system.sh at /root/?" "yes" "YELLOW";
 }
 yes_edit_no update_sysm "$update_sysm" "Install update-system.sh at ~/.bash_aliases.d/? (Global system update function)?" "yes" "GREEN"
+
+packman_r(){ 
+    sudo cp -fv $pacmn /root/.bash_aliases.d/
+}
+packman(){
+    cp -fv $pacmn ~/.bash_aliases.d/
+    yes_edit_no packman_r "$pacmn" "Install package_managers.sh at /root/?" "yes" "YELLOW" 
+}
+yes_edit_no packman "$pacmn" "Install package_managers.sh at ~/.bash_aliases.d/ (package manager aliases)? " "yes" "GREEN"
+
+if [ $distro == "Manjaro" ] ; then
+    manj_r(){ 
+        sudo cp -fv $manjaro /root/.bash_aliases.d/; 
+    }
+    manj(){
+        cp -fv $manjaro ~/.bash_aliases.d/
+        yes_edit_no manj_r "$manjaro" "Install manjaro.sh at /root/?" "yes" "YELLOW" 
+    }
+    yes_edit_no manj "$manjaro" "Install manjaro.sh at ~/.bash_aliases.d/ (manjaro specific aliases)? " "yes" "GREEN"
+fi
+
 
 systemd_r(){ 
     sudo cp -fv $systemd /root/.bash_aliases.d/;
@@ -118,14 +133,14 @@ dosu(){
 yes_edit_no dosu "$dosu" "Install sudo.sh at ~/.bash_aliases.d/ (sudo aliases)?" "yes" "GREEN"
 
 
-packman_r(){ 
-    sudo cp -fv $pacmn /root/.bash_aliases.d/
+git_r(){ 
+    sudo cp -fv $gits /root/.bash_aliases.d/; 
 }
-packman(){
-    cp -fv $pacmn ~/.bash_aliases.d/
-    yes_edit_no packman_r "$pacmn" "Install package_managers.sh at /root/?" "yes" "YELLOW" 
+gith(){
+    cp -fv $gits ~/.bash_aliases.d/
+    yes_edit_no git_r "$gits" "Install git.sh at /root/?" "yes" "YELLOW" 
 }
-yes_edit_no packman "$pacmn" "Install package_managers.sh at ~/.bash_aliases.d/ (package manager aliases)? " "yes" "GREEN"
+yes_edit_no gith "$gits" "Install git.sh at ~/.bash_aliases.d/ (git aliases)? " "yes" "GREEN"
 
 ssh_r(){ 
     sudo cp -fv $sshs /root/.bash_aliases.d/; 
@@ -146,21 +161,12 @@ ps11(){
 }
 yes_edit_no ps11 "$ps1" "Install PS1_colours.sh at ~/.bash_aliases.d/ (Coloured command prompt)? " "yes" "GREEN"
 
-if [ $distro == "Manjaro" ] ; then
-    manj_r(){ 
-        sudo cp -fv $manjaro /root/.bash_aliases.d/; 
+if type python &> /dev/null; then
+    pthon(){
+        cp -fv $pthon ~/.bash_aliases.d/
     }
-    manj(){
-        cp -fv $manjaro ~/.bash_aliases.d/
-        yes_edit_no manj_r "$manjaro" "Install manjaro.sh at /root/?" "yes" "YELLOW" 
-    }
-    yes_edit_no manj "$manjaro" "Install manjaro.sh at ~/.bash_aliases.d/ (manjaro specific aliases)? " "yes" "GREEN"
+    yes_edit_no pthon "$pthon" "Install python.sh at ~/.bash_aliases.d/ (aliases for a python development)? " "yes" "GREEN" 
 fi
-
-pthon(){
-    cp -fv $pthon ~/.bash_aliases.d/
-}
-yes_edit_no pthon "$pthon" "Install python.sh at ~/.bash_aliases.d/ (aliases for a python development)? " "yes" "GREEN" 
 
 # Variety aliases 
 # 
@@ -172,5 +178,3 @@ variti(){
     yes_edit_no variti_r "$variti" "Install variety.sh at /root/?" "yes" "YELLOW" 
 }
 yes_edit_no variti "$variti" "Install variety.sh at ~/.bash_aliases.d/ (aliases for a variety of tools)? " "yes" "GREEN" 
-
-
