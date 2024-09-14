@@ -302,20 +302,33 @@ shell-keybinds() {
     fi
     
     reade -Q "GREEN" -i "y" -p "Enable vi-mode instead of emacs mode (might cause issues with pasteing)? [Y/n]: " "n" vimde
+
+    sed -i "s|^set editing-mode .*|#set editing-mode vi|g" $binds
+
     if [ "$vimde" == "y" ]; then
         sed -i "s|.set editing-mode .*|set editing-mode vi|g" $binds
     fi
+   
+    sed -i "s|^set show-mode-in-prompt .*|#set show-mode-in-prompt on|g" $binds
+     
     reade -Q "GREEN" -i "y" -p "Enable visual que for vi/emacs toggle? (Displayed as '(ins)/(cmd) - (emacs)') [Y/n]: " "n" vivisual
     if [ "$vivisual" == "y" ]; then
         sed -i "s|.set show-mode-in-prompt .*|set show-mode-in-prompt on|g" $binds
     fi
-    reade -Q "GREEN" -i "y" -p "Set caps to escape? (Might cause X11 errors with SSH) [Y/n]: " "n" xtrm
-    if [ "$xtrm" != "y" ] && ! [ -z "$xtrm" ]; then
-        sed -i "s|setxkbmap |#setxkbmap |g" $binds
-    fi
+
+    sed -i "s|^setxkbmap |#setxkbmap |g" $binds
+     
+    if test $X11_WAY == 'x11'; then 
+        reade -Q "GREEN" -i "y" -p "Set caps to escape? (Might cause X11 errors with SSH) [Y/n]: " "n" xtrm
+        if [ "$xtrm" = "y" ]; then
+            sed -i "s|#setxkbmap |setxkbmap |g" $binds
+        fi
+    fi 
+
     cp -fv $binds1 ~/.keybinds.d/
     cp -fv $binds2 ~/.keybinds 
     cp -fv $binds ~/
+
     if test -f ~/.bashrc && ! grep -q '\[ -f ~/.keybinds \]' ~/.bashrc; then
          if grep -q '\[ -f ~/.bash_aliases \]' ~/.bashrc; then
                 sed -i 's|\(\[ -f \~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\1\n\n\[ -f \~/.keybinds \] \&\& source \~/.keybinds\n|g' ~/.bashrc
