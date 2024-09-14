@@ -132,28 +132,36 @@ if ! type snap &> /dev/null; then
 fi
 unset inssnap
 
+if test -z $(eval "$pac_ls_ins groff 2> /dev/null"); then
+    printf "${CYAN}groff${normal} is not installed (Necessary for 'man' (manual) command)\n"
+    reade -Q 'GREEN' -i 'y' -p "Install groff? [Y/n]: " 'n' groff_ins
+    if test $groff_ins == 'y'; then
+        eval "yes | $pac_ins groff"
+        printf "Logout and login (or reboot) to take effect\n" 
+    fi
+    unset groff_ins 
+fi
+
+if test -z $(eval "$pac_ls_ins manpages-posix 2> /dev/null"); then
+    printf "${CYAN}manpages-posix${normal} is not installed (Manpages for posix-compliant (f.ex. bash) commands (f.ex. alias, test, type, etc...))\n"
+    reade -Q 'GREEN' -i 'y' -p "Install manpages-posix? [Y/n]: " 'n' posixman_ins
+    if test $posixman_ins == 'y'; then
+        eval "yes | $pac_ins manpages-posix -y"
+    fi
+    unset posixman_ins 
+fi
 
 if test $distro_base == 'Debian'; then
-    
-    if test -z $(apt list --installed groff 2> /dev/null); then
-        printf "${CYAN}groff${normal} is not installed (Necessary for 'man' (manual) command)\n"
-        reade -Q 'GREEN' -i 'y' -p "Install groff? [Y/n]: " 'n' groff_ins
-        if test $groff_ins == 'y'; then
-            eval "$pac_ins groff -y"
-            printf "Logout and login (or reboot) to take effect\n" 
+    if ! $(apt list --installed software-properties-common 2> /dev/null); then
+        printf "${CYAN}add-apt-repository${normal} is not installed (cmd tool for installing extra repositories/ppas on debian systems)\n"
+        reade -Q 'GREEN' -i 'y' -p "Install add-apt-repository? [Y/n]: " 'n' add_apt_ins
+        if test $add_apt_ins == 'y'; then
+            eval "$pac_ins software-properties-common"
         fi
-        unset groff_ins 
+        unset add_apt_ins 
     fi
-    
-    if test -z $(apt list --installed manpages-posix 2> /dev/null); then
-        printf "${CYAN}manpages-posix${normal} is not installed (Manpages for posix-compliant (f.ex. bash) commands (f.ex. alias, test, type, etc...))\n"
-        reade -Q 'GREEN' -i 'y' -p "Install manpages-posix? [Y/n]: " 'n' posixman_ins
-        if test $posixman_ins == 'y'; then
-            eval "$pac_ins manpages-posix -y"
-        fi
-        unset posixman_ins 
-    fi
-    
+
+
     if type add-apt-repository &> /dev/null; then
         if ! test -f install_list-ppa.sh; then
                 eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_list-ppa.sh)" 
@@ -181,6 +189,16 @@ if test $distro_base == 'Debian'; then
             fi
             unset ins_curl
         fi
+    fi 
+
+elif test $distro_base == 'Arch'; then
+    if test -z $(eval "$pac_ls_ins pacseek 2> /dev/null"); then
+        printf "${CYAN}pacseek${normal} (A TUI for managing packages from pacman and AUR) is not installed\n"
+        reade -Q 'GREEN' -i 'y' -p "Install pacseek? [Y/n]: " 'n' pacs_ins
+        if test $pacs_ins == 'y'; then
+            eval "yes | $pac_ins pacseek"
+        fi
+        unset pacs_ins 
     fi 
 fi
 
@@ -422,7 +440,7 @@ if test -f ~/.config/pipewire/pipewire-pulse.conf.d/switch-on-connect.conf; then
     prmpt='[N/y]: '
 fi 
 reade -Q "$color" -i "$pre" -p "Install and configure pipewire? (sound system - pulseaudio replacement) $prmpt" "$othr" pipew
-if [ $pipewire == "y" ]; then
+if [ $pipew == "y" ]; then
     if ! test -f install_pipewire.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipewire.sh)" 
     else
