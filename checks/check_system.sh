@@ -1,4 +1,4 @@
-if ! test -f ../aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
+if type curl &> /dev/null && ! test -f ../aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh
 )" 
 else
@@ -186,7 +186,7 @@ do
             AUR_search="pamac search"
             AUR_ls_ins="pamac list --installed"    
              
-            if ! test -f checks/check_pamac.sh; then
+            if type curl &> /dev/null && ! test -f checks/check_pamac.sh; then
                 eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pamac.sh)" 
             else
                 . ./checks/check_pamac.sh
@@ -301,7 +301,7 @@ do
             reade -Q "GREEN" -i "y" -p "Install pikaur ( Pacman wrapper )? [Y/n]: " "n" insyay
             if [ "y" == "$insyay" ]; then 
 
-                if ! test -f ../AUR_insers/install_pikaur.sh; then
+                if type curl &> /dev/null && ! test -f ../AUR_insers/install_pikaur.sh; then
                     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/AUR_insers/install_pikaur.sh)" 
                 else
                     eval ../AUR_insers/install_pikaur.sh
@@ -344,9 +344,14 @@ do
 done
     
 
-if ! type curl &> /dev/null && ! test -z $pac_ins; then
-     eval "$pac_ins curl"
+if ! type curl &> /dev/null && ! test -z "$pac_ins"; then
+    printf "$(tput setaf 6 && tput bold)curl${normal} not installed (cmd tool for interacting with urls)\n$(tput sgr0)"
+    reade -Q 'GREEN' -i 'y' -p "Install curl? [Y/n]: " 'n' ins_curl
+    if test "$ins_curl" == 'y' || test "$ins_curl" == '' || test "$ins_curl" == 'Y'; then
+       eval "$pac_ins curl -y"
+    fi
 fi
+unset ins_curl
 
 if type nala &> /dev/null && test $pac == 'apt'; then
     pac="nala"
