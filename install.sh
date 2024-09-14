@@ -153,7 +153,7 @@ fi
 
 if test $distro_base == 'Debian'; then
 
-     if ! test -z $(apt list --installed software-properties-common 2> /dev/null | awk 'NR>2{print;}'); then
+     if ! test -z $(apt list --installed software-properties-common 2> /dev/null | awk 'NR>1{print;}'); then
         printf "${CYAN}add-apt-repository${normal} is not installed (cmd tool for installing extra repositories/ppas on debian systems)\n"
         reade -Q 'GREEN' -i 'y' -p "Install add-apt-repository? [Y/n]: " 'n' add_apt_ins
         if test $add_apt_ins == 'y'; then
