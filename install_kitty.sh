@@ -240,6 +240,8 @@ if test $ktty_cnf == 'y'; then
     reade -Q "GREEN" -i "y" -p "When opening a new window/pane inside kitty, keep the current directory (instead of $HOME)? [Y/n]: " "n" ktty_cwd          
     if test $ktty_cwd == 'y'; then
         sed -i 's|map kitty_mod+enter launch|map kitty_mod+enter launch --cwd=current|g' $dir/kitty.conf 
+        sed -i 's|map kitty_mod+enter+alt launch|map kitty_mod+enter launch --cwd=current|g' $dir/kitty.conf 
+         
     fi
     
     reade -Q "GREEN" -i "y" -p "Set background opacity? (transparency) [Y/n]: " "n" ktty_trns

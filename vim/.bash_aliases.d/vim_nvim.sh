@@ -46,6 +46,7 @@ if type nvim &> /dev/null; then
     complete -F _man-all man-all-nvim                                                       
                                                                                             
     alias mana="man-all-nvim"                                                               
+    alias man-a="man-all-nvim"                                                               
     alias superman="man-all-nvim"                                                           
-    alias sman="man-all-nvim"                                                               
+    alias man-all="man-all-nvim"                                                               
 fi

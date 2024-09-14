@@ -1,0 +1,7 @@
+if type pw-cli &> /dev/null; then
+    complete -W "help h load-module lm unload-module um connect con disconnect dis list-remotes lr switch-remotes sr list-objects ls info i create-device cd create-node cn destroy d create-link cl export-node en enum-params e set-param s permissions sp get-permissions gp send-command c quit q" pw-cli
+fi
+
+if type wpctl &> /dev/null; then
+    complete -W "status get-volume inspect set-default set-volume set-mute set-profile set-route clear-default settings set-log-level -h --help" wpctl
+fi
