@@ -152,7 +152,8 @@ if test -z $(eval "$pac_ls_ins manpages-posix 2> /dev/null"); then
 fi
 
 if test $distro_base == 'Debian'; then
-    if ! test -z $(apt list --installed software-properties-common 2> /dev/null | awk 'NR>2{print;}'); then
+
+     if ! test -z $(apt list --installed software-properties-common 2> /dev/null | awk 'NR>2{print;}'); then
         printf "${CYAN}add-apt-repository${normal} is not installed (cmd tool for installing extra repositories/ppas on debian systems)\n"
         reade -Q 'GREEN' -i 'y' -p "Install add-apt-repository? [Y/n]: " 'n' add_apt_ins
         if test $add_apt_ins == 'y'; then
@@ -179,7 +180,17 @@ if test $distro_base == 'Debian'; then
             unset ppa_ins 
         fi
     fi 
-    
+
+     if ! test -z $(apt list --installed nala 2> /dev/null | awk 'NR>2{print;}'); then
+        printf "${CYAN}nala${normal} is not installed (A TUI wrapper for apt install, update, upgrade, search, etc..)\n"
+        reade -Q 'GREEN' -i 'y' -p "Install nala? [Y/n]: " 'n' nala_ins
+        if test $nala_ins == 'y'; then
+            eval "$pac_ins nala"
+        fi
+        unset pac_ins 
+    fi
+         
+
     if test $distro == "Ubuntu"; then 
         if ! type synaptic &> /dev/null; then
             printf "${CYAN}synaptic${normal} is not installed (Better GUI for package management)\n"
