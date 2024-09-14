@@ -153,7 +153,7 @@ fi
 
 if test $distro_base == 'Debian'; then
 
-     if test -z $(apt list --installed software-properties-common 2> /dev/null | awk 'NR>1{print;}'); then
+     if test -z "$(apt list --installed software-properties-common 2> /dev/null | awk 'NR>1{print;}')"; then
         printf "${CYAN}add-apt-repository${normal} is not installed (cmd tool for installing extra repositories/ppas on debian systems)\n"
         reade -Q 'GREEN' -i 'y' -p "Install add-apt-repository? [Y/n]: " 'n' add_apt_ins
         if test $add_apt_ins == 'y'; then
@@ -166,12 +166,11 @@ if test $distro_base == 'Debian'; then
     if type add-apt-repository &> /dev/null; then
         if ! test -f install_list-ppa.sh; then
                 eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_list-ppa.sh)" 
-             
         else
             ./install_list-ppa.sh
         fi
 
-        if ! type ppa-purge &> /dev/null; then
+        if ! type ppa-purge &> /dev/null && "$(apt search ppa-purge 2> /dev/null | awk 'NR>2{print;}')"; then
             printf "${CYAN}ppa-purge${normal} is not installed (cmd tool for removing ppa repositories)\n"
             reade -Q 'GREEN' -i 'y' -p "Install ppa-purge? [Y/n]: " 'n' ppa_ins
             if test $ppa_ins == 'y'; then

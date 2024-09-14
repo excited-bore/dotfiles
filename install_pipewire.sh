@@ -87,19 +87,31 @@ fi
 if type systemctl &> /dev/null && ! test -f /etc/systemd/user/pipewire-load-switch-on-connect.service; then
     reade -Q 'GREEN' -i 'y' -p "Set USB-audiodevices to autoswitch when connected? [Y/n]: " 'n' auto_s
     if test $auto_s == 'y'; then
+        mkdir -p ~/.config/pipewire/pipewire-pulse.conf.d/
         conf=~/.config/pipewire/pipewire-pulse.conf.d/switch-on-connect.conf
         if [ ! -e $conf ] || ! grep -q "# override for pipewire-pulse.conf file" $conf; then
-            mkdir -p ~/.config/pipewire/pipewire-pulse.conf.d/
-            mkdir -p /etc/pipewire/pipewire-pulse.conf.d/
-            mkdir -p ~/.config/systemd/user/
             echo "# override for pipewire-pulse.conf file" >> $conf
             echo "pulse.cmd = [" >> $conf
             echo "  { cmd = \"load-module\" args = \"module-always-sink\" flags = [ ] }" >> $conf
             echo "  { cmd = \"load-module\" args = \"module-switch-on-connect\" }" >> $conf
             echo "]" >> $conf
         fi
-        sudo mv -f $conf /etc/pipewire/pipewire-pulse.conf.d
 
+        printf "${GREEN}Added pipewire conf for $USER at:\n${CYAN}$HOME/.config/pipewire/pipewire-pulse.conf.d\n${normal}" 
+
+        reade -Q 'GREEN' -i 'y' -p "Install USB-audio autoswitch on connect for pipewire system-wide? (at /etc/pipewire/pipewire-pulse.conf.d/) [Y/n]: " 'n' auto_s_sys
+        if test $auto_s_sys == 'y'; then
+            if ! test -d /etc/pipewire/pipewire-pulse.conf.d/; then
+                echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for and create /etc/pipewire/pipewire-pulse.conf.d/"
+                sudo mkdir -p /etc/pipewire/pipewire-pulse.conf.d/
+            fi
+            echo "Next $(tput setaf 1)sudo$(tput sgr0) will move $conf to /etc/pipewire/pipewire-pulse.conf.d/"
+            sudo cp -vf $conf /etc/pipewire/pipewire-pulse.conf.d
+            printf "${GREEN}Added pipewire conf for all users at:\n${CYAN}/etc/pipewire/pipewire-pulse.conf.d\n${normal}" 
+        fi
+
+        echo "${green}Installing systemd service${normal}" 
+        mkdir -p ~/.config/systemd/user/
         serv="pipewire-load-switch-on-connect"
         servF="$serv.service"
         myuser="$USER"
@@ -120,7 +132,7 @@ if type systemctl &> /dev/null && ! test -f /etc/systemd/user/pipewire-load-swit
         #if ! sudo grep -q "load-module module-switch-on-connect" /etc/pulse/default.pa; then
         #    sudo sed -i "s,\(load-module module-switch-on-port-available\),\1\nload-module module-switch-on-connect,g" /etc/pulse/default.pa
         #fi
-        printf "Added pipewire conf at:\n~/.config/pipewire/pipewire-pulse.conf.d\n/etc/pipewire/pipewire.conf.d/\n$servFile\n"
+        #printf "Added pipewire conf at:\n~/.config/pipewire/pipewire-pulse.conf.d\n/etc/pipewire/pipewire.conf.d/\n$servFile\n"
         #printf "Added pipewire conf at: \n~/.config/pipewire/pipewire-pulse.conf.d\n /etc/pipewire/pipewire.conf.d/\n $servFile\n /etc/pulse/default.pa\n"
     fi 
 fi
