@@ -118,13 +118,16 @@ do
         pac="pacman"
         pac_up="sudo pacman -Su"
         pac_ins="sudo pacman -S"
-        pac_search="sudo pacman -Ss"
-
+        pac_search="pacman -Ss"
+        pac_ls_ins="pacman -Q"
+         
         AUR_pac="pamac"
         AUR_up="pamac update"
         AUR_ins="pamac install"
         AUR_search="pamac search"
+        AUR_ls_ins="pamac list --installed"
          
+
         distro_base="Arch"
         distro="Manjaro"
           
@@ -132,7 +135,8 @@ do
         pac="apt"
         pac_up="sudo apt update"
         pac_ins="sudo apt install"
-        pac_search="sudo apt install"
+        pac_search="apt search"
+        pac_ls_ins="apt list --installed" 
 
         distro_base="Debian"
         distro="Ubuntu"
@@ -164,7 +168,8 @@ do
         pac="pacman"
         pac_up="sudo pacman -Su"
         pac_ins="sudo pacman -S"
-        pac_search="sudo pacman -Ss" 
+        pac_search="pacman -Ss"
+        pac_ls_ins="pacman -Q" 
 
         
         #
@@ -177,8 +182,9 @@ do
 
             AUR_pac="pamac"
             AUR_up="pamac update"
-            AUR_ins="pamac install"    
-            AUR_search="pamac search"    
+            AUR_ins="pamac install"
+            AUR_search="pamac search"
+            AUR_ls_ins="pamac list --installed"    
              
             if ! test -f checks/check_pamac.sh; then
                 eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pamac.sh)" 
@@ -191,6 +197,7 @@ do
             AUR_up="pikaur -Syu"
             AUR_ins="pikaur -S"
             AUR_search="pikaur -Ss"
+            AUR_ls_ins="pikaur -Q"
              
         elif type yay &> /dev/null; then
 
@@ -198,45 +205,54 @@ do
             AUR_up="yay -Syu"
             AUR_ins="yay -S"
             AUR_search="yay -Ss"
+            AUR_ls_ins="yay -Q" 
              
         elif type pacaur &> /dev/null; then
 
             AUR_pac="pacaur"
             AUR_up="pacaur -Syu"
             AUR_ins="pacaur -S"
+            AUR_search="pacaur -Ss"
+            AUR_ls_ins="pacaur -Q"
 
         elif type aura &> /dev/null; then
 
             AUR_pac="aura"
             AUR_up="aura -Au"
             AUR_ins="aura -A"
-            AUR_search="aura -s"
-         
+            AUR_search="aura -Ss"
+            AUR_ls_ins="aura -Q"
+             
         elif type aurman &> /dev/null; then
 
             AUR_pac="aurman"
             AUR_up="aurman -Syu"
             AUR_ins="aurman -S"
             AUR_search="aurman -Ss"
-             
+            AUR_ls_ins="aurman -Q"
+
         elif type pakku &> /dev/null ; then
 
             AUR_pac="pakku"
             AUR_up="pakku -Syu"
             AUR_ins="pakku -S"
             AUR_search="pakku -Ss"
+            AUR_ls_ins="pakku -Q"
              
         elif type paru &> /dev/null; then
             AUR_pac="paru"
             AUR_up="paru -Syua"
             AUR_ins="paru -S"
             AUR_search="paru -Ss"
+            AUR_search="paru -Q"
              
         elif type trizen &> /dev/null; then
             AUR_pac="trizen"
             AUR_up="trizen -Syu"
             AUR_ins="trizen -S"
-        
+            AUR_search="trizen -Ss"
+            AUR_ls_ins="trizen -Q"
+
         #
         # SEARCH AND BUILD
         # 
@@ -246,6 +262,8 @@ do
             AUR_pac="aur"
             AUR_up=""
             AUR_ins=""
+            AUR_search="aur search"
+             
         #elif type repoctl &> /dev/null; then
         #    pac_AUR="repoctl"
         #elif type yaah &> /dev/null; then
@@ -266,8 +284,6 @@ do
         #    pac_AUR="kalu"
         #elif type octopi &> /dev/null; then
         #    pac_AUR="octopi"
-        #elif type pacseek &> /dev/null; then
-        #    pac_AUR="pacseek"
         #elif type PkgBrowser &> /dev/null; then
         #    pac_AUR="PkgBrowser"
         #elif type yup &> /dev/null ; then
@@ -276,7 +292,9 @@ do
 
             AUR_pac="auracle"
             AUR_up="auracle update"
-            AUR_ins="none"
+            AUR_ins=""
+            AUR_search="auracle search"
+             
 
         else
             printf "Your Arch system seems to have no (known) AUR helper installed\n"
@@ -292,7 +310,8 @@ do
                 AUR_pac="pikaur"
                 AUR_up="pikaur -Syu"
                 AUR_ins="pikaur -S"
-                AUR_search="pikaur -S"
+                AUR_search="pikaur -Ss"
+                AUR_ls_ins="pikaur -Q"
                  
             fi
             unset insyay 
@@ -306,7 +325,8 @@ do
         pac="apt"
         pac_ins="sudo apt install"
         pac_up="sudo apt update"
-        pac_search="sudo apt search"
+        pac_search="apt search"
+        pac_ls_ins="apt list --installed"
                      
         distro_base="Debian"
         distro="Raspbian"
@@ -315,22 +335,31 @@ do
         pac="apt"
         pac_ins="sudo apt install"
         pac_up="sudo apt update"
-        pac_search="sudo apt search"
+        pac_search="apt search"
+        pac_ls_ins="apt list --installed"
          
         distro_base="Debian"   
         distro="Debian"
     fi 
 done
     
-if type nala &> /dev/null && test $pac == 'apt'; then
-    pac="nala"
-    pac_ins="sudo nala install"
-    pac_up="sudo nala update"
-fi
 
 if ! type curl &> /dev/null && ! test -z $pac_ins; then
      eval "$pac_ins curl"
 fi
+
+if type nala &> /dev/null && test $pac == 'apt'; then
+    pac="nala"
+    pac_ins="sudo nala install"
+    pac_up="sudo nala update" 
+fi
+
+if typ && test $pac == 'apt'; then
+    pac="nala"
+    pac_ins="sudo nala install"
+    pac_up="sudo nala update" 
+fi
+
 
 # TODO: Change this to uname -sm?
 if test $machine == 'Linux'; then
