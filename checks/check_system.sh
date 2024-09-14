@@ -90,7 +90,7 @@ else
 fi
 
 # https://unix.stackexchange.com/questions/202891/how-to-know-whether-wayland-or-x11-is-being-used
-export X11_WAY="$(loginctl show-session $(awk '/tty/ {print $1}' <(loginctl)) -p Type | awk -F= '{print $2}')"
+export X11_WAY="$(loginctl show-session $(loginctl | grep $(whoami) | awk 'NR=1{print $1}') -p Type | awk -F= 'NR==1{print $2}')"
 
 distro_base=/
 distro=/

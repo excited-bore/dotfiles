@@ -43,7 +43,6 @@ if ! type AppImageLauncher &> /dev/null; then
             fi
             file=$(echo "$ltstv" | grep --color=never $code_name"_"$arch) 
 
-            echo $file 
             wget -P $tmpd https://github.com/TheAssassin/AppImageLauncher/releases/download/$tag/$file
             sudo dpkg -i $tmpd/$file 
             sudo apt --fix-broken install -y
