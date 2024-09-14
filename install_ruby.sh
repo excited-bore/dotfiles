@@ -33,18 +33,18 @@ if ! type rbenv &> /dev/null; then
     if test $machine == 'Mac' && type brew &> /dev/null; then
         brew install rbenv 
     elif test "$distro_base" == "Arch"; then
-        if test -z "$AUR_install"; then 
+        if test -z "$AUR_ins"; then 
             reade -Q 'GREEN' -i 'y' -p 'No AUR helper found. Install yay? [Y/n]: ' 'n' ins_yay
             if test $ins_yay == 'y'; then
-                if ! test -f AUR_installers/install_yay.sh ; then
-                     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/AUR_installers/install_yay.sh )" 
+                if ! test -f AUR_insers/install_yay.sh ; then
+                     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/AUR_insers/install_yay.sh )" 
                 else
-                    . ./AUR_installers/install_yay.sh 
+                    . ./AUR_insers/install_yay.sh 
                 fi 
             fi 
         fi 
 
-        eval "$AUR_install ruby-build rbenv"
+        eval "$AUR_ins ruby-build rbenv"
     elif [ $distro_base == "Debian" ]; then
         sudo apt install rbenv                 
     fi 

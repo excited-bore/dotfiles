@@ -46,7 +46,7 @@ if [ $distro == "Manjaro" ]; then
     pamac install apx
 elif test $distro_base == "Arch"; then
     #TODO integrate different AUR launchers
-    eval "$AUR_install apx" 
+    eval "$AUR_ins apx" 
     #echo "Install with apx with AUR launcher of choice (f.ex. yay, pamac)"
     #return 0
 elif test $distro_base == "Debian"; then

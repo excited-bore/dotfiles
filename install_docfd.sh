@@ -25,8 +25,8 @@ if test -z $SYSTEM_UPDATED; then
 fi
 
 if ! type docfd &> /dev/null; then 
-    if ! test -z $AUR_install; then
-        eval "$AUR_install" docfd-bin  
+    if ! test -z $AUR_ins; then
+        eval "$AUR_ins" docfd-bin  
     fi
 fi
 

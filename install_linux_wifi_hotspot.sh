@@ -33,8 +33,8 @@ if ! type wihotspot &> /dev/null; then
         sudo apt update
         sudo apt install linux-wifi-hotspot
     elif [ $distro == "Arch" ]; then
-        if ! test -z "$AUR_install"; then
-            eval "$AUR_install" linux-wifi-hotspot
+        if ! test -z "$AUR_ins"; then
+            eval "$AUR_ins" linux-wifi-hotspot
         else
             echo "Install linux-wifi-hotspot from the AUR. If you have an AUR Helper that is not an AUR wrapper, try installing it manually"
         fi
