@@ -354,12 +354,6 @@ if type nala &> /dev/null && test $pac == 'apt'; then
     pac_up="sudo nala update" 
 fi
 
-if typ && test $pac == 'apt'; then
-    pac="nala"
-    pac_ins="sudo nala install"
-    pac_up="sudo nala update" 
-fi
-
 
 # TODO: Change this to uname -sm?
 if test $machine == 'Linux'; then
