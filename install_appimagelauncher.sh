@@ -25,8 +25,8 @@ if ! type AppImageLauncher &> /dev/null; then
     elif test $distro_base == "Debian"; then
         if type add-apt-repository &> /dev/null && [[ $(check-ppa ppa:appimagelauncher-team/stable) =~ 'OK' ]]; then
             sudo add-apt-repository ppa:appimagelauncher-team/stable
-            sudo apt-get update
-            sudo apt-get install appimagelauncher 
+            eval "$pac_up"
+            eval "$pac_ins appimagelauncher" 
         else
             #if ! $(apt search libfuse2t64 &> /dev/null | awk 'NR>2 {print;}'); then
             #    eval "$pac_ins libfuse2t64 -y "
@@ -38,10 +38,12 @@ if ! type AppImageLauncher &> /dev/null; then
             tag=$(curl -sL https://api.github.com/repos/TheAssassin/AppImageLauncher/releases/latest | jq -r ".tag_name") 
             ltstv=$(curl -sL https://api.github.com/repos/TheAssassin/AppImageLauncher/releases/latest | jq -r ".assets" | grep --color=never "name" | sed 's/"name"://g' | tr '"' ' ' | tr ',' ' ' | sed 's/[[:space:]]//g')
             code_name='bionic' 
-            if [[ $release < 16.04 ]] || [[ $release == 16.04 ]]; then
+            if ! test -z && [[ $release < 16.04 ]] || [[ $release == 16.04 ]]; then
                 code_name='xenial'
             fi
             file=$(echo "$ltstv" | grep --color=never $code_name"_"$arch) 
+
+            echo $file 
             wget -P $tmpd https://github.com/TheAssassin/AppImageLauncher/releases/download/$tag/$file
             sudo dpkg -i $tmpd/$file 
             sudo apt --fix-broken install -y
