@@ -31,9 +31,9 @@ else
 fi
 
 if test $distro == "Arch" || test $distro == "Manjaro"; then
-    sudo pacman -S docker-compose
+    eval "$pac_ins docker-compose"
 elif [ $distro_base == "Debian" ]; then
-    sudo apt install docker-compose
+    eval "$pac_ins docker-compose"
 fi
 
 last=$(pwd)

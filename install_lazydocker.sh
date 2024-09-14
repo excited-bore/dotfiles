@@ -33,9 +33,9 @@ if ! type lazydocker &> /dev/null; then
     else
         if ! type curl &> /dev/null; then
             if test $distro_base == 'Debian'; then
-                sudo apt install curl
+                eval "$pac_ins curl"
             elif test $distro_base == 'Arch'; then
-                sudo pacman -S curl  
+                eval "$pac_ins curl  "
             fi
         fi
         curl https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh | bash

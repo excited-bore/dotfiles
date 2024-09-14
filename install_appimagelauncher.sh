@@ -21,7 +21,7 @@ fi
 if ! type AppImageLauncher &> /dev/null; then
     echo "This next $(tput setaf 1)sudo$(tput sgr0) will install Appimagelauncher"
     if test $distro_base == "Arch" ; then 
-        sudo pacman -S appimagelauncher
+        eval "$pac_ins appimagelauncher"
     elif test $distro_base == "Debian"; then
         if type add-apt-repository &> /dev/null && [[ $(check-ppa ppa:appimagelauncher-team/stable) =~ 'OK' ]]; then
             sudo add-apt-repository ppa:appimagelauncher-team/stable
@@ -29,10 +29,10 @@ if ! type AppImageLauncher &> /dev/null; then
             sudo apt-get install appimagelauncher 
         else
             #if ! $(apt search libfuse2t64 &> /dev/null | awk 'NR>2 {print;}'); then
-            #    sudo apt install libfuse2t64 -y 
+            #    eval "$pac_ins libfuse2t64 -y "
             #fi
             if ! $(apt search jq &> /dev/null | awk 'NR>2 {print;}'); then
-                sudo apt install jq -y 
+                eval "$pac_ins jq -y "
             fi
             tmpd=$(mktemp -d)
             tag=$(curl -sL https://api.github.com/repos/TheAssassin/AppImageLauncher/releases/latest | jq -r ".tag_name") 

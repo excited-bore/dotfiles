@@ -32,9 +32,9 @@ if ! type neofetch &> /dev/null && ! type fastfetch &> /dev/null && ! type scree
         reade -Q "CYAN" -i "fast" -p "Which one? [Fast/neo/screen]: " "neo screen" sym2
         if test "$sym2" == "neo"; then
             if test $distro_base == "Debian"; then
-               sudo apt install neofetch
+               eval "$pac_ins neofetch"
             elif test $distro_base == "Arch"; then
-               sudo pacman -S neofetch
+               eval "$pac_ins neofetch"
             fi
             
             if ! test -f ~/.config/neofetch/config.conf; then
@@ -56,7 +56,7 @@ if ! type neofetch &> /dev/null && ! type fastfetch &> /dev/null && ! type scree
         elif test "$sym2" == "fast"; then 
             if test $distro_base == "Debian"; then
                 if ! type jq &> /dev/null; then
-                    sudo apt install jq
+                    eval "$pac_ins jq"
                 fi
                 if [[ $arch =~ "arm" ]]; then 
                    fetch_arch="armv7l"
@@ -71,13 +71,13 @@ if ! type neofetch &> /dev/null && ! type fastfetch &> /dev/null && ! type scree
                 wget -P $tmp https://github.com/fastfetch-cli/fastfetch/releases/download/$ltstv/fastfetch-$os-$fetch_arch.deb
                 sudo dpkg -i $tmp/fastfetch-$os-$fetch_arch.deb 
             elif test $distro_base == "Arch"; then
-               sudo pacman -S fastfetch
+               eval "$pac_ins fastfetch"
             fi
         elif test "$sym2" == "screen"; then      
             if test $distro_base == "Debian"; then
-               sudo apt install screenfetch
+               eval "$pac_ins screenfetch"
             elif test $distro_base == "Arch"; then
-               sudo pacman -S screenFetch
+               eval "$pac_ins screenFetch"
             fi
         fi
     #fi

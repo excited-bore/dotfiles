@@ -24,9 +24,9 @@ if ! type curl &> /dev/null; then
     reade -Q "GREEN" -i "y" -p "Curl necessary for curl. Install curl? [Y/n]: " "n" tojump
     if [ "$tojump" == "y" ]; then
         if test $distro == "Arch" || test $distro == "Manjaro";then
-            sudo pacman -S curl
+            eval "$pac_ins curl"
         elif test $distro_base == "Debian"; then
-            sudo apt install curl
+            eval "$pac_ins curl"
         fi
     fi
     unset tojump

@@ -38,7 +38,7 @@ if ! type pipx &> /dev/null; then
             fi
         elif test $distro_base == "Arch"; then 
             echo "This next $(tput setaf 1)sudo$(tput sgr0) will install pipx"
-            sudo pacman -S python-pipx
+            eval "$pac_ins python-pipx"
             if [[ $(pipx --version) < 1.6.0 ]]; then 
                 pipx install pipx
                 pipx upgrade pipx
@@ -48,7 +48,7 @@ if ! type pipx &> /dev/null; then
             fi
         elif test $distro_base == "Debian"; then
             echo "This next $(tput setaf 1)sudo$(tput sgr0) will install pipx"
-            sudo apt install pipx
+            eval "$pac_ins pipx"
             if [[ $(pipx --version) < 1.6.0 ]]; then 
                 pipx install pipx
                 pipx upgrade pipx

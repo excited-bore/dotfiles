@@ -35,9 +35,9 @@ fi
 
 if ! type kitty &> /dev/null; then
     if test "$distro" == "Arch" || test "$distro" == "Manjaro"; then
-       sudo pacman -S kitty 
+       eval "$pac_ins kitty "
     elif test "$distro_base" == "Debian"; then    
-        sudo apt install kitty
+        eval "$pac_ins kitty"
         if [ ! -x "$(command -v kitten)" ]; then
             sudo ln -s ~/.local/share/kitty-ssh-kitten/kitty/bin/kitten    
         fi
@@ -48,7 +48,7 @@ fi
 if test $distro_base == 'Arch' && ! ls /usr/share/fonts/noto | grep -i -q emoji; then
     reade -Q 'GREEN' -i 'y' -p 'Install noto-emoji font for kitty? [Y/n]: ' 'n' emoji
     if test $emoji == 'y'; then
-        sudo pacman -S noto-fonts-emoji
+        eval "$pac_ins noto-fonts-emoji"
     fi
     unset emoji
 fi

@@ -27,9 +27,9 @@ fi
 
 if ! type bat &> /dev/null; then 
     if test $distro == "Arch" || test $distro == "Manjaro";then
-        sudo pacman -S bat
+        eval "$pac_ins bat"
     elif [ $distro_base == "Debian" ]; then
-        sudo apt install bat
+        eval "$pac_ins bat"
         if [ -x "$(command -v batcat)" ]; then
             mkdir -p ~/.local/bin
             ln -s /usr/bin/batcat ~/.local/bin/bat
@@ -41,9 +41,9 @@ if ! type batdiff &> /dev/null; then
     reade -Q "GREEN" -i "y" -p "Install bat-extras (includes batdiff/batgrep/batman/bat-modules/batpipe/batwatch) [Y/n]: " "n" bat
     if test "$bat" == "y"; then
         if test "$distro" == "Arch" || test "$distro" == "Manjaro";then
-            sudo pacman -S bat-extras
+            eval "$pac_ins bat-extras"
         elif [ $distro_base == "Debian" ]; then
-            #yes | sudo apt install golang
+            #yes | eval "$pac_ins golang"
             #go install mvdan.cc/sh/v3/cmd/shfmt@latest
             git clone https://github.com/eth-p/bat-extras $TMPDIR/bat-extras
             chown -R $USER $TMPDIR/bat-extras

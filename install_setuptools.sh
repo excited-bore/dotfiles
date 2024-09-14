@@ -5,9 +5,9 @@ else
 fi
 
 if test $distro == "Arch" || test $distro == "Manjaro"; then
-    sudo pacman -S make cmake
+    eval "$pac_ins make cmake"
 elif [ $distro_base == "Debian" ]; then
-    sudo apt install make cmake autoconf g++ gettext libncurses5-dev libtool libtool-bin 
+    eval "$pac_ins make cmake autoconf g++ gettext libncurses5-dev libtool libtool-bin "
 fi
 
 if which pip 2>/dev/null || echo FALSE ; then

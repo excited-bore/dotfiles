@@ -26,9 +26,9 @@ else
 fi
 
 if test "$distro" == "Arch" || test "$distro" == "Manjaro"; then
-    sudo pacman -S snapd
+    eval "$pac_ins snapd"
 elif [ "$distro_base" == "Debian" ]; then
-    sudo apt install snapd
+    eval "$pac_ins snapd"
 fi
 
 if grep -q "SNAP" $ENVVAR; then

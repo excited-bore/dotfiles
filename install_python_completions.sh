@@ -32,9 +32,9 @@ fi
 
 if ! type activate-global-python-argcomplete &> /dev/null; then
     if test $distro_base == "Debian"; then
-        sudo apt install python3 python-is-python3
+        eval "$pac_ins python3 python-is-python3"
     elif test $distro_base == "Arch"; then
-        sudo pacman -S python
+        eval "$pac_ins python"
     fi
 fi
 

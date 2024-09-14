@@ -32,23 +32,23 @@ if ! type bashtop &> /dev/null && ! type bpytop &> /dev/null && ! type btop &> /
         reade -Q "CYAN" -i "btop" -p "Which one? [Btop/bpytop/bashtop]: " "bpytop bashtop" sym2
         if test "$sym2" == "btop"; then
             if test $distro_base == "Debian"; then
-               sudo apt install btop
+               eval "$pac_ins btop"
             elif test $distro == "Arch" || test $distro == "Manjaro"; then
-               sudo pacman -S btop
+               eval "$pac_ins btop"
             fi
         elif test "$sym2" == "bpytop"; then 
            if test $distro_base == "Debian"; then
-               sudo apt install bpytop
+               eval "$pac_ins bpytop"
             elif test $distro == "Arch" || test $distro == "Manjaro"; then
-               sudo pacman -S bpytop
+               eval "$pac_ins bpytop"
             fi
         elif test "$sym2" == "bashtop"; then      
             if type add-apt-repository &> /dev/null && [[ $(check-ppa ppa:bashtop-monitor/bashtop) =~ 'OK' ]]; then
                 sudo add-apt-repository ppa:bashtop-monitor/bashtop
                 sudo apt update
-                sudo apt install bashtop
+                eval "$pac_ins bashtop"
             elif test "$distro" == "Arch" || test "$distro" == "Manjaro"; then
-               sudo pacman -S bashtop
+               eval "$pac_ins bashtop"
             else
                 git clone https://github.com/aristocratos/bashtop.git $TMPDIR
                 (cd $TMPDIR/bashtop && sudo make install)

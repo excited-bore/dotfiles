@@ -265,9 +265,9 @@ if ! test -f /usr/bin/rifle || ! test -f ~/.bash_aliases.d/fzf-rifle.sh && grep 
         if ! type rifle &> /dev/null; then
             if ! type python &> /dev/null; then
                 if test $distro_base == 'Debian'; then
-                    sudo apt install python3 python-is-python3
+                    eval "$pac_ins python3 python-is-python3"
                 elif test $distro_base == 'Arch'; then  
-                    sudo pacman -S python
+                    eval "$pac_ins python"
                 fi
             fi
             sudo wget -P /usr/bin/ https://raw.githubusercontent.com/ranger/ranger/master/ranger/ext/rifle.py 

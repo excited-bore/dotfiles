@@ -37,9 +37,7 @@ fi
 
 if ! type autojump &> /dev/null; then
     if test "$distro_base" == "Arch"; then
-        if ! test -z "$AUR_ins"; then 
-            eval "$AUR_ins" visual-studio-code-bin
-        else
+        if test -z "$AUR_ins"; then 
             reade -Q 'GREEN' -i 'y' -p 'No AUR helper found. Install yay? [Y/n]: ' 'n' ins_yay
             if test $ins_yay == 'y'; then
                 if ! test -f AUR_insers/install_yay.sh ; then
@@ -50,10 +48,11 @@ if ! type autojump &> /dev/null; then
             fi
             unset ins_yay
             yay -S visual-studio-code-bin 
+        else 
+            eval "$AUR_ins autojump"
         fi
-        eval "$AUR_ins" autojump
     elif [ $distro_base == "Debian" ]; then
-        sudo apt install autojump                                                              
+        eval "$pac_ins autojump"                                                              
     fi
 fi
 

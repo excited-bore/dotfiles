@@ -27,8 +27,8 @@ fi
 
 if ! type pv &> /dev/null; then
     if test "$distro_base" == "Arch"; then
-        yes | sudo pacman -S pv 
+        yes | eval "$pac_ins pv "
     elif [ $distro_base == "Debian" ]; then
-        sudo apt install pv -y                                                               
+        eval "$pac_ins pv -y                                                               "
     fi
 fi

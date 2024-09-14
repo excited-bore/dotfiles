@@ -31,7 +31,7 @@ if ! type wihotspot &> /dev/null; then
     if [ $distro == "Ubuntu" ] && [[ $(check-ppa ppa:lakinduakash/lwh) =~ 'OK' ]]; then
         sudo add-apt-repository ppa:lakinduakash/lwh
         sudo apt update
-        sudo apt install linux-wifi-hotspot
+        eval "$pac_ins linux-wifi-hotspot"
     elif [ $distro == "Arch" ]; then
         if ! test -z "$AUR_ins"; then
             eval "$AUR_ins" linux-wifi-hotspot

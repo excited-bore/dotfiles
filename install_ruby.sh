@@ -46,7 +46,7 @@ if ! type rbenv &> /dev/null; then
 
         eval "$AUR_ins ruby-build rbenv"
     elif [ $distro_base == "Debian" ]; then
-        sudo apt install rbenv                 
+        eval "$pac_ins rbenv                 "
     fi 
 
     if ! grep -q 'eval "$(rbenv init -)' ~/.bashrc; then 

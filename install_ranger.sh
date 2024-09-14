@@ -41,9 +41,9 @@ fi
 # Ranger (File explorer)
 if ! type ranger &> /dev/null; then
      if test $distro_base == "Arch"; then
-        sudo pacman -S ranger
+        eval "$pac_ins ranger"
     elif test $distro_base == "Debian"; then    
-        sudo apt install ranger
+        eval "$pac_ins ranger"
     fi
 fi
 
@@ -135,7 +135,7 @@ if ! test -d ~/.config/ranger/plugins/devicons2; then
         mkdir -p ~/.config/ranger/plugins
         git clone https://github.com/cdump/ranger-devicons2 ~/.config/ranger/plugins/devicons2
         if test "$distro" == "Arch" || test $distro == "Manjaro" ;then
-            sudo pacman -S ttf-nerd-fonts-symbols-common ttf-nerd-fonts-symbols ttf-nerd-fonts-symbols-mono
+            eval "$pac_ins ttf-nerd-fonts-symbols-common ttf-nerd-fonts-symbols ttf-nerd-fonts-symbols-mono"
         elif [ "$distro_base" == "Debian" ]; then    
             reade -Q "YELLOW" -i "y" -p "Install Nerdfonts from binary - no apt? (Special FontIcons) [Y/n]: " "n" nrdfnts
             if [ -z $nrdfnts ] || [ "Y" == $nrdfnts ] || [ $nrdfnts == "y" ]; then
@@ -153,9 +153,9 @@ fi
 #sed -i 's|set preview_images false|set preview_images true|g' ~/.config/ranger/rc.conf
 #if [ -z $rplg ] || [ "y" == $rplg ]; then
 #    if test $distro == "Arch" || test $distro == "Manjaro";then
-#       sudo pacman -S terminology
+#       eval "$pac_ins terminology"
 #    elif test $distro_base == "Debian"; then 
-#       sudo apt install terminology
+#       eval "$pac_ins terminology"
 #    fi
 #fi
 

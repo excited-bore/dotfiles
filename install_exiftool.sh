@@ -33,9 +33,9 @@ if ! type exiftool &> /dev/null; then
     if [ "$distro" == "Manjaro" ]; then
         pamac install perl-image-exiftool
     elif test "$distro_base" == "Arch"; then
-        sudo pacman -S perl-image-exiftool
+        eval "$pac_ins perl-image-exiftool"
     elif [ $distro_base == "Debian" ]; then
-        sudo apt install libimage-exiftool-perl
+        eval "$pac_ins libimage-exiftool-perl"
     fi
 fi
 

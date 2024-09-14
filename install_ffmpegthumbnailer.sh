@@ -23,8 +23,8 @@ fi
 
 if ! type ffmpegthumbnailer &> /dev/null; then 
     if test $distro == "Arch" || test $distro == "Manjaro"; then
-        sudo pacman -S ffmpegthumbnailer
+        eval "$pac_ins ffmpegthumbnailer"
     elif [ $distro_base == "Debian" ]; then
-        sudo apt install ffmpegthumbnailer 
+        eval "$pac_ins ffmpegthumbnailer "
     fi
 fi
