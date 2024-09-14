@@ -153,15 +153,26 @@ fi
 
 if test $distro_base == 'Debian'; then
 
-     if test -z "$(apt list --installed software-properties-common 2> /dev/null | awk 'NR>1{print;}')"; then
-        printf "${CYAN}add-apt-repository${normal} is not installed (cmd tool for installing extra repositories/ppas on debian systems)\n"
-        reade -Q 'GREEN' -i 'y' -p "Install add-apt-repository? [Y/n]: " 'n' add_apt_ins
-        if test $add_apt_ins == 'y'; then
-            eval "$pac_ins software-properties-common"
-        fi
-        unset add_apt_ins 
-    fi
+     if test -z "$(apt list --installed software-properties-common 2> /dev/null | awk 'NR>1{print;}')"|| test -z "$(apt list --installed python3-launchpadlib 2> /dev/null | awk 'NR>1{print;}')"; then
+        if test -z "$(apt list --installed software-properties-common 2> /dev/null | awk 'NR>1{print;}')"; then 
+            printf "${CYAN}add-apt-repository${normal} is not installed (cmd tool for installing extra repositories/ppas on debian systems)\n"
+            reade -Q 'GREEN' -i 'y' -p "Install add-apt-repository? [Y/n]: " 'n' add_apt_ins
+            if test $add_apt_ins == 'y'; then
+                eval "$pac_ins software-properties-common"
+            fi
+            unset add_apt_ins 
+        fi 
 
+        if test -z "$(apt list --installed python3-launchpadlib 2> /dev/null | awk 'NR>1{print;}')"; then
+            printf "${CYAN}python3-launchpadlib${normal} is not installed (python3 library that adds support for ppas from Ubuntu's 'https://launchpad.net' to add-apt-repository)\n"
+            reade -Q 'GREEN' -i 'y' -p "Install python3-launchpadlib? [Y/n]: " 'n' lpdlb_ins
+            if test $lpdlb_ins == 'y'; then
+                eval "$pac_ins python3-launchpadlib"
+            fi
+            unset lpdlb_ins 
+             
+        fi 
+    fi
 
     if type add-apt-repository &> /dev/null; then
         if ! test -f install_list-ppa.sh; then
@@ -170,7 +181,7 @@ if test $distro_base == 'Debian'; then
             ./install_list-ppa.sh
         fi
 
-        if ! type ppa-purge &> /dev/null && "$(apt search ppa-purge 2> /dev/null | awk 'NR>2{print;}')"; then
+        if ! type ppa-purge &> /dev/null && ! test -z "$(apt search ppa-purge 2> /dev/null | awk 'NR>2{print;}')"; then
             printf "${CYAN}ppa-purge${normal} is not installed (cmd tool for removing ppa repositories)\n"
             reade -Q 'GREEN' -i 'y' -p "Install ppa-purge? [Y/n]: " 'n' ppa_ins
             if test $ppa_ins == 'y'; then
