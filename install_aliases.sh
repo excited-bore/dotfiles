@@ -54,8 +54,8 @@ if test $ansr == "y"; then
     }
     general(){
         cp -fv $genr ~/.bash_aliases.d/
-        yes_edit_no general_r "$genr" "Install general.sh at /root/?" "yes" "GREEN"; }
-    yes_edit_no general "$genr" "Install general.sh at ~/?" "edit" "GREEN"
+        yes_edit_no general_r "$genr" "Install general.sh at /root/?" "yes" "YELLOW"; }
+    yes_edit_no general "$genr" "Install general.sh at ~/?" "yes" "GREEN"
 fi
 
 update_sysm=aliases/.bash_aliases.d/update-system.sh
