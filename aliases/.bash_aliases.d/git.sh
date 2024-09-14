@@ -114,7 +114,7 @@ alias git-status="git status"
 git-add-remote-url() { git remote -v add "$1" "$2"; }
 #git-add-remote-ssh() { git remote -v add "$1" git@github.com:$GITNAME/"$2.git"; }
 
-alias git-reset-to-last-HEAD="git reset --hard"
+alias git-reset-hard="git reset --hard"
 alias git-add-all="git add -A"
 #alias git-commit-all="git commit -a";
     

@@ -16,15 +16,58 @@ if type lowfi &> /dev/null; then
 fi
 
 if type nmap &> /dev/null; then
-    function open-ports-outgoing(){
+    function net-open-ports-outgoing(){
         if test -z $@; then
+            printf "No arguments. This could take a while.\n" 
             time nmap -p- portquiz.net | grep -i open 
         else 
-            time nmap -p $@ portquiz.net 
+            time nmap -p "$@" portquiz.net 
         fi
     }
-    complete -W "$(seq 1 10000)" open-ports-outgoing 
+    complete -W "$(seq 1 10000)" net-open-ports-outgoing 
 fi
+
+#if type ss &> /dev/null; then
+   #alias net-list-active-ports="ss -tulpn | awk '{print \$5;}' | grep --color=never '[^\:][0-9]$' | cut -d: -f2 | xargs | tr ' ' '\n' | sort -u"  
+#fi
+
+if type netstat &> /dev/null; then
+    # Netstat deprecated 
+    # https://blog.pcarleton.com/post/netstat-vs-ss/
+    alias netstat-is-installed-but-use-ss='ss'
+    alias netstat-list-all-ports="netstat -a"
+    alias netstat-list-all-ports-tcp="netstat -at"
+    alias netstat-list-all-ports-udp="netstat -au"
+    #alias netstat-list-ports-in-use="netstat -latu | awk 'NR>2{print \$4}' | cut -d: -f2 | grep --color=never [0-9]" 
+    #alias netstat-open-ports-incoming='netstat -nalpeec --inet | $PAGER'
+    alias netstat-open-ports-listening-no-unix='netstat -ntulpeec | $PAGER' 
+    alias netstat-open-ports-listening-tcp='netstat -ntlpeec | $PAGER' 
+    alias netstat-open-ports-listening-udp='netstat -nulpeec | $PAGER' 
+    alias netstat-open-ports-listening-unix='netstat -nxlpeec | $PAGER' 
+    alias netstat-open-ports-listening-all='netstat -nalpeec | $PAGER' 
+    alias netstat-stats='netstat -s | $PAGER' 
+    alias netstat-stats-tcp='netstat -st | $PAGER' 
+    alias netstat-stats-udp='netstat -su | $PAGER' 
+    alias netstat-kernel-interface='netstat -iee | $PAGER' 
+    alias netstat-masquerades='netstat -M | $PAGER' 
+    alias netstat-routing-table-kernel='netstat -r | $PAGER' 
+    alias netstat-ip4v6-group-membership='netstat -g | $PAGER' 
+    
+    function netstat-search-program-port(){
+        if ! test -z "$@"; then
+            for i in "$@"; do
+                printf "${CYAN}Port $i ${normal}\n" 
+                netstat -an | grep ":$i" 
+            done
+        fi
+    }
+    #if ! type ss &> /dev/null; then
+        complete -W "$(seq 1 10000)" netstat-search-program-port 
+    #else
+    #    complete -W "$(net-list-all-active-ports)" netstat-search-program-port 
+    #fi
+fi
+
 
 if type exiftool &> /dev/null; then
     alias exiftool-folder="exiftool -r -all=$(pwd)"
@@ -59,6 +102,7 @@ if type fzf &> /dev/null && type mullvad &> /dev/null; then
         mullvad connect && (eval "$ssns" &> /dev/null) 
     }
 fi
+
 
 # rg stuff
 if type rg &> /dev/null; then

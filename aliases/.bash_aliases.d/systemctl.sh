@@ -9,12 +9,19 @@ alias service-system-list-files="sudo systemctl list-unit-files"
 alias service-user-list-files="systemctl --user list-unit-files"
 alias service-systemd-restart="sudo systemctl restart"
 
-service-system-start(){
+alias restart-display="sudo systemctl restart display-manager"  
+alias bios="systemctl reboot --firmware-setup"
+
+if type pipewire &> /dev/null; then
+    alias restart-pipewire="systemctl restart --user pipewire"
+fi
+
+system-service-start(){
     sudo systemctl start $@; 
     sudo systemctl status $@;
 }
 
-_service-system-start(){
+_system-service-start(){
     local cur=${COMP_WORDS[COMP_CWORD]} prev=${COMP_WORDS[COMP_CWORD-1]}
     cur_orig=$cur
     if [[ $cur =~ '\\' ]]; then
@@ -30,12 +37,12 @@ _service-system-start(){
 
 complete -F _service-system-start service-system-start
 
-service-user-start(){
+service-start(){
     systemctl --user start $@;
     systemctl --user status $@;
 }
 
-_service-user-start(){
+_service-start(){
     local cur=${COMP_WORDS[COMP_CWORD]} prev=${COMP_WORDS[COMP_CWORD-1]}
     cur_orig=$cur
     if [[ $cur =~ '\\' ]]; then
@@ -49,18 +56,17 @@ _service-user-start(){
     return 0
 }
 
-complete -F _service-user-start service-user-start
+complete -F _service-start service-start
 
-alias service-system-stop="sudo systemctl stop "
-alias service-user-stop="systemctl --user stop "
+alias system-service-stop="sudo systemctl stop "
+alias service-stop="systemctl --user stop "
 
-service-system-restart(){
-    sudo systemctl stop $@;
-    sudo systemctl start $@;
+system-service-restart(){
+    sudo systemctl restart $@;
     sudo systemctl status $@;
 }
 
-_service-system-restart(){
+_system-service-restart(){
     local cur=${COMP_WORDS[COMP_CWORD]} prev=${COMP_WORDS[COMP_CWORD-1]}
     cur_orig=$cur
     if [[ $cur =~ '\\' ]]; then
@@ -74,15 +80,14 @@ _service-system-restart(){
     return 0
 }
 
-complete -F _service-system-restart service-system-restart
+complete -F _system-service-restart system-service-restart
 
-service-user-restart(){
-    systemctl --user stop $@;
-    systemctl --user start $@;
+service-restart(){
+    systemctl --user restart $@;
     systemctl --user status $@;
 }
 
-_service-user-restart(){
+_service-restart(){
     local cur=${COMP_WORDS[COMP_CWORD]} prev=${COMP_WORDS[COMP_CWORD-1]}
     cur_orig=$cur
     if [[ $cur =~ '\\' ]]; then
@@ -96,17 +101,15 @@ _service-user-restart(){
     return 0
 }
 
-complete -F _service-user-restart service-user-restart
+complete -F _service-restart service-restart
 
-alias systemd-enable-systemservice="sudo systemctl enable "
-alias systemd-enable-userservice="systemctl --user enable "
 
-service-system-enable-now(){
+system-service-enable-now(){
     sudo systemctl enable --now $@;
     sudo systemctl status $@;
 }
 
-_service-system-enable-now(){
+_system-service-enable-now(){
     local cur=${COMP_WORDS[COMP_CWORD]} prev=${COMP_WORDS[COMP_CWORD-1]}
     cur_orig=$cur
     if [[ $cur =~ '\\' ]]; then
@@ -120,14 +123,14 @@ _service-system-enable-now(){
     return 0
 }
 
-complete -F _service-system-enable-now service-system-enable-now
+complete -F _system-service-enable-now system-service-enable-now
 
-service-user-enable-now(){
+service-enable-now(){
     systemctl --user enable --now $@;
     systemctl --user status $@;
 }
 
-_service-user-enable-now(){
+_service-enable-now(){
     local cur=${COMP_WORDS[COMP_CWORD]} prev=${COMP_WORDS[COMP_CWORD-1]}
     cur_orig=$cur
     if [[ $cur =~ '\\' ]]; then
@@ -141,7 +144,7 @@ _service-user-enable-now(){
     return 0
 }
 
-complete -F _service-user-enable-now service-user-enable-now
+complete -F _service-enable-now service-enable-now
 
 alias service-system-disable="sudo systemctl disable "
 alias service-user-disable="systemctl --user disable "
@@ -150,7 +153,6 @@ alias service-user-disable-now="systemctl --user disable --now "
 alias service-status="systemctl status"
 alias service-system-reloadall="sudo systemctl daemon-reload"
 alias service-user-reloadall="systemctl --user daemon-reload"
-alias bios="systemctl reboot --firmware-setup"
 alias bluetooth-start="sudo systemctl start bluetooth.service && blueman-manager"
 alias bluetooth-down="sudo systemctl stop bluetooth.service"
 
@@ -213,7 +215,6 @@ function service-user-create(){
 }
 
 #if test $XDG_SESSION_TYPE == 'x11'; then
-   alias restart-display="sudo systemctl restart display-manager"  
 #fi
 
 #function systemctl_create_multi_user_system_daemon(){

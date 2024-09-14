@@ -95,17 +95,17 @@ update_sysm_r(){
 update_sysm(){
     cp -fv $update_sysm ~/.bash_aliases.d/
     sed -i '/SYSTEM_UPDATED="TRUE"/d' ~/.bash_aliases.d/update-system.sh
-    yes_edit_no update_sysm_r "$update_sysm" "Install update-system.sh at /root/?" "yes" "GREEN";
+    yes_edit_no update_sysm_r "$update_sysm" "Install update-system.sh at /root/?" "yes" "YELLOW";
 }
-yes_edit_no update_sysm "$update_sysm" "Install update-system.sh at ~/.bash_aliases.d/? (Global system update function)?" "edit" "GREEN"
+yes_edit_no update_sysm "$update_sysm" "Install update-system.sh at ~/.bash_aliases.d/? (Global system update function)?" "yes" "GREEN"
 
 systemd_r(){ 
     sudo cp -fv $systemd /root/.bash_aliases.d/;
 }
 systemd(){
     cp -fv $systemd ~/.bash_aliases.d/
-    yes_edit_no systemd_r "$systemd" "Install systemctl.sh at /root/?" "yes" "GREEN"; }
-yes_edit_no systemd "$systemd" "Install systemctl.sh at ~/.bash_aliases.d/? (systemctl aliases/functions)?" "edit" "GREEN"
+    yes_edit_no systemd_r "$systemd" "Install systemctl.sh at /root/?" "yes" "YELLOW"; }
+yes_edit_no systemd "$systemd" "Install systemctl.sh at ~/.bash_aliases.d/? (systemctl aliases/functions)?" "yes" "GREEN"
     
 
 dosu_r(){ 
@@ -114,8 +114,8 @@ dosu_r(){
 
 dosu(){ 
     cp -fv $dosu ~/.bash_aliases.d/;
-    yes_edit_no dosu_r "$dosu" "Install sudo.sh at /root/?" "yes" "GREEN"; }
-yes_edit_no dosu "$dosu" "Install sudo.sh at ~/.bash_aliases.d/ (sudo aliases)?" "edit" "GREEN"
+    yes_edit_no dosu_r "$dosu" "Install sudo.sh at /root/?" "yes" "YELLOW"; }
+yes_edit_no dosu "$dosu" "Install sudo.sh at ~/.bash_aliases.d/ (sudo aliases)?" "yes" "GREEN"
 
 
 packman_r(){ 
@@ -123,18 +123,18 @@ packman_r(){
 }
 packman(){
     cp -fv $pacmn ~/.bash_aliases.d/
-    yes_edit_no packman_r "$pacmn" "Install package_managers.sh at /root/?" "edit" "YELLOW" 
+    yes_edit_no packman_r "$pacmn" "Install package_managers.sh at /root/?" "yes" "YELLOW" 
 }
-yes_edit_no packman "$pacmn" "Install package_managers.sh at ~/.bash_aliases.d/ (package manager aliases)? " "edit" "GREEN"
+yes_edit_no packman "$pacmn" "Install package_managers.sh at ~/.bash_aliases.d/ (package manager aliases)? " "yes" "GREEN"
 
 ssh_r(){ 
     sudo cp -fv $sshs /root/.bash_aliases.d/; 
 }
 sshh(){
     cp -fv $sshs ~/.bash_aliases.d/
-    yes_edit_no ssh_r "$sshs" "Install ssh.sh at /root/?" "edit" "YELLOW" 
+    yes_edit_no ssh_r "$sshs" "Install ssh.sh at /root/?" "yes" "YELLOW" 
 }
-yes_edit_no sshh "$sshs" "Install ssh.sh at ~/.bash_aliases.d/ (ssh aliases)? " "edit" "GREEN"
+yes_edit_no sshh "$sshs" "Install ssh.sh at ~/.bash_aliases.d/ (ssh aliases)? " "yes" "GREEN"
 
 
 ps1_r(){ 
@@ -142,7 +142,7 @@ ps1_r(){
 }
 ps11(){
     cp -fv $ps1 ~/.bash_aliases.d/
-    yes_edit_no ps1_r "$ps1" "Install PS1_colours.sh at /root/?" "yes" "GREEN" 
+    yes_edit_no ps1_r "$ps1" "Install PS1_colours.sh at /root/?" "yes" "YELLOW" 
 }
 yes_edit_no ps11 "$ps1" "Install PS1_colours.sh at ~/.bash_aliases.d/ (Coloured command prompt)? " "yes" "GREEN"
 
@@ -152,10 +152,15 @@ if [ $distro == "Manjaro" ] ; then
     }
     manj(){
         cp -fv $manjaro ~/.bash_aliases.d/
-        yes_edit_no manj_r "$manjaro" "Install manjaro.sh at /root/?" "yes" "GREEN" 
+        yes_edit_no manj_r "$manjaro" "Install manjaro.sh at /root/?" "yes" "YELLOW" 
     }
     yes_edit_no manj "$manjaro" "Install manjaro.sh at ~/.bash_aliases.d/ (manjaro specific aliases)? " "yes" "GREEN"
 fi
+
+pthon(){
+    cp -fv $pthon ~/.bash_aliases.d/
+}
+yes_edit_no pthon "$pthon" "Install python.sh at ~/.bash_aliases.d/ (aliases for a python development)? " "yes" "GREEN" 
 
 # Variety aliases 
 # 
@@ -164,12 +169,8 @@ variti_r(){
 }
 variti(){
     cp -fv $variti ~/.bash_aliases.d/
-    yes_edit_no variti_r "$variti" "Install variety.sh at /root/?" "no" "YELLOW" 
+    yes_edit_no variti_r "$variti" "Install variety.sh at /root/?" "yes" "YELLOW" 
 }
-yes_edit_no variti "$variti" "Install variety.sh at ~/.bash_aliases.d/ (aliases for a variety of tools)? " "edit" "GREEN" 
+yes_edit_no variti "$variti" "Install variety.sh at ~/.bash_aliases.d/ (aliases for a variety of tools)? " "yes" "GREEN" 
 
-pthon(){
-    cp -fv $pthon ~/.bash_aliases.d/
-}
-yes_edit_no pthon "$pthon" "Install python.sh at ~/.bash_aliases.d/ (aliases for a python development)? " "edit" "GREEN" 
 

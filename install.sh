@@ -361,6 +361,20 @@ if ! test -f ~/.bash_preexec || ! test -f /root/.bash_preexec; then
     unset bash_preexec
 fi
 
+# Bash Preexec
+if ! test -f ~/.bash_preexec || ! test -f /root/.bash_preexec; then
+    reade -Q "GREEN" -i "y" -p "Install pre-execution hooks for bash in ~/.bash_preexec? [Y/n]: " "n" bash_preexec
+    if [ -z "$bash_preexec" ] || [ "y" == "$bash_preexec" ]; then
+        if ! test -f install_bash_preexec.sh; then
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bash_preexec.sh)" 
+        else
+            ./install_bash_preexec.sh
+        fi 
+    fi
+    unset bash_preexec
+fi
+
+
 # Moar (Custom pager instead of less)
 pre='y'
 othr='n'
@@ -381,6 +395,28 @@ if [ -z $moar ] || [ "Y" == $moar ] || [ $moar == "y" ]; then
     fi
 fi
 unset pre color othr moar
+
+
+# Pipewire (better sound)
+pre='y'
+othr='n'
+color='GREEN'
+prmpt='[Y/n]: '
+if test -f ~/.config/pipewire/pipewire-pulse.conf.d/switch-on-connect.conf; then
+    pre='n' 
+    othr='y'
+    color='YELLOW'
+    prmpt='[N/y]: '
+fi 
+reade -Q "$color" -i "$pre" -p "Install and configure pipewire? (sound system - pulseaudio replacement) $prmpt" "$othr" pipew
+if [ $pipewire == "y" ]; then
+    if ! test -f install_pipewire.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipewire.sh)" 
+    else
+        ./install_pipewire.sh 
+    fi
+fi
+unset pre color othr pipewire
 
 
 # Nano (Editor)
@@ -687,6 +723,32 @@ unset strshp
 unset pre color othr prmpt 
 
 
+# Nmap
+pre='y'
+othr='n'
+color='GREEN'
+prmpt='[Y/n]: '
+if type nmap &> /dev/null; then
+    pre='n' 
+    othr='y'
+    color='YELLOW'
+    prmpt='[N/y]: '
+fi 
+
+if ! type nmap &> /dev/null; then
+    reade -Q "GREEN" -i "y" -p "Install nmap? (Network port scanning tool) [Y/n]: " "n" tojump
+    if [ "$tojump" == "y" ]; then
+        if ! test -f install_nmap.sh; then
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nmap.sh)" 
+        else
+            ./install_nmap.sh
+        fi
+    fi
+    unset tojump
+    unset pre color othr prmpt 
+fi
+
+
 # Ufw / Gufw
 pre='y'
 othr='n'
@@ -710,55 +772,31 @@ fi
 unset ins_ufw
 unset pre color othr prmpt 
 
-# Nmap
-pre='y'
-othr='n'
-color='GREEN'
-prmpt='[Y/n]: '
-if ! type nmap &> /dev/null; then
-    pre='n' 
-    othr='y'
-    color='YELLOW'
-    prmpt='[N/y]: '
-fi 
+
+
+
+# Netstat - deprecated
+#pre='y'
+#othr='n'
+#color='GREEN'
+#prmpt='[Y/n]: '
+#if type netstat &> /dev/null || type netstat-nat &> /dev/null; then
+#    pre='n' 
+#    othr='y'
+#    color='YELLOW'
+#    prmpt='[N/y]: '
+#fi 
 #
-if ! type nmap &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Install nmap? (Network port scanning tool) [Y/n]: " "n" tojump
-    if [ "$tojump" == "y" ]; then
-        if ! test -f install_nmap.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nmap.sh)" 
-        else
-            ./install_nmap.sh
-        fi
-    fi
-    unset tojump
-    unset pre color othr prmpt 
-fi
-
-
-
-# Netstat
-pre='y'
-othr='n'
-color='GREEN'
-prmpt='[Y/n]: '
-if type netstat &> /dev/null || type netstat-nat &> /dev/null; then
-    pre='n' 
-    othr='y'
-    color='YELLOW'
-    prmpt='[N/y]: '
-fi 
-
-reade -Q "$color" -i "$pre" -p "Install netstat? (Also port scanning tool) $prmpt" "$othr" tojump
-if [ "$tojump" == "y" ]; then
-    if ! test -f install_netstat.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_netstat.sh)" 
-    else
-        ./install_netstat.sh
-    fi
-fi
-unset tojump
-unset pre color othr prmpt 
+#reade -Q "$color" -i "$pre" -p "Install netstat? (Also port scanning tool) $prmpt" "$othr" tojump
+#if [ "$tojump" == "y" ]; then
+#    if ! test -f install_netstat.sh; then
+#        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_netstat.sh)" 
+#    else
+#        ./install_netstat.sh
+#    fi
+#fi
+#unset tojump
+#unset pre color othr prmpt 
 
 
 

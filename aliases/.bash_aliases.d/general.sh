@@ -310,7 +310,7 @@ alias all-null="&> /dev/null"
 alias no-output="&> /dev/null"
 
 # Show open ports
-alias openports='netstat -nape --inet'
+#alias openports='netstat -nape --inet'
 
 # Wifi enable/disable
 if type nmcli &> /dev/null; then
@@ -335,7 +335,7 @@ alias men="man man"
 # No alias starting with = 
 # alias =>="|"
 
-# Space seperated words to newline
+# Different kind of script oneliners
 alias word2line="tr ' ' '\n'"
 alias line2word="tr '\n' ' '"
 alias tab2space="tr -s ' '"
@@ -344,12 +344,14 @@ alias upper2lower="tr '[:upper:]' '[:lower:]'"
 alias upper1stletter="\${var^}"
 alias lower2upper="tr '[:lower:]' '[:upper:]'"
 alias remove-whitespace='| xargs'
-
+alias file-no-filetype="${i%.*}"
 alias remove-empty-lines="sed '/^[[:space:]]*$/d'"
 alias get-first-stringwords="frst=\"\$(echo \$words | awk '{print \$1}')\" && words=\"\$(echo \$words | sed \"s/\<\$frst\> //g\")\""
 
-# Pipe column output to a pager
+# Helps pipeing column output to a pager
 alias column="column -c $(tput cols)"
+
+
 
 alias tar-create="tar -cvf"
 alias tar-unpack="tar -xvf"
