@@ -28,8 +28,8 @@ fi
 
 
 if ! type lazydocker &> /dev/null; then
-    if test $distro_base == "Arch" && ! test -z "$AUR_install"; then
-        eval "$AUR_install lazydocker"
+    if test $distro_base == "Arch" && ! test -z "$AUR_ins"; then
+        eval "$AUR_ins lazydocker"
     else
         if ! type curl &> /dev/null; then
             if test $distro_base == 'Debian'; then
