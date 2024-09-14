@@ -21,7 +21,13 @@ if ! type list-ppa &> /dev/null; then
                 ./install_pipx.sh
             fi  
         fi
-        pipx install list-ppa
+
+        if ! type pipx &> /dev/null && test -f $HOME/.local/bin/pipx; then 
+            $HOME/.local/bin/pipx install list-ppa 
+        elif type pipx &> /dev/null; then 
+            pipx install list-ppa
+        fi
+
         if ! test -f ~/.config/ppas; then 
             reade -Q 'GREEN' -i 'y' -p "Run list-ppa (generates file containin ppas that have a release file for your version in ~/.config/ppas - !! Can take a while - can be rerun)? [Y/n]: " 'n' ppa_ins
             if test $ppa_ins == 'y'; then

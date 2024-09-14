@@ -1,26 +1,17 @@
 #!/bin/bash
 
-if ! type curl &> /dev/null; then
-    printf "$(tput setaf 6 && tput bold)curl${normal} not installed (cmd tool for interacting with urls)\n$(tput sgr0)"
-    printf "$(tput setaf 2 && tput bold)Install curl? [Y/n]: $(tput sgr0)" ins_curl
-    read ins_curl 
-    if test $ins_curl == 'y' || test $ins_curl == '' || test $ins_curl == 'Y'; then
-       eval "$pac_ins curl -y"
-    fi
-fi
-unset ins_curl
-
 if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
 else
     . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
 fi
 
-if ! test -f checks/check_system.sh; then
+if type curl &> /dev/null && ! test -f checks/check_system.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
 else
-    . checks/check_system.sh
+    . ./checks/check_system.sh
 fi
+
 
 if ! test -f checks/check_envvar.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)" 
@@ -181,7 +172,7 @@ if test $distro_base == 'Debian'; then
             ./install_list-ppa.sh
         fi
 
-        if ! type ppa-purge &> /dev/null && ! test -z "$(apt search ppa-purge 2> /dev/null | awk 'NR>2{print;}')"; then
+        if ! type ppa-purge &> /dev/null && !test -z "$(apt search ppa-purge 2> /dev/null | awk 'NR>2{print;}')"; then
             printf "${CYAN}ppa-purge${normal} is not installed (cmd tool for removing ppa repositories)\n"
             reade -Q 'GREEN' -i 'y' -p "Install ppa-purge? [Y/n]: " 'n' ppa_ins
             if test $ppa_ins == 'y'; then
@@ -191,7 +182,7 @@ if test $distro_base == 'Debian'; then
         fi
     fi 
 
-     if ! test -z $(apt list --installed nala 2> /dev/null | awk 'NR>2{print;}'); then
+     if ! type nala &> /dev/null && !test -z "$(apt search nala 2> /dev/null | awk 'NR>2{print;}')"; then
         printf "${CYAN}nala${normal} is not installed (A TUI wrapper for apt install, update, upgrade, search, etc..)\n"
         reade -Q 'GREEN' -i 'y' -p "Install nala? [Y/n]: " 'n' nala_ins
         if test $nala_ins == 'y'; then
