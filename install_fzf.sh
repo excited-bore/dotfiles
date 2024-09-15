@@ -39,7 +39,7 @@ fi
  # Bash completion issue with fzf fix
  # https://github.com/cykerway/complete-alias/issues/46
 
-if ! test -d ~/.fzf ; then
+if ! test -d ~/.fzf  || test -f ~/.fzf.bash; then
     git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
     ~/.fzf/install
     if [[ $ENVVAR =~ '.environment.env' ]]; then 

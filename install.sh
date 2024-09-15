@@ -73,12 +73,14 @@ unset sym1 sym2 sym3 beep
 
 # Environment variables
 
-if ! test -f install_envvars.sh; then
-    tmp=$(mktemp) && wget -O $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_envvars.sh
-    ./$tmp 'n' 
-else
-    ./install_envvars.sh 'n'  
-fi 
+if ! test -f $HOME/.environment.env; then
+    if ! test -f install_envvars.sh; then
+        tmp=$(mktemp) && wget -O $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_envvars.sh
+        ./$tmp 'n' 
+    else
+        ./install_envvars.sh 'n'  
+    fi 
+fi
 
 # Appimagelauncher
 
