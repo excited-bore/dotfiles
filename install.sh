@@ -74,8 +74,8 @@ unset sym1 sym2 sym3 beep
 # Environment variables
 
 if ! test -f install_envvars.sh; then
-    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_envvars.sh
-    . $tmp 'n' 
+    tmp=$(mktemp) && wget -O $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_envvars.sh
+    ./$tmp 'n' 
 else
     ./install_envvars.sh 'n'  
 fi 
@@ -187,11 +187,13 @@ if test $distro_base == 'Debian'; then
         reade -Q 'GREEN' -i 'y' -p "Install nala? [Y/n]: " 'n' nala_ins
         if test $nala_ins == 'y'; then
             eval "$pac_ins nala"
+            pac="nala"
+            pac_ins="sudo nala install"
+            pac_up="sudo nala update" 
         fi
         unset pac_ins 
     fi
          
-
     if test $distro == "Ubuntu"; then 
         if ! type synaptic &> /dev/null; then
             printf "${CYAN}synaptic${normal} is not installed (Better GUI for package management)\n"
@@ -979,8 +981,8 @@ fi
 #if [ "$envvars" == "y" ] || [ -z "$envvars" ]; then
     if ! test -f install_envvars.sh; then
         tmp=$(mktemp) 
-        curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_envvars.sh
-        . $tmp  
+        wget -O $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_envvars.sh
+        ./$tmp  
     else
         ./install_envvars.sh  
     fi 

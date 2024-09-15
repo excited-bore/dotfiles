@@ -348,10 +348,20 @@ if ! type curl &> /dev/null && ! test -z "$pac_ins"; then
     printf "$(tput setaf 6 && tput bold)curl${normal} not installed (cmd tool for interacting with urls)\n$(tput sgr0)"
     reade -Q 'GREEN' -i 'y' -p "Install curl? [Y/n]: " 'n' ins_curl
     if test "$ins_curl" == 'y' || test "$ins_curl" == '' || test "$ins_curl" == 'Y'; then
-       eval "$pac_ins curl -y"
+       eval "$pac_ins curl"
     fi
 fi
 unset ins_curl
+
+if ! type wget &> /dev/null && ! test -z "$pac_ins"; then
+    printf "$(tput setaf 6 && tput bold)wget${normal} not installed (cmd tool for downloading files for the internet)\n$(tput sgr0)"
+    reade -Q 'GREEN' -i 'y' -p "Install wget? [Y/n]: " 'n' ins_wget
+    if test "$ins_wget" == 'y' || test "$ins_wget" == '' || test "$ins_wget" == 'Y'; then
+       eval "$pac_ins wget"
+    fi
+fi
+unset ins_wget
+
 
 if type nala &> /dev/null && test $pac == 'apt'; then
     pac="nala"
