@@ -172,7 +172,7 @@ if test $distro_base == 'Debian'; then
             ./install_list-ppa.sh
         fi
 
-        if ! type ppa-purge &> /dev/null && ! test -z "$(apt search ppa-purge 2> /dev/null | awk 'NR>2{print;}')"; then
+        if ! type ppa-purge &> /dev/null && !test -z "$(apt search ppa-purge 2> /dev/null | awk 'NR>2{print;}')"; then
             printf "${CYAN}ppa-purge${normal} is not installed (cmd tool for removing ppa repositories)\n"
             reade -Q 'GREEN' -i 'y' -p "Install ppa-purge? [Y/n]: " 'n' ppa_ins
             if test $ppa_ins == 'y'; then
@@ -182,7 +182,7 @@ if test $distro_base == 'Debian'; then
         fi
     fi 
 
-     if ! test -z $(apt list --installed nala 2> /dev/null | awk 'NR>2{print;}'); then
+     if ! type nala &> /dev/null && !test -z "$(apt search nala 2> /dev/null | awk 'NR>2{print;}')"; then
         printf "${CYAN}nala${normal} is not installed (A TUI wrapper for apt install, update, upgrade, search, etc..)\n"
         reade -Q 'GREEN' -i 'y' -p "Install nala? [Y/n]: " 'n' nala_ins
         if test $nala_ins == 'y'; then
