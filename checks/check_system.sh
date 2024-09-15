@@ -1,4 +1,4 @@
-if ! test -f ../aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
+if type curl &> /dev/null && ! test -f ../aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh
 )" 
 else
@@ -344,7 +344,7 @@ do
 done
     
 
-if ! type curl &> /dev/null && ! test -z $pac_ins; then
+if ! type curl &> /dev/null && ! test -z "$pac_ins"; then
     printf "$(tput setaf 6 && tput bold)curl${normal} not installed (cmd tool for interacting with urls)\n$(tput sgr0)"
     reade -Q 'GREEN' -i 'y' -p "Install curl? [Y/n]: " 'n' ins_curl
     if test "$ins_curl" == 'y' || test "$ins_curl" == '' || test "$ins_curl" == 'Y'; then
