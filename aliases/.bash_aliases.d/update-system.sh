@@ -78,7 +78,7 @@ function update-system() {
     elif test "$pac" == "apt"; then
         eval "$pac_up"
         hdrs="linux-headers-$(uname -r)"
-        if test -z "$(apt list --installed | grep $hdrs)"; then
+        if test -z "$(apt list --installed 2> /dev/null | grep $hdrs)"; then
             reade -Q "GREEN" -i "y" -p "Right linux headers not installed. Install $hdrs? [Y/n]: " "n" hdrs_ins
             if [ "$hdrs_ins" == "y" ]; then
                 eval "$pac_ins $hdrs"
