@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
+if type curl &> /dev/null && ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
 else
     . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
@@ -19,20 +19,27 @@ else
     . ./checks/check_envvar.sh
 fi
 
-if ! test -f aliases/.bash_aliases.d/update-system.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)" 
-else
-    . ./aliases/.bash_aliases.d/update-system.sh
+if ! type update-system &> /dev/null; then
+    if ! test -f aliases/.bash_aliases.d/update-system.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)" 
+    else
+        . ./aliases/.bash_aliases.d/update-system.sh
+    fi
 fi
 
-update-system
+if test -z $SYSTEM_UPDATED; then
+    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "n" updatesysm
+    if test $updatesysm == "y"; then
+        update-system                     
+    fi
+fi
+
 
 if ! test -f checks/check_rlwrap.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_rlwrap.sh)" 
 else
     . ./checks/check_rlwrap.sh
 fi
-
 
 printf "${green}If all necessary files are sourced correctly, this text looks green.\nIf not, something went wrong.\n"
 if type gio &> /dev/null; then
@@ -184,7 +191,7 @@ if test $distro_base == 'Debian'; then
         fi
     fi 
 
-     if ! type nala &> /dev/null && !test -z "$(apt search nala 2> /dev/null | awk 'NR>2{print;}')"; then
+     if ! type nala &> /dev/null && ! test -z "$(apt search nala 2> /dev/null | awk 'NR>2{print;}')"; then
         printf "${CYAN}nala${normal} is not installed (A TUI wrapper for apt install, update, upgrade, search, etc..)\n"
         reade -Q 'GREEN' -i 'y' -p "Install nala? [Y/n]: " 'n' nala_ins
         if test $nala_ins == 'y'; then
@@ -421,6 +428,26 @@ if ! test -f ~/.bash_preexec || ! test -f /root/.bash_preexec; then
     unset bash_preexec
 fi
 
+# Pipewire (better sound)
+pre='y'
+othr='n'
+color='GREEN'
+prmpt='[Y/n]: '
+if type wireplumber &> /dev/null && test -f ~/.config/pipewire/pipewire-pulse.conf.d/switch-on-connect.conf; then
+    pre='n' 
+    othr='y'
+    color='YELLOW'
+    prmpt='[N/y]: '
+fi 
+reade -Q "$color" -i "$pre" -p "Install and configure pipewire? (sound system - pulseaudio replacement) $prmpt" "$othr" pipew
+if [ $pipew == "y" ]; then
+    if ! test -f install_pipewire.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipewire.sh)" 
+    else
+        ./install_pipewire.sh 
+    fi
+fi
+unset pre color othr pipew
 
 # Moar (Custom pager instead of less)
 pre='y'
@@ -444,26 +471,6 @@ fi
 unset pre color othr moar
 
 
-# Pipewire (better sound)
-pre='y'
-othr='n'
-color='GREEN'
-prmpt='[Y/n]: '
-if test -f ~/.config/pipewire/pipewire-pulse.conf.d/switch-on-connect.conf; then
-    pre='n' 
-    othr='y'
-    color='YELLOW'
-    prmpt='[N/y]: '
-fi 
-reade -Q "$color" -i "$pre" -p "Install and configure pipewire? (sound system - pulseaudio replacement) $prmpt" "$othr" pipew
-if [ $pipew == "y" ]; then
-    if ! test -f install_pipewire.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipewire.sh)" 
-    else
-        ./install_pipewire.sh 
-    fi
-fi
-unset pre color othr pipewire
 
 
 # Nano (Editor)

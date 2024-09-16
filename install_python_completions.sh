@@ -38,7 +38,7 @@ if ! type activate-global-python-argcomplete &> /dev/null; then
     fi
 fi
 
-if ! type pipx &> /dev/null; then
+if type curl &> /dev/null && ! type pipx &> /dev/null; then
    if ! test -f install_pipx.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)" 
     else
@@ -46,7 +46,7 @@ if ! type pipx &> /dev/null; then
     fi 
 fi
 
-if ! test -z $upg_pipx && test $upg_pipx == 'y'; then
+if ! type pipx &> /dev/null && test -f $HOME/.local/bin/pipx; then
     $HOME/.local/bin/pipx install argcomplete
 else
     pipx install argcomplete

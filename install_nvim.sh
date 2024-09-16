@@ -87,13 +87,15 @@ if test $machine == 'Mac' && type brew &> /dev/null; then
                     fi
                 fi 
 
-                if ! test -f install_pipx.sh; then
-                     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)" 
-                else
-                    ./install_pipx.sh
+                if ! type pipx &> /dev/null && ! test -f $HOME/.local/bin/pipx; then
+                    if ! test -f install_pipx.sh ; then
+                         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)" 
+                    else
+                        ./install_pipx.sh
+                    fi
                 fi
 
-                if ! test -z $upg_pipx && test $upg_pipx == 'y'; then
+                if ! type pipx &> /dev/null && test -f $HOME/.local/bin/pipx; then
                     $HOME/.local/bin/pipx install pynvim
                     $HOME/.local/bin/pipx install pylint 
                     $HOME/.local/bin/pipx install jedi 
@@ -176,15 +178,23 @@ elif test $distro_base == "Arch"; then
                     fi
                 fi 
                  
-                if ! test -f install_pipx.sh; then
-                     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)" 
+                if ! type pipx &> /dev/null && ! test -f $HOME/.local/bin/pipx; then
+                    if ! test -f install_pipx.sh; then
+                         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)" 
+                    else
+                        ./install_pipx.sh
+                    fi
+                fi 
+
+                if ! type pipx &> /dev/null && test -f $HOME/.local/bin/pipx; then
+                    $HOME/.local/bin/pipx install pynvim
+                    $HOME/.local/bin/pipx install pylint 
+                    $HOME/.local/bin/pipx install jedi 
                 else
-                    ./install_pipx.sh
+                    pipx install pynvim 
+                    pipx install pylint
+                    pipx install jedi
                 fi
-                eval "$pac_ins python-pynvim"
-                pipx install pynvim 
-                pipx install pylint
-                pipx install jedi
             fi
         fi
         if ! type npm &> /dev/null || ! npm list -g | grep neovim &> /dev/null; then
