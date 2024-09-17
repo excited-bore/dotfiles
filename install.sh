@@ -341,8 +341,10 @@ shell-keybinds() {
     else
         . ./checks/check_keybinds.sh
     fi
-    
-    reade -Q "GREEN" -i "y" -p "Enable vi-mode instead of emacs mode (might cause issues with pasteing)? [Y/n]: " "n" vimde
+   
+    printf "${cyan}You can always switch between vi/emacs mode with${CYAN}Ctrl-o${normal}\n"
+     
+    reade -Q "YELLOW" -i "n" -p "Startup in vi-mode instead of emacs mode?(might cause issues with pasteing) [N/y]: " "y" vimde
 
     sed -i "s|^set editing-mode .*|#set editing-mode vi|g" $binds
 

@@ -59,9 +59,9 @@ if ! test -f ~/.bash_completion.d/pipewire; then
     fi
 fi
 
+mkdir -p ~/.config/wireplumber/wireplumber.conf.d/
 
 if echo $(wpctl status) | grep -q 'HMDI'; then
-    mkdir -p ~/.config/wireplumber/wireplumber.conf.d/
     reade -Q 'GREEN' -i 'y' -p "Unlist all HDMI audio devices from pipewire? [Y/n]: " 'n' unlst_hdmi
     if test $unlst_hdmi == 'y'; then
         hdmi_f="$HOME/.config/wireplumber/wireplumber.conf.d/51-HDMI-disable.conf"  
@@ -84,20 +84,26 @@ if echo $(wpctl status) | grep -q 'HMDI'; then
     fi
 fi
 
+# https://wiki.archlinux.org/title/PipeWire#Sound_does_not_automatically_switch_when_connecting_a_new_device
 if type systemctl &> /dev/null && ! test -f /etc/systemd/user/pipewire-load-switch-on-connect.service; then
-    #reade -Q 'GREEN' -i 'y' -p "Set USB-audiodevices to autoswitch when connected? [Y/n]: " 'n' auto_s
-    #if test $auto_s == 'y'; then
-    #    mkdir -p ~/.config/pipewire/pipewire-pulse.conf.d/
-    #    conf=~/.config/pipewire/pipewire-pulse.conf.d/switch-on-connect.conf
-    #    if [ ! -e $conf ] || ! grep -q "# override for pipewire-pulse.conf file" $conf; then
-    #        echo "# override for pipewire-pulse.conf file" >> $conf
-    #        echo "pulse.cmd = [" >> $conf
-    #        echo "  { cmd = \"load-module\" args = \"module-always-sink\" flags = [ ] }" >> $conf
-    #        echo "  { cmd = \"load-module\" args = \"module-switch-on-connect\" }" >> $conf
-    #        echo "]" >> $conf
-    #    fi
-
-    #    printf "${GREEN}Added pipewire conf for $USER at:\n${CYAN}$HOME/.config/pipewire/pipewire-pulse.conf.d\n${normal}" 
+    #printf "${CYAN}You should test first whether sounds autoswitches when connected${normal}\n"
+    reade -Q 'GREEN' -i 'y' -p "Create device-autoswitch on connect conf file? [Y/n]: " 'n' auto_s
+    if test $auto_s == 'y'; then
+        mkdir -p ~/.config/pipewire/pipewire-pulse.conf.d/
+        conf=~/.config/pipewire/pipewire-pulse.conf.d/switch-on-connect.conf
+        if [ ! -e $conf ] || ! grep -q "# override for pipewire-pulse.conf file" $conf; then
+            echo "# override for pipewire-pulse.conf file" >> $conf
+            echo "pulse.cmd = [" >> $conf
+            echo "  { cmd = \"load-module\" args = \"module-always-sink\" flags = [ ] }" >> $conf
+            echo "  { cmd = \"load-module\" args = \"module-switch-on-connect\" }" >> $conf
+            echo "]" >> $conf
+        fi
+        systemctl restart --user pipewire-pulse.service 
+        if systemctl status --user --no-pager -l pipewire-pulse.service | grep -q 'File exists'; then
+            sed -i '/module-always-sink/d' $conf 
+            systemctl restart --user pipewire-pulse.service 
+        fi
+        printf "${GREEN}Added pipewire conf for $USER at:\n${CYAN}$HOME/.config/pipewire/pipewire-pulse.conf.d\n${normal}" 
 
     #    reade -Q 'GREEN' -i 'y' -p "Install USB-audio autoswitch on connect for pipewire system-wide? (at /etc/pipewire/pipewire-pulse.conf.d/) [Y/n]: " 'n' auto_s_sys
     #    if test $auto_s_sys == 'y'; then
@@ -159,9 +165,90 @@ if ! test -f $HOME/.config/wireplumber/wireplumber.conf.d/51-dualshock4-disable.
     fi
 fi
 
+if ! test -f $HOME/.config/wireplumber/wireplumber.conf.d/51-disable-suspension.conf; then
+    printf "${yellow}Noticeable audio delay or audible pop/crack when starting playback can be caused by ${YELLOW}'node suspension when inactive'${normal}\n"
+    reade -Q 'GREEN' -i 'n' -p "Disable node suspension when inactive? [N/y]: " 'n' dis_node
+    if test $dis_node == 'y'; then
+        dis_node_f="$HOME/.config/wireplumber/wireplumber.conf.d/51-disable-suspension.conf"  
+        touch dis_node_f 
+        printf "monitor.alsa.rules = [
+  {
+    matches = [
+      {
+        # Matches all sources
+        node.name = "~alsa_input.*"
+      },
+      {
+        # Matches all sinks
+        node.name = "~alsa_output.*"
+      }
+    ]
+    actions = {
+      update-props = {
+        session.suspend-timeout-seconds = 0
+      }
+    }
+  }
+]
+# bluetooth devices
+monitor.bluez.rules = [
+  {
+    matches = [
+      {
+        # Matches all sources
+        node.name = "~bluez_input.*"
+      },
+      {
+        # Matches all sinks
+        node.name = "~bluez_output.*"
+      }
+    ]
+    actions = {
+      update-props = {
+        session.suspend-timeout-seconds = 0
+      }
+    }
+  }
+]" > $dis_node_f 
+fi
+
+
+if ! type qwpgraph &> /dev/null; then
+    reade -Q 'GREEN' -i 'y' -p "Install patchbay interface 'qpwgraph'? (create and manage audiostreams) [Y/n]: " 'n' patchb
+    if test "$patchb" == 'y'; then
+        if test "$distro_base" == 'Arch' || test "$distro_base" == 'Debian'; then
+            eval "$pac_ins qpwgraph"
+        fi
+    fi
+    unset patchb 
+fi
+
+file=pipewire/.bash_aliases.d/pipewire.sh
+file1=pipewire/.bash_completions.d/pipewire
+if ! test -f $file || ! test -f $file1; then
+    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/pipewire/.bash_aliases.d/pipewire.sh
+    tmp1=$(mktemp) && curl -o $tmp1 https://raw.githubusercontent.com/excited-bore/dotfiles/main/pipewire/.bash_completions.d/pipewire
+    file=$tmp
+    file1=$tmp1
+fi
+
+pipewire_r(){ 
+    sudo cp -fv $file /root/.bash_aliases.d/; 
+    sudo cp -fv $file1 /root/.bash_completion.d/; 
+}
+
+pipewiresh(){
+    cp -fv $file ~/.bash_aliases.d/
+    cp -fv $file1 ~/.bash_completion.d/;
+    yes_edit_no pipewire_r "$file $file1" "Install pipewire aliases at /root/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)? " "yes" "GREEN"
+}
+yes_edit_no pipewiresh "$file $file1" "Install pipewire aliases at ~/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)? " "yes" "GREEN"
+
+
 if type systemctl &> /dev/null; then
-    reade -Q 'GREEN' -i 'y' -p 'Restart pipewire service? [Y/n]: ' 'n' rs_pwr
+    reade -Q 'GREEN' -i 'y' -p 'Restart pipewire service(s)? [Y/n]: ' 'n' rs_pwr
     if test $rs_pwr == 'y'; then
-       systemctl restart --user pipewire 
+       systemctl restart --user wireplumber pipewire pipewire-pulse 
+       systemctl status --user wireplumber pipewire pipewire-pulse 
     fi
 fi

@@ -54,3 +54,6 @@ fi
 if flatpak list --columns=name | grep "flatseal" &> /dev/null; then
 	alias flatseal='flatpak run --file-forwarding com.github.tchx84.Flatseal'
 fi
+if flatpak list --columns=name | grep "yuzu" &> /dev/null; then
+	alias yuzu='GDK_BACKEND=x11 flatpak run --file-forwarding org.yuzu_emu.yuzu'
+fi

@@ -117,6 +117,7 @@ function cd() {
     done
     if [ $push == 1 ]; then
         pushd "$PWD" &>/dev/null;  
+        export DIRS="$DIRS $PWD" 
     fi
     builtin cd -- "$@"; 
 }
@@ -258,6 +259,7 @@ bind -m vi-command      '"\C-b": quoted-insert'
 bind -m vi-insert       '"\C-b": quoted-insert'
 
 # Ctrl+o: Change from vi-mode to emacs mode and back
+# This is also configured in ~/.fzf/shell/key-bindings-bash.sh if you have fzf keybinds installed
 bind -m vi-command '"\C-o": emacs-editing-mode'
 bind -m vi-insert '"\C-o": emacs-editing-mode'
 bind -m emacs-standard '"\C-o": vi-editing-mode'
@@ -284,7 +286,7 @@ _edit_wo_executing() {
 bind -m vi-insert      -x '"\C-e":_edit_wo_executing'
 bind -m vi-command     -x '"v":_edit_wo_executing'
 bind -m vi-command     -x '"\C-e":_edit_wo_executing'
-bind -m emacs-standard -x '"\C-x\C-e":_edit_wo_executing'
+bind -m emacs-standard -x '"\C-e\C-e":_edit_wo_executing'
 
 # RLWRAP 
 
@@ -396,16 +398,16 @@ bind -m vi-insert      '"\e[15~": "\205\206"'
 if type neofetch &> /dev/null || type fastfetch &> /dev/null || type screenfetch &> /dev/null; then
     
     # Last one loaded is the winner
-    if type fastfetch &> /dev/null; then
-        bind -x '"\207": stty sane && fastfetch'
+    if type neofetch &> /dev/null; then
+        bind -x '"\207": stty sane && neofetch'
     fi
     
     if type screenfetch &> /dev/null; then
         bind -x '"\207": stty sane && screenfetch'
     fi
     
-    if type neofetch &> /dev/null; then
-        bind -x '"\207": stty sane && neofetch'
+    if type fastfetch &> /dev/null; then
+        bind -x '"\207": stty sane && fastfetch'
     fi
     
     bind -m emacs-standard '"\e[17~": "\207\n"'
