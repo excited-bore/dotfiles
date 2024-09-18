@@ -1,20 +1,43 @@
 #source /usr/share/bash-completion/completions/systemctl 
-alias service_system_list_units="sudo systemctl list-units --all"
-alias service_user_list_units="systemctl --user list-units --all"
-alias service_system_list_services="sudo systemctl list-units --type=service"
-alias service_user_list_services="systemctl --user list-units --type=service"
-alias service_system_list_sockets="sudo systemctl list-units --type=socket"
-alias service_user_list_sockets="systemctl --user list-units --type=socket"
-alias service_system_list_files="sudo systemctl list-unit-files"
-alias service_user_list_files="systemctl --user list-unit-files"
-alias service_systemd_restart="sudo systemctl restart"
+alias service-system-list-units="sudo systemctl list-units --all"
+alias service-user-list-units="systemctl --user list-units --all"
+alias service-system-list-services="sudo systemctl list-units --type=service"
+alias service-user-list-services="systemctl --user list-units --type=service"
+alias service-system-list-sockets="sudo systemctl list-units --type=socket"
+alias service-user-list-sockets="systemctl --user list-units --type=socket"
+alias service-system-list-files="sudo systemctl list-unit-files"
+alias service-user-list-files="systemctl --user list-unit-files"
+alias service-systemd-restart="sudo systemctl restart"
 
-service_system_start(){
+
+alias bios="systemctl reboot --firmware-setup"
+
+
+alias restart-network="systemctl restart NetworkManager"  
+alias status-network="systemctl status NetworkManager"  
+
+alias restart-bluetooth="systemctl restart bluetooth.target"
+alias status-bluetooth="systemctl status bluetooth.target"
+
+alias restart-display="sudo systemctl restart display-manager"  
+alias status-display="sudo systemctl status display-manager"  
+
+
+if type pipewire &> /dev/null; then
+    servs="wireplumber pipewire pipewire-pulse" 
+    alias stop-pipewire="systemctl stop --user $servs"
+    alias start-pipewire="systemctl start --user $servs"
+    alias restart-pipewire="systemctl restart --user $servs"
+    alias status-pipewire="systemctl status --user $servs"
+    unset servs 
+fi
+
+system-service-start(){
     sudo systemctl start $@; 
     sudo systemctl status $@;
 }
 
-_service_system_start(){
+_system-service-start(){
     local cur=${COMP_WORDS[COMP_CWORD]} prev=${COMP_WORDS[COMP_CWORD-1]}
     cur_orig=$cur
     if [[ $cur =~ '\\' ]]; then
@@ -28,14 +51,14 @@ _service_system_start(){
     return 0
 }
 
-complete -F _service_system_start service_system_start
+complete -F _service-system-start service-system-start
 
-service_user_start(){
+service-start(){
     systemctl --user start $@;
     systemctl --user status $@;
 }
 
-_service_user_start(){
+_service-start(){
     local cur=${COMP_WORDS[COMP_CWORD]} prev=${COMP_WORDS[COMP_CWORD-1]}
     cur_orig=$cur
     if [[ $cur =~ '\\' ]]; then
@@ -49,18 +72,17 @@ _service_user_start(){
     return 0
 }
 
-complete -F _service_user_start service_user_start
+complete -F _service-start service-start
 
-alias service_system_stop="sudo systemctl stop "
-alias service_user_stop="systemctl --user stop "
+alias system-service-stop="sudo systemctl stop "
+alias service-stop="systemctl --user stop "
 
-service_system_restart(){
-    sudo systemctl stop $@;
-    sudo systemctl start $@;
+system-service-restart(){
+    sudo systemctl restart $@;
     sudo systemctl status $@;
 }
 
-_service_system_restart(){
+_system-service-restart(){
     local cur=${COMP_WORDS[COMP_CWORD]} prev=${COMP_WORDS[COMP_CWORD-1]}
     cur_orig=$cur
     if [[ $cur =~ '\\' ]]; then
@@ -74,15 +96,14 @@ _service_system_restart(){
     return 0
 }
 
-complete -F _service_system_restart service_system_restart
+complete -F _system-service-restart system-service-restart
 
-service_user_restart(){
-    systemctl --user stop $@;
-    systemctl --user start $@;
+service-restart(){
+    systemctl --user restart $@;
     systemctl --user status $@;
 }
 
-_service_user_restart(){
+_service-restart(){
     local cur=${COMP_WORDS[COMP_CWORD]} prev=${COMP_WORDS[COMP_CWORD-1]}
     cur_orig=$cur
     if [[ $cur =~ '\\' ]]; then
@@ -96,17 +117,15 @@ _service_user_restart(){
     return 0
 }
 
-complete -F _service_user_restart service_user_restart
+complete -F _service-restart service-restart
 
-alias systemd_enable_systemservice="sudo systemctl enable "
-alias systemd_enable_userservice="systemctl --user enable "
 
-service_system_enable_now(){
+system-service-enable-now(){
     sudo systemctl enable --now $@;
     sudo systemctl status $@;
 }
 
-_service_system_enable_now(){
+_system-service-enable-now(){
     local cur=${COMP_WORDS[COMP_CWORD]} prev=${COMP_WORDS[COMP_CWORD-1]}
     cur_orig=$cur
     if [[ $cur =~ '\\' ]]; then
@@ -120,14 +139,14 @@ _service_system_enable_now(){
     return 0
 }
 
-complete -F _service_system_enable_now service_system_enable_now
+complete -F _system-service-enable-now system-service-enable-now
 
-service_user_enable_now(){
+service-enable-now(){
     systemctl --user enable --now $@;
     systemctl --user status $@;
 }
 
-_service_user_enable_now(){
+_service-enable-now(){
     local cur=${COMP_WORDS[COMP_CWORD]} prev=${COMP_WORDS[COMP_CWORD-1]}
     cur_orig=$cur
     if [[ $cur =~ '\\' ]]; then
@@ -141,33 +160,32 @@ _service_user_enable_now(){
     return 0
 }
 
-complete -F _service_user_enable_now service_user_enable_now
+complete -F _service-enable-now service-enable-now
 
-alias service_system_disable="sudo systemctl disable "
-alias service_user_disable="systemctl --user disable "
-alias service_system_disable_now="sudo systemctl disable --now "
-alias service_user_disable_now="systemctl --user disable --now "
-alias service_status="systemctl status"
-alias service_system_reloadall="sudo systemctl daemon-reload"
-alias service_user_reloadall="systemctl --user daemon-reload"
-alias bios="systemctl reboot --firmware-setup"
-alias bluetooth_start="sudo systemctl start bluetooth.service && blueman-manager"
-alias bluetooth_down="sudo systemctl stop bluetooth.service"
+alias service-system-disable="sudo systemctl disable "
+alias service-user-disable="systemctl --user disable "
+alias service-system-disable-now="sudo systemctl disable --now "
+alias service-user-disable-now="systemctl --user disable --now "
+alias service-status="systemctl status"
+alias service-system-reloadall="sudo systemctl daemon-reload"
+alias service-user-reloadall="systemctl --user daemon-reload"
+alias bluetooth-start="sudo systemctl start bluetooth.service && blueman-manager"
+alias bluetooth-down="sudo systemctl stop bluetooth.service"
 
-alias service_system_logs="sudo journalctl -x"
-alias service_system_log_unit="sudo journalctl -x -u"
-alias service_user_logs="journalctl -x"
-alias service_user_log_unit="journalctl -x -u"
-alias service_system_logs_boot="sudo journalctl -xb"
-alias service_user_logs_boot="journalctl -xb"
-alias service_system_logs_boot_reverse="sudo journalctl -xrb"
-alias service_user_logs_boot_reverse="journalctl -xrb"
-alias service_system_logs_live="sudo journalctl -xf"
-alias service_user_logs_live="journalctl -xf"
-alias service_system_logs_reverse="sudo journalctl -xr"
-alias service_user_logs_reverse="journalctl -xr"
+alias service-system-logs="sudo journalctl -x"
+alias service-system-log-unit="sudo journalctl -x -u"
+alias service-user-logs="journalctl -x"
+alias service-user-log-unit="journalctl -x -u"
+alias service-system-logs-boot="sudo journalctl -xb"
+alias service-user-logs-boot="journalctl -xb"
+alias service-system-logs-boot-reverse="sudo journalctl -xrb"
+alias service-user-logs-boot-reverse="journalctl -xrb"
+alias service-system-logs-live="sudo journalctl -xf"
+alias service-user-logs-live="journalctl -xf"
+alias service-system-logs-reverse="sudo journalctl -xr"
+alias service-user-logs-reverse="journalctl -xr"
 
-function service_system_create(){
+function service-system-create(){
     read -p "Give up a '*.service' name (script adds file extension .service): " inpt;
     if [ -z "$inpt" ]; then
         echo "Give up a viable filename please";
@@ -187,11 +205,11 @@ function service_system_create(){
         sudoedit $servF;
         serv="/etc/systemd/system/$inpt.service";
         sudo mv -f $servF $serv;
-        systemd_start_systemservice $serv;
+        systemd-start-systemservice $serv;
     fi
 }
 
-function service_user_create(){
+function service-user-create(){
     read -p "Give up a '*.service' name (script adds file extension .service): " inpt;
     if [ -z "$inpt" ]; then
         echo "Give up a viable filename please";
@@ -208,9 +226,12 @@ function service_user_create(){
         echo "[Install]" >> $serv;
         echo "WantedBy=default.target" >> $serv;
         $EDITOR $serv;
-        systemd_start_userservice $serv;
+        systemd-start-userservice $serv;
     fi
 }
+
+#if test $XDG_SESSION_TYPE == 'x11'; then
+#fi
 
 #function systemctl_create_multi_user_system_daemon(){
 #    read -p "Give up a '*.conf' name (script adds file extension .conf): " inpt;

@@ -36,16 +36,16 @@ if ! type yt-dlp &> /dev/null; then
         if test $machine == 'Mac' && type brew &> /dev/null; then
             brew install pipx
         elif test $distro == "Arch" || $distro == "Manjaro"; then
-            sudo pacman -S python-pipx
+            eval "$pac_ins python-pipx"
         elif test $distro_base == "Debian"; then
-            sudo apt install pipx
+            eval "$pac_ins pipx"
         fi
     fi
     pipx install yt-dlp
 fi
 
 if ! type ffmpeg &> /dev/null; then
-    reade -Q 'GREEN' -i 'y' -p 'Install ffmpeg (usefull for video/audio conversion)? [Y/n]:' '' ffmpeg
+    reade -Q 'GREEN' -i 'y' -p 'Install ffmpeg (usefull for video/audio conversion)? [Y/n]: ' '' ffmpeg
     if test $ffmpeg == 'y' ;then
         if ! test -f install_ffmpeg.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/install_ffmpeg.sh)" 

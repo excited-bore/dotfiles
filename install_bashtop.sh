@@ -12,6 +12,13 @@ if ! type update-system &> /dev/null; then
     fi
 fi
 
+if ! test -f aliases/.bash_aliases.d/package_managers.sh; then
+    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/package_managers.sh)" 
+else
+    source aliases/.bash_aliases.d/package_managers.sh
+fi
+
+
 if test -z $SYSTEM_UPDATED; then
     reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "n" updatesysm
     if test $updatesysm == "y"; then
@@ -22,26 +29,26 @@ fi
 if ! type bashtop &> /dev/null && ! type bpytop &> /dev/null && ! type btop &> /dev/null; then
     reade -Q "GREEN" -i "y" -p "Install bashtop / btop / bpytop? [Y/n]: " "n" sym2
     if test "$sym2" == "y"; then
-        reade -Q "GREEN" -i "btop" -p "Which one? [Btop/bpytop/bashtop]: " "bpytop bashtop" sym2
+        reade -Q "CYAN" -i "btop" -p "Which one? [Btop/bpytop/bashtop]: " "bpytop bashtop" sym2
         if test "$sym2" == "btop"; then
             if test $distro_base == "Debian"; then
-               sudo apt install btop
+               eval "$pac_ins btop"
             elif test $distro == "Arch" || test $distro == "Manjaro"; then
-               sudo pacman -S btop
+               eval "$pac_ins btop"
             fi
         elif test "$sym2" == "bpytop"; then 
            if test $distro_base == "Debian"; then
-               sudo apt install bpytop
+               eval "$pac_ins bpytop"
             elif test $distro == "Arch" || test $distro == "Manjaro"; then
-               sudo pacman -S bpytop
+               eval "$pac_ins bpytop"
             fi
         elif test "$sym2" == "bashtop"; then      
-            if test "$distro" == "Ubuntu"; then
+            if type add-apt-repository &> /dev/null && [[ $(check-ppa ppa:bashtop-monitor/bashtop) =~ 'OK' ]]; then
                 sudo add-apt-repository ppa:bashtop-monitor/bashtop
                 sudo apt update
-                sudo apt install bashtop
+                eval "$pac_ins bashtop"
             elif test "$distro" == "Arch" || test "$distro" == "Manjaro"; then
-               sudo pacman -S bashtop
+               eval "$pac_ins bashtop"
             else
                 git clone https://github.com/aristocratos/bashtop.git $TMPDIR
                 (cd $TMPDIR/bashtop && sudo make install)

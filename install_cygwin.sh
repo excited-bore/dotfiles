@@ -2,7 +2,6 @@ if ! test -f checks/check_system.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
 else
     . ./checks/check_system.sh
-
 fi
 
 if ! test -f checks/check_envvar.sh.sh; then
@@ -17,7 +16,10 @@ else
     . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
 fi
 
+
 if test $machine == 'Windows'; then
+    alias wget='wget.exe' 
+    alias curl='curl.exe' 
     if test $win_bash_shell == 'Cygwin'; then
         cyg_bashr=~/.bashrc 
         cyg_home=~/ 
@@ -29,7 +31,9 @@ if test $machine == 'Windows'; then
     
     # Install Cygwin
     if ! type winget &> /dev/null; then
-        pwsh install_winget.ps1 
+        tmpd=$(mktemp -d)
+        wget -P $tmpd https://raw.githubusercontent.com/asheroto/winget-install/master/winget-install.ps1  
+        sudo pwsh $tmpd/winget-install.ps1
     fi
     if ! test $win_bash_shell == 'Cygwin' && ! test -d /c/cygwin$ARCH_WIN; then
         winget install Cygwin.Cygwin
@@ -42,8 +46,8 @@ if test $machine == 'Windows'; then
         reade -Q "GREEN" -i "y" -p "Install dos2unix? [Y/n]: " "n" dos2unx
         if test $dos2unx == 'y' ; then 
             winget install dos2unix
-        else
-            exit 1
+        #else
+            #exit 1
         fi 
         unset dos2unx 
     fi
@@ -52,7 +56,7 @@ if test $machine == 'Windows'; then
      
     if test -d /c/cygwin$ARCH_WIN && ! test -d $cyg_home; then
         printf "${RED}Test run Cygwin terminal first before running 'install_cygwin.sh' again (still need to install dos2unix and apt-cyg)${normal}\nThe script checks if something what it already has been installed and what not so you won't have to reconfigure.\n" 
-        exit 1
+        #exit 1
     fi
 
     # Dos2unix preexec hook
@@ -95,7 +99,6 @@ if test $machine == 'Windows'; then
                 printf "Open up Cygwin terminal and type 'install apt-cyg /bin' to finish installing apt-cyg\n"
             else
                 printf "Dont know how to install using this shell\nFile downloaded at '$tmpd/apt-cyg' and should install using 'C:\cygwin64\bin\bash.exe install $tmpd/apt-cyg'\n"
-                exit 1
             fi
         fi 
     fi 

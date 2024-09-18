@@ -26,16 +26,17 @@ fi
 
 if ! type jq &> /dev/null; then
     if test $distro == "Manjaro" || test $distro == "Arch"; then
-        sudo pacman -S jq
+        eval "$pac_ins jq"
     elif test $distro_base == "Debian"; then
-        sudo apt install jq
+        eval "$pac_ins jq"
     fi
 fi
 fonts=$(mktemp -d)
 wget -P "$fonts" https://github.com/vorillaz/devicons/archive/master.zip 
+unzip $fonts/master.zip -d $fonts
 ltstv=$(curl -sL "https://api.github.com/repos/ryanoasis/nerd-fonts/releases/latest" | jq -r ".tag_name")
-wget -P "$fonts" https://github.com/ryanoasis/nerd-fonts/releases/$ltstv/Hermit.zip
-unzip $fonts/master.zip $fonts/Hermit.zip
+wget -P "$fonts" https://github.com/ryanoasis/nerd-fonts/releases/download/$ltstv/Hermit.zip
+unzip $fonts/Hermit.zip -d $fonts
 rm -f $fonts/master.zip $fonts/Hermit.zip
 mv $fonts/* ~/.local/share/fonts
 sudo fc-cache -fv

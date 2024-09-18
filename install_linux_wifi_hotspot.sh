@@ -13,6 +13,13 @@ if ! type update-system &> /dev/null; then
     fi
 fi
 
+if ! test -f aliases/.bash_aliases.d/package_managers.sh; then
+    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/package_managers.sh)" 
+else
+    source aliases/.bash_aliases.d/package_managers.sh
+fi
+
+
 if test -z $SYSTEM_UPDATED; then
     reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y" updatesysm
     if test $updatesysm == "y"; then
@@ -21,16 +28,15 @@ if test -z $SYSTEM_UPDATED; then
 fi
 
 if ! type wihotspot &> /dev/null; then
-    if [ $distro == "Ubuntu" ]; then
+    if [ $distro == "Ubuntu" ] && [[ $(check-ppa ppa:lakinduakash/lwh) =~ 'OK' ]]; then
         sudo add-apt-repository ppa:lakinduakash/lwh
         sudo apt update
-        sudo apt install linux-wifi-hotspot
+        eval "$pac_ins linux-wifi-hotspot"
     elif [ $distro == "Arch" ]; then
-        if ! test -z "$AUR_install"; then
-            eval "$AUR_install" linux-wifi-hotspot
+        if ! test -z "$AUR_ins"; then
+            eval "$AUR_ins" linux-wifi-hotspot
         else
             echo "Install linux-wifi-hotspot from the AUR. If you have an AUR Helper that is not an AUR wrapper, try installing it manually"
-            exit 1
         fi
     elif [ $distro == "Manjaro" ]; then
         pamac install linux-wifi-hotspot

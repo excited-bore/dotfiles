@@ -33,9 +33,9 @@ fi
 answer=""
 if [ ! -x "$(command -v most)" ]; then
     if test $distro_base == "Debian" ; then
-        sudo apt install most
+        eval "$pac_ins most"
     elif test $distro == "Arch" || test $distro == "Manjaro"; then
-        sudo pacman -S most
+        eval "$pac_ins most"
     fi
 fi
 

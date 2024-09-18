@@ -41,7 +41,7 @@ fi
 if type flatpak &> /dev/null && grep -q "#EnableFlatpak" /etc/pamac.conf; then
     reade -Q "GREEN" -i "y" -p "Enable flatpak in pamac? [Y/n]: " "n" fltpak
     if [ "$fltpak" == "y" ]; then
-        sudo pacman -S libpamac-flatpak-plugin
+        eval "$pac_ins libpamac-flatpak-plugin"
         sudo sed -i 's|#EnableFlatpak|EnableFlatpak|g' /etc/pamac.conf 
 
         if grep -q "#CheckFlatpakUpdates" /etc/pamac.conf; then
@@ -58,7 +58,7 @@ fi
 if type snap &> /dev/null && grep -q "#EnableSnap" /etc/pamac.conf; then
     reade -Q "GREEN" -i "y" -p "Enable snap in pamac? [Y/n]:" "n" snap
     if [ "$snap" == "y" ]; then
-        sudo pacman -S libpamac-snap-plugin
+        eval "$pac_ins libpamac-snap-plugin"
         sudo sed -i 's|#EnableSnap|EnableSnap|g' /etc/pamac.conf 
     fi
     unset snap

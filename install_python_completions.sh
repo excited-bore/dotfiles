@@ -32,12 +32,24 @@ fi
 
 if ! type activate-global-python-argcomplete &> /dev/null; then
     if test $distro_base == "Debian"; then
-        sudo apt install python3 pipx
-        pipx install argcomplete
-    elif test $distro == "Arch" || test $distro == "Manjaro"; then
-        sudo pacman -S python python-pipx
-        pipx install argcomplete
+        eval "$pac_ins python3 python-is-python3"
+    elif test $distro_base == "Arch"; then
+        eval "$pac_ins python"
     fi
+fi
+
+if type curl &> /dev/null && ! type pipx &> /dev/null; then
+   if ! test -f install_pipx.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)" 
+    else
+        ./install_pipx.sh
+    fi 
+fi
+
+if ! type pipx &> /dev/null && test -f $HOME/.local/bin/pipx; then
+    $HOME/.local/bin/pipx install argcomplete
+else
+    pipx install argcomplete
 fi
 
 if type activate-global-python-argcomplete &> /dev/null; then
@@ -50,14 +62,14 @@ fi
 #    echo ". ~/.bash_completion.d/_python-argcomplete" >> ~/.bashrc
 #fi
 
-reade -Q "YELLOW" -i "y" -p "Install python completion system wide? (/root/.bashrc) [Y/n]: " "n" arg
-if [ "y" == "$arg" ]; then 
-    if type activate-global-python-argcomplete &> /dev/null; then
-        sudo activate-global-python-argcomplete --dest=/root/.bash_completion.d
-    elif type activate-global-python-argcomplete3 &> /dev/null; then
-        sudo activate-global-python-argcomplete3 --dest=/root/.bash_completion.d
-    fi
-    #if ! sudo grep -q "python-argcomplete" /root/.bashrc; then
-    #    printf "\n. ~/.bash_completion.d/_python-argcomplete" | sudo tee -a /root/.bashrc
-    #fi
-fi
+#reade -Q "YELLOW" -i "y" -p "Install python completion system wide? (/root/.bashrc) [Y/n]: " "n" arg
+#if [ "y" == "$arg" ]; then 
+#    if type activate-global-python-argcomplete &> /dev/null; then
+#        sudo activate-global-python-argcomplete --dest=/root/.bash_completion.d
+#    elif type activate-global-python-argcomplete3 &> /dev/null; then
+#        sudo activate-global-python-argcomplete3 --dest=/root/.bash_completion.d
+#    fi
+#    #if ! sudo grep -q "python-argcomplete" /root/.bashrc; then
+#    #    printf "\n. ~/.bash_completion.d/_python-argcomplete" | sudo tee -a /root/.bashrc
+#    #fi
+#fi

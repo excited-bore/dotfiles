@@ -8,6 +8,7 @@ if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
 else
     . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
 fi 
+
 if ! test -f checks/check_envvar.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)" 
 else
@@ -35,12 +36,23 @@ if test -z $SYSTEM_UPDATED; then
 fi 
 
 if ! type autojump &> /dev/null; then
-    if [ "$distro" == "Manjaro" ]; then
-        pamac install autojump
-    elif test "$distro" == "Arch" && ! test -z "$AUR_install"; then
-        eval "$AUR_install" autojump
+    if test "$distro_base" == "Arch"; then
+        if test -z "$AUR_ins"; then 
+            reade -Q 'GREEN' -i 'y' -p 'No AUR helper found. Install yay? [Y/n]: ' 'n' ins_yay
+            if test $ins_yay == 'y'; then
+                if ! test -f AUR_insers/install_yay.sh ; then
+                     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/AUR_insers/install_yay.sh )" 
+                else
+                    . ./AUR_insers/install_yay.sh 
+                fi 
+            fi
+            unset ins_yay
+            yay -S visual-studio-code-bin 
+        else 
+            eval "$AUR_ins autojump"
+        fi
     elif [ $distro_base == "Debian" ]; then
-        sudo apt install autojump                                                              
+        eval "$pac_ins autojump"                                                              
     fi
 fi
 

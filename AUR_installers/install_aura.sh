@@ -16,7 +16,7 @@ fi
 
 if ! type aura &> /dev/null; then
     if ! type git &> /dev/null || ! type makepkg &> /dev/null; then
-        sudo pacman -S --needed base-devel git
+        eval "$pac_ins --needed base-devel git"
     fi
     git clone https://aur.archlinux.org/aura-bin.git $TMPDIR/aura-bin
     (cd $TMPDIR/aura-bin

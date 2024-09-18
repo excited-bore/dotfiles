@@ -9,8 +9,9 @@ fi
 if ! type update-system &> /dev/null; then
     if ! test -f aliases/.bash_aliases.d/update-system.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)" 
-        . ./aliases/.bash_aliases.d/update-system.sh
     else
+        . ./aliases/.bash_aliases.d/update-system.sh
+         
     fi
 fi
 
@@ -41,7 +42,7 @@ fi
 #    fi 
 #fi
 
-git_hl(){
+function git_hl(){
     if ! test -z "$1"; then
         cmd="$1"
     else
@@ -211,7 +212,7 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
               reade -Q "CYAN" -i "y" -p "You selected $diff. Configure? [Y/n]: " "n" conf
               if test "y" == "$conf"; then 
                   diff="batdiff --staged --paging=never"
-                  reade -Q "CYAN" -i "n" -p "Use delta config? [Y/n]: " diffr1
+                  reade -Q "CYAN" -i "y" -p "Use delta config? [Y/n]: " 'n' diffr1
                   if test "$diffr1" == 'y'; then
                         diff=$diff" --delta"
                   fi
@@ -1263,9 +1264,9 @@ fi
         reade -Q "GREEN" -i "y" -p "Install git? [Y/n]:" "n" nstll
         if [ "$nstll" == "y" ]; then
             if test $distro == "Arch" || "$distro" == "Manjaro"; then
-                sudo pacman -S git
+                eval "$pac_ins git"
             elif test "$distro_base" == "Debian"; then
-                sudo apt install git
+                eval "$pac_ins git"
             fi
         fi
     fi
@@ -1281,6 +1282,12 @@ fi
         unset gitglobal
     fi
     
+    if test $global == '--global' && ! test -f ~/.gitconfig; then
+        touch ~/.gitconfig 
+    elif ! test -f .gitconfig; then
+        touch .gitconfig
+    fi
+
     local name gitname
     local prename='n'
     color="YELLOW" 
@@ -1391,22 +1398,37 @@ fi
             fi
             if test "$distro" == "Arch" || test "$distro" == "Manjaro"; then
                 if test $pager == "diff-so-fancy"; then
-                    sudo pacman -S diff-so-fancy
+                    eval "$pac_ins diff-so-fancy"
                 elif test $pager == "delta"; then
-                    sudo pacman -S git-delta
+                    eval "$pac_ins git-delta"
                 elif test $pager == "ydiff"; then
-                    sudo pacman -S pipx
-                    pipx install --upgrade ydiff
-                fi
+                    if ! test -z $upg_pipx && ! test -f install_pipx.sh; then
+                        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)"
+                    else
+                        ./install_pipx.sh
+                    fi
+                    if test $upg_pipx == 'y'; then
+                        $HOME/.local/bin/pipx install --upgrade ydiff
+                    else
+                        pipx install --upgrade ydiff
+                    fi
             elif test "$distro_base" == "Debian"; then
                 if test $pager == "diff-so-fancy"; then
-                    sudo apt install npm
+                    eval "$pac_ins npm"
                     sudo npm -g install diff-so-fancy 
                 elif test $pager == "delta"; then
-                    sudo apt install debdelta
+                    eval "$pac_ins git-delta"
                 elif test $pager == "ydiff"; then
-                    sudo apt install pipx
-                    pipx install --upgrade ydiff
+                    if ! test -f install_pipx.sh; then
+                        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)"
+                    else
+                        ./install_pipx.sh
+                    fi
+                    if ! test -z $upg_pipx && test $upg_pipx == 'y'; then
+                        $HOME/.local/bin/pipx install --upgrade ydiff
+                    else
+                        pipx install --upgrade ydiff
+                    fi
                 fi
             fi
         fi
@@ -1652,7 +1674,7 @@ fi
     local b="$(git config $global --list | grep 'merge.guitool' | awk 'BEGIN { FS = "=" } ;{print $2;}')"
 
     local diffguipre="n"
-    if test "$b" == '' && ! test "$b" == false ; then
+    if test "$b" == '' && ! test "$b" == false ;then
         diffguipre="y"
     fi
     reade -Q "CYAN" -i "$diffguipre" -p "Set merge guitool?: " "n" difftool;
@@ -1721,29 +1743,31 @@ fi
         fi 
     fi
     
-    local diffpre="n"
-    if ! grep -q 'pager:' ~/.config/lazygit/config.yml ; then
-        diffpre="y"
-    fi 
-    if type lazygit &> /dev/null; then
-        reade -Q "CYAN" -i "$diffpre" -p "Configure custom interactive diff filter for Lazygit? [Y/n]: " "n" gitdiff1 ;     
+    #local diffpre="n"
+    #if ! grep -q 'pager:' ~/.config/lazygit/config.yml ; then
+    #    diffpre="y"
+    #fi 
+    
+    if ! type lazygit &> /dev/null || ! grep -q 'pager:' ~/.config/lazygit/config.yml; then
+        reade -Q "CYAN" -i "y" -p "Configure custom interactive diff filter for Lazygit? [Y/n]: " "n" gitdiff1 ;     
         if [ "y" == "$gitdiff1" ]; then
             git_hl "lazygit"
         fi 
     fi
     
-    
-    if ! test -f ~/.bash_aliases.d/fzf-git.sh; then
-        reade -Q "GREEN" -i "y" -p "Install fzf-git? (Extra fzf stuff on leader-key C-g): [Y/n]: " "n" gitfzf
-        if [ "$fzfgit" == "y" ]; then
-            if ! test -f checks/check_aliases_dir.sh; then
-                eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)" 
-            else
-               . ./checks/check_aliases_dir.sh
-            fi
-            wget -O ~/.bash_aliases.d/fzf-git.sh https://raw.githubusercontent.com/junegunn/fzf-git.sh/main/fzf-git.sh 
-        fi
-    fi
+    # FZF is cool but ripgrep-dir is cooler
+
+    #if ! test -f ~/.bash_aliases.d/fzf-git.sh; then
+    #    reade -Q "GREEN" -i "y" -p "Install fzf-git? (Extra fzf stuff on leader-key C-g): [Y/n]: " "n" gitfzf
+    #    if [ "$fzfgit" == "y" ]; then
+    #        if ! test -f checks/check_aliases_dir.sh; then
+    #            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)" 
+    #        else
+    #           . ./checks/check_aliases_dir.sh
+    #        fi
+    #        curl -o ~/.bash_aliases.d/fzf-git.sh https://raw.githubusercontent.com/junegunn/fzf-git.sh/main/fzf-git.sh 
+    #    fi
+    #fi
 
     local gitals
     reade -Q "GREEN" -i "y" -p "Install git.sh? (Git aliases) [Y/n]: " "n" gitals
@@ -1754,7 +1778,7 @@ fi
            . ./checks/check_aliases_dir.sh
         fi
         if ! test -f aliases/.bash_aliases.d/git.sh; then
-            wget -O ~/.bash_aliases.d/git.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/git.sh  
+            curl -o ~/.bash_aliases.d/git.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/git.sh  
         else
             cp -fv aliases/.bash_aliases.d/git.sh ~/.bash_aliases.d/
         fi

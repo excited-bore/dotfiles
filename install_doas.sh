@@ -21,9 +21,9 @@ if test -z $SYSTEM_UPDATED; then
 fi
 
 if test $distro == "Arch" || test $distro == "Manjaro"; then
-    sudo pacman -S opendoas 
+    eval "$pac_ins opendoas "
 elif test $distro_base == "Debian"; then
-    sudo apt install doas
+    eval "$pac_ins doas"
 fi 
 
 sed -i "s/user/$USER/g" doas/doas.conf

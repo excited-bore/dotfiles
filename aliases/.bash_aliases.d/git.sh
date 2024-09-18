@@ -3,6 +3,44 @@ if ! type reade &> /dev/null && test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh; 
     source ~/.bash_aliases.d/00-rlwrap_scripts.sh
 fi
 
+if type wget &> /dev/null && type jq &> /dev/null; then
+    function get-latest-releases-github(){
+        if test -z "$@"; then
+            reade -Q 'GREEN' -p 'Github link: ' '' gtb_link
+        else
+            gtb_link="$@"
+        fi
+        if ! [[ "$gtb_link" =~ 'https://github.com' ]]; then
+            echo "Not a valid github link"
+            return 1
+        fi
+         
+        new_url="$(echo "$(echo "$gtb_link" | sed 's|https://github.com|https://api.github.com/repos|g')/releases/latest")" 
+        ltstv=$(curl -sL "$new_url" | jq -r ".assets" | grep --color=never "name" | sed 's/"name"://g' | tr '"' ' ' | tr ',' ' ' | sed 's/[[:space:]]//g')
+        versn=$(curl -sL "$new_url" | jq -r '.tag_name')
+        link="$gtb_link/releases/download/$versn/" 
+
+        if test -z $ltstv; then
+            printf "${red}No releases found.${normal}\n"
+            return 1 
+        fi
+
+        if type fzf &> /dev/null; then
+            res="$(echo "$ltstv" | fzf --multi --reverse --height 50%)"
+        else
+           printf "Files: \n${cyan}$ltstv${normal}\n"
+           #frst="$(echo $ltstv | awk '{print $1}')"  
+           #ltstv="$(echo $ltstv | sed "s/\<$frst\> //g")" 
+           reade -Q 'CYAN' -p "Which one?: " "$ltstv" res 
+        fi
+        
+        if ! test -z $res; then
+            reade -Q 'GREEN' -i "$HOME/Downloads" -p "Download Folder?: " -e dir
+            wget -P $dir "$link$res"
+        fi
+    }
+fi
+
 alias columns="git column --mode=column"
 
 alias git-config-pull-rebase-false="git config pull.rebase false"
@@ -15,6 +53,7 @@ alias git-config-global-pull-fastforward-only="git config pull.ff only"
 alias git-config-pull-fastforward-only="git config --global pull.ff only"
 
 alias git-safe-force-push="git push --force-with-lease"
+
 
 function git-add-ssh-key() { 
     if [ ! -f ~/.ssh/config ]; then
@@ -75,7 +114,7 @@ alias git-status="git status"
 git-add-remote-url() { git remote -v add "$1" "$2"; }
 #git-add-remote-ssh() { git remote -v add "$1" git@github.com:$GITNAME/"$2.git"; }
 
-alias git-reset-to-last-HEAD="git reset --hard"
+alias git-reset-hard="git reset --hard"
 alias git-add-all="git add -A"
 #alias git-commit-all="git commit -a";
     

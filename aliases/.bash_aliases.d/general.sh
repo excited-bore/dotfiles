@@ -11,23 +11,23 @@ if test $machine == 'Windows' && test $win_bash_shell == 'Cygwin'; then
     alias cd-home-="cd /cygdrive/c/Users/$USER"
 fi
 
-source_profile=""
-if test -z $PROFILE; then
-    if test -f ~/.profile; then
-        #PROFILE=~/.profile 
-        #source_profile="source ~/.profile" 
-        alias r="stty sane && source ~/.profile && source ~/.bashrc"
-    fi
-    if test -f ~/.bash_profile; then
-        #PROFILE=~/.bash_profile 
-        #source_profile="source ~/.bash_profile" 
-        alias r="stty sane && source ~/.bash_profile && source ~/.bashrc"
-    fi
-elif ! test -z $PROFILE; then
-    alias r="stty sane && source $PROFILE && source ~/.bashrc"
-else
+#source_profile=""
+#if test -z $PROFILE; then
+#    if test -f ~/.profile; then
+#        #PROFILE=~/.profile 
+#        #source_profile="source ~/.profile" 
+#        alias r="stty sane && source ~/.profile && source ~/.bashrc"
+#    fi
+#    if test -f ~/.bash_profile; then
+#        #PROFILE=~/.bash_profile 
+#        #source_profile="source ~/.bash_profile" 
+#        alias r="stty sane && source ~/.bash_profile && source ~/.bashrc"
+#    fi
+#elif ! test -z $PROFILE; then
+#    alias r="stty sane && source $PROFILE && source ~/.bashrc"
+#else
     alias r="stty sane && source ~/.bashrc"
-fi
+#fi
 
 #if test -z $PAGER; then
 #    PAGER=less
@@ -210,7 +210,7 @@ function cp-trash(){
     fi
 }
 
-##alias cp="cp-trash -rv"
+alias cp="cp-trash -rv"
 
 # mv (recursively native) verbose and only ask for interaction when overwriting newer files
 
@@ -273,7 +273,7 @@ function mv-trash(){
 } 
 
 
-##alias mv="mv-trash -v"
+alias mv="mv-trash -v"
 
 
 # rm recursively and verbose
@@ -310,7 +310,7 @@ alias all-null="&> /dev/null"
 alias no-output="&> /dev/null"
 
 # Show open ports
-alias openports='netstat -nape --inet'
+#alias openports='netstat -nape --inet'
 
 # Wifi enable/disable
 if type nmcli &> /dev/null; then
@@ -335,19 +335,23 @@ alias men="man man"
 # No alias starting with = 
 # alias =>="|"
 
-# Space seperated words to newline
+# Different kind of script oneliners
 alias word2line="tr ' ' '\n'"
 alias line2word="tr '\n' ' '"
 alias tab2space="tr -s ' '"
 alias only1space="tr -s ' '"
 alias upper2lower="tr '[:upper:]' '[:lower:]'"
+alias upper1stletter="\${var^}"
 alias lower2upper="tr '[:lower:]' '[:upper:]'"
-
+alias remove-whitespace='| xargs'
+alias file-no-filetype="${i%.*}"
 alias remove-empty-lines="sed '/^[[:space:]]*$/d'"
-alias get-first-stringwords="frst=\"$(echo $words | awk '{print $1}')\" && words=\"$(echo $words | sed "s/\<$frst\> //g")\""
+alias get-first-stringwords="frst=\"\$(echo \$words | awk '{print \$1}')\" && words=\"\$(echo \$words | sed \"s/\<\$frst\> //g\")\""
 
-# Pipe column output to a pager
+# Helps pipeing column output to a pager
 alias column="column -c $(tput cols)"
+
+
 
 alias tar-create="tar -cvf"
 alias tar-unpack="tar -xvf"
@@ -385,13 +389,38 @@ extract-archive(){
 
 complete -F _files extract
 
+# whereis    
+if type whereis &> /dev/null; then
+     function edit-whereis(){
+        if test -z $EDITOR && type nano &> /dev/null; then
+            EDITOR=nano 
+        fi
+        if test -z $EDITOR && type vim &> /dev/null; then
+            EDITOR=vim
+        fi
+        if test -z $EDITOR && type nvim &> /dev/null; then
+            EDITOR=nvim 
+        fi
+        $EDITOR $(whereis $1 | awk '{print $2;}')
+     } 
+    
+     complete -F _commands edit-whereis  
+fi
+
+
+
 # eur and us format date
 alias date-us='date "+%Y-%m-%d %A %T %Z"'
 alias date-eu='date "+%d-%m-%Y %A %T %Z"'
 
 alias redirect-tty-output-to="exec 1>/dev/pts/"
 
-alias list-GPU-drivers="inxi -G"
+alias GPU-drivers="inxi -G"
+
+# Thank you Andrea 
+# https://www.youtube.com/watch?v=Y_KfQIaOZkE
+alias weather="inxi -w"
+alias weather-full="curl wttr.in | $PAGER"
 
 # crontab
 # 
@@ -628,6 +657,8 @@ function file-put-quotations-around(){
 }
 
 complete -F _files file_put_quotations_around
+
+alias shutdown-now='shutdown now'
 
 function iommu-groups(){
     shopt -s nullglob

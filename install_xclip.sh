@@ -21,8 +21,8 @@ fi
 
 if ! type xclip &> /dev/null; then 
     if test $distro == "Arch" || test $distro == "Manjaro";then
-        sudo pacman -S xclip
+        eval "$pac_ins xclip"
     elif [ $distro_base == "Debian" ]; then
-        sudo apt install xclip 
+        eval "$pac_ins xclip "
     fi
 fi

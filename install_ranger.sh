@@ -25,6 +25,7 @@ if ! test -f checks/check_envvar.sh; then
 else
     . ./checks/check_envvar.sh
 fi 
+
 if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
 else
@@ -39,10 +40,10 @@ fi
 
 # Ranger (File explorer)
 if ! type ranger &> /dev/null; then
-     if test $distro == "Arch" || test $distro == "Manjaro"; then
-        sudo pacman -S ranger python python-pipx
-    elif [ $distro_base == "Debian" ]; then    
-        sudo apt install ranger python3 python3-dev pipx
+     if test $distro_base == "Arch"; then
+        eval "$pac_ins ranger"
+    elif test $distro_base == "Debian"; then    
+        eval "$pac_ins ranger"
     fi
 fi
 
@@ -72,20 +73,20 @@ else
 fi
 if [ -d ~/.bash_aliases.d/ ]; then
     if ! test -f ranger/.bash_aliases.d/ranger.sh ; then
-        wget -O ~/.bash_aliases.d/ranger.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/.bash_aliases.d/ranger.sh
+        curl -o ~/.bash_aliases.d/ranger.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/.bash_aliases.d/ranger.sh
     else
         cp -bfv ranger/.bash_aliases.d/ranger.sh ~/.bash_aliases.d/ranger.sh
     fi
-    if test -f ~/.bash_aliases.d/ranger.sh~; then
+    if type gio &> /dev/null && test -f ~/.bash_aliases.d/ranger.sh~; then
         gio trash ~/.bash_aliases.d/ranger.sh~
     fi
 fi
 
 if ! [ -d ranger/.config/ranger/ ]; then
     tmpdir=$(mktemp -d -t ranger-XXXXXXXXXX)
-    wget -O $tmpdir/rc.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/.config/ranger/rc.conf
-    wget -O $tmpdir/scope.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/.config/ranger/scope.sh
-    wget -O $tmpdir/rifle.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/.config/ranger/rifle.conf
+    curl -o $tmpdir/rc.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/.config/ranger/rc.conf
+    curl -o $tmpdir/scope.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/.config/ranger/scope.sh
+    curl -o $tmpdir/rifle.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/.config/ranger/rifle.conf
     dir=$tmpdir
 else
     dir=ranger/.config/ranger
@@ -97,14 +98,16 @@ rangr_cnf() {
     fi
     
     cp -bfv -t ~/.config/ranger $dir/rc.conf $dir/rifle.conf $dir/scope.sh
-    if test -f ~/.config/ranger/rc.conf~; then
-        gio trash ~/.config/ranger/rc.conf~ 
-    fi
-    if test -f ~/.config/ranger/rifle.conf~; then
-        gio trash ~/.config/ranger/rifle.conf~ 
-    fi
-    if test -f ~/.config/ranger/scope.sh~; then
-        gio trash ~/.config/ranger/scope.sh~ 
+    if type gio &> /dev/null; then 
+        if test -f ~/.config/ranger/rc.conf~; then
+            gio trash ~/.config/ranger/rc.conf~ 
+        fi
+        if test -f ~/.config/ranger/rifle.conf~; then
+            gio trash ~/.config/ranger/rifle.conf~ 
+        fi
+        if test -f ~/.config/ranger/scope.sh~; then
+            gio trash ~/.config/ranger/scope.sh~ 
+        fi
     fi
 }
 yes_edit_no rangr_cnf "$dir/rc.conf $dir/rifle.conf $dir/scope.sh" "Install predefined configuration (rc.conf,rifle.conf and scope.sh at ~/.config/ranger/)? " "edit" "GREEN"
@@ -132,7 +135,7 @@ if ! test -d ~/.config/ranger/plugins/devicons2; then
         mkdir -p ~/.config/ranger/plugins
         git clone https://github.com/cdump/ranger-devicons2 ~/.config/ranger/plugins/devicons2
         if test "$distro" == "Arch" || test $distro == "Manjaro" ;then
-            sudo pacman -S ttf-nerd-fonts-symbols-common ttf-nerd-fonts-symbols ttf-nerd-fonts-symbols-mono
+            eval "$pac_ins ttf-nerd-fonts-symbols-common ttf-nerd-fonts-symbols ttf-nerd-fonts-symbols-mono"
         elif [ "$distro_base" == "Debian" ]; then    
             reade -Q "YELLOW" -i "y" -p "Install Nerdfonts from binary - no apt? (Special FontIcons) [Y/n]: " "n" nrdfnts
             if [ -z $nrdfnts ] || [ "Y" == $nrdfnts ] || [ $nrdfnts == "y" ]; then
@@ -150,18 +153,18 @@ fi
 #sed -i 's|set preview_images false|set preview_images true|g' ~/.config/ranger/rc.conf
 #if [ -z $rplg ] || [ "y" == $rplg ]; then
 #    if test $distro == "Arch" || test $distro == "Manjaro";then
-#       sudo pacman -S terminology
+#       eval "$pac_ins terminology"
 #    elif test $distro_base == "Debian"; then 
-#       sudo apt install terminology
+#       eval "$pac_ins terminology"
 #    fi
 #fi
 
-if [ -x "$(command -v nvim)" ]; then
+if type nvim &> /dev/null; then
     reade -Q "GREEN" -i "y" -p "Integrate ranger with nvim? (Install nvim ranger plugins) [Y/n]: " "n" rangrvim
     if [[ -z $rangrvim || "y" == $rangrvim ]]; then
         if test -f  ~/.config/nvim/init.vim && ! grep -q "Ranger integration" ~/.config/nvim/init.vim; then
-            sed -i 's|"Plug '\''francoiscabrol/ranger.vim'\''|Plug '\''francoiscabrol/ranger.vim'\''|g' ~/.config/nvim/init.vim
-            sed -i 's|"Plug '\''rbgrouleff/bclose.vim'\''|Plug '\''rbgrouleff/bclose.vim'\''|g' ~/.config/nvim/init.vim
+            sed -i 's|"Plugin '\''francoiscabrol/ranger.vim'\''|Plugin '\''francoiscabrol/ranger.vim'\''|g' ~/.config/nvim/init.vim
+            sed -i 's|"Plugin '\''rbgrouleff/bclose.vim'\''|Plugin '\''rbgrouleff/bclose.vim'\''|g' ~/.config/nvim/init.vim
             sed -i 's|"let g:ranger_replace_netrw = 1|let g:ranger_replace_netrw = 1|g' ~/.config/nvim/init.vim
             sed -i 's|"let g:ranger_map_keys = 0|let g:ranger_map_keys = 0|g' ~/.config/nvim/init.vim
             nvim +PlugInstall

@@ -16,7 +16,7 @@ fi
 
 if ! type pakku &> /dev/null; then
     if ! type git &> /dev/null || ! type makepkg &> /dev/null; then
-        sudo pacman -S --needed base-devel git
+        eval "$pac_ins --needed base-devel git"
     fi
     git clone https://aur.archlinux.org/pakku.git $TMPDIR/pakku
     (cd $TMPDIR/pakku

@@ -39,13 +39,20 @@ fi
  # Bash completion issue with fzf fix
  # https://github.com/cykerway/complete-alias/issues/46
 
-if ! test -d ~/.fzf ; then
+if ! test -d ~/.fzf  || test -f ~/.fzf.bash; then
     git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
     ~/.fzf/install
     if [[ $ENVVAR =~ '.environment.env' ]]; then 
         sed -i 's|.export PATH=$PATH:$HOME/.fzf/bin|export PATH=$PATH:$HOME/.fzf/bin|g' $ENVVAR
     elif ! grep -q '.fzf/bin' $ENVVAR; then
-        echo 'export PATH="$PATH:$HOME/.fzf/bin"' >> $ENVVAR
+        if grep -q '~/.environment.env' $ENVVAR; then
+            sed -i 's|\(\[ -f ~/.environment.env\] \&\& source \~/.environment.env\)|\export PATH=$PATH:$HOME/.fzf/bin\n\n\1\n|g' ~/.bashrc
+        elif grep -q '~/.bash_aliases' $ENVVAR; then
+            sed -i 's|\(\[ -f ~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\export PATH=$PATH:$HOME/.fzf/bin\n\n\1\n|g' ~/.bashrc
+            sed -i 's|\(if \[ -f ~/.bash_aliases \]; then\)|export PATH=$PATH:$HOME/.fzf/bin\n\n\1\n|g' ~/.bashrc 
+        else 
+            echo 'export PATH="$PATH:$HOME/.fzf/bin"' >> $ENVVAR
+        fi
     fi
     rm -v ~/.fzf.bash
     sed -i '/\[ -f \~\/.fzf.bash \] \&\& source \~\/.fzf.bash/d' ~/.bashrc
@@ -63,9 +70,7 @@ if test -f ~/.keybinds.d/keybinds.bash && grep -q '^bind -m emacs-standard  '\''
 fi
 
 unset fzf_key
-source $ENVVAR
-
-
+export PATH="$PATH:$HOME/.fzf/bin"
 
 if [ ! -f ~/.fzf_history ]; then
     touch ~/.fzf_history 
@@ -151,9 +156,9 @@ if ! type rg &> /dev/null; then
         fi
         
         reade -Q "GREEN" -i "y" -p "Add shortcut for ripgrep files in dir? (Ctrl-g) [Y/n]: " "n" rpgrpdir
-        if [ -z $rpgrp ] || [ "Y" == $rpgrp ] || [ $rpgrp == "y" ]; then
+        if [ $rpgrpdir == "y" ]; then
             if ! test -f fzf/.bash_aliases.d/ripgrep-directory.sh; then
-                wget -O ~/.bash_aliases.d/ripgrep-directory.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/.bash_aliases.d/ripgrep-directory.sh
+                curl -o ~/.bash_aliases.d/ripgrep-directory.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/.bash_aliases.d/ripgrep-directory.sh
             else
                 cp -fv fzf/.bash_aliases.d/ripgrep-directory.sh ~/.bash_aliases.d/
             fi
@@ -211,12 +216,12 @@ if [ $ENVVAR == ~/.environment.env ] ; then
     sed -i 's/#--bind/--bind/' $ENVVAR
     sed -i 's/#--preview-window/--preview-window/' $ENVVAR
     sed -i 's/#--color/--color/' $ENVVAR
-    if type tree &> /dev/null && type vlc &> /dev/null; then
+    if type tree &> /dev/null; then
         sed -i 's|#export FZF_ALT_C_OPTS=|export FZF_ALT_C_OPTS=|g' $ENVVAR
     fi
 elif ! grep -q "export FZF_DEFAULT_COMMAND" $ENVVAR; then
     printf "\n# FZF\nexport FZF_DEFAULT_COMMAND=\"$fnd\"\nexport FZF_CTRL_T_COMMAND='$FZF_DEFAULT_COMMAND'\n" >> $ENVVAR
-    if type tree &> /dev/null && type vlc &> /dev/null; then
+    if type tree &> /dev/null; then
         printf "export FZF_ALT_C_OPTS=\"--preview 'tree -C {}\"\n" >> $ENVVAR 
     fi
 fi
@@ -231,12 +236,12 @@ if [ $ENVVAR_R == /root/.environment.env ] ; then
     sudo sed -i 's/--bind/#--bind/' $ENVVAR_R
     sudo sed -i 's/--preview-window/#--preview-window/' $ENVVAR_R
     sudo sed -i 's/--color/#--color/' $ENVVAR_R
-    if type tree &> /dev/null && type vlc &> /dev/null; then
+    if type tree &> /dev/null; then
        sudo sed -i 's|#export FZF_ALT_C_OPTS=|export FZF_ALT_C_OPTS=|g' $ENVVAR_R
     fi 
 elif ! sudo grep -q "export FZF_DEFAULT_COMMAND" $ENVVAR_R; then
     printf "\n# FZF\nexport FZF_DEFAULT_COMMAND=\"$fnd\"\nexport FZF_CTRL_T_COMMAND='$FZF_DEFAULT_COMMAND'" | sudo tee -a $ENVVAR_R
-    if type tree &> /dev/null && type vlc &> /dev/null; then
+    if type tree &> /dev/null; then
         printf "\nexport FZF_ALT_C_OPTS=\"--preview 'tree -C {}\"" | sudo tee -a $ENVVAR_R
     fi
 fi
@@ -254,17 +259,24 @@ fi
 #unset comp_key
 
     
-if ! grep -q "fzf_rifle" ~/.fzf/shell/key-bindings.bash; then
+if ! test -f /usr/bin/rifle || ! test -f ~/.bash_aliases.d/fzf-rifle.sh && grep -q "fzf_rifle" ~/.keybinds.d/keybinds.bash; then
     reade -Q "GREEN" -i "y" -p "Use rifle (file opener from 'ranger') to open found files and dirs with a custom Ctrl-F filesearch shortcut? [Y/n]: " "n" fzf_f
     if [ "$fzf_f" == "y" ] || [ -z "$fzf_f" ] ; then
         if ! type rifle &> /dev/null; then
+            if ! type python &> /dev/null; then
+                if test $distro_base == 'Debian'; then
+                    eval "$pac_ins python3 python-is-python3"
+                elif test $distro_base == 'Arch'; then  
+                    eval "$pac_ins python"
+                fi
+            fi
             sudo wget -P /usr/bin/ https://raw.githubusercontent.com/ranger/ranger/master/ranger/ext/rifle.py 
             sudo mv -v /usr/bin/rifle.py /usr/bin/rifle
             sudo chmod +x /usr/bin/rifle
         fi
         if ! test -f ranger/.config/ranger/rifle.conf; then
-            wget -O ~/.config/ranger/rifle.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/.config/ranger/rifle.conf  
-            wget -O ~/.bash_aliases.d/fzf-rifle.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/.bash_aliases.d/fzf-rifle.sh
+            curl -o ~/.config/ranger/rifle.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/.config/ranger/rifle.conf  
+            curl -o ~/.bash_aliases.d/fzf-rifle.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/.bash_aliases.d/fzf-rifle.sh
         else
             mkdir -p ~/.config/ranger
             cp -fv ranger/.config/ranger/rifle.conf ~/.config/ranger/
@@ -310,7 +322,7 @@ if ! test -f ~/.bash_aliases.d/docker-fzf.sh; then
         else
             ./checks/check_aliases_dir.sh
         fi
-        wget -O ~/.bash_aliases.d/docker-fzf.sh https://raw.githubusercontent.com/MartinRamm/fzf-docker/master/docker-fzf 
+        curl -o ~/.bash_aliases.d/docker-fzf.sh https://raw.githubusercontent.com/MartinRamm/fzf-docker/master/docker-fzf 
     fi
 fi
 unset fzf_t;

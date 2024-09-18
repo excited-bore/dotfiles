@@ -20,10 +20,10 @@ if test -z $SYSTEM_UPDATED; then
     fi
 fi
 
-if test $distro == "Arch" || test $distro == "Manjaro"; then
-    sudo pacman -S xorg
+if test $distro_base == "Arch"; then
+    eval "$pac_ins xorg"
 elif [ $distro_base == "Debian" ];then
-    sudo apt install xorg 
+    eval "$pac_ins xorg "
 fi 
 
 #This should create a xorg.conf.new file in /root/ that you can copy over to /etc/X11/xorg.conf

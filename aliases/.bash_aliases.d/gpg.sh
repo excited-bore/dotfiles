@@ -1,3 +1,5 @@
+##### GPG ####
+
 if ! type reade &> /dev/null ; then
     source ~/.bash_aliases.d/00-rlwrap_scripts.sh
 fi
@@ -7,12 +9,85 @@ if test -z $GNUPGHOME; then
     GNUPGHOME=$HOME/.gnupg
 fi
 
+# Arch specific issue
+# https://forum.gnupg.org/t/problem-with-socket-connection-refused/4669/2
+if grep -q '^log-file socket://' $GNUPGHOME/gpg.conf; then
+    sed -i 's|^log-file socket://|#log-file socket://|g' $GNUPGHOME/gpg.conf
+fi
+
 #publickey_mails=$("$GPG" --list-keys 2>/dev/null | grep --color=never \< | cut -d'<' -f2- | cut -d'>' -f1)
 #privatekey_mails=$("$GPG" --list-secret-keys 2>/dev/null | grep --color=never \< | cut -d'<' -f2- | cut -d'>' -f1)
+alias gpg-refresh-keys='gpg --refresh-keys'
 alias gpg-list-publickey-mails="$GPG --list-keys | grep --color=never \< | cut -d'<' -f2- | cut -d'>' -f1"
 alias gpg-list-privatekey-mails="$GPG --list-secret-keys | grep --color=never \< | cut -d'<' -f2- | cut -d'>' -f1"
 alias gpg-list-known-keyservers="grep --color=never "^keyserver" $GNUPGHOME/gpg.conf | grep -v --color=never "keyserver-" | awk '{print $2}' | tr '\n' ' '"
 
+alias gpg-encrypt-file-gpg="gpg --symmetric"
+alias gpg-encrypt-file-unreadable="gpg --symmetric"
+alias gpg-encrypt-file-asc="gpg --armor --symmetric"
+alias gpg-encrypt-file-readable="gpg --armor --symmetric"
+
+function gpg-encrypt-custom-algo(){
+    if test -z $1; then
+        reade -Q 'GREEN' -p "File/Folder?: " -e file
+    else
+        file=$1
+    fi
+
+    cmd="gpg --symmetric --cipher-algo"
+    if $(type gpg-zip &> /dev/null || type gpgtar &> /dev/null) && test -d $file; then
+        if type gpgtar &> /dev/null; then
+            cmd='gpgtar --symmetric --gpg-args'
+        elif type gpg-zip &> /dev/null; then 
+            cmd='gpg-zip --symmetric' 
+        fi
+    fi
+
+    cphrs=$(gpg --version | grep Cipher | cut -d: -f2 | sed 's|,||g')
+    prm="AES128/${YELLOW}$(echo $cphrs | tr ' ' '/' | sed 's|/AES|${GREEN}/AES|')" 
+    reade -Q 'GREEN' -i 'AES128' -p "Algorithm? [$prm]: " "$cphrs" algo
+    if test $algo == '3DES' || test $algo == 'IDEA' || test $algo == 'CAST5' || test $algo == 'BLOWFISH'; then
+        printf "${red}$algo is an older cipher algorithm${normal}\n" 
+        reade -Q 'YELLOW' -i 'n' -p "Use anyway? [N/y]: " "y" algo_old
+        if test $algo_old == 'y'; then
+            algo=$algo" --allow-old-cipher-algo" 
+        else 
+            echo "Aborted"
+            return 1 
+        fi
+    fi
+
+    reade -Q 'YELLOW' -i 'n' -p "Readable format (.asc - ASCII)? [N/y]: " "y" asc
+    arm=''
+    if test $asc == 'y'; then
+        arm='--armour'
+    fi
+
+    reade -Q 'GREEN' -p "Output (empty - same file/dir + .gpg)?: " "" outpt
+    utpt=''
+    if ! test -z $outpt; then
+        utpt="--output $outpt.gpg" 
+    elif test -d $file; then
+        utpt="--output ${file%/}.gpg" 
+    fi
+
+    if ! test -z "$algo" ; then
+        eval "$cmd --cipher-algo=$algo $arm $utpt $file"
+    else
+        echo "Aborted"
+    fi
+}
+
+
+function gpg-decrypt-asc(){ 
+    for i in "$@"; do 
+        arm=''
+        if [[ $i =~ ".asc" ]]; then
+            arm="--armor"
+        fi
+        echo "${i%.*}" | { read file; gpg --decrypt "$arm" "$i" > "$file"; }
+    done
+}
 
 #fingerprints_all=$("$GPG" --list-keys --list-options show-only-fpr-mbox 2>/dev/null | awk '{print $1;}')
 alias gpg-list-key-fingerprints="$GPG --list-keys --list-options show-only-fpr-mbox | awk '{print $1;}'"

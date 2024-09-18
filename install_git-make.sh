@@ -22,31 +22,31 @@ fi
 
 if ! type git &> /dev/null; then
     if test $distro == "Arch" || test $distro == "Manjaro"; then
-        sudo pacman -S git
+        eval "$pac_ins git"
     elif test $distro_base == "Debian" ; then
-        sudo apt install git
+        eval "$pac_ins git"
     fi
 fi
 
 if ! type make &> /dev/null; then
     if test $distro == "Arch" || test $distro == "Manjaro"; then
-        sudo pacman -S make 
+        eval "$pac_ins make "
     elif test $distro_base == "Debian" ; then
-        sudo apt install make 
+        eval "$pac_ins make "
     fi 
 fi
 
 if ! type cmake &> /dev/null; then
     if test $distro == "Arch" || test $distro == "Manjaro"; then
-        sudo pacman -S cmake 
+        eval "$pac_ins cmake "
     elif test $distro_base == "Debian" ; then
-        sudo apt install cmake 
+        eval "$pac_ins cmake "
     fi 
 fi
 
 
 #if test $distro == "Arch" || test $distro == "Manjaro"; then
-#    sudo pacman -S make cmake
+#    eval "$pac_ins make cmake"
 #elif test $distro_base == "Debian" ; then
-#    sudo apt install make cmake autoconf g++ gettext libncurses5-dev libtool libtool-bin 
+#    eval "$pac_ins make cmake autoconf g++ gettext libncurses5-dev libtool libtool-bin "
 #fi

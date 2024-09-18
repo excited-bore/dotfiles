@@ -25,8 +25,8 @@ if test -z $SYSTEM_UPDATED; then
 fi
 
 if ! type docfd &> /dev/null; then 
-    if ! test -z $AUR_install; then
-        eval "$AUR_install" docfd-bin  
+    if ! test -z $AUR_ins; then
+        eval "$AUR_ins" docfd-bin  
     fi
 fi
 
@@ -49,7 +49,7 @@ if ! type pdftotext &> /dev/null; then
     reade -Q 'GREEN' -i 'y' -p "Also install pdftotext for pdf support? [Y/n]: " 'n' pft2txt
     if test $pdf2txt == 'y'; then
         if test $distro_base == 'Arch'; then
-            sudo pacman -S python-pdftotext  
+            eval "$pac_ins python-pdftotext  "
         fi
     fi
 fi
@@ -59,7 +59,7 @@ if ! type pandoc &> /dev/null; then
     reade -Q 'GREEN' -i 'y' -p "Also install pandoc for .epub, .odt, .docx, .fb2, .ipynb, .html, and .htm files? [Y/n]: " 'n' pndc
     if test $pndc == 'y'; then
         if test $distro_base == 'Arch'; then
-            sudo pacman -S python-pdftotext  
+            eval "$pac_ins python-pdftotext  "
         fi
     fi
 fi

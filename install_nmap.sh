@@ -21,9 +21,9 @@ fi
 
 if ! type nmap &> /dev/null ; then 
     if test "$distro" == "Arch" || test "$distro" == "Manjaro"; then
-        sudo pacman -S nmap
+        eval "$pac_ins nmap"
     elif test "$distro_base" == "Debian"; then
-        sudo apt install nmap 
+        eval "$pac_ins nmap "
     fi
 fi
 

@@ -28,10 +28,10 @@ fi
 
 
 if ! type tmux &> /dev/null; then
-    if test "$distro" == "Arch" || test "$distro" == "Manjaro"; then
-        sudo pacman -S tmux
+    if test "$distro_base" == "Arch"; then
+        eval "$pac_ins tmux"
     elif test "$distro_base" == "Debian"; then
-        sudo apt install tmux
+        eval "$pac_ins tmux"
     fi
 fi
 
@@ -66,11 +66,15 @@ fi
 if test -f tmux/.tmux.conf; then
     file=tmux/.tmux.conf
 else
-    file1="$(mktemp -d -t tmux-XXXXXXXXXX)"
-    wget -O $file1/.tmux.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/tmux/.tmux.conf
-    file=$file1/.tmux.conf
+    dir1="$(mktemp -d -t tmux-XXXXXXXXXX)"
+    curl -s -o $dir1/.tmux.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/tmux/.tmux.conf
+    file=$dir1/.tmux.conf
 fi
 
+# Comment out potential ranger plugin
+sed -i 's|^\(bind-key ` run-shell -b '\''/usr/bin/python3 -m ranger_tmux.drop\)|#\1|g' $file
+
+# Comment out other plugins
 sed -i 's|^set -g @plugin|#set -g @plugin|g' $file
 sed -i 's|^run '\''~/.tmux/plugins/tpm/tpm'\''|#run '\''~/.tmux/plugins/tpm/tpm'\''|g' $file
 sed -i 's|^set -g @continuum-restore '\''on'\''|#set -g @continuum-restore '\''on'\''|g' $file
@@ -78,7 +82,7 @@ sed -i 's|^set -g @continuum-restore '\''on'\''|#set -g @continuum-restore '\''o
 reade -Q "GREEN" -i "y" -p "Install tmux.conf? (tmux conf at ~/.tmux.conf) [Y/n]: " "n" tmuxc
 if [ "$tmuxc"  == "y" ] || [ -z "$tmuxc" ]; then
     cp -bfv $file ~/
-    if test -f $file~; then
+    if test -f $file~ && type gio &> /dev/null; then
         gio trash $file~
     fi
 fi
@@ -103,11 +107,11 @@ unset tmuxx
 
 reade -Q "GREEN" -i "y" -p "Install tmux clipboard plugin? (tmux-yank) [Y/n]: " "n"  tmuxx
 if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
-    if [ ! -x "$(command -v xclip)" ] && [ ! -x "$(command -v xsel)" ]; then
-        if test "$distro" == "Arch" || test "$distro" == "Manjaro"; then
-            sudo pacman -Syu xclip xsel
+    if ! type xclip &> /dev/null || ! type xsel &> /dev/null; then
+        if test "$distro_base" == "Arch"; then
+            eval "$pac_ins xclip xsel"
         elif test $distro_base == "Debian"; then
-            sudo apt install xclip xsel
+            eval "$pac_ins xclip xsel"
         fi
     fi
     sed -i 's|#set -g @plugin '\''tmux-plugins/tmux-yank'\''|set -g @plugin '\''tmux-plugins/tmux-yank'\''|g' ~/.tmux.conf
@@ -166,9 +170,9 @@ unset tmuxx
 #    if [ "$tmuxx"  == "y" ] || [ -z "$tmuxx" ]; then
 #        if [ ! -x "$(command -v pip)" ]; then
 #            if test $distro == "Arch" || test $distro == "Manjaro"; then
-#                sudo pacman -Syu python-pip
+#                eval "$pac_insyu python-pip"
 #            elif [ $distro_base == "Debian" ]; then
-#                sudo apt install python3-pip
+#                eval "$pac_ins python3-pip"
 #            fi
 #        fi
 #        pip install --break-system-packages ranger_tmux
@@ -226,9 +230,9 @@ if [ -z "$tmuxx" ] || [ "$tmuxx"  == "y" ]; then
     if test -f tmux/.bash_aliases.d/tmux.sh; then
         cp -bfv tmux/.bash_aliases.d/tmux.sh ~/.bash_aliases.d/
     else
-        wget -O ~/.bash_aliases.d/tmux.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/tmux/.bash_aliases.d/tmux.sh
+        curl -o ~/.bash_aliases.d/tmux.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/tmux/.bash_aliases.d/tmux.sh
     fi
-    if test -f ~/.bash_aliases.d/tmux.sh~; then 
+    if test -f ~/.bash_aliases.d/tmux.sh~ && type gio &> /dev/null; then 
         gio trash ~/.bash_aliases.d/tmux.sh~
     fi
 fi
@@ -248,4 +252,4 @@ tmux source-file ~/.tmux.conf
 . ~/.tmux/plugins/tpm/bin/install_plugins
 . ~/.tmux/plugins/tpm/bin/update_plugins all
 
-echo "${green}Install plugins in tmux with 'C-b + I' / Update with 'C-b + U'"
+echo "${green}Install plugins in tmux with 'C-b + I' / Update with 'C-b + U'${normal}"

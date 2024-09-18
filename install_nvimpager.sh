@@ -41,9 +41,9 @@ fi
 
 if ! type scdoc &> /dev/null; then
     if test $distro_base == "Debian"; then
-       sudo apt install scdoc
+       eval "$pac_ins scdoc"
     elif test $distro == "Arch" || test $distro == "Manjaro"; then
-       sudo pacman -S scdoc
+       eval "$pac_ins scdoc"
     fi
 fi
 

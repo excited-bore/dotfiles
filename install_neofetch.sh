@@ -32,14 +32,31 @@ if ! type neofetch &> /dev/null && ! type fastfetch &> /dev/null && ! type scree
         reade -Q "CYAN" -i "fast" -p "Which one? [Fast/neo/screen]: " "neo screen" sym2
         if test "$sym2" == "neo"; then
             if test $distro_base == "Debian"; then
-               sudo apt install neofetch
-            elif test $distro == "Arch" || test $distro == "Manjaro"; then
-               sudo pacman -S neofetch
+               eval "$pac_ins neofetch"
+            elif test $distro_base == "Arch"; then
+               eval "$pac_ins neofetch"
+            fi
+            
+            if ! test -f ~/.config/neofetch/config.conf; then
+
+                if test -f neofetch/.config/neofetch/config.conf; then
+                    file=neofetch/.config/neofetch/config.conf
+                else
+                    dir1="$(mktemp -d -t tmux-XXXXXXXXXX)"
+                    curl -s -o $dir1/config.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/neofetch/.config/neofetch/config.conf
+                    file=$dir1/config.conf
+                fi
+                 
+                function neofetch_conf() {
+                    mkdir -p ~/.config/neofetch 
+                    cp -fbv $file ~/.config/neofetch/ 
+                }
+                yes_edit_no neofetch_conf "$file" "Install neofetch config.conf at $HOME/.config/neofetch/?" "yes" "GREEN"; 
             fi
         elif test "$sym2" == "fast"; then 
             if test $distro_base == "Debian"; then
                 if ! type jq &> /dev/null; then
-                    sudo apt install jq
+                    eval "$pac_ins jq"
                 fi
                 if [[ $arch =~ "arm" ]]; then 
                    fetch_arch="armv7l"
@@ -50,16 +67,17 @@ if ! type neofetch &> /dev/null && ! type fastfetch &> /dev/null && ! type scree
                 fi
                 os="linux"
                 ltstv=$(curl -sL https://api.github.com/repos/fastfetch-cli/fastfetch/releases/latest | jq -r ".tag_name")
-                tmpdir=$(mktemp -d -t fast-XXXXXXXXXX)
-                wget -P $tmpdir https://github.com/fastfetch-cli/fastfetch/releases/download/$ltstv/fastfetch-$os-$fetch_arch.deb
-            elif test $distro == "Arch" || test $distro == "Manjaro"; then
-               sudo pacman -S fastfetch
+                tmp=$(mktemp -d)
+                wget -P $tmp https://github.com/fastfetch-cli/fastfetch/releases/download/$ltstv/fastfetch-$os-$fetch_arch.deb
+                sudo dpkg -i $tmp/fastfetch-$os-$fetch_arch.deb 
+            elif test $distro_base == "Arch"; then
+               eval "$pac_ins fastfetch"
             fi
-        elif  test "$sym2" == "screen"; then      
+        elif test "$sym2" == "screen"; then      
             if test $distro_base == "Debian"; then
-               sudo apt install screenfetch
-            elif test $distro == "Arch" || test $distro == "Manjaro"; then
-               sudo pacman -S screenFetch
+               eval "$pac_ins screenfetch"
+            elif test $distro_base == "Arch"; then
+               eval "$pac_ins screenFetch"
             fi
         fi
     #fi

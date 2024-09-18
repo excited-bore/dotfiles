@@ -6,7 +6,7 @@ fi
 
 if [ ! -f ~/.bash_completion ]; then
     if ! test -f completions/.bash_completion; then
-        wget -P ~/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/completions/.bash_completion
+        curl -o ~/.bash_completion https://raw.githubusercontent.com/excited-bore/dotfiles/main/completions/.bash_completion
     else
         cp -fv completions/.bash_completion ~/
     fi 
@@ -26,7 +26,7 @@ if ! sudo test -f /root/.bash_completion; then
     echo "Next $(tput setaf 1)sudo$(tput sgr0) will install '.bash_completion.d' in /root and source it with '/root/.bash_completion"
     if [ ! -f /root/.bash_completion ]; then
         if ! test -f completions/.bash_completion; then
-            sudo wget -P /root/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/completions/.bash_completion 
+            sudo curl -o /root/.bash_completion https://raw.githubusercontent.com/excited-bore/dotfiles/main/completions/.bash_completion 
         else
             sudo cp -fv completions/.bash_completion /root/
         fi 

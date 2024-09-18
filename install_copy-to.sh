@@ -26,15 +26,25 @@ if test -z $SYSTEM_UPDATED; then
     fi
 fi
 
-reade -Q "GREEN" -i "y" -p "Install copy-to? (Python tool for copying between 2 maps) [Y/n]:" "n" cpcnf
-if [ -z $compl ] || [ "y" == $compl ]; then
+if ! type copy-to &> /dev/null; then
     if ! type pipx &> /dev/null ; then
-        if test $distro == "Arch" || test $distro == "Manjaro"; then
-            sudo pacman -S python-pipx
-        elif [ $distro_base == "Debian" ]; then
-            sudo apt install pipx
+        if ! test -f install_pipx.sh; then
+            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)"
+        else
+            ./install_pipx.sh
         fi
     fi
+
+    if ! test -z $upg_pipx && test $upg_pipx == 'y'; then
+        $HOME/.local/bin/pipx install copy-to
+    else
+        pipx install copy-to
+    fi
 fi
-pipx install copy-to
-copy-to -h
+
+
+if type copy-to &> /dev/null; then
+    copy-to -h
+else
+    printf "Something went wrong installing\n"
+fi

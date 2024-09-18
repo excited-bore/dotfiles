@@ -21,9 +21,9 @@ fi
 
 if ! type netstat &> /dev/null ; then 
     if test "$distro" == "Arch" || test "$distro" == "Manjaro"; then
-        sudo pacman -S netstat
+        eval "$pac_ins netstat-nat"
     elif test "$distro_base" == "Debian"; then
-        sudo apt install netstat 
+        eval "$pac_ins netstat-nat "
     fi
 fi
 

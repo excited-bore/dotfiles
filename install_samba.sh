@@ -26,9 +26,9 @@ fi
 
 if ! command -v samba &> /dev/null; then
     if test "$distro" == "Arch" || test "$distro" == "Manjaro"; then
-        sudo pacman -S samba
+        eval "$pac_ins samba"
     elif [ $distro_base == "Debian" ];then
-        sudo apt install samba samba-common  
+        eval "$pac_ins samba samba-common  "
     fi
 fi
 
@@ -46,10 +46,10 @@ done
 reade -Q "GREEN" -p "Drive name: (doesn't matter): " "" drive
 if ! test "$drive"; then
     printf "${red}Drive name can't be empty\n${normal}"
-    exit 1
+    #exit 1
 elif sudo grep -q "$drive" /etc/samba/smb.conf; then
     printf "${red}Drive name already taken\n${normal}"
-    exit 1
+    #exit 1
 fi
 reade -Q "GREEN" -i "/mnt" -p "Mount point (path name): " -e mnt
 reade -Q "GREEN" -i "y" -p "Browseable: [Y/n]: " "n" browse

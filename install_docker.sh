@@ -20,13 +20,14 @@ if test -z $SYSTEM_UPDATED; then
     fi
 fi
 
-if test $distro_base == "Debian"; then
-    sudo apt install docker.io
-    sudo apt remove docker docker-engine 
-    curl -sSL https://get.docker.com | sh
-    sudo usermod -aG docker $USER
-    echo "You should relogin for docker to work"
-elif test $distro == "Arch" || test $distro == "Manjaro"; then
-    sudo pacman -S docker
-    sudo usermod -aG docker $USER
+if ! type docker &> /dev/null; then
+    if test $distro_base == "Debian"; then
+        eval "$pac_ins docker.io"
+        sudo apt remove docker docker-engine 
+        curl -sSL https://get.docker.com | sh
+        printf "${cyan}Log out and log in again${normal}, execute ${cyan}'groups'${normal} and check if ${cyan}'docker'${normal} in there.\n Else, execute ${GREEN}'sudo usermod -aG docker $USER'${normal}\n"
+    elif test $distro == "Arch" || test $distro == "Manjaro"; then
+        eval "$pac_ins docker"
+        printf "${cyan}Log out and log in again${normal}, execute ${cyan}'groups'${normal} and check if ${cyan}'docker'${normal} in there.\n Else, execute ${GREEN}'sudo usermod -aG docker $USER'${normal}\n"
+    fi
 fi

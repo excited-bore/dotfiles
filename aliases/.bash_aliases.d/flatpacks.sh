@@ -5,15 +5,15 @@ fi
 
 function flatpak (){
   env -u SESSION_MANAGER flatpak "$@"
-  if [ "$1" == "install" ] && ! grep -q "$2" ~/.bash_aliases.d/flatpacks.sh; then
+  pack="${@: -1}" 
+  if [ "$1" == "install" ] && flatpak list --columns=name | grep -i -q --color=never "$pack" && ! grep -q "$pack" ~/.bash_aliases.d/flatpacks.sh; then
         #python /usr/bin/update_flatpak_cli.py
-        name="$(flatpak list | grep --color=never "$2" | awk '{print $1;}')"
-        name_noup="$(echo $name | tr '[:upper:]' '[:lower:]')" 
-        app_id="$(flatpak list | grep --color=never "$2" | awk '{print $2;}')"
-        reade -Q 'GREEN' -i 'y' -p "No previous aliases for app detected. Create alias? (flatpak run --file-forwarding $app_id -> ~/.bash_aliases.d/flatpacks.sh) [Y/n]: " 'n' ansr
+        name="$(flatpak list --columns=name | grep -i --color=never "$pack" | tr ' ' '-' | tr '[:upper:]' '[:lower:]' | awk '{print;}')"
+        app_id="$(flatpak list --columns=application,name | grep -i --color=never "$pack" | awk '{print $1;}')"
+        reade -Q 'GREEN' -i 'y' -p "No previous aliases for app detected. Create alias? (alias $name='flatpak run --file-forwarding $app_id' -> ~/.bash_aliases.d/flatpacks.sh) [Y/n]: " 'n' ansr
         if test $ansr == 'y'; then
-            printf "if flatpak list --columns=name | grep \"$name\" &> /dev/null; then\n\talias $name_noup='flatpak run --file-forwarding $app_id'\nfi\n" >> ~/.bash_aliases.d/flatpacks.sh 
-            source ~/.bash_aliases.d/flatpacks.sh 
+            printf "if flatpak list --columns=name | grep \"$name\" &> /dev/null; then\n\talias $name='flatpak run --file-forwarding $app_id'\nfi\n" >> ~/.bash_aliases.d/flatpacks.sh 
+            alias $name="flatpak run --file-forwarding $app_id" 
         fi
         unset ansr name name_noup app_id 
    fi
@@ -44,4 +44,13 @@ if flatpak list --columns=name | grep "discord-screenaudio" &> /dev/null; then
 fi
 if flatpak list --columns=name | grep "Neovim" &> /dev/null; then
 	alias neovim='flatpak run --file-forwarding io.neovim.nvim'
+fi
+if flatpak list --columns=name | grep "Soundux" &> /dev/null; then
+        alias soundux='GDK_BACKEND=x11 flatpak run --file-forwarding io.github.Soundux'
+fi
+if flatpak list --columns=name | grep "microsoft-edge" &> /dev/null; then
+	alias microsoft-edge='flatpak run --file-forwarding com.microsoft.Edge'
+fi
+if flatpak list --columns=name | grep "flatseal" &> /dev/null; then
+	alias flatseal='flatpak run --file-forwarding com.github.tchx84.Flatseal'
 fi

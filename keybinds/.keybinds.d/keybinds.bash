@@ -46,9 +46,10 @@ stty werase 'undef'
 # .Inputrc (readline conf) however has to be compiled, so restart shell
 
 # Set caps to Escape
-if type setxkbmap &> /dev/null; then
-    setxkbmap -option caps:escape
-fi
+X11_WAY="$(loginctl show-session $(awk '/tty/ {print $1}' <(loginctl)) -p Type | awk -F= '{print $2}')"
+#if test "$X11_WAY" == 'x11'; then
+#    #setxkbmap -option caps:escape
+#fi
 
 # Set Shift delete to backspace
 # xmodmap -e "keycode 119 = Delete BackSpace"     
@@ -116,6 +117,7 @@ function cd() {
     done
     if [ $push == 1 ]; then
         pushd "$PWD" &>/dev/null;  
+        export DIRS="$DIRS $PWD" 
     fi
     builtin cd -- "$@"; 
 }
@@ -257,6 +259,7 @@ bind -m vi-command      '"\C-b": quoted-insert'
 bind -m vi-insert       '"\C-b": quoted-insert'
 
 # Ctrl+o: Change from vi-mode to emacs mode and back
+# This is also configured in ~/.fzf/shell/key-bindings-bash.sh if you have fzf keybinds installed
 bind -m vi-command '"\C-o": emacs-editing-mode'
 bind -m vi-insert '"\C-o": emacs-editing-mode'
 bind -m emacs-standard '"\C-o": vi-editing-mode'
@@ -283,7 +286,7 @@ _edit_wo_executing() {
 bind -m vi-insert      -x '"\C-e":_edit_wo_executing'
 bind -m vi-command     -x '"v":_edit_wo_executing'
 bind -m vi-command     -x '"\C-e":_edit_wo_executing'
-bind -m emacs-standard -x '"\C-x\C-e":_edit_wo_executing'
+bind -m emacs-standard -x '"\C-e\C-e":_edit_wo_executing'
 
 # RLWRAP 
 
@@ -294,9 +297,9 @@ bind -m emacs-standard -x '"\C-x\C-e":_edit_wo_executing'
 #fi
 
 if type osc &> /dev/null; then
-    bind -m emacs-standard -x '"\C-s" : echo "$READLINE_LINE" | osc copy' 
-    bind -m vi-command     -x '"\C-s" : echo "$READLINE_LINE" | osc copy' 
-    bind -m vi-insert      -x '"\C-s" : echo "$READLINE_LINE" | osc copy'
+    bind -m emacs-standard -x '"\C-s" : printf "$READLINE_LINE" | osc copy' 
+    bind -m vi-command     -x '"\C-s" : printf "$READLINE_LINE" | osc copy' 
+    bind -m vi-insert      -x '"\C-s" : printf "$READLINE_LINE" | osc copy'
    
     function osc-print-to-prompt(){
         pasters="$(osc paste)"
@@ -313,9 +316,9 @@ if type osc &> /dev/null; then
 
 elif type xclip &> /dev/null; then
     # Ctrl-s: Proper copy
-    bind -m emacs-standard -x '"\C-s" : echo "$READLINE_LINE" | xclip -i -sel c' 
-    bind -m vi-command     -x '"\C-s" : echo "$READLINE_LINE" | xclip -i -sel c' 
-    bind -m vi-insert      -x '"\C-s" : echo "$READLINE_LINE" | xclip -i -sel c'
+    bind -m emacs-standard -x '"\C-s" : printf "$READLINE_LINE" | xclip -i -sel c' 
+    bind -m vi-command     -x '"\C-s" : printf "$READLINE_LINE" | xclip -i -sel c' 
+    bind -m vi-insert      -x '"\C-s" : printf "$READLINE_LINE" | xclip -i -sel c'
    
     function xclip-print-to-prompt(){
         pasters="$(xclip -o -sel c)"
@@ -391,35 +394,55 @@ bind -m emacs-standard '"\e[15~": "\205\206"'
 bind -m vi-command     '"\e[15~": "\205\206"'
 bind -m vi-insert      '"\e[15~": "\205\206"'
 
-# F6 - Bashtop (Better top/htop)
-if type bashtop &> /dev/null || type btop &> /dev/null || type bpytop &> /dev/null; then
-    if type bpytop &> /dev/null; then
-        bind -x '"\207": stty sane && bpytop'
-    fi
-    if type btop &> /dev/null; then
-        bind -x '"\207": stty sane && btop'
-    fi
-    if type bashtop &> /dev/null; then
-        bind -x '"\207": stty sane && bashtop'
-    fi
-    bind -m emacs-standard '"\e[17~": "\207\n\C-l"'
-    bind -m vi-command     '"\e[17~": "\207\n\C-l"'
-    bind -m vi-insert      '"\e[17~": "\207\n\C-l"'
-fi
-
-# F7 - Bashtop (Better top/htop)
+# F6 - (neo/fast/screen)fetch (System overview)
 if type neofetch &> /dev/null || type fastfetch &> /dev/null || type screenfetch &> /dev/null; then
+    
+    # Last one loaded is the winner
     if type neofetch &> /dev/null; then
-        bind -x '"\208": stty sane && neofetch'
+        bind -x '"\207": stty sane && neofetch'
     fi
-    if type fastfetch &> /dev/null; then
-        bind -x '"\208": stty sane && fastfetch'
-    fi
+    
     if type screenfetch &> /dev/null; then
-        bind -x '"\208": stty sane && screenfetch'
+        bind -x '"\207": stty sane && screenfetch'
     fi
-    bind -m emacs-standard '"\e[18~": "\208\n"'
-    bind -m vi-command     '"\e[18~": "\208\n"'
-    bind -m vi-insert      '"\e[18~": "\208\n"'
+    
+    if type fastfetch &> /dev/null; then
+        bind -x '"\207": stty sane && fastfetch'
+    fi
+    
+    bind -m emacs-standard '"\e[17~": "\207\n"'
+    bind -m vi-command     '"\e[17~": "\207\n"'
+    bind -m vi-insert      '"\e[17~": "\207\n"'
 fi
 
+
+# F7 - (bash/b/bpy)top (Better top/htop)
+if type bashtop &> /dev/null || type btop &> /dev/null || type bpytop &> /dev/null; then
+     
+    # Last one loaded is the winner
+    if type bpytop &> /dev/null; then
+        bind -x '"\208": stty sane && bpytop'
+    fi
+    
+    if type btop &> /dev/null; then
+        bind -x '"\208": stty sane && btop'
+    fi
+    
+    if type bashtop &> /dev/null; then
+        bind -x '"\208": stty sane && bashtop'
+    fi
+    
+    bind -m emacs-standard '"\e[18~": "\208\n\C-l"'
+    bind -m vi-command     '"\e[18~": "\208\n\C-l"'
+    bind -m vi-insert      '"\e[18~": "\208\n\C-l"'
+fi
+
+
+# F8 - Lazydocker (Docker TUI)
+if type lazydocker &> /dev/null; then
+    
+    bind -x '"\209": stty sane && lazydocker'
+    bind -m emacs-standard '"\e[19~": "\209\n"'
+    bind -m vi-command     '"\e[19~": "\209\n"'
+    bind -m vi-insert      '"\e[19~": "\209\n"'
+fi
