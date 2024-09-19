@@ -116,9 +116,13 @@ function cd() {
         j=$(($j+1));
     done
     if [ $push == 1 ]; then
-        pushd "$PWD" &>/dev/null;  
+        pushd "$(pwd)" &>/dev/null;  
     fi
     builtin cd -- "$@"; 
+    export DIRS="$(dirs -l)" 
+    if test "$TERM" == 'xterm-kitty' && test -f ~/.config/kitty/env.conf; then
+        sed -i "s|env DIRS.*|env DIRS=""$DIRS""|g" ~/.config/kitty/env.conf
+    fi
 }
 complete -F _cd cd
 if type _fzf_dir_completion &> /dev/null; then
@@ -258,6 +262,7 @@ bind -m vi-command      '"\C-b": quoted-insert'
 bind -m vi-insert       '"\C-b": quoted-insert'
 
 # Ctrl+o: Change from vi-mode to emacs mode and back
+# This is also configured in ~/.fzf/shell/key-bindings-bash.sh if you have fzf keybinds installed
 bind -m vi-command '"\C-o": emacs-editing-mode'
 bind -m vi-insert '"\C-o": emacs-editing-mode'
 bind -m emacs-standard '"\C-o": vi-editing-mode'
@@ -284,7 +289,7 @@ _edit_wo_executing() {
 bind -m vi-insert      -x '"\C-e":_edit_wo_executing'
 bind -m vi-command     -x '"v":_edit_wo_executing'
 bind -m vi-command     -x '"\C-e":_edit_wo_executing'
-bind -m emacs-standard -x '"\C-x\C-e":_edit_wo_executing'
+bind -m emacs-standard -x '"\C-e\C-e":_edit_wo_executing'
 
 # RLWRAP 
 
@@ -393,21 +398,32 @@ bind -m vi-command     '"\e[15~": "\205\206"'
 bind -m vi-insert      '"\e[15~": "\205\206"'
 
 # F6 - (neo/fast/screen)fetch (System overview)
-if type neofetch &> /dev/null || type fastfetch &> /dev/null || type screenfetch &> /dev/null; then
+if type neofetch &> /dev/null || type fastfetch &> /dev/null || type screenfetch &> /dev/null || type onefetch &> /dev/null; then
     
     # Last one loaded is the winner
-    if type fastfetch &> /dev/null; then
-        bind -x '"\207": stty sane && fastfetch'
+    if type neofetch &> /dev/null; then
+        bind -x '"\207": stty sane && neofetch'
+        fetch="neofetch" 
     fi
     
     if type screenfetch &> /dev/null; then
         bind -x '"\207": stty sane && screenfetch'
+        fetch="screenfetch" 
     fi
     
-    if type neofetch &> /dev/null; then
-        bind -x '"\207": stty sane && neofetch'
+    if type fastfetch &> /dev/null; then
+        bind -x '"\207": stty sane && fastfetch'
+        fetch="fastfetch" 
     fi
-    
+ 
+    if type onefetch &> /dev/null; then
+        if type neofetch &> /dev/null || type fastfetch &> /dev/null || type screenfetch &> /dev/null; then  
+            bind -x '"\207": stty sane; type git &> /dev/null && git rev-parse --git-dir &> /dev/null && reade -Q "GREEN" -i "y" -p "Use onefetch? (lists github stats): " "n" gstats && test $gstats == "y" && onefetch || '"$fetch"' '
+        else 
+            bind -x '"\207": stty sane && '"$fetch"''
+        fi
+    fi
+
     bind -m emacs-standard '"\e[17~": "\207\n"'
     bind -m vi-command     '"\e[17~": "\207\n"'
     bind -m vi-insert      '"\e[17~": "\207\n"'

@@ -36,14 +36,9 @@ fi
 answer=""
 if ! type moar &> /dev/null; then
     
-    if [ $distro == "Manjaro" ]; then
-        
-        reade -Q "GREEN" -i "y" -p "Install moar from packagemanager (y), github binary (b) or not [Y/b/n]: " "b n"  answer
-        if [ "$answer" == "y" ] || [ -z "$answer" ] || [ "$answer" == "Y" ]; then
-            yes | pamac install moar;
-        fi
+
     
-    elif [ $distro == "Arch" ] && ! test -z "$AUR_ins"; then
+    if [ "$distro_base" == "Arch" ] && ! test -z "$AUR_ins"; then
         
         reade -Q "GREEN" -i "y" -p "Install moar from packagemanager (y), github binary (b) or not [Y/b/n]: " "b n"  answer
         if [ "$answer" == "y" ] || [ -z "$answer" ] || [ "$answer" == "Y" ]; then

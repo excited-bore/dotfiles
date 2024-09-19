@@ -9,11 +9,27 @@ alias service-system-list-files="sudo systemctl list-unit-files"
 alias service-user-list-files="systemctl --user list-unit-files"
 alias service-systemd-restart="sudo systemctl restart"
 
-alias restart-display="sudo systemctl restart display-manager"  
+
 alias bios="systemctl reboot --firmware-setup"
 
+
+alias restart-network="systemctl restart NetworkManager"  
+alias status-network="systemctl status NetworkManager"  
+
+alias restart-bluetooth="systemctl restart bluetooth.target"
+alias status-bluetooth="systemctl status bluetooth.target"
+
+alias restart-display="sudo systemctl restart display-manager"  
+alias status-display="sudo systemctl status display-manager"  
+
+
 if type pipewire &> /dev/null; then
-    alias restart-pipewire="systemctl restart --user pipewire"
+    servs="wireplumber pipewire pipewire-pulse" 
+    alias stop-pipewire="systemctl stop --user $servs"
+    alias start-pipewire="systemctl start --user $servs"
+    alias restart-pipewire="systemctl restart --user $servs"
+    alias status-pipewire="systemctl status --user $servs"
+    unset servs 
 fi
 
 system-service-start(){

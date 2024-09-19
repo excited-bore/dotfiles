@@ -389,3 +389,77 @@ elif eval "$arch_cmd" | grep -q "armv"; then
 elif eval "$arch_cmd" | grep -q "aarch"; then
     arch="arm64"
 fi
+
+function check-ppa(){
+    SCRIPT="check-ppa"
+    VERSION="1.1"
+    DATE="2024-09-02"
+    RELEASE="$(lsb_release -si) $(lsb_release -sr)"
+    
+    helpsection() 
+    { 
+        echo "Usage : $SCRIPT [PPA]... 
+    -h, --help     shows this help
+
+    Version $VERSION - $DATE"
+    }
+
+    ppa_verification()
+    { 
+        local ppa="${1#ppa:}"
+
+        local codename="$(lsb_release -sc)"
+        local url="http://ppa.launchpad.net/$ppa/ubuntu/dists/$codename/"
+
+        wget "$url" -q -O /dev/null
+        ######################################################################
+        # Exit Status
+        #
+        # Wget may return one of several error codes if it encounters problems.
+        # 0 No problems occurred.
+        # 1 Generic error code.
+        # 2 Parse error--for instance, when parsing command-line options, the `.wgetrc' or `.netrc'...
+        # 3 File I/O error.
+        # 4 Network failure.
+        # 5 SSL verification failure.
+        # 6 Username/password authentication failure.
+        # 7 Protocol errors.
+        # 8 Server issued an error response.
+        ######################################################################
+        case $? in
+          0) # Success
+            echo "'$ppa' is ${GREEN}OK${normal} for $RELEASE"
+            ;;
+          8) # HTTP 404 (Not Found) would result in wget returning 8
+            echo "'$ppa' is ${RED}UNAVAILABLE${normal} for $RELEASE"
+            return 1
+            ;;
+          *)
+            echo "Error fetching $url" >&2
+            return 3
+        esac
+    }
+
+    PPA=
+    while [ -n "$*" ] ; do
+        case "$1" in
+          -h|--help)
+            helpsection
+            return 0
+            ;;
+          *)
+            PPA="$@"
+            ;;
+        esac
+        shift
+    done
+
+    if [ -z "$PPA" ]; then
+        helpsection >&2
+        return 2
+    fi
+
+    ppa_verification "$PPA"
+}
+
+complete -W "-h --help" check-ppa

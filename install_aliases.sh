@@ -61,7 +61,7 @@ fi
 
 update_sysm=aliases/.bash_aliases.d/update-system.sh
 pacmn=aliases/.bash_aliases.d/package_managers.sh
-test $distro == "Manjaro" && && manjaro=aliases/.bash_aliases.d/manjaro.sh
+test $distro == "Manjaro" && manjaro=aliases/.bash_aliases.d/manjaro.sh
 type systemctl &> /dev/null && systemd=aliases/.bash_aliases.d/systemctl.sh
 type sudo &> /dev/null && dosu=aliases/.bash_aliases.d/sudo.sh
 type git &> /dev/null && gits=aliases/.bash_aliases.d/git.sh

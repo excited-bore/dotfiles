@@ -29,17 +29,19 @@ if type nvim &> /dev/null; then
 
     # All man pages                                                                         
     function man-all-nvim() {                                                               
-        local b=()                                                                          
-        for i in $(man -aw $@); do                                                          
-            local e                                                                         
-            e=$(basename "$i|q" | sed 's|\(\)*.gz|\1|g')                                    
-            b+=("+Man $e");                                                                 
-        done;                                                                               
-        if echo $(type "$@") | grep -q "shell builtin"; then                                
-            nvim "${b[@]}" "+silent Man!" <(help -m $@) "+bfirst"                           
-        else                                                                                
-            nvim "${b[@]}" "+Bclose" "+bfirst"                                              
-        fi                                                                                  
+        for j in $@; do 
+            local b=()                                                                          
+            for i in $(man -aw $j); do                                                          
+                local e                                                                         
+                e=$(basename "$i|q" | sed 's|\(\)*.gz|\1|g')                                    
+                b+=("+Man $e");                                                                 
+            done;                                                                               
+            if [[ $(compgen -b) == *"$j"* ]]; then                                
+                nvim "${b[@]}" "+silent Man!" <(help -m $j) "+bfirst"                           
+            else                                                                                
+                nvim "${b[@]}" "+Bclose" "+bfirst"                                              
+            fi                                                                                  
+        done 
     }                                                                                       
                                                                                             
     # Taken from original _man function                                                                                                                                            

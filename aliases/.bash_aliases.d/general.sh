@@ -415,7 +415,12 @@ alias date-eu='date "+%d-%m-%Y %A %T %Z"'
 
 alias redirect-tty-output-to="exec 1>/dev/pts/"
 
-alias list-GPU-drivers="inxi -G"
+alias GPU-drivers="inxi -G"
+
+# Thank you Andrea 
+# https://www.youtube.com/watch?v=Y_KfQIaOZkE
+alias weather="inxi -w"
+alias weather-full="curl wttr.in | $PAGER"
 
 # crontab
 # 
