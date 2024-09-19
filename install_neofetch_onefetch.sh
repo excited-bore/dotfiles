@@ -82,3 +82,31 @@ if ! type neofetch &> /dev/null && ! type fastfetch &> /dev/null && ! type scree
         fi
     #fi
 fi
+
+if ! type onefetch &> /dev/null; then
+    reade -Q "GREEN" -i "y" -p "Install onefetch? (lists github stats like lines of codes) [Y/n]: " "n" nftch
+    if test $nftch == 'y'; then
+        if $distro_base == 'Arch'; then
+            eval "$pac_ins onefetch"
+        elif $distro_base == 'Debian' && type add-apt-repository &> /dev/null && [[ $(check-ppa ppa:o2sh/onefetch) =~ 'OK' ]]; then
+            sudo add-apt-repository ppa:o2sh/onefetch 
+            eval "$pac_up" 
+            eval "$pac_ins onefetch"
+        elif $distro == 'Fedora'; then
+            sudo dnf copr enable varlad/onefetch
+            sudo dnf install onefetch 
+        elif $distro == 'alpine'; then
+            apk update
+            apk add onefetch    
+        elif $machine == 'Mac' && type brew &> /dev/null; then
+            brew install onefetch 
+        elif $machine == 'Windows'; then
+            winget install onefetch
+        elif type nix-env &> /dev/null; then
+            nix-env -i onefetch
+        else 
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+            cargo install onefetch 
+        fi
+    fi
+fi

@@ -688,7 +688,7 @@ pre='y'
 othr='n'
 color='GREEN'
 prmpt='[Y/n]: '
-if type neofetch &> /dev/null || type fastfetch &> /dev/null || type screenfetch &> /dev/null; then
+if ! type neofetch &> /dev/null && ! type fastfetch &> /dev/null && ! type screenfetch &> /dev/null && ! type onefetch &> /dev/null; then
     pre='n' 
     othr='y'
     color='YELLOW'
@@ -697,10 +697,10 @@ fi
 
 reade -Q "$color" -i "$pre" -p "Install neofetch/fastfetch/screenFetch)? (Terminal taskmanager - system information tool) $prmpt" "$othr" tojump
 if [ "$tojump" == "y" ]; then
-    if ! test -f install_neofetch.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_neofetch.sh)" 
+    if ! test -f install_neofetch_onefetch.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_neofetch_onefetch.sh)" 
     else
-        ./install_neofetch.sh
+        ./install_neofetch_onefetch.sh
     fi
 fi
 unset tojump
