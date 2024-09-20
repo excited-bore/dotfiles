@@ -215,7 +215,7 @@ if test $distro_base == 'Debian'; then
     fi 
 
 elif test $distro_base == 'Arch'; then
-    if test -z $(eval "$pac_ls_ins pacseek 2> /dev/null"); then
+    if test -z "$(eval "$pac_ls_ins pacseek 2> /dev/null")"; then
         printf "${CYAN}pacseek${normal} (A TUI for managing packages from pacman and AUR) is not installed\n"
         reade -Q 'GREEN' -i 'y' -p "Install pacseek? [Y/n]: " 'n' pacs_ins
         if test $pacs_ins == 'y'; then
