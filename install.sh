@@ -343,7 +343,7 @@ shell-keybinds() {
         . ./checks/check_keybinds.sh
     fi
    
-    printf "${cyan}You can always switch between vi/emacs mode with${CYAN}Ctrl-o${normal}\n"
+    printf "${cyan}You can always switch between vi/emacs mode with ${CYAN}Ctrl-o${normal}\n"
      
     reade -Q "YELLOW" -i "n" -p "Startup in vi-mode instead of emacs mode?(might cause issues with pasteing) [N/y]: " "y" vimde
 

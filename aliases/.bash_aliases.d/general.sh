@@ -416,6 +416,8 @@ alias date-eu='date "+%d-%m-%Y %A %T %Z"'
 alias redirect-tty-output-to="exec 1>/dev/pts/"
 
 alias GPU-drivers="inxi -G"
+alias list-GPU-drivers="inxi -G"
+
 
 # Thank you Andrea 
 # https://www.youtube.com/watch?v=Y_KfQIaOZkE
