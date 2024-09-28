@@ -15,6 +15,16 @@ if type lowfi &> /dev/null; then
     alias lowfi-play="lowfi play"
 fi
 
+if type nyx &> /dev/null; then
+    alias status-tor="nyx"
+fi
+
+if type torsocks &> /dev/null; then
+    alias tor-shell-on="sourc torsocks on"
+    alias tor-shell-off="sourc torsocks off"
+fi
+
+
 if type nmap &> /dev/null; then
     function net-open-ports-outgoing(){
         if test -z $@; then

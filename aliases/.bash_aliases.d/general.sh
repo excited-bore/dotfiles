@@ -407,7 +407,7 @@ if type whereis &> /dev/null; then
      complete -F _commands edit-whereis  
 fi
 
-
+alias ip-adress="wget -qO - https://api.ipify.org; echo"
 
 # eur and us format date
 alias date-us='date "+%Y-%m-%d %A %T %Z"'

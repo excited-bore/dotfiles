@@ -47,7 +47,7 @@ if ! type autojump &> /dev/null; then
                 fi 
             fi
             unset ins_yay
-            yay -S visual-studio-code-bin 
+            yay -S autojump 
         else 
             eval "$AUR_ins autojump"
         fi

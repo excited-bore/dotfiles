@@ -830,8 +830,6 @@ unset ins_ufw
 unset pre color othr prmpt 
 
 
-
-
 # Netstat - deprecated
 #pre='y'
 #othr='n'
