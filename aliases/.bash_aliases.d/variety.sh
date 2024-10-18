@@ -20,8 +20,8 @@ if type nyx &> /dev/null; then
 fi
 
 if type torsocks &> /dev/null; then
-    alias tor-shell-on="sourc torsocks on"
-    alias tor-shell-off="sourc torsocks off"
+    alias tor-shell-on="source torsocks on"
+    alias tor-shell-off="source torsocks off"
 fi
 
 
@@ -37,14 +37,18 @@ if type nmap &> /dev/null; then
     complete -W "$(seq 1 10000)" net-open-ports-outgoing 
 fi
 
-#if type ss &> /dev/null; then
-   #alias net-list-active-ports="ss -tulpn | awk '{print \$5;}' | grep --color=never '[^\:][0-9]$' | cut -d: -f2 | xargs | tr ' ' '\n' | sort -u"  
-#fi
+if type ss &> /dev/null; then
+    alias ports-listen-tcp="ss -nlt"
+  #alias net-list-active-ports="ss -tulpn | awk '{print \$5;}' | grep --color=never '[^\:][0-9]$' | cut -d: -f2 | xargs | tr ' ' '\n' | sort -u"  
+fi
+
 
 if type netstat &> /dev/null; then
     # Netstat deprecated 
     # https://blog.pcarleton.com/post/netstat-vs-ss/
-    alias netstat-is-installed-but-use-ss='ss'
+    if type ss &> /dev/null; then
+        alias netstat-is-installed-but-use-ss='ss'
+    fi
     alias netstat-list-all-ports="netstat -a"
     alias netstat-list-all-ports-tcp="netstat -at"
     alias netstat-list-all-ports-udp="netstat -au"

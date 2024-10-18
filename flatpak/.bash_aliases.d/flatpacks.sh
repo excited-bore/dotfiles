@@ -61,3 +61,6 @@ fi
 if flatpak list --columns=name | grep "yuzu" &> /dev/null; then
 	alias yuzu='GDK_BACKEND=x11 flatpak run --file-forwarding org.yuzu_emu.yuzu'
 fi
+if flatpak list --columns=name | grep "zoom" &> /dev/null; then
+	alias zoom='flatpak run --file-forwarding us.zoom.Zoom'
+fi

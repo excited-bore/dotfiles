@@ -24,10 +24,28 @@ if type tor &> /dev/null; then
     servs="tor" 
     alias stop-tor="sudo systemctl stop  $servs"
     alias start-tor="sudo systemctl start  $servs"
+    alias enable-tor="sudo systemctl enable  $servs"
+    alias disable-tor="sudo systemctl disable  $servs"
+    alias enable-now-tor="sudo systemctl enable --now $servs"
+    alias disable-now-tor="sudo systemctl disable --now  $servs"
     alias restart-tor="sudo systemctl restart  $servs"
     alias status-tor-service="sudo systemctl status $servs"
     unset servs 
 fi
+
+if type docker &> /dev/null; then
+    servs="docker" 
+    alias stop-docker="sudo systemctl stop  $servs"
+    alias start-docker="sudo systemctl start  $servs"
+    alias restart-docker="sudo systemctl restart  $servs"
+    alias disable-docker="sudo systemctl disable  $servs"
+    alias enable-docker="sudo systemctl enable  $servs"
+    alias enable-now-docker="sudo systemctl enable --now $servs"
+    alias disable-now-docker="sudo systemctl disable --now  $servs"
+    alias status-docker-service="sudo systemctl status $servs"
+    unset servs 
+fi
+
 
 if type pipewire &> /dev/null; then
     servs="pipewire" 
@@ -41,6 +59,11 @@ if type pipewire &> /dev/null; then
     alias start-pipewire="systemctl start --user $servs"
     alias restart-pipewire="systemctl restart --user $servs"
     alias status-pipewire="systemctl status --user $servs"
+    alias disable-pipewire="systemctl disable --user  $servs"
+    alias enable-pipewire="systemctl enable --user  $servs"
+    alias enable-now-pipewire="systemctl enable --user --now $servs"
+    alias disable-now-pipewire="systemctl disable --user --now  $servs"
+
     unset servs 
 fi
 

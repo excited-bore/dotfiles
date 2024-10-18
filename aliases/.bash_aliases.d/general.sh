@@ -47,6 +47,7 @@ alias cp-old="cp -ruv"
 alias copy="cp"
 
 
+
 function cp-all-to(){
     local dest
     if [ -z "$1" ] && [ -d "$1" ]; then
@@ -323,7 +324,8 @@ alias lsall="ls -Ahl"
 
 # Listen only directories, including that are hidden
 alias lsdir="ls -Ap | grep \".*/$\""
-alias q="exit"
+alias q='exit'
+#alias q='! test -z jobs && kill -2 "$(jobs -p)" && reade -Q "GREEN" -i "y" -p "Jobs are still running in the background. Send interrupt signal (kill)?: " "n" kill_ && test "$kill_" == "y" && kill "$(jobs -p)" && exit || kill -18 "$(jobs -p)" || exit'
 alias d="dirs"
 alias c="cd"
 alias x="cd .."
