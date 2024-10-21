@@ -16,7 +16,7 @@ color='GREEN'
 prmpt='[Both/exit/intr/n]: '
 
 echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for terminate background processes /root/.bashrc' "
-if grep -q "trap 'kill \$(jobs -p).*" ~/.bashrc || sudo grep -q "trap 'kill \$(jobs -p).*" /root/.bashrc; then
+if grep -q "trap \"! \[ test -z \$(jobs -p) ] && kill \$(jobs -p)\".*" ~/.bashrc || sudo grep -q "trap \"! \[ test -z \$(jobs -p) ] && kill \$(jobs -p)\".*" /root/.bashrc; then
     pre='n' 
     othr='both exit intr'
     color='YELLOW'
@@ -32,10 +32,10 @@ if ! [ $int_r  == "n" ]; then
     elif test $int_r == 'intr'; then
         sig='INT'  
     fi
-    if ! grep -q "trap 'kill \$(jobs -p).*" ~/.bashrc; then 
-        printf "[ ! -z "$(jobs -p)" ] && trap 'kill $(jobs -p)' $sig\n" >> ~/.bashrc
+    if ! grep -q "trap \"! \[ test -z \$(jobs -p) ] && kill \$(jobs -p)\".*" ~/.bashrc; then 
+        printf "trap \" ! [ -z \$(jobs -p) ] && kill \$(jobs -p) $sig\n\"" >> ~/.bashrc
     else  
-        sed -i 's|\[ ! -z "$(jobs -p)" \] \&\& trap '\''kill $(jobs -p)'\'' .*|\[ ! -z "$(jobs -p)" \] \&\& trap '\''kill $(jobs -p)'\'' '"$sig"'|g' ~/.bashrc
+        sed -i 's|trap ! \[ -z $(jobs -p) \] \&\& kill $(jobs -p) .*|trap ! [ -z $(jobs -p) \] \&\& kill $(jobs -p) '"$sig"'|g' ~/.bashrc 
     fi 
     
     pre='same'
@@ -61,9 +61,9 @@ if ! [ $int_r  == "n" ]; then
         fi
 
         if ! sudo grep -q "trap 'kill \$(jobs -p).*" /root/.bashrc; then 
-            printf "[ ! -z "$(jobs -p)" ] && trap 'kill $(jobs -p)' $sig\n" | sudo tee -a /root/.bashrc
+            printf "trap \" ! [ -z \$(jobs -p) ] && kill \$(jobs -p) $sig\n\"" | sudo tee -a /root/.bashrc
         else  
-            sudo sed -i 's|\[ ! -z "$(jobs -p)" \] \&\& trap '\''kill $(jobs -p)'\'' .*|\[ ! -z "$(jobs -p)" \] \&\& trap '\''kill $(jobs -p)'\'' '"$sig"'|g' /root/.bashrc 
+            sudo sed -i 's|trap ! \[ -z $(jobs -p) \] \&\& kill $(jobs -p) .*|trap ! [ -z $(jobs -p) \] \&\& kill $(jobs -p) '"$sig"'|g' /root/.bashrc 
         fi  
     fi     
 fi
