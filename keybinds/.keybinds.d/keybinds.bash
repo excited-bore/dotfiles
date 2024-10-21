@@ -45,11 +45,12 @@ stty werase 'undef'
 # xrdb -merge ~/.Xresources
 # .Inputrc (readline conf) however has to be compiled, so restart shell
 
-# Set caps to Escape
 X11_WAY="$(loginctl show-session $(awk '/tty/ {print $1}' <(loginctl)) -p Type | awk -F= '{print $2}')"
-#if test "$X11_WAY" == 'x11'; then
-#    #setxkbmap -option caps:escape
-#fi
+
+# Set caps to Escape
+if test "$X11_WAY" == 'x11'; then
+    setxkbmap -option caps:escape
+fi
 
 # Set Shift delete to backspace
 xmodmap -e "keycode 119 = Delete BackSpace"     
