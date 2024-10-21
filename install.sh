@@ -132,7 +132,7 @@ if ! type snap &> /dev/null; then
 fi
 unset inssnap
 
-if test -z $(eval "$pac_ls_ins groff 2> /dev/null"); then
+if test -z "$(eval "$pac_ls_ins groff 2> /dev/null")"; then
     printf "${CYAN}groff${normal} is not installed (Necessary for 'man' (manual) command)\n"
     reade -Q 'GREEN' -i 'y' -p "Install groff? [Y/n]: " 'n' groff_ins
     if test $groff_ins == 'y'; then
@@ -142,23 +142,24 @@ if test -z $(eval "$pac_ls_ins groff 2> /dev/null"); then
     unset groff_ins 
 fi
 
-if test -z $(eval "$pac_ls_ins manpages-posix 2> /dev/null"); then
-    printf "${CYAN}manpages-posix${normal} is not installed (Manpages for posix-compliant (f.ex. bash) commands (f.ex. alias, test, type, etc...))\n"
-    reade -Q 'GREEN' -i 'y' -p "Install manpages-posix? [Y/n]: " 'n' posixman_ins
-    if test $posixman_ins == 'y'; then
-        eval "yes | $pac_ins manpages-posix -y"
-    fi
-    unset posixman_ins 
-fi
 
 if test $distro_base == 'Debian'; then
+
+     if test -z $(eval "$pac_ls_ins manpages-posix 2> /dev/null"); then
+        printf "${CYAN}manpages-posix${normal} is not installed (Manpages for posix-compliant (f.ex. bash) commands (f.ex. alias, test, type, etc...))\n"
+        reade -Q 'GREEN' -i 'y' -p "Install manpages-posix? [Y/n]: " 'n' posixman_ins
+        if test $posixman_ins == 'y'; then
+            eval "yes | $pac_ins manpages-posix -y"
+        fi
+        unset posixman_ins 
+     fi
 
      if test -z "$(apt list --installed software-properties-common 2> /dev/null | awk 'NR>1{print;}')"|| test -z "$(apt list --installed python3-launchpadlib 2> /dev/null | awk 'NR>1{print;}')"; then
         if test -z "$(apt list --installed software-properties-common 2> /dev/null | awk 'NR>1{print;}')"; then 
             printf "${CYAN}add-apt-repository${normal} is not installed (cmd tool for installing extra repositories/ppas on debian systems)\n"
             reade -Q 'GREEN' -i 'y' -p "Install add-apt-repository? [Y/n]: " 'n' add_apt_ins
             if test $add_apt_ins == 'y'; then
-                eval "$pac_ins software-properties-common"
+                eval "yes | $pac_ins software-properties-common"
             fi
             unset add_apt_ins 
         fi 
@@ -167,7 +168,7 @@ if test $distro_base == 'Debian'; then
             printf "${CYAN}python3-launchpadlib${normal} is not installed (python3 library that adds support for ppas from Ubuntu's 'https://launchpad.net' to add-apt-repository)\n"
             reade -Q 'GREEN' -i 'y' -p "Install python3-launchpadlib? [Y/n]: " 'n' lpdlb_ins
             if test $lpdlb_ins == 'y'; then
-                eval "$pac_ins python3-launchpadlib"
+                eval "yes | $pac_ins python3-launchpadlib"
             fi
             unset lpdlb_ins 
              
@@ -185,7 +186,7 @@ if test $distro_base == 'Debian'; then
             printf "${CYAN}ppa-purge${normal} is not installed (cmd tool for removing ppa repositories)\n"
             reade -Q 'GREEN' -i 'y' -p "Install ppa-purge? [Y/n]: " 'n' ppa_ins
             if test $ppa_ins == 'y'; then
-                eval "$pac_ins ppa-purge -y"
+                eval "yes | $pac_ins ppa-purge"
             fi
             unset ppa_ins 
         fi
@@ -215,7 +216,7 @@ if test $distro_base == 'Debian'; then
     fi 
 
 elif test $distro_base == 'Arch'; then
-    if test -z $(eval "$pac_ls_ins pacseek 2> /dev/null"); then
+    if test -z "$(eval "$pac_ls_ins pacseek 2> /dev/null")"; then
         printf "${CYAN}pacseek${normal} (A TUI for managing packages from pacman and AUR) is not installed\n"
         reade -Q 'GREEN' -i 'y' -p "Install pacseek? [Y/n]: " 'n' pacs_ins
         if test $pacs_ins == 'y'; then
@@ -292,8 +293,8 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         ./install_aliases.sh
     fi
 fi
-
 source ~/.bashrc
+
 
 
 # Shell-keybinds
@@ -342,7 +343,7 @@ shell-keybinds() {
         . ./checks/check_keybinds.sh
     fi
    
-    printf "${cyan}You can always switch between vi/emacs mode with${CYAN}Ctrl-o${normal}\n"
+    printf "${cyan}You can always switch between vi/emacs mode with ${CYAN}Ctrl-o${normal}\n"
      
     reade -Q "YELLOW" -i "n" -p "Startup in vi-mode instead of emacs mode?(might cause issues with pasteing) [N/y]: " "y" vimde
 
@@ -688,7 +689,7 @@ pre='y'
 othr='n'
 color='GREEN'
 prmpt='[Y/n]: '
-if type neofetch &> /dev/null || type fastfetch &> /dev/null || type screenfetch &> /dev/null; then
+if ! type neofetch &> /dev/null && ! type fastfetch &> /dev/null && ! type screenfetch &> /dev/null && ! type onefetch &> /dev/null; then
     pre='n' 
     othr='y'
     color='YELLOW'
@@ -697,10 +698,10 @@ fi
 
 reade -Q "$color" -i "$pre" -p "Install neofetch/fastfetch/screenFetch)? (Terminal taskmanager - system information tool) $prmpt" "$othr" tojump
 if [ "$tojump" == "y" ]; then
-    if ! test -f install_neofetch.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_neofetch.sh)" 
+    if ! test -f install_neofetch_onefetch.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_neofetch_onefetch.sh)" 
     else
-        ./install_neofetch.sh
+        ./install_neofetch_onefetch.sh
     fi
 fi
 unset tojump
@@ -827,8 +828,6 @@ if [ $ins_ufw == "y" ]; then
 fi
 unset ins_ufw
 unset pre color othr prmpt 
-
-
 
 
 # Netstat - deprecated

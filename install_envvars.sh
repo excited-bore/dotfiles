@@ -354,7 +354,7 @@ elif [ "$envvars" == "y" ]; then
         (echo "" | mimeopen -a editor-check.sh &> $TMPDIR/editor-outpt)
         editors="$(cat $TMPDIR/editor-outpt | awk 'NR > 2' | awk '{if (prev_1_line) print prev_1_line; prev_1_line=prev_line} {prev_line=$NF}' | sed 's|[()]||g' | tr -s [:space:] \\n | uniq | tr '\n' ' ') $editors"
         editors="$(echo $editors | tr ' ' '\n' | sort -u)"
-        prmpt="Found visual editors using ${CYAN}mimeopen${normal} (non definitive list): ${GREEN}\n"
+        prmpt="Found editors using ${CYAN}mimeopen${normal} (non definitive list): ${GREEN}\n"
         for i in $editors; do
             prmpt="$prmpt\t - $i\n"
         done

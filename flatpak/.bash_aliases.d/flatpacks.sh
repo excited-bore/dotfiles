@@ -27,6 +27,10 @@ if flatpak list --columns=name | grep "Discord" &> /dev/null; then
     alias discord='GDK_BACKEND=x11 flatpak run com.discordapp.Discord' 
 fi
 
+if flatpak list --columns=name | grep "Ryujinx" &> /dev/null; then
+    alias ryujinx='GDK_BACKEND=x11 flatpak run org.ryujinx.Ryujinx' 
+fi
+
 if flatpak list --columns=name | grep "Discover Overlay" &> /dev/null; then
     alias discover-overlay='GDK_BACKEND=x11 flatpak run io.github.trigg.discover_overlay' 
     alias discord-overlay='discover-overlay' 
@@ -56,4 +60,7 @@ if flatpak list --columns=name | grep "flatseal" &> /dev/null; then
 fi
 if flatpak list --columns=name | grep "yuzu" &> /dev/null; then
 	alias yuzu='GDK_BACKEND=x11 flatpak run --file-forwarding org.yuzu_emu.yuzu'
+fi
+if flatpak list --columns=name | grep "zoom" &> /dev/null; then
+	alias zoom='flatpak run --file-forwarding us.zoom.Zoom'
 fi

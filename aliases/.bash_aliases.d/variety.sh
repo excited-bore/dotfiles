@@ -15,6 +15,16 @@ if type lowfi &> /dev/null; then
     alias lowfi-play="lowfi play"
 fi
 
+if type nyx &> /dev/null; then
+    alias status-tor="nyx"
+fi
+
+if type torsocks &> /dev/null; then
+    alias tor-shell-on="source torsocks on"
+    alias tor-shell-off="source torsocks off"
+fi
+
+
 if type nmap &> /dev/null; then
     function net-open-ports-outgoing(){
         if test -z $@; then
@@ -27,14 +37,18 @@ if type nmap &> /dev/null; then
     complete -W "$(seq 1 10000)" net-open-ports-outgoing 
 fi
 
-#if type ss &> /dev/null; then
-   #alias net-list-active-ports="ss -tulpn | awk '{print \$5;}' | grep --color=never '[^\:][0-9]$' | cut -d: -f2 | xargs | tr ' ' '\n' | sort -u"  
-#fi
+if type ss &> /dev/null; then
+    alias ports-listen-tcp="ss -nlt"
+  #alias net-list-active-ports="ss -tulpn | awk '{print \$5;}' | grep --color=never '[^\:][0-9]$' | cut -d: -f2 | xargs | tr ' ' '\n' | sort -u"  
+fi
+
 
 if type netstat &> /dev/null; then
     # Netstat deprecated 
     # https://blog.pcarleton.com/post/netstat-vs-ss/
-    alias netstat-is-installed-but-use-ss='ss'
+    if type ss &> /dev/null; then
+        alias netstat-is-installed-but-use-ss='ss'
+    fi
     alias netstat-list-all-ports="netstat -a"
     alias netstat-list-all-ports-tcp="netstat -at"
     alias netstat-list-all-ports-udp="netstat -au"
@@ -70,14 +84,14 @@ fi
 
 
 if type exiftool &> /dev/null; then
-    alias exiftool-folder="exiftool -r -all=$(pwd)"
+    alias exiftool-folder="exiftool -r -all= $(pwd)"
     function exiftool-add-cron-wipe-all-metadata-rec-dir(){
         reade -Q 'GREEN' -i '0,5,10,15,25,30,35,40,45,5,55' -p 'Minutes? (0-59): ' '0 5 10 15 25 30 35 40 45 50 55' min
         reade -Q 'GREEN' -p "Dir?: " -e dir
-        (crontab -l; echo "0,5,10,15,25,30,35,40,45,5,55 * * * * exiftool -r -all=$dir") | sort -u | crontab -; crontab -l 
+        (crontab -l; echo "0,5,10,15,25,30,35,40,45,5,55 * * * * exiftool -r -all= $dir") | sort -u | crontab -; crontab -l 
         unset min dir 
     } 
-    alias exiftool-add-cron-wipe-all-metadata-rec-picture-dir="(crontab -l; echo '0,5,10,15,25,30,35,40,45,5,55 * * * * exiftool -r -all=$HOME/Pictures') | sort -u | crontab -; crontab -l"
+    alias exiftool-add-cron-wipe-all-metadata-rec-picture-dir="(crontab -l; echo '0,5,10,15,25,30,35,40,45,5,55 * * * * exiftool -r -all= $HOME/Pictures') | sort -u | crontab -; crontab -l"
 fi
 
 if type lazygit &> /dev/null && type copy-to &> /dev/null; then

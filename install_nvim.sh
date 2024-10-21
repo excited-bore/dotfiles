@@ -113,7 +113,6 @@ if test $machine == 'Mac' && type brew &> /dev/null; then
                 sudo npm install -g neovim
             fi
         fi
-        printf "${red}This next prompt might take a while to load since it might initialize cpan (perl)${normal}\n" 
         if ! type gem &> /dev/null || ! gem list | grep neovim &> /dev/null; then
             reade -Q "GREEN" -i "y" -p "Install nvim-ruby? [Y/n]: " "n" rubyscripts
             if [ -z $rubyscripts ] || [ "y" == $rubyscripts ]; then
@@ -126,7 +125,16 @@ if test $machine == 'Mac' && type brew &> /dev/null; then
                 gem install neovim
             fi
         fi
-        printf "${red}This next prompt might take a while to load since it might initialize cpan (perl)${normal}\n" 
+         
+        #printf "${CYAN}Checking whether perl modules for nvim are installed means initializing cpan ([perl package manager)${normal}\n" 
+        if ! type cpanm &> /dev/null; then
+            if ! test -f install_cpanm.sh; then
+                 eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cpanm.sh)" 
+            else
+                ./install_cpanm.sh
+            fi 
+        fi
+        reade -Q "GREEN" -i "y" -p "Initialize cpan? [Y/n]: " "n" cpan_ini
          
         if ! type cpan &> /dev/null || ! cpan -l 2> /dev/null | grep Neovim::Ext &> /dev/null; then
             reade -Q "GREEN" -i "y" -p "Install nvim-perl? [Y/n]: " "n" perlscripts
@@ -652,7 +660,7 @@ vimsh(){
     cp -fv $file1 ~/.bash_completion.d/;
     yes_edit_no vimsh_r "$dir/vim_nvim.sh $dir1/vim_nvim" "Install vim aliases at /root/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)? " "yes" "GREEN"
 }
-yes_edit_no vimsh "$dir/vim_nvim.sh $dir1/vim_nvim" "Install vim aliases at ~/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)? " "edit" "GREEN"
+yes_edit_no vimsh "$dir/vim_nvim.sh $dir1/vim_nvim" "Install vim aliases at ~/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)? " "yes" "GREEN"
 
 if ! type nvimpager &> /dev/null; then
     reade -Q "YELLOW" -i "n" -p "Install nvimpager? [N/y]: " "y" vimrc 

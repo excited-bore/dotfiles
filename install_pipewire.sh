@@ -238,7 +238,7 @@ pipewire_r(){
 }
 
 pipewiresh(){
-    cp -fv $file ~/.bash_aliases.d/
+    cp -fv $file ~/.bash_aliases.d/;
     cp -fv $file1 ~/.bash_completion.d/;
     yes_edit_no pipewire_r "$file $file1" "Install pipewire aliases at /root/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)? " "yes" "GREEN"
 }
@@ -247,7 +247,7 @@ yes_edit_no pipewiresh "$file $file1" "Install pipewire aliases at ~/.bash_alias
 
 if type systemctl &> /dev/null; then
     reade -Q 'GREEN' -i 'y' -p 'Restart pipewire service(s)? [Y/n]: ' 'n' rs_pwr
-    if test $rs_pwr == 'y'; then
+    if test "$rs_pwr" == 'y'; then
        systemctl restart --user wireplumber pipewire pipewire-pulse 
        systemctl status --user wireplumber pipewire pipewire-pulse 
     fi

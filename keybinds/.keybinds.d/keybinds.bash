@@ -52,7 +52,7 @@ X11_WAY="$(loginctl show-session $(awk '/tty/ {print $1}' <(loginctl)) -p Type |
 #fi
 
 # Set Shift delete to backspace
-# xmodmap -e "keycode 119 = Delete BackSpace"     
+xmodmap -e "keycode 119 = Delete BackSpace"     
 
 # READLINE
 
@@ -116,10 +116,13 @@ function cd() {
         j=$(($j+1));
     done
     if [ $push == 1 ]; then
-        pushd "$PWD" &>/dev/null;  
-        export DIRS="$DIRS $PWD" 
+        pushd "$(pwd)" &>/dev/null;  
     fi
     builtin cd -- "$@"; 
+    export DIRS="$(dirs -l)" 
+    if test "$TERM" == 'xterm-kitty' && test -f ~/.config/kitty/env.conf; then
+        sed -i "s|env DIRS.*|env DIRS=""$DIRS""|g" ~/.config/kitty/env.conf
+    fi
 }
 complete -F _cd cd
 if type _fzf_dir_completion &> /dev/null; then
@@ -395,21 +398,32 @@ bind -m vi-command     '"\e[15~": "\205\206"'
 bind -m vi-insert      '"\e[15~": "\205\206"'
 
 # F6 - (neo/fast/screen)fetch (System overview)
-if type neofetch &> /dev/null || type fastfetch &> /dev/null || type screenfetch &> /dev/null; then
+if type neofetch &> /dev/null || type fastfetch &> /dev/null || type screenfetch &> /dev/null || type onefetch &> /dev/null; then
     
     # Last one loaded is the winner
     if type neofetch &> /dev/null; then
         bind -x '"\207": stty sane && neofetch'
+        fetch="neofetch" 
     fi
     
     if type screenfetch &> /dev/null; then
         bind -x '"\207": stty sane && screenfetch'
+        fetch="screenfetch" 
     fi
     
     if type fastfetch &> /dev/null; then
         bind -x '"\207": stty sane && fastfetch'
+        fetch="fastfetch" 
     fi
-    
+ 
+    if type onefetch &> /dev/null; then
+        if type neofetch &> /dev/null || type fastfetch &> /dev/null || type screenfetch &> /dev/null; then  
+            bind -x '"\207": stty sane; type git &> /dev/null && git rev-parse --git-dir &> /dev/null && reade -Q "GREEN" -i "y" -p "Use onefetch? (lists github stats): " "n" gstats && test $gstats == "y" && onefetch || '"$fetch"' '
+        else 
+            bind -x '"\207": stty sane && '"$fetch"''
+        fi
+    fi
+
     bind -m emacs-standard '"\e[17~": "\207\n"'
     bind -m vi-command     '"\e[17~": "\207\n"'
     bind -m vi-insert      '"\e[17~": "\207\n"'

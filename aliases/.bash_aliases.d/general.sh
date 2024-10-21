@@ -47,6 +47,7 @@ alias cp-old="cp -ruv"
 alias copy="cp"
 
 
+
 function cp-all-to(){
     local dest
     if [ -z "$1" ] && [ -d "$1" ]; then
@@ -323,7 +324,8 @@ alias lsall="ls -Ahl"
 
 # Listen only directories, including that are hidden
 alias lsdir="ls -Ap | grep \".*/$\""
-alias q="exit"
+alias q='exit'
+#alias q='! test -z jobs && kill -2 "$(jobs -p)" && reade -Q "GREEN" -i "y" -p "Jobs are still running in the background. Send interrupt signal (kill)?: " "n" kill_ && test "$kill_" == "y" && kill "$(jobs -p)" && exit || kill -18 "$(jobs -p)" || exit'
 alias d="dirs"
 alias c="cd"
 alias x="cd .."
@@ -407,7 +409,10 @@ if type whereis &> /dev/null; then
      complete -F _commands edit-whereis  
 fi
 
+alias ip-adress="wget -qO - https://api.ipify.org; echo"
 
+alias list-kill-signals="kill -l"
+alias kill-signals="kill -l"
 
 # eur and us format date
 alias date-us='date "+%Y-%m-%d %A %T %Z"'
@@ -416,6 +421,8 @@ alias date-eu='date "+%d-%m-%Y %A %T %Z"'
 alias redirect-tty-output-to="exec 1>/dev/pts/"
 
 alias GPU-drivers="inxi -G"
+alias list-GPU-drivers="inxi -G"
+
 
 # Thank you Andrea 
 # https://www.youtube.com/watch?v=Y_KfQIaOZkE

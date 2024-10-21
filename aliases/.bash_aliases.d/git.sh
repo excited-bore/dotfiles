@@ -87,7 +87,7 @@ git-https-to-ssh(){
             git remote get-url origin;
         fi        
     else
-            gitRm=$(git remote get-url $1 | sed 's,.*.com/,git@github.com:,g'); git remote -v set-url origin $gitRm;
+            gitRm=$(git remote get-url $1 | sed 's,.*.com/,git@github.com:,g'); git remote -v set-url $1 $gitRm;
             git remote get-url $1;
     fi
 }
@@ -101,7 +101,7 @@ git-ssh-to-https(){
             git remote get-url origin;
         fi        
     else
-        gitRm=$(git remote get-url $1 | sed 's,.*.com:,https://github.com/,g'); git remote -v set-url origin $gitRm;
+        gitRm=$(git remote get-url $1 | sed 's,.*.com:,https://github.com/,g'); git remote -v set-url $1 $gitRm;
         git remote get-url $1;
     fi
 }
