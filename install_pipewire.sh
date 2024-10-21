@@ -176,11 +176,11 @@ if ! test -f $HOME/.config/wireplumber/wireplumber.conf.d/51-disable-suspension.
     matches = [
       {
         # Matches all sources
-        node.name = "~alsa_input.*"
+        node.name = \"~alsa_input.*\"
       },
       {
         # Matches all sinks
-        node.name = "~alsa_output.*"
+        node.name = \"~alsa_output.*\"
       }
     ]
     actions = {
@@ -196,11 +196,11 @@ monitor.bluez.rules = [
     matches = [
       {
         # Matches all sources
-        node.name = "~bluez_input.*"
+        node.name = \"~bluez_input.*\"
       },
       {
         # Matches all sinks
-        node.name = "~bluez_output.*"
+        node.name = \"~bluez_output.*\"
       }
     ]
     actions = {
