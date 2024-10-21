@@ -144,7 +144,7 @@ do
         codename="$(lsb_release -a | grep --color=never 'Codename' | awk '{print $2}')"
         release="$(lsb_release -a | grep --color=never 'Release' | awk '{print $2;}')"
 
-    elif test -f $f && [[ $f == /etc/SuSE-release || $f == /etc/SUSE-brand ]] && test $distro == /; then
+    elif test -f $f && [[ $f == /etc/SuSE-release || $f == /etc/SUSE-brand ]] && test "$distro" == / ; then
         if ! test -z "$(lsb_release -a | grep Leap)"; then
             pac="zypper_leap"
         else

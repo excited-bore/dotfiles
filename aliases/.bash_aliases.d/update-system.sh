@@ -209,4 +209,3 @@ function update-system() {
     fi
 }
 
- SYSTEM_UPDATED="TRUE"
