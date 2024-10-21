@@ -31,7 +31,7 @@ if ! type lazygit &> /dev/null; then
     if test $distro_base == "Arch"; then
         eval "$pac_ins lazygit"
     elif test $distro_base == "Debian"; then
-        if ! test -z $(apt search lazygit 2> /dev/null | awk 'NR>2 {print;}'); then 
+        if ! test -z "$(apt search --names-only lazygit 2> /dev/null | awk 'NR>2 {print;}')"; then 
             eval "$pac_ins lazygit "
         else
             if ! type curl &> /dev/null; then
