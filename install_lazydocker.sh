@@ -31,14 +31,23 @@ if ! type lazydocker &> /dev/null; then
     if test $distro_base == "Arch" && ! test -z "$AUR_ins"; then
         eval "$AUR_ins lazydocker"
     else
-        if ! type curl &> /dev/null; then
-            if test $distro_base == 'Debian'; then
-                eval "$pac_ins curl"
-            elif test $distro_base == 'Arch'; then
-                eval "$pac_ins curl  "
-            fi
+        if ! type go &> /dev/null || [[ $(go version | awk '{print $3}' | cut -c 3-) < 1.19 ]]; then
+           if ! test -f install_go.sh; then
+                 tmp=$(mktemp) && wget -O $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_go.sh
+                ./$tmp 
+            else
+                ./install_go.sh
+            fi 
+            go install github.com/jesseduffield/lazydocker@latest 
         fi
-        curl https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh | bash
+        #if ! type curl &> /dev/null; then
+        #    if test $distro_base == 'Debian'; then
+        #        eval "$pac_ins curl"
+        #    elif test $distro_base == 'Arch'; then
+        #        eval "$pac_ins curl  "
+        #    fi
+        #fi
+        #curl https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh | bash
     fi
     lazydocker --version
     unset nstll
