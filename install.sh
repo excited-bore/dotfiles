@@ -665,7 +665,7 @@ pre='y'
 othr='n'
 color='GREEN'
 prmpt='[Y/n]: '
-if type bat &> /dev/null; then
+if type bat &> /dev/null || type batcat &> /dev/null; then
     pre='n' 
     othr='y'
     color='YELLOW'

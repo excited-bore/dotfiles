@@ -31,7 +31,7 @@ if ! type lazydocker &> /dev/null; then
     if test $distro_base == "Arch" && ! test -z "$AUR_ins"; then
         eval "$AUR_ins lazydocker"
     else
-        if ! type go &> /dev/null || [[ $(go version | awk '{print $3}' | cut -c 3-) < 1.19 ]]; then
+        if ! type go &> /dev/null || $(type go &> /dev/null && [[ $(go version | awk '{print $3}' | cut -c 3-) < 1.19 ]]); then
            if ! test -f install_go.sh; then
                  tmp=$(mktemp) && wget -O $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_go.sh
                 ./$tmp 

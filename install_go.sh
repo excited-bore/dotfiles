@@ -45,7 +45,7 @@ if ! type go &> /dev/null; then
             file="$latest.linux-$arch.tar.gz"
             
             checksum=$(curl -sL "https://golang.google.cn/dl/" | awk 'BEGIN{FS="\n"; RS=""} $0 ~ /'$file'/ &&  $0 ~ /<\/tt>/ {print $0;}' | grep "<tt>" | sed "s,.*<tt>\(.*\)</tt>.*,\1,g")
-            if [ ! -x "$(command -v go version)" ] || [[ ! "$(go version)" =~ $latest ]]; then
+            if ! type go &> /dev/null || ! [[ "$(go version)" =~ $latest ]]; then
                 wget -P $TMPDIR https://golang.google.cn/dl/$file
                 file=$TMPDIR/$file
                 sum=$(sha256sum $file | awk '{print $1;}')
