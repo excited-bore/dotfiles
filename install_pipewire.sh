@@ -87,7 +87,7 @@ fi
 # https://wiki.archlinux.org/title/PipeWire#Sound_does_not_automatically_switch_when_connecting_a_new_device
 if type systemctl &> /dev/null && ! test -f /etc/systemd/user/pipewire-load-switch-on-connect.service; then
     #printf "${CYAN}You should test first whether sounds autoswitches when connected${normal}\n"
-    reade -Q 'GREEN' -i 'y' -p "Create device-autoswitch on connect conf file? [Y/n]: " 'n' auto_s
+    reade -Q 'GREEN' -i 'y' -p "Create 'USB-audiodevice-autoswitch-on-connect' configuration file? [Y/n]: " 'n' auto_s
     if test $auto_s == 'y'; then
         mkdir -p ~/.config/pipewire/pipewire-pulse.conf.d/
         conf=~/.config/pipewire/pipewire-pulse.conf.d/switch-on-connect.conf
