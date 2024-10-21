@@ -61,7 +61,7 @@ if ! [ $int_r  == "n" ]; then
         fi
 
         if ! sudo grep -q "trap 'kill \$(jobs -p).*" /root/.bashrc; then 
-            printf "trap '! [ -z \"\$(jobs -p)\" ] && kill \"\$(jobs -p)\" $sig\n'" | sudo tee -a /root/.bashrc
+            printf "trap '! [ -z \"\$(jobs -p)\" ] && kill \"\$(jobs -p)\" $sig\n'" | sudo tee -a /root/.bashrc &> /dev/null
         else  
             sudo sed -i 's|trap '\''! \[ -z "$(jobs -p)" \] \&\& kill "$(jobs -p)"'\'' .*|trap '\''! [ -z "$(jobs -p)" \] \&\& kill "$(jobs -p)"'\'' '"$sig"'|g' /root/.bashrc 
         fi  
