@@ -63,7 +63,7 @@ if ! type go &> /dev/null; then
             fi
             sudo tar -C /usr/local -xzf $file
             export PATH=$PATH:/usr/local/go/bin 
-            sed -i 's|.export export PATH=$PATH:/usr/local/go/bin|export PATH=$PATH:/usr/local/go/bin|g' $ENVVAR
+            sed -i 's|.export PATH=$PATH:/usr/local/go/bin|export PATH=$PATH:/usr/local/go/bin|g' $ENVVAR
             rm $file
             #if grep -q "GOROOT" $ENVVAR; then
             #    sed -i "s|.export GOROOT=|export GOROOT=|g" $ENVVAR
