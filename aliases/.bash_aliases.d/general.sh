@@ -411,6 +411,9 @@ fi
 
 alias ip-adress="wget -qO - https://api.ipify.org; echo"
 
+alias list-kill-signals="kill -l"
+alias kill-signals="kill -l"
+
 # eur and us format date
 alias date-us='date "+%Y-%m-%d %A %T %Z"'
 alias date-eu='date "+%d-%m-%Y %A %T %Z"'

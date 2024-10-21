@@ -293,66 +293,6 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         ./install_aliases.sh
     fi
 fi
-
-
-pre='both'
-othr='exit intr n'
-color='GREEN'
-prmpt='[Both/exit/intr/n]: '
-
-echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for terminate background processes /root/.bashrc' "
-if grep -q 'trap ''kill $(jobs -p)' ~/.bashrc && sudo grep -q 'trap ''kill $(jobs -p)' /root/.bashrc; then
-    pre='n' 
-    othr='both exit intr'
-    color='YELLOW'
-    prmpt='[N/both/exit/intr]: '
-fi 
-
-reade -Q "$color" -i "$pre" -p "Send kill signal to background processes when exiting (Ctrl-q)/interrupting (Ctrl-c) for $USER? $prmpt" "$othr" int_r
-if ! [ $int_r  == "n" ]; then
-    if test $int_r == 'both'; then
-        sig='INT EXIT'  
-    elif test $int_r == 'exit'; then
-        sig='EXIT'  
-    elif test $int_r == 'intr'; then
-        sig='INT'  
-    fi
-    if ! grep -q 'trap ''kill $(jobs -p)' ~/.bashrc; then 
-        printf "trap 'kill \$(jobs -p) $sig " >> ~/.bashrc
-    else  
-        sed -i 's|trap '\''kill $(jobs -p)'\'' .*|trap '\''kill $(jobs -p)'\'' '"$sig"'|g' ~/.bashrc
-    fi 
-    
-    pre='same'
-    othr='both exit intr n'
-    color='GREEN'
-    prmpt='[Same/both/exit/intr/n]: '
-    echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for terminate background processes /root/.bashrc' "
-     
-    if grep -q 'trap ''kill $(jobs -p)' /root/.bashrc; then
-        pre='n' 
-        othr='same both exit intr'
-        color='YELLOW'
-        prmpt='[N/same/both/exit/intr]: '
-    fi 
-    reade -Q "$color" -i "$pre" -p "Send kill signal to background processes when exiting (Ctrl-q)/interrupting (Ctrl-c) for root? $prmpt" "$othr" int_r 
-    if ! [ $int_r  == "n" ]; then
-        if test $int_r == 'both'; then
-            sig='INT EXIT'  
-        elif test $int_r == 'exit'; then
-            sig='EXIT'  
-        elif test $int_r == 'intr'; then
-            sig='INT'  
-        fi
-
-        if ! sudo grep -q 'trap ''kill $(jobs -p)' /root/.bashrc; then 
-            printf "trap 'kill \$(jobs -p) $sig " | sudo tee -a /root/.bashrc
-        else  
-            sudo sed -i 's|trap '\''kill $(jobs -p)'\'' .*|trap '\''kill $(jobs -p)'\'' '"$sig"'|g' /root/.bashrc
-        fi  
-    fi     
-fi
-unset int_r sig
 source ~/.bashrc
 
 

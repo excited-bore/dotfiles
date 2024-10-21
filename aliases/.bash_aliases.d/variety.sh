@@ -84,14 +84,14 @@ fi
 
 
 if type exiftool &> /dev/null; then
-    alias exiftool-folder="exiftool -r -all=$(pwd)"
+    alias exiftool-folder="exiftool -r -all= $(pwd)"
     function exiftool-add-cron-wipe-all-metadata-rec-dir(){
         reade -Q 'GREEN' -i '0,5,10,15,25,30,35,40,45,5,55' -p 'Minutes? (0-59): ' '0 5 10 15 25 30 35 40 45 50 55' min
         reade -Q 'GREEN' -p "Dir?: " -e dir
-        (crontab -l; echo "0,5,10,15,25,30,35,40,45,5,55 * * * * exiftool -r -all=$dir") | sort -u | crontab -; crontab -l 
+        (crontab -l; echo "0,5,10,15,25,30,35,40,45,5,55 * * * * exiftool -r -all= $dir") | sort -u | crontab -; crontab -l 
         unset min dir 
     } 
-    alias exiftool-add-cron-wipe-all-metadata-rec-picture-dir="(crontab -l; echo '0,5,10,15,25,30,35,40,45,5,55 * * * * exiftool -r -all=$HOME/Pictures') | sort -u | crontab -; crontab -l"
+    alias exiftool-add-cron-wipe-all-metadata-rec-picture-dir="(crontab -l; echo '0,5,10,15,25,30,35,40,45,5,55 * * * * exiftool -r -all= $HOME/Pictures') | sort -u | crontab -; crontab -l"
 fi
 
 if type lazygit &> /dev/null && type copy-to &> /dev/null; then

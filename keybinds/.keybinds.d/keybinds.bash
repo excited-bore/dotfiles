@@ -52,7 +52,7 @@ X11_WAY="$(loginctl show-session $(awk '/tty/ {print $1}' <(loginctl)) -p Type |
 #fi
 
 # Set Shift delete to backspace
-# xmodmap -e "keycode 119 = Delete BackSpace"     
+xmodmap -e "keycode 119 = Delete BackSpace"     
 
 # READLINE
 

@@ -67,6 +67,10 @@ if type pipewire &> /dev/null; then
     unset servs 
 fi
 
+if type fzf &> /dev/null; then
+    alias systemctl-fzf-running-units='systemctl --no-pager --state running | head -n -6 |  fzf --ansi'
+fi
+
 system-service-start(){
     sudo systemctl start $@; 
      systemctl status $@;
