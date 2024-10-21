@@ -25,7 +25,7 @@ fi
 if test -z $SYSTEM_UPDATED; then
     reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y" updatesysm
     if test $updatesysm == "y"; then
-        update-system                     
+        update-system 
     fi
 fi 
 

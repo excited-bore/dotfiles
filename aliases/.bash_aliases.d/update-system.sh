@@ -206,6 +206,8 @@ function update-system() {
             fi
         fi
         unset dev_up
+        
     fi
+    export SYSTEM_UPDATED=TRUE
 }
 
