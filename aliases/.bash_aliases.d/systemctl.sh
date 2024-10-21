@@ -9,16 +9,71 @@ alias service-system-list-files="sudo systemctl list-unit-files"
 alias service-user-list-files="systemctl --user list-unit-files"
 alias service-systemd-restart="sudo systemctl restart"
 
-alias restart-display="sudo systemctl restart display-manager"  
 alias bios="systemctl reboot --firmware-setup"
 
+alias restart-network="systemctl restart NetworkManager"  
+alias status-network="systemctl status NetworkManager"  
+
+alias restart-bluetooth="systemctl restart bluetooth.target"
+alias status-bluetooth="systemctl status bluetooth.target"
+
+alias restart-display="sudo systemctl restart display-manager"  
+alias status-display="sudo systemctl status display-manager"  
+
+if type tor &> /dev/null; then
+    servs="tor" 
+    alias stop-tor="sudo systemctl stop  $servs"
+    alias start-tor="sudo systemctl start  $servs"
+    alias enable-tor="sudo systemctl enable  $servs"
+    alias disable-tor="sudo systemctl disable  $servs"
+    alias enable-now-tor="sudo systemctl enable --now $servs"
+    alias disable-now-tor="sudo systemctl disable --now  $servs"
+    alias restart-tor="sudo systemctl restart  $servs"
+    alias status-tor-service="sudo systemctl status $servs"
+    unset servs 
+fi
+
+if type docker &> /dev/null; then
+    servs="docker" 
+    alias stop-docker="sudo systemctl stop  $servs"
+    alias start-docker="sudo systemctl start  $servs"
+    alias restart-docker="sudo systemctl restart  $servs"
+    alias disable-docker="sudo systemctl disable  $servs"
+    alias enable-docker="sudo systemctl enable  $servs"
+    alias enable-now-docker="sudo systemctl enable --now $servs"
+    alias disable-now-docker="sudo systemctl disable --now  $servs"
+    alias status-docker-service="sudo systemctl status $servs"
+    unset servs 
+fi
+
+
 if type pipewire &> /dev/null; then
-    alias restart-pipewire="systemctl restart --user pipewire"
+    servs="pipewire" 
+    if type wireplumber &> /dev/null; then
+        servs=$servs" wireplumber" 
+    fi
+    if type pipewire-pulse &> /dev/null; then
+        servs=$servs" pipewire-pulse" 
+    fi
+    alias stop-pipewire="systemctl stop --user $servs"
+    alias start-pipewire="systemctl start --user $servs"
+    alias restart-pipewire="systemctl restart --user $servs"
+    alias status-pipewire="systemctl status --user $servs"
+    alias disable-pipewire="systemctl disable --user  $servs"
+    alias enable-pipewire="systemctl enable --user  $servs"
+    alias enable-now-pipewire="systemctl enable --user --now $servs"
+    alias disable-now-pipewire="systemctl disable --user --now  $servs"
+
+    unset servs 
+fi
+
+if type fzf &> /dev/null; then
+    alias systemctl-fzf-running-units='systemctl --no-pager --state running | head -n -6 |  fzf --ansi'
 fi
 
 system-service-start(){
     sudo systemctl start $@; 
-    sudo systemctl status $@;
+     systemctl status $@;
 }
 
 _system-service-start(){

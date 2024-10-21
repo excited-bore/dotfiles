@@ -34,8 +34,10 @@ if ! type pyenv &> /dev/null; then
         brew install pyenv 
     elif test "$distro_base" == "Arch"; then
         eval "$pac_ins pyenv"
-    elif [ $distro_base == "Debian" ]; then
-        eval "$pac_ins pyenv                 "
+    elif [ $distro_base == "Debian" ] && ! test -z "$(apt search pyenv 2> /dev/null)"; then
+        eval "$pac_ins pyenv"
+    else
+        curl https://pyenv.run | bash
     fi 
 fi
 
