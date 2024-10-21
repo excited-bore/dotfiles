@@ -61,7 +61,9 @@ if ! type go &> /dev/null; then
             if ! type tar &> /dev/null; then
                 eval "$pac_ins tar" 
             fi
-            sudo tar -C /usr/bin -xzf $file
+            sudo tar -C /usr/local -xzf $file
+            export PATH=$PATH:/usr/local/go/bin 
+            sed -i 's|.export export PATH=$PATH:/usr/local/go/bin|export PATH=$PATH:/usr/local/go/bin|g' $ENVVAR
             rm $file
             #if grep -q "GOROOT" $ENVVAR; then
             #    sed -i "s|.export GOROOT=|export GOROOT=|g" $ENVVAR
