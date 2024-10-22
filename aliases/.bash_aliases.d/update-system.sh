@@ -88,7 +88,7 @@ function update-system() {
         if apt --dry-run autoremove 2> /dev/null | grep -Po '^Remv \K[^ ]+'; then
             reade -Q 'GREEN' -i 'y' -p 'Autoremove unneccesary packages? [Y/n]: '  'n' remove
             if test $remove == 'y'; then
-                sudo "$pac" -y autoremove
+                yes | sudo "$pac" autoremove
             fi
         fi
     elif test "$pac" == "apk"; then

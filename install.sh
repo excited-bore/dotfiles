@@ -28,7 +28,7 @@ if ! type update-system &> /dev/null; then
 fi
 
 if test -z $SYSTEM_UPDATED; then
-    reade -Q "CYAN" -i "y" -p "Update system? [Y/n]: " "n" updatesysm
+    reade -Q "CYAN" -i "y" -p  "Update system? [Y/n]: " "n" updatesysm
     if test $updatesysm == "y"; then
         update-system                     
     fi
@@ -183,7 +183,7 @@ if test $distro_base == 'Debian'; then
         fi
 
         if ! type ppa-purge &> /dev/null && ! test -z "$(apt search ppa-purge 2> /dev/null | awk 'NR>2{print;}')"; then
-            printf "${CYAN}ppa-purge${normal} is not installed (cmd tool for removing ppa repositories)\n"
+            printf "${CYAN}ppa-purge${normal} is not installed (cmd tool for disabling installed PPA's)\n"
             reade -Q 'GREEN' -i 'y' -p "Install ppa-purge? [Y/n]: " 'n' ppa_ins
             if test $ppa_ins == 'y'; then
                 eval "yes | $pac_ins ppa-purge"
