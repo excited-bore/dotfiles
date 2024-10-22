@@ -127,7 +127,9 @@ if type rg &> /dev/null; then
             echo "  - the replacement"
             return 1
         fi
-        rg "$1" --multiline --color=never --files-with-matches | xargs sed -i "s/$1/$2/g"
+        printf 'Replacing '"${CYAN}$1${normal}"' with '"${YELLOW}$2${normal}""\n" 
+        rg "$1" --multiline --files-with-matches 
+        rg "$1" --multiline --color=never --files-with-matches | xargs sed -i 's|'"$1"'|'"$2"'|g'
     }
 fi
 

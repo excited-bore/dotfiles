@@ -20,6 +20,19 @@ alias status-bluetooth="systemctl status bluetooth.target"
 alias restart-display="sudo systemctl restart display-manager"  
 alias status-display="sudo systemctl status display-manager"  
 
+if type samba &> /dev/null; then
+    servs="smbd nmbd" 
+    alias stop-samba="sudo systemctl stop $servs"
+    alias start-samba="sudo systemctl start $servs"
+    alias enable-samba="sudo systemctl enable $servs"
+    alias disable-samba="sudo systemctl disable $servs"
+    alias enable-now-samba="sudo systemctl enable --now $servs"
+    alias disable-now-samba="sudo systemctl disable --now $servs"
+    alias restart-samba="sudo systemctl restart $servs"
+    alias status-samba-service="sudo systemctl status $servs"
+    unset servs 
+fi
+
 if type tor &> /dev/null; then
     servs="tor" 
     alias stop-tor="sudo systemctl stop  $servs"
