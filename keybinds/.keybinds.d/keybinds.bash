@@ -176,7 +176,7 @@ bind -m emacs-standard  '"\e[1;2C": forward-word'
 bind -m vi-command      '"\e[1;2C": forward-word'
 bind -m vi-insert       '"\e[1;2C": forward-word'
 
-alias __='clear && tput cup $(($LINE_TPUT+1)) $TPUT_COL && tput sc 1 && tput cuu1 && echo "${PS1@P}" && tput cuu1'
+alias __='clear && tput cup $(($LINE_TPUT+1)) $TPUT_COL && tput sc && tput cuu1 && echo "${PS1@P}" && tput cuu1'
 
 # Shift up => Clean reset
 #bind -x '"\e288": "cd \C-i"'
