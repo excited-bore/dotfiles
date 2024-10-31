@@ -23,7 +23,7 @@ if ! type update-system &> /dev/null; then
 fi
 
 if test -z $SYSTEM_UPDATED; then
-    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "y" updatesysm
+    reade -Q "CYAN" -i "y" -p "Update system? [Y/n]: " "n" updatesysm
     if test $updatesysm == "y"; then
         update-system                     
     fi
@@ -63,7 +63,7 @@ mkdir -p ~/.config/wireplumber/wireplumber.conf.d/
 
 if echo $(wpctl status) | grep -q 'HMDI'; then
     reade -Q 'GREEN' -i 'y' -p "Unlist all HDMI audio devices from pipewire? [Y/n]: " 'n' unlst_hdmi
-    if test $unlst_hdmi == 'y'; then
+    if test "$unlst_hdmi" == 'y'; then
         hdmi_f="$HOME/.config/wireplumber/wireplumber.conf.d/51-HDMI-disable.conf"  
         touch hdmi_f 
         printf "monitor.alsa.rules = [
@@ -87,7 +87,7 @@ fi
 # https://wiki.archlinux.org/title/PipeWire#Sound_does_not_automatically_switch_when_connecting_a_new_device
 if type systemctl &> /dev/null && ! test -f /etc/systemd/user/pipewire-load-switch-on-connect.service; then
     #printf "${CYAN}You should test first whether sounds autoswitches when connected${normal}\n"
-    reade -Q 'GREEN' -i 'y' -p "Create device-autoswitch on connect conf file? [Y/n]: " 'n' auto_s
+    reade -Q 'GREEN' -i 'y' -p "Create 'USB-audiodevice-autoswitch-on-connect' configuration file? [Y/n]: " 'n' auto_s
     if test $auto_s == 'y'; then
         mkdir -p ~/.config/pipewire/pipewire-pulse.conf.d/
         conf=~/.config/pipewire/pipewire-pulse.conf.d/switch-on-connect.conf
@@ -140,7 +140,7 @@ if type systemctl &> /dev/null && ! test -f /etc/systemd/user/pipewire-load-swit
     #    #fi
     #    #printf "Added pipewire conf at:\n~/.config/pipewire/pipewire-pulse.conf.d\n/etc/pipewire/pipewire.conf.d/\n$servFile\n"
     #    #printf "Added pipewire conf at: \n~/.config/pipewire/pipewire-pulse.conf.d\n /etc/pipewire/pipewire.conf.d/\n $servFile\n /etc/pulse/default.pa\n"
-    #fi 
+    fi 
 fi
 
 if ! test -f $HOME/.config/wireplumber/wireplumber.conf.d/51-dualshock4-disable.conf; then
@@ -176,11 +176,11 @@ if ! test -f $HOME/.config/wireplumber/wireplumber.conf.d/51-disable-suspension.
     matches = [
       {
         # Matches all sources
-        node.name = "~alsa_input.*"
+        node.name = \"~alsa_input.*\"
       },
       {
         # Matches all sinks
-        node.name = "~alsa_output.*"
+        node.name = \"~alsa_output.*\"
       }
     ]
     actions = {
@@ -196,11 +196,11 @@ monitor.bluez.rules = [
     matches = [
       {
         # Matches all sources
-        node.name = "~bluez_input.*"
+        node.name = \"~bluez_input.*\"
       },
       {
         # Matches all sinks
-        node.name = "~bluez_output.*"
+        node.name = \"~bluez_output.*\"
       }
     ]
     actions = {
@@ -210,6 +210,7 @@ monitor.bluez.rules = [
     }
   }
 ]" > $dis_node_f 
+    fi 
 fi
 
 

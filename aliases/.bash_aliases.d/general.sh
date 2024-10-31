@@ -211,7 +211,7 @@ function cp-trash(){
     fi
 }
 
-alias cp="cp-trash -rv"
+#alias cp="cp-trash -rv"
 
 # mv (recursively native) verbose and only ask for interaction when overwriting newer files
 
@@ -274,19 +274,17 @@ function mv-trash(){
 } 
 
 
-alias mv="mv-trash -v"
+#alias mv="mv-trash -v"
 
 
 # rm recursively and verbose
 
-alias rm="rm -rv"
+alias rm="rm --verbose -r --interactive=once"
 shred_iterates=3
 alias rm-shred="shred -vzn $shred_iterates -u"
 #alias remove="rm"
 alias rm-all-folder="rm -rv ./*";
 alias rm-all-hidden="rm -rv .[!.]* *";
-
-#alias rm="gio trash"
 
 # With parent directories and verbose
 alias mkdir="mkdir -pv"

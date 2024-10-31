@@ -5,10 +5,13 @@ fi
 
 user="burp"
 user1=
+user2="root"
 ip="192.168.0.140"
 ip1=
+ip2="139.162.150.36"
 ssh_file="~/.ssh/id_ed25519"
 ssh_file1="~/.ssh/id_rsa1"
+ssh_file2="~/.ssh/minecraft_ti"
 
 # To prevent 'failed to preserve ownership' errors
 copy_sshfs(){ cp -r --no-preserve=mode "$1" "$2"; }
@@ -36,6 +39,7 @@ addr=$(nmcli device show | grep IP4.ADDR | awk 'NR==1{print $2}'| sed 's|\(.*\)/
 #Server access
 alias serber="ssh -XY -i $ssh_file $user@$ip"
 alias serber1="ssh -XY -p 4000 -i $ssh_file1 $user1@$ip1"
+alias minecraft_ti="ssh -XY -i $ssh_file2 $user2@$ip2"
 alias serber_unmnt="fusermount3 -u /mnt/mount1/"
 alias serber_unmnt1="fusermount3 -u /mnt/mount2/"
 
