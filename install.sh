@@ -252,6 +252,28 @@ else
 fi
 
 
+# Rm prompt
+pre='y'
+othr='n'
+color='GREEN'
+prmpt='[Y/n]: '
+if type rm-prompt &> /dev/null; then
+    pre='n' 
+    othr='y'
+    color='YELLOW'
+    prmpt='[N/y]: '
+fi
+
+reade -Q "GREEN" -i "y" -p "Install rm-prompt? (Rm but lists files/directories before deletion) [Y/n]: " "n" rmp
+if [ -z "$rmp" ] || [ "y" == "$rmp" ]; then
+    if ! test -f install_rmprompt.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_rmprompt.sh)" 
+    else
+        ./install_rmprompt.sh
+    fi 
+fi
+unset rmp
+
 # Bash alias completions
 
 if ! test -f ~/.bash_completion.d/complete_alias || ! test -f /root/.bash_completion.d/complete_alias; then
@@ -267,6 +289,7 @@ if ! test -f ~/.bash_completion.d/complete_alias || ! test -f /root/.bash_comple
 fi
 
 # Python completions
+
 if ! type activate-global-python-argcomplete &> /dev/null; then
     reade -Q "GREEN" -i "y" -p "Install python completions in ~/.bash_completion.d? [Y/n]: " "n" pycomp
     if [ -z $pycomp ] || [ "y" == $pycomp ]; then
@@ -302,11 +325,10 @@ source ~/.bashrc
 binds=keybinds/.inputrc
 binds1=keybinds/.keybinds.d/keybinds.bash
 binds2=keybinds/.keybinds
-if ! test -f keybinds/.inputrc; then
+if ! test -f $binds; then
     tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.inputrc
     tmp1=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds.d/keybinds.bash 
     tmp2=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds 
-    
     binds=$tmp
     binds1=$tmp1
     binds2=$tmp2

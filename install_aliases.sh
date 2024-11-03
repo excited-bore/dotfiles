@@ -105,28 +105,39 @@ if test $ansr == "y"; then
 
     reade -Q "GREEN" -i "y" -p "Set to rm (remove) to always be verbose? [Y/n]: " "n" rm_verb
      
-    prompt="${green}Set rm (remove) to:
-    - ${bold}Always give a prompt once before removing${normal}${green} and recursively look for files inside given directories to remove?
-    - Only give a prompt once?
+    prompt="${green}    - Force copy, recursively delete given directories (enable deletion of direction without deleting every file in directory first) and ${bold}always give at least one prompt before removing?${normal}${green}
+    - Force copy, ${YELLOW}don't${normal}${green} recursively look for files and give a prompt not always, but if removing 3 or more files/folder?
     - Recursively look without a prompt?${normal}\n" 
-    prompt2="Rm = [Recur_prompt/none/prompt/recur]: "       
+    prompt2="Rm = [Recur-prompt/none/prompt/recur"       
+    pre="recur-prompt" 
     ansrs="none prompt recur" 
 
+    if type rm-prompt &> /dev/null; then 
+        prompt="${GREEN}    - Alias 'rm' to use 'rm-prompt' which lists all files and directories before removing them ${normal}\n$prompt"
+        prompt2="Rm = [Rm-prompt/recur-prompt/none/prompt/recur"       
+        pre="rm-prompt" 
+        ansrs="recur-prompt none prompt recur " 
+    fi 
+    
     if type gio &> /dev/null; then 
         prompt="$prompt${green}    - Don't use 'rm' but use 'gio trash' to trash files (leaving a copy in ${cyan}trash:///${green} after 'removing')${normal}\n"
-        prompt2="Rm = [Recur_prompt/none/prompt/recur/trash]: "       
+        prompt2="$prompt2/trash]: "       
         ansrs="none prompt recur trash" 
+    else  
+        prompt2="$prompt2]: "       
     fi 
 
-    printf "$prompt" 
-    reade -Q "GREEN" -i "recur_prompt" -p "$prompt2" "$ansrs" ansr 
+    printf "${CYAN}Set rm (remove) to:\n$prompt" 
+    reade -Q "GREEN" -i "$pre" -p "$prompt2" "$ansrs" ansr 
     if $([ "$ansr" == "none" ] || [ -z "$ansr" ]) && test "$rm_verb" == 'n'; then
         sed -i 's|^alias rm="|#alias rm="|g' $genr
     else
         test $rm_verb == 'y' && verb='--verbose'
         if [ "$ansr" == "none" ] || [ -z "$ansr" ]; then 
             sed -i 's|.*alias rm=".*|alias rm="rm --verbose"|' $genr
-        elif [ "$ansr" == "recur_prompt" ] || [ "$ansr" == "Recur_prompt" ]; then
+        elif [ "$ansr" == "rm-prompt" ] || [ "$ansr" == "Rm-prompt" ]; then
+            sed -i 's|.*alias rm=".*|alias rm="rm-prompt"|' $genr
+        elif [ "$ansr" == "recur-prompt" ] || [ "$ansr" == "Recur-prompt" ]; then
             sed -i 's|.*alias rm=".*|alias rm="rm '$verb' -r --interactive=once"|' $genr
         elif [ "$ansr" == "prompt" ]; then
             sed -i 's|.*alias rm=".*|alias rm="rm '$verb' --interactive=once"|g' $genr
