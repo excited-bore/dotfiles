@@ -295,7 +295,7 @@ if type pacman &> /dev/null; then
 
     if type perl &> /dev/null && type zcat &> /dev/null && ! test -f $HOME/.cache/AUR/packages-meta-ext-v1.json.extracted.txt; then
         # https://stackoverflow.com/questions/50596286/how-to-programmably-get-the-metadata-of-all-packages-available-from-aur-in-archl 
-        zcat <(curl  https://aur.archlinux.org/packages-meta-ext-v1.json.gz) | jq --compact-output '.[] | {Name, Version, Description, Keywords, PackageBase, URL, Popularity, OutOfDate, Maintainer, FirstSubmitted, LastModified, Depends, MakeDepends, License}' | perl -pe 's/^\{\"|\"?,"(?![^:]+\])/\n/g' | perl -pe 's/\\(?=")|\"(?=:)|:\K\[?\"\[?\"?|\"?\]\}?$//gm' | perl -pe 's/\",\" ?/ /gm' | perl -pe 's/^([^:]+)(:)(.*)$/$1                    $2 $3/gm' | perl -pe 's/^.{16}\K +//gm' | perl -0777 -pe 's/\n+(?=Name)/\n\n\nRepository      : AUR\n/gm' $HOME/.cache/AUR/packages-meta-ext-v1.json.extracted.txt
+        zcat <(curl -sSL https://aur.archlinux.org/packages-meta-ext-v1.json.gz) | jq --compact-output '.[] | {Name, Version, Description, Keywords, PackageBase, URL, Popularity, OutOfDate, Maintainer, FirstSubmitted, LastModified, Depends, MakeDepends, License}' | perl -pe 's/^\{\"|\"?,"(?![^:]+\])/\n/g' | perl -pe 's/\\(?=")|\"(?=:)|:\K\[?\"\[?\"?|\"?\]\}?$//gm' | perl -pe 's/\",\" ?/ /gm' | perl -pe 's/^([^:]+)(:)(.*)$/$1                    $2 $3/gm' | perl -pe 's/^.{16}\K +//gm' | perl -0777 -pe 's/\n+(?=Name)/\n\n\nRepository      : AUR\n/gm' $HOME/.cache/AUR/packages-meta-ext-v1.json.extracted.txt
 
     fi
 
@@ -324,7 +324,8 @@ if type pacman &> /dev/null; then
                         pamac install $packages
                     elif test "$reslt" == "Install dependencies"; then 
                        for i in $packages; do 
-                           depends="$(cat $HOME/.cache/AUR/packages-meta-ext-v1.json.extracted.txt | awk '/'"$i"'/ { found_hotspot = 1; next; } /Depends/ && found_hotspot { print $0; found_hotspot = 0;}' | awk 'NR==1{$1=$2=""; print $0 }' | awk '{$1=$1};1')" 
+                           depends="$(cat $HOME/.cache/AUR/packages-meta-ext-v1.json.extracted.txt | awk '/'"$i"'/ { found_deps = 1; next; } /Depends/ && found_deps { print $0; found_deps = 0;}' | awk 'NR==1{$1=$2=""; print $0 }' | awk '{$1=$1};1')" 
+                           #depends="$(cat $HOME/.cache/AUR/packages-meta-ext-v1.json.extracted.txt | awk '/'"$i"'/ { found_deps = 1; next; } /Depends/ {print $0; next;} /MakeDepends/ {print $0; next;} /License/ && found_deps { found_deps = 0;}' | awk 'NR==1{$1=$2=""; print $0 }' | awk '{$1=$1};1')" 
                         done; 
                         pamac install $depends 
                    fi 
