@@ -1,12 +1,4 @@
-# https://stackoverflow.com/questions/5412761/using-colors-with-printf
-# Execute (during printf) for colored prompt
-# printf  "${blue}This text is blue${white}\n"
-function compare-tput-escape_color(){
-    for (( ansi=0; ansi <= 120; ansi++)); do
-        printf "$ansi $(tput setaf $ansi) tput foreground $(tput sgr0) $(tput setab $ansi) tput background $(tput sgr0)"; echo -e " \033[$ansi;mEscape\033[0m"
-    done | $PAGER
-    unset ansi
-}
+#!/bin/bash
 
 red=$(tput setaf 1)
 red1=$(tput setaf 9)
@@ -188,91 +180,83 @@ reade(){
         done
         OPTIND=1;
         value=$(eval $rlwstring);
-        eval "${@:$#:1}=$value" && command rm $tmpf &> /dev/null;
+        eval "${@:$#:1}=$value" && rm $tmpf &> /dev/null;
     fi
     unset bash_rlwrap 
 }
 
+function rm-prompt(){
+    while :; do
+       case "$1" in
+          -h|-\?|--help)  
+               printf "Remove and prompt items to remove (using a pager and reade)\n   -h : Show this explanation on screen\n"
+               exit 
+               ;;
+          --)              # End of all options.
+              break
+              ;;
+          *)               # Default case: No more options, so break out of the loop.
+              break 
+       esac
+    done  
+    if test -z $RMPROMPT_RM_OPT; then
+        RMPROMPT_RM_OPT='-rv' 
+    fi
+    if test -z "$RMPROMPT_LS_CMD"; then
+        RMPROMPT_LS_CMD='ls -ARh --color=always' 
+    fi
+    if test -z "$RMPROMPT_LS_DIR_CMD"; then
+        RMPROMPT_LS_DIR_CMD="$RMPROMPT_LS_CMD" 
+    fi
+    if test -z $RMPROMPT_PAGER; then
+        RMPROMPT_PAGER=$PAGER 
+    fi
+    if test "$RMPROMPT_NOPAGER" == 1; then  
+        RMPROMPT_PAGER=cat 
+    fi
 
-#reade -p "Usb ids" $(sudo lsusb | awk 'BEGIN { FS = ":" };{print $1;}')
+    local symlinks=0 
+    local files=0 
+    local dirss=0
+    local exitmeyesplease=0 
+    for itm in $(echo $@ | sort -u); do
+        if ! test -e "$itm" && ! test -L "$itm"; then
+           printf "${red}$itm does not exist\n"
+           break && exit 1
+       elif test -L "$itm"; then
+           symlinks="$(($symlinks + 1))"      
+       elif test -d "$itm"; then
+           dirss=$(($dirss + $(ls -AR $itm | grep --color=none ':' | cut -d: -f-1 | wc -w)))
+           files="$(($files + $(find $itm -type f | wc -w)))"  
+        else
+            files="$(($files + 1))"
+        fi
+    done 
 
-function yes_edit_no(){
-    if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ]; then
-        printf "Needs 3 parameters.\n 1) Function with commands if yes\n 2) File to edit\n 3) prompt (adds [y/n/e]: afterwards) \n (4) Default \"yes\",\"edit\",\"no\")\n (5) Optional - Colour)\n";
-        return 0;
-    else
-        pass="";
-        clr="";
-        pre="y"
-        choices="e n"
-        deflt=" [Y/e/n]: "; 
-        prompt="$3$deflt";
-        if [ "$4" == "edit" ]; then
-            pre="e"
-            choices="y n"
-            deflt=" [y/E/n]: ";
-            prompt="$3$deflt";
-        elif [ "$4" == "no" ]; then
-            pre="n"
-            choices="y e"
-            deflt=" [y/e/N]: ";
-            prompt="$3$deflt";
-        fi
-        if [ ! -z "$5" ]; then
-            clr="-Q $5"
-        fi
-        
-        reade $clr -i "$pre" -p "$prompt" "$choices" pass;
-        
-        #Undercase only
-        pass=$(echo "$pass" | tr '[:upper:]' '[:lower:]')
+    for itm in $(echo $@ | sort -u); do
+       if test -d "$itm"; then
+           eval "$RMPROMPT_LS_DIR_CMD -- \"$itm\"" 
+       else
+           eval "$RMPROMPT_LS_CMD -- \"$itm\"" 
+       fi
+    done | $RMPROMPT_PAGER  
 
-        if [ -z "$pass" ]; then
-            pass="$pre";
-        fi
-        
-        if [ "$pass" == "y" ]; then
-           $1; 
-        elif [ "$pass" == "e" ]; then
-            str=($2);
-            for i in "${str[@]}"; do
-                "$EDITOR" "$i";
-            done;
-            deflt=" [y/N]: "
-            pre="n"
-            prompt="$3$deflt";
-            reade $clr -i "$pre" -p "$prompt" "y n" pass2;
-            if [ "$pass2" == "y" ]; then
-                $1;
-            fi
+    [[ $files > 0 ]] && files="${RED}$files${YELLOW}" || files="${CYAN}$files${YELLOW}" 
+    [[ $symlinks > 0 ]] && symlinks="${RED}$symlinks${YELLOW}" || symlinks="${CYAN}$symlinks${YELLOW}"
+    [[ $dirss > 0 ]] && dirss="${RED}$dirss${YELLOW}" || dirss="${CYAN}$dirss${YELLOW}" 
+    
+    if [[ $files > 0 ]] || [[ $symlinks > 0 ]] || [[ $dirss > 0 ]]; then
+        reade -Q 'YELLOW' -i 'y' -p "Remove all $symlinks symlink(s), $files file(s) and all $dirss directory(s)? [Y/n]: " 'n' rm_stff
+        if test "$rm_stff" == 'y'; then
+            command rm $RMPROMPT_RM_OPT -- "$@" 
         fi
     fi
+    unset rm_stff dirss files i itm
 }
 
-function yes_no(){
-    if [ -z "$1" ] || [ -z "$2" ]; then
-        printf "Needs 3 parameters.\n 1) String with commands if yes\n 2) prompt (adds [y/n]: afterwards) \n(3) Default \"yes\",\"no\")\n(4) Optional - Colour)\n";
-        return 0;
-    else
-        pass="";
-        clr="";
-        pre="y"
-        deflt=" [Y/n]: "; 
-        prompt="$2$deflt";
-        if [ "$3" == "no" ]; then
-            pre="n"
-            deflt=" [y/N]: ";
-        fi
-        if [ ! -z "$4" ]; then
-            clr="-Q $4"
-        fi
-        reade $clr -i "$pre" -p "$prompt" " y e n" pass;
-        
-        #Undercase only
-        pass=$(echo "$pass" | tr '[:upper:]' '[:lower:]')
-        
-        if [ "$pass" == "y" ]; then
-           $1; 
-        fi
-    fi
-} 
+if ! test -z "$@" &> /dev/null; then
+    rm-prompt "$@"
+else
+    printf "${RED}Please give up at least 1 file or directory as argument${normal}\n"
+    exit 1
+fi

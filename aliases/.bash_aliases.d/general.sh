@@ -42,7 +42,7 @@ fi
 
 # cp recursively, verbose ()
 # cpOld same but no files older are overwritten
-alias cp="cp -rv"
+alias cp="xcp --glob  --recursive  --verbose   --dereference  --"
 alias cp-old="cp -ruv"
 alias copy="cp"
 
@@ -211,7 +211,7 @@ function cp-trash(){
     fi
 }
 
-#alias cp="cp-trash -rv"
+alias cp="xcp --glob  --recursive  --verbose   --dereference  --"
 
 # mv (recursively native) verbose and only ask for interaction when overwriting newer files
 
@@ -274,12 +274,12 @@ function mv-trash(){
 } 
 
 
-#alias mv="mv-trash -v"
+alias mv="mv-trash -v"
 
 
 # rm recursively and verbose
 
-alias rm="rm --verbose -r --interactive=once"
+alias rm="rm-prompt"
 shred_iterates=3
 alias rm-shred="shred -vzn $shred_iterates -u"
 #alias remove="rm"
@@ -290,7 +290,7 @@ alias rm-all-hidden="rm -rv .[!.]* *";
 alias mkdir="mkdir -pv"
 
 #Always output colours for ls, grep and variants
-alias ls="ls --color=always"
+alias ls="eza --header --color=always --icons"
 alias grep='grep --colour=always'
 alias egrep='egrep --colour=always'
 alias fgrep='fgrep --colour=always'
