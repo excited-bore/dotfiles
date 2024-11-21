@@ -15,7 +15,7 @@ if test -z "$distro"; then
 fi
 
 if type pamac &> /dev/null && grep -q '#EnableAUR' /etc/pamac.conf; then
-    if ! test -f checks/check_pamac.sh; then
+    if ! test -f checks/clheck_pamac.sh; then
          eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pamac.sh)" 
     else
         . ./checks/check_pamac.sh
@@ -24,6 +24,70 @@ fi
 
 # https://www.explainxkcd.com/wiki/index.php/1654:_Universal_Install_Script
 function update-system() {
+    unset YES 
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+        -h|-\?|--help)  
+        printf "System updater using *most* known packagemanagers.\n
+    Includes: 
+    ${CYAN}Windows${cyan}
+        - winget 
+    ${WHITE1}MacOs${white}
+        - softwareupdate
+        - (home)brew
+    ${GREEN}Linux${green}
+        - apt 
+        - nala
+        - pacman 
+            ${GREEN1}AUR-helpers${green1}
+            - yay
+            - pamac
+            - pikaur 
+            - pacaur 
+            - aura 
+            - aurman 
+            - auracle
+            - pakku
+            - paru
+            - trizen 
+        - dnf
+        - yum
+        - nix profile + nix-env
+        - zypper 
+        - apk
+    ${MAGENTA}Variety${magenta}
+        - flatpak
+        - snap
+    It will also suggest:
+        - To install brew if on MacOs and not installed
+        - To autoremove unnecessary packages if using an apt-based system
+        - To activate automatic timesync for timedatectl if it is not set
+        - The right linux kernel headers if they aren't installed yet
+        (for now only supported for apt and pacman)
+        - Refresh gpg keys if gpg is installed
+        - Update using (some) language packagemanagers:
+          Supports
+          - npm
+          - pipx
+          - cargo
+          - gem\n\n
+    -h / --help : Show this help message and exit\n"
+            exit
+            ;;
+            -y|--yes)
+              YES="yes | "
+              shift # past value
+              ;;
+            -*|--*)
+              echo "Unknown option $1"
+              exit 1
+              ;;
+            *)
+              break
+              ;;
+          esac
+        done
+         
     if type timedatectl &> /dev/null && ! test "$(timedatectl show | grep ^NTP | head -n 1 | awk 'BEGIN { FS = "=" } ; {print $2}')" == "yes"; then 
         reade -Q "GREEN" -i "y" -p "Timedate NTP not set (Automatic timesync). This can cause issues with syncing to repositories. Activate it? [Y/n]: " "n" set_ntp
         if [ "$set_ntp" == "y" ]; then
@@ -33,7 +97,7 @@ function update-system() {
     fi
 
     if test $machine == 'Mac' && ! type brew &> /dev/null; then
-        printf "${GREEN}Homebrew is a commandline package manager (like the Appstore) thatworks as an opensource alternative to the Appstore\nGui applications are available for it as well\n${normal}"
+        printf "${GREEN}Homebrew is a commandline package manager (like the Appstore) that works as an opensource alternative to the Appstore\nGui applications are available for it as well\n${normal}"
         reade -Q 'CYAN' -i 'y' -p 'Install brew? [Y/n]: ' 'n' brew
         if test $brew == 'y'; then
             if ! test -f install_brew.sh; then
@@ -73,10 +137,20 @@ function update-system() {
         sudo softwareupdate -i -a
         if type brew &> /dev/null; then
             pac=brew       
-            brew upgrade 
+            if type yes &> /dev/null && ! test -z "$YES" ;then
+                yes | brew update  
+                yes | brew upgrade 
+            else
+                brew update 
+                brew upgrade
+            fi
         fi
-    elif test "$pac" == "apt"; then
-        eval "$pac_up"
+    elif test "$pac" == "apt" && test "$pac" == "nala"; then
+        if ! test -z "$YES"; then
+            eval "$pac_up -y"
+        else
+            eval "$pac_up"
+        fi
         hdrs="linux-headers-$(uname -r)"
         if test -z "$(apt list --installed 2> /dev/null | grep $hdrs)"; then
             reade -Q "GREEN" -i "y" -p "Right linux headers not installed. Install $hdrs? [Y/n]: " "n" hdrs_ins
@@ -84,23 +158,39 @@ function update-system() {
                 eval "$pac_ins $hdrs"
             fi
         fi
-        sudo "$pac" upgrade
+        if ! test -z "$YES"; then 
+            sudo "$pac" upgrade -y
+        else 
+            sudo "$pac" upgrade 
+        fi
         if apt --dry-run autoremove 2> /dev/null | grep -Po '^Remv \K[^ ]+'; then
             reade -Q 'GREEN' -i 'y' -p 'Autoremove unneccesary packages? [Y/n]: '  'n' remove
             if test $remove == 'y'; then
-                yes | sudo "$pac" autoremove
+                if ! test -z "$YES"; then 
+                    sudo "$pac" autoremove -y
+                else
+                    sudo "$pac" autoremove 
+                fi
             fi
         fi
     elif test "$pac" == "apk"; then
         apk update
     elif test "$pac" == "pacman"; then
         if ! test -z "$AUR_up"; then
-            eval "$AUR_up"
+            if ! test -z "$YES"; then 
+                eval "yes | $AUR_up"
+            else 
+                eval "$AUR_up"
+            fi
         else
-            eval "$pac_up"
+            if ! test -z "$YES"; then 
+                eval "yes | $pac_up"
+            else 
+                eval "$pac_up"
+            fi
         fi
         hdrs="$(echo $(uname -r) | cut -d. -f-2)"
-        hdrs="linux$(echo $(uname -r) | cut -d. -f-1)${hdrs: -1}-headers"
+        hdrs="linux${hdrs//"."}-headers"
         if test -z "$(pacman -Q $hdrs)"; then
             reade -Q "GREEN" -i "y" -p "Right linux headers not installed. Install $hdrs? [Y/n]: " "n" hdrs_ins
             if [ "$hdrs_ins" == "y" ]; then
@@ -112,21 +202,42 @@ function update-system() {
         continue
     # https://en.opensuse.org/System_Updates
     elif test "$pac" == "zypper_leap"; then
-        sudo zypper up
+        if ! test -z "$YES"; then 
+            yes | sudo zypper up
+        else
+            sudo zypper up
+        fi
     elif test "$pac" == "zypper_tumble"; then
-        sudo zypper dup
+        if ! test -z "$YES"; then 
+            yes | sudo zypper dup
+        else
+            yes | sudo zypper dup
+        fi
+
     elif test "$pac" == "yum"; then
-        yum update
+        if ! test -z "$YES"; then 
+            yes | yum update
+        else
+            yum update
+        fi 
     fi
     
     unset hdrs hdrs_ins 
 
     if type flatpak &> /dev/null; then
-        flatpak update
+        if ! test -z "$YES"; then 
+            flatpak update -y
+        else
+            flatpak update
+        fi
     fi
 
     if type snap &> /dev/null; then
-        snap refresh
+        if ! test -z "$YES"; then 
+            yes | snap refresh
+        else
+            snap refresh
+        fi
     fi
 
     if type nix-env &> /dev/null; then
@@ -144,6 +255,7 @@ function update-system() {
         else
             up_gpg=gpg
         fi
+
         reade -i "n" -p "Refresh ${CYAN}gpg keys?${normal} ${MAGENTA}(Keyservers can be unstable so this might take a while) [N/y]:${normal} " "y" gpg_up
         if test "$gpg_up" == 'y'; then
            "$up_gpg" --refresh-keys  
@@ -173,15 +285,16 @@ function update-system() {
                 reade -Q "magenta" -i "y" -p "Update ${red}${bold}global${normal}${magenta1} npm packages? (Javascript) [Y/n]: " "n" npm_up
                 if [ "$npm_up" == "y" ]; then
                     echo "This next $(tput setaf 1)sudo$(tput sgr0) will update using 'sudo npm -g update'";
-                    sudo npm -g update
-                    sudo npm -g upgrade
+
+                        sudo npm -g update
+                        sudo npm -g upgrade
                 fi
                 unset npm_up
                 
             fi
             
             if type cargo &> /dev/null; then
-                reade -Q "magenta" -i "y" -p "Update cargo (Rust)? [Y/n]: " "n" cargo_up
+                reade -q "magenta" -i "y" -p "update cargo (rust)? [y/n]: " "n" cargo_up
                 if [ "$cargo_up" == "y" ]; then
                     if test -z "$(cargo --list | grep install-update)"; then
                         reade -Q "MAGENTA" -i "y" -p "To update cargo packages, 'cargo-update' needs to be installed first. Install? [Y/n]: " "n" carg_ins
@@ -208,6 +321,7 @@ function update-system() {
         unset dev_up
         
     fi
-    export SYSTEM_UPDATED=TRUE
+    export SYSTEM_UPDATED="TRUE"
 }
 
+alias update-system-yes="update-system -y"

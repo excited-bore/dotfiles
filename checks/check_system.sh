@@ -1,6 +1,14 @@
-if type curl &> /dev/null && ! test -f ../aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh
-)" 
+if ! test -f ../aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
+    if type curl &> /dev/null; then
+if  type curl &> /dev/null; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
+    else 
+        continue 
+    fi
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
+    else 
+        continue 
+    fi
 else
     . aliases/.bash_aliases.d/00-rlwrap_scripts.sh
 fi
@@ -22,7 +30,7 @@ if test -z $TMPDIR; then
     TMPDIR=$(mktemp -d)
 fi
 
-pthdos2unix=""
+pthdos2nix=""
 if test $machine == 'Windows'; then 
     alias wget='wget.exe' 
     alias curl='curl.exe' 
@@ -127,7 +135,6 @@ do
         AUR_search="pamac search"
         AUR_ls_ins="pamac list --installed"
          
-
         distro_base="Arch"
         distro="Manjaro"
           
@@ -151,7 +158,7 @@ do
             pac="zypper_tumble"
         fi
         distro_base="Slackware"
-        distro="Suse"
+        distro="openSuse"
     elif [ -f $f ] && [ $f == /etc/gentoo-release ] && [ $distro == / ]; then
         pac="emerge"
         distro_base="Slackware"
@@ -160,6 +167,11 @@ do
         pac="dnf"
         distro_base="RedHat"
         distro="Fedora"
+    elif [ -f $f ] && [ $f == /etc/nix-release ] && [ $distro == / ]; then
+        pac="nix profile"
+        pac_ins="nix profile install"
+        distro_base="Nix"
+        distro="Nix" 
     elif [ -f $f ] && [ $f == /etc/redhat-release ] && [ $distro == / ]; then
         pac="yum"
         distro_base="RedHat"
@@ -186,8 +198,12 @@ do
             AUR_search="pamac search"
             AUR_ls_ins="pamac list --installed"    
              
-            if type curl &> /dev/null && ! test -f checks/check_pamac.sh; then
-                eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pamac.sh)" 
+            if ! test -f checks/check_pamac.sh; then
+                if type curl &> /dev/null; then
+                    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pamac.sh)" 
+                else
+                    continue
+                fi
             else
                 . ./checks/check_pamac.sh
             fi
@@ -295,24 +311,22 @@ do
             AUR_ins=""
             AUR_search="auracle search"
              
-
         else
-            printf "Your Arch system seems to have no (known) AUR helper installed\n"
-            reade -Q "GREEN" -i "y" -p "Install pikaur ( Pacman wrapper )? [Y/n]: " "n" insyay
+            printf "${CYAN}yay${normal} is not installed (Pacman wrapper for installing AUR packages, needed for yay-fzf-install)\n"
+            reade -Q "GREEN" -i "y" -p "Install yay? [Y/n]: " "n" insyay
             if [ "y" == "$insyay" ]; then 
 
-                if type curl &> /dev/null && ! test -f ../AUR_insers/install_pikaur.sh; then
-                    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/AUR_insers/install_pikaur.sh)" 
+                if type curl &> /dev/null && ! test -f ../AUR_installers/install_yay.sh; then
+                    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/AUR_installers/install_yay.sh)" 
                 else
-                    eval ../AUR_insers/install_pikaur.sh
+                    eval ../AUR_installers/install_yay.sh
                 fi
 
-                AUR_pac="pikaur"
-                AUR_up="pikaur -Syu"
-                AUR_ins="pikaur -S"
-                AUR_search="pikaur -Ss"
-                AUR_ls_ins="pikaur -Q"
-                 
+                AUR_pac="yay"
+                AUR_up="yay -Syu"
+                AUR_ins="yay -S"
+                AUR_search="yay -Ss"
+                AUR_ls_ins="yay -Q"
             fi
             unset insyay 
         fi
@@ -463,3 +477,97 @@ function check-ppa(){
 }
 
 complete -W "-h --help" check-ppa
+
+# VARS
+
+export PROFILE=~/.profile
+
+if ! [ -f ~/.profile ]; then
+    touch ~/.profile
+fi
+
+if [ -f ~/.bash_profile ]; then
+    export PROFILE=~/.bash_profile
+fi
+
+export ENVVAR=~/.bashrc
+
+if [ -f ~/.environment.env ]; then
+    export ENVVAR=~/.environment.env
+fi
+
+export ALIAS=~/.bashrc
+
+if [ -f ~/.bash_aliases ]; then
+    export ALIAS=~/.bash_aliases
+fi
+
+if [ -d ~/.bash_aliases.d/ ]; then
+    export ALIAS_FILEDIR=~/.bash_aliases.d/
+fi
+
+export COMPLETION=~/.bashrc
+
+if [ -f ~/.bash_completion ]; then
+    export COMPLETION=~/.bash_completion
+fi
+
+if [ -d ~/.bash_completion.d/ ]; then
+    export COMPLETION_FILEDIR=~/.bash_completion.d/
+fi
+
+export KEYBIND=~/.bashrc
+
+if [ -f ~/.keybinds ]; then
+    export KEYBIND=~/.keybinds
+fi
+
+if [ -d ~/.keybinds.d/ ]; then
+    export KEYBIND_FILEDIR=~/.keybinds.d/
+fi
+
+if [ -f ~/.bash_profile ]; then
+    export PROFILE=~/.bash_profile
+fi
+
+export PROFILE_R=/root/.profile
+export ALIAS_R=/root/.bashrc
+export COMPLETION_R=/root/.bashrc
+export KEYBIND_R=/root/.bashrc
+export ENVVAR_R=/root/.bashrc
+
+echo "This next $(tput setaf 1)sudo$(tput sgr0) checks for the profile, environment, bash_alias, bash_completion and keybind files and dirs in '/root/' to generate global variables.";
+
+if ! sudo test -f /root/.profile; then
+    sudo touch /root/.profile
+fi
+
+if sudo test -f /root/.bash_profile; then
+    export PROFILE_R=/root/.bash_profile
+fi
+
+if sudo test -f /root/.environment.env; then
+    export ENVVAR_R=/root/.environment.env
+fi
+
+if sudo test -f /root/.bash_aliases; then
+    export ALIAS_R=/root/.bash_aliases
+fi
+if sudo test -d /root/.bash_aliases.d/; then
+    export ALIAS_FILEDIR_R=/root/.bash_aliases.d/
+fi
+
+if sudo test -f /root/.bash_completion; then
+    export COMPLETION_R=/root/.bash_completion
+fi
+
+if sudo test -d /root/.bash_completion.d/; then
+    export COMPLETION_FILEDIR_R=/root/.bash_completion.d/
+fi
+if sudo test -f /root/.keybinds  ; then
+    export KEYBIND_R=/root/.keybinds
+fi
+
+if sudo test -d /root/.keybinds.d/  ; then
+    export KEYBIND_FILEDIR_R=/root/.keybindsd.d/
+fi

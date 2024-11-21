@@ -279,6 +279,28 @@ if type pacman &> /dev/null; then
             unset group nstall
         }
 
+        function pacman-fzf-list-files-installed(){ 
+            pre='' 
+            if ! test -z "$@"; then
+                if ! test -z "$2"; then
+                    printf "Only give 1 argument\n"
+                    exit 1
+                else
+                    pre="--query $@"
+                fi
+            fi 
+            nstall="$(pacman -Q | fzf $pre --ansi --multi --select-1 --preview 'cat <(pacman -Qk {1})' --preview-window='down,10%,follow' --reverse --sync --height 33%  | awk '{print $1}')" 
+            if ! test -z "$nstall"; then
+                for i in ${nstall[@]}; do
+                    echo "${bold}$(pacman -Qk $i)"
+                    pacman -Ql $i | awk '{$1="";print}' | sed 's| \(.*\)|\1|g'   
+                    echo "" 
+                done | $PAGER
+            fi
+            unset nstall
+        }
+         
+
         function pacman-fzf-remove(){ 
             pre=""
             if ! test -z "$@"; then
@@ -315,25 +337,34 @@ if type pacman &> /dev/null; then
         complete -W "$(zcat $HOME/.cache/AUR/packages.gz)" AUR-list-website
         #cat packages-meta-ext-v1.json.extracted.txt | awk '{$1=$2=""; print $0}' | 
         
-        function AUR-fzf-packages(){
-            packages="$(cat $HOME/.cache/AUR/packages-meta-ext-v1.json.extracted.txt | grep --color=never -e 'Name.*:' -e 'Description.*:' | awk '{ $1=$2=""; print $0}' | paste -d "\t"  - - | fzf --ansi --select-1 --multi --reverse --sync --delimiter '\t' --with-nth 1 --height 33% --preview='echo {2}' --preview-window='down,10%,follow' | sed 's/^ *//g' | awk '{print $1}')" 
-           if type pamac &> /dev/null; then
-               reslt=$(printf "Install\nInstall dependencies\n" | fzf --reverse)
-               if  ! test -z "$reslt"; then
-                   if test "$reslt" == 'Install'; then 
-                        pamac install $packages
-                    elif test "$reslt" == "Install dependencies"; then 
-                       for i in $packages; do 
-                           depends="$(cat $HOME/.cache/AUR/packages-meta-ext-v1.json.extracted.txt | awk '/'"$i"'/ { found_deps = 1; next; } /Depends/ && found_deps { print $0; found_deps = 0;}' | awk 'NR==1{$1=$2=""; print $0 }' | awk '{$1=$1};1')" 
-                           #depends="$(cat $HOME/.cache/AUR/packages-meta-ext-v1.json.extracted.txt | awk '/'"$i"'/ { found_deps = 1; next; } /Depends/ {print $0; next;} /MakeDepends/ {print $0; next;} /License/ && found_deps { found_deps = 0;}' | awk 'NR==1{$1=$2=""; print $0 }' | awk '{$1=$1};1')" 
-                        done; 
-                        pamac install $depends 
-                   fi 
-               fi
-           else
-               printf "$packages\n"
-           fi
-        } 
+        #function AUR-fzf-packages(){
+        #    packages="$(cat $HOME/.cache/AUR/packages-meta-ext-v1.json.extracted.txt | grep --color=never -e 'Name.*:' -e 'Description.*:' | awk '{ $1=$2=""; print $0}' | paste -d "\t"  - - | fzf -i --ansi --select-1 --multi --reverse --sync --delimiter '\t' --with-nth 1 --height 33% --preview='echo {2}' --preview-window='down,10%,follow' | sed 's/^ *//g' | awk '{print $1}')" 
+        #    if ! test -z $packages; then
+        #       if type pamac &> /dev/null; then
+        #           reslt=$(printf "Install\nInstall dependencies\n" | fzf --reverse  --height 33%)
+        #           if ! test -z "$reslt"; then
+        #               if test "$reslt" == 'Install'; then 
+        #                    pamac install $packages
+        #                elif test "$reslt" == "Install dependencies"; then 
+        #                   for i in $packages; do 
+        #                       #depends="$(cat $HOME/.cache/AUR/packages-meta-ext-v1.json.extracted.txt | awk '/'"$i"'/ { found_deps = 1; next; } /License/ && found_deps { found_deps = 0;} found_deps' | awk 'NR==1{$1=$2=""; print $0 }' )" 
+        #                       #echo $depends  
+        #                       #depends="$(cat $HOME/.cache/AUR/packages-meta-ext-v1.json.extracted.txt | awk '/'"$i"'/ { found_deps = 1; next; } /Depends/ {print $0; next;} /MakeDepends/ {print $0; next;} /License/ && found_deps { found_deps = 0;}' | awk 'NR==1{$1=$2=""; print $0 }' | awk '{$1=$1};1')" 
+        #                        depends="$(cat $HOME/.cache/AUR/packages-meta-ext-v1.json.extracted.txt | awk '/'"$i"'/ { found_deps = 1; next; } /License/ { found_deps = 0;} found_deps' | awk '/Depends/ {found_deps=1; next} /License/ {found_deps=0} found_deps' | xargs | sed 's|[[:space:]]:[[:space:]]|:|g')"  
+        #                        for j in ${depends[@]}; do 
+        #                            if [[ $j =~ '=' ]] || [[ $j =~ '<' ]] || [[ $j =~ '>' ]]; then 
+        #                                echo "$j"; 
+        #                            fi; 
+        #                        done 
+        #                    done; 
+        #                   #a pamac install $depends 
+        #               fi 
+        #           fi
+        #       else
+        #           printf "$packages\n"
+        #       fi
+        #   fi
+        #} 
     fi
    #sed -n -e 's/^.*stalled: //p' 
 
@@ -467,31 +498,17 @@ if type pacman &> /dev/null; then
 
     if type yay &> /dev/null; then
         alias yay-update="yay -Su"
+        alias yay-install="yay -Su"
         alias yay-update-yes="yes | yay -Su"
+        alias yay-remove="yay -R"
         alias yay-list-installed="yay -Q" 
-        alias yay-list-groups="yay -Ssq" 
+        #alias yay-list-groups="yay -Ssq" 
         alias yay-list-all-aur="yay -Slaq"
         alias yay-clear-cache="yay -Sc"
 
+        # https://smarttech101.com/aur-arch-user-repository-and-yay-in-arch-linux 
         
-        #function yay-fzf-install(){ 
-        #    pre='' 
-        #    if ! test -z "$@"; then
-        #        if ! test -z "$2"; then
-        #            printf "Only give 1 argument\n"
-        #            exit 1
-        #        else
-        #            pre="--query $@"
-        #        fi
-        #    fi 
-        #    nstall="$(yay list | fzf $pre --ansi --multi --select-1 --reverse --sync --height 33%  | awk '{print $1}')" 
-        #    if ! test -z "$nstall"; then
-        #        yay install "$nstall" 
-        #    fi
-        #    unset nstall
-        #}
-        
-        function yay-fzf-list-files(){ 
+        function yay-fzf-install(){ 
             pre='' 
             if ! test -z "$@"; then
                 if ! test -z "$2"; then
@@ -501,14 +518,10 @@ if type pacman &> /dev/null; then
                     pre="--query $@"
                 fi
             fi 
-            nstall="$(yay list | fzf $pre --ansi --multi --select-1 --reverse --sync --height 33%  | awk '{print $1}')" 
-            if ! test -z "$nstall"; then
-                yay list --files $nstall  
-            fi
-            unset nstall
+            yay -Slq | fzf $pre --ansi --reverse --multi --preview-window=80% --preview 'cat <(yay -Si {1} | bat -n --language txt --color=always) <(echo '') <(yay --getpkgbuild --print {1} | bat -n --language bash --color=always)' | xargs --no-run-if-empty --open-tty yay -Su --combinedupgrade 
         }
-        
-        #function yay-fzf-list-files-installed(){ 
+       
+        #function yay-fzf-list-files(){ 
         #    pre='' 
         #    if ! test -z "$@"; then
         #        if ! test -z "$2"; then
@@ -518,43 +531,29 @@ if type pacman &> /dev/null; then
         #            pre="--query $@"
         #        fi
         #    fi 
-        #    nstall="$(yay list -i | fzf $pre --ansi --multi --select-1 --reverse --sync --height 33%  | awk '{print $1}')" 
+        #    nstall="$(yay -Q | fzf $pre --ansi --multi --select-1 --preview 'cat <(yay -Si {1} | bat -n --language txt --color=always)' --reverse --sync --height 33%  | awk '{print $1}')" 
         #    if ! test -z "$nstall"; then
         #        yay list --files $nstall  
         #    fi
-        #    unset nstall
+        #    #unset nstall
         #}
-        # 
-
-        #function yay-fzf-install-by-group(){ 
-        #    if ! test -z "$@"; then
-        #        group="$@"
-        #    else 
-        #        group="$(yay list --groups | sort -u | fzf --select-1 --reverse --sync --height 33%)" 
-        #    fi
-        #    nstall="$(yay list --groups $group | fzf --ansi --multi --select-1 --reverse --sync --height 33%  | awk '{print $1}')" 
-        #    if ! test -z "$nstall"; then
-        #        yay install "$nstall" 
-        #    fi
-        #    unset group nstall
-        #}
-
-        #function yay-fzf-remove(){ 
-        #    pre=""
-        #    if ! test -z "$@"; then
-        #        if ! test -z "$2"; then
-        #            printf "Only give 1 argument\n"
-        #            exit 1
-        #        else
-        #            pre="--query $@"
-        #        fi
-        #    fi 
-        #    nstall="$(yay list -i | fzf $pre --ansi --multi --select-1 --reverse --sync --height 33%  | awk '{print $1}')"      
-        #    if ! test -z "$nstall"; then
-        #        yay remove "$nstall" 
-        #    fi 
-        #    unset nstall
-        #}
+        
+        function yay-fzf-remove(){ 
+            pre=""
+            if ! test -z "$@"; then
+                if ! test -z "$2"; then
+                    printf "Only give 1 argument\n"
+                    exit 1
+                else
+                    pre="--query $@"
+                fi
+            fi 
+            nstall="$(yay -Q | fzf $pre --ansi --multi --select-1 --reverse --sync --height 33%  | awk '{print $1}')"      
+            if ! test -z "$nstall"; then
+                yay -R "$nstall" 
+            fi 
+            unset nstall
+        }
          
     fi
 fi
