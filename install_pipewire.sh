@@ -166,8 +166,9 @@ if ! test -f $HOME/.config/wireplumber/wireplumber.conf.d/51-dualshock4-disable.
 fi
 
 if ! test -f $HOME/.config/wireplumber/wireplumber.conf.d/51-disable-suspension.conf; then
-    printf "${yellow}Noticeable audio delay or audible pop/crack when starting playback can be caused by ${YELLOW}'node suspension when inactive'${normal}\n"
-    reade -Q 'GREEN' -i 'n' -p "Disable node suspension when inactive? [N/y]: " 'n' dis_node
+    printf "${yellow}Noticeable audio delay or audible pop/crack when starting playback can be caused by ${YELLOW}'node suspension when inactive'\n${normal}"
+    printf "${RED}This might also break more then it helps\n${normal}"
+    reade -Q 'YELLOW' -i 'n' -p "Disable node suspension when inactive? [N/y]: " 'y' dis_node
     if test $dis_node == 'y'; then
         dis_node_f="$HOME/.config/wireplumber/wireplumber.conf.d/51-disable-suspension.conf"  
         touch dis_node_f 

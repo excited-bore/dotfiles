@@ -188,7 +188,7 @@ reade(){
         done
         OPTIND=1;
         value=$(eval $rlwstring);
-        eval "${@:$#:1}=$value" && rm $tmpf &> /dev/null;
+        eval "${@:$#:1}=$value" && command rm $tmpf &> /dev/null;
     fi
     unset bash_rlwrap 
 }

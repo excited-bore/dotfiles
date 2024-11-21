@@ -186,6 +186,19 @@ reade(){
 }
 
 function rm-prompt(){
+    while :; do
+       case "$1" in
+          -h|-\?|--help)  
+               printf "Remove and prompt items to remove (using a pager and reade)\n   -h : Show this explanation on screen\n"
+               exit 
+               ;;
+          --)              # End of all options.
+              break
+              ;;
+          *)               # Default case: No more options, so break out of the loop.
+              break 
+       esac
+    done  
     if test -z $RMPROMPT_RM_OPT; then
         RMPROMPT_RM_OPT='-rv' 
     fi
@@ -202,14 +215,16 @@ function rm-prompt(){
         RMPROMPT_PAGER=cat 
     fi
 
+    local symlinks=0 
     local files=0 
     local dirss=0
     local exitmeyesplease=0 
     for itm in $(echo $@ | sort -u); do
-        if ! test -e "$itm"; then
+        if ! test -e "$itm" && ! test -L "$itm"; then
            printf "${red}$itm does not exist\n"
-           exitmeyesplease=1
-           break
+           break && exit 1
+       elif test -L "$itm"; then
+           symlinks="$(($symlinks + 1))"      
        elif test -d "$itm"; then
            dirss=$(($dirss + $(ls -AR $itm | grep --color=none ':' | cut -d: -f-1 | wc -w)))
            files="$(($files + $(find $itm -type f | wc -w)))"  
@@ -217,21 +232,26 @@ function rm-prompt(){
             files="$(($files + 1))"
         fi
     done 
-    if test "$exitmeyesplease" == 1; then
-        exit 1
-    fi
+
     for itm in $(echo $@ | sort -u); do
        if test -d "$itm"; then
-           eval "$RMPROMPT_LS_DIR_CMD $itm" 
+           eval "$RMPROMPT_LS_DIR_CMD -- \"$itm\"" 
        else
-           eval "$RMPROMPT_LS_CMD $itm" 
+           eval "$RMPROMPT_LS_CMD -- \"$itm\"" 
        fi
     done | $RMPROMPT_PAGER  
-    reade -Q 'YELLOW' -i 'y' -p "Remove all ${RED}$files${YELLOW} file(s) and all ${RED}$dirss${YELLOW} directory(s)? [Y/n]: " 'n' rm_stff
-    if test "$rm_stff" == 'y'; then
-        rm $RMPROMPT_RM_OPT $@ 
+
+    [[ $files > 0 ]] && files="${RED}$files${YELLOW}" || files="${CYAN}$files${YELLOW}" 
+    [[ $symlinks > 0 ]] && symlinks="${RED}$symlinks${YELLOW}" || symlinks="${CYAN}$symlinks${YELLOW}"
+    [[ $dirss > 0 ]] && dirss="${RED}$dirss${YELLOW}" || dirss="${CYAN}$dirss${YELLOW}" 
+    
+    if [[ $files > 0 ]] || [[ $symlinks > 0 ]] || [[ $dirss > 0 ]]; then
+        reade -Q 'YELLOW' -i 'y' -p "Remove all $symlinks symlink(s), $files file(s) and all $dirss directory(s)? [Y/n]: " 'n' rm_stff
+        if test "$rm_stff" == 'y'; then
+            command rm $RMPROMPT_RM_OPT -- "$@" 
+        fi
     fi
-    unset rm_stff dirss files i itm exitmeyesplease
+    unset rm_stff dirss files i itm
 }
 
 if ! test -z "$@" &> /dev/null; then
