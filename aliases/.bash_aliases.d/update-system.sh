@@ -190,7 +190,7 @@ function update-system() {
             fi
         fi
         hdrs="$(echo $(uname -r) | cut -d. -f-2)"
-        hdrs="linux$(echo $(uname -r) | cut -d. -f-1)${hdrs: -1}-headers"
+        hdrs="linux${hdrs//'.'}-headers"
         if test -z "$(pacman -Q $hdrs)"; then
             reade -Q "GREEN" -i "y" -p "Right linux headers not installed. Install $hdrs? [Y/n]: " "n" hdrs_ins
             if [ "$hdrs_ins" == "y" ]; then
