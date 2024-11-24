@@ -1,6 +1,12 @@
 # https://stackoverflow.com/questions/5412761/using-colors-with-printf
 # Execute (during printf) for colored prompt
 # printf  "${blue}This text is blue${white}\n"
+
+# https://unix.stackexchange.com/questions/139231/keep-aliases-when-i-use-sudo-bash
+if type sudo &> /dev/null; then
+    alias sudo='sudo '
+fi
+
 function compare-tput-escape_color(){
     for (( ansi=0; ansi <= 120; ansi++)); do
         printf "$ansi $(tput setaf $ansi) tput foreground $(tput sgr0) $(tput setab $ansi) tput background $(tput sgr0)"; echo -e " \033[$ansi;mEscape\033[0m"
@@ -74,10 +80,14 @@ italic=$(tput it)
 # printf "${CYAN}bluh"; read -e -r foo  is also problematic because prompt disappears when arrow up and back down
 
 reade(){
-    fcomp="n"
     while getopts ':b:e:i:p:Q:s:S:' flag; do
         case "${flag}" in
             e)  fcomp='y'
+                break 
+            ;;
+
+            *)  fcomp='n'
+                break 
             ;;
         esac
     done && OPTIND=1;
@@ -125,8 +135,8 @@ reade(){
                     ;;
                 S)  ;;
             esac
-        done; 
-        OPTIND=1;
+        done && OPTIND=1;
+
         eval "$readstr" value;
 
         if test $fcomp == 'y'; then
@@ -143,24 +153,31 @@ reade(){
         unset fcomp
     else
         if [[ $# < 2 ]]; then
+            echo "$@" 
             echo "Give up at least two variables for reade(). "
             echo "First a string with autocompletions, space seperated"
             echo "Second a variable (could be empty) for the return string"
             return 0
         fi
         
+
         local args="${@:$#-1:1}"
+
         # Reverse wordlist order (last -> first) because ???
         args=$(echo $args | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }')
         args=$(echo $args | tr ' ' '\n')
         tmpf=$(mktemp)
+
         echo "$args" > "$tmpf"
+        
+        local breaklines=''
+
         if test "$args" == ''; then
-            rlwstring="rlwrap -D 0 -b \"$breaklines\" -o cat"
+            rlwstring="rlwrap --ansi-colour-aware -s 1000 -D 0 -b \"$breaklines\" -o cat"
         else
-            rlwstring="rlwrap -s 1000 -D 0 -H $tmpf -b \"$breaklines\" -f <(echo \"${args[@]}\") -o cat"
+            rlwstring="rlwrap --ansi-colour-aware -s 1000 -D 0 -H $tmpf -b \"$breaklines\" -f <(echo \"${args[@]}\") -o cat"
         fi
-        breaklines=''
+
         while getopts ':b:e:i:p:Q:s:S:' flag; do
             case "${flag}" in
                 b)  breaklines=${OPTARG};
@@ -185,13 +202,91 @@ reade(){
                 S)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-E\"${OPTARG}\" |g");
                     ;;
             esac
-        done
-        OPTIND=1;
+        done && OPTIND=1;
         value=$(eval $rlwstring);
         eval "${@:$#:1}=$value" && command rm $tmpf &> /dev/null;
     fi
     unset bash_rlwrap 
 }
+
+
+function readyn(){
+    if [[ $# < 1 ]]; then
+        echo "Give up one variables for reade(): "
+        echo "The variable (could be empty) that contains the return string"
+        return 0
+    fi
+        
+    while :; do
+       case $1 in
+           -h|-\?|--help)
+               printf "${bold}readyn${normal} [-h/--help] [ -n ] [ -p PROMPTSTRING ] [ -Q COLOURSTRING ]  [ -b BREAK-CHARS ] returnvar\n
+    Simplifies yes/no prompt for reade. Supply at least 1 variable to put the answer in.  
+   '${GREEN} [Yes/no]: ${normal}' (default): 'y' as pre-given, 'n' as other option. Colour for the prompt is GREEN
+   '${YELLOW} [No/yes]: ${normal}' : 'n' as pre-given, 'y' as other option. Colour for the prompt is YELLOW
+    For both an empty answer will return the default answer. 
+
+   -n
+
+   Set '${YELLOW} [No/yes]: ${normal}' as the default prompt. 
+    
+   -Q ${underline_on}Colour${underline_off}
+
+   Use  one  of  the  colour names black, red, green, yellow, blue, cyan, purple (=magenta) or white, or an ANSI-conformant <colour_spec> to colour any prompt displayed  by  command.\n An uppercase colour name (Yellow or YELLOW ) gives a bold prompt.\n Prompts that already contain (colour) escape sequences or one of the readline \"ignore markers\" (ASCII 0x01 and 0x02) are not coloured.
+    
+    -b ${underline_on}list_of_characters${underline_off} 
+    (From rlwrap manual) Consider  the specified characters word-breaking (whitespace is always word-breaking). This determines what is considered a \"word\", both when completing and when building a completion word list from files specified by -f options following (not preceding!) it.\n Default list (){}[],'+-=&^%%\$#@\";|\ \n Unless -c is specified, / and . (period) are included in the default list\n\n"
+              return 0
+          ;;
+          # Otherwise 
+          *) break 
+          ;;
+       esac
+    done
+  
+    local breaklines=''
+    while getopts ':b:Q:p:' flag; do
+        case "${flag}" in
+             b)  breaklines="-b \"${OPTARG}\"";
+             ;;    
+             p)  prmpt=${OPTARG};
+             ;;
+             Q)  color=${OPTARG};
+             ;;    
+
+        esac
+    done && OPTIND=1;
+
+    while getopts ':n:' flag; do
+        case "${flag}" in
+              n)  pre='n'
+                  othr='y'
+                  prmpt1=' [No/yes]: ' 
+                  test -z $color && color='YELLOW'
+                  break 
+              ;;
+              *)  pre='y'
+                  othr='n'
+                  prmpt1=' [Yes/no]: ' 
+                  test -z $color && color='GREEN'
+                  break 
+              ;;    
+        esac
+    done && OPTIND=1;
+
+    if ! test -z "$prmpt"; then
+        reade -Q "$color" $breaklines -i "$pre" -p "$prmpt$prmpt1" "$othr" value;   
+    else
+        reade -Q "$color" $breaklines -i "$pre" -p "$prmpt1" "$othr" value;    
+    fi
+
+    eval "${@:$#:1}=$value" 
+
+    unset pre other prmpt prmpt1 color readestr breaklines value 
+}
+
+alias yes_no='readyn'
+alias yes-no='readyn'
 
 
 #reade -p "Usb ids" $(sudo lsusb | awk 'BEGIN { FS = ":" };{print $1;}')
@@ -249,30 +344,3 @@ function yes_edit_no(){
     fi
 }
 
-function yes_no(){
-    if [ -z "$1" ] || [ -z "$2" ]; then
-        printf "Needs 3 parameters.\n 1) String with commands if yes\n 2) prompt (adds [y/n]: afterwards) \n(3) Default \"yes\",\"no\")\n(4) Optional - Colour)\n";
-        return 0;
-    else
-        pass="";
-        clr="";
-        pre="y"
-        deflt=" [Y/n]: "; 
-        prompt="$2$deflt";
-        if [ "$3" == "no" ]; then
-            pre="n"
-            deflt=" [y/N]: ";
-        fi
-        if [ ! -z "$4" ]; then
-            clr="-Q $4"
-        fi
-        reade $clr -i "$pre" -p "$prompt" " y e n" pass;
-        
-        #Undercase only
-        pass=$(echo "$pass" | tr '[:upper:]' '[:lower:]')
-        
-        if [ "$pass" == "y" ]; then
-           $1; 
-        fi
-    fi
-} 

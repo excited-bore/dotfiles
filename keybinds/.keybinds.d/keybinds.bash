@@ -284,7 +284,7 @@ _edit_wo_executing() {
     #[ "$(sed -n '/^#!\/bin\/bash/p;q' "$tmpf")" ] && sed -i 1d "$tmpf"
     READLINE_LINE="$(<"$tmpf")"
     READLINE_POINT="${#READLINE_LINE}"
-    rm "$tmpf" &> /dev/null
+    command rm "$tmpf" &> /dev/null
 }
 
 bind -m vi-insert      -x '"\C-e":_edit_wo_executing'
