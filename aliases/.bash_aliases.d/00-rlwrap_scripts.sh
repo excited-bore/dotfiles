@@ -83,9 +83,11 @@ reade(){
     while getopts ':b:e:i:p:Q:s:S:' flag; do
         case "${flag}" in
             e)  fcomp='y'
+                break 
             ;;
 
             *)  fcomp='n'
+                break 
             ;;
         esac
     done && OPTIND=1;
@@ -151,24 +153,31 @@ reade(){
         unset fcomp
     else
         if [[ $# < 2 ]]; then
+            echo "$@" 
             echo "Give up at least two variables for reade(). "
             echo "First a string with autocompletions, space seperated"
             echo "Second a variable (could be empty) for the return string"
             return 0
         fi
         
-        local breaklines=''
+
         local args="${@:$#-1:1}"
+
         # Reverse wordlist order (last -> first) because ???
         args=$(echo $args | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }')
         args=$(echo $args | tr ' ' '\n')
         tmpf=$(mktemp)
+
         echo "$args" > "$tmpf"
+        
+        local breaklines=''
+
         if test "$args" == ''; then
             rlwstring="rlwrap --ansi-colour-aware -s 1000 -D 0 -b \"$breaklines\" -o cat"
         else
             rlwstring="rlwrap --ansi-colour-aware -s 1000 -D 0 -H $tmpf -b \"$breaklines\" -f <(echo \"${args[@]}\") -o cat"
         fi
+
         while getopts ':b:e:i:p:Q:s:S:' flag; do
             case "${flag}" in
                 b)  breaklines=${OPTARG};
@@ -193,8 +202,7 @@ reade(){
                 S)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-E\"${OPTARG}\" |g");
                     ;;
             esac
-        done
-        OPTIND=1;
+        done && OPTIND=1;
         value=$(eval $rlwstring);
         eval "${@:$#:1}=$value" && command rm $tmpf &> /dev/null;
     fi
@@ -209,11 +217,10 @@ function readyn(){
         return 0
     fi
         
-    local breaklines=''
     while :; do
        case $1 in
            -h|-\?|--help)
-               printf "reade [-h/--help] [ -n ] [ -p PROMPTSTRING ] [ -Q COLOURSTRING ]  [ -b BREAK-CHARS ] returnvar\n
+               printf "${bold}readyn${normal} [-h/--help] [ -n ] [ -p PROMPTSTRING ] [ -Q COLOURSTRING ]  [ -b BREAK-CHARS ] returnvar\n
     Simplifies yes/no prompt for reade. Supply at least 1 variable to put the answer in.  
    '${GREEN} [Yes/no]: ${normal}' (default): 'y' as pre-given, 'n' as other option. Colour for the prompt is GREEN
    '${YELLOW} [No/yes]: ${normal}' : 'n' as pre-given, 'y' as other option. Colour for the prompt is YELLOW
@@ -236,10 +243,11 @@ function readyn(){
           ;;
        esac
     done
-
+  
+    local breaklines=''
     while getopts ':b:Q:p:' flag; do
         case "${flag}" in
-             b)  breaklines=${OPTARG};
+             b)  breaklines="-b \"${OPTARG}\"";
              ;;    
              p)  prmpt=${OPTARG};
              ;;
@@ -251,7 +259,7 @@ function readyn(){
 
     while getopts ':n:' flag; do
         case "${flag}" in
-              n) pre='n'
+              n)  pre='n'
                   othr='y'
                   prmpt1=' [No/yes]: ' 
                   test -z $color && color='YELLOW'
@@ -266,18 +274,20 @@ function readyn(){
         esac
     done && OPTIND=1;
 
-
     if ! test -z "$prmpt"; then
-        reade -Q "$color" -b "$breaklines" -i "$pre" -p "$prmpt$prmpt1" "$othr" value;   
+        reade -Q "$color" $breaklines -i "$pre" -p "$prmpt$prmpt1" "$othr" value;   
     else
-        reade -Q "$color" -b "$breaklines" -i "$pre" -p "$prmpt1" "$othr" value;    
+        reade -Q "$color" $breaklines -i "$pre" -p "$prmpt1" "$othr" value;    
     fi
 
     eval "${@:$#:1}=$value" 
-    unset pre other prmpt prmpt1 color readestr breaklines 
+
+    unset pre other prmpt prmpt1 color readestr breaklines value 
 }
 
 alias yes_no='readyn'
+alias yes-no='readyn'
+
 
 #reade -p "Usb ids" $(sudo lsusb | awk 'BEGIN { FS = ":" };{print $1;}')
 
