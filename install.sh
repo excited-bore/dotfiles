@@ -36,7 +36,7 @@ if ! type update-system &> /dev/null; then
 fi
 
 if test -z $SYSTEM_UPDATED; then
-    reade -Q "CYAN" -i "y" -p  "Update system? [Y/n]: " "n" updatesysm
+    readyn -Q "CYAN" -p "Update system?" updatesysm
     if test $updatesysm == "y"; then
         update-system                     
     else
@@ -59,28 +59,28 @@ printf "${green} Will now start with updating system ${normal}\n"
 
 
 if [ ! -e ~/config ] && test -d ~/.config; then
-    reade -Q "BLUE" -i "y" -p "Create ~/.config to ~/config symlink? [Y(es)/n(o)]: " "n" sym1
+    readyn -Q "BLUE" -p "Create ~/.config to ~/config symlink? " sym1
     if [ -z $sym1 ] || [ "y" == $sym1 ]; then
         ln -s ~/.config ~/config
     fi
 fi
 
 if [ ! -e ~/lib_systemd ] && test -d ~/lib/systemd/system; then
-    reade -Q "BLUE" -i "y" -p "Create /lib/systemd/system/ to user directory symlink? [Y/n]: " "n" sym2
+    readyn -Q "BLUE" -p "Create /lib/systemd/system/ to user directory symlink? " sym2
     if [ -z $sym2 ] || [ "y" == $sym2 ]; then
         ln -s /lib/systemd/system/ ~/lib_systemd
     fi
 fi
 
 if [ ! -e ~/etc_systemd ] && test -d ~/etc/systemd/system; then
-    reade -Q "BLUE" -i "y" -p "Create /etc/systemd/system/ to user directory symlink? [Y/n]: " "n" sym3
+    readyn -Q "BLUE" -p "Create /etc/systemd/system/ to user directory symlink? " sym3
     if [ -z $sym3 ] || [ "y" == $sym3 ]; then
         ln -s /etc/systemd/system/ ~/etc_systemd
     fi
 fi
 
 if test -d /etc/modprobe.d && [ ! -f /etc/modprobe.d/nobeep.conf ]; then
-    reade -Q "GREEN" -i "y" -p "Remove terminal beep? (blacklist pcspkr) [Y/n]: " "n" beep
+    readyn -p "Remove terminal beep? (blacklist pcspkr)" beep
     if [ "$beep" == "y" ] || [ -z "$beep" ]; then
         echo "blacklist pcspkr" | sudo tee /etc/modprobe.d/nobeep.conf
     fi
@@ -103,7 +103,7 @@ fi
 
 if ! type AppImageLauncher &> /dev/null; then
     printf "${GREEN}If you want to install applications using appimages, there is a helper called 'appimagelauncher'\n"
-     reade -Q "GREEN" -i "y" -p "Check if appimage ready and install appimagelauncher? [Y/n]: " "n" appimage_install
+     readyn -p "Check if appimage ready and install appimagelauncher?" appimage_install
      if test $appimage_install == 'y'; then
          if ! test -f ./install_appimagelauncher.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_appimagelauncher.sh)" 
@@ -118,7 +118,7 @@ fi
 
 #if ! type flatpak &> /dev/null; then
    #printf "%s\n" "${blue}No flatpak detected. (Independent package manager from Red Hat)${normal}"
-   reade -Q "GREEN" -i "y" -p "Install (or just configure) Flatpak? [Y/n]: " "n" insflpk 
+   readyn -p "Install (or just configure) Flatpak?" insflpk 
    if [ "y" == "$insflpk" ]; then
        if ! test -f install_flatpak.sh; then
            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_flatpak.sh)" 
@@ -131,7 +131,7 @@ unset insflpk
 
 if ! type snap &> /dev/null; then
     printf "%s\n" "${blue}No snap detected. (Independent package manager from Canonical)${normal}"
-    reade -Q "MAGENTA" -i "n" -p "Install? [N/y]: " "y" inssnap 
+    readyn -Q "MAGENTA" -p "Install snap?" -n inssnap 
     if [ "y" == "$inssnap" ]; then
         if ! test -f install_snapd.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_snapd.sh)" 
@@ -144,7 +144,7 @@ unset inssnap
 
 if test -z "$(eval "$pac_ls_ins groff 2> /dev/null")"; then
     printf "${CYAN}groff${normal} is not installed (Necessary for 'man' (manual) command)\n"
-    reade -Q 'GREEN' -i 'y' -p "Install groff? [Y/n]: " 'n' groff_ins
+    readyn -p "Install groff? " groff_ins
     if test $groff_ins == 'y'; then
         eval "yes | $pac_ins groff"
         printf "Logout and login (or reboot) to take effect\n" 
@@ -157,7 +157,7 @@ if test $distro_base == 'Debian'; then
 
      if test -z $(eval "$pac_ls_ins manpages-posix 2> /dev/null"); then
         printf "${CYAN}manpages-posix${normal} is not installed (Manpages for posix-compliant (f.ex. bash) commands (f.ex. alias, test, type, etc...))\n"
-        reade -Q 'GREEN' -i 'y' -p "Install manpages-posix? [Y/n]: " 'n' posixman_ins
+        readyn -p "Install manpages-posix? " posixman_ins
         if test $posixman_ins == 'y'; then
             eval "yes | $pac_ins manpages-posix -y"
         fi
@@ -167,7 +167,7 @@ if test $distro_base == 'Debian'; then
      if test -z "$(apt list --installed software-properties-common 2> /dev/null | awk 'NR>1{print;}')"|| test -z "$(apt list --installed python3-launchpadlib 2> /dev/null | awk 'NR>1{print;}')"; then
         if test -z "$(apt list --installed software-properties-common 2> /dev/null | awk 'NR>1{print;}')"; then 
             printf "${CYAN}add-apt-repository${normal} is not installed (cmd tool for installing extra repositories/ppas on debian systems)\n"
-            reade -Q 'GREEN' -i 'y' -p "Install add-apt-repository? [Y/n]: " 'n' add_apt_ins
+            readyn -p "Install add-apt-repository? " add_apt_ins
             if test $add_apt_ins == 'y'; then
                 eval "yes | $pac_ins software-properties-common"
             fi
@@ -176,7 +176,7 @@ if test $distro_base == 'Debian'; then
 
         if test -z "$(apt list --installed python3-launchpadlib 2> /dev/null | awk 'NR>1{print;}')"; then
             printf "${CYAN}python3-launchpadlib${normal} is not installed (python3 library that adds support for ppas from Ubuntu's 'https://launchpad.net' to add-apt-repository)\n"
-            reade -Q 'GREEN' -i 'y' -p "Install python3-launchpadlib? [Y/n]: " 'n' lpdlb_ins
+            readyn -p "Install python3-launchpadlib? " lpdlb_ins
             if test $lpdlb_ins == 'y'; then
                 eval "yes | $pac_ins python3-launchpadlib"
             fi
@@ -194,7 +194,7 @@ if test $distro_base == 'Debian'; then
 
         if ! type ppa-purge &> /dev/null && ! test -z "$(apt search ppa-purge 2> /dev/null | awk 'NR>2{print;}')"; then
             printf "${CYAN}ppa-purge${normal} is not installed (cmd tool for disabling installed PPA's)\n"
-            reade -Q 'GREEN' -i 'y' -p "Install ppa-purge? [Y/n]: " 'n' ppa_ins
+            readyn -p "Install ppa-purge? " ppa_ins
             if test $ppa_ins == 'y'; then
                 eval "yes | $pac_ins ppa-purge"
             fi
@@ -204,7 +204,7 @@ if test $distro_base == 'Debian'; then
 
     if ! type nala &> /dev/null && ! test -z "$(apt search nala 2> /dev/null | awk 'NR>2{print;}')"; then
         printf "${CYAN}nala${normal} is not installed (A TUI wrapper for apt install, update, upgrade, search, etc..)\n"
-        reade -Q 'GREEN' -i 'y' -p "Install nala? [Y/n]: " 'n' nala_ins
+        readyn -p "Install nala? " nala_ins
         if test $nala_ins == 'y'; then
             eval "$pac_ins nala"
             pac="nala"
@@ -217,7 +217,7 @@ if test $distro_base == 'Debian'; then
     if test $distro == "Ubuntu"; then 
         if ! type synaptic &> /dev/null; then
             printf "${CYAN}synaptic${normal} is not installed (Better GUI for package management)\n"
-            reade -Q 'GREEN' -i 'y' -p "Install synaptic? [Y/n]: " 'n' ins_curl
+            readyn -p "Install synaptic? " ins_curl
             if test $ins_curl == 'y'; then
                eval "$pac_ins synaptic -y"
             fi
@@ -230,7 +230,7 @@ elif test $distro_base == 'Arch'; then
 
     echo "Next $(tput setaf 1)sudo$(tput sgr0) will check whether colors are enabled for 'pacman'"
     if sudo grep -q '#Colors' /etc/pacman.conf; then
-        reade -Q 'GREEN' -i 'y' -p "Enable colors for pacman? [Y/n]: " 'n' pacs_col
+        readyn -Q "GREEN" -p "Enable colors for pacman? " pacs_col
         if test $pacs_col == 'y'; then
             sudo sed -i 's|#Colors|Colors|g' /etc/pacman.conf       
         fi
@@ -239,7 +239,7 @@ elif test $distro_base == 'Arch'; then
    
     if ! type yay &> /dev/null; then
         printf "${CYAN}yay${normal} is not installed (Pacman wrapper for installing AUR packages, needed for yay-fzf-install)\n"
-        reade -Q "GREEN" -i "y" -p "Install yay? [Y/n]: " "n" insyay
+        readyn -p "Install yay?" insyay
         if [ "y" == "$insyay" ]; then 
             if type curl &> /dev/null && ! test -f ../AUR_installers/install_yay.sh; then
                 eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/AUR_installers/install_yay.sh)" 
@@ -258,7 +258,7 @@ elif test $distro_base == 'Arch'; then
 
     if test -z "$(eval "$pac_ls_ins pacseek 2> /dev/null")"; then
         printf "${CYAN}pacseek${normal} (A TUI for managing packages from pacman and AUR) is not installed\n"
-        reade -Q 'GREEN' -i 'y' -p "Install pacseek? [Y/n]: " 'n' pacs_ins
+        readyn -p "Install pacseek? " pacs_ins
         if test $pacs_ins == 'y'; then
             eval "yes | $pac_ins pacseek"
         fi
@@ -268,7 +268,7 @@ fi
 
 
 if ! sudo test -f /etc/polkit/49-nopasswd_global.pkla && ! sudo test -f /etc/polkit-1/rules.d/90-nopasswd_global.rules; then
-    reade -Q "YELLOW" -i "n" -p "Install polkit files for automatic authentication for passwords? [N/y]: " "y" plkit
+    readyn -Q "YELLOW" -p "Install polkit files for automatic authentication for passwords? " plkit
     if [ "y" == "$plkit" ]; then
         if ! test -f install_polkit_wheel.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_polkit_wheel.sh)" 
@@ -293,18 +293,9 @@ fi
 
 
 # Eza prompt
-pre='y'
-othr='n'
-color='GREEN'
-prmpt='[Y/n]: '
-if type eza &> /dev/null; then
-    pre='n' 
-    othr='y'
-    color='YELLOW'
-    prmpt='[N/y]: '
-fi
 
-reade -Q "$color" -i "$pre" -p "Install Eza? (A modern replacement for ls) $prmpt" "$othr" rmp
+readyn -p "Install Eza? (A modern replacement for ls)" -n "type eza &> /dev/null" rmp
+
 if [ -z "$rmp" ] || [ "y" == "$rmp" ]; then
     if ! test -f install_eza.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_eza.sh)" 
@@ -315,18 +306,9 @@ fi
 unset rmp
 
 # Xcp
-pre='y'
-othr='n'
-color='GREEN'
-prmpt='[Y/n]: '
-if type xcp &> /dev/null; then
-    pre='n' 
-    othr='y'
-    color='YELLOW'
-    prmpt='[N/y]: '
-fi
 
-reade -Q "$color" -i "$pre" -p "Install xcp? (cp but faster and with progress bar) $prmpt" "$othr" rmp
+readyn -p "Install xcp? (cp but faster and with progress bar)" -n "type xcp &> /dev/null" rmp
+
 if [ -z "$rmp" ] || [ "y" == "$rmp" ]; then
     if ! test -f install_xcp.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_xcp.sh)" 
@@ -339,18 +321,9 @@ unset rmp
 
 
 # Rm prompt
-pre='y'
-othr='n'
-color='GREEN'
-prmpt='[Y/n]: '
-if type rm-prompt &> /dev/null; then
-    pre='n' 
-    othr='y'
-    color='YELLOW'
-    prmpt='[N/y]: '
-fi
 
-reade -Q "$color" -i "$pre" -p "Install rm-prompt? (Rm but lists files/directories before deletion) $prmpt" "$othr" rmp
+readyn -p "Install rm-prompt? (Rm but lists files/directories before deletion)" -n "type rm-prompt &> /dev/null" rmp
+
 if [ -z "$rmp" ] || [ "y" == "$rmp" ]; then
     if ! test -f install_rmprompt.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_rmprompt.sh)" 
@@ -358,37 +331,35 @@ if [ -z "$rmp" ] || [ "y" == "$rmp" ]; then
         ./install_rmprompt.sh
     fi 
 fi
+
 unset rmp
 
 # Bash alias completions
+# v
 
-if ! test -f ~/.bash_completion.d/complete_alias || ! test -f /root/.bash_completion.d/complete_alias; then
-    reade -Q "GREEN" -i "y" -p "Install bash completions for aliases in ~/.bash_completion.d? [Y/n]: " "n" compl
-    if [ -z "$compl" ] || [ "y" == "$compl" ]; then
-        if ! test -f install_bashalias_completions.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bashalias_completions.sh)" 
-        else
-            ./install_bashalias_completions.sh
-        fi 
-    fi
-    unset compl
+readyn -p "Install bash completions for aliases in ~/.bash_completion.d?" -n "! test -f ~/.bash_completion.d/complete_alias || ! test -f /root/.bash_completion.d/complete_alias" compl
+if [ -z "$compl" ] || [ "y" == "$compl" ]; then
+    if ! test -f install_bashalias_completions.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bashalias_completions.sh)" 
+    else
+        ./install_bashalias_completions.sh
+    fi 
 fi
+unset compl
 
 # Python completions
 
-if ! type activate-global-python-argcomplete &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Install python completions in ~/.bash_completion.d? [Y/n]: " "n" pycomp
-    if [ -z $pycomp ] || [ "y" == $pycomp ]; then
-        if ! test -f install_python_completions.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_python_completions.sh)" 
-        else
-            ./install_python_completions.sh
-        fi
+readyn -p "Install python completions in ~/.bash_completion.d?" -n "! type activate-global-python-argcomplete &> /dev/null" pycomp
+if [ -z $pycomp ] || [ "y" == $pycomp ]; then
+    if ! test -f install_python_completions.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_python_completions.sh)" 
+    else
+        ./install_python_completions.sh
     fi
-    unset pycomp
 fi
+unset pycomp
 
-reade -Q "GREEN" -i "y" -p "Install bash aliases and other config? [Y/n]: " "n" scripts
+readyn -p "Install bash aliases and other config?" scripts
 if [ -z $scripts ] || [ "y" == $scripts ]; then
 
     if ! test -f checks/check_aliases_dir.sh; then
@@ -398,7 +369,7 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
     fi
     if ! test -f install_aliases.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/install_aliases.sh)" 
-    else
+    els
         ./install_aliases.sh
     fi
 fi
@@ -453,7 +424,7 @@ shell-keybinds() {
    
     printf "${cyan}You can always switch between vi/emacs mode with ${CYAN}Ctrl-o${normal}\n"
      
-    reade -Q "YELLOW" -i "n" -p "Startup in vi-mode instead of emacs mode?(might cause issues with pasteing) [N/y]: " "y" vimde
+    readyn -Q "YELLOW" -p "Startup in vi-mode instead of emacs mode? (might cause issues with pasteing)" vimde
 
     sed -i "s|^set editing-mode .*|#set editing-mode vi|g" $binds
 
@@ -463,7 +434,7 @@ shell-keybinds() {
    
     sed -i "s|^set show-mode-in-prompt .*|#set show-mode-in-prompt on|g" $binds
      
-    reade -Q "GREEN" -i "y" -p "Enable visual que for vi/emacs toggle? (Displayed as '(ins)/(cmd) - (emacs)') [Y/n]: " "n" vivisual
+    readyn -p "Enable visual que for vi/emacs toggle? (Displayed as '(ins)/(cmd) - (emacs)')" vivisual
     if [ "$vivisual" == "y" ]; then
         sed -i "s|.set show-mode-in-prompt .*|set show-mode-in-prompt on|g" $binds
     fi
@@ -471,7 +442,7 @@ shell-keybinds() {
     sed -i "s|^setxkbmap |#setxkbmap |g" $binds
      
     if test $X11_WAY == 'x11'; then 
-        reade -Q "GREEN" -i "y" -p "Set caps to escape? (Might cause X11 errors with SSH) [Y/n]: " "n" xtrm
+        readyn -p "Set caps to escape? (Might cause X11 errors with SSH)" xtrm
         if [ "$xtrm" = "y" ]; then
             sed -i "s|#setxkbmap |setxkbmap |g" $binds
         fi
@@ -514,43 +485,29 @@ xresources() {
 yes_edit_no xresources "$xterm" "Install .Xresources at ~/? (Xterm configuration)" "edit" "YELLOW"
 
 # Bash Preexec
-if ! test -f ~/.bash_preexec || ! test -f /root/.bash_preexec; then
-    reade -Q "GREEN" -i "y" -p "Install pre-execution hooks for bash in ~/.bash_preexec? [Y/n]: " "n" bash_preexec
-    if [ -z "$bash_preexec" ] || [ "y" == "$bash_preexec" ]; then
-        if ! test -f install_bash_preexec.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bash_preexec.sh)" 
-        else
-            ./install_bash_preexec.sh
-        fi 
-    fi
-    unset bash_preexec
+readyn -p "Install pre-execution hooks for bash in ~/.bash_preexec?" -n "! test -f ~/.bash_preexec || ! test -f /root/.bash_preexec" bash_preexec
+if [ -z "$bash_preexec" ] || [ "y" == "$bash_preexec" ]; then
+    if ! test -f install_bash_preexec.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bash_preexec.sh)" 
+    else
+        ./install_bash_preexec.sh
+    fi 
 fi
+unset bash_preexec
 
 # Bash Preexec
-if ! test -f ~/.bash_preexec || ! test -f /root/.bash_preexec; then
-    reade -Q "GREEN" -i "y" -p "Install pre-execution hooks for bash in ~/.bash_preexec? [Y/n]: " "n" bash_preexec
-    if [ -z "$bash_preexec" ] || [ "y" == "$bash_preexec" ]; then
-        if ! test -f install_bash_preexec.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bash_preexec.sh)" 
-        else
-            ./install_bash_preexec.sh
-        fi 
-    fi
-    unset bash_preexec
+readyn -p "Install pre-execution hooks for bash in ~/.bash_preexec?" -n "! test -f ~/.bash_preexec || ! test -f /root/.bash_preexec" bash_preexec
+if [ -z "$bash_preexec" ] || [ "y" == "$bash_preexec" ]; then
+    if ! test -f install_bash_preexec.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bash_preexec.sh)" 
+    else
+        ./install_bash_preexec.sh
+    fi 
 fi
+unset bash_preexec
 
 # Pipewire (better sound)
-pre='y'
-othr='n'
-color='GREEN'
-prmpt='[Y/n]: '
-if type wireplumber &> /dev/null && test -f ~/.config/pipewire/pipewire-pulse.conf.d/switch-on-connect.conf; then
-    pre='n' 
-    othr='y'
-    color='YELLOW'
-    prmpt='[N/y]: '
-fi 
-reade -Q "$color" -i "$pre" -p "Install and configure pipewire? (sound system - pulseaudio replacement) $prmpt" "$othr" pipew
+readyn -p "Install and configure pipewire? (sound system - pulseaudio replacement)" -n 'type wireplumber &> /dev/null && test -f ~/.config/pipewire/pipewire-pulse.conf.d/switch-on-connect.conf;' pipew
 if [ $pipew == "y" ]; then
     if ! test -f install_pipewire.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipewire.sh)" 
@@ -558,20 +515,12 @@ if [ $pipew == "y" ]; then
         ./install_pipewire.sh 
     fi
 fi
-unset pre color othr pipew
+unset pipew
 
 # Moar (Custom pager instead of less)
-pre='y'
-othr='n'
-color='GREEN'
-prmpt='[Y/n]: '
-if type moar &> /dev/null; then
-    pre='n' 
-    othr='y'
-    color='YELLOW'
-    prmpt='[N/y]: '
-fi 
-reade -Q "$color" -i "$pre" -p "Install moar? (Custom pager/less replacement - awesome default options) $prmpt" "$othr" moar
+
+readyn -p "Install moar? (Custom pager/less replacement - awesome default options)" -n 'type moar &> /dev/null;' moar
+
 if [ -z $moar ] || [ "Y" == $moar ] || [ $moar == "y" ]; then
     if ! test -f install_moar.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_moar.sh)" 
@@ -579,24 +528,14 @@ if [ -z $moar ] || [ "Y" == $moar ] || [ $moar == "y" ]; then
         ./install_moar.sh 
     fi
 fi
-unset pre color othr moar
-
+unset moar
 
 
 
 # Nano (Editor)
-pre='y'
-othr='n'
-color='GREEN'
-prmpt='[Y/n]: '
-if type nano &> /dev/null && test -f ~/.nanorc &> /dev/null; then
-    pre='n' 
-    othr='y'
-    color='YELLOW'
-    prmpt='[N/y]: '
-fi
 
-reade -Q "$color" -i "$pre" -p "Install nano + config? (Simple terminal editor) $prmpt" "$othr" nno
+readyn -p "Install nano + config? (Simple terminal editor)" -n "type nano &> /dev/null && test -f ~/.nanorc &> /dev/null" nno
+
 if [ "y" == "$nno" ]; then
     if ! test -f install_nano.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nano.sh)" 
@@ -604,21 +543,13 @@ if [ "y" == "$nno" ]; then
         ./install_nano.sh
     fi
 fi
-unset pre color othr nno
+unset nno
 
 
 # Nvim (Editor)
-pre='y'
-othr='n'
-color='GREEN'
-prmpt='[Y/n]: '
-if type nvim &> /dev/null; then
-    pre='n' 
-    othr='y'
-    color='YELLOW'
-    prmpt='[N/y]: '
-fi
-reade -Q "$color" -i "$pre" -p "Install neovim + config? (Complex terminal editor) $prmpt" "$othr" nvm
+
+readyn -p "Install neovim + config? (Complex terminal editor)" -n "type nvim &> /dev/null" nvm
+
 if [ "y" == "$nvm" ]; then
     if ! test -f install_nvim.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nvim.sh)" 
@@ -626,22 +557,13 @@ if [ "y" == "$nvm" ]; then
         ./install_nvim.sh
     fi
 fi
-unset pre color othr nvm
+unset nvm
 
 
 # Kitty (Terminal emulator)
-pre='y'
-othr='n'
-color='GREEN'
-prmpt='[Y/n]: '
-if type kitty &> /dev/null; then
-    pre='n' 
-    othr='y'
-    color='YELLOW'
-    prmpt='[N/y]: '
-fi 
 
-reade -Q "$color" -i "$pre" -p "Install Kitty? (Terminal emulator) $prmpt" "$othr" kittn
+readyn -p "Install Kitty? (Terminal emulator)" -n "type kitty &> /dev/null" kittn
+
 if [ "y" == "$kittn" ]; then
     if ! test -f install_kitty.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_kitty.sh)" 
@@ -649,21 +571,13 @@ if [ "y" == "$kittn" ]; then
         ./install_kitty.sh
     fi
 fi
-unset pre color othr kittn
+unset kittn
 
 
 # Fzf (Fuzzy Finder)
-pre='y'
-othr='n'
-color='GREEN'
-prmpt='[Y/n]: '
-if type fzf &> /dev/null && type rg &> /dev/null; then
-    pre='n' 
-    othr='y'
-    color='YELLOW'
-    prmpt='[N/y]: '
-fi 
-reade -Q "$color" -i "$pre" -p "Install fzf? (Fuzzy file/folder finder - keybinding yes for upgraded Ctrl-R/reverse-search, fzf filenames on Ctrl+T and fzf-version of 'cd' on Alt-C + Custom script: Ctrl-f becomes system-wide file opener) $prmpt" "$othr" findr
+ 
+readyn -p "Install fzf? (Fuzzy file/folder finder - keybinding yes for upgraded Ctrl-R/reverse-search, fzf filenames on Ctrl+T and fzf-version of 'cd' on Alt-C + Custom script: Ctrl-f becomes system-wide file opener)" -n "type fzf &> /dev/null && type rg &> /dev/null" findr
+
 if [ "y" == "$findr" ]; then
     if ! test -f install_fzf.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fzf.sh)" 
@@ -671,20 +585,12 @@ if [ "y" == "$findr" ]; then
         ./install_fzf.sh
     fi
 fi
-unset pre color othr findr
+unset findr
 
 # Git
-pre='y'
-othr='n'
-color='GREEN'
-prmpt='[Y/n]: '
-if type git &> /dev/null && test -f ~/.gitconfig; then
-    pre='n' 
-    othr='y'
-    color='YELLOW'
-    prmpt='[N/y]: '
-fi 
-reade -Q "$color" -i "$pre" -p "Install Git and configure? (Project managing tool) $prmpt" "$othr" git_ins
+
+readyn -p "Install Git and configure? (Project managing tool)" -n "type git &> /dev/null && test -f ~/.gitconfig" git_ins
+
 if [ "y" == "$git_ins" ]; then
     if ! test -f install_git.sh; then
         ins_git=$(mktemp)
@@ -695,20 +601,12 @@ if [ "y" == "$git_ins" ]; then
         ./install_git.sh 'global'
     fi
 fi
-unset pre color othr git_ins
+unset git_ins
 
 # Lazygit
-pre='y'
-othr='n'
-color='GREEN'
-prmpt='[Y/n]: '
-if type lazygit &> /dev/null; then
-    pre='n' 
-    othr='y'
-    color='YELLOW'
-    prmpt='[N/y]: '
-fi 
-reade -Q "$color" -i "$pre" -p "Install lazygit? $prmpt" "$othr" git_ins
+
+readyn -p "Install lazygit?" -n "type lazygit &> /dev/null" git_ins
+
 if [ "y" == "$git_ins" ]; then
     if ! test -f install_lazygit.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_lazygit.sh)" 
@@ -716,10 +614,10 @@ if [ "y" == "$git_ins" ]; then
         ./install_lazygit.sh
     fi
 fi
-unset pre color othr git_ins
+unset git_ins
 
 # Osc
-#reade -Q "GREEN" -i "y" -p "Install Osc52 clipboard? (Universal clipboard tool / works natively over ssh) [Y/n]: " "n" osc
+#readyn -p "Install Osc52 clipboard? (Universal clipboard tool / works natively over ssh)" osc
 #if [ -z $osc ] || [ "Y" == $osc ] || [ $osc == "y" ]; then
 #    ./install_osc.sh 
 #fi
@@ -727,17 +625,9 @@ unset pre color othr git_ins
 
 
 # Ranger (File explorer)
-pre='y'
-othr='n'
-color='GREEN'
-prmpt='[Y/n]: '
-if type ranger &> /dev/null; then
-    pre='n' 
-    othr='y'
-    color='YELLOW'
-    prmpt='[N/y]: '
-fi 
-reade -Q "$color" -i "$pre" -p "Install Ranger? (Terminal file explorer) $prmpt" "$othr" rngr
+
+readyn -p "Install Ranger? (Terminal file explorer)" -n "type ranger &> /dev/null" rngr
+
 if [ "y" == "$rngr" ]; then
     if ! test -f install_ranger.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ranger.sh)" 
@@ -745,20 +635,12 @@ if [ "y" == "$rngr" ]; then
         ./install_ranger.sh
     fi
 fi
-unset pre color othr rngr
+unset rngr
 
 # Tmux (File explorer)
-pre='y'
-othr='n'
-color='GREEN'
-prmpt='[Y/n]: '
-if type tmux &> /dev/null; then
-    pre='n' 
-    othr='y'
-    color='YELLOW'
-    prmpt='[N/y]: '
-fi 
-reade -Q "$color" -i "$pre" -p "Install Tmux? (Terminal multiplexer) $prmpt" "$othr" tmx
+
+readyn -p "Install Tmux? (Terminal multiplexer)" -n "type tmux &> /dev/null" tmx
+
 if [ "y" == "$tmx" ]; then
     if ! test -f install_tmux.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_tmux.sh)" 
@@ -766,21 +648,12 @@ if [ "y" == "$tmx" ]; then
         ./install_tmux.sh
     fi
 fi
-unset pre color othr prmpt tmx
+unset tmx
 
 # Bat
-pre='y'
-othr='n'
-color='GREEN'
-prmpt='[Y/n]: '
-if type bat &> /dev/null || type batcat &> /dev/null; then
-    pre='n' 
-    othr='y'
-    color='YELLOW'
-    prmpt='[N/y]: '
-fi 
 
-reade -Q "$color" -i "$pre" -p "Install Bat? (Cat clone with syntax highlighting) $prmpt" "$othr" bat
+readyn -p "Install Bat? (Cat clone with syntax highlighting)" -n "type bat &> /dev/null || type batcat &> /dev/null" bat
+
 if [ -z $bat ] || [ "Y" == $bat ] || [ $bat == "y" ]; then
     if ! test -f install_bat.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bat.sh)" 
@@ -788,23 +661,13 @@ if [ -z $bat ] || [ "Y" == $bat ] || [ $bat == "y" ]; then
         ./install_bat.sh 
     fi
 fi
-unset bat
-unset pre color othr prmpt 
+unset bat 
 
 
-# Neofetch
-pre='y'
-othr='n'
-color='GREEN'
-prmpt='[Y/n]: '
-if type neofetch &> /dev/null || type fastfetch &> /dev/null || type screenfetch &> /dev/null; then
-    pre='n' 
-    othr='y'
-    color='YELLOW'
-    prmpt='[N/y]: '
-fi 
+# Neofetch 
 
-reade -Q "$color" -i "$pre" -p "Install neofetch/fastfetch/screenFetch)? (Terminal taskmanager - system information tool) $prmpt" "$othr" tojump
+readyn -p "Install neofetch/fastfetch/screenFetch)? (Terminal taskmanager - system information tool)" -n "type neofetch &> /dev/null || type fastfetch &> /dev/null || type screenfetch &> /dev/null" tojump
+
 if [ "$tojump" == "y" ]; then
     if ! test -f install_neofetch_onefetch.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_neofetch_onefetch.sh)" 
@@ -812,23 +675,12 @@ if [ "$tojump" == "y" ]; then
         ./install_neofetch_onefetch.sh
     fi
 fi
-unset tojump
-unset pre color othr prmpt 
+unset tojump  
 
 
 # Bashtop
-pre='y'
-othr='n'
-color='GREEN'
-prmpt='[Y/n]: '
-if type bashtop &> /dev/null || type bpytop &> /dev/null || type btop &> /dev/null; then
-    pre='n' 
-    othr='y'
-    color='YELLOW'
-    prmpt='[N/y]: '
-fi 
 
-reade -Q "$color" -i "$pre" -p "Install bashtop? (Python based improved top/htop) $prmpt" "$othr" tojump
+readyn -p "Install bashtop? (Python based improved top/htop)" -n "type bashtop &> /dev/null || type bpytop &> /dev/null || type btop &> /dev/null" tojump
 if [ "$tojump" == "y" ]; then
     if ! test -f install_bashtop.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bashtop.sh)" 
@@ -837,46 +689,23 @@ if [ "$tojump" == "y" ]; then
     fi
 fi
 unset tojump
-unset pre color othr prmpt 
 
 
 # Autojump
-pre='y'
-othr='n'
-color='GREEN'
-prmpt='[Y/n]: '
-if type autojump &> /dev/null; then
-    pre='n' 
-    othr='y'
-    color='YELLOW'
-    prmpt='[N/y]: '
-fi 
-#if ! type autojump &> /dev/null; then
-    reade -Q "$color" -i "$pre" -p "Install autojump? (jump to folders using 'bookmarks' - j_ ) $prmpt" "$othr" tojump
-    if [ "$tojump" == "y" ]; then
-        if ! test -f install_autojump.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_autojump.sh)" 
-        else
-            ./install_autojump.sh
-        fi
+
+readyn -p "Install autojump? (jump to folders using 'bookmarks' - j_ )" -n "type autojump &> /dev/null" tojump
+if [ "$tojump" == "y" ]; then
+    if ! test -f install_autojump.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_autojump.sh)" 
+    else
+        ./install_autojump.sh
     fi
-    unset tojump
-    unset pre color othr prmpt 
-#fi
+fi
+unset tojump
 
 # Starship
-pre='y'
-othr='n'
-color='GREEN'
-prmpt='[Y/n]: '
-if type starship &> /dev/null; then
-    pre='n' 
-    othr='y'
-    color='YELLOW'
-    prmpt='[N/y]: '
-fi 
 
-reade -Q "$color" -i "$pre" -p "Install Starship? (Snazzy looking prompt) $prmpt" "$othr" strshp
+readyn -p "Install Starship? (Snazzy looking prompt)" -n "type starship &> /dev/null" strshp
 if [ $strshp == "y" ]; then
     if ! test -f install_starship.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_starship.sh)" 
@@ -885,48 +714,25 @@ if [ $strshp == "y" ]; then
     fi
 fi
 unset strshp
-unset pre color othr prmpt 
 
 
 # Nmap
-pre='y'
-othr='n'
-color='GREEN'
-prmpt='[Y/n]: '
-if type nmap &> /dev/null; then
-    pre='n' 
-    othr='y'
-    color='YELLOW'
-    prmpt='[N/y]: '
-fi 
 
-if ! type nmap &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Install nmap? (Network port scanning tool) [Y/n]: " "n" tojump
-    if [ "$tojump" == "y" ]; then
-        if ! test -f install_nmap.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nmap.sh)" 
-        else
-            ./install_nmap.sh
-        fi
+readyn -p "Install nmap? (Network port scanning tool)" -n 'type nmap &> /dev/null' nmap
+
+if [ "$nmap" == "y" ]; then
+    if ! test -f install_nmap.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nmap.sh)" 
+    else
+        ./install_nmap.sh
     fi
-    unset tojump
-    unset pre color othr prmpt 
 fi
+unset nmap
 
 
 # Ufw / Gufw
-pre='y'
-othr='n'
-color='GREEN'
-prmpt='[Y/n]: '
-if type ufw &> /dev/null; then
-    pre='n' 
-    othr='y'
-    color='YELLOW'
-    prmpt='[N/y]: '
-fi 
 
-reade -Q "$color" -i "$pre" -p "Install ufw? (Uncomplicated firewall - Iptables wrapper) $prmpt" "$othr" ins_ufw
+readyn -p "Install ufw? (Uncomplicated firewall - Iptables wrapper)" -n "type ufw &> /dev/null" ins_ufw
 if [ $ins_ufw == "y" ]; then
     if ! test -f install_ufw.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ufw.sh)" 
@@ -935,7 +741,6 @@ if [ $ins_ufw == "y" ]; then
     fi
 fi
 unset ins_ufw
-unset pre color othr prmpt 
 
 
 # Netstat - deprecated
@@ -965,17 +770,9 @@ unset pre color othr prmpt
 
 
 # Lazydocker
-pre='y'
-othr='n'
-color='GREEN'
-prmpt='[Y/n]: '
-if type lazydocker &> /dev/null; then
-    pre='n' 
-    othr='y'
-    color='YELLOW'
-    prmpt='[N/y]: '
-fi 
-reade -Q "$color" -i "$pre" -p "Install lazydocker? $prmpt" "$othr" git_ins
+
+readyn -p "Install lazydocker?" -n "type lazydocker &> /dev/null" git_ins
+
 if [ "y" == "$git_ins" ]; then
     if ! test -f install_lazydocker.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_lazydocker.sh)" 
@@ -983,22 +780,13 @@ if [ "y" == "$git_ins" ]; then
         ./install_lazydocker.sh
     fi
 fi
-unset pre color othr git_ins
+unset git_ins
 
 
 # Exiftool (Metadata wiper)
-pre='y'
-othr='n'
-color='GREEN'
-prmpt='[Y/n]: '
-if type exiftool &> /dev/null; then
-    pre='n' 
-    othr='y'
-    color='YELLOW'
-    prmpt='[N/y]: '
-fi 
 
-reade -Q "$color" -i "$pre" -p "Install exiftool? (Metadata wiper for files) $prmpt" "$othr" exif_t
+readyn -p "Install exiftool? (Metadata wiper for files)" -n "type exiftool &> /dev/null" exif_t
+
 if [ -z $exif_t ] || [ "Y" == $exif_t ] || [ $exif_t == "y" ]; then
     if ! test -f install_exiftool.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_exiftool.sh)" 
@@ -1006,21 +794,12 @@ if [ -z $exif_t ] || [ "Y" == $exif_t ] || [ $exif_t == "y" ]; then
         ./install_exiftool.sh 
     fi
 fi
-unset pre color othr prmpt exif_t
+unset exif_t
 
 # Testdisk (File recovery tool)
-pre='y'
-othr='n'
-color='GREEN'
-prmpt='[Y/n]: '
-if type testdisk &> /dev/null; then
-    pre='n' 
-    othr='y'
-    color='YELLOW'
-    prmpt='[N/y]: '
-fi 
 
-reade -Q "$color" -i "$pre" -p "Install testdisk? (File recovery tool) $prmpt" "$othr" kittn
+readyn -p "Install testdisk? (File recovery tool)" -n "type testdisk &> /dev/null" kittn
+
 if [ "y" == "$kittn" ]; then
     if ! test -f install_testdisk.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_testdisk.sh)" 
@@ -1029,22 +808,12 @@ if [ "y" == "$kittn" ]; then
     fi
 fi
 unset kittn
-unset pre color othr prmpt 
 
 
 # Ffmpeg
-pre='y'
-othr='n'
-color='GREEN'
-prmpt='[Y/n]: '
-if type ffmpeg &> /dev/null; then
-    pre='n' 
-    othr='y'
-    color='YELLOW'
-    prmpt='[N/y]: '
-fi 
-#if ! type yt-dlp &> /dev/null; then
-reade -Q "$color" -i "$pre" -p "Install ffmpeg? (video/audio/image file converter) $prmpt" "$othr" ffmpg
+
+readyn -p "Install ffmpeg? (video/audio/image file converter)" -n "type ffmpeg &> /dev/null" ffmpg
+
 if [ "$ffmpg" == "y" ]; then
     if ! test -f install_ffmpeg.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ffmpeg.sh)" 
@@ -1053,32 +822,20 @@ if [ "$ffmpg" == "y" ]; then
     fi
 fi
 unset ffmpg
-unset pre color othr prmpt 
 
 
 # Yt-dlp
-pre='y'
-othr='n'
-color='GREEN'
-prmpt='[Y/n]: '
-if type yt-dlp &> /dev/null; then
-    pre='n' 
-    othr='y'
-    color='YELLOW'
-    prmpt='[N/y]: '
-fi 
-#if ! type yt-dlp &> /dev/null; then
-    reade -Q "$color" -i "$pre" -p "Install yt-dlp? (youtube video downloader) $prmpt" "$othr" tojump
-    if [ "$tojump" == "y" ]; then
-        if ! test -f install_yt-dlp.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_yt-dlp.sh)" 
-        else
-            ./install_yt-dlp.sh
-        fi
+
+readyn -p "Install yt-dlp? (youtube video downloader)" -n "type yt-dlp &> /dev/null" yt_dlp
+
+if [ "$yt_dlp" == "y" ]; then
+    if ! test -f install_yt-dlp.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_yt-dlp.sh)" 
+    else
+        ./install_yt-dlp.sh
     fi
-    unset tojump
-    unset pre color othr prmpt 
-#fi
+fi
+unset yt_dlp
 
 
 # Environment.env
@@ -1109,7 +866,7 @@ fi
 echo "Next $(tput setaf 1)sudo$(tput sgr0) will check whether root account is enabled"
 if ! test $(sudo passwd -S | awk '{print $2}') == 'L'; then
     printf "${CYAN}One more thing before finishing off${normal}: the ${RED}root${normal} account is still enabled.\n${RED1}This can be considered a security risk!!${normal}\n"
-    reade -Q 'YELLOW' -i 'y' -p 'Disable root account? (Enable again by giving up a password with \\"sudo passwd root\\") [Y/n]: ' 'n' root_dis
+    readyn -Q 'YELLOW' -p 'Disable root account? (Enable again by giving up a password with \\"sudo passwd root\\")' root_dis
     if test $root_dis == 'y'; then
        sudo passwd -l root 
     fi

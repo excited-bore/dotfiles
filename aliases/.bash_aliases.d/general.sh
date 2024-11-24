@@ -287,7 +287,7 @@ alias rm-all-hidden="rm -rv .[!.]* *";
 alias mkdir="mkdir -pv"
 
 #Always output colours for ls, grep and variants
-alias ls="eza --header --color=always --icons=always"
+alias ls="eza --header --color=always --icons"
 
 # List directories first
 alias ls-dirtop="ls --group-directories-first"
