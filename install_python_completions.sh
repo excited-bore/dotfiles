@@ -58,6 +58,8 @@ elif type activate-global-python-argcomplete3 &> /dev/null; then
     activate-global-python-argcomplete3 --dest=/home/$USER/.bash_completion.d 
 fi
     
+sed -i 's|.export PYTHON_ARGCOMPLETE_OK="True"|export PYTHON_ARGCOMPLETE_OK="True"|g' $ENVVAR
+
 #if ! grep -q "python-argcomplete" ~/.bashrc; then
 #    echo ". ~/.bash_completion.d/_python-argcomplete" >> ~/.bashrc
 #fi

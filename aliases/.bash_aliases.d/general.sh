@@ -40,12 +40,49 @@ fi
 
 #tput cup $(stty size | awk '{print int($1/2);}') 0 && tput cuu1 && tput ed && ls
 
+
+# Another wrapper (untested)
+# https://superuser.com/questions/299694/is-there-a-directory-history-for-bash
+
+# Cd wrapper
+function cd-w() {
+    local push=1
+    local j=0
+    if test "$1" == "--"; then
+        shift;
+    fi 
+    for i in $(dirs -l 2>/dev/null); do
+        if [[ -z "${@}" && "$i" == "$HOME" ]] || test "$(realpath ${@: -1:1})" == "$i"; then
+            push=0
+            pushd -n +$j &>/dev/null
+        fi
+        j=$(($j+1));
+    done
+    if [ $push == 1 ]; then
+        pushd "$(pwd)" &>/dev/null;  
+    fi
+    builtin cd -- "$@"; 
+    #export DIRS="$(dirs -l)" 
+    #if test "$TERM" == 'xterm-kitty' && test -f ~/.config/kitty/env.conf; then
+    #    sed -i "s|env DIRS.*|env DIRS=""$DIRS""|g" ~/.config/kitty/env.conf
+    #fi
+}
+
+complete -F _cd cd-w
+if type _fzf_dir_completion &> /dev/null; then
+    complete -F _fzf_dir_completion cd
+fi
+
+alias cd='cd-w'
+
 # cp recursively, verbose ()
 # cpOld same but no files older are overwritten
-alias cp="xcp --glob  --recursive  --verbose   --dereference  --"
+alias cp="xcp --glob  --recursive  --verbose --dereference  --"
 alias cp-old="cp -ruv"
 alias copy="cp"
 
+# scp - copy over ssh 
+alias scp="scp -r "
 
 
 function cp-all-to(){
@@ -287,7 +324,7 @@ alias rm-all-hidden="rm -rv .[!.]* *";
 alias mkdir="mkdir -pv"
 
 #Always output colours for ls, grep and variants
-alias ls="eza --header --color=always --icons"
+alias ls="eza --header --color=always --icons=always"
 
 # List directories first
 alias ls-dirtop="ls --group-directories-first"
@@ -704,6 +741,12 @@ function iommu-groups(){
     done;
 }
 
+# disk free and free
+alias free='free -h'
+alias free-kilo='command free --kilo'
+alias free-mega='command free --mega'
+alias free-giga='command free --giga'
+alias df='df -h -T --total'
 
 alias regenerate-initrams-all-kernels="sudo mkinitcpio -P"
 hdrs="$(echo $(uname -r) | cut -d. -f-2)"

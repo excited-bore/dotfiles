@@ -227,15 +227,12 @@ if test $distro_base == 'Debian'; then
 
 elif test $distro_base == 'Arch'; then
 
-
-    echo "Next $(tput setaf 1)sudo$(tput sgr0) will check whether colors are enabled for 'pacman'"
-    if sudo grep -q '#Colors' /etc/pacman.conf; then
-        readyn -Q "GREEN" -p "Enable colors for pacman? " pacs_col
-        if test $pacs_col == 'y'; then
-            sudo sed -i 's|#Colors|Colors|g' /etc/pacman.conf       
-        fi
-        unset pacs_col 
+    ! type pactree &> /dev/null && printf "${CYAN}pacman-contrib${normal} is not installed (Includes tools like pactree, pacsearch, pacdiff..)\n" 
+    readyn -p 'Install pacman-conrib package ' -n 'type pactree &> /dev/null' pacmn_cntr
+    if test $pacmn_cntr == 'y'; then
+        sudo pacman -Su pacman-contrib
     fi
+    unset pacmn_cntr
    
     if ! type yay &> /dev/null; then
         printf "${CYAN}yay${normal} is not installed (Pacman wrapper for installing AUR packages, needed for yay-fzf-install)\n"
@@ -874,5 +871,7 @@ if ! test $(sudo passwd -S | awk '{print $2}') == 'L'; then
 fi
 
 echo "${cyan}${bold}Source .bashrc 'source ~/.bashrc' and you can check all aliases with 'alias'";
-alias -p;
 echo "${green}${bold}Done!"
+readyn -p 'List all aliases?' allis
+test $allis == 'y' && ( set -o posix ; alias ) | $PAGER
+unset allis

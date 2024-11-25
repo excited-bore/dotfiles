@@ -207,6 +207,7 @@ _service-start(){
 
 complete -F _service-start service-start
 
+
 alias system-service-stop="sudo systemctl stop "
 alias service-stop="systemctl --user stop "
 
@@ -294,6 +295,11 @@ _service-enable-now(){
 }
 
 complete -F _service-enable-now service-enable-now
+
+alias systemctl-failed='systemctl --failed'
+alias systemctl-failed-root='sudo systemctl --failed'
+alias service-failed='systemctl --failed'
+alias service-failed-system='sudo systemctl --failed'
 
 alias service-system-disable="sudo systemctl disable "
 alias service-user-disable="systemctl --user disable "

@@ -197,6 +197,16 @@ function update-system() {
                 eval "$pac_ins $hdrs"
             fi
         fi
+        
+        readyn -p 'Clean unnessecary packages?' cachcln
+        if test $cachcln == 'y'; then
+            if ! test -z "$AUR_clean"; then
+                eval "$AUR_clean"
+            else
+                eval "$pac_clean"
+            fi
+        fi
+        unset cachcln 
     elif test "$distro" == "Gentoo"; then
         #TODO Add update cycle for Gentoo systems
         continue
