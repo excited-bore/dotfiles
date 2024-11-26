@@ -700,6 +700,18 @@ if [ "$tojump" == "y" ]; then
 fi
 unset tojump
 
+# Zoxide 
+
+readyn -p "Install zoxide? (A cd that guesses the right path based on a history)" -n "type zoxide &> /dev/null" zoxs
+if [ "$zoxs" == "y" ]; then
+    if ! test -f install_zoxide.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_zoxide.sh)" 
+    else
+        ./install_zoxide.sh
+    fi
+fi
+unset zoxs
+
 
 # Starship
 
