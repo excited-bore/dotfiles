@@ -700,6 +700,7 @@ if [ "$tojump" == "y" ]; then
 fi
 unset tojump
 
+
 # Starship
 
 readyn -p "Install Starship? (Snazzy looking prompt)" -n "type starship &> /dev/null" strshp
@@ -711,6 +712,18 @@ if [ $strshp == "y" ]; then
     fi
 fi
 unset strshp
+
+# Thefuck
+
+readyn -p "Install 'thefuck'? (Correct last command that ended with an error)" -n "type thefuck &> /dev/null" tf
+if [ "$tf" == "y" ]; then
+    if ! test -f install_thefuck.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_thefuck.sh)" 
+    else
+        ./install_thefuck.sh
+    fi
+fi
+unset tf
 
 
 # Nmap

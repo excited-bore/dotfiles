@@ -219,7 +219,13 @@ function rm-prompt(){
     local files=0 
     local dirss=0
     local exitmeyesplease=0 
+    local itms 
     for itm in $(echo $@ | sort -u); do
+
+        # Omit trailing slash '/' because 'test -L' otherwise does not recognize directory symlinks
+
+        test -d "$itm" && itm=${itm%/} 
+
         if ! test -e "$itm" && ! test -L "$itm"; then
            printf "${red}$itm does not exist\n"
            break && exit 1
@@ -229,8 +235,9 @@ function rm-prompt(){
            dirss=$(($dirss + $(ls -AR $itm | grep --color=none ':' | cut -d: -f-1 | wc -w)))
            files="$(($files + $(find $itm -type f | wc -w)))"  
         else
-            files="$(($files + 1))"
+           files="$(($files + 1))"
         fi
+        itms="$itms $itm"  
     done 
 
     for itm in $(echo $@ | sort -u); do
@@ -248,7 +255,7 @@ function rm-prompt(){
     if [[ $files > 0 ]] || [[ $symlinks > 0 ]] || [[ $dirss > 0 ]]; then
         reade -Q 'YELLOW' -i 'y' -p "Remove all $symlinks symlink(s), $files file(s) and all $dirss directory(s)? [Y/n]: " 'n' rm_stff
         if test "$rm_stff" == 'y'; then
-            command rm $RMPROMPT_RM_OPT -- "$@" 
+            command rm -f $RMPROMPT_RM_OPT -- $itms 
         fi
     fi
     unset rm_stff dirss files i itm
