@@ -700,6 +700,19 @@ if [ "$tojump" == "y" ]; then
 fi
 unset tojump
 
+# Zoxide 
+
+readyn -p "Install zoxide? (A cd that guesses the right path based on a history)" -n "type zoxide &> /dev/null" zoxs
+if [ "$zoxs" == "y" ]; then
+    if ! test -f install_zoxide.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_zoxide.sh)" 
+    else
+        ./install_zoxide.sh
+    fi
+fi
+unset zoxs
+
+
 # Starship
 
 readyn -p "Install Starship? (Snazzy looking prompt)" -n "type starship &> /dev/null" strshp
@@ -711,6 +724,18 @@ if [ $strshp == "y" ]; then
     fi
 fi
 unset strshp
+
+# Thefuck
+
+readyn -p "Install 'thefuck'? (Correct last command that ended with an error)" -n "type thefuck &> /dev/null" tf
+if [ "$tf" == "y" ]; then
+    if ! test -f install_thefuck.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_thefuck.sh)" 
+    else
+        ./install_thefuck.sh
+    fi
+fi
+unset tf
 
 
 # Nmap

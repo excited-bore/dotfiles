@@ -158,7 +158,7 @@ do
             pac="zypper_tumble"
         fi
         distro_base="Slackware"
-        distro="openSuse"
+        distro="openSUSE"
     elif [ -f $f ] && [ $f == /etc/gentoo-release ] && [ $distro == / ]; then
         pac="emerge"
         distro_base="Slackware"
