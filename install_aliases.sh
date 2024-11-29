@@ -117,9 +117,9 @@ if test $ansr == "y"; then
                 ezalias=$ezalias" --color=always" 
             fi
              
-            readyn -p "Add filetype/directory icons for all the found items in 'eza'? " eza_icon
+            readyn -p "Always show filetype/directory icons for items with 'eza'? " eza_icon
             if test $eza_icon == 'y'; then
-                ezalias=$ezalias" --icons" 
+                ezalias=$ezalias" --icons=always" 
             fi
               
             sed -i 's|.*alias ls=".*|alias ls="'"$ezalias"'"|g' $genr  
@@ -224,6 +224,20 @@ if test $ansr == "y"; then
         fi
     fi
     unset cat
+   
+    rver=$(echo $(ruby --version) | awk '{print $2}' | cut -d. -f-2)'.0'
+    paths=$(gem environment | awk '/- GEM PATH/{flag=1;next}/- GEM CONFIGURATION/{flag=0}flag' | sed 's|     - ||g' | paste -s -d ':')
+    if grep -q "GEM" $ENVVAR; then
+        sed -i "s|.export GEM_|export GEM_|g'" $ENVVAR 
+        sed -i "s|.export PATH=\$PATH:\$GEM_PATH|export PATH=\$PATH:\$GEM_PATH|g" $ENVVAR
+        sed -i "s|export GEM_HOME=.*|export GEM_HOME=$HOME/.gem/ruby/$rver|g" $ENVVAR
+        sed -i "s|export GEM_PATH=.*|export GEM_PATH=$paths|g" $ENVVAR
+        sed -i 's|export PATH=$PATH:$GEM_PATH.*|export PATH=$PATH:$GEM_PATH:$GEM_HOME/bin|g' $ENVVAR
+    else
+        printf "export GEM_HOME=$HOME/.gem/ruby/$rver\n" >> $ENVVAR
+        printf "export GEM_PATH=$paths\n" >> $ENVVAR
+        printf "export PATH=\$PATH:\$GEM_PATH:\$GEM_HOME/bin\n" >> $ENVVAR
+    fi
 
     general_r(){ 
         sudo cp -fv $genr /root/.bash_aliases.d/;

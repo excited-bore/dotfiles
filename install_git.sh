@@ -1326,13 +1326,19 @@ fi
         fi
     fi
 
+    readyn -p 'Configure git to look for ssh:// instead of https:// when f.ex. pulling/pushing?' -n "\$(git config $global --list | grep url.ssh://git@github.com/.insteadof= | awk 'BEGIN { FS = \"=\" } ;{print \$2;}')\" == ''" githttpee 
+    if [ "y" == $githttpee ]; then
+        git config $global url.ssh://git@github.com/.insteadOf https://github.com/
+    fi
+    unset gihttpee
+
     # https://www.youtube.com/watch?v=aolI_Rz0ZqY
     local gitrerere rerere
     local prererere='n'
     color="YELLOW" 
     othr='y'
     prmpt='[Y/n]: ' 
-    if test "$(git config $global --list | grep 'rerere.enabled' | awk 'BEGIN { FS = "=" } ;{print $2;}')" == '' ; then
+    if test "$(git config $global --list | grep -q 'rerere.enabled' | awk 'BEGIN { FS = "=" } ;{print $2;}')" == '' ; then
         prererere='y'
         color="CYAN" 
         othr='n'

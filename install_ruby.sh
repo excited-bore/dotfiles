@@ -69,12 +69,14 @@ unset latest vers all
 rver=$(echo $(ruby --version) | awk '{print $2}' | cut -d. -f-2)'.0'
 paths=$(gem environment | awk '/- GEM PATH/{flag=1;next}/- GEM CONFIGURATION/{flag=0}flag' | sed 's|     - ||g' | paste -s -d ':')
 if grep -q "GEM" $ENVVAR; then
-    sed -i "s|.export GEM_HOME=.*|export GEM_HOME=$HOME/.gem/ruby/$rver|g" $ENVVAR
-    sed -i "s|.export GEM_PATH=.*|export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin|g" $ENVVAR
-    sed -i 's|.export PATH=$PATH:$GEM_PATH.*|export PATH=$PATH:$GEM_PATH:$GEM_HOME/bin|g' $ENVVAR
+    sed -i "s|.export GEM_|export GEM_|g'" $ENVVAR 
+    sed -i "s|.export PATH=\$PATH:\$GEM_PATH|export PATH=\$PATH:\$GEM_PATH|g" $ENVVAR
+    sed -i "s|export GEM_HOME=.*|export GEM_HOME=$HOME/.gem/ruby/$rver|g" $ENVVAR
+    sed -i "s|export GEM_PATH=.*|export GEM_PATH=$paths|g" $ENVVAR
+    sed -i 's|export PATH=$PATH:$GEM_PATH.*|export PATH=$PATH:$GEM_PATH:$GEM_HOME/bin|g' $ENVVAR
 else
     printf "export GEM_HOME=$HOME/.gem/ruby/$rver\n" >> $ENVVAR
-    printf "export GEM_PATH=/usr/lib/ruby/gems/$rver:$HOME/.local/share/gem/ruby/$rver/bin\n" >> $ENVVAR
+    printf "export GEM_PATH=$paths\n" >> $ENVVAR
     printf "export PATH=\$PATH:\$GEM_PATH:\$GEM_HOME/bin\n" >> $ENVVAR
 fi
 

@@ -99,22 +99,24 @@ fzf_rifle(){
                 if test "$result" == 'Put item in prompt'; then
                     print-path-to-prompt "$fle" 
                 else
-                    rifle -p "${result::1}" "$fle";
+                    rifle -p ${result::1} "$fle";
                 fi
                 return 0;
             fi
         else
             #IFS=$'\n' read -d "\034" -r -a files <<<"${fle}\034";
-            opts="$(rifle -l "$fle")"
-            result="$(printf "Put items in prompt (lines)\nPut items in prompt (words)\n$opts" | fzf --height 50% --reverse)";
-            if test "$result" == 'Put items in prompt (lines)'; then
-                print-path-to-prompt -l "$fle"   
-            elif test "$result" == 'Put items in prompt (words)'; then 
-                print-path-to-prompt "$fle" 
-            else
-                rifle -p ${result::1} $fle;
-            fi
-            return 0;
+            for i in ${fle[@]}; do
+                opts="$(rifle -l "$i")"
+                result="$(printf "Put items in prompt (lines)\nPut items in prompt (words)\n$opts" | fzf --height 50% --reverse)";
+                if test "$result" == 'Put items in prompt (lines)'; then
+                    print-path-to-prompt -l "$i"   
+                elif test "$result" == 'Put items in prompt (words)'; then 
+                    print-path-to-prompt "$i" 
+                else
+                    rifle -p ${result::1} $i;
+                fi
+                return 0;
+            done
         fi    
     fi
     unset fle 

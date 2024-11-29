@@ -3,32 +3,23 @@ if ! type reade &> /dev/null && test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh; 
     . ~/.bash_aliases.d/00-rlwrap_scripts.sh
 fi
 
-user="burp"
-user1=
-user2="root"
-ip="192.168.0.140"
-ip1=
-ip2="139.162.150.36"
-ssh_file="~/.ssh/id_ed25519"
-ssh_file1="~/.ssh/id_rsa1"
-ssh_file2="~/.ssh/minecraft_ti"
-
-# To prevent 'failed to preserve ownership' errors
-copy_sshfs(){ cp -r --no-preserve=mode "$1" "$2"; }
-move_sshfs(){ cp -r --no-preserve=mode "$1" "$2" && rmTrash "$1"; }
-
-copy_to_serber() { scp -r $user@$ip:$1 $2; }
-#function cp_from_serber() { scp -r }
-
 # SSH in Kitty only really w
 #[ "$TERM" = "xterm-kitty" ] && alias ssh="kitty +kitten ssh -R 50000:${KITTY_LISTEN_ON#*:}"
 [ "$TERM" = "xterm-kitty" ] && alias ssh="kitty +kitten ssh"
 
-
 # For Xclip, we need X11 to function properly  
 # Even if X11 fowarding is setup, x11 still needs a display
 # So we need to set the DISPLAY to the host's (you) by passing your IP to DISPLAY before connecting
-addr=$(nmcli device show | grep IP4.ADDR | awk 'NR==1{print $2}'| sed 's|\(.*\)/.*|\1|')
+if test $X11_WAY == 'x11' && type nmcli &> /dev/null; then
+    addr=$(nmcli device show | grep IP4.ADDR | awk 'NR==1{print $2}'| sed 's|\(.*\)/.*|\1|')
+fi
+
+alias smv="rsync -avz --remove-source-files -e ssh "
+
+# To prevent 'failed to preserve ownership' errors
+copy-sshfs(){ cp -r --no-preserve=mode "$1" "$2"; }
+move-sshfs(){ cp -r --no-preserve=mode "$1" "$2" && rmTrash "$1"; }
+
 
 # -t forces allocation for a pseudo-terminal
 # -X enables X11 forwarding
@@ -36,14 +27,64 @@ addr=$(nmcli device show | grep IP4.ADDR | awk 'NR==1{print $2}'| sed 's|\(.*\)/
 # We set DISPLAY and start a login shell instead of just connecting
 # This *should* also forward GUI for GUI apps
 
-#Server access
-alias serber="ssh -XY -i $ssh_file $user@$ip"
-alias serber1="ssh -XY -p 4000 -i $ssh_file1 $user1@$ip1"
-alias minecraft_ti="ssh -XY -i $ssh_file2 $user2@$ip2"
-alias serber_unmnt="fusermount3 -u /mnt/mount1/"
-alias serber_unmnt1="fusermount3 -u /mnt/mount2/"
+# https://askubuntu.com/questions/275965/how-to-list-all-variables-names-and-their-current-values
+function valid-ip(){
+    local IPA1=$1
+    local stat=1
 
-ssh_key_and_add_to_agent_by_host() {
+    if [[ $IPA1 =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+        
+        local ip1 ip2 ip3 ip4
+        
+        ip1=$(echo $IPA1 | cut -d. -f1)
+        ip2=$(echo $IPA1 | cut -d. -f2)
+        ip3=$(echo $IPA1 | cut -d. -f3)
+        ip4=$(echo $IPA1 | cut -d. -f4)
+
+        # It's testing if any part of IP is more than 255
+        [[ $ip1 -le 255 && $ip2 -le 255 && $ip3 -le 255 && $ip4 -le 255 ]]  
+            
+        # If any part of IP as tested above is more than 255 stat will have a non zero value
+        stat=$? 
+    else
+        return 1
+    fi
+    return $stat # as expected returning
+}
+
+function add-known-ip(){
+    ! test -f ~/.bash_aliases.d/ssh1.sh && touch ~/.bash_aliases.d/ssh1.sh 
+    ips=$( ( set -o posix ; set ) | grep --color=never ^ip )
+    ipss=0
+    for i in ${ips[@]}; do
+        valid-ip $i && ipss="$(($ipss + 1))"
+    done
+    reade -Q 'CYAN' -p 'Ip?: ' "${ipss[@]}" ipnr
+    if valid-ip $ipnr ; then 
+        for i in ${ips[@]}; do
+            ipss="$(($ipss + 1))"
+        done
+        ipn="ip$ipss" 
+    elif [[ $ip_n =~ ip=.* ]]; then 
+        ipn=$(echo $ip_n | cut -d= -f1)
+        ipnr=$(echo $ip_n | cut -d= -f2)
+    fi
+     
+}
+
+
+function add-ssh-alias(){
+    ! test -f ~/.bash_aliases.d/ssh1.sh && touch ~/.bash_aliases.d/ssh1.sh 
+    local servers servr nam ipnr ips ipn ipss 
+    servers=$( ( set -o posix ; alias ) | grep --color=never ^server )
+    servr='server1' 
+    ! [ -z $servers ] && servr="server$((${#servers[@]} + 1))"  
+    reade -Q 'CYAN' -i "$servr" -p 'Server name? [Default:server1]: ' '' nam
+    alias ${!nam} &> /dev/null && echo 'Name already taken' && return 0 
+    unset i  
+}
+
+ssh-key-and-add-to-agent-by-host() {
     keytype=''
     if [ ! -f ~/.ssh/config ]; then
         touch ~/.ssh/config;
@@ -90,21 +131,3 @@ ssh_key_and_add_to_agent_by_host() {
     echo "Public key: "
     cat ~/.ssh/$name.pub; 
 }
-
-serber_mnt() {
-    if [ ! -d /mnt/mount1 ]; then
-        mkdir /mnt/mount1; 
-    fi;
-    if [ ! -e ~/Files/Files ]; then
-        sshfs $user@$ip:/mnt/MyStuff/ /mnt/mount1/ -o IdentityFile=$ssh_file,follow_symlinks,reconnect,default_permissions,uid=1000,gid=1001,workaround=rename;
-    fi
-}
-
-serber_mnt1(){
-    if ! [ -d /mnt/mount2 ]; then
-        mkdir /mnt/mount2; 
-    fi;
-    if [ ! -e /mnt/mount2/.bashrc ]; then
-        sshfs $user@$ip:/media/ /mnt/mount2/ -o IdentityFile=$ssh_file,follow_symlinks,reconnect,default_permissions,uid=1000,gid=1001,workaround=rename;
-    fi
-}                                    

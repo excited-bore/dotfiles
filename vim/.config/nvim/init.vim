@@ -1149,7 +1149,9 @@ set t_kb=^?
 set t_kD=^[[3~
 
 
-vnoremap / y/<C-r>0
+nnoremap / /\c
+vnoremap / y/\c<C-r>0
+
 " Ctrl - f => Find
 " Don't forget: Enter, not escape
 "nnoremap <C-f> /
