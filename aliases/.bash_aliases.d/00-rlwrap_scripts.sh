@@ -211,68 +211,81 @@ reade(){
 
 
 function readyn(){
-    if [[ $# < 1 ]]; then
-        echo "Give up one variables for reade(): "
-        echo "The variable (could be empty) that contains the return string"
-        return 0
-    fi
         
     while :; do
        case $1 in
            -h|-\?|--help)
-               printf "${bold}readyn${normal} [-h/--help] [ -n ] [ -p PROMPTSTRING ] [ -Q COLOURSTRING ]  [ -b BREAK-CHARS ] returnvar\n
-    Simplifies yes/no prompt for reade. Supply at least 1 variable to put the answer in.  
-   '${GREEN} [Yes/no]: ${normal}' (default): 'y' as pre-given, 'n' as other option. Colour for the prompt is GREEN
-   '${YELLOW} [No/yes]: ${normal}' : 'n' as pre-given, 'y' as other option. Colour for the prompt is YELLOW
+               printf "${bold}readyn${normal} [-h/--help] [ -n ] [ -p PROMPTSTRING ] [ -Q COLOURSTRING ]  [ -b BREAK-CHARS ] [ returnvar ]\n
+               Simplifies yes/no prompt for ${bold}reade${normal}. Supply at least 1 variable as the last argument to put the answer in, otherwise the value will be in '\$READYN_VALUE'.  
+'${GREEN} [${underline_on}Y${underline_off}es/${underline_on}n${underline_off}o]: ${normal}' : 'y' as pre-given, 'n' as other option. Colour for the prompt is ${GREEN}GREEN (Default)${normal} 
+'${YELLOW} [${underline_on}N${underline_off}o/${underline_on}y${underline_off}es]: ${normal}' : 'n' as pre-given, 'y' as other option. Colour for the prompt is ${YELLOW}YELLOW${normal}
     For both an empty answer will return the default answer. 
 
    -n
 
-   Set '${YELLOW} [No/yes]: ${normal}' as the default prompt. 
+   Set '${YELLOW} [${underline_on}N${underline_off}o/${underline_on}y${underline_off}es]: ${normal}' as the default prompt. 
     
    -Q ${underline_on}Colour${underline_off}
 
    Use  one  of  the  colour names black, red, green, yellow, blue, cyan, purple (=magenta) or white, or an ANSI-conformant <colour_spec> to colour any prompt displayed  by  command.\n An uppercase colour name (Yellow or YELLOW ) gives a bold prompt.\n Prompts that already contain (colour) escape sequences or one of the readline \"ignore markers\" (ASCII 0x01 and 0x02) are not coloured.
     
     -b ${underline_on}list_of_characters${underline_off} 
+
     (From rlwrap manual) Consider  the specified characters word-breaking (whitespace is always word-breaking). This determines what is considered a \"word\", both when completing and when building a completion word list from files specified by -f options following (not preceding!) it.\n Default list (){}[],'+-=&^%%\$#@\";|\ \n Unless -c is specified, / and . (period) are included in the default list\n\n"
               return 0
           ;;
+
           # Otherwise 
           *) break 
           ;;
        esac
-    done
-  
+    done && OPTIND=1;
+   
+    #https://stackoverflow.com/questions/12022592/how-can-i-use-long-options-with-the-bash-getopts-builtin
+
+    for arg in "$@"; do
+      shift
+      case "$arg" in
+        '--break-chars')       set -- "$@" '-b'   ;;
+        '--colour')            set -- "$@" '-Q'   ;;
+        '--prompt')            set -- "$@" '-p'   ;;
+        '--no')                set -- "$@" '-n'   ;;
+        *)                     set -- "$@" "$arg" ;;
+      esac
+    done 
+
     local breaklines=''
-    while getopts ':b:Q:p:' flag; do
+    local nocase='' 
+    local pre='' 
+    local color='' 
+    OPTIND=1
+    while getopts ':b:Q:p:n:' flag; do
         case "${flag}" in
              b)  breaklines="-b \"${OPTARG}\"";
              ;;    
+             Q)  color="${OPTARG}";
+             ;;    
              p)  prmpt=${OPTARG};
              ;;
-             Q)  color=${OPTARG};
-             ;;    
-
+             n) if [ "${OPTARG}" ] && ! test "${OPTARG}" == '--' && ! [[ ${OPTARG} =~ -.* ]]; then
+                    nocase="${OPTARG}"
+                fi 
+                if test -z "$nocase" || eval $nocase; then
+                    pre='n'
+                    othr='y'
+                    prmpt1=" [${underline_on}N${underline_off}o/${underline_on}y${underline_off}es]: "
+                    test -z $color && color='YELLOW'
+                fi
+             ;;
         esac
     done && OPTIND=1;
 
-    while getopts ':n:' flag; do
-        case "${flag}" in
-              n)  pre='n'
-                  othr='y'
-                  prmpt1=' [No/yes]: ' 
-                  test -z $color && color='YELLOW'
-                  break 
-              ;;
-              *)  pre='y'
-                  othr='n'
-                  prmpt1=' [Yes/no]: ' 
-                  test -z $color && color='GREEN'
-                  break 
-              ;;    
-        esac
-    done && OPTIND=1;
+    if test -z $pre; then 
+        pre='y'
+        othr='n'
+        prmpt1=" [${underline_on}Y${underline_off}es/${underline_on}n${underline_off}o]: "
+        test -z $color && color='GREEN'
+    fi
 
     if ! test -z "$prmpt"; then
         reade -Q "$color" $breaklines -i "$pre" -p "$prmpt$prmpt1" "$othr" value;   
@@ -280,7 +293,11 @@ function readyn(){
         reade -Q "$color" $breaklines -i "$pre" -p "$prmpt1" "$othr" value;    
     fi
 
-    eval "${@:$#:1}=$value" 
+    if ! test -z "${@:$#:1}" && ! test "${@:$#:1}" == '/bin/bash'; then
+        eval "${@:$#:1}=$value" 
+    else
+        export READYN_VALUE="$value" 
+    fi
 
     unset pre other prmpt prmpt1 color readestr breaklines value 
 }
