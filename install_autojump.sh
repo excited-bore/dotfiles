@@ -40,7 +40,7 @@ if ! type autojump &> /dev/null; then
     if test "$distro_base" == "Arch"; then
         if test -z "$AUR_ins"; then 
             reade -Q 'GREEN' -i 'y' -p 'No AUR helper found. Install yay? [Y/n]: ' 'n' ins_yay
-            if test $ins_yay == 'y'; then
+            if test "$ins_yay" == 'y'; then
                 if ! test -f AUR_insers/install_yay.sh ; then
                      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/AUR_insers/install_yay.sh )" 
                 else
@@ -50,19 +50,19 @@ if ! type autojump &> /dev/null; then
             unset ins_yay
             yay -S autojump 
         else 
-            eval "$AUR_ins autojump"
+            ${AUR_ins} autojump
         fi
     elif [ $distro_base == "Debian" ]; then
-        eval "$pac_ins autojump"                                                              
+        ${pac_ins} autojump                                                              
     fi
 fi
 
-if ! grep -q "autojump" ~/.bashrc; then
-    printf "[ -s /etc/profile.d/autojump.sh ] && source /etc/profile.d/autojump.sh\n" >> ~/.bashrc
-&> /dev/null
-fi
-if ! sudo grep -q "autojump" /root/.bashrc; then
-    printf "[ -s /etc/profile.d/autojump.sh ] && source /etc/profile.d/autojump.sh\n" | sudo tee -a /root/.bashrc &> /dev/null
-fi
+#if ! grep -q "autojump" ~/.bashrc; then
+#    printf "[ -s /etc/profile.d/autojump.sh ] && source /etc/profile.d/autojump.sh\n" >> ~/.bashrc
+#&> /dev/null
+#fi
+#if ! sudo grep -q "autojump" /root/.bashrc; then
+#    printf "[ -s /etc/profile.d/autojump.sh ] && source /etc/profile.d/autojump.sh\n" | sudo tee -a /root/.bashrc &> /dev/null
+#fi
 
 unset tojump bnd bnd_r

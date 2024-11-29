@@ -339,9 +339,9 @@ alias ls-files="ls -Ahp | grep -v /"
 alias ls-dirs="ls -Ahp | grep \".*/$\""
 
 if type eza &> /dev/null; then
-    alias eza="eza --color=always --header --icons=always" 
+    alias eza="eza --color=always --header --icons=always --smart-group" 
     alias ls-dirtop="eza --group-directories-first"
-    alias ls-all="eza -A --long --git --header"
+    alias ls-all="eza -A --long --git --header --smart-group"
     alias ls-files="eza -A --only-files"
     alias ls-dirs="eza -A --only-dirs" 
     alias eza-git="eza --long --git-repos --header --git" 
@@ -349,6 +349,8 @@ if type eza &> /dev/null; then
 fi
 
 alias ll="ls-all"
+alias lp="ls-all | $PAGER"
+
 
 alias grep='grep --colour=always'
 alias egrep='egrep --colour=always'
@@ -576,18 +578,18 @@ function crontab-new(){
 alias cron-new='crontab-new'
 
 function ln-soft(){
-    if ([[ "$1" = /* ]] || [ -d "$1" ] || [ -f "$1" ]) && ([[ $(readlink -f "$2") ]] || [[ $(readlink -d "$2") ]]); then
-        if [[ "$1" = /* ]]; then  
-            ln -s "$1" "$2";
-        else     
+    if ([ -d "$1" ] || [ -f "$1" ]) && ([[ $(readlink -f "$2") ]] || [[ $(readlink -d "$2") ]]); then
+        if [ -e "$(pwd)/$1" ]; then  
             ln -s "$(pwd)/$1" "$2";
+        else     
+            ln -s "$1" "$2";
         fi;
     else
         echo "Give a file and a name pls";
     fi
 }
 
-complete -F _files ln-soft
+complete -F _filedir ln-soft
 
 
 function ln-hard(){
@@ -602,7 +604,7 @@ function ln-hard(){
     fi
 }
 
-complete -F _files ln-hard
+complete -F _filedir ln-hard
 
 function trash(){
     for arg in $@ ; do

@@ -16,7 +16,7 @@ color='GREEN'
 prmpt='[Both/exit/intr/n]: '
 
 echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for terminate background processes /root/.bashrc' "
-if grep -q "trap '! \[ -z \"\$(jobs -p)\" ] && kill -9 \"\$(jobs -p*" ~/.bashrc || sudo grep -q "trap '! [ -z \"\$(jobs -p)\" ] && kill -9 \"\$(jobs -p*" /root/.bashrc; then
+if grep -q "trap '! \[ -z \"\$(jobs -p)\" ] && kill -9 \$(jobs -p.*" ~/.bashrc || sudo grep -q "trap '! [ -z \"\$(jobs -p)\" ] && kill -9 \$(jobs -p.*" /root/.bashrc; then
     pre='n' 
     othr='both exit intr'
     color='YELLOW'
@@ -32,10 +32,10 @@ if ! [ $int_r  == "n" ]; then
     elif test $int_r == 'intr'; then
         sig='INT'  
     fi
-    if grep -q "trap '! \[ -z \"\$(jobs -p)\" ] && kill -9 \"\$(jobs -p*" ~/.bashrc; then 
+    if grep -q "trap '! \[ -z \"\$(jobs -p)\" ] && kill -9 \$(jobs -p.*" ~/.bashrc; then 
         sed -i '/trap '\''! \[ -z "$(jobs -p)" \] \&\& kill -9 "$(jobs -p.*/d' ~/.bashrc  
     fi 
-    printf "trap '! [ -z \"\$(jobs -p)\" ] && kill -9 \"\$(jobs -p | tr \"\\\n\"  \" \")\"' $sig\n" >> ~/.bashrc
+    printf "trap '! [ -z \"\$(jobs -p)\" ] && kill -9 \$(jobs -p | tr \"\\\n\" \" \")' $sig\n" >> ~/.bashrc
         
     pre='same'
     othr='both exit intr n'
@@ -59,10 +59,10 @@ if ! [ $int_r  == "n" ]; then
             sig='INT'  
         fi
 
-        if  sudo grep -q "trap '! \[ -z \"\$(jobs -p)\" ] && kill -9 \"\$(jobs -p).*" /root/.bashrc; then 
-            sudo  sed -i '/trap '\''! \[ -z "$(jobs -p)" \] \&\& kill -9 "$(jobs -p.*/d' /root/.bashrc 
+        if  sudo grep -q "trap '! \[ -z \"\$(jobs -p)\" ] && kill -9 \$(jobs -p.*" /root/.bashrc; then 
+            sudo sed -i '/trap '\''! \[ -z "$(jobs -p)" \] \&\& kill -9 "$(jobs -p.*/d' /root/.bashrc 
         fi  
-        printf "trap '! [ -z \"\$(jobs -p)\" ] && kill -9 \"\$(jobs -p | tr \"\\\n\"  \" \")\"' $sig\n" | sudo tee -a /root/.bashrc &> /dev/null
+        printf "trap '! [ -z \"\$(jobs -p)\" ] && kill -9 \"\$(jobs -p | tr \\\n\"  \" \")' $sig\n" | sudo tee -a /root/.bashrc &> /dev/null
     fi     
 fi
 unset int_r sig
@@ -207,10 +207,10 @@ if test $ansr == "y"; then
     fi 
     if type bat &> /dev/null; then
         reade -Q "YELLOW" -i "n" -p "Set 'cat' as alias for 'bat'? [N/y]: " "y" cat
-        if [ "$cat" != "y" ]; then
-            sed -i 's|^alias cat="bat"|#alias cat="bat"|g' $genr
-        else
+        if [ "$cat" == "y" ]; then
             sed -i 's|.*alias cat="bat"|alias cat="bat"|g' $genr
+        else
+            sed -i 's|^alias cat="bat"|#alias cat="bat"|g' $genr
         fi
     fi
     unset cat
@@ -218,7 +218,7 @@ if test $ansr == "y"; then
     rver=$(echo $(ruby --version) | awk '{print $2}' | cut -d. -f-2)'.0'
     paths=$(gem environment | awk '/- GEM PATH/{flag=1;next}/- GEM CONFIGURATION/{flag=0}flag' | sed 's|     - ||g' | paste -s -d ':')
     if grep -q "GEM" $ENVVAR; then
-        sed -i "s|.export GEM_|export GEM_|g'" $ENVVAR 
+        sed -i "s|.export GEM_|export GEM_|g" $ENVVAR 
         sed -i "s|.export PATH=\$PATH:\$GEM_PATH|export PATH=\$PATH:\$GEM_PATH|g" $ENVVAR
         sed -i "s|export GEM_HOME=.*|export GEM_HOME=$HOME/.gem/ruby/$rver|g" $ENVVAR
         sed -i "s|export GEM_PATH=.*|export GEM_PATH=$paths|g" $ENVVAR

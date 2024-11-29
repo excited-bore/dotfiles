@@ -198,7 +198,7 @@ function update-system() {
             fi
         fi
         
-        readyn -p 'Clean unnessecary packages?' cachcln
+        readyn $YES -p 'Clean unnessecary (orphan) packages?' cachcln
         if test $cachcln == 'y'; then
             if ! test -z "$AUR_clean"; then
                 eval "$AUR_clean"

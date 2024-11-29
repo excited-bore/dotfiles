@@ -33,12 +33,19 @@ if ! type pyenv &> /dev/null; then
     if test $machine == 'Mac' && type brew &> /dev/null; then
         brew install pyenv 
     elif test "$distro_base" == "Arch"; then
-        eval "$pac_ins pyenv"
+        ${pac_ins} pyenv
     elif [ $distro_base == "Debian" ] && ! test -z "$(apt search pyenv 2> /dev/null)"; then
-        eval "$pac_ins pyenv"
+        ${pac_ins} pyenv
     else
         curl https://pyenv.run | bash
     fi 
+fi
+
+readyn -p 'Enable pyenv shell integration for current shell?' shell_init
+if test "$shell_init" == 'y'; then
+    export PYENV_ROOT="$HOME/.pyenv"
+    [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+    eval "$(pyenv init -)" 
 fi
 
 if type pyenv &> /dev/null; then
@@ -55,9 +62,16 @@ if type pyenv &> /dev/null; then
     
     printf "Python versions:\n${CYAN}$(echo $all | tr ' ' '\n' | tac | column)${normal}\n" 
     reade -Q 'GREEN' -i "$frst" -p "Which version to install?: " "$all" vers  
+
+    verss="$(pyenv completions global | sed '/--help/d' | sed '/system/d')" 
+
     if ! test -z "$vers"; then
-        pyenv install "$vers" 
-        pyenv global $latest 
+        if [[ "${verss}" != *"$vers"* ]]; then 
+            pyenv install "$vers" 
+        fi
+        pyenv global "$vers" 
+        test "$shell_init" == 'y' && pyenv shell "$vers" 
+        python --version
     fi
 fi
-unset latest vers all
+unset frst vers verss all shell_init

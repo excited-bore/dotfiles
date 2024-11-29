@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # https://stackoverflow.com/questions/5412761/using-colors-with-printf
 # Execute (during printf) for colored prompt
 # printf  "${blue}This text is blue${white}\n"
@@ -6,6 +8,32 @@
 if type sudo &> /dev/null; then
     alias sudo='sudo '
 fi
+
+# https://stackoverflow.com/questions/4023830/how-to-compare-two-strings-in-dot-separated-version-format-in-bash
+
+function version-higher () {
+    if [[ $1 == $2 ]]; then
+        return 0
+    fi
+    local IFS=.
+    local i ver1=($1) ver2=($2)
+    # fill empty fields in ver1 with zeros
+    for ((i=${#ver1[@]}; i<${#ver2[@]}; i++))
+    do
+        ver1[i]=0
+    done
+    for ((i=0; i<${#ver1[@]}; i++))
+    do
+        if ((10#${ver1[i]:=0} > 10#${ver2[i]:=0})); then
+            return 0
+        fi
+        if ((10#${ver1[i]} < 10#${ver2[i]})); then
+            return 1
+        fi
+    done
+    return 0
+}
+
 
 function compare-tput-escape_color(){
 for (( ansi=0; ansi <= 120; ansi++)); do
@@ -79,7 +107,77 @@ italic=$(tput it)
 # read -e -r -p $'\e[31mFoobar\e[0m: ' foo  for example
 # printf "${CYAN}bluh"; read -e -r foo  is also problematic because prompt disappears when arrow up and back down
 
-reade(){
+function reade(){
+
+    local VERSION='1.0' 
+
+    unset READE_VALUE
+
+    while :; do
+        case $1 in
+            -h|-\?|--help)
+            printf "${bold}reade${normal} [ -h/--help ] [ -v/--version] [ -i/--pregiven PREGIVEN ] [ -e/--file-completion ]  [ -s/--no-echo ] [ -p/--prompt PROMPTSTRING ] [ -Q/--colour COLOURSTRING ] [ -b/--break-chars BREAKCHARS-STRING ] ${bold}CHOICES-STRING${normal}  ${bold}returnvar${normal}\n
+   Simplifies prompt for ${bold}read/rlwrap${normal}: Will use 'rlwrap' if it is installed, otherwise resorts to 'read' 
+   Supply at least 2 variables: 
+   - A space seperated string with the choices for answer. ${bold}If no choices need to be given, supply a empty string '' - WILL NOT WORK WITHOUT EMPTY STRING. ${normal}
+   - The last argument to put the answer in, otherwise the value will be in '\$READE_VALUE'.  
+
+   -h, --help  
+        
+        Print this text and exit
+
+   -v, --version  
+        
+        Print version and exit
+
+   -Q ${underline_on}Colour${underline_off}
+
+        Use  one  of  the  colour names black, red, green, yellow, blue, cyan, purple (=magenta) or white, or an ANSI-conformant <colour_spec> to colour any prompt displayed  by  command.\n An uppercase colour name (Yellow or YELLOW ) gives a bold prompt.\n Prompts that already contain (colour) escape sequences or one of the readline \"ignore markers\" (ASCII 0x01 and 0x02) are not coloured.
+
+   -i, --pre-given ${underline_on}pregiven string${underline_off} 
+
+        Autofill prompt with 'PREGIVEN' - must come in the form of a string (only works when rlwrap is installed) 
+
+   -s, --no-echo 
+
+        Doesn't echo what's being typed to the terminal - usefull for password prompts and the like
+
+   -e, --file-completion 
+
+        Use filecompletions. 
+        Will stop using rlwrap if it is installed because 'rlwrap' doesn't properly add slashed before spaces in filenames/directorynames and will use 'read -e' which does properly do this instead
+    
+   -b ${underline_on}list_of_characters${underline_off} 
+
+       (From rlwrap manual) Consider  the specified characters word-breaking (whitespace is always word-breaking). This determines what is considered a \"word\", both when completing and when building a completion word list from files specified by -f options following (not preceding!) it.\n Default list (){}[],'+-=&^%%\$#@\";|\ \n Unless -c is specified, / and . (period) are included in the default list\n\n" 
+              return 0
+          ;;
+          -v|--version) 
+             printf "${bold}Version${normal} : $VERSION\n"
+             return 0
+          ;; 
+          # Otherwise 
+          *) break 
+          ;;
+       esac
+    done && OPTIND=1;
+
+    #https://stackoverflow.com/questions/12022592/how-can-i-use-long-options-with-the-bash-getopts-builtin
+
+    for arg in "$@"; do
+      shift
+      case "$arg" in
+        '--break-chars')       set -- "$@" '-b'   ;;
+        '--colour')            set -- "$@" '-Q'   ;;
+        '--prompt')            set -- "$@" '-p'   ;;
+        '--file-completions')  set -- "$@" '-e'   ;;
+        '--pre-given')         set -- "$@" '-i'   ;;
+        '--no-echo')           set -- "$@" '-s'   ;;
+        *)                     set -- "$@" "$arg" ;;
+      esac
+    done 
+    
+
     while getopts ':b:e:i:p:Q:s:S:' flag; do
         case "${flag}" in
             e)  fcomp='y'
@@ -108,34 +206,36 @@ reade(){
                     pre="${OPTARG}"
                     ;;
                 Q)  if [[ "${OPTARG}" =~ ^[[:upper:]]+$ ]]; then
-                    color="${bold}"
-                fi
-                OPTARG=$(echo ${OPTARG} | awk '{print tolower($0)}')
-                if [[ "${OPTARG}" =~ "red" ]]; then
-                    color=$color"${red}"
-                elif [[ "${OPTARG}" =~ "green" ]]; then
-                    color=$color"${green}"
-                elif [[ "${OPTARG}" =~ "blue" ]]; then
-                    color=$color"${blue}"
-                elif [[ "${OPTARG}" =~ "yellow" ]]; then
-                    color=$color"${yellow}"
-                elif [[ "${OPTARG}" =~ "cyan" ]]; then
-                    color=$color"${cyan}"
-                elif [[ "${OPTARG}" =~ "magenta" ]]; then
-                    color=$color"${magenta}"
-                elif [[ "${OPTARG}" =~ "black" ]]; then
-                    color=$color"${black}"
-                elif [[ "${OPTARG}" =~ "white" ]]; then
-                    color=$color"${white}"
-                fi
-                ;;
-            p)  readstr=$(echo "$readstr" | sed 's|read |printf "'"${color}${OPTARG}${normal}"'\n"; read |g');
-                ;;
-            s)  readstr=$(echo "$readstr" | sed 's|read |read -s "'"${OPTARG}"'" |g');
-                ;;
-            S)  ;;
-        esac
-    done && OPTIND=1;
+                        color="${bold}"
+                    fi
+                    OPTARG=$(echo ${OPTARG} | awk '{print tolower($0)}')
+                    if [[ "${OPTARG}" =~ "red" ]]; then
+                        color=$color"${red}"
+                    elif [[ "${OPTARG}" =~ "green" ]]; then
+                        color=$color"${green}"
+                    elif [[ "${OPTARG}" =~ "blue" ]]; then
+                        color=$color"${blue}"
+                    elif [[ "${OPTARG}" =~ "yellow" ]]; then
+                        color=$color"${yellow}"
+                    elif [[ "${OPTARG}" =~ "cyan" ]]; then
+                        color=$color"${cyan}"
+                    elif [[ "${OPTARG}" =~ "magenta" ]]; then
+                        color=$color"${magenta}"
+                    elif [[ "${OPTARG}" =~ "black" ]]; then
+                        color=$color"${black}"
+                    elif [[ "${OPTARG}" =~ "white" ]]; then
+                        color=$color"${white}"
+                    fi
+                    ;;
+                p)  readstr=$(echo "$readstr" | sed 's|read |printf "'"${color}${OPTARG}${normal}"'\n"; read |g');
+                    ;;
+                s)  readstr=$(echo "$readstr" | sed 's|read |read -s "'"${OPTARG}"'" |g');
+                    ;;
+                S)  ;;
+            esac
+         done && OPTIND=1;
+
+        eval "$readstr" value;
 
     eval "$readstr" value;
 
@@ -148,8 +248,16 @@ reade(){
         value="$pre"  
     fi
 
+        if ! test -z "$pre" && test -z "$value" || test "$value" == ""; then
+            value="$pre"  
+        fi
+
         #black, red, green, yellow, blue, cyan, purple (=magenta) or white
-        eval "${@:$#:1}=$value";
+        if ! test -z "${@:$#:1}" && ! test "${@:$#:1}" == '/bin/bash' && ! [[ "${@:$#:1}" =~ -.* ]]; then
+            eval "${@:$#:1}=$value"  
+        else
+            export READE_VALUE="$value"
+        fi
         unset fcomp
     else
         if [[ $# < 2 ]]; then
@@ -203,8 +311,15 @@ reade(){
                     ;;
             esac
         done && OPTIND=1;
+
         value=$(eval $rlwstring);
-        eval "${@:$#:1}=$value" && command rm $tmpf &> /dev/null;
+
+        if ! test -z "${@:$#:1}" && ! test "${@:$#:1}" == '/bin/bash' && ! [[ "${@:$#:1}" =~ -.* ]]; then
+            eval "${@:$#:1}=$value"  
+        else
+            export READE_VALUE="$value" 
+        fi
+        command rm $tmpf &> /dev/null;
     fi
     unset bash_rlwrap 
 }
@@ -212,39 +327,52 @@ reade(){
 
 function readyn(){
 
+    unset READYN_VALUE
+
+    local VERSION='1.0' 
+
     while :; do
         case $1 in
             -h|-\?|--help)
-                printf "${bold}readyn${normal} [ -h/--help ] [ -y/--yes [ PREFILL ] ]  [ -n/--no [ CONDITION ] ] [ -p/--prompt PROMPTSTRING ] [ -Q/--colour COLOURSTRING ]  [ -b/--break-chars BREAK-CHARS ] [ returnvar ]\n
+                printf "${bold}readyn${normal} [ -h/--help ] [ -v/--version ]  [ -y/--yes [ PREFILL ] ]  [ -n/--no [ CONDITION ] ] [ -p/--prompt PROMPTSTRING ] [ -Q/--colour COLOURSTRING ]  [ -b/--break-chars BREAK-CHARS ] [ returnvar ]\n
                Simplifies yes/no prompt for ${bold}reade${normal}. Supply at least 1 variable as the last argument to put the answer in, otherwise the value will be in '\$READYN_VALUE'.  
 '${GREEN} [${underline_on}Y${underline_off}es/${underline_on}n${underline_off}o]: ${normal}' : 'y' as pre-given, 'n' as other option. Colour for the prompt is ${GREEN}GREEN (Default)${normal} 
 '${YELLOW} [${underline_on}N${underline_off}o/${underline_on}y${underline_off}es]: ${normal}' : 'n' as pre-given, 'y' as other option. Colour for the prompt is ${YELLOW}YELLOW${normal}
     For both an empty answer will return the default answer. 
 
+    -h, --help  
+        
+        Print this text and exit
+     
    -y, --yes ${underline_on}prefill${underline_off} 
 
-   Autofill prompt with 'y' if nothing is supplied, otherwise prefill with given 
+        Autofill prompt with 'y' if nothing is supplied, otherwise prefill with given 
 
    -n, --no ${underline_on}condition${underline_off}
 
-   Set '${YELLOW} [${underline_on}N${underline_off}o/${underline_on}y${underline_off}es]: ${normal}' as the default prompt. 
+       Set '${YELLOW} [${underline_on}N${underline_off}o/${underline_on}y${underline_off}es]: ${normal}' as the default prompt. Give a condition for when to prompt with 'no'. 
     
    -Q ${underline_on}Colour${underline_off}
 
-   Use  one  of  the  colour names black, red, green, yellow, blue, cyan, purple (=magenta) or white, or an ANSI-conformant <colour_spec> to colour any prompt displayed  by  command.\n An uppercase colour name (Yellow or YELLOW ) gives a bold prompt.\n Prompts that already contain (colour) escape sequences or one of the readline \"ignore markers\" (ASCII 0x01 and 0x02) are not coloured.
+        Use  one  of  the  colour names black, red, green, yellow, blue, cyan, purple (=magenta) or white, or an ANSI-conformant <colour_spec> to colour any prompt displayed  by  command.\n An uppercase colour name (Yellow or YELLOW ) gives a bold prompt.\n Prompts that already contain (colour) escape sequences or one of the readline \"ignore markers\" (ASCII 0x01 and 0x02) are not coloured.
     
     -b ${underline_on}list_of_characters${underline_off} 
 
-    (From rlwrap manual) Consider  the specified characters word-breaking (whitespace is always word-breaking). This determines what is considered a \"word\", both when completing and when building a completion word list from files specified by -f options following (not preceding!) it.\n Default list (){}[],'+-=&^%%\$#@\";|\ \n Unless -c is specified, / and . (period) are included in the default list\n\n"
+        (From rlwrap manual) Consider  the specified characters word-breaking (whitespace is always word-breaking). This determines what is considered a \"word\", both when completing and when building a completion word list from files specified by -f options following (not preceding!) it.\n Default list (){}[],'+-=&^%%\$#@\";|\ \n Unless -c is specified, / and . (period) are included in the default list\n\n"
               return 0
           ;;
+          -v|--version) 
+             printf "${bold}Version${normal} : $VERSION\n"
+             return 0
+          ;; 
 
           # Otherwise 
           *) break 
           ;;
        esac
     done && OPTIND=1;
-   
+    
+
     #https://stackoverflow.com/questions/12022592/how-can-i-use-long-options-with-the-bash-getopts-builtin
 
     for arg in "$@"; do
@@ -282,13 +410,13 @@ function readyn(){
                     fi
                 fi
              ;;
-             n) if [ "${OPTARG}" ] && ! test "${OPTARG}" == '--' && ! [[ ${OPTARG} =~ -.* ]] && ! test "${OPTARG}" == "${@:$#:1}"; then
+             n) if [ "${OPTARG}" ] && ! test "${OPTARG}" == '--' && ! [[ ${OPTARG} =~ ^-.* ]] && ! test "${OPTARG}" == "${@:$#:1}"; then
                     nocase="${OPTARG}"
                 fi 
-                if [[ ${OPTARG} =~ -.* ]]; then
+                if [[ ${OPTARG} =~ ^-.* ]]; then
                     OPTIND=$(($OPTIND - 1)) 
                 fi
-                if test -z $nocase || eval $nocase; then
+                if ! test -z "$nocase" && eval "$nocase" || test -z "$nocase" ; then
                     pre='n'
                     othr='y'
                     prmpt1=" [${underline_on}N${underline_off}o/${underline_on}y${underline_off}es]: "
