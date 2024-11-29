@@ -1,13 +1,21 @@
 #!/bin/bash
 
-if type curl &> /dev/null && ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
+if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
+    if type curl &> /dev/null; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
+    else 
+        continue 
+    fi
 else
     . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
 fi
 
-if type curl &> /dev/null && ! test -f checks/check_system.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
+if ! test -f checks/check_system.sh; then
+    if type curl &> /dev/null; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
+    else 
+        continue 
+    fi
 else
     . ./checks/check_system.sh
 fi
@@ -31,6 +39,8 @@ if test -z $SYSTEM_UPDATED; then
     reade -Q "CYAN" -i "y" -p  "Update system? [Y/n]: " "n" updatesysm
     if test $updatesysm == "y"; then
         update-system                     
+    else
+        export SYSTEM_UPDATED="TRUE"
     fi
 fi
 
@@ -216,6 +226,36 @@ if test $distro_base == 'Debian'; then
     fi 
 
 elif test $distro_base == 'Arch'; then
+
+
+    echo "Next $(tput setaf 1)sudo$(tput sgr0) will check whether colors are enabled for 'pacman'"
+    if sudo grep -q '#Colors' /etc/pacman.conf; then
+        reade -Q 'GREEN' -i 'y' -p "Enable colors for pacman? [Y/n]: " 'n' pacs_col
+        if test $pacs_col == 'y'; then
+            sudo sed -i 's|#Colors|Colors|g' /etc/pacman.conf       
+        fi
+        unset pacs_col 
+    fi
+   
+    if ! type yay &> /dev/null; then
+        printf "${CYAN}yay${normal} is not installed (Pacman wrapper for installing AUR packages, needed for yay-fzf-install)\n"
+        reade -Q "GREEN" -i "y" -p "Install yay? [Y/n]: " "n" insyay
+        if [ "y" == "$insyay" ]; then 
+            if type curl &> /dev/null && ! test -f ../AUR_installers/install_yay.sh; then
+                eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/AUR_installers/install_yay.sh)" 
+            else
+                eval ../AUR_installers/install_yay.sh
+            fi
+            AUR_pac="yay"
+            AUR_up="yay -Syu"
+            AUR_ins="yay -S"
+            AUR_search="yay -Ss"
+            AUR_ls_ins="yay -Q"
+        fi
+        unset insyay
+    fi
+
+
     if test -z "$(eval "$pac_ls_ins pacseek 2> /dev/null")"; then
         printf "${CYAN}pacseek${normal} (A TUI for managing packages from pacman and AUR) is not installed\n"
         reade -Q 'GREEN' -i 'y' -p "Install pacseek? [Y/n]: " 'n' pacs_ins
@@ -252,6 +292,52 @@ else
 fi
 
 
+# Eza prompt
+pre='y'
+othr='n'
+color='GREEN'
+prmpt='[Y/n]: '
+if type eza &> /dev/null; then
+    pre='n' 
+    othr='y'
+    color='YELLOW'
+    prmpt='[N/y]: '
+fi
+
+reade -Q "$color" -i "$pre" -p "Install Eza? (A modern replacement for ls) $prmpt" "$othr" rmp
+if [ -z "$rmp" ] || [ "y" == "$rmp" ]; then
+    if ! test -f install_eza.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_eza.sh)" 
+    else
+        ./install_eza.sh
+    fi 
+fi
+unset rmp
+
+# Xcp
+pre='y'
+othr='n'
+color='GREEN'
+prmpt='[Y/n]: '
+if type xcp &> /dev/null; then
+    pre='n' 
+    othr='y'
+    color='YELLOW'
+    prmpt='[N/y]: '
+fi
+
+reade -Q "$color" -i "$pre" -p "Install xcp? (cp but faster and with progress bar) $prmpt" "$othr" rmp
+if [ -z "$rmp" ] || [ "y" == "$rmp" ]; then
+    if ! test -f install_xcp.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_xcp.sh)" 
+    else
+        ./install_xcp.sh
+    fi 
+fi
+unset rmp
+
+
+
 # Rm prompt
 pre='y'
 othr='n'
@@ -264,7 +350,7 @@ if type rm-prompt &> /dev/null; then
     prmpt='[N/y]: '
 fi
 
-reade -Q "GREEN" -i "y" -p "Install rm-prompt? (Rm but lists files/directories before deletion) [Y/n]: " "n" rmp
+reade -Q "$color" -i "$pre" -p "Install rm-prompt? (Rm but lists files/directories before deletion) $prmpt" "$othr" rmp
 if [ -z "$rmp" ] || [ "y" == "$rmp" ]; then
     if ! test -f install_rmprompt.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_rmprompt.sh)" 
@@ -711,7 +797,7 @@ pre='y'
 othr='n'
 color='GREEN'
 prmpt='[Y/n]: '
-if ! type neofetch &> /dev/null && ! type fastfetch &> /dev/null && ! type screenfetch &> /dev/null && ! type onefetch &> /dev/null; then
+if type neofetch &> /dev/null || type fastfetch &> /dev/null || type screenfetch &> /dev/null; then
     pre='n' 
     othr='y'
     color='YELLOW'
