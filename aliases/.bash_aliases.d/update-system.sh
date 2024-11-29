@@ -75,7 +75,7 @@ function update-system() {
             exit
             ;;
             -y|--yes)
-              YES="yes | "
+              YES="-y"
               shift # past value
               ;;
             -*|--*)
@@ -240,8 +240,10 @@ function update-system() {
         fi
     fi
 
+    YES="-y n" 
+
     if type nix-env &> /dev/null; then
-        reade -i "n" -p "Update ${CYAN}nix packages?${normal} ${MAGENTA}(Fetching updated list could take a long time) [N/y]:${normal} " "y" nix_up
+        readyn $YES --no -p "${normal}Update ${CYAN}nix packages?${normal} ${MAGENTA}(Fetching updated list could take a long time)${YELLOW}" nix_up
         if test "$nix_up" == 'y'; then
             printf "Updating all ${MAGENTA}nix packages${normal} using 'nix-env -u *'\n" && nix-env -u * 2> /dev/null
         fi 
@@ -256,7 +258,7 @@ function update-system() {
             up_gpg=gpg
         fi
 
-        reade -i "n" -p "Refresh ${CYAN}gpg keys?${normal} ${MAGENTA}(Keyservers can be unstable so this might take a while) [N/y]:${normal} " "y" gpg_up
+        readyn $YES --no -p "${normal}Refresh ${CYAN}gpg keys?${normal} ${MAGENTA}(Keyservers can be unstable so this might take a while)${YELLOW}" gpg_up
         if test "$gpg_up" == 'y'; then
            "$up_gpg" --refresh-keys  
         fi
@@ -264,7 +266,7 @@ function update-system() {
     unset up_gpg gpg_up
 
     if type pipx &> /dev/null || type npm &> /dev/null || type gem &> /dev/null || type cargo &> /dev/null; then 
-        reade -i "n" -p "Update ${CYAN}packages for development package-managers - pipx, npm, gem, cargo...${normal} ${MAGENTA}(WARNING: this could take a lot longer relative to regular pm's) [N/y]:${normal} " "y" dev_up
+        readyn $YES --no -p "${normal}Update ${CYAN}packages for development package-managers - pipx, npm, gem, cargo...${normal} ${MAGENTA}(WARNING: this could take a lot longer relative to regular pm's)${YELLOW}" "y" dev_up
         if [ "$dev_up" == "y" ]; then
             
             if type pipx &> /dev/null; then
@@ -282,15 +284,13 @@ function update-system() {
                 #fi
                 #unset npm_up
 
-                reade -Q "magenta" -i "y" -p "Update ${red}${bold}global${normal}${magenta1} npm packages? (Javascript) [Y/n]: " "n" npm_up
+                reade -Q "magenta" -i "y" -p "${normal}Update ${red}${bold}global${normal}${magenta1} npm packages? (Javascript) [Y/n]: " "n" npm_up
                 if [ "$npm_up" == "y" ]; then
                     echo "This next $(tput setaf 1)sudo$(tput sgr0) will update using 'sudo npm -g update'";
-
-                        sudo npm -g update
-                        sudo npm -g upgrade
+                    sudo npm -g update
+                    sudo npm -g upgrade
                 fi
                 unset npm_up
-                
             fi
             
             if type cargo &> /dev/null; then

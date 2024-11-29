@@ -8,10 +8,10 @@ if type sudo &> /dev/null; then
 fi
 
 function compare-tput-escape_color(){
-    for (( ansi=0; ansi <= 120; ansi++)); do
-        printf "$ansi $(tput setaf $ansi) tput foreground $(tput sgr0) $(tput setab $ansi) tput background $(tput sgr0)"; echo -e " \033[$ansi;mEscape\033[0m"
-    done | $PAGER
-    unset ansi
+for (( ansi=0; ansi <= 120; ansi++)); do
+    printf "$ansi $(tput setaf $ansi) tput foreground $(tput sgr0) $(tput setab $ansi) tput background $(tput sgr0)"; echo -e " \033[$ansi;mEscape\033[0m"
+done | $PAGER
+unset ansi
 }
 
 red=$(tput setaf 1)
@@ -84,11 +84,11 @@ reade(){
         case "${flag}" in
             e)  fcomp='y'
                 break 
-            ;;
+                ;;
 
             *)  fcomp='n'
                 break 
-            ;;
+                ;;
         esac
     done && OPTIND=1;
     bash_rlwrap='y'
@@ -103,51 +103,51 @@ reade(){
                 b)  ;;
                 e)  readstr=$(echo "$readstr" | sed 's|read |read -e -r |g');
                     ;;
-                #  Even though it's in the read man, -i does not actually work
-                i)  readstr=$(echo "$readstr" | sed 's|read |read -i "'"${OPTARG}"'" |g');
+                    #  Even though it's in the read man, -i does not actually work
+                    i)  readstr=$(echo "$readstr" | sed 's|read |read -i "'"${OPTARG}"'" |g');
                     pre="${OPTARG}"
                     ;;
                 Q)  if [[ "${OPTARG}" =~ ^[[:upper:]]+$ ]]; then
-                        color="${bold}"
-                    fi
-                    OPTARG=$(echo ${OPTARG} | awk '{print tolower($0)}')
-                    if [[ "${OPTARG}" =~ "red" ]]; then
-                        color=$color"${red}"
-                    elif [[ "${OPTARG}" =~ "green" ]]; then
-                        color=$color"${green}"
-                    elif [[ "${OPTARG}" =~ "blue" ]]; then
-                        color=$color"${blue}"
-                    elif [[ "${OPTARG}" =~ "yellow" ]]; then
-                        color=$color"${yellow}"
-                    elif [[ "${OPTARG}" =~ "cyan" ]]; then
-                        color=$color"${cyan}"
-                    elif [[ "${OPTARG}" =~ "magenta" ]]; then
-                        color=$color"${magenta}"
-                    elif [[ "${OPTARG}" =~ "black" ]]; then
-                        color=$color"${black}"
-                    elif [[ "${OPTARG}" =~ "white" ]]; then
-                        color=$color"${white}"
-                    fi
-                    ;;
-                p)  readstr=$(echo "$readstr" | sed 's|read |printf "'"${color}${OPTARG}${normal}"'\n"; read |g');
-                    ;;
-                s)  readstr=$(echo "$readstr" | sed 's|read |read -s "'"${OPTARG}"'" |g');
-                    ;;
-                S)  ;;
-            esac
-        done && OPTIND=1;
+                    color="${bold}"
+                fi
+                OPTARG=$(echo ${OPTARG} | awk '{print tolower($0)}')
+                if [[ "${OPTARG}" =~ "red" ]]; then
+                    color=$color"${red}"
+                elif [[ "${OPTARG}" =~ "green" ]]; then
+                    color=$color"${green}"
+                elif [[ "${OPTARG}" =~ "blue" ]]; then
+                    color=$color"${blue}"
+                elif [[ "${OPTARG}" =~ "yellow" ]]; then
+                    color=$color"${yellow}"
+                elif [[ "${OPTARG}" =~ "cyan" ]]; then
+                    color=$color"${cyan}"
+                elif [[ "${OPTARG}" =~ "magenta" ]]; then
+                    color=$color"${magenta}"
+                elif [[ "${OPTARG}" =~ "black" ]]; then
+                    color=$color"${black}"
+                elif [[ "${OPTARG}" =~ "white" ]]; then
+                    color=$color"${white}"
+                fi
+                ;;
+            p)  readstr=$(echo "$readstr" | sed 's|read |printf "'"${color}${OPTARG}${normal}"'\n"; read |g');
+                ;;
+            s)  readstr=$(echo "$readstr" | sed 's|read |read -s "'"${OPTARG}"'" |g');
+                ;;
+            S)  ;;
+        esac
+    done && OPTIND=1;
 
-        eval "$readstr" value;
+    eval "$readstr" value;
 
-        if test $fcomp == 'y'; then
-            echo $value >> ~/.bash_history
-            history -n
-        fi
+    if test $fcomp == 'y'; then
+        echo $value >> ~/.bash_history
+        history -n
+    fi
 
-        if ! test -z "$pre" && test -z "$value" || test "$value" == ""; then
-            value="$pre"  
-        fi
-    
+    if ! test -z "$pre" && test -z "$value" || test "$value" == ""; then
+        value="$pre"  
+    fi
+
         #black, red, green, yellow, blue, cyan, purple (=magenta) or white
         eval "${@:$#:1}=$value";
         unset fcomp
@@ -159,7 +159,7 @@ reade(){
             echo "Second a variable (could be empty) for the return string"
             return 0
         fi
-        
+
 
         local args="${@:$#-1:1}"
 
@@ -169,7 +169,7 @@ reade(){
         tmpf=$(mktemp)
 
         echo "$args" > "$tmpf"
-        
+
         local breaklines=''
 
         if test "$args" == ''; then
@@ -182,24 +182,24 @@ reade(){
             case "${flag}" in
                 b)  breaklines=${OPTARG};
                     ;;
-                # File completions
-                e)  rlwstring=$(echo $rlwstring | sed "s| -f <(echo \"${args[@]}\") | |g");
+                    # File completions
+                    e)  rlwstring=$(echo $rlwstring | sed "s| -f <(echo \"${args[@]}\") | |g");
                     rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-c |g");
                     ;;
-                # Pre-filled answer
-                i)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-P \"${OPTARG}\" |g");
+                    # Pre-filled answer
+                    i)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-P \"${OPTARG}\" |g");
                     ;;
-                # Prompt
-                p)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-S \"${OPTARG}\" |g");
+                    # Prompt
+                    p)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-S \"${OPTARG}\" |g");
                     ;;
-                # Prompt colours
-                Q)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-p${OPTARG} |g");
+                    # Prompt colours
+                    Q)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-p${OPTARG} |g");
                     ;;
-                # Password
-                s)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-aN\"${OPTARG}\" |g");
+                    # Password
+                    s)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-aN\"${OPTARG}\" |g");
                     ;;
-                # Always echo *** w/ passwords
-                S)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-E\"${OPTARG}\" |g");
+                    # Always echo *** w/ passwords
+                    S)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-E\"${OPTARG}\" |g");
                     ;;
             esac
         done && OPTIND=1;
@@ -211,17 +211,21 @@ reade(){
 
 
 function readyn(){
-        
+
     while :; do
-       case $1 in
-           -h|-\?|--help)
-               printf "${bold}readyn${normal} [-h/--help] [ -n/--no [ CONDITION ] ] [ -p/--prompt PROMPTSTRING ] [ -Q/--colour COLOURSTRING ]  [ -b/--break-chars BREAK-CHARS ] [ returnvar ]\n
+        case $1 in
+            -h|-\?|--help)
+                printf "${bold}readyn${normal} [ -h/--help ] [ -y/--yes [ PREFILL ] ]  [ -n/--no [ CONDITION ] ] [ -p/--prompt PROMPTSTRING ] [ -Q/--colour COLOURSTRING ]  [ -b/--break-chars BREAK-CHARS ] [ returnvar ]\n
                Simplifies yes/no prompt for ${bold}reade${normal}. Supply at least 1 variable as the last argument to put the answer in, otherwise the value will be in '\$READYN_VALUE'.  
 '${GREEN} [${underline_on}Y${underline_off}es/${underline_on}n${underline_off}o]: ${normal}' : 'y' as pre-given, 'n' as other option. Colour for the prompt is ${GREEN}GREEN (Default)${normal} 
 '${YELLOW} [${underline_on}N${underline_off}o/${underline_on}y${underline_off}es]: ${normal}' : 'n' as pre-given, 'y' as other option. Colour for the prompt is ${YELLOW}YELLOW${normal}
     For both an empty answer will return the default answer. 
 
-   -n
+   -y, --yes ${underline_on}prefill${underline_off} 
+
+   Autofill prompt with 'y' if nothing is supplied, otherwise prefill with given 
+
+   -n, --no ${underline_on}condition${underline_off}
 
    Set '${YELLOW} [${underline_on}N${underline_off}o/${underline_on}y${underline_off}es]: ${normal}' as the default prompt. 
     
@@ -250,6 +254,7 @@ function readyn(){
         '--colour')            set -- "$@" '-Q'   ;;
         '--prompt')            set -- "$@" '-p'   ;;
         '--no')                set -- "$@" '-n'   ;;
+        '--yes')               set -- "$@" '-y'   ;;
         *)                     set -- "$@" "$arg" ;;
       esac
     done 
@@ -257,9 +262,10 @@ function readyn(){
     local breaklines=''
     local nocase='' 
     local pre='' 
+    local preff='' 
     local color='' 
     OPTIND=1
-    while getopts ':b:Q:p:n:' flag; do
+    while getopts ':b:Q:p:y:yn:n' flag; do
         case "${flag}" in
              b)  breaklines="-b \"${OPTARG}\"";
              ;;    
@@ -267,10 +273,22 @@ function readyn(){
              ;;    
              p)  prmpt=${OPTARG};
              ;;
-             n) if [ "${OPTARG}" ] && ! test "${OPTARG}" == '--' && ! [[ ${OPTARG} =~ -.* ]]; then
+             y) if [ "${OPTARG}" ] && ! test "${OPTARG}" == '--' && ! [[ ${OPTARG} =~ -.* ]] && ! test "${OPTARG}" == "${@:$#:1}"; then
+                    preff=${OPTARG};
+                else
+                    preff='y'
+                    if [[ ${OPTARG} =~ -.* ]]; then
+                        OPTIND=$(($OPTIND - 1)) 
+                    fi
+                fi
+             ;;
+             n) if [ "${OPTARG}" ] && ! test "${OPTARG}" == '--' && ! [[ ${OPTARG} =~ -.* ]] && ! test "${OPTARG}" == "${@:$#:1}"; then
                     nocase="${OPTARG}"
                 fi 
-                if test -z "$nocase" || eval $nocase; then
+                if [[ ${OPTARG} =~ -.* ]]; then
+                    OPTIND=$(($OPTIND - 1)) 
+                fi
+                if test -z $nocase || eval $nocase; then
                     pre='n'
                     othr='y'
                     prmpt1=" [${underline_on}N${underline_off}o/${underline_on}y${underline_off}es]: "
@@ -279,7 +297,6 @@ function readyn(){
              ;;
         esac
     done && OPTIND=1;
-
     if test -z $pre; then 
         pre='y'
         othr='n'
@@ -287,13 +304,23 @@ function readyn(){
         test -z $color && color='GREEN'
     fi
 
-    if ! test -z "$prmpt"; then
-        reade -Q "$color" $breaklines -i "$pre" -p "$prmpt$prmpt1" "$othr" value;   
+    if ! test -z $preff; then
+        if test -z "$prmpt"; then
+            printf "${!color}$prmpt1$preff${normal}\n" ;   
+        else
+            printf "${!color}$prmpt$prmpt1$preff${normal}\n" ;   
+        fi
+        value=$preff 
     else
-        reade -Q "$color" $breaklines -i "$pre" -p "$prmpt1" "$othr" value;    
-    fi
+        if ! test -z "$prmpt"; then
+            reade -Q "$color" $breaklines -i "$pre" -p "$prmpt$prmpt1" "$othr" value;   
+        else
+            reade -Q "$color" $breaklines -i "$pre" -p "$prmpt1" "$othr" value;    
+        fi
 
-    if ! test -z "${@:$#:1}" && ! test "${@:$#:1}" == '/bin/bash'; then
+    fi 
+
+    if ! test -z "${@:$#:1}" && ! test "${@:$#:1}" == '/bin/bash' && ! [[ "${@:$#:1}" =~ -.* ]]; then
         eval "${@:$#:1}=$value" 
     else
         export READYN_VALUE="$value" 
