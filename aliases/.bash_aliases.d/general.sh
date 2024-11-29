@@ -77,7 +77,7 @@ alias cd='cd-w'
 
 # cp recursively, verbose ()
 # cpOld same but no files older are overwritten
-alias cp="xcp --glob  --recursive  --verbose --dereference  --"
+alias cp="xcp --glob  --recursive  --verbose   --dereference  --"
 alias cp-old="cp -ruv"
 alias copy="cp"
 
@@ -324,7 +324,7 @@ alias rm-all-hidden="rm -rv .[!.]* *";
 alias mkdir="mkdir -pv"
 
 #Always output colours for ls, grep and variants
-alias ls="eza --header --color=always --icons=always --smart-group"
+alias ls="eza --header --color=always --icons=always"
 
 # List directories first
 alias ls-dirtop="ls --group-directories-first"
