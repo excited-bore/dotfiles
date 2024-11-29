@@ -1,4 +1,25 @@
 #source /usr/share/bash-completion/completions/systemctl 
+
+function print-path-to-prompt(){
+    lines="n"
+    while getopts ':l' flag; do
+        case "${flag}" in
+            l)  lines="y"
+                shift 
+                ;;
+        esac
+    done && OPTIND=1;
+    fls=$(echo "$@" | sed 's| |\\ |g' | sed 's|\[|\\\[|g' | sed 's|\]|\\\]|g' | sed 's|(|\\(|g' | sed 's|)|\\)|g' | sed 's|{|\\{|g' | sed 's|}|\\}|g')
+    if test $lines == 'n'; then
+        fls="$(echo $fls | tr "\n" ' ')"
+#    else
+#        fls="$(echo $fls | tr "\n" "/ \n")"
+    fi
+    READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$fls${READLINE_LINE:$READLINE_POINT}"
+    READLINE_POINT=$(( READLINE_POINT + ${#fls} ))
+    unset lines fls 
+}
+
 alias service-system-list-units="sudo systemctl list-units --all"
 alias service-user-list-units="systemctl --user list-units --all"
 alias service-system-list-services="sudo systemctl list-units --type=service"
@@ -14,13 +35,39 @@ alias bios="systemctl reboot --firmware-setup"
 alias restart-network="systemctl restart NetworkManager"  
 alias status-network="systemctl status NetworkManager"  
 
-alias restart-bluetooth="systemctl restart bluetooth.target"
-alias status-bluetooth="systemctl status bluetooth.target"
+alias restart-bluetooth="systemctl restart bluetooth.service"
+alias status-bluetooth="systemctl status bluetooth.service"
 
 alias restart-display="sudo systemctl restart display-manager"  
 alias status-display="sudo systemctl status display-manager"  
 
-if type tor &> /dev/null; then
+if systemctl list-units --full -all | grep -Fq "ssh.service"; then
+    servs="ssh sshd" 
+    alias stop-sshd="sudo systemctl stop $servs"
+    alias start-sshd="sudo systemctl start $servs"
+    alias enable-sshd="sudo systemctl enable $servs"
+    alias disable-sshd="sudo systemctl disable $servs"
+    alias enable-now-sshd="sudo systemctl enable --now $servs"
+    alias disable-now-sshd="sudo systemctl disable --now $servs"
+    alias restart-sshd="sudo systemctl restart $servs"  
+    alias status-sshd="sudo systemctl status $servs"  
+    unset servs 
+fi
+
+if systemctl list-units --full -all | grep -Fq "smb.service"; then
+    servs="smbd nmbd" 
+    alias stop-samba="sudo systemctl stop $servs"
+    alias start-samba="sudo systemctl start $servs"
+    alias enable-samba="sudo systemctl enable $servs"
+    alias disable-samba="sudo systemctl disable $servs"
+    alias enable-now-samba="sudo systemctl enable --now $servs"
+    alias disable-now-samba="sudo systemctl disable --now $servs"
+    alias restart-samba="sudo systemctl restart $servs"
+    alias status-samba-service="sudo systemctl status $servs"
+    unset servs 
+fi
+
+if systemctl list-units --full -all | grep -Fq "tor.service"; then
     servs="tor" 
     alias stop-tor="sudo systemctl stop  $servs"
     alias start-tor="sudo systemctl start  $servs"
@@ -63,17 +110,64 @@ if type pipewire &> /dev/null; then
     alias enable-pipewire="systemctl enable --user  $servs"
     alias enable-now-pipewire="systemctl enable --user --now $servs"
     alias disable-now-pipewire="systemctl disable --user --now  $servs"
-
     unset servs 
 fi
 
 if type fzf &> /dev/null; then
-    alias systemctl-fzf-running-units='systemctl --no-pager --state running | head -n -6 |  fzf --ansi'
+    function systemctl-running-units-fzf() {
+        if test -z $1; then
+            unit=$(systemctl --no-pager --state running | head -n -6 | tail -n +2 | fzf --multi --ansi| awk '{print $1;}')
+        else
+            unit=$(systemctl --no-pager --state running | head -n -6 | tail -n +2 | fzf --multi --ansi -q "$@" | awk '{print $1;}')
+        fi
+        echo $unit 
+        reade -Q "GREEN" -i "status" -p "What to do? [Status/stop/restart/enable/disable/edit/print]: " "stop restart enable disable edit print" actn 
+        if ! test -z $actn; then
+            if test $actn == 'status'; then
+                systemctl status $unit 
+            elif test $actn == 'stop'; then
+                systemctl status $unit 
+                systemctl stop $unit 
+            elif test $actn == 'restart'; then
+                systemctl restart $unit 
+                systemctl status $unit 
+            elif test $actn == 'enable'; then
+                reade -Q "GREEN" -i "n" -p "Also start $unit? [N/y]: " "y" now
+                if test $now == 'y'; then
+                    systemctl enable --now $unit 
+                    systemctl status $unit 
+                else
+                    systemctl enable $unit 
+                    systemctl status $unit 
+                fi
+                unset $now 
+            elif test $actn == 'disable'; then
+                reade -Q "GREEN" -i "n" -p "Also stop $unit? [N/y]: " "y" now
+                if test $now == 'y'; then
+                    systemctl disable --now $unit 
+                    systemctl status $unit 
+                else
+                    systemctl disable $unit 
+                    systemctl status $unit 
+                fi
+                unset $now 
+            elif test $actn == 'edit'; then
+                 files='' 
+                 for un in $unit; do
+                     files=$files"/lib/systemd/system/$un " 
+                 done
+                 $EDITOR $files 
+            elif test $actn == 'print'; then
+                echo "$unit"         
+            fi
+        fi
+        unset unit actn  
+    }
 fi
 
 system-service-start(){
     sudo systemctl start $@; 
-     systemctl status $@;
+    systemctl status $@;
 }
 
 _system-service-start(){

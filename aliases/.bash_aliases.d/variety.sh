@@ -127,7 +127,13 @@ if type rg &> /dev/null; then
             echo "  - the replacement"
             return 1
         fi
-        rg "$1" --multiline --color=never --files-with-matches | xargs sed -i "s/$1/$2/g"
+        frst=$(echo $1 | sed 's|"|\\"|g' | sed 's|\[|\\[|g' | sed 's|\]|\\]|g') 
+        scnd=$(echo $2 | sed 's|"|\\"|g' | sed 's|\[|\\[|g' | sed 's|\]|\\]|g') 
+        printf 'Replacing '"${CYAN}$frst${normal}"' with '"${YELLOW}$scnd${normal}""\n" 
+        #echo $frst'|'$scnd 
+        rg "$(echo $frst | sed 's|?|\\\?|g')" --multiline --files-with-matches 
+        rg "$(echo $frst | sed 's|?|\\?|g')" --multiline --color=never --files-with-matches | xargs sed -i "s|${frst}|${scnd}|g"
+        unset $frst $scnd 
     }
 fi
 

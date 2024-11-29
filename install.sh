@@ -28,7 +28,7 @@ if ! type update-system &> /dev/null; then
 fi
 
 if test -z $SYSTEM_UPDATED; then
-    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "n" updatesysm
+    reade -Q "CYAN" -i "y" -p  "Update system? [Y/n]: " "n" updatesysm
     if test $updatesysm == "y"; then
         update-system                     
     fi
@@ -182,8 +182,8 @@ if test $distro_base == 'Debian'; then
             ./install_list-ppa.sh
         fi
 
-        if ! type ppa-purge &> /dev/null && !test -z "$(apt search ppa-purge 2> /dev/null | awk 'NR>2{print;}')"; then
-            printf "${CYAN}ppa-purge${normal} is not installed (cmd tool for removing ppa repositories)\n"
+        if ! type ppa-purge &> /dev/null && ! test -z "$(apt search ppa-purge 2> /dev/null | awk 'NR>2{print;}')"; then
+            printf "${CYAN}ppa-purge${normal} is not installed (cmd tool for disabling installed PPA's)\n"
             reade -Q 'GREEN' -i 'y' -p "Install ppa-purge? [Y/n]: " 'n' ppa_ins
             if test $ppa_ins == 'y'; then
                 eval "yes | $pac_ins ppa-purge"
@@ -192,7 +192,7 @@ if test $distro_base == 'Debian'; then
         fi
     fi 
 
-     if ! type nala &> /dev/null && ! test -z "$(apt search nala 2> /dev/null | awk 'NR>2{print;}')"; then
+    if ! type nala &> /dev/null && ! test -z "$(apt search nala 2> /dev/null | awk 'NR>2{print;}')"; then
         printf "${CYAN}nala${normal} is not installed (A TUI wrapper for apt install, update, upgrade, search, etc..)\n"
         reade -Q 'GREEN' -i 'y' -p "Install nala? [Y/n]: " 'n' nala_ins
         if test $nala_ins == 'y'; then
@@ -201,7 +201,7 @@ if test $distro_base == 'Debian'; then
             pac_ins="sudo nala install"
             pac_up="sudo nala update" 
         fi
-        unset pac_ins 
+        unset nala_ins 
     fi
          
     if test $distro == "Ubuntu"; then 
@@ -665,7 +665,7 @@ pre='y'
 othr='n'
 color='GREEN'
 prmpt='[Y/n]: '
-if type bat &> /dev/null; then
+if type bat &> /dev/null || type batcat &> /dev/null; then
     pre='n' 
     othr='y'
     color='YELLOW'

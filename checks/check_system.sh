@@ -2,7 +2,7 @@ if type curl &> /dev/null && ! test -f ../aliases/.bash_aliases.d/00-rlwrap_scri
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh
 )" 
 else
-    . ../aliases/.bash_aliases.d/00-rlwrap_scripts.sh
+    . aliases/.bash_aliases.d/00-rlwrap_scripts.sh
 fi
 
 
@@ -144,7 +144,7 @@ do
         codename="$(lsb_release -a | grep --color=never 'Codename' | awk '{print $2}')"
         release="$(lsb_release -a | grep --color=never 'Release' | awk '{print $2;}')"
 
-    elif test -f $f && [[ $f == /etc/SuSE-release || $f == /etc/SUSE-brand ]] && test $distro == /; then
+    elif test -f $f && [[ $f == /etc/SuSE-release || $f == /etc/SUSE-brand ]] && test "$distro" == / ; then
         if ! test -z "$(lsb_release -a | grep Leap)"; then
             pac="zypper_leap"
         else

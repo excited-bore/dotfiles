@@ -10,6 +10,13 @@ else
     . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
 fi
 
+if ! test -f checks/check_aliases_dir.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)" 
+else
+    . checks/check_aliases_dir.sh
+fi
+
+
 pre='both'
 othr='exit intr n'
 color='GREEN'
@@ -32,10 +39,10 @@ if ! [ $int_r  == "n" ]; then
     elif test $int_r == 'intr'; then
         sig='INT'  
     fi
-    if ! grep -q "trap \"! \[ test -z \$(jobs -p) ] && kill \$(jobs -p)\".*" ~/.bashrc; then 
-        printf "trap \" ! [ -z \$(jobs -p) ] && kill \$(jobs -p) $sig\n\"" >> ~/.bashrc
+    if ! grep -q "trap '! \[ -z \"\$(jobs -p)\" ] && kill \"\$(jobs -p)\"' .*" ~/.bashrc; then 
+        printf "trap '! [ -z \"\$(jobs -p)\" ] && kill \"\$(jobs -p)\"' $sig\n" >> ~/.bashrc
     else  
-        sed -i 's|trap ! \[ -z $(jobs -p) \] \&\& kill $(jobs -p) .*|trap ! [ -z $(jobs -p) \] \&\& kill $(jobs -p) '"$sig"'|g' ~/.bashrc 
+        sed -i 's|trap '\''! \[ -z "$(jobs -p)" \] && kill "$(jobs -p)"'\'' .*|trap '\''! [ -z "$(jobs -p)" \] \&\& kill "$(jobs -p)"'\'' '"$sig"'|g' ~/.bashrc 
     fi 
     
     pre='same'
@@ -44,7 +51,7 @@ if ! [ $int_r  == "n" ]; then
     prmpt='[Same/both/exit/intr/n]: '
     echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for terminate background processes /root/.bashrc' "
      
-    if sudo grep -q 'trap ''kill $(jobs -p)' /root/.bashrc; then
+    if sudo grep -q "trap '! \[ -z \"\$(jobs -p)\" ] && kill \"\$(jobs -p)\"' .*" /root/.bashrc; then
         pre='n' 
         othr='same both exit intr'
         color='YELLOW'
@@ -60,10 +67,10 @@ if ! [ $int_r  == "n" ]; then
             sig='INT'  
         fi
 
-        if ! sudo grep -q "trap 'kill \$(jobs -p).*" /root/.bashrc; then 
-            printf "trap \" ! [ -z \$(jobs -p) ] && kill \$(jobs -p) $sig\n\"" | sudo tee -a /root/.bashrc
+        if ! sudo grep -q "trap '! \[ -z \"\$(jobs -p)\" ] && kill \"\$(jobs -p)\"' .*" /root/.bashrc; then 
+            printf "trap '! [ -z \"\$(jobs -p)\" ] && kill \"\$(jobs -p)\"' $sig\n" | sudo tee -a /root/.bashrc &> /dev/null
         else  
-            sudo sed -i 's|trap ! \[ -z $(jobs -p) \] \&\& kill $(jobs -p) .*|trap ! [ -z $(jobs -p) \] \&\& kill $(jobs -p) '"$sig"'|g' /root/.bashrc 
+            sudo sed -i 's|trap '\''! \[ -z "$(jobs -p)" \] && kill "$(jobs -p)"'\'' .*|trap '\''! [ -z "$(jobs -p)" \] \&\& kill "$(jobs -p)"'\'' '"$sig"'|g' /root/.bashrc 
         fi  
     fi     
 fi
@@ -82,24 +89,54 @@ if test $ansr == "y"; then
     if test -f ~/.environment.env; then
         sed -i 's|^export TRASH_BIN_LIMIT=|export TRASH_BIN_LIMIT=|g' ~/.environment.env
     fi
-    reade -Q "GREEN" -i "y" -p "Set cp/mv (when overwriting) to backup files? (will also trash backups) [Y/n]: " "n" ansr         
-    if [ "$ansr" != "y" ]; then
-        sed -i 's|^alias cp="cp-trash -rv"|#alias cp="cp-trash -rv"|g' $genr
-        sed -i 's|^alias mv="mv-trash -v"|#alias mv="mv-trash -v"|g' $genr
-    else
-        sed -i 's|.*alias cp="cp-trash -rv"|alias cp="cp-trash -rv"|g' $genr
-        sed -i 's|.*alias mv="mv-trash -v"|alias mv="mv-trash -v"|g' $genr
-    fi
-    unset ansr
 
     if type gio &> /dev/null; then 
-        reade -Q "YELLOW" -i "n" -p "Set 'gio trash' alias for rm? [N/y]: " "y" ansr 
+        reade -Q "GREEN" -i "y" -p "Set cp/mv (when overwriting) to backup files? (will also trash backups) [Y/n]: " "n" ansr         
         if [ "$ansr" != "y" ]; then
-            sed -i 's|^alias rm="gio trash"|#alias rm="gio trash"|g' $genr
+            sed -i 's|^alias cp="cp-trash -rv"|#alias cp="cp-trash -rv"|g' $genr
+            sed -i 's|^alias mv="mv-trash -v"|#alias mv="mv-trash -v"|g' $genr
         else
-            sed -i 's|.*alias rm="gio trash"|alias rm="gio trash"|g' $genr
+            sed -i 's|.*alias cp="cp-trash -rv"|alias cp="cp-trash -rv"|g' $genr
+            sed -i 's|.*alias mv="mv-trash -v"|alias mv="mv-trash -v"|g' $genr
         fi
+        unset ansr
+            
     fi 
+
+    reade -Q "GREEN" -i "y" -p "Set to rm (remove) to always be verbose? [Y/n]: " "n" rm_verb
+     
+    prompt="${green}Set rm (remove) to:
+    - ${bold}Always give a prompt once before removing${normal}${green} and recursively look for files inside given directories to remove?
+    - Only give a prompt once?
+    - Recursively look without a prompt?${normal}\n" 
+    prompt2="Rm = [Recur_prompt/none/prompt/recur]: "       
+    ansrs="none prompt recur" 
+
+    if type gio &> /dev/null; then 
+        prompt="$prompt${green}    - Don't use 'rm' but use 'gio trash' to trash files (leaving a copy in ${cyan}trash:///${green} after 'removing')${normal}\n"
+        prompt2="Rm = [Recur_prompt/none/prompt/recur/trash]: "       
+        ansrs="none prompt recur trash" 
+    fi 
+
+    printf "$prompt" 
+    reade -Q "GREEN" -i "recur_prompt" -p "$prompt2" "$ansrs" ansr 
+    if $([ "$ansr" == "none" ] || [ -z "$ansr" ]) && test "$rm_verb" == 'n'; then
+        sed -i 's|^alias rm="|#alias rm="|g' $genr
+    else
+        test $rm_verb == 'y' && verb='--verbose'
+        if [ "$ansr" == "none" ] || [ -z "$ansr" ]; then 
+            sed -i 's|.*alias rm=".*|alias rm="rm --verbose"|' $genr
+        elif [ "$ansr" == "recur_prompt" ] || [ "$ansr" == "Recur_prompt" ]; then
+            sed -i 's|.*alias rm=".*|alias rm="rm '$verb' -r --interactive=once"|' $genr
+        elif [ "$ansr" == "prompt" ]; then
+            sed -i 's|.*alias rm=".*|alias rm="rm '$verb' --interactive=once"|g' $genr
+        elif [ "$ansr" == "recur" ]; then
+            sed -i 's|.*alias rm=".*|alias rm="rm '$verb' -r"|g' $genr
+        elif [ "$ansr" == "trash" ]; then
+            sed -i 's|.*alias rm=".*|alias rm="gio trash"|g' $genr
+        fi
+        unset ansr prompt prompt2 ansrs rm_verb verb
+    fi
     if type bat &> /dev/null; then
         reade -Q "YELLOW" -i "n" -p "Set 'cat' as alias for 'bat'? [N/y]: " "y" cat
         if [ "$cat" != "y" ]; then
