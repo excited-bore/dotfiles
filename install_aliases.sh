@@ -81,7 +81,7 @@ if ! test -f aliases/.bash_aliases.d/general.sh; then
     genr=$tmp
 fi
 
-reade -Q "GREEN" -i "y" -p "Install general.sh at ~/? (aliases related to general actions - cd/mv/cp/rm + completion script replacement for 'read -e') [Y/n]: " "n" ansr         
+readyn -p "Install general.sh at ~/? (aliases related to general actions - cd/mv/cp/rm + completion script replacement for 'read -e')" ansr         
 
 if test $ansr == "y"; then
     if test -f ~/.environment.env; then
@@ -102,22 +102,22 @@ if test $ansr == "y"; then
     #fi 
 
     if type eza &>/dev/null; then
-        reade -Q "GREEN" -i "y" -p "${CYAN}eza${GREEN} installed. Set ls (list items directory) to 'eza'? [Y/n]: " "n" eza_verb
+        readyn -p "${CYAN}eza${GREEN} installed. Set ls (list items directory) to 'eza'?" eza_verb
         if test $eza_verb == 'y'; then
 
             ezalias="eza"
 
-            reade -Q "GREEN" -i "y" -p "Add '--header' as an option for 'eza'? (explanation of table content at top) [Y/n]: " "n" eza_hdr
+            readyn -p "Add '--header' as an option for 'eza'? (explanation of table content at top)" eza_hdr
             if test $eza_hdr == 'y'; then
                 ezalias=$ezalias" --header" 
             fi
             
-            reade -Q "GREEN" -i "y" -p "Always color 'eza' output? [Y/n]: " "n" eza_clr
+            readyn -p "Always color 'eza' output?" eza_clr
             if test $eza_clr == 'y'; then
                 ezalias=$ezalias" --color=always" 
             fi
              
-            reade -Q "GREEN" -i "y" -p "Add filetype/directory icons for all the found items in 'eza'? [Y/n]: " "n" eza_icon
+            readyn -p "Add filetype/directory icons for all the found items in 'eza'? " eza_icon
             if test $eza_icon == 'y'; then
                 ezalias=$ezalias" --icons" 
             fi
@@ -127,23 +127,23 @@ if test $ansr == "y"; then
         fi
     fi
 
-        reade -Q 'GREEN' -i 'y' -p "Set cp alias? [Y/n]: " 'n' cp_all
+        readyn -p "Set cp alias?" cp_all
 
         if type xcp &> /dev/null; then 
-            reade -Q 'GREEN' -i 'y' -p "${CYAN}xcp${GREEN} installed. Use xcp instead of cp? [Y/n]: " 'n' cp_xcp
+            readyn -p "${CYAN}xcp${GREEN} installed. Use xcp instead of cp?" cp_xcp
             if test $cp_xcp == 'y'; then
                 cp_xcp='xcp --glob ' 
             else
                 cp_xcp="cp" 
             fi
  
-            reade -Q 'GREEN' -i 'y' -p "Be recursive? (Recursive means copy everything inside directories without aborting) [Y/n]: " 'n' cp_r
+            readyn -p "Be recursive? (Recursive means copy everything inside directories without aborting)" cp_r
             if test "$cp_r" == 'y'; then
                 cp_r='--recursive ' 
             else
                 cp_r="" 
             fi 
-            reade -Q 'GREEN' -i 'y' -p "Be verbose? (All info about copying process) [Y/n]: " 'n' cp_v
+            readyn -p "Be verbose? (All info about copying process)" cp_v
             if test "$cp_v" == 'y'; then
                 cp_v='--verbose ' 
             else
@@ -157,7 +157,7 @@ if test $ansr == "y"; then
                 cp_ov="" 
             fi
             
-            reade -Q 'GREEN' -i 'y' -p "Lookup files/directories of symlinks? [Y/n]: " 'n' cp_der
+            readyn -p "Lookup files/directories of symlinks?" cp_der
             if test $cp_der == 'y'; then
                 cp_der='--dereference ' 
             else

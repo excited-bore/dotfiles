@@ -215,7 +215,7 @@ function readyn(){
     while :; do
        case $1 in
            -h|-\?|--help)
-               printf "${bold}readyn${normal} [-h/--help] [ -n ] [ -p PROMPTSTRING ] [ -Q COLOURSTRING ]  [ -b BREAK-CHARS ] [ returnvar ]\n
+               printf "${bold}readyn${normal} [-h/--help] [ -n/--no [ CONDITION ] ] [ -p/--prompt PROMPTSTRING ] [ -Q/--colour COLOURSTRING ]  [ -b/--break-chars BREAK-CHARS ] [ returnvar ]\n
                Simplifies yes/no prompt for ${bold}reade${normal}. Supply at least 1 variable as the last argument to put the answer in, otherwise the value will be in '\$READYN_VALUE'.  
 '${GREEN} [${underline_on}Y${underline_off}es/${underline_on}n${underline_off}o]: ${normal}' : 'y' as pre-given, 'n' as other option. Colour for the prompt is ${GREEN}GREEN (Default)${normal} 
 '${YELLOW} [${underline_on}N${underline_off}o/${underline_on}y${underline_off}es]: ${normal}' : 'n' as pre-given, 'y' as other option. Colour for the prompt is ${YELLOW}YELLOW${normal}
