@@ -211,8 +211,6 @@ function cp-trash(){
     fi
 }
 
-alias cp="xcp --glob  --recursive  --verbose   --dereference  --"
-
 # mv (recursively native) verbose and only ask for interaction when overwriting newer files
 
 alias mv="mv -v"
@@ -276,7 +274,6 @@ function mv-trash(){
 
 alias mv="mv-trash -v"
 
-
 # rm recursively and verbose
 
 alias rm="rm-prompt"
@@ -290,7 +287,32 @@ alias rm-all-hidden="rm -rv .[!.]* *";
 alias mkdir="mkdir -pv"
 
 #Always output colours for ls, grep and variants
-alias ls="eza --header --color=always --icons"
+alias ls="eza --header --color=always --icons=always"
+
+# List directories first
+alias ls-dirtop="ls --group-directories-first"
+
+# Listen hidden files and permissions
+alias ls-all="ls -Ahl"
+
+# Listen only files, including that are hidden 
+alias ls-files="ls -Ahp | grep -v /"
+
+# Listen only directories, including that are hidden
+alias ls-dirs="ls -Ahp | grep \".*/$\""
+
+if type eza &> /dev/null; then
+    alias eza="eza --color=always --header --icons=always" 
+    alias ls-dirtop="eza --group-directories-first"
+    alias ls-all="eza -A --long --git --header"
+    alias ls-files="eza -A --only-files"
+    alias ls-dirs="eza -A --only-dirs" 
+    alias eza-git="eza --long --git-repos --header --git" 
+    alias ls-git="eza-git"
+fi
+
+alias ll="ls-all"
+
 alias grep='grep --colour=always'
 alias egrep='egrep --colour=always'
 alias fgrep='fgrep --colour=always'
@@ -298,6 +320,14 @@ alias rg='rg --color=always'
 
 alias grep-no-color='grep --color=never'
 alias grep-no-case-sensitivwe='grep -i'
+
+
+# Refresh output command every 0.1s
+alias refresh="watch -n0 --color bash -ic"
+alias refresh-diff="watch -n0 -d --color bash -ic"
+complete -F _commands refresh refresh-diff
+
+type viddy &> /dev/null && alias refresh="viddy --interval 0.1 --disable_auto_save --shell-options '--login' -- " && alias refresh-diff="viddy -D --interval 0.1 --disable_auto_save --shell-options '--login' -- " && complete -F _commands viddy
 
 #alias cat="bat"
 
@@ -317,11 +347,6 @@ if type nmcli &> /dev/null; then
     alias wifi-disable='nmcli radio wifi off'
 fi
 
-# Listen hidden files and permissions
-alias lsall="ls -Ahl"
-
-# Listen only directories, including that are hidden
-alias lsdir="ls -Ap | grep \".*/$\""
 alias q='exit'
 #alias q='! test -z jobs && kill -2 "$(jobs -p)" && reade -Q "GREEN" -i "y" -p "Jobs are still running in the background. Send interrupt signal (kill)?: " "n" kill_ && test "$kill_" == "y" && kill "$(jobs -p)" && exit || kill -18 "$(jobs -p)" || exit'
 alias d="dirs"
@@ -406,6 +431,10 @@ if type whereis &> /dev/null; then
     
      complete -F _commands edit-whereis  
 fi
+
+alias start-cups="sudo cupsctl WebInterface=y; xdg-open 'http://localhost:631'"
+alias start-printer="start-printer"
+
 
 alias ip-adress="wget -qO - https://api.ipify.org; echo"
 
@@ -675,5 +704,11 @@ function iommu-groups(){
     done;
 }
 
+
 alias regenerate-initrams-all-kernels="sudo mkinitcpio -P"
+hdrs="$(echo $(uname -r) | cut -d. -f-2)"
+curr="linux${hdrs//'.'}"
+alias regenerate-initrams-current-kernel="sudo mkinitcpi -p $curr"
+unset hdrs curr
+
 alias list-drivers-modules-in-use="lspci -nnk"
