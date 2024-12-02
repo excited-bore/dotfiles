@@ -47,12 +47,21 @@ if type ffmpeg &> /dev/null; then
         done
     }
 
+    function videotomp3(){
+        reade -Q "GREEN" -i "n" -p "Delete after conversion? [N/y]: " "y" del
+        for var in "$@"
+        do
+            ffmpeg -i "$var" -vn -acodec libmp3lame -ac 2 -ab 160k -ar 48000 "${var%.*}.mp3" && test "$del" == 'y' && test -f "$var" && rm -v "$var" 
+        done
+    }
+     
+
     function ffmpeg-convert-to-mp4(){
         reade -Q "GREEN" -i "n" -p "Delete after conversion? [N/y]: " "y" del
         for var in "$@"
         do
+            local sub='' 
             reade -Q "GREEN" -p "Add subtitle file? (leave empty if no): " -e sub
-            sub='' 
             if ! test -z $sub && ! test -f "$sub"; then
                 echo 'No subtitle file found'
                 return 1
@@ -62,5 +71,7 @@ if type ffmpeg &> /dev/null; then
             ffmpeg -i "$var" $sub "${var%.*}.mp4" && test "$del" == 'y' && test -f "$var" && rm -v "$var" 
             test "$del" == 'y' && test -f $sub && rm -v $sub  
         done
+        unset del sub var 
     }
+    
 fi

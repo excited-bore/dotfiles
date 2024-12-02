@@ -215,8 +215,9 @@ if test $ansr == "y"; then
         fi
         unset ansr prompt prompt2 ansrs rm_verb verb
     fi
+    
     if type bat &> /dev/null; then
-        reade -Q "YELLOW" -i "n" -p "Set 'cat' as alias for 'bat'? [N/y]: " "y" cat
+        readyn -n -p "Set 'cat' as alias for 'bat'?" cat
         if [ "$cat" == "y" ]; then
             sed -i 's|.*alias cat="bat"|alias cat="bat"|g' $genr
         else
@@ -224,7 +225,17 @@ if test $ansr == "y"; then
         fi
     fi
     unset cat
-   
+ 
+   if type ack &> /dev/null; then
+        readyn -n -p "Set 'ack' as alias for 'grep'?" ack_gr
+        if [ "$ack_gr" == "y" ]; then
+            sed -i 's|.*alias grep="ack"|alias ack="ack"|g' $genr
+        else
+            sed -i 's|^alias grep="ack"|alias grep="grep --color=always"|g' $genr
+        fi
+    fi
+    unset ack_gr
+
     rver=$(echo $(ruby --version) | awk '{print $2}' | cut -d. -f-2)'.0'
     paths=$(gem environment | awk '/- GEM PATH/{flag=1;next}/- GEM CONFIGURATION/{flag=0}flag' | sed 's|     - ||g' | paste -s -d ':')
     if grep -q "GEM" $ENVVAR; then

@@ -7,11 +7,19 @@ else
     . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
 fi
   
+lsblk --all --exclude 7 -o NAME,SIZE,FSTYPE,MOUNTPOINT,LABEL,UUID
 
-sudo blkid
-readecomp=($(sudo blkid | awk 'BEGIN { FS = ":" };{print $1;}'))
+echo
+printf "${bold}Currently in /etc/fstab: ${normal}\n"
+cat /etc/fstab | tail +7
+
+echo
+printf "$(sudo blkid | grep -v 'loop' | perl -pe "s| LABEL=\"(.*?)\"| LABEL=\"${GREEN}\1\"${normal}|g" | tac)"
+echo
+
+echo
+readecomp=($(sudo blkid | awk 'BEGIN { FS = ":" };{print $1;}' | grep -v 'loop' | tac))
 drives="${readecomp[@]}"
-
 reade -Q "GREEN" -i "/dev/" -p "Choose drive to mount: " "$drives" drive
 reade -Q "GREEN" -i "/mnt" -p "Mount point? (will make if not exists): " -e mnt
 if [ ! -d $mnt ]; then
@@ -29,7 +37,7 @@ elif [[ $type_fs == "exfat" || $type_fs == "ext4" ]]; then
     attr="nosuid,nodev,nofail,auto,x-gvfs-show 0 0"
 else
     echo "Unrecognized filetype"
-    #exit 1
+    exit 1
 fi
 
 if test "$type_fs" == "ext4"; then
@@ -39,8 +47,13 @@ if test "$type_fs" == "ext4"; then
     fi
 fi
 
-
-read -p "Will write \"$uuid $mnt $type_fs $attr\" to /etc/fstab. Ok? [Y/n]: " ok
+reade -Q 'YELLOW' -i 'y' -p "Will write \"$uuid $mnt $type_fs $attr\" to /etc/fstab. Ok? [Y/n]: " 'n' ok
 if [ -z $ok ] || [ $ok == "y" ]; then
    echo "$uuid $mnt $type_fs $attr" | sudo tee -a /etc/fstab 
 fi
+
+echo
+printf "${bold}Currently in /etc/fstab: ${normal}\n"
+cat /etc/fstab | tail +7
+
+unset readecomp drives drive mnt uuid type_fs attr chown_stff ok
