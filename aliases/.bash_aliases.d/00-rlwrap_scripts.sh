@@ -9,6 +9,11 @@ if type sudo &> /dev/null; then
     alias sudo='sudo '
 fi
 
+if type wget &> /dev/null; then
+    alias wget='wget --https-only '
+fi
+
+
 # https://stackoverflow.com/questions/4023830/how-to-compare-two-strings-in-dot-separated-version-format-in-bash
 
 function version-higher () {

@@ -14,27 +14,28 @@ alias list-shellvars-bash="compgen -v | $PAGER"
 alias list-file-and-dirs-bash="compgen -f | $PAGER"
 
 _commands(){
-    COMPREPLY=($(compgen -c $2))
+    COMPREPLY=($(compgen -c -- ${2}))
     return 0
 }
 
 _builtins(){
-    COMPREPLY=($(compgen -b $2))
+    COMPREPLY=($(compgen -b -- ${2}))
     return 0
 }
 
 _files(){
-    COMPREPLY=($(compgen -f $2))
+    comptopt -o filenames 2>/dev/null 
+    COMPREPLY=($(compgen -f -- ${2}))
     return 0
 }
 
 _users(){
-    COMPREPLY=($(compgen -u $2))
+    COMPREPLY=($(compgen -u -- ${2}))
     return 0
 }
 
 _groups(){
-    COMPREPLY=($(compgen -g $2))
+    COMPREPLY=($(compgen -g -- ${2}))
     return 0
 }
 

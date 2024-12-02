@@ -3,6 +3,11 @@ if ! type reade &> /dev/null && test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh; 
     . ~/.bash_aliases.d/00-rlwrap_scripts.sh
 fi
 
+alias list-all-aliases="alias | awk '{\$1=\"\"; print}' | \$PAGER"
+alias list-all-functions="declare -f | \$PAGER"
+alias list-all-aliases-and-fucntions="(alias | awk '{\$1=\"\"; print}'; declare -f) | \$PAGER"
+
+
 if [ -z $TRASHBIN_LIMIT ]; then
    TRASHBIN_LIMIT=100 
 fi
@@ -10,6 +15,46 @@ fi
 if test $machine == 'Windows' && test $win_bash_shell == 'Cygwin'; then
     alias cd-home-="cd /cygdrive/c/Users/$USER"
 fi
+
+function change-username-and-homefolder(){
+    ! shopt -q login_shell && printf "${RED}Not login shell\nLogout, press 'Ctrl+Alt+F1/F2/...F6' to drop to a login shell and login as root or a user other then the one you want to change.\n${YELLOW}(Make sure the root account is enabled with 'sudo passwd su' - you can disable it afterwards with 'sudo passwd -l su')${normal}\n" && return 1
+    local frst="$(echo $(users | word2line | uniq | grep -v root ) | awk '{print $1}')" 
+    local words="$(echo $words | sed "s/\<$frst\> //g")" 
+    reade -Q 'CYAN' -i "$frst" -p "Old username (Empty = $frst): " "$words" usrname 
+    test -z "$usrname" && usrname="$frst" 
+    test "$USER" == "$usrname" && printf "${RED}Can't change username for $usrname while logged as said\nLogout, press 'Ctrl+Alt+F1/F2/...F6' to drop to a login shell (if not already in one) and login as root or a user other then the one you want to change.\n${YELLOW}(Make sure the root account is enabled with 'sudo passwd su' - you can disable it afterwards with 'sudo passwd -l su')${normal}\n" && return 1 
+    reade -Q 'MAGENTA' -p 'New username: ' '' usrname_nw 
+    if ! test -z "$usrname_nw"; then
+        if ! test -z "$(ps -U $usrname 2> /dev/null)"; then
+            printf "There are still processes running under user $usrname!\nKilling all processes for user..."  
+            sleep 5
+            sudo pkill -U $(id -u "$usrname") 
+            printf "Done!\n" 
+        fi
+        sudo usermod -l "$usrname_nw" -d /home/"$usrname_nw" -m "$usrname" &&  
+        sudo groupmod -n "$usrname_nw" "$usrname" &&  
+        sudo test -f /etc/lightdm/lightdm.conf && sudo grep -q "autologin-user=$usrname" /etc/lightdm/lightdm.conf && sudo sed -i "s/^autologin-user=$usrname/autologin-user=$usrname_nw/g" /etc/lightdm/lightdm.conf &&
+        test -f /home/$usrname_nw/.config/starship.toml && grep -q "/home/$usrname" /home/$usrname_nw/.config/starship.toml && sed -i "s|/home/$usrname|/home/$usrname_nw|g" /home/$usrname_nw/.config/starship.toml   
+        printf "${GREEN}Changed username and homedirectory to $usrname_nw!${normal}\n" && 
+        unset usrname usrname_nw && 
+        return 0 || return 1; 
+    else
+        printf "${YELLOW}Please give up a new username to change to.${normal}\n"
+        return 1 
+    fi
+}
+
+function change-device-name-to(){
+    local oldname=$(hostname) 
+    reade -Q 'CYAN' -p "New device name (hostname): " "" name
+    test -z "$name" && printf "Name cant be empty.\n" && return 1
+    sudo hostnamectl set-hostname "$name" 
+    sudo sed -i "s/$oldname/$name/g" /etc/hosts &&
+    sudo sed -i "s/$oldname/$name/g" /etc/hostname && 
+    unset name &&
+    printf "${GREEN}Changed device name (hostname) to $name!${normal}\n" &&
+    return 0 || return 1;
+}
 
 #source_profile=""
 #if test -z $PROFILE; then
@@ -52,11 +97,13 @@ function cd-w() {
         shift;
     fi 
     for i in $(dirs -l 2>/dev/null); do
-        if [[ -z "${@}" && "$i" == "$HOME" ]] || test "$(realpath ${@: -1:1})" == "$i"; then
-            push=0
-            pushd -n +$j &>/dev/null
+        if test -e "$i"; then
+            if [[ -z "${@}" && "$i" == "$home" ]] || test "$(realpath ${@: -1:1})" == "$i"; then
+                push=0
+                pushd -n +$j &>/dev/null
+            fi
+            j=$(($j+1));
         fi
-        j=$(($j+1));
     done
     if [ $push == 1 ]; then
         pushd "$(pwd)" &>/dev/null;  
@@ -97,7 +144,7 @@ function cp-all-to(){
     fi
 }
 
-complete -F _filedir cp-all-to
+complete -F _files cp-all-to
 
 alias cpf-bckup="cp -f -b"
 
@@ -311,26 +358,33 @@ function mv-trash(){
 
 alias mv="mv-trash -v"
 
-# rm recursively and verbose
+
+# Rm 
 
 alias rm="rm-prompt"
+
 shred_iterates=3
 alias rm-shred="shred -vzn $shred_iterates -u"
-#alias remove="rm"
+
+alias remove="rm"
+
 alias rm-all-folder="rm -rv ./*";
+
 alias rm-all-hidden="rm -rv .[!.]* *";
 
-# With parent directories and verbose
-alias mkdir="mkdir -pv"
+
+
+# Ls and Eza
 
 #Always output colours for ls, grep and variants
-alias ls="eza --header --color=always --icons=always"
+alias ls="ls --color=always"
 
 # List directories first
 alias ls-dirtop="ls --group-directories-first"
 
 # Listen hidden files and permissions
 alias ls-all="ls -Ahl"
+alias llnh="ls-all"
 
 # Listen only files, including that are hidden 
 alias ls-files="ls -Ahp | grep -v /"
@@ -339,21 +393,39 @@ alias ls-files="ls -Ahp | grep -v /"
 alias ls-dirs="ls -Ahp | grep \".*/$\""
 
 if type eza &> /dev/null; then
+
     alias eza="eza --color=always --header --icons=always --smart-group" 
-    alias ls-dirtop="eza --group-directories-first"
-    alias ls-all="eza -A --long --git --header --smart-group"
-    alias ls-files="eza -A --only-files"
-    alias ls-dirs="eza -A --only-dirs" 
+    alias eza-dirtop="eza --group-directories-first"
+    alias eza-all="eza -A --long --git --smart-group --octal-permissions --header"
+    alias eza-dirs="eza -A --only-dirs" 
+    alias eza-files="eza -A --only-files"
     alias eza-git="eza --long --git-repos --header --git" 
+
+    alias ls="eza"
+    alias ls-all="eza-all"
+    alias llnh="eza -A --long --color=always --icons=always --smart-group --octal-permissions"
+    alias ls-dirtop="eza-dirtop"
+    alias ls-dirs="eza-dirs"
+    alias ls-files="eza-files"
     alias ls-git="eza-git"
+
 fi
 
 alias ll="ls-all"
-alias lp="ls-all | $PAGER"
+
+
+function ls-all-pager(){ ls-all "$@" | $PAGER; }
+alias ll-pager="ls-all-pager"
+alias llp="ls-all-pager"
+alias lp="ls-all-pager"
+
+
+# With parent directories and verbose
+alias mkdir="mkdir -pv"
 
 
 alias grep='grep --colour=always'
-alias egrep='egrep --colour=always'
+alias egrep='grep -e'
 alias fgrep='fgrep --colour=always'
 alias rg='rg --color=always'
 
@@ -414,7 +486,6 @@ alias get-first-stringwords="frst=\"\$(echo \$words | awk '{print \$1}')\" && wo
 
 # Helps pipeing column output to a pager
 alias column="column -c \$(tput cols)"
-
 
 
 alias tar-create="tar -cvf"
@@ -501,6 +572,7 @@ function cron-list-all-user-jobs(){
     mktemp_f=$(mktemp) && for user in $(cut -f1 -d: /etc/passwd); do echo "$(tput setaf 10)User: $(tput bold)$user"; printf "$(tput setaf 12)Crontab: $(tput bold)"; sudo crontab -u "$user" -l; echo; done &> "$mktemp_f"; cat $mktemp_f | $PAGER; rm $mktemp_f &> /dev/null; unset mktemp_f
 }
 alias crontab-list-all-user-jobs="cron-list-all-user-jobs"
+alias list-all-cronjobs-user="cron-list-all-user-jobs"
 
 alias crontab-edit="env VISUAL=$CRONEDITOR crontab -e"
 alias cron-edit="env VISUAL=$CRONEDITOR crontab -e"
@@ -589,7 +661,7 @@ function ln-soft(){
     fi
 }
 
-complete -F _filedir ln-soft
+#complete -F _filedir ln-soft
 
 
 function ln-hard(){
@@ -604,7 +676,7 @@ function ln-hard(){
     fi
 }
 
-complete -F _filedir ln-hard
+#complete -F _filedir ln-hard
 
 function trash(){
     for arg in $@ ; do
@@ -613,7 +685,7 @@ function trash(){
             if [ $(gio trash --list | wc -l) -gt "$TRASHBIN_LIMIT" ]; then
                 local ansr
                 echo "${red1}Trashbin has more then $TRASHBIN_LIMIT items"
-                reade -Q "YELLOW" -i "y" -p "Empty? ('trash-restore' to restore) [Y/n]: " "y n"  ansr
+                reade -Q "YELLOW" -i "y" -p "Empty? ('trash-restore' to restore) [Y/n]: " "n"  ansr
                 if [ $ansr == "y" ]; then
                     trash-empty
                 fi
@@ -626,7 +698,7 @@ function trash(){
     done
 }
 
-complete -F _filedir trash
+#complete -F _filedir trash
 
 alias trash-list="gio trash --list"
 alias trash-empty="gio trash --empty"
@@ -653,24 +725,136 @@ complete -F _trash trash-list
 complete -F _trash trash-restore
 
 function add-to-group() {
-    if [[ -z $1 ]]; then
-        echo "Give a group and a username (default: $USER)"
-    elif [[ -z $2 ]]; then
+    if [ -z $1 ]; then
+        echo "Give a user and the group (user can be empty - default: $USER)"
+    elif [ -z $2 ]; then
         sudo usermod -aG $USER $1;
     else
         sudo usermod -aG $1 $2;
-    fi; }
+    fi 
+}
 
 complete -F _groups add_to_group
 
-function set-user-executable() {
-    if [[ ! -f $1 ]] ; then
-        echo "Give a file to set as an executable";
-    else
-        sudo chmod u+x $1;
-    fi; }
+# https://stackoverflow.com/questions/22381983/how-to-check-file-owner-in-linux
+# I still do == cause used to ¯\_(ツ)_/¯
+#
 
-complete -F _files mark_user_executable
+function set-executable-user() {
+    if ! test -z "$@"; then
+        for i in "$@"; do 
+            if test "$(stat -c '%U' "$i")" == 'root' || ! test "$(stat -c '%U' "$i")" == "$USER"; then
+                sudo chmod u+x $i;
+            else 
+                chmod u+x $i;    
+            fi 
+            llnh $i 
+        done
+        unset i 
+    fi
+}
+
+function set-executable-group() {
+    if ! test -z "$@"; then
+        for i in "$@"; do 
+            if test "$(stat -c '%U' "$i")" == 'root' || ! test "$(stat -c '%U' "$i")" == "$USER"; then
+                sudo chmod g+x $i;
+            else 
+                chmod g+x $i;    
+            fi 
+            llnh $i 
+        done
+        unset i 
+    fi
+}
+
+function set-executable-other() {
+    if ! test -z "$@"; then
+        for i in "$@"; do 
+            if test "$(stat -c '%U' "$i")" == 'root' || ! test "$(stat -c '%U' "$i")" == "$USER"; then
+                sudo chmod o+x $i;
+            else 
+                chmod o+x $i;    
+            fi 
+            llnh $i 
+        done
+        unset i 
+    fi
+}
+
+
+function set-executable-all() {
+    if ! test -z "$@"; then
+        for i in "$@"; do 
+            if test "$(stat -c '%U' "$i")" == 'root' || ! test "$(stat -c '%U' "$i")" == "$USER"; then
+                sudo chmod +x $i;
+            else 
+                chmod +x $i;    
+            fi 
+            llnh $i 
+        done
+        unset i 
+    fi
+}
+
+
+function unset-executable-user() {
+    if ! test -z "$@"; then
+        for i in "$@"; do 
+            if test "$(stat -c '%U' "$i")" == 'root' || ! test "$(stat -c '%U' "$i")" == "$USER"; then
+                sudo chmod u-x $i;
+            else
+                chmod u-x $i    
+            fi 
+            llnh $i 
+        done
+        unset i 
+    fi
+}
+
+function unset-executable-group() {
+    if ! test -z "$@"; then
+        for i in "$@"; do 
+            if test "$(stat -c '%U' "$i")" == 'root' || ! test "$(stat -c '%U' "$i")" == "$USER"; then
+                sudo chmod g-x $i;
+            else
+                chmod g-x $i    
+            fi 
+            llnh $i 
+        done
+        unset i 
+    fi
+}
+
+function unset-executable-other() {
+    if ! test -z "$@"; then
+        for i in "$@"; do 
+            if test "$(stat -c '%U' "$i")" == 'root' || ! test "$(stat -c '%U' "$i")" == "$USER"; then
+                sudo chmod o-x $i;
+            else
+                chmod o-x $i    
+            fi 
+            llnh $i 
+        done
+        unset i 
+    fi
+}
+
+
+
+function unset-executable-all() {
+    if ! test -z "$@"; then
+        for i in "$@"; do 
+            if test "$(stat -c '%U' "$i")" == 'root' || ! test "$(stat -c '%U' "$i")" == "$USER"; then
+                sudo chmod -x $i;
+            else
+                chmod -x $i    
+            fi 
+            llnh $i 
+        done
+        unset i 
+    fi
+}
 
 alias locales-list-enabled="locale -a"
 
@@ -757,3 +941,22 @@ alias regenerate-initrams-current-kernel="sudo mkinitcpi -p $curr"
 unset hdrs curr
 
 alias list-drivers-modules-in-use="lspci -nnk"
+alias motherboard-info="sudo dmidecode -t 1 && sudo dmidecode -t 2"
+alias mobo-info="motherboard"
+alias bios-info="sudo dmidecode -t 0"
+alias motherboard-info-full="sudo dmidecode -t 1 && sudo dmidecode -t 2 && sudo dmidecode -t 0 | $PAGER"
+
+function boot-into(){
+    local opts="$(efibootmgr | grep --color=never Boot00 | awk '{print $1;}' | sed 's/Boot//g' | cut -d* -f-1)" 
+    local frst="$(echo $opts | awk '{print $1}')" 
+    local opts="$(echo $opts | sed "s/\<$frst\> //g")"  
+    efibootmgr
+    reade -Q 'GREEN' -i "$frst" -p "What to boot into? (Empty: $frst): " "$opts" bootnt
+    if [[ $bootnt =~ "000*" ]]; then
+        efibootmgr --bootnext $bootnt 
+    fi
+    efibootmgr 
+    printf "\n${CYAN}Will reboot in 5 seconds if not interrupted\n${normal}" 
+    sleep 5 && reboot 
+    unset bootnt 
+}

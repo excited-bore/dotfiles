@@ -1,0 +1,1 @@
+${pac_ins} checksec

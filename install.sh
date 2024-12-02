@@ -229,7 +229,7 @@ if test $distro_base == 'Debian'; then
 elif test $distro_base == 'Arch'; then
 
     ! type pactree &> /dev/null && printf "${CYAN}pacman-contrib${normal} is not installed (Includes tools like pactree, pacsearch, pacdiff..)\n" 
-    readyn -p 'Install pacman-conrib package ' -n 'type pactree &> /dev/null' pacmn_cntr
+    readyn -p 'Install pacman-contrib package?' -n 'type pactree &> /dev/null' pacmn_cntr
     if test $pacmn_cntr == 'y'; then
         sudo pacman -Su pacman-contrib
     fi
@@ -288,6 +288,43 @@ if ! test -f checks/check_completions_dir.sh; then
 else
     . ./checks/check_completions_dir.sh
 fi
+
+# Ack prompt
+
+readyn -p "Install Ack? (A modern replacement for grep - finds lines in shell output)" -n "type ack &> /dev/null" ack
+
+if [ "y" == "$ack" ]; then
+    if ! test -f install_ack.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ack.sh)" 
+    else
+        ./install_ack.sh
+    fi 
+fi
+unset ack
+
+# Hhighlighter (or just h)
+
+readyn -p "Install Hhighlighter (or just h)? (A tiny utility to highlight multiple keywords with different colors in a textoutput)" -n "type h &> /dev/null" h
+if [ "y" == "$h" ]; then
+    if ! type ack &> /dev/null; then
+        printf "For ${CYAN}Hhighlighter${normal} to work, ${CYAN}ack${normal} needs to be installed first." 
+        readyn -p "Install Ack and then hhighlighter?" ansr 
+        if test "$ansr" == 'y'; then
+            continue 
+        else
+            break
+        fi
+        unset ansr 
+    fi
+    if ! test -f install_hhighlighter.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_hhighlighter.sh)" 
+    else
+        ./install_hhighlighter.sh
+    fi 
+fi
+unset h
+
+
 
 
 # Eza prompt
