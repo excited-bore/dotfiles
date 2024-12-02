@@ -402,27 +402,31 @@ if type neofetch &> /dev/null || type fastfetch &> /dev/null || type screenfetch
 fi
 unset fetch
 
-# F7 - (bash/b/bpy)top (Better top/htop)
+# F7 - Htop and alternatives
+
+bind -x '"\208": stty sane && readyn -p "Start htop as root?" ansr && test "$ansr" == "y" && sudo htop || htop'
+
+# Last one loaded is the winner
+
 if type bashtop &> /dev/null || type btop &> /dev/null || type bpytop &> /dev/null; then
-     
-    # Last one loaded is the winner
     
     if type bpytop &> /dev/null; then
-        bind -x '"\208": stty sane && readyn -p "Start bpytop as root?" ansr && test "$ansr" == "y" && sudo bpytop || bpytop'
+        bind -x '"\208": stty sane && readyn -p "Start htop as root?" ansr && test "$ansr" == "y" && sudo htop || readyn -p "Use bpytop instead of htop?" ansr && test "$ansr" == "y" && bpytop || htop'
+    fi
+    
+    if type bashtop &> /dev/null; then
+        bind -x '"\208": stty sane && readyn -p "Start htop as root?" ansr && test "$ansr" == "y" && sudo htop || readyn -p "Use bashtop instead of htop?" ansr && test "$ansr" == "y" && bashtop || htop'
     fi
     
     if type btop &> /dev/null; then
         bind -x '"\208": stty sane && readyn -p "Start btop as root?" ansr && test "$ansr" == "y" && sudo btop || btop'
     fi
     
-    if type bashtop &> /dev/null; then
-        bind -x '"\208": stty sane && readyn -p "Start bashtop as root?" ansr && test "$ansr" == "y" && sudo bashtop || bashtop'
-    fi
-    
-    bind -m emacs-standard '"\e[18~": "\208\n\C-l"'
-    bind -m vi-command     '"\e[18~": "\208\n\C-l"'
-    bind -m vi-insert      '"\e[18~": "\208\n\C-l"'
 fi
+
+bind -m emacs-standard '"\e[18~": "\208\n\C-l"'
+bind -m vi-command     '"\e[18~": "\208\n\C-l"'
+bind -m vi-insert      '"\e[18~": "\208\n\C-l"'
 
 
 # F8 - Lazydocker (Docker TUI)

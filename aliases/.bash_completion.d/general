@@ -1,0 +1,11 @@
+_trash(){
+    #WORD_ORIG=$COMP_WORDBREAKS
+    #COMP_WORDBREAKS=${COMP_WORDBREAKS/:/}
+    _get_comp_words_by_ref -n : cur
+    COMPREPLY=($(compgen -W "$(gio trash --list | awk '{print $1;}' | sed 's|trash:///|trash\\\:///|g' )" -- "$cur") )
+    __ltrim_colon_completions "$cur"
+    #COMP_WORDBREAKS=$WORD_ORIG
+    return 0
+}
+
+complete -f -o plusdirs -X '!*.@(mp4|m4a|mkv|mp3|ogg)' vlc
