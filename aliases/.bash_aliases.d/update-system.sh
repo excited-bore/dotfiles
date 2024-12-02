@@ -147,15 +147,15 @@ function update-system() {
         fi
     elif test "$pac" == "apt" && test "$pac" == "nala"; then
         if ! test -z "$YES"; then
-            eval "$pac_up -y"
+            ${pac_up} -y
         else
-            eval "$pac_up"
+            ${pac_up}
         fi
         hdrs="linux-headers-$(uname -r)"
         if test -z "$(apt list --installed 2> /dev/null | grep $hdrs)"; then
             reade -Q "GREEN" -i "y" -p "Right linux headers not installed. Install $hdrs? [Y/n]: " "n" hdrs_ins
             if [ "$hdrs_ins" == "y" ]; then
-                eval "$pac_ins $hdrs"
+                ${pac_ins} "$hdrs"
             fi
         fi
         if ! test -z "$YES"; then 
@@ -332,6 +332,7 @@ function update-system() {
         
     fi
     export SYSTEM_UPDATED="TRUE"
+    unset YES 
 }
 
 alias update-system-yes="update-system -y"
