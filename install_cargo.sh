@@ -25,15 +25,20 @@ if test -z $SYSTEM_UPDATED; then
     fi
 fi
 
+
 if ! type cargo &> /dev/null; then
-    if test $distro_base == "Debian"; then
-       eval "$pac_ins cargo"
-    elif test $distro_base == "Arch"; then
-       eval "$pac_ins cargo"
-    elif test $distro == 'Fedora'; then
-       eval "$pac_ins cargo" 
-    fi
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh 
 fi
+
+#if ! type cargo &> /dev/null; then
+#    if test $distro_base == "Debian"; then
+#       eval "$pac_ins cargo"
+#    elif test $distro_base == "Arch"; then
+#       eval "$pac_ins cargo"
+#    elif test $distro == 'Fedora'; then
+#       eval "$pac_ins cargo" 
+#    fi
+#fi
 
 if ! grep -q "# RUST" $ENVVAR; then
     printf "# RUST\ntest -d ~/.cargo/bin && export PATH=\$PATH:~/.cargo/bin\n" >> $ENVVAR 

@@ -20,6 +20,7 @@ alias smv="rsync -avz --remove-source-files -e ssh "
 copy-sshfs(){ cp -r --no-preserve=mode "$1" "$2"; }
 move-sshfs(){ cp -r --no-preserve=mode "$1" "$2" && rmTrash "$1"; }
 
+alias ssh-change-config="$EDITOR ~/.ssh/config"
 
 # -t forces allocation for a pseudo-terminal
 # -X enables X11 forwarding

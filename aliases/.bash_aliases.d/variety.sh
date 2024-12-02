@@ -4,6 +4,9 @@ if ! type reade &> /dev/null && test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh; 
     . ~/.bash_aliases.d/00-rlwrap_scripts.sh
 fi 
 
+alias blesh="source /usr/share/blesh/ble.sh"
+alias blesh-unload="source out/ble.sh"
+
 # Kdocker is a system tray app
 # thunderbird does not support trays on linux, which why we do this
 
@@ -154,16 +157,6 @@ alias stow-adopt="stow ./ -t ~/ --adopt"
 #    doas echo $PTRACE_ELEVATED_PRIVILIGE > /proc/sys/kernel/yama/ptrace_scope;   
 #}
 
-
-if type ffmpeg &> /dev/null; then
-    function videotomp3(){
-        reade -Q "GREEN" -i "n" -p "Delete after conversion? [N/y]: " "y" del
-        for var in "$@"
-        do
-            ffmpeg -i "$var" -vn -acodec libmp3lame -ac 2 -ab 160k -ar 48000 "${var%.*}.mp3" && test "$del" == 'y' && test -f "$var" && rm -v "$var" 
-        done
-    }
-fi
 
 vlc_folder(){
     if [ -d $1 ]; then

@@ -22,10 +22,10 @@ function starship-presets() {
     if [ "$hmdir" == "y" ]; then
         sudo cp -f ~/.config/starship.toml /root/.config/starship.toml
         unset hmdir
-        reade -Q 'GREEN' -i 'y' -p "Set '~' to '/root'? [Y/n]: " "n" hmdir
-        if [ "$hmdir" == "y" ]; then
-           sudo sed -i 's|\(home_symbol = \).*|\1"'"/root"'"|' /root/.config/starship.toml  
-        fi
+        #reade -Q 'GREEN' -i 'y' -p "Set '~' to '/root'? [Y/n]: " "n" hmdir
+        #if [ "$hmdir" == "y" ]; then
+        #   sudo sed -i 's|\(home_symbol = \).*|\1"'"/root"'"|' /root/.config/starship.toml  
+        #fi
     fi
 }
 
