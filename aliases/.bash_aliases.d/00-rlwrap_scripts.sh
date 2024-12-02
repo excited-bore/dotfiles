@@ -118,30 +118,28 @@ function reade(){
 
     unset READE_VALUE
 
-    while :; do
-        case $1 in
-            -h|-\?|--help)
-            printf "${bold}reade${normal} [ -h/--help ] [ -v/--version] [ -i/--pregiven PREGIVEN ] [ -e/--file-completion ]  [ -s/--no-echo ] [ -p/--prompt PROMPTSTRING ] [ -Q/--colour COLOURSTRING ] [ -b/--break-chars BREAKCHARS-STRING ] ${bold}CHOICES-STRING${normal}  ${bold}returnvar${normal}\n
-   Simplifies prompt for ${bold}read/rlwrap${normal}: Will use 'rlwrap' if it is installed, otherwise resorts to 'read' 
-   Supply at least 2 variables: 
-   - A space seperated string with the choices for answer. ${bold}If no choices need to be given, supply a empty string '' - WILL NOT WORK WITHOUT EMPTY STRING. ${normal}
-   - The last argument to put the answer in, otherwise the value will be in '\$READE_VALUE'.  
+    local hlpstr="${bold}reade${normal} [ -h/--help ] [ -v/--version] [ -i/--pregiven pregiven ] [ -e/--file-completion ]  [ -s/--no-echo ] [ -p/--prompt promptstring ] [ -q/--colour colourstring ] [ -b/--break-chars breakchars-string ] ${bold}choices-string${normal}  ${bold}returnvar${normal}\n
+   simplifies prompt for ${bold}read/rlwrap${normal}: will use 'rlwrap' if it is installed, otherwise resorts to 'read' 
+   supply at least 2 variables: 
+   - a space seperated string with the choices for answer. ${bold}if no choices need to be given, supply a empty string '' - will not work without empty string. ${normal}
+   - the last argument to put the answer in, otherwise the value will be in '\$reade_value'.  
 
    -h, --help  
         
-        Print this text and exit
+        print this text and exit
 
    -v, --version  
         
-        Print version and exit
+        print version and exit
 
-   -Q ${underline_on}Colour${underline_off}
+   -q ${underline_on}colour${underline_off}
 
-        Use  one  of  the  colour names black, red, green, yellow, blue, cyan, purple (=magenta) or white, or an ANSI-conformant <colour_spec> to colour any prompt displayed  by  command.\n An uppercase colour name (Yellow or YELLOW ) gives a bold prompt.\n Prompts that already contain (colour) escape sequences or one of the readline \"ignore markers\" (ASCII 0x01 and 0x02) are not coloured.
+        use  one  of  the  colour names black, red, green, yellow, blue, cyan, purple (=magenta) or white, or an ansi-conformant <colour_spec> to colour any prompt displayed  by  command.\n an upper
+        case colour name (yellow or yellow ) gives a bold prompt.\n prompts that already contain (colour) escape sequences or one of the readline \"ignore markers\" (ascii 0x01 and 0x02) are not coloured.
 
    -i, --pre-given ${underline_on}pregiven string${underline_off} 
 
-        Autofill prompt with 'PREGIVEN' - must come in the form of a string (only works when rlwrap is installed) 
+        autofill prompt with 'pregiven' - must come in the form of a string (only works when rlwrap is installed) 
 
    -s, --no-echo 
 
@@ -155,20 +153,26 @@ function reade(){
    -b ${underline_on}list_of_characters${underline_off} 
 
        (From rlwrap manual) Consider  the specified characters word-breaking (whitespace is always word-breaking). This determines what is considered a \"word\", both when completing and when building a completion word list from files specified by -f options following (not preceding!) it.\n Default list (){}[],'+-=&^%%\$#@\";|\ \n Unless -c is specified, / and . (period) are included in the default list\n\n" 
+
+    while :; do
+        case $1 in
+            -v|--version) 
+               printf "${bold}version${normal} : $version\n"
+               return 0
+            ;; 
+            ""|-h|-\?|--help)
+              printf "$hlpstr"  
               return 0
           ;;
-          -v|--version) 
-             printf "${bold}Version${normal} : $VERSION\n"
-             return 0
-          ;; 
           # Otherwise 
-          *) break 
+          *) printf "$hlpstr"  
+             return 0 
           ;;
        esac
     done && OPTIND=1;
 
     #https://stackoverflow.com/questions/12022592/how-can-i-use-long-options-with-the-bash-getopts-builtin
-
+--fixed-strings
     for arg in "$@"; do
       shift
       case "$arg" in

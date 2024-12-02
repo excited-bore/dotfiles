@@ -4,7 +4,7 @@ if ! type reade &> /dev/null && test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh; 
     . ~/.bash_aliases.d/00-rlwrap_scripts.sh
 fi 
 
-alias blesh="source /usr/share/blesh/ble.sh"
+alias blesh="source ~/.local/share/blesh/ble-0.4.0-devel3/ble.sh "
 alias blesh-unload="source out/ble.sh"
 
 # Kdocker is a system tray app

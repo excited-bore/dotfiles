@@ -295,6 +295,11 @@ function cp-trash(){
     fi
 }
 
+# Cp recursively and verbose
+alias cp="cp -rv"
+type xcp &>/dev/null && alias cp="xcp -r --glob"
+alias cp-retrace-symlinks="cp --dereference --driver parblock"
+
 # mv (recursively native) verbose and only ask for interaction when overwriting newer files
 
 alias mv="mv -v"
@@ -497,6 +502,7 @@ alias mktar='tar -cvf'
 alias mkbz2='tar -cvjf'
 alias mkgz='tar -cvzf'
 alias untar='tar -xvf'
+alias untargz='tar -xvf'
 alias unbz2='tar -xvjf'
 alias ungz='tar -xvzf'
 alias un7z="7z x"
@@ -569,7 +575,7 @@ alias weather-full="curl wttr.in | $PAGER"
 # crontab
 # 
 function cron-list-all-user-jobs(){
-    mktemp_f=$(mktemp) && for user in $(cut -f1 -d: /etc/passwd); do echo "$(tput setaf 10)User: $(tput bold)$user"; printf "$(tput setaf 12)Crontab: $(tput bold)"; sudo crontab -u "$user" -l; echo; done &> "$mktemp_f"; cat $mktemp_f | $PAGER; rm $mktemp_f &> /dev/null; unset mktemp_f
+    mktemp_f=$(mktemp) && for user in $(cut -f1 -d: /etc/passwd); do echo "$(tput setaf 10)User: $(tput bold)$user"; printf "$(tput setaf 12)Crontab: $(tput bold)"; sudo crontab -u "$user" -l; echo; done &> "$mktemp_f"; cat $mktemp_f | $PAGER; builtin rm $mktemp_f &> /dev/null; unset mktemp_f
 }
 alias crontab-list-all-user-jobs="cron-list-all-user-jobs"
 alias list-all-cronjobs-user="cron-list-all-user-jobs"
@@ -702,16 +708,6 @@ function trash(){
 
 alias trash-list="gio trash --list"
 alias trash-empty="gio trash --empty"
-
-_trash(){
-    #WORD_ORIG=$COMP_WORDBREAKS
-    #COMP_WORDBREAKS=${COMP_WORDBREAKS/:/}
-    _get_comp_words_by_ref -n : cur
-    COMPREPLY=($(compgen -W "$(gio trash --list | awk '{print $1;}' | sed 's|trash:///|trash\\\:///|g' )" -- "$cur") )
-    __ltrim_colon_completions "$cur"
-    #COMP_WORDBREAKS=$WORD_ORIG
-    return 0
-}
 
 function trash-restore(){
     for arg in "$@"; do
@@ -856,6 +852,25 @@ function unset-executable-all() {
     fi
 }
 
+# FIND 
+
+type fd &> /dev/null && alias fd='fd --color=always --hidden'
+
+tree=''
+type tree &> /dev/null && tree=' | tree '
+
+if type fd &> /dev/null; then
+    alias find-files-dir="fd --search-path . --type file" 
+    alias find-files-system="fd --search-path / --type file" 
+    alias find-symlinks-dir="fd --search-path . --type symlink $tree | $PAGER"
+    alias find-symlinks-system="fd --search-path / --type symlink $tree | $PAGER"
+else
+    alias find-files-dir="find . -type f" 
+    alias find-files-system="find / -type f" 
+    alias find-symlinks-dir="find . -type l -exec ls --color -d {} \; $tree | $PAGER"
+    alias find-symlinks-system="find / -type l -exec ls --color -d {} \; $tree | $PAGER"
+fi
+
 alias locales-list-enabled="locale -a"
 
 # https://askubuntu.com/questions/76808/how-do-i-use-variables-in-a-sed-command
@@ -946,6 +961,8 @@ alias mobo-info="motherboard"
 alias bios-info="sudo dmidecode -t 0"
 alias motherboard-info-full="sudo dmidecode -t 1 && sudo dmidecode -t 2 && sudo dmidecode -t 0 | $PAGER"
 
+# Dual boot stuff
+
 function boot-into(){
     local opts="$(efibootmgr | grep --color=never Boot00 | awk '{print $1;}' | sed 's/Boot//g' | cut -d* -f-1)" 
     local frst="$(echo $opts | awk '{print $1}')" 
@@ -960,3 +977,6 @@ function boot-into(){
     fi
     unset bootnt 
 }
+
+alias next-boot="boot-into"
+

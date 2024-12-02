@@ -147,15 +147,15 @@ function update-system() {
         fi
     elif test "$pac" == "apt" && test "$pac" == "nala"; then
         if ! test -z "$YES"; then
-            eval "$pac_up -y"
+            ${pac_up} -y
         else
-            eval "$pac_up"
+            ${pac_up}
         fi
         hdrs="linux-headers-$(uname -r)"
         if test -z "$(apt list --installed 2> /dev/null | grep $hdrs)"; then
             reade -Q "GREEN" -i "y" -p "Right linux headers not installed. Install $hdrs? [Y/n]: " "n" hdrs_ins
             if [ "$hdrs_ins" == "y" ]; then
-                eval "$pac_ins $hdrs"
+                ${pac_ins} "$hdrs"
             fi
         fi
         if ! test -z "$YES"; then 
@@ -178,15 +178,15 @@ function update-system() {
     elif test "$pac" == "pacman"; then
         if ! test -z "$AUR_up"; then
             if ! test -z "$YES"; then 
-                eval "yes | $AUR_up"
+                yes | ${AUR_up}
             else 
-                eval "$AUR_up"
+                ${AUR_up}
             fi
         else
             if ! test -z "$YES"; then 
-                eval "yes | $pac_up"
+                yes | ${pac_up}
             else 
-                eval "$pac_up"
+                ${pac_up}
             fi
         fi
         hdrs="$(echo $(uname -r) | cut -d. -f-2)"
@@ -194,16 +194,16 @@ function update-system() {
         if test -z "$(pacman -Q $hdrs)"; then
             reade -Q "GREEN" -i "y" -p "Right linux headers not installed. Install $hdrs? [Y/n]: " "n" hdrs_ins
             if [ "$hdrs_ins" == "y" ]; then
-                eval "$pac_ins $hdrs"
+                ${pac_ins} "$hdrs"
             fi
         fi
         
         readyn $YES -p 'Clean unnessecary (orphan) packages?' cachcln
         if test $cachcln == 'y'; then
             if ! test -z "$AUR_clean"; then
-                eval "$AUR_clean"
+                ${AUR_clean}
             else
-                eval "$pac_clean"
+                ${pac_clean}
             fi
         fi
         unset cachcln 
@@ -250,7 +250,9 @@ function update-system() {
         fi
     fi
 
-    YES="-y n" 
+    if ! test -z "$YES"; then
+        YES="-y n" 
+    fi
 
     if type nix-env &> /dev/null; then
         readyn $YES --no -p "${normal}Update ${CYAN}nix packages?${normal} ${MAGENTA}(Fetching updated list could take a long time)${YELLOW}" nix_up
@@ -270,7 +272,7 @@ function update-system() {
 
         readyn $YES --no -p "${normal}Refresh ${CYAN}gpg keys?${normal} ${MAGENTA}(Keyservers can be unstable so this might take a while)${YELLOW}" gpg_up
         if test "$gpg_up" == 'y'; then
-           "$up_gpg" --refresh-keys  
+           ${up_gpg} --refresh-keys  
         fi
     fi
     unset up_gpg gpg_up
@@ -332,6 +334,7 @@ function update-system() {
         
     fi
     export SYSTEM_UPDATED="TRUE"
+    unset YES 
 }
 
 alias update-system-yes="update-system -y"
