@@ -41,6 +41,20 @@ alias status-bluetooth="systemctl status bluetooth.service"
 alias restart-display="sudo systemctl restart display-manager"  
 alias status-display="sudo systemctl status display-manager"  
 
+__get_all_units1(){
+ { SYSTEMD_COLORS=0 __systemctl $1 list-unit-files  --legend=false "$2*"
+   SYSTEMD_COLORS=0 __systemctl $1 list-units --all --legend=false "$2*"
+ } |
+ { while read -r a b
+   do echo " $a"
+   done
+ }
+}
+
+alias systemctl-find-service-file="systemctl show -P FragmentPath "
+
+complete -F __get_all_units1 systemctl-find-service-file
+
 if systemctl list-units --full -all | grep -Fq "ssh.service"; then
     servs="ssh sshd" 
     alias stop-sshd="sudo systemctl stop $servs"
@@ -184,7 +198,7 @@ _system-service-start(){
     return 0
 }
 
-complete -F _service-system-start service-system-start
+complete -F _system-service-start system-service-start
 
 service-start(){
     systemctl --user start $@;
