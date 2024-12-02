@@ -713,14 +713,14 @@ fi
 unset tojump  
 
 
-# Bashtop
+# Btop
 
-readyn -p "Install bashtop? (Python based improved top/htop)" -n "type bashtop &> /dev/null || type bpytop &> /dev/null || type btop &> /dev/null" tojump
+readyn -p "Install Btop? (A processmanager with a fastly improved TUI relative top/htop written in C++)" -n "type btop &> /dev/null" tojump
 if [ "$tojump" == "y" ]; then
-    if ! test -f install_bashtop.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bashtop.sh)" 
+    if ! test -f install_btop.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_btop.sh)" 
     else
-        ./install_bashtop.sh
+        ./install_btop.sh
     fi
 fi
 unset tojump
