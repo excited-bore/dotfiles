@@ -952,11 +952,11 @@ function boot-into(){
     local opts="$(echo $opts | sed "s/\<$frst\> //g")"  
     efibootmgr
     reade -Q 'GREEN' -i "$frst" -p "What to boot into? (Empty: $frst): " "$opts" bootnt
-    if [[ $bootnt =~ "000*" ]]; then
-        efibootmgr --bootnext $bootnt 
+    if [[ $bootnt =~ 000[[:digit:]] ]]; then
+        sudo efibootmgr --bootnext "$bootnt" 
+        efibootmgr 
+        printf "\n${CYAN}Will reboot in 5 seconds if not interrupted\n${normal}" 
+        sleep 5 && reboot 
     fi
-    efibootmgr 
-    printf "\n${CYAN}Will reboot in 5 seconds if not interrupted\n${normal}" 
-    sleep 5 && reboot 
     unset bootnt 
 }
