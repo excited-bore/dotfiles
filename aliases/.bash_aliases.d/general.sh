@@ -703,16 +703,6 @@ function trash(){
 alias trash-list="gio trash --list"
 alias trash-empty="gio trash --empty"
 
-_trash(){
-    #WORD_ORIG=$COMP_WORDBREAKS
-    #COMP_WORDBREAKS=${COMP_WORDBREAKS/:/}
-    _get_comp_words_by_ref -n : cur
-    COMPREPLY=($(compgen -W "$(gio trash --list | awk '{print $1;}' | sed 's|trash:///|trash\\\:///|g' )" -- "$cur") )
-    __ltrim_colon_completions "$cur"
-    #COMP_WORDBREAKS=$WORD_ORIG
-    return 0
-}
-
 function trash-restore(){
     for arg in "$@"; do
         gio trash --restore "$arg";
@@ -855,6 +845,25 @@ function unset-executable-all() {
         unset i 
     fi
 }
+
+# FIND 
+
+type fd &> /dev/null && alias fd='fd --color=always --hidden'
+
+tree=''
+type tree &> /dev/null && tree=' | tree '
+
+if type fd &> /dev/null; then
+    alias find-files-dir="fd --search-path . --type file" 
+    alias find-files-system="fd --search-path / --type file" 
+    alias find-symlinks-dir="fd --search-path . --type symlink $tree | $PAGER"
+    alias find-symlinks-system="fd --search-path / --type symlink $tree | $PAGER"
+else
+    alias find-files-dir="find . -type f" 
+    alias find-files-system="find / -type f" 
+    alias find-symlinks-dir="find . -type l -exec ls --color -d {} \; $tree | $PAGER"
+    alias find-symlinks-system="find / -type l -exec ls --color -d {} \; $tree | $PAGER"
+fi
 
 alias locales-list-enabled="locale -a"
 
