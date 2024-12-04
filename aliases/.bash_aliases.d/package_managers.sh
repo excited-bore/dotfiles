@@ -253,6 +253,7 @@ if type pacman &> /dev/null; then
     alias pacman-rm-lock="sudo rm /var/lib/pacman/db.lck"
     alias pacman-remove="sudo pacman -R"
     alias pacman-remove-dependencies="sudo pacman -Rs"
+    alias pacman-clean-cache="sudo pacman -Sc" 
     
 
     if type fzf &> /dev/null; then

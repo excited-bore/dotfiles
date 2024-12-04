@@ -241,6 +241,18 @@ require("lazy").setup({
             end
         },
 
+        --{
+        --  "kelly-lin/ranger.nvim",
+        --  config = function()
+        --    require("ranger-nvim").setup({ replace_netrw = true })
+        --    vim.api.nvim_set_keymap("n", "<leader>ef", "", {
+        --      noremap = true,
+        --      callback = function()
+        --        require("ranger-nvim").open(true)
+        --      end,
+        --    })
+        --  end,
+        --},
         -- https://www.playfulpython.com/configuring-neovim-as-a-python-ide/
 
         { "hrsh7th/nvim-cmp",
@@ -342,4 +354,182 @@ require("lazy").setup({
     } 
 })
 
+-- local ranger_nvim = require("ranger-nvim")
+-- ranger_nvim.setup({
+--   enable_cmds = true,
+--   replace_netrw = false,
+--   keybinds = {
+--     ["ov"] = ranger_nvim.OPEN_MODE.vsplit,
+--     ["oh"] = ranger_nvim.OPEN_MODE.split,
+--     ["ot"] = ranger_nvim.OPEN_MODE.tabedit,
+--     ["or"] = ranger_nvim.OPEN_MODE.rifle,
+--   },
+--   ui = {
+--     border = "none",
+--     height = 1,
+--     width = 1,
+--     x = 0.5,
+--     y = 0.5,
+--   }
+-- })
+
+-- require("oil").setup({
+--   -- Oil will take over directory buffers (e.g. `vim .` or `:e src/`)
+--   -- Set to false if you want some other plugin (e.g. netrw) to open when you edit directories.
+--     -- default_file_explorer = true,   
+--     view_options = {
+--         -- Show files and directories that start with "."
+--         show_hidden = true
+--     }
+-- })
+-- 
+-- vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
+
+
+require("telescope")
+
+-- To get telescope-file-browser loaded and working with telescope,
+-- you need to call load_extension, somewhere after setup function:
+require('telescope').load_extension('media_files')
+-- require('telescope').load_extension("whaler")
+
+require('telescope').setup {
+    layout_strategy='vertical',
+    layout_config={width=0.5},
+    pickers = {
+      find_files = {
+       -- theme = "dropdown", 
+        follow = true,
+        ignore = true,
+        hidden = true
+      }
+    }
+}
+
+  vim.g.loaded_netrwPlugin = 1
+ vim.g.loaded_netrw = 1
+
+require("telescope").setup {
+  extensions = {
+    file_browser = {
+      theme = "ivy",
+      -- disables netrw and use telescope-file-browser in its place
+      hijack_netrw = true,
+      mappings = {
+        ["i"] = {
+          -- your custom insert mode mappings
+        },
+        ["n"] = {
+          -- your custom normal mode mappings
+        },
+      },
+    },
+  },
+}
+-- To get telescope-file-browser loaded and working with telescope,
+-- you need to call load_extension, somewhere after setup function:
+require("telescope").load_extension "file_browser"
+
+
+-- local find_files_hijack_netrw = vim.api.nvim_create_augroup("find_files_hijack_netrw", { clear = true })
+-- -- clear FileExplorer appropriately to prevent netrw from launching on folders
+-- -- netrw may or may not be loaded before telescope-find-files
+-- -- conceptual credits to nvim-tree and telescope-file-browser
+-- vim.api.nvim_create_autocmd("VimEnter", {
+--     pattern = "*",
+--     once = true,
+--     callback = function()
+--         pcall(vim.api.nvim_clear_autocmds, { group = "FileExplorer" })
+--     end,
+-- })
+-- vim.api.nvim_create_autocmd("BufEnter", {
+--     group = find_files_hijack_netrw,
+--     pattern = "*",
+--     callback = function()
+--         vim.schedule(function()
+--             -- Early return if netrw or not a directory
+--             if vim.bo[0].filetype == "netrw" or vim.fn.isdirectory(vim.fn.expand("%:p")) == 0 then
+--                 return
+--             end
+-- 
+--             vim.api.nvim_buf_set_option(0, "bufhidden", "wipe")
+-- 
+--             require("telescope.builtin").find_files({
+--                 cwd = vim.fn.expand("%:p:h"),
+--             })
+--         end)
+--     end,
+-- })
+
+local netrw_bufname
+
+  -- clear FileExplorer appropriately to prevent netrw from launching on folders
+  -- netrw may or may not be loaded before telescope-file-browser config
+  -- conceptual credits to nvim-tree
+  pcall(vim.api.nvim_clear_autocmds, { group = "FileExplorer" })
+  vim.api.nvim_create_autocmd("VimEnter", {
+    pattern = "*",
+    once = true,
+    callback = function()
+      pcall(vim.api.nvim_clear_autocmds, { group = "FileExplorer" })
+    end,
+  })
+  vim.api.nvim_create_autocmd("BufEnter", {
+    group = vim.api.nvim_create_augroup(":Telescope find_files", { clear = true }),
+    pattern = "*",
+    callback = function()
+      vim.schedule(function()
+        if vim.bo[0].filetype == "netrw" then
+          return
+        end
+        local bufname = vim.api.nvim_buf_get_name(0)
+        if vim.fn.isdirectory(bufname) == 0 then
+          _, netrw_bufname = pcall(vim.fn.expand, "#:p:h")
+          return
+        end
+
+        -- prevents reopening of file-browser if exiting without selecting a file
+        if netrw_bufname == bufname then
+          netrw_bufname = nil
+          return
+        else
+          netrw_bufname = bufname
+        end
+
+        -- ensure no buffers remain with the directory name
+        vim.api.nvim_buf_set_option(0, "bufhidden", "wipe")
+
+        require("telescope").extensions.find_files {
+          cwd = vim.fn.expand "%:p:h",
+        }
+      end)
+    end,
+    desc = "telescope find_file replacement for netrw",
+  })
+
+
+-- lga_actions = require("telescope-live-grep-args.actions")
+
+-- telescope.setup {
+--   extensions = {
+--     live_grep_args = {
+--       auto_quoting = true, -- enable/disable auto-quoting
+--       -- define mappings, e.g.
+--       mappings = { -- extend mappings
+--         i = {
+--           ["<C-k>"] = lga_actions.quote_prompt(),
+--           ["<C-i>"] = lga_actions.quote_prompt({ postfix = " --iglob " }),
+--           -- freeze the current list and start a fuzzy search in the frozen list
+--           ["<C-space>"] = actions.to_fuzzy_refine,
+--         },
+--       },
+--       -- ... also accepts theme settings, for example:
+--       -- theme = "dropdown", -- use dropdown theme
+--       -- theme = { }, -- use own theme spec
+--       -- layout_config = { mirror=true }, -- mirror preview pane
+--     }
+--   }
+-- }
+
+-- telescope.load_extension("live_grep_args")
 EOF

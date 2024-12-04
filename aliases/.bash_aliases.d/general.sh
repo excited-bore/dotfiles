@@ -295,6 +295,11 @@ function cp-trash(){
     fi
 }
 
+# Cp recursively and verbose
+alias cp="cp -rv"
+type xcp &>/dev/null && alias cp="xcp -r --glob"
+alias cp-retrace-symlinks="cp --dereference --driver parblock"
+
 # mv (recursively native) verbose and only ask for interaction when overwriting newer files
 
 alias mv="mv -v"
@@ -497,6 +502,7 @@ alias mktar='tar -cvf'
 alias mkbz2='tar -cvjf'
 alias mkgz='tar -cvzf'
 alias untar='tar -xvf'
+alias untargz='tar -xvf'
 alias unbz2='tar -xvjf'
 alias ungz='tar -xvzf'
 alias un7z="7z x"
@@ -955,6 +961,8 @@ alias mobo-info="motherboard"
 alias bios-info="sudo dmidecode -t 0"
 alias motherboard-info-full="sudo dmidecode -t 1 && sudo dmidecode -t 2 && sudo dmidecode -t 0 | $PAGER"
 
+# Dual boot stuff
+
 function boot-into(){
     local opts="$(efibootmgr | grep --color=never Boot00 | awk '{print $1;}' | sed 's/Boot//g' | cut -d* -f-1)" 
     local frst="$(echo $opts | awk '{print $1}')" 
@@ -969,3 +977,6 @@ function boot-into(){
     fi
     unset bootnt 
 }
+
+alias next-boot="boot-into"
+
