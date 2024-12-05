@@ -41,10 +41,10 @@ function version-higher () {
 
 
 function compare-tput-escape_color(){
-for (( ansi=0; ansi <= 120; ansi++)); do
-    printf "$ansi $(tput setaf $ansi) tput foreground $(tput sgr0) $(tput setab $ansi) tput background $(tput sgr0)"; echo -e " \033[$ansi;mEscape\033[0m"
-done | $PAGER
-unset ansi
+    for (( ansi=0; ansi <= 120; ansi++)); do
+        printf "$ansi $(tput setaf $ansi) tput foreground $(tput sgr0) $(tput setab $ansi) tput background $(tput sgr0)"; echo -e " \033[$ansi;mEscape\033[0m"
+    done | $PAGER
+    unset ansi
 }
 
 red=$(tput setaf 1)
@@ -110,22 +110,23 @@ italic=$(tput it)
 # This goes for both tput and escape codes
 #
 # read -e -r -p $'\e[31mFoobar\e[0m: ' foo  for example
-# printf "${CYAN}bluh"; read -e -r foo  is also problematic because prompt disappears when arrow up and back down
+# printf "${CYAN}bar"; read -e -r foo  is also problematic because prompt disappears when arrow up and back down
 
 function reade(){
 
     local VERSION='1.0' 
 
     unset READE_VALUE
-
-    while :; do
-        case $1 in
-            -h|-\?|--help)
-            printf "${bold}reade${normal} [ -h/--help ] [ -v/--version] [ -i/--pregiven PREGIVEN ] [ -e/--file-completion ]  [ -s/--no-echo ] [ -p/--prompt PROMPTSTRING ] [ -Q/--colour COLOURSTRING ] [ -b/--break-chars BREAKCHARS-STRING ] ${bold}CHOICES-STRING${normal}  ${bold}returnvar${normal}\n
+    
+    hlpstr="${bold}reade${normal} [ -h/--help ] [ -v/--version] [ -i/--pregiven PREGIVEN ] [ -e/--file-completion ]  [ -s/--no-echo ] [ -p/--prompt PROMPTSTRING ] [ -Q/--colour COLOURSTRING ] [ -b/--break-chars BREAKCHARS-STRING ] ${bold}CHOICES-STRING${normal}  ${bold}returnvar${normal}\n
    Simplifies prompt for ${bold}read/rlwrap${normal}: Will use 'rlwrap' if it is installed, otherwise resorts to 'read' 
-   Supply at least 2 variables: 
-   - A space seperated string with the choices for answer. ${bold}If no choices need to be given, supply a empty string '' - WILL NOT WORK WITHOUT EMPTY STRING. ${normal}
-   - The last argument to put the answer in, otherwise the value will be in '\$READE_VALUE'.  
+   Takes at least one argument, otherwise will prompt help page.
+
+   Any pre-given choice can be toggled between using the ${bold}up${normal} and ${bold}down${normal} arrow keys
+
+   Supply at least 1 variable: 
+
+   - The last argument - a variable to put the prompt response in. If no variable is supplied, the returned value will be in the '\$REPLY' and '\$READE_VALUE'. 
 
    -h, --help  
         
@@ -139,9 +140,9 @@ function reade(){
 
         Use  one  of  the  colour names black, red, green, yellow, blue, cyan, purple (=magenta) or white, or an ANSI-conformant <colour_spec> to colour any prompt displayed  by  command.\n An uppercase colour name (Yellow or YELLOW ) gives a bold prompt.\n Prompts that already contain (colour) escape sequences or one of the readline \"ignore markers\" (ASCII 0x01 and 0x02) are not coloured.
 
-   -i, --pre-given ${underline_on}pregiven string${underline_off} 
+    -i, --pre-given ${underline_on}PREGIVEN(S) - SPACESEPERATED WORD STRING${underline_off} 
 
-        Autofill prompt with 'PREGIVEN' - must come in the form of a string (only works when rlwrap is installed) 
+        Autofill prompt with 'PREGIVEN' - must come in the form of a string (only works when rlwrap is installed) and every WORD needs to be space-separated. Only the first will be show at first, the others will be selectable with autocompletion/arrowkeys in the order they were given ${bold}if rlwrap is installed${normal} 
 
    -s, --no-echo 
 
@@ -155,6 +156,11 @@ function reade(){
    -b ${underline_on}list_of_characters${underline_off} 
 
        (From rlwrap manual) Consider  the specified characters word-breaking (whitespace is always word-breaking). This determines what is considered a \"word\", both when completing and when building a completion word list from files specified by -f options following (not preceding!) it.\n Default list (){}[],'+-=&^%%\$#@\";|\ \n Unless -c is specified, / and . (period) are included in the default list\n\n" 
+
+    while :; do
+        case $1 in
+          ''|-h|-\?|--help)
+              printf "$hlpstr" 
               return 0
           ;;
           -v|--version) 
@@ -198,8 +204,8 @@ function reade(){
     if [[ $(uname -s) =~ 'MINGW' ]] && ! type pacman &> /dev/null; then
         bash_rlwrap='n'
     fi
-    if ! type rlwrap &> /dev/null || test "$fcomp" == 'y' || test $bash_rlwrap == 'n' ; then
-        readstr="read  ";
+    if ! type rlwrap &> /dev/null || test "$fcomp" == 'y' || test "$bash_rlwrap" == 'n' ; then
+        readstr="read  "
         color=""
         while getopts ':b:e:i:p:Q:s:S:' flag; do
             case "${flag}" in
@@ -207,8 +213,9 @@ function reade(){
                 e)  readstr=$(echo "$readstr" | sed 's|read |read -e -r |g');
                     ;;
                     #  Even though it's in the read man, -i does not actually work
-                    i)  readstr=$(echo "$readstr" | sed 's|read |read -i "'"${OPTARG}"'" |g');
-                    pre="${OPTARG}"
+                i)  arg="$(echo ${OPTARG} | awk '{print $1;}')"
+                    readstr=$(echo "$readstr" | sed 's|read |read -e -i "'"$arg"'" |g');
+                    pre="$arg"
                     ;;
                 Q)  if [[ "${OPTARG}" =~ ^[[:upper:]]+$ ]]; then
                         color="${bold}"
@@ -232,75 +239,76 @@ function reade(){
                         color=$color"${white}"
                     fi
                     ;;
-                p)  readstr=$(echo "$readstr" | sed 's|read |printf "'"${color}${OPTARG}${normal}"'\n"; read |g');
+                p)  if test -z "$color"; then
+                        readstr=$(echo "$readstr" | sed 's|read |printf "'"${OPTARG}"'\n"; read |g');
+                    else
+                        readstr=$(echo "$readstr" | sed 's|read |printf "'"${color}${OPTARG}${normal}"'\n"; read |g');
+                    fi
                     ;;
                 s)  readstr=$(echo "$readstr" | sed 's|read |read -s "'"${OPTARG}"'" |g');
                     ;;
                 S)  ;;
             esac
-         done && OPTIND=1;
+        done;
 
-        eval "$readstr" value;
+        shift $((OPTIND-1)) 
+        
+        eval "${readstr} value";
 
-    eval "$readstr" value;
-
-    if test $fcomp == 'y'; then
-        echo $value >> ~/.bash_history
-        history -n
-    fi
-
-    if ! test -z "$pre" && test -z "$value" || test "$value" == ""; then
-        value="$pre"  
-    fi
+        if test "$fcomp" == 'y'; then
+            echo $value >> $HISTFILE 
+            history -n
+        fi
 
         if ! test -z "$pre" && test -z "$value" || test "$value" == ""; then
             value="$pre"  
         fi
 
-        #black, red, green, yellow, blue, cyan, purple (=magenta) or white
-        if ! test -z "${@:$#:1}" && ! test "${@:$#:1}" == '/bin/bash' && ! [[ "${@:$#:1}" =~ -.* ]]; then
+        export READE_VALUE="$value"
+        export REPLY="$value" 
+
+        if ! test -z "$@"; then
             eval "${@:$#:1}=$value"  
-        else
-            export READE_VALUE="$value"
         fi
+
         unset fcomp
+
     else
-        if [[ $# < 2 ]]; then
-            echo "$@" 
-            echo "Give up at least two variables for reade(). "
-            echo "First a string with autocompletions, space seperated"
-            echo "Second a variable (could be empty) for the return string"
+        if [[ $# < 1 ]]; then
+            echo "Give at least 1 variable up for reade(). "
+            echo "- A variable for the return string"
             return 0
         fi
 
-
-        local args="${@:$#-1:1}"
-
-        # Reverse wordlist order (last -> first) because ???
-        args=$(echo $args | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }')
-        args=$(echo $args | tr ' ' '\n')
-        tmpf=$(mktemp)
-
-        echo "$args" > "$tmpf"
-
         local breaklines=''
 
-        if test "$args" == ''; then
-            rlwstring="rlwrap --ansi-colour-aware -s 1000 -D 0 -b \"$breaklines\" -o cat"
-        else
-            rlwstring="rlwrap --ansi-colour-aware -s 1000 -D 0 -H $tmpf -b \"$breaklines\" -f <(echo \"${args[@]}\") -o cat"
-        fi
+        #local args="${@:$#-1:1}"
+
+        ## Reverse wordlist order (last -> first) because ???
+        #args=$(echo $args | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }')
+        #args=$(echo $args | tr ' ' '\n')
+
+        local tmpf=''
+        rlwstring="rlwrap --ansi-colour-aware -s 1000 -D 0 -b \"$breaklines\" -o cat"
 
         while getopts ':b:e:i:p:Q:s:S:' flag; do
             case "${flag}" in
                 b)  breaklines=${OPTARG};
                     ;;
                     # File completions
-                    e)  rlwstring=$(echo $rlwstring | sed "s| -f <(echo \"${args[@]}\") | |g");
-                    rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-c |g");
+                    e)  #rlwstring=$(echo $rlwstring | sed "s| -f <(echo \"${args[@]}\") | |g");
+                        rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-c |g");
                     ;;
                     # Pre-filled answer
-                    i)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-P \"${OPTARG}\" |g");
+                    i)  frst="$(echo ${OPTARG} | awk '{print $1}')"  
+                        rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-P \"$frst\" |g");
+                        args=$(echo ${OPTARG} | sed "s/\<$frst\> //g") 
+                        ! test -z "$args" &&
+                        args=$(echo $args | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }') &&
+                        args=$(echo $args | tr ' ' '\n') &&
+                        tmpf=$(mktemp) && 
+                        echo "$args" > "$tmpf" && 
+                        rlwstring=$(echo $rlwstring | sed 's| -o cat| \-H $tmpf  \-f <(echo \"${args[@]}\") -o cat|g') 
                     ;;
                     # Prompt
                     p)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-S \"${OPTARG}\" |g");
@@ -315,12 +323,14 @@ function reade(){
                     S)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-E\"${OPTARG}\" |g");
                     ;;
             esac
-        done && OPTIND=1;
+        done;
 
-        value=$(eval $rlwstring);
+        shift $((OPTIND-1)) 
 
-        if ! test -z "${@:$#:1}" && ! test "${@:$#:1}" == '/bin/bash' && ! [[ "${@:$#:1}" =~ -.* ]]; then
-            eval "${@:$#:1}=$value"  
+        value="$(eval $rlwstring)";
+
+        if ! test $# -eq 0; then
+            eval "${@:$#:1}=$value" 
         else
             export READE_VALUE="$value" 
         fi
@@ -332,38 +342,65 @@ function reade(){
 
 function readyn(){
 
-    unset READYN_VALUE
-
     local VERSION='1.0' 
 
     while :; do
         case $1 in
-            -h|-\?|--help)
-                printf "${bold}readyn${normal} [ -h/--help ] [ -v/--version ]  [ -y/--yes [ PREFILL ] ]  [ -n/--no [ CONDITION ] ] [ -p/--prompt PROMPTSTRING ] [ -Q/--colour COLOURSTRING ]  [ -b/--break-chars BREAK-CHARS ] [ returnvar ]\n
-               Simplifies yes/no prompt for ${bold}reade${normal}. Supply at least 1 variable as the last argument to put the answer in, otherwise the value will be in '\$READYN_VALUE'.  
-'${GREEN} [${underline_on}Y${underline_off}es/${underline_on}n${underline_off}o]: ${normal}' : 'y' as pre-given, 'n' as other option. Colour for the prompt is ${GREEN}GREEN (Default)${normal} 
-'${YELLOW} [${underline_on}N${underline_off}o/${underline_on}y${underline_off}es]: ${normal}' : 'n' as pre-given, 'y' as other option. Colour for the prompt is ${YELLOW}YELLOW${normal}
-    For both an empty answer will return the default answer. 
+            -h|-\?|--help|'')
+                printf "     ${bold}readyn${normal} [ -h/--help ] [ -v/--version ]  [ -y/--yes [ PREFILL ] ]  [ -n/--no [ CONDITION ] ] [ -p/--prompt PROMPTSTRING ] [ -Q/--colour COLOURSTRING ]  [ -b/--break-chars BREAK-CHARS ] [ returnvar ]\n
+     Simplifies yes/no prompt for ${bold}reade${normal}. 
+     Takes at least one argument, otherwise will prompt help page.
+     
+     Like 'read' and 'reade', supply at a variable as the last argument for the return value. 
+     Otherwise the value will be in the '\$REPLY' and '\$READE_VALUE'.    
+     '${GREEN} [${underline_on}Y${underline_off}es/${underline_on}n${underline_off}o]: ${normal}' : 'y' as pre-given, 'n' as other option. Colour for the prompt is ${GREEN}GREEN (Default)${normal} 
+     '${YELLOW} [${underline_on}N${underline_off}o/${underline_on}y${underline_off}es]: ${normal}' : 'n' as pre-given, 'y' as other option. Colour for the prompt is ${YELLOW}YELLOW${normal}
+     For both an empty answer will return the default answer. 
 
     -h, --help  
         
         Print this text and exit
      
-   -y, --yes ${underline_on}prefill${underline_off} 
+    -p, --prompt ${underline_on}PROMPTSTRING${underline_off} 
 
-        Autofill prompt with 'y' if nothing is supplied, otherwise prefill with given 
+        Prompt to supply. At the end of the prompt '[${underline_on}Y${underline_off}es/${underline_on}n${underline_off}o]: ' or '[${underline_on}N${underline_off}o/${underline_on}y${underline_off}es]: ' will appear.  
 
-   -n, --no ${underline_on}condition${underline_off}
+    -y, --yes [ ${underline_on}prefill${underline_off} ], [[ ${underline_on}prefill-prompt${underline_off} ]] 
+        Set to 'Yes' prompt with 2 optional, comma-separated arguments 
+        Pregiven is 'y' without argument, otherwise first becomes pregiven. 
+        Second optional is the prefill word in coloured prompt ([Word]), otherwise defaults to '[${underline_on}Y${underline_off}es/${underline_on}n${underline_off}o]: ' 
 
-       Set '${YELLOW} [${underline_on}N${underline_off}o/${underline_on}y${underline_off}es]: ${normal}' as the default prompt. Give a condition for when to prompt with 'no'. 
+    -n, --no [ ${underline_on}prefill${underline_off} ], [[ ${underline_on}prefill-prompt${underline_off} ]] 
+        Same as for --yes but 'no' variant
+        Default pregiven is 'n', prompt word in prompt defaults to '[${underline_on}N${underline_off}o/${underline_on}y${underline_off}es]: ' when only '--no' is supplied
+        
+        If neither '--no' or '--yes' are active => yes-prompt 
     
-   -Q ${underline_on}Colour${underline_off}
+    -c, --condition ${underline_on}CONDITION${underline_off} 
 
-        Use  one  of  the  colour names black, red, green, yellow, blue, cyan, purple (=magenta) or white, or an ANSI-conformant <colour_spec> to colour any prompt displayed  by  command.\n An uppercase colour name (Yellow or YELLOW ) gives a bold prompt.\n Prompts that already contain (colour) escape sequences or one of the readline \"ignore markers\" (ASCII 0x01 and 0x02) are not coloured.
-    
+        At default will prefer to prompt the '--no' flag over the '--yes' flag. 
+        If you only want the '--no' prompt to be applicable when a given condition is active then give it up as an argument in a string. 
+
+    -Y, --yes-colour ${underline_on}COLOUR${underline_off}
+        Default: ${GREEN}GREEN${normal} 
+
+    -N, --no-colour ${underline_on}COLOUR${underline_off}
+        Default: ${YELLOW}YELLOW${normal} 
+
+        Only active if --yes(Default)/--no applicable. 
+        Use  one  of  the  colour names black, red, green, yellow, blue, cyan, purple (=magenta) or white, or an ANSI-conformant <colour_spec> to colour any prompt displayed  by  command.\n\tAn uppercase colour name (Yellow or YELLOW ) gives a bold prompt.\n Prompts that already contain (colour) escape sequences or one of the readline \"ignore markers\" (ASCII 0x01 and 0x02) are not coloured.
+
+    -a, --auto 
+        
+        Fill in with the pregiven immediately
+
     -b ${underline_on}list_of_characters${underline_off} 
 
-        (From rlwrap manual) Consider  the specified characters word-breaking (whitespace is always word-breaking). This determines what is considered a \"word\", both when completing and when building a completion word list from files specified by -f options following (not preceding!) it.\n Default list (){}[],'+-=&^%%\$#@\";|\ \n Unless -c is specified, / and . (period) are included in the default list\n\n"
+        (Applicable when ${bold}rlwrap${normal} installed - from manual):
+        Consider  the specified characters word-breaking (whitespace is always word-breaking). 
+        This determines what is considered a \"word\", both when completing and when building a completion word list from files specified by -f options following (not preceding!) it.
+        Default list (){}[],'+-=&^%%\$#@\";|\  
+        Unless -c is specified, / and . (period) are included in the default list\n\n"
               return 0
           ;;
           -v|--version) 
@@ -383,80 +420,166 @@ function readyn(){
     for arg in "$@"; do
       shift
       case "$arg" in
-        '--break-chars')       set -- "$@" '-b'   ;;
-        '--colour')            set -- "$@" '-Q'   ;;
-        '--prompt')            set -- "$@" '-p'   ;;
-        '--no')                set -- "$@" '-n'   ;;
         '--yes')               set -- "$@" '-y'   ;;
+        '--no')                set -- "$@" '-n'   ;;
+        '--yes-colour')        set -- "$@" '-Y'   ;;
+        '--auto')              set -- "$@" '-a'   ;;
+        '--no-colour')         set -- "$@" '-N'   ;;
+        '--prompt')            set -- "$@" '-p'   ;;
+        '--condition')         set -- "$@" '-c'   ;;
+        '--break-chars')       set -- "$@" '-b'   ;;
         *)                     set -- "$@" "$arg" ;;
       esac
     done 
 
     local breaklines=''
-    local nocase='' 
-    local pre='' 
-    local preff='' 
-    local color='' 
+    local condition='' 
+    local pre='y'
+    local pre_y='y'
+    local pre_n='n' 
+    local othr='n' 
+    local prmpty="${underline_on}Y${underline_off}es"
+    local prmptn="${underline_on}n${underline_off}o"
+    local ycolor='GREEN' 
+    local ncolor='YELLOW' 
+    local color="$ycolor" 
+    local ygivn=0, ngivn=0 
+    local preff=''
+    local auto=''
     OPTIND=1
-    while getopts ':b:Q:p:y:yn:n' flag; do
+    while getopts ':anyb:Y:N:c:p:y:n:' flag; do
         case "${flag}" in
-             b)  breaklines="-b \"${OPTARG}\"";
+             a)  auto='y' 
+                 ;;
+             b) if [ "${OPTARG}" ] && ! test "${OPTARG}" == '--' && ! [[ ${OPTARG} =~ ^-.* ]]; then 
+                    breaklines="-b \"${OPTARG}\"";
+                fi 
+                if [[ ${OPTARG} =~ -.* ]]; then
+                    OPTIND=$(($OPTIND - 1)) 
+                fi
              ;;    
-             Q)  color="${OPTARG}";
+             Y) if [ "${OPTARG}" ] && ! test "${OPTARG}" == '--' && ! [[ ${OPTARG} =~ ^-.* ]]; then 
+                    ycolor="${OPTARG}";
+                fi
+                if [[ ${OPTARG} =~ -.* ]]; then
+                    OPTIND=$(($OPTIND - 1)) 
+                fi
              ;;    
-             p)  prmpt=${OPTARG};
+             N) if [ "${OPTARG}" ] && ! test "${OPTARG}" == '--' && ! [[ ${OPTARG} =~ ^-.* ]]; then
+                    ncolor="${OPTARG}";
+                fi
+                if [[ ${OPTARG} =~ -.* ]]; then
+                    OPTIND=$(($OPTIND - 1)) 
+                fi 
+             ;;    
+             p) if [ "${OPTARG}" ] && ! test "${OPTARG}" == '--' && ! [[ ${OPTARG} =~ ^-.* ]]; then
+                    prmpt="${OPTARG}";
+                    echo $prmpt 
+                fi
+                if [[ ${OPTARG} =~ -.* ]]; then
+                    OPTIND=$(($OPTIND - 1)) 
+                fi 
              ;;
-             y) if [ "${OPTARG}" ] && ! test "${OPTARG}" == '--' && ! [[ ${OPTARG} =~ -.* ]] && ! test "${OPTARG}" == "${@:$#:1}"; then
-                    preff=${OPTARG};
+             y)  preff='y'
+                 local args='' 
+                 if [ "${OPTARG}" ] && ! test "${OPTARG}" == '--' && ! [[ ${OPTARG} =~ ^-.* ]]; then
+
+                    # disable glob 
+                    set -f 
+
+                    # split on space characters 
+                    IFS=',' 
+
+                    args=($OPTARG);
+                    pre_y="${args[0]}" 
+                    ! test -z "${args[1]}" && prmpty="${args[1]}" 
                 else
-                    preff='y'
+                    pre='y' 
+                    prmpty="${underline_on}Y${underline_off}es"
+                    prmptn="${underline_on}n${underline_off}o" 
                     if [[ ${OPTARG} =~ -.* ]]; then
                         OPTIND=$(($OPTIND - 1)) 
                     fi
                 fi
-             ;;
-             n) if [ "${OPTARG}" ] && ! test "${OPTARG}" == '--' && ! [[ ${OPTARG} =~ ^-.* ]] && ! test "${OPTARG}" == "${@:$#:1}"; then
-                    nocase="${OPTARG}"
-                fi 
-                if [[ ${OPTARG} =~ ^-.* ]]; then
-                    OPTIND=$(($OPTIND - 1)) 
-                fi
-                if ! test -z "$nocase" && eval "$nocase" || test -z "$nocase" ; then
+                #if ! test -z "$condition" && ! ${condition} || test -z "$condition" ; then
+                #    pre='y'
+                #    othr='n'
+                #    color="$ycolor" 
+                #fi
+                ;;
+
+            n)  preff='n'
+                local args='' 
+                if [ "${OPTARG}" ] && ! test "${OPTARG}" == '--' && ! [[ ${OPTARG} =~ -.* ]]; then
+                    set -f 
+                    IFS=',' 
+                    args=($OPTARG);
+                    pre_n="${args[0]}"
+                    ! test -z "${args[1]}" && prmptn="${args[1]}"  
+                else
                     pre='n'
-                    othr='y'
-                    prmpt1=" [${underline_on}N${underline_off}o/${underline_on}y${underline_off}es]: "
-                    test -z $color && color='YELLOW'
+                    prmptn="${underline_on}N${underline_off}o"
+                    prmpty="${underline_on}y${underline_off}es" 
+                    if [[ ${OPTARG} =~ -.* ]]; then
+                        OPTIND=$(($OPTIND - 1)) 
+                    fi
                 fi
-             ;;
+                ;; 
+
+              c) if [ "${OPTARG}" ] && ! test "${OPTARG}" == '--' && ! [[ ${OPTARG} =~ ^-.* ]]; then
+                    condition="${OPTARG}"
+                fi 
+                if [[ ${OPTARG} =~ -.* ]]; then
+                    OPTIND=$(($OPTIND - 1)) 
+                fi 
+                ;;
         esac
-    done && OPTIND=1;
-    if test -z $pre; then 
-        pre='y'
-        othr='n'
-        prmpt1=" [${underline_on}Y${underline_off}es/${underline_on}n${underline_off}o]: "
-        test -z $color && color='GREEN'
+    done 
+    
+    shift $((OPTIND-1)) 
+    
+    if test -z "$preff" || test "$preff" == 'y'; then
+        prmpt1=" [$prmpty/$prmptn]: "
+        color="$ycolor"
+        pre=$pre_y 
+        othr=$pre_n 
+    else
+        prmpt1=" [$prmptn/$prmpty]: "
+        color="$ncolor"
+        pre=$pre_n 
+        othr=$pre_y 
     fi
 
-    if ! test -z $preff; then
-        if test -z "$prmpt"; then
-            printf "${!color}$prmpt1$preff${normal}\n" ;   
-        else
-            printf "${!color}$prmpt$prmpt1$preff${normal}\n" ;   
-        fi
-        value=$preff 
-    else
-        if ! test -z "$prmpt"; then
-            reade -Q "$color" $breaklines -i "$pre" -p "$prmpt$prmpt1" "$othr" value;   
-        else
-            reade -Q "$color" $breaklines -i "$pre" -p "$prmpt1" "$othr" value;    
-        fi
+    if ! test -z "$condition" && eval "${condition}"; then
+        test "$prmptn" == "${underline_on}n${underline_off}o" && prmptn="${underline_on}N${underline_off}o"  
+        test "$prmpty" == "${underline_on}Y${underline_off}es" && prmpty="${underline_on}y${underline_off}es"  
+        prmpt1=" [$prmptn/$prmpty]: "
+        color="$ncolor"
+        pre=$pre_n 
+        othr=$pre_y 
+    fi
 
+    if ! test -z $auto; then
+        if test -z "$prmpt"; then
+            printf "${!color}$prmpt1: $pre${normal}\n";   
+        else
+            printf "${!color}$prmpt$prmpt1: $pre${normal}\n";   
+        fi
+        value=$pre 
+    else
+        if test -z "$prmpt"; then
+            reade -Q "$color" $breaklines -i "$pre $othr" -p "$prmpt1" value;   
+        else
+            reade -Q "$color" $breaklines -i "$pre $othr" -p "$prmpt$prmpt1" value;    
+        fi
+         
     fi 
 
-    if ! test -z "${@:$#:1}" && ! test "${@:$#:1}" == '/bin/bash' && ! [[ "${@:$#:1}" =~ -.* ]]; then
+    export READE_VALUE="$value" 
+    export REPLY="$value" 
+
+    if ! test $# -eq 0; then
         eval "${@:$#:1}=$value" 
-    else
-        export READYN_VALUE="$value" 
     fi
 
     unset pre other prmpt prmpt1 color readestr breaklines value 
@@ -494,7 +617,7 @@ function yes_edit_no(){
             clr="-Q $5"
         fi
         
-        reade $clr -i "$pre" -p "$prompt" "$choices" pass;
+        reade $clr -i "$pre $choices" -p "$prompt" pass;
         
         #Undercase only
         pass=$(echo "$pass" | tr '[:upper:]' '[:lower:]')
@@ -510,10 +633,10 @@ function yes_edit_no(){
             for i in "${str[@]}"; do
                 "$EDITOR" "$i";
             done;
-            deflt=" [y/N]: "
+            deflt=" [N/y]: "
             pre="n"
             prompt="$3$deflt";
-            reade $clr -i "$pre" -p "$prompt" "y n" pass2;
+            reade $clr -i "$pre y" -p "$prompt" pass2;
             if [ "$pass2" == "y" ]; then
                 $1;
             fi

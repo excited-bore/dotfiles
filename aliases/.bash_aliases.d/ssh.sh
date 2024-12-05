@@ -60,7 +60,7 @@ function add-known-ip(){
     for i in ${ips[@]}; do
         valid-ip $i && ipss="$(($ipss + 1))"
     done
-    reade -Q 'CYAN' -p 'Ip?: ' "${ipss[@]}" ipnr
+    reade -Q 'CYAN' -i "${ipss[@]}" -p 'Ip?: ' ipnr
     if valid-ip $ipnr ; then 
         for i in ${ips[@]}; do
             ipss="$(($ipss + 1))"
@@ -80,7 +80,7 @@ function add-ssh-alias(){
     servers=$( ( set -o posix ; alias ) | grep --color=never ^server )
     servr='server1' 
     ! [ -z $servers ] && servr="server$((${#servers[@]} + 1))"  
-    reade -Q 'CYAN' -i "$servr" -p 'Server name? [Default:server1]: ' '' nam
+    reade -Q 'CYAN' -i "$servr" -p 'Server name? [Default:server1]: ' nam
     alias ${!nam} &> /dev/null && echo 'Name already taken' && return 0 
     unset i  
 }
@@ -92,7 +92,7 @@ ssh-key-and-add-to-agent-by-host() {
     fi
     local opts name kyname host keytype uname sx11
     echo "${green}FYI: Some services (f.ex. default setting openssh, github) only check for id_keyname type keys (f.ex. id_ed25519)"
-    reade -Q "GREEN" -i "id_ed25519" -p "Give up filename \(Recommended: id_ed25519, id_ecdsa-sk, id_ed25519-sk, id_dsa, id_ecdsa or id_rsa\): " "id_dsa id_ecdsa id_ecdsa-sk id_ed25519 id_ed25519-sk id_rsa" name
+    reade -Q "GREEN" -i "id_ed25519 id_dsa id_ecdsa id_ecdsa-sk id_ed25519 id_ed25519-sk id_rsa" -p "Give up filename \(Recommended: id_ed25519, id_ecdsa-sk, id_ed25519-sk, id_dsa, id_ecdsa or id_rsa\): " name
     if [[ "$name" == "id_"* ]]; then
         reade -Q "green" -i "y" -p "Given name starts with \"id_\". Use name for keytype?:" "y n" kyname
         if [ "y" == "$kyname" ]; then
@@ -100,7 +100,7 @@ ssh-key-and-add-to-agent-by-host() {
         fi
     fi
     if test -z $keytype; then
-        reade -Q "GREEN" -i "id_ed25519" -p "Give up keytype \(dsa \| ecdsa \| ecdsa-sk \| ed25519 (Default) \| ed25519-sk \| rsa\): " "dsa ecdsa ecdsa-sk ed25519 ed25519-sk rsa" keytype
+        reade -Q "GREEN" -i "ed25519 dsa ecdsa ecdsa-sk ed25519 ed25519-sk rsa" -p "Give up keytype \(dsa \| ecdsa \| ecdsa-sk \| ed25519 (Default) \| ed25519-sk \| rsa\): "  keytype
     fi
     read -p "Give up remote machine (hostname / Ip address) : " host
     if [ -z $host ]; then

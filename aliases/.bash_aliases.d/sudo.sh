@@ -44,7 +44,7 @@ function sudo-add-envvar-exception(){
     vars="$(echo $vars | sed "s/\<$frst\> //g")"
     if test -z "$@"; then
         printenv 
-        reade -Q 'GREEN' -i "$frst" -p "Pathvariable?: " "$vars" pathvr
+        reade -Q 'GREEN' -i "$frst $vars" -p "Pathvariable?: " pathvr
     else
         if [[ "$@" =~ '$' ]]; then
             pathvr="$(sed 's/$//g')"

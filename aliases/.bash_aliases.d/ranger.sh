@@ -6,7 +6,7 @@
 #https://github.com/JohanChane/ranger-quit_cd_wd
 
 # Ranger 
-alias ranger='ranger 2> /dev/null'
+#alias ranger='ranger 2> /dev/null'
 if [ -n "$RANGER_LEVEL" ]; then 
     export PS1="[ranger]$PS1"; 
 fi

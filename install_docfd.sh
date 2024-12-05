@@ -18,7 +18,7 @@ if ! type update-system &> /dev/null; then
 fi
 
 if test -z $SYSTEM_UPDATED; then
-    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "n" updatesysm
+    readyn -Y "CYAN" -p "Update system?" updatesysm
     if test $updatesysm == "y"; then
         update-system                     
     fi
@@ -56,7 +56,7 @@ fi
 
 # pandoc
 if ! type pandoc &> /dev/null; then
-    reade -Q 'GREEN' -i 'y' -p "Also install pandoc for .epub, .odt, .docx, .fb2, .ipynb, .html, and .htm files? [Y/n]: " 'n' pndc
+    readyn -p "Also install pandoc for .epub, .odt, .docx, .fb2, .ipynb, .html, and .htm files? [Y/n]: " 'n' pndc
     if test $pndc == 'y'; then
         if test $distro_base == 'Arch'; then
             eval "$pac_ins python-pdftotext  "

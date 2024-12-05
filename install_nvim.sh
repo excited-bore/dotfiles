@@ -17,7 +17,7 @@ if ! type update-system &> /dev/null; then
 fi
 
 if test -z $SYSTEM_UPDATED; then
-    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "n" updatesysm
+    readyn -Y "CYAN" -p "Update system?" updatesysm
     if test $updatesysm == "y"; then
         update-system                     
     fi
@@ -62,22 +62,22 @@ if test $machine == 'Mac' && type brew &> /dev/null; then
         brew install neovim
     fi
     if ! type xclip &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Install nvim clipboard? (xsel xclip) [Y/n]: " "n" clip
+        readyn -p "Install nvim clipboard? (xsel xclip)" clip
         if [ -z $clip ] || [ "y" == $clip ]; then
             brew install xsel xclip
             echo "${green} If this is for use with ssh on serverside, X11 needs to be forwarded"
             echo "${green} At clientside, 'ForwardX11 yes' also needs to be put in ~/.ssh/config under Host"
             echo "${green} Connection also need to start with -X flag (ssh -X ..@..)${normal}"
-            reade -Q "GREEN" -i "y" -p "Forward X11 in /etc/ssh/sshd.config? [Y/n]: " "n" x11f
+            readyn -p "Forward X11 in /etc/ssh/sshd.config?" x11f
             if [ -z $x11f ] || [ "y" == $x11f ]; then
                sudo sed -i 's|.X11Forwarding yes|X11Forwarding yes|g' /etc/ssh/sshd.config
             fi
         fi
     fi
-    reade -Q "GREEN" -i "y" -p "Install nvim code language support (python, javascript, ruby, perl, ..)? [Y/n]: " "n" langs
+    readyn -p "Install nvim code language support (python, javascript, ruby, perl, ..)?" langs
     if test "$langs" == 'y'; then
         if ! type pylint &> /dev/null; then
-            reade -Q "GREEN" -i "y" -p "Install nvim-python? [Y/n]: " "n" pyscripts
+            readyn -p "Install nvim-python?" pyscripts
             if [ -z $pyscripts ] || [ "y" == $pyscripts ]; then
                 if ! type pyenv &> /dev/null; then 
                     if ! test -f install_pyenv.sh; then

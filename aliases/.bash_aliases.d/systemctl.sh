@@ -156,7 +156,7 @@ if type fzf &> /dev/null; then
                 fi
                 unset $now 
             elif test $actn == 'disable'; then
-                reade -Q "GREEN" -i "n" -p "Also stop $unit? [N/y]: " "y" now
+                readyn -n -p "Also stop $unit? " now
                 if test $now == 'y'; then
                     systemctl disable --now $unit 
                     systemctl status $unit 

@@ -161,7 +161,7 @@ if type apt &> /dev/null; then
                 ppa="$(cat ~/.config/ppas | fzf --reverse)"
             else
                 printf "${cyan}No 'ppa-list' file found${normal}\n" 
-                reade -Q 'GREEN' -i 'y' -p 'Generate list of known ppas (faster then constantly pining launchpad.net)? [Y/n]: ' 'n' res
+                readyn -Y 'GREEN' -p 'Generate list of known ppas (faster then constantly pining launchpad.net)?' res
                 if test $res == 'y'; then
                    list-ppa --file ~/.config/ppas 
                 else 
@@ -185,7 +185,7 @@ if type apt &> /dev/null; then
                 fi
             elif test -z $ppa && test -f ~/.config/ppas; then
                 printf "${cyan}No package selected. Maybe list is incomplete?${normal}\n" 
-                reade -Q 'GREEN' -i 'y' -p 'Regenerate list of known ppas? [Y/n]: ' 'n' res
+                readyn -p 'Regenerate list of known ppas?' res
                 if test $res == 'y'; then
                    list-ppa --file ~/.config/ppas 
                 fi
@@ -248,10 +248,13 @@ if type pacman &> /dev/null; then
     #          mirrors are ranked by their current access time.  The higher number the higher possibility of a fast mirror.  If a number is given the resulting mirrorlist contains that number of servers.
     alias pacman-create-default-mirrors-and-forcerefresh="sudo pacman-mirrors -f 5 && sudo pacman -Syy"
     alias pacman-create-default-mirrors-and-refresh="sudo pacman-mirrors -f 5 && sudo pacman -Sy"
+    alias pacman-list-files-package="pacman -Ql"
     alias pacman-list-AUR-installed="pacman -Qm"
     alias pacman-rm-lock="sudo rm /var/lib/pacman/db.lck"
     alias pacman-remove="sudo pacman -R"
     alias pacman-remove-dependencies="sudo pacman -Rs"
+    alias pacman-clean-cache="sudo pacman -Sc" 
+    
 
     if type fzf &> /dev/null; then
 
@@ -386,14 +389,16 @@ if type pacman &> /dev/null; then
         alias pamac-forcerefresh="pamac update --force-refresh && pamac upgrade --force-refresh"
         alias pamac-clear-cache="pamac clean"
         alias pamac-remove-orphans="pamac remove -o" 
-        
+       
+        alias pamac-list-files-package="pacman-list-files-package" 
+
         function pamac-fzf-remove-package(){
             if test -z "$@"; then
                 compedit="$(pamac list | awk '{print $1}')" 
                  if ! type fzf &> /dev/null; then  
                     frst="$(echo $compedit | awk '{print $1}')"
                     compedit="$(echo $compedit | sed "s/\<$frst\> //g")"
-                    reade -Q 'GREEN' -i "$frst" -p "Give up package: " "$compedit" packg
+                    reade -Q 'GREEN' -i "$frst $compedit" -p "Give up package: " packg
                  else
                      packg="$(echo "$compedit" | fzf --reverse --multi --height 50%)"
                  fi
@@ -506,6 +511,7 @@ if type pacman &> /dev/null; then
         alias yay-list-all-aur="yay -Slaq"
         alias yay-clear-cache="yay -Sc"
 
+        alias yay-list-files-package="pacman-list-files-package" 
         # https://smarttech101.com/aur-arch-user-repository-and-yay-in-arch-linux 
         
         function yay-fzf-install(){ 

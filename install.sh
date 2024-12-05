@@ -1,5 +1,6 @@
 #!/bin/bash
 
+export INSTALL=1 
 
 if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
     if type curl &> /dev/null; then
@@ -10,6 +11,7 @@ if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
 else
     . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
 fi
+
 
 if ! test -f checks/check_system.sh; then
     if type curl &> /dev/null; then
@@ -37,7 +39,7 @@ if ! type update-system &> /dev/null; then
 fi
 
 if test -z $SYSTEM_UPDATED; then
-    readyn -Q "CYAN" -p "Update system?" updatesysm
+    readyn -Y "CYAN" -p "Update system?" updatesysm
     if test $updatesysm == "y"; then
         update-system                     
     else
@@ -60,21 +62,21 @@ printf "${green} Will now start with updating system ${normal}\n"
 
 
 if [ ! -e ~/config ] && test -d ~/.config; then
-    readyn -Q "BLUE" -p "Create ~/.config to ~/config symlink? " sym1
+    readyn -Y "BLUE" -p "Create ~/.config to ~/config symlink? " sym1
     if [ -z $sym1 ] || [ "y" == $sym1 ]; then
         ln -s ~/.config ~/config
     fi
 fi
 
 if [ ! -e ~/lib_systemd ] && test -d ~/lib/systemd/system; then
-    readyn -Q "BLUE" -p "Create /lib/systemd/system/ to user directory symlink? " sym2
+    readyn -Y "BLUE" -p "Create /lib/systemd/system/ to user directory symlink? " sym2
     if [ -z $sym2 ] || [ "y" == $sym2 ]; then
         ln -s /lib/systemd/system/ ~/lib_systemd
     fi
 fi
 
 if [ ! -e ~/etc_systemd ] && test -d ~/etc/systemd/system; then
-    readyn -Q "BLUE" -p "Create /etc/systemd/system/ to user directory symlink? " sym3
+    readyn -Y "BLUE" -p "Create /etc/systemd/system/ to user directory symlink? " sym3
     if [ -z $sym3 ] || [ "y" == $sym3 ]; then
         ln -s /etc/systemd/system/ ~/etc_systemd
     fi
@@ -132,7 +134,7 @@ unset insflpk
 
 if ! type snap &> /dev/null; then
     printf "%s\n" "${blue}No snap detected. (Independent package manager from Canonical)${normal}"
-    readyn -Q "MAGENTA" -p "Install snap?" -n inssnap 
+    readyn -Y "MAGENTA" -p "Install snap?" -n inssnap 
     if [ "y" == "$inssnap" ]; then
         if ! test -f install_snapd.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_snapd.sh)" 
@@ -228,10 +230,12 @@ if test $distro_base == 'Debian'; then
 
 elif test $distro_base == 'Arch'; then
 
-    ! type pactree &> /dev/null && printf "${CYAN}pacman-contrib${normal} is not installed (Includes tools like pactree, pacsearch, pacdiff..)\n" 
-    readyn -p 'Install pacman-contrib package?' -n 'type pactree &> /dev/null' pacmn_cntr
-    if test $pacmn_cntr == 'y'; then
-        sudo pacman -Su pacman-contrib
+    if test -z $(pacman -Q pacman-contrib); then
+        printf "${CYAN}pacman-contrib${normal} is not installed (Includes tools like pactree, pacsearch, pacdiff..)\n" 
+        readyn -p 'Install pacman-contrib package?' -n 'type pactree &> /dev/null' pacmn_cntr
+        if test $pacmn_cntr == 'y'; then
+            sudo pacman -Su pacman-contrib
+        fi
     fi
     unset pacmn_cntr
    
@@ -266,7 +270,7 @@ fi
 
 
 if ! sudo test -f /etc/polkit/49-nopasswd_global.pkla && ! sudo test -f /etc/polkit-1/rules.d/90-nopasswd_global.rules; then
-    readyn -Q "YELLOW" -p "Install polkit files for automatic authentication for passwords? " plkit
+    readyn -Y "YELLOW" -p "Install polkit files for automatic authentication for passwords? " plkit
     if [ "y" == "$plkit" ]; then
         if ! test -f install_polkit_wheel.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_polkit_wheel.sh)" 
@@ -291,7 +295,7 @@ fi
 
 # Ack prompt
 
-readyn -p "Install Ack? (A modern replacement for grep - finds lines in shell output)" -n "type ack &> /dev/null" ack
+readyn -p "Install Ack? (A modern replacement for grep - finds lines in shell output)" -n -c "type ack &> /dev/null" ack
 
 if [ "y" == "$ack" ]; then
     if ! test -f install_ack.sh; then
@@ -304,7 +308,7 @@ unset ack
 
 # Hhighlighter (or just h)
 
-readyn -p "Install Hhighlighter (or just h)? (A tiny utility to highlight multiple keywords with different colors in a textoutput)" -n "type h &> /dev/null" h
+readyn -n -c "type h &> /dev/null" -p "Install Hhighlighter (or just h)? (A tiny utility to highlight multiple keywords with different colors in a textoutput)" h
 if [ "y" == "$h" ]; then
     if ! type ack &> /dev/null; then
         printf "For ${CYAN}Hhighlighter${normal} to work, ${CYAN}ack${normal} needs to be installed first." 
@@ -329,7 +333,7 @@ unset h
 
 # Eza prompt
 
-readyn -p "Install Eza? (A modern replacement for ls)" -n "type eza &> /dev/null" rmp
+readyn -p "Install Eza? (A modern replacement for ls)" -n -c "type eza &> /dev/null" rmp
 
 if [ -z "$rmp" ] || [ "y" == "$rmp" ]; then
     if ! test -f install_eza.sh; then
@@ -342,7 +346,7 @@ unset rmp
 
 # Xcp
 
-readyn -p "Install xcp? (cp but faster and with progress bar)" -n "type xcp &> /dev/null" rmp
+readyn -p "Install xcp? (cp but faster and with progress bar)" -n -c "type xcp &> /dev/null" rmp
 
 if [ -z "$rmp" ] || [ "y" == "$rmp" ]; then
     if ! test -f install_xcp.sh; then
@@ -357,7 +361,7 @@ unset rmp
 
 # Rm prompt
 
-readyn -p "Install rm-prompt? (Rm but lists files/directories before deletion)" -n "type rm-prompt &> /dev/null" rmp
+readyn -p "Install rm-prompt? (Rm but lists files/directories before deletion)" -n -c "type rm-prompt &> /dev/null" rmp
 
 if [ -z "$rmp" ] || [ "y" == "$rmp" ]; then
     if ! test -f install_rmprompt.sh; then
@@ -459,7 +463,7 @@ shell-keybinds() {
    
     printf "${cyan}You can always switch between vi/emacs mode with ${CYAN}Ctrl-o${normal}\n"
      
-    readyn -Q "YELLOW" -p "Startup in vi-mode instead of emacs mode? (might cause issues with pasteing)" vimde
+    readyn -Y "YELLOW" -p "Startup in vi-mode instead of emacs mode? (might cause issues with pasteing)" vimde
 
     sed -i "s|^set editing-mode .*|#set editing-mode vi|g" $binds
 
@@ -569,7 +573,7 @@ unset moar
 
 # Nano (Editor)
 
-readyn -p "Install nano + config? (Simple terminal editor)" -n "type nano &> /dev/null && test -f ~/.nanorc &> /dev/null" nno
+readyn -p "Install nano + config? (Simple terminal editor)" -n -c "type nano &> /dev/null && test -f ~/.nanorc &> /dev/null" nno
 
 if [ "y" == "$nno" ]; then
     if ! test -f install_nano.sh; then
@@ -583,7 +587,7 @@ unset nno
 
 # Nvim (Editor)
 
-readyn -p "Install neovim + config? (Complex terminal editor)" -n "type nvim &> /dev/null" nvm
+readyn -p "Install neovim + config? (Complex terminal editor)" -n -c "type nvim &> /dev/null" nvm
 
 if [ "y" == "$nvm" ]; then
     if ! test -f install_nvim.sh; then
@@ -597,7 +601,7 @@ unset nvm
 
 # Kitty (Terminal emulator)
 
-readyn -p "Install Kitty? (Terminal emulator)" -n "type kitty &> /dev/null" kittn
+readyn -p "Install Kitty? (Terminal emulator)" -n -c "type kitty &> /dev/null" kittn
 
 if [ "y" == "$kittn" ]; then
     if ! test -f install_kitty.sh; then
@@ -611,7 +615,7 @@ unset kittn
 
 # Fzf (Fuzzy Finder)
  
-readyn -p "Install fzf? (Fuzzy file/folder finder - keybinding yes for upgraded Ctrl-R/reverse-search, fzf filenames on Ctrl+T and fzf-version of 'cd' on Alt-C + Custom script: Ctrl-f becomes system-wide file opener)" -n "type fzf &> /dev/null && type rg &> /dev/null" findr
+readyn -p "Install fzf? (Fuzzy file/folder finder - keybinding yes for upgraded Ctrl-R/reverse-search, fzf filenames on Ctrl+T and fzf-version of 'cd' on Alt-C + Custom script: Ctrl-f becomes system-wide file opener)" -n -c "type fzf &> /dev/null && type rg &> /dev/null" findr
 
 if [ "y" == "$findr" ]; then
     if ! test -f install_fzf.sh; then
@@ -624,7 +628,7 @@ unset findr
 
 # Git
 
-readyn -p "Install Git and configure? (Project managing tool)" -n "type git &> /dev/null && test -f ~/.gitconfig" git_ins
+readyn -p "Install Git and configure? (Project managing tool)" -n -c "type git &> /dev/null && test -f ~/.gitconfig" git_ins
 
 if [ "y" == "$git_ins" ]; then
     if ! test -f install_git.sh; then
@@ -640,7 +644,7 @@ unset git_ins
 
 # Lazygit
 
-readyn -p "Install lazygit?" -n "type lazygit &> /dev/null" git_ins
+readyn -p "Install lazygit?" -n -c "type lazygit &> /dev/null" git_ins
 
 if [ "y" == "$git_ins" ]; then
     if ! test -f install_lazygit.sh; then
@@ -661,7 +665,7 @@ unset git_ins
 
 # Ranger (File explorer)
 
-readyn -p "Install Ranger? (Terminal file explorer)" -n "type ranger &> /dev/null" rngr
+readyn -p "Install Ranger? (Terminal file explorer)" -n -c "type ranger &> /dev/null" rngr
 
 if [ "y" == "$rngr" ]; then
     if ! test -f install_ranger.sh; then
@@ -674,7 +678,7 @@ unset rngr
 
 # Tmux (File explorer)
 
-readyn -p "Install Tmux? (Terminal multiplexer)" -n "type tmux &> /dev/null" tmx
+readyn -p "Install Tmux? (Terminal multiplexer)" -n -c "type tmux &> /dev/null" tmx
 
 if [ "y" == "$tmx" ]; then
     if ! test -f install_tmux.sh; then
@@ -687,7 +691,7 @@ unset tmx
 
 # Bat
 
-readyn -p "Install Bat? (Cat clone with syntax highlighting)" -n "type bat &> /dev/null || type batcat &> /dev/null" bat
+readyn -p "Install Bat? (Cat clone with syntax highlighting)" -n -c "type bat &> /dev/null || type batcat &> /dev/null" bat
 
 if [ -z $bat ] || [ "Y" == $bat ] || [ $bat == "y" ]; then
     if ! test -f install_bat.sh; then
@@ -701,7 +705,7 @@ unset bat
 
 # Neofetch 
 
-readyn -p "Install neofetch/fastfetch/screenFetch)? (Terminal taskmanager - system information tool)" -n "type neofetch &> /dev/null || type fastfetch &> /dev/null || type screenfetch &> /dev/null" tojump
+readyn -p "Install neofetch/fastfetch/screenFetch)? (Terminal taskmanager - system information tool)" -n -c "type neofetch &> /dev/null || type fastfetch &> /dev/null || type screenfetch &> /dev/null" tojump
 
 if [ "$tojump" == "y" ]; then
     if ! test -f install_neofetch_onefetch.sh; then
@@ -713,14 +717,14 @@ fi
 unset tojump  
 
 
-# Bashtop
+# Btop
 
-readyn -p "Install bashtop? (Python based improved top/htop)" -n "type bashtop &> /dev/null || type bpytop &> /dev/null || type btop &> /dev/null" tojump
+readyn -p "Install Btop? (A processmanager with a fastly improved TUI relative top/htop written in C++)" -n -c "type btop &> /dev/null" tojump
 if [ "$tojump" == "y" ]; then
-    if ! test -f install_bashtop.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bashtop.sh)" 
+    if ! test -f install_btop.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_btop.sh)" 
     else
-        ./install_bashtop.sh
+        ./install_btop.sh
     fi
 fi
 unset tojump
@@ -728,7 +732,7 @@ unset tojump
 
 # Autojump
 
-readyn -p "Install autojump? (jump to folders using 'bookmarks' - j_ )" -n "type autojump &> /dev/null" tojump
+readyn -p "Install autojump? (jump to folders using 'bookmarks' - j_ )" -n -c "type autojump &> /dev/null" tojump
 if [ "$tojump" == "y" ]; then
     if ! test -f install_autojump.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_autojump.sh)" 
@@ -740,7 +744,7 @@ unset tojump
 
 # Zoxide 
 
-readyn -p "Install zoxide? (A cd that guesses the right path based on a history)" -n "type zoxide &> /dev/null" zoxs
+readyn -p "Install zoxide? (A cd that guesses the right path based on a history)" -n -c "type zoxide &> /dev/null" zoxs
 if [ "$zoxs" == "y" ]; then
     if ! test -f install_zoxide.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_zoxide.sh)" 
@@ -753,7 +757,7 @@ unset zoxs
 
 # Starship
 
-readyn -p "Install Starship? (Snazzy looking prompt)" -n "type starship &> /dev/null" strshp
+readyn -p "Install Starship? (Snazzy looking prompt)" -n -c "type starship &> /dev/null" strshp
 if [ $strshp == "y" ]; then
     if ! test -f install_starship.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_starship.sh)" 
@@ -765,7 +769,7 @@ unset strshp
 
 # Thefuck
 
-readyn -p "Install 'thefuck'? (Correct last command that ended with an error)" -n "type thefuck &> /dev/null" tf
+readyn -p "Install 'thefuck'? (Correct last command that ended with an error)" -n -c "type thefuck &> /dev/null" tf
 if [ "$tf" == "y" ]; then
     if ! test -f install_thefuck.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_thefuck.sh)" 
@@ -792,7 +796,7 @@ unset nmap
 
 # Ufw / Gufw
 
-readyn -p "Install ufw? (Uncomplicated firewall - Iptables wrapper)" -n "type ufw &> /dev/null" ins_ufw
+readyn -p "Install ufw? (Uncomplicated firewall - Iptables wrapper)" -n -c "type ufw &> /dev/null" ins_ufw
 if [ $ins_ufw == "y" ]; then
     if ! test -f install_ufw.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ufw.sh)" 
@@ -831,7 +835,7 @@ unset ins_ufw
 
 # Lazydocker
 
-readyn -p "Install lazydocker?" -n "type lazydocker &> /dev/null" git_ins
+readyn -p "Install lazydocker?" -n -c "type lazydocker &> /dev/null" git_ins
 
 if [ "y" == "$git_ins" ]; then
     if ! test -f install_lazydocker.sh; then
@@ -845,7 +849,7 @@ unset git_ins
 
 # Exiftool (Metadata wiper)
 
-readyn -p "Install exiftool? (Metadata wiper for files)" -n "type exiftool &> /dev/null" exif_t
+readyn -p "Install exiftool? (Metadata wiper for files)" -n -c "type exiftool &> /dev/null" exif_t
 
 if [ -z $exif_t ] || [ "Y" == $exif_t ] || [ $exif_t == "y" ]; then
     if ! test -f install_exiftool.sh; then
@@ -858,7 +862,7 @@ unset exif_t
 
 # Testdisk (File recovery tool)
 
-readyn -p "Install testdisk? (File recovery tool)" -n "type testdisk &> /dev/null" kittn
+readyn -p "Install testdisk? (File recovery tool)" -n -c "type testdisk &> /dev/null" kittn
 
 if [ "y" == "$kittn" ]; then
     if ! test -f install_testdisk.sh; then
@@ -872,7 +876,7 @@ unset kittn
 
 # Ffmpeg
 
-readyn -p "Install ffmpeg? (video/audio/image file converter)" -n "type ffmpeg &> /dev/null" ffmpg
+readyn -p "Install ffmpeg? (video/audio/image file converter)" -n -c "type ffmpeg &> /dev/null" ffmpg
 
 if [ "$ffmpg" == "y" ]; then
     if ! test -f install_ffmpeg.sh; then
@@ -886,7 +890,7 @@ unset ffmpg
 
 # Yt-dlp
 
-readyn -p "Install yt-dlp? (youtube video downloader)" -n "type yt-dlp &> /dev/null" yt_dlp
+readyn -p "Install yt-dlp? (youtube video downloader)" -n -c "type yt-dlp &> /dev/null" yt_dlp
 
 if [ "$yt_dlp" == "y" ]; then
     if ! test -f install_yt-dlp.sh; then
@@ -926,7 +930,7 @@ unset yt_dlp
 echo "Next $(tput setaf 1)sudo$(tput sgr0) will check whether root account is enabled"
 if ! test $(sudo passwd -S | awk '{print $2}') == 'L'; then
     printf "${CYAN}One more thing before finishing off${normal}: the ${RED}root${normal} account is still enabled.\n${RED1}This can be considered a security risk!!${normal}\n"
-    readyn -Q 'YELLOW' -p 'Disable root account? (Enable again by giving up a password with \\"sudo passwd root\\")' root_dis
+    readyn -Y 'YELLOW' -p 'Disable root account? (Enable again by giving up a password with \\"sudo passwd root\\")' root_dis
     if test $root_dis == 'y'; then
        sudo passwd -l root 
     fi

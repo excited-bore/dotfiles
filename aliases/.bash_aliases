@@ -5,7 +5,7 @@ shopt -s expand_aliases
 
 if [ -d ~/.bash_aliases.d/ ] && [ "$(ls -A ~/.bash_aliases.d/)" ]; then
   for alias in ~/.bash_aliases.d/*; do
-      source "$alias" 
+        source "$alias" 
   done
 fi
 

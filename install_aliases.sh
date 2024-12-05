@@ -69,9 +69,12 @@ unset int_r sig
 
 
 genr=aliases/.bash_aliases.d/general.sh
+genrc=aliases/.bash_completion.d/general
 if ! test -f aliases/.bash_aliases.d/general.sh; then
     tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/general.sh 
+    tmp1=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliasases/.bash_completion.d/general 
     genr=$tmp
+    genrc=$tmp1
 fi
 
 readyn -p "Install general.sh at ~/? (aliases related to general actions - cd/mv/cp/rm + completion script replacement for 'read -e')" ansr         
@@ -232,11 +235,13 @@ if test $ansr == "y"; then
 
     general_r(){ 
         sudo cp -fv $genr /root/.bash_aliases.d/;
+        sudo cp -fv $genrc /root/.bash_completion.d/;
     }
     general(){
         cp -fv $genr ~/.bash_aliases.d/
-        yes_edit_no general_r "$genr" "Install general.sh at /root/?" "yes" "YELLOW"; }
-    yes_edit_no general "$genr" "Install general.sh at ~/?" "yes" "GREEN"
+        cp -fv $genrc ~/.bash_completion.d/
+        yes_edit_no general_r "$genr $genrc" "Install general.sh at /root/?" "yes" "YELLOW"; }
+    yes_edit_no general "$genr $genrc" "Install general.sh at ~/?" "yes" "GREEN"
 fi
 
 update_sysm=aliases/.bash_aliases.d/update-system.sh
@@ -282,7 +287,7 @@ packman(){
 }
 yes_edit_no packman "$pacmn" "Install package_managers.sh at ~/.bash_aliases.d/ (package manager aliases)? " "yes" "GREEN"
 
-if [ $distro == "Manjaro" ] ; then
+if [ "$distro" == "Manjaro" ] ; then
     manj_r(){ 
         sudo cp -fv $manjaro /root/.bash_aliases.d/; 
     }
@@ -358,4 +363,5 @@ variti(){
     yes_edit_no variti_r "$variti" "Install variety.sh at /root/?" "yes" "YELLOW" 
 }
 yes_edit_no variti "$variti" "Install variety.sh at ~/.bash_aliases.d/ (aliases for a variety of tools)? " "yes" "GREEN" 
+
 

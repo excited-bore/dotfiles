@@ -1,10 +1,10 @@
 # https://calbertts.medium.com/docker-and-fuzzy-finder-fzf-4c6416f5e0b5
 
-docker-fzf-new-container() {
+function docker-fzf-new-container(){
   export FZF_DEFAULT_OPTS='--height 90% --reverse --border'
   local image=$(docker images --format '{{.Repository}}:{{.Tag}}' | fzf-tmux --reverse --multi)
   if [[ $image != '' ]]; then
-    echo -e "\n  \033[1mDocker image:\033[0m" $image
+    printf "${GREEN}Docker image: ${normal}\n" $image
     read -e -p $'  \e[1mOptions: \e[0m' -i "-it --rm" options
 
     printf "  \033[1mChoose the command: \033[0m"

@@ -20,10 +20,10 @@ function change-username-and-homefolder(){
     ! shopt -q login_shell && printf "${RED}Not login shell\nLogout, press 'Ctrl+Alt+F1/F2/...F6' to drop to a login shell and login as root or a user other then the one you want to change.\n${YELLOW}(Make sure the root account is enabled with 'sudo passwd su' - you can disable it afterwards with 'sudo passwd -l su')${normal}\n" && return 1
     local frst="$(echo $(users | word2line | uniq | grep -v root ) | awk '{print $1}')" 
     local words="$(echo $words | sed "s/\<$frst\> //g")" 
-    reade -Q 'CYAN' -i "$frst" -p "Old username (Empty = $frst): " "$words" usrname 
+    reade -Q 'CYAN' -i "$frst $words" -p "Old username (Empty = $frst): " usrname 
     test -z "$usrname" && usrname="$frst" 
     test "$USER" == "$usrname" && printf "${RED}Can't change username for $usrname while logged as said\nLogout, press 'Ctrl+Alt+F1/F2/...F6' to drop to a login shell (if not already in one) and login as root or a user other then the one you want to change.\n${YELLOW}(Make sure the root account is enabled with 'sudo passwd su' - you can disable it afterwards with 'sudo passwd -l su')${normal}\n" && return 1 
-    reade -Q 'MAGENTA' -p 'New username: ' '' usrname_nw 
+    reade -Q 'MAGENTA' -p 'New username: ' usrname_nw 
     if ! test -z "$usrname_nw"; then
         if ! test -z "$(ps -U $usrname 2> /dev/null)"; then
             printf "There are still processes running under user $usrname!\nKilling all processes for user..."  
@@ -46,7 +46,7 @@ function change-username-and-homefolder(){
 
 function change-device-name-to(){
     local oldname=$(hostname) 
-    reade -Q 'CYAN' -p "New device name (hostname): " "" name
+    reade -Q 'CYAN' -p "New device name (hostname): " name
     test -z "$name" && printf "Name cant be empty.\n" && return 1
     sudo hostnamectl set-hostname "$name" 
     sudo sed -i "s/$oldname/$name/g" /etc/hosts &&
@@ -88,6 +88,8 @@ function change-device-name-to(){
 
 # Another wrapper (untested)
 # https://superuser.com/questions/299694/is-there-a-directory-history-for-bash
+
+alias disable-glob="set -f"
 
 # Cd wrapper
 function cd-w() {
@@ -295,6 +297,11 @@ function cp-trash(){
     fi
 }
 
+# Cp recursively and verbose
+alias cp="cp -rv"
+type xcp &>/dev/null && alias cp="xcp -r --glob"
+alias cp-retrace-symlinks="cp --dereference --driver parblock"
+
 # mv (recursively native) verbose and only ask for interaction when overwriting newer files
 
 alias mv="mv -v"
@@ -497,6 +504,7 @@ alias mktar='tar -cvf'
 alias mkbz2='tar -cvjf'
 alias mkgz='tar -cvzf'
 alias untar='tar -xvf'
+alias untargz='tar -xvf'
 alias unbz2='tar -xvjf'
 alias ungz='tar -xvzf'
 alias un7z="7z x"
@@ -569,7 +577,7 @@ alias weather-full="curl wttr.in | $PAGER"
 # crontab
 # 
 function cron-list-all-user-jobs(){
-    mktemp_f=$(mktemp) && for user in $(cut -f1 -d: /etc/passwd); do echo "$(tput setaf 10)User: $(tput bold)$user"; printf "$(tput setaf 12)Crontab: $(tput bold)"; sudo crontab -u "$user" -l; echo; done &> "$mktemp_f"; cat $mktemp_f | $PAGER; rm $mktemp_f &> /dev/null; unset mktemp_f
+    mktemp_f=$(mktemp) && for user in $(cut -f1 -d: /etc/passwd); do echo "$(tput setaf 10)User: $(tput bold)$user"; printf "$(tput setaf 12)Crontab: $(tput bold)"; sudo crontab -u "$user" -l; echo; done &> "$mktemp_f"; cat $mktemp_f | $PAGER; builtin rm $mktemp_f &> /dev/null; unset mktemp_f
 }
 alias crontab-list-all-user-jobs="cron-list-all-user-jobs"
 alias list-all-cronjobs-user="cron-list-all-user-jobs"
@@ -702,16 +710,6 @@ function trash(){
 
 alias trash-list="gio trash --list"
 alias trash-empty="gio trash --empty"
-
-_trash(){
-    #WORD_ORIG=$COMP_WORDBREAKS
-    #COMP_WORDBREAKS=${COMP_WORDBREAKS/:/}
-    _get_comp_words_by_ref -n : cur
-    COMPREPLY=($(compgen -W "$(gio trash --list | awk '{print $1;}' | sed 's|trash:///|trash\\\:///|g' )" -- "$cur") )
-    __ltrim_colon_completions "$cur"
-    #COMP_WORDBREAKS=$WORD_ORIG
-    return 0
-}
 
 function trash-restore(){
     for arg in "$@"; do
@@ -856,6 +854,25 @@ function unset-executable-all() {
     fi
 }
 
+# FIND 
+
+type fd &> /dev/null && alias fd='fd --color=always --hidden'
+
+tree=''
+type tree &> /dev/null && tree=' | tree '
+
+if type fd &> /dev/null; then
+    alias find-files-dir="fd --search-path . --type file" 
+    alias find-files-system="fd --search-path / --type file" 
+    alias find-symlinks-dir="fd --search-path . --type symlink $tree | $PAGER"
+    alias find-symlinks-system="fd --search-path / --type symlink $tree | $PAGER"
+else
+    alias find-files-dir="find . -type f" 
+    alias find-files-system="find / -type f" 
+    alias find-symlinks-dir="find . -type l -exec ls --color -d {} \; $tree | $PAGER"
+    alias find-symlinks-system="find / -type l -exec ls --color -d {} \; $tree | $PAGER"
+fi
+
 alias locales-list-enabled="locale -a"
 
 # https://askubuntu.com/questions/76808/how-do-i-use-variables-in-a-sed-command
@@ -946,6 +963,8 @@ alias mobo-info="motherboard"
 alias bios-info="sudo dmidecode -t 0"
 alias motherboard-info-full="sudo dmidecode -t 1 && sudo dmidecode -t 2 && sudo dmidecode -t 0 | $PAGER"
 
+# Dual boot stuff
+
 function boot-into(){
     local opts="$(efibootmgr | grep --color=never Boot00 | awk '{print $1;}' | sed 's/Boot//g' | cut -d* -f-1)" 
     local frst="$(echo $opts | awk '{print $1}')" 
@@ -960,3 +979,6 @@ function boot-into(){
     fi
     unset bootnt 
 }
+
+alias next-boot="boot-into"
+

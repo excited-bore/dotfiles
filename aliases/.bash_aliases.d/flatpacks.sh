@@ -1,3 +1,5 @@
+#!/bin/bash
+
 ### FLATPAK ###                           
 if ! type reade &> /dev/null && test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh; then
     . ~/.bash_aliases.d/00-rlwrap_scripts.sh

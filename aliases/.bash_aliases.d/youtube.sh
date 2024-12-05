@@ -31,7 +31,7 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
         plst_frm=''
         rror='' 
 
-    reade -Q 'GREEN' -i 'n' -p 'Download playlist if url directs to one? [N/y]: ' 'y' plslt
+        reade -Q 'GREEN' -i 'n' -p 'Download playlist if url directs to one? [N/y]: ' 'y' plslt
         if test $plslt == 'y' ; then
             playlist="--yes-playlist"
             reade -Q 'cyan' -i '' -p 'Start playlist? (In numbers, leave empty will start here): ' '' start
@@ -337,5 +337,4 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
     #}
     #alias youtube-download-playlist-dir="yt-dl-playlist-yt-dl-playlist-audio-only-dir"
 fi
-
 
