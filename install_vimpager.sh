@@ -50,7 +50,7 @@ if type nvimpager &> /dev/null; then
     fi
 fi
 
-reade -Q 'GREEN' -i 'y' -p "Set .vimrc as default vimpager read config for $USER? [Y/n]: " "n" conf
+readyn -p "Set .vimrc as default vimpager read config for $USER?" conf
 if test "$conf" == "y"; then
     if grep -q "VIMPAGER_RC" $ENVVAR; then 
         sed -i "s|.export VIMPAGER_RC=|export VIMPAGER_RC=|g" $ENVVAR
@@ -60,7 +60,7 @@ if test "$conf" == "y"; then
     fi
 fi
 
-reade -Q "GREEN" -i "y" -p "Set vimpager as default pager for $USER? [Y/n]: " "n" moar_usr
+readyn -p "Set vimpager as default pager for $USER?" moar_usr
 if [ -z "$moar_usr" ] || [ "y" == "$moar_usr" ] || [ "Y" == "$moar_usr" ]; then
     if grep -q " PAGER=" $ENVVAR; then 
         sed -i "s|.export PAGER=|export PAGER=|g" $ENVVAR
@@ -70,7 +70,7 @@ if [ -z "$moar_usr" ] || [ "y" == "$moar_usr" ] || [ "Y" == "$moar_usr" ]; then
     fi
 fi
 
-reade -Q 'YELLOW' -i 'y' -p "Set .vimrc as default vimpager read config for root? [Y/n]: " "n" conf
+reade -Q 'YELLOW' -i 'y' -p "Set .vimrc as default vimpager read config for root?" conf
 if test "$conf" == "y"; then
     if sudo grep -q "VIMPAGER_RC" $ENVVAR_R; then 
         sudo sed -i "s|.export VIMPAGER_RC=|export VIMPAGER_RC=|g" $ENVVAR_R
@@ -81,7 +81,7 @@ if test "$conf" == "y"; then
 fi
 
     
-reade -Q "YELLOW" -i "y" -p "Set vimpager default pager for root? [Y/n]: " "n" moar_root
+reade -Q "YELLOW" -i "y" -p "Set vimpager default pager for root?" moar_root
 if [ -z "$moar_root" ] || [ "y" == "$moar_root" ] || [ "Y" == "$moar_root" ]; then
     if sudo grep -q " PAGER=" $ENVVAR_R; then
         sudo sed -i "s|.export PAGER=|export PAGER=|g" $ENVVAR_R

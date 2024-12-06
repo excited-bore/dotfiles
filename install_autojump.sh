@@ -39,7 +39,7 @@ fi
 if ! type autojump &> /dev/null; then
     if test "$distro_base" == "Arch"; then
         if test -z "$AUR_ins"; then 
-            reade -Q 'GREEN' -i 'y' -p 'No AUR helper found. Install yay? [Y/n]: ' 'n' ins_yay
+            readyn -p 'No AUR helper found. Install yay?' ins_yay
             if test "$ins_yay" == 'y'; then
                 if ! test -f AUR_insers/install_yay.sh ; then
                      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/AUR_insers/install_yay.sh )" 

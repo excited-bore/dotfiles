@@ -59,7 +59,7 @@ if ! test -d ~/.fzf  || test -f ~/.fzf.bash; then
     [ ! -f ~/.bash_completion.d/fzf-completion.bash ] && ln -s ~/.fzf/shell/completion.bash ~/.bash_completion.d/fzf-completion.bash
     
     printf "${cyan}Fzf${normal} keybinds:\n\t - Fzf history on Ctrl-R (replaces reverse-search-history)\n\t - Filepath retriever on Ctrl-T\n\t - Directory navigator on Alt-C\n\t - **<TAB> for fzf completion on some commands\n"
-    reade -Q "GREEN" -i "y" -p "Use fzf keybinds? [Y/n]: " "n" fzf_key
+    readyn -p "Use fzf keybinds?" fzf_key
     if test $fzf_key == 'y' ; then 
         [ ! -f ~/.keybinds.d/fzf-bindings.bash ] && ln -s ~/.fzf/shell/key-bindings.bash ~/.keybinds.d/fzf-bindings.bash
     fi
@@ -80,7 +80,7 @@ fnd="find"
 
 # TODO: Make better check: https://github.com/sharkdp/fd
 if ! type fd-find &> /dev/null && ! type fd &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Install fd and use for fzf? (Faster find) [Y/n]: " "n" fdr
+    readyn -p "Install fd and use for fzf? (Faster find)" fdr
     if [ -z $fdr ] || [ "Y" == $fdr ] || [ $fdr == "y" ]; then
         if ! test -f install_fd.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fd.sh)" 
@@ -96,7 +96,7 @@ fi
 
 # BAT
 if ! type bat &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Install bat? (File previews/thumbnails for riflesearch) [Y/n]: " "n" bat
+    readyn -p "Install bat? (File previews/thumbnails for riflesearch)" bat
     if [ "$bat" == "y" ]; then
         if ! test -f install_bat.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bat.sh)" 
@@ -109,7 +109,7 @@ fi
 
 # TREE
 if ! type tree &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Install tree? (Builtin cd shortcut gets a nice directory tree preview ) [Y/n]: " "n" tree
+    readyn -p "Install tree? (Builtin cd shortcut gets a nice directory tree preview ) " tree
     if [ "$tree" == "y" ]; then
         if ! test -f install_tree.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_tree.sh)" 
@@ -122,7 +122,7 @@ fi
 
 #TODO: fzf-rifle.sh still has ffmpegthumbnailer part (could use sed check)
 if ! type ffmpegthumbnailer &> /dev/null; then 
-    reade -Q "GREEN" -i "y" -p "Install ffmpegthumbnailer? (Video thumbnails for riflesearch) [Y/n]: " "n" ffmpg
+    readyn -p "Install ffmpegthumbnailer? (Video thumbnails for riflesearch)" ffmpg
     if [ "$ffmpg" == "y" ]; then
         if ! test -f install_ffmpegthumbnailer.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ffmpegthumbnailer.sh)" 
@@ -137,7 +137,7 @@ fi
 # TODO: Check export for ripgrep
 # TODO: Do more with ripgrep
 if ! type rg &> /dev/null; then
-     reade -Q "GREEN" -i "y" -p "Install ripgrep? (Recursive grep, opens possibility for line by line fzf ) [Y/n]: " "n" rpgrp
+     readyn -p "Install ripgrep? (Recursive grep, opens possibility for line by line fzf )" rpgrp
      if [ -z $rpgrp ] || [ "Y" == $rpgrp ] || [ $rpgrp == "y" ]; then
         if ! test -f install_ripgrep.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ripgrep.sh)" 
@@ -155,7 +155,7 @@ if ! type rg &> /dev/null; then
              printf "\n# RIPGREP\nexport RG_PREFIX='rg --column --line-number --no-heading --color=always --smart-case \"" | sudo tee -a $ENVVAR_R
         fi
         
-        reade -Q "GREEN" -i "y" -p "Add shortcut for ripgrep files in dir? (Ctrl-g) [Y/n]: " "n" rpgrpdir
+        readyn -p "Add shortcut for ripgrep files in dir? (Ctrl-g)" rpgrpdir
         if [ $rpgrpdir == "y" ]; then
             if ! test -f fzf/.bash_aliases.d/ripgrep-directory.sh; then
                 curl -o ~/.bash_aliases.d/ripgrep-directory.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/.bash_aliases.d/ripgrep-directory.sh
@@ -170,7 +170,7 @@ fi
 
 # XCLIP
 if ! type xclip &> /dev/null; then 
-    reade -Q "GREEN" -i "y" -p "Install xclip? (Clipboard tool for Ctrl-R/Reverse history shortcut) [Y/n]: " "n" xclip
+    readyn -p "Install xclip? (Clipboard tool for Ctrl-R/Reverse history shortcut)" xclip
     if [ "$xclip" == "y" ]; then
         if ! test -f install_xclip.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_xclip.sh)" 
@@ -193,9 +193,9 @@ unset xclip
 
 
 #echo "${green}Fzf will use '${CYAN}$fnd${normal}${green}'. Set default options that are fzf related to:${normal}"
-#reade -Q "GREEN" -i "y" -p "    Search globally instead of in current folder? [Y/n]: " "n" fndgbl
-#reade -Q "GREEN" -i "y" -p "    Search only files? [Y/n]: " "n" fndfle
-#reade -Q "GREEN" -i "y" -p "    Include hidden files? [Y/n]: " "n" fndhiddn
+#readyn -p "    Search globally instead of in current folder?" fndgbl
+#readyn -p "    Search only files?" fndfle
+#readyn -p "    Include hidden files?" fndhiddn
 #if [ $fnd == "find" ]; then
 #   test "$fndgbl" == "y" && fnd="find /"
 #   test "$fndfle" == "y" && fnd="$fnd -type f"
@@ -248,7 +248,7 @@ fi
  
 
 #if type kitty &> /dev/null; then
-#    reade -Q "GREEN" -i "y" -p "Add shortcut for fzf-autocompletion? (Ctrl-Tab) [Y/n]: " "n" comp_key
+#    readyn -p "Add shortcut for fzf-autocompletion? (Ctrl-Tab) "" comp_key
 #    if [ "$comp_key" == "y" ]; then
 #        if ! test -f .keybinds.d/keybinds.bash && ! grep -q "(Kitty)" ~/.fzf/shell/key-bindings.bash; then
 #            printf "\n# (Kitty) Ctrl-tab for fzf autocompletion" >> ~/.fzf/shell/key-bindings.bash
@@ -260,7 +260,7 @@ fi
 
     
 if ! test -f /usr/bin/rifle || ! test -f ~/.bash_aliases.d/fzf-rifle.sh && grep -q "fzf_rifle" ~/.keybinds.d/keybinds.bash; then
-    reade -Q "GREEN" -i "y" -p "Use rifle (file opener from 'ranger') to open found files and dirs with a custom Ctrl-F filesearch shortcut? [Y/n]: " "n" fzf_f
+    readyn -p "Use rifle (file opener from 'ranger') to open found files and dirs with a custom Ctrl-F filesearch shortcut?" fzf_f
     if [ "$fzf_f" == "y" ] || [ -z "$fzf_f" ] ; then
         if ! type rifle &> /dev/null; then
             if ! type python &> /dev/null; then
@@ -291,7 +291,7 @@ unset fzf_f
 
 
 
-#reade -Q "GREEN" -i "y" -p "Add shortcut for riflesearch on Ctrl-F? (Fzf and paste in console) [Y/n]: " "n" fzf_t
+#readyn -p "Add shortcut for riflesearch on Ctrl-F? (Fzf and paste in console) "" fzf_t
 #if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ] ; then 
 #    #sed -i 's|# CTRL-T|# CTRL-F|g' ~/.fzf/shell/key-bindings.bash
 #     
@@ -303,7 +303,7 @@ unset fzf_f
 #fi
 
 
-# reade -Q "GREEN" -i "y" -p "Change Alt-C shortcut to Ctrl-S for fzf cd? [Y/n]:" "n" fzf_t
+# readyn -p "Change Alt-C shortcut to Ctrl-S for fzf cd? [Y/n]:" "n" fzf_t
 # if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ]; then 
 #     sed -i 's|# ALT-C - cd into the selected directory|# CTRL-S - cd into the selected directory|g' ~/.fzf/shell/key-bindings.bash
 #     sed -i 's|\\ec|\\C-s|g'  ~/.fzf/shell/key-bindings.bash
@@ -315,7 +315,7 @@ unset fzf_f
 
 
 if ! test -f ~/.bash_aliases.d/docker-fzf.sh; then
-    reade -Q "GREEN" -i "y" -p "Install fzf-docker (fzf aliases for docker)? [Y/n]: " "n" fzf_d
+    readyn -p "Install fzf-docker (fzf aliases for docker)?" fzf_d
     if [ "$fzf_d" == "y" ] || [ -z "$fzf_d" ]; then 
         if ! test -f checks/check_aliases_dir.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)" 

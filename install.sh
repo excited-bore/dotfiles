@@ -222,7 +222,7 @@ if test $distro_base == 'Debian'; then
             printf "${CYAN}synaptic${normal} is not installed (Better GUI for package management)\n"
             readyn -p "Install synaptic? " ins_curl
             if test $ins_curl == 'y'; then
-               eval "$pac_ins synaptic -y"
+                ${pac_ins} synaptic -y
             fi
             unset ins_curl
         fi
@@ -230,7 +230,7 @@ if test $distro_base == 'Debian'; then
 
 elif test $distro_base == 'Arch'; then
 
-    if test -z $(pacman -Q pacman-contrib); then
+    if test -z "$(pacman -Q pacman-contrib)"; then
         printf "${CYAN}pacman-contrib${normal} is not installed (Includes tools like pactree, pacsearch, pacdiff..)\n" 
         readyn -p 'Install pacman-contrib package?' -n 'type pactree &> /dev/null' pacmn_cntr
         if test $pacmn_cntr == 'y'; then
@@ -719,7 +719,7 @@ unset tojump
 
 # Btop
 
-readyn -p "Install Btop? (A processmanager with a fastly improved TUI relative top/htop written in C++)" -n -c "type btop &> /dev/null" tojump
+readyn -p "Install Btop? (A processmanager with a fastly improved TUI relative to top/htop written in C++)" -n -c "type btop &> /dev/null" tojump
 if [ "$tojump" == "y" ]; then
     if ! test -f install_btop.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_btop.sh)" 

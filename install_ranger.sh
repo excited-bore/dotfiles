@@ -112,7 +112,7 @@ rangr_cnf() {
 }
 yes_edit_no rangr_cnf "$dir/rc.conf $dir/rifle.conf $dir/scope.sh" "Install predefined configuration (rc.conf,rifle.conf and scope.sh at ~/.config/ranger/)? " "edit" "GREEN"
 
-reade -Q "GREEN" -i "y" -p "F2 for Ranger? [Y/n]: " "n" rf2
+readyn -p "F2 for Ranger?" rf2
 if [ -z "$rf2" ] || [ "y" == "$rf2" ]; then
     binds=~/.bashrc
     if [ -f ~/.keybinds.d/keybinds.bash ]; then
@@ -130,14 +130,14 @@ if [ -z "$rf2" ] || [ "y" == "$rf2" ]; then
 fi
 
 if ! test -d ~/.config/ranger/plugins/devicons2; then
-    reade -Q "GREEN" -i "y" -p "Install ranger (dev)icons? (ranger plugin at ~/.conf/ranger/plugins) [Y/n]: " "n" rplg
+    readyn -p "Install ranger (dev)icons? (ranger plugin at ~/.conf/ranger/plugins)" rplg
     if [ -z $rplg ] || [ "y" == $rplg ]; then
         mkdir -p ~/.config/ranger/plugins
         git clone https://github.com/cdump/ranger-devicons2 ~/.config/ranger/plugins/devicons2
         if test "$distro" == "Arch" || test $distro == "Manjaro" ;then
             eval "$pac_ins ttf-nerd-fonts-symbols-common ttf-nerd-fonts-symbols ttf-nerd-fonts-symbols-mono"
         elif [ "$distro_base" == "Debian" ]; then    
-            reade -Q "YELLOW" -i "y" -p "Install Nerdfonts from binary - no apt? (Special FontIcons) [Y/n]: " "n" nrdfnts
+            readyn -p "Install Nerdfonts from binary - no apt? (Special FontIcons)" nrdfnts
             if [ -z $nrdfnts ] || [ "Y" == $nrdfnts ] || [ $nrdfnts == "y" ]; then
                 if ! test -f ./install_nerdfonts.sh; then
                     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nerdfonts.sh)" 
@@ -149,7 +149,7 @@ if ! test -d ~/.config/ranger/plugins/devicons2; then
     fi
 fi
 
-#reade -Q "GREEN" -i "y" -p "Install and enable ranger image previews? (Installs terminology) [Y/n]:" "n" rplg
+#readyn -p "Install and enable ranger image previews? (Installs terminology)" rplg
 #sed -i 's|set preview_images false|set preview_images true|g' ~/.config/ranger/rc.conf
 #if [ -z $rplg ] || [ "y" == $rplg ]; then
 #    if test $distro == "Arch" || test $distro == "Manjaro";then
@@ -160,7 +160,7 @@ fi
 #fi
 
 if type nvim &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Integrate ranger with nvim? (Install nvim ranger plugins) [Y/n]: " "n" rangrvim
+    readyn -p "Integrate ranger with nvim? (Install nvim ranger plugins)" rangrvim
     if [[ -z $rangrvim || "y" == $rangrvim ]]; then
         if test -f  ~/.config/nvim/init.vim && ! grep -q "Ranger integration" ~/.config/nvim/init.vim; then
             sed -i 's|"Plugin '\''francoiscabrol/ranger.vim'\''|Plugin '\''francoiscabrol/ranger.vim'\''|g' ~/.config/nvim/init.vim

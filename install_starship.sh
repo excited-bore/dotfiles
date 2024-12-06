@@ -21,7 +21,7 @@ if test -z $SYSTEM_UPDATED; then
 fi
 
 if ! type curl &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Curl necessary for curl. Install curl? [Y/n]: " "n" tojump
+    readyn -p "Curl necessary for curl. Install curl?" tojump
     if [ "$tojump" == "y" ]; then
         if test $distro == "Arch" || test $distro == "Manjaro";then
             eval "$pac_ins curl"
@@ -35,7 +35,7 @@ fi
 # https://unix.stackexchange.com/questions/690233/piping-yes-when-running-scripts-from-curl
 sh -c "$(curl -fsSL https://starship.rs/install.sh)" -y -f
 
-reade -Q "GREEN" -i "y" -p "Install starship.sh for user? [Y/n]: " "n" strship
+readyn -p "Install starship.sh for user?" strship
 if [ "y" == "$strship" ]; then
     if ! grep -q "starship" ~/.bashrc; then
         echo "eval \"\$(starship init bash)\"" >> ~/.bashrc
@@ -64,7 +64,7 @@ if [ "y" == "$strship" ]; then
 fi
 unset strship
 
-reade -Q "YELLOW" -i "y" -p "Install starship.sh for root? [Y/n]: " "n" strship
+readyn -p "Install starship.sh for root?" strship
 if [ "y" == "$strship" ]; then
     if ! sudo grep -q "starship" /root/.bashrc; then
         printf "eval \"\$(starship init bash)\"\n" | sudo tee -a /root/.bashrc &> /dev/null

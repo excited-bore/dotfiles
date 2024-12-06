@@ -47,7 +47,7 @@ if ! type flatpak &> /dev/null; then
 fi
 
 if type flatpak &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Add flatpak dirs to path? (XDG_DATA_DIRS) [Y/n]: " "n" flpkvrs 
+    readyn -p "Add flatpak dirs to path? (XDG_DATA_DIRS)" flpkvrs 
     if [ "$flpkvrs" == "y" ]; then
         if grep -q "FLATPAK" $ENVVAR; then
             sed -i 's|.export PATH=$PATH:$HOME/.local/bin/flatpak|export PATH=$PATH:$HOME/.local/bin/flatpak|g' $ENVVAR
@@ -65,7 +65,7 @@ fi
 unset flpkvrs
 
 if ! test -f ~/.bash_aliases.d/flatpacks.sh; then
-    reade -Q "GREEN" -i "y" -p "Install flatpackwrapper? (For one-word flatpak aliases in terminal) [Y/n]: " "n" pam
+    readyn -p "Install flatpackwrapper? (For one-word flatpak aliases in terminal)" pam
     if [ -z $pam ] || [ "y" == $pam ]; then
         if ! test -f install_bashalias_completions.sh; then
              eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bashalias_completions.sh)" 
@@ -90,7 +90,7 @@ fi
 unset pam file
 
 if ! echo $(flatpak list --columns=name) | grep -q "Flatseal"; then
-    reade -Q "GREEN" -i "y" -p "Install GUI for configuring flatpak permissions - flatseal? [Y/n]: " "n" fltseal
+    readyn -p "Install GUI for configuring flatpak permissions - flatseal?" fltseal
     if [ -z $fltseal ] || [ "y" == $fltseal ]; then
         flatpak install flatseal
     fi
@@ -102,7 +102,7 @@ localauth_conf=$(test -d /etc/polkit-1/localauthority.conf.d/ && ! test -f /etc/
 rules_d=$(test -d /etc/polkit-1/rules.d/ && ! test -f /etc/polkit-1/rules.d/90-nopasswd_global.rules)
 
 if $localauth || $localauth_conf || $rules_d; then
-    reade -Q "GREEN" -i "y" -p "Run installer for no password with pam? [Y/n]: " "n" pam
+    readyn -p "Run installer for no password with pam?" pam
     if [ "y" == $pam ]; then
         if ! test -f install_polkit_wheel.sh; then
              eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_polkit_wheel.sh)" 

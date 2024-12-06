@@ -6,7 +6,7 @@
 
 # https://unix.stackexchange.com/questions/139231/keep-aliases-when-i-use-sudo-bash
 if type sudo &> /dev/null; then
-    alias sudo='sudo '
+    alias sudo='sudo -k '
 fi
 
 if type wget &> /dev/null; then
@@ -205,17 +205,25 @@ function reade(){
         bash_rlwrap='n'
     fi
     if ! type rlwrap &> /dev/null || test "$fcomp" == 'y' || test "$bash_rlwrap" == 'n' ; then
-        readstr="read  "
+        readstr="read -r "
         color=""
+        OLD_HISTFILE=$HISTFILE
         while getopts ':b:e:i:p:Q:s:S:' flag; do
             case "${flag}" in
                 b)  ;;
-                e)  readstr=$(echo "$readstr" | sed 's|read |read -e -r |g');
+                e)  readstr=$(echo "$readstr" | sed 's|read |read -e |g');
                     ;;
                     #  Even though it's in the read man, -i does not actually work
                 i)  arg="$(echo ${OPTARG} | awk '{print $1;}')"
+                    args="$(echo ${OPTARG} | sed "s/\<$frst\> //g")"  
                     readstr=$(echo "$readstr" | sed 's|read |read -e -i "'"$arg"'" |g');
                     pre="$arg"
+                    ! test -z "$args" &&   
+                    args=$(echo $args | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }') &&
+                    args=$(echo $args | tr ' ' '\n') &&
+                    tmpf=$(mktemp) && 
+                    echo "$args" > "$tmpf" && 
+                    export HISTFILE=$tmpf
                     ;;
                 Q)  if [[ "${OPTARG}" =~ ^[[:upper:]]+$ ]]; then
                         color="${bold}"
@@ -252,7 +260,7 @@ function reade(){
         done;
 
         shift $((OPTIND-1)) 
-        
+       
         eval "${readstr} value";
 
         if test "$fcomp" == 'y'; then
@@ -447,36 +455,35 @@ function readyn(){
     local preff=''
     local auto=''
     OPTIND=1
-    while getopts ':anyb:Y:N:c:p:y:n:' flag; do
+    while getopts 'anyb:Y:N:c:p:y:n:' flag; do
         case "${flag}" in
              a)  auto='y' 
                  ;;
              b) if [ "${OPTARG}" ] && ! test "${OPTARG}" == '--' && ! [[ ${OPTARG} =~ ^-.* ]]; then 
                     breaklines="-b \"${OPTARG}\"";
                 fi 
-                if [[ ${OPTARG} =~ -.* ]]; then
+                if [[ ${OPTARG} =~ ^-.* ]]; then
                     OPTIND=$(($OPTIND - 1)) 
                 fi
              ;;    
              Y) if [ "${OPTARG}" ] && ! test "${OPTARG}" == '--' && ! [[ ${OPTARG} =~ ^-.* ]]; then 
                     ycolor="${OPTARG}";
                 fi
-                if [[ ${OPTARG} =~ -.* ]]; then
+                if [[ ${OPTARG} =~ ^-.* ]]; then
                     OPTIND=$(($OPTIND - 1)) 
                 fi
              ;;    
              N) if [ "${OPTARG}" ] && ! test "${OPTARG}" == '--' && ! [[ ${OPTARG} =~ ^-.* ]]; then
                     ncolor="${OPTARG}";
                 fi
-                if [[ ${OPTARG} =~ -.* ]]; then
+                if [[ ${OPTARG} =~ ^-.* ]]; then
                     OPTIND=$(($OPTIND - 1)) 
                 fi 
              ;;    
              p) if [ "${OPTARG}" ] && ! test "${OPTARG}" == '--' && ! [[ ${OPTARG} =~ ^-.* ]]; then
                     prmpt="${OPTARG}";
-                    echo $prmpt 
                 fi
-                if [[ ${OPTARG} =~ -.* ]]; then
+                if [[ ${OPTARG} =~ ^-.* ]]; then
                     OPTIND=$(($OPTIND - 1)) 
                 fi 
              ;;
@@ -510,7 +517,7 @@ function readyn(){
 
             n)  preff='n'
                 local args='' 
-                if [ "${OPTARG}" ] && ! test "${OPTARG}" == '--' && ! [[ ${OPTARG} =~ -.* ]]; then
+                if [ "${OPTARG}" ] && ! test "${OPTARG}" == '--' && ! [[ ${OPTARG} =~ ^-.* ]]; then
                     set -f 
                     IFS=',' 
                     args=($OPTARG);
@@ -520,7 +527,7 @@ function readyn(){
                     pre='n'
                     prmptn="${underline_on}N${underline_off}o"
                     prmpty="${underline_on}y${underline_off}es" 
-                    if [[ ${OPTARG} =~ -.* ]]; then
+                    if [[ ${OPTARG} =~ ^-.* ]]; then
                         OPTIND=$(($OPTIND - 1)) 
                     fi
                 fi
@@ -529,7 +536,7 @@ function readyn(){
               c) if [ "${OPTARG}" ] && ! test "${OPTARG}" == '--' && ! [[ ${OPTARG} =~ ^-.* ]]; then
                     condition="${OPTARG}"
                 fi 
-                if [[ ${OPTARG} =~ -.* ]]; then
+                if [[ ${OPTARG} =~ ^-.* ]]; then
                     OPTIND=$(($OPTIND - 1)) 
                 fi 
                 ;;
