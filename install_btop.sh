@@ -20,14 +20,14 @@ fi
 
 
 if test -z $SYSTEM_UPDATED; then
-    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "n" updatesysm
+    readyn -Y "CYAN" -p "Update system?" updatesysm
     if test $updatesysm == "y"; then
         update-system                     
     fi
 fi
 
 if ! type btop &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Install btop? [Y/n]: " "n" sym2
+    readyn -p "Install btop?" sym2
     if test "$sym2" == "y"; then
         #reade -Q "CYAN" -i "btop" -p "Which one? [Btop/bpytop/bashtop]: " "bpytop bashtop" sym2
         #if test "$sym2" == "btop"; then

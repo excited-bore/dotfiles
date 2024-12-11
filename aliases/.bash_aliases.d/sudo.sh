@@ -21,7 +21,7 @@ function sudo-remove-user-from-sudo-groups(){
     frst="$(echo $users_ | awk '{print $1}')"
     vars="$(echo $users_ | sed "s/\<$frst\> //g")"
     if test -z "$1"; then
-        reade -Q 'GREEN' -i "$frst" -p "User?: " "$users_" usr
+        reade -Q 'GREEN' -i "$frst $users_" -p "User?: " usr
     else
         user_="$1"
     fi
@@ -44,7 +44,7 @@ function sudo-add-envvar-exception(){
     vars="$(echo $vars | sed "s/\<$frst\> //g")"
     if test -z "$@"; then
         printenv 
-        reade -Q 'GREEN' -i "$frst" -p "Pathvariable?: " "$vars" pathvr
+        reade -Q 'GREEN' -i "$frst $vars" -p "Pathvariable?: " pathvr
     else
         if [[ "$@" =~ '$' ]]; then
             pathvr="$(sed 's/$//g')"

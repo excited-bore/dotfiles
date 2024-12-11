@@ -161,7 +161,7 @@ if type apt &> /dev/null; then
                 ppa="$(cat ~/.config/ppas | fzf --reverse)"
             else
                 printf "${cyan}No 'ppa-list' file found${normal}\n" 
-                reade -Q 'GREEN' -i 'y' -p 'Generate list of known ppas (faster then constantly pining launchpad.net)? [Y/n]: ' 'n' res
+                readyn -Y 'GREEN' -p 'Generate list of known ppas (faster then constantly pining launchpad.net)?' res
                 if test $res == 'y'; then
                    list-ppa --file ~/.config/ppas 
                 else 
@@ -185,7 +185,7 @@ if type apt &> /dev/null; then
                 fi
             elif test -z $ppa && test -f ~/.config/ppas; then
                 printf "${cyan}No package selected. Maybe list is incomplete?${normal}\n" 
-                reade -Q 'GREEN' -i 'y' -p 'Regenerate list of known ppas? [Y/n]: ' 'n' res
+                readyn -p 'Regenerate list of known ppas?' res
                 if test $res == 'y'; then
                    list-ppa --file ~/.config/ppas 
                 fi
@@ -398,7 +398,7 @@ if type pacman &> /dev/null; then
                  if ! type fzf &> /dev/null; then  
                     frst="$(echo $compedit | awk '{print $1}')"
                     compedit="$(echo $compedit | sed "s/\<$frst\> //g")"
-                    reade -Q 'GREEN' -i "$frst" -p "Give up package: " "$compedit" packg
+                    reade -Q 'GREEN' -i "$frst $compedit" -p "Give up package: " packg
                  else
                      packg="$(echo "$compedit" | fzf --reverse --multi --height 50%)"
                  fi

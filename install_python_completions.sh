@@ -13,7 +13,7 @@ if ! type update-system &> /dev/null; then
 fi
 
 if test -z $SYSTEM_UPDATED; then
-    reade -Q "CYAN" -i "y" -p "Update system? [Y/n]: " "n" updatesysm
+    readyn -Y "CYAN" -p "Update system?" updatesysm
     if test $updatesysm == "y"; then
         update-system                     
     fi
@@ -64,7 +64,7 @@ sed -i 's|.export PYTHON_ARGCOMPLETE_OK="True"|export PYTHON_ARGCOMPLETE_OK="Tru
 #    echo ". ~/.bash_completion.d/_python-argcomplete" >> ~/.bashrc
 #fi
 
-#reade -Q "YELLOW" -i "y" -p "Install python completion system wide? (/root/.bashrc) [Y/n]: " "n" arg
+#reade -Q "YELLOW" -i "y" -p "Install python completion system wide? (/root/.bashrc) "" arg
 #if [ "y" == "$arg" ]; then 
 #    if type activate-global-python-argcomplete &> /dev/null; then
 #        sudo activate-global-python-argcomplete --dest=/root/.bash_completion.d

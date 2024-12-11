@@ -11,6 +11,7 @@ if type vim &> /dev/null || type nvim &> /dev/null; then
     alias vim-dir="$VIM ./"
     alias vim-checkhealth="$VIM +checkhealth"
     alias vim-diff="$VIM -d" 
+
     if type fzf &> /dev/null; then 
         function vim-fzf(){
         query=''
@@ -51,4 +52,8 @@ if type nvim &> /dev/null; then
     alias man-a="man-all-nvim"                                                               
     alias superman="man-all-nvim"                                                           
     alias man-all="man-all-nvim"                                                               
+    
+    #function vim-grep(){
+    #    vim $@ | grep $1 
+    #} 
 fi

@@ -903,7 +903,7 @@ fi
 
 if ! test -z "$no_aur"; then
     printf "Your Arch system seems to have no (known) AUR helper installed\n"
-    readyn -Q 'CYAN' -p "Install yay ( AUR helper/wrapper )?" insyay
+    readyn -Y 'CYAN' -p "Install yay ( AUR helper/wrapper )?" insyay
     if [ "y" == "$insyay" ]; then 
 
         if ! test -f ../AUR_insers/install_yay.sh; then 

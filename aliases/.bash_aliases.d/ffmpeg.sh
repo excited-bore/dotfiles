@@ -1,3 +1,5 @@
+#!/bin/bash
+
 if ! type reade &> /dev/null && test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh; then
     . ~/.bash_aliases.d/00-rlwrap_scripts.sh
 fi 
@@ -5,7 +7,7 @@ fi
 if type ffmpeg &> /dev/null; then
 
     function ffmpeg-convert-to-mp3(){
-        reade -Q "GREEN" -i "n" -p "Delete after conversion? [N/y]: " "y" del
+        readyn -N 'GREEN' -n -p "Delete after conversion?" del
         for var in "$@"
         do
             ffmpeg -i "$var" -vn -acodec libmp3lame -ac 2 -ab 160k -ar 48000 "${var%.*}.mp3" && test "$del" == 'y' && test -f "$var" && rm -v "$var" 
@@ -13,7 +15,7 @@ if type ffmpeg &> /dev/null; then
     }
     
     function ffmpeg-convert-mkv-embed-subtitles(){
-        reade -Q "GREEN" -i "n" -p "Delete after conversion? [N/y]: " "y" del
+        readyn -N 'GREEN' -n -p "Delete after conversion?" del
         for var in "$@"
         do
             filename=$(basename -- "$var")
@@ -26,7 +28,7 @@ if type ffmpeg &> /dev/null; then
                 compgen -G "$filename*.srt" &> /dev/null && pos=$(compgen -G "$filename*.srt")
                 compgen -G "$filename*.vtt" &> /dev/null && pos=$(compgen -G "$filename*.vtt")
                 compgen -G "$filename*.ass" &> /dev/null && pos=$(compgen -G "$filename*.ass")
-                reade -Q "GREEN" -i "y" -p " Use ${cyan}$pos${GREEN} as subtitle file [Y/n]: " "n" sub_pos
+                reade -N "GREEN" -n -p " Use ${cyan}$pos${GREEN} as subtitle file?" sub_pos
                 if test $sub_pos == 'y'; then
                     sub=$pos 
                 fi
@@ -48,7 +50,7 @@ if type ffmpeg &> /dev/null; then
     }
 
     function videotomp3(){
-        reade -Q "GREEN" -i "n" -p "Delete after conversion? [N/y]: " "y" del
+        readyn -N "GREEN" -n -p "Delete after conversion?" del
         for var in "$@"
         do
             ffmpeg -i "$var" -vn -acodec libmp3lame -ac 2 -ab 160k -ar 48000 "${var%.*}.mp3" && test "$del" == 'y' && test -f "$var" && rm -v "$var" 
@@ -57,7 +59,7 @@ if type ffmpeg &> /dev/null; then
      
 
     function ffmpeg-convert-to-mp4(){
-        reade -Q "GREEN" -i "n" -p "Delete after conversion? [N/y]: " "y" del
+        reade -N "GREEN" -n -p "Delete after conversion?" del
         for var in "$@"
         do
             local sub='' 

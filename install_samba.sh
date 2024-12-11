@@ -13,7 +13,7 @@ if ! type update-system &> /dev/null; then
 fi
 
 if test -z $SYSTEM_UPDATED; then
-    reade -Q "CYAN" -i "y" -p "Update system? [Y/n]: " "n" updatesysm
+    readyn -Y "CYAN" -p "Update system?" updatesysm
     if test $updatesysm == "y"; then
         update-system                     
     fi
@@ -43,7 +43,7 @@ for i in $(seq 1 7); do
     done
 done
 
-reade -Q "GREEN" -p "Drive name: (doesn't matter): " "" drive
+reade -Q "GREEN" -p "Drive name: (doesn't matter): "  drive
 if ! test "$drive"; then
     printf "${red}Drive name can't be empty\n${normal}"
     #exit 1
@@ -52,11 +52,11 @@ elif sudo grep -q "$drive" /etc/samba/smb.conf; then
     #exit 1
 fi
 reade -Q "GREEN" -i "/mnt" -p "Mount point (path name): " -e mnt
-reade -Q "GREEN" -i "y" -p "Browseable: [Y/n]: " "n" browse
-reade -Q "GREEN" -i "y" -p "Writeable: [Y/n]: " "n" write
-reade -Q "GREEN" -i "y" -p "Public [Y/n]: " "n" public
-reade -Q "GREEN" -i "0777" -p "Create file mask (Default: 0777): " "$wordcomp"  fmask
-reade -Q "GREEN" -i "0777" -p "Directory mask (Default: 0777): " "$wordcomp" dmask
+readyn -p "Browseable: " browse
+readyn -p "Writeable: " write
+readyn -p "Public" public
+reade -Q "GREEN" -i "0777 $wordcomp" -p "Create file mask (Default: 0777): " fmask
+reade -Q "GREEN" -i "0777 $wordcomp" -p "Directory mask (Default: 0777): " dmask
 
 if [[ -z $write || "y" == $write ]]; then
     write="yes"
@@ -97,13 +97,13 @@ printf "\n[$drive]
     Create mask=$fmask
     Directory mask=$dmask" | sudo tee -a /etc/samba/smb.conf &> /dev/null
 
-reade -Q "YELLOW" -i "y" -p "Edit /etc/samba/smb.conf [Y/n]: " "n" edit
+readyn -Y "YELLOW"  -p "Edit /etc/samba/smb.conf" edit
 if test "$edit" == "y"; then
     sudo $EDITOR /etc/samba/smb.conf
 fi
 
-reade -Q "GREEN" -i "$USER" -p "User $USER for login to drive? : " "$USER" usr
-reade -Q "GREEN" -i "y" -p "No password? (You will have to set it otherwise) [Y/n]: " "n" nopswd
+reade -Q "GREEN" -i "$USER $(users)" -p "User $USER for login to drive?: " usr
+readyn -p "No password? (You will have to set it otherwise)" nopswd
 if ! test "$usr" ; then
     usr=$USER
 fi

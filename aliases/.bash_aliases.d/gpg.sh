@@ -45,10 +45,10 @@ function gpg-encrypt-custom-algo(){
 
     cphrs=$(gpg --version | grep Cipher | cut -d: -f2 | sed 's|,||g')
     prm="AES128/${YELLOW}$(echo $cphrs | tr ' ' '/' | sed 's|/AES|${GREEN}/AES|')" 
-    reade -Q 'GREEN' -i 'AES128' -p "Algorithm? [$prm]: " "$cphrs" algo
+    reade -Q 'GREEN' -i "AES128 $cphrs" -p "Algorithm? [$prm]: "  algo
     if test $algo == '3DES' || test $algo == 'IDEA' || test $algo == 'CAST5' || test $algo == 'BLOWFISH'; then
         printf "${red}$algo is an older cipher algorithm${normal}\n" 
-        reade -Q 'YELLOW' -i 'n' -p "Use anyway? [N/y]: " "y" algo_old
+        readyn -n -N 'YELLOW' -p "Use anyway?" algo_old
         if test $algo_old == 'y'; then
             algo=$algo" --allow-old-cipher-algo" 
         else 
@@ -57,13 +57,13 @@ function gpg-encrypt-custom-algo(){
         fi
     fi
 
-    reade -Q 'YELLOW' -i 'n' -p "Readable format (.asc - ASCII)? [N/y]: " "y" asc
+    readyn -n -N 'YELLOW' -p "Readable format (.asc - ASCII)?" asc
     arm=''
     if test $asc == 'y'; then
         arm='--armour'
     fi
 
-    reade -Q 'GREEN' -p "Output (empty - same file/dir + .gpg)?: " "" outpt
+    readyn -Q 'GREEN' -p "Output (empty - same file/dir + .gpg)?: "  outpt
     utpt=''
     if ! test -z $outpt; then
         utpt="--output $outpt.gpg" 
@@ -110,7 +110,7 @@ function receive-mails-csv-file(){
             s='chrome'
             d="[Chrome/firefox]"
         fi
-        reade -Q "GREEN" -i "$s" -p "Chrome or firefox based? $d: " "chrome" based
+        reade -Q "GREEN" -i "$s firefox chrome" -p "Chrome or firefox based? $d: " based
         
         if test $based == 'firefox'; then
             b=$(cat "$file" | tr ',' ' '| awk '{print $2;}')
@@ -145,18 +145,18 @@ function gpg-publish-key() {
     fi 
     if test -z "$2"; then 
         mails=$($GPG $dir --list-keys --list-options show-only-fpr-mbox | awk '{print $2;}')
-        reade -Q "GREEN" -i "' '" -p "Get fingerprints from which mails? (All is option - Separate by spaces and add quotation marks around if using multiple fingerprints): " "all $mails" keyid
+        reade -Q "GREEN" -i "' ' all $mails" -p "Get fingerprints from which mails? (All is option - Separate by spaces and add quotation marks around if using multiple fingerprints): "  keyid
         keyid=$($GPG --list-keys --list-options show-only-fpr-mbox $keyid | awk '{print $1;}' )
     else
         keyid="$2"
     fi
-    reade -Q "GREEN" -i "n" -p "Set keyserver? (Otherwise looks for last defined keyserver in \$GNUPGHOME/.gnupg/gpg.conf) [N/y]: " "y" c_srv
+    readyn -n -N "GREEN" -p "Set keyserver? (Otherwise looks for last defined keyserver in \$GNUPGHOME/.gnupg/gpg.conf)" c_srv
     if test "$c_srv" == "y"; then
         printf "Known keyservers from \$GNUPGHOME/gpg.conf: \n"
         for i in $keyservers_all; do
             printf "\t- ${CYAN}$i${normal}\n"
         done
-        reade -Q "GREEN" -i "' '" -p "Keyserver? (separate by spaces and add quotation marks around if using multiple servers; f.ex. 'keys.openpgp.org keys.mailvelope.com' ): " "all $keyservers_all" serv 
+        reade -Q "GREEN" -i "' ' all $keyservers_all" -p "Keyserver? (separate by spaces and add quotation marks around if using multiple servers; f.ex. 'keys.openpgp.org keys.mailvelope.com' ): " serv 
         if test "$serv" == "all"; then
             for srv in $keyservers_all; do
                 succeeded=0
@@ -164,7 +164,7 @@ function gpg-publish-key() {
                     printf "Trying to send ${bold}${magenta}$srv${normal} fingerprint(s)/keyid(s)\n ${CYAN}$keyid${normal}\n"
                     "$GPG" $dir --verbose --keyserver "$srv" --send-key $keyid  
                     if [[ $? > 0 ]]; then
-                        reade -Q "YELLOW" -i "y" -p "Failed sending key to server. Retry? [Y/n]: " "n" retry 
+                        readyn -Y "YELLOW" -i "y" -p "Failed sending key to server. Retry?" retry 
                         if test $retry == 'n'; then
                             succeeded=1    
                         fi
@@ -181,7 +181,7 @@ function gpg-publish-key() {
                     printf "Trying to send ${bold}${magenta}$s${normal} fingerprint(s)/keyid(s):\n ${CYAN}$keyid${normal}\n"
                     "$GPG" $dir --verbose --keyserver "$s" --send-key $keyid  
                     if [[ $? > 0 ]]; then
-                        reade -Q "YELLOW" -i "y" -p "Failed sending key to server. Retry? [Y/n]: " "n" retry 
+                        readyn -Y "YELLOW" -p "Failed sending key to server. Retry?" retry 
                         if test $retry == 'n'; then
                             succeeded=1    
                         fi
@@ -197,7 +197,7 @@ function gpg-publish-key() {
             printf "Trying to send fingerprint(s)/keyid(s):\n ${CYAN}$keyid${normal}\n"
             "$GPG" $dir --verbose --send-key $keyid  
             if [[ $? > 0 ]]; then
-                reade -Q "YELLOW" -i "y" -p "Failed sending key to server. Retry? [Y/n]: " "n" retry 
+                readyn -Y "YELLOW" -p "Failed sending key to server. Retry?" retry 
                 if test $retry == 'n'; then
                     succeeded=1    
                 fi
@@ -237,31 +237,31 @@ function gpg-get-emails-exported-browserlogins-and-generate-keys(){
 
     default_key=''
     #reade -Q "CYAN" -i "n" -p "Set custom algorithm? (Default \"ed25519/cert,sign+cv25519/encr\") [N/y]: " "y" algo 
-    reade -Q "CYAN" -i "n" -p "Set custom algorithm? (Default Ecc type 'ed25519' for cert,sign and seperate 'cv25519' key for encr) [N/y]: " "y" algo 
+    reade -n -N "CYAN" -p "Set custom algorithm? (Default Ecc type 'ed25519' for cert,sign and seperate 'cv25519' key for encr)" algo 
     
     if test "$algo" == 'y'; then
         printf "Default suggestions GPG defaults\n"
-        reade -Q "GREEN" -i 'ecc' -p "Signing/Certifying key algorithm? (Elliptic-curve/Rivest–Shamir–Adleman/Digital Signature Algorithm) [ecc/rsa/dsa]: " "rsa dsa" pubkey
+        reade -Q "GREEN" -i 'ecc rsa dsa' -p "Signing/Certifying key algorithm? (Elliptic-curve/Rivest–Shamir–Adleman/Digital Signature Algorithm) [ecc/rsa/dsa]: " pubkey
         if test $pubkey == 'rsa' || test $pubkey == 'dsa'; then   
-                reade -Q "GREEN" -i '8192' -p "Set the length (in bits) for the keys. 8192 is given at default because it automatically shifts to the highest amount in bits possible: " "4096 2048 1024" length               
+                reade -Q "GREEN" -i '8192 4096 2048 1024' -p "Set the length (in bits) for the keys. 8192 is given at default because it automatically shifts to the highest amount in bits possible: " length               
                 pubkey="$pubkey$length"
         elif test $pubkey == 'ecc'; then
-            reade -Q "GREEN" -i 'ed25519' -p "What Elliptic-curve cryptography keyalgorithm would you like? [ed25519/ed488/nistp256/nistp384/nistp521/brainpoolP256r1/brainpoolP384r1/brainpoolP512r1/secp256k1]: " "ed488 nistp256 nistp384 nistp521 brainpoolP256r1 brainpoolP384r1 brainpoolP512r1 secp256k1" pubkey
+            reade -Q "GREEN" -i 'ed25519 ed488 nistp256 nistp384 nistp521 brainpoolP256r1 brainpoolP384r1 brainpoolP512r1 secp256k1' -p "What Elliptic-curve cryptography keyalgorithm would you like? [ed25519/ed488/nistp256/nistp384/nistp521/brainpoolP256r1/brainpoolP384r1/brainpoolP512r1/secp256k1]: " pubkey
         fi
 
-        reade -Q "GREEN" -i 'cert,sign' -p "Keyuse: (Default: signing and certification) [cert,sign/cert/sign]: " "cert sign" cert_sign
+        reade -Q "GREEN" -i 'cert,sign cert sign' -p "Keyuse: (Default: signing and certification) [cert,sign/cert/sign]: " cert_sign
 
-        reade -Q "GREEN" -i 'y' -p "Set custom expiration date for primary key? (Default: 3 years) [Y/n]: " "n" exp
+        reade -n -N "GREEN" -p "Set custom expiration date for primary key? (Default: 3 years)" exp
         if test $exp == 'y'; then
             printf "${CYAN}\t - Set expiration to a set date\n\t - Set to date including hours, minutes and seconds\n\t - Set by period valid\n\t - Set to never expire \n\t(f.ex. 25/02/2059 vs 2059-11-13T10:39:35 vs 10y vs never)\n"
-            reade -Q "GREEN" -i 'period' -p "[Period/date-hour/date/never]?: " "date date-hour never" exp
+            reade -Q "GREEN" -i 'period date date-hour never' -p "[Period/date-hour/date/never]?: " exp
             year=$(expr $(date --iso-8601 | tr '-' ' ' |  awk '{print $1}') + 3)
             month=$(date --iso-8601 | tr '-' ' ' |  awk '{print $2}')
             day=$(date --iso-8601 | tr '-' ' ' |  awk '{print $3}')
             if test $exp == 'date'; then
-                reade -Q "GREEN" -i "$year" -p "Year? : " "" year
-                reade -Q "GREEN" -i "$month" -p "Month? : " "" month
-                reade -Q "GREEN" -i "$day" -p "Day? : " "" day
+                reade -Q "GREEN" -i "$year" -p "Year? : " year
+                reade -Q "GREEN" -i "$month" -p "Month? : " month
+                reade -Q "GREEN" -i "$day" -p "Day? : " day
                 if [[ ${#month} < 2 ]]; then
                     month="0$month"
                 fi
@@ -270,12 +270,12 @@ function gpg-get-emails-exported-browserlogins-and-generate-keys(){
                 fi
                 exp="$year-$month-$day"
             elif test $exp == 'date-hour'; then
-                reade -Q "GREEN" -i "$year" -p "Year?: " "" year
-                reade -Q "GREEN" -i "$month" -p "Month?: " "" month
-                reade -Q "GREEN" -i "$day" -p "Day?: " "" day
-                reade -Q "GREEN" -i "00" -p "Hour?: " "" hour
-                reade -Q "GREEN" -i "00" -p "Minute?: " "" minute
-                reade -Q "GREEN" -i "00" -p "Seconds?: " "" seconds
+                reade -Q "GREEN" -i "$year" -p "Year?: " year
+                reade -Q "GREEN" -i "$month" -p "Month?: " month
+                reade -Q "GREEN" -i "$day" -p "Day?: " day
+                reade -Q "GREEN" -i "00" -p "Hour?: " hour
+                reade -Q "GREEN" -i "00" -p "Minute?: " minute
+                reade -Q "GREEN" -i "00" -p "Seconds?: " seconds
                 if [[ ${#month} < 2 ]]; then
                     month="0$month"
                 fi
@@ -293,33 +293,33 @@ function gpg-get-emails-exported-browserlogins-and-generate-keys(){
                 fi
                 exp="$year$month$day""T""$hour$minute$seconds"
             elif test $exp == 'period'; then
-                reade -Q "GREEN" -i "years" -p "Period? [Years/months/weeks/days/seconds]: " "months weeks days seconds" period
-                reade -Q "GREEN" -i "3" -p "Number of $period?: " "" num_period
+                reade -Q "GREEN" -i "years months weeks days seconds" -p "Period? [Years/months/weeks/days/seconds]: " period
+                reade -Q "GREEN" -i "3" -p "Number of $period?: " num_period
                 exp="$num_period$period"
             fi
         fi
 
-        reade -Q "GREEN" -i 'y' -p "Add encryption subkey? (Using a different key for signing/verifying and encryption/decryption is good practice) [Y/n]: " "n" enckeys
+        reade -Q "GREEN" -p "Add encryption subkey? (Using a different key for signing/verifying and encryption/decryption is good practice)" enckeys
         if test $enckeys == 'y' && ! [[ $pubkey =~ 'dsa' ]]; then
-            reade -Q "GREEN" -i 'y' -p "Same algorithm for encryption subkey? [Y/n]: " "n" enckeys
+            reade -Q "GREEN" -p "Same algorithm for encryption subkey?" enckeys
             if test $enckeys == 'n'; then
-                reade -Q "GREEN" -i 'elg' -p "Wich encryption algorithm? [elg (ElGamal - Default)/rsa/ecc(Elliptic-curve cryptography)]: " "rsa ecc" enckey
+                reade -Q "GREEN" -i 'elg rsa ecc' -p "Wich encryption algorithm? [elg (ElGamal - Default)/rsa/ecc(Elliptic-curve cryptography)]: " enckey
                 if test $enckey == 'rsa' || test $enckey == 'elg'; then   
-                    reade -Q "GREEN" -i '8192' -p "Set the length (in bits) for the keys. 8192 is given at default because it automatically shifts to the highest amount in bits possible: " "4096 2048 1024" lengthenc            
+                    reade -Q "GREEN" -i '8192 4096 2048 1024' -p "Set the length (in bits) for the keys. 8192 is given at default because it automatically shifts to the highest amount in bits possible: " lengthenc            
                     enckey="$enckey$lengthenc"
                 elif test $enckey == 'ecc'; then
-                    reade -Q "GREEN" -i 'cv25519' -p "What Elliptic-curve cryptography keyalgorithm would you like? [cv25519/cv488/nistp256/nistp384/nistp521/brainpoolP256r1/brainpoolP384r1/brainpoolP512r1/secp256k1]: " "cv488 nistp256 nistp384 nistp521 brainpoolP256r1 brainpoolP384r1 brainpoolP512r1 secp256k1" enckey
+                    reade -Q "GREEN" -i 'cv25519 cv488 nistp256 nistp384 nistp521 brainpoolP256r1 brainpoolP384r1 brainpoolP512r1 secp256k1' -p "What Elliptic-curve cryptography keyalgorithm would you like? [cv25519/cv488/nistp256/nistp384/nistp521/brainpoolP256r1/brainpoolP384r1/brainpoolP512r1/secp256k1]: " enckey
                 fi   
                 #default_key="$pubkey/cert,sign+$enckey/encr"
             fi
         elif [[ $pubkey =~ 'dsa' ]]; then
             printf "Need a different algorithm for encryption (Dsa is only for signing)\n"
-            reade -Q "GREEN" -i 'elg' -p "Wich encryption algorithm? [elg (ElGamal - Default)/rsa/ecc(Elliptic-curve cryptography)]: " "rsa ecc" enckey
+            reade -Q "GREEN" -i 'elg rsa ecc' -p "Wich encryption algorithm? [elg (ElGamal - Default)/rsa/ecc(Elliptic-curve cryptography)]: " enckey
             if test $enckey == 'rsa' || test $enckey == 'elg'; then   
-                reade -Q "GREEN" -i '8192' -p "Set the length (in bits) for the keys. 8192 is given at default because it automatically shifts to the highest amount in bits possible: " "4096 2048 1024" lengthenc            
+                reade -Q "GREEN" -i '8192 4096 2048 1024' -p "Set the length (in bits) for the keys. 8192 is given at default because it automatically shifts to the highest amount in bits possible: " lengthenc            
                 enckey="$enckey$lengthenc"
             elif test $enckey == 'ecc'; then
-                reade -Q "GREEN" -i 'cv25519' -p "What Elliptic-curve cryptography keyalgorithm would you like? [cv25519/cv488/nistp256/nistp384/nistp521/brainpoolP256r1/brainpoolP384r1/brainpoolP512r1/secp256k1]: " "cv488 nistp256 nistp384 nistp521 brainpoolP256r1 brainpoolP384r1 brainpoolP512r1 secp256k1" enckey
+                reade -Q "GREEN" -i 'cv25519 cv488 nistp256 nistp384 nistp521 brainpoolP256r1 brainpoolP384r1 brainpoolP512r1 secp256k1' -p "What Elliptic-curve cryptography keyalgorithm would you like? [cv25519/cv488/nistp256/nistp384/nistp521/brainpoolP256r1/brainpoolP384r1/brainpoolP512r1/secp256k1]: " enckey
             fi
             #default_key="$pubkey/cert,sign+$enckey/encr"
             #default_key="$pubkey/cert,sign"
@@ -327,7 +327,7 @@ function gpg-get-emails-exported-browserlogins-and-generate-keys(){
             enckey=$(echo $pubkey | sed 's|ed|cv|')
         fi
         
-        reade -Q "GREEN" -i 'y' -p "Set custom expiration date for subkey? (Default: 3 years) [Y/n]: " "n" exp
+        readyn -Q "GREEN" -p "Set custom expiration date for subkey? (Default: 3 years)" exp
         if test $exp == 'y'; then
             printf "${CYAN}\t - Set expiration to a set date\n\t - Set to date including hours, minutes and seconds\n\t - Set by period valid\n\t - Set to never expire \n\t(f.ex. 25/02/2059 vs 2059-11-13T10:39:35 vs 10y vs never)\n"
             reade -Q "GREEN" -i 'date' -p "[Date/Date-hour/period/never]?: " "date-hour period never" exp
@@ -335,9 +335,9 @@ function gpg-get-emails-exported-browserlogins-and-generate-keys(){
             month=$(date --iso-8601 | tr '-' ' ' |  awk '{print $2}')
             day=$(date --iso-8601 | tr '-' ' ' |  awk '{print $3}')
             if test $exp == 'date'; then
-                reade -Q "GREEN" -i "$year" -p "Year? : " "" year
-                reade -Q "GREEN" -i "$month" -p "Month? : " "" month
-                reade -Q "GREEN" -i "$day" -p "Day? : " "" day
+                reade -Q "GREEN" -i "$year" -p "Year? : " year
+                reade -Q "GREEN" -i "$month" -p "Month? : " month
+                reade -Q "GREEN" -i "$day" -p "Day? : " day
                 if [[ ${#month} < 2 ]]; then
                     month="0$month"
                 fi
@@ -346,8 +346,8 @@ function gpg-get-emails-exported-browserlogins-and-generate-keys(){
                 fi
                 exp="$year-$month-$day"
             elif test $exp == 'date-hour'; then
-                reade -Q "GREEN" -i "$year" -p "Year?: " "" year
-                reade -Q "GREEN" -i "$month" -p "Month?: " "" month
+                reade -Q "GREEN" -i "$year" -p "Year?: " year
+                reade -Q "GREEN" -i "$month" -p "Month?: " month
                 reade -Q "GREEN" -i "$day" -p "Day?: " "" day
                 reade -Q "GREEN" -i "00" -p "Hour?: " "" hour
                 reade -Q "GREEN" -i "00" -p "Minute?: " "" minute
@@ -369,14 +369,14 @@ function gpg-get-emails-exported-browserlogins-and-generate-keys(){
                 fi
                 exp="$year$month$day""T""$hour$minute$seconds"
             elif test $exp == 'period'; then
-                reade -Q "GREEN" -i "years" -p "Period? [Years/months/weeks/days/seconds]: " "months weeks days seconds" period
-                reade -Q "GREEN" -i "3" -p "Number of $period?: " "" num_period
+                reade -Q "GREEN" -i "years months weeks days seconds" -p "Period? [Years/months/weeks/days/seconds]: " period
+                reade -Q "GREEN" -i "3" -p "Number of $period?: " num_period
                 exp="$num_period$period"
             fi
         fi
         
     fi
-    reade -Q "YELLOW" -i "n" -p "Never use passwords when generating keys? [N/y]: " 'y' always_no_pw
+    reade -n -N "YELLOW" -p "Never use passwords when generating keys?" always_no_pw
 
     private_mails=$("$GPG" $dir --list-secret-keys | grep --color=never \< | cut -d'<' -f2- | cut -d'>' -f1)
     

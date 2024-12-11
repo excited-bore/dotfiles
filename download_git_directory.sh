@@ -7,7 +7,7 @@ else
 fi
 
 if test -z $1; then
-    reade -Q "GREEN" -p "Give up git directory url: " "" gitdir
+    reade -Q "GREEN" -p "Give up git directory url: " gitdir
 else
     git_url=$1
 fi

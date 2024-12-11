@@ -23,7 +23,7 @@ if ! type update-system &> /dev/null; then
 fi
 
 if test -z $SYSTEM_UPDATED; then
-    reade -Q "CYAN" -i "y" -p "Update system? [Y/n]: " "n" updatesysm
+    readyn -Y "CYAN" -p "Update system?" updatesysm
     if test $updatesysm == "y"; then
         update-system                     
     fi
@@ -87,7 +87,7 @@ fi
 # https://wiki.archlinux.org/title/PipeWire#Sound_does_not_automatically_switch_when_connecting_a_new_device
 if type systemctl &> /dev/null && ! test -f /etc/systemd/user/pipewire-load-switch-on-connect.service; then
     #printf "${CYAN}You should test first whether sounds autoswitches when connected${normal}\n"
-    reade -Q 'GREEN' -i 'y' -p "Create 'USB-audiodevice-autoswitch-on-connect' configuration file? [Y/n]: " 'n' auto_s
+    readyn -p "Create 'USB-audiodevice-autoswitch-on-connect' configuration file?" auto_s
     if test $auto_s == 'y'; then
         mkdir -p ~/.config/pipewire/pipewire-pulse.conf.d/
         conf=~/.config/pipewire/pipewire-pulse.conf.d/switch-on-connect.conf
@@ -145,7 +145,7 @@ fi
 
 if ! test -f $HOME/.config/wireplumber/wireplumber.conf.d/51-dualshock4-disable.conf; then
     mkdir -p ~/.config/wireplumber/wireplumber.conf.d/
-    reade -Q 'GREEN' -i 'y' -p "Unlist dualshock 4 audio sources from pipewire? (prevents usb-autoconnect from triggering) [Y/n]: " 'n' ds4
+    readyn -p "Unlist dualshock 4 audio sources from pipewire? (prevents usb-autoconnect from triggering)" ds4
     if [ -z $ds4 ] || [ "y" == $ds4 ] || [ "y" == $ds4 ]; then
         touch $HOME/.config/wireplumber/wireplumber.conf.d/51-dualshock4-disable.conf   
         printf "monitor.alsa.rules = [
@@ -168,7 +168,7 @@ fi
 if ! test -f $HOME/.config/wireplumber/wireplumber.conf.d/51-disable-suspension.conf; then
     printf "${yellow}Noticeable audio delay or audible pop/crack when starting playback can be caused by ${YELLOW}'node suspension when inactive'\n${normal}"
     printf "${RED}This might also break more then it helps\n${normal}"
-    reade -Q 'YELLOW' -i 'n' -p "Disable node suspension when inactive? [N/y]: " 'y' dis_node
+    readyn -n -p "Disable node suspension when inactive?" dis_node
     if test $dis_node == 'y'; then
         dis_node_f="$HOME/.config/wireplumber/wireplumber.conf.d/51-disable-suspension.conf"  
         touch dis_node_f 
@@ -216,7 +216,7 @@ fi
 
 
 if ! type qwpgraph &> /dev/null; then
-    reade -Q 'GREEN' -i 'y' -p "Install patchbay interface 'qpwgraph'? (create and manage audiostreams) [Y/n]: " 'n' patchb
+    readyn -p "Install patchbay interface 'qpwgraph'? (create and manage audiostreams)" patchb
     if test "$patchb" == 'y'; then
         if test "$distro_base" == 'Arch' || test "$distro_base" == 'Debian'; then
             eval "$pac_ins qpwgraph"
@@ -226,12 +226,13 @@ if ! type qwpgraph &> /dev/null; then
 fi
 
 file=pipewire/.bash_aliases.d/pipewire.sh
-file1=pipewire/.bash_completions.d/pipewire
+file1=pipewire/.bash_completion.d/pipewire
 if ! test -f $file || ! test -f $file1; then
-    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/pipewire/.bash_aliases.d/pipewire.sh
-    tmp1=$(mktemp) && curl -o $tmp1 https://raw.githubusercontent.com/excited-bore/dotfiles/main/pipewire/.bash_completions.d/pipewire
-    file=$tmp
-    file1=$tmp1
+    tmpd=$(mktemp -d)
+     wget -P $tmpd https://raw.githubusercontent.com/excited-bore/dotfiles/main/pipewire/.bash_aliases.d/pipewire.sh
+     wget -P $tmpd https://raw.githubusercontent.com/excited-bore/dotfiles/main/pipewire/.bash_completions.d/pipewire
+    file=$tmpd/pipewire.sh
+    file1=$tmpd/pipewire
 fi
 
 pipewire_r(){ 

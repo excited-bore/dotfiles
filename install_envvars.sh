@@ -43,14 +43,14 @@ environment-variables_r(){
     printf "$prmpt" 
     
     if ! sudo grep -q "~/.environment.env" /root/.profile; then
-        reade -Q 'GREEN' -i 'y' -p "Link .environment.env in ${YELLOW}/root/.profile${GREEN}? [Y/n]: " 'n' prof
+        readyn -p "Link .environment.env in ${YELLOW}/root/.profile${GREEN}?" prof
         if test $prof == 'y'; then
             printf "\n[ -f ~/.environment.env ] && source ~/.environment.env\n\n" | sudo tee -a /root/.profile
         fi
     fi
     if sudo test -f /root/.bash_profile; then
         printf "\n${GREEN}Since file ${cyan}/root/.bash_profile${green} exists, ${cyan}bash${green} won't source ${magenta}/root/.profile${green} natively at login.\n${normal}"
-        reade -Q 'GREEN' -i 'prof' -p "Source $HOME/.profile in $HOME/.bash_profile or source $HOME/.environment.env directly in $HOME/.bash_profile? [Prof/path/none]: " 'path none' bash_prof
+        reade -Q 'GREEN' -i 'prof path none' -p "Source $HOME/.profile in $HOME/.bash_profile or source $HOME/.environment.env directly in $HOME/.bash_profile? [Prof/path/none]: " bash_prof
         if [[ $bash_prof =~ 'prof' ]]; then
             if sudo grep -q '.bashrc' /root/.bash_profile && ! sudo  grep -q "~/.profile" /root/.bash_profile; then
                 sudo sed -i 's|\(\[ -f ~/.bashrc \] && source ~/.bashrc\)|\[ -f \~/.profile \] \&\& source \~/.profile\n\n\1\n|g' /root/.bash_profile
@@ -67,7 +67,7 @@ environment-variables_r(){
             fi
         fi
         if sudo test -f /root/.bashrc && ! sudo grep -q "~/.environment.env" /root/.bashrc; then
-            reade -Q 'GREEN' -i 'y' -p "Source /root/.environment.env in /root/.bashrc? [Y/n]: " 'n' bashrc
+            readyn -Q 'GREEN' -p "Source /root/.environment.env in /root/.bashrc?" bashrc
             if test $bashrc == 'y'; then 
                 if sudo grep -q "[ -f ~/.bash_completion ]" /root/.bashrc; then
                     sudo sed -i 's|\(\[ -f ~/.bash_completion \] \&\& source \~/.bash_completion\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' /root/.bashrc
@@ -103,7 +103,7 @@ environment-variables(){
     printf "$prmpt" 
     
     if ! grep -q "~/.environment.env" ~/.profile; then
-        reade -Q 'GREEN' -i 'y' -p "Link .environment.env in ~/.profile? [Y/n]: " 'n' prof
+        readyn -p "Link .environment.env in ~/.profile?" prof
         if test $prof == 'y'; then
             printf "\n[ -f ~/.environment.env ] && source ~/.environment.env\n\n" >> ~/.profile
         fi
@@ -225,12 +225,12 @@ elif [ "$envvars" == "y" ]; then
     #fi
     
     # TODO: non ugly values
-    reade -Q "GREEN" -i "y" -p "Set LS_COLORS with some predefined values? [Y/n]: " "n" lsclrs
+    readyn -p "Set LS_COLORS with some predefined values?" lsclrs
     if [ "$lsclrs" == "y" ] || [ -z "$lsclrs" ]; then
         sed 's/^#export LS_COLORS/export LS_COLORS/' -i $pathvr
     fi
     
-    reade -Q "GREEN" -i "y" -p "Set PAGER? (Page reader) [Y/n]: " "n" pgr
+    readyn -p "Set PAGER? (Page reader)" pgr
     if [ "$pgr" == "y" ] || [ -z "$pgr" ]; then
         # Uncomment export PAGER=
         sed 's/^#export PAGER=/export PAGER=/' -i $pathvr
@@ -261,7 +261,7 @@ elif [ "$envvars" == "y" ]; then
         fi
         printf "$prmpt${normal}"
         
-        reade -Q "GREEN" -i "less" -p "PAGER(less default)=" "$pagers" pgr2
+        reade -Q "GREEN" -i "less $pagers" -p "PAGER(less default)=" pgr2
         
         pgr2="$(where_cmd $pgr2)"
         sed -i 's|export PAGER=.*|export PAGER='"$pgr2"'|' $pathvr
@@ -296,7 +296,7 @@ elif [ "$envvars" == "y" ]; then
                 prmpt="$prmpt \tnvimpager = The pager that acts and feels like Neovim. Did you guess?\n"
             fi
             printf "$prmpt${normal}"
-            reade -Q "GREEN" -i "less" -p "BAT_PAGER(less default)=" "$pagers" pgr2
+            reade -Q "GREEN" -i "less $pagers" -p "BAT_PAGER(less default)=" pgr2
             pgr2="$(where_cmd $pgr2)"
             [[ "$pgr2" =~ "less" ]] && pgr2="$pgr2 \$LESS --line-numbers"  
             [[ "$pgr2" =~ "moar" ]] && pgr2="$pgr2 \$MOAR --no-linenumbers"  
@@ -307,13 +307,13 @@ elif [ "$envvars" == "y" ]; then
     unset prmpt
     
     if type nvim &> /dev/null; then
-        reade -Q "GREEN" -i "y" -p "Set Neovim as MANPAGER? [Y/n]: " "n" manvim
+        readyn -p "Set Neovim as MANPAGER?" manvim
         if [ "$manvim" == "y" ]; then
            sed -i 's|.export MANPAGER=.*|export MANPAGER='\''nvim +Man!'\''|g' $pathvr 
         fi
     fi
 
-    reade -Q "GREEN" -i "y" -p "Set EDITOR and VISUAL? [Y/n]: " "n" edtvsl
+    readyn -p "Set EDITOR and VISUAL?" edtvsl
     if [ "$edtvsl" == "y" ] || [ -z "$edtvsl" ]; then
         if type vi &> /dev/null; then
             editors="vi $editors"
@@ -368,7 +368,7 @@ elif [ "$envvars" == "y" ]; then
         #frst="$(echo $compedit | awk '{print $1}')"
         #compedit="$(echo $compedit | sed "s/\<$frst\> //g")"
         printf "$prmpt"
-        reade -Q "GREEN" -i "$frst" -p "EDITOR (Terminal - $frst default)=" "$editors_p" edtor
+        reade -Q "GREEN" -i "$frst $editors_p" -p "EDITOR (Terminal - $frst default)="  edtor
         edtor="$(where_cmd $edtor)"
         if [[ "$edtor" =~ "emacs" ]]; then
             edtor="$edtor -nw"
@@ -377,7 +377,7 @@ elif [ "$envvars" == "y" ]; then
         
         # Make .txt file and output file
          
-        reade -Q 'CYAN' -i 'n' -p "Set VISUAL to '\\\\\$EDITOR'? (otherwise set manually again) [N/y]: " 'y' vis_ed
+        ready -N 'CYAN' -n -p "Set VISUAL to '\\\\\$EDITOR'? (otherwise set manually again)" vis_ed
         if test $vis_ed == 'y'; then
             sed -i 's|#export VISUAL=|export VISUAL=|g' $pathvr
             sed -i 's|export VISUAL=.*|export VISUAL=$EDITOR|g' $pathvr
@@ -400,7 +400,7 @@ elif [ "$envvars" == "y" ]; then
         unset vis_ed
 
         if grep -q "#export SUDO_EDITOR" $pathvr; then
-            reade -Q "GREEN" -i "y" -p "Set SUDO_EDITOR to \\\\\$EDITOR? [Y/n]: " "n" sud_edt
+            readyn -p "Set SUDO_EDITOR to \\\\\$EDITOR?" sud_edt
             if test "$sud_edt" == "y"; then
                 sed -i 's|#export SUDO_EDITOR.*|export SUDO_EDITOR=$EDITOR|g' $pathvr
             fi
@@ -409,11 +409,11 @@ elif [ "$envvars" == "y" ]; then
 
         if grep -q "#export SUDO_VISUAL" $pathvr; then
             printf "!! Warning: Certain visual code editors (like ${CYAN}'Visual Studio Code'${normal}) don't work properly when using ${RED}sudo${normal}\nIt might be better to keep using \$EDITOR depending on what \$VISUAL is configured as\n" 
-            reade -Q "GREEN" -i "y" -p "Set SUDO_VISUAL to \\\\\$EDITOR? [Y/n]: " "n" sud_vis
+            readyn -p "Set SUDO_VISUAL to \\\\\$EDITOR?" sud_vis
             if test "$sud_vis" == "y"; then
                 sed -i 's|#export SUDO_VISUAL.*|export SUDO_VISUAL=$EDITOR|g' $pathvr
             else 
-                reade -Q "GREEN" -i "y" -p "Set SUDO_VISUAL to \\\\\$VISUAL? [Y/n]: " "n" sud_edt
+                readyn -p "Set SUDO_VISUAL to \\\\\$VISUAL?" sud_edt
                 if test "$sud_vis" == "y"; then
                     sed -i 's|#export SUDO_VISUAL.*|export SUDO_VISUAL=$VISUAL|g' $pathvr
                 fi     
@@ -425,7 +425,7 @@ elif [ "$envvars" == "y" ]; then
             echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for 'Defaults env_keep += \"PAGER\"' in /etc/sudoers"
             if ! sudo grep -q "Defaults env_keep += \"PAGER\"" /etc/sudoers; then
                 printf "${bold}${yellow}Sudo by default does not respect the user's PAGER environment. If you were to want to use a custom pager with sudo (except with ${cyan}systemctl/journalctl${bold}${yellow}, more on that later) you would need to always pass your environment using 'sudo -E'\n${normal}"
-                reade -Q "YELLOW" -i "y" -p "Change this behaviour permanently in /etc/sudoers? [Y/n]: " "n" sudrs
+                ready -Y 'YELLOW' -p "Change this behaviour permanently in /etc/sudoers?" sudrs
                 if test "$sudrs" == "y"; then
                     sudo sed -i '1s/^/Defaults env_keep += "PAGER SYSTEMD_PAGERSECURE"\n/' /etc/sudoers
                     echo "Added ${RED}'Defaults env_keep += \"PAGER SYSTEMD_PAGERSECURE\"'${normal} to /etc/sudoers"
@@ -494,7 +494,7 @@ elif [ "$envvars" == "y" ]; then
         - XDG_DATA_DIRS=/usr/local/share/:/usr/share\n\
         - XDG_STATE_HOME=$HOME/.local/state\n"
         printf "$prmpt${normal}"
-        reade -Q "GREEN" -i "y" -p "Set XDG environment? [Y/n]: " "n" xdgInst
+        readyn -p "Set XDG environment?" xdgInst
         if [ -z "$xdgInst" ] || [ "y" == "$xdgInst" ]; then
             sed 's/^#export XDG_CACHE_HOME=\(.*\)/export XDG_CACHE_HOME=\1/' -i $pathvr 
             sed 's/^#export XDG_CONFIG_HOME=\(.*\)/export XDG_CONFIG_HOME=\1/' -i $pathvr
@@ -513,14 +513,14 @@ elif [ "$envvars" == "y" ]; then
     if type systemctl &> /dev/null; then
         pageSec=1
         printf "${cyan}Systemd comes preinstalled with ${GREEN}SYSTEMD_PAGERSECURE=1${normal}.\n This means any pager without a 'secure mode' cant be used for ${CYAN}systemctl/journalctl${normal}.\n(Features that are fairly obscure and mostly less-specific in the first place -\n No editing (v), no examining (:e), no pipeing (|)...)\n It's an understandable concern to be better safe and sound, but this does constrain the user to ${CYAN}only using less.${normal}\n"
-        reade -Q "YELLOW" -i "y" -p "${yellow}Set SYSTEMD_PAGERSECURE to 0? [Y/n]: " "n" page_sec
+        reade -Q "YELLOW" -i "y" -p "${yellow}Set SYSTEMD_PAGERSECURE to 0? "" page_sec
         if test "$page_sec" == "y"; then
             pageSec=0 
             if test -f /etc/sudoers; then 
                 echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for 'Defaults env_keep += \"SYSTEMD_PAGERSECURE\"' in /etc/sudoers"
                 if ! sudo grep -q "Defaults env_keep += \"SYSTEMD_PAGERSECURE\"" /etc/sudoers; then
                     printf "${bold}${yellow}Sudo won't respect the user's SYSTEMD_PAGERSECURE environment. If you were to want to keep your userdefined less options or use a custom pager when using sudo with ${cyan}systemctl/journalctl${bold}${yellow}, you would need to always pass your environment using 'sudo -E'\n${normal}"
-                    reade -Q "YELLOW" -i "y" -p "Change this behaviour permanently in /etc/sudoers? [Y/n]: " "n" sudrs
+                    reade -Q "YELLOW" -i "y" -p "Change this behaviour permanently in /etc/sudoers? "" sudrs
                     if test "$sudrs" == "y"; then
                         sudo sed -i '1s/^/Defaults env_keep += "SYSTEMD_PAGERSECURE"\n/' /etc/sudoers
                         echo "Added ${RED}'Defaults env_keep += \"SYSTEMD_PAGERSECURE\"'${normal} to /etc/sudoers"
@@ -542,7 +542,7 @@ elif [ "$envvars" == "y" ]; then
         - SYSTEMD_LOG_TID=\"true\"\n\
         - SYSTEMD_LOG_TARGET=\"auto\"\n"
         printf "$prmpt${normal}"
-        reade -Q "YELLOW" -i "y" -p "Set systemd environment? [Y/n]: " "n" xdgInst
+        reade -Q "YELLOW" -i "y" -p "Set systemd environment? "" xdgInst
         if [ -z "$xdgInst" ] || [ "y" == "$xdgInst" ]; then
             sed 's/^#export SYSTEMD_PAGER=\(.*\)/export SYSTEMD_PAGER=\1/' -i $pathvr 
             if test "$pageSec" == 0; then

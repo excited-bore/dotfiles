@@ -31,27 +31,27 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
         plst_frm=''
         rror='' 
 
-    reade -Q 'GREEN' -i 'n' -p 'Download playlist if url directs to one? [N/y]: ' 'y' plslt
+        readyn -n -N 'GREEN' -p 'Download playlist if url directs to one?' plslt
         if test $plslt == 'y' ; then
             playlist="--yes-playlist"
-            reade -Q 'cyan' -i '' -p 'Start playlist? (In numbers, leave empty will start here): ' '' start
+            reade -Q 'cyan' -i '' -p 'Start playlist? (In numbers, leave empty will start here): ' start
             if [ ! -z "$start" ]; then
                 start=" --playlist-start $start";
             fi
-            reade -Q 'cyan' -i '' -p 'End playlist? (In numbers, leave empty will download until end): ' '' end
+            reade -Q 'cyan' -i '' -p 'End playlist? (In numbers, leave empty will download until end): ' end
             if [ ! -z "$end" ]; then
                 end=" --playlist-end $end";
             fi
 
-            reade -Q "green" -i "y" -p "Give each videotitle the index according how it's ordered in the playlist? (f.ex. '4) Lofi Mix.mp3') [Y/n]: " "n" plst_rank
+            readyn -Y "green" -p "Give each videotitle the index according how it's ordered in the playlist? (f.ex. '4) Lofi Mix.mp3')" plst_rank
             if test "$plst_rank" == "y"; then
                 plst_frm="%(playlist_index)s - %(title)s.%(ext)s"
             fi
             
-            reade -Q "green" -i "3" -p "How many errors for a video in list is skipped? : " "1 2 4 5 6 7 8 9 10" rror
+            reade -Q "green" -i "3 1 2 4 5 6 7 8 9 10" -p "How many errors for a video in list is skipped?: " rror
             rror=" --skip-playlist-after-error $rror"
 
-            reade -Q "green" -i "y" -p "Make directory using playlist name and put songs in said dir? [Y/n]: " "n" plst_dir
+            readyn -Q "green" -p "Make directory using playlist name and put songs in said dir?" plst_dir
             if test "$plst_dir" == "y"; then
                 if ! test -z $plst_rank; then
                     plst_frm="%(playlist)s/%(playlist_index)s - %(title)s.%(ext)s"
@@ -69,16 +69,16 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
         format_cap=""
         format_all=""
 
-        reade -Q 'CYAN' -i 'n' -p 'Audio only? [N/y]: ' 'y' aud_only
+        readyn -n -N 'CYAN' -p 'Audio only?:' aud_only
         if test $aud_only == 'y'; then
-            reade -Q "green" -i "best" -p "Audio Format? [Best(default)/mp3/opus/aac/alac/flac/m4a/vorbis/wav]: " "mp3 opus aac alac flac m4a  vorbis wav" format
+            reade -Q "green" -i "best mp3 opus aac alac flac m4a vorbis wav" -p "Audio Format? [Best(default)/mp3/opus/aac/alac/flac/m4a/vorbis/wav]: " format
             if test "$format" == 'best'; then
                 format='-x'
             else
                 format="-x --audio-format $format"
             fi
         else
-            reade -Q "green" -i "best" -p "Video Format? [Best(default)/mp4/mkv/avi/flv/gif/mov/mp4/webm/aac/aiff/alac/flac/m4a/mka/mp3/ogg/opus/vorbis/wav]: " "mp4 mkv avi flv gif mov webm aac aiff alac flac m4a mka mp3 ogg opus vorbis wav" format
+            reade -Q "green" -i "best mp4 mkv avi flv gif mov webm aac aiff alac flac m4a mka mp3 ogg opus vorbis wav" -p "Video Format? [Best(default)/mp4/mkv/avi/flv/gif/mov/mp4/webm/aac/aiff/alac/flac/m4a/mka/mp3/ogg/opus/vorbis/wav]: " format
             if ! test $format == 'best'; then
                 format=" --recode-video $format"
             else
@@ -86,7 +86,7 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
             fi
         fi
 
-        reade -Q "GREEN" -i "y" -p "Include subtitles and auto captions? [Y(Both)/n/sub/cap]: " "n sub cap" sub_cap
+        reade -Q "GREEN" -i "y n sub cap" -p "Include subtitles and auto captions? [Y(Both)/n/sub/cap]: " sub_cap
 
         if test "$sub_cap" == 'y' || test "$sub_cap" == 'sub' || test "$sub_cap" == 'cap' ; then
             sub=''
@@ -113,7 +113,7 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
                     echo 'No subtitles available for this video'
                     format_sub=''
                 else 
-                    reade -Q "CYAN" -i "n" -p "Set subtitle format? [N/y]: " "y" format_sub
+                    readyn -n -N "CYAN" -p "Set subtitle format?" format_sub
                     if test "$format_sub" == 'y'; then
                         sub_langs=$(echo "$sub_list" | awk 'NR>1{print $1;}' | sed '/live_chat/d')
                         frst_frm=$(echo $subs | awk '{print $1}')
@@ -122,24 +122,24 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
                         frm_pre=$(echo "$subs" | tr '\n' ' ' | tr -s ' ' | tr ' ' '/' | sed 's/.$//')
                         echo "$sub_list"
                         if ! test -z "$sub_langs"; then
-                            reade -Q "cyan" -i "all" -p "Languages?: " "$sub_langs" lang
+                            readyn -Q "cyan" -i "all $sub_langs" -p "Languages?: " lang
                             if ! test -z $lang; then
                                 lang="$sub_lang $lang"
                             fi
                         fi
                         if ! test -z "$sub_langs"; then
-                            reade -Q "cyan" -i "$frst_frm" -p "Format [$frst_frm_p/$frm_pre]: " "$subs" format
+                            reade -Q "cyan" -i "$frst_frm $subs" -p "Format [$frst_frm_p/$frm_pre]: " format
                             format_sub="--sub-format $format"
                         fi
                         live_chat=""
                         if [[ $yt_dl =~ 'yt-dlp' ]] && [[ "$sub_list" =~ 'live_chat' ]]; then 
                             if test "$subs" == 'all'; then
-                                reade -Q 'cyan' -i 'n' -p 'Subtitles include live chat. Explicitly exclude from subtitles? [N/y]: ' "y" live_chat_no
+                                readyn -y 'cyan' -p 'Subtitles include live chat. Explicitly exclude from subtitles?' live_chat_no
                                 if test "$live_chat_no" == 'y'; then
                                     live_chat="--compat-options no-live-chat"
                                 fi
                             else
-                                reade -Q 'cyan' -i 'n' -p 'Subtitles include live chat. Write subtitles for? [N/y]: ' "y" live_chat
+                                readyn -n -N 'cyan' -p 'Subtitles include live chat. Write subtitles for?' live_chat
                                 if test "$live_chat" == 'y'; then
                                     if ! test -z "$lang"; then
                                         lang="$lang,live_chat"
@@ -159,7 +159,7 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
                 if test -z "$cap_list" || [[ "$cap_list" =~ 'no auto captions' ]] ; then
                     echo 'No auto captions available for this video'
                 else
-                    reade -Q "CYAN" -i "n" -p "Set auto captions format? [N/y]: " "y" sub_auto
+                    readyn -n -N "CYAN" -p "Set auto captions format?" sub_auto
                     if test $sub_auto == 'y'; then
                         [[ $yt_dl =~ 'yt_dlp' ]] && sub_auto=" --write-auto-subs" || sub_auto=" --write-auto-sub" 
                         format_sub=''
@@ -170,9 +170,9 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
                         cap_frm_p=$(echo "$cap_frm" | tr '\n' ' ' | tr -s ' ' | tr ' ' '/' | sed 's/.$//')
                         eval 'echo "$cap_list"'" $less_"
                         if ! test -z "$cap_langs" ; then
-                            reade -Q "cyan" -i "all" -p "Languages?: " "$cap_langs" caplang
+                            reade -Q "cyan" -i "all $cap_langs" -p "Languages?: "  caplang
                             cap_lang="$sub_lang $caplang"
-                            reade -Q "cyan" -i "$frst_frm" -p "Format [$frst_frm_p/$cap_frm_p]: " "$cap_frm" format_cap
+                            reade -Q "cyan" -i "$frst_frm $cap_frm" -p "Format [$frst_frm_p/$cap_frm_p]: " format_cap
                             format_cap="--sub-format $format_cap"
                         else
                             format_cap=''
@@ -187,7 +187,7 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
             # https://stackoverflow.com/questions/17988756/how-to-select-lines-between-two-marker-patterns-which-may-occur-multiple-times-w
         fi
         
-        reade -Q "magenta" -i "n" -p "Set ${bold}minimum${normal}${magenta} resolution? (Will always try to the get best available by default) [N/y]: " "y" min_res 
+        readyn -n -N "magenta" -p "Set ${bold}minimum${normal}${magenta} resolution? (Will always try to the get best available by default)" min_res 
         if test $min_res == 'y'; then
             echo 'Fetching available formats'
             eval "$yt_dl --color always --list-formats $url | awk '/\[info\]/,EOF' $less_"   
@@ -337,5 +337,4 @@ if test -z "$yt_dl" && type yt-dlp &> /dev/null || type youtube-dl &> /dev/null;
     #}
     #alias youtube-download-playlist-dir="yt-dl-playlist-yt-dl-playlist-audio-only-dir"
 fi
-
 

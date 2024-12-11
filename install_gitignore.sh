@@ -18,7 +18,7 @@ if [ "$1" == 'local' ] || [ 'global' == "$1" ]; then
     git clone https://github.com/github/gitignore $gitignd/gitignore
     globl="$1"
 else
-    reade -Q "GREEN" -i "y" -p "Download template gitignores, choose and install? [Y/n]: " "n" gitgn 
+    readyn -p "Download template gitignores, choose and install?" gitgn 
     if [ "y" == "$gitgn" ]; then
         git clone https://github.com/github/gitignore $gitignd/gitignore
         reade -Q "GREEN" -i "local" -p "Install globally or locally? ( ./ vs ~/.config/git/ignore ) [Local/global]: " "global local" globl
@@ -55,7 +55,7 @@ else
             unset gitign
         else
             comp="AllGlobal Toggle Stop $(ls *.gitignore)"
-            reade -Q "CYAN" -p "Which templates need to be installed? ( 'AllGlobal', 'Toggle' to switch between global and case specific temps and Ctrl-C / 'Stop' to abort): " "$comp"  gitign
+            reade -Q "CYAN" -i "$comp" -p "Which templates need to be installed? ( 'AllGlobal', 'Toggle' to switch between global and case specific temps and Ctrl-C / 'Stop' to abort): "  gitign
             if [ -f "$gitign" ]; then
                 printf "\n\n#\n# $(basename ${gitign})\n#\n\n\n" | tr 'a-z' 'A-Z' >> "$ignfl"
                 unalias cat

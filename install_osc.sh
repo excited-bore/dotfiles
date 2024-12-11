@@ -21,14 +21,14 @@ if ! type update-system &> /dev/null; then
 fi
 
 if test -z $SYSTEM_UPDATED; then
-    reade -Q "CYAN" -i "y" -p "Update system? [Y/n]: " "n" updatesysm
+    readyn -Y "CYAN" -p "Update system?" updatesysm
     if test $updatesysm == "y"; then
         update-system                     
     fi
 fi
 
 if ! type go &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Installer uses go. Install? [Y/n]: " "n" go
+    readyn -p "Installer uses go. Install?" go
     if [ "y" == "$go" ]; then
         if ! test -f install_go.sh; then
              eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_go.sh)" 
@@ -40,7 +40,7 @@ if ! type go &> /dev/null; then
 fi
 
 #if [ -z "$GOPATH" ]; then
-#    reade -Q "GREEN" -i "y" -p "Installer uses go. In order to use go commandline tools, go binaries need to be sourced globally. Set GOPATH? [Y/n]: " "n" gopth
+#    readyn -p "Installer uses go. In order to use go commandline tools, go binaries need to be sourced globally. Set GOPATH?" gopth
 #    if [ "y" == "$gopth" ];  then
 #        
 #        reade -Q "CYAN" -i "$HOME/.local" -p "Set GOPATH (go packages): " -e gopth

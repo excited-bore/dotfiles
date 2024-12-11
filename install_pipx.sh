@@ -15,7 +15,7 @@ if ! type update-system &> /dev/null; then
 fi
 
 if test -z $SYSTEM_UPDATED; then
-    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "n" updatesysm
+    readyn -Y "CYAN" -p "Update system?" updatesysm
     if test $updatesysm == "y"; then
         update-system                     
     fi
@@ -23,7 +23,7 @@ fi
 
 
 if ! type pipx &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Install pipx? (for installing packages outside of virtual environments) [Y/n]: " "n" insppx
+    readyn -p "Install pipx? (for installing packages outside of virtual environments)" insppx
     if test $insppx == "y"; then
         upg_pipx='n' 
         if test $machine == 'Mac' && type brew &> /dev/null; then
@@ -66,7 +66,7 @@ if ! type pipx &> /dev/null; then
         source ~/.bashrc 
 
         if ! test $machine == 'Windows'; then 
-            reade -Q "GREEN" -i "y" -p "Set to install packages globally (including for root)? [Y/n]: " "n" insppxgl
+            readyn -p "Set to install packages globally (including for root)?" insppxgl
             if test $insppxgl == "y"; then 
                 if test $upg_pipx == 'y'; then 
                     sudo $HOME/.local/bin/pipx --global ensurepath
@@ -77,7 +77,7 @@ if ! type pipx &> /dev/null; then
         fi 
         
         if ! type activate-global-python-argcomplete &> /dev/null; then
-            reade -Q "GREEN" -i "y" -p "Install argcomplete with pipx? (autocompletion for python scripts) [Y/n]: " "n" pycomp
+            readyn -p "Install argcomplete with pipx? (autocompletion for python scripts)" pycomp
             if test $pycomp == 'y'; then
                 if test $upg_pipx == 'y'; then
                     $HOME/.local/bin/pipx install argcomplete

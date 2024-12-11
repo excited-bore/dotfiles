@@ -20,7 +20,7 @@ echo
 echo
 readecomp=($(sudo blkid | awk 'BEGIN { FS = ":" };{print $1;}' | grep -v 'loop' | tac))
 drives="${readecomp[@]}"
-reade -Q "GREEN" -i "/dev/" -p "Choose drive to mount: " "$drives" drive
+reade -Q "GREEN" -i "/dev/ $drives" -p "Choose drive to mount: "  drive
 reade -Q "GREEN" -i "/mnt" -p "Mount point? (will make if not exists): " -e mnt
 if [ ! -d $mnt ]; then
     sudo mkdir -p $mnt
@@ -41,13 +41,13 @@ else
 fi
 
 if test "$type_fs" == "ext4"; then
-    reade -Q "GREEN" -i "y" -p "Set permissions for $mnt to $USER:$USER using 'sudo chown -R'?: " chown_stff
+    readyn -p "Set permissions for $mnt to $USER:$USER using 'sudo chown -R'?: " chown_stff
     if test "$chown_stff" == "y"; then
         sudo chown -R $USER:$USER $mnt
     fi
 fi
 
-reade -Q 'YELLOW' -i 'y' -p "Will write \"$uuid $mnt $type_fs $attr\" to /etc/fstab. Ok? [Y/n]: " 'n' ok
+readyn -Y 'YELLOW' -p "Will write \"$uuid $mnt $type_fs $attr\" to /etc/fstab. Ok?" ok
 if [ -z $ok ] || [ $ok == "y" ]; then
    echo "$uuid $mnt $type_fs $attr" | sudo tee -a /etc/fstab 
 fi

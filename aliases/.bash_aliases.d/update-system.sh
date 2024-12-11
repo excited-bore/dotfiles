@@ -1,26 +1,37 @@
-if ! type reade &> /dev/null; then
-    if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
-    else
-        . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
-    fi
-fi
+#!/bin/bash
 
-if test -z "$distro"; then 
-    if ! test -f checks/check_system.sh; then
-         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
-    else
-        . ./checks/check_system.sh
-    fi
-fi
+if ! type reade &> /dev/null && test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh; then
+    . ~/.bash_aliases.d/00-rlwrap_scripts.sh
+fi 
 
-if type pamac &> /dev/null && grep -q '#EnableAUR' /etc/pamac.conf; then
-    if ! test -f checks/clheck_pamac.sh; then
-         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pamac.sh)" 
-    else
-        . ./checks/check_pamac.sh
-    fi
-fi
+
+#if ! type reade &> /dev/null; then
+#    if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
+#        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
+#    elif test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh~/.bash_aliases.d/00-rlwrap_scripts.sh; then
+#       source ~/.bash_aliases.d/00-rlwrap_scripts.sh
+#    else
+#        . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
+#    
+#    fi
+#fi
+##
+
+#if test -z "$distro"; then 
+#    if ! test -f checks/check_system.sh; then
+#         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
+#    else
+#        . ./checks/check_system.sh
+#    fi
+#fi
+#
+#if type pamac &> /dev/null && grep -q '#EnableAUR' /etc/pamac.conf; then
+#    if ! test -f checks/clheck_pamac.sh; then
+#         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pamac.sh)" 
+#    else
+#        . ./checks/check_pamac.sh
+#    fi
+#fi
 
 # https://www.explainxkcd.com/wiki/index.php/1654:_Universal_Install_Script
 function update-system() {
@@ -89,7 +100,7 @@ function update-system() {
         done
          
     if type timedatectl &> /dev/null && ! test "$(timedatectl show | grep ^NTP | head -n 1 | awk 'BEGIN { FS = "=" } ; {print $2}')" == "yes"; then 
-        reade -Q "GREEN" -i "y" -p "Timedate NTP not set (Automatic timesync). This can cause issues with syncing to repositories. Activate it? [Y/n]: " "n" set_ntp
+        readyn -p "Timedate NTP not set (Automatic timesync). This can cause issues with syncing to repositories. Activate it?" set_ntp
         if [ "$set_ntp" == "y" ]; then
             timedatectl set-ntp true
             timedatectl status
@@ -98,7 +109,7 @@ function update-system() {
 
     if test $machine == 'Mac' && ! type brew &> /dev/null; then
         printf "${GREEN}Homebrew is a commandline package manager (like the Appstore) that works as an opensource alternative to the Appstore\nGui applications are available for it as well\n${normal}"
-        reade -Q 'CYAN' -i 'y' -p 'Install brew? [Y/n]: ' 'n' brew
+        readyn -y 'CYAN' -p 'Install brew?' brew
         if test $brew == 'y'; then
             if ! test -f install_brew.sh; then
                  eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_brew.sh)" 
@@ -108,7 +119,7 @@ function update-system() {
         fi
     elif test $machine == 'Windows' && test $win_bash_shell == 'Git' && ! test -d "/c/cygwin$ARCH_WIN" && ! test -d '/c/git-sdk-32' && ! type wsl &> /dev/null; then
         printf "${GREEN}Git bash is an environment without a package manager.\n\t - Cygwin is a collection of UNIX related tools (with a pm if you install 'apt-cyg')\n\t- Git SDK for windows comes with pacman (arch package manager)\n${normal}"
-        reade -Q 'CYAN' -i 'wsl' -p 'Install WSL, git SDK, Cygwin? [Wsl/sdk/cyg/n]: ' 'sdk cyg n' cyg
+        reade -Q 'CYAN' -i 'wsl sdk cyg n' -p 'Install WSL, git SDK, Cygwin? [Wsl/sdk/cyg/n]: ' cyg
         if test $cyg == 'cyg'; then
             if ! test -f install_cygwin.sh; then
                  eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cygwin.sh)" 
@@ -133,6 +144,7 @@ function update-system() {
     echo "This next $(tput setaf 1)sudo$(tput sgr0) will try to update the packages for your system using the package managers it knows";
 
     if test $machine == 'Mac'; then
+        echo "This next $(tput setaf 1)sudo$(tput sgr0) will try to update the packages for your system using the package managers it knows";
         pac=softwareupdate
         sudo softwareupdate -i -a
         if type brew &> /dev/null; then
@@ -153,18 +165,19 @@ function update-system() {
         fi
         hdrs="linux-headers-$(uname -r)"
         if test -z "$(apt list --installed 2> /dev/null | grep $hdrs)"; then
-            reade -Q "GREEN" -i "y" -p "Right linux headers not installed. Install $hdrs? [Y/n]: " "n" hdrs_ins
+            readyn -p "Right linux headers not installed. Install $hdrs?" hdrs_ins
             if [ "$hdrs_ins" == "y" ]; then
                 ${pac_ins} "$hdrs"
             fi
         fi
+        echo "This next $(tput setaf 1)sudo$(tput sgr0) will try to update the packages for your system using the package managers it knows";
         if ! test -z "$YES"; then 
-            sudo "$pac" upgrade -y
+            sudo ${pac} upgrade -y
         else 
-            sudo "$pac" upgrade 
+            sudo ${pac} upgrade 
         fi
         if apt --dry-run autoremove 2> /dev/null | grep -Po '^Remv \K[^ ]+'; then
-            reade -Q 'GREEN' -i 'y' -p 'Autoremove unneccesary packages? [Y/n]: '  'n' remove
+            readyn -p 'Autoremove unneccesary packages?' remove
             if test $remove == 'y'; then
                 if ! test -z "$YES"; then 
                     sudo "$pac" autoremove -y
@@ -189,21 +202,32 @@ function update-system() {
                 ${pac_up}
             fi
         fi
-        hdrs="$(echo $(uname -r) | cut -d. -f-2)"
+        local hdrs="$(echo $(uname -r) | cut -d. -f-2)"
         hdrs="linux${hdrs//"."}-headers"
         if test -z "$(pacman -Q $hdrs)"; then
-            reade -Q "GREEN" -i "y" -p "Right linux headers not installed. Install $hdrs? [Y/n]: " "n" hdrs_ins
+            readyn -p "Right linux headers not installed. Install $hdrs?" hdrs_ins
             if [ "$hdrs_ins" == "y" ]; then
                 ${pac_ins} "$hdrs"
             fi
         fi
-        
-        readyn $YES -p 'Clean unnessecary (orphan) packages?' cachcln
+       
+        local auto=''
+        ! test -z $YES && auto='--auto '
+
+        readyn $auto -p 'Clean unnessecary (orphan) packages?' cachcln
         if test $cachcln == 'y'; then
             if ! test -z "$AUR_clean"; then
-                ${AUR_clean}
+                if ! test "$YES"; then 
+                    yes | ${AUR_clean}
+                else
+                    ${AUR_clean}
+                fi
             else
-                ${pac_clean}
+                if ! test "$YES"; then 
+                    yes | ${pac_clean}  
+                else
+                    ${pac_clean}
+                fi
             fi
         fi
         unset cachcln 
@@ -212,16 +236,18 @@ function update-system() {
         continue
     # https://en.opensuse.org/System_Updates
     elif test "$pac" == "zypper_leap"; then
+        echo "This next $(tput setaf 1)sudo$(tput sgr0) will try to update the packages for your system using the package managers it knows";
         if ! test -z "$YES"; then 
             yes | sudo zypper up
         else
             sudo zypper up
         fi
     elif test "$pac" == "zypper_tumble"; then
+        echo "This next $(tput setaf 1)sudo$(tput sgr0) will try to update the packages for your system using the package managers it knows";
         if ! test -z "$YES"; then 
             yes | sudo zypper dup
         else
-            yes | sudo zypper dup
+            sudo zypper dup
         fi
 
     elif test "$pac" == "yum"; then
@@ -251,7 +277,7 @@ function update-system() {
     fi
 
     if ! test -z "$YES"; then
-        YES="-y n" 
+        YES="--auto" 
     fi
 
     if type nix-env &> /dev/null; then
@@ -282,7 +308,7 @@ function update-system() {
         if [ "$dev_up" == "y" ]; then
             
             if type pipx &> /dev/null; then
-                reade -Q "magenta" -i "y" -p "Update pipx? (Python standalone packages) [Y/n]: " "n" pipx_up
+                readyn -Y "MAGENTA" -p "Update pipx? (Python standalone packages)" pipx_up
                 if [ "$pipx_up" == "y" ]; then
                     pipx upgrade-all
                 fi
@@ -296,7 +322,7 @@ function update-system() {
                 #fi
                 #unset npm_up
 
-                reade -Q "magenta" -i "y" -p "${normal}Update ${red}${bold}global${normal}${magenta1} npm packages? (Javascript) [Y/n]: " "n" npm_up
+                readyn -Y "magenta" -p "${normal}Update ${red}${bold}global${normal}${magenta1} npm packages? (Javascript)" npm_up
                 if [ "$npm_up" == "y" ]; then
                     echo "This next $(tput setaf 1)sudo$(tput sgr0) will update using 'sudo npm -g update'";
                     sudo npm -g update
@@ -306,10 +332,10 @@ function update-system() {
             fi
             
             if type cargo &> /dev/null; then
-                reade -q "magenta" -i "y" -p "update cargo (rust)? [y/n]: " "n" cargo_up
+                readyn -Y "magenta" -p "Update cargo (rust)?"  cargo_up
                 if [ "$cargo_up" == "y" ]; then
                     if test -z "$(cargo --list | grep install-update)"; then
-                        reade -Q "MAGENTA" -i "y" -p "To update cargo packages, 'cargo-update' needs to be installed first. Install? [Y/n]: " "n" carg_ins
+                        readyn -Y "MAGENTA" -p "To update cargo packages, 'cargo-update' needs to be installed first. Install?" carg_ins
                         if [ "$carg_ins" == "y" ]; then
                             cargo install cargo-update
                         fi
@@ -323,7 +349,7 @@ function update-system() {
             fi
 
             if type gem &> /dev/null; then
-                reade -Q "magenta" -i "y" -p "Update local gems? (Ruby-on-rails) [Y/n]: " "n" gem_up
+                readyn -Y "magenta" -p "Update local gems? (Ruby-on-rails)" gem_up
                 if [ "$gem_up" == "y" ]; then
                     gem update 
                 fi

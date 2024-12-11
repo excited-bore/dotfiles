@@ -13,7 +13,7 @@ if ! type update-system &> /dev/null; then
 fi
 
 if test -z $SYSTEM_UPDATED; then
-    reade -Q "CYAN" -i "y" -p "Update system? [Y/n]: " "n" updatesysm
+    readyn -Y "CYAN" -p "Update system?" updatesysm
     if test $updatesysm == "y"; then
         update-system                     
     fi
@@ -57,7 +57,7 @@ if ! type nvimpager &> /dev/null; then
     )
 fi
 
-reade -Q 'GREEN' -i 'y' -p 'Copy configuration from ~/.config/nvim/ to ~/.config/nvimpager/ ? [Y/n]: ' "n" conf
+readyn -p 'Copy configuration from ~/.config/nvim/ to ~/.config/nvimpager/ ?' conf
 if test "$conf" == "y"; then
     if ! test -d ~/.config/nvimpager; then
         mkdir ~/.config/nvimpager
@@ -65,7 +65,7 @@ if test "$conf" == "y"; then
     cp -fv ~/.config/nvim/* ~/.config/nvimpager/ 
 fi
 
-reade -Q "GREEN" -i "y" -p "Set nvimpager as default pager for $USER? [Y/n]: " "n" moar_usr
+readyn -p "Set nvimpager as default pager for $USER?" moar_usr
 if [ -z "$moar_usr" ] || [ "y" == "$moar_usr" ] || [ "Y" == "$moar_usr" ]; then
     if grep -q "PAGER" $ENVVAR; then 
         sed -i "s|.export PAGER=|export PAGER=|g" $ENVVAR
@@ -75,7 +75,7 @@ if [ -z "$moar_usr" ] || [ "y" == "$moar_usr" ] || [ "Y" == "$moar_usr" ]; then
     fi
 fi
     
-reade -Q "YELLOW" -i "y" -p "Set nvimpager default pager for root? [Y/n]: " "n" moar_root
+readyn -Y 'YELLOW' -p "Set nvimpager default pager for root?" moar_root
 if [ -z "$moar_root" ] || [ "y" == "$moar_root" ] || [ "Y" == "$moar_root" ]; then
     if sudo grep -q "PAGER" $ENVVAR_R; then
         sudo sed -i "s|.export PAGER=|export PAGER=|g" $ENVVAR_R

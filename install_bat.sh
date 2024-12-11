@@ -19,7 +19,7 @@ if ! type update-system &> /dev/null; then
 fi
 
 if test -z $SYSTEM_UPDATED; then
-    reade -Q "CYAN" -i "n" -p "Update system? [Y/n]: " "n" updatesysm
+    readyn -Y "CYAN" -p "Update system?" updatesysm
     if test $updatesysm == "y"; then
         update-system                     
     fi
@@ -38,7 +38,7 @@ if ! type bat &> /dev/null; then
 fi 
 
 if ! type batdiff &> /dev/null; then 
-    reade -Q "GREEN" -i "y" -p "Install bat-extras (includes batdiff/batgrep/batman/bat-modules/batpipe/batwatch) [Y/n]: " "n" bat
+    readyn -p "Install bat-extras (includes batdiff/batgrep/batman/bat-modules/batpipe/batwatch)" bat
     if test "$bat" == "y"; then
         if test "$distro" == "Arch" || test "$distro" == "Manjaro";then
             eval "$pac_ins bat-extras"

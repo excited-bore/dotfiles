@@ -248,14 +248,16 @@ function rm-prompt(){
        fi
     done | $RMPROMPT_PAGER  
 
-    [[ $files > 0 ]] && files="${RED}$files${YELLOW}" || files="${CYAN}$files${YELLOW}" 
-    [[ $symlinks > 0 ]] && symlinks="${RED}$symlinks${YELLOW}" || symlinks="${CYAN}$symlinks${YELLOW}"
-    [[ $dirss > 0 ]] && dirss="${RED}$dirss${YELLOW}" || dirss="${CYAN}$dirss${YELLOW}" 
-    
-    if [[ $files > 0 ]] || [[ $symlinks > 0 ]] || [[ $dirss > 0 ]]; then
-        reade -Q 'YELLOW' -i 'y' -p "Remove all $symlinks symlink(s), $files file(s) and all $dirss directory(s)? [Y/n]: " 'n' rm_stff
-        if test "$rm_stff" == 'y'; then
-            command rm -f $RMPROMPT_RM_OPT -- $itms 
+    if test $? == 0; then   
+        [[ $files > 0 ]] && files="${RED}$files${YELLOW}" || files="${CYAN}$files${YELLOW}" 
+        [[ $symlinks > 0 ]] && symlinks="${RED}$symlinks${YELLOW}" || symlinks="${CYAN}$symlinks${YELLOW}"
+        [[ $dirss > 0 ]] && dirss="${RED}$dirss${YELLOW}" || dirss="${CYAN}$dirss${YELLOW}" 
+        
+        if [[ $files > 0 ]] || [[ $symlinks > 0 ]] || [[ $dirss > 0 ]]; then
+            reade -Q 'YELLOW' -i 'y' -p "Remove all $symlinks symlink(s), $files file(s) and all $dirss directory(s)? [Y/n]: " 'n' rm_stff
+            if test "$rm_stff" == 'y'; then
+                command rm -f $RMPROMPT_RM_OPT -- $itms 
+            fi
         fi
     fi
     unset rm_stff dirss files i itm

@@ -21,7 +21,7 @@ fi
 
 
 if test -z $SYSTEM_UPDATED; then
-    reade -Q "CYAN" -i "y" -p "Update system? [Y/n]: " "n" updatesysm
+    readyn -Y "CYAN" -p "Update system?" updatesysm
     if test $updatesysm == "y"; then
         update-system                     
     fi
@@ -57,7 +57,7 @@ wihotspot
 
 if type systemctl &> /dev/null; then
 
-    reade -Q "CYAN" -i "y" -p "Enable hotspot on startup with systemctl? [Y/n]: " "n" hotspot
+    reade -Q "CYAN" -i "y" -p "Enable hotspot on startup with systemctl? "" hotspot
     if test $hotspot == "y"; then
         systemctl enable create_ap
     fi

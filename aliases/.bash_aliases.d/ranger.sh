@@ -7,9 +7,9 @@
 
 # Ranger 
 #alias ranger='ranger 2> /dev/null'
-#if [ -n "$RANGER_LEVEL" ]; then 
-#    export PS1="[ranger]$PS1"; 
-#fi
+if [ -n "$RANGER_LEVEL" ]; then 
+    export PS1="[ranger]$PS1"; 
+fi
 
 #function ranger {
 #    local IFS=$'\t\n'

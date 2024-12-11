@@ -20,7 +20,7 @@ if ! type update-system &> /dev/null; then
 fi
 
 if test -z $SYSTEM_UPDATED; then
-    reade -Q "CYAN" -i "y" -p "Update system? [Y/n]: " "n" updatesysm
+    readyn -Y "CYAN" -p "Update system?" updatesysm
     if test $updatesysm == "y"; then
         update-system                     
     fi
@@ -40,7 +40,7 @@ if ! type moar &> /dev/null; then
     
     if [ "$distro_base" == "Arch" ] && ! test -z "$AUR_ins"; then
         
-        reade -Q "GREEN" -i "y" -p "Install moar from packagemanager (y), github binary (b) or not [Y/b/n]: " "b n"  answer
+        reade -Q 'GREEN' -i 'y' -p "Install moar from packagemanager (y), github binary (b) or not [Y/b/n]: " "b n"  answer
         if [ "$answer" == "y" ] || [ -z "$answer" ] || [ "$answer" == "Y" ]; then
             eval "$AUR_ins moar-git";
         fi
@@ -51,7 +51,7 @@ if ! type moar &> /dev/null; then
         reade -Q "YELLOW" -i "b" -p "Install moar from github binary (b) or not (anything but empty or b) [B/n]: " "n"  answer
         if [ -z "$answer" ] || [ "B" == "$answer" ] || [ "b" == "$answer" ]; then
             if ! type wget &> /dev/null; then
-                reade -Q "GREEN" -i "y" -p "Need wget for this to work (tool to fetch file from the internet). Install wget? [Y/n]: " "n"  ins_wget
+                readyn -p "Need wget for this to work (tool to fetch file from the internet). Install wget?"  ins_wget
                 if test $ins_wget == 'y'; then
                     eval "$pac_ins wget"
                 fi
@@ -74,7 +74,7 @@ if ! type moar &> /dev/null; then
 fi
 
 
-reade -Q "GREEN" -i "y" -p "Set moar as default pager for $USER? [Y/n]: " "n" moar_usr
+readyn -p "Set moar as default pager for $USER?" moar_usr
 if [ -z "$moar_usr" ] || [ "y" == "$moar_usr" ] || [ "Y" == "$moar_usr" ]; then
     
     if grep -q "MOAR" $ENVVAR; then 
@@ -93,7 +93,7 @@ if [ -z "$moar_usr" ] || [ "y" == "$moar_usr" ] || [ "Y" == "$moar_usr" ]; then
     fi
 fi
     
-reade -Q "YELLOW" -i "y" -p "Set moar as default pager for root? [Y/n]: " "n" moar_root
+reade -Q "YELLOW" -i "y" -p "Set moar as default pager for root?" moar_root
 if [ -z "$moar_root" ] || [ "y" == "$moar_root" ] || [ "Y" == "$moar_root" ]; then
     if sudo grep -q "MOAR" $ENVVAR_R; then
         sudo sed -i "s|.export MOAR=.*|export MOAR='--statusbar=bold --colors=auto --render-unprintable=highlight --quit-if-one-screen'|g" $ENVVAR_R 

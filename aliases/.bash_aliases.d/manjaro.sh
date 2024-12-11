@@ -5,7 +5,7 @@ if ! type reade &> /dev/null && test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh; 
 fi
 
 #linux_curr=$(sudo mhwd-kernel --listinstalled | awk 'NR==1{print $4;}' | cut -d\( -f2- | cut -d\) -f1)
-linux_lts='linux66'
+#linux_lts='linux66'
 
 alias pamac-list-installed="pamac list --installed "
 alias manjaro-GPU-list-drivers="sudo mhwd -l -d"
@@ -24,11 +24,11 @@ function manjaro-GPU-remove-driver-by-name(){
 function manjaro-install-kernel(){
     kernels="$(sudo mhwd-kernel --list | awk 'NR>1{print $2;}')"
     kernels="$(echo $kernels | sed "s/\<$linux_lts\> //g")"
-    reade -Q 'GREEN' -i "y" -p "Remove current kernel after installation? [Y/n]: " "n" rm_af
+    readyn -p "Remove current kernel after installation?" rm_af
     rm_af="$(test $rm_af == 'y' && echo 'rmc' || echo '')"    
     kernels_p=$(echo $kernels | tr " " '/')
     linux_lts_p="$(echo $linux_lts | tr '[:lower:]' '[:upper:]')"
-    reade -Q 'GREEN' -i "$linux_lts" -p "Install which one [$linux_lts_p/$kernels_p]: " "$kernels" kern
+    reade -Q 'GREEN' -i "$linux_lts $kernels" -p "Install which one [$linux_lts_p/$kernels_p]: " kern
     sudo mhwd-kernel -i $kern $rm_af
     sudo mhwd-kernel --listinstalled
     unset kern kernels rm_af linux_lts_p kernels_p 
@@ -44,7 +44,7 @@ function manjaro-remove-kernel(){
     else
         kernels_p=''
     fi
-    reade -Q 'GREEN' -i "$frst" -p "Remove which one [$frst_p$kernels_p]: " "$kernels" kern
+    reade -Q 'GREEN' -i "$frst $kernels" -p "Remove which one [$frst_p$kernels_p]: "  kern
     sudo mhwd-kernel -r $kern
     sudo mhwd-kernel --listinstalled
     unset kern kernels frst frst_p kernels_p 

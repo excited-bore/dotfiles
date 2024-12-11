@@ -23,7 +23,7 @@ if grep -q "trap '! \[ -z \"\$(jobs -p)\" ] && kill -9 \$(jobs -p.*" ~/.bashrc |
     prmpt='[N/both/exit/intr]: '
 fi 
 
-reade -Q "$color" -i "$pre" -p "Send kill signal to background processes when exiting (Ctrl-q) / interrupting (Ctrl-c) for $USER? $prmpt" "$othr" int_r
+reade -Q "$color" -i "$pre $othr" -p "Send kill signal to background processes when exiting (Ctrl-q) / interrupting (Ctrl-c) for $USER? $prmpt" int_r
 if ! [ $int_r  == "n" ]; then
     if test $int_r == 'both'; then
         sig='INT EXIT'  
@@ -49,7 +49,7 @@ if ! [ $int_r  == "n" ]; then
         color='YELLOW'
         prmpt='[N/same/both/exit/intr]: '
     fi 
-    reade -Q "$color" -i "$pre" -p "Send kill signal to background processes when exiting (Ctrl-q)/interrupting (Ctrl-c) for root? $prmpt" "$othr" int_r 
+    reade -Q "$color" -i "$pre $othr" -p "Send kill signal to background processes when exiting (Ctrl-q)/interrupting (Ctrl-c) for root? $prmpt" int_r 
     if ! [ $int_r  == "n" ]; then
         if test $int_r == 'both'; then
             sig='INT EXIT'  
@@ -85,7 +85,7 @@ if test $ansr == "y"; then
     fi
 
     #if type gio &> /dev/null; then 
-    #    reade -Q "GREEN" -i "y" -p "Set cp/mv (when overwriting) to backup files? (will also trash backups) [Y/n]: " "n" ansr         
+    #    readyn -p "Set cp/mv (when overwriting) to backup files? (will also trash backups) "" ansr         
     #    if [ "$ansr" != "y" ]; then
     #        sed -i 's|^alias cp="cp-trash -rv"|#alias cp="cp-trash -rv"|g' $genr
     #        sed -i 's|^alias mv="mv-trash -v"|#alias mv="mv-trash -v"|g' $genr
@@ -146,7 +146,7 @@ if test $ansr == "y"; then
                 cp_v="" 
             fi
 
-            reade -Q 'YELLOW' -i 'n' -p "Never overwrite already present files? [N/y]: " 'y' cp_ov
+            readyn -n -p "Never overwrite already present files?" cp_ov
             if test $cp_ov == 'y'; then
                 cp_ov='--no-clobber ' 
             else
@@ -166,7 +166,7 @@ if test $ansr == "y"; then
             unset cp_all cp_xcp cp_v cp_ov   
     fi 
      
-    reade -Q "GREEN" -i "y" -p "Set rm (remove) to always be verbose? [Y/n]: " "n" rm_verb
+    readyn -p "Set rm (remove) to always be verbose?" rm_verb
      
     prompt="${green}    - Force remove, recursively delete given directories (enable deletion of direction without deleting every file in directory first) and ${bold}always give at least one prompt before removing?${normal}${green}
     - Force remove, ${YELLOW}don't${normal}${green} recursively look for files and give a prompt not always, but if removing 3 or more files/folder?
@@ -191,7 +191,7 @@ if test $ansr == "y"; then
     fi 
 
     printf "${CYAN}Set rm (remove) to:\n$prompt" 
-    reade -Q "GREEN" -i "$pre" -p "$prompt2" "$ansrs" ansr 
+    reade -Q "GREEN" -i "$pre $ansrs" -p "$prompt2" ansr 
     if $([ "$ansr" == "none" ] || [ -z "$ansr" ]) && test "$rm_verb" == 'n'; then
         sed -i 's|^alias rm="|#alias rm="|g' $genr
     else

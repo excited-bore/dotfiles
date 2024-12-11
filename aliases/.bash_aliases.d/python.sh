@@ -34,7 +34,7 @@ if type pyenv &> /dev/null; then
 
     function pyenv-enable(){
          if test -z "$1" ; then
-            reade -Q 'GREEN' -i "stable" -p "What versions to list? [Stable/all]: " "all" vers_all
+            reade -Q 'GREEN' -i "stable all" -p "What versions to list? [Stable/all]: " vers_all
             if test $vers_all == 'stable'; then
                 all="$(pyenv install -l | grep --color=never -E [[:space:]][0-9].*[0-9]$ | sed '/rc/d' | xargs| tr ' ' '\n' | tac)" 
                 frst="$(echo $all | awk '{print $1}')"
@@ -45,12 +45,12 @@ if type pyenv &> /dev/null; then
                 all="$(echo $all | sed "s/\<$frst\> //g")" 
             fi
             printf "Python versions:\n${CYAN}$(echo $all | tr ' ' '\n' | tac | column)${normal}\n" 
-            reade -Q 'GREEN' -i "$frst" -p "Which version to install?: " "$all" vers  
+            reade -Q 'GREEN' -i "$frst $all" -p "Which version to install?: " vers  
         else
             vers="$1"
         fi
          
-        reade -Q 'GREEN' -i "global" -p "Set python version globally or locally? [Global/local]: " 'local' ansr 
+        reade -Q 'GREEN' -i "global local" -p "Set python version globally or locally? [Global/local]: " ansr 
         if test "$ansr" == 'global'; then
             pyenv global "$vers" 
             readyn -p "Also set pyenv for shell? (only works if shell integration is enabled)" ansr
@@ -65,7 +65,7 @@ if type pyenv &> /dev/null; then
     function pyenv-install-and-enable(){
         
          if test -z "$1" ; then
-            reade -Q 'GREEN' -i "stable" -p "What versions to list? [Stable/all]: " "all" vers_all
+            reade -Q 'GREEN' -i "stable all" -p "What versions to list? [Stable/all]: " vers_all
             if test $vers_all == 'stable'; then
                 all="$(pyenv install -l | grep --color=never -E [[:space:]][0-9].*[0-9]$ | sed '/rc/d' | xargs| tr ' ' '\n' | tac)" 
                 frst="$(echo $all | awk '{print $1}')"
@@ -76,7 +76,7 @@ if type pyenv &> /dev/null; then
                 all="$(echo $all | sed "s/\<$frst\> //g")" 
             fi
             printf "Python versions:\n${CYAN}$(echo $all | tr ' ' '\n' | tac | column)${normal}\n" 
-            reade -Q 'GREEN' -i "$frst" -p "Which version to install?: " "$all" vers  
+            reade -Q 'GREEN' -i "$frst $all" -p "Which version to install?: " vers  
         else
             vers="$1"
         fi
@@ -102,4 +102,4 @@ if type pyenv &> /dev/null; then
     } 
     
 fi
-complete -W "$(pyenv completions install | sed '/--.*/d' | sed '/system/d')" pyenv-install-globally
+#complete -W "$(pyenv completions install | sed '/--.*/d' | sed '/system/d')" pyenv-install-globally

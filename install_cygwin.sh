@@ -43,7 +43,7 @@ if test $machine == 'Windows'; then
     # Install dos2unix 
     if ! type dos2unix &> /dev/null; then
         printf "${CYAN}Bash scripts won't run in Cygwin without convertion from dos${green}(using ${magenta}'dos2unix'${green} f.ex.)${normal}\n"
-        reade -Q "GREEN" -i "y" -p "Install dos2unix? [Y/n]: " "n" dos2unx
+        readyn -p "Install dos2unix?" dos2unx
         if test $dos2unx == 'y' ; then 
             winget install dos2unix
         #else
@@ -87,7 +87,7 @@ if test $machine == 'Windows'; then
     # Install apt-cyg 
     if ! type apt-cyg &> /dev/null || test $win_bash_shell == 'Git' && ! test -f /c/cygwin$ARCH_WIN/bin/apt-cyg; then
         printf "${green}Even though cygwin comes preinstalled with a lot of tools, it does not come with a package manager.. ${normal}\n"
-        reade -Q 'GREEN' -i 'y' -p 'Install apt-cyg? (Package manager for Cygwin) [Y/n]: ' 'n' apt_cyg
+        readyn -p 'Install apt-cyg? (Package manager for Cygwin)' apt_cyg
         if test "$apt_cyg" == '' || test "$apt_cyg" == "y" || test "$apt_cyg" == 'Y'; then
             tmpd=$(mktemp -d) 
             curl.exe https://raw.githubusercontent.com/transcode-open/apt-cyg/master/apt-cyg > $tmpd/apt-cyg
