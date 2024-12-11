@@ -16,45 +16,17 @@ if test $machine == 'Windows' && test $win_bash_shell == 'Cygwin'; then
     alias cd-home-="cd /cygdrive/c/Users/$USER"
 fi
 
-function change-username-and-homefolder(){
-    ! shopt -q login_shell && printf "${RED}Not login shell\nLogout, press 'Ctrl+Alt+F1/F2/...F6' to drop to a login shell and login as root or a user other then the one you want to change.\n${YELLOW}(Make sure the root account is enabled with 'sudo passwd su' - you can disable it afterwards with 'sudo passwd -l su')${normal}\n" && return 1
-    local frst="$(echo $(users | word2line | uniq | grep -v root ) | awk '{print $1}')" 
-    local words="$(echo $words | sed "s/\<$frst\> //g")" 
-    reade -Q 'CYAN' -i "$frst $words" -p "Old username (Empty = $frst): " usrname 
-    test -z "$usrname" && usrname="$frst" 
-    test "$USER" == "$usrname" && printf "${RED}Can't change username for $usrname while logged as said\nLogout, press 'Ctrl+Alt+F1/F2/...F6' to drop to a login shell (if not already in one) and login as root or a user other then the one you want to change.\n${YELLOW}(Make sure the root account is enabled with 'sudo passwd su' - you can disable it afterwards with 'sudo passwd -l su')${normal}\n" && return 1 
-    reade -Q 'MAGENTA' -p 'New username: ' usrname_nw 
-    if ! test -z "$usrname_nw"; then
-        if ! test -z "$(ps -U $usrname 2> /dev/null)"; then
-            printf "There are still processes running under user $usrname!\nKilling all processes for user..."  
-            sleep 5
-            sudo pkill -U $(id -u "$usrname") 
-            printf "Done!\n" 
-        fi
-        sudo usermod -l "$usrname_nw" -d /home/"$usrname_nw" -m "$usrname" &&  
-        sudo groupmod -n "$usrname_nw" "$usrname" &&  
-        sudo test -f /etc/lightdm/lightdm.conf && sudo grep -q "autologin-user=$usrname" /etc/lightdm/lightdm.conf && sudo sed -i "s/^autologin-user=$usrname/autologin-user=$usrname_nw/g" /etc/lightdm/lightdm.conf &&
-        test -f /home/$usrname_nw/.config/starship.toml && grep -q "/home/$usrname" /home/$usrname_nw/.config/starship.toml && sed -i "s|/home/$usrname|/home/$usrname_nw|g" /home/$usrname_nw/.config/starship.toml   
-        printf "${GREEN}Changed username and homedirectory to $usrname_nw!${normal}\n" && 
-        unset usrname usrname_nw && 
-        return 0 || return 1; 
-    else
-        printf "${YELLOW}Please give up a new username to change to.${normal}\n"
-        return 1 
-    fi
-}
+if type sudo &> /dev/null; then
+    alias sudo='sudo '
+fi
 
-function change-device-name-to(){
-    local oldname=$(hostname) 
-    reade -Q 'CYAN' -p "New device name (hostname): " name
-    test -z "$name" && printf "Name cant be empty.\n" && return 1
-    sudo hostnamectl set-hostname "$name" 
-    sudo sed -i "s/$oldname/$name/g" /etc/hosts &&
-    sudo sed -i "s/$oldname/$name/g" /etc/hostname && 
-    unset name &&
-    printf "${GREEN}Changed device name (hostname) to $name!${normal}\n" &&
-    return 0 || return 1;
-}
+if type wget &> /dev/null; then
+    alias wget='wget --https-only '
+fi
+
+if type curl &> /dev/null; then
+   alias curl="curl --proto '=https' --tlsv1.2" 
+fi
 
 alias my-folder="sudo chown -R $USER:$USER ./"
 
@@ -365,7 +337,7 @@ function mv-trash(){
 } 
 
 
-alias mv="mv-trash -v"
+# alias mv="mv-trash -v"
 
 
 # Rm 
@@ -373,6 +345,7 @@ alias mv="mv-trash -v"
 alias rm="rm-prompt"
 
 shred_iterates=3
+
 alias rm-shred="shred -vzn $shred_iterates -u"
 
 alias remove="rm"
@@ -502,6 +475,13 @@ alias tar-unpack="tar -xvf"
 alias tar-list="tar -tvf"
 
 # Alias's for archives
+function zip(){
+    if [[ $# == 1 ]] && test -e $1; then 
+        zip -r $(basename $1).zip $1 
+    else
+        zip $@
+    fi
+}
 alias mktar='tar -cvf'
 alias mkbz2='tar -cvjf'
 alias mkgz='tar -cvzf'
@@ -554,7 +534,6 @@ fi
 
 alias start-cups="sudo cupsctl WebInterface=y; xdg-open 'http://localhost:631'"
 alias start-printer="start-printer"
-
 
 alias ip-adress="wget -qO - https://api.ipify.org; echo"
 
@@ -952,6 +931,11 @@ alias free-kilo='command free --kilo'
 alias free-mega='command free --mega'
 alias free-giga='command free --giga'
 alias df='df -h -T --total'
+alias du="du -hs | awk '{print \$1}'"
+alias folder-size="du"
+alias dir-size="du"
+alias dirsize="du"
+
 
 alias regenerate-initrams-all-kernels="sudo mkinitcpio -P"
 hdrs="$(echo $(uname -r) | cut -d. -f-2)"
@@ -983,4 +967,45 @@ function boot-into(){
 }
 
 alias next-boot="boot-into"
+
+function change-username-and-homefolder(){
+    ! shopt -q login_shell && printf "${RED}Not login shell\nLogout, press 'Ctrl+Alt+F1/F2/...F6' to drop to a login shell and login as root or a user other then the one you want to change.\n${YELLOW}(Make sure the root account is enabled with 'sudo passwd su' - you can disable it afterwards with 'sudo passwd -l su')${normal}\n" && return 1
+    local frst="$(echo $(users | word2line | uniq | grep -v root ) | awk '{print $1}')" 
+    local words="$(echo $words | sed "s/\<$frst\> //g")" 
+    reade -Q 'CYAN' -i "$frst $words" -p "Old username (Empty = $frst): " usrname 
+    test -z "$usrname" && usrname="$frst" 
+    test "$USER" == "$usrname" && printf "${RED}Can't change username for $usrname while logged as said\nLogout, press 'Ctrl+Alt+F1/F2/...F6' to drop to a login shell (if not already in one) and login as root or a user other then the one you want to change.\n${YELLOW}(Make sure the root account is enabled with 'sudo passwd su' - you can disable it afterwards with 'sudo passwd -l su')${normal}\n" && return 1 
+    reade -Q 'MAGENTA' -p 'New username: ' usrname_nw 
+    if ! test -z "$usrname_nw"; then
+        if ! test -z "$(ps -U $usrname 2> /dev/null)"; then
+            printf "There are still processes running under user $usrname!\nKilling all processes for user..."  
+            sleep 5
+            sudo pkill -U $(id -u "$usrname") 
+            printf "Done!\n" 
+        fi
+        sudo usermod -l "$usrname_nw" -d /home/"$usrname_nw" -m "$usrname" &&  
+        sudo groupmod -n "$usrname_nw" "$usrname" &&  
+        sudo test -f /etc/lightdm/lightdm.conf && sudo grep -q "autologin-user=$usrname" /etc/lightdm/lightdm.conf && sudo sed -i "s/^autologin-user=$usrname/autologin-user=$usrname_nw/g" /etc/lightdm/lightdm.conf &&
+        test -f /home/$usrname_nw/.config/starship.toml && grep -q "/home/$usrname" /home/$usrname_nw/.config/starship.toml && sed -i "s|/home/$usrname|/home/$usrname_nw|g" /home/$usrname_nw/.config/starship.toml   
+        printf "${GREEN}Changed username and homedirectory to $usrname_nw!${normal}\n" && 
+        unset usrname usrname_nw && 
+        return 0 || return 1; 
+    else
+        printf "${YELLOW}Please give up a new username to change to.${normal}\n"
+        return 1 
+    fi
+}
+
+function change-device-name-to(){
+    local oldname=$(hostname) 
+    reade -Q 'CYAN' -p "New device name (hostname): " name
+    test -z "$name" && printf "Name cant be empty.\n" && return 1
+    sudo hostnamectl set-hostname "$name" 
+    sudo sed -i "s/$oldname/$name/g" /etc/hosts &&
+    sudo sed -i "s/$oldname/$name/g" /etc/hostname && 
+    unset name &&
+    printf "${GREEN}Changed device name (hostname) to $name!${normal}\n" &&
+    return 0 || return 1;
+}
+
 

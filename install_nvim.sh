@@ -23,11 +23,11 @@ if test -z $SYSTEM_UPDATED; then
     fi
 fi
 
-if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
-else
-    . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
-fi
+#if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
+#     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
+#else
+#    . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
+#fi
 
 if ! test -f checks/check_envvar.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)" 
@@ -384,7 +384,7 @@ elif [ $distro_base == "Debian" ];then
          fi
          unset nvmapt nvmappmg insflpk nvmflpk
     else 
-        eval "$pac_ins -y neovim "
+        ${pac_ins} -y neovim 
     fi
         
     if ! type xclip &> /dev/null; then
@@ -394,7 +394,7 @@ elif [ $distro_base == "Debian" ];then
             echo "${green} If this is for use with ssh on serverside, X11 needs to be forwarded"
             echo "${green} At clientside, 'ForwardX11 yes' also needs to be put in ~/.ssh/config under Host"
             echo "${green} Connection also need to start with -X flag (ssh -X ..@..)${normal}"
-            reade -Q "GREEN" -i "n" -p "Forward X11 in /etc/ssh/sshd.config?" x11f
+            readyn -n -p "Forward X11 in /etc/ssh/sshd.config?" x11f
             if [ -z $x11f ] || [ "y" == $x11f ]; then
                sudo sed -i 's|.X11Forwarding yes|X11Forwarding yes|g' /etc/ssh/sshd_config
             fi
@@ -489,11 +489,13 @@ elif [ $distro_base == "Debian" ];then
     
     if ! type ctags &> /dev/null; then
         readyn -p "Install ctags?" ctags
-        if  [ "y" == $ctags ]; then
-            eval "$pac_ins universal-ctags"
+        if [ "y" == $ctags ]; then
+            ${pac_ins} universal-ctags
         fi
     fi
 fi
+
+cargo install ast-grep
 
 unset rver paths clip x11f pyscripts jsscripts ctags rubyscripts perlscripts nvmbin
 
@@ -509,6 +511,19 @@ if ! type rg &> /dev/null; then
 fi
 
 unset rg_ins
+
+if ! type ast-grep &> /dev/null; then
+    readyn -p "Install ast-grep (search and rewrite code at large scale using precise AST pattern)?" ast_ins
+    if [ "y" == $ast_ins ]; then
+        if ! test -f install_ast-grep.sh; then
+             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ast-grep.sh)" 
+        else
+            ./install_ast-grep.sh
+        fi
+    fi
+fi
+
+unset ast_ins
 
 if ! test -d vim/; then
     tmpdir=$(mktemp -d -t nvim-XXXXXXXXXX)

@@ -240,34 +240,34 @@ function reade(){
         while getopts ':b:e:i:p:Q:s:S:' flag; do
             case "${flag}" in
                 b)  breaklines=${OPTARG};
-                    ;;
-                    # File completions
-                    e)  #rlwstring=$(echo $rlwstring | sed "s| -f <(echo \"${args[@]}\") | |g");
-                        rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-c |g");
-                    ;;
-                    # Pre-filled answer
-                    i)  frst="$(echo ${OPTARG} | awk '{print $1}')"  
-                        rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-P \"$frst\" |g");
-                        args=$(echo ${OPTARG} | sed "s/\<$frst\> //g") 
-                        ! test -z "$args" &&
-                        args=$(echo $args | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }') &&
-                        args=$(echo $args | tr ' ' '\n') &&
-                        tmpf=$(mktemp) && 
-                        echo "$args" > "$tmpf" && 
-                        rlwstring=$(echo $rlwstring | sed 's| -o cat| \-H $tmpf  \-f <(echo \"${args[@]}\") -o cat|g') 
-                    ;;
-                    # Prompt
-                    p)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-S \"${OPTARG}\" |g");
-                    ;;
-                    # Prompt colours
-                    Q)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-p${OPTARG} |g");
-                    ;;
-                    # Password
-                    s)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-aN\"${OPTARG}\" |g");
-                    ;;
-                    # Always echo *** w/ passwords
-                    S)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-E\"${OPTARG}\" |g");
-                    ;;
+                ;;
+                # File completions
+                e)  #rlwstring=$(echo $rlwstring | sed "s| -f <(echo \"${args[@]}\") | |g");
+                    rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-c |g");
+                ;;
+                # Pre-filled answer
+                i)  frst="$(echo ${OPTARG} | awk '{print $1}')"  
+                    rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-P \"$frst\" |g");
+                    args=$(echo ${OPTARG} | sed "s|\<$frst\> ||g") 
+                    ! test -z "$args" &&
+                    args=$(echo $args | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }') &&
+                    args=$(echo $args | tr ' ' '\n') &&
+                    tmpf=$(mktemp) && 
+                    echo "$args" > "$tmpf" && 
+                    rlwstring=$(echo $rlwstring | sed 's| -o cat| \-H $tmpf  \-f <(echo \"${args[@]}\") -o cat|g') 
+                ;;
+                # Prompt
+                p)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-S \"${OPTARG}\" |g");
+                ;;
+                # Prompt colours
+                Q)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-p${OPTARG} |g");
+                ;;
+                # Password
+                s)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-aN\"${OPTARG}\" |g");
+                ;;
+                # Always echo *** w/ passwords
+                S)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-E\"${OPTARG}\" |g");
+                ;;
             esac
         done;
 
