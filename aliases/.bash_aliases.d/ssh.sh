@@ -22,6 +22,12 @@ move-sshfs(){ cp -r --no-preserve=mode "$1" "$2" && rmTrash "$1"; }
 
 alias ssh-change-config="$EDITOR ~/.ssh/config"
 
+alias get-ssh-port="sshd -T | grep -i port | awk 'NR==1{print \$2;}'"
+function active-ssh-connections(){
+    ss -tn state established '(dport = :'$(get-ssh-port)' or sport = :'$(get-ssh-port)')'
+} 
+
+
 # -t forces allocation for a pseudo-terminal
 # -X enables X11 forwarding
 # -i is for a public/private keyfile

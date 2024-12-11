@@ -12,6 +12,12 @@ else
     . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
 fi
 
+if ! test -f rlwrap-scripts/reade; then
+    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade)" 
+else
+    . ./rlwrap-scripts/reade
+fi
+
 
 if ! test -f checks/check_system.sh; then
     if type curl &> /dev/null; then
@@ -47,24 +53,21 @@ if test -z $SYSTEM_UPDATED; then
     fi
 fi
 
-if ! type reade &>/dev/null; then
+if ! type rlwrap &>/dev/null; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_rlwrap.sh)" 
 else
     . ./checks/check_rlwrap.sh
 fi
 
-
-readyn -p "Install reade and readyn?" -c 'test -f /usr/bin/reade' insrde
-if test $insrde == 'y'; then
-    if ! test -f install_reade_readyn.sh; then
-         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_reade_readyn.sh)" 
-    else
-        ./install_reade_readyn.sh
-    fi
-fi
-unset insrde
-
-
+#readyn -p "Install reade and readyn?" -c 'test -f /usr/bin/reade' insrde
+#if test $insrde == 'y'; then
+#    if ! test -f install_reade_readyn.sh; then
+#         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_reade_readyn.sh)" 
+#    else
+#        ./install_reade_readyn.sh
+#    fi
+#fi
+#unset insrde
 
 
 
@@ -629,7 +632,7 @@ unset kittn
 
 # Fzf (Fuzzy Finder)
  
-readyn -p "Install fzf? (Fuzzy file/folder finder - keybinding yes for upgraded Ctrl-R/reverse-search, fzf filenames on Ctrl+T and fzf-version of 'cd' on Alt-C + Custom script: Ctrl-f becomes system-wide file opener)" -n -c "type fzf &> /dev/null && type rg &> /dev/null" findr
+readyn -p "Install fzf? (Fuzzy file/folder finder - keybinding yes for upgraded Ctrl-R/reverse-search, fzf filenames on Ctrl+T and fzf-version of 'cd' on Alt-C + Custom script: Ctrl-f becomes system-wide file opener)" -n -c "type fzf &> /dev/null" findr
 
 if [ "y" == "$findr" ]; then
     if ! test -f install_fzf.sh; then
@@ -639,6 +642,34 @@ if [ "y" == "$findr" ]; then
     fi
 fi
 unset findr
+
+
+
+# Rg (ripgrep)
+
+readyn -p "Install ripgrep? (recursively searches the current directory for lines matching a regex pattern)" -c "type rg &> /dev/null" rgrp
+if [ "y" == "$rgrp" ]; then
+    if ! test -f install_ripgrep.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ripgrep.sh)" 
+    else
+        ./install_ripgrep.sh
+    fi
+fi
+unset rgrp
+
+
+# Ast-grep (ast-grep)
+
+readyn -p "Install ast-grep? (Search and Rewrite code at large scale using precise AST pattern)" -c "type ast-grep &> /dev/null" rgrp
+if [ "y" == "$rgrp" ]; then
+    if ! test -f install_ast-grep.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ast-grep.sh)" 
+    else
+        ./install_ast-grep.sh
+    fi
+fi
+unset rgrp
+
 
 # Git
 

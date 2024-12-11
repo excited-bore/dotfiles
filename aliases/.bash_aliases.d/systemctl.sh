@@ -65,6 +65,7 @@ if systemctl list-units --full -all | grep -Fq "ssh.service"; then
     alias disable-now-sshd="sudo systemctl disable --now $servs"
     alias restart-sshd="sudo systemctl restart $servs"  
     alias status-sshd="sudo systemctl status $servs"  
+    alias logs-ssh="sudo journalctl -u ssh"  
     unset servs 
 fi
 

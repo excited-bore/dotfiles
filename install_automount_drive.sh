@@ -1,32 +1,32 @@
-#! /bin/bash
+#!/bin/bash
+
 #DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 # https://unix.stackexchange.com/questions/278631/bash-script-auto-complete-for-user-input-based-on-array-data
-if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
+
+if ! test -f rlwrap-scripts/reade; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade)" 
 else
-    . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
+    . ./rlwrap-scripts/reade
 fi
   
 lsblk --all --exclude 7 -o NAME,SIZE,FSTYPE,MOUNTPOINT,LABEL,UUID
 
-echo
-printf "${bold}Currently in /etc/fstab: ${normal}\n"
+printf "\n${bold}Currently in /etc/fstab: ${normal}\n"
+
 cat /etc/fstab | tail +7
 
-echo
-printf "$(sudo blkid | grep -v 'loop' | perl -pe "s| LABEL=\"(.*?)\"| LABEL=\"${GREEN}\1\"${normal}|g" | tac)"
-echo
+printf "\n$(sudo blkid | grep -v 'loop' | perl -pe "s| LABEL=\"(.*?)\"| LABEL=\"${GREEN}\1\"${normal}|g" | tac)\n\n"
 
-echo
 readecomp=($(sudo blkid | awk 'BEGIN { FS = ":" };{print $1;}' | grep -v 'loop' | tac))
 drives="${readecomp[@]}"
-reade -Q "GREEN" -i "/dev/ $drives" -p "Choose drive to mount: "  drive
+
+reade -Q "GREEN" -i "/dev/ $drives" -p "Choose drive to mount: " drive
 reade -Q "GREEN" -i "/mnt" -p "Mount point? (will make if not exists): " -e mnt
+
 if [ ! -d $mnt ]; then
     sudo mkdir -p $mnt
     echo "Created $mnt"
 fi
-sudo chown -R $USER $mnt
 
 uuid=$(sudo blkid | grep $drive | perl -pe 's|.*?UUID="(.*?)".*|UUID=\1|')
 type_fs=$(sudo blkid | grep $drive | perl -pe 's|.*?TYPE="(.*?)".*|\1|')
