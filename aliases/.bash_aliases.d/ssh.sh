@@ -94,7 +94,7 @@ ssh-key-and-add-to-agent-by-host() {
     echo "${green}FYI: Some services (f.ex. default setting openssh, github) only check for id_keyname type keys (f.ex. id_ed25519)"
     reade -Q "GREEN" -i "id_ed25519 id_dsa id_ecdsa id_ecdsa-sk id_ed25519 id_ed25519-sk id_rsa" -p "Give up filename \(Recommended: id_ed25519, id_ecdsa-sk, id_ed25519-sk, id_dsa, id_ecdsa or id_rsa\): " name
     if [[ "$name" == "id_"* ]]; then
-        reade -Q "green" -i "y" -p "Given name starts with \"id_\". Use name for keytype?:" "y n" kyname
+        readyn -Y "green" -p "Given name starts with \"id_\". Use name for keytype?" kyname
         if [ "y" == "$kyname" ]; then
             keytype=$(echo $name | sed 's|id_||g') 
         fi
@@ -111,7 +111,7 @@ ssh-key-and-add-to-agent-by-host() {
         echo "Remote username can't be empty";
         return 0
     fi
-    read -p "Forward X11? Needed for xclip [Y/n]:" sx11
+    readyn -p "Forward X11? Needed for xclip" sx11
     if [ -z "$sx11" ] || [ "$sx11" == "y" ]; then
         opts="  ForwardX11 yes\n  ForwardX11Trusted yes\n"
     fi

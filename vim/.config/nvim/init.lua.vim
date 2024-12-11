@@ -423,8 +423,33 @@ require("telescope").setup {
     },
   },
 }
+
+ -- This is a snippet on how you can add change directory functionality to some pickers, like find files.
+
+require("telescope").setup {
+  defaults = {
+    -- ....
+  },
+  pickers = {
+    find_files = {
+      mappings = {
+        n = {
+          ["cd"] = function(prompt_bufnr)
+            local selection = require("telescope.actions.state").get_selected_entry()
+            local dir = vim.fn.fnamemodify(selection.path, ":p:h")
+            require("telescope.actions").close(prompt_bufnr)
+            -- Depending on what you want put `cd`, `lcd`, `tcd`
+            vim.cmd(string.format("silent lcd %s", dir))
+          end
+        }
+      }
+    },
+  }
+}
+
 -- To get telescope-file-browser loaded and working with telescope,
 -- you need to call load_extension, somewhere after setup function:
+
 require("telescope").load_extension "file_browser"
 
 

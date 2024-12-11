@@ -47,12 +47,26 @@ if test -z $SYSTEM_UPDATED; then
     fi
 fi
 
-
-if ! test -f checks/check_rlwrap.sh; then
+if ! type reade &>/dev/null; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_rlwrap.sh)" 
 else
     . ./checks/check_rlwrap.sh
 fi
+
+
+readyn -p "Install reade and readyn?" -c 'test -f /usr/bin/reade' insrde
+if test $insrde == 'y'; then
+    if ! test -f install_reade_readyn.sh; then
+         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_reade_readyn.sh)" 
+    else
+        ./install_reade_readyn.sh
+    fi
+fi
+unset insrde
+
+
+
+
 
 printf "${green}If all necessary files are sourced correctly, this text looks green.\nIf not, something went wrong.\n"
 if type gio &> /dev/null; then

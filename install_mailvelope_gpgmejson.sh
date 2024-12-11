@@ -26,7 +26,7 @@ gpgme_json="$(whereis gpgme-json | awk '{print $2;}')"
 
 if test $machine == 'Mac'; then
     if test -d ~/Library/Application Support/Google/Chrome && ! test -f ~/Library/Application Support/Google/Chrome/NativeMessagingHosts/gpgmejson.json; then
-        reade -Q "BLUE" -i "y" -p "Add gpgme-json for google chrome based browsers? [Y/n]: " "n" ggl
+        reade -Q "BLUE" -i "y" -p "Add gpgme-json for google chrome based browsers? "" ggl
         if test $ggl == 'y'; then
             file="{ 
           \"name\": \"gpgmejson\", 
@@ -55,7 +55,7 @@ if test $machine == 'Mac'; then
         fi
     fi
     if test -d ~/Library/Application Support/Mozilla && ! test -f ~/Library/Application Support/Mozilla/NativeMessagingHosts/NativeMessagingHosts/gpgmejson.json; then
-        reade -Q "BLUE" -i "y" -p "Add gpgme-json for firefox? [Y/n]: " "n" mozilla
+        reade -Q "BLUE" -i "y" -p "Add gpgme-json for firefox? "" mozilla
         if test $mozilla == 'y'; then
             file="{ 
           \"name\": \"gpgmejson\", 
@@ -70,7 +70,7 @@ if test $machine == 'Mac'; then
     fi
 elif test $machine == 'Linux'; then
     if test -d ~/.config/google-chrome/ && ! test -f ~/.config/google-chrome/NativeMessagingHosts/gpgmejson.json; then
-        reade -Q "BLUE" -i "y" -p "Add gpgme-json for google chrome based browsers? [Y/n]: " "n" ggl
+        reade -Q "BLUE" -i "y" -p "Add gpgme-json for google chrome based browsers? "" ggl
         if test $ggl == 'y'; then
             file="{ 
           \"name\": \"gpgmejson\", 
@@ -84,7 +84,7 @@ elif test $machine == 'Linux'; then
         fi
     fi
     if test -d ~/.config/BraveSoftware/Brave-Browser/ && ! test -f ~/.config/BraveSoftware/Brave-Browser/NativeMessagingHosts/gpgmejson.json; then
-        reade -Q "BLUE" -i "y" -p "Add gpgme-json for brave browser? [Y/n]: " "n" brave
+        reade -Q "BLUE" -i "y" -p "Add gpgme-json for brave browser? "" brave
         if test $brave == 'y'; then
             file="{ 
           \"name\": \"gpgmejson\", 
@@ -98,7 +98,7 @@ elif test $machine == 'Linux'; then
         fi
     fi
     if test -d ~/.config/microsoft-edge/ && ! test -f ~/.config/microsoft-edge/NativeMessagingHosts/gpgmejson.json; then
-        reade -Q "BLUE" -i "y" -p "Add gpgme-json for Edge? [Y/n]: " "n" edge
+        reade -Q "BLUE" -i "y" -p "Add gpgme-json for Edge? "" edge
         if test $edge == 'y'; then
             file="{
           \"name\": \"gpgmejson\", 
@@ -112,7 +112,7 @@ elif test $machine == 'Linux'; then
         fi
     fi
     if test -d ~/.mozilla/ && ! test -f ~/.mozilla/native-messaging-hosts/gpgmejson.json; then
-        reade -Q "BLUE" -i "y" -p "Add gpgme-json for firefox? [Y/n]: " "n" mozilla
+        reade -Q "BLUE" -i "y" -p "Add gpgme-json for firefox? "" mozilla
         if test $mozilla == 'y'; then
             file="{
           \"name\": \"gpgmejson\", 

@@ -12,7 +12,7 @@ function flatpak (){
         #python /usr/bin/update_flatpak_cli.py
         name="$(flatpak list --columns=name | grep -i --color=never "$pack" | tr ' ' '-' | tr '[:upper:]' '[:lower:]' | awk '{print;}')"
         app_id="$(flatpak list --columns=application,name | grep -i --color=never "$pack" | awk '{print $1;}')"
-        reade -Q 'GREEN' -i 'y' -p "No previous aliases for app detected. Create alias? (alias $name='flatpak run --file-forwarding $app_id' -> ~/.bash_aliases.d/flatpacks.sh) [Y/n]: " 'n' ansr
+        readyn -p "No previous aliases for app detected. Create alias? (alias $name='flatpak run --file-forwarding $app_id' -> ~/.bash_aliases.d/flatpacks.sh)" ansr
         if test $ansr == 'y'; then
             printf "if flatpak list --columns=name | grep \"$name\" &> /dev/null; then\n\talias $name='flatpak run --file-forwarding $app_id'\nfi\n" >> ~/.bash_aliases.d/flatpacks.sh 
             alias $name="flatpak run --file-forwarding $app_id" 

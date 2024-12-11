@@ -56,6 +56,8 @@ function change-device-name-to(){
     return 0 || return 1;
 }
 
+alias my-folder="sudo chown -R $USER:$USER ./"
+
 #source_profile=""
 #if test -z $PROFILE; then
 #    if test -f ~/.profile; then
@@ -594,27 +596,27 @@ function crontab-new(){
     #if test $guru == 'y'; then
     #    xdg-open https://crontab.guru/     
     #fi
-    reade -Q 'GREEN' -i 'custom' -p 'When? [Custom/@yearly/@annually/@monthly/@weekly/@daily/@hourly/@reboot]: ' '@yearly @annually @monthly @weekly @daily @hourly @reboot' when
+    reade -Q 'GREEN' -i 'custom @yearly @annually @monthly @weekly @daily @hourly @reboot' -p 'When? [Custom/@yearly/@annually/@monthly/@weekly/@daily/@hourly/@reboot]: ' when
     if test "$when" == 'custom'; then
         printf "\t * means any value/not applicable\n\t , for multiple values\n\t - for a range in values\n\t / for step values (f.ex */2 every 2nd of)\n\tFor weekdays mon/tue/wed/thur/fri/sat/sun are alternatives to numeric values\n" 
-        reade -Q 'GREEN' -i '*' -p 'Minutes? (0-59): ' '0 5 10 15 25 30 35 40 45 50 55 0,5,10,15,25,30,35,40,45,5,55' min
-        reade -Q 'GREEN' -i '*' -p 'Hours? (0-23): ' '0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23' hour
-        reade -Q 'GREEN' -i '*' -p 'Days?: (1-31): ' '0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31' days
-        reade -Q 'GREEN' -i '*' -p 'Month? (1-12): ' '0 1 2 3 4 5 6 7 8 9 10 11 12' month
-        reade -Q 'GREEN' -i '*' -p 'Day of week? (0-6 (7 non-standard),mon/tue/wed/thur/fri/sat/sun): ' 'sun 0 mon 1 tue 2 wed 3 thur 4 fri 5 sat 6 sun 1-2 1-3 1-4 1-5 1-6 1-7 2-3 2-4 2-5 2-6 2-7 3-4 3-5 3-6 3-7 4-5 4-6 4-7 5-6 5-7 6-7' week
+        reade -Q 'GREEN' -i '* 0 5 10 15 25 30 35 40 45 50 55 0,5,10,15,25,30,35,40,45,5,55' -p 'Minutes? (0-59): ' min
+        reade -Q 'GREEN' -i '* 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23' -p 'Hours? (0-23): ' hour
+        reade -Q 'GREEN' -i '* 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31' -p 'Days?: (1-31): ' days
+        reade -Q 'GREEN' -i '* 0 1 2 3 4 5 6 7 8 9 10 11 12' -p 'Month? (1-12): ' month
+        reade -Q 'GREEN' -i '* sun 0 mon 1 tue 2 wed 3 thur 4 fri 5 sat 6 sun 1-2 1-3 1-4 1-5 1-6 1-7 2-3 2-4 2-5 2-6 2-7 3-4 3-5 3-6 3-7 4-5 4-6 4-7 5-6 5-7 6-7' -p 'Day of week? (0-6 (7 non-standard),mon/tue/wed/thur/fri/sat/sun): ' week
         format="$min $hour $days $month $week" 
     else
         format=$when 
     fi
     users=$(compgen -u) 
     reade -Q 'GREEN' -i "$USER" -p 'User: ' "$users" user
-    reade -Q 'GREEN' -i "command" -p 'Script file or command? [Command/file]: ' 'file' cmd_file
+    reade -Q 'GREEN' -i "command file" -p 'Script file or command? [Command/file]: ' cmd_file
     if test $cmd_file == 'file'; then
         reade -Q 'GREEN' -p 'File to script: ' -e file
-        reade -Q 'GREEN' -i 'bash' -p 'Language: ' ' python php zsh dash fish' cmd
+        reade -Q 'GREEN' -i 'bash python php zsh dash fish' -p 'Language: ' cmd
         cmd="$cmd $file" 
     else
-        reade -Q 'GREEN' -i "''" -p 'Command: ' "" cmd
+        reade -Q 'GREEN' -i "''" -p 'Command: ' cmd
     fi
     if test 'root' == $user || test $user == 'system'; then
         if test $format == '@daily'; then
@@ -970,7 +972,7 @@ function boot-into(){
     local frst="$(echo $opts | awk '{print $1}')" 
     local opts="$(echo $opts | sed "s/\<$frst\> //g")"  
     efibootmgr
-    reade -Q 'GREEN' -i "$frst" -p "What to boot into? (Empty: $frst): " "$opts" bootnt
+    reade -Q 'GREEN' -i "$frst $opts" -p "What to boot into? (Empty: $frst): " bootnt
     if [[ $bootnt =~ 000[[:digit:]] ]]; then
         sudo efibootmgr --bootnext "$bootnt" 
         efibootmgr 

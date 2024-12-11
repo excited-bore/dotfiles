@@ -20,7 +20,7 @@ function starship-presets() {
     unset hmdir
     readyn -p "Set prompt identical for root?" hmdir
     if [ "$hmdir" == "y" ]; then
-        sudo cp -f ~/.config/starship.toml /root/.config/starship.toml
+        command sudo cp -f ~/.config/starship.toml /root/.config/starship.toml
         unset hmdir
         #reade -Q 'GREEN' -i 'y' -p "Set '~' to '/root'? [Y/n]: " "n" hmdir
         #if [ "$hmdir" == "y" ]; then

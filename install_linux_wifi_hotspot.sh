@@ -57,7 +57,7 @@ wihotspot
 
 if type systemctl &> /dev/null; then
 
-    reade -Q "CYAN" -i "y" -p "Enable hotspot on startup with systemctl? [Y/n]: " "n" hotspot
+    reade -Q "CYAN" -i "y" -p "Enable hotspot on startup with systemctl? "" hotspot
     if test $hotspot == "y"; then
         systemctl enable create_ap
     fi

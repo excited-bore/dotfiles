@@ -79,7 +79,7 @@ if ! type go &> /dev/null; then
 fi
 
 if echo $(go env) | grep -q "GOPATH=$HOME/go"; then
-    reade -Q "GREEN" -i "y" -p "Source installed go outside of $HOME/go? (Set GOPATH):" "n" gopth
+    readyn -p "Source installed go outside of $HOME/go? (Set GOPATH):" "n" gopth
     if [ "y" == "$gopth" ]; then
         reade -Q "CYAN" -i "$HOME/.local" -p "GOPATH: " -e gopth
         #echo "${CYAN}Only GOPATH is necessary. Setting GOROOT is usually for development reasons${normal}"

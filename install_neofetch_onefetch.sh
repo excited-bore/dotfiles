@@ -26,7 +26,7 @@ else
 fi 
 
 if ! type neofetch &> /dev/null && ! type fastfetch &> /dev/null && ! type screenFetch &> /dev/null; then
-    #reade -Q "GREEN" -i "y" -p "Install neofetch/fastfetch/screenFetch? [Y/n]: " "n" sym2
+    #readyn -p "Install neofetch/fastfetch/screenFetch? "" sym2
     #if test "$sym2" == "y"; then
         
         reade -Q "CYAN" -i "fast" -p "Which one? [Fast/neo/screen]: " "neo screen" sym2
@@ -84,7 +84,7 @@ if ! type neofetch &> /dev/null && ! type fastfetch &> /dev/null && ! type scree
 fi
 
 if ! type onefetch &> /dev/null; then
-    reade -Q "GREEN" -i "y" -p "Install onefetch? (lists github stats like lines of codes) [Y/n]: " "n" nftch
+    readyn -p "Install onefetch? (lists github stats like lines of codes) "" nftch
     if test $nftch == 'y'; then
         if test $distro_base == 'Arch'; then
             eval "$pac_ins onefetch"

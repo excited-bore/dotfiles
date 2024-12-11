@@ -144,6 +144,7 @@ function update-system() {
     echo "This next $(tput setaf 1)sudo$(tput sgr0) will try to update the packages for your system using the package managers it knows";
 
     if test $machine == 'Mac'; then
+        echo "This next $(tput setaf 1)sudo$(tput sgr0) will try to update the packages for your system using the package managers it knows";
         pac=softwareupdate
         sudo softwareupdate -i -a
         if type brew &> /dev/null; then
@@ -169,10 +170,11 @@ function update-system() {
                 ${pac_ins} "$hdrs"
             fi
         fi
+        echo "This next $(tput setaf 1)sudo$(tput sgr0) will try to update the packages for your system using the package managers it knows";
         if ! test -z "$YES"; then 
-            sudo "$pac" upgrade -y
+            sudo ${pac} upgrade -y
         else 
-            sudo "$pac" upgrade 
+            sudo ${pac} upgrade 
         fi
         if apt --dry-run autoremove 2> /dev/null | grep -Po '^Remv \K[^ ]+'; then
             readyn -p 'Autoremove unneccesary packages?' remove
@@ -200,7 +202,7 @@ function update-system() {
                 ${pac_up}
             fi
         fi
-        hdrs="$(echo $(uname -r) | cut -d. -f-2)"
+        local hdrs="$(echo $(uname -r) | cut -d. -f-2)"
         hdrs="linux${hdrs//"."}-headers"
         if test -z "$(pacman -Q $hdrs)"; then
             readyn -p "Right linux headers not installed. Install $hdrs?" hdrs_ins
@@ -208,13 +210,24 @@ function update-system() {
                 ${pac_ins} "$hdrs"
             fi
         fi
-        
-        readyn $YES -p 'Clean unnessecary (orphan) packages?' cachcln
+       
+        local auto=''
+        ! test -z $YES && auto='--auto '
+
+        readyn $auto -p 'Clean unnessecary (orphan) packages?' cachcln
         if test $cachcln == 'y'; then
             if ! test -z "$AUR_clean"; then
-                ${AUR_clean}
+                if ! test "$YES"; then 
+                    yes | ${AUR_clean}
+                else
+                    ${AUR_clean}
+                fi
             else
-                ${pac_clean}
+                if ! test "$YES"; then 
+                    yes | ${pac_clean}  
+                else
+                    ${pac_clean}
+                fi
             fi
         fi
         unset cachcln 
@@ -223,16 +236,18 @@ function update-system() {
         continue
     # https://en.opensuse.org/System_Updates
     elif test "$pac" == "zypper_leap"; then
+        echo "This next $(tput setaf 1)sudo$(tput sgr0) will try to update the packages for your system using the package managers it knows";
         if ! test -z "$YES"; then 
             yes | sudo zypper up
         else
             sudo zypper up
         fi
     elif test "$pac" == "zypper_tumble"; then
+        echo "This next $(tput setaf 1)sudo$(tput sgr0) will try to update the packages for your system using the package managers it knows";
         if ! test -z "$YES"; then 
             yes | sudo zypper dup
         else
-            yes | sudo zypper dup
+            sudo zypper dup
         fi
 
     elif test "$pac" == "yum"; then
@@ -307,7 +322,7 @@ function update-system() {
                 #fi
                 #unset npm_up
 
-                reade -Y "magenta" -p "${normal}Update ${red}${bold}global${normal}${magenta1} npm packages? (Javascript)" npm_up
+                readyn -Y "magenta" -p "${normal}Update ${red}${bold}global${normal}${magenta1} npm packages? (Javascript)" npm_up
                 if [ "$npm_up" == "y" ]; then
                     echo "This next $(tput setaf 1)sudo$(tput sgr0) will update using 'sudo npm -g update'";
                     sudo npm -g update

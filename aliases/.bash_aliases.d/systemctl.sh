@@ -135,7 +135,7 @@ if type fzf &> /dev/null; then
             unit=$(systemctl --no-pager --state running | head -n -6 | tail -n +2 | fzf --multi --ansi -q "$@" | awk '{print $1;}')
         fi
         echo $unit 
-        reade -Q "GREEN" -i "status" -p "What to do? [Status/stop/restart/enable/disable/edit/print]: " "stop restart enable disable edit print" actn 
+        reade -Q "GREEN" -i "status stop restart enable disable edit print" -p "What to do? [Status/stop/restart/enable/disable/edit/print]: " actn 
         if ! test -z $actn; then
             if test $actn == 'status'; then
                 systemctl status $unit 
