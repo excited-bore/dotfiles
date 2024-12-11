@@ -1,4 +1,4 @@
-# !/bin/bash
+#!/bin/bash
 if ! test -f checks/check_system.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
 else
@@ -28,9 +28,9 @@ fi
 
 if ! type rg &> /dev/null; then 
     if test $distro_base == "Arch"; then
-        eval "$pac_ins ripgrep"
+        ${pac_ins} ripgrep
     elif test $distro_base == "Debian"; then
-        eval "$pac_ins ripgrep "
+        ${pac_ins} ripgrep
     fi
 fi
 
