@@ -373,17 +373,17 @@ require("lazy").setup({
 --   }
 -- })
 
--- require("oil").setup({
---   -- Oil will take over directory buffers (e.g. `vim .` or `:e src/`)
---   -- Set to false if you want some other plugin (e.g. netrw) to open when you edit directories.
---     -- default_file_explorer = true,   
---     view_options = {
---         -- Show files and directories that start with "."
---         show_hidden = true
---     }
--- })
--- 
--- vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
+ require("oil").setup({
+   -- Oil will take over directory buffers (e.g. `vim .` or `:e src/`)
+   -- Set to false if you want some other plugin (e.g. netrw) to open when you edit directories.
+     default_file_explorer = false,   
+     view_options = {
+         -- Show files and directories that start with "."
+         show_hidden = true
+     }
+ })
+ 
+ vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
 
 
 require("telescope")
@@ -424,6 +424,11 @@ require("telescope").setup {
   },
 }
 
+-- require("whichkey").setup { 
+
+-- }
+
+
  -- This is a snippet on how you can add change directory functionality to some pickers, like find files.
 
 require("telescope").setup {
@@ -444,14 +449,26 @@ require("telescope").setup {
         }
       }
     },
+  },
+  extensions = {
+      ast_grep = {
+          command = {
+              "sg",
+              "--json=stream",
+          }, -- must have --json=stream
+          grep_open_files = false, -- search in opened files
+          lang = nil, -- string value, specify language for ast-grep `nil` for default
+      }
   }
 }
 
 -- To get telescope-file-browser loaded and working with telescope,
 -- you need to call load_extension, somewhere after setup function:
 
+-- require("telescope").load_extension "ast_grep"
 require("telescope").load_extension "file_browser"
 
+require('mini.files').setup()
 
 -- local find_files_hijack_netrw = vim.api.nvim_create_augroup("find_files_hijack_netrw", { clear = true })
 -- -- clear FileExplorer appropriately to prevent netrw from launching on folders
