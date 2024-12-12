@@ -318,26 +318,26 @@ if type pacman &> /dev/null; then
          
     fi
 
-    if type perl &> /dev/null && type zcat &> /dev/null && ! test -f $HOME/.cache/AUR/packages-meta-ext-v1.json.extracted.txt; then
-        # https://stackoverflow.com/questions/50596286/how-to-programmably-get-the-metadata-of-all-packages-available-from-aur-in-archl 
-        zcat <(curl -sSL https://aur.archlinux.org/packages-meta-ext-v1.json.gz) | jq --compact-output '.[] | {Name, Version, Description, Keywords, PackageBase, URL, Popularity, OutOfDate, Maintainer, FirstSubmitted, LastModified, Depends, MakeDepends, License}' | perl -pe 's/^\{\"|\"?,"(?![^:]+\])/\n/g' | perl -pe 's/\\(?=")|\"(?=:)|:\K\[?\"\[?\"?|\"?\]\}?$//gm' | perl -pe 's/\",\" ?/ /gm' | perl -pe 's/^([^:]+)(:)(.*)$/$1                    $2 $3/gm' | perl -pe 's/^.{16}\K +//gm' | perl -0777 -pe 's/\n+(?=Name)/\n\n\nRepository      : AUR\n/gm' $HOME/.cache/AUR/packages-meta-ext-v1.json.extracted.txt
+    #if type perl &> /dev/null && type zcat &> /dev/null && ! test -f $HOME/.cache/AUR/packages-meta-ext-v1.json.extracted.txt; then
+    #    # https://stackoverflow.com/questions/50596286/how-to-programmably-get-the-metadata-of-all-packages-available-from-aur-in-archl 
+    #    zcat <(curl -sSL https://aur.archlinux.org/packages-meta-ext-v1.json.gz) | jq --compact-output '.[] | {Name, Version, Description, Keywords, PackageBase, URL, Popularity, OutOfDate, Maintainer, FirstSubmitted, LastModified, Depends, MakeDepends, License}' | perl -pe 's/^\{\"|\"?,"(?![^:]+\])/\n/g' | perl -pe 's/\\(?=")|\"(?=:)|:\K\[?\"\[?\"?|\"?\]\}?$//gm' | perl -pe 's/\",\" ?/ /gm' | perl -pe 's/^([^:]+)(:)(.*)$/$1                    $2 $3/gm' | perl -pe 's/^.{16}\K +//gm' | perl -0777 -pe 's/\n+(?=Name)/\n\n\nRepository      : AUR\n/gm' $HOME/.cache/AUR/packages-meta-ext-v1.json.extracted.txt
 
-    fi
+    #fi
 
     if type xdg-open &> /dev/null && type zcat &> /dev/null && type fzf &> /dev/null; then
-
-        function AUR-fzf-list-website(){
-            Q=''
-            if ! test -z $@; then
-                Q="-Q $@"
-            fi
-            packages="$(cat $HOME/.cache/AUR/packages-meta-ext-v1.json.extracted.txt | grep --color=never -e 'Name.*:' -e 'Description.*:' | awk '{ $1=$2=""; print $0}' | paste -d "\t"  - - | fzf --ansi --select-1 --multi --reverse --sync --delimiter '\t' --with-nth 1 --height 33% --preview='echo {2}' --preview-window='down,10%,follow' | sed 's/^ *//g' | awk '{print $1}')" 
-            for i in $packages; do 
-                xdg-open "https://aur.archlinux.org/packages/$i" 
-            done 
-            unset packages i  
-        } 
-        complete -W "$(zcat $HOME/.cache/AUR/packages.gz)" AUR-list-website
+        continue 
+        #function AUR-fzf-list-website(){
+        #    Q=''
+        #    if ! test -z $@; then
+        #        Q="-Q $@"
+        #    fi
+        #    packages="$(cat $HOME/.cache/AUR/packages-meta-ext-v1.json.extracted.txt | grep --color=never -e 'Name.*:' -e 'Description.*:' | awk '{ $1=$2=""; print $0}' | paste -d "\t"  - - | fzf --ansi --select-1 --multi --reverse --sync --delimiter '\t' --with-nth 1 --height 33% --preview='echo {2}' --preview-window='down,10%,follow' | sed 's/^ *//g' | awk '{print $1}')" 
+        #    for i in $packages; do 
+        #        xdg-open "https://aur.archlinux.org/packages/$i" 
+        #    done 
+        #    unset packages i  
+        #} 
+        #complete -W "$(zcat $HOME/.cache/AUR/packages.gz)" AUR-list-website
         #cat packages-meta-ext-v1.json.extracted.txt | awk '{$1=$2=""; print $0}' | 
         
         #function AUR-fzf-packages(){

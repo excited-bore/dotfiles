@@ -373,17 +373,17 @@ require("lazy").setup({
 --   }
 -- })
 
--- require("oil").setup({
---   -- Oil will take over directory buffers (e.g. `vim .` or `:e src/`)
---   -- Set to false if you want some other plugin (e.g. netrw) to open when you edit directories.
---     -- default_file_explorer = true,   
---     view_options = {
---         -- Show files and directories that start with "."
---         show_hidden = true
---     }
--- })
--- 
--- vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
+ require("oil").setup({
+   -- Oil will take over directory buffers (e.g. `vim .` or `:e src/`)
+   -- Set to false if you want some other plugin (e.g. netrw) to open when you edit directories.
+     default_file_explorer = false,   
+     view_options = {
+         -- Show files and directories that start with "."
+         show_hidden = true
+     }
+ })
+ 
+ vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
 
 
 require("telescope")
@@ -430,6 +430,7 @@ require("telescope").setup {
 -- you need to call load_extension, somewhere after setup function:
 require("telescope").load_extension "file_browser"
 
+require('mini.files').setup()
 
 -- local find_files_hijack_netrw = vim.api.nvim_create_augroup("find_files_hijack_netrw", { clear = true })
 -- -- clear FileExplorer appropriately to prevent netrw from launching on folders

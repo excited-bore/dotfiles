@@ -1,11 +1,13 @@
 # !/bin/bash
-
 if ! type reade &> /dev/null && test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh; then
     . ~/.bash_aliases.d/00-rlwrap_scripts.sh
 fi 
 
-alias blesh="source ~/.local/share/blesh/ble-0.4.0-devel3/ble.sh "
-alias blesh-unload="source out/ble.sh"
+if ! type ble &> /dev/null; then
+    alias ble-load="sed 's/#\(.*ble.sh --noattach\)/\1/g' ~/.bashrc && source ~/.bashrc"
+else  
+    alias ble-unload="sed 's/^\(.*ble.sh --noattach\)/#\1/g' ~/.bashrc && source ~/.bashrc"
+fi
 
 # Kdocker is a system tray app
 # thunderbird does not support trays on linux, which why we do this

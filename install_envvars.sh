@@ -323,6 +323,10 @@ elif [ "$envvars" == "y" ]; then
             editors="nano"
             prmpt="${green}\tnano = Default editor - Basic, but userfriendly\n" 
         fi 
+        if type edit &> /dev/null; then
+            editors="edit $editors"
+            prmpt="$prmpt \tOne of unix default editors = Archaic editor - not recommended\n"
+        fi
         if type micro &> /dev/null; then
             editors="micro $editors"
             prmpt="$prmpt \tMicro = Relatively good out-of-the-box editor - Decent keybindings, yet no customizations\n"
@@ -331,6 +335,7 @@ elif [ "$envvars" == "y" ]; then
             editors="ne $editors"
             prmpt="$prmpt \tNice editor = Relatively good out-of-the-box editor - Decent keybindings, yet no customizations\n"
         fi
+
         if type vim &> /dev/null; then
             editors="vim $editors"
             prmpt="$prmpt \tvim = The one and only true modal editor - Not userfriendly, but many features (maybe even too many) and greatly customizable\n"
