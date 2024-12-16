@@ -13,9 +13,9 @@ else
 fi
 
 if ! test -f rlwrap-scripts/reade; then
-    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade)" 
+    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade)" &> /dev/null 
 else
-    . ./rlwrap-scripts/reade
+    . ./rlwrap-scripts/reade &> /dev/null
 fi
 
 

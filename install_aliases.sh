@@ -245,6 +245,8 @@ if test $ansr == "y"; then
 fi
 
 update_sysm=aliases/.bash_aliases.d/update-system.sh
+reade=rlwrap-scripts/reade
+readyn=rlwrap-scripts/readyn
 pacmn=aliases/.bash_aliases.d/package_managers.sh
 test $distro == "Manjaro" && manjaro=aliases/.bash_aliases.d/manjaro.sh
 type systemctl &> /dev/null && systemd=aliases/.bash_aliases.d/systemctl.sh
@@ -274,7 +276,7 @@ update_sysm_r(){
 update_sysm(){
     cp -fv $update_sysm ~/.bash_aliases.d/
     sed -i '/SYSTEM_UPDATED="TRUE"/d' ~/.bash_aliases.d/update-system.sh
-    yes_edit_no update_sysm_r "$update_sysm" "Install update-system.sh at /root/?" "yes" "YELLOW";
+    yes_edit_no update_sysm_r "$update_sysm" "Install update-system.sh at /root/.bash_aliases.d//?" "yes" "YELLOW";
 }
 yes_edit_no update_sysm "$update_sysm" "Install update-system.sh at ~/.bash_aliases.d/? (Global system update function)?" "yes" "GREEN"
 
@@ -283,9 +285,20 @@ packman_r(){
 }
 packman(){
     cp -fv $pacmn ~/.bash_aliases.d/
-    yes_edit_no packman_r "$pacmn" "Install package_managers.sh at /root/?" "yes" "YELLOW" 
+    yes_edit_no packman_r "$pacmn" "Install package_managers.sh at /root/.bash_aliases.d/?" "yes" "YELLOW" 
 }
 yes_edit_no packman "$pacmn" "Install package_managers.sh at ~/.bash_aliases.d/ (package manager aliases)? " "yes" "GREEN"
+
+reade_r(){ 
+    sudo cp -fv $reade $readyn /root/.bash_aliases.d/
+}
+readei(){
+    cp -fv $reade $readyn ~/.bash_aliases.d/
+    yes_edit_no reade_r "$reade $readyn" "Install reade and readyn at /root/.bash_aliases.d/?" "yes" "YELLOW" 
+}
+yes_edit_no readei "$reade $readyn" "Install reade and readyn at ~/.bash_aliases.d/ (rlwrap/read functions)? " "yes" "GREEN"
+
+
 
 if [ "$distro" == "Manjaro" ] ; then
     manj_r(){ 
@@ -293,7 +306,7 @@ if [ "$distro" == "Manjaro" ] ; then
     }
     manj(){
         cp -fv $manjaro ~/.bash_aliases.d/
-        yes_edit_no manj_r "$manjaro" "Install manjaro.sh at /root/?" "yes" "YELLOW" 
+        yes_edit_no manj_r "$manjaro" "Install manjaro.sh at /root/.bash_aliases.d/?" "yes" "YELLOW" 
     }
     yes_edit_no manj "$manjaro" "Install manjaro.sh at ~/.bash_aliases.d/ (manjaro specific aliases)? " "yes" "GREEN"
 fi
@@ -304,7 +317,7 @@ systemd_r(){
 }
 systemd(){
     cp -fv $systemd ~/.bash_aliases.d/
-    yes_edit_no systemd_r "$systemd" "Install systemctl.sh at /root/?" "yes" "YELLOW"; }
+    yes_edit_no systemd_r "$systemd" "Install systemctl.sh at /root/.bash_aliases.d/?" "yes" "YELLOW"; }
 yes_edit_no systemd "$systemd" "Install systemctl.sh at ~/.bash_aliases.d/? (systemctl aliases/functions)?" "yes" "GREEN"
     
 
@@ -314,7 +327,7 @@ dosu_r(){
 
 dosu(){ 
     cp -fv $dosu ~/.bash_aliases.d/;
-    yes_edit_no dosu_r "$dosu" "Install sudo.sh at /root/?" "yes" "YELLOW"; }
+    yes_edit_no dosu_r "$dosu" "Install sudo.sh at /root/.bash_aliases.d/?" "yes" "YELLOW"; }
 yes_edit_no dosu "$dosu" "Install sudo.sh at ~/.bash_aliases.d/ (sudo aliases)?" "yes" "GREEN"
 
 
@@ -323,7 +336,7 @@ git_r(){
 }
 gith(){
     cp -fv $gits ~/.bash_aliases.d/
-    yes_edit_no git_r "$gits" "Install git.sh at /root/?" "yes" "YELLOW" 
+    yes_edit_no git_r "$gits" "Install git.sh at /root/.bash_aliases.d/?" "yes" "YELLOW" 
 }
 yes_edit_no gith "$gits" "Install git.sh at ~/.bash_aliases.d/ (git aliases)? " "yes" "GREEN"
 
@@ -332,7 +345,7 @@ ssh_r(){
 }
 sshh(){
     cp -fv $sshs ~/.bash_aliases.d/
-    yes_edit_no ssh_r "$sshs" "Install ssh.sh at /root/?" "yes" "YELLOW" 
+    yes_edit_no ssh_r "$sshs" "Install ssh.sh at /root/.bash_aliases.d/?" "yes" "YELLOW" 
 }
 yes_edit_no sshh "$sshs" "Install ssh.sh at ~/.bash_aliases.d/ (ssh aliases)? " "yes" "GREEN"
 
@@ -342,7 +355,7 @@ ps1_r(){
 }
 ps11(){
     cp -fv $ps1 ~/.bash_aliases.d/
-    yes_edit_no ps1_r "$ps1" "Install PS1_colours.sh at /root/?" "yes" "YELLOW" 
+    yes_edit_no ps1_r "$ps1" "Install PS1_colours.sh at /root/.bash_aliases.d/?" "yes" "YELLOW" 
 }
 yes_edit_no ps11 "$ps1" "Install PS1_colours.sh at ~/.bash_aliases.d/ (Coloured command prompt)? " "yes" "GREEN"
 

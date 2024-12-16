@@ -4,9 +4,9 @@
 # https://unix.stackexchange.com/questions/278631/bash-script-auto-complete-for-user-input-based-on-array-data
 
 if ! test -f rlwrap-scripts/reade; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade)" 
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade)" &> /dev/null 
 else
-    . ./rlwrap-scripts/reade
+    . ./rlwrap-scripts/reade &> /dev/null
 fi
   
 lsblk --all --exclude 7 -o NAME,SIZE,FSTYPE,MOUNTPOINT,LABEL,UUID
