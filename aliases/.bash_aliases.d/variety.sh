@@ -24,11 +24,21 @@ if type nyx &> /dev/null; then
     alias status-tor="nyx"
 fi
 
+if type java &> /dev/null; then
+    alias java-jar="java -jar"
+fi
+
+
 if type torsocks &> /dev/null; then
     alias tor-shell-on="source torsocks on"
     alias tor-shell-off="source torsocks off"
 fi
 
+if test -f /opt/anaconda/bin/activate; then
+    alias conda-activate='CRYPTOGRAPHY_OPENSSL_NO_LEGACY=1 source /opt/anaconda/bin/activate root'
+    alias conda-deactivate='CRYPTOGRAPHY_OPENSSL_NO_LEGACY=1 conda deactivate'
+    #CRYPTOGRAPHY_OPENSSL_NO_LEGACY=1 source /opt/anaconda/bin/activate root 
+fi
 
 if type nmap &> /dev/null; then
     function net-open-ports-outgoing(){

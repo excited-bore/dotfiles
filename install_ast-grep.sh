@@ -39,6 +39,6 @@ if ! type ast-grep &> /dev/null; then
    cargo install ast-grep 
 
    if ! test -f ~/.bash_aliases.d/ast-grep; then
-      echo "$(ast-grep completions bash)" > ~/.bash_aliases.d/ast-grep
+      echo "$(ast-grep completions bash)" > ~/.bash_completion.d/ast-grep
    fi
 fi

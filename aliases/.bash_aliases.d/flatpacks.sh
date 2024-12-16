@@ -56,3 +56,9 @@ fi
 if flatpak list --columns=name | grep "flatseal" &> /dev/null; then
 	alias flatseal='flatpak run --file-forwarding com.github.tchx84.Flatseal'
 fi
+if flatpak list --columns=name | grep "bottles" &> /dev/null; then
+	alias bottles='flatpak run --file-forwarding com.usebottles.bottles'
+fi
+if flatpak list --columns=name | grep "signal-desktop" &> /dev/null; then
+	alias signal-desktop='flatpak run --file-forwarding org.signal.Signal'
+fi

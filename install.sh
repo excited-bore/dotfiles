@@ -12,6 +12,12 @@ else
     . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
 fi
 
+if ! test -f rlwrap-scripts/reade; then
+    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade)" 
+else
+    . ./rlwrap-scripts/reade
+fi
+
 
 if ! test -f checks/check_system.sh; then
     if type curl &> /dev/null; then
@@ -47,24 +53,21 @@ if test -z $SYSTEM_UPDATED; then
     fi
 fi
 
-if ! type reade &>/dev/null; then
+if ! type rlwrap &>/dev/null; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_rlwrap.sh)" 
 else
     . ./checks/check_rlwrap.sh
 fi
 
-
-readyn -p "Install reade and readyn?" -c 'test -f /usr/bin/reade' insrde
-if test $insrde == 'y'; then
-    if ! test -f install_reade_readyn.sh; then
-         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_reade_readyn.sh)" 
-    else
-        ./install_reade_readyn.sh
-    fi
-fi
-unset insrde
-
-
+#readyn -p "Install reade and readyn?" -c 'test -f /usr/bin/reade' insrde
+#if test $insrde == 'y'; then
+#    if ! test -f install_reade_readyn.sh; then
+#         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_reade_readyn.sh)" 
+#    else
+#        ./install_reade_readyn.sh
+#    fi
+#fi
+#unset insrde
 
 
 

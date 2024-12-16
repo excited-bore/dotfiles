@@ -324,8 +324,8 @@ if type pacman &> /dev/null; then
 
     #fi
 
-    if type xdg-open &> /dev/null && type zcat &> /dev/null && type fzf &> /dev/null; then
-        continue 
+    #if type xdg-open &> /dev/null && type zcat &> /dev/null && type fzf &> /dev/null; then
+    #    continue 
         #function AUR-fzf-list-website(){
         #    Q=''
         #    if ! test -z $@; then
@@ -368,7 +368,7 @@ if type pacman &> /dev/null; then
         #       fi
         #   fi
         #} 
-    fi
+    #fi
    #sed -n -e 's/^.*stalled: //p' 
 
     ### PAMAC ###
