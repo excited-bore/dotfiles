@@ -17,6 +17,7 @@ set show-mode-in-prompt on
 # Insert mode / Emacs mode are magenta, command mode is blue
 # https://github.com/calid/bash
 # 
+
 $if term=linux
 	#Version with color (insert - purple / command - blue)
         #set vi-ins-mode-string \1\e[35;1m\2(ins)\1\e[?0c\2\1\e[3m\2

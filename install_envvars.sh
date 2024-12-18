@@ -119,7 +119,7 @@ environment-variables(){
      
     if test -f ~/.bash_profile; then
         printf "\n${GREEN}Since file ${cyan}$HOME/.bash_profile${green} exists, ${cyan}bash${green} won't source ${magenta}$HOME/.profile${green} natively at login.\n${normal}"
-        reade -Q 'GREEN' -i 'prof' -p "Source $HOME/.profile in $HOME/.bash_profile or source $HOME/.environment.env directly in $HOME/.bash_profile? [Prof/path/none]: " 'path none' bash_prof
+        reade -Q 'GREEN' -i 'prof path none' -p "Source $HOME/.profile in $HOME/.bash_profile or source $HOME/.environment.env directly in $HOME/.bash_profile? [Prof/path/none]: " bash_prof
         if [[ $bash_prof =~ 'prof' ]]; then
             if ! grep -q "~/.profile" ~/.bash_profile; then
                 printf "\n[ -f ~/.environment.env ] && source ~/.profile\n\n" >> ~/.bash_profile
@@ -130,7 +130,7 @@ environment-variables(){
             fi
         fi
         if test -f ~/.bashrc && ! grep -q "~/.environment.env" ~/.bashrc; then
-            reade -Q 'GREEN' -i 'y' -p "Source $HOME/.environment.env in $HOME/.bashrc? [Y/n]: " 'n' bashrc
+            readyn -p "Source $HOME/.environment.env in $HOME/.bashrc?" bashrc
             if test $bashrc == 'y'; then 
                 if grep -q "[ -f ~/.bash_completion ]" ~/.bashrc; then
                      sed -i 's|\(\[ -f ~/.bash_completion \] \&\& source \~/.bash_completion\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' ~/.bashrc
@@ -382,7 +382,7 @@ elif [ "$envvars" == "y" ]; then
         
         # Make .txt file and output file
          
-        ready -N 'CYAN' -n -p "Set VISUAL to '\\\\\$EDITOR'? (otherwise set manually again)" vis_ed
+        readyn -N 'CYAN' -n -p "Set VISUAL to '\\\\\$EDITOR'? (otherwise set manually again)" vis_ed
         if test $vis_ed == 'y'; then
             sed -i 's|#export VISUAL=|export VISUAL=|g' $pathvr
             sed -i 's|export VISUAL=.*|export VISUAL=$EDITOR|g' $pathvr
