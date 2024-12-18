@@ -13,10 +13,6 @@ if type wget &> /dev/null; then
     alias wget='wget --https-only '
 fi
 
-if type curl &> /dev/null; then
-   alias curl='curl --proto "=https" --tlsv1.2 ' 
-fi
-
 
 # https://stackoverflow.com/questions/4023830/how-to-compare-two-strings-in-dot-separated-version-format-in-bash
 

@@ -275,11 +275,11 @@ elif test $distro_base == 'Arch'; then
     fi
 
 
-    if test -z "$(eval "$pac_ls_ins pacseek 2> /dev/null")"; then
+    if ! test -z "$AUR_ls_ins" && test -z "$(${AUR_ls_ins} pacseek 2> /dev/null)"; then
         printf "${CYAN}pacseek${normal} (A TUI for managing packages from pacman and AUR) is not installed\n"
         readyn -p "Install pacseek? " pacs_ins
         if test $pacs_ins == 'y'; then
-            eval "yes | $pac_ins pacseek"
+            yes | ${AUR_ins} pacseek
         fi
         unset pacs_ins 
     fi 

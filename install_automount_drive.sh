@@ -8,7 +8,13 @@ if ! test -f rlwrap-scripts/reade; then
 else
     . ./rlwrap-scripts/reade &> /dev/null
 fi
-  
+
+if ! test -f rlwrap-scripts/readyn; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/readyn)" &> /dev/null 
+else
+    . ./rlwrap-scripts/readyn &> /dev/null
+fi
+
 lsblk --all --exclude 7 -o NAME,SIZE,FSTYPE,MOUNTPOINT,LABEL,UUID
 
 printf "\n${bold}Currently in /etc/fstab: ${normal}\n"
@@ -47,13 +53,12 @@ if test "$type_fs" == "ext4"; then
     fi
 fi
 
-readyn -Y 'YELLOW' -p "Will write \"$uuid $mnt $type_fs $attr\" to /etc/fstab. Ok?" ok
+readyn -Y 'YELLOW' -p "Will write '$uuid $mnt $type_fs $attr' to /etc/fstab. Ok?" ok
 if [ -z $ok ] || [ $ok == "y" ]; then
    echo "$uuid $mnt $type_fs $attr" | sudo tee -a /etc/fstab 
 fi
 
-echo
-printf "${bold}Currently in /etc/fstab: ${normal}\n"
+printf "\n${bold}Currently in /etc/fstab: ${normal}\n"
 cat /etc/fstab | tail +7
 
-unset readecomp drives drive mnt uuid type_fs attr chown_stff ok
+#unset readecomp drives drive mnt uuid type_fs attr chown_stff ok
