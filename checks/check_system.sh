@@ -901,6 +901,11 @@ if ! type curl &> /dev/null && ! test -z $pac_ins; then
     ${pac_ins} curl
 fi
 
+if ! type jq &> /dev/null && ! test -z $pac_ins; then
+    ${pac_ins} jq
+fi
+
+
 if type pamac &> /dev/null; then
     if ! test -f checks/check_pamac.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pamac.sh)" 

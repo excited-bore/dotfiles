@@ -525,7 +525,7 @@ elif [ "$envvars" == "y" ]; then
                 echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for 'Defaults env_keep += \"SYSTEMD_PAGERSECURE\"' in /etc/sudoers"
                 if ! sudo grep -q "Defaults env_keep += \"SYSTEMD_PAGERSECURE\"" /etc/sudoers; then
                     printf "${bold}${yellow}Sudo won't respect the user's SYSTEMD_PAGERSECURE environment. If you were to want to keep your userdefined less options or use a custom pager when using sudo with ${cyan}systemctl/journalctl${bold}${yellow}, you would need to always pass your environment using 'sudo -E'\n${normal}"
-                    reade -Q "YELLOW" -i "y" -p "Change this behaviour permanently in /etc/sudoers? "" sudrs
+                    reade -Q "YELLOW" -i "y" -p "Change this behaviour permanently in /etc/sudoers?" sudrs
                     if test "$sudrs" == "y"; then
                         sudo sed -i '1s/^/Defaults env_keep += "SYSTEMD_PAGERSECURE"\n/' /etc/sudoers
                         echo "Added ${RED}'Defaults env_keep += \"SYSTEMD_PAGERSECURE\"'${normal} to /etc/sudoers"
