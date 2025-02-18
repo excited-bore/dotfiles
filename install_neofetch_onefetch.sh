@@ -75,23 +75,23 @@ if ! type neofetch &> /dev/null && ! type fastfetch &> /dev/null && ! type scree
             fi
         elif test "$sym2" == "screen"; then      
             if test $distro_base == "Debian"; then
-               eval "$pac_ins screenfetch"
+               ${pac_ins} screenfetch
             elif test $distro_base == "Arch"; then
-               eval "$pac_ins screenFetch"
+               ${pac_ins} screenFetch
             fi
         fi
     #fi
 fi
 
 if ! type onefetch &> /dev/null; then
-    readyn -p "Install onefetch? (lists github stats like lines of codes) "" nftch
+    readyn -p "Install onefetch? (lists github stats like lines of codes)" nftch
     if test $nftch == 'y'; then
         if test $distro_base == 'Arch'; then
-            eval "$pac_ins onefetch"
+            ${pac_ins} onefetch
         elif test $distro_base == 'Debian' && type add-apt-repository &> /dev/null && [[ $(check-ppa ppa:o2sh/onefetch) =~ 'OK' ]]; then
             sudo add-apt-repository ppa:o2sh/onefetch 
-            eval "$pac_up" 
-            eval "$pac_ins onefetch"
+            ${pac_up}
+            ${pac_ins} onefetch
         elif test $distro == 'Fedora'; then
             sudo dnf copr enable varlad/onefetch
             sudo dnf install onefetch 

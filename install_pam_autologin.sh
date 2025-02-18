@@ -21,7 +21,7 @@ fi
 if [ "$distro" == "Manjaro" ]; then
     pamac install pam_autologin
 elif test "$distro" == "Arch" && ! test "$AUR_ins" == ""; then
-    eval "$AUR_ins" pam_autologin
+    ${AUR_ins} pam_autologin
 fi
 
 if ! sudo grep -q "pam_autologin.so" /etc/pam.d/login; then 

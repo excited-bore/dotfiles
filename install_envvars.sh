@@ -110,7 +110,7 @@ environment-variables(){
         unset prof
     fi
     if test -f ~/.bash_profile && ! grep -q "~/.bash_profile" ~/.profile; then
-        reade -Q 'GREEN' -i 'y' -p "Link ~/.bash_profile in ~/.profile? [Y/n]: " 'n' bprof
+        readyn -p "Link ~/.bash_profile in ~/.profile?" bprof
         if test $prof == 'y'; then
             printf "\n[ -f ~/.bash_profile ] && source ~/.bash_profile\n\n" >> ~/.profile
         fi
@@ -430,7 +430,7 @@ elif [ "$envvars" == "y" ]; then
             echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for 'Defaults env_keep += \"PAGER\"' in /etc/sudoers"
             if ! sudo grep -q "Defaults env_keep += \"PAGER\"" /etc/sudoers; then
                 printf "${bold}${yellow}Sudo by default does not respect the user's PAGER environment. If you were to want to use a custom pager with sudo (except with ${cyan}systemctl/journalctl${bold}${yellow}, more on that later) you would need to always pass your environment using 'sudo -E'\n${normal}"
-                ready -Y 'YELLOW' -p "Change this behaviour permanently in /etc/sudoers?" sudrs
+                readyn -Y 'YELLOW' -p "Change this behaviour permanently in /etc/sudoers?" sudrs
                 if test "$sudrs" == "y"; then
                     sudo sed -i '1s/^/Defaults env_keep += "PAGER SYSTEMD_PAGERSECURE"\n/' /etc/sudoers
                     echo "Added ${RED}'Defaults env_keep += \"PAGER SYSTEMD_PAGERSECURE\"'${normal} to /etc/sudoers"
@@ -440,7 +440,7 @@ elif [ "$envvars" == "y" ]; then
             echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for 'Defaults env_keep += \"EDITOR\"' and 'Defaults env_keep += \"VISUAL\"' in /etc/sudoers"
             if ! sudo grep -q "Defaults env_keep += \"EDITOR\"" /etc/sudoers || ! sudo grep -q "Defaults env_keep += \"VISUAL\""  /etc/sudoers; then
                 printf "${bold}${yellow}Sudo by default does not respect the user's EDITOR/VISUAL environment and SUDO_EDITOR is not always checked by programs.\nIf you were to want edit root crontabs (sudo crontab -e), you would get vi (unless using 'sudo -E' to pass your environment)\n${normal}"
-                reade -Q "YELLOW" -i "n" -p "Change this behaviour permanently in /etc/sudoers? (Run 'man --pager='less -p ^security' less' if you want to see the potential security holes when using less) [N/y]: " "y" sudrs
+                readyn -Y "YELLOW" -p "Change this behaviour permanently in /etc/sudoers? (Run 'man --pager='less -p ^security' less' if you want to see the potential security holes when using less)" sudrs
                 if test "$sudrs" == "y"; then
                     if ! sudo grep -q "Defaults env_keep += \"EDITOR\"" /etc/sudoers ; then 
                         sudo sed -i '1s/^/Defaults env_keep += "EDITOR"\n/' /etc/sudoers
@@ -462,7 +462,7 @@ elif [ "$envvars" == "y" ]; then
     fi
     #reade -Q "GREEN" -i "n" -p "Set DISPLAY to ':$(addr).0'? [Y/n]:" "n" dsply
     if [[ $- =~ i ]] && [[ -n "$SSH_TTY" ]]; then
-        reade -Q "YELLOW" -i "n" -p "Detected shell is SSH. For X11, it's more reliable performance to dissallow shared clipboard (to prevent constant hanging). Set DISPLAY to 'localhost:10.0'? [Y/n]:" "n" dsply
+        reade -Y "YELLOW" -n -p "Detected shell is SSH. For X11, it's more reliable performance to dissallow shared clipboard (to prevent constant hanging). Set DISPLAY to 'localhost:10.0'?" dsply
         if [ "$dsply" == "y" ] || [ -z "$dsply" ]; then
             sed -i "s|.export DISPLAY=.*|export DISPLAY=\"localhost:10.0\"|" $pathvr
         fi
@@ -518,14 +518,14 @@ elif [ "$envvars" == "y" ]; then
     if type systemctl &> /dev/null; then
         pageSec=1
         printf "${cyan}Systemd comes preinstalled with ${GREEN}SYSTEMD_PAGERSECURE=1${normal}.\n This means any pager without a 'secure mode' cant be used for ${CYAN}systemctl/journalctl${normal}.\n(Features that are fairly obscure and mostly less-specific in the first place -\n No editing (v), no examining (:e), no pipeing (|)...)\n It's an understandable concern to be better safe and sound, but this does constrain the user to ${CYAN}only using less.${normal}\n"
-        reade -Q "YELLOW" -i "y" -p "${yellow}Set SYSTEMD_PAGERSECURE to 0? " page_sec
+        reade -N "YELLOW" -n -p "${yellow}Set SYSTEMD_PAGERSECURE to 0?" page_sec
         if test "$page_sec" == "y"; then
             pageSec=0 
             if test -f /etc/sudoers; then 
                 echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for 'Defaults env_keep += \"SYSTEMD_PAGERSECURE\"' in /etc/sudoers"
                 if ! sudo grep -q "Defaults env_keep += \"SYSTEMD_PAGERSECURE\"" /etc/sudoers; then
                     printf "${bold}${yellow}Sudo won't respect the user's SYSTEMD_PAGERSECURE environment. If you were to want to keep your userdefined less options or use a custom pager when using sudo with ${cyan}systemctl/journalctl${bold}${yellow}, you would need to always pass your environment using 'sudo -E'\n${normal}"
-                    reade -Q "YELLOW" -i "y" -p "Change this behaviour permanently in /etc/sudoers?" sudrs
+                    readyn -Y "YELLOW -p "Change this behaviour permanently in /etc/sudoers?" sudrs
                     if test "$sudrs" == "y"; then
                         sudo sed -i '1s/^/Defaults env_keep += "SYSTEMD_PAGERSECURE"\n/' /etc/sudoers
                         echo "Added ${RED}'Defaults env_keep += \"SYSTEMD_PAGERSECURE\"'${normal} to /etc/sudoers"
@@ -547,7 +547,7 @@ elif [ "$envvars" == "y" ]; then
         - SYSTEMD_LOG_TID=\"true\"\n\
         - SYSTEMD_LOG_TARGET=\"auto\"\n"
         printf "$prmpt${normal}"
-        reade -Q "YELLOW" -i "y" -p "Set systemd environment? " xdgInst
+        readyn -Y "YELLOW" -p "Set systemd environment? " xdgInst
         if [ -z "$xdgInst" ] || [ "y" == "$xdgInst" ]; then
             sed 's/^#export SYSTEMD_PAGER=\(.*\)/export SYSTEMD_PAGER=\1/' -i $pathvr 
             if test "$pageSec" == 0; then

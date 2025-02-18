@@ -157,7 +157,7 @@ function update-system() {
                 brew upgrade
             fi
         fi
-    elif test "$pac" == "apt" && test "$pac" == "nala"; then
+    elif test "$pac" == "apt" || test "$pac" == "nala"; then
         if ! test -z "$YES"; then
             ${pac_up} -y
         else

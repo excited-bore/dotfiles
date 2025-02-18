@@ -48,12 +48,12 @@ if ! type moar &> /dev/null; then
     else
         
         printf "Package manager unknown or PM doesn't offer moar (f.ex. apt).\n"; 
-        reade -Q "YELLOW" -i "b" -p "Install moar from github binary (b) or not (anything but empty or b) [B/n]: " "n"  answer
-        if [ -z "$answer" ] || [ "B" == "$answer" ] || [ "b" == "$answer" ]; then
+        readyn -Y "YELLOW" -p "Install moar from github binary or not?" answer
+        if [ -z "$answer" ] || [ "Y" == "$answer" ] || [ "y" == "$answer" ]; then
             if ! type wget &> /dev/null; then
                 readyn -p "Need wget for this to work (tool to fetch file from the internet). Install wget?"  ins_wget
                 if test $ins_wget == 'y'; then
-                    eval "$pac_ins wget"
+                    ${pac_ins} wget
                 fi
                 unset ins_wget 
             fi
@@ -93,7 +93,7 @@ if [ -z "$moar_usr" ] || [ "y" == "$moar_usr" ] || [ "Y" == "$moar_usr" ]; then
     fi
 fi
     
-reade -Q "YELLOW" -i "y" -p "Set moar as default pager for root?" moar_root
+readyn -p "Set moar as default pager for root?" moar_root
 if [ -z "$moar_root" ] || [ "y" == "$moar_root" ] || [ "Y" == "$moar_root" ]; then
     if sudo grep -q "MOAR" $ENVVAR_R; then
         sudo sed -i "s|.export MOAR=.*|export MOAR='--statusbar=bold --colors=auto --render-unprintable=highlight --quit-if-one-screen'|g" $ENVVAR_R 

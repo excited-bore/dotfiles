@@ -32,7 +32,10 @@ if ! type list-ppa &> /dev/null; then
             reade -Q 'GREEN' -i 'y' -p "Run list-ppa (generates file containin ppas that have a release file for your version in ~/.config/ppas - !! Can take a while - can be rerun)? [Y/n]: " 'n' ppa_ins
             if test $ppa_ins == 'y'; then
                 if ! type list-ppa &> /dev/null; then
-                    $HOME/.local/bin/list-ppa --file ~/.config/ppas 
+		    lspp="$(pipx list 2> /dev/null | grep venvs | awk '{print $4}')\list-ppa"
+		    #lspp="$(pipx list 2> /dev/null | grep venvs | awk '{print $4}' | dos2unix)\list-ppa"
+                    $lspp --file ~/.config/ppas
+		    unset $lspp
                 else
                     list-ppa --file ~/.config/ppas
                 fi

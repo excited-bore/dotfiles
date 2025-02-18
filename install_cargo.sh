@@ -49,3 +49,5 @@ echo "This next $(tput setaf 1)sudo$(tput sgr0) will set envvar for cargo in $EN
 if ! sudo grep -q "# RUST" $ENVVAR_R; then
     printf "# RUST\ntest -d ~/.cargo/bin && export PATH=\$PATH:~/.cargo/bin\n" | sudo tee -a $ENVVAR_R &> /dev/null 
 fi
+
+source ~/.cargo/bin

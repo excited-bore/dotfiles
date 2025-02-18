@@ -14,8 +14,10 @@ fi
 
 if ! test -f rlwrap-scripts/reade; then
     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade)" &> /dev/null 
+    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/readyn)" &> /dev/null 
 else
     . ./rlwrap-scripts/reade &> /dev/null
+    . ./rlwrap-scripts/readyn &> /dev/null
 fi
 
 
@@ -175,7 +177,7 @@ fi
 
 if test $distro_base == 'Debian'; then
 
-     if test -z $(eval "$pac_ls_ins manpages-posix 2> /dev/null"); then
+     if test -z "$(${pac_ls_ins} manpages-posix 2> /dev/null)"; then
         printf "${CYAN}manpages-posix${normal} is not installed (Manpages for posix-compliant (f.ex. bash) commands (f.ex. alias, test, type, etc...))\n"
         readyn -p "Install manpages-posix? " posixman_ins
         if test $posixman_ins == 'y'; then
