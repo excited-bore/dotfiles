@@ -518,7 +518,7 @@ elif [ "$envvars" == "y" ]; then
     if type systemctl &> /dev/null; then
         pageSec=1
         printf "${cyan}Systemd comes preinstalled with ${GREEN}SYSTEMD_PAGERSECURE=1${normal}.\n This means any pager without a 'secure mode' cant be used for ${CYAN}systemctl/journalctl${normal}.\n(Features that are fairly obscure and mostly less-specific in the first place -\n No editing (v), no examining (:e), no pipeing (|)...)\n It's an understandable concern to be better safe and sound, but this does constrain the user to ${CYAN}only using less.${normal}\n"
-        reade -Q "YELLOW" -i "y" -p "${yellow}Set SYSTEMD_PAGERSECURE to 0? "" page_sec
+        reade -Q "YELLOW" -i "y" -p "${yellow}Set SYSTEMD_PAGERSECURE to 0? " page_sec
         if test "$page_sec" == "y"; then
             pageSec=0 
             if test -f /etc/sudoers; then 
@@ -547,7 +547,7 @@ elif [ "$envvars" == "y" ]; then
         - SYSTEMD_LOG_TID=\"true\"\n\
         - SYSTEMD_LOG_TARGET=\"auto\"\n"
         printf "$prmpt${normal}"
-        reade -Q "YELLOW" -i "y" -p "Set systemd environment? "" xdgInst
+        reade -Q "YELLOW" -i "y" -p "Set systemd environment? " xdgInst
         if [ -z "$xdgInst" ] || [ "y" == "$xdgInst" ]; then
             sed 's/^#export SYSTEMD_PAGER=\(.*\)/export SYSTEMD_PAGER=\1/' -i $pathvr 
             if test "$pageSec" == 0; then
