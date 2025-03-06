@@ -45,13 +45,13 @@ if ! test -f ~/.bash_aliases.d/bash.sh; then
     fi
 fi
 
-if ! test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh; then 
-    if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
-        curl -o ~/.bash_aliases.d/00-rlwrap_scripts.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh  
-    else
-        cp -fv aliases/.bash_aliases.d/00-rlwrap_scripts.sh ~/.bash_aliases.d/
-    fi
-fi
+#if ! test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh; then 
+#    if ! test -f /usr/local/bin/reade; then
+#        curl -o ~/.bash_aliases.d/00-rlwrap_scripts.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh  
+#    else
+#        cp -fv aliases/.bash_aliases.d/00-rlwrap_scripts.sh ~/.bash_aliases.d/
+#    fi
+#fi
 
 
 if ! sudo test -f /root/.bash_aliases; then

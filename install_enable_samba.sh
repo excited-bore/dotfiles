@@ -20,7 +20,7 @@ if test -z $SYSTEM_UPDATED; then
 fi
 
 if ! type reade &> /dev/null; then
-   if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
+   if ! test -f /usr/local/bin/reade; then
          eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_rlwrap.sh)" 
     else
         . ./checks/check_rlwrap.sh

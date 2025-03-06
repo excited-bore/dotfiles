@@ -26,7 +26,7 @@ if test -z $SYSTEM_UPDATED; then
     fi
 fi
 
-if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
+if ! test -f /usr/local/bin/reade; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
 else
     . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
@@ -35,9 +35,9 @@ fi
 
 if ! type kitty &> /dev/null; then
     if test "$distro" == "Arch" || test "$distro" == "Manjaro"; then
-       eval "$pac_ins kitty "
+        ${pac_ins} kitty 
     elif test "$distro_base" == "Debian"; then    
-        eval "$pac_ins kitty"
+        ${pac_ins} kitty 
         if [ ! -x "$(command -v kitten)" ]; then
             sudo ln -s ~/.local/share/kitty-ssh-kitten/kitty/bin/kitten    
         fi
@@ -45,10 +45,10 @@ if ! type kitty &> /dev/null; then
     fi
 fi
 
-if test $distro_base == 'Arch' && ! ls /usr/share/fonts/noto | grep -i -q emoji; then
-    reade -Q 'GREEN' -i 'y' -p 'Install noto-emoji font for kitty? [Y/n]: ' 'n' emoji
+if test "$distro_base" == 'Arch' && ! ls /usr/share/fonts/noto | grep -i -q emoji; then
+    readyn -p 'Install noto-emoji font for kitty?' emoji
     if test $emoji == 'y'; then
-        eval "$pac_ins noto-fonts-emoji"
+        ${pac_ins} noto-fonts-emoji
     fi
     unset emoji
 fi
