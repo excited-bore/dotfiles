@@ -191,13 +191,17 @@ function update-system() {
     elif test "$pac" == "pacman"; then
         if ! test -z "$AUR_up"; then
             if ! test -z "$YES"; then 
-                yes | ${AUR_up}
+                if test "$AUR_up" == "pamac update"; then
+                    pamac update --no-confirm
+                else
+                    yes | ${AUR_up}
+                fi
             else 
                 ${AUR_up}
             fi
         else
             if ! test -z "$YES"; then 
-                yes | ${pac_up}
+                ${pac_up} --noconfirm
             else 
                 ${pac_up}
             fi
