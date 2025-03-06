@@ -556,7 +556,11 @@ alias weather="inxi -w"
 alias weather-full="curl wttr.in | $PAGER"
 
 # crontab
-# 
+
+alias cron-list='crontab -l'
+alias crontab-list='crontab -l'
+
+
 function cron-list-all-user-jobs(){
     mktemp_f=$(mktemp) && for user in $(cut -f1 -d: /etc/passwd); do echo "$(tput setaf 10)User: $(tput bold)$user"; printf "$(tput setaf 12)Crontab: $(tput bold)"; sudo crontab -u "$user" -l; echo; done &> "$mktemp_f"; cat $mktemp_f | $PAGER; builtin rm $mktemp_f &> /dev/null; unset mktemp_f
 }
