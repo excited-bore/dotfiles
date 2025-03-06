@@ -406,6 +406,9 @@ require('telescope').setup {
     }
 }
 
+  vim.g.loaded_netrwPlugin = 1
+ vim.g.loaded_netrw = 1
+
 require("telescope").setup {
   extensions = {
     file_browser = {
@@ -423,49 +426,8 @@ require("telescope").setup {
     },
   },
 }
-
--- require("whichkey").setup { 
-
--- }
-
-
- -- This is a snippet on how you can add change directory functionality to some pickers, like find files.
-
-require("telescope").setup {
-  defaults = {
-    -- ....
-  },
-  pickers = {
-    find_files = {
-      mappings = {
-        n = {
-          ["cd"] = function(prompt_bufnr)
-            local selection = require("telescope.actions.state").get_selected_entry()
-            local dir = vim.fn.fnamemodify(selection.path, ":p:h")
-            require("telescope.actions").close(prompt_bufnr)
-            -- Depending on what you want put `cd`, `lcd`, `tcd`
-            vim.cmd(string.format("silent lcd %s", dir))
-          end
-        }
-      }
-    },
-  },
-  extensions = {
-      ast_grep = {
-          command = {
-              "sg",
-              "--json=stream",
-          }, -- must have --json=stream
-          grep_open_files = false, -- search in opened files
-          lang = nil, -- string value, specify language for ast-grep `nil` for default
-      }
-  }
-}
-
 -- To get telescope-file-browser loaded and working with telescope,
 -- you need to call load_extension, somewhere after setup function:
-
--- require("telescope").load_extension "ast_grep"
 require("telescope").load_extension "file_browser"
 
 require('mini.files').setup()

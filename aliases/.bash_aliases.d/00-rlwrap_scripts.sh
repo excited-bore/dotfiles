@@ -180,15 +180,16 @@ function reade(){
 
    -h, --help  
         
-        Print this text and exit
+        print this text and exit
 
    -v, --version  
         
-        Print version and exit
+        print version and exit
 
-   -Q ${underline_on}Colour${underline_off}
+   -q ${underline_on}colour${underline_off}
 
-        Use  one  of  the  colour names black, red, green, yellow, blue, cyan, purple (=magenta) or white, or an ANSI-conformant <colour_spec> to colour any prompt displayed  by  command.\n An uppercase colour name (Yellow or YELLOW ) gives a bold prompt.\n Prompts that already contain (colour) escape sequences or one of the readline \"ignore markers\" (ASCII 0x01 and 0x02) are not coloured.
+        use  one  of  the  colour names black, red, green, yellow, blue, cyan, purple (=magenta) or white, or an ansi-conformant <colour_spec> to colour any prompt displayed  by  command.\n an upper
+        case colour name (yellow or yellow ) gives a bold prompt.\n prompts that already contain (colour) escape sequences or one of the readline \"ignore markers\" (ascii 0x01 and 0x02) are not coloured.
 
     -i, --pre-given ${underline_on}PREGIVEN(S) - SPACESEPERATED WORD STRING${underline_off} 
 
@@ -213,18 +214,15 @@ function reade(){
               printf "$hlpstr" 
               return 0
           ;;
-          -v|--version) 
-             printf "${bold}Version${normal} : $VERSION\n"
-             return 0
-          ;; 
           # Otherwise 
-          *) break 
+          *) printf "$hlpstr"  
+             return 0 
           ;;
        esac
     done && OPTIND=1;
 
     #https://stackoverflow.com/questions/12022592/how-can-i-use-long-options-with-the-bash-getopts-builtin
-
+--fixed-strings
     for arg in "$@"; do
       shift
       case "$arg" in
