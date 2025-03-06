@@ -29,12 +29,12 @@ if ! type neofetch &> /dev/null && ! type fastfetch &> /dev/null && ! type scree
     #readyn -p "Install neofetch/fastfetch/screenFetch? "" sym2
     #if test "$sym2" == "y"; then
         
-        reade -Q "CYAN" -i "fast" -p "Which one? [Fast/neo/screen]: " "neo screen" sym2
+        reade -Q "CYAN" -i "fast neo screen" -p "Which one? [Fast/neo/screen]: " sym2
         if test "$sym2" == "neo"; then
             if test "$distro_base" == "Debian"; then
-               eval "$pac_ins neofetch"
+               ${pac_ins} neofetch
             elif test "$distro_base" == "Arch"; then
-               eval "$pac_ins neofetch"
+               ${pac_ins} neofetch
             fi
             
             if ! test -f ~/.config/neofetch/config.conf; then
@@ -56,7 +56,7 @@ if ! type neofetch &> /dev/null && ! type fastfetch &> /dev/null && ! type scree
         elif test "$sym2" == "fast"; then 
             if test $distro_base == "Debian"; then
                 if ! type jq &> /dev/null; then
-                    eval "$pac_ins jq"
+                    ${pac_ins} jq
                 fi
                 if [[ $arch =~ "arm" ]]; then 
                    fetch_arch="armv7l"
@@ -71,7 +71,7 @@ if ! type neofetch &> /dev/null && ! type fastfetch &> /dev/null && ! type scree
                 wget -P $tmp https://github.com/fastfetch-cli/fastfetch/releases/download/$ltstv/fastfetch-$os-$fetch_arch.deb
                 sudo dpkg -i $tmp/fastfetch-$os-$fetch_arch.deb 
             elif test $distro_base == "Arch"; then
-               eval "$pac_ins fastfetch"
+               ${pac_ins} fastfetch
             fi
         elif test "$sym2" == "screen"; then      
             if test $distro_base == "Debian"; then
@@ -90,7 +90,7 @@ if ! type onefetch &> /dev/null; then
             ${pac_ins} onefetch
         elif test $distro_base == 'Debian' && type add-apt-repository &> /dev/null && [[ $(check-ppa ppa:o2sh/onefetch) =~ 'OK' ]]; then
             sudo add-apt-repository ppa:o2sh/onefetch 
-            ${pac_up}
+            ${pac_up} 
             ${pac_ins} onefetch
         elif test $distro == 'Fedora'; then
             sudo dnf copr enable varlad/onefetch

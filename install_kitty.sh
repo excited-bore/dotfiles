@@ -200,19 +200,19 @@ if test $ktty_cnf == 'y'; then
             layout_p=$(echo "$lays" | tr ' ' '/') 
             layout_p="${layout_p^}" 
 
-            reade -Q "GREEN" -i "$frst" -p "$prompt? [$layout_p]: " "$layouts1" ktty_splt         
+            reade -Q "GREEN" -i "$frst $layouts1" -p "$prompt? [$layout_p]: " ktty_splt         
             if test $ktty_splt == 'splits'; then
                 enbld="$enbld splits" 
                 lays=$(echo "$lays" | sed "s/splits //g")  
                 readyn -p "Set position new window?" ktty_splt1 
 
                 if test $ktty_splt1 == 'y' ; then
-                    reade -Q "GREEN" -i "default" -p "Position new window: [Default/hsplit/vsplit/before/after]: " "hsplit vsplit before after" ktty_pos         
+                    reade -Q "GREEN" -i "default hsplit vsplit before after" -p "Position new window: [Default/hsplit/vsplit/before/after]: " ktty_pos         
                     sed -i "s|map kitty_mod+enter[^+].*|map kitty_mod+enter launch --location=$ktty_pos|g" $dir/kitty.conf 
                 fi
                 readyn -p "Add shortcut for new window pos on ctrl+shift+alt+enter?" ktty_splt2         
                 if test $ktty_splt2 == 'y' ; then
-                    reade -Q "GREEN" -i "hsplit" -p "Position new window: [Hsplit/vsplit/before/after]: " "vsplit before after" ktty_pos         
+                    reade -Q "GREEN" -i "hsplit vsplit before after" -p "Position new window: [Hsplit/vsplit/before/after]: " ktty_pos         
                     sed -i "s|map kitty_mod+alt+enter.*|map kitty_mod+alt+enter launch --location=$ktty_pos|g" $dir/kitty.conf 
                 fi
                  
@@ -246,7 +246,7 @@ if test $ktty_cnf == 'y'; then
     
     readyn -p "Set background opacity? (transparency)" ktty_trns
     if test $ktty_trns == 'y'; then
-        reade -Q "GREEN" -i "1.0" -p "Opacity : " "0.9 0.8 0.7 0.6 0.5 .4 0.3 0.2 0.1" ktty_trns1
+        reade -Q "GREEN" -i "1.0 0.9 0.8 0.7 0.6 0.5 .4 0.3 0.2 0.1" -p "Opacity : " ktty_trns1
         sed -i "s|background_opacity [0-9]\.[0-9]|background_opacity $ktty_trns1|g" $dir/kitty.conf 
     fi
     printf "${cyan}kitty.conf:${normal} \n" 

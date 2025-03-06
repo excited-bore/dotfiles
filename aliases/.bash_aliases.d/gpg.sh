@@ -627,18 +627,18 @@ function gpg-receive-keys-keyserver-by-fingerprints() {
     if test -z "$1"; then 
         reade -Q "GREEN" -i "mail" -p "Lookup fingerprint by mail or select fingerprint directly? [Mail/fingerprint]: " "fingerprint" fingrprnt_mail
         if test $fingrprnt_mail == 'mail' ; then
-            reade -Q "GREEN" -i "' '" -p "Mail(s)?: " "all $publickey_mails" mails
+            reade -Q "GREEN" -i "' ' all $publickey_mails" -p "Mail(s)?: " mails
             if test $mails == all; then
                 mails="$publickey_mails"
             fi
             $GPG --list-keys --list-options show-only-fpr-mbox $mails
             fingerprints_some=$($GPG --list-keys --list-options show-only-fpr-mbox $mails | awk '{print $1;}')
-            reade -Q "GREEN" -i "' '" -p "Fingerprint(s)?: " "all $fingerprints_some" fingrprnt
+            reade -Q "GREEN" -i "' '" -p "Fingerprint(s)?: " fingrprnt
             if test $fingrprnt == all; then
                 fingrprnt="$fingerprints_some"
             fi 
         else
-            reade -Q "GREEN" -i "' '" -p "Fingerprint(s)?: " "all $fingerprints_all" fingrprnt
+            reade -Q "GREEN" -i "' ' all $fingerprints_all" -p "Fingerprint(s)?: " fingrprnt
         fi
     else
         fingrprnt="$1"
@@ -646,14 +646,14 @@ function gpg-receive-keys-keyserver-by-fingerprints() {
     if test "$fingrprnt" == 'all'; then
         fingrprnt="$fingerprints_all"
     fi
-    reade -Q "GREEN" -i "n" -p "Set keyserver? (Otherwise looks for last defined keyserver in \$GNUPGHOME/.gnupg/gpg.conf) [N/y]: " "y" c_srv
+    readyn -n -p "Set keyserver? (Otherwise looks for last defined keyserver in \$GNUPGHOME/.gnupg/gpg.conf)" c_srv
     if test "$c_srv" == 'y'; then
         #reade -Q "GREEN" -i "hkp://keys.openpgp.org" -p "Keyserver?: " "hkp://keyserver.ubuntu.com hkp://pgp.mit.edu hkp://pool.sks-keyservers.net hkps://keys.mailvelope.com hkps://api.protonmail.ch" serv 
         printf "Known keyservers from \$GNUPGHOME/gpg.conf: \n"
         for i in $keyservers_all; do
             printf "\t- ${CYAN}$i${normal}\n"
         done
-        reade -Q "GREEN" -i "all" -p "Keyserver? (Default: all known): " "$keyservers_all" serv 
+        reade -Q "GREEN" -i "all $keyservers_all" -p "Keyserver? (Default: all known): " serv 
         if test "$serv" == 'all'; then
             for srv in $keyservers_all; do
                 echo "Searching ${bold}${magenta}$srv${normal}"

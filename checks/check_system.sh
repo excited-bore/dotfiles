@@ -155,9 +155,9 @@ if test $machine == 'Windows'; then
        printf "${RED}Winget (official window package manager) not installed - can't run scripts without install programs through it${normal}\n" 
        readyn -p "(Attempt to) Install winget? ${CYAN}(Windows 10 - version 1809 required at mimimum for winget)${GREEN}" wngt
        if test "$wngt" == 'y'; then
-        tmpd=$(mktemp -d)
-        wget -P $tmpd https://raw.githubusercontent.com/asheroto/winget-install/master/winget-install.ps1  
-        sudo pwsh $tmpd/winget-install.ps1
+            tmpd=$(mktemp -d)
+            wget -P $tmpd https://raw.githubusercontent.com/asheroto/winget-install/master/winget-install.ps1  
+            sudo pwsh $tmpd/winget-install.ps1
        else
             printf "${RED}Can't install scripts without winget${normal}\n" 
             #exit 1 
@@ -523,10 +523,10 @@ if ! test -z "$no_aur"; then
     readyn -Y 'CYAN' -p "Install yay ( AUR helper/wrapper )?" insyay
     if [ "y" == "$insyay" ]; then 
 
-        if ! test -f ../AUR_insers/install_yay.sh; then 
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/AUR_insers/install_yay.sh)" 
+        if ! test -f ../AUR_installers/install_yay.sh; then 
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/AUR_installers/install_yay.sh)" 
         else
-            eval ../AUR_insers/install_yay.sh
+            eval ../AUR_installers/install_yay.sh
         fi
 
         AUR_pac="yay"
@@ -565,17 +565,17 @@ elif test $machine == 'Mac'; then
     arch_cmd="sysctl -n machdep.cpu.brand_string"
 fi
 
-if eval "$arch_cmd" | grep -q "Intel"; then
+if ${arch_cmd} | grep -q "Intel"; then
     arch="386"
-elif eval "$arch_cmd" | grep -q "AMD"; then
+elif ${arch_cmd} | grep -q "AMD"; then
     if lscpu | grep -q "x86_64"; then 
         arch="amd64"
     else
         arch="amd32"
     fi
-elif eval "$arch_cmd" | grep -q "armv"; then
+elif ${arch_cmd} | grep -q "armv"; then
     arch="armv7l"
-elif eval "$arch_cmd" | grep -q "aarch"; then
+elif ${arch_cmd} | grep -q "aarch"; then
     arch="arm64"
 fi
 

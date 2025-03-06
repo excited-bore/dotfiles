@@ -219,11 +219,22 @@ if ! type qwpgraph &> /dev/null; then
     readyn -p "Install patchbay interface 'qpwgraph'? (create and manage audiostreams)" patchb
     if test "$patchb" == 'y'; then
         if test "$distro_base" == 'Arch' || test "$distro_base" == 'Debian'; then
-            eval "$pac_ins qpwgraph"
+            ${pac_ins} qpwgraph
         fi
     fi
     unset patchb 
 fi
+
+if ! type easyeffects &> /dev/null; then
+    readyn -p "Install sound effect configurator 'easyeffects'? (Enable/disable audio effects on audiostreams)" ezff
+    if test "$ezff" == 'y'; then
+        if test "$distro_base" == 'Arch' || test "$distro_base" == 'Debian'; then
+            ${pac_ins} easyeffects
+        fi
+    fi
+    unset ezff 
+fi
+
 
 file=pipewire/.bash_aliases.d/pipewire.sh
 file1=pipewire/.bash_completion.d/pipewire
