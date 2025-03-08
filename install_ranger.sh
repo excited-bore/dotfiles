@@ -26,7 +26,7 @@ else
     . ./checks/check_envvar.sh
 fi 
 
-if ! test -f /usr/local/bin/reade; then
+if ! type reade &> /dev/null; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
 else
     . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
@@ -110,7 +110,7 @@ rangr_cnf() {
         fi
     fi
 }
-yes_edit_no rangr_cnf "$dir/rc.conf $dir/rifle.conf $dir/scope.sh" "Install predefined configuration (rc.conf,rifle.conf and scope.sh at ~/.config/ranger/)? " "edit" "GREEN"
+yes-no-edit -f rangr_cnf -g "$dir/rc.conf $dir/rifle.conf $dir/scope.sh" -p "Install predefined configuration (rc.conf,rifle.conf and scope.sh at ~/.config/ranger/)? " -i "e" -Q "GREEN"
 
 readyn -p "F2 for Ranger?" rf2
 if [ -z "$rf2" ] || [ "y" == "$rf2" ]; then

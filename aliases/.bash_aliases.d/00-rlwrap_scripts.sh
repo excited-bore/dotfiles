@@ -102,7 +102,7 @@ italic=$(tput it)
 # Arguments: Completions(string with space entries, AWK works too),return value(-a password prompt, -c complete filenames, -p prompt flag, -Q prompt colour, -b break-chars (when does a string break for autocomp), -e change char given for multiple autocompletions)
 # 'man rlwrap' to see all unimplemented options
 
-if ! test -f /usr/local/bin/reade; then
+if ! type reade &> /dev/null ; then
     if test -f rlwrap-scripts/reade; then
         . ./rlwrap-scripts/reade 1> /dev/null
     else
@@ -110,7 +110,7 @@ if ! test -f /usr/local/bin/reade; then
     fi
 fi
 
-if ! test -f /usr/local/bin/readyn; then
+if ! type readyn &> /dev/null; then
     if test -f rlwrap-scripts/readyn; then
         . ./rlwrap-scripts/readyn 1> /dev/null
     else
@@ -118,55 +118,64 @@ if ! test -f /usr/local/bin/readyn; then
     fi
 fi
 
-function yes_edit_no(){
-    if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ]; then
-        printf "Needs 3 parameters.\n 1) Function with commands if yes\n 2) File to edit\n 3) prompt (adds [y/n/e]: afterwards) \n (4) Default \"yes\",\"edit\",\"no\")\n (5) Optional - Colour)\n";
-        return 0;
+if ! type yes-no-edit &> /dev/null; then
+    if test -f rlwrap-scripts/yes-no-edit; then
+        . ./rlwrap-scripts/yes-no-edit 1> /dev/null
     else
-        pass="";
-        clr="";
-        pre="y"
-        choices="e n"
-        deflt=" [Y/e/n]: "; 
-        prompt="$3$deflt";
-        if [ "$4" == "edit" ]; then
-            pre="e"
-            choices="y n"
-            deflt=" [y/E/n]: ";
-            prompt="$3$deflt";
-        elif [ "$4" == "no" ]; then
-            pre="n"
-            choices="y e"
-            deflt=" [y/e/N]: ";
-            prompt="$3$deflt";
-        fi
-        if [ ! -z "$5" ]; then
-            clr="-Q $5"
-        fi
-        
-        reade $clr -i "$pre $choices" -p "$prompt" pass;
-        
-        #Undercase only
-        pass=$(echo "$pass" | tr '[:upper:]' '[:lower:]')
-
-        if [ -z "$pass" ]; then
-            pass="$pre";
-        fi
-        
-        if [ "$pass" == "y" ]; then
-           $1; 
-        elif [ "$pass" == "e" ]; then
-            str=($2);
-            for i in "${str[@]}"; do
-                "$EDITOR" "$i";
-            done;
-            deflt=" [N/y]: "
-            pre="n"
-            prompt="$3$deflt";
-            reade $clr -i "$pre y" -p "$prompt" pass2;
-            if [ "$pass2" == "y" ]; then
-                $1;
-            fi
-        fi
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/yes-no-edit)" &> /dev/null 
     fi
-}
+fi
+
+
+#function yes-no-edit(){
+#    if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ]; then
+#        printf "Needs 3 parameters.\n 1) Function with commands if yes\n 2) File to edit\n 3) prompt (adds [y/n/e]: afterwards) \n (4) Default \"yes\",\"edit\",\"no\")\n (5) Optional - Colour)\n";
+#        return 0;
+#    else
+#        pass="";
+#        clr="";
+#        pre="y"
+#        choices="e n"
+#        deflt=" [Y/e/n]: "; 
+#        prompt="$3$deflt";
+#        if [ "$4" == "edit" ]; then
+#            pre="e"
+#            choices="y n"
+#            deflt=" [y/E/n]: ";
+#            prompt="$3$deflt";
+#        elif [ "$4" == "no" ]; then
+#            pre="n"
+#            choices="y e"
+#            deflt=" [y/e/N]: ";
+#            prompt="$3$deflt";
+#        fi
+#        if [ ! -z "$5" ]; then
+#            clr="-Q $5"
+#        fi
+#        
+#        reade $clr -i "$pre $choices" -p "$prompt" pass;
+#        
+#        #Undercase only
+#        pass=$(echo "$pass" | tr '[:upper:]' '[:lower:]')
+#
+#        if [ -z "$pass" ]; then
+#            pass="$pre";
+#        fi
+#        
+#        if [ "$pass" == "y" ]; then
+#           $1; 
+#        elif [ "$pass" == "e" ]; then
+#            str=($2);
+#            for i in "${str[@]}"; do
+#                "$EDITOR" "$i";
+#            done;
+#            deflt=" [N/y]: "
+#            pre="n"
+#            prompt="$3$deflt";
+#            reade $clr -i "$pre y" -p "$prompt" pass2;
+#            if [ "$pass2" == "y" ]; then
+#                $1;
+#            fi
+#        fi
+#    fi
+#}

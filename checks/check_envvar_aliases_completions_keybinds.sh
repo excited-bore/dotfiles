@@ -33,7 +33,7 @@ if ! test -f ~/.bash_aliases.d/bash.sh; then
 fi
 
 #if ! test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh; then 
-#    if ! test -f /usr/local/bin/reade; then
+#    if ! type reade &> /dev/null; then
 #        curl -o ~/.bash_aliases.d/00-rlwrap_scripts.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh  
 #    else
 #        cp -fv aliases/.bash_aliases.d/00-rlwrap_scripts.sh ~/.bash_aliases.d/

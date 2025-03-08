@@ -106,7 +106,7 @@ italic=$(tput it)
 # Arguments: Completions(string with space entries, AWK works too),return value(-a password prompt, -c complete filenames, -p prompt flag, -Q prompt colour, -b break-chars (when does a string break for autocomp), -e change char given for multiple autocompletions)
 # 'man rlwrap' to see all unimplemented options
 
-if ! test -f /usr/local/bin/reade; then
+if ! type reade &> /dev/null; then
     if test -f rlwrap-scripts/reade; then
         . ./rlwrap-scripts/reade 1> /dev/null
     else
@@ -641,7 +641,7 @@ export COMPLETION_R=/root/.bashrc
 export KEYBIND_R=/root/.bashrc
 export ENVVAR_R=/root/.bashrc
 
-#echo "This next $(tput setaf 1)sudo$(tput sgr0) checks for the profile, environment, bash_alias, bash_completion and keybind files and dirs in '/root/' to generate global variables.";
+echo "This next $(tput setaf 1)sudo$(tput sgr0) checks for the profile, environment, bash_alias, bash_completion and keybind files and dirs in '/root/' to generate global variables.";
 
 if ! sudo test -f /root/.profile; then
     sudo touch /root/.profile

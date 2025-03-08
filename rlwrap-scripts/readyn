@@ -1,5 +1,12 @@
 #!/bin/bash
 
+[[ $0 != $BASH_SOURCE ]] && SCRIPT_DIR="$( dirname "${BASH_SOURCE[0]}" )" || SCRIPT_DIR="$( cd "$( dirname "$-1" )" && pwd )"
+
+! test -f $SCRIPT_DIR/reade &&
+printf "'reade' needs to be in the same folder as 'readyn' for it to work\n" &&
+exit 1 ||
+source $SCRIPT_DIR/reade
+
 function readyn(){
 
     [[ $0 != $BASH_SOURCE ]] && SCRIPT_DIR="$( dirname "${BASH_SOURCE[0]}" )" || SCRIPT_DIR="$( cd "$( dirname "$-1" )" && pwd )"
@@ -280,9 +287,9 @@ function readyn(){
         value=$pre 
     else
         if test -z "$prmpt"; then
-            $SCRIPT_DIR/reade -Q "$color" $breaklines -i "$pre $othr" -p "$prmpt1" value;   
+            reade -Q "$color" $breaklines -i "$pre $othr" -p "$prmpt1" value;   
         else
-            $SCRIPT_DIR/reade -Q "$color" $breaklines -i "$pre $othr" -p "$prmpt$prmpt1" value;    
+            reade -Q "$color" $breaklines -i "$pre $othr" -p "$prmpt$prmpt1" value;    
         fi
          
     fi 
@@ -297,4 +304,4 @@ function readyn(){
     unset pre other prmpt prmpt1 color readestr breaklines value SCRIPT_DIR 
 }
 
-readyn $@
+#readyn $@

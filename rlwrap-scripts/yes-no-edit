@@ -1,10 +1,21 @@
 #!/bin/bash
 
-function yes-no-edit(){
+# Get script dir when sourced
+# or just run as exec
+[[ $0 != $BASH_SOURCE ]] && SCRIPT_DIR="$( dirname "${BASH_SOURCE[0]}" )" || SCRIPT_DIR="$( cd "$( dirname "$-1" )" && pwd )"
 
-    # Get script dir when sourced
-    # or just run as exec
-    [[ $0 != $BASH_SOURCE ]] && SCRIPT_DIR="$( dirname "${BASH_SOURCE[0]}" )" || SCRIPT_DIR="$( cd "$( dirname "$-1" )" && pwd )"
+! test -f $SCRIPT_DIR/reade &&
+printf "'reade' needs to be in the same folder as 'yes-no-edit' for it to work\n" &&
+exit 1 ||
+source $SCRIPT_DIR/reade
+
+! test -f $SCRIPT_DIR/readyn &&
+printf "'readyn' needs to be in the same folder as 'yes-no-edit' for it to work\n" &&
+exit 1 ||
+source $SCRIPT_DIR/readyn
+
+
+function yes-no-edit(){
 
     red=$(tput setaf 1)
     red1=$(tput setaf 9)
@@ -320,8 +331,8 @@ function yes-no-edit(){
                 YES_NO_EDITOR='vi' 
             fi
         fi
-
-        . $SCRIPT_DIR/reade $color1 -i "${choices[*]}" $prmpt pass;
+    
+        reade $color1 -i "${choices[*]}" "$prmpt" pass;
         
         #Undercase only
         pass=$(echo "$pass" | tr '[:upper:]' '[:lower:]')
@@ -336,14 +347,16 @@ function yes-no-edit(){
         if ! test -z "$norepeat" ; then
             if ! test $pass == 'n' && ! test $pass == 'y'; then 
                 test "$norepeat" == 'n' && repeat='--no ' || repeat=''
-                . $SCRIPT_DIR/readyn $color1 $repeat "$prmpt" pass 
+                 
+                ! type readyn &> /dev/null && . $SCRIPT_DIR/readyn  
+                readyn $color1 $repeat "$prmpt" pass 
             fi
         else
             while : ; do
                 
                 test "$pass" == 'y'  || test "$pass" == 'n'  && break;
                 
-                . $SCRIPT_DIR/reade $color1 -i "${choices[*]}" "$prmpt" pass;
+                reade $color1 -i "${choices[*]}" "$prmpt" pass;
 
                 #Undercase only
                 pass=$(echo "$pass" | tr '[:upper:]' '[:lower:]')
@@ -365,4 +378,4 @@ function yes-no-edit(){
     unset SCRIPT_DIR
 }
 
-yes-no-edit $@
+#yes-no-edit $@

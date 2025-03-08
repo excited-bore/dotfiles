@@ -1,5 +1,8 @@
- #DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-if ! test -f /usr/local/bin/reade; then
+#!/bin/bash
+
+#DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+ if ! type reade &> /dev/null; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
 else
     . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
@@ -32,11 +35,10 @@ else
     . ./checks/check_envvar.sh
 fi
 
-
 answer=""
+
 if ! type moar &> /dev/null; then
     
-
     
     if [ "$distro_base" == "Arch" ] && ! test -z "$AUR_ins"; then
         

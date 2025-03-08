@@ -9,6 +9,7 @@ if ! test -f rlwrap-scripts/reade; then
 else
     . ./rlwrap-scripts/reade 1> /dev/null
     . ./rlwrap-scripts/readyn 1> /dev/null
+    . ./rlwrap-scripts/yes-no-edit 1> /dev/null
 fi
 
 
@@ -52,16 +53,6 @@ else
     . ./checks/check_rlwrap.sh
 fi
 
-readyn -p "Install reade and readyn?" -c 'test -f /usr/local/bin/reade' insrde
-if test "$insrde" == 'y'; then
-    if ! test -f install_reade_readyn.sh; then
-         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_reade_readyn.sh)" 
-    else
-        ./install_reade_readyn.sh
-    fi
-fi
-unset insrde
-
 
 
 printf "${green}If all necessary files are sourced correctly, this text looks green.\nIf not, something went wrong.\n"
@@ -69,7 +60,6 @@ if type gio &> /dev/null; then
     printf "\n${green}Files that get overwritten get backed up and trashed (to prevent clutter).\nRecover using ${cyan}'gio trash --list'${green} and ${cyan}'gio trash --restore' ${normal}\n"
 fi
 printf "${green} Will now start with updating system ${normal}\n"
-
 
 if [ ! -e ~/config ] && test -d ~/.config; then
     readyn -Y "BLUE" -p "Create ~/.config to ~/config symlink? " sym1
@@ -408,17 +398,31 @@ if [ -z $pycomp ] || [ "y" == $pycomp ]; then
 fi
 unset pycomp
 
+
+# Rlwrap scripts
+
+readyn -p "Install reade, readyn and yes-no-edit?" -c 'test -f ~/.bash_aliases.d/reade' insrde
+if test "$insrde" == 'y'; then
+    if ! test -f install_reade_readyn.sh; then
+         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_reade_readyn.sh)" 
+    else
+        ./install_reade_readyn.sh
+    fi
+fi
+unset insrde
+
+
 readyn -p "Install bash aliases and other config?" scripts
 if [ -z $scripts ] || [ "y" == $scripts ]; then
 
     if ! test -f checks/check_aliases_dir.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)" 
     else
-        ./checks/check_aliases_dir.sh
+        . ./checks/check_aliases_dir.sh
     fi
     if ! test -f install_aliases.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/install_aliases.sh)" 
-    els
+    else
         ./install_aliases.sh
     fi
 fi
@@ -433,8 +437,8 @@ binds1=keybinds/.keybinds.d/keybinds.bash
 binds2=keybinds/.keybinds
 if ! test -f $binds; then
     tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.inputrc
-    tmp1=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds.d/keybinds.bash 
-    tmp2=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds 
+    tmp1=$(mktemp) && curl -o $tmp1 https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds.d/keybinds.bash 
+    tmp2=$(mktemp) && curl -o $tmp2 https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds 
     binds=$tmp
     binds1=$tmp1
     binds2=$tmp2
@@ -513,9 +517,10 @@ shell-keybinds() {
        sed -i 's|#export INPUTRC.*|export INPUTRC=~/.inputrc|g' ~/.environment.env
     fi
     unset vimde vivisual xterm
-    yes_edit_no shell-keybinds_r "$binds $binds2 $binds1" "Install .inputrc and keybinds.bash at /root/ and /root/.keybinds.d/?" "yes" "YELLOW"; 
+    yes-no-edit -f shell-keybinds_r -g "$binds $binds2 $binds1" -p "Install .inputrc and keybinds.bash at /root/ and /root/.keybinds.d/?" -i "y" "YELLOW"; 
 }
-yes_edit_no shell-keybinds "$binds $binds2 $binds1" "Install .inputrc and keybinds.bash at ~/ and ~/.keybinds.d/? (keybinds configuration)" "yes" "GREEN"
+
+yes-no-edit -f shell-keybinds -g "$binds $binds2 $binds1" -p "Install .inputrc and keybinds.bash at ~/ and ~/.keybinds.d/? (keybinds configuration)" -i "y" -Q "GREEN"
 
 # Xresources
 
@@ -530,8 +535,8 @@ xresources_r(){
     }
 xresources() {
     cp -fv $xterm ~/.Xresources;
-    yes_edit_no xresources_r "$xterm" "Install .Xresources at /root/?" "edit" "RED"; }
-yes_edit_no xresources "$xterm" "Install .Xresources at ~/? (Xterm configuration)" "edit" "YELLOW"
+    yes-no-edit xresources_r "$xterm" "Install .Xresources at /root/?" "edit" "RED"; }
+yes-no-edit xresources "$xterm" "Install .Xresources at ~/? (Xterm configuration)" "edit" "YELLOW"
 
 # Bash Preexec
 readyn -p "Install pre-execution hooks for bash in ~/.bash_preexec?" -n "! test -f ~/.bash_preexec || ! test -f /root/.bash_preexec" bash_preexec
