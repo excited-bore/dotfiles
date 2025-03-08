@@ -8,7 +8,6 @@
 if type sudo &> /dev/null; then
     alias sudo='sudo '
 fi
-
 if type wget &> /dev/null; then
     alias wget='wget --https-only '
 fi
@@ -119,3 +118,55 @@ if ! test -f /usr/local/bin/readyn; then
     fi
 fi
 
+function yes_edit_no(){
+    if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ]; then
+        printf "Needs 3 parameters.\n 1) Function with commands if yes\n 2) File to edit\n 3) prompt (adds [y/n/e]: afterwards) \n (4) Default \"yes\",\"edit\",\"no\")\n (5) Optional - Colour)\n";
+        return 0;
+    else
+        pass="";
+        clr="";
+        pre="y"
+        choices="e n"
+        deflt=" [Y/e/n]: "; 
+        prompt="$3$deflt";
+        if [ "$4" == "edit" ]; then
+            pre="e"
+            choices="y n"
+            deflt=" [y/E/n]: ";
+            prompt="$3$deflt";
+        elif [ "$4" == "no" ]; then
+            pre="n"
+            choices="y e"
+            deflt=" [y/e/N]: ";
+            prompt="$3$deflt";
+        fi
+        if [ ! -z "$5" ]; then
+            clr="-Q $5"
+        fi
+        
+        reade $clr -i "$pre $choices" -p "$prompt" pass;
+        
+        #Undercase only
+        pass=$(echo "$pass" | tr '[:upper:]' '[:lower:]')
+
+        if [ -z "$pass" ]; then
+            pass="$pre";
+        fi
+        
+        if [ "$pass" == "y" ]; then
+           $1; 
+        elif [ "$pass" == "e" ]; then
+            str=($2);
+            for i in "${str[@]}"; do
+                "$EDITOR" "$i";
+            done;
+            deflt=" [N/y]: "
+            pre="n"
+            prompt="$3$deflt";
+            reade $clr -i "$pre y" -p "$prompt" pass2;
+            if [ "$pass2" == "y" ]; then
+                $1;
+            fi
+        fi
+    fi
+}

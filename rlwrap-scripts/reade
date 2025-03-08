@@ -142,6 +142,7 @@ function reade(){
     if [[ $(uname -s) =~ 'MINGW' ]] && ! type pacman &> /dev/null; then
         bash_rlwrap='n'
     fi
+     
     if ! type rlwrap &> /dev/null || test "$fcomp" == 'y' || test "$bash_rlwrap" == 'n' ; then
         readstr="read -r "
         color=""
@@ -257,7 +258,7 @@ function reade(){
                     rlwstring=$(echo $rlwstring | sed 's| -o cat| \-H $tmpf  \-f <(echo \"${args[@]}\") -o cat|g') 
                 ;;
                 # Prompt
-                p)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-S \"${OPTARG}\" |g");
+                p) rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-S \"${OPTARG}\" |g");
                 ;;
                 # Prompt colours
                 Q)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-p${OPTARG} |g");
@@ -274,17 +275,16 @@ function reade(){
         shift $((OPTIND-1)) 
 
         value="$(eval $rlwstring)";
+        command rm $tmpf &> /dev/null;
+
+        export REPLY="$value" 
+        export READE_VALUE="$value" 
 
         if ! test $# -eq 0; then
             eval "${@:$#:1}=$value" 
-        else
-            export READE_VALUE="$value" 
         fi
-        command rm $tmpf &> /dev/null;
     fi
     unset bash_rlwrap 
 }
-
-
 
 reade $@
