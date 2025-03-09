@@ -196,7 +196,7 @@ function yes-no-edit(){
         functn="" 
         files="" 
         
-        while getopts 'dnb:o:Q:i:n:e:g:f:p:' flag; do
+        while getopts 'db:n:o:Q:i:e:g:f:p:' flag; do
             case "${flag}" in
                 b)  ;;
                 d)  noprompt='y';
@@ -308,23 +308,24 @@ function yes-no-edit(){
             fi
         fi
    
-        test -z $noprompt && prmpt="$prmpt$prmpt1" 
+        test -z "$noprompt" && prmpt2="$prmpt$prmpt1" || prmpt2="$prmpt" 
 
-        test -z $color && reade -i "${choices[*]}" -p "$prmpt" pass || 
-        reade -Q $color -i "${choices[*]}" -p "$prmpt" pass
+        test -z $color && reade -i "${choices[*]}" -p "$prmpt2" pass || 
+        reade -Q $color -i "${choices[*]}" -p "$prmpt2" pass
         
         #Undercase only
         pass=$(echo "$pass" | tr '[:upper:]' '[:lower:]')
 
         if test "$pass" == 'e'; then
             ${YES_NO_EDITOR} ${files[*]}
-        elif ! test -z $first && test "$pass" == "$first"; then
+        elif ! test -z "$first" && test "$pass" == "$first"; then
             ${othercmd} ${files[*]} 
         fi  
      
         if ! test -z "$norepeat" ; then
-            if ! test $pass == 'n' && ! test $pass == 'y'; then 
-                if test $pre == 'n'; then
+            if ! test "$pass" == 'n' && ! test "$pass" == 'y'; then 
+                 
+                if test "$norepeat" == 'n'; then
                     test -z $color && readyn --no "$prmpt" pass || 
                     readyn --no -N $color -p "$prmpt" pass 
                 else
@@ -336,8 +337,8 @@ function yes-no-edit(){
             while : ; do
                 test "$pass" == 'y' || test "$pass" == 'n'  && break;
 
-                test -z $color && reade -i "${choices[*]}" -p "$prmpt" pass || 
-                reade -Q "$color" -i "${choices[*]}" -p "$prmpt" pass;
+                test -z $color && reade -i "${choices[*]}" -p "$prmpt2" pass || 
+                reade -Q "$color" -i "${choices[*]}" -p "$prmpt2" pass;
 
                 #Undercase only
                 pass=$(echo "$pass" | tr '[:upper:]' '[:lower:]')
@@ -350,11 +351,11 @@ function yes-no-edit(){
                     ${othercmd} ${files[*]} 
                 fi 
             done
-
-            ! test -z "$functn" && test "$pass" == 'y' && ${functn} && return 0 ||
-            test $# -gt 0 && eval "${@:$#:1}=$pass" 
-             
         fi
+
+        ! test -z "$functn" && test "$pass" == 'y' && ${functn} && return 0 ||
+        test $# -gt 0 && eval "${@:$#:1}=$pass" 
+             
     fi
     unset SCRIPT_DIR
 }

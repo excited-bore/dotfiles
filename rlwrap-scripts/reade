@@ -138,7 +138,9 @@ function reade(){
                 ;;
         esac
     done && OPTIND=1;
-    bash_rlwrap='y'
+
+    local bash_rlwrap='y'
+
     if [[ $(uname -s) =~ 'MINGW' ]] && ! type pacman &> /dev/null; then
         bash_rlwrap='n'
     fi
@@ -202,22 +204,22 @@ function reade(){
 
         shift $((OPTIND-1)) 
        
-        eval "${readstr} value";
+        eval "${readstr} vvvvvvvvvv";
 
         if test "$fcomp" == 'y'; then
-            echo $value >> $HISTFILE 
+            echo $vvvvvvvvvv >> $HISTFILE 
             history -n
         fi
 
-        if ! test -z "$pre" && test -z "$value" || test "$value" == ""; then
+        if ! test -z "$pre" && test -z "$vvvvvvvvvv" || test "$vvvvvvvvvv" == ""; then
             value="$pre"  
         fi
 
-        export READE_VALUE="$value"
-        export REPLY="$value" 
+        export READE_VALUE="$vvvvvvvvvv"
+        export REPLY="$vvvvvvvvvv" 
 
         if ! test -z "$@"; then
-            eval "${@:$#:1}=$value"  
+            eval "${@:$#:1}=$vvvvvvvvvv"  
         fi
 
         unset fcomp
@@ -238,7 +240,7 @@ function reade(){
         #args=$(echo $args | tr ' ' '\n')
 
         local tmpf=''
-        rlwstring="rlwrap --ansi-colour-aware -s 1000 -D 0 -b \"$breaklines\" -o cat"
+        local rlwstring="rlwrap --ansi-colour-aware -s 1000 -D 0 -b \"$breaklines\" -o cat"
 
         while getopts ':b:e:i:p:Q:s:S:' flag; do
             case "${flag}" in
@@ -276,16 +278,16 @@ function reade(){
 
         shift $((OPTIND-1)) 
 
-        value="$(eval $rlwstring)";
+        # Cant unset of localize this 'vvvvvvvv' variable 
 
-        export REPLY="$value" 
-        export READE_VALUE="$value" 
+        vvvvvvvv="$(eval $rlwstring)";
 
-        ! test $# -eq 0 && eval "${@:$#:1}=$value" 
+        export REPLY="$vvvvvvvv" 
+        export READE_VALUE="$vvvvvvvv" 
+
+        ! test $# -eq 0 && eval "${@:$#:1}=$vvvvvvvv" 
 
         command rm $tmpf &> /dev/null;
     fi
-    unset bash_rlwrap 
+    unset bash_rlwrap frst rlwstring args tmpf breaklines readstr color
 }
-
-#reade $@

@@ -362,7 +362,7 @@ elif [ "$envvars" == "y" ]; then
         (echo "" | mimeopen -a editor-check.sh &> $TMPDIR/editor-outpt)
         editors="$(cat $TMPDIR/editor-outpt | awk 'NR > 2' | awk '{if (prev_1_line) print prev_1_line; prev_1_line=prev_line} {prev_line=$NF}' | sed 's|[()]||g' | tr -s [:space:] \\n | uniq | tr '\n' ' ') $editors"
         editors="$(echo $editors | tr ' ' '\n' | sort -u)"
-        prmpt="Found visual editors using ${CYAN}mimeopen${normal} (non definitive list): ${GREEN}\n"
+        prmpt="Found editors using ${CYAN}mimeopen${normal} (non definitive list): ${GREEN}\n"
         for i in $editors; do
             prmpt="$prmpt\t - $i\n"
         done
@@ -396,7 +396,7 @@ elif [ "$envvars" == "y" ]; then
             #compedit="$(echo $compedit | sed "s/\<$frst\> //g")"
             printf "$prmpt"
 
-            reade -Q "GREEN" -i "$frst" -p "VISUAL (GUI editor - $frst default)=" "$editors_p" vsual
+            reade -Q "GREEN" -i "$frst $editors_p" -p "VISUAL (GUI editor - $frst default)=" vsual
             vsual="$(where_cmd $vsual)"
             sed -i 's|#export VISUAL=|export VISUAL=|g' $pathvr
             sed -i 's|export VISUAL=.*|export VISUAL='"$vsual"'|g' $pathvr
@@ -518,14 +518,14 @@ elif [ "$envvars" == "y" ]; then
     if type systemctl &> /dev/null; then
         pageSec=1
         printf "${cyan}Systemd comes preinstalled with ${GREEN}SYSTEMD_PAGERSECURE=1${normal}.\n This means any pager without a 'secure mode' cant be used for ${CYAN}systemctl/journalctl${normal}.\n(Features that are fairly obscure and mostly less-specific in the first place -\n No editing (v), no examining (:e), no pipeing (|)...)\n It's an understandable concern to be better safe and sound, but this does constrain the user to ${CYAN}only using less.${normal}\n"
-        reade -N "YELLOW" -n -p "${yellow}Set SYSTEMD_PAGERSECURE to 0?" page_sec
+        readyn -N "YELLOW" -n -p "${yellow}Set SYSTEMD_PAGERSECURE to 0?" page_sec
         if test "$page_sec" == "y"; then
             pageSec=0 
             if test -f /etc/sudoers; then 
                 echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for 'Defaults env_keep += \"SYSTEMD_PAGERSECURE\"' in /etc/sudoers"
                 if ! sudo grep -q "Defaults env_keep += \"SYSTEMD_PAGERSECURE\"" /etc/sudoers; then
                     printf "${bold}${yellow}Sudo won't respect the user's SYSTEMD_PAGERSECURE environment. If you were to want to keep your userdefined less options or use a custom pager when using sudo with ${cyan}systemctl/journalctl${bold}${yellow}, you would need to always pass your environment using 'sudo -E'\n${normal}"
-                    readyn -Y "YELLOW -p "Change this behaviour permanently in /etc/sudoers?" sudrs
+                    readyn -Y "YELLOW" -p "Change this behaviour permanently in /etc/sudoers?" sudrs
                     if test "$sudrs" == "y"; then
                         sudo sed -i '1s/^/Defaults env_keep += "SYSTEMD_PAGERSECURE"\n/' /etc/sudoers
                         echo "Added ${RED}'Defaults env_keep += \"SYSTEMD_PAGERSECURE\"'${normal} to /etc/sudoers"
@@ -547,8 +547,9 @@ elif [ "$envvars" == "y" ]; then
         - SYSTEMD_LOG_TID=\"true\"\n\
         - SYSTEMD_LOG_TARGET=\"auto\"\n"
         printf "$prmpt${normal}"
-        readyn -Y "YELLOW" -p "Set systemd environment? " xdgInst
-        if [ -z "$xdgInst" ] || [ "y" == "$xdgInst" ]; then
+        readyn -Y "YELLOW" -p "Set systemd environment?" xdgInst
+
+        if test -z "$xdgInst" || test "y" == "$xdgInst"; then
             sed 's/^#export SYSTEMD_PAGER=\(.*\)/export SYSTEMD_PAGER=\1/' -i $pathvr 
             if test "$pageSec" == 0; then
                 sed 's/^#export SYSTEMD_PAGERSECURE=\(.*\)/export SYSTEMD_PAGERSECURE=0/' -i $pathvr
@@ -564,7 +565,7 @@ elif [ "$envvars" == "y" ]; then
             sed 's/^#export SYSTEMD_LOG_TARGET=\(.*\)/export SYSTEMD_LOG_TARGET=\1/' -i $pathvr
         fi
     fi
-   
+        
     if test -d $HOME/.fzf/bin; then
         sed -i 's|^#export PATH=$PATH:$HOME/.fzf/bin|export PATH=$PATH:$HOME/.fzf/bin|g' $pathvr
     fi
@@ -572,8 +573,8 @@ elif [ "$envvars" == "y" ]; then
     if type libvirtd &> /dev/null; then
         sed -i 's/^#export LIBVIRT_DEFAULT_URI/export LIBVIRT_DEFAULT_URI/' $pathvr
     fi
-   
-    yes-no-edit -f environment-variables -g "$pathvr" -p "Install .environment.env in $HOME?" -i "e" --Q "GREEN"
+    
+    yes-no-edit -f environment-variables -g "$pathvr" -p "Install .environment.env in $HOME?" -i "e" -Q "GREEN"
     printf "It's recommended to logout and login again to notice a change for ${MAGENTA}.profile${normal} and any ${CYAN}.*shelltype*_profiles\n${normal}" 
 
 fi 
