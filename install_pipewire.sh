@@ -7,7 +7,7 @@ else
     . ./checks/check_system.sh
 fi
 
-if ! test -f /usr/local/bin/reade; then
+if ! type reade &> /dev/null; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
 else
     . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
@@ -254,9 +254,9 @@ pipewire_r(){
 pipewiresh(){
     cp -fv $file ~/.bash_aliases.d/;
     cp -fv $file1 ~/.bash_completion.d/;
-    yes_edit_no pipewire_r "$file $file1" "Install pipewire aliases at /root/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)? " "yes" "GREEN"
+    yes-no-edit -f pipewire_r -g "$file $file1" -p "Install pipewire aliases at /root/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)?" -i "y" -Q "GREEN"
 }
-yes_edit_no pipewiresh "$file $file1" "Install pipewire aliases at ~/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)? " "yes" "GREEN"
+yes-no-edit -f pipewiresh -g "$file $file1" -p "Install pipewire aliases at ~/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)? " -i "y" -Q "GREEN"
 
 
 if type systemctl &> /dev/null; then

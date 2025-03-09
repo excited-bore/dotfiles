@@ -3,64 +3,23 @@
 export INSTALL=1 
 
 
-if ! test -f rlwrap-scripts/reade; then
-    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade)" &> /dev/null 
-    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/readyn)" &> /dev/null 
-else
-    . ./rlwrap-scripts/reade 1> /dev/null
-    . ./rlwrap-scripts/readyn 1> /dev/null
-fi
-
-
-if ! test -f checks/check_system.sh; then
+if ! test -f checks/check_all.sh; then
     if type curl &> /dev/null; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)" 
     else 
         continue 
     fi
 else
-    . ./checks/check_system.sh
+    . ./checks/check_all.sh
 fi
 
 
-if ! test -f checks/check_envvar.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)" 
-else
-    . ./checks/check_envvar.sh
-fi
-
-if ! type update-system &> /dev/null; then
-    if ! test -f aliases/.bash_aliases.d/update-system.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)" 
-    else
-        . ./aliases/.bash_aliases.d/update-system.sh
-    fi
-fi
-
-if test -z $SYSTEM_UPDATED; then
-    readyn -Y "CYAN" -p "Update system?" updatesysm
-    if test $updatesysm == "y"; then
-        update-system                     
-    else
-        export SYSTEM_UPDATED="TRUE"
-    fi
-fi
 
 if ! type rlwrap &>/dev/null; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_rlwrap.sh)" 
 else
     . ./checks/check_rlwrap.sh
 fi
-
-readyn -p "Install reade and readyn?" -c 'test -f /usr/local/bin/reade' insrde
-if test "$insrde" == 'y'; then
-    if ! test -f install_reade_readyn.sh; then
-         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_reade_readyn.sh)" 
-    else
-        ./install_reade_readyn.sh
-    fi
-fi
-unset insrde
 
 
 
@@ -69,7 +28,6 @@ if type gio &> /dev/null; then
     printf "\n${green}Files that get overwritten get backed up and trashed (to prevent clutter).\nRecover using ${cyan}'gio trash --list'${green} and ${cyan}'gio trash --restore' ${normal}\n"
 fi
 printf "${green} Will now start with updating system ${normal}\n"
-
 
 if [ ! -e ~/config ] && test -d ~/.config; then
     readyn -Y "BLUE" -p "Create ~/.config to ~/config symlink? " sym1
@@ -408,17 +366,31 @@ if [ -z $pycomp ] || [ "y" == $pycomp ]; then
 fi
 unset pycomp
 
+
+# Rlwrap scripts
+
+readyn -p "Install reade, readyn and yes-no-edit?" -c 'test -f ~/.bash_aliases.d/reade' insrde
+if test "$insrde" == 'y'; then
+    if ! test -f install_reade_readyn.sh; then
+         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_reade_readyn.sh)" 
+    else
+        ./install_reade_readyn.sh
+    fi
+fi
+unset insrde
+
+
 readyn -p "Install bash aliases and other config?" scripts
 if [ -z $scripts ] || [ "y" == $scripts ]; then
 
     if ! test -f checks/check_aliases_dir.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)" 
     else
-        ./checks/check_aliases_dir.sh
+        . ./checks/check_aliases_dir.sh
     fi
     if ! test -f install_aliases.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/install_aliases.sh)" 
-    els
+    else
         ./install_aliases.sh
     fi
 fi
@@ -433,8 +405,8 @@ binds1=keybinds/.keybinds.d/keybinds.bash
 binds2=keybinds/.keybinds
 if ! test -f $binds; then
     tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.inputrc
-    tmp1=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds.d/keybinds.bash 
-    tmp2=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds 
+    tmp1=$(mktemp) && curl -o $tmp1 https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds.d/keybinds.bash 
+    tmp2=$(mktemp) && curl -o $tmp2 https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds 
     binds=$tmp
     binds1=$tmp1
     binds2=$tmp2
@@ -513,9 +485,10 @@ shell-keybinds() {
        sed -i 's|#export INPUTRC.*|export INPUTRC=~/.inputrc|g' ~/.environment.env
     fi
     unset vimde vivisual xterm
-    yes_edit_no shell-keybinds_r "$binds $binds2 $binds1" "Install .inputrc and keybinds.bash at /root/ and /root/.keybinds.d/?" "yes" "YELLOW"; 
+    yes-no-edit -f shell-keybinds_r -g "$binds $binds2 $binds1" -p "Install .inputrc and keybinds.bash at /root/ and /root/.keybinds.d/?" -i "y" "YELLOW"; 
 }
-yes_edit_no shell-keybinds "$binds $binds2 $binds1" "Install .inputrc and keybinds.bash at ~/ and ~/.keybinds.d/? (keybinds configuration)" "yes" "GREEN"
+
+yes-no-edit -f shell-keybinds -g "$binds $binds2 $binds1" -p "Install .inputrc and keybinds.bash at ~/ and ~/.keybinds.d/? (keybinds configuration)" -i "y" -Q "GREEN"
 
 # Xresources
 
@@ -530,8 +503,8 @@ xresources_r(){
     }
 xresources() {
     cp -fv $xterm ~/.Xresources;
-    yes_edit_no xresources_r "$xterm" "Install .Xresources at /root/?" "edit" "RED"; }
-yes_edit_no xresources "$xterm" "Install .Xresources at ~/? (Xterm configuration)" "edit" "YELLOW"
+    yes-no-edit -f xresources_r -g "$xterm" -p "Install .Xresources at /root/?" -i "e" -Q "RED"; }
+yes-no-edit -f xresources -g "$xterm" -p "Install .Xresources at ~/? (Xterm configuration)" -i "e" -Q "YELLOW"
 
 # Bash Preexec
 readyn -p "Install pre-execution hooks for bash in ~/.bash_preexec?" -n "! test -f ~/.bash_preexec || ! test -f /root/.bash_preexec" bash_preexec

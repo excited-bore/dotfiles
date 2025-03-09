@@ -13,7 +13,7 @@ else
 fi
 
 
-if ! test -f /usr/local/bin/reade; then
+if ! type reade &> /dev/null; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
 else
     . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
@@ -148,7 +148,7 @@ environment-variables(){
     fi
     
     if ! sudo grep -q '.environment.env' /root/.bashrc && ! sudo grep -q '.environment.env' $PROFILE_R; then
-        yes_edit_no environment-variables_r "$pathvr" "Install .environment.env in /root/?" "edit" "YELLOW"; 
+        yes-no-edit -f environment-variables_r -g "$pathvr" -p "Install .environment.env in /root/?" -i "e" -Q "YELLOW"; 
     fi 
 }
 
@@ -192,7 +192,7 @@ if [ "$envvars" == "y" ] && test "$1" == 'n'; then
     sed 's|#export TMPDIR|export TMPDIR|' -i $pathvr
 
     if ! grep -q '.environment.env' ~/.bashrc && ! grep -q '.environment.env' $PROFILE; then
-        yes_edit_no environment-variables "$pathvr" "Install .environment.env in $HOME?" "edit" "GREEN"
+        yes-no-edit -f environment-variables -g "$pathvr" -p "Install .environment.env in $HOME?" -i "e" -Q "GREEN"
         printf "It's recommended to logout and login again to notice a change for ${MAGENTA}.profile${normal} and any ${CYAN}.*shelltype*_profiles\n${normal}" 
     fi
 
@@ -214,7 +214,7 @@ elif [ "$envvars" == "y" ]; then
     sed 's|#export TMPDIR|export TMPDIR|' -i $pathvr
 
     if ! grep -q '.environment.env' ~/.bashrc && ! grep -q '.environment.env' $PROFILE; then
-        yes_edit_no environment-variables "$pathvr" "Install .environment.env in $HOME?" "edit" "GREEN"
+        yes-no-edit -f environment-variables -g "$pathvr" -p "Install .environment.env in $HOME?" -i "e" -Q "GREEN"
         printf "It's recommended to logout and login again to notice a change for ${MAGENTA}.profile${normal} and any ${CYAN}.*shelltype*_profiles\n${normal}" 
     fi
     
@@ -573,7 +573,7 @@ elif [ "$envvars" == "y" ]; then
         sed -i 's/^#export LIBVIRT_DEFAULT_URI/export LIBVIRT_DEFAULT_URI/' $pathvr
     fi
    
-    yes_edit_no environment-variables "$pathvr" "Install .environment.env in $HOME?" "edit" "GREEN"
+    yes-no-edit -f environment-variables -g "$pathvr" -p "Install .environment.env in $HOME?" -i "e" --Q "GREEN"
     printf "It's recommended to logout and login again to notice a change for ${MAGENTA}.profile${normal} and any ${CYAN}.*shelltype*_profiles\n${normal}" 
 
 fi 

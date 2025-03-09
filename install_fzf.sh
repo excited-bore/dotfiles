@@ -12,7 +12,7 @@ else
     . ./checks/check_envvar_aliases_completions_keybinds.sh
 fi
 
-if ! test -f /usr/local/bin/reade; then
+if ! type reade &> /dev/null; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
 else
     . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh

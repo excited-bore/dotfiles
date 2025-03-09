@@ -12,7 +12,7 @@ if ! type update-system &> /dev/null; then
         . ./aliases/.bash_aliases.d/update-system.sh
     fi
 fi
-if ! test -f /usr/local/bin/reade; then
+if ! type reade &> /dev/null; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
 else
     . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
@@ -64,4 +64,4 @@ fi
 ytbe(){
     cp -fv "$ytbe" ~/.bash_aliases.d/
 }
-yes_edit_no ytbe "$ytbe" "Install yt-dlp (youtube cli download) and youtube.sh at ~/.bash_aliases.d/ (yt-dlp aliases)?" "yes" "GREEN"
+yes-no-edit -f ytbe -g "$ytbe" -p "Install yt-dlp (youtube cli download) and youtube.sh at ~/.bash_aliases.d/ (yt-dlp aliases)?" -i "y" -Q "GREEN"

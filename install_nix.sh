@@ -10,7 +10,7 @@ else
     . ./checks/check_envvar_aliases_completions_keybinds.sh
 fi
 
-if ! test -f /usr/local/bin/reade; then
+if ! type reade &> /dev/null; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
 else
     . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
@@ -53,9 +53,9 @@ if type nix &> /dev/null; then
 
     function ins_nix(){
         cp -vf $nixsh ~/.bash_aliases.d/nix.sh
-        yes_edit_no ins_nix_r "$nixsh" "Install nix.sh to /root? (nix bash aliases)" "yes" "GREEN"; 
+        yes-no-edit -f ins_nix_r -g "$nixsh" -p "Install nix.sh to /root? (nix bash aliases)" -i "y" -Q "GREEN"; 
     }	
-    yes_edit_no ins_nix "$nixsh" "Install nix.sh to $HOME? (nix bash aliases)" "yes" "GREEN"
+    yes-no-edit -f ins_nix -g "$nixsh" -p "Install nix.sh to $HOME? (nix bash aliases)" -i "y" -Q "GREEN"
     unset nixsh	
 
     if [[ $distro == "Raspbian" && $(uname -m) == "aarch64" ]]; then

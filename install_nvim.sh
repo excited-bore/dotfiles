@@ -23,7 +23,7 @@ if test -z $SYSTEM_UPDATED; then
     fi
 fi
 
-#if ! test -f /usr/local/bin/reade; then
+#if ! type reade &> /dev/null; then
 #     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
 #else
 #    . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
@@ -645,9 +645,9 @@ function instvim(){
     if [ -z $vimrc ] && [ ! -f ~/.vimrc ]; then
         ln -s ~/.config/nvim/init.vim ~/.vimrc
     fi
-    yes_edit_no instvim_r "$dir/init.vim $dir/init.lua.vim $dir/plug_lazy_adapter.vim" "Install (neo)vim readconfigs at /root/.config/nvim/ ? (init.vim, init.lua, etc..)" "edit" "YELLOW"
+    yes-no-edit -f instvim_r -g "$dir/init.vim $dir/init.lua.vim $dir/plug_lazy_adapter.vim" -p "Install (neo)vim readconfigs at /root/.config/nvim/ ? (init.vim, init.lua, etc..)" -i "e" -Q "YELLOW"
 }
-yes_edit_no instvim "$dir/init.vim $dir/init.lua.vim $dir/plug_lazy_adapter.vim" "Install (neo)vim readconfigs at ~/.config/nvim/ ? (init.vim, init.lua, etc..)" "edit" "GREEN"
+yes-no-edit -f instvim -g "$dir/init.vim $dir/init.lua.vim $dir/plug_lazy_adapter.vim" -p "Install (neo)vim readconfigs at ~/.config/nvim/ ? (init.vim, init.lua, etc..)" -i "e" -Q "GREEN"
 
 unset dir tmpdir tmpfile
 
@@ -673,9 +673,9 @@ vimsh_r(){
 vimsh(){
     cp -fv $file ~/.bash_aliases.d/
     cp -fv $file1 ~/.bash_completion.d/;
-    yes_edit_no vimsh_r "$dir/vim_nvim.sh $dir1/vim_nvim" "Install vim aliases at /root/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)? " "yes" "GREEN"
+    yes-no-edit vimsh_r -g "$dir/vim_nvim.sh $dir1/vim_nvim" -p "Install vim aliases at /root/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)? " -i "y" -Q "GREEN"
 }
-yes_edit_no vimsh "$dir/vim_nvim.sh $dir1/vim_nvim" "Install vim aliases at ~/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)? " "yes" "GREEN"
+yes-no-edit -f vimsh -g "$dir/vim_nvim.sh $dir1/vim_nvim" -p "Install vim aliases at ~/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)? " -i "y" -Q "GREEN"
 
 if ! type nvimpager &> /dev/null; then
     readyn -n -p "Install nvimpager?" vimrc 

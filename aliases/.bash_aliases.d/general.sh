@@ -67,6 +67,7 @@ alias disable-glob="set -f"
 
 # Cd wrapper
 function cd-w() {
+    ! test -d $@ && builtin cd -- $@ && return 0 
     local push=1
     local j=0
     if test "$1" == "--"; then

@@ -8,7 +8,6 @@
 if type sudo &> /dev/null; then
     alias sudo='sudo '
 fi
-
 if type wget &> /dev/null; then
     alias wget='wget --https-only '
 fi
@@ -103,7 +102,7 @@ italic=$(tput it)
 # Arguments: Completions(string with space entries, AWK works too),return value(-a password prompt, -c complete filenames, -p prompt flag, -Q prompt colour, -b break-chars (when does a string break for autocomp), -e change char given for multiple autocompletions)
 # 'man rlwrap' to see all unimplemented options
 
-if ! test -f /usr/local/bin/reade; then
+if ! type reade &> /dev/null ; then
     if test -f rlwrap-scripts/reade; then
         . ./rlwrap-scripts/reade 1> /dev/null
     else
@@ -111,11 +110,20 @@ if ! test -f /usr/local/bin/reade; then
     fi
 fi
 
-if ! test -f /usr/local/bin/readyn; then
+if ! type readyn &> /dev/null; then
     if test -f rlwrap-scripts/readyn; then
         . ./rlwrap-scripts/readyn 1> /dev/null
     else
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/readyn)" &> /dev/null 
     fi
 fi
+
+if ! type yes-no-edit &> /dev/null; then
+    if test -f rlwrap-scripts/yes-no-edit; then
+        . ./rlwrap-scripts/yes-no-edit 1> /dev/null
+    else
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/yes-no-edit)" &> /dev/null 
+    fi
+fi
+
 

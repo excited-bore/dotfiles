@@ -51,7 +51,7 @@ if ! type neofetch &> /dev/null && ! type fastfetch &> /dev/null && ! type scree
                     mkdir -p ~/.config/neofetch 
                     cp -fbv $file ~/.config/neofetch/ 
                 }
-                yes_edit_no neofetch_conf "$file" "Install neofetch config.conf at $HOME/.config/neofetch/?" "yes" "GREEN"; 
+                yes-no-edit -f neofetch_conf -g "$file" -p "Install neofetch config.conf at $HOME/.config/neofetch/?" -i "y" -Q "GREEN"; 
             fi
         elif test "$sym2" == "fast"; then 
             if test $distro_base == "Debian"; then

@@ -1,6 +1,6 @@
 # !/bin/bash
 
-if ! test -f /usr/local/bin/reade; then
+if ! type reade &> /dev/null; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
 else
     . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
@@ -16,7 +16,7 @@ if sudo test -d /etc/polkit-1/localauthority/50-local.d/ && ! sudo test -f /etc/
     function localauth_conf(){
         sudo cp -bfv $file /etc/polkit-1/localauthority/50-local.d/90-nopasswd_global.pkla
     } 
-    yes_edit_no localauth_conf "$file" "Install $file at /etc/polkit-1/localauthority/50-local.d/?" "yes" "GREEN"; 
+    yes-no-edit -f localauth_conf -g "$file" -p "Install $file at /etc/polkit-1/localauthority/50-local.d/?" -i "y" -Q "GREEN"; 
     unset file 
 fi
 
@@ -30,7 +30,7 @@ if sudo test -d /etc/polkit-1/localauthority.conf.d/ && ! sudo test -f /etc/polk
     function localauth_conf_d(){
         sudo cp -fbv $file /etc/polkit-1/localauthority.conf.d/90-nopasswd_global.conf
     } 
-    yes_edit_no localauth_conf_d "$file" "Install $file at /etc/polkit-1/localauthority.conf.d?" "yes" "GREEN"; 
+    yes-no-edit -f localauth_conf_d -g "$file" -p "Install $file at /etc/polkit-1/localauthority.conf.d?" -i "y" -Q "GREEN"; 
     unset file 
 fi
 
@@ -44,6 +44,6 @@ if sudo test -d /etc/polkit-1/rules.d/ && ! sudo test -f /etc/polkit-1/rules.d//
     function rules_conf(){
         sudo cp -fbv $file /etc/polkit-1/rules.d/90-nopasswd_global.rules
     } 
-    yes_edit_no rules_conf "$file" "Install $file at/etc/polkit-1/rules.d/?" "yes" "GREEN"; 
+    yes-no-edit -f rules_conf -g "$file" -p "Install $file at/etc/polkit-1/rules.d/?" -i "y" -Q "GREEN"; 
     unset file 
 fi

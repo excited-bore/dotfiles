@@ -142,6 +142,7 @@ function reade(){
     if [[ $(uname -s) =~ 'MINGW' ]] && ! type pacman &> /dev/null; then
         bash_rlwrap='n'
     fi
+     
     if ! type rlwrap &> /dev/null || test "$fcomp" == 'y' || test "$bash_rlwrap" == 'n' ; then
         readstr="read -r "
         color=""
@@ -166,6 +167,8 @@ function reade(){
                 Q)  if [[ "${OPTARG}" =~ ^[[:upper:]]+$ ]]; then
                         color="${bold}"
                     fi
+                 
+                    echo $OPTARG
                     OPTARG=$(echo ${OPTARG} | awk '{print tolower($0)}')
                     if [[ "${OPTARG}" =~ "red" ]]; then
                         color=$color"${red}"
@@ -257,7 +260,7 @@ function reade(){
                     rlwstring=$(echo $rlwstring | sed 's| -o cat| \-H $tmpf  \-f <(echo \"${args[@]}\") -o cat|g') 
                 ;;
                 # Prompt
-                p)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-S \"${OPTARG}\" |g");
+                p) rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-S \"${OPTARG}\" |g");
                 ;;
                 # Prompt colours
                 Q)  rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-p${OPTARG} |g");
@@ -275,16 +278,14 @@ function reade(){
 
         value="$(eval $rlwstring)";
 
-        if ! test $# -eq 0; then
-            eval "${@:$#:1}=$value" 
-        else
-            export READE_VALUE="$value" 
-        fi
+        export REPLY="$value" 
+        export READE_VALUE="$value" 
+
+        ! test $# -eq 0 && eval "${@:$#:1}=$value" 
+
         command rm $tmpf &> /dev/null;
     fi
     unset bash_rlwrap 
 }
 
-
-
-reade $@
+#reade $@

@@ -39,21 +39,22 @@ fi
 
 if type ffmpeg &> /dev/null; then
 							
-						ffmpgsh=$(pwd)/aliases/.bash_aliases.d/ffmpeg.sh
-						if ! test -f $ffmpgsh; then
-										wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/ffmpeg.sh
-										ffmpgsh=$TMPDIR/ffmpeg.sh
-						fi
+    ffmpgsh=$(pwd)/aliases/.bash_aliases.d/ffmpeg.sh
+    if ! test -f $ffmpgsh; then
+        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/ffmpeg.sh
+        ffmpgsh=$TMPDIR/ffmpeg.sh
+    fi
 
-						function ins_ffmpg_r(){
-										sudo cp -vf $ffmpgsh /root/.bash_aliases.d/
-						}	
+    function ins_ffmpg_r(){
+        sudo cp -vf $ffmpgsh /root/.bash_aliases.d/
+    }	
 
-						function ins_ffmpg(){
-										cp -vf $ffmpgsh ~/.bash_aliases.d/nix.sh
-										yes_edit_no ins_ffmpg_r "$ffmpgsh" "Install ffmpeg.sh to /root? (nix bash aliases)" "yes" "GREEN"; 
-						}	
-						yes_edit_no ins_ffmpg "$ffmpgsh" "Install ffmpeg.sh to $HOME? (nix bash aliases)" "yes" "GREEN"
+    function ins_ffmpg(){
+        cp -vf $ffmpgsh ~/.bash_aliases.d/nix.sh
+        yes-no-edit -f ins_ffmpg_r -g "$ffmpgsh" -p "Install ffmpeg.sh to /root? (nix bash aliases)" -i "y" -Q "GREEN"; 
+    }	
 
-						unset ffmpgsh	
+    yes-no-edit -f ins_ffmpg -g "$ffmpgsh" -p "Install ffmpeg.sh to $HOME? (nix bash aliases)" -i "y" -Q "GREEN"
+
+    unset ffmpgsh	
 fi
