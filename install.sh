@@ -3,49 +3,17 @@
 export INSTALL=1 
 
 
-if ! test -f rlwrap-scripts/reade; then
-    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade)" &> /dev/null 
-    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/readyn)" &> /dev/null 
-else
-    . ./rlwrap-scripts/reade 1> /dev/null
-    . ./rlwrap-scripts/readyn 1> /dev/null
-    . ./rlwrap-scripts/yes-no-edit 1> /dev/null
-fi
-
-
-if ! test -f checks/check_system.sh; then
+if ! test -f checks/check_all.sh; then
     if type curl &> /dev/null; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)" 
     else 
         continue 
     fi
 else
-    . ./checks/check_system.sh
+    . ./checks/check_all.sh
 fi
 
 
-if ! test -f checks/check_envvar.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)" 
-else
-    . ./checks/check_envvar.sh
-fi
-
-if ! type update-system &> /dev/null; then
-    if ! test -f aliases/.bash_aliases.d/update-system.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)" 
-    else
-        . ./aliases/.bash_aliases.d/update-system.sh
-    fi
-fi
-
-if test -z $SYSTEM_UPDATED; then
-    readyn -Y "CYAN" -p "Update system?" updatesysm
-    if test $updatesysm == "y"; then
-        update-system                     
-    else
-        export SYSTEM_UPDATED="TRUE"
-    fi
-fi
 
 if ! type rlwrap &>/dev/null; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_rlwrap.sh)" 
@@ -535,8 +503,8 @@ xresources_r(){
     }
 xresources() {
     cp -fv $xterm ~/.Xresources;
-    yes-no-edit xresources_r "$xterm" "Install .Xresources at /root/?" "edit" "RED"; }
-yes-no-edit xresources "$xterm" "Install .Xresources at ~/? (Xterm configuration)" "edit" "YELLOW"
+    yes-no-edit -f xresources_r -g "$xterm" -p "Install .Xresources at /root/?" -i "e" -Q "RED"; }
+yes-no-edit -f xresources -g "$xterm" -p "Install .Xresources at ~/? (Xterm configuration)" -i "e" -Q "YELLOW"
 
 # Bash Preexec
 readyn -p "Install pre-execution hooks for bash in ~/.bash_preexec?" -n "! test -f ~/.bash_preexec || ! test -f /root/.bash_preexec" bash_preexec

@@ -672,3 +672,8 @@ fi
 if sudo test -f /root/.keybinds  ; then
     export KEYBIND_R=/root/.keybinds
 fi
+
+if sudo test -d /root/.keybinds.d/  ; then
+    export KEYBIND_FILEDIR_R=/root/.keybindsd.d/
+fi
+

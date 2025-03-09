@@ -167,6 +167,8 @@ function reade(){
                 Q)  if [[ "${OPTARG}" =~ ^[[:upper:]]+$ ]]; then
                         color="${bold}"
                     fi
+                 
+                    echo $OPTARG
                     OPTARG=$(echo ${OPTARG} | awk '{print tolower($0)}')
                     if [[ "${OPTARG}" =~ "red" ]]; then
                         color=$color"${red}"
@@ -275,14 +277,13 @@ function reade(){
         shift $((OPTIND-1)) 
 
         value="$(eval $rlwstring)";
-        command rm $tmpf &> /dev/null;
 
         export REPLY="$value" 
         export READE_VALUE="$value" 
 
-        if ! test $# -eq 0; then
-            eval "${@:$#:1}=$value" 
-        fi
+        ! test $# -eq 0 && eval "${@:$#:1}=$value" 
+
+        command rm $tmpf &> /dev/null;
     fi
     unset bash_rlwrap 
 }

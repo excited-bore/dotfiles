@@ -185,8 +185,7 @@ function yes-no-edit(){
         choicesp=("y(es)" "n(o)" "e(dit)"); 
         prmpt='' 
         prmpt1='' 
-        color="${normal}";
-        color1="";
+        color="";
         YES_NO_EDITOR="$EDITOR"
         othercmd=''
         other=''
@@ -235,28 +234,7 @@ function yes-no-edit(){
                     return 0 ||
                     YES_NO_EDITOR="${OPTARG}";
                     ;; 
-                Q)  if [[ "${OPTARG}" =~ ^[[:upper:]]+$ ]]; then
-                        color="${bold}"
-                    fi
-                    color1="-Q ${OPTARG}"
-                    OPTARG=$(echo ${OPTARG} | awk '{print tolower($0)}')
-                    if [[ "${OPTARG}" =~ "red" ]]; then
-                        color=$color"${red}"
-                    elif [[ "${OPTARG}" =~ "green" ]]; then
-                        color=$color"${green}"
-                    elif [[ "${OPTARG}" =~ "blue" ]]; then
-                        color=$color"${blue}"
-                    elif [[ "${OPTARG}" =~ "yellow" ]]; then
-                        color=$color"${yellow}"
-                    elif [[ "${OPTARG}" =~ "cyan" ]]; then
-                        color=$color"${cyan}"
-                    elif [[ "${OPTARG}" =~ "magenta" ]]; then
-                        color=$color"${magenta}"
-                    elif [[ "${OPTARG}" =~ "black" ]]; then
-                        color=$color"${black}"
-                    elif [[ "${OPTARG}" =~ "white" ]]; then
-                        color=$color"${white}"
-                    fi
+                Q)  color="${OPTARG}"
                     ;;
                 i)  found='n'
                     i=0;
@@ -280,8 +258,7 @@ function yes-no-edit(){
                         for i in "${!choicesp[@]}"; do
                             prmpt1="$prmpt1/${choicesp[$i]}" && unset $choicesp[$i];
                         done && i=0; 
-                        prmpt1="$prmpt1]:${color} " 
-                        prmpt="-p $prmpt1" 
+                        prmpt1="$prmpt1]:${normal} " 
                     fi
                     ;;
                 f)  test -z "${OPTARG}" && 
@@ -289,8 +266,7 @@ function yes-no-edit(){
                     return 0 || 
                     functn="${OPTARG}";
                     ;; 
-                p)  test -z "$noprompt" && 
-                    prmpt="-p ${color}${OPTARG}$prmpt1"
+                p)  prmpt="${OPTARG}"
                     ;;
                 g)  test -z "${OPTARG}" && 
                     printf "This flag requires a string with files to edit/review\n" && 
@@ -308,6 +284,7 @@ function yes-no-edit(){
         done;
          
         shift $((OPTIND-1))
+        
 
         if test -z "$files"; then 
            if test $# -eq 1 || test $# -gt 1; then
@@ -319,7 +296,6 @@ function yes-no-edit(){
             fi
         fi
 
-        
         if test -z "$YES_NO_EDITOR"; then
             if type nvim &> /dev/null; then
                 YES_NO_EDITOR='nvim' 
@@ -331,8 +307,11 @@ function yes-no-edit(){
                 YES_NO_EDITOR='vi' 
             fi
         fi
-    
-        reade $color1 -i "${choices[*]}" "$prmpt" pass;
+   
+        test -z $noprompt && prmpt="$prmpt$prmpt1" 
+
+        test -z $color && reade -i "${choices[*]}" -p "$prmpt" pass || 
+        reade -Q $color -i "${choices[*]}" -p "$prmpt" pass
         
         #Undercase only
         pass=$(echo "$pass" | tr '[:upper:]' '[:lower:]')
@@ -343,20 +322,22 @@ function yes-no-edit(){
             ${othercmd} ${files[*]} 
         fi  
      
-
         if ! test -z "$norepeat" ; then
             if ! test $pass == 'n' && ! test $pass == 'y'; then 
-                test "$norepeat" == 'n' && repeat='--no ' || repeat=''
-                 
-                ! type readyn &> /dev/null && . $SCRIPT_DIR/readyn  
-                readyn $color1 $repeat "$prmpt" pass 
+                if test $pre == 'n'; then
+                    test -z $color && readyn --no "$prmpt" pass || 
+                    readyn --no -N $color -p "$prmpt" pass 
+                else
+                    test -z $color && readyn "$prmpt" pass || 
+                    readyn -Y $color -p "$prmpt" pass 
+                fi
             fi
         else
             while : ; do
-                
-                test "$pass" == 'y'  || test "$pass" == 'n'  && break;
-                
-                reade $color1 -i "${choices[*]}" "$prmpt" pass;
+                test "$pass" == 'y' || test "$pass" == 'n'  && break;
+
+                test -z $color && reade -i "${choices[*]}" -p "$prmpt" pass || 
+                reade -Q "$color" -i "${choices[*]}" -p "$prmpt" pass;
 
                 #Undercase only
                 pass=$(echo "$pass" | tr '[:upper:]' '[:lower:]')
@@ -377,5 +358,3 @@ function yes-no-edit(){
     fi
     unset SCRIPT_DIR
 }
-
-#yes-no-edit $@

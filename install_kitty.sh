@@ -266,7 +266,7 @@ if test $ktty_cnf == 'y'; then
             gio trash ~/.config/kitty/ssh.conf~
         fi 
     }
-    yes_edit_no kitty_conf "$dir/kitty.conf $dir/ssh.conf" "Install kitty.conf and ssh.conf at ~/.config/kitty ?" "edit" "GREEN"
+    yes-no-edit -f kitty_conf -g "$dir/kitty.conf $dir/ssh.conf" -i "Install kitty.conf and ssh.conf at ~/.config/kitty?" -i "e" -Q "GREEN"
 fi
 unset ktty_conf
 

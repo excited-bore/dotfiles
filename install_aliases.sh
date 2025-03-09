@@ -242,8 +242,8 @@ if test $ansr == "y"; then
     general(){
         cp -fv $genr ~/.bash_aliases.d/
         cp -fv $genrc ~/.bash_completion.d/
-        yes_edit_no general_r "$genr $genrc" "Install general.sh at /root/?" "yes" "YELLOW"; }
-    yes_edit_no general "$genr $genrc" "Install general.sh at ~/?" "yes" "GREEN"
+        yes-no-edit -f general_r -g "$genr $genrc" -p "Install general.sh at /root/?" -i "y" -Q "YELLOW";}
+    yes-no-edit -f general -g "$genr $genrc" -p "Install general.sh at ~/?" -i "y" -Q "GREEN"
 fi
 
 update_sysm=aliases/.bash_aliases.d/update-system.sh
@@ -278,27 +278,27 @@ update_sysm_r(){
 update_sysm(){
     cp -fv $update_sysm ~/.bash_aliases.d/
     sed -i '/SYSTEM_UPDATED="TRUE"/d' ~/.bash_aliases.d/update-system.sh
-    yes_edit_no update_sysm_r "$update_sysm" "Install update-system.sh at /root/.bash_aliases.d//?" "yes" "YELLOW";
+    yes-no-edit -f update_sysm_r -g "$update_sysm" -p "Install update-system.sh at /root/.bash_aliases.d//?" -i "y" -Q "YELLOW";
 }
-yes_edit_no update_sysm "$update_sysm" "Install update-system.sh at ~/.bash_aliases.d/? (Global system update function)?" "yes" "GREEN"
+yes-no-edit -f update_sysm -g "$update_sysm" -p "Install update-system.sh at ~/.bash_aliases.d/? (Global system update function)?" -i "y" -Q "GREEN"
 
 packman_r(){ 
     sudo cp -fv $pacmn /root/.bash_aliases.d/
 }
 packman(){
     cp -fv $pacmn ~/.bash_aliases.d/
-    yes_edit_no packman_r "$pacmn" "Install package_managers.sh at /root/.bash_aliases.d/?" "yes" "YELLOW" 
+    yes-no-edit -f packman_r -g "$pacmn" -p "Install package_managers.sh at /root/.bash_aliases.d/?" -i "y" -Q "YELLOW"
 }
-yes_edit_no packman "$pacmn" "Install package_managers.sh at ~/.bash_aliases.d/ (package manager aliases)? " "yes" "GREEN"
+yes-no-edit -f packman -g "$pacmn" -p "Install package_managers.sh at ~/.bash_aliases.d/ (package manager aliases)? " -i "y" -Q "GREEN"
 
 reade_r(){ 
     sudo cp -fv $reade $readyn /root/.bash_aliases.d/
 }
 readei(){
     cp -fv $reade $readyn ~/.bash_aliases.d/
-    yes_edit_no reade_r "$reade $readyn" "Install reade and readyn at /root/.bash_aliases.d/?" "yes" "YELLOW" 
+    yes-no-edit -f reade_r -g "$reade $readyn" -p "Install reade and readyn at /root/.bash_aliases.d/?" -i "y" -Q "YELLOW"
 }
-yes_edit_no readei "$reade $readyn" "Install reade and readyn at ~/.bash_aliases.d/ (rlwrap/read functions)? " "yes" "GREEN"
+yes-no-edit -f readei -g "$reade $readyn" -p "Install reade and readyn at ~/.bash_aliases.d/ (rlwrap/read functions)? " -i "y" -Q "GREEN"
 
 
 
@@ -308,9 +308,9 @@ if [ "$distro" == "Manjaro" ] ; then
     }
     manj(){
         cp -fv $manjaro ~/.bash_aliases.d/
-        yes_edit_no manj_r "$manjaro" "Install manjaro.sh at /root/.bash_aliases.d/?" "yes" "YELLOW" 
+        yes-no-edit -f manj_r -g "$manjaro" -p "Install manjaro.sh at /root/.bash_aliases.d/?" -i "y" -Q "YELLOW" 
     }
-    yes_edit_no manj "$manjaro" "Install manjaro.sh at ~/.bash_aliases.d/ (manjaro specific aliases)? " "yes" "GREEN"
+    yes-no-edit -f manj -g "$manjaro" -p "Install manjaro.sh at ~/.bash_aliases.d/ (manjaro specific aliases)? " -i "y" -Q "GREEN"
 fi
 
 
@@ -319,8 +319,8 @@ systemd_r(){
 }
 systemd(){
     cp -fv $systemd ~/.bash_aliases.d/
-    yes_edit_no systemd_r "$systemd" "Install systemctl.sh at /root/.bash_aliases.d/?" "yes" "YELLOW"; }
-yes_edit_no systemd "$systemd" "Install systemctl.sh at ~/.bash_aliases.d/? (systemctl aliases/functions)?" "yes" "GREEN"
+    yes-no-edit -f systemd_r -g "$systemd" -p "Install systemctl.sh at /root/.bash_aliases.d/?" -i "y" -Q "YELLOW"; }
+yes-no-edit -f systemd -g "$systemd" -p "Install systemctl.sh at ~/.bash_aliases.d/? (systemctl aliases/functions)?" -i "y" -Q "GREEN"
     
 
 dosu_r(){ 
@@ -329,8 +329,8 @@ dosu_r(){
 
 dosu(){ 
     cp -fv $dosu ~/.bash_aliases.d/;
-    yes_edit_no dosu_r "$dosu" "Install sudo.sh at /root/.bash_aliases.d/?" "yes" "YELLOW"; }
-yes_edit_no dosu "$dosu" "Install sudo.sh at ~/.bash_aliases.d/ (sudo aliases)?" "yes" "GREEN"
+    yes-no-edit -f dosu_r -g "$dosu" -p "Install sudo.sh at /root/.bash_aliases.d/?" -i "y" -Q "YELLOW"; }
+yes-no-edit -f dosu -g "$dosu" -p "Install sudo.sh at ~/.bash_aliases.d/ (sudo aliases)?" -i "y" -Q "GREEN"
 
 
 git_r(){ 
@@ -338,18 +338,18 @@ git_r(){
 }
 gith(){
     cp -fv $gits ~/.bash_aliases.d/
-    yes_edit_no git_r "$gits" "Install git.sh at /root/.bash_aliases.d/?" "yes" "YELLOW" 
+    yes-no-edit -f git_r -g "$gits" -p "Install git.sh at /root/.bash_aliases.d/?" -i "y" -Q "YELLOW" 
 }
-yes_edit_no gith "$gits" "Install git.sh at ~/.bash_aliases.d/ (git aliases)? " "yes" "GREEN"
+yes-no-edit -f gith -g "$gits" -p "Install git.sh at ~/.bash_aliases.d/ (git aliases)? " -i "y" -Q "GREEN"
 
 ssh_r(){ 
     sudo cp -fv $sshs /root/.bash_aliases.d/; 
 }
 sshh(){
     cp -fv $sshs ~/.bash_aliases.d/
-    yes_edit_no ssh_r "$sshs" "Install ssh.sh at /root/.bash_aliases.d/?" "yes" "YELLOW" 
+    yes-no-edit -f ssh_r -g "$sshs" -p "Install ssh.sh at /root/.bash_aliases.d/?" -i "y" -Q "YELLOW" 
 }
-yes_edit_no sshh "$sshs" "Install ssh.sh at ~/.bash_aliases.d/ (ssh aliases)? " "yes" "GREEN"
+yes-no-edit -f sshh -g "$sshs" -p "Install ssh.sh at ~/.bash_aliases.d/ (ssh aliases)? " -i "y" -Q "GREEN"
 
 
 ps1_r(){ 
@@ -357,15 +357,15 @@ ps1_r(){
 }
 ps11(){
     cp -fv $ps1 ~/.bash_aliases.d/
-    yes_edit_no ps1_r "$ps1" "Install PS1_colours.sh at /root/.bash_aliases.d/?" "yes" "YELLOW" 
+    yes-no-edit -f ps1_r -g "$ps1" -p "Install PS1_colours.sh at /root/.bash_aliases.d/?" -i "y" -Q "YELLOW" 
 }
-yes_edit_no ps11 "$ps1" "Install PS1_colours.sh at ~/.bash_aliases.d/ (Coloured command prompt)? " "yes" "GREEN"
+yes-no-edit -f ps11 -g "$ps1" -p "Install PS1_colours.sh at ~/.bash_aliases.d/ (Coloured command prompt)? " -i "y" -Q "GREEN"
 
 if type python &> /dev/null; then
     pthon(){
         cp -fv $pthon ~/.bash_aliases.d/
     }
-    yes_edit_no pthon "$pthon" "Install python.sh at ~/.bash_aliases.d/ (aliases for a python development)? " "yes" "GREEN" 
+    yes-no-edit -f pthon -g "$pthon" -p "Install python.sh at ~/.bash_aliases.d/ (aliases for a python development)? " -i "y" -Q "GREEN" 
 fi
 
 # Variety aliases 
@@ -375,8 +375,8 @@ variti_r(){
 }
 variti(){
     cp -fv $variti ~/.bash_aliases.d/
-    yes_edit_no variti_r "$variti" "Install variety.sh at /root/?" "yes" "YELLOW" 
+    yes-no-edit -f variti_r -g "$variti" -p "Install variety.sh at /root/?" -i "y" -Q "YELLOW" 
 }
-yes_edit_no variti "$variti" "Install variety.sh at ~/.bash_aliases.d/ (aliases for a variety of tools)? " "yes" "GREEN" 
+yes-no-edit -f variti -g "$variti" -p "Install variety.sh at ~/.bash_aliases.d/ (aliases for a variety of tools)?" -i "y" -Q "GREEN" 
 
 

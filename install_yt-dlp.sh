@@ -64,4 +64,4 @@ fi
 ytbe(){
     cp -fv "$ytbe" ~/.bash_aliases.d/
 }
-yes_edit_no ytbe "$ytbe" "Install yt-dlp (youtube cli download) and youtube.sh at ~/.bash_aliases.d/ (yt-dlp aliases)?" "yes" "GREEN"
+yes-no-edit -f ytbe -g "$ytbe" -p "Install yt-dlp (youtube cli download) and youtube.sh at ~/.bash_aliases.d/ (yt-dlp aliases)?" -i "y" -Q "GREEN"
