@@ -369,15 +369,15 @@ unset pycomp
 
 # Rlwrap scripts
 
-readyn -p "Install reade, readyn and yes-no-edit?" -c 'test -f ~/.bash_aliases.d/reade' insrde
-if test "$insrde" == 'y'; then
-    if ! test -f install_reade_readyn.sh; then
-         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_reade_readyn.sh)" 
-    else
-        ./install_reade_readyn.sh
-    fi
-fi
-unset insrde
+#readyn -p "Install reade, readyn and yes-no-edit?" -c 'test -f ~/.bash_aliases.d/reade' insrde
+#if test "$insrde" == 'y'; then
+#    if ! test -f install_reade_readyn.sh; then
+#         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_reade_readyn.sh)" 
+#    else
+#        ./install_reade_readyn.sh
+#    fi
+#fi
+#unset insrde
 
 
 readyn -p "Install bash aliases and other config?" scripts
@@ -394,9 +394,8 @@ if [ -z $scripts ] || [ "y" == $scripts ]; then
         ./install_aliases.sh
     fi
 fi
-source ~/.bashrc
 
-
+source ~/.bashrc &> /dev/null
 
 # Shell-keybinds
 
@@ -415,6 +414,7 @@ fi
 if ! test -f /etc/inputrc; then
     sed -i 's/^$include \/etc\/inputrc/#$include \/etc\/inputrc/g' $binds
 fi
+
 
 shell-keybinds_r(){ 
     if [ -f /root/.environment.env ]; then
@@ -485,7 +485,7 @@ shell-keybinds() {
        sed -i 's|#export INPUTRC.*|export INPUTRC=~/.inputrc|g' ~/.environment.env
     fi
     unset vimde vivisual xterm
-    yes-no-edit -f shell-keybinds_r -g "$binds $binds2 $binds1" -p "Install .inputrc and keybinds.bash at /root/ and /root/.keybinds.d/?" -i "y" "YELLOW"; 
+    yes-no-edit -f shell-keybinds_r -g "$binds $binds2 $binds1" -p "Install .inputrc and keybinds.bash at /root/ and /root/.keybinds.d/?" -i "y" -Q "YELLOW"; 
 }
 
 yes-no-edit -f shell-keybinds -g "$binds $binds2 $binds1" -p "Install .inputrc and keybinds.bash at ~/ and ~/.keybinds.d/? (keybinds configuration)" -i "y" -Q "GREEN"
@@ -503,21 +503,13 @@ xresources_r(){
     }
 xresources() {
     cp -fv $xterm ~/.Xresources;
-    yes-no-edit -f xresources_r -g "$xterm" -p "Install .Xresources at /root/?" -i "e" -Q "RED"; }
+    yes-no-edit -f xresources_r -g "$xterm" -p "Install .Xresources at /root/?" -i "e" -Q "RED"; 
+}
 yes-no-edit -f xresources -g "$xterm" -p "Install .Xresources at ~/? (Xterm configuration)" -i "e" -Q "YELLOW"
 
-# Bash Preexec
-readyn -p "Install pre-execution hooks for bash in ~/.bash_preexec?" -n "! test -f ~/.bash_preexec || ! test -f /root/.bash_preexec" bash_preexec
-if [ -z "$bash_preexec" ] || [ "y" == "$bash_preexec" ]; then
-    if ! test -f install_bash_preexec.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bash_preexec.sh)" 
-    else
-        ./install_bash_preexec.sh
-    fi 
-fi
-unset bash_preexec
 
 # Bash Preexec
+
 readyn -p "Install pre-execution hooks for bash in ~/.bash_preexec?" -n "! test -f ~/.bash_preexec || ! test -f /root/.bash_preexec" bash_preexec
 if [ -z "$bash_preexec" ] || [ "y" == "$bash_preexec" ]; then
     if ! test -f install_bash_preexec.sh; then
@@ -529,6 +521,7 @@ fi
 unset bash_preexec
 
 # Pipewire (better sound)
+
 readyn -p "Install and configure pipewire? (sound system - pulseaudio replacement)" -n 'type wireplumber &> /dev/null && test -f ~/.config/pipewire/pipewire-pulse.conf.d/switch-on-connect.conf;' pipew
 if [ $pipew == "y" ]; then
     if ! test -f install_pipewire.sh; then
