@@ -8,7 +8,18 @@ Currently only focused on **bash** on **Linux** (On a distro with *Apt* or *Pacm
 
 ## Install.sh
 
-Try it out with if you have curl installed. Worked and tested for Manjaro and Ubuntu:
+Try it out with if you have curl installed. Worked and tested for Manjaro and Ubuntu.  
+
+You can use the main file `install.sh` to run most of the necessary/interesting tweaks / get on overview of the most interesting tools added. If you have 'rlwrap' installed, it will give you a ton of easy 'yes/no' questions to go through. Keep pressing Ctrl+C if you want to quit out, or use Ctrl+Z in conjunction with 'ps' and 'kill -9 \<ProcessID-number\>' to kill the entire project.   
+Again, if you cloned the github (or downloaded and unzipped it from github), just go into the folder and run the main file `install.sh`, **however** it's best to **source the file** if you want immediate effect (and if you want the greatest chance for the script to run without errors). This is because it includes **a lot of files with bashaliases and other essential scripts that need to be sourced** and **cannot be executed**.  
+
+To do this, run:  
+
+```
+source ./install.sh
+```
+If you don't have the github cloned/downloaded, you could try to run this command (though experimental, not catastrophically) to get the same effect:  
+
 ```
 eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install.sh)"
 ```

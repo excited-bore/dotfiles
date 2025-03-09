@@ -580,3 +580,5 @@ elif [ "$envvars" == "y" ]; then
 fi 
 
 #unset prmpt pathvr xdgInst
+
+source ~/.bashrc &> /dev/null

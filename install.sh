@@ -2,7 +2,6 @@
 
 export INSTALL=1 
 
-
 if ! test -f checks/check_all.sh; then
     if type curl &> /dev/null; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)" 
@@ -12,7 +11,6 @@ if ! test -f checks/check_all.sh; then
 else
     . ./checks/check_all.sh
 fi
-
 
 
 if ! type rlwrap &>/dev/null; then
@@ -935,7 +933,7 @@ echo "Next $(tput setaf 1)sudo$(tput sgr0) will check whether root account is en
 if ! test $(sudo passwd -S | awk '{print $2}') == 'L'; then
     printf "${CYAN}One more thing before finishing off${normal}: the ${RED}root${normal} account is still enabled.\n${RED1}This can be considered a security risk!!${normal}\n"
     readyn -Y 'YELLOW' -p 'Disable root account? (Enable again by giving up a password with \\"sudo passwd root\\")' root_dis
-    if test $root_dis == 'y'; then
+    if test "$root_dis" == 'y'; then
        sudo passwd -l root 
     fi
     unset root_dis
@@ -944,5 +942,5 @@ fi
 echo "${cyan}${bold}Source .bashrc 'source ~/.bashrc' and you can check all aliases with 'alias'";
 echo "${green}${bold}Done!"
 readyn -p 'List all aliases?' allis
-test $allis == 'y' && ( set -o posix ; alias ) | $PAGER
+test "$allis" == 'y' && ( set -o posix ; alias ) | $PAGER
 unset allis
