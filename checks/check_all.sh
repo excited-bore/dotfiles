@@ -147,7 +147,7 @@ fi
 
 if test -z $SYSTEM_UPDATED; then
     readyn -Y "CYAN" -p "Update system?" updatesysm
-    if test $updatesysm == "y"; then
+    if test "$updatesysm" == "y"; then
         update-system                     
     else
         export SYSTEM_UPDATED="TRUE"

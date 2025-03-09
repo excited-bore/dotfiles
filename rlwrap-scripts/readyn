@@ -284,24 +284,24 @@ function readyn(){
         else
             printf "${!color}$prmpt$prmpt1$pre${normal}\n";   
         fi
-        value=$pre 
+        vvvvvvvvvv=$pre 
     else
         if test -z "$prmpt"; then
-            reade -Q "$color" $breaklines -i "$pre $othr" -p "$prmpt1" value;   
+            reade -Q "$color" $breaklines -i "$pre $othr" -p "$prmpt1" vvvvvvvvvv;   
         else
-            reade -Q "$color" $breaklines -i "$pre $othr" -p "$prmpt$prmpt1" value;    
+            reade -Q "$color" $breaklines -i "$pre $othr" -p "$prmpt$prmpt1" vvvvvvvvvv;    
         fi
          
     fi 
 
-    export READE_VALUE="$value" 
-    export REPLY="$value" 
+    export READE_VALUE="$vvvvvvvvvv" 
+    export REPLY="$vvvvvvvvvv" 
 
     if ! test $# -eq 0; then
-        eval "${@:$#:1}=$value" 
+        eval "${@:$#:1}=$vvvvvvvvvv" 
     fi
 
-    unset pre other prmpt prmpt1 color readestr breaklines value SCRIPT_DIR 
+    unset pre other prmpt prmpt1 color readestr breaklines SCRIPT_DIR 
 }
 
 #readyn $@

@@ -249,6 +249,7 @@ fi
 update_sysm=aliases/.bash_aliases.d/update-system.sh
 reade=rlwrap-scripts/reade
 readyn=rlwrap-scripts/readyn
+yesnoedit=rlwrap-scripts/yes-no-edit
 pacmn=aliases/.bash_aliases.d/package_managers.sh
 test $distro == "Manjaro" && manjaro=aliases/.bash_aliases.d/manjaro.sh
 type systemctl &> /dev/null && systemd=aliases/.bash_aliases.d/systemctl.sh
@@ -259,9 +260,12 @@ ps1=aliases/.bash_aliases.d/PS1_colours.sh
 variti=aliases/.bash_aliases.d/variety.sh
 type python &> /dev/null && pthon=aliases/.bash_aliases.d/python.sh
 if ! test -d aliases/.bash_aliases.d/; then
-    tmp1=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh && update_sysm=$tmp1
-    tmp4=$(mktemp) && curl -o $tmp4 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/package_managers.sh && pacmn=$tmp4
+    tmp1=$(mktemp) && curl -o $tmp1 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh && update_sysm=$tmp1
+    tmp2=$(mktemp) && curl -o $tmp2 https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade && reade=$tmp2
+    tmp3=$(mktemp) && curl -o $tmp3 https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/readyn && readyn=$tmp3
+    tmp10=$(mktemp) && curl -o $tmp10 https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/yes-no-edit && yesnoedit=$tmp10
     test $distro == "Manjaro" && tmp7=$(mktemp) && curl -o $tmp7 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/manjaro.sh && manjaro=$tmp7
+    tmp4=$(mktemp) && curl -o $tmp4 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/package_managers.sh && pacmn=$tmp4
     type systemctl &> /dev/null && tmp2=$(mktemp) && curl -o $tmp2 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/systemctl.sh && systemd=$tmp2
     type sudo &> /dev/null && tmp3=$(mktemp) && curl -o $tmp3 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/sudo.sh && dosu=$tmp3
     type git &> /dev/null && tmp10=$(mktemp) && curl -o $tmp10 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/git.sh && gits=$tmp5
@@ -292,13 +296,13 @@ packman(){
 yes-no-edit -f packman -g "$pacmn" -p "Install package_managers.sh at ~/.bash_aliases.d/ (package manager aliases)? " -i "y" -Q "GREEN"
 
 reade_r(){ 
-    sudo cp -fv $reade $readyn /root/.bash_aliases.d/
+    sudo cp -fv $reade $readyn $yesnoedit /root/.bash_aliases.d/
 }
 readei(){
-    cp -fv $reade $readyn ~/.bash_aliases.d/
-    yes-no-edit -f reade_r -g "$reade $readyn" -p "Install reade and readyn at /root/.bash_aliases.d/?" -i "y" -Q "YELLOW"
+    cp -fv $reade $readyn $yesnoedit ~/.bash_aliases.d/
+    yes-no-edit -f reade_r -g "$reade $readyn $yesnoedit" -p "Install reade, readyn and yes-no-edit at /root/.bash_aliases.d/?" -i "y" -Q "YELLOW"
 }
-yes-no-edit -f readei -g "$reade $readyn" -p "Install reade and readyn at ~/.bash_aliases.d/ (rlwrap/read functions)? " -i "y" -Q "GREEN"
+yes-no-edit -f readei -g "$reade $readyn" -p "Install reade, readyn and yes-no-edit at ~/.bash_aliases.d/ (rlwrap/read functions)? " -i "y" -Q "GREEN"
 
 
 
