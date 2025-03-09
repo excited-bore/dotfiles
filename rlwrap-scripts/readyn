@@ -9,60 +9,59 @@ source $SCRIPT_DIR/reade
 
 function readyn(){
 
-    [[ $0 != $BASH_SOURCE ]] && SCRIPT_DIR="$( dirname "${BASH_SOURCE[0]}" )" || SCRIPT_DIR="$( cd "$( dirname "$-1" )" && pwd )"
+    [[ $0 != $BASH_SOURCE ]] && local SCRIPT_DIR="$( dirname "${BASH_SOURCE[0]}" )" || local SCRIPT_DIR="$( cd "$( dirname "$-1" )" && pwd )"
 
-    red=$(tput setaf 1)
-    red1=$(tput setaf 9)
-    green=$(tput setaf 2)
-    green1=$(tput setaf 10)
-    yellow=$(tput setaf 3)
-    yellow1=$(tput setaf 11)
-    blue=$(tput setaf 4)
-    blue1=$(tput setaf 12)
-    magenta=$(tput setaf 5)
-    magenta1=$(tput setaf 13)
-    cyan=$(tput setaf 6)
-    cyan1=$(tput setaf 14)
-    white=$(tput setaf 7)
-    white1=$(tput setaf 15)
-    black=$(tput setaf 16)
-    grey=$(tput setaf 8)
+    local red=$(tput setaf 1)
+    local red1=$(tput setaf 9)
+    local green=$(tput setaf 2)
+    local green1=$(tput setaf 10)
+    local yellow=$(tput setaf 3)
+    local yellow1=$(tput setaf 11)
+    local blue=$(tput setaf 4)
+    local blue1=$(tput setaf 12)
+    local magenta=$(tput setaf 5)
+    local magenta1=$(tput setaf 13)
+    local cyan=$(tput setaf 6)
+    local cyan1=$(tput setaf 14)
+    local white=$(tput setaf 7)
+    local white1=$(tput setaf 15)
+    local black=$(tput setaf 16)
+    local grey=$(tput setaf 8)
 
-    RED=$(tput setaf 1 && tput bold)
-    RED1=$(tput setaf 9 && tput bold)
-    GREEN=$(tput setaf 2 && tput bold)
-    GREEN1=$(tput setaf 10 && tput bold)
-    YELLOW=$(tput setaf 3 && tput bold)
-    YELLOW1=$(tput setaf 11 && tput bold)
-    BLUE=$(tput setaf 4 && tput bold)
-    BLUE1=$(tput setaf 12 && tput bold)
-    MAGENTA=$(tput setaf 5 && tput bold)
-    MAGENTA1=$(tput setaf 13 && tput bold)
-    CYAN=$(tput setaf 6 && tput bold)
-    CYAN1=$(tput setaf 14 && tput bold)
-    WHITE=$(tput setaf 7 && tput bold)
-    WHITE1=$(tput setaf 15 && tput bold)
-    BLACK=$(tput setaf 16 && tput bold)
-    GREY=$(tput setaf 8 && tput bold)
+    local RED=$(tput setaf 1 && tput bold)
+    local RED1=$(tput setaf 9 && tput bold)
+    local GREEN=$(tput setaf 2 && tput bold)
+    local GREEN1=$(tput setaf 10 && tput bold)
+    local YELLOW=$(tput setaf 3 && tput bold)
+    local YELLOW1=$(tput setaf 11 && tput bold)
+    local BLUE=$(tput setaf 4 && tput bold)
+    local BLUE1=$(tput setaf 12 && tput bold)
+    local MAGENTA=$(tput setaf 5 && tput bold)
+    local MAGENTA1=$(tput setaf 13 && tput bold)
+    local CYAN=$(tput setaf 6 && tput bold)
+    local CYAN1=$(tput setaf 14 && tput bold)
+    local WHITE=$(tput setaf 7 && tput bold)
+    local WHITE1=$(tput setaf 15 && tput bold)
+    local BLACK=$(tput setaf 16 && tput bold)
+    local GREY=$(tput setaf 8 && tput bold)
 
-    bold=$(tput bold)
-    underline_on=$(tput smul)
-    underline_off=$(tput rmul)
-    bold_on=$(tput smso)
-    bold_off=$(tput rmso)
-    half_bright=$(tput dim)
-    reverse_color=$(tput rev)
+    local bold=$(tput bold)
+    local underline_on=$(tput smul)
+    local underline_off=$(tput rmul)
+    local bold_on=$(tput smso)
+    local bold_off=$(tput rmso)
+    local half_bright=$(tput dim)
+    local reverse_color=$(tput rev)
 
     # Reset
-    normal=$(tput sgr0)
+    local normal=$(tput sgr0)
 
     # Broken !! (Or im dumb?)
-    blink=$(tput blink)
-    underline=$(tput ul)
-    italic=$(tput it)
-         
+    local blink=$(tput blink)
+    local underline=$(tput ul)
+    local italic=$(tput it)
 
-    VERSION='1.0' 
+    local VERSION='1.0' 
 
     while :; do
         case $1 in
@@ -152,20 +151,22 @@ function readyn(){
       esac
     done 
 
-    breaklines=''
-    condition='' 
-    pre='y'
-    pre_y='y'
-    pre_n='n' 
-    othr='n' 
-    prmpty="${underline_on}Y${underline_off}es"
-    prmptn="${underline_on}n${underline_off}o"
-    ycolor='GREEN' 
-    ncolor='YELLOW' 
-    color="$ycolor" 
-    ygivn=0, ngivn=0 
-    preff=''
-    auto=''
+    local breaklines=''
+    local condition='' 
+    local args=''
+    local pre='y'
+    local preff=''
+    local pre_y='y'
+    local pre_n='n' 
+    local othr='n' 
+    local prmpty="${underline_on}Y${underline_off}es"
+    local prmptn="${underline_on}n${underline_off}o"
+    local ycolor='GREEN' 
+    local ncolor='YELLOW' 
+    local color="$ycolor" 
+    local ygivn=0, ngivn=0 
+    local auto=''
+
     OPTIND=1
     while getopts 'anyb:Y:N:c:p:y:n:' flag; do
         case "${flag}" in
@@ -220,11 +221,6 @@ function readyn(){
                         OPTIND=$(($OPTIND - 1)) 
                     fi
                 fi
-                #if ! test -z "$condition" && ! ${condition} || test -z "$condition" ; then
-                #    pre='y'
-                #    othr='n'
-                #    color="$ycolor" 
-                #fi
                 ;;
 
             n)  preff='n'
@@ -300,8 +296,4 @@ function readyn(){
     if ! test $# -eq 0; then
         eval "${@:$#:1}=$vvvvvvvvvv" 
     fi
-
-    unset pre other prmpt prmpt1 color readestr breaklines SCRIPT_DIR 
 }
-
-#readyn $@

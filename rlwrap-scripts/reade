@@ -2,61 +2,61 @@
 
 function reade(){
 
-    red=$(tput setaf 1)
-    red1=$(tput setaf 9)
-    green=$(tput setaf 2)
-    green1=$(tput setaf 10)
-    yellow=$(tput setaf 3)
-    yellow1=$(tput setaf 11)
-    blue=$(tput setaf 4)
-    blue1=$(tput setaf 12)
-    magenta=$(tput setaf 5)
-    magenta1=$(tput setaf 13)
-    cyan=$(tput setaf 6)
-    cyan1=$(tput setaf 14)
-    white=$(tput setaf 7)
-    white1=$(tput setaf 15)
-    black=$(tput setaf 16)
-    grey=$(tput setaf 8)
+    local red=$(tput setaf 1)
+    local red1=$(tput setaf 9)
+    local green=$(tput setaf 2)
+    local green1=$(tput setaf 10)
+    local yellow=$(tput setaf 3)
+    local yellow1=$(tput setaf 11)
+    local blue=$(tput setaf 4)
+    local blue1=$(tput setaf 12)
+    local magenta=$(tput setaf 5)
+    local magenta1=$(tput setaf 13)
+    local cyan=$(tput setaf 6)
+    local cyan1=$(tput setaf 14)
+    local white=$(tput setaf 7)
+    local white1=$(tput setaf 15)
+    local black=$(tput setaf 16)
+    local grey=$(tput setaf 8)
 
-    RED=$(tput setaf 1 && tput bold)
-    RED1=$(tput setaf 9 && tput bold)
-    GREEN=$(tput setaf 2 && tput bold)
-    GREEN1=$(tput setaf 10 && tput bold)
-    YELLOW=$(tput setaf 3 && tput bold)
-    YELLOW1=$(tput setaf 11 && tput bold)
-    BLUE=$(tput setaf 4 && tput bold)
-    BLUE1=$(tput setaf 12 && tput bold)
-    MAGENTA=$(tput setaf 5 && tput bold)
-    MAGENTA1=$(tput setaf 13 && tput bold)
-    CYAN=$(tput setaf 6 && tput bold)
-    CYAN1=$(tput setaf 14 && tput bold)
-    WHITE=$(tput setaf 7 && tput bold)
-    WHITE1=$(tput setaf 15 && tput bold)
-    BLACK=$(tput setaf 16 && tput bold)
-    GREY=$(tput setaf 8 && tput bold)
+    local RED=$(tput setaf 1 && tput bold)
+    local RED1=$(tput setaf 9 && tput bold)
+    local GREEN=$(tput setaf 2 && tput bold)
+    local GREEN1=$(tput setaf 10 && tput bold)
+    local YELLOW=$(tput setaf 3 && tput bold)
+    local YELLOW1=$(tput setaf 11 && tput bold)
+    local BLUE=$(tput setaf 4 && tput bold)
+    local BLUE1=$(tput setaf 12 && tput bold)
+    local MAGENTA=$(tput setaf 5 && tput bold)
+    local MAGENTA1=$(tput setaf 13 && tput bold)
+    local CYAN=$(tput setaf 6 && tput bold)
+    local CYAN1=$(tput setaf 14 && tput bold)
+    local WHITE=$(tput setaf 7 && tput bold)
+    local WHITE1=$(tput setaf 15 && tput bold)
+    local BLACK=$(tput setaf 16 && tput bold)
+    local GREY=$(tput setaf 8 && tput bold)
 
-    bold=$(tput bold)
-    underline_on=$(tput smul)
-    underline_off=$(tput rmul)
-    bold_on=$(tput smso)
-    bold_off=$(tput rmso)
-    half_bright=$(tput dim)
-    reverse_color=$(tput rev)
+    local bold=$(tput bold)
+    local underline_on=$(tput smul)
+    local underline_off=$(tput rmul)
+    local bold_on=$(tput smso)
+    local bold_off=$(tput rmso)
+    local half_bright=$(tput dim)
+    local reverse_color=$(tput rev)
 
     # Reset
-    normal=$(tput sgr0)
+    local normal=$(tput sgr0)
    
     # Broken !! (Or im dumb?)
-    blink=$(tput blink)
-    underline=$(tput ul)
-    italic=$(tput it)
+    local blink=$(tput blink)
+    local underline=$(tput ul)
+    local italic=$(tput it)
      
     local VERSION='1.0' 
 
     unset READE_VALUE
     
-    hlpstr="${bold}reade${normal} [ -h/--help ] [ -v/--version] [ -i/--pregiven PREGIVEN ] [ -e/--file-completion ]  [ -s/--no-echo ] [ -p/--prompt PROMPTSTRING ] [ -Q/--colour COLOURSTRING ] [ -b/--break-chars BREAKCHARS-STRING ] ${bold}CHOICES-STRING${normal}  ${bold}returnvar${normal}\n
+    local hlpstr="${bold}reade${normal} [ -h/--help ] [ -v/--version] [ -i/--pregiven PREGIVEN ] [ -e/--file-completion ]  [ -s/--no-echo ] [ -p/--prompt PROMPTSTRING ] [ -Q/--colour COLOURSTRING ] [ -b/--break-chars BREAKCHARS-STRING ] ${bold}CHOICES-STRING${normal}  ${bold}returnvar${normal}\n
    Simplifies prompt for ${bold}read/rlwrap${normal}: Will use 'rlwrap' if it is installed, otherwise resorts to 'read' 
    Takes at least one argument, otherwise will prompt help page.
 
@@ -126,6 +126,7 @@ function reade(){
       esac
     done 
     
+    local fcomp='' 
 
     while getopts ':b:e:i:p:Q:s:S:' flag; do
         case "${flag}" in
@@ -146,9 +147,12 @@ function reade(){
     fi
      
     if ! type rlwrap &> /dev/null || test "$fcomp" == 'y' || test "$bash_rlwrap" == 'n' ; then
-        readstr="read -r "
-        color=""
-        OLD_HISTFILE=$HISTFILE
+        local readstr="read -r "
+        local color=""
+        local args=''
+        local tmpf=''
+        local pre=''
+        local OLD_HISTFILE=$HISTFILE
         while getopts ':b:e:i:p:Q:s:S:' flag; do
             case "${flag}" in
                 b)  ;;
@@ -169,8 +173,6 @@ function reade(){
                 Q)  if [[ "${OPTARG}" =~ ^[[:upper:]]+$ ]]; then
                         color="${bold}"
                     fi
-                 
-                    echo $OPTARG
                     OPTARG=$(echo ${OPTARG} | awk '{print tolower($0)}')
                     if [[ "${OPTARG}" =~ "red" ]]; then
                         color=$color"${red}"
@@ -212,7 +214,7 @@ function reade(){
         fi
 
         if ! test -z "$pre" && test -z "$vvvvvvvvvv" || test "$vvvvvvvvvv" == ""; then
-            value="$pre"  
+            vvvvvvvvvv="$pre"  
         fi
 
         export READE_VALUE="$vvvvvvvvvv"
@@ -221,8 +223,6 @@ function reade(){
         if ! test -z "$@"; then
             eval "${@:$#:1}=$vvvvvvvvvv"  
         fi
-
-        unset fcomp
 
     else
         if [[ $# < 1 ]]; then
@@ -240,6 +240,8 @@ function reade(){
         #args=$(echo $args | tr ' ' '\n')
 
         local tmpf=''
+        local frst=''
+        local args=''
         local rlwstring="rlwrap --ansi-colour-aware -s 1000 -D 0 -b \"$breaklines\" -o cat"
 
         while getopts ':b:e:i:p:Q:s:S:' flag; do
@@ -289,5 +291,4 @@ function reade(){
 
         command rm $tmpf &> /dev/null;
     fi
-    unset bash_rlwrap frst rlwstring args tmpf breaklines readstr color
 }
