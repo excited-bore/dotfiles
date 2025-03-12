@@ -6,63 +6,44 @@ else
     . checks/check_all.sh
 fi
 
-
-pre='both'
-othr='exit intr n'
-color='GREEN'
-prmpt='[Both/exit/intr/n]: '
-
-echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for terminate background processes /root/.bashrc' "
-if grep -q "trap '! \[ -z \"\$(jobs -p)\" ] && kill -9 \$(jobs -p.*" ~/.bashrc || sudo grep -q "trap '! [ -z \"\$(jobs -p)\" ] && kill -9 \$(jobs -p.*" /root/.bashrc; then
-    pre='n' 
-    othr='both exit intr'
-    color='YELLOW'
-    prmpt='[N/both/exit/intr]: '
-fi 
-
-reade -Q "$color" -i "$pre $othr" -p "Send kill signal to background processes when exiting (Ctrl-q) / interrupting (Ctrl-c) for $USER? $prmpt" int_r
-if ! [ $int_r  == "n" ]; then
-    if test $int_r == 'both'; then
-        sig='INT EXIT'  
-    elif test $int_r == 'exit'; then
-        sig='EXIT'  
-    elif test $int_r == 'intr'; then
-        sig='INT'  
-    fi
-    if grep -q "trap '! \[ -z \"\$(jobs -p)\" ] && kill -9 \$(jobs -p.*" ~/.bashrc; then 
-        sed -i '/trap '\''! \[ -z "$(jobs -p)" \] \&\& kill -9 "$(jobs -p.*/d' ~/.bashrc  
-    fi 
-    printf "trap '! [ -z \"\$(jobs -p)\" ] && kill -9 \$(jobs -p | tr \"\\\n\" \" \")' $sig\n" >> ~/.bashrc
-        
-    pre='same'
-    othr='both exit intr n'
-    color='GREEN'
-    prmpt='[Same/both/exit/intr/n]: '
-    echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for terminate background processes /root/.bashrc' "
-     
-    if sudo grep -q "trap '! \[ -z \"\$(jobs -p)\" ] && kill -9 \"\$(jobs -p.*" /root/.bashrc; then
-        pre='n' 
-        othr='same both exit intr'
-        color='YELLOW'
-        prmpt='[N/same/both/exit/intr]: '
-    fi 
-    reade -Q "$color" -i "$pre $othr" -p "Send kill signal to background processes when exiting (Ctrl-q)/interrupting (Ctrl-c) for root? $prmpt" int_r 
-    if ! [ $int_r  == "n" ]; then
-        if test $int_r == 'both'; then
-            sig='INT EXIT'  
-        elif test $int_r == 'exit'; then
-            sig='EXIT'  
-        elif test $int_r == 'intr'; then
-            sig='INT'  
-        fi
-
-        if sudo grep -q "trap '! \[ -z \"\$(jobs -p)\" ] && kill -9 \$(jobs -p.*" /root/.bashrc; then 
-            sudo sed -i '/trap '\''! \[ -z "$(jobs -p)" \] \&\& kill -9 "$(jobs -p.*/d' /root/.bashrc 
-        fi  
-        printf "trap '! [ -z \"\$(jobs -p)\" ] && kill -9 \"\$(jobs -p | tr \\\n\"  \" \")' $sig\n" | sudo tee -a /root/.bashrc &> /dev/null
-    fi     
+rlwrpscrpt=aliases/.bash_aliases.d/00-rlwrap_scripts.sh
+reade=rlwrap-scripts/reade
+readyn=rlwrap-scripts/readyn
+yesnoedit=rlwrap-scripts/yes-no-edit
+csysm=checks/check_system.sh
+if ! test -d checks/; then
+    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade && reade=$tmp
+    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/readyn && readyn=$tmp
+    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/yes-no-edit && yesnoedit=$tmp
+    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh && rlwrapscrpt=$tmp
+    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh && csysm=$tmp
 fi
-unset int_r sig
+
+reade_r(){ 
+    sudo cp -fv $rlwrapscrpt /root/.bash_aliases.d/
+    sudo cp -fv $reade /root/.bash_aliases.d/01_reade.sh
+    sudo cp -fv $readyn /root/.bash_aliases.d/02_readyn.sh
+    sudo cp -fv $yesnoedit /root/.bash_aliases.d/03_yes-no-edit.sh
+}
+readeu(){
+    cp -fv $rlwrapscrpt ~/.bash_aliases.d/
+    cp -fv $reade ~/.bash_aliases.d/01_reade.sh
+    cp -fv $readyn ~/.bash_aliases.d/02_readyn.sh
+    cp -fv $yesnoedit ~/.bash_aliases.d/03_yes-no-edit.sh
+    yes-no-edit -f reade_r -g "$reade $readyn $yesnoedit $rlwrapscrpt" -p "Install reade, readyn and yes-no-edit at /root/.bash_aliases.d/?" -i "y" -Q "YELLOW"
+}
+yes-no-edit -f readeu -g "$reade $readyn $yesnoedit $rlwrapscrpt" -p "Install reade, readyn, yes-no-edit and rlwrap_scripts at ~/.bash_aliases.d/ (rlwrap/read functions that are used in other aliases)? " -i "y" -Q "GREEN"
+
+
+csysm_r(){ 
+    sudo cp -fv $csysm /root/.bash_aliases.d/04_check_system.sh; 
+}
+csysm(){
+    cp -fv $csysm ~/.bash_aliases.d/04_check_system.sh
+    yes-no-edit -f csysm_r -g "$csysm" -p "Install check_system.sh at /root/?" -i "y" -Q "YELLOW" 
+}
+yes-no-edit -f csysm -g "$csysm" -p "Install check_system.sh at ~/.bash_aliases.d/ (do a checkup on what kind of system this is - used for later scripts)?" -i "y" -Q "GREEN" 
+
 
 
 genr=aliases/.bash_aliases.d/general.sh
@@ -163,7 +144,6 @@ if test $ansr == "y"; then
             unset cp_all cp_xcp cp_v cp_ov   
     fi 
      
-    readyn -p "Set rm (remove) to always be verbose?" rm_verb
      
     prompt="${green}    - Force remove, recursively delete given directories (enable deletion of direction without deleting every file in directory first) and ${bold}always give at least one prompt before removing?${normal}${green}
     - Force remove, ${YELLOW}don't${normal}${green} recursively look for files and give a prompt not always, but if removing 3 or more files/folder?
@@ -177,6 +157,8 @@ if test $ansr == "y"; then
         prompt2="Rm = [Rm-prompt/recur-prompt/none/prompt/recur"       
         pre="rm-prompt" 
         ansrs="recur-prompt none prompt recur " 
+    else 
+        readyn -p "Set rm (remove) to always be verbose?" rm_verb
     fi 
     
     if type gio &> /dev/null; then 
@@ -248,11 +230,66 @@ if test $ansr == "y"; then
     yes-no-edit -f general -g "$genr $genrc" -p "Install general.sh at ~/?" -i "y" -Q "GREEN"
 fi
 
+pre='both'
+othr='exit intr n'
+color='GREEN'
+prmpt='[Both/exit/intr/n]: '
+
+# echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for terminate background processes /root/.bashrc' "
+if grep -q "trap '! \[ -z \"\$(jobs -p)\" ] && kill -9 \$(jobs -p.*" ~/.bashrc || grep -q "trap '! [ -z \"\$(jobs -p)\" ] && kill -9 \$(jobs -p.*" /root/.bashrc; then
+    pre='n' 
+    othr='both exit intr'
+    color='YELLOW'
+    prmpt='[N/both/exit/intr]: '
+fi 
+
+reade -Q "$color" -i "$pre $othr" -p "Send kill signal to background processes when exiting (Ctrl-q) / interrupting (Ctrl-c) for $USER? $prmpt" int_r
+if ! [ $int_r  == "n" ]; then
+    if test $int_r == 'both'; then
+        sig='INT EXIT'  
+    elif test $int_r == 'exit'; then
+        sig='EXIT'  
+    elif test $int_r == 'intr'; then
+        sig='INT'  
+    fi
+    if grep -q "trap '! \[ -z \"\$(jobs -p)\" ] && kill -9 \$(jobs -p.*" ~/.bashrc; then 
+        sed -i '/trap '\''! \[ -z "$(jobs -p)" \] \&\& kill -9 "$(jobs -p.*/d' ~/.bashrc  
+    fi 
+    printf "trap '! [ -z \"\$(jobs -p)\" ] && kill -9 \$(jobs -p | tr \"\\\n\" \" \")' $sig\n" >> ~/.bashrc
+        
+    pre='same'
+    othr='both exit intr n'
+    color='GREEN'
+    prmpt='[Same/both/exit/intr/n]: '
+    echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for terminate background processes /root/.bashrc' "
+     
+    if sudo grep -q "trap '! \[ -z \"\$(jobs -p)\" ] && kill -9 \"\$(jobs -p.*" /root/.bashrc; then
+        pre='n' 
+        othr='same both exit intr'
+        color='YELLOW'
+        prmpt='[N/same/both/exit/intr]: '
+    fi 
+    reade -Q "$color" -i "$pre $othr" -p "Send kill signal to background processes when exiting (Ctrl-q)/interrupting (Ctrl-c) for root? $prmpt" int_r 
+    if ! [ $int_r  == "n" ]; then
+        if test $int_r == 'both'; then
+            sig='INT EXIT'  
+        elif test $int_r == 'exit'; then
+            sig='EXIT'  
+        elif test $int_r == 'intr'; then
+            sig='INT'  
+        fi
+
+        if sudo grep -q "trap '! \[ -z \"\$(jobs -p)\" ] && kill -9 \$(jobs -p.*" /root/.bashrc; then 
+            sudo sed -i '/trap '\''! \[ -z "$(jobs -p)" \] \&\& kill -9 "$(jobs -p.*/d' /root/.bashrc 
+        fi  
+        printf "trap '! [ -z \"\$(jobs -p)\" ] && kill -9 \"\$(jobs -p | tr \\\n\"  \" \")' $sig\n" | sudo tee -a /root/.bashrc &> /dev/null
+    fi     
+fi
+unset int_r sig
+
+
 bashc=aliases/.bash_aliases.d/bash.sh
 update_sysm=aliases/.bash_aliases.d/update-system.sh
-reade=rlwrap-scripts/reade
-readyn=rlwrap-scripts/readyn
-yesnoedit=rlwrap-scripts/yes-no-edit
 pacmn=aliases/.bash_aliases.d/package_managers.sh
 test $distro == "Manjaro" && manjaro=aliases/.bash_aliases.d/manjaro.sh
 type systemctl &> /dev/null && systemd=aliases/.bash_aliases.d/systemctl.sh
@@ -263,11 +300,8 @@ ps1=aliases/.bash_aliases.d/PS1_colours.sh
 variti=aliases/.bash_aliases.d/variety.sh
 type python &> /dev/null && pthon=aliases/.bash_aliases.d/python.sh
 if ! test -d aliases/.bash_aliases.d/; then
-    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/bash.sh && bash=$tmp 
     tmp1=$(mktemp) && curl -o $tmp1 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh && update_sysm=$tmp1
-    tmp2=$(mktemp) && curl -o $tmp2 https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade && reade=$tmp2
-    tmp3=$(mktemp) && curl -o $tmp3 https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/readyn && readyn=$tmp3
-    tmp10=$(mktemp) && curl -o $tmp10 https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/yes-no-edit && yesnoedit=$tmp10
+    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/bash.sh && bash=$tmp 
     test $distro == "Manjaro" && tmp7=$(mktemp) && curl -o $tmp7 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/manjaro.sh && manjaro=$tmp7
     tmp4=$(mktemp) && curl -o $tmp4 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/package_managers.sh && pacmn=$tmp4
     type systemctl &> /dev/null && tmp2=$(mktemp) && curl -o $tmp2 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/systemctl.sh && systemd=$tmp2
@@ -280,14 +314,13 @@ if ! test -d aliases/.bash_aliases.d/; then
 fi 
 
 bash_r(){ 
-    sudo cp -fv $bash /root/.bash_aliases.d/;
+    sudo cp -fv $bashc /root/.bash_aliases.d/;
 }
 bash_u(){
-    cp -fv $bash ~/.bash_aliases.d/
-    yes-no-edit -f bash_r -g "$bash" -p "Install bash.sh at /root/.bash_aliases.d//?" -i "y" -Q "GREEN";
+    cp -fv $bashc ~/.bash_aliases.d/
+    yes-no-edit -f bash_r -g "$bashc" -p "Install bash.sh at /root/.bash_aliases.d//?" -i "y" -Q "GREEN";
 }
-yes-no-edit -f bash_u -g "$bash" -p "Install bash.sh at ~/.bash_aliases.d/? (a few bash related helper functions)?" -i "y" -Q "GREEN"
-
+yes-no-edit -f bash_u -g "$bashc" -p "Install bash.sh at ~/.bash_aliases.d/? (a few bash related helper functions)?" -i "y" -Q "GREEN"
 
 update_sysm_r(){ 
     sudo cp -fv $update_sysm /root/.bash_aliases.d/;
@@ -308,20 +341,6 @@ packman(){
     yes-no-edit -f packman_r -g "$pacmn" -p "Install package_managers.sh at /root/.bash_aliases.d/?" -i "y" -Q "YELLOW"
 }
 yes-no-edit -f packman -g "$pacmn" -p "Install package_managers.sh at ~/.bash_aliases.d/ (package manager aliases)? " -i "y" -Q "GREEN"
-
-reade_r(){ 
-    sudo cp -fv $reade /root/.bash_aliases.d/01_reade.sh
-    sudo cp -fv $readyn /root/.bash_aliases.d/02_readyn.sh
-    sudo cp -fv $yesnoedit /root/.bash_aliases.d/03_yes-no-edit.sh
-}
-readeu(){
-    cp -fv $reade ~/.bash_aliases.d/01_reade.sh
-    cp -fv $readyn ~/.bash_aliases.d/02_readyn.sh
-    cp -fv $yesnoedit ~/.bash_aliases.d/03_yes-no-edit.sh
-    yes-no-edit -f reade_r -g "$reade $readyn $yesnoedit" -p "Install reade, readyn and yes-no-edit at /root/.bash_aliases.d/?" -i "y" -Q "YELLOW"
-}
-yes-no-edit -f readeu -g "$reade $readyn $yesnoedit" -p "Install reade, readyn and yes-no-edit at ~/.bash_aliases.d/ (rlwrap/read functions)? " -i "y" -Q "GREEN"
-
 
 
 if [ "$distro" == "Manjaro" ] ; then

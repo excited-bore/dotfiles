@@ -109,14 +109,28 @@ italic=$(tput it)
 if ! type reade &> /dev/null; then
     if test -f rlwrap-scripts/reade; then
         . ./rlwrap-scripts/reade 1> /dev/null
+    elif test -f ./01_reade; then
+        . ./01_reade 1> /dev/null
     else
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade)" &> /dev/null 
     fi
 fi
 
-if ! test -f /usr/local/bin/readyn; then
+if ! type readyn &> /dev/null; then
     if test -f rlwrap-scripts/readyn; then
         . ./rlwrap-scripts/readyn 1> /dev/null
+    elif test -f ./02_readyn; then
+        . ./02_readyn 1> /dev/null
+    else
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/readyn)" &> /dev/null 
+    fi
+fi
+
+if ! type yes-no-edit &> /dev/null; then
+    if test -f rlwrap-scripts/yes-no-edit; then
+        . ./rlwrap-scripts/readyn 1> /dev/null
+    elif test -f ./03_yes-no-edit; then
+        . ./03_yes-no-edit 1> /dev/null
     else
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/readyn)" &> /dev/null 
     fi
@@ -641,39 +655,34 @@ export COMPLETION_R=/root/.bashrc
 export KEYBIND_R=/root/.bashrc
 export ENVVAR_R=/root/.bashrc
 
-echo "This next $(tput setaf 1)sudo$(tput sgr0) checks for the profile, environment, bash_alias, bash_completion and keybind files and dirs in '/root/' to generate global variables.";
 
-if ! sudo test -f /root/.profile; then
-    sudo touch /root/.profile
-fi
-
-if sudo test -f /root/.bash_profile; then
+if test -f /root/.bash_profile; then
     export PROFILE_R=/root/.bash_profile
 fi
 
-if sudo test -f /root/.environment.env; then
+if test -f /root/.environment.env; then
     export ENVVAR_R=/root/.environment.env
 fi
 
-if sudo test -f /root/.bash_aliases; then
+if test -f /root/.bash_aliases; then
     export ALIAS_R=/root/.bash_aliases
 fi
-if sudo test -d /root/.bash_aliases.d/; then
+if test -d /root/.bash_aliases.d/; then
     export ALIAS_FILEDIR_R=/root/.bash_aliases.d/
 fi
 
-if sudo test -f /root/.bash_completion; then
+if test -f /root/.bash_completion; then
     export COMPLETION_R=/root/.bash_completion
 fi
 
-if sudo test -d /root/.bash_completion.d/; then
+if test -d /root/.bash_completion.d/; then
     export COMPLETION_FILEDIR_R=/root/.bash_completion.d/
 fi
-if sudo test -f /root/.keybinds  ; then
+if test -f /root/.keybinds  ; then
     export KEYBIND_R=/root/.keybinds
 fi
 
-if sudo test -d /root/.keybinds.d/  ; then
+if test -d /root/.keybinds.d/  ; then
     export KEYBIND_FILEDIR_R=/root/.keybindsd.d/
 fi
 
