@@ -12,11 +12,19 @@ else
     . ./checks/check_all.sh
 fi
 
-
 if ! type rlwrap &>/dev/null; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_rlwrap.sh)" 
 else
     . ./checks/check_rlwrap.sh
+fi
+
+
+if ! type curl &> /dev/null && ! test -z "$pac_ins"; then
+    ${pac_ins} curl
+fi
+
+if ! type jq &> /dev/null && ! test -z "$pac_ins"; then
+    ${pac_ins} jq
 fi
 
 
@@ -223,6 +231,13 @@ elif test $distro_base == 'Arch'; then
         unset insyay
     fi
 
+    if type pamac &> /dev/null; then
+        if ! test -f checks/check_pamac.sh; then
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pamac.sh)" 
+        else
+            . ./checks/check_pamac.sh
+        fi
+    fi
 
     if ! test -z "$AUR_ls_ins" && test -z "$(${AUR_ls_ins} pacseek 2> /dev/null)"; then
         printf "${CYAN}pacseek${normal} (A TUI for managing packages from pacman and AUR) is not installed\n"

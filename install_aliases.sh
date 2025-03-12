@@ -12,27 +12,27 @@ readyn=rlwrap-scripts/readyn
 yesnoedit=rlwrap-scripts/yes-no-edit
 csysm=checks/check_system.sh
 if ! test -d checks/; then
+    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh && rlwrapscrpt=$tmp
     tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade && reade=$tmp
     tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/readyn && readyn=$tmp
     tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/yes-no-edit && yesnoedit=$tmp
-    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh && rlwrapscrpt=$tmp
     tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh && csysm=$tmp
 fi
 
 reade_r(){ 
-    sudo cp -fv $rlwrapscrpt /root/.bash_aliases.d/
+    sudo cp -fv $rlwrpscrpt /root/.bash_aliases.d/
     sudo cp -fv $reade /root/.bash_aliases.d/01_reade.sh
     sudo cp -fv $readyn /root/.bash_aliases.d/02_readyn.sh
     sudo cp -fv $yesnoedit /root/.bash_aliases.d/03_yes-no-edit.sh
 }
 readeu(){
-    cp -fv $rlwrapscrpt ~/.bash_aliases.d/
+    cp -fv $rlwrpscrpt ~/.bash_aliases.d/
     cp -fv $reade ~/.bash_aliases.d/01_reade.sh
     cp -fv $readyn ~/.bash_aliases.d/02_readyn.sh
     cp -fv $yesnoedit ~/.bash_aliases.d/03_yes-no-edit.sh
-    yes-no-edit -f reade_r -g "$reade $readyn $yesnoedit $rlwrapscrpt" -p "Install reade, readyn and yes-no-edit at /root/.bash_aliases.d/?" -i "y" -Q "YELLOW"
+    yes-no-edit -f reade_r -g "$reade $readyn $yesnoedit $rlwrpscrpt" -p "Install reade, readyn and yes-no-edit at /root/.bash_aliases.d/?" -i "y" -Q "YELLOW"
 }
-yes-no-edit -f readeu -g "$reade $readyn $yesnoedit $rlwrapscrpt" -p "Install reade, readyn, yes-no-edit and rlwrap_scripts at ~/.bash_aliases.d/ (rlwrap/read functions that are used in other aliases)? " -i "y" -Q "GREEN"
+yes-no-edit -f readeu -g "$reade $readyn $yesnoedit $rlwrpscrpt" -p "Install reade, readyn, yes-no-edit and rlwrap_scripts at ~/.bash_aliases.d/ (rlwrap/read functions that are used in other aliases)? " -i "y" -Q "GREEN"
 
 
 csysm_r(){ 
