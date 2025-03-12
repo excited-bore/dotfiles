@@ -1,16 +1,11 @@
 #!/bin/bash
 
-if ! test -f checks/check_system.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
+if ! test -f checks/check_all.sh; then
+     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)" 
 else
-    . checks/check_system.sh
+    . checks/check_all.sh
 fi
 
-if ! type reade &> /dev/null; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
-else
-    . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
-fi
 
 pre='both'
 othr='exit intr n'
@@ -61,7 +56,7 @@ if ! [ $int_r  == "n" ]; then
             sig='INT'  
         fi
 
-        if  sudo grep -q "trap '! \[ -z \"\$(jobs -p)\" ] && kill -9 \$(jobs -p.*" /root/.bashrc; then 
+        if sudo grep -q "trap '! \[ -z \"\$(jobs -p)\" ] && kill -9 \$(jobs -p.*" /root/.bashrc; then 
             sudo sed -i '/trap '\''! \[ -z "$(jobs -p)" \] \&\& kill -9 "$(jobs -p.*/d' /root/.bashrc 
         fi  
         printf "trap '! [ -z \"\$(jobs -p)\" ] && kill -9 \"\$(jobs -p | tr \\\n\"  \" \")' $sig\n" | sudo tee -a /root/.bashrc &> /dev/null
@@ -253,6 +248,7 @@ if test $ansr == "y"; then
     yes-no-edit -f general -g "$genr $genrc" -p "Install general.sh at ~/?" -i "y" -Q "GREEN"
 fi
 
+bashc=aliases/.bash_aliases.d/bash.sh
 update_sysm=aliases/.bash_aliases.d/update-system.sh
 reade=rlwrap-scripts/reade
 readyn=rlwrap-scripts/readyn
@@ -267,6 +263,7 @@ ps1=aliases/.bash_aliases.d/PS1_colours.sh
 variti=aliases/.bash_aliases.d/variety.sh
 type python &> /dev/null && pthon=aliases/.bash_aliases.d/python.sh
 if ! test -d aliases/.bash_aliases.d/; then
+    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/bash.sh && bash=$tmp 
     tmp1=$(mktemp) && curl -o $tmp1 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh && update_sysm=$tmp1
     tmp2=$(mktemp) && curl -o $tmp2 https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade && reade=$tmp2
     tmp3=$(mktemp) && curl -o $tmp3 https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/readyn && readyn=$tmp3
@@ -274,13 +271,23 @@ if ! test -d aliases/.bash_aliases.d/; then
     test $distro == "Manjaro" && tmp7=$(mktemp) && curl -o $tmp7 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/manjaro.sh && manjaro=$tmp7
     tmp4=$(mktemp) && curl -o $tmp4 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/package_managers.sh && pacmn=$tmp4
     type systemctl &> /dev/null && tmp2=$(mktemp) && curl -o $tmp2 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/systemctl.sh && systemd=$tmp2
-    type sudo &> /dev/null && tmp3=$(mktemp) && curl -o $tmp3 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/sudo.sh && dosu=$tmp3
+    type sudo &> /dev/null && tpac_insmp3=$(mktemp) && curl -o $tmp3 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/sudo.sh && dosu=$tmp3
     type git &> /dev/null && tmp10=$(mktemp) && curl -o $tmp10 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/git.sh && gits=$tmp5
     type ssh &> /dev/null && tmp5=$(mktemp) && curl -o $tmp5 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/ssh.sh && sshs=$tmp5
     tmp6=$(mktemp) && curl -o $tmp6 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/ps1.sh && ps1=$tmp6
     tmp8=$(mktemp) && curl -o $tmp8 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/variety.sh && variti=$tmp8
     type python &> /dev/null && tmp9=$(mktemp) && curl -o $tmp9 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/python.sh && pthon=$tmp9
 fi 
+
+bash_r(){ 
+    sudo cp -fv $bash /root/.bash_aliases.d/;
+}
+bash_u(){
+    cp -fv $bash ~/.bash_aliases.d/
+    yes-no-edit -f bash_r -g "$bash" -p "Install bash.sh at /root/.bash_aliases.d//?" -i "y" -Q "GREEN";
+}
+yes-no-edit -f bash_u -g "$bash" -p "Install bash.sh at ~/.bash_aliases.d/? (a few bash related helper functions)?" -i "y" -Q "GREEN"
+
 
 update_sysm_r(){ 
     sudo cp -fv $update_sysm /root/.bash_aliases.d/;
@@ -303,13 +310,17 @@ packman(){
 yes-no-edit -f packman -g "$pacmn" -p "Install package_managers.sh at ~/.bash_aliases.d/ (package manager aliases)? " -i "y" -Q "GREEN"
 
 reade_r(){ 
-    sudo cp -fv $reade $readyn $yesnoedit /root/.bash_aliases.d/
+    sudo cp -fv $reade /root/.bash_aliases.d/01_reade.sh
+    sudo cp -fv $readyn /root/.bash_aliases.d/02_readyn.sh
+    sudo cp -fv $yesnoedit /root/.bash_aliases.d/03_yes-no-edit.sh
 }
-readei(){
-    cp -fv $reade $readyn $yesnoedit ~/.bash_aliases.d/
+readeu(){
+    cp -fv $reade ~/.bash_aliases.d/01_reade.sh
+    cp -fv $readyn ~/.bash_aliases.d/02_readyn.sh
+    cp -fv $yesnoedit ~/.bash_aliases.d/03_yes-no-edit.sh
     yes-no-edit -f reade_r -g "$reade $readyn $yesnoedit" -p "Install reade, readyn and yes-no-edit at /root/.bash_aliases.d/?" -i "y" -Q "YELLOW"
 }
-yes-no-edit -f readei -g "$reade $readyn" -p "Install reade, readyn and yes-no-edit at ~/.bash_aliases.d/ (rlwrap/read functions)? " -i "y" -Q "GREEN"
+yes-no-edit -f readeu -g "$reade $readyn $yesnoedit" -p "Install reade, readyn and yes-no-edit at ~/.bash_aliases.d/ (rlwrap/read functions)? " -i "y" -Q "GREEN"
 
 
 
