@@ -1,5 +1,7 @@
 #!/bin/bash
 
+test -z "$PAGER" && type less &> /dev/null && PAGER="$(whereis less | awk '{print $2}')"
+
 alias list-commands-bash="compgen -c | $PAGER"
 alias list-keywords-bash="compgen -k | $PAGER"
 alias list-builtins-bash="compgen -b | $PAGER"

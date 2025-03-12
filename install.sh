@@ -198,7 +198,7 @@ elif test $distro_base == 'Arch'; then
 
     if test -z "$(pacman -Q pacman-contrib)"; then
         printf "${CYAN}pacman-contrib${normal} is not installed (Includes tools like pactree, pacsearch, pacdiff..)\n" 
-        readyn -p 'Install pacman-contrib package?' -n 'type pactree &> /dev/null' pacmn_cntr
+        readyn -p 'Install pacman-contrib package?' -c 'type pactree &> /dev/null' pacmn_cntr
         if test $pacmn_cntr == 'y'; then
             sudo pacman -Su pacman-contrib
         fi
@@ -261,7 +261,7 @@ fi
 
 # Ack prompt
 
-readyn -p "Install Ack? (A modern replacement for grep - finds lines in shell output)" -n -c "type ack &> /dev/null" ack
+readyn -p "Install Ack? (A modern replacement for grep - finds lines in shell output)" -c "type ack &> /dev/null" ack
 
 if [ "y" == "$ack" ]; then
     if ! test -f install_ack.sh; then
@@ -274,7 +274,7 @@ unset ack
 
 # Hhighlighter (or just h)
 
-readyn -n -c "type h &> /dev/null" -p "Install Hhighlighter (or just h)? (A tiny utility to highlight multiple keywords with different colors in a textoutput)" h
+readyn -c "type h &> /dev/null" -p "Install Hhighlighter (or just h)? (A tiny utility to highlight multiple keywords with different colors in a textoutput)" h
 if [ "y" == "$h" ]; then
     if ! type ack &> /dev/null; then
         printf "For ${CYAN}Hhighlighter${normal} to work, ${CYAN}ack${normal} needs to be installed first." 
@@ -299,7 +299,7 @@ unset h
 
 # Eza prompt
 
-readyn -p "Install Eza? (A modern replacement for ls)" -n -c "type eza &> /dev/null" rmp
+readyn -p "Install Eza? (A modern replacement for ls)" -c "type eza &> /dev/null" rmp
 
 if [ -z "$rmp" ] || [ "y" == "$rmp" ]; then
     if ! test -f install_eza.sh; then
@@ -312,7 +312,7 @@ unset rmp
 
 # Xcp
 
-readyn -p "Install xcp? (cp but faster and with progress bar)" -n -c "type xcp &> /dev/null" rmp
+readyn -p "Install xcp? (cp but faster and with progress bar)" -c "type xcp &> /dev/null" rmp
 
 if [ -z "$rmp" ] || [ "y" == "$rmp" ]; then
     if ! test -f install_xcp.sh; then
@@ -327,7 +327,7 @@ unset rmp
 
 # Rm prompt
 
-readyn -p "Install rm-prompt? (Rm but lists files/directories before deletion)" -n -c "type rm-prompt &> /dev/null" rmp
+readyn -p "Install rm-prompt? (Rm but lists files/directories before deletion)" -c "type rm-prompt &> /dev/null" rmp
 
 if [ -z "$rmp" ] || [ "y" == "$rmp" ]; then
     if ! test -f install_rmprompt.sh; then
@@ -342,7 +342,7 @@ unset rmp
 # Bash alias completions
 # v
 
-readyn -p "Install bash completions for aliases in ~/.bash_completion.d?" -n "! test -f ~/.bash_completion.d/complete_alias || ! test -f /root/.bash_completion.d/complete_alias" compl
+readyn -p "Install bash completions for aliases in ~/.bash_completion.d?" -c "! test -f ~/.bash_completion.d/complete_alias || ! test -f /root/.bash_completion.d/complete_alias" compl
 if [ -z "$compl" ] || [ "y" == "$compl" ]; then
     if ! test -f install_bashalias_completions.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bashalias_completions.sh)" 
@@ -354,7 +354,7 @@ unset compl
 
 # Python completions
 
-readyn -p "Install python completions in ~/.bash_completion.d?" -n "! type activate-global-python-argcomplete &> /dev/null" pycomp
+readyn -p "Install python completions in ~/.bash_completion.d?" -c "! type activate-global-python-argcomplete &> /dev/null" pycomp
 if [ -z $pycomp ] || [ "y" == $pycomp ]; then
     if ! test -f install_python_completions.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_python_completions.sh)" 
@@ -508,7 +508,7 @@ yes-no-edit -f xresources -g "$xterm" -p "Install .Xresources at ~/? (Xterm conf
 
 # Bash Preexec
 
-readyn -p "Install pre-execution hooks for bash in ~/.bash_preexec?" -n "! test -f ~/.bash_preexec || ! test -f /root/.bash_preexec" bash_preexec
+readyn -p "Install pre-execution hooks for bash in ~/.bash_preexec?" -c "! test -f ~/.bash_preexec || ! test -f /root/.bash_preexec" bash_preexec
 if [ -z "$bash_preexec" ] || [ "y" == "$bash_preexec" ]; then
     if ! test -f install_bash_preexec.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bash_preexec.sh)" 
@@ -520,7 +520,7 @@ unset bash_preexec
 
 # Pipewire (better sound)
 
-readyn -p "Install and configure pipewire? (sound system - pulseaudio replacement)" -n 'type wireplumber &> /dev/null && test -f ~/.config/pipewire/pipewire-pulse.conf.d/switch-on-connect.conf;' pipew
+readyn -p "Install and configure pipewire? (sound system - pulseaudio replacement)" -c 'type wireplumber &> /dev/null && test -f ~/.config/pipewire/pipewire-pulse.conf.d/switch-on-connect.conf;' pipew
 if [ $pipew == "y" ]; then
     if ! test -f install_pipewire.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipewire.sh)" 
@@ -532,7 +532,7 @@ unset pipew
 
 # Moar (Custom pager instead of less)
 
-readyn -p "Install moar? (Custom pager/less replacement - awesome default options)" -n 'type moar &> /dev/null;' moar
+readyn -p "Install moar? (Custom pager/less replacement - awesome default options)" -c 'type moar &> /dev/null;' moar
 
 if [ -z $moar ] || [ "Y" == $moar ] || [ $moar == "y" ]; then
     if ! test -f install_moar.sh; then
@@ -547,7 +547,7 @@ unset moar
 
 # Nano (Editor)
 
-readyn -p "Install nano + config? (Simple terminal editor)" -n -c "type nano &> /dev/null && test -f ~/.nanorc &> /dev/null" nno
+readyn -p "Install nano + config? (Simple terminal editor)" -c "type nano &> /dev/null && test -f ~/.nanorc &> /dev/null" nno
 
 if [ "y" == "$nno" ]; then
     if ! test -f install_nano.sh; then
@@ -561,7 +561,7 @@ unset nno
 
 # Nvim (Editor)
 
-readyn -p "Install neovim + config? (Complex terminal editor)" -n -c "type nvim &> /dev/null" nvm
+readyn -p "Install neovim + config? (Complex terminal editor)" -c "type nvim &> /dev/null" nvm
 
 if [ "y" == "$nvm" ]; then
     if ! test -f install_nvim.sh; then
@@ -575,7 +575,7 @@ unset nvm
 
 # Kitty (Terminal emulator)
 
-readyn -p "Install Kitty? (Terminal emulator)" -n -c "type kitty &> /dev/null" kittn
+readyn -p "Install Kitty? (Terminal emulator)" -c "type kitty &> /dev/null" kittn
 
 if [ "y" == "$kittn" ]; then
     if ! test -f install_kitty.sh; then
@@ -589,7 +589,7 @@ unset kittn
 
 # Fzf (Fuzzy Finder)
  
-readyn -p "Install fzf? (Fuzzy file/folder finder - keybinding yes for upgraded Ctrl-R/reverse-search, fzf filenames on Ctrl+T and fzf-version of 'cd' on Alt-C + Custom script: Ctrl-f becomes system-wide file opener)" -n -c "type fzf &> /dev/null" findr
+readyn -p "Install fzf? (Fuzzy file/folder finder - keybinding yes for upgraded Ctrl-R/reverse-search, fzf filenames on Ctrl+T and fzf-version of 'cd' on Alt-C + Custom script: Ctrl-f becomes system-wide file opener)" -c "type fzf &> /dev/null" findr
 
 if [ "y" == "$findr" ]; then
     if ! test -f install_fzf.sh; then
@@ -646,7 +646,7 @@ unset git_ins
 
 # Lazygit
 
-readyn -p "Install lazygit?" -n -c "type lazygit &> /dev/null" git_ins
+readyn -p "Install lazygit?" -c "type lazygit &> /dev/null" git_ins
 
 if [ "y" == "$git_ins" ]; then
     if ! test -f install_lazygit.sh; then
