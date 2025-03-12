@@ -338,7 +338,7 @@ function mv-trash(){
 } 
 
 
-# alias mv="mv-trash -v"
+alias mv="mv-trash -v"
 
 
 # Rm 
