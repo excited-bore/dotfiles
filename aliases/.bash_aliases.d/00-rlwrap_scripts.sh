@@ -105,6 +105,8 @@ italic=$(tput it)
 if ! type reade &> /dev/null ; then
     if test -f rlwrap-scripts/reade; then
         . ./rlwrap-scripts/reade 1> /dev/null
+    elif test -f ./01_reade.sh; then
+        . ./01_reade.sh 1> /dev/null
     else
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade)" &> /dev/null 
     fi
@@ -113,6 +115,8 @@ fi
 if ! type readyn &> /dev/null; then
     if test -f rlwrap-scripts/readyn; then
         . ./rlwrap-scripts/readyn 1> /dev/null
+    elif test -f ./02_readyn.sh; then
+        . ./02_readyn.sh 1> /dev/null
     else
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/readyn)" &> /dev/null 
     fi
@@ -121,6 +125,8 @@ fi
 if ! type yes-no-edit &> /dev/null; then
     if test -f rlwrap-scripts/yes-no-edit; then
         . ./rlwrap-scripts/yes-no-edit 1> /dev/null
+    elif test -f ./03_yes-no-edit.sh; then
+        . ./03_yes-no-edit.sh 1> /dev/null
     else
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/yes-no-edit)" &> /dev/null 
     fi

@@ -1,127 +1,9 @@
 #!/bin/bash
 
-# https://stackoverflow.com/questions/5412761/using-colors-with-printf
-# Execute (during printf) for colored prompt
-# printf  "${blue}This text is blue${white}\n"
-
-# https://unix.stackexchange.com/questions/139231/keep-aliases-when-i-use-sudo-bash
-if type sudo &> /dev/null; then
-    alias sudo='sudo '
+if ! type reade &> /dev/null ; then
+   test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh && source ~/.bash_aliases.d/00-rlwrap_scripts.sh 
+   test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh && source aliases/.bash_aliases.d/00-rlwrap_scripts.sh 
 fi
-
-if type wget &> /dev/null; then
-    alias wget='wget --https-only '
-fi
-
-if type curl &> /dev/null; then
-   alias curl='curl --proto "=https" --tlsv1.2 ' 
-fi
-
-# https://stackoverflow.com/questions/4023830/how-to-compare-two-strings-in-dot-separated-version-format-in-bash
-
-function version-higher () {
-    if [[ $1 == $2 ]]; then
-        return 0
-    fi
-    local IFS=.
-    local i ver1=($1) ver2=($2)
-    # fill empty fields in ver1 with zeros
-    for ((i=${#ver1[@]}; i<${#ver2[@]}; i++))
-    do
-        ver1[i]=0
-    done
-    for ((i=0; i<${#ver1[@]}; i++))
-    do
-        if ((10#${ver1[i]:=0} > 10#${ver2[i]:=0})); then
-            return 0
-        fi
-        if ((10#${ver1[i]} < 10#${ver2[i]})); then
-            return 1
-        fi
-    done
-    return 0
-}
-
-
-function compare-tput-escape_color(){
-for (( ansi=0; ansi <= 120; ansi++)); do
-    printf "$ansi $(tput setaf $ansi) tput foreground $(tput sgr0) $(tput setab $ansi) tput background $(tput sgr0)"; echo -e " \033[$ansi;mEscape\033[0m"
-done | $PAGER
-unset ansi
-}
-
-red=$(tput setaf 1)
-red1=$(tput setaf 9)
-green=$(tput setaf 2)
-green1=$(tput setaf 10)
-yellow=$(tput setaf 3)
-yellow1=$(tput setaf 11)
-blue=$(tput setaf 4)
-blue1=$(tput setaf 12)
-magenta=$(tput setaf 5)
-magenta1=$(tput setaf 13)
-cyan=$(tput setaf 6)
-cyan1=$(tput setaf 14)
-white=$(tput setaf 7)
-white1=$(tput setaf 15)
-black=$(tput setaf 16)
-grey=$(tput setaf 8)
-
-RED=$(tput setaf 1 && tput bold)
-RED1=$(tput setaf 9 && tput bold)
-GREEN=$(tput setaf 2 && tput bold)
-GREEN1=$(tput setaf 10 && tput bold)
-YELLOW=$(tput setaf 3 && tput bold)
-YELLOW1=$(tput setaf 11 && tput bold)
-BLUE=$(tput setaf 4 && tput bold)
-BLUE1=$(tput setaf 12 && tput bold)
-MAGENTA=$(tput setaf 5 && tput bold)
-MAGENTA1=$(tput setaf 13 && tput bold)
-CYAN=$(tput setaf 6 && tput bold)
-CYAN1=$(tput setaf 14 && tput bold)
-WHITE=$(tput setaf 7 && tput bold)
-WHITE1=$(tput setaf 15 && tput bold)
-BLACK=$(tput setaf 16 && tput bold)
-GREY=$(tput setaf 8 && tput bold)
-
-bold=$(tput bold)
-underline_on=$(tput smul)
-underline_off=$(tput rmul)
-bold_on=$(tput smso)
-bold_off=$(tput rmso)
-half_bright=$(tput dim)
-reverse_color=$(tput rev)
-
-# Reset
-normal=$(tput sgr0)
-
-# Broken !! (Or im dumb?)
-blink=$(tput blink)
-underline=$(tput ul)
-italic=$(tput it)
-
-# ...
-# https://ss64.com/bash/tput.html
-
-# Arguments: Completions(string with space entries, AWK works too),return value(-a password prompt, -c complete filenames, -p prompt flag, -Q prompt colour, -b break-chars (when does a string break for autocomp), -e change char given for multiple autocompletions)
-# 'man rlwrap' to see all unimplemented options
-
-if ! type reade &> /dev/null; then
-    if test -f rlwrap-scripts/reade; then
-        . ./rlwrap-scripts/reade 1> /dev/null
-    else
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade)" &> /dev/null 
-    fi
-fi
-
-if ! test -f /usr/local/bin/readyn; then
-    if test -f rlwrap-scripts/readyn; then
-        . ./rlwrap-scripts/readyn 1> /dev/null
-    else
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/readyn)" &> /dev/null 
-    fi
-fi
-
 
 unameOut="$(uname -s)"
 case "${unameOut}" in
@@ -500,51 +382,6 @@ do
 done
     
 
-
-if ! type curl &> /dev/null && ! test -z "$pac_ins"; then
-    ${pac_ins} curl
-fi
-
-if ! type jq &> /dev/null && ! test -z "$pac_ins"; then
-    ${pac_ins} jq
-fi
-
-
-if type pamac &> /dev/null; then
-    if ! test -f checks/check_pamac.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pamac.sh)" 
-    else
-        . ./checks/check_pamac.sh
-    fi
-fi
-
-if ! test -z "$no_aur"; then
-    printf "Your Arch system seems to have no (known) AUR helper installed\n"
-    readyn -Y 'CYAN' -p "Install yay ( AUR helper/wrapper )?" insyay
-    if [ "y" == "$insyay" ]; then 
-
-        if ! test -f ../AUR_installers/install_yay.sh; then 
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/AUR_installers/install_yay.sh)" 
-        else
-            eval ../AUR_installers/install_yay.sh
-        fi
-
-        AUR_pac="yay"
-        AUR_up="yay -Syu"
-        AUR_ins="yay -S"
-        AUR_search="yay -Ss"
-        AUR_rm="yay -R"
-        AUR_rm_casc="yay -Rc"
-        AUR_rm_orph="yay -Rs"
-        AUR_clean="yay -Sc"
-        AUR_clean_cache="yay -Scc"
-        AUR_ls_ins="yay -Q" 
-         
-    fi
-    unset insyay 
-fi
-
-
 if type nala &> /dev/null && test "$pac" == 'apt'; then
     pac="nala"
     pac_ins="sudo nala install"
@@ -641,39 +478,34 @@ export COMPLETION_R=/root/.bashrc
 export KEYBIND_R=/root/.bashrc
 export ENVVAR_R=/root/.bashrc
 
-echo "This next $(tput setaf 1)sudo$(tput sgr0) checks for the profile, environment, bash_alias, bash_completion and keybind files and dirs in '/root/' to generate global variables.";
 
-if ! sudo test -f /root/.profile; then
-    sudo touch /root/.profile
-fi
-
-if sudo test -f /root/.bash_profile; then
+if test -f /root/.bash_profile; then
     export PROFILE_R=/root/.bash_profile
 fi
 
-if sudo test -f /root/.environment.env; then
+if test -f /root/.environment.env; then
     export ENVVAR_R=/root/.environment.env
 fi
 
-if sudo test -f /root/.bash_aliases; then
+if test -f /root/.bash_aliases; then
     export ALIAS_R=/root/.bash_aliases
 fi
-if sudo test -d /root/.bash_aliases.d/; then
+if test -d /root/.bash_aliases.d/; then
     export ALIAS_FILEDIR_R=/root/.bash_aliases.d/
 fi
 
-if sudo test -f /root/.bash_completion; then
+if test -f /root/.bash_completion; then
     export COMPLETION_R=/root/.bash_completion
 fi
 
-if sudo test -d /root/.bash_completion.d/; then
+if test -d /root/.bash_completion.d/; then
     export COMPLETION_FILEDIR_R=/root/.bash_completion.d/
 fi
-if sudo test -f /root/.keybinds  ; then
+if test -f /root/.keybinds  ; then
     export KEYBIND_R=/root/.keybinds
 fi
 
-if sudo test -d /root/.keybinds.d/  ; then
+if test -d /root/.keybinds.d/  ; then
     export KEYBIND_FILEDIR_R=/root/.keybindsd.d/
 fi
 
