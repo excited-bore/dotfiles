@@ -977,7 +977,13 @@ inoremap <C-e> <C-\><C-o>:e
 vnoremap <C-e> y:e<C-r>"
 
 " - Open current directory using netrw (or alternative)
-nnoremap - :e ./<C-r>
+if !has('nvim')
+    nnoremap <silent><A-e> :e ./<CR>
+    inoremap <silent><A-e> <C-\><C-o>:e ./<CR>
+else
+    nnoremap <silent><A-e> :lua require('mini.files').open() <CR>
+    inoremap <silent><A-e> <C-\><C-o>:lua require('mini.files').open() <CR>
+endif
 
 "if exists(':Telescope')
 "    nnoremap <silent><C-e> :Telescope find_files no_ignore=true prompt_prefix=🔍<cr>
