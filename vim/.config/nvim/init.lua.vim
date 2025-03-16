@@ -327,10 +327,11 @@ require("lazy").setup({
                 }
                 require("lspconfig").pyright.setup {
                     capabilities = capabilities,
-                }
-              end
-            },
-        { "nvim-treesitter/nvim-treesitter", version = false,
+            }
+            end
+        },{
+
+          "nvim-treesitter/nvim-treesitter", version = false,
           build = function()
             require("nvim-treesitter.install").update({ with_sync = true })
           end,
@@ -350,9 +351,47 @@ require("lazy").setup({
               }
             })
           end
+        },{
+        
+            "echasnovski/mini.files", 
+           
+            config = function()
+                require("mini.files").setup {
+                mappings = {
+                    close       = 'q',
+                    go_in       = '<C-Right>',
+                    go_in_plus  = '<C-Up>',
+                    go_out      = '<C-Left>',
+                    go_out_plus = '<C-Down>',
+                    mark_goto   = "'",
+                    mark_set    = 'm',
+                    reset       = '<BS>',
+                    reveal_cwd  = '@',
+                    show_help   = 'g?',
+                    synchronize = '<C-S>',
+                    trim_left   = '<',
+                    trim_right  = '>'
+                },
+            }            
+            
+
+            vim.api.nvim_create_autocmd('User', {
+              pattern = 'MiniFilesBufferCreate',
+              callback = function(args)
+                vim.keymap.set('i', '<C-s>', function() MiniFiles.synchronize() end, { buffer = args.data.buf_id })
+                vim.keymap.set('n', '<C-s>', function() MiniFiles.synchronize() end, { buffer = args.data.buf_id })
+              end,
+            })
         }
     } 
 })
+
+
+n = {
+    ["-"] = { function()
+        require("mini.files").open()
+    end, "Open MiniFiles"}
+  }
 
 -- local ranger_nvim = require("ranger-nvim")
 -- ranger_nvim.setup({
@@ -393,7 +432,7 @@ require("telescope")
 require('telescope').load_extension('media_files')
 -- require('telescope').load_extension("whaler")
 
-require('telescope').setup {
+require('telescope').setup({
     layout_strategy='vertical',
     layout_config={width=0.5},
     pickers = {
@@ -404,12 +443,12 @@ require('telescope').setup {
         hidden = true
       }
     }
-}
+})
 
-  vim.g.loaded_netrwPlugin = 1
- vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+vim.g.loaded_netrw = 1
 
-require("telescope").setup {
+require("telescope").setup({
   extensions = {
     file_browser = {
       theme = "ivy",
@@ -425,12 +464,23 @@ require("telescope").setup {
       },
     },
   },
-}
+}) 
 -- To get telescope-file-browser loaded and working with telescope,
 -- you need to call load_extension, somewhere after setup function:
 require("telescope").load_extension "file_browser"
 
-require('mini.files').setup()
+
+-- https://github.com/echasnovski/mini.files
+
+
+
+-- save in minifiles 
+-- https://github.com/echasnovski/mini.nvim/discussions/1532
+
+
+
+
+
 
 -- local find_files_hijack_netrw = vim.api.nvim_create_augroup("find_files_hijack_netrw", { clear = true })
 -- -- clear FileExplorer appropriately to prevent netrw from launching on folders
@@ -467,6 +517,7 @@ require('mini.files').setup()
 
 -- telescope.setup {
 --   extensions = {
+        }
 --     live_grep_args = {
 --       auto_quoting = true, -- enable/disable auto-quoting
 --       -- define mappings, e.g.
