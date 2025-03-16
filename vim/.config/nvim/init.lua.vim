@@ -329,8 +329,8 @@ require("lazy").setup({
                     capabilities = capabilities,
             }
             end
-        },{
-
+        },
+        {
           "nvim-treesitter/nvim-treesitter", version = false,
           build = function()
             require("nvim-treesitter.install").update({ with_sync = true })
@@ -354,11 +354,11 @@ require("lazy").setup({
         },{
         
             "echasnovski/mini.files", 
-           
+             
             config = function()
                 require("mini.files").setup {
                 mappings = {
-                    close       = 'q',
+                    close       = '<C-Q>',
                     go_in       = '<C-Right>',
                     go_in_plus  = '<C-Up>',
                     go_out      = '<C-Left>',
@@ -371,27 +371,43 @@ require("lazy").setup({
                     synchronize = '<C-S>',
                     trim_left   = '<',
                     trim_right  = '>'
-                },
-            }            
-            
-
-            vim.api.nvim_create_autocmd('User', {
-              pattern = 'MiniFilesBufferCreate',
-              callback = function(args)
-                vim.keymap.set('i', '<C-s>', function() MiniFiles.synchronize() end, { buffer = args.data.buf_id })
-                vim.keymap.set('n', '<C-s>', function() MiniFiles.synchronize() end, { buffer = args.data.buf_id })
-              end,
-            })
-        }
-    } 
+                }
+            }
+            end
+       }
+    }
 })
 
+local MiniFiles = require('mini.files')
+vim.api.nvim_create_autocmd('user', {
+  pattern = 'minifilesbuffercreate',
+  callback = function(args)
+    vim.keymap.set('i', '<c-q>', function() MiniFiles.close() end, { buffer = args.data.buf_id })
+    vim.keymap.set('i', '<c-right>', function() MiniFiles.go_in() end, { buffer = args.data.buf_id })
+    vim.keymap.set('i', '<c-up>', function() MiniFiles.go_in_plus() end, { buffer = args.data.buf_id })
+    vim.keymap.set('i', '<c-left>', function() MiniFiles.go_out() end, { buffer = args.data.buf_id })
+    vim.keymap.set('i', '<c-down>', function() MiniFiles.go_out_plus() end, { buffer = args.data.buf_id })
+    vim.keymap.set('i', '<c-r>', function() MiniFiles.reset() end, { buffer = args.data.buf_id })
+    vim.keymap.set('i', '<c-s>', function() MiniFiles.synchronize() end, { buffer = args.data.buf_id })
+    vim.keymap.set('n', '-', function() MiniFiles.open() end, { })
+    end,
+})
 
-n = {
-    ["-"] = { function()
-        require("mini.files").open()
-    end, "Open MiniFiles"}
-  }
+-- n = {
+--     ["-"] = { function()
+--         MiniFiles.open(vim.api.nvim_buf_get_name(0))
+--     end, "Open MiniFiles"}
+-- }
+
+
+
+-- files.setup({
+--   mappings = {
+--     go_out = '-',
+--   },
+-- })
+-- vim.keymap.set('n', '-', files.open)
+-- vim.api.nvim_echo({{'first chunk and ', 'None'}, {'second chunk to echo', 'None'}}, false, {})
 
 -- local ranger_nvim = require("ranger-nvim")
 -- ranger_nvim.setup({
@@ -422,7 +438,7 @@ n = {
      }
  })
  
- vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
+-- vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
 
 
 require("telescope")
@@ -470,9 +486,10 @@ require("telescope").setup({
 require("telescope").load_extension "file_browser"
 
 
--- https://github.com/echasnovski/mini.files
+require('glow').setup()
 
 
+require("toggleterm").setup()
 
 -- save in minifiles 
 -- https://github.com/echasnovski/mini.nvim/discussions/1532
@@ -517,7 +534,7 @@ require("telescope").load_extension "file_browser"
 
 -- telescope.setup {
 --   extensions = {
-        }
+--        }
 --     live_grep_args = {
 --       auto_quoting = true, -- enable/disable auto-quoting
 --       -- define mappings, e.g.
