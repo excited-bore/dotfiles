@@ -1,7 +1,6 @@
  " lua config at 
 " $HOME/.config/nvim/init.lua.vim
 
-
 " highlight Visual cterm=reverse ctermbg=NONE
 " These options and commands enable some very useful features in Vim, that
 " no user should live without
@@ -271,7 +270,7 @@ let g:neomake_python_enabled_makers = ['pylint']
 let g:pluginInstallPath=expand('~/.vim/plugins')
 
 if has('win32')
-    source C:\Users\Burp\AppData\Local\nvim\plug_lazy_adapter.vim
+    source $HOME\AppData\Local\nvim\plug_lazy_adapter.vim
 else
     source $HOME/.config/nvim/plug_lazy_adapter.vim
 endif
@@ -317,7 +316,8 @@ if has('nvim')
    
     "Mini + File browser
     Plugin 'echasnovski/mini.nvim'
-    Plugin 'echasnovski/mini.files'
+    
+    "Plugin 'echasnovski/mini.files'
 
     " Nice keybinds overview for nvim
     "Plugin 'folke/which-key.nvim'
@@ -336,6 +336,19 @@ else
     Plugin 'nvim-tree/nvim-web-devicons'
     " Enable Omnicomplete features
     "set omnifunc=v:"lua.vim.lsp.omnifunc
+ 
+    " Markdown preview
+    Plugin 'ellisonleao/glow.nvim'
+   
+    " Diff plugin
+    Plugin 'sindrets/diffview.nvim'
+
+    " Lazygit plugin
+    Plugin 'kdheepak/lazygit.nvim'
+
+    " Toggle Terminal
+    Plugin 'akinsho/toggleterm.nvim'
+
 endif
 
 " Normal file operations
@@ -347,8 +360,6 @@ Plugin 'tpope/vim-eunuch'
 " Codeium (Free Copilot AI Helper) 
 "Plugin 'Exafunction/codeium.vim', { 'branch': 'main' }
 
-" Markdown preview
-Plugin 'ellisonleao/glow.nvim'
 
 " Nerdtree | Left block directory tree
 "Plugin 'preservim/nerdtree'
@@ -369,15 +380,6 @@ Plugin 'ojroques/vim-oscyank', {'branch': 'main'}
 
 " Color codes for pager
 Plugin 'vim-scripts/AnsiEsc.vim'
-
-" Diff plugin
-Plugin 'sindrets/diffview.nvim'
-
-" Lazygit plugin
-Plugin 'kdheepak/lazygit.nvim'
-
-" Toggle Terminal
-Plugin 'akinsho/toggleterm.nvim'
 
 " Ranger integration
 "Plugin 'rbgrouleff/bclose.vim'
@@ -458,10 +460,12 @@ let g:airline_exclude_filetypes = ['nerdtree']
 if !has('nvim')
     call plug#end()
 else
-    source $HOME/.config/nvim/init.lua.vim
+    if has('win32')
+        source $HOME\AppData\Local\nvim\init.lua.vim
+    else
+        source $HOME/.config/nvim/init.lua.vim
+    endif
     lua require("lazy")
-    lua require('glow').setup()
-    lua require("toggleterm").setup()
 endif
 
 
@@ -971,6 +975,9 @@ vnoremap <C-z> u
 nnoremap <C-e> :e 
 inoremap <C-e> <C-\><C-o>:e 
 vnoremap <C-e> y:e<C-r>"
+
+" - Open current directory using netrw (or alternative)
+nnoremap - :e ./<C-r>
 
 "if exists(':Telescope')
 "    nnoremap <silent><C-e> :Telescope find_files no_ignore=true prompt_prefix=🔍<cr>
