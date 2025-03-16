@@ -269,10 +269,15 @@ let g:neomake_python_enabled_makers = ['pylint']
 "Vim plugins point to githubs wich is very nice and just fucking cool
 
 let g:pluginInstallPath=expand('~/.vim/plugins')
-source $HOME/.config/nvim/plug_lazy_adapter.vim
+
+if has('win32')
+    source C:\Users\Burp\AppData\Local\nvim\plug_lazy_adapter.vim
+else
+    source $HOME/.config/nvim/plug_lazy_adapter.vim
+endif
 
 if !has('nvim')
-    call plug#begin(g:pluginInstallPath)
+  call plug#begin(g:pluginInstallPath)
 endif
 
 " Autocomplete engine (Conquer of completions)
@@ -780,6 +785,7 @@ colorscheme gruvbox
 
 "Add tab 
 nnoremap <Tab>   i<tab><esc><right>
+
 "Visual mode 
 vnoremap <Tab>   >gv
 vnoremap <S-Tab> <gv 
@@ -866,17 +872,18 @@ vnoremap <silent><C-Tab> <esc>:bnext<cr>
 " Open previous buffer
 nnoremap <silent><C-S-Tab> :bprev<cr>
 inoremap <silent><C-S-Tab> <C-\><C-o>:bprev<cr>
-vnoremap <silent><C-S-Tab> <esc>:bprev<cr>
+vnoremap <silent><C-S-Tab> <esc>:+bprev<cr>
 
 " Open Horizontal buffer
 nnoremap <silent><C-w>h :split<cr>
 inoremap <silent><C-w>h <C-\><C-o>:split<cr>
 vnoremap <silent><C-w>h <esc>:split<cr>gv
 
-"" Open Vertical buffer
-"nnoremap <S-A-Down> :vertical sb
-"inoremap <S-A-Down> <C-\><C-o>:vertical sb
+"" open vertical buffer
+"nnoremap <s-a-down> :vertical sb
+"inoremap <s-a-down> <c-\><c-o>:vertical sb
 "vnoremap <S-A-Down> <esc>:vertical sb
+
 
 
 " Choose pane
@@ -1220,16 +1227,65 @@ inoremap <M-h> <C-\><C-o>:%s,,,gc<Left><Left><Left><Left>
 vnoremap <M-h> y:%s,<C-r>",,gc<Left><Left><Left>
 cnoremap <M-h> <C-e><C-u>nohl<CR>:<Esc>
 
+if has('x11')
+    nnoremap y "+^y
+    nnoremap yy "+^yg_
+    nnoremap Y "+^Y
+    nnoremap YY "+^Yg_
+    vnoremap y "+y
+    "vnoremap yy "+^yg_
+    vnoremap Y "+Y
+    "vnoremap YY "+^Yg_
+ 
+    nnoremap c "+y
+    nnoremap cc "+0yg_
+    nnoremap C "+Y
+    nnoremap CC "+0Yg_
+    vnoremap c "+y
+    vnoremap cc "+0yg_
+    vnoremap C "+Y
+    vnoremap CC "+0Yg_
 
-nnoremap y "+^y
-nnoremap yy "+^yg_
-nnoremap Y "+^Y
-nnoremap YY "+^Yg_
-vnoremap y "+y
-"vnoremap yy "+^yg_
-vnoremap Y "+Y
-"vnoremap YY "+^Yg_
+    nnoremap v "+p
+    nnoremap V "+P
+    vnoremap v "+p  
+    vnoremap V "+P
 
+    nnoremap p "+p
+    nnoremap P o<esc>"+P
+    vnoremap p "+p  
+    vnoremap P o<esc>"+P
+
+else
+    nnoremap y "*^y
+    nnoremap yy "*^yg_
+    nnoremap Y "*^Y
+    nnoremap YY "*^Yg_
+    vnoremap y "*y
+    "vnoremap yy "+^yg_
+    vnoremap Y "*Y
+    "vnoremap YY "+^Yg_
+
+    nnoremap c "*y
+    nnoremap cc "*0yg_
+    nnoremap C "*Y
+    nnoremap CC "*0Yg_
+    vnoremap c "*y
+    vnoremap cc "*0yg_
+    vnoremap C "*Y
+    vnoremap CC "*0Yg_
+
+    nnoremap v "*p
+    nnoremap V "*P
+    vnoremap v "*p  
+    vnoremap V "*P
+
+    nnoremap p "*p
+    nnoremap P o<esc>"*P
+    vnoremap p "*p  
+    vnoremap P o<esc>"*P
+
+endif
 
 nnoremap d "_d
 nnoremap D "_D
@@ -1237,24 +1293,6 @@ nnoremap D "_D
 vnoremap d "_c
 vnoremap D "_C
 
-nnoremap c "+y
-nnoremap cc "0yg_
-nnoremap C "+Y
-nnoremap CC "+0Yg_
-vnoremap c "+y
-vnoremap cc "+0yg_
-vnoremap C "+Y
-vnoremap CC "+0Yg_
-
-nnoremap v "+p
-nnoremap V "+P
-vnoremap v "+p  
-vnoremap V "+P
-
-nnoremap p "+p
-nnoremap P o<esc>"+P
-vnoremap p "+p  
-vnoremap P o<esc>"+P
 
 nnoremap <A-d> cc
 vnoremap <A-d> c
