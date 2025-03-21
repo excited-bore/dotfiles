@@ -1,28 +1,15 @@
-if ! test -f checks/check_system.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
-else
-    . ./checks/check_system.sh
-fi
-
-#if ! test -f checks/check_envvar.sh; then
-#     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)" 
-#else
-#    . ./checks/check_envvar.sh
-#fi
-
-if ! type update-system &> /dev/null; then
-    if ! test -f aliases/.bash_aliases.d/update-system.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)" 
-    else
-        . ./aliases/.bash_aliases.d/update-system.sh
-    fi
-fi
-
-if test -z $SYSTEM_UPDATED; then
-    readyn -Y "CYAN" -p "Update system?" updatesysm
-    if test $updatesysm == "y"; then
-        update-system                     
-    fi
+#!/bin/bash
+ 
+[[ $0 != $BASH_SOURCE ]] && SCRIPT_DIR="$( dirname "${BASH_SOURCE[0]}" )" || SCRIPT_DIR="$( cd "$( dirname "$-1" )" && pwd )" 
+ 
+if ! test -f $SCRIPT_DIR/../checks/check_all.sh; then 
+    if type curl &> /dev/null; then 
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)"  
+    else  
+        continue  
+    fi 
+else 
+    . $SCRIPT_DIR/../checks/check_all.sh 
 fi
 
 
@@ -50,4 +37,6 @@ if ! sudo grep -q "# RUST" $ENVVAR_R; then
     printf "# RUST\ntest -d ~/.cargo/bin && export PATH=\$PATH:~/.cargo/bin\n" | sudo tee -a $ENVVAR_R &> /dev/null 
 fi
 
-source ~/.cargo/bin
+export PATH=$PATH:"$HOME/.cargo/bin"
+
+. "$HOME/.cargo/env"

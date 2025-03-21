@@ -204,7 +204,7 @@ if test $distro_base == 'Debian'; then
 
 elif test $distro_base == 'Arch'; then
 
-    if test -z "$(pacman -Q pacman-contrib)"; then
+    if test -z "$(pacman -Q pacman-contrib 2> /dev/null)"; then
         printf "${CYAN}pacman-contrib${normal} is not installed (Includes tools like pactree, pacsearch, pacdiff..)\n" 
         readyn -p 'Install pacman-contrib package?' -c 'type pactree &> /dev/null' pacmn_cntr
         if test $pacmn_cntr == 'y'; then
@@ -242,7 +242,7 @@ elif test $distro_base == 'Arch'; then
     if ! test -z "$AUR_ls_ins" && test -z "$(${AUR_ls_ins} pacseek 2> /dev/null)"; then
         printf "${CYAN}pacseek${normal} (A TUI for managing packages from pacman and AUR) is not installed\n"
         readyn -p "Install pacseek? " pacs_ins
-        if test $pacs_ins == 'y'; then
+        if test "$pacs_ins" == 'y'; then
             yes | ${AUR_ins} pacseek
         fi
         unset pacs_ins 
@@ -295,7 +295,11 @@ if [ "y" == "$h" ]; then
         printf "For ${CYAN}Hhighlighter${normal} to work, ${CYAN}ack${normal} needs to be installed first." 
         readyn -p "Install Ack and then hhighlighter?" ansr 
         if test "$ansr" == 'y'; then
-            continue 
+    		if ! test -f install_ack.sh; then
+        		eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ack.sh)" 
+    		else
+        		./install_ack.sh
+    		fi 
         else
             break
         fi
@@ -308,8 +312,6 @@ if [ "y" == "$h" ]; then
     fi 
 fi
 unset h
-
-
 
 
 # Eza prompt

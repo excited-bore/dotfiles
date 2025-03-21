@@ -4,16 +4,15 @@
 # or just run as exec
 [[ $0 != $BASH_SOURCE ]] && SCRIPT_DIR="$( dirname "${BASH_SOURCE[0]}" )" || SCRIPT_DIR="$( cd "$( dirname "$-1" )" && pwd )"
 
-! test -f $SCRIPT_DIR/reade &&
-printf "'reade' needs to be in the same folder as 'yes-no-edit' for it to work\n" &&
-exit 1 ||
-source $SCRIPT_DIR/reade
+! test -f $SCRIPT_DIR/reade && ! test -f $SCRIPT_DIR/01-reade.sh &&
+printf "'reade' needs to be in the same folder as 'yes-no-edit' for it to work\n" ||
+(test -f $SCRIPT_DIR/reade && source $SCRIPT_DIR/reade) ||
+(test -f $SCRIPT_DIR/01-reade.sh && source $SCRIPT_DIR/01-reade.sh)
 
-! test -f $SCRIPT_DIR/readyn &&
-printf "'readyn' needs to be in the same folder as 'yes-no-edit' for it to work\n" &&
-exit 1 ||
-source $SCRIPT_DIR/readyn
-
+! test -f $SCRIPT_DIR/readyn && ! test -f $SCRIPT_DIR/02-readyn.sh
+printf "'readyn' needs to be in the same folder as 'yes-no-edit' for it to work\n" ||
+(test -f $SCRIPT_DIR/readyn && source $SCRIPT_DIR/readyn) ||
+(test -f $SCRIPT_DIR/02-readyn.sh && source $SCRIPT_DIR/02-readyn.sh)
 
 function yes-no-edit(){
 

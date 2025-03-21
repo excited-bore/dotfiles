@@ -111,7 +111,7 @@ environment-variables(){
     fi
     if test -f ~/.bash_profile && ! grep -q "~/.bash_profile" ~/.profile; then
         readyn -p "Link ~/.bash_profile in ~/.profile?" bprof
-        if test $prof == 'y'; then
+        if test "$prof" == 'y'; then
             printf "\n[ -f ~/.bash_profile ] && source ~/.bash_profile\n\n" >> ~/.profile
         fi
         unset bprof

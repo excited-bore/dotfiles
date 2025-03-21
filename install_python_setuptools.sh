@@ -1,27 +1,18 @@
-if ! test -f checks/check_system.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
-else
-    . ./checks/check_system.sh
-fi
+#!/bin/bash
 
-if ! type update-system &> /dev/null; then
-    if ! test -f aliases/.bash_aliases.d/update-system.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)" 
+if ! test -f checks/check_all.sh; then
+    if type curl &> /dev/null; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)"
     else
-        . ./aliases/.bash_aliases.d/update-system.sh
+        continue
     fi
-    update-system
 else
-    readyn -Y "CYAN" -p "Update system?" updatesysm
-    if test $updatesysm == "y"; then
-        update-system                     
-    fi
+    . ./checks/check_all.sh
 fi
-
-if test $distro == "Arch" || test $distro == "Manjaro"; then
-    eval "$pac_ins make cmake"
-elif [ $distro_base == "Debian" ]; then
-    eval "$pac_ins make cmake autoconf g++ gettext libncurses5-dev libtool libtool-bin "
+if test "$distro" == "Arch" || test "$distro" == "Manjaro"; then
+    ${pac_ins} make cmake
+elif [ "$distro_base" == "Debian" ]; then
+    ${pac_ins} make cmake autoconf g++ gettext libncurses5-dev libtool libtool-bin
 fi
 
 if which pip 2>/dev/null || echo FALSE ; then

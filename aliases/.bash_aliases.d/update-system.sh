@@ -178,11 +178,11 @@ function update-system() {
         fi
         if apt --dry-run autoremove 2> /dev/null | grep -Po '^Remv \K[^ ]+'; then
             readyn -p 'Autoremove unneccesary packages?' remove
-            if test $remove == 'y'; then
+            if test "$remove" == 'y'; then
                 if ! test -z "$YES"; then 
-                    sudo "$pac" autoremove -y
+                    sudo ${pac} autoremove -y
                 else
-                    sudo "$pac" autoremove 
+                    sudo ${pac} autoremove 
                 fi
             fi
         fi
@@ -208,7 +208,7 @@ function update-system() {
         fi
         local hdrs="$(echo $(uname -r) | cut -d. -f-2)"
         hdrs="linux${hdrs//"."}-headers"
-        if test -z "$(pacman -Q $hdrs)"; then
+        if test -z "$(pacman -Q $hdrs 2> /dev/null)"; then
             readyn -p "Right linux headers not installed. Install $hdrs?" hdrs_ins
             if [ "$hdrs_ins" == "y" ]; then
                 ${pac_ins} "$hdrs"

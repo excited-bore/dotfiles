@@ -12,9 +12,9 @@ fi
 
 if ! type cargo &> /dev/null; then
     if ! test -f install_cargo.sh; then
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)"
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)"
     else
-       ./install_cargo.sh
+       . ./install_cargo.sh
     fi
 fi
 

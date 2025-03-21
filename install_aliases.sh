@@ -21,25 +21,25 @@ fi
 
 reade_r(){ 
     sudo cp -fv $rlwrpscrpt /root/.bash_aliases.d/
-    sudo cp -fv $reade /root/.bash_aliases.d/01_reade.sh
-    sudo cp -fv $readyn /root/.bash_aliases.d/02_readyn.sh
-    sudo cp -fv $yesnoedit /root/.bash_aliases.d/03_yes-no-edit.sh
+    sudo cp -fv $reade /root/.bash_aliases.d/01-reade.sh
+    sudo cp -fv $readyn /root/.bash_aliases.d/02-readyn.sh
+    sudo cp -fv $yesnoedit /root/.bash_aliases.d/03-yes-no-edit.sh
 }
 readeu(){
     cp -fv $rlwrpscrpt ~/.bash_aliases.d/
-    cp -fv $reade ~/.bash_aliases.d/01_reade.sh
-    cp -fv $readyn ~/.bash_aliases.d/02_readyn.sh
-    cp -fv $yesnoedit ~/.bash_aliases.d/03_yes-no-edit.sh
+    cp -fv $reade ~/.bash_aliases.d/01-reade.sh
+    cp -fv $readyn ~/.bash_aliases.d/02-readyn.sh
+    cp -fv $yesnoedit ~/.bash_aliases.d/03-yes-no-edit.sh
     yes-no-edit -f reade_r -g "$reade $readyn $yesnoedit $rlwrpscrpt" -p "Install reade, readyn and yes-no-edit at /root/.bash_aliases.d/?" -i "y" -Q "YELLOW"
 }
 yes-no-edit -f readeu -g "$reade $readyn $yesnoedit $rlwrpscrpt" -p "Install reade, readyn, yes-no-edit and rlwrap_scripts at ~/.bash_aliases.d/ (rlwrap/read functions that are used in other aliases)? " -i "y" -Q "GREEN"
 
 
 csysm_r(){ 
-    sudo cp -fv $csysm /root/.bash_aliases.d/04_check_system.sh; 
+    sudo cp -fv $csysm /root/.bash_aliases.d/04-check_system.sh; 
 }
 csysm(){
-    cp -fv $csysm ~/.bash_aliases.d/04_check_system.sh
+    cp -fv $csysm ~/.bash_aliases.d/04-check_system.sh
     yes-no-edit -f csysm_r -g "$csysm" -p "Install check_system.sh at /root/?" -i "y" -Q "YELLOW" 
 }
 yes-no-edit -f csysm -g "$csysm" -p "Install check_system.sh at ~/.bash_aliases.d/ (do a checkup on what kind of system this is - used for later scripts)?" -i "y" -Q "GREEN" 

@@ -1,32 +1,13 @@
-if ! test -f checks/check_system.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
-else
-    . ./checks/check_system.sh
-fi
-if ! type reade &> /dev/null; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
-else
-    . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
-fi 
-if ! test -f checks/check_envvar.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)" 
-else
-    . ./checks/check_envvar.sh
-fi
+#!/bin/bash
 
-if ! type update-system &> /dev/null; then
-    if ! test -f aliases/.bash_aliases.d/update-system.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)" 
-    else
-        . ./aliases/.bash_aliases.d/update-system.sh
+if ! test -f checks/check_all.sh; then
+    if type curl &> /dev/null; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)" 
+    else 
+        continue 
     fi
-fi
-
-if test -z $SYSTEM_UPDATED; then
-    readyn -Y "CYAN" -p "Update system?" updatesysm
-    if test $updatesysm == "y"; then
-        update-system                     
-    fi
+else
+    . ./checks/check_all.sh
 fi 
 
 if ! type rbenv &> /dev/null; then
@@ -34,19 +15,19 @@ if ! type rbenv &> /dev/null; then
         brew install rbenv 
     elif test "$distro_base" == "Arch"; then
         if test -z "$AUR_ins"; then 
-            reade -Q 'GREEN' -i 'y' -p 'No AUR helper found. Install yay? [Y/n]: ' 'n' ins_yay
+            readyn -p 'No AUR helper found. Install yay?' ins_yay
             if test $ins_yay == 'y'; then
-                if ! test -f AUR_insers/install_yay.sh ; then
-                     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/AUR_insers/install_yay.sh )" 
+                if ! test -f AUR_installers/install_yay.sh ; then
+                     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/AUR_installers/install_yay.sh )" 
                 else
-                    . ./AUR_insers/install_yay.sh 
+                    . ./AUR_installers/install_yay.sh 
                 fi 
             fi 
         fi 
 
-        eval "$AUR_ins ruby-build rbenv"
+        ${AUR_ins} ruby-build rbenv
     elif [ $distro_base == "Debian" ]; then
-        eval "$pac_ins rbenv                 "
+        ${pac_ins} rbenv                
     fi 
 
     if ! grep -q 'eval "$(rbenv init -)' ~/.bashrc; then 
@@ -58,7 +39,7 @@ if type rbenv &> /dev/null; then
     all="$(rbenv install -l)" 
     latest="$(rbenv install -l | grep -v - | tail -1)" 
     printf "Ruby versions:\n${CYAN}$all${normal}\n" 
-    reade -Q 'GREEN' -i "$latest" -p "Which version to install? : " "$all" vers  
+    reade -Q 'GREEN' -i "$latest $all" -p "Which version to install? : " vers  
     if ! test -z $vers; then
         rbenv install $vers 
         rbenv global $latest 
