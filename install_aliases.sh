@@ -138,8 +138,8 @@ if test $ansr == "y"; then
                 cp_der="" 
             fi
              
-
-            sed -i 's|^alias cp=".*|alias cp="'"$cp_xcp $cp_r $cp_v $cp_ov $cp_der"' --"|g' $genr
+	    sed -i 's|^alias cp=".*|alias cp="'"$cp_xcp $cp_r $cp_v $cp_ov $cp_der"' --"|g' $genr 
+            #[[ "$cp_xcp" =~ 'xcp --glob' ]] && sed -i 's|^alias cp=".*|type xcp \&> /dev/null && alias cp="'"$cp_xcp $cp_r $cp_v $cp_ov $cp_der"' --" \|\| alias cp="cp "'"$cp_r $cp_v $cp_ov $cp_der"' --"|g' $genr || sed -i 's|^alias cp=".*|type xcp \&> /dev/null && alias cp="'"$cp_xcp $cp_r $cp_v $cp_ov $cp_der"' --"|g' 
 
             unset cp_all cp_xcp cp_v cp_ov   
     fi 
@@ -244,12 +244,12 @@ if grep -q "trap '! \[ -z \"\$(jobs -p)\" ] && kill -9 \$(jobs -p.*" ~/.bashrc |
 fi 
 
 reade -Q "$color" -i "$pre $othr" -p "Send kill signal to background processes when exiting (Ctrl-q) / interrupting (Ctrl-c) for $USER? $prmpt" int_r
-if ! [ $int_r  == "n" ]; then
-    if test $int_r == 'both'; then
+if [ "$int_r"  == "both" ] || test "$int_r" == 'exit' || test "$int_r" == 'intr'; then
+    if test "$int_r" == 'both'; then
         sig='INT EXIT'  
-    elif test $int_r == 'exit'; then
+    elif test "$int_r" == 'exit'; then
         sig='EXIT'  
-    elif test $int_r == 'intr'; then
+    elif test "$int_r" == 'intr'; then
         sig='INT'  
     fi
     if grep -q "trap '! \[ -z \"\$(jobs -p)\" ] && kill -9 \$(jobs -p.*" ~/.bashrc; then 
@@ -270,7 +270,7 @@ if ! [ $int_r  == "n" ]; then
         prmpt='[N/same/both/exit/intr]: '
     fi 
     reade -Q "$color" -i "$pre $othr" -p "Send kill signal to background processes when exiting (Ctrl-q)/interrupting (Ctrl-c) for root? $prmpt" int_r 
-    if ! [ $int_r  == "n" ]; then
+    if [ "$int_r"  == "both" ] || test "$int_r" == 'exit' || test "$int_r" == 'intr'; then
         if test $int_r == 'both'; then
             sig='INT EXIT'  
         elif test $int_r == 'exit'; then
