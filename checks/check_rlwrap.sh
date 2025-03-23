@@ -11,15 +11,15 @@ fi
 
 if ! type rlwrap &> /dev/null; then
     readyn -p "Install rlwrap? (Offers autocompletion for input prompts - keyboard up/down)" answr
-    if [ "$answr" == "y" ] || [ -z "$answr" ] || [ "Y" == "$answr" ]; then
-        if test $machine == 'Windows' && type pacman &> /dev/null; then
+    if [[ "$answr" == "y" ]] || test -z "$answr" || [[ "Y" == "$answr" ]]; then
+        if [[ $machine == 'Windows' ]] && type pacman &> /dev/null; then
             pacman -S rlwrap
         elif [[ $(uname -s) =~ 'CYGWIN' ]] && type apt-cyg &> /dev/null; then
             apt-cyg install rlwrap
-        elif test $distro_base == "Debian"; then
-            eval "$pac_ins rlwrap"
-        elif test $distro_base == "Arch"; then
-            eval "$pac_ins rlwrap"
+        elif [[ "$distro_base" == "Debian" ]]; then
+            eval "${pac_ins} rlwrap"
+        elif [[ "$distro_base" == "Arch" ]]; then
+            eval "${pac_ins} rlwrap"
         else
             if type git &> /dev/null && type make &> /dev/null; then
                 (cd $TMPDIR

@@ -1,6 +1,8 @@
 #!/bin/bash
 
 function reade(){
+    ! test -z $ZSH_VERSION &&
+        setopt err_return extended_glob local_options local_traps
 
     local red=$(tput setaf 1)
     local red1=$(tput setaf 9)
@@ -126,49 +128,85 @@ function reade(){
       esac
     done 
     
-    local fcomp='' 
-
-    while getopts ':b:e:i:p:Q:s:S:' flag; do
+    local fcomp='n' 
+    local noecho='n' 
+     
+    while getopts 'sS:b:e:i:p:Q:' flag; do
         case "${flag}" in
             e)  fcomp='y'
-                break 
                 ;;
-
-            *)  fcomp='n'
-                break 
+            s)  noecho='y'
                 ;;
         esac
     done && OPTIND=1;
 
-    local bash_rlwrap='y'
+    local rlwrap_installable='y'
 
     if [[ $(uname -s) =~ 'MINGW' ]] && ! type pacman &> /dev/null; then
-        bash_rlwrap='n'
+        rlwrap_installable='n'
     fi
      
-    if ! type rlwrap &> /dev/null || test "$fcomp" == 'y' || test "$bash_rlwrap" == 'n' ; then
-        local readstr="read -r "
+    if ! type rlwrap &> /dev/null || [[ "$fcomp" == 'y' ]] || [[ "$rlwrap_installable" == 'n' ]]; then
+        if ! test -z $ZSH_VERSION; then
+            if [[ "$noecho" == 'y' ]]; then
+                local readstr="read vvvvvvvvvv";
+            else
+                local readstr="vvvvvvvvvv=''; vared vvvvvvvvvv";
+            fi
+        else
+            local readstr="read -r vvvvvvvvvv" 
+        fi
+        
         local color=""
         local args=''
         local tmpf=''
+        local eflag=0
         local pre=''
-        local OLD_HISTFILE=$HISTFILE
-        while getopts ':b:e:i:p:Q:s:S:' flag; do
+        # local array=()
+        echo $@
+        export OLD_HISTFILE=$HISTFILE
+        while getopts 'sS:b:e:i:p:Q:' flag; do
             case "${flag}" in
                 b)  ;;
-                e)  readstr=$(echo "$readstr" | sed 's|read |read -e |g');
+                e)  if (test -z $ZSH_VERSION || [[ $noecho == 'y' ]]); then 
+                        readstr=$(echo "$readstr" | sed 's|read |read -e |g');
+                    else
+                        readstr=$(echo "$readstr" | sed 's|vvvvvvvvvv=.*; vared|vvvvvvvvvv="\$(pwd)"; vared|g');
+                    fi
+                    echo bluh
                     ;;
-                    #  Even though it's in the read man, -i does not actually work
+                    #  Even though it's in the read man for bash, -i (on it's own) does not actually work
                 i)  arg="$(echo ${OPTARG} | awk '{print $1;}')"
-                    args="$(echo ${OPTARG} | sed "s/\<$frst\> //g")"  
-                    readstr=$(echo "$readstr" | sed 's|read |read -e -i "'"$arg"'" |g');
+                    args="$(echo ${OPTARG} | sed "s/\<$arg\> //g")"  
+                    
+                    if test -z $ZSH_VERSION; then
+                        readstr=$(echo "$readstr" | sed 's|read |read -e -i "'"$arg"'" |g') 
+                    elif [[ $noecho == 'n' ]]; then
+                        readstr=$(echo "$readstr" | sed 's|vvvvvvvvvv=.*; vared|vvvvvvvvvv="'"$arg"'"; vared|g')
+                    fi
                     pre="$arg"
-                    ! test -z "$args" &&   
-                    args=$(echo $args | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }') &&
-                    args=$(echo $args | tr ' ' '\n') &&
-                    tmpf=$(mktemp) && 
-                    echo "$args" > "$tmpf" && 
-                    export HISTFILE=$tmpf
+                    
+                    if ! test -z "$args"; then
+                        args=$(echo $args | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }') 
+                        args=$(echo $args | tr ' ' '\n') 
+                        
+                        #array=(${(f)args}) 
+                        tmpf=$(mktemp) 
+                        
+                        echo "$args" > "$tmpf"  
+                        #echo $arg >> "$tmpf" 
+                        
+                        #if ! test -z "$ZSH_VERSION"; then  
+                        #    history -p
+                        #    export HISTFILE=$tmpf
+                        #    fc -R
+                        #else
+                        if test -z "$ZSH_VERSION"; then  
+                            history -c
+                            history -r "$tmpf"
+                        fi
+                        # https://unix.stackexchange.com/questions/265957/zsh-histfile-still-read-from-zsh-history
+                    fi
                     ;;
                 Q)  if [[ "${OPTARG}" =~ ^[[:upper:]]+$ ]]; then
                         color="${bold}"
@@ -192,28 +230,65 @@ function reade(){
                         color=$color"${white}"
                     fi
                     ;;
-                p)  if test -z "$color"; then
-                        readstr=$(echo "$readstr" | sed 's|read |printf "'"${OPTARG}"'\n"; read |g');
+                p)  if test -z $ZSH_VERSION; then 
+                        test -z "$color" &&
+                            readstr=$(echo "$readstr" | sed 's|read |printf "'"${OPTARG}"'\n"; read |g') ||
+                            readstr=$(echo "$readstr" | sed 's|read |printf "'"${color}${OPTARG}${normal}"'\n"; read |g')
+                    elif [[ $noecho == 'y' ]]; then
+                        test -z "$color" &&
+                            readstr=$(echo "$readstr" | sed 's|vvvvvvvvvv|"?'"${OPTARG}"'" vvvvvvvvvv|g') ||
+                            readstr=$(echo "$readstr" | sed 's|vvvvvvvvvv|"?'"${color}${OPTARG}${normal}"'" vvvvvvvvvv|g');
+                    elif test -z "$color"; then
+                        readstr=$(echo "$readstr" | sed 's|vared |vared -p "'"${OPTARG}"'" |g');
                     else
-                        readstr=$(echo "$readstr" | sed 's|read |printf "'"${color}${OPTARG}${normal}"'\n"; read |g');
+                        readstr=$(echo "$readstr" | sed 's|vared |vared -p "'"${color}${OPTARG}${normal}"'" |g');
                     fi
                     ;;
-                s)  readstr=$(echo "$readstr" | sed 's|read |read -s "'"${OPTARG}"'" |g');
+                s)  readstr=$(echo "$readstr" | sed 's|read |read -s |g') 
                     ;;
                 S)  ;;
             esac
         done;
 
         shift $((OPTIND-1)) 
-       
-        eval "${readstr} vvvvvvvvvv";
-
-        if test "$fcomp" == 'y'; then
-            echo $vvvvvvvvvv >> $HISTFILE 
-            history -n
+     
+        if ! test -z "$ZSH_VERSION"; then
+            continue
+            #TRAPINT() {
+            #    export HISTFILE=$OLD_HISTFILE
+            #    fc -R
+            #    return $((128+$1))
+            #}
+            #trap 'history -p; export HISTFILE=$OLD_HISTFILE; fc -R; return $((128+$1))' SIGINT SIGQUIT 
+            #_my_vared_completions() {
+            #    compadd "$@" "${array[@]}"  # Add the words to the completion system
+            #}
+            #compdef _my_vared_completions vared
+        else
+            trap 'history -p; export HISTFILE=$OLD_HISTFILE; history -r; return 1' SIGINT SIGQUIT SIGSTP 
         fi
+        
+        eval "${readstr}"
 
-        if ! test -z "$pre" && test -z "$vvvvvvvvvv" || test "$vvvvvvvvvv" == ""; then
+        export HISTFILE=$OLD_HISTFILE
+        if ! [[ -z "$tmpf" ]]; then
+            if ! test -z "$ZSH_VERSION"; then  
+                history -p
+                export HISTFILE=$OLD_HISTFILE
+                fc -R
+            else
+                history -c
+                export HISTFILE=$OLD_HISTFILE
+                history -r
+            fi
+            command rm -f $tmpf 
+        fi
+        
+        test -z "$ZSH_VERSION" && 
+            trap - SIGINT SIGQUIT SIGSTP 
+            # trap - SIGINT SIGQUIT
+
+        if ! test -z "$pre" && test -z "$vvvvvvvvvv" || [[ "$vvvvvvvvvv" == "" ]]; then
             vvvvvvvvvv="$pre"  
         fi
 
@@ -221,7 +296,7 @@ function reade(){
         export REPLY="$vvvvvvvvvv" 
 
         if ! test -z "$@"; then
-            eval "${@:$#:1}=$vvvvvvvvvv"  
+            eval "${@:$#:1}='$vvvvvvvvvv'" 
         fi
 
     else

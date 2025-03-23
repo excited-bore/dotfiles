@@ -14,7 +14,7 @@ fi
 
 if ! type trizen &> /dev/null; then
     if ! type git &> /dev/null || ! type makepkg &> /dev/null || ! type fakeroot &> /dev/null; then
-        ${pac_ins} --needed base-devel git fakeroot
+        eval ${pac_ins} --needed base-devel git fakeroot
     fi
     git clone https://aur.archlinux.org/trizen.git $TMPDIR/trizen
     (cd $TMPDIR/trizen

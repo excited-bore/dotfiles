@@ -4,6 +4,16 @@
 # Execute (during printf) for colored prompt
 # printf  "${blue}This text is blue${white}\n"
 
+function get-script-dir(){
+    if test -z $ZSH_VERSION; then
+        [[ $0 != $BASH_SOURCE ]] && SCRIPT_DIR="$( dirname "${BASH_SOURCE[0]}" )" || SCRIPT_DIR="$( cd "$( dirname "$-1" )" && pwd )"
+    else
+        SCRIPT_DIR="${0:A:h}"
+    fi
+    eval "$1=$SCRIPT_DIR" 
+}
+
+
 # https://unix.stackexchange.com/questions/139231/keep-aliases-when-i-use-sudo-bash
 if type sudo &> /dev/null; then
     alias sudo='sudo '
@@ -15,7 +25,7 @@ fi
 
 # https://stackoverflow.com/questions/4023830/how-to-compare-two-strings-in-dot-separated-version-format-in-bash
 
-function version-higher () {
+function version-higher(){
     if [[ $1 == $2 ]]; then
         return 0
     fi
@@ -145,9 +155,11 @@ if ! type update-system &> /dev/null; then
     fi
 fi
 
+# printf "${green} Will now start with updating system ${normal}\n"
+
 if test -z $SYSTEM_UPDATED; then
     readyn -Y "CYAN" -p "Update system?" updatesysm
-    if test "$updatesysm" == "y"; then
+    if [[ "$updatesysm" == "y" ]]; then
         update-system-yes                     
         export SYSTEM_UPDATED="TRUE"
     else

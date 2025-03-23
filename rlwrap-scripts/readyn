@@ -1,16 +1,18 @@
 #!/bin/bash
 
-[[ $0 != $BASH_SOURCE ]] && SCRIPT_DIR="$( dirname "${BASH_SOURCE[0]}" )" || SCRIPT_DIR="$( cd "$( dirname "$-1" )" && pwd )"
+if test -z $ZSH_VERSION; then
+    [[ $0 != $BASH_SOURCE ]] && SCRIPT_DIR="$( dirname "${BASH_SOURCE[0]}" )" || SCRIPT_DIR="$( cd "$( dirname "$-1" )" && pwd )"
+else
+    SCRIPT_DIR="${0:A:h}"
+fi
 
 ! test -f $SCRIPT_DIR/reade && ! test -f $SCRIPT_DIR/01-reade.sh &&
 printf "'reade' needs to be in the same folder as 'readyn' for it to work\n" ||
-(test -f $SCRIPT_DIR/reade && source $SCRIPT_DIR/reade) ||
-(test -f $SCRIPT_DIR/01-reade.sh && source $SCRIPT_DIR/01-reade.sh)
+test -f $SCRIPT_DIR/reade && source $SCRIPT_DIR/reade || 
+test -f $SCRIPT_DIR/01-reade.sh && source $SCRIPT_DIR/01-reade.sh &> /dev/null
 
 function readyn(){
-
-    [[ $0 != $BASH_SOURCE ]] && local SCRIPT_DIR="$( dirname "${BASH_SOURCE[0]}" )" || local SCRIPT_DIR="$( cd "$( dirname "$-1" )" && pwd )"
-
+    
     local red=$(tput setaf 1)
     local red1=$(tput setaf 9)
     local green=$(tput setaf 2)
@@ -150,7 +152,7 @@ function readyn(){
         *)                     set -- "$@" "$arg" ;;
       esac
     done 
-
+   
     local breaklines=''
     local condition='' 
     local args=''
@@ -172,28 +174,28 @@ function readyn(){
         case "${flag}" in
              a)  auto='y' 
                  ;;
-             b) if [ "${OPTARG}" ] && ! test "${OPTARG}" == '--' && ! [[ ${OPTARG} =~ ^-.* ]]; then 
+             b) if [[ "${OPTARG}" ]] && ! [[ "${OPTARG}" == '--' ]] && ! [[ ${OPTARG} =~ ^-.* ]]; then 
                     breaklines="-b \"${OPTARG}\"";
                 fi 
                 if [[ ${OPTARG} =~ ^-.* ]]; then
                     OPTIND=$(($OPTIND - 1)) 
                 fi
              ;;    
-             Y) if [ "${OPTARG}" ] && ! test "${OPTARG}" == '--' && ! [[ ${OPTARG} =~ ^-.* ]]; then 
+             Y) if [[ "${OPTARG}" ]] && ! [[ "${OPTARG}" == '--' ]] && ! [[ ${OPTARG} =~ ^-.* ]]; then 
                     ycolor="${OPTARG}";
                 fi
                 if [[ ${OPTARG} =~ ^-.* ]]; then
                     OPTIND=$(($OPTIND - 1)) 
                 fi
              ;;    
-             N) if [ "${OPTARG}" ] && ! test "${OPTARG}" == '--' && ! [[ ${OPTARG} =~ ^-.* ]]; then
+             N) if [[ "${OPTARG}" ]] && ! [[ "${OPTARG}" == '--' ]] && ! [[ ${OPTARG} =~ ^-.* ]]; then
                     ncolor="${OPTARG}";
                 fi
                 if [[ ${OPTARG} =~ ^-.* ]]; then
                     OPTIND=$(($OPTIND - 1)) 
                 fi 
              ;;    
-             p) if [ "${OPTARG}" ] && ! test "${OPTARG}" == '--' && ! [[ ${OPTARG} =~ ^-.* ]]; then
+             p) if [[ "${OPTARG}" ]] && ! [[ "${OPTARG}" == '--' ]] && ! [[ ${OPTARG} =~ ^-.* ]]; then
                     prmpt="${OPTARG}";
                 fi
                 if [[ ${OPTARG} =~ ^-.* ]]; then
@@ -202,7 +204,7 @@ function readyn(){
              ;;
              y)  preff='y'
                  args='' 
-                 if [ "${OPTARG}" ] && ! test "${OPTARG}" == '--' && ! [[ ${OPTARG} =~ ^-.* ]]; then
+                 if [[ "${OPTARG}" ]] && ! [[ "${OPTARG}" == '--' ]] && ! [[ ${OPTARG} =~ ^-.* ]]; then
 
                     # disable glob 
                     set -f 
@@ -225,7 +227,7 @@ function readyn(){
 
             n)  preff='n'
                 args='' 
-                if [ "${OPTARG}" ] && ! test "${OPTARG}" == '--' && ! [[ ${OPTARG} =~ ^-.* ]]; then
+                if [[ "${OPTARG}" ]] && ! [[ "${OPTARG}" == '--' ]] && ! [[ ${OPTARG} =~ ^-.* ]]; then
                     set -f 
                     IFS=',' 
                     args=($OPTARG);
@@ -241,7 +243,7 @@ function readyn(){
                 fi
                 ;; 
 
-              c) if [ "${OPTARG}" ] && ! test "${OPTARG}" == '--' && ! [[ ${OPTARG} =~ ^-.* ]]; then
+              c) if [[ "${OPTARG}" ]] && ! [[ "${OPTARG}" == '--' ]] && ! [[ ${OPTARG} =~ ^-.* ]]; then
                     condition="${OPTARG}"
                 fi 
                 if [[ ${OPTARG} =~ ^-.* ]]; then
@@ -253,7 +255,7 @@ function readyn(){
 
     shift $((OPTIND-1)) 
 
-    if test -z "$preff" || test "$preff" == 'y'; then
+    if test -z "$preff" || [[ "$preff" == 'y' ]]; then
         prmpt1=" [$prmpty/$prmptn]: "
         color="$ycolor"
         pre=$pre_y 
@@ -266,19 +268,24 @@ function readyn(){
     fi
 
     if ! test -z "$condition" && eval "${condition}"; then
-        test "$prmptn" == "${underline_on}n${underline_off}o" && prmptn="${underline_on}N${underline_off}o"  
-        test "$prmpty" == "${underline_on}Y${underline_off}es" && prmpty="${underline_on}y${underline_off}es"  
+        [[ "$prmptn" == "${underline_on}n${underline_off}o" ]] && prmptn="${underline_on}N${underline_off}o"  
+        [[ "$prmpty" == "${underline_on}Y${underline_off}es" ]] && prmpty="${underline_on}y${underline_off}es"  
         prmpt1=" [$prmptn/$prmpty]: "
         color="$ncolor"
         pre=$pre_n 
         othr=$pre_y 
     fi
 
-    if ! test -z $auto; then
+    if ! test -z "$auto"; then
         if test -z "$prmpt"; then
-            printf "${!color}$prmpt1$pre${normal}\n";   
+            test -z $ZSH_VERSION &&
+                printf "${!color}$prmpt1$pre${normal}\n" ||
+                printf "${(P)color}$prmpt1$pre${normal}\n";   
         else
-            printf "${!color}$prmpt$prmpt1$pre${normal}\n";   
+            test -z $ZSH_VERSION &&
+                printf "${!color}$prmpt$prmpt1$pre${normal}\n" || 
+                printf "${(P)color}$prmpt$prmpt1$pre${normal}\n";   
+
         fi
         vvvvvvvvvv=$pre 
     else

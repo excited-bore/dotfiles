@@ -1,41 +1,40 @@
 #!/bin/bash
- 
-[[ $0 != $BASH_SOURCE ]] && SCRIPT_DIR="$( dirname "${BASH_SOURCE[0]}" )" || SCRIPT_DIR="$( cd "$( dirname "$-1" )" && pwd )" 
- 
-if ! test -f $SCRIPT_DIR/checks/check_all.sh; then 
-    if type curl &> /dev/null; then 
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)"  
-    else  
-        continue  
-    fi 
-else 
-    . $SCRIPT_DIR/checks/check_all.sh 
+
+if ! test -f checks/check_all.sh; then
+    if type curl &>/dev/null; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)"
+    else
+        continue
+    fi
+else
+    . ./checks/check_all.sh
 fi
 
+get-script-dir SCRIPT_DIR
 
 #if ! type cargo &> /dev/null; then
-#    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh 
+#    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 #fi
 
-if ! type cargo &> /dev/null; then
-    if test $distro_base == "Debian"; then
-        ${pac_ins} rust
-    elif test $distro_base == "Arch"; then
-        ${pac_ins} rust
-    elif test $distro == 'Fedora'; then
-        ${pac_ins} rust 
+if ! type cargo &>/dev/null; then
+    if [[ "$distro_base" == "Debian" ]]; then
+        eval "${pac_ins}" rust
+    elif [[ "$distro_base" == "Arch" ]]; then
+        eval "${pac_ins}" rust
+    elif [[ "$distro" == 'Fedora' ]]; then
+        eval "${pac_ins}" rust
     fi
 fi
 
-#if ! grep -q "# RUST" $ENVVAR; then
-#    printf "# RUST\ntest -d ~/.cargo/bin && export CARGO_INSTALL_ROOT=\$HOME/.cargo &&\nexport PATH=\$PATH:~/.cargo/bin\n" >> $ENVVAR 
-#fi
+if ! grep -q "# RUST" "$ENVVAR"; then
+    printf "# RUST\ntest -d ~/.cargo/bin && export CARGO_INSTALL_ROOT=\$HOME/.cargo &&\nexport PATH=\$PATH:~/.cargo/bin\n" >>"$ENVVAR"
+fi
 
-#echo "This next $(tput setaf 1)sudo$(tput sgr0) will set envvar for cargo in $ENVVAR_R";
+echo "This next $(tput setaf 1)sudo$(tput sgr0) will set envvar for cargo in $ENVVAR_R"
 
-#if ! sudo grep -q "# RUST" $ENVVAR_R; then
-#    printf "# RUST\ntest -d \$HOME/.cargo/bin && export CARGO_INSTALL_ROOT=\$HOME/.cargo &&\nexport PATH=\$PATH:\$HOME/.cargo/bin\n" | sudo tee -a $ENVVAR_R &> /dev/null 
-#fi
+if ! sudo grep -q "# RUST" "$ENVVAR_R"; then
+    printf "# RUST\ntest -d \$HOME/.cargo/bin && export CARGO_INSTALL_ROOT=\$HOME/.cargo &&\nexport PATH=\$PATH:\$HOME/.cargo/bin\n" | sudo tee -a "$ENVVAR_R" &>/dev/null
+fi
 
 #echo "This next $(tput setaf 1)sudo$(tput sgr0) will check if the variable CARGO_INSTALL_ROOT is being kept from the user's environment in /etc/sudoers";
 
@@ -48,7 +47,7 @@ fi
 #fi
 #unset ansr
 
-#export CARGO_INSTALL_ROOT=$HOME/.cargo
-#export PATH=$PATH:$HOME/.cargo/bin
+export CARGO_INSTALL_ROOT=$HOME/.cargo
+export PATH=$PATH:$HOME/.cargo/bin
 
-#. "$HOME/.cargo/env"
+# . "$HOME/.cargo"

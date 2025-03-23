@@ -1,44 +1,30 @@
-if ! test -f checks/check_system.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
-else
-    . ./checks/check_system.sh
-fi
+#!/usr/bin/env bash
 
-if ! type reade &> /dev/null; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
-else
-    . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
-fi
-
-
-if ! type update-system &> /dev/null; then
-    if ! test -f aliases/.bash_aliases.d/update-system.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)" 
+if ! test -f checks/check_all.sh; then
+    if type curl &>/dev/null; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        . ./aliases/.bash_aliases.d/update-system.sh
+        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
+        return 1 || exit 1
     fi
+else
+    . ./checks/check_all.sh
 fi
 
-if test -z $SYSTEM_UPDATED; then
-    readyn -Y "CYAN" -p "Update system?" updatesysm
-    if test $updatesysm == "y"; then
-        update-system                     
-    fi
-fi
+get-script-dir SCRIPT_DIR
 
-
-if ! type lazydocker &> /dev/null; then
-    if test $distro_base == "Arch" && ! test -z "$AUR_ins"; then
-        eval "$AUR_ins lazydocker"
+if ! type lazydocker &>/dev/null; then
+    if [[ $distro_base == "Arch" ]] && ! test -z "$AUR_ins"; then
+        eval "${AUR_ins}" lazydocker
     else
-        if ! type go &> /dev/null || $(type go &> /dev/null && [[ $(go version | awk '{print $3}' | cut -c 3-) < 1.19 ]]); then
-           if ! test -f install_go.sh; then
-                 tmp=$(mktemp) && wget -O $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_go.sh
-                ./$tmp 
+        if ! type go &>/dev/null || $(type go &>/dev/null && [[ $(go version | awk '{print $3}' | cut -c 3-) < 1.19 ]]); then
+            if ! test -f install_go.sh; then
+                tmp=$(mktemp) && wget -O $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_go.sh
+                ./$tmp
             else
-                ./install_go.sh
-            fi 
-            go install github.com/jesseduffield/lazydocker@latest 
+                . ./install_go.sh
+            fi
+            go install github.com/jesseduffield/lazydocker@latest
         fi
         #if ! type curl &> /dev/null; then
         #    if test $distro_base == 'Debian'; then
