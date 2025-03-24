@@ -162,8 +162,6 @@ function reade(){
         local tmpf=''
         local eflag=0
         local pre=''
-        # local array=()
-        echo $@
         export OLD_HISTFILE=$HISTFILE
         while getopts 'sS:b:e:i:p:Q:' flag; do
             case "${flag}" in
@@ -173,7 +171,6 @@ function reade(){
                     else
                         readstr=$(echo "$readstr" | sed 's|vvvvvvvvvv=.*; vared|vvvvvvvvvv="\$(pwd)"; vared|g');
                     fi
-                    echo bluh
                     ;;
                     #  Even though it's in the read man for bash, -i (on it's own) does not actually work
                 i)  arg="$(echo ${OPTARG} | awk '{print $1;}')"
