@@ -76,56 +76,34 @@ if ! test -f $HOME/.environment.env; then
     fi
 fi
 
-# Appimagelauncher
-
-if ! type AppImageLauncher &>/dev/null; then
-    printf "${GREEN}If you want to install applications using appimages, there is a helper called 'appimagelauncher'\n"
-    readyn -p "Check if appimage ready and install appimagelauncher?" appimage_install
-    if [[ "$appimage_install" == 'y' ]]; then
-        if ! test -f $SCRIPT_DIR/install_appimagelauncher.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_appimagelauncher.sh)"
-        else
-            $SCRIPT_DIR/install_appimagelauncher.sh
-        fi
-    fi
-fi
-
-# Flatpak
-
-#if ! type flatpak &> /dev/null; then
-#printf "%s\n" "${blue}No flatpak detected. (Independent package manager from Red Hat)${normal}"
-readyn -p "Install (or just configure) Flatpak?" insflpk
-if [[ "y" == "$insflpk" ]]; then
-    if ! test -f $SCRIPT_DIR/install_flatpak.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_flatpak.sh)"
-    else
-        $SCRIPT_DIR/install_flatpak.sh
-    fi
-fi
-#fi
-unset insflpk
-
-if ! type snap &>/dev/null; then
-    printf "%s\n" "${blue}No snap detected. (Independent package manager from Canonical)${normal}"
-    readyn -Y "MAGENTA" -p "Install snap?" -n inssnap
-    if [[ "y" == "$inssnap" ]]; then
-        if ! test -f $SCRIPT_DIR/install_snapd.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_snapd.sh)"
-        else
-            $SCRIPT_DIR/install_snapd.sh
-        fi
-    fi
-fi
-unset inssnap
 
 if test -z "$(eval "$pac_ls_ins groff 2> /dev/null")"; then
     printf "${CYAN}groff${normal} is not installed (Necessary for 'man' (manual) command)\n"
     readyn -p "Install groff? " groff_ins
     if [[ $groff_ins == 'y' ]]; then
-        eval "yes | ${pac_ins} groff"
+        eval "${pac_ins}" groff
         printf "Logout and login (or reboot) to take effect\n"
     fi
     unset groff_ins
+fi
+
+
+if test -z "$(eval "$pac_ls_ins zip 2> /dev/null")" || test -z "$(eval "$pac_ls_ins unzip 2> /dev/null")"; then
+    printf "${CYAN}zip${normal} and/or ${CYAN}unzip${normal} are not installed \n"
+    readyn -p "Install zip and unzip? " nzp_ins
+    if [[ $nzp_ins == 'y' ]]; then
+        eval "${pac_ins}" zip unzip
+    fi
+    unset nzp_ins
+fi
+
+if [[ $X11_WAY == 'x11' ]] && ( ! [[ type xclip &> /dev/null ]] || ! [[ type xsel &> /dev/null ]]); then
+    printf "${CYAN}xclip${normal} and/or ${CYAN}xsel${normal} are not installed (clipboard tools for X11 based systems)\n"
+    readyn -p "Install xclip and xsel? " nzp_ins
+    if [[ $nzp_ins == 'y' ]]; then
+        eval "${pac_ins}" xclip xsel
+    fi
+    unset nzp_ins
 fi
 
 if [[ $distro_base == 'Debian' ]]; then
@@ -134,7 +112,7 @@ if [[ $distro_base == 'Debian' ]]; then
         printf "${CYAN}manpages-posix${normal} is not installed (Manpages for posix-compliant (f.ex. bash) commands (f.ex. alias, test, type, etc...))\n"
         readyn -p "Install manpages-posix? " posixman_ins
         if test $posixman_ins == 'y'; then
-            eval "yes | $pac_ins manpages-posix -y"
+            eval "${pac_ins}" manpages-posix
         fi
         unset posixman_ins
     fi
@@ -171,7 +149,7 @@ if [[ $distro_base == 'Debian' ]]; then
             printf "${CYAN}ppa-purge${normal} is not installed (cmd tool for disabling installed PPA's)\n"
             readyn -p "Install ppa-purge? " ppa_ins
             if test $ppa_ins == 'y'; then
-                eval "yes | $pac_ins ppa-purge"
+                eval "yes | ${pac_ins} ppa-purge"
             fi
             unset ppa_ins
         fi
@@ -180,8 +158,8 @@ if [[ $distro_base == 'Debian' ]]; then
     if ! type nala &>/dev/null && ! test -z "$(apt search nala 2>/dev/null | awk 'NR>2{print;}')"; then
         printf "${CYAN}nala${normal} is not installed (A TUI wrapper for apt install, update, upgrade, search, etc..)\n"
         readyn -p "Install nala? " nala_ins
-        if test $nala_ins == 'y'; then
-            eval "$pac_ins nala"
+        if [[ $nala_ins == 'y' ]]; then
+            eval "${pac_ins}" nala
             pac="nala"
             pac_ins="sudo nala install"
             pac_up="sudo nala update"
@@ -189,7 +167,7 @@ if [[ $distro_base == 'Debian' ]]; then
         unset nala_ins
     fi
 
-    if test $distro == "Ubuntu"; then
+    if [[ $distro == "Ubuntu" ]]; then
         if ! type synaptic &>/dev/null; then
             printf "${CYAN}synaptic${normal} is not installed (Better GUI for package management)\n"
             readyn -p "Install synaptic? " ins_curl
@@ -272,6 +250,50 @@ if ! test -f $SCRIPT_DIR/checks/check_completions_dir.sh; then
 else
     . $SCRIPT_DIR/checks/check_completions_dir.sh
 fi
+
+# Appimagelauncher
+
+if ! type AppImageLauncher &>/dev/null; then
+    printf "${GREEN}If you want to install applications using appimages, there is a helper called 'appimagelauncher'\n"
+    readyn -p "Check if appimage ready and install appimagelauncher?" appimage_install
+    if [[ "$appimage_install" == 'y' ]]; then
+        if ! test -f $SCRIPT_DIR/install_appimagelauncher.sh; then
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_appimagelauncher.sh)"
+        else
+            $SCRIPT_DIR/install_appimagelauncher.sh
+        fi
+    fi
+fi
+
+
+# Flatpak
+
+#if ! type flatpak &> /dev/null; then
+#printf "%s\n" "${blue}No flatpak detected. (Independent package manager from Red Hat)${normal}"
+readyn -p "Install (or just configure) Flatpak?" insflpk
+if [[ "y" == "$insflpk" ]]; then
+    if ! test -f $SCRIPT_DIR/install_flatpak.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_flatpak.sh)"
+    else
+        $SCRIPT_DIR/install_flatpak.sh
+    fi
+fi
+#fi
+unset insflpk
+
+if ! type snap &>/dev/null; then
+    printf "%s\n" "${blue}No snap detected. (Independent package manager from Canonical)${normal}"
+    readyn -Y "MAGENTA" -p "Install snap?" -n inssnap
+    if [[ "y" == "$inssnap" ]]; then
+        if ! test -f $SCRIPT_DIR/install_snapd.sh; then
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_snapd.sh)"
+        else
+            $SCRIPT_DIR/install_snapd.sh
+        fi
+    fi
+fi
+unset inssnap
+
 
 # Ack prompt
 

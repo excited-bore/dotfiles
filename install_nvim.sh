@@ -42,6 +42,13 @@ if [[ "$machine" == 'Mac' ]] && type brew &>/dev/null; then
             fi
         fi
     fi
+    if ! type gcc &>/dev/null || ! type npm &> /dev/null || ! type unzip &> /dev/null; then
+        readyn -p "Install necessary tools for using supplied config? (tools include: gcc - GNU C compiler, npm - javascript package manager and unzip)" gccn
+        if [ -z $gccn ] || [[ "y" == $gccn ]]; then
+            eval "${pac_ins}" gcc npm unzip
+        fi
+    fi
+
     readyn -p "Install nvim code language support (python, javascript, ruby, perl, ..)?" langs
     if [[ "$langs" == 'y' ]]; then
         if ! type pylint &>/dev/null; then
@@ -126,7 +133,7 @@ if [[ "$machine" == 'Mac' ]] && type brew &>/dev/null; then
 
 elif [[ "$distro_base" == "Arch" ]]; then
     if ! type nvim &>/dev/null; then
-        eval "$pac_ins neovim "
+        eval "${pac_ins}" --noconfirm neovim 
     fi
     if ! type xclip &>/dev/null; then
         readyn -p "Install nvim clipboard? (xsel xclip)" clip
@@ -139,6 +146,12 @@ elif [[ "$distro_base" == "Arch" ]]; then
             if [ -z $x11f ] || [[ "y" == $x11f ]]; then
                 sudo sed -i 's|.X11Forwarding yes|X11Forwarding yes|g' /etc/ssh/sshd_config
             fi
+        fi
+    fi
+    if ! type gcc &>/dev/null || ! type npm &> /dev/null || ! type unzip &> /dev/null; then
+        readyn -p "Install necessary tools for using supplied config? (tools include: gcc - GNU C compiler, npm - javascript package manager and unzip)" gccn
+        if [ -z $gccn ] || [[ "y" == $gccn ]]; then
+            eval "${pac_ins}" gcc npm unzip
         fi
     fi
     readyn -p "Install nvim code language support (python, javascript, ruby, perl, ..)?" langs
@@ -349,7 +362,7 @@ elif [[ "$distro_base" == "Debian" ]]; then
         fi
         unset nvmapt nvmappmg insflpk nvmflpk
     else
-        ${pac_ins} -y neovim
+        eval "${pac_ins}" neovim
     fi
 
     if ! type xclip &>/dev/null; then
@@ -365,6 +378,15 @@ elif [[ "$distro_base" == "Debian" ]]; then
             fi
         fi
     fi
+    
+    if ! type gcc &>/dev/null || ! type npm &> /dev/null || ! type unzip &> /dev/null; then
+        readyn -p "Install necessary tools for using supplied config? (tools include: gcc - GNU C compiler, npm - javascript package manager and unzip)" gccn
+        if [ -z $gccn ] || [[ "y" == $gccn ]]; then
+            eval "${pac_ins}" gcc npm unzip
+        fi
+    fi
+
+   
     readyn -p "Install nvim code language support (python, javascript, ruby, perl, ..)?" langs
     if [[ "$langs" == 'y' ]]; then
         if ! type pylint &>/dev/null; then

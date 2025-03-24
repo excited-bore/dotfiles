@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 if ! test -f checks/check_all.sh; then
     if ! type curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
@@ -12,7 +14,7 @@ fi
 # Environment variables
 
 #if ! test -z $1; then
-#envvars=$1
+#envvars=$"1
 #else
 #fi
 
@@ -34,7 +36,7 @@ environment-variables_r() {
 
     if ! sudo grep -q "~/.environment.env" /root/.profile; then
         readyn -p "Link .environment.env in ${YELLOW}/root/.profile${GREEN}?" prof
-        if test $prof == 'y'; then
+        if [[ $prof == 'y' ]]; then
             printf "\n[ -f ~/.environment.env ] && source ~/.environment.env\n\n" | sudo tee -a /root/.profile
         fi
     fi
@@ -48,17 +50,18 @@ environment-variables_r() {
             else
                 printf "\n[ -f ~/.environment.env ] && source ~/.profile\n\n" | sudo tee -a /root/.bash_profile
             fi
-        elif test $bash_prof == 'path'; then
+        elif [[ "$bash_prof" == 'path' ]]; then
             if sudo grep -q '.bashrc' /root/.bash_profile && ! sudo grep -q "~/.environment.env" /root/.bash_profile; then
                 sudo sed -i 's|\(\[ -f ~/.bashrc \] && source ~/.bashrc\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' /root/.bash_profile
                 sudo sed -i 's|\(\[\[ -f ~/.bashrc \]\] && . ~/.bashrc\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' /root/.bash_profile
+
             else
                 printf "\n[ -f ~/.environment.env ] && source ~/.environment.env\n\n" | sudo tee -a /root/.bash_profile
             fi
         fi
         if sudo test -f /root/.bashrc && ! sudo grep -q "~/.environment.env" /root/.bashrc; then
             readyn -Y 'GREEN' -p "Source /root/.environment.env in /root/.bashrc?" bashrc
-            if test $bashrc == 'y'; then
+            if [[ $bashrc == 'y' ]]; then
                 if sudo grep -q "[ -f ~/.bash_completion ]" /root/.bashrc; then
                     sudo sed -i 's|\(\[ -f ~/.bash_completion \] \&\& source \~/.bash_completion\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' /root/.bashrc
                 elif sudo grep -q "[ -f ~/.bash_aliases ]" /root/.bashrc; then
@@ -94,7 +97,7 @@ environment-variables() {
 
     if ! grep -q "~/.environment.env" ~/.profile; then
         readyn -p "Link .environment.env in ~/.profile?" prof
-        if test $prof == 'y'; then
+        if [[ $prof == 'y' ]]; then
             printf "\n[ -f ~/.environment.env ] && source ~/.environment.env\n\n" >>~/.profile
         fi
         unset prof
@@ -114,7 +117,7 @@ environment-variables() {
             if ! grep -q "~/.profile" ~/.bash_profile; then
                 printf "\n[ -f ~/.environment.env ] && source ~/.profile\n\n" >>~/.bash_profile
             fi
-        elif test $bash_prof == 'path'; then
+        elif [[ $bash_prof == 'path' ]]; then
             if ! grep -q "~/.environment.env" ~/.bash_profile; then
                 printf "\n[ -f ~/.environment.env ] && source ~/.environment.env\n\n" >>~/.bash_profile
             fi
@@ -170,6 +173,7 @@ if [[ "$envvars" == "y" ]] && [[ "$1" == 'n' ]]; then
 
     # Allow if checks
     sed -i 's/^#\[\[/\[\[/' $pathvr
+    sed -i 's/^#(\[/(\[/' $pathvr
     sed -i 's/^#type/type/' $pathvr
 
     # Comment out FZF stuff
@@ -349,19 +353,18 @@ elif [[ "$envvars" == "y" ]]; then
         touch $TMPDIR/editor-outpt
         # Redirect output to file in subshell (mimeopen gives output but also starts read. This cancels read). In tmp because that gets cleaned up
         (echo "" | mimeopen -a editor-check.sh &>$TMPDIR/editor-outpt)
-        editors="$(cat $TMPDIR/editor-outpt | awk 'NR > 2' | awk '{if (prev_1_line) print prev_1_line; prev_1_line=prev_line} {prev_line=$NF}' | sed 's|[()]||g' | tr -s '[:space:]' '\\n' | uniq | tr '\n' ' ') $editors"
-        editors="$(echo $editors | tr ' ' '\n' | sort -u)"
+        editors1="$(cat $TMPDIR/editor-outpt | awk 'NR > 2' | awk '{if (prev_1_line) print prev_1_line; prev_1_line=prev_line} {prev_line=$NF}' | sed 's|[()]||g' | uniq) $editors"
+        editors1="$(echo $editors1 | tr ' ' '\n' | sort -u)"
         prmpt="Found editors using ${CYAN}mimeopen${normal} (non definitive list): ${GREEN}\n"
-        for i in $editors; do
+        while IFS= read -r i; do            
             prmpt="$prmpt\t - $i\n"
-        done
-        prmpt="$prmpt${normal}"
-
+        done <<< $editors1
+        
         frst="$(echo $editors | awk '{print $1}')"
         editors_p="$(echo $editors | sed "s/\<$frst\> //g")"
         #frst="$(echo $compedit | awk '{print $1}')"
         #compedit="$(echo $compedit | sed "s/\<$frst\> //g")"
-        printf "$prmpt"
+        printf "$prmpt${normal}"
         reade -Q "GREEN" -i "$frst $editors_p" -p "EDITOR (Terminal - $frst default)=" edtor
         edtor="$(where_cmd $edtor)"
         if [[ "$edtor" =~ "emacs" ]]; then
@@ -376,15 +379,16 @@ elif [[ "$envvars" == "y" ]]; then
             sed -i 's|#export VISUAL=|export VISUAL=|g' $pathvr
             sed -i 's|export VISUAL=.*|export VISUAL=$EDITOR|g' $pathvr
         else
+           
             prmpt="Found visual editors using ${CYAN}mimeopen${normal} (non definitive list): ${GREEN}\n"
-            for i in $editors; do
+            while IFS= read -r i; do            
                 prmpt="$prmpt\t - $i\n"
-            done
+            done <<< $editors1
             prmpt="$prmpt${normal}"
             #frst="$(echo $compedit | awk '{print $1}')"
             #compedit="$(echo $compedit | sed "s/\<$frst\> //g")"
             printf "$prmpt"
-
+        
             reade -Q "GREEN" -i "$frst $editors_p" -p "VISUAL (GUI editor - $frst default)=" vsual
             vsual="$(where_cmd $vsual)"
             sed -i 's|#export VISUAL=|export VISUAL=|g' $pathvr
@@ -489,7 +493,7 @@ elif [[ "$envvars" == "y" ]]; then
         - XDG_STATE_HOME=$HOME/.local/state\n"
         printf "$prmpt${normal}"
         readyn -p "Set XDG environment?" xdgInst
-        if [ -z "$xdgInst" ] || [ "y" == "$xdgInst" ]; then
+        if [ -z "$xdgInst" ] || [[ "y" == "$xdgInst" ]]; then
             sed 's/^#export XDG_CACHE_HOME=\(.*\)/export XDG_CACHE_HOME=\1/' -i $pathvr
             sed 's/^#export XDG_CONFIG_HOME=\(.*\)/export XDG_CONFIG_HOME=\1/' -i $pathvr
             sed 's/^#export XDG_CONFIG_DIRS=\(.*\)/export XDG_CONFIG_DIRS=\1/' -i $pathvr
