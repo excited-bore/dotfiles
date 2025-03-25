@@ -97,7 +97,7 @@ if test -z "$(eval "$pac_ls_ins zip 2> /dev/null")" || test -z "$(eval "$pac_ls_
     unset nzp_ins
 fi
 
-if [[ $X11_WAY == 'x11' ]] && ( ! [[ type xclip &> /dev/null ]] || ! [[ type xsel &> /dev/null ]]); then
+if [[ $X11_WAY == 'x11' ]] && ! type xclip &> /dev/null || ! type xsel &> /dev/null; then
     printf "${CYAN}xclip${normal} and/or ${CYAN}xsel${normal} are not installed (clipboard tools for X11 based systems)\n"
     readyn -p "Install xclip and xsel? " nzp_ins
     if [[ $nzp_ins == 'y' ]]; then
@@ -142,7 +142,7 @@ if [[ $distro_base == 'Debian' ]]; then
         if ! test -f $SCRIPT_DIR/install_list-ppa.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_list-ppa.sh)"
         else
-            $SCRIPT_DIR/install_list-ppa.sh
+            . $SCRIPT_DIR/install_list-ppa.sh
         fi
 
         if ! type ppa-purge &>/dev/null && ! test -z "$(apt search ppa-purge 2>/dev/null | awk 'NR>2{print;}')"; then
@@ -171,8 +171,8 @@ if [[ $distro_base == 'Debian' ]]; then
         if ! type synaptic &>/dev/null; then
             printf "${CYAN}synaptic${normal} is not installed (Better GUI for package management)\n"
             readyn -p "Install synaptic? " ins_curl
-            if test $ins_curl == 'y'; then
-                eval ${pac_ins} synaptic -y
+            if [[ $ins_curl == 'y' ]]; then
+                eval "${pac_ins} synaptic -y"
             fi
             unset ins_curl
         fi

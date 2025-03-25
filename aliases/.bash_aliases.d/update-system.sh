@@ -98,7 +98,9 @@ function update-system() {
               ;;
           esac
         done
-         
+    
+    local flag hdrs
+
     if type timedatectl &> /dev/null && ! [[ "$(timedatectl show | grep '^NTP' | head -n 1 | awk 'BEGIN { FS = "=" } ; {print $2}')" == "yes" ]]; then 
         readyn -p "Timedate NTP not set (Automatic timesync). This can cause issues with syncing to repositories. Activate it?" set_ntp
         if [[ "$set_ntp" == "y" ]]; then
@@ -159,28 +161,56 @@ function update-system() {
         fi
     elif [[ "$pac" == "apt" ]] || [[ "$pac" == "nala" ]]; then
         if ! test -z "$YES"; then
-            eval ${pac_up} -y
+            if [[ "$pac" == "apt" ]]; then
+                eval ${pac_up} -y
+            else
+                eval "yes | ${pac_up}"
+            fi
         else
             eval ${pac_up}
         fi
         hdrs="linux-headers-$(uname -r)"
         if test -z "$(apt list --installed 2> /dev/null | grep $hdrs)"; then
-            readyn -p "Right linux headers not installed. Install $hdrs?" hdrs_ins
+            
+            ! test -z "$YES" && flag='--auto' || flag=''
+            
+            readyn $flag -p "Right linux headers not installed. Install $hdrs?" hdrs_ins
             if [[ "$hdrs_ins" == "y" ]]; then
-                eval ${pac_ins} $hdrs
+                eval "${pac_ins} $hdrs"
             fi
         fi
         echo "This next $(tput setaf 1)sudo$(tput sgr0) will try to update the packages for your system using the package managers it knows";
-        if ! test -z "$YES"; then 
-            sudo ${pac} upgrade -y
-        else 
-            sudo ${pac} upgrade 
+        
+        ! test -z "$YES" && flag='--auto' || flag=''
+        
+        readyn $flag -p "Upgrade system?" upgrd
+        if [[ $upgrd == 'y' ]];then
+
+            if ! test -z "$YES"; then 
+                
+                if [[ "$pac" == "apt" ]]; then
+                    eval "sudo ${pac} upgrade -y"
+                else
+                    eval "yes | sudo ${pac} upgrade"
+                fi
+                
+            else            
+                eval "sudo ${pac} upgrade" 
+            fi
         fi
+ 
         if apt --dry-run autoremove 2> /dev/null | grep -Po '^Remv \K[^ ]+'; then
-            readyn -p 'Autoremove unneccesary packages?' remove
-            if test "$remove" == 'y'; then
-                if ! test -z "$YES"; then 
-                    sudo ${pac} autoremove -y
+            
+            ! test -z "$YES" && flag='--auto' || flag=''
+            
+            readyn $flag -p 'Autoremove unneccesary packages?' remove
+            if [[ "$remove" == 'y' ]]; then
+                if ! test -z "$YES"; then
+                    if [[ "$pac" == "apt" ]]; then
+                        eval "yes | sudo ${pac} autoremove -y"
+                    else
+                        eval "yes | sudo ${pac} autoremove" 
+                    fi
                 else
                     sudo ${pac} autoremove 
                 fi
@@ -199,43 +229,46 @@ function update-system() {
             else 
                 eval ${AUR_up}
             fi
-        else
-            if ! test -z "$YES"; then 
-                eval ${pac_up} --noconfirm
-            else 
-                eval ${pac_up}
-            fi
+        fi 
+        
+        if ! test -z "$YES"; then 
+            eval "${pac_up} --noconfirm"
+        else 
+            eval "${pac_up}"
         fi
-        local hdrs="$(echo $(uname -r) | cut -d. -f-2)"
+        
+        hdrs="$(echo $(uname -r) | cut -d. -f-2)"
         hdrs="linux${hdrs//"."}-headers"
         if test -z "$(pacman -Q $hdrs 2> /dev/null)"; then
-            readyn -p "Right linux headers not installed. Install $hdrs?" hdrs_ins
+            
+            ! test -z "$YES" && flag='--auto' || flag=''
+            
+            readyn $flag -p "Right linux headers not installed. Install $hdrs?" hdrs_ins
             if [[ "$hdrs_ins" == "y" ]]; then
-                eval ${pac_ins} $hdrs
+                eval "${pac_ins} $hdrs"
             fi
         fi
        
-        local auto=''
-        ! test -z $YES && auto='--auto'
-
-        readyn $auto -p 'Clean unnessecary (orphan) packages?' cachcln
+        ! test -z "$YES" && flag='--auto' || flag=''
+        
+        readyn $flag -p 'Clean unnessecary (orphan) packages?' cachcln
         if [[ $cachcln == 'y' ]]; then
             if ! [[ -z "$AUR_clean" ]]; then
                 if ! test -z "$YES"; then 
                     if [[ "$AUR_up" == "pamac update" ]]; then
-                        pamac update --no-confirm
+                        pamac clean --no-confirm
                     else
-                        yes | eval ${AUR_up}
+                        eval "yes | ${AUR_clean}"
                     fi
                 else
-                    eval ${AUR_clean}
+                    eval "${AUR_clean}"
                 fi
+            fi
+ 
+            if ! test -z "$YES"; then 
+                eval "yes | ${pac_clean}"  
             else
-                if ! test -z "$YES"; then 
-                    yes | eval ${pac_clean}  
-                else
-                    eval ${pac_clean}
-                fi
+                eval "${pac_clean}"
             fi
         fi
         unset cachcln 
@@ -285,7 +318,7 @@ function update-system() {
     fi
 
     if ! test -z "$YES"; then
-        YES="-a" 
+        YES="--auto" 
     fi
 
     if type nix-env &> /dev/null; then
