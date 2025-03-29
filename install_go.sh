@@ -1,40 +1,18 @@
-if ! test -f checks/check_system.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
-else
-    . ./checks/check_system.sh
-fi
+#!/bin/bash
 
-if ! type update-system &> /dev/null; then
-    if ! test -f aliases/.bash_aliases.d/update-system.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)" 
+if ! test -f checks/check_all.sh; then
+    if type curl &> /dev/null; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)"
     else
-        . ./aliases/.bash_aliases.d/update-system.sh
+        continue
     fi
-fi
-
-if test -z $SYSTEM_UPDATED; then
-    readyn -Y "CYAN" -p "Update system?" updatesysm
-    if test $updatesysm == "y"; then
-        update-system                     
-    fi
-fi
-
-if ! type reade &> /dev/null; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
 else
-    . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
+    . ./checks/check_all.sh
 fi
-
-if ! test -f checks/check_envvar.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)" 
-else
-    . ./checks/check_envvar.sh
-fi
-
 
 if ! type go &> /dev/null; then 
     if test $distro == "Arch" || test $distro == "Manjaro"; then
-        eval "$pac_ins go"
+        ${pac_ins} go
     elif [ $distro_base == "Debian" ]; then
         if [[ "$arch" =~ "arm"* ]]; then
            arch="armv6l"
@@ -79,7 +57,7 @@ if ! type go &> /dev/null; then
 fi
 
 if echo $(go env) | grep -q "GOPATH=$HOME/go"; then
-    readyn -p "Source installed go outside of $HOME/go? (Set GOPATH):" "n" gopth
+    readyn -p "Source installed go outside of $HOME/go? (Set GOPATH):" gopth
     if [ "y" == "$gopth" ]; then
         reade -Q "CYAN" -i "$HOME/.local" -p "GOPATH: " -e gopth
         #echo "${CYAN}Only GOPATH is necessary. Setting GOROOT is usually for development reasons${normal}"

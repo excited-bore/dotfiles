@@ -228,7 +228,7 @@ require("lazy").setup({
       root = vim.g.pluginInstallPath,  -- share plugin folder with Plug
       spec = {
         LazyPlugSpecs,
-        { 
+       { 
             'mikesmithgh/kitty-scrollback.nvim',
             enabled = true,
             lazy = true,
@@ -239,8 +239,6 @@ require("lazy").setup({
             config = function()
               require('kitty-scrollback').setup()
             end
-        },
-
         --{
         --  "kelly-lin/ranger.nvim",
         --  config = function()
@@ -254,105 +252,265 @@ require("lazy").setup({
         --  end,
         --},
         -- https://www.playfulpython.com/configuring-neovim-as-a-python-ide/
+        },{
 
-        { "hrsh7th/nvim-cmp",
+            "hrsh7th/nvim-cmp",
+              dependencies = {
+                "hrsh7th/cmp-nvim-lsp",
+                "L3MON4D3/LuaSnip",
+                "saadparwaiz1/cmp_luasnip"
+              },
+              config = function()
+                local has_words_before = function()
+                  unpack = unpack or table.unpack
+                  local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+                  return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+                end
+
+                local cmp = require('cmp')
+                local luasnip = require('luasnip')
+
+                cmp.setup({
+                  snippet = {
+                    expand = function(args)
+                      luasnip.lsp_expand(args.body)
+                    end
+                },
+                    completion = {
+                    autocomplete = false
+                    },
+                    mapping = cmp.mapping.preset.insert ({
+                        ["<Tab>"] = cmp.mapping(function(fallback)
+                        if cmp.visible() then
+                            cmp.select_next_item()
+                        elseif luasnip.expand_or_jumpable() then
+                            luasnip.expand_or_jump()
+                        elseif has_words_before() then
+                            cmp.complete()
+                        else
+                            fallback()
+                        end
+                    end, { "i", "s" }),
+                        ["<s-Tab>"] = cmp.mapping(function(fallback)
+                        if cmp.visible() then
+                           cmp.select_prev_item()
+                        elseif luasnip.jumpable(-1) then
+                            luasnip.jump(-1)
+                        else
+                            fallback()
+                        end
+                    end, { "i", "s" }),
+                    ["<c-e>"] = cmp.mapping.abort(),
+                    ["<CR>"] = cmp.mapping.confirm({ select=true }),
+                  }),
+                  sources = {
+                    { name = "nvim_lsp" },
+                    { name = "luasnip" },
+                  }
+                })
+            end
+        },{
+            "williamboman/mason.nvim",
+            dependencies = {
+                "williamboman/mason-lspconfig.nvim",
+                "WhoIsSethDaniel/mason-tool-installer.nvim",
+            },
+            config = function()
+                require("mason").setup()
+
+                require("mason-lspconfig").setup({
+                    automatic_installation = true,
+                    ensure_installed = {
+                        "html",
+                        "cssls",
+                        "jsonls",
+                        "pyright",
+                        "bashls",
+                       -- "tailwindcss",
+                       -- "tsserver",
+                       -- "eslint",
+
+                    },
+                })
+
+                require("mason-tool-installer").setup({
+                    ensure_installed = {
+                        "prettier",
+                        "stylua", -- lua formatter
+                        "isort", -- python formatter
+                        "black", -- python formatter
+                        "pylint",
+                        -- "eslint_d",
+                        "shellcheck",
+                        "glow",
+                        "markdownlint",
+                        "shfmt",
+                        "powershell_es",
+                    },
+                })
+            end, 
+        },{
+       
+        -- https://dev.to/slydragonn/ultimate-neovim-setup-guide-lazynvim-plugin-manager-23b7
+       
+        "neovim/nvim-lspconfig",
+        
           dependencies = {
             "hrsh7th/cmp-nvim-lsp",
-            "L3MON4D3/LuaSnip",
-            "saadparwaiz1/cmp_luasnip"
-          },
-          config = function()
-            local has_words_before = function()
-              unpack = unpack or table.unpack
-              local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-              return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
-            end
-
-            local cmp = require('cmp')
-            local luasnip = require('luasnip')
-
-            cmp.setup({
-              snippet = {
-                expand = function(args)
-                  luasnip.lsp_expand(args.body)
-                end
-              },
-              completion = {
-                autocomplete = false
-              },
-              mapping = cmp.mapping.preset.insert ({
-                ["<Tab>"] = cmp.mapping(function(fallback)
-                  if cmp.visible() then
-                    cmp.select_next_item()
-                  elseif luasnip.expand_or_jumpable() then
-                    luasnip.expand_or_jump()
-                  elseif has_words_before() then
-                    cmp.complete()
-                  else
-                    fallback()
-                  end
-                end, { "i", "s" }),
-                ["<s-Tab>"] = cmp.mapping(function(fallback)
-                  if cmp.visible() then
-                    cmp.select_prev_item()
-                  elseif luasnip.jumpable(-1) then
-                    luasnip.jump(-1)
-                  else
-                    fallback()
-                  end
-                end, { "i", "s" }),
-                ["<c-e>"] = cmp.mapping.abort(),
-                ["<CR>"] = cmp.mapping.confirm({ select=true }),
-              }),
-              sources = {
-                { name = "nvim_lsp" },
-                { name = "luasnip" },
-              }
-            })
-          end
-        },
-        { "neovim/nvim-lspconfig",
-          dependencies = {
             "williamboman/mason.nvim",
             "williamboman/mason-lspconfig.nvim"
           },
           config = function()
+            local nvim_lsp = require("lspconfig")
+            local mason_lspconfig = require("mason-lspconfig")
+
+            local protocol = require("vim.lsp.protocol")
+
+            local on_attach = function(client, bufnr)
+                -- format on save
+                if client.server_capabilities.documentFormattingProvider then
+                    vim.api.nvim_create_autocmd("BufWritePre", {
+                        group = vim.api.nvim_create_augroup("Format", { clear = true }),
+                        buffer = bufnr,
+                        callback = function()
+                            vim.lsp.buf.format()
+                        end,
+                    })
+                end
+            end
+      
             local capabilities = vim.lsp.protocol.make_client_capabilities()
+            
             capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 
-            require('mason').setup()
             local mason_lspconfig = require 'mason-lspconfig'
-            mason_lspconfig.setup {
-                    ensure_installed = { "pyright" }
-                }
-                require("lspconfig").pyright.setup {
-                    capabilities = capabilities,
-                }
-              end
-            },
-        { "nvim-treesitter/nvim-treesitter", version = false,
-          build = function()
-            require("nvim-treesitter.install").update({ with_sync = true })
-          end,
-          config = function()
-            require("nvim-treesitter.configs").setup({
-              ensure_installed = { "c", "lua", "vim", "vimdoc", "query", "python", "javascript" },
-              auto_install = false,
-              highlight = { enable = true, additional_vim_regex_highlighting = false },
-              incremental_selection = {
-                enable = true,
-                keymaps = {
-                  init_selection = "<C-n>",
-                  node_incremental = "<C-n>",
-                  scope_incremental = "<C-s>",
-                  node_decremental = "<C-m>",
-                }
-              }
+            mason_lspconfig.setup_handlers( {
+                function(server)
+                    nvim_lsp[server].setup({
+                        capabilities = capabilities,
+                   })
+                end,
+                ["html"] = function()
+                    nvim_lsp["html"].setup({
+                        on_attach = on_attach,
+                        capabilities = capabilities,
+                    })
+                end,
+                ["cssls"] = function()
+                    nvim_lsp["cssls"].setup({
+                        on_attach = on_attach,
+                        capabilities = capabilities,
+                    })
+                end,
+                ["jsonls"] = function()
+                    nvim_lsp["jsonls"].setup({
+                        on_attach = on_attach,
+                        capabilities = capabilities,
+                    })
+                end,
+                ["bashls"] = function()
+                    nvim_lsp["bashls"].setup({
+                        on_attach = on_attach,
+                        capabilities = capabilities,
+                    })
+                end,
+                ["pyright"] = function()
+                    nvim_lsp["pyright"].setup({
+                        on_attach = on_attach,
+                        capabilities = capabilities,
+                    })
+                end,
             })
-          end
+            end
+        },{
+            
+            "nvim-treesitter/nvim-treesitter", version = false,
+            
+            build = function()
+                require("nvim-treesitter.install").update({ with_sync = true })
+            end,
+            config = function()
+                require("nvim-treesitter.configs").setup({
+                    ensure_installed = { "c", "lua", "vim", "vimdoc", "query", "python", "javascript", "powershell", "bash" },
+                    auto_install = false,
+                    highlight = { enable = true, additional_vim_regex_highlighting = false },
+                    incremental_selection = {
+                        enable = true,
+                        keymaps = {
+                            init_selection = "<C-n>",
+                            node_incremental = "<C-n>",
+                            scope_incremental = "<C-s>",
+                            node_decremental = "<C-m>",
+                        }
+                    }
+                })
+           end
+        },{
+            "echasnovski/mini.icons",
+            
+            config = function()
+                require("mini.icons").setup() 
+            end
+        },{
+        
+        "echasnovski/mini.files", 
+         
+        config = function()
+            require("mini.files").setup {
+            mappings = {
+                close       = '<C-Q>',
+                go_in       = '<C-Right>',
+                go_in_plus  = '<C-Up>',
+                go_out      = '<C-Left>',
+                go_out_plus = '<C-Down>',
+                mark_goto   = "'",
+                mark_set    = 'm',
+                reset       = '<BS>',
+                reveal_cwd  = '@',
+                show_help   = 'g?',
+                synchronize = '<C-S>',
+                trim_left   = '<',
+                trim_right  = '>'
+                }
+            }
+            end
         }
-    } 
+    }
 })
+
+
+
+local MiniFiles = require('mini.files')
+vim.api.nvim_create_autocmd('user', {
+  pattern = 'minifilesbuffercreate',
+  callback = function(args)
+    vim.keymap.set('i', '<c-q>', function() MiniFiles.close() end, { buffer = args.data.buf_id })
+    vim.keymap.set('i', '<c-right>', function() MiniFiles.go_in() end, { buffer = args.data.buf_id })
+    vim.keymap.set('i', '<c-up>', function() MiniFiles.go_in_plus() end, { buffer = args.data.buf_id })
+    vim.keymap.set('i', '<c-left>', function() MiniFiles.go_out() end, { buffer = args.data.buf_id })
+    vim.keymap.set('i', '<c-down>', function() MiniFiles.go_out_plus() end, { buffer = args.data.buf_id })
+    vim.keymap.set('i', '<c-r>', function() MiniFiles.reset() end, { buffer = args.data.buf_id })
+    vim.keymap.set('i', '<c-s>', function() MiniFiles.synchronize() end, { buffer = args.data.buf_id })
+    vim.keymap.set('n', '<a-e>', function() MiniFiles.open() end, {  buffer = args.data.buf_id })
+    vim.keymap.set('i', '<a-e>', function() MiniFiles.open() end, {  buffer = args.data.buf_id })
+    end,
+})
+
+-- n = {
+--     ["-"] = { function()
+--         MiniFiles.open(vim.api.nvim_buf_get_name(0))
+--     end, "Open MiniFiles"}
+-- }
+
+
+
+-- files.setup({
+--   mappings = {
+--     go_out = '-',
+--   },
+-- })
+-- vim.keymap.set('n', '-', files.open)
+-- vim.api.nvim_echo({{'first chunk and ', 'None'}, {'second chunk to echo', 'None'}}, false, {})
 
 -- local ranger_nvim = require("ranger-nvim")
 -- ranger_nvim.setup({
@@ -383,7 +541,7 @@ require("lazy").setup({
      }
  })
  
- vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
+-- vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
 
 
 require("telescope")
@@ -393,7 +551,7 @@ require("telescope")
 require('telescope').load_extension('media_files')
 -- require('telescope').load_extension("whaler")
 
-require('telescope').setup {
+require('telescope').setup({
     layout_strategy='vertical',
     layout_config={width=0.5},
     pickers = {
@@ -404,12 +562,12 @@ require('telescope').setup {
         hidden = true
       }
     }
-}
+})
 
-  vim.g.loaded_netrwPlugin = 1
- vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+vim.g.loaded_netrw = 1
 
-require("telescope").setup {
+require("telescope").setup({
   extensions = {
     file_browser = {
       theme = "ivy",
@@ -425,12 +583,24 @@ require("telescope").setup {
       },
     },
   },
-}
+}) 
 -- To get telescope-file-browser loaded and working with telescope,
 -- you need to call load_extension, somewhere after setup function:
 require("telescope").load_extension "file_browser"
 
-require('mini.files').setup()
+
+require('glow').setup()
+
+
+require("toggleterm").setup()
+
+-- save in minifiles 
+-- https://github.com/echasnovski/mini.nvim/discussions/1532
+
+
+
+
+
 
 -- local find_files_hijack_netrw = vim.api.nvim_create_augroup("find_files_hijack_netrw", { clear = true })
 -- -- clear FileExplorer appropriately to prevent netrw from launching on folders
@@ -467,6 +637,7 @@ require('mini.files').setup()
 
 -- telescope.setup {
 --   extensions = {
+--        }
 --     live_grep_args = {
 --       auto_quoting = true, -- enable/disable auto-quoting
 --       -- define mappings, e.g.

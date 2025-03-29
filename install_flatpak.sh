@@ -1,46 +1,33 @@
-if ! test -f checks/check_system.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
+#!/usr/bin/env bash
+
+if ! test -f checks/check_all.sh; then
+    if type curl &> /dev/null; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh) 
+    else 
+        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n" 
+        return 1 || exit 1 
+    fi
 else
-    . ./checks/check_system.sh
+    . ./checks/check_all.sh
 fi
 
 if ! test -f checks/check_envvar_aliases_completions_keybinds.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar_aliases_completions_keybinds.sh)" 
+     source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar_aliases_completions_keybinds.sh) 
 else
     . ./checks/check_envvar_aliases_completions_keybinds.sh
 fi
 
-if ! type reade &> /dev/null; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
-else
-    . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
-fi
-
-if ! type update-system &> /dev/null; then
-    if ! test -f aliases/.bash_aliases.d/update-system.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)" 
-    else
-        . ./aliases/.bash_aliases.d/update-system.sh
-    fi
-fi
-
-if test -z $SYSTEM_UPDATED; then
-    readyn -Y "CYAN" -p "Update system?" updatesysm
-    if test $updatesysm == "y"; then
-        update-system                     
-    fi
-fi
 
 if ! type flatpak &> /dev/null; then
-    if test "$distro" == "Manjaro"; then
+    if [[ "$distro" == "Manjaro" ]]; then
         pamac install flatpak libpamac-flatpak-plugin python
-    elif test "$distro_base" == "Arch"; then
-        eval "$pac_ins flatpak python"
-    elif test "$distro_base" == "Debian"; then
+    elif [[ "$distro_base" == "Arch" ]]; then
+        eval "${pac_ins} flatpak python"
+    elif [[ "$distro_base" == "Debian" ]]; then
         if [[ "$XDG_CURRENT_DESKTOP" =~ "GNOME" ]]; then
-            eval "$pac_ins gnome-software-plugin-flatpak gir1.2-xdpgtk* gir1.2-flatpak* python3 "
+            eval "${pac_ins} gnome-software-plugin-flatpak gir1.2-xdpgtk* gir1.2-flatpak* python3 "
         else 
-            eval "$pac_ins flatpak python3 gir1.2-xdpgtk* gir1.2-flatpak*"
+            eval "${pac_ins} flatpak python3 gir1.2-xdpgtk* gir1.2-flatpak*"
         fi
         flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
     fi
@@ -48,7 +35,7 @@ fi
 
 if type flatpak &> /dev/null; then
     readyn -p "Add flatpak dirs to path? (XDG_DATA_DIRS)" flpkvrs 
-    if [ "$flpkvrs" == "y" ]; then
+    if [[ "$flpkvrs" == "y" ]]; then
         if grep -q "FLATPAK" $ENVVAR; then
             sed -i 's|.export PATH=$PATH:$HOME/.local/bin/flatpak|export PATH=$PATH:$HOME/.local/bin/flatpak|g' $ENVVAR
             sed -i 's|.export FLATPAK=|export FLATPAK=$HOME/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share|'  $ENVVAR 
@@ -66,7 +53,7 @@ unset flpkvrs
 
 if ! test -f ~/.bash_aliases.d/flatpacks.sh; then
     readyn -p "Install flatpackwrapper? (For one-word flatpak aliases in terminal)" pam
-    if [ -z $pam ] || [ "y" == $pam ]; then
+    if test -z $pam || [[ "y" == $pam ]]; then
         if ! test -f install_bashalias_completions.sh; then
              eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bashalias_completions.sh)" 
         else
@@ -81,7 +68,7 @@ if ! test -f ~/.bash_aliases.d/flatpacks.sh; then
             file=$dir1/flatpacks.sh
         fi
          
-        if [ ! -f ~/.bash_aliases.d/flatpacks.sh ]; then
+        if ! test -f ~/.bash_aliases.d/flatpacks.sh; then
             cp -bfv $file ~/.bash_aliases.d/ 
             source ~/.bash_aliases.d/flatpacks.sh 
         fi
@@ -91,7 +78,7 @@ unset pam file
 
 if ! echo $(flatpak list --columns=name) | grep -q "Flatseal"; then
     readyn -p "Install GUI for configuring flatpak permissions - flatseal?" fltseal
-    if [ -z $fltseal ] || [ "y" == $fltseal ]; then
+    if test -z $fltseal || [[ "y" == $fltseal ]]; then
         flatpak install flatseal
     fi
 fi
@@ -103,7 +90,7 @@ rules_d=$(test -d /etc/polkit-1/rules.d/ && ! test -f /etc/polkit-1/rules.d/90-n
 
 if $localauth || $localauth_conf || $rules_d; then
     readyn -p "Run installer for no password with pam?" pam
-    if [ "y" == $pam ]; then
+    if [[ "y" == $pam ]]; then
         if ! test -f install_polkit_wheel.sh; then
              eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_polkit_wheel.sh)" 
         else

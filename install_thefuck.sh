@@ -1,55 +1,37 @@
-if ! test -f checks/check_system.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
-else
-    . ./checks/check_system.sh
-fi
+#!/usr/bin/env bash
 
-if ! type reade &> /dev/null; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
-else
-    . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
-fi 
-
-if ! test -f checks/check_envvar.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)" 
-else
-    . ./checks/check_envvar.sh
-fi
-
-if ! type update-system &> /dev/null; then
-    if ! test -f aliases/.bash_aliases.d/update-system.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)" 
+if ! test -f checks/check_all.sh; then
+    if type curl &>/dev/null; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        . ./aliases/.bash_aliases.d/update-system.sh
+        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
+        return 1 || exit 1
     fi
+else
+    . ./checks/check_all.sh
 fi
 
-if test -z $SYSTEM_UPDATED; then
-    readyn -Y "CYAN" -p "Update system?" updatesysm
-    if test $updatesysm == "y"; then
-        update-system                     
-    fi
-fi 
+get-script-dir SCRIPT_DIR
 
-if ! type thefuck &> /dev/null; then
-    if test $machine == 'Mac' && type brew &> /dev/null; then
+if ! type thefuck &>/dev/null; then
+    if [[ $machine == 'Mac' ]] && type brew &>/dev/null; then
         brew install thefuck
-    elif test $distro == 'Arch'; then
-        sudo pacman -S thefuck 
-    elif type pkg &> /dev/null; then
+    elif [[ $distro_base == 'Arch' ]]; then
+        sudo pacman -S thefuck
+    elif type pkg &>/dev/null; then
         pkg install thefuck
-    elif type crew &> /dev/null; then
+    elif type crew &>/dev/null; then
         crew install thefuck
     else
-        if ! type pipx &> /dev/null; then
+        if ! type pipx &>/dev/null; then
             if ! test -f install_pipx.sh; then
                 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)"
             else
-                ./install_pipx.sh
+                . ./install_pipx.sh
             fi
-            if test -f $HOME/.local/bin/pipx && ! type pipx &> /dev/null; then
+            if test -f $HOME/.local/bin/pipx && ! type pipx &>/dev/null; then
                 $HOME/.local/bin/pipx install --upgrade thefuck
-            elif type pipx &> /dev/null; then
+            elif type pipx &>/dev/null; then
                 pipx install --upgrade thefuck
             fi
         fi
@@ -57,15 +39,15 @@ if ! type thefuck &> /dev/null; then
 fi
 
 if ! grep -q 'eval $(thefuck --alias' ~/.bashrc; then
-    reade -Q 'GREEN' -i 'f' -p "Alias for name 'thefuck'? [Empty: 'f' - 'thefuck' cant be used]: " 'fuck fuk hell heck hek egh huhn huh nono again agin asscreamIscream' ansr
-    if test $ansr == 'thefuck'; then
-        printf "'thefuck' cant be aliased to 'thefuck'\n" 
+    reade -Q 'GREEN' -i 'f fuk oops ops fuck hell heck hek egh huhn huh nono again agin asscreamIscream' -p "Alias for name 'thefuck'? [Empty: 'f' - 'thefuck' cant be used]: " ansr
+    if [[ $ansr == 'thefuck' ]]; then
+        printf "'thefuck' cant be aliased to 'thefuck'\n"
         printf "Using 'f' as alias\n"
         ansr='f'
     fi
-    
+
     if ! test -z $ansr; then
-        printf "eval \$(thefuck --alias $ansr)\n" >> ~/.bashrc  
+        printf "eval \$(thefuck --alias $ansr)\n" >>~/.bashrc
     fi
-    unset ansr 
+    unset ansr
 fi

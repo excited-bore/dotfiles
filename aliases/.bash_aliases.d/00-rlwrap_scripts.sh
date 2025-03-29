@@ -1,5 +1,7 @@
 #!/bin/bash
 
+[[ $0 != $BASH_SOURCE ]] && SCRIPT_DIR="$( dirname "${BASH_SOURCE[0]}" )" || SCRIPT_DIR="$( cd "$( dirname "$-1" )" && pwd )"
+
 # https://stackoverflow.com/questions/5412761/using-colors-with-printf
 # Execute (during printf) for colored prompt
 # printf  "${blue}This text is blue${white}\n"
@@ -103,24 +105,30 @@ italic=$(tput it)
 # 'man rlwrap' to see all unimplemented options
 
 if ! type reade &> /dev/null ; then
-    if test -f rlwrap-scripts/reade; then
-        . ./rlwrap-scripts/reade 1> /dev/null
+    if test -f $SCRIPT_DIR/../rlwrap-scripts/reade; then
+        . $SCRIPT_DIR/../rlwrap-scripts/reade 1> /dev/null
+    elif test -f $SCRIPT_DIR/01-reade.sh; then
+	. $SCRIPT_DIR/01-reade.sh 1> /dev/null
     else
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade)" &> /dev/null 
     fi
 fi
 
 if ! type readyn &> /dev/null; then
-    if test -f rlwrap-scripts/readyn; then
-        . ./rlwrap-scripts/readyn 1> /dev/null
+    if test -f $SCRIPT_DIR/../rlwrap-scripts/readyn; then
+        . $SCRIPT_DIR/../rlwrap-scripts/readyn 1> /dev/null
+    elif test -f $SCRIPT_DIR/02-readyn.sh; then
+        . $SCRIPT_DIR/02-readyn.sh 1> /dev/null
     else
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/readyn)" &> /dev/null 
     fi
 fi
 
 if ! type yes-no-edit &> /dev/null; then
-    if test -f rlwrap-scripts/yes-no-edit; then
-        . ./rlwrap-scripts/yes-no-edit 1> /dev/null
+    if test -f $SCRIPT_DIR/../rlwrap-scripts/yes-no-edit; then
+        . $SCRIPT_DIR/../rlwrap-scripts/yes-no-edit 1> /dev/null
+    elif test -f $SCRIPT_DIR/03-yes-no-edit.sh; then
+        . $SCRIPT_DIR/03-yes-no-edit.sh 1> /dev/null
     else
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/yes-no-edit)" &> /dev/null 
     fi
