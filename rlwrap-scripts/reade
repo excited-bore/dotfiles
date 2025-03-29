@@ -1,7 +1,9 @@
 #!/bin/bash
 
 function reade() {
-    test -n "$ZSH_VERSION" && setopt err_return extended_glob local_options local_traps
+    test -n "$ZSH_VERSION" && setopt err_return extended_glob local_options local_traps &&
+        HISTSIZE=1000 &&
+        SAVEHIST=1000
 
     local red=$(tput setaf 1)
     local red1=$(tput setaf 9)
@@ -167,10 +169,9 @@ function reade() {
         local color=""
         local args=''
         local tmpf=''
-        local tmp2
+        local oldhist=''
         local eflag=0
         local pre=''
-        export OGHISTFILE=$HISTFILE
         while getopts 'sS:b:e:i:p:Q:' flag; do
             case "${flag}" in
             b) ;;
@@ -203,22 +204,37 @@ function reade() {
                     tmpf=$(mktemp)
 
                     echo "$args" >"$tmpf"
+                  
+                    test -e $HISTFILE &&
+                        oldhist=$HISTFILE
+
+                    ! test -e $HISTFILE && test -n $BASH_VERSION && test -f ~/.bash_history && test -n "$(cat ~/.bash_history)" &&
+                        oldhist=~/.bash_history 
+
+                    ! test -e $HISTFILE && test -n $ZSH_VERSION && test -f ~/.zhistory && test -n "$(cat ~/.zhistory)" &&
+                        oldhist=~/.zhistory 
+                     
+                    if ! test -e "$HISTFILE"; then
+                        oldhist=$(mktemp)
+                        echo $(history | awk '{$1=""; print; }') > $oldhist
+                    fi
                 
 		    if test -n "$BASH_VERSION"; then
                         while IFS='' read -r LINE || [ -n "${LINE}" ]; do
                             history -s "${LINE}"
                         done <"$tmpf"
-                        export HISTFILE=$tmpf
+                        history -c
+                        history -r $tmpf
                     fi
                     
                     if test -n "$ZSH_VERSION"; then
                         echo "$arg" >>"$tmpf"
+
                         while IFS='' read -r LINE || [ -n "${LINE}" ]; do
                             print -S "${LINE}"
-                        done <"$tmpf"
-                        fc -ap $tmpf
+                        done < $tmpf
+                        fc -p "$tmpf"
                     fi
-                    
                     
                     # https://unix.stackexchange.com/questions/265957/zsh-histfile-still-read-from-zsh-history
                 fi
@@ -275,27 +291,41 @@ function reade() {
 
         shift $((OPTIND - 1))
         
-        oldtrps="$(trap)" 
-
-        test -n "$BASH_VERSION" && trap "export HISTFILE=$OGHISTFILE; history -c; history -r; return 1" SIGINT SIGQUIT
-        test -n "$ZSH_VERSION" && trap "fc -P; return $((128+$1))" SIGINT SIGQUIT
-            
-        eval "${readstr}"
+        local oldtrps="$(trap)" 
       
-        export HISTFILE=$OGHISTFILE
+        # https://stackoverflow.com/questions/14702148/how-to-fire-a-command-when-a-shell-script-is-interrupted 
+
+        test -n "$BASH_VERSION" &&
+        trap "history -c; history -r $oldhist; command rm -f $tmpf; eval \"$oldtrps\"; return 1" SIGINT 
+        #exitfn() {
+        #    trap SIGINT
+        #    history -c
+        #    history -r $oldhist
+        #    command rm -f $tmpf 
+        #    return
+        #} &&
+        #trap "exitfn" SIGINT 
+        
+        test -n "$ZSH_VERSION" && 
+        TRAPINT() {
+            fc -R $oldhist 
+            command rm -f $tmpf
+            return $((128+$1)) 
+        }
+
+        eval "${readstr}"
 
         test -n "$BASH_VERSION" && 
             history -c && 
-            history -r 
+            history -r $oldhist
+            trap SIGINT
      
         test -n "$ZSH_VERSION" && 
-            fc -P
-
+            fc -R $oldhist
+        
         eval "$oldtrps"
         
-        if [ -e "$tmpf" ]; then
-            command rm -f $tmpf
-        fi
+        [ -e "$tmpf" ] && command rm -f $tmpf
         
         if ! test -z "$pre" && test -z "$vvvvvvvvvv" || [[ "$vvvvvvvvvv" == "" ]]; then
             vvvvvvvvvv="$pre"
@@ -316,13 +346,6 @@ function reade() {
         fi
 
         local breaklines=''
-
-        #local args="${@:$#-1:1}"
-
-        ## Reverse wordlist order (last -> first) because ???
-        #args=$(echo $args | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }')
-        #args=$(echo $args | tr ' ' '\n')
-
         local tmpf=''
         local frst=''
         local args=''

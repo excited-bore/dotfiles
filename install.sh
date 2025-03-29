@@ -99,7 +99,7 @@ if test -z "$(eval "$pac_ls_ins zip 2> /dev/null")" || test -z "$(eval "$pac_ls_
     unset nzp_ins
 fi
 
-if [[ "$X11_WAY" == 'x11' ]] && ! type xclip &>/dev/null || ! type xsel &>/dev/null; then
+if [[ "$X11_WAY" == 'x11' ]] && ( ! type xclip &>/dev/null || ! type xsel &>/dev/null ); then
     printf "${CYAN}xclip${normal} and/or ${CYAN}xsel${normal} are not installed (clipboard tools for X11 based systems)\n"
     readyn -p "Install xclip and xsel? " nzp_ins
     if [[ $nzp_ins == 'y' ]]; then

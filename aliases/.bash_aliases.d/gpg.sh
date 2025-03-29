@@ -1,6 +1,6 @@
 ##### GPG ####
 
-if ! type reade &> /dev/null ; then
+if ! type reade &> /dev/null && test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh; then
     source ~/.bash_aliases.d/00-rlwrap_scripts.sh
 fi
 
