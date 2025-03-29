@@ -112,7 +112,7 @@ if [[ $distro_base == 'Debian' ]]; then
     if test -z "$(${pac_ls_ins} manpages-posix 2>/dev/null)"; then
         printf "${CYAN}manpages-posix${normal} is not installed (Manpages for posix-compliant (f.ex. bash) commands (f.ex. alias, test, type, etc...))\n"
         readyn -p "Install manpages-posix? " posixman_ins
-        if test $posixman_ins == 'y'; then
+        if [[ $posixman_ins == 'y' ]]; then
             eval "${pac_ins}" manpages-posix
         fi
         unset posixman_ins

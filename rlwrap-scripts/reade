@@ -1,8 +1,7 @@
 #!/bin/bash
 
 function reade() {
-    ! test -z $ZSH_VERSION &&
-        setopt err_return extended_glob local_options local_traps
+    test -n "$ZSH_VERSION" && setopt err_return extended_glob local_options local_traps
 
     local red=$(tput setaf 1)
     local red1=$(tput setaf 9)
@@ -150,29 +149,36 @@ function reade() {
     fi
 
     if ! type rlwrap &>/dev/null || [[ "$fcomp" == 'y' ]] || [[ "$rlwrap_installable" == 'n' ]]; then
-        if ! test -z $ZSH_VERSION; then
-            if [[ "$noecho" == 'y' ]]; then
-                local readstr="read vvvvvvvvvv"
-            else
-                local readstr="vvvvvvvvvv=''; vared vvvvvvvvvv"
-            fi
-        else
-            local readstr="read -r vvvvvvvvvv"
+      
+        local readstr='' 
+        
+        if test -n "$BASH_VERSION"; then
+            readstr="read -r vvvvvvvvvv"
         fi
 
+        if test -n "$ZSH_VERSION"; then
+            if [[ "$noecho" == 'y' ]]; then
+                readstr="read vvvvvvvvvv"
+            elif [[ "$noecho" == 'n' ]]; then
+                readstr="vvvvvvvvvv=''; vared vvvvvvvvvv"
+            fi
+        fi
+        
         local color=""
         local args=''
         local tmpf=''
+        local tmp2
         local eflag=0
         local pre=''
-        export OLD_HISTFILE=$HISTFILE
+        export OGHISTFILE=$HISTFILE
         while getopts 'sS:b:e:i:p:Q:' flag; do
             case "${flag}" in
             b) ;;
             e)
-                if (test -z $ZSH_VERSION || [[ $noecho == 'y' ]]); then
+                if test -n "$BASH_VERSION" || [[ $noecho == 'y' ]]; then
                     readstr=$(echo "$readstr" | sed 's|read |read -e |g')
-                else
+                fi
+                if test -n "$ZSH_VERSION"; then
                     readstr=$(echo "$readstr" | sed 's|vvvvvvvvvv=.*; vared|vvvvvvvvvv="\$(pwd)"; vared|g')
                 fi
                 ;;
@@ -181,9 +187,11 @@ function reade() {
                 arg="$(echo ${OPTARG} | awk '{print $1;}')"
                 args="$(echo ${OPTARG} | sed "s/\<$arg\> //g")"
 
-                if test -z $ZSH_VERSION; then
+                if test -n "$BASH_VERSION"; then
                     readstr=$(echo "$readstr" | sed 's|read |read -e -i "'"$arg"'" |g')
-                elif [[ $noecho == 'n' ]]; then
+                fi 
+                
+                if test -n "$ZSH_VERSION" && [[ $noecho == 'n' ]]; then
                     readstr=$(echo "$readstr" | sed 's|vvvvvvvvvv=.*; vared|vvvvvvvvvv=""; vared -h|g')
                 fi
                 pre="$arg"
@@ -192,24 +200,26 @@ function reade() {
                     args=$(echo "$args" | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }')
                     args=$(echo "$args" | tr ' ' '\n')
 
-                    #array=(${(f)args})
                     tmpf=$(mktemp)
 
                     echo "$args" >"$tmpf"
-
-                    if ! test -z "$ZSH_VERSION"; then
-
+                
+		    if test -n "$BASH_VERSION"; then
+                        while IFS='' read -r LINE || [ -n "${LINE}" ]; do
+                            history -s "${LINE}"
+                        done <"$tmpf"
+                        export HISTFILE=$tmpf
+                    fi
+                    
+                    if test -n "$ZSH_VERSION"; then
                         echo "$arg" >>"$tmpf"
-                        history -p
-
                         while IFS='' read -r LINE || [ -n "${LINE}" ]; do
                             print -S "${LINE}"
                         done <"$tmpf"
-                    else
-                        #if test -z "$ZSH_VERSION"; then
-                        history -c
-                        history -r "$tmpf"
+                        fc -ap $tmpf
                     fi
+                    
+                    
                     # https://unix.stackexchange.com/questions/265957/zsh-histfile-still-read-from-zsh-history
                 fi
                 ;;
@@ -237,18 +247,22 @@ function reade() {
                 fi
                 ;;
             p)
-                if test -z $ZSH_VERSION; then
+                if test -n "$BASH_VERSION"; then
                     test -z "$color" &&
                         readstr=$(echo "$readstr" | sed 's|read |printf "'"${OPTARG}"'\n"; read |g') ||
                         readstr=$(echo "$readstr" | sed 's|read |printf "'"${color}${OPTARG}${normal}"'\n"; read |g')
-                elif [[ $noecho == 'y' ]]; then
-                    test -z "$color" &&
-                        readstr=$(echo "$readstr" | sed 's|vvvvvvvvvv|"?'"${OPTARG}"'" vvvvvvvvvv|g') ||
-                        readstr=$(echo "$readstr" | sed 's|vvvvvvvvvv|"?'"${color}${OPTARG}${normal}"'" vvvvvvvvvv|g')
-                elif test -z "$color"; then
-                    readstr=$(echo "$readstr" | sed 's|vared |vared -p "'"${OPTARG}"'" |g')
-                else
-                    readstr=$(echo "$readstr" | sed 's|vared |vared -p "'"${color}${OPTARG}${normal}"'" |g')
+                fi 
+                
+                if test -n "$ZSH_VERSION"; then
+                    if [[ $noecho == 'y' ]]; then
+                        test -z "$color" &&
+                            readstr=$(echo "$readstr" | sed 's|vvvvvvvvvv|"?'"${OPTARG}"'" vvvvvvvvvv|g') ||
+                            readstr=$(echo "$readstr" | sed 's|vvvvvvvvvv|"?'"${color}${OPTARG}${normal}"'" vvvvvvvvvv|g')
+                    elif test -n "$color"; then
+                        readstr=$(echo "$readstr" | sed 's|vared |vared -p "'"${color}${OPTARG}${normal}"'" |g')
+                    else
+                        readstr=$(echo "$readstr" | sed 's|vared |vared -p "'"${optarg}"'" |g')
+                    fi
                 fi
                 ;;
             s)
@@ -260,30 +274,29 @@ function reade() {
         done
 
         shift $((OPTIND - 1))
+        
+        oldtrps="$(trap)" 
 
-        if ! test -z "$ZSH_VERSION"; then
-            trap 'export HISTFILE=$OLD_HISTFILE; fc -R; return $((128+$1))' SIGINT SIGQUIT
-
-        else
-            trap 'history -c; export HISTFILE=$OLD_HISTFILE; history -r; return 1' SIGINT SIGQUIT RETURN
-        fi
-
+        test -n "$BASH_VERSION" && trap "export HISTFILE=$OGHISTFILE; history -c; history -r; return 1" SIGINT SIGQUIT
+        test -n "$ZSH_VERSION" && trap "fc -P; return $((128+$1))" SIGINT SIGQUIT
+            
         eval "${readstr}"
+      
+        export HISTFILE=$OGHISTFILE
 
-        if ! [[ -z "$tmpf" ]]; then
-            if ! test -z "$ZSH_VERSION"; then
-                fc -P
-                fc -R
-            else
-                history -c
-                export HISTFILE=$OLD_HISTFILE
-                history -r
-            fi
+        test -n "$BASH_VERSION" && 
+            history -c && 
+            history -r 
+     
+        test -n "$ZSH_VERSION" && 
+            fc -P
+
+        eval "$oldtrps"
+        
+        if [ -e "$tmpf" ]; then
             command rm -f $tmpf
         fi
-
-        trap - SIGINT SIGQUIT
-
+        
         if ! test -z "$pre" && test -z "$vvvvvvvvvv" || [[ "$vvvvvvvvvv" == "" ]]; then
             vvvvvvvvvv="$pre"
         fi

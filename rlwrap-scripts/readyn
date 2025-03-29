@@ -1,8 +1,13 @@
 #!/bin/bash
 
-if test -z $ZSH_VERSION; then
-    [[ $0 != $BASH_SOURCE ]] && SCRIPT_DIR="$( dirname "${BASH_SOURCE[0]}" )" || SCRIPT_DIR="$( cd "$( dirname "$-1" )" && pwd )"
-else
+if test -n "$BASH_VERSION"; then
+    echo bl
+    SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+    echo bl
+    #SCRIPT_DIR=$(dirname "$0")
+fi
+
+if test -n "$ZSH_VERSION"; then
     SCRIPT_DIR="${0:A:h}"
 fi
 

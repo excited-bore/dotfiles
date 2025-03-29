@@ -12,10 +12,10 @@ else
     . checks/check_system.sh
 fi
 
-if ! type list-ppa &> /dev/null; then
+if ! type list-ppa &> /dev/null || [[ $(pipx list 2> /dev/null | grep list-ppa | awk '{print $4}') =~ 'C:' ]] then
     printf "${CYAN}list-ppa${normal} is not installed (python cmd tool for listing ppas from 'launchpad.net'\n"
     reade -Q 'GREEN' -i 'y' -p "Install list-ppa? [Y/n]: " 'n' ppa_ins
-    if [[ $ppa_ins == 'y'; ]] then
+    if [[ $ppa_ins == 'y' ]]; then
         if ! type pipx &> /dev/null; then
             if ! test -f install_pipx.sh; then
                 eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)" 
@@ -33,7 +33,7 @@ if ! type list-ppa &> /dev/null; then
         if ! test -f ~/.config/ppas; then 
             readyn -p "Run list-ppa (generates file containin ppas that have a release file for your version in ~/.config/ppas - !! Can take a while - can be rerun)?" ppa_ins
             if [[ $ppa_ins == 'y' ]]; then
-                if ! type list-ppa &> /dev/null && [[ $(pipx list 2> /dev/null | grep venvs | awk '{print $4}') =~ 'C:' ]]; then
+                if ! type list-ppa &> /dev/null || [[ $(pipx list 2> /dev/null | grep list-ppa | awk '{print $4}') =~ 'C:' ]]; then
                     lspp="$(pipx list 2> /dev/null | grep venvs | awk '{print $4}')\list-ppa"
 		    #lspp="$(pipx list 2> /dev/null | grep venvs | awk '{print $4}' | dos2unix)\list-ppa"
                     $lspp --file ~/.config/ppas
