@@ -31,24 +31,25 @@ environment-variables_r() {
     if sudo test -f /root/.bashrc; then
         shell_rcs="$shell_rcs${GREEN}\t- /root/.bashrc\n"
     fi
-    prmpt="File(s):\n$shell_profiles${normal} get sourced at login\nFile ${MAGENTA}.profile${RED} won't get sourced at login${normal} if ${CYAN}.*shelltype*_profile${normal} exists\nFile(s):\n${CYAN}$shell_rcs${normal} get sourced when starting a new *shelltype* shell\n"
+    prmpt="File(s):\n$shell_profiles${normal} get sourced at login\nFile ${MAGENTA}.profile${RED} won't get sourced at login${normal} if ${CYAN}.*shelltype*_profile (f.ex. .bash_profile)${normal} exists\nFile(s):\n${CYAN}$shell_rcs${normal} get sourced when starting a new *shelltype* shell\n"
     printf "$prmpt"
 
     if ! sudo grep -q "~/.environment.env" /root/.profile; then
         readyn -p "Link .environment.env in ${YELLOW}/root/.profile${GREEN}?" prof
         if [[ $prof == 'y' ]]; then
-            printf "\n[ -f ~/.environment.env ] && source ~/.environment.env\n\n" | sudo tee -a /root/.profile
+            printf "\n[ -f ~/.environment.env ] && source ~/.environment.env\n\n" | sudo tee -a /root/.profile 1> /dev/null
         fi
     fi
     if sudo test -f /root/.bash_profile; then
         printf "\n${GREEN}Since file ${cyan}/root/.bash_profile${green} exists, ${cyan}bash${green} won't source ${magenta}/root/.profile${green} natively at login.\n${normal}"
         reade -Q 'GREEN' -i 'prof path none' -p "Source $HOME/.profile in $HOME/.bash_profile or source $HOME/.environment.env directly in $HOME/.bash_profile? [Prof/path/none]: " bash_prof
-        if [[ $bash_prof =~ 'prof' ]]; then
+	prmpt="- Src = Just source $HOME/.environment.env in $HOME/.profile and $HOME/.bash_profile\n - del-prof = Copy everything from $HOME/.profile and also source $HOME/.environment in $HOME/.bash_profile and the delete $HOME/.profile?\n - del-shprof = Copy everything from $HOME/.bash_profile and also source $HOME/.environment.env in $HOME/.profile, then delete $HOME/.bash_profile?\n - link-prof = Source $HOME/.environment.env in $HOME/.profile, copy everything from $HOME/.bash_profile, then delete it but also add a symlink from $HOME/.profile to $HOME/.bash_profile\n"
+	if [[ $bash_prof == 'prof' ]]; then
             if sudo grep -q '.bashrc' /root/.bash_profile && ! sudo grep -q "~/.profile" /root/.bash_profile; then
                 sudo sed -i 's|\(\[ -f ~/.bashrc \] && source ~/.bashrc\)|\[ -f \~/.profile \] \&\& source \~/.profile\n\n\1\n|g' /root/.bash_profile
                 sudo sed -i 's|\(\[\[ -f ~/.bashrc \]\] && . ~/.bashrc\)|\[ -f \~/.profile \] \&\& source \~/.profile\n\n\1\n|g' /root/.bash_profile
             else
-                printf "\n[ -f ~/.environment.env ] && source ~/.profile\n\n" | sudo tee -a /root/.bash_profile
+                printf "\n[ -f ~/.profile ] && source ~/.profile\n\n" | sudo tee -a /root/.bash_profile 1> /dev/null
             fi
         elif [[ "$bash_prof" == 'path' ]]; then
             if sudo grep -q '.bashrc' /root/.bash_profile && ! sudo grep -q "~/.environment.env" /root/.bash_profile; then
@@ -92,7 +93,7 @@ environment-variables() {
     if test -f ~/.bashrc; then
         shell_rcs="$shell_rcs${GREEN}\t- $HOME/.bashrc\n"
     fi
-    prmpt="File(s):\n$shell_profiles${normal} get sourced at login\nFile ${MAGENTA}.profile${RED} won't get sourced at login${normal} if ${CYAN}.*shelltype*_profile${normal} exists\nFile(s):\n${CYAN}$shell_rcs${normal} get sourced when starting a new *shelltype* shell\n"
+    prmpt="File(s):\n$shell_profiles${normal} get sourced at login\nFile ${MAGENTA}.profile${RED} won't get sourced at login${normal} if ${CYAN}.*shelltype*_profile(f.ex. .bash_profile)${normal} exists\nFile(s):\n${CYAN}$shell_rcs${normal} get sourced when starting a new *shelltype* shell\n"
     printf "$prmpt"
 
     if ! grep -q "~/.environment.env" ~/.profile; then
@@ -104,7 +105,7 @@ environment-variables() {
     fi
     if test -f ~/.bash_profile && ! grep -q "~/.bash_profile" ~/.profile; then
         readyn -p "Link ~/.bash_profile in ~/.profile?" bprof
-        if test "$prof" == 'y'; then
+        if [[ "$prof" == 'y' ]]; then
             printf "\n[ -f ~/.bash_profile ] && source ~/.bash_profile\n\n" >>~/.profile
         fi
         unset bprof
@@ -113,9 +114,9 @@ environment-variables() {
     if test -f ~/.bash_profile; then
         printf "\n${GREEN}Since file ${cyan}$HOME/.bash_profile${green} exists, ${cyan}bash${green} won't source ${magenta}$HOME/.profile${green} natively at login.\n${normal}"
         reade -Q 'GREEN' -i 'prof path none' -p "Source $HOME/.profile in $HOME/.bash_profile or source $HOME/.environment.env directly in $HOME/.bash_profile? [Prof/path/none]: " bash_prof
-        if [[ $bash_prof =~ 'prof' ]]; then
+        if [[ $bash_prof == 'prof' ]]; then
             if ! grep -q "~/.profile" ~/.bash_profile; then
-                printf "\n[ -f ~/.environment.env ] && source ~/.profile\n\n" >>~/.bash_profile
+                printf "\n[ -f ~/.profile ] && source ~/.profile\n\n" >>~/.bash_profile
             fi
         elif [[ $bash_prof == 'path' ]]; then
             if ! grep -q "~/.environment.env" ~/.bash_profile; then
@@ -124,7 +125,7 @@ environment-variables() {
         fi
         if test -f ~/.bashrc && ! grep -q "~/.environment.env" ~/.bashrc; then
             readyn -p "Source $HOME/.environment.env in $HOME/.bashrc?" bashrc
-            if test $bashrc == 'y'; then
+            if [[ $bashrc == 'y' ]]; then
                 if grep -q "[ -f ~/.bash_completion ]" ~/.bashrc; then
                     sed -i 's|\(\[ -f ~/.bash_completion \] \&\& source \~/.bash_completion\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' ~/.bashrc
                 elif grep -q "[ -f ~/.bash_aliases ]" ~/.bashrc || grep -q "~/.bash_aliases" ~/.bashrc; then
@@ -164,7 +165,7 @@ prmpt='[Y/n]: '
 #    prmpt='[N/y]: '
 #fi
 
-reade -Q "$color" -i "$pre" -p "Check existence/Create '.environment.env' and link it to '.bashrc' in $HOME/ and /root/? $prmpt" "$othr" envvars
+reade -Q "$color" -i "$pre $othr" -p "Check existence/Create '.environment.env' and link it to '.bashrc' in $HOME/ and /root/? $prmpt" envvars
 
 if [[ "$envvars" == "y" ]] && [[ "$1" == 'n' ]]; then
 

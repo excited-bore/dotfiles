@@ -190,7 +190,7 @@ if [[ "$tmuxx" == "y" ]] || [ -z "$tmuxx" ]; then
 
     if ! [ -e ~/.bash_completion.d/tmux ]; then
         curl https://raw.githubusercontent.com/imomaliev/tmux-bash-completion/master/completions/tmux >~/.bash_completion.d/tmux 2>/dev/null
-        source ~/.bashrc
+        [[ "$SSHELL" == 'bash' ]] && source ~/.bashrc
     fi
 fi
 
@@ -199,7 +199,7 @@ unset tmuxx
 readyn -Y 'YELLOW' -p "Install tmux completions at root? " tmuxx
 if [[ "$tmuxx" == "y" ]] || [ -z "$tmuxx" ]; then
     if ! [ -e /root/.bash_completion.d/tmux ]; then
-        curl https://raw.githubusercontent.com/imomaliev/tmux-bash-completion/master/completions/tmux | sudo tee -a /root/.bash_completion.d/tmux &>/dev/null
+        curl -s https://raw.githubusercontent.com/imomaliev/tmux-bash-completion/master/completions/tmux | sudo tee -a /root/.bash_completion.d/tmux &>/dev/null
     fi
 fi
 unset tmuxx
@@ -209,7 +209,7 @@ if [ -z "$tmuxx" ] || [[ "$tmuxx" == "y" ]]; then
     if test -f tmux/.bash_aliases.d/tmux.sh; then
         cp -bfv tmux/.bash_aliases.d/tmux.sh ~/.bash_aliases.d/
     else
-        curl -o ~/.bash_aliases.d/tmux.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/tmux/.bash_aliases.d/tmux.sh
+        curl -s -o ~/.bash_aliases.d/tmux.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/tmux/.bash_aliases.d/tmux.sh
     fi
     if type gio &>/dev/null && test -f ~/.bash_aliases.d/tmux.sh~; then
         gio trash ~/.bash_aliases.d/tmux.sh~

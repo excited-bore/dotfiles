@@ -36,6 +36,7 @@ fi
 # https://www.explainxkcd.com/wiki/index.php/1654:_Universal_Install_Script
 function update-system() {
     test -e $YES && unset YES 
+    test -e $NOGUI && unset NOGUI
     while [[ $# -gt 0 ]]; do
         case $1 in
         -h|-\?|--help)  
@@ -82,13 +83,19 @@ function update-system() {
           - pipx
           - cargo
           - gem\n\n
-    -h / --help : Show this help message and exit\n"
+    -h / --help : Show this help message and exit\n
+    -y / --yes  : Auto update without prompting. \n
+    -s / --skipgui : Skip asking to updating if it requires a GUI prompt (f.ex. snap)\n"
             exit
             ;;
             -y|--yes)
               YES="-y"
               shift # past value
               ;;
+	    -s|--skipgui)
+	      NOGUI='y'
+	      shift
+	      ;;
             -*|--*)
               echo "Unknown option $1"
               exit 1
@@ -167,7 +174,7 @@ function update-system() {
                 eval "yes | ${pac_up}"
             fi
         else
-            eval ${pac_up}
+            eval "${pac_up}"
         fi
         hdrs="linux-headers-$(uname -r)"
         if test -z "$(apt list --installed 2> /dev/null | grep $hdrs)"; then
@@ -250,26 +257,28 @@ function update-system() {
         fi
        
         ! test -z "$YES" && flag='--auto' || flag=''
-        
-        readyn $flag -p 'Clean unnessecary (orphan) packages?' cachcln
+       	
+	[[ "$distro_base" == 'Debian' ]] && clean=' (/Autoremove) ' || clean='' 
+
+        readyn $flag -p "Clean$clean unnessecary orphan packages?" cachcln
         if [[ $cachcln == 'y' ]]; then
             if ! [[ -z "$AUR_clean" ]]; then
                 if ! test -z "$YES"; then 
-                    if [[ "$AUR_up" == "pamac update" ]]; then
+                    if [[ "$AUR" == "pamac" ]]; then
                         pamac clean --no-confirm
                     else
-                        eval "yes | ${AUR_clean}"
+                        eval "yes | $AUR_clean"
                     fi
                 else
-                    eval "${AUR_clean}"
+                    eval "$AUR_clean"
                 fi
-            fi
- 
-            if ! test -z "$YES"; then 
-                eval "yes | ${pac_clean}"  
-            else
-                eval "${pac_clean}"
-            fi
+	   elif ! test -z $pac_clean; then
+            	if ! test -z "$YES"; then 
+		    eval "yes | $pac_clean"  
+            	else
+                    eval "$pac_clean"
+                fi
+	    fi
         fi
         unset cachcln 
     elif [[ "$distro" == "Gentoo" ]]; then
@@ -302,17 +311,17 @@ function update-system() {
     unset hdrs hdrs_ins 
 
     if type flatpak &> /dev/null; then
-        if ! test -z "$YES"; then 
+	if ! test -z "$YES"; then 
             flatpak update -y
         else
             flatpak update
         fi
     fi
 
-    if type snap &> /dev/null; then
-        if ! test -z "$YES"; then 
-            yes | snap refresh
-        else
+
+    if test -z "$NOGUI" && type snap &> /dev/null; then
+	readyn --auto -p "Update (refresh) snap packages?" snaprfrsh
+	if [[ "$snaprfrsh" == 'y' ]]; then 
             snap refresh
         fi
     fi
@@ -404,4 +413,4 @@ function update-system() {
     unset YES 
 }
 
-alias update-system-yes="update-system -y"
+alias update-system-yes="update-system -y -s"

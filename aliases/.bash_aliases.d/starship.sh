@@ -7,7 +7,7 @@ function starship-presets() {
     starship preset "$ansr" -o ~/.config/starship.toml
     local hmdir
     readyn -p "Set '~' to '$HOME'?" hmdir
-    if [ "$hmdir" == "y" ]; then
+    if [[ "$hmdir" == "y" ]]; then
         if grep -q 'home_symbol' ~/.config/starship.toml; then
             sed -i 's|\(home_symbol = \).*|\1"'"$HOME"'"|' ~/.config/starship.toml 
         elif grep -q '\[directory\]' ~/.config/starship.toml; then
@@ -19,7 +19,7 @@ function starship-presets() {
     source ~/.bashrc
     unset hmdir
     readyn -p "Set prompt identical for root?" hmdir
-    if [ "$hmdir" == "y" ]; then
+    if [[ "$hmdir" == "y" ]]; then
         command sudo cp -f ~/.config/starship.toml /root/.config/starship.toml
         unset hmdir
         #reade -Q 'GREEN' -i 'y' -p "Set '~' to '/root'? [Y/n]: " "n" hmdir

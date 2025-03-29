@@ -52,7 +52,9 @@ if ! type pipx &>/dev/null; then
         else
             pipx ensurepath
         fi
-        source ~/.bashrc
+        
+	[[ "$SSHELL" == "bash" ]] && source ~/.bashrc 
+	[[ "$SSHELL" == "zsh" ]] && source ~/.zshrc &> /dev/null	
 
         if ! [[ "$machine" == 'Windows' ]]; then
             readyn -p "Set to install packages globally (including for root)?" insppxgl

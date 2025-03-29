@@ -11,13 +11,13 @@ else
     . ./checks/check_all.sh
 fi
 
-get-script-dir SCRIPT_DIR 
+get-script-dir DIR 
 
 if ! type cargo &> /dev/null; then
-    if ! test -f install_cargo.sh; then
+    if ! test -f $DIR/install_cargo.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)"
     else
-       . ./install_cargo.sh
+       . $DIR/install_cargo.sh
     fi
 fi
 
@@ -26,7 +26,7 @@ carv=$(cargo search 'eza = # A modern replacement for ls' | awk 'NR==1{print $3;
 
 if ! type eza &> /dev/null || version-higher $carv $ezv; then
     if type eza &> /dev/null && ! test -z "$pac_rm"; then
-        yes | ${pac_rm} eza   
+        yes | eval "${pac_rm}" eza   
     else
         printf "Installing cargo version for eza (latest) but unable to remove current version for eza.\n Package manager probably unkown, try uninstalling manually.\n"
     fi
@@ -63,8 +63,8 @@ if ! type eza &> /dev/null || version-higher $carv $ezv; then
 fi
 
 if ! test -f ~/.bash_completion.d/eza; then
-   reade -Q 'GREEN' -i 'y' -p 'Install bash completions for eza? [Y/n]: ' 'n' bash_cm  
-   if test $bash_cm == 'y'; then
+   readyn -p 'Install bash completions for eza?' bash_cm  
+   if [[ $bash_cm == 'y' ]]; then
         if ! test -f checks/check_completions_dir.sh; then
              eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)" 
         else

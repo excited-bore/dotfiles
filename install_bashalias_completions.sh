@@ -13,16 +13,11 @@ fi
 
 get-script-dir SCRIPT_DIR
 
-if ! test -f checks/check_completions_dir.sh; then
-    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)"
-else
-    . ./checks/check_completions_dir.sh
-fi
 
-if ! test -f checks/check_aliases_dir.sh; then
-    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)"
+if ! test -f checks/check_envvar_aliases_completions_keybinds.sh; then
+    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar_aliases_completions_keybinds.sh)"
 else
-    . ./checks/check_aliases_dir.sh
+    . ./checks/check_envvar_aliases_completions_keybinds.sh
 fi
 
 if ! [ -e ~/.bash_completion.d/complete_alias ]; then

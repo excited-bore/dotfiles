@@ -1,60 +1,18 @@
 #!/bin/bash
 
-# https://stackoverflow.com/questions/5412761/using-colors-with-printf
-# Execute (during printf) for colored prompt
-# printf  "${blue}This text is blue${white}\n"
-
-function get-script-dir(){
-    if test -z $ZSH_VERSION; then
-        [[ $0 != $BASH_SOURCE ]] && SCRIPT_DIR="$( dirname "${BASH_SOURCE[0]}" )" || SCRIPT_DIR="$( cd "$( dirname "$-1" )" && pwd )"
-    else
-        SCRIPT_DIR="${0:A:h}"
-    fi
-    eval "$1=$SCRIPT_DIR" 
-}
-
+[[ "$1" == 'n' ]] && SYSTEM_UPDATED='TRUE'
 
 # https://unix.stackexchange.com/questions/139231/keep-aliases-when-i-use-sudo-bash
-if type sudo &> /dev/null; then
+if type sudo &>/dev/null; then
     alias sudo='sudo '
 fi
-if type wget &> /dev/null; then
+if type wget &>/dev/null; then
     alias wget='wget --https-only '
 fi
 
-
-# https://stackoverflow.com/questions/4023830/how-to-compare-two-strings-in-dot-separated-version-format-in-bash
-
-function version-higher(){
-    if [[ $1 == $2 ]]; then
-        return 0
-    fi
-    local IFS=.
-    local i ver1=($1) ver2=($2)
-    # fill empty fields in ver1 with zeros
-    for ((i=${#ver1[@]}; i<${#ver2[@]}; i++))
-    do
-        ver1[i]=0
-    done
-    for ((i=0; i<${#ver1[@]}; i++))
-    do
-        if ((10#${ver1[i]:=0} > 10#${ver2[i]:=0})); then
-            return 0
-        fi
-        if ((10#${ver1[i]} < 10#${ver2[i]})); then
-            return 1
-        fi
-    done
-    return 0
-}
-
-
-function compare-tput-escape_color(){
-    for (( ansi=0; ansi <= 120; ansi++)); do
-        printf "$ansi $(tput setaf $ansi) tput foreground $(tput sgr0) $(tput setab $ansi) tput background $(tput sgr0)"; echo -e " \033[$ansi;mEscape\033[0m"
-    done | $PAGER
-    unset ansi
-}
+# https://stackoverflow.com/questions/5412761/using-colors-with-printf
+# Execute (during printf) for colored prompt
+# printf  "${blue}This text is blue${white}\n"
 
 red=$(tput setaf 1)
 red1=$(tput setaf 9)
@@ -112,44 +70,41 @@ italic=$(tput it)
 # Arguments: Completions(string with space entries, AWK works too),return value(-a password prompt, -c complete filenames, -p prompt flag, -Q prompt colour, -b break-chars (when does a string break for autocomp), -e change char given for multiple autocompletions)
 # 'man rlwrap' to see all unimplemented options
 
-if ! type reade &> /dev/null ; then
+if ! type reade &>/dev/null; then
     if test -f rlwrap-scripts/reade; then
-        . ./rlwrap-scripts/reade 1> /dev/null
+        . ./rlwrap-scripts/reade 1>/dev/null
     else
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade)" &> /dev/null 
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade)" &>/dev/null
     fi
 fi
 
-if ! type readyn &> /dev/null; then
+if ! type readyn &>/dev/null; then
     if test -f rlwrap-scripts/readyn; then
-        . ./rlwrap-scripts/readyn 1> /dev/null
+        . ./rlwrap-scripts/readyn 1>/dev/null
     else
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/readyn)" &> /dev/null 
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/readyn)" &>/dev/null
     fi
 fi
 
-if ! type yes-no-edit &> /dev/null; then
+if ! type yes-no-edit &>/dev/null; then
     if test -f rlwrap-scripts/yes-no-edit; then
-        . ./rlwrap-scripts/yes-no-edit 1> /dev/null
+        . ./rlwrap-scripts/yes-no-edit 1>/dev/null
     else
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/yes-no-edit)" &> /dev/null 
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/yes-no-edit)" &>/dev/null
     fi
 fi
 
 if ! test -f checks/check_system.sh; then
-    if type curl &> /dev/null; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
-    else 
-        continue 
+    if type curl &>/dev/null; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)"
     fi
 else
     . ./checks/check_system.sh
 fi
 
-
-if ! type update-system &> /dev/null; then
+if ! type update-system &>/dev/null; then
     if ! test -f aliases/.bash_aliases.d/update-system.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)" 
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)"
     else
         . ./aliases/.bash_aliases.d/update-system.sh
     fi
@@ -160,10 +115,51 @@ fi
 if test -z $SYSTEM_UPDATED; then
     readyn -Y "CYAN" -p "Update system?" updatesysm
     if [[ "$updatesysm" == "y" ]]; then
-        update-system-yes                     
+        update-system-yes
         export SYSTEM_UPDATED="TRUE"
     else
         export SYSTEM_UPDATED="TRUE"
     fi
 fi
 
+function get-script-dir() {
+    if test -z $ZSH_VERSION; then
+        #[[ $0 != $BASH_SOURCE ]] && SCRIPT_DIR="$( dirname "${BASH_SOURCE[0]}" )" || SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+        SCRIPT_DIR=$(dirname "$0")
+    else
+        SCRIPT_DIR="${0:A:h}"
+    fi
+    eval "$1=$SCRIPT_DIR"
+}
+
+# https://stackoverflow.com/questions/4023830/how-to-compare-two-strings-in-dot-separated-version-format-in-bash
+
+function version-higher() {
+    if [[ $1 == $2 ]]; then
+        return 0
+    fi
+    local IFS=.
+    local i ver1=($1) ver2=($2)
+    # fill empty fields in ver1 with zeros
+    for ((i = ${#ver1[@]}; i < ${#ver2[@]}; i++)); do
+        ver1[i]=0
+    done
+    for ((i = 0; i < ${#ver1[@]}; i++)); do
+        if ((10#${ver1[i]:=0} > 10#${ver2[i]:=0})); then
+            return 0
+        fi
+        if ((10#${ver1[i]} < 10#${ver2[i]})); then
+            return 1
+        fi
+    done
+    return 0
+}
+
+function compare-tput-escape_color() {
+    test -z $PAGER && PAGER=less
+    for ((ansi = 0; ansi <= 120; ansi++)); do
+        printf "$ansi $(tput setaf $ansi) tput foreground $(tput sgr0) $(tput setab $ansi) tput background $(tput sgr0)"
+        echo -e " \033[$ansi;mEscape\033[0m"
+    done | $PAGER
+    unset ansi
+}

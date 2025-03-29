@@ -208,8 +208,7 @@ function yes-no-edit() {
         while getopts 'db:n:o:Q:i:e:g:f:p:' flag; do
             case "${flag}" in
             b) ;;
-            d)
-                noprompt='y'
+            d) noprompt='y'
                 ;;
             o)
                 local j=0
@@ -250,10 +249,10 @@ function yes-no-edit() {
                 color="${OPTARG}"
                 ;;
             i)
-                found='n'
+                local found='n'
                 local i=0
                 
-                test -z "$ZSH_VERSION" && 
+                test -n "$BASH_VERSION" && 
                 
                 # Bash variant - list arrays
                 for i in "${!choices[@]}"; do
@@ -264,27 +263,30 @@ function yes-no-edit() {
                         pre=${OPTARG}
                         break
                     fi
-                done || 
+                done  
                 
                 # Zsh variant -- associative arrays
-                local indice=0 
+                test -n "$ZSH_VERSION" && 
+
+                local indice=0  &&
                 for i in "${choices[@]}"; do
                     if [[ "$i" == "${OPTARG}" ]]; then
                         found='y'
                         indice=${choices[(i)$i]}
-                        choices[${choices[(i)$i]}]=() 
+                        choices[$indice]=() 
                         choices=("${OPTARG}" ${choices[@]})
                         pre=${OPTARG}
                         break
                     fi
                 done
+                
                 [[ "$found" == 'n' ]] &&
                     printf "${OPTARG} is not a choice between '${choices[*]}'\n" &&
                     return 0
 
                 if test -z "$noprompt"; then
 
-                    test -z $ZSH_VERSION && 
+                    test -n "$BASH_VERSION" && 
                     
                     # Bash variant - list arrays
                     prmpt1=" [${bold}${choicesp[$i]^}" && 
@@ -292,10 +294,12 @@ function yes-no-edit() {
                     for i in "${!choicesp[@]}"; do                          
                         prmpt1="$prmpt1/${choicesp[$i]}" 
                         unset $choicesp[$i]; 
-                    done && i=0 ||
+                    done && i=0
 
                     # ZSH can't do ${string^} text substition like bash
                     # (capitalize the first letter in a string)
+                    test -n "$ZSH_VERSION" && 
+                    
                     local fst="$(tr '[:lower:]' '[:upper:]' <<<${choicesp[$indice]:0:1})${choicesp[$indice]:1}" &&
                     prmpt1=" [${bold}$fst" && 
                     choicesp[$indice]=() && 

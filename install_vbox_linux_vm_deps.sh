@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 if ! test -f checks/check_all.sh; then
     if type curl &>/dev/null; then
@@ -11,8 +11,6 @@ else
     . ./checks/check_all.sh
 fi
 
-if ! type tree &> /dev/null; then 
-    if [[ "$distro_base" == "Arch" ]] || [[ "$distro_base" == "Debian" ]] ;then
-        eval "$pac_ins tree"
-    fi
+if ! type make &> /dev/null || ! type perl &> /dev/null || ! type gcc &> /dev/null; then
+	eval "{pac_ins} make perl gcc"
 fi

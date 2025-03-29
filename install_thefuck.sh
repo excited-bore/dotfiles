@@ -39,8 +39,8 @@ if ! type thefuck &>/dev/null; then
 fi
 
 if ! grep -q 'eval $(thefuck --alias' ~/.bashrc; then
-    reade -Q 'GREEN' -i 'f fuck fuk hell heck hek egh huhn huh nono again agin asscreamIscream' -p "Alias for name 'thefuck'? [Empty: 'f' - 'thefuck' cant be used]: " ansr
-    if test $ansr == 'thefuck'; then
+    reade -Q 'GREEN' -i 'f fuk oops ops fuck hell heck hek egh huhn huh nono again agin asscreamIscream' -p "Alias for name 'thefuck'? [Empty: 'f' - 'thefuck' cant be used]: " ansr
+    if [[ $ansr == 'thefuck' ]]; then
         printf "'thefuck' cant be aliased to 'thefuck'\n"
         printf "Using 'f' as alias\n"
         ansr='f'

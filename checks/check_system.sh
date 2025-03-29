@@ -63,6 +63,20 @@ if [[ $machine == 'Windows' ]]; then
    unset wngt wmic gsdn jqin
 fi
 
+# Shell that script is run in
+# https://stackoverflow.com/questions/5166657/how-do-i-tell-what-type-my-shell-is
+
+if test -n "$BASH_VERSION"; then
+    SSHELL=bash
+elif test -n "$ZSH_VERSION"; then
+    SSHELL=zsh
+elif test -n "$KSH_VERSION" || test -n "$FCEDIT"; then
+    SSHELL=ksh
+elif test -n "$PS3"; then
+    SSHELL=unknown
+else
+    SSHELL=sh
+fi
 
 if test -z $EDITOR; then
     if type nano &> /dev/null; then
@@ -194,6 +208,7 @@ elif test -f == /etc/arch-release && [[ $distro == / ]]; then
     pac_rm="pacman -R"
     pac_rm_casc="pacman -Rc"
     pac_rm_orph="pacman -Rs"
+    pac_clean="sudo pacman -R $(pacman -Qdtq)"
     pac_clean_cache="pacman -Scc"
     pac_ls_ins="pacman -Q" 
 
@@ -217,16 +232,16 @@ elif test -f == /etc/arch-release && [[ $distro == / ]]; then
         AUR_ls_ins="pamac list --installed"    
     elif type yay &> /dev/null; then
 
-        AUR_pac="yay"
-        AUR_up="yay -Syu"
-        AUR_ins="yay -S"
-        AUR_search="yay -Ss"
-        AUR_rm="yay -R"
-        AUR_rm_casc="yay -Rc"
-        AUR_rm_orph="yay -Rs"
-        AUR_clean="yay -Sc"
-        AUR_clean_cache="yay -Scc"
-        AUR_ls_ins="yay -Q" 
+        AUR_pac="sudo yay"
+        AUR_up="sudo yay -Syu"
+        AUR_ins="sudo yay -S"
+        AUR_search="sudo yay -Ss"
+        AUR_rm="sudo yay -R"
+        AUR_rm_casc="sudo yay -Rc"
+        AUR_rm_orph="sudo yay -Rs"
+        AUR_clean="sudo yay -Sc"
+        AUR_clean_cache="sudo yay -Scc"
+        AUR_ls_ins="sudo yay -Q" 
     elif type pikaur &> /dev/null; then
 
         AUR_pac="pikaur"

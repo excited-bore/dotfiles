@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+
 if ! grep -q "/usr/share/bash-completion/bash_completion" ~/.bashrc; then
     echo "[ -r /usr/share/bash-completion/bash_completion ] && . /usr/share/bash-completion/bash_completion" >>~/.bashrc
 fi
@@ -9,8 +10,8 @@ if ! test -d ~/.bash_aliases.d/; then
 fi
 
 if ! test -f ~/.bash_aliases; then
-    if test -f ../aliases/.bash_aliases; then
-        cp -fv ../aliases/.bash_aliases ~/
+    if test -f aliases/.bash_aliases; then
+        cp -fv aliases/.bash_aliases ~/
     else
         curl -o ~/.bash_aliases https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases
     fi
@@ -21,8 +22,8 @@ if ! test -d ~/.bash_completion.d/; then
 fi
 
 if ! test -f ~/.bash_completion; then
-    if test -f ../completions/.bash_completion; then
-        cp -fv ../completions/.bash_completion ~/
+    if test -f completions/.bash_completion; then
+        cp -fv completions/.bash_completion ~/
     else
         curl -o ~/.bash_completion https://raw.githubusercontent.com/excited-bore/dotfiles/main/completions/.bash_completion
     fi
@@ -33,10 +34,10 @@ if ! test -d ~/.keybinds.d/; then
 fi
 
 if ! test -f ~/.keybinds; then
-    if test -f ../keybinds/.keybinds; then
-        cp -fv ../keybinds/.keybinds ~/
+    if test -f keybinds/.keybinds; then
+        cp -fv keybinds/.keybinds ~/
     else
-        curl -o ~/.bash_aliases https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds
+        curl -o ~/.keybinds https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds
     fi
 fi
 

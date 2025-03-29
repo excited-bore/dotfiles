@@ -35,6 +35,10 @@ if ! type lazydocker &>/dev/null; then
         #fi
         #curl https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh | bash
     fi
-    lazydocker --version
+    
+    if type lazydocker &> /dev/null; then
+        lazydocker --version
+    fi
+    
     unset nstll
 fi

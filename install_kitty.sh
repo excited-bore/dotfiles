@@ -19,7 +19,6 @@ if ! type kitty &>/dev/null; then
         if [[ "$distro_base" == "Debian" ]] && ! type kitten &>/dev/null; then
             sudo ln -s ~/.local/share/kitty-ssh-kitten/kitty/bin/kitten
         fi
-        kitty +kitten update-self
     fi
 fi
 

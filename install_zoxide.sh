@@ -44,7 +44,7 @@ if ! type zoxide &>/dev/null; then
 fi
 
 if ! grep -q 'eval "$(zoxide init bash)"' ~/.bashrc; then
-    printf 'eval "$(zoxide init bash)"' >>~/.bashrc
+    printf 'eval "$(zoxide init bash)"\n' >>~/.bashrc
 fi
 
 if type autojump &>/dev/null; then

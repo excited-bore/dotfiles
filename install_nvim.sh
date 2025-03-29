@@ -11,233 +11,32 @@ else
     . ./checks/check_all.sh
 fi
 
+get-script-dir DIR
+
 if ! test -f checks/check_envvar_aliases_completions_keybinds.sh; then
     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar_aliases_completions_keybinds.sh)"
 else
     . ./checks/check_envvar_aliases_completions_keybinds.sh
 fi
 
-if ! test -f aliases/.bash_aliases.d/package_managers.sh; then
-    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/package_managers.sh)"
-else
-    source aliases/.bash_aliases.d/package_managers.sh
+#. $DIR/setup_git_build_from_source.sh "y" "neovim" "https://github.com" "neovim/neovim" "stable" "sudo apt update; eval "$pac_ins ninja-build gettext libtool libtool-bin cmake g++ pkg-config unzip curl doxygen" "make CMAKE_BUILD_TYPE=RelWithDebInfo; sudo make install" "sudo make uninstall" "make distclean; make deps" "y""
+    
+vrs=10
+if [[ "$distro_base" == "Debian" ]]; then
+    vrs=$(apt search neovim 2>/dev/null | awk 'NR>2 {print;}' | grep '^neovim/' | awk '{print $2}' | sed 's/~.*//g' | sed 's|\(.*\..*\)\..*|\1|g')
+    #Minimum version for Lazy plugin manager
 fi
 
-#. $DIR/setup_git_build_from_source.sh "y" "neovim" "https://github.com" "neovim/neovim" "stable" "sudo apt update; eval "$pac_ins ninja-build gettext libtool libtool-bin cmake g++ pkg-config unzip curl doxygen" "make CMAKE_BUILD_TYPE=RelWithDebInfo; sudo make install" "sudo make uninstall" "make distclean; make deps" "y""
-
-if [[ "$machine" == 'Mac' ]] && type brew &>/dev/null; then
-    if ! type nvim &>/dev/null; then
-        brew install neovim
-    fi
-    if ! type xclip &>/dev/null; then
-        readyn -p "Install nvim clipboard? (xsel xclip)" clip
-        if [ -z $clip ] || [[ "y" == "$clip" ]]; then
-            brew install xsel xclip
-            echo "${green} If this is for use with ssh on serverside, X11 needs to be forwarded"
-            echo "${green} At clientside, 'ForwardX11 yes' also needs to be put in ~/.ssh/config under Host"
-            echo "${green} Connection also need to start with -X flag (ssh -X ..@..)${normal}"
-            readyn -p "Forward X11 in /etc/ssh/sshd.config?" x11f
-            if test -z "$x11f" || [[ "y" == "$x11f" ]]; then
-                sudo sed -i 's|.X11Forwarding yes|X11Forwarding yes|g' /etc/ssh/sshd.config
-            fi
+if [[ "$distro_base" == "Debian" ]] && [[ $vrs < 0.8 ]]; then
+    echo "Neovim apt version is below 0.8, wich too low to run Lazy.nvim (nvim plugin manager)"
+    if ! test -z "$(sudo apt list --installed 2>/dev/null | grep neovim)"; then
+        readyn -p "Uninstall apt version of neovim?" nvmapt
+        if [ "y" == "$nvmapt" ]; then
+            sudo apt remove neovim
         fi
     fi
-    if ! type gcc &>/dev/null || ! type npm &> /dev/null || ! type unzip &> /dev/null; then
-        readyn -p "Install necessary tools for using supplied config? (tools include: gcc - GNU C compiler, npm - javascript package manager and unzip)" gccn
-        if [ -z $gccn ] || [[ "y" == $gccn ]]; then
-            eval "${pac_ins}" gcc npm unzip
-        fi
-    fi
-
-    readyn -p "Install nvim code language support (python, javascript, ruby, perl, ..)?" langs
-    if [[ "$langs" == 'y' ]]; then
-        if ! type pylint &>/dev/null; then
-            readyn -p "Install nvim-python?" pyscripts
-            if test -z $pyscripts || [[ "y" == "$pyscripts" ]]; then
-                if ! type pyenv &>/dev/null; then
-                    if ! test -f install_pyenv.sh; then
-                        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pyenv.sh)"
-                    else
-                        . ./install_pyenv.sh
-                    fi
-                fi
-
-                if ! type pipx &>/dev/null && ! test -f $HOME/.local/bin/pipx; then
-                    if ! test -f install_pipx.sh; then
-                        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)"
-                    else
-                        . ./install_pipx.sh
-                    fi
-                fi
-
-                if ! type pipx &>/dev/null && test -f $HOME/.local/bin/pipx; then
-                    $HOME/.local/bin/pipx install pynvim
-                    $HOME/.local/bin/pipx install pylint
-                    $HOME/.local/bin/pipx install jedi
-                else
-                    pipx install pynvim
-                    pipx install pylint
-                    pipx install jedi
-                fi
-            fi
-        fi
-        if ! type npm &>/dev/null || ! npm list -g | grep neovim &>/dev/null; then
-            readyn -p "Install nvim-javascript? " jsscripts
-            if [ -z $jsscripts ] || [[ "y" == "$jsscripts" ]]; then
-                brew install npm nodejs
-                sudo npm install -g neovim
-            fi
-        fi
-        if ! type gem &>/dev/null || ! gem list | grep neovim &>/dev/null; then
-            readyn -p "Install nvim-ruby? " rubyscripts
-            if [ -z $rubyscripts ] || [[ "y" == $rubyscripts ]]; then
-                brew install ruby
-                if ! test -f install_ruby.sh; then
-                    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ruby.sh)"
-                else
-                    . ./install_ruby.sh
-                fi
-                gem install neovim
-            fi
-        fi
-
-        #printf "${CYAN}Checking whether perl modules for nvim are installed means initializing cpan ([perl package manager)${normal}\n"
-        if ! type cpanm &>/dev/null; then
-            if ! test -f install_cpanm.sh; then
-                eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cpanm.sh)"
-            else
-                . ./install_cpanm.sh
-            fi
-        fi
-        readyn -p "Initialize cpan?" cpan_ini
-
-        if ! type cpan &>/dev/null || ! cpan -l 2>/dev/null | grep Neovim::Ext &>/dev/null; then
-            readyn -p "Install nvim-perl?" perlscripts
-            if [ -z $perlscripts ] || [[ "y" == $perlscripts ]]; then
-                brew install cpanminus
-                cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
-                sudo cpanm --sudo -n Neovim::Ext
-                readyn -p "Perl uses cpan for the installation of modules. Initialize cpan? (Will prevent nvim :checkhealth warning)" cpn
-                if [[ "y" == $cpn ]]; then
-                    cpan -l
-                fi
-            fi
-        fi
-    fi
-    if ! type ctags &>/dev/null; then
-        readyn -p "Install ctags?" ctags
-        if [[ "y" == $ctags ]]; then
-            brew install ctags
-        fi
-    fi
-
-elif [[ "$distro_base" == "Arch" ]]; then
-    if ! type nvim &>/dev/null; then
-        eval "${pac_ins}" --noconfirm neovim 
-    fi
-    if ! type xclip &>/dev/null; then
-        readyn -p "Install nvim clipboard? (xsel xclip)" clip
-        if [ -z $clip ] || [[ "y" == $clip ]]; then
-            eval "${pac_ins}" xsel xclip
-            echo "${green} If this is for use with ssh on serverside, X11 needs to be forwarded"
-            echo "${green} At clientside, 'ForwardX11 yes' also needs to be put in ~/.ssh/config under Host"
-            echo "${green} Connection also need to start with -X flag (ssh -X ..@..)"
-            readyn -p "Forward X11 in /etc/ssh/sshd.config?" x11f
-            if [ -z $x11f ] || [[ "y" == $x11f ]]; then
-                sudo sed -i 's|.X11Forwarding yes|X11Forwarding yes|g' /etc/ssh/sshd_config
-            fi
-        fi
-    fi
-    if ! type gcc &>/dev/null || ! type npm &> /dev/null || ! type unzip &> /dev/null; then
-        readyn -p "Install necessary tools for using supplied config? (tools include: gcc - GNU C compiler, npm - javascript package manager and unzip)" gccn
-        if [ -z $gccn ] || [[ "y" == $gccn ]]; then
-            eval "${pac_ins}" gcc npm unzip
-        fi
-    fi
-    readyn -p "Install nvim code language support (python, javascript, ruby, perl, ..)?" langs
-    if [[ "$langs" == 'y' ]]; then
-        if ! type pylint &>/dev/null; then
-            readyn -p "Install nvim-python?" pyscripts
-            if [ -z $pyscripts ] || [[ "y" == $pyscripts ]]; then
-                if ! type pyenv &>/dev/null; then
-                    if ! test -f install_pyenv.sh; then
-                        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pyenv.sh)"
-                    else
-                        . ./install_pyenv.sh
-                    fi
-                fi
-
-                if ! type pipx &>/dev/null && ! test -f $HOME/.local/bin/pipx; then
-                    if ! test -f install_pipx.sh; then
-                        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)"
-                    else
-                        . ./install_pipx.sh
-                    fi
-                fi
-
-                if ! type pipx &>/dev/null && test -f $HOME/.local/bin/pipx; then
-                    $HOME/.local/bin/pipx install pynvim
-                    $HOME/.local/bin/pipx install pylint
-                    $HOME/.local/bin/pipx install jedi
-                else
-                    pipx install pynvim
-                    pipx install pylint
-                    pipx install jedi
-                fi
-            fi
-        fi
-        if ! type npm &>/dev/null || ! npm list -g | grep neovim &>/dev/null; then
-            readyn -p "Install nvim-javascript?" jsscripts
-            if [ -z $jsscripts ] || [[ "y" == "$jsscripts" ]]; then
-                eval "$pac_ins npm nodejs"
-                sudo npm install -g neovim
-            fi
-        fi
-        if ! type gem &>/dev/null || ! gem list | grep neovim &>/dev/null; then
-            readyn -p "Install nvim-ruby?" rubyscripts
-            if [ -z $rubyscripts ] || [[ "y" == "$rubyscripts" ]]; then
-                eval "${pac_ins} ruby"
-                if ! test -f install_ruby.sh; then
-                    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ruby.sh)"
-                else
-                    . ./install_ruby.sh
-                fi
-                gem install neovim
-            fi
-        fi
-        
-        printf "${red}This next prompt might take a while to load since it might initialize cpan (perl)${normal}\n"
-        if ! type cpan &>/dev/null || ! cpan -l 2>/dev/null | grep Neovim::Ext &>/dev/null; then
-            readyn -p "Install nvim-perl?" perlscripts
-            if [ -z $perlscripts ] || [[ "y" == $perlscripts ]]; then
-                eval "${pac_ins}" cpanminus
-                cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
-                sudo cpanm --sudo -n Neovim::Ext
-                readyn -p "Perl uses cpan for the installation of modules. Initialize cpan? (Will prevent nvim :checkhealth warning)" cpn
-                if [[ "y" == "$cpn" ]]; then
-                    cpan -l
-                fi
-            fi
-        fi
-    fi
-    if ! type ctags &>/dev/null; then
-        readyn -p "Install ctags?" ctags
-        if [ "y" == $ctags ]; then
-            eval "${pac_ins}" ctags
-        fi
-    fi
-elif [[ "$distro_base" == "Debian" ]]; then
-    b=$(apt search neovim 2>/dev/null | awk 'NR>2 {print;}' | grep '^neovim/' | awk '{print $2}' | sed 's/~.*//g' | sed 's|\(.*\..*\)\..*|\1|g')
-    #Minimum version for Lazy plugin manager
-    if [[ $b < 0.8 ]]; then
-        echo "Neovim apt version is below 0.8, wich too low to run Lazy.nvim (nvim plugin manager)"
-        if ! test -z "$(sudo apt list --installed 2>/dev/null | grep neovim)"; then
-            readyn -p "Uninstall apt version of neovim?" nvmapt
-            if [ "y" == "$nvmapt" ]; then
-                sudo apt remove neovim
-            fi
-        fi
-        #if ! type nvim &> /dev/null; then
+    
+    if ! type nvim &> /dev/null; then
         readyn -n -p "Still wish to install through apt?" nvmapt
         if [[ "y" == $nvmapt ]]; then
             eval "${pac_ins}" neovim
@@ -267,7 +66,7 @@ elif [[ "$distro_base" == "Debian" ]]; then
                     fi
                 fi
                 reade -Q "GREEN" -i "$pre $choices" -p "$prompt" nvmappmg
-                if [[ "$nvmappmg" == 'ppa-unstable' ]]; then
+                if [[ "$nfvmappmg" == 'ppa-unstable' ]]; then
                     sudo add-apt-repository ppa:neovim-ppa/unstable
                     sudo apt update
                     eval "${pac_ins} neovim"
@@ -360,128 +159,119 @@ elif [[ "$distro_base" == "Debian" ]]; then
                 fi
             fi
         fi
-        unset nvmapt nvmappmg insflpk nvmflpk
-    else
-        eval "${pac_ins}" neovim
     fi
+    unset nvmapt nvmappmg insflpk nvmflpk
+else
+    eval "${pac_ins}" neovim
+fi
 
-    if ! type xclip &>/dev/null; then
-        readyn -p "Install nvim clipboard? (xsel xclip)" clip
-        if [ -z $clip ] || [[ "y" == $clip ]]; then
-            eval "${pac_ins}" xsel xclip
-            echo "${green} If this is for use with ssh on serverside, X11 needs to be forwarded"
-            echo "${green} At clientside, 'ForwardX11 yes' also needs to be put in ~/.ssh/config under Host"
-            echo "${green} Connection also need to start with -X flag (ssh -X ..@..)${normal}"
-            readyn -n -p "Forward X11 in /etc/ssh/sshd.config?" x11f
-            if [ -z $x11f ] || [[ "y" == $x11f ]]; then
-                sudo sed -i 's|.X11Forwarding yes|X11Forwarding yes|g' /etc/ssh/sshd_config
-            fi
-        fi
-    fi
-    
-    if ! type gcc &>/dev/null || ! type npm &> /dev/null || ! type unzip &> /dev/null; then
-        readyn -p "Install necessary tools for using supplied config? (tools include: gcc - GNU C compiler, npm - javascript package manager and unzip)" gccn
-        if [ -z $gccn ] || [[ "y" == $gccn ]]; then
-            eval "${pac_ins}" gcc npm unzip
-        fi
-    fi
-
-   
-    readyn -p "Install nvim code language support (python, javascript, ruby, perl, ..)?" langs
-    if [[ "$langs" == 'y' ]]; then
-        if ! type pylint &>/dev/null; then
-            readyn -p "Install nvim-python?" pyscripts
-            if [ -z $pyscripts ] || [[ "y" == "$pyscripts" ]]; then
-                if ! type pyenv &>/dev/null; then
-                    if ! test -f install_pyenv.sh; then
-                        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pyenv.sh)"
-                    else
-                        . ./install_pyenv.sh
-                    fi
-                fi
-                if ! test -f install_pipx.sh; then
-                    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)"
-                else
-                    . ./install_pipx.sh
-                fi
-
-                if ! test -z $upg_pipx && [[ $upg_pipx == 'y' ]]; then
-                    $HOME/.local/bin/pipx install pynvim
-                    $HOME/.local/bin/pipx install pylint
-                    $HOME/.local/bin/pipx install jedi
-                else
-                    pipx install pynvim
-                    pipx install pylint
-                    pipx install jedi
-                fi
-            fi
-        fi
-
-        if ! type npm &>/dev/null || ! npm list -g | grep neovim &>/dev/null; then
-            readyn -p "Install nvim-javascript?" jsscripts
-            if [ -z $jsscripts ] || [[ "y" == $jsscripts ]]; then
-                eval "$pac_ins nodejs npm"
-                sudo npm install -g neovim
-                if [[ $(which nvim) == "$HOME/.local/bin/flatpak/nvim" ]]; then
-                    qry=$(flatpak list | grep node)
-                    if ! test -z "$qry"; then
-                        echo "${green} Flatpak version nvim needs flatpak's SDK for a node provider"
-                        readyn -p "Install flatpak node SDK and set in environment?" flpknode
-                        if [ -z $flpknode ] || [[ "y" == "$flpknode" ]]; then
-                            flatpak install node18
-                            #if grep -q "FLATPAK_ENABLE_SDK_EXT*.*node" $ENVVAR; then
-                            #    sed -i "s|.export FLATPAK_ENABLE_SDK_EXT=|export FLATPAK_ENABLE_SDK_EXT=|g" $ENVVAR
-                            #    sed -i 's|export FLATPAK_ENABLE_SDK_EXT=\(.*\)node..\(.*\)|export FLATPAK_ENABLE_SDK_EXT=\1node18\2|g' $ENVVAR
-                            #elif grep -q "FLATPAK_ENABLE_SDK_EXT" $ENVVAR; then
-                            #    sed -i 's|.export FLATPAK_ENABLE_SDK_EXT=|export FLATPAK_ENABLE_SDK_EXT=|g' $ENVVAR
-                            #    sed -i 's|export FLATPAK_ENABLE_SDK_EXT=\(.*\)|export FLATPAK_ENABLE_SDK_EXT=\1,node18|g' $ENVVAR
-                            #else
-                            #    echo 'export FLATPAK_ENABLE_SDK_EXT=node18' $ENVVAR
-                            #fi
-
-                        fi
-                    fi
-                    unset flpknode qry
-
-                fi
-            fi
-        fi
-
-        if ! type gem &>/dev/null || ! gem list | grep neovim &>/dev/null; then
-            readyn -p "Install nvim-ruby?" rubyscripts
-            if [ -z $rubyscripts ] || [[ "y" == $rubyscripts ]]; then
-                eval "${pac_ins}" ruby ruby-dev
-                if ! test -f install_ruby.sh; then
-                    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ruby.sh)"
-                else
-                    . ./install_ruby.sh
-                fi
-                gem install neovim
-            fi
-        fi
-
-        if ! type cpan &>/dev/null || ! cpan -l 2>/dev/null | grep Neovim::Ext &>/dev/null; then
-            readyn -p "Install nvim-perl? " perlscripts
-            if [ -z $perlscripts ] || [[ "y" == "$perlscripts" ]]; then
-                eval "${pac_ins}" cpanminus
-                cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
-                sudo cpanm --sudo -n Neovim::Ext
-                readyn -y -p "Perl uses cpan for the installation of modules. Initialize cpan? (Will prevent nvim :checkhealth warning)" cpn
-                if [[ "y" == "$cpn" ]]; then
-                    cpan -l
-                fi
-            fi
-        fi
-    fi
-
-    if ! type ctags &>/dev/null; then
-        readyn -p "Install ctags?" ctags
-        if [[ "y" == "$ctags" ]]; then
-            eval "${pac_ins}" universal-ctags
+if [[ $X11_WAY == 'x11' ]] && ! type xclip &>/dev/null; then
+    readyn -p "Install nvim clipboard? (xsel xclip)" clip
+    if [ -z $clip ] || [[ "y" == "$clip" ]]; then
+        eval "${pac_ins}" install xsel xclip
+        echo "${green} If this is for use with ssh on serverside, X11 needs to be forwarded"
+        echo "${green} At clientside, 'ForwardX11 yes' also needs to be put in ~/.ssh/config under Host"
+        echo "${green} Connection also need to start with -X flag (ssh -X ..@..)${normal}"
+        readyn -p "Forward X11 in /etc/ssh/sshd.config?" x11f
+        if test -z "$x11f" || [[ "y" == "$x11f" ]]; then
+            sudo sed -i 's|.X11Forwarding yes|X11Forwarding yes|g' /etc/ssh/sshd.config
         fi
     fi
 fi
 
+if ! type gcc &>/dev/null || ! type npm &>/dev/null || ! type unzip &>/dev/null; then
+    readyn -p "Install necessary tools for using supplied config? (tools include: gcc - GNU C compiler, npm - javascript package manager and unzip)" gccn
+    if [ -z $gccn ] || [[ "y" == $gccn ]]; then
+        eval "${pac_ins}" gcc npm unzip
+    fi
+fi
+
+readyn -p "Install nvim code language support (python, javascript, ruby, perl, ..)?" langs
+if [[ "$langs" == 'y' ]]; then
+    if ! type pylint &>/dev/null; then
+        readyn -p "Install nvim-python?" pyscripts
+        if test -z $pyscripts || [[ "y" == "$pyscripts" ]]; then
+            if ! type pyenv &>/dev/null; then
+                if ! test -f $DIR/install_pyenv.sh; then
+                    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pyenv.sh)"
+                else
+                    . $DIR/install_pyenv.sh
+                fi
+            fi
+
+            if ! type pipx &>/dev/null && ! test -f $HOME/.local/bin/pipx; then
+                if ! test -f $DIR/install_pipx.sh; then
+                    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)"
+                else
+                    . $DIR/install_pipx.sh
+                fi
+            fi
+
+            if ! type pipx &>/dev/null && test -f $HOME/.local/bin/pipx; then
+                $HOME/.local/bin/pipx install pynvim
+                $HOME/.local/bin/pipx install pylint
+                $HOME/.local/bin/pipx install jedi
+            else
+                pipx install pynvim
+                pipx install pylint
+                pipx install jedi
+            fi
+        fi
+    fi
+    if ! type npm &>/dev/null || ! npm list -g | grep neovim &>/dev/null; then
+        readyn -p "Install nvim-javascript? " jsscripts
+        if [ -z $jsscripts ] || [[ "y" == "$jsscripts" ]]; then
+            eval "${pac_ins}" npm nodejs
+            sudo npm install -g neovim
+        fi
+    fi
+    if ! type gem &>/dev/null || ! gem list | grep neovim &>/dev/null; then
+        readyn -p "Install nvim-ruby? " rubyscripts
+        if [ -z $rubyscripts ] || [[ "y" == $rubyscripts ]]; then
+            if ! test -f install_ruby.sh; then
+                eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ruby.sh)"
+            else
+                . ./install_ruby.sh
+            fi
+            gem install neovim
+        fi
+    fi
+
+    #printf "${CYAN}Checking whether perl modules for nvim are installed means initializing cpan ([perl package manager)${normal}\n"
+
+    if ! type cpan &> /dev/null; then
+        readyn -p "Install Perl and cpanminus?" perlins
+        if [[ $perlins == 'y' ]]; then
+            eval "${pac_ins}" perl cpanminus
+        fi
+    fi
+
+    if type cpan &> /dev/null; then
+        printf "${CYAN}Perl uses cpan for the installation of modules and running this for the first time takes a while.\n${normal}"
+        readyn -p "Run it now and check whether neovim module is installed?" cpn
+        if [[ "y" == $cpn ]]; then
+            cpan -l &> /dev/null
+        else
+            if ! type cpanm &>/dev/null || ! cpan -l 2>/dev/null | grep Neovim::Ext &>/dev/null; then
+                readyn -p "Install nvim-perl?" perlscripts
+                if [ -z $perlscripts ] || [[ "y" == $perlscripts ]]; then
+                    if ! type cpanm &> /dev/null; then
+                        eval "${pac_ins}" cpanminus
+                    fi
+                    /usr/bin/vendor_perl/cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+                    sudo /usr/bin/vendor_perl/cpanm --sudo -n Neovim::Ext      
+                fi
+            fi
+        fi
+    fi
+fi
+
+if ! type ctags &>/dev/null; then
+    readyn -p "Install ctags? (helps with generating tags for quick lookup of f.ex. functions - best supported for in C development)" ctags
+    if [[ "y" == $ctags ]]; then
+        eval "${pac_ins}" ctags
+    fi
+fi
 
 unset rver paths clip x11f pyscripts jsscripts ctags rubyscripts perlscripts nvmbin
 
@@ -535,7 +325,7 @@ function instvim_r() {
         sudo bash -c 'gio trash /root/.config/nvim/*~'
     fi
     # Symlink configs to flatpak dirs for possible flatpak nvim use
-    if type flatpak &> /dev/null && echo "$(flatpak list)" | grep -q "neovim"; then
+    if type flatpak &>/dev/null && echo "$(flatpak list)" | grep -q "neovim"; then
         sudo mkdir -p /root/.var/app/io.neovim.nvim/config/nvim/
         sudo ln -s /root/.config/nvim/* /root/.var/app/io.neovim.nvim/config/nvim/
     fi
@@ -588,7 +378,7 @@ function instvim() {
     fi
 
     # Symlink configs to flatpak dirs for possible flatpak nvim use
-    if type flatpak &> /dev/null && echo "$(flatpak list)" | grep -q "neovim"; then
+    if type flatpak &>/dev/null && echo "$(flatpak list)" | grep -q "neovim"; then
         mkdir -p ~/.var/app/io.neovim.nvim/config/nvim/
         ln -s ~/.config/nvim/* ~/.var/app/io.neovim.nvim/config/nvim/
     fi
@@ -636,6 +426,8 @@ yes-no-edit -f instvim -g "$dir/init.vim $dir/init.lua.vim $dir/plug_lazy_adapte
 
 unset dir tmpdir tmpfile
 
+echo bluh
+
 #nvim +CocUpdate
 nvim +checkhealth
 echo "Install Completion language plugins with ':CocInstall coc-..' / Update with :CocUpdate"
@@ -654,7 +446,7 @@ vimsh_r() {
     sudo cp -fv $file /root/.bash_aliases.d/
     sudo cp -fv $file1 /root/.bash_completion.d/
 }
-    
+
 vimsh() {
     cp -fv $file ~/.bash_aliases.d/
     cp -fv $file1 ~/.bash_completion.d/
