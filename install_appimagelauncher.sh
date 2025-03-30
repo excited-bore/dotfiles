@@ -1,9 +1,14 @@
 #!/usr/bin/env bash
 
-if ! test -f checks/check_system.sh; then
-    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)"
+if ! test -f checks/check_all.sh; then
+    if type curl &>/dev/null; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
+    else
+        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
+        return 1 || exit 1
+    fi
 else
-    . ./checks/check_system.sh
+    . ./checks/check_all.sh
 fi
 
 if ! test -f checks/check_appimage_ready.sh; then
@@ -20,9 +25,9 @@ fi
 
 if ! type AppImageLauncher &>/dev/null; then
     echo "This next $(tput setaf 1)sudo$(tput sgr0) will install Appimagelauncher"
-    if test $distro_base == "Arch"; then
+    if [[ $distro_base == "Arch" ]]; then
         eval "$pac_ins appimagelauncher"
-    elif test $distro_base == "Debian"; then
+    elif [[ $distro_base == "Debian" ]]; then
         if type add-apt-repository &>/dev/null && [[ $(check-ppa ppa:appimagelauncher-team/stable) =~ 'OK' ]]; then
             sudo add-apt-repository ppa:appimagelauncher-team/stable
             eval "$pac_up"
