@@ -1,3 +1,26 @@
+# Powershell generally usefull aliases and variables
+
+# Check if admin
+# https://superuser.com/questions/749243/detect-if-powershell-is-running-as-administrator
+
+$isAdmin = [bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).groups -match "S-1-5-32-544")
+
+$EDITOR = 'notepad'
+
+if (Get-Command vim -errorAction SilentlyContinue){
+   $EDITOR = 'vim'
+}
+
+if (Get-Command nvim -errorAction SilentlyContinue){
+    $EDITOR = 'nvim'
+}
+
+function edit-powershell-profile(){
+    & $EDITOR $PROFILE
+}
+
+
+
 # Get all available functions (and show them)
 
 function Get-Functions ($a){
@@ -77,6 +100,40 @@ function Get-Properties-Object(){
 
 Set-Alias -Name list-object-properties -Value Get-Properties-Object
 
+# Move-Item also moves hidden items
+
+#function Move-Item
+#{
+#    Move-Item -Force
+#}
+
+# Use 'BitTransfer' to copy items instead of Copy-item to reduce slow loadtimes
+# https://stackoverflow.com/questions/2434133/progress-during-large-file-copy-copy-item-write-progress
+
+# Also, copying to an empty destination will create a file first
+
+Import-Module BitsTransfer
+function Copy-Item () {
+    [CmdletBinding()]
+    Param
+    (
+        [parameter(mandatory=$true, position=0)]$Source,
+        [parameter(mandatory=$true, position=1)]$Destination,
+        [parameter(mandatory=$false, position=2, ValueFromRemainingArguments=$true)]$Remaining
+    )
+   
+    if ((Test-Path -Path $Source -PathType Leaf) -and -not (Test-Path -Path $Destination -PathType Leaf)){
+         New-Item -ItemType File -Path $Destination -Force
+    } 
+    
+    Start-BitsTransfer -Source $Source -Destination $Destination @Remaining
+    #if ($args.Length -eq 0 -or $args.Length -eq 1){
+    #    Write-Host 'Supply at least 2 arguments: source and destination'
+    #}elseif($args.Length -eq 2 -or $args.Length -gt 2){
+    #    Start-BitsTransfer -Source $args[0] -Destination $args[1] 
+    #} 
+}
+
 # Get all COM ports
 
 Set-Alias -Name Get-COM-ports -Value mode
@@ -91,6 +148,12 @@ function shutdown-now {
 
 function reboot {
     shutdown /f /t 0 /r
+}
+
+if ( $isAdmin -eq $true -or (Get-Command sudo -errorAction SilentlyContinue)){
+    function bios(){
+        sudo shutdown /r /fw /f /t 0
+    }
 }
 
 # Set 'where' to 'where.exe' instead of 'Where-Object' by
@@ -150,7 +213,7 @@ if (Get-Command -Type alias type -ErrorAction SilentlyContinue){
     Remove-Item -Force Alias:type
     function type { 
         if( $args ){ 
-            Get-Command $args | Format-Table CommandType
+            Get-Command @args | Format-Table CommandType
         }else{ 
             Get-Command | Format-Table Name, CommandType 
         } 
@@ -161,7 +224,10 @@ if (Get-Command -Type alias type -ErrorAction SilentlyContinue){
 
 # Make symlink
 
-function link-soft ($target, $link) {
+function link-soft ($target, $link) { 
+    if ($link -eq $null){
+        $link = $(Get-Item $target).BaseName + $(Get-Item $target).Extension
+    }
     New-Item -Path $link -ItemType SymbolicLink -Value $target
 }
 
@@ -205,14 +271,28 @@ Set-Alias -Name vim -Value nvim
 
 if ((Get-Alias man -ErrorAction SilentlyContinue) -and ((Get-Command nvim -ErrorAction SilentlyContinue) -or (Get-command less -ErrorAction SilentlyContinue))){
     Remove-Item -Force Alias:man
-    if (Get-Command nvim -ErrorAction SilentlyContinue){
-        function man($a){
-            help.exe $a | nvim '+Man' -ErrorAction SilentlyContinue
-        } 
-    }else{
-        function man($a){
-            help.exe $a | less
-        }
+    function man($a){
+        if (Get-Command nvim -ErrorAction SilentlyContinue){
+            if ($null -ne $a){
+                if (Get-Command -Type CmdLet -Name $a){
+                    Get-Help $a | nvim                  
+                }else{
+                    help.exe $a  | nvim 
+                } 
+            }else{
+                help.exe | nvim
+            } 
+        }else{
+            if ($null -ne $a){
+                if (Get-Command -Type CmdLet -Name $a){
+                    Get-Help $a | less.exe                
+                }else{
+                    help.exe $a | less.exe
+                }
+            }else{
+                help.exe | less
+            }
+        }    
     }
 }
 
@@ -220,4 +300,8 @@ if ((Get-Alias man -ErrorAction SilentlyContinue) -and ((Get-Command nvim -Error
 
 if (Test-Path 'C:\Program Files\VideoLAN\VLC\vlc.exe' -PathType Leaf){ 
     Set-Alias -Name vlc -Value 'C:\Program Files\VideoLAN\VLC\vlc.exe' 
+}
+
+function install-Ubuntu(){
+    wsl.exe --install -d Ubuntu
 }
