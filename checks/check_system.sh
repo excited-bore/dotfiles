@@ -21,7 +21,7 @@ if test -z $TMPDIR; then
 fi
 
 pthdos2unix=""
-if test $machine == 'Windows'; then 
+if [[ $machine == 'Windows' ]]; then 
     alias wget='wget.exe' 
     alias curl='curl.exe' 
    # https://stackoverflow.com/questions/13701218/windows-path-to-posix-path-conversion-in-bash 
@@ -36,7 +36,7 @@ if test $machine == 'Windows'; then
        #win_ver=$(cmd /c ver)
        printf "${RED}Winget (official window package manager) not installed - can't run scripts without install programs through it${normal}\n" 
        readyn -p "(Attempt to) Install winget? ${CYAN}(Windows 10 - version 1809 required at mimimum for winget)${GREEN}" wngt
-       if test "$wngt" == 'y'; then
+       if [[ "$wngt" == 'y' ]]; then
             tmpd=$(mktemp -d)
             wget -P $tmpd https://raw.githubusercontent.com/asheroto/winget-install/master/winget-install.ps1  
             sudo pwsh $tmpd/winget-install.ps1
@@ -48,7 +48,7 @@ if test $machine == 'Windows'; then
    if ! type sudo &> /dev/null; then
        printf "${RED}Sudo (Commandline tool to install/modify files at higher privilige, as root/admin) not installed - most of the script won't run without without${normal}\n" 
        reade -Q 'GREEN' -i 'y' -p 'Install (g)sudo (unofficial sudo)? [Y/n]: ' 'n' gsdn
-       if test $gsdn == 'y'; then
+       if [[ "$gsdn" == 'y' ]]; then
             ./../install_gsudo.sh
        #else
            #exit 1
@@ -56,13 +56,27 @@ if test $machine == 'Windows'; then
    fi
    if ! type jq &> /dev/null; then
        reade -Q 'GREEN' -i 'y' -p 'Install jq? (Json parser - used in scripts to get latest releases from github) [Y/n]: ' 'n' jqin 
-       if test $jqin == 'y'; then
+       if [[ $jqin == 'y' ]]; then
             winget install jqlang.jq
        fi
    fi
    unset wngt wmic gsdn jqin
 fi
 
+# Shell that script is run in
+# https://stackoverflow.com/questions/5166657/how-do-i-tell-what-type-my-shell-is
+
+if test -n "$BASH_VERSION"; then
+    SSHELL=bash
+elif test -n "$ZSH_VERSION"; then
+    SSHELL=zsh
+elif test -n "$KSH_VERSION" || test -n "$FCEDIT"; then
+    SSHELL=ksh
+elif test -n "$PS3"; then
+    SSHELL=unknown
+else
+    SSHELL=sh
+fi
 
 if test -z $EDITOR; then
     if type nano &> /dev/null; then
@@ -98,35 +112,115 @@ distro_base=/
 distro=/
 packagemanager=/
 arch=/
-declare -A osInfo;
-osInfo[/etc/alpine-release]=apk
-osInfo[/etc/arch-release]=pacman
-osInfo[/etc/fedora-release]=dnf
-osInfo[/etc/debian_version]=apt
-osInfo[/etc/gentoo-release]=emerge
-osInfo[/etc/manjaro-release]=pamac
-osInfo[/etc/redhat-release]=yum
-osInfo[/etc/rpi-issue]=apt
-osInfo[/etc/SuSE-release]=zypp
-osInfo[/etc/SUSE-brand]=zypp
 
-for f in ${!osInfo[@]};
-do
-    if [ -f $f ] && [ $f == /etc/alpine-release ] && [ $distro == / ]; then
-        pac="apk"
-        distro_base="BSD"
-        distro="Alpine"
-    elif [ -f $f ] && [ $f == /etc/manjaro-release ] && [ $distro == / ]; then
-        pac="pacman"
-        pac_up="sudo pacman -Su"
-        pac_ins="sudo pacman -S"
-        pac_search="sudo pacman -Ss"
-        pac_rm="sudo pacman -R"
-        pac_rm_casc="sudo pacman -Rc"
-        pac_rm_orph="sudo pacman -Rs"
-        pac_clean_cache="sudo pacman -Scc"
-        pac_ls_ins="pacman -Q"
-         
+if test -f /etc/alpine-release && [[ $distro == / ]]; then
+    pac="apk"
+    distro_base="BSD"
+    distro="Alpine"
+elif test -f /etc/manjaro-release && [[ $distro == / ]]; then
+    pac="pacman"
+    pac_up="sudo pacman -Su"
+    pac_ins="sudo pacman -S"
+    pac_search="sudo pacman -Ss"
+    pac_rm="sudo pacman -R"
+    pac_rm_casc="sudo pacman -Rc"
+    pac_rm_orph="sudo pacman -Rs"
+    pac_clean_cache="sudo pacman -Scc"
+    pac_ls_ins="pacman -Q"
+     
+    AUR_pac="pamac"
+    AUR_up="pamac update"
+    AUR_ins="pamac install"
+    AUR_search="pamac search"
+    AUR_rm="pamac remove" 
+    AUR_rm_casc="pamac remove --cascade" 
+    AUR_rm_orph="pamac remove --orphans"
+    AUR_clean_cache="pamac clean"
+    AUR_ls_ins="pamac list --installed"
+     
+
+    distro_base="Arch"
+    distro="Manjaro"
+      
+elif test -f /etc/issue && grep -q "Ubuntu" /etc/issue && [[ $distro == / ]]; then
+    pac="apt"
+    pac_up="sudo apt update"
+    pac_ins="sudo apt install"
+    pac_search="apt search"
+    pac_ls_ins="apt list --installed" 
+
+    distro_base="Debian"
+    distro="Ubuntu"
+
+    codename="$(lsb_release -a | grep --color=never 'Codename' | awk '{print $2}')"
+    release="$(lsb_release -a | grep --color=never 'Release' | awk '{print $2;}')"
+
+elif (test -f == /etc/SuSE-release || test -f == /etc/SUSE-brand) && [[ $distro == / ]]; then
+    if ! test -z "$(lsb_release -a | grep Leap)"; then
+        pac="zypper_leap"
+    else
+        pac="zypper_tumble"
+    fi
+    distro_base="Slackware"
+    distro="openSUSE"
+elif test -f == /etc/gentoo-release && [[ $distro == / ]]; then
+    pac="emerge"
+    distro_base="Slackware"
+    distro="Gentoo"
+elif test -f == /etc/fedora-release && [[ $distro == / ]]; then
+    pac="dnf"
+    distro_base="RedHat"
+    distro="Fedora"
+elif test -f == /etc/redhat-release && [[ $distro == / ]]; then
+    pac="yum"
+    distro_base="RedHat"
+    distro="Redhat"
+elif test -f == /etc/arch-release && [[ $distro == / ]]; then
+       
+    unset ansr ansr1 
+
+    # Extra repositories check 
+    if [[ $(grep 'extra' -A2 /etc/pacman.conf) =~ "#Include" ]]; then  
+        readyn -p "Include 'extra' repositories for pacman?" ansr
+        if [[ "$ansr" == 'y' ]]; then
+            sudo sed -i '/^\[extra\]$/,/^$/ { s|#Siglevel =|Siglevel =| }' /etc/pacman.conf 
+            sudo sed -i '/^\[extra\]$/,/^$/ { s|#Include =|Include =| }' /etc/pacman.conf 
+        fi
+    fi
+
+    # Multilib repositories check 
+    if [[ $(grep 'multilib' -A2 /etc/pacman.conf) =~ "#Include" ]]; then  
+        readyn -p "Include 'multilib' repositories for pacman?" ansr1
+        if [[ "$ansr" == 'y' ]]; then
+            sudo sed -i '/^\[multilib\]$/,/^$/ { s|#Siglevel =|Siglevel =| }' /etc/pacman.conf 
+            sudo sed -i '/^\[multilib\]$/,/^$/ { s|#Include =|Include =| }' /etc/pacman.conf 
+        fi
+    fi
+
+    [[ "$ansr" == 'y' ]] || [[ "$ansr1" == 'y' ]] && sudo pacman -Syy 
+    
+    unset ansr ansr1 
+
+    pac="pacman"
+    pac_up="sudo pacman -Su"
+    pac_ins="sudo pacman -S"
+    pac_search="sudo pacman -Ss"
+    pac_rm="pacman -R"
+    pac_rm_casc="pacman -Rc"
+    pac_rm_orph="pacman -Rs"
+    pac_clean="sudo pacman -R $(pacman -Qdtq)"
+    pac_clean_cache="pacman -Scc"
+    pac_ls_ins="pacman -Q" 
+
+    
+    #
+    # PACMAN WRAPPERS
+    # 
+    
+    # Check every package manager known by archwiki 
+    #
+    if type pamac &> /dev/null; then
+
         AUR_pac="pamac"
         AUR_up="pamac update"
         AUR_ins="pamac install"
@@ -135,254 +229,161 @@ do
         AUR_rm_casc="pamac remove --cascade" 
         AUR_rm_orph="pamac remove --orphans"
         AUR_clean_cache="pamac clean"
-        AUR_ls_ins="pamac list --installed"
+        AUR_ls_ins="pamac list --installed"    
+    elif type yay &> /dev/null; then
+
+        AUR_pac="sudo yay"
+        AUR_up="sudo yay -Syu"
+        AUR_ins="sudo yay -S"
+        AUR_search="sudo yay -Ss"
+        AUR_rm="sudo yay -R"
+        AUR_rm_casc="sudo yay -Rc"
+        AUR_rm_orph="sudo yay -Rs"
+        AUR_clean="sudo yay -Sc"
+        AUR_clean_cache="sudo yay -Scc"
+        AUR_ls_ins="sudo yay -Q" 
+    elif type pikaur &> /dev/null; then
+
+        AUR_pac="pikaur"
+        AUR_up="pikaur -Syu"
+        AUR_ins="pikaur -S"
+        AUR_search="pikaur -Ss"
+        AUR_rm="pikaur -R"
+        AUR_rm_casc="pikaur -Rc"
+        AUR_rm_orph="pikaur -Rs"
+        AUR_clean="pikaur -Sc"
+        AUR_clean_cache="pikaur -Scc"
+        AUR_ls_ins="pikaur -Q"
+    elif type pacaur &> /dev/null; then
+
+        AUR_pac="pacaur"
+        AUR_up="pacaur -Syu"
+        AUR_ins="pacaur -S"
+        AUR_search="pacaur -Ss"
+        AUR_clean="pacaur -Sc"
+        AUR_ls_ins="pacaur -Q"
+
+    elif type aura &> /dev/null; then
+
+        AUR_pac="aura"
+        AUR_up="aura -Au"
+        AUR_ins="aura -A"
+        AUR_search="aura -Ss"
+        AUR_ls_ins="aura -Q"
          
+    elif type aurman &> /dev/null; then
 
-        distro_base="Arch"
-        distro="Manjaro"
-          
-    elif test -f /etc/issue && grep -q "Ubuntu" /etc/issue && [ $distro == / ]; then
-        pac="apt"
-        pac_up="sudo apt update"
-        pac_ins="sudo apt install"
-        pac_search="apt search"
-        pac_ls_ins="apt list --installed" 
+        AUR_pac="aurman"
+        AUR_up="aurman -Syu"
+        AUR_ins="aurman -S"
+        AUR_search="aurman -Ss"
+        AUR_ls_ins="aurman -Q"
 
-        distro_base="Debian"
-        distro="Ubuntu"
+    elif type pakku &> /dev/null ; then
 
-        codename="$(lsb_release -a | grep --color=never 'Codename' | awk '{print $2}')"
-        release="$(lsb_release -a | grep --color=never 'Release' | awk '{print $2;}')"
-
-    elif test -f $f && [[ $f == /etc/SuSE-release || $f == /etc/SUSE-brand ]] && test $distro == /; then
-        if ! test -z "$(lsb_release -a | grep Leap)"; then
-            pac="zypper_leap"
-        else
-            pac="zypper_tumble"
-        fi
-        distro_base="Slackware"
-        distro="openSUSE"
-    elif [ -f $f ] && [ $f == /etc/gentoo-release ] && [ $distro == / ]; then
-        pac="emerge"
-        distro_base="Slackware"
-        distro="Gentoo"
-    elif [ -f $f ] && [ $f == /etc/fedora-release ] && [ $distro == / ]; then
-        pac="dnf"
-        distro_base="RedHat"
-        distro="Fedora"
-    elif [ -f $f ] && [ $f == /etc/redhat-release ] && [ $distro == / ]; then
-        pac="yum"
-        distro_base="RedHat"
-        distro="Redhat"
-    elif [ -f $f ] && [ $f == /etc/arch-release ] && [ $distro == / ]; then
-           
-        unset ansr ansr1 
-
-        # Extra repositories check 
-        if [[ $(grep 'extra' -A2 /etc/pacman.conf) =~ "#Include" ]]; then  
-            readyn -p "Include 'extra' repositories for pacman?" ansr
-            if test "$ansr" == 'y'; then
-                sudo sed -i '/^\[extra\]$/,/^$/ { s|#Siglevel =|Siglevel =| }' /etc/pacman.conf 
-                sudo sed -i '/^\[extra\]$/,/^$/ { s|#Include =|Include =| }' /etc/pacman.conf 
-            fi
-        fi
-
-        # Multilib repositories check 
-        if [[ $(grep 'multilib' -A2 /etc/pacman.conf) =~ "#Include" ]]; then  
-            readyn -p "Include 'multilib' repositories for pacman?" ansr1
-            if test "$ansr" == 'y'; then
-                sudo sed -i '/^\[multilib\]$/,/^$/ { s|#Siglevel =|Siglevel =| }' /etc/pacman.conf 
-                sudo sed -i '/^\[multilib\]$/,/^$/ { s|#Include =|Include =| }' /etc/pacman.conf 
-            fi
-        fi
-
-        test "$ansr" == 'y' || test "$ansr1" == 'y' && sudo pacman -Syy 
-        
-        unset ansr ansr1 
-
-        pac="pacman"
-        pac_up="sudo pacman -Su"
-        pac_ins="sudo pacman -S"
-        pac_search="sudo pacman -Ss"
-        pac_rm="pacman -R"
-        pac_rm_casc="pacman -Rc"
-        pac_rm_orph="pacman -Rs"
-        pac_clean_cache="pacman -Scc"
-        pac_ls_ins="pacman -Q" 
-
-        
-        #
-        # PACMAN WRAPPERS
-        # 
-        
-        # Check every package manager known by archwiki 
-        #
-        if type pamac &> /dev/null; then
-
-            AUR_pac="pamac"
-            AUR_up="pamac update"
-            AUR_ins="pamac install"
-            AUR_search="pamac search"
-            AUR_rm="pamac remove" 
-            AUR_rm_casc="pamac remove --cascade" 
-            AUR_rm_orph="pamac remove --orphans"
-            AUR_clean_cache="pamac clean"
-            AUR_ls_ins="pamac list --installed"    
-        elif type yay &> /dev/null; then
-
-            AUR_pac="yay"
-            AUR_up="yay -Syu"
-            AUR_ins="yay -S"
-            AUR_search="yay -Ss"
-            AUR_rm="yay -R"
-            AUR_rm_casc="yay -Rc"
-            AUR_rm_orph="yay -Rs"
-            AUR_clean="yay -Sc"
-            AUR_clean_cache="yay -Scc"
-            AUR_ls_ins="yay -Q" 
-        elif type pikaur &> /dev/null; then
-
-            AUR_pac="pikaur"
-            AUR_up="pikaur -Syu"
-            AUR_ins="pikaur -S"
-            AUR_search="pikaur -Ss"
-            AUR_rm="pikaur -R"
-            AUR_rm_casc="pikaur -Rc"
-            AUR_rm_orph="pikaur -Rs"
-            AUR_clean="pikaur -Sc"
-            AUR_clean_cache="pikaur -Scc"
-            AUR_ls_ins="pikaur -Q"
-        elif type pacaur &> /dev/null; then
-
-            AUR_pac="pacaur"
-            AUR_up="pacaur -Syu"
-            AUR_ins="pacaur -S"
-            AUR_search="pacaur -Ss"
-            AUR_clean="pacaur -Sc"
-            AUR_ls_ins="pacaur -Q"
-
-        elif type aura &> /dev/null; then
-
-            AUR_pac="aura"
-            AUR_up="aura -Au"
-            AUR_ins="aura -A"
-            AUR_search="aura -Ss"
-            AUR_ls_ins="aura -Q"
-             
-        elif type aurman &> /dev/null; then
-
-            AUR_pac="aurman"
-            AUR_up="aurman -Syu"
-            AUR_ins="aurman -S"
-            AUR_search="aurman -Ss"
-            AUR_ls_ins="aurman -Q"
-
-        elif type pakku &> /dev/null ; then
-
-            AUR_pac="pakku"
-            AUR_up="pakku -Syu"
-            AUR_ins="pakku -S"
-            AUR_search="pakku -Ss"
-            AUR_ls_ins="pakku -Q"
-             
-        elif type paru &> /dev/null; then
-            AUR_pac="paru"
-            AUR_up="paru -Syua"
-            AUR_ins="paru -S"
-            AUR_search="paru -Ss"
-            AUR_search="paru -Q"
-             
-        elif type trizen &> /dev/null; then
-            AUR_pac="trizen"
-            AUR_up="trizen -Syu"
-            AUR_ins="trizen -S"
-            AUR_search="trizen -Ss"
-            AUR_ls_ins="trizen -Q"
-
-        #
-        # SEARCH AND BUILD
-        # 
-        
-        # Aurutils
-        elif type aur &> /dev/null; then
-            AUR_pac="aur"
-            AUR_up=""
-            AUR_ins=""
-            AUR_search="aur search"
-             
-        #elif type repoctl &> /dev/null; then
-        #    pac_AUR="repoctl"
-        #elif type yaah &> /dev/null; then
-        #    pac_AUR="yaah"
-        #elif type bauerbill &> /dev/null; then
-        #    pac_AUR="bauerbill"
-        #elif type PKGBUILDer &> /dev/null; then
-        #    pac_AUR="PKGBUILDer"
-        #elif type rua &> /dev/null; then
-        #    pac_AUR="rua"
-        #elif type pbget &> /dev/null; then
-        #    pac_AUR="pbget"
-        #elif type argon &> /dev/null ; then
-        #    pac_AUR="argon"
-        #elif type cylon &> /dev/null; then
-        #    pac_AUR="cylon"
-        #elif type kalu &> /dev/null; then
-        #    pac_AUR="kalu"
-        #elif type octopi &> /dev/null; then
-        #    pac_AUR="octopi"
-        #elif type PkgBrowser &> /dev/null; then
-        #    pac_AUR="PkgBrowser"
-        #elif type yup &> /dev/null ; then
-        #    pac_AUR="yup"
-        elif type auracle &> /dev/null; then
-
-            AUR_pac="auracle"
-            AUR_up="auracle update"
-            AUR_ins=""
-            AUR_search="auracle search"
-             
-        else
-            no_aur='TRUE' 
-        fi
-
-        distro_base="Arch"
-        distro="Arch"
-
-    elif [ -f $f ] && [ $f == /etc/rpi-issue ] && [ $distro == / ];then
-
-        pac="apt"
-        pac_ins="sudo apt install"
-        pac_up="sudo apt update"
-        pac_upg="sudo apt upgrade"
-        pac_search="apt search"
-        pac_rm="sudo apt remove"
-        pac_rm_orph="sudo apt purge"
-        pac_clean="sudo apt autoremove"
-        pac_clean_cache="sudo apt clean"
-        pac_ls_ins="apt list --installed"
-                     
-        distro_base="Debian"
-        distro="Raspbian"
-
-    elif [ -f $f ] && [ $f == /etc/debian_version ] && [ $distro == / ];then
-        pac="apt"
-        pac_ins="sudo apt install"
-        pac_up="sudo apt update"
-        pac_upg="sudo apt upgrade"
-        pac_search="apt search"
-        pac_rm="sudo apt remove"
-        pac_rm_orph="sudo apt purge"
-        pac_clean="sudo apt autoremove"
-        pac_clean_cache="sudo apt clean"
-        pac_ls_ins="apt list --installed"
+        AUR_pac="pakku"
+        AUR_up="pakku -Syu"
+        AUR_ins="pakku -S"
+        AUR_search="pakku -Ss"
+        AUR_ls_ins="pakku -Q"
          
-        distro_base="Debian"   
-        distro="Debian"
-    fi 
-done
+    elif type paru &> /dev/null; then
+        AUR_pac="paru"
+        AUR_up="paru -Syua"
+        AUR_ins="paru -S"
+        AUR_search="paru -Ss"
+        AUR_search="paru -Q"
+         
+    elif type trizen &> /dev/null; then
+        AUR_pac="trizen"
+        AUR_up="trizen -Syu"
+        AUR_ins="trizen -S"
+        AUR_search="trizen -Ss"
+        AUR_ls_ins="trizen -Q"
+
+    #
+    # SEARCH AND BUILD
+    # 
+    
+    # Aurutils
+    elif type aur &> /dev/null; then
+        AUR_pac="aur"
+        AUR_up=""
+        AUR_ins=""
+        AUR_search="aur search"
+         
+    #elif type repoctl &> /dev/null; then
+    #    pac_AUR="repoctl"
+    #elif type yaah &> /dev/null; then
+    #    pac_AUR="yaah"
+    #elif type bauerbill &> /dev/null; then
+    #    pac_AUR="bauerbill"
+    #elif type PKGBUILDer &> /dev/null; then
+    #    pac_AUR="PKGBUILDer"
+    #elif type rua &> /dev/null; then
+    #    pac_AUR="rua"
+    #elif type pbget &> /dev/null; then
+    #    pac_AUR="pbget"
+    #elif type argon &> /dev/null ; then
+    #    pac_AUR="argon"
+    #elif type cylon &> /dev/null; then
+    #    pac_AUR="cylon"
+    #elif type kalu &> /dev/null; then
+    #    pac_AUR="kalu"
+    #elif type octopi &> /dev/null; then
+    #    pac_AUR="octopi"
+    #elif type PkgBrowser &> /dev/null; then
+    #    pac_AUR="PkgBrowser"
+    #elif type yup &> /dev/null ; then
+    #    pac_AUR="yup"
+    elif type auracle &> /dev/null; then
+
+        AUR_pac="auracle"
+        AUR_up="auracle update"
+        AUR_ins=""
+        AUR_search="auracle search"
+         
+    else
+        no_aur='TRUE' 
+    fi
+
+    distro_base="Arch"
+    distro="Arch"
+
+elif test -f == /etc/rpi-issue && [[ $distro == / ]]; then
+
+    pac="apt"
+    pac_ins="sudo apt install"
+    pac_up="sudo apt update"
+    pac_upg="sudo apt upgrade"
+    pac_search="apt search"
+    pac_rm="sudo apt remove"
+    pac_rm_orph="sudo apt purge"
+    pac_clean="sudo apt autoremove"
+    pac_clean_cache="sudo apt clean"
+    pac_ls_ins="apt list --installed"
+                 
+    distro_base="Debian"
+    distro="Raspbian"
+
+elif test -f == /etc/debian_version && [[ $distro == / ]]; then
+    pac="apt"
+    pac_ins="sudo apt install"
+    pac_up="sudo apt update"
+    pac_upg="sudo apt upgrade"
+    pac_search="apt search"
+    pac_rm="sudo apt remove"
+    pac_rm_orph="sudo apt purge"
+    pac_clean="sudo apt autoremove"
+    pac_clean_cache="sudo apt clean"
+    pac_ls_ins="apt list --installed"
+     
+    distro_base="Debian"   
+    distro="Debian"
+fi 
     
 
-if type nala &> /dev/null && test "$pac" == 'apt'; then
+if type nala &> /dev/null && [[ "$pac" == 'apt' ]]; then
     pac="nala"
     pac_ins="sudo nala install"
     pac_up="sudo nala update"
@@ -396,9 +397,9 @@ if type nala &> /dev/null && test "$pac" == 'apt'; then
 fi
 
 # TODO: Change this to uname -sm?
-if test $machine == 'Linux'; then
+if [[ $machine == 'Linux' ]]; then
     arch_cmd="lscpu"
-elif test $machine == 'Mac'; then
+elif [[ $machine == 'Mac' ]]; then
     arch_cmd="sysctl -n machdep.cpu.brand_string"
 fi
 
@@ -420,54 +421,54 @@ fi
 
 export PROFILE=~/.profile
 
-if ! [ -f ~/.profile ]; then
+if ! test -f ~/.profile; then
     touch ~/.profile
 fi
 
-if [ -f ~/.bash_profile ]; then
+if test -f ~/.bash_profile; then
     export PROFILE=~/.bash_profile
 fi
 
 export ENVVAR=~/.bashrc
 
-if [ -f ~/.environment.env ]; then
+if test -f ~/.environment.env; then
     export ENVVAR=~/.environment.env
 fi
 
 export ALIAS=~/.bashrc
 
-if [ -f ~/.bash_aliases ]; then
+if test -f ~/.bash_aliases; then
     export ALIAS=~/.bash_aliases
 fi
 
-if [ -d ~/.bash_aliases.d/ ]; then
+if test -d ~/.bash_aliases.d/; then
     export ALIAS_FILEDIR=~/.bash_aliases.d/
 fi
 
 
 export COMPLETION=~/.bashrc
 
-if [ -f ~/.bash_completion ]; then
+if test -f ~/.bash_completion; then
     export COMPLETION=~/.bash_completion
 fi
 
-if [ -d ~/.bash_completion.d/ ]; then
+if test -d ~/.bash_completion.d/; then
     export COMPLETION_FILEDIR=~/.bash_completion.d/
 fi
 
 
 export KEYBIND=~/.bashrc
 
-if [ -f ~/.keybinds ]; then
+if test -f ~/.keybinds; then
     export KEYBIND=~/.keybinds
 fi
 
-if [ -d ~/.keybinds.d/ ]; then
+if test -d ~/.keybinds.d/; then
     export KEYBIND_FILEDIR=~/.keybinds.d/
 fi
 
 
-if [ -f ~/.bash_profile ]; then
+if test -f ~/.bash_profile; then
     export PROFILE=~/.bash_profile
 fi
 

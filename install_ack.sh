@@ -8,9 +8,9 @@ fi
 
 if ! type ack &> /dev/null; then
     if ! test -z "$pac_ins"; then
-        ${pac_ins} ack 
+        eval "${pac_ins}" ack 
     fi
-    if ! test $? == 0 || test -z "$pac_ins"; then
+    if ! [[ $? == 0 ]] || test -z "$pac_ins"; then
         b="$(curl https://beyondgrep.com/ack-2.16-single-file)" 
         sudo tee "$b" /usr/bin/ack 
         sudo chmod 0755 /usr/bin/ack

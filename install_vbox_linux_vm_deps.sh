@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 if ! test -f checks/check_all.sh; then
     if type curl &>/dev/null; then
@@ -11,11 +11,6 @@ else
     . ./checks/check_all.sh
 fi
 
-get-script-dir SCRIPT_DIR
-
-if ! type testdisk &>/dev/null; then
-    echo "This next $(tput setaf 1)sudo$(tput sgr0) will install testdisk"
-    if [[ $distro_base == "Arch" ]] || [[ $distro_base == "Debian" ]]; then
-        eval "${pac_ins}" testdisk
-    fi
+if ! type make &> /dev/null || ! type perl &> /dev/null || ! type gcc &> /dev/null; then
+	eval "{pac_ins} make perl gcc"
 fi

@@ -27,10 +27,8 @@ if test -z $SYSTEM_UPDATED; then
 fi
 
 if ! type rg &> /dev/null; then 
-    if test $distro_base == "Arch"; then
-        ${pac_ins} ripgrep
-    elif test $distro_base == "Debian"; then
-        ${pac_ins} ripgrep
+    if [[ $distro_base == "Arch" ]] || [[ "$distro_base" == 'Debian' ]]; then
+        eval "${pac_ins} ripgrep"
     fi
 fi
 

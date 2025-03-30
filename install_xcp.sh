@@ -1,19 +1,22 @@
-if ! test -f install_cargo.sh; then
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)"
-else
-   ./install_cargo.sh
+#!/bin/bash 
+    
+if ! test -f checks/check_all.sh; then 
+    if type curl &> /dev/null; then 
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)"  
+    else  
+        continue  
+    fi 
+else 
+    . ./checks/check_all.sh 
 fi
 
-if ! test -f checks/check_envvar.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)" 
-else
-    . ./checks/check_envvar.sh
+if ! type xcp &> /dev/null; then
+	if ! type cargo &> /dev/null; then
+		if ! test -f install_cargo.sh; then
+    			eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)"
+		else
+   			. ./install_cargo.sh
+		fi
+	fi
+	cargo install xcp
 fi
-
-if ! type reade &> /dev/null; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
-else
-    . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
-fi
-
-cargo install xcp

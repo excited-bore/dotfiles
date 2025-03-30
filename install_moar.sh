@@ -2,49 +2,24 @@
 
 #DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
- if ! type reade &> /dev/null; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
-else
-    . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
-fi
-
-if ! test -f checks/check_system.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
-else
-    . ./checks/check_system.sh
-fi
-
-if ! type update-system &> /dev/null; then
-    if ! test -f aliases/.bash_aliases.d/update-system.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)" 
+if ! test -f checks/check_all.sh; then
+    if type curl &> /dev/null; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)"
     else
-        . ./aliases/.bash_aliases.d/update-system.sh
+        continue
     fi
-fi
-
-if test -z $SYSTEM_UPDATED; then
-    readyn -Y "CYAN" -p "Update system?" updatesysm
-    if test $updatesysm == "y"; then
-        update-system                     
-    fi
-fi
-
-if ! test -f checks/check_envvar.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)" 
 else
-    . ./checks/check_envvar.sh
+    . ./checks/check_all.sh
 fi
 
 answer=""
 
 if ! type moar &> /dev/null; then
     
-    
     if [ "$distro_base" == "Arch" ] && ! test -z "$AUR_ins"; then
-        
-        reade -Q 'GREEN' -i 'y' -p "Install moar from packagemanager (y), github binary (b) or not [Y/b/n]: " "b n"  answer
+        reade -Q 'GREEN' -i 'y b n' -p "Install moar from packagemanager (y), github binary (b) or not [Y/b/n]: "  answer
         if [ "$answer" == "y" ] || [ -z "$answer" ] || [ "$answer" == "Y" ]; then
-            eval "$AUR_ins moar-git";
+            ${AUR_ins} moar-git;
         fi
     
     else
