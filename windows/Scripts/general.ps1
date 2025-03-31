@@ -20,6 +20,56 @@ function edit-powershell-profile(){
 }
 
 
+# Use 'BitTransfer' to copy items instead of Copy-item to reduce slow loadtimes
+# https://stackoverflow.com/questions/2434133/progress-during-large-file-copy-copy-item-write-progress
+
+# Also, copying to an empty destination will create a file first
+
+Import-Module BitsTransfer
+function Copy-Item () {
+    [CmdletBinding()]
+    Param
+    (
+        [parameter(mandatory=$true, position=0)]$Source,
+        [parameter(mandatory=$true, position=1)]$Destination,
+        [parameter(mandatory=$false, position=2, ValueFromRemainingArguments=$true)]$Remaining
+    )
+   
+    if (Test-Path -Path $Destination -PathType Container){
+        $newF = $(Get-Item $Source).BaseName + $(Get-Item $Source).Extension
+        $Destination = Join-Path -Path $Destination -ChildPath $newF   
+    }
+
+    if ((Test-Path -Path $Source -PathType Leaf) -and -not (Test-Path -Path $Destination -PathType Leaf)){
+         New-Item -ItemType File -Path $Destination -Force
+    } 
+    
+    if ( $null -eq $Remaining ){
+        Start-BitsTransfer -Source $Source -Destination $Destination
+    }else{ 
+        Start-BitsTransfer -Source $Source -Destination $Destination @Remaining
+    }
+
+}
+
+if (Get-Command Add-Alias -errorAction SilentlyContinue){
+    # Don't use Commandlets like Move-Item or Remove-Item because 
+    # 1) They're more so used in scripts rather then straight from the shell
+    # 2) Setting f.ex. Add-Alias 'Move-Item -Force' breaks 'mv'
+    
+    # ls shows hidden files
+    Add-Alias ls 'ls -Force'
+   
+    # mv - move hidden files
+    Add-Alias mv 'mv -Force'
+
+    # cp - use bitstransfer
+    Add-Alias cp 'cp -Verbose'
+
+    # rm removes hidden files and recursively (everything in folder) 
+    Add-Alias rm 'rm -Force -Recurse'
+
+}
 
 # Get all available functions (and show them)
 
@@ -107,32 +157,6 @@ Set-Alias -Name list-object-properties -Value Get-Properties-Object
 #    Move-Item -Force
 #}
 
-# Use 'BitTransfer' to copy items instead of Copy-item to reduce slow loadtimes
-# https://stackoverflow.com/questions/2434133/progress-during-large-file-copy-copy-item-write-progress
-
-# Also, copying to an empty destination will create a file first
-
-Import-Module BitsTransfer
-function Copy-Item () {
-    [CmdletBinding()]
-    Param
-    (
-        [parameter(mandatory=$true, position=0)]$Source,
-        [parameter(mandatory=$true, position=1)]$Destination,
-        [parameter(mandatory=$false, position=2, ValueFromRemainingArguments=$true)]$Remaining
-    )
-   
-    if ((Test-Path -Path $Source -PathType Leaf) -and -not (Test-Path -Path $Destination -PathType Leaf)){
-         New-Item -ItemType File -Path $Destination -Force
-    } 
-    
-    Start-BitsTransfer -Source $Source -Destination $Destination @Remaining
-    #if ($args.Length -eq 0 -or $args.Length -eq 1){
-    #    Write-Host 'Supply at least 2 arguments: source and destination'
-    #}elseif($args.Length -eq 2 -or $args.Length -gt 2){
-    #    Start-BitsTransfer -Source $args[0] -Destination $args[1] 
-    #} 
-}
 
 # Get all COM ports
 
@@ -199,12 +223,9 @@ function global:Reload-Profile{
 
 # r -> Reload profile
 
-Get-Alias -Definition "Invoke-History" | grep.exe -q 'r ->' && Remove-Item -Force Alias:r && Set-Alias -Name r -Value Reload-Profile
-
-# Remove recursively and forceably
-
-function rm {
-    Remove-Item -Recurse -Force
+if (Get-Alias -Definition "Invoke-History" | grep.exe -q 'r ->'){
+    Remove-Item -Force Alias:r $oldAlias 
+    Set-Alias -Name r -Value Reload-Profile
 }
 
 # Set 'type' to 'Get-Command' instead of 'Get-Content' which gives closer compatibility to bash
@@ -224,14 +245,24 @@ if (Get-Command -Type alias type -ErrorAction SilentlyContinue){
 
 # Make symlink
 
-function link-soft ($target, $link) { 
-    if ($link -eq $null){
-        $link = $(Get-Item $target).BaseName + $(Get-Item $target).Extension
+function link-soft($target, $link) { 
+    if ($null -eq $link){
+        if (Test-Path $target -PathType Leaf){
+            $link = $(Get-Item $target).BaseName + $(Get-Item $target).Extension
+        }elseif (Test-Path $target -PathType Container){
+
+            $link = $(Get-Item $target).BaseName        
+       }
     }
-    New-Item -Path $link -ItemType SymbolicLink -Value $target
+    if (Test-Path $link -PathType Leaf){
+        New-Item -Path $link -ItemType SymbolicLink -Value $target
+    }else{
+        cmd /c mklink /d $link $target
+    }
 }
 
 Set-Alias -Name symlink-soft -Value link-soft
+Set-Alias -Name softlink -Value link-soft
 
 
 # Up one directory
@@ -304,4 +335,8 @@ if (Test-Path 'C:\Program Files\VideoLAN\VLC\vlc.exe' -PathType Leaf){
 
 function install-Ubuntu(){
     wsl.exe --install -d Ubuntu
+}
+
+function update-all-wing(){
+    winget update --all --include-unknown
 }
