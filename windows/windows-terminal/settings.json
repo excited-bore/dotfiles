@@ -32,10 +32,6 @@
             "id": "User.paste"
         },
         {
-            "command": "find",
-            "id": "User.find"
-        },
-        {
             "command": 
             {
                 "action": "splitPane",
@@ -43,6 +39,10 @@
                 "splitMode": "duplicate"
             },
             "id": "User.splitPane.A6751878"
+        },
+        {
+            "command": "find",
+            "id": "User.find"
         },
         {
             "command": 
@@ -58,8 +58,8 @@
     "keybindings": 
     [
         {
-            "id": "User.sendInput.24C6F4B1",
-            "keys": "ctrl+tab"
+            "id": null,
+            "keys": "alt+shift+minus"
         },
         {
             "id": "User.copy.644BA8F2",
@@ -70,8 +70,12 @@
             "keys": "ctrl+shift+tab"
         },
         {
-            "id": null,
-            "keys": "alt+shift+minus"
+            "id": "User.sendInput.24C6F4B1",
+            "keys": "ctrl+tab"
+        },
+        {
+            "id": "Terminal.ClosePane",
+            "keys": "ctrl+shift+w"
         },
         {
             "id": "User.paste",
@@ -80,10 +84,6 @@
         {
             "id": "User.find",
             "keys": "ctrl+shift+f"
-        },
-        {
-            "id": "Terminal.ClosePane",
-            "keys": "ctrl+shift+w"
         },
         {
             "id": "User.splitPane.A6751878",
@@ -118,7 +118,14 @@
     ],
     "profiles": 
     {
-        "defaults": {},
+        "defaults": 
+        {
+            "font": 
+            {
+                "face": "NotoMono Nerd Font Mono"
+            },
+            "opacity": 65,
+        },
         "list": 
         [
             {
@@ -175,6 +182,12 @@
                 "hidden": false,
                 "name": "Ubuntu",
                 "source": "CanonicalGroupLimited.Ubuntu_79rhkp1fndgsc"
+            },
+            {
+                "guid": "{0ffd45b2-cbea-58f4-8b50-33ca2b42f31c}",
+                "hidden": false,
+                "name": "Ubuntu",
+                "source": "Microsoft.WSL"
             }
         ]
     },
