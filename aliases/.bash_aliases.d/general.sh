@@ -1,4 +1,4 @@
-### GENERAL ###
+## GENERAL ###
 if ! type reade &> /dev/null && test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh; then
     . ~/.bash_aliases.d/00-rlwrap_scripts.sh
 fi
@@ -664,6 +664,7 @@ function ln-soft(){
     fi
 }
 
+alias link-soft="ln-soft"
 alias softlink="ln-soft"
 alias symlink="ln-soft"
 
