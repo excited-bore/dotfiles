@@ -1,4 +1,4 @@
-### GENERAL ###
+## GENERAL ###
 if ! type reade &> /dev/null && test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh; then
     . ~/.bash_aliases.d/00-rlwrap_scripts.sh
 fi
@@ -12,7 +12,7 @@ if [ -z $TRASHBIN_LIMIT ]; then
    TRASHBIN_LIMIT=100 
 fi
 
-if test $machine == 'Windows' && test $win_bash_shell == 'Cygwin'; then
+if [[ $machine == 'Windows' ]] && [[ $win_bash_shell == 'Cygwin' ]]; then
     alias cd-home-="cd /cygdrive/c/Users/$USER"
 fi
 
@@ -70,7 +70,7 @@ function cd-w() {
     ! test -d $@ && builtin cd -- $@ && return 0 
     local push=1
     local j=0
-    if test "$1" == "--"; then
+    if [[ "$1" == "--" ]]; then
         shift;
     fi 
     for i in $(dirs -l 2>/dev/null); do
@@ -580,7 +580,7 @@ function crontab-new(){
     #    xdg-open https://crontab.guru/     
     #fi
     reade -Q 'GREEN' -i 'custom @yearly @annually @monthly @weekly @daily @hourly @reboot' -p 'When? [Custom/@yearly/@annually/@monthly/@weekly/@daily/@hourly/@reboot]: ' when
-    if test "$when" == 'custom'; then
+    if [[ "$when" == 'custom' ]]; then
         printf "\t * means any value/not applicable\n\t , for multiple values\n\t - for a range in values\n\t / for step values (f.ex */2 every 2nd of)\n\tFor weekdays mon/tue/wed/thur/fri/sat/sun are alternatives to numeric values\n" 
         reade -Q 'GREEN' -i '* 0 5 10 15 25 30 35 40 45 50 55 0,5,10,15,25,30,35,40,45,5,55' -p 'Minutes? (0-59): ' min
         reade -Q 'GREEN' -i '* 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23' -p 'Hours? (0-23): ' hour
@@ -594,33 +594,33 @@ function crontab-new(){
     users=$(compgen -u) 
     reade -Q 'GREEN' -i "$USER" -p 'User: ' "$users" user
     reade -Q 'GREEN' -i "command file" -p 'Script file or command? [Command/file]: ' cmd_file
-    if test $cmd_file == 'file'; then
+    if [[ $cmd_file == 'file' ]]; then
         reade -Q 'GREEN' -p 'File to script: ' -e file
         reade -Q 'GREEN' -i 'bash python php zsh dash fish' -p 'Language: ' cmd
         cmd="$cmd $file" 
     else
         reade -Q 'GREEN' -i "''" -p 'Command: ' cmd
     fi
-    if test 'root' == $user || test $user == 'system'; then
-        if test $format == '@daily'; then
+    if [[ 'root' == $user ]] || [[ $user == 'system' ]]; then
+        if [[ $format == '@daily' ]]; then
             if ! test -f /etc/cron.daily/schedule; then
                 sudo touch /etc/cron.daily/schedule
             fi
             sudo echo "$format root $cmd" >> /etc/cron.daily/schedule
             sudo chmod 600 /etc/cron.daily/schedule 
-        elif test $format == '@hourly'; then 
+        elif [[ $format == '@hourly' ]]; then 
             if ! test -f /etc/cron.hourly/schedule; then
                 sudo touch /etc/cron.hourly/schedule
             fi
             sudo echo "$format root $cmd" >> /etc/cron.hourly/schedule
             sudo chmod 600 /etc/cron.hourly/schedule 
-        elif test $format == '@monthly'; then 
+        elif [[ $format == '@monthly' ]]; then 
             if ! test -f /etc/cron.monthly/schedule; then
                 sudo touch /etc/cron.monthly/schedule
             fi
             sudo echo "$format root $cmd" >> /etc/cron.monthly/schedule
             sudo chmod 600 /etc/cron.monthly/schedule 
-        elif test $format == '@weekly'; then 
+        elif [[ $format == '@weekly' ]]; then 
             if ! test -f /etc/cron.weekly/schedule; then
                 sudo touch /etc/cron.weekly/schedule
             fi
@@ -643,31 +643,57 @@ function crontab-new(){
 alias cron-new='crontab-new'
 
 function ln-soft(){
-    if ([ -d "$1" ] || [ -f "$1" ]) && ([[ $(readlink -f "$2") ]] || [[ $(readlink -d "$2") ]]); then
-        if [ -e "$(pwd)/$1" ]; then  
-            ln -s "$(pwd)/$1" "$2";
-        else     
-            ln -s "$1" "$2";
-        fi;
+    if ([ -d "$1" ] || [ -f "$1" ]); then 
+        if test -n "$2" && ([[ $(readlink -f "$2") ]] || [[ $(readlink -d "$2") ]]); then
+            if [[ "$1" == /* ]]; then  
+                ln -s "$1" "$2";
+            else     
+                ln -s "$(pwd)/$1" "$2";
+            fi;
+        else
+            if [[ "$1" == /* ]]; then  
+                ln -s "$1" $(basename "$1")
+            else     
+                ln -s "$(pwd)/$1" $(basename "$1")
+            fi;
+        fi
+        return 0
     else
-        echo "Give a file and a name pls";
+        echo "Give up a file or folder please";
+        return 1
     fi
 }
+
+alias link-soft="ln-soft"
+alias softlink="ln-soft"
+alias symlink="ln-soft"
 
 #complete -F _filedir ln-soft
 
 
 function ln-hard(){
-    if ([[ "$0" = /* ]] || [ -d "$1" ] || [ -f "$1" ]) && ([[ $(readlink -f "$2") ]] || [[ $(readlink -d "$2") ]]); then
-        if [[ "$1" = /* ]]; then  
-            ln "$1" "$2";
-        else     
-            ln "$(pwd)/$1" "$2";
-        fi;
+    if ([[ "$0" = /* ]] || [ -d "$1" ] || [ -f "$1" ]); then
+        if test -n "$2" && ([[ $(readlink -f "$2") ]] || [[ $(readlink -d "$2") ]]); then
+            if [[ "$1" == /* ]]; then  
+                ln "$1" "$2";
+            else     
+                ln "$(pwd)/$1" "$2";
+            fi
+        else
+            if [[ "$1" == /* ]]; then  
+                ln "$1" $(basename "$1")
+            else     
+                ln "$(pwd)/$1" $(basename "$1")
+            fi; 
+        fi
+        return 0
     else
-        echo "Give a file and a name pls";
+        echo "Give up a file or folder please";
+        return 1
     fi
 }
+
+alias hardlink="ln-hard"
 
 #complete -F _filedir ln-hard
 
@@ -726,7 +752,7 @@ complete -F _groups add_to_group
 function set-executable-user() {
     if ! test -z "$@"; then
         for i in "$@"; do 
-            if test "$(stat -c '%U' "$i")" == 'root' || ! test "$(stat -c '%U' "$i")" == "$USER"; then
+            if [[ "$(stat -c '%U' "$i")" == 'root' ]] || ! [[ "$(stat -c '%U' "$i")" == "$USER" ]]; then
                 sudo chmod u+x $i;
             else 
                 chmod u+x $i;    
@@ -740,7 +766,7 @@ function set-executable-user() {
 function set-executable-group() {
     if ! test -z "$@"; then
         for i in "$@"; do 
-            if test "$(stat -c '%U' "$i")" == 'root' || ! test "$(stat -c '%U' "$i")" == "$USER"; then
+            if [[ "$(stat -c '%U' "$i")" == 'root' ]] || ! [[ "$(stat -c '%U' "$i")" == "$USER" ]]; then
                 sudo chmod g+x $i;
             else 
                 chmod g+x $i;    
@@ -754,7 +780,7 @@ function set-executable-group() {
 function set-executable-other() {
     if ! test -z "$@"; then
         for i in "$@"; do 
-            if test "$(stat -c '%U' "$i")" == 'root' || ! test "$(stat -c '%U' "$i")" == "$USER"; then
+            if [[ "$(stat -c '%U' "$i")" == 'root' ]] || ! [[ "$(stat -c '%U' "$i")" == "$USER" ]]; then
                 sudo chmod o+x $i;
             else 
                 chmod o+x $i;    
@@ -769,7 +795,7 @@ function set-executable-other() {
 function set-executable-all() {
     if ! test -z "$@"; then
         for i in "$@"; do 
-            if test "$(stat -c '%U' "$i")" == 'root' || ! test "$(stat -c '%U' "$i")" == "$USER"; then
+            if [[ "$(stat -c '%U' "$i")" == 'root' ]] || ! [[ "$(stat -c '%U' "$i")" == "$USER" ]]; then
                 sudo chmod +x $i;
             else 
                 chmod +x $i;    
@@ -784,7 +810,7 @@ function set-executable-all() {
 function unset-executable-user() {
     if ! test -z "$@"; then
         for i in "$@"; do 
-            if test "$(stat -c '%U' "$i")" == 'root' || ! test "$(stat -c '%U' "$i")" == "$USER"; then
+            if [[ "$(stat -c '%U' "$i")" == 'root' ]] || ! [[ "$(stat -c '%U' "$i")" == "$USER" ]]; then
                 sudo chmod u-x $i;
             else
                 chmod u-x $i    
@@ -798,7 +824,7 @@ function unset-executable-user() {
 function unset-executable-group() {
     if ! test -z "$@"; then
         for i in "$@"; do 
-            if test "$(stat -c '%U' "$i")" == 'root' || ! test "$(stat -c '%U' "$i")" == "$USER"; then
+            if [[ "$(stat -c '%U' "$i")" == 'root' ]] || ! [[ "$(stat -c '%U' "$i")" == "$USER" ]]; then
                 sudo chmod g-x $i;
             else
                 chmod g-x $i    
@@ -812,7 +838,7 @@ function unset-executable-group() {
 function unset-executable-other() {
     if ! test -z "$@"; then
         for i in "$@"; do 
-            if test "$(stat -c '%U' "$i")" == 'root' || ! test "$(stat -c '%U' "$i")" == "$USER"; then
+            if [[ "$(stat -c '%U' "$i")" == 'root' ]] || ! [[ "$(stat -c '%U' "$i")" == "$USER" ]]; then
                 sudo chmod o-x $i;
             else
                 chmod o-x $i    
@@ -828,7 +854,7 @@ function unset-executable-other() {
 function unset-executable-all() {
     if ! test -z "$@"; then
         for i in "$@"; do 
-            if test "$(stat -c '%U' "$i")" == 'root' || ! test "$(stat -c '%U' "$i")" == "$USER"; then
+            if [[ "$(stat -c '%U' "$i")" == 'root' ]] || ! [[ "$(stat -c '%U' "$i")" == "$USER" ]]; then
                 sudo chmod -x $i;
             else
                 chmod -x $i    
@@ -874,7 +900,7 @@ function print-path-to-prompt(){
         esac
     done && OPTIND=1;
     fls=$(echo "$@" | sed 's| |\\ |g' | sed 's|\[|\\\[|g' | sed 's|\]|\\\]|g' | sed 's|(|\\(|g' | sed 's|)|\\)|g' | sed 's|{|\\{|g' | sed 's|}|\\}|g')
-    if test $lines == 'n'; then
+    if [[ $lines == 'n' ]]; then
         fls="$(echo $fls | tr "\n" ' ')"
     fi
     READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$fls${READLINE_LINE:$READLINE_POINT}"
@@ -970,6 +996,7 @@ function boot-into(){
     unset bootnt 
 }
 
+alias reboot-into="boot-into"
 alias next-boot="boot-into"
 
 function change-username-and-homefolder(){
@@ -978,7 +1005,7 @@ function change-username-and-homefolder(){
     local words="$(echo $words | sed "s/\<$frst\> //g")" 
     reade -Q 'CYAN' -i "$frst $words" -p "Old username (Empty = $frst): " usrname 
     test -z "$usrname" && usrname="$frst" 
-    test "$USER" == "$usrname" && printf "${RED}Can't change username for $usrname while logged as said\nLogout, press 'Ctrl+Alt+F1/F2/...F6' to drop to a login shell (if not already in one) and login as root or a user other then the one you want to change.\n${YELLOW}(Make sure the root account is enabled with 'sudo passwd su' - you can disable it afterwards with 'sudo passwd -l su')${normal}\n" && return 1 
+    [[ "$USER" == "$usrname" ]] && printf "${RED}Can't change username for $usrname while logged as said\nLogout, press 'Ctrl+Alt+F1/F2/...F6' to drop to a login shell (if not already in one) and login as root or a user other then the one you want to change.\n${YELLOW}(Make sure the root account is enabled with 'sudo passwd su' - you can disable it afterwards with 'sudo passwd -l su')${normal}\n" && return 1 
     reade -Q 'MAGENTA' -p 'New username: ' usrname_nw 
     if ! test -z "$usrname_nw"; then
         if ! test -z "$(ps -U $usrname 2> /dev/null)"; then
@@ -1011,5 +1038,4 @@ function change-device-name-to(){
     printf "${GREEN}Changed device name (hostname) to $name!${normal}\n" &&
     return 0 || return 1;
 }
-
 
