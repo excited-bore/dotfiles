@@ -1,6 +1,8 @@
-if [[ $distro == "Manjaro" || $distro == "Arch" ]]; then
+#!/bin/bash
+
+if [[ $distro_base == "Arch" ]]; then
     alias kitty_remote_fix="sudo pacman -S kitty-terminfo"
-elif [ $distro_base == "Debian" ]; then
+elif [[ $distro_base == "Debian" ]]; then
     alias kitty_remote_fix="sudo apt install kitty-terminfo"
 fi
 
