@@ -118,10 +118,8 @@ if test -z $SYSTEM_UPDATED; then
     readyn -Y "CYAN" -p "Update system?" updatesysm
     if [[ "$updatesysm" == "y" ]]; then
         update-system-yes
-        export SYSTEM_UPDATED="TRUE"
-    else
-        export SYSTEM_UPDATED="TRUE"
     fi
+    export SYSTEM_UPDATED="TRUE"
 fi
 
 function get-script-dir() {

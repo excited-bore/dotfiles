@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export SYSTEM_UPDATED="TRUE"
+
 if ! test -f checks/check_all.sh; then
     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)"
 else
