@@ -24,12 +24,12 @@ if ! type rlwrap &>/dev/null; then
 fi
 
 if ! type curl &>/dev/null && ! test -z "$pac_ins"; then
-    printf "Installing curl\n"
+    printf "${GREEN}Installing curl\n${normal}"
     eval ${pac_ins} curl
 fi
 
 if ! type jq &>/dev/null && ! test -z "$pac_ins"; then
-    printf "Installing jq\n"
+    printf "${GREEN}Installing jq\n${normal}"
     eval ${pac_ins} jq
 fi
 
@@ -40,28 +40,28 @@ fi
 
 if [[ ! -e ~/config ]] && test -d ~/.config; then
     readyn -Y "BLUE" -p "Create ~/.config to ~/config symlink? " sym1
-    if [[ -z $sym1 ]] || [[ "y" == $sym1 ]]; then
+    if [[ "y" == $sym1 ]]; then
         ln -s ~/.config ~/config
     fi
 fi
 
 if [[ ! -e ~/lib_systemd ]] && test -d ~/lib/systemd/system; then
     readyn -Y "BLUE" -p "Create /lib/systemd/system/ to user directory symlink? " sym2
-    if [[ -z $sym2 ]] || [[ "y" == $sym2 ]]; then
+    if [[ "y" == $sym2 ]]; then
         ln -s /lib/systemd/system/ ~/lib_systemd
     fi
 fi
 
 if [[ ! -e ~/etc_systemd ]] && test -d ~/etc/systemd/system; then
     readyn -Y "BLUE" -p "Create /etc/systemd/system/ to user directory symlink? " sym3
-    if [[ -z $sym3 ]] || [[ "y" == $sym3 ]]; then
+    if [[ "y" == $sym3 ]]; then
         ln -s /etc/systemd/system/ ~/etc_systemd
     fi
 fi
 
 if test -d /etc/modprobe.d && ! test -f /etc/modprobe.d/nobeep.conf; then
     readyn -p "Remove terminal beep? (blacklist pcspkr)" beep
-    if [[ "$beep" == "y" ]] || [[ -z "$beep" ]]; then
+    if [[ "$beep" == "y" ]]; then
         echo "blacklist pcspkr" | sudo tee /etc/modprobe.d/nobeep.conf 1>/dev/null
     fi
 fi
@@ -99,7 +99,7 @@ if test -z "$(eval "$pac_ls_ins zip 2> /dev/null")" || test -z "$(eval "$pac_ls_
     unset nzp_ins
 fi
 
-if [[ "$X11_WAY" == 'x11' ]] && ( ! type xclip &>/dev/null || ! type xsel &>/dev/null ); then
+if [[ "$X11_WAY" == 'x11' ]] && (! type xclip &>/dev/null || ! type xsel &>/dev/null); then
     printf "${CYAN}xclip${normal} and/or ${CYAN}xsel${normal} are not installed (clipboard tools for X11 based systems)\n"
     readyn -p "Install xclip and xsel? " nzp_ins
     if [[ $nzp_ins == 'y' ]]; then
@@ -413,7 +413,7 @@ unset pycomp
 get-script-dir SCRIPT_DIR
 
 readyn -p "Install bash aliases and other config?" scripts
-if [[ -z $scripts ]] || [[ "y" == $scripts ]]; then
+if [[ "y" == $scripts ]]; then
 
     if ! test -f $SCRIPT_DIR/checks/check_aliases_dir.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)"
@@ -544,7 +544,7 @@ yes-no-edit -f xresources -g "$xterm" -p "Install .Xresources at ~/? (Xterm conf
 # Bash Preexec
 
 readyn -p "Install pre-execution hooks for bash in ~/.bash_preexec?" -c "! test -f ~/.bash_preexec || ! test -f /root/.bash_preexec" bash_preexec
-if [[ -z "$bash_preexec" ]] || [[ "y" == "$bash_preexec" ]]; then
+if [[ "y" == "$bash_preexec" ]]; then
     if ! test -f $SCRIPT_DIR/install_bash_preexec.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bash_preexec.sh)"
     else
@@ -569,7 +569,7 @@ unset pipew
 
 readyn -p "Install moar? (Custom pager/less replacement - awesome default options)" -c 'type moar &> /dev/null;' moar
 
-if [[ -z $moar ]] || [[ "Y" == $moar ]] || [[ $moar == "y" ]]; then
+if [[ $moar == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_moar.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_moar.sh)"
     else

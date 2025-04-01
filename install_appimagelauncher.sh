@@ -26,7 +26,26 @@ fi
 if ! type AppImageLauncher &>/dev/null; then
     echo "This next $(tput setaf 1)sudo$(tput sgr0) will install Appimagelauncher"
     if [[ $distro_base == "Arch" ]]; then
-        eval "$pac_ins appimagelauncher"
+        if test -z "$AUR_ins"; then
+            printf "Need an AUR installer / pacman wrapper for installing appimagelauncher.${CYAN}yay${normal} is recommended\n"
+            readyn -p "Install yay?" insyay
+            if [[ "y" == "$insyay" ]]; then
+                if type curl &>/dev/null && ! test -f $SCRIPT_DIR/AUR_installers/install_yay.sh; then
+                    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/AUR_installers/install_yay.sh)
+                else
+                    . $SCRIPT_DIR/AUR_installers/install_yay.sh
+                fi
+                AUR_pac="yay"
+                AUR_up="yay -Syu"
+                AUR_ins="yay -S"
+                AUR_search="yay -Ss"
+                AUR_ls_ins="yay -Q"
+            fi
+            unset insyay
+        fi
+
+        eval "$AUR_ins appimagelauncher"
+
     elif [[ $distro_base == "Debian" ]]; then
         if type add-apt-repository &>/dev/null && [[ $(check-ppa ppa:appimagelauncher-team/stable) =~ 'OK' ]]; then
             sudo add-apt-repository ppa:appimagelauncher-team/stable

@@ -12,5 +12,5 @@ else
 fi
 
 if ! type make &> /dev/null || ! type perl &> /dev/null || ! type gcc &> /dev/null; then
-	eval "{pac_ins} make perl gcc"
+	eval "${pac_ins} make perl gcc"
 fi

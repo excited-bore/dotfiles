@@ -31,7 +31,7 @@ if [[ "$distro_base" == "Debian" ]] && [[ $vrs < 0.8 ]]; then
     echo "Neovim apt version is below 0.8, wich too low to run Lazy.nvim (nvim plugin manager)"
     if ! test -z "$(sudo apt list --installed 2>/dev/null | grep neovim)"; then
         readyn -p "Uninstall apt version of neovim?" nvmapt
-        if [ "y" == "$nvmapt" ]; then
+        if [[ "y" == "$nvmapt" ]]; then
             sudo apt remove neovim
         fi
     fi
@@ -42,7 +42,7 @@ if [[ "$distro_base" == "Debian" ]] && [[ $vrs < 0.8 ]]; then
             eval "${pac_ins}" neovim
         else
             readyn -p "Install nvim through alternative means (appimage - flatpak - build from source (+ Ubuntu: ppa))?" nvmappmg
-            if ! test -z "$nvmappmg" || [[ "y" == "$nvmappmg" ]]; then
+            if [[ "y" == "$nvmappmg" ]]; then
                 pre="appimage"
                 choices="flatpak build"
                 prompt="Which one (Appimage/flatpak/build from source)? [Flatpak/appimage/build]: "
@@ -167,7 +167,7 @@ fi
 
 if [[ $X11_WAY == 'x11' ]] && ! type xclip &>/dev/null; then
     readyn -p "Install nvim clipboard? (xsel xclip)" clip
-    if [ -z $clip ] || [[ "y" == "$clip" ]]; then
+    if [[ "y" == "$clip" ]]; then
         eval "${pac_ins}" install xsel xclip
         echo "${green} If this is for use with ssh on serverside, X11 needs to be forwarded"
         echo "${green} At clientside, 'ForwardX11 yes' also needs to be put in ~/.ssh/config under Host"
@@ -181,7 +181,7 @@ fi
 
 if ! type gcc &>/dev/null || ! type npm &>/dev/null || ! type unzip &>/dev/null; then
     readyn -p "Install necessary tools for using supplied config? (tools include: gcc - GNU C compiler, npm - javascript package manager and unzip)" gccn
-    if [ -z $gccn ] || [[ "y" == $gccn ]]; then
+    if [[ "y" == $gccn ]]; then
         eval "${pac_ins}" gcc npm unzip
     fi
 fi
@@ -190,7 +190,7 @@ readyn -p "Install nvim code language support (python, javascript, ruby, perl, .
 if [[ "$langs" == 'y' ]]; then
     if ! type pylint &>/dev/null; then
         readyn -p "Install nvim-python?" pyscripts
-        if test -z $pyscripts || [[ "y" == "$pyscripts" ]]; then
+        if [[ "y" == "$pyscripts" ]]; then
             if ! type pyenv &>/dev/null; then
                 if ! test -f $DIR/install_pyenv.sh; then
                     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pyenv.sh)"
@@ -220,14 +220,14 @@ if [[ "$langs" == 'y' ]]; then
     fi
     if ! type npm &>/dev/null || ! npm list -g | grep neovim &>/dev/null; then
         readyn -p "Install nvim-javascript? " jsscripts
-        if [ -z $jsscripts ] || [[ "y" == "$jsscripts" ]]; then
+        if [[ "y" == "$jsscripts" ]]; then
             eval "${pac_ins}" npm nodejs
             sudo npm install -g neovim
         fi
     fi
     if ! type gem &>/dev/null || ! gem list | grep neovim &>/dev/null; then
         readyn -p "Install nvim-ruby? " rubyscripts
-        if [ -z $rubyscripts ] || [[ "y" == $rubyscripts ]]; then
+        if [[ "y" == $rubyscripts ]]; then
             if ! test -f install_ruby.sh; then
                 eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ruby.sh)"
             else
@@ -252,9 +252,9 @@ if [[ "$langs" == 'y' ]]; then
         if [[ "y" == $cpn ]]; then
             cpan -l &> /dev/null
         else
-            if ! type cpanm &>/dev/null || ! cpan -l 2>/dev/null | grep Neovim::Ext &>/dev/null; then
+            if ! type cpanm &>/dev/null || ! cpan -l 2>/dev/null | grep -q Neovim::Ext; then
                 readyn -p "Install nvim-perl?" perlscripts
-                if [ -z $perlscripts ] || [[ "y" == $perlscripts ]]; then
+                if [[ "y" == $perlscripts ]]; then
                     if ! type cpanm &> /dev/null; then
                         eval "${pac_ins}" cpanminus
                     fi
@@ -321,7 +321,7 @@ function instvim_r() {
         sudo mkdir -p /root/.config/nvim/
     fi
     sudo cp -bfv $dir/* /root/.config/nvim/
-    if ! sudo test -z $(ls /root/.config/nvim/*~ &>/dev/null); then
+    if sudo test -n "$(ls /root/.config/nvim/*~ &>/dev/null)"; then
         sudo bash -c 'gio trash /root/.config/nvim/*~'
     fi
     # Symlink configs to flatpak dirs for possible flatpak nvim use
@@ -334,33 +334,33 @@ function instvim_r() {
         sudo sed -i 's|.export MYVIMRC="|export MYVIMRC=~/.config/nvim/init.vim "|g' $ENVVAR_R
         sudo sed -i 's|.export MYGVIMRC="|export MYGVIMRC=~/.config/nvim/init.vim "|g' $ENVVAR_R
     else
-        printf "export MYVIMRC=~/.config/nvim/init.vim\n" | sudo tee -a $ENVVAR_R
-        printf "export MYGVIMRC=~/.config/nvim/init.vim\n" | sudo tee -a $ENVVAR_R
+        printf "export MYVIMRC=~/.config/nvim/init.vim\n" | sudo tee -a $ENVVAR_R &> /dev/null
+        printf "export MYGVIMRC=~/.config/nvim/init.vim\n" | sudo tee -a $ENVVAR_R &> /dev/null
     fi
 
     readyn -p "Set nvim as default for root EDITOR? " vimrc
-    if [ -z "$vimrc" ] || [[ "$vimrc" == "y" ]]; then
+    if [[ "$vimrc" == "y" ]]; then
         if sudo grep -q "EDITOR" $ENVVAR_R; then
             sudo sed -i "s|.export EDITOR=.*|export EDITOR=$(where_cmd nvim)|g" $ENVVAR_R
         else
-            printf "export EDITOR=$(where_cmd nvim)\n" | sudo tee -a $ENVVAR_R
+            printf "export EDITOR=$(where_cmd nvim)\n" | sudo tee -a $ENVVAR_R &> /dev/null 
         fi
     fi
     unset vimrc
 
     readyn -p "Set nvim as default for root VISUAL? " vimrc
-    if [ -z "$vimrc" ] || [[ "$vimrc" == "y" ]]; then
+    if [[ "$vimrc" == "y" ]]; then
         if sudo grep -q "VISUAL" $ENVVAR_R; then
             sudo sed -i "s|.export VISUAL=*|export VISUAL=$(where_cmd nvim)|g" $ENVVAR_R
         else
-            printf "export VISUAL=$(where_cmd nvim)\n" | sudo tee -a $ENVVAR_R
+            printf "export VISUAL=$(where_cmd nvim)\n" | sudo tee -a $ENVVAR_R &> /dev/null
         fi
     fi
     unset vimrc
 
     if ! sudo test -f /root/.vimrc; then
-        readyn -Y 'YELLOW' -p "Make symlink for init.vim at /root/.vimrc for user? (Might conflict with nvim +checkhealth) " vimrc_r
-        if [ -z $vimrc_r ] || [[ "y" == "$vimrc_r" ]] && ! test -f /root/.vimrc; then
+        readyn -Y 'YELLOW' -p "Make symlink for init.vim at /root/.vimrc for user? (Might conflict with nvim +checkhealth)" -c "! test -f /root/.vimrc" vimrc_r
+        if [[ "y" == "$vimrc_r" ]]; then
             sudo ln -s /root/.config/nvim/init.vim /root/.vimrc
         fi
     fi
@@ -373,7 +373,7 @@ function instvim() {
 
     cp -bfv $dir/* ~/.config/nvim/
 
-    if ! test -z $(ls ~/.config/nvim/*~ &>/dev/null); then
+    if test -n "$(ls ~/.config/nvim/*~ &>/dev/null)"; then
         gio trash ~/.config/nvim/*~
     fi
 
@@ -397,7 +397,7 @@ function instvim() {
     fi
 
     readyn -p "Set Neovim as default for user EDITOR? " vimrc
-    if [ -z "$vimrc" ] || [[ "$vimrc" == "y" ]]; then
+    if [[ "$vimrc" == "y" ]]; then
         if grep -q "EDITOR" $ENVVAR; then
             sed -i "s|.export EDITOR=.*|export EDITOR=$(where_cmd nvim)|g" $ENVVAR
         else
@@ -407,7 +407,7 @@ function instvim() {
     unset vimrc
 
     readyn -p "Set Neovim as default for user VISUAL? " vimrc
-    if [ -z "$vimrc" ] || [[ "$vimrc" == "y" ]]; then
+    if [[ "$vimrc" == "y" ]]; then
         if grep -q "VISUAL" $ENVVAR; then
             sed -i "s|.export VISUAL=*|export VISUAL=$(where_cmd nvim)|g" $ENVVAR
         else
@@ -416,8 +416,8 @@ function instvim() {
     fi
     unset vimrc
 
-    readyn -Y 'YELLOW' -p "Make symlink for init.vim at ~/.vimrc for user? (Might conflict with nvim +checkhealth)" vimrc
-    if [ -z $vimrc ] && ! test -f ~/.vimrc; then
+    readyn -Y 'YELLOW' -p "Make symlink for init.vim at ~/.vimrc for user? (Might conflict with nvim +checkhealth)" -c "! test -f ~/.vimrc" vimrc
+    if [[ $vimrc == 'y' ]]; then
         ln -s ~/.config/nvim/init.vim ~/.vimrc
     fi
     yes-no-edit -f instvim_r -g "$dir/init.vim $dir/init.lua.vim $dir/plug_lazy_adapter.vim" -p "Install (neo)vim readconfigs at /root/.config/nvim/ ? (init.vim, init.lua, etc..)" -i "e" -Q "YELLOW"
@@ -425,8 +425,6 @@ function instvim() {
 yes-no-edit -f instvim -g "$dir/init.vim $dir/init.lua.vim $dir/plug_lazy_adapter.vim" -p "Install (neo)vim readconfigs at ~/.config/nvim/ ? (init.vim, init.lua, etc..)" -i "e" -Q "GREEN"
 
 unset dir tmpdir tmpfile
-
-echo bluh
 
 #nvim +CocUpdate
 nvim +checkhealth
@@ -450,13 +448,13 @@ vimsh_r() {
 vimsh() {
     cp -fv $file ~/.bash_aliases.d/
     cp -fv $file1 ~/.bash_completion.d/
-    yes-no-edit -f vimsh_r -g "$dir/vim_nvim.sh $dir1/vim_nvim" -p "Install vim aliases at /root/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)? " -i "y" -Q "GREEN"
+    yes-no-edit -f vimsh_r -g "$dir/vim_nvim.sh $dir1/vim_nvim" -p "Install vim aliases at /root/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)?" -i "y" -Q "GREEN"
 }
-yes-no-edit -f vimsh -g "$dir/vim_nvim.sh $dir1/vim_nvim" -p "Install vim aliases at ~/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)? " -i "y" -Q "GREEN"
+yes-no-edit -f vimsh -g "$dir/vim_nvim.sh $dir1/vim_nvim" -p "Install vim aliases at ~/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)?" -i "y" -Q "GREEN"
 
 if ! type nvimpager &>/dev/null; then
     readyn -n -p "Install nvimpager?" vimrc
-    if [ -z "$vimrc" ] || [[ "$vimrc" == "y" ]]; then
+    if [[ "$vimrc" == "y" ]]; then
         if ! test -f install_nvimpager.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nvimpager.sh)"
         else

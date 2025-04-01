@@ -2,13 +2,15 @@
 
 [[ "$1" == 'n' ]] && SYSTEM_UPDATED='TRUE'
 
+# Allow sudo aliases
 # https://unix.stackexchange.com/questions/139231/keep-aliases-when-i-use-sudo-bash
-if type sudo &>/dev/null; then
-    alias sudo='sudo '
-fi
-if type wget &>/dev/null; then
+
+# type sudo &>/dev/null &&
+#    alias sudo='sudo '
+
+# Wget only uses (encrypted) https
+type wget &>/dev/null &&
     alias wget='wget --https-only '
-fi
 
 # https://stackoverflow.com/questions/5412761/using-colors-with-printf
 # Execute (during printf) for colored prompt

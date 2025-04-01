@@ -37,7 +37,7 @@ set relativenumber
 
 "https://vim.fandom.com/wiki/GNU/Linux_clipboard_copy/paste_with_xclip
 "The 'a' and 'A' options enables copying selected text to system clipboard 
-set guioptions=aAimrLT
+"set guioptions=aAimrLT
 
 " Set shell and shell cmd flags (-l/--login, -i/--interactive - WARNING: Might break config)
 "set shell=/bin/bash    
