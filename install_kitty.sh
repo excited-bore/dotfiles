@@ -172,9 +172,9 @@ if [[ $ktty_cnf == 'y' ]]; then
                 prompt="$j-th layout in list? "
             fi
 
-            local frst="$(echo "$lays" | awk '{print $1}')"
-            local layouts1=$(echo "$lays" | sed "s/\<"$frst"\> //g")
-            local layout_p=$(echo "$lays" | tr ' ' '/')
+            frst="$(echo "$lays" | awk '{print $1}')"
+            layouts1=$(echo "$lays" | sed "s/\<"$frst"\> //g")
+            layout_p=$(echo "$lays" | tr ' ' '/')
 
             test -z "$ZSH_VERSION" &&
 
