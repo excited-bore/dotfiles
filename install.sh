@@ -398,38 +398,6 @@ if [[ -z $pycomp ]] || [[ "y" == "$pycomp" ]]; then
 fi
 unset pycomp
 
-# Rlwrap scripts
-
-#readyn -p "Install reade, readyn and yes-no-edit?" -c 'test -f ~/.bash_aliases.d/reade' insrde
-#if test "$insrde" == 'y'; then
-#    if ! test -f install_reade_readyn.sh; then
-#         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_reade_readyn.sh)"
-#    else
-#        ./install_reade_readyn.sh
-#    fi
-#fi
-#unset insrde
-
-get-script-dir SCRIPT_DIR
-
-readyn -p "Install bash aliases and other config?" scripts
-if [[ "y" == $scripts ]]; then
-
-    if ! test -f $SCRIPT_DIR/checks/check_aliases_dir.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)"
-    else
-        . $SCRIPT_DIR/checks/check_aliases_dir.sh
-    fi
-    if ! test -f $SCRIPT_DIR/install_aliases.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/install_aliases.sh)"
-    else
-        . $SCRIPT_DIR/install_aliases.sh
-    fi
-fi
-
-test -n $BASH_VERSION && source ~/.bashrc &>/dev/null
-test -n $ZSH_VERSION && source ~/.zshrc &>/dev/null
-
 get-script-dir SCRIPT_DIR
 
 # Shell-keybinds
@@ -523,6 +491,40 @@ shell-keybinds() {
 }
 
 yes-no-edit -f shell-keybinds -g "$binds $binds2 $binds1" -p "Install .inputrc and keybinds.bash at ~/ and ~/.keybinds.d/? (keybinds configuration)" -i "y" -Q "GREEN"
+
+# Rlwrap scripts
+
+#readyn -p "Install reade, readyn and yes-no-edit?" -c 'test -f ~/.bash_aliases.d/reade' insrde
+#if test "$insrde" == 'y'; then
+#    if ! test -f install_reade_readyn.sh; then
+#         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_reade_readyn.sh)"
+#    else
+#        ./install_reade_readyn.sh
+#    fi
+#fi
+#unset insrde
+
+# Aliases
+
+readyn -p "Install bash aliases and other config?" scripts
+if [[ "y" == $scripts ]]; then
+
+    if ! test -f $SCRIPT_DIR/checks/check_aliases_dir.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)"
+    else
+        . $SCRIPT_DIR/checks/check_aliases_dir.sh
+    fi
+    if ! test -f $SCRIPT_DIR/install_aliases.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/install_aliases.sh)"
+    else
+        . $SCRIPT_DIR/install_aliases.sh
+    fi
+fi
+
+test -n $BASH_VERSION && source ~/.bashrc &>/dev/null
+test -n $ZSH_VERSION && source ~/.zshrc &>/dev/null
+
+get-script-dir SCRIPT_DIR
 
 # Xresources
 

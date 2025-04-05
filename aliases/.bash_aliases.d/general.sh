@@ -12,7 +12,7 @@ if [ -z $TRASHBIN_LIMIT ]; then
    TRASHBIN_LIMIT=100 
 fi
 
-if test $machine == 'Windows' && test $win_bash_shell == 'Cygwin'; then
+if [[ $machine == 'Windows' ]] && [[ $win_bash_shell == 'Cygwin' ]]; then
     alias cd-home-="cd /cygdrive/c/Users/$USER"
 fi
 
@@ -101,7 +101,6 @@ alias cd='cd-w'
 
 # cp recursively, verbose ()
 # cpOld same but no files older are overwritten
-alias cp="xcp --glob --recursive --verbose n --dereference --"
 alias cp-old="cp -ruv"
 alias copy="cp"
 
@@ -247,7 +246,7 @@ function cp-trash(){
         esac
     done
     
-    if [ $bcp == 1 ]; then
+    if [[ $bcp == 1 ]]; then
         cp "$@"
     else
         cp -b "$@"
@@ -257,7 +256,7 @@ function cp-trash(){
         target=1
     fi
     
-    if [ $target == 1 ] ; then
+    if [[ $target == 1 ]] ; then
         for s in "${sorce[@]}"; do
             if [ -a "$dest/$s$suff" ]; then 
                 trash "$dest/$(basename $s$suff)" 
@@ -273,7 +272,7 @@ function cp-trash(){
 }
 
 # Cp recursively and verbose
-alias cp="xcp --glob --recursive --verbose n --dereference --"
+alias cp="xcp --glob --recursive --verbose  --dereference --"
 alias cp-retrace-symlinks="cp --dereference --driver parblock"
 
 # mv (recursively native) verbose and only ask for interaction when overwriting newer files

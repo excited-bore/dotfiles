@@ -36,18 +36,15 @@ if ! sudo grep -q "# RUST" "$ENVVAR_R"; then
     printf "# RUST\ntest -d \$HOME/.cargo/bin && export CARGO_INSTALL_ROOT=\$HOME/.cargo &&\nexport PATH=\$PATH:\$HOME/.cargo/bin\n" | sudo tee -a "$ENVVAR_R" &>/dev/null
 fi
 
-#echo "This next $(tput setaf 1)sudo$(tput sgr0) will check if the variable CARGO_INSTALL_ROOT is being kept from the user's environment in /etc/sudoers";
+echo "This next $(tput setaf 1)sudo$(tput sgr0) will check if something along the lines of 'Defaults secure_path=\".*/\.cargo/bin\"' is being kept in /etc/sudoers";
 
-#if test -f /etc/sudoers && ! sudo grep -q "Defaults env_keep += \"CARGO_INSTALL_ROOT\"" /etc/sudoers; then
-#    readyn -Y 'GREEN' -p "Keep the environment variable ${RED}CARGO_INSTALL_ROOT${GREEN} when using sudo (so cargo installed binaries stay available)?" ansr
-#    if test "$ansr" == 'y'; then
-#    	sudo sed -i '1s/^/Defaults env_keep += "CARGO_INSTALL_ROOT"\n/' /etc/sudoers
-#        echo "Added ${RED}'Defaults env_keep += \"CARGO_INSTALL_ROOT\"'${normal} to /etc/sudoers"
-#    fi
-#fi
-#unset ansr
+if test -f /etc/sudoers && ! sudo grep -q "/bin:$HOME/.cargo/bin" /etc/sudoers; then
+    readyn -Y 'GREEN' -p "Add ${RED}$HOME/.cargo/bin${GREEN} to /etc/sudoers? (so rust applications installed with cargo can be executed using sudo)?" ansr
+    if [[ "$ansr" == 'y' ]]; then
+        sudo sed -i 's,Defaults secure_path="\(.*\)",Defaults secure_path="\1:'"$HOME"'/.cargo/bin/",g' /etc/sudoers
+        echo "Added ${GREEN}'/home/$USER/.cargo/bin'${normal} to ${RED}secure_path${normal} in /etc/sudoers!"
+    fi
+fi
 
 export CARGO_INSTALL_ROOT=$HOME/.cargo
 export PATH=$PATH:$HOME/.cargo/bin
-
-# . "$HOME/.cargo"
