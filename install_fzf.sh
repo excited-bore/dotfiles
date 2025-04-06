@@ -45,9 +45,9 @@ if ! test -d ~/.fzf || test -f ~/.fzf.bash; then
         ln -s ~/.fzf/shell/completion.bash ~/.bash_completion.d/fzf-completion.bash
 
     printf "${cyan}Fzf${normal} keybinds:\n\t - Fzf history on Ctrl-R (replaces reverse-search-history)\n\t - Filepath retriever on Ctrl-T\n\t - Directory navigator on Alt-C\n\t - **<TAB> for fzf completion on some commands\n"
-    readyn -p "Use fzf keybinds?" fzf_key -c "! test -f ~/.keybinds.d/fzf-bindings.bash"
-    if [[ $fzf_key == 'y' ]]; then
-        [ -f ~/.keybinds.d/fzf-bindings.bash ] && command rm ~/.keybinds.d/fzf-bindings.bash
+    readyn -p "Use fzf keybinds?" -c "! test -f ~/.keybinds.d/fzf-bindings.bash" fzf_key
+    if [[ "$fzf_key" == 'y' ]]; then
+        test -f ~/.keybinds.d/fzf-bindings.bash && command rm ~/.keybinds.d/fzf-bindings.bash
         ln -s ~/.fzf/shell/key-bindings.bash ~/.keybinds.d/fzf-bindings.bash
     fi
 fi
@@ -68,7 +68,7 @@ fnd="find"
 # TODO: Make better check: https://github.com/sharkdp/fd
 if ! type fd-find &>/dev/null && ! type fd &>/dev/null; then
     readyn -p "Install fd and use for fzf? (Faster find)" fdr
-    if [ -z $fdr ] || [[ "Y" == "$fdr" ]] || [[ "$fdr" == "y" ]]; then
+    if [[ "$fdr" == "y" ]]; then
         if ! test -f install_fd.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fd.sh)"
         else
@@ -125,7 +125,7 @@ fi
 # TODO: Do more with ripgrep
 if ! type rg &>/dev/null; then
     readyn -p "Install ripgrep? (Recursive grep, opens possibility for line by line fzf )" rpgrp
-    if [ -z $rpgrp ] || [[ "Y" == "$rpgrp" ]] || [[ "$rpgrp" == "y" ]]; then
+    if [[ "$rpgrp" == "y" ]]; then
         if ! test -f install_ripgrep.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ripgrep.sh)"
         else
@@ -155,14 +155,10 @@ if ! type rg &>/dev/null; then
 fi
 
 # XCLIP
-if ! type xclip &>/dev/null; then
-    readyn -p "Install xclip? (Clipboard tool for Ctrl-R/Reverse history shortcut)" xclip
-    if [[ "$xclip" == "y" ]]; then
-        if ! test -f install_xclip.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_xclip.sh)"
-        else
-            . ./install_xclip.sh
-        fi
+if [[ "$X11_WAY" == 'x11' ]] && (! type xclip &>/dev/null || ! type xsel &> /dev/null ); then
+    readyn -p "Install xclip? (Clipboard tool for Ctrl-R/Reverse history shortcut)" xclipp
+    if [[ "$xclipp" == "y" ]]; then
+        eval "${pac_ins} xclip xsel" 
     fi
     if [[ $ENVVAR == ~/.environment.env ]]; then
         sed -i 's|#export FZF_CTRL_R_OPTS=|export FZF_CTRL_R_OPTS=|g' $ENVVAR
@@ -242,9 +238,9 @@ fi
 #fi
 #unset comp_key
 
-if ! test -f /usr/bin/rifle || ! test -f ~/.bash_aliases.d/fzf-rifle.sh && grep -q "fzf_rifle" ~/.keybinds.d/keybinds.bash; then
+if ! test -f /usr/bin/rifle || ! test -f ~/.bash_aliases.d/fzf-rifle.sh && grep -q "fzf_rifle" $KEYBIND; then
     readyn -p "Use rifle (file opener from 'ranger') to open found files and dirs with a custom Ctrl-F filesearch shortcut?" fzf_f
-    if [[ "$fzf_f" == "y" ]] || [ -z "$fzf_f" ]; then
+    if [[ "$fzf_f" == "y" ]]; then
         if ! type rifle &>/dev/null; then
             if ! type python &>/dev/null; then
                 if [[ "$distro_base" == 'Debian' ]]; then
@@ -295,7 +291,7 @@ unset fzf_f
 
 if ! test -f ~/.bash_aliases.d/docker-fzf.sh; then
     readyn -p "Install fzf-docker (fzf aliases for docker)?" fzf_d
-    if [[ "$fzf_d" == "y" ]] || [ -z "$fzf_d" ]; then
+    if [[ "$fzf_d" == "y" ]]; then
         if ! test -f checks/check_aliases_dir.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)"
         else

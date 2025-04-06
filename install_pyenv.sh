@@ -32,7 +32,7 @@ fi
 if type pyenv &> /dev/null; then
     reade -Q 'GREEN' -i "stable all" -p "What versions to list? [Stable/all]: " vers_all
     if [[ "$vers_all" == 'stable' ]]; then
-        all="$(pyenv install -l | grep --color=never -E [[:space:]][0-9].*[0-9]$ | sed '/rc/d' | xargs| tr ' ' '\n' | tac)" 
+        all="$(pyenv install -l | grep --color=never -E '[[:space:]][0-9].*[0-9]$' | sed '/rc/d' | xargs| tr ' ' '\n' | tac)" 
         frst="$(echo $all | awk '{print $1}')"
         all="$(echo $all | sed "s/\<$frst\> //g")" 
     else

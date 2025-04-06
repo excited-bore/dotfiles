@@ -151,9 +151,9 @@ function reade() {
     fi
 
     if ! type rlwrap &>/dev/null || [[ "$fcomp" == 'y' ]] || [[ "$rlwrap_installable" == 'n' ]]; then
-      
-        local readstr='' 
-        
+
+        local readstr=''
+
         if test -n "$BASH_VERSION"; then
             readstr="read -r vvvvvvvvvv"
         fi
@@ -165,7 +165,7 @@ function reade() {
                 readstr="vvvvvvvvvv=''; vared vvvvvvvvvv"
             fi
         fi
-        
+
         local color=""
         local args=''
         local tmpf=''
@@ -190,8 +190,8 @@ function reade() {
 
                 if test -n "$BASH_VERSION"; then
                     readstr=$(echo "$readstr" | sed 's|read |read -e -i "'"$arg"'" |g')
-                fi 
-                
+                fi
+
                 if test -n "$ZSH_VERSION" && [[ $noecho == 'n' ]]; then
                     readstr=$(echo "$readstr" | sed 's|vvvvvvvvvv=.*; vared|vvvvvvvvvv=""; vared -h|g')
                 fi
@@ -204,38 +204,38 @@ function reade() {
                     tmpf=$(mktemp)
 
                     echo "$args" >"$tmpf"
-                  
+
                     test -e $HISTFILE &&
                         oldhist=$HISTFILE
 
                     ! test -e $HISTFILE && test -n $BASH_VERSION && test -f ~/.bash_history && test -n "$(cat ~/.bash_history)" &&
-                        oldhist=~/.bash_history 
+                        oldhist=~/.bash_history
 
                     ! test -e $HISTFILE && test -n $ZSH_VERSION && test -f ~/.zhistory && test -n "$(cat ~/.zhistory)" &&
-                        oldhist=~/.zhistory 
-                     
+                        oldhist=~/.zhistory
+
                     if ! test -e "$HISTFILE"; then
                         oldhist=$(mktemp)
-                        echo $(history | awk '{$1=""; print; }') > $oldhist
+                        echo $(history | awk '{$1=""; print; }') >$oldhist
                     fi
-                
-		    if test -n "$BASH_VERSION"; then
+
+                    if test -n "$BASH_VERSION"; then
                         while IFS='' read -r LINE || [ -n "${LINE}" ]; do
                             history -s "${LINE}"
                         done <"$tmpf"
                         history -c
                         history -r $tmpf
                     fi
-                    
+
                     if test -n "$ZSH_VERSION"; then
                         echo "$arg" >>"$tmpf"
 
                         while IFS='' read -r LINE || [ -n "${LINE}" ]; do
                             print -S "${LINE}"
-                        done < $tmpf
+                        done <$tmpf
                         fc -p "$tmpf"
                     fi
-                    
+
                     # https://unix.stackexchange.com/questions/265957/zsh-histfile-still-read-from-zsh-history
                 fi
                 ;;
@@ -267,8 +267,8 @@ function reade() {
                     test -z "$color" &&
                         readstr=$(echo "$readstr" | sed 's|read |printf "'"${OPTARG}"'\n"; read |g') ||
                         readstr=$(echo "$readstr" | sed 's|read |printf "'"${color}${OPTARG}${normal}"'\n"; read |g')
-                fi 
-                
+                fi
+
                 if test -n "$ZSH_VERSION"; then
                     if [[ $noecho == 'y' ]]; then
                         test -z "$color" &&
@@ -290,43 +290,44 @@ function reade() {
         done
 
         shift $((OPTIND - 1))
-        
-        local oldtrps="$(trap)" 
-      
-        # https://stackoverflow.com/questions/14702148/how-to-fire-a-command-when-a-shell-script-is-interrupted 
+
+        local oldtrps="$(trap)"
+
+        # https://stackoverflow.com/questions/14702148/how-to-fire-a-command-when-a-shell-script-is-interrupted
 
         test -n "$BASH_VERSION" &&
-        trap "history -c; history -r $oldhist; command rm -f $tmpf; eval \"$oldtrps\"; return 1" SIGINT 
+            trap "history -c; history -r $oldhist; command rm -f $tmpf; eval \"$oldtrps\"; test -n \"$oldtrps\" && eval \"$oldtrps\" || trap - SIGINT; exit 130" SIGINT
         #exitfn() {
         #    trap SIGINT
         #    history -c
         #    history -r $oldhist
-        #    command rm -f $tmpf 
+        #    command rm -f $tmpf
         #    return
         #} &&
-        #trap "exitfn" SIGINT 
-        
-        test -n "$ZSH_VERSION" && 
-        TRAPINT() {
-            fc -R $oldhist 
-            command rm -f $tmpf
-            return $((128+$1)) 
-        }
+        #trap "exitfn" SIGINT
+
+        test -n "$ZSH_VERSION" &&
+            TRAPINT() {
+                fc -R "$oldhist"
+                command rm -f "$tmpf"
+                return $((128 + $1))
+            }
 
         eval "${readstr}"
 
-        test -n "$BASH_VERSION" && 
-            history -c && 
+        test -n "$BASH_VERSION" &&
+            history -c &&
             history -r $oldhist
-            trap SIGINT
-     
-        test -n "$ZSH_VERSION" && 
+
+        test -n "$ZSH_VERSION" &&
             fc -R $oldhist
-        
-        eval "$oldtrps"
-        
+
+        test -n "$oldtrps" &&
+            eval "$oldtrps" ||
+            trap - SIGINT
+
         [ -e "$tmpf" ] && command rm -f $tmpf
-        
+
         if ! test -z "$pre" && test -z "$vvvvvvvvvv" || [[ "$vvvvvvvvvv" == "" ]]; then
             vvvvvvvvvv="$pre"
         fi
@@ -342,7 +343,7 @@ function reade() {
         if [[ $# < 1 ]]; then
             echo "Give at least 1 variable up for reade(). "
             echo "- A variable for the return string"
-            return 0
+            return 1
         fi
 
         local breaklines=''

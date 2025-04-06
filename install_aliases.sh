@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export SYSTEM_UPDATED="TRUE"
+
 if ! test -f checks/check_all.sh; then
     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)"
 else
@@ -95,7 +97,7 @@ if [[ $ansr == "y" ]]; then
                 ezalias=$ezalias" --icons=always"
             fi
 
-            sed -i 's|.*alias ls=".*|alias ls="'"$ezalias"'"|g' $genr
+            sed -i 's|.*alias ls=".*|type eza \&> /dev/null \&\& alias ls="'"$ezalias"'"|g' $genr
             unset ezalias eza_clr eza_hdr eza_icon
         fi
     fi
@@ -103,45 +105,45 @@ if [[ $ansr == "y" ]]; then
     readyn -p "Set cp alias?" cp_all
 
     if type xcp &>/dev/null; then
-        readyn -p "${CYAN}xcp${GREEN} installed. Use xcp instead of cp?" cp_xcp
-        if [[ $cp_xcp == 'y' ]]; then
-            cp_xcp='xcp --glob '
+        readyn -p "${CYAN}xcp${GREEN} installed. Use xcp instead of cp (might conflict with sudo cp if cargo not available is sudo path / secure_path in /etc/sudoers)?" cp_xcpq
+        if [[ $cp_xcpq == 'y' ]]; then
+            cp_xcp='xcp --glob'
         else
             cp_xcp="cp"
         fi
-
-        readyn -p "Be recursive? (Recursive means copy everything inside directories without aborting)" cp_r
-        if [[ "$cp_r" == 'y' ]]; then
-            cp_r='--recursive '
-        else
-            cp_r=""
-        fi
-        readyn -p "Be verbose? (All info about copying process)" cp_v
-        if [[ "$cp_v" == 'y' ]]; then
-            cp_v='--verbose '
-        else
-            cp_v=""
-        fi
-
-        readyn -n -p "Never overwrite already present files?" cp_ov
-        if [[ $cp_ov == 'y' ]]; then
-            cp_ov='--no-clobber '
-        else
-            cp_ov=""
-        fi
-
-        readyn -p "Lookup files/directories of symlinks?" cp_der
-        if [[ $cp_der == 'y' ]]; then
-            cp_der='--dereference '
-        else
-            cp_der=""
-        fi
-
-        sed -i 's|^alias cp=".*|alias cp="'"$cp_xcp $cp_r $cp_v $cp_ov $cp_der"' --"|g' $genr
-        #[[ "$cp_xcp" =~ 'xcp --glob' ]] && sed -i 's|^alias cp=".*|type xcp \&> /dev/null && alias cp="'"$cp_xcp $cp_r $cp_v $cp_ov $cp_der"' --" \|\| alias cp="cp "'"$cp_r $cp_v $cp_ov $cp_der"' --"|g' $genr || sed -i 's|^alias cp=".*|type xcp \&> /dev/null && alias cp="'"$cp_xcp $cp_r $cp_v $cp_ov $cp_der"' --"|g'
-
-        unset cp_all cp_xcp cp_v cp_ov
     fi
+    readyn -p "Be recursive? (Recursive means copy everything inside directories without aborting)" cp_r
+    if [[ "$cp_r" == 'y' ]]; then
+        cp_r='--recursive'
+        xcp_r="--recursive"
+    fi
+    readyn -p "Be verbose? (All info about copying process)" cp_v
+    if [[ "$cp_v" == 'y' ]]; then
+        cp_v='--verbose'
+        xcp_v="--verbose"
+    fi
+
+    readyn -n -p "Never overwrite already present files?" cp_ov
+    if [[ $cp_ov == 'y' ]]; then
+        cp_ov='--no-clobber'
+        xcp_ov="--no-clobber"
+    fi
+
+    readyn -p "Lookup files/directories of symlinks?" cp_der
+    if [[ $cp_der == 'y' ]]; then
+        cp_der='--dereference'
+        xcp_der="--dereference"
+    fi
+    
+    
+    if type xcp &> /dev/null && [[ $cp_xcpq == 'y' ]]; then
+        sed -i 's|^alias cp=".*|alias cp="'"$cp_xcp $xcp_r $xcp_v $xcp_ov $xcp_der"' --"|g' $genr 
+    else 
+        sed -i 's|^alias cp=".*|alias cp="'"$cp_xcp $cp_r $cp_v $cp_ov $cp_der"' --"|g' $genr
+    fi
+    #[[ "$cp_xcp" =~ 'xcp --glob' ]] && sed -i 's|^alias cp=".*|type xcp \&> /dev/null && alias cp="'"$cp_xcp $cp_r $cp_v $cp_ov $cp_der"' --" \|\| alias cp="cp "'"$cp_r $cp_v $cp_ov $cp_der"' --"|g' $genr || sed -i 's|^alias cp=".*|type xcp \&> /dev/null && alias cp="'"$cp_xcp $cp_r $cp_v $cp_ov $cp_der"' --"|g'
+
+    unset cp_all cp_xcp cp_v cp_ov cp_xcpq
 
     prompt="${green}    - Force remove, recursively delete given directories (enable deletion of direction without deleting every file in directory first) and ${bold}always give at least one prompt before removing?${normal}${green}
     - Force remove, ${YELLOW}don't${normal}${green} recursively look for files and give a prompt not always, but if removing 3 or more files/folder?

@@ -14,7 +14,7 @@ fi
 get-script-dir SCRIPT_DIR
 
 if ! type lazydocker &>/dev/null; then
-    if [[ $distro_base == "Arch" ]] && ! test -z "$AUR_ins"; then
+    if [[ $distro_base == "Arch" ]] && test -n "$AUR_ins"; then
         eval "${AUR_ins}" lazydocker
     else
         if ! type go &>/dev/null || $(type go &>/dev/null && [[ $(go version | awk '{print $3}' | cut -c 3-) < 1.19 ]]); then
@@ -35,10 +35,10 @@ if ! type lazydocker &>/dev/null; then
         #fi
         #curl https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh | bash
     fi
-    
-    if type lazydocker &> /dev/null; then
+
+    if type lazydocker &>/dev/null; then
         lazydocker --version
     fi
-    
+
     unset nstll
 fi
