@@ -390,24 +390,32 @@ function yes-no-edit() {
             while :; do
                 [[ "$vvvvvvvvvv" == 'y' ]] || [[ "$vvvvvvvvvv" == 'n' ]] && break
 
-                test -z $color && reade -i "${choices[*]}" -p "$prmpt2" vvvvvvvvvv ||
-                    reade -Q "$color" -i "${choices[*]}" -p "$prmpt2" vvvvvvvvvv
-
-                #Undercase only
+                if test -z $color; then 
+                    reade -i "${choices[*]}" -p "$prmpt2" vvvvvvvvvv || break
+                else
+                    reade -Q "$color" -i "${choices[*]}" -p "$prmpt2" vvvvvvvvvv || break
+                fi
+                
+                # For whatever reason,  ' || break' doesnt work so this check here is being put here if something like an interrupt occured
+                test -z $vvvvvvvvvv && break
+                
+                # Undercase only
                 vvvvvvvvvv=$(echo "$vvvvvvvvvv" | tr '[:upper:]' '[:lower:]')
 
                 [[ "$vvvvvvvvvv" == 'y' ]] || [[ "$vvvvvvvvvv" == 'n' ]] && break
 
                 if [[ "$vvvvvvvvvv" == 'e' ]]; then
                     ${YES_NO_EDITOR} ${files[*]}
-                elif ! test -z "$first" && [[ "$vvvvvvvvvv" == "$first" ]]; then
+                elif test -n "$first" && [[ "$vvvvvvvvvv" == "$first" ]]; then
                     ${othercmd} ${files[*]}
                 fi
             done
         fi
 
-        ! test -z "$functn" && [[ "$vvvvvvvvvv" == 'y' ]] && ${functn} && return 0 ||
-            test $# -gt 0 && eval "${@:$#:1}=$vvvvvvvvvv"
+        test -n "$functn" && [[ "$vvvvvvvvvv" == 'y' ]] && 
+            ${functn} && return 0 ||
+        test $# -gt 0 && 
+            eval "${@:$#:1}=$vvvvvvvvvv"
 
     fi
 }

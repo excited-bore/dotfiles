@@ -296,7 +296,7 @@ function reade() {
         # https://stackoverflow.com/questions/14702148/how-to-fire-a-command-when-a-shell-script-is-interrupted
 
         test -n "$BASH_VERSION" &&
-            trap "history -c; history -r $oldhist; command rm -f $tmpf; eval \"$oldtrps\"; test -n \"$oldtrps\" && eval \"$oldtrps\" || trap - SIGINT; return 1" SIGINT
+            trap "history -c; history -r $oldhist; command rm -f $tmpf; eval \"$oldtrps\"; test -n \"$oldtrps\" && eval \"$oldtrps\" || trap - SIGINT; exit 130" SIGINT
         #exitfn() {
         #    trap SIGINT
         #    history -c
@@ -343,7 +343,7 @@ function reade() {
         if [[ $# < 1 ]]; then
             echo "Give at least 1 variable up for reade(). "
             echo "- A variable for the return string"
-            return 0
+            return 1
         fi
 
         local breaklines=''
