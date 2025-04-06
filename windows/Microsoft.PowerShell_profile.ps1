@@ -1,3 +1,10 @@
+# Install sudo if not found
+
+if (-Not (Get-Command sudo -errorAction SilentlyContinue)){
+    Write-Host 'Sudo not found. Installing...'
+    Install-Module -Name Sudo
+}
+
 Import-Module $HOME\Documents\PowerShell\Modules\copy-to.psm1
 
 # Source every script in the 'Scripts' folder that ends on '.ps1'
