@@ -5,6 +5,13 @@
 
 $isAdmin = [bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).groups -match "S-1-5-32-544")
 
+#if (-not (Get-Command sudo -errorAction SilentlyContinue)){
+#    function sudo(){
+#         runas /user:\administrator
+#    }
+#    
+#}
+
 $EDITOR = 'notepad'
 
 if (Get-Command vim -errorAction SilentlyContinue){
@@ -174,11 +181,11 @@ function reboot {
     shutdown /f /t 0 /r
 }
 
-if ( $isAdmin -eq $true -or (Get-Command sudo -errorAction SilentlyContinue)){
+#if ( $isAdmin -eq $true -or (Get-Command sudo -errorAction SilentlyContinue)){
     function bios(){
         sudo shutdown /r /fw /f /t 0
     }
-}
+#}
 
 # Set 'where' to 'where.exe' instead of 'Where-Object' by
 
@@ -338,5 +345,10 @@ function install-Ubuntu(){
 }
 
 function update-all-wing(){
-    winget update --all --include-unknown
+    sudo winget update --all --include-unknown
 }
+
+function upgrade-all-wing(){
+    sudo winget upgrade --all --include-unknown
+}
+

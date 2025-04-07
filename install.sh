@@ -46,14 +46,14 @@ if [[ ! -e ~/config ]] && test -d ~/.config; then
 fi
 
 if [[ ! -e ~/lib_systemd ]] && test -d ~/lib/systemd/system; then
-    readyn -Y "BLUE" -p "Create /lib/systemd/system/ to user directory symlink? " sym2
+    readyn -Y "BLUE" -p "Create /lib/systemd/system/ to user directory symlink?" sym2
     if [[ "y" == $sym2 ]]; then
         ln -s /lib/systemd/system/ ~/lib_systemd
     fi
 fi
 
 if [[ ! -e ~/etc_systemd ]] && test -d ~/etc/systemd/system; then
-    readyn -Y "BLUE" -p "Create /etc/systemd/system/ to user directory symlink? " sym3
+    readyn -Y "BLUE" -p "Create /etc/systemd/system/ to user directory symlink?" sym3
     if [[ "y" == $sym3 ]]; then
         ln -s /etc/systemd/system/ ~/etc_systemd
     fi
@@ -82,7 +82,7 @@ fi
 
 if test -z "$(eval "$pac_ls_ins groff 2> /dev/null")"; then
     printf "${CYAN}groff${normal} is not installed (Necessary for 'man' (manual) command)\n"
-    readyn -p "Install groff? " groff_ins
+    readyn -p "Install groff?" groff_ins
     if [[ $groff_ins == 'y' ]]; then
         eval "${pac_ins}" groff
         printf "Logout and login (or reboot) to take effect\n"
@@ -92,7 +92,7 @@ fi
 
 if test -z "$(eval "$pac_ls_ins zip 2> /dev/null")" || test -z "$(eval "$pac_ls_ins unzip 2> /dev/null")"; then
     printf "${CYAN}zip${normal} and/or ${CYAN}unzip${normal} are not installed \n"
-    readyn -p "Install zip and unzip? " nzp_ins
+    readyn -p "Install zip and unzip?" nzp_ins
     if [[ $nzp_ins == 'y' ]]; then
         eval "${pac_ins}" zip unzip
     fi
@@ -101,7 +101,7 @@ fi
 
 if [[ "$X11_WAY" == 'x11' ]] && (! type xclip &>/dev/null || ! type xsel &>/dev/null); then
     printf "${CYAN}xclip${normal} and/or ${CYAN}xsel${normal} are not installed (clipboard tools for X11 based systems)\n"
-    readyn -p "Install xclip and xsel? " nzp_ins
+    readyn -p "Install xclip and xsel?" nzp_ins
     if [[ $nzp_ins == 'y' ]]; then
         eval "${pac_ins}" xclip xsel
     fi
@@ -111,7 +111,7 @@ fi
 if [[ $distro_base == 'Debian' ]]; then
     if test -z "$(${pac_ls_ins} manpages-posix 2>/dev/null)"; then
         printf "${CYAN}manpages-posix${normal} is not installed (Manpages for posix-compliant (f.ex. bash) commands (f.ex. alias, test, type, etc...))\n"
-        readyn -p "Install manpages-posix? " posixman_ins
+        readyn -p "Install manpages-posix?" posixman_ins
         if [[ $posixman_ins == 'y' ]]; then
             eval "${pac_ins}" manpages-posix
         fi
@@ -121,7 +121,7 @@ if [[ $distro_base == 'Debian' ]]; then
     if test -z "$(apt list --installed software-properties-common 2>/dev/null | awk 'NR>1{print;}')" || test -z "$(apt list --installed python3-launchpadlib 2>/dev/null | awk 'NR>1{print;}')"; then
         if test -z "$(apt list --installed software-properties-common 2>/dev/null | awk 'NR>1{print;}')"; then
             printf "${CYAN}add-apt-repository${normal} is not installed (cmd tool for installing extra repositories/ppas on debian systems)\n"
-            readyn -p "Install add-apt-repository? " add_apt_ins
+            readyn -p "Install add-apt-repository?" add_apt_ins
             if [[ $add_apt_ins == 'y' ]]; then
                 eval "yes | $pac_ins software-properties-common"
             fi
@@ -130,7 +130,7 @@ if [[ $distro_base == 'Debian' ]]; then
 
         if test -z "$(apt list --installed python3-launchpadlib 2>/dev/null | awk 'NR>1{print;}')"; then
             printf "${CYAN}python3-launchpadlib${normal} is not installed (python3 library that adds support for ppas from Ubuntu's 'https://launchpad.net' to add-apt-repository)\n"
-            readyn -p "Install python3-launchpadlib? " lpdlb_ins
+            readyn -p "Install python3-launchpadlib?" lpdlb_ins
             if [[ $lpdlb_ins == 'y' ]]; then
                 eval "yes | $pac_ins python3-launchpadlib"
             fi
@@ -148,7 +148,7 @@ if [[ $distro_base == 'Debian' ]]; then
 
         if ! type ppa-purge &>/dev/null && ! test -z "$(apt search ppa-purge 2>/dev/null | awk 'NR>2{print;}')"; then
             printf "${CYAN}ppa-purge${normal} is not installed (cmd tool for disabling installed PPA's)\n"
-            readyn -p "Install ppa-purge? " ppa_ins
+            readyn -p "Install ppa-purge?" ppa_ins
             if [[ $ppa_ins == 'y' ]]; then
                 eval "yes | ${pac_ins} ppa-purge"
             fi
@@ -158,7 +158,7 @@ if [[ $distro_base == 'Debian' ]]; then
 
     if ! type nala &>/dev/null && ! test -z "$(apt search nala 2>/dev/null | awk 'NR>2{print;}')"; then
         printf "${CYAN}nala${normal} is not installed (A TUI wrapper for apt install, update, upgrade, search, etc..)\n"
-        readyn -p "Install nala? " nala_ins
+        readyn -p "Install nala?" nala_ins
         if [[ $nala_ins == 'y' ]]; then
             eval "${pac_ins}" nala
             pac="nala"
@@ -337,7 +337,7 @@ unset h
 
 readyn -p "Install eza? (A modern replacement for ls)" -c "type eza &> /dev/null" rmp
 
-if [[ -z "$rmp" ]] || [[ "y" == "$rmp" ]]; then
+if [[ "y" == "$rmp" ]]; then
     if ! test -f $SCRIPT_DIR/install_eza.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_eza.sh)"
     else
@@ -363,7 +363,7 @@ unset rmp
 
 readyn -p "Install rm-prompt? (Rm but lists files/directories before deletion)" -c "type rm-prompt &> /dev/null" rmp
 
-if [[ -z "$rmp" ]] || [[ "y" == "$rmp" ]]; then
+if [[ "y" == "$rmp" ]]; then
     if ! test -f $SCRIPT_DIR/install_rmprompt.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_rmprompt.sh)"
     else
@@ -376,8 +376,8 @@ unset rmp
 # Bash alias completions
 # v
 
-readyn -p "Install bash completions for aliases in ~/.bash_completion.d?" -c "! test -f ~/.bash_completion.d/complete_alias || ! test -f /root/.bash_completion.d/complete_alias" compl
-if [[ -z "$compl" ]] || [[ "y" == "$compl" ]]; then
+readyn -p "Install bash completions for aliases in ~/.bash_completion.d?" -c "test -f ~/.bash_completion.d/complete_alias && test -f /root/.bash_completion.d/complete_alias" compl
+if [[ "y" == "$compl" ]]; then
     if ! test -f $SCRIPT_DIR/install_bashalias_completions.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bashalias_completions.sh)"
     else
@@ -388,8 +388,8 @@ unset compl
 
 # Python completions
 
-readyn -p "Install python completions in ~/.bash_completion.d?" -c "! type activate-global-python-argcomplete &> /dev/null" pycomp
-if [[ -z $pycomp ]] || [[ "y" == "$pycomp" ]]; then
+readyn -p "Install python completions in ~/.bash_completion.d?" -c "type activate-global-python-argcomplete &> /dev/null" pycomp
+if [[ "y" == "$pycomp" ]]; then
     if ! test -f $SCRIPT_DIR/install_python_completions.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_python_completions.sh)"
     else
