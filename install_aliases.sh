@@ -8,6 +8,8 @@ else
     . ./checks/check_all.sh
 fi
 
+unalias sudo
+
 get-script-dir SCRIPT_DIR
 
 rlwrpscrpt=aliases/.bash_aliases.d/00-rlwrap_scripts.sh
@@ -103,45 +105,51 @@ if [[ $ansr == "y" ]]; then
     fi
 
     readyn -p "Set cp alias?" cp_all
+ 
 
-    if type xcp &>/dev/null; then
-        readyn -p "${CYAN}xcp${GREEN} installed. Use xcp instead of cp (might conflict with sudo cp if cargo not available is sudo path / secure_path in /etc/sudoers)?" cp_xcpq
-        if [[ $cp_xcpq == 'y' ]]; then
-            cp_xcp='xcp --glob'
-        else
-            cp_xcp="cp"
+    if [[ $cp_all == 'y' ]]; then
+        cp_xcp="cp"
+        cp_r=''
+        cp_vr=''
+        cp_ov=''
+        cp_der=''
+        if type xcp &>/dev/null; then
+            readyn -p "${CYAN}xcp${GREEN} installed. Use xcp instead of cp (might conflict with sudo cp if cargo not available is sudo path / secure_path in /etc/sudoers)?" cp_xcpq
+            if [[ $cp_xcpq == 'y' ]]; then
+                cp_xcp='xcp --glob'
+            fi
         fi
-    fi
-    readyn -p "Be recursive? (Recursive means copy everything inside directories without aborting)" cp_r
-    if [[ "$cp_r" == 'y' ]]; then
-        cp_r='--recursive'
-        xcp_r="--recursive"
-    fi
-    readyn -p "Be verbose? (All info about copying process)" cp_v
-    if [[ "$cp_v" == 'y' ]]; then
-        cp_v='--verbose'
-        xcp_v="--verbose"
-    fi
+        readyn -p "Be recursive? (Recursive means copy everything inside directories without aborting)" cp_rq
+        if [[ "$cp_rq" == 'y' ]]; then
+            cp_r='--recursive'
+            #xcp_r="--recursive"
+        fi
+        readyn -p "Be verbose? (All info about copying process)" cp_vq
+        if [[ "$cp_vq" == 'y' ]]; then
+            cp_v='--verbose'
+            #xcp_v="--verbose"
+        fi
 
-    readyn -n -p "Never overwrite already present files?" cp_ov
-    if [[ $cp_ov == 'y' ]]; then
-        cp_ov='--no-clobber'
-        xcp_ov="--no-clobber"
-    fi
+        readyn -n -p "Never overwrite already present files?" cp_ovq
+        if [[ $cp_ovq == 'y' ]]; then
+            cp_ov='--no-clobber'
+            #xcp_ov="--no-clobber"
+        fi
 
-    readyn -p "Lookup files/directories of symlinks?" cp_der
-    if [[ $cp_der == 'y' ]]; then
-        cp_der='--dereference'
-        xcp_der="--dereference"
+        readyn -p "Lookup files/directories of symlinks?" cp_derq
+        if [[ $cp_derq == 'y' ]]; then
+            cp_der='--dereference'
+            #xcp_der="--dereference"
+        fi
+        
+        
+        #if type xcp &> /dev/null && [[ $cp_xcpq == 'y' ]]; then
+            #sed -i 's|^alias cp=".*|alias cp="'"$cp_xcp $xcp_r $xcp_v $xcp_ov $xcp_der"' --"|g' $genr 
+        #else 
+            sed -i 's|^alias cp=".*|alias cp="'"$cp_xcp $cp_r $cp_v $cp_ov $cp_der"'"|g' $genr
+        #fi
+        #[[ "$cp_xcp" =~ 'xcp --glob' ]] && sed -i 's|^alias cp=".*|type xcp \&> /dev/null && alias cp="'"$cp_xcp $cp_r $cp_v $cp_ov $cp_der"' --" \|\| alias cp="cp "'"$cp_r $cp_v $cp_ov $cp_der"' --"|g' $genr || sed -i 's|^alias cp=".*|type xcp \&> /dev/null && alias cp="'"$cp_xcp $cp_r $cp_v $cp_ov $cp_der"' --"|g'
     fi
-    
-    
-    if type xcp &> /dev/null && [[ $cp_xcpq == 'y' ]]; then
-        sed -i 's|^alias cp=".*|alias cp="'"$cp_xcp $xcp_r $xcp_v $xcp_ov $xcp_der"' --"|g' $genr 
-    else 
-        sed -i 's|^alias cp=".*|alias cp="'"$cp_xcp $cp_r $cp_v $cp_ov $cp_der"' --"|g' $genr
-    fi
-    #[[ "$cp_xcp" =~ 'xcp --glob' ]] && sed -i 's|^alias cp=".*|type xcp \&> /dev/null && alias cp="'"$cp_xcp $cp_r $cp_v $cp_ov $cp_der"' --" \|\| alias cp="cp "'"$cp_r $cp_v $cp_ov $cp_der"' --"|g' $genr || sed -i 's|^alias cp=".*|type xcp \&> /dev/null && alias cp="'"$cp_xcp $cp_r $cp_v $cp_ov $cp_der"' --"|g'
 
     unset cp_all cp_xcp cp_v cp_ov cp_xcpq
 
