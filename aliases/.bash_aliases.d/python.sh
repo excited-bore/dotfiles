@@ -13,8 +13,8 @@ alias pip='XDG_CACHE_HOME=/tmp pip'
 
 alias python-version="python --version"
 
-alias python-twine-upload-test="if type deactivate &> /dev/null; then deactivate; fi; eval "$pybuild" && twine check dist/* && twine upload --repository testpypi dist/* && echo ''; rm dist/*"
-alias python-twine-upload="if type deactivate &> /dev/null; then deactivate; fi; eval "$pybuild" && twine check dist/* && twine upload dist/* && echo ''; rm dist/*"
+alias python-twine-upload-test="if type deactivate &> /dev/null; then deactivate; fi; eval \"$pybuild\" && twine check dist/* && twine upload --repository testpypi dist/* && echo ''; rm dist/*"
+alias python-twine-upload="if type deactivate &> /dev/null; then deactivate; fi; eval \"$pybuild\" && twine check dist/* && twine upload dist/* && echo ''; rm dist/*"
 alias python-venv="! test -d venv && ! test -d .venv && python3 -m venv .venv && source .venv/bin/activate || test -d venv && source venv/bin/activate || test -d .venv && source .venv/bin/activate"
 alias python-venv-activate="test -d venv && source venv/bin/activate || test -d .venv && source .venv/bin/activate"
 alias python-venv-deactivate="deactivate"
