@@ -58,36 +58,40 @@
     "keybindings": 
     [
         {
-            "id": null,
-            "keys": "alt+shift+minus"
-        },
-        {
-            "id": "User.copy.644BA8F2",
-            "keys": "ctrl+c"
+            "id": "User.sendInput.24C6F4B1",
+            "keys": "ctrl+tab"
         },
         {
             "id": "User.sendInput.47959F19",
             "keys": "ctrl+shift+tab"
         },
         {
-            "id": "User.sendInput.24C6F4B1",
-            "keys": "ctrl+tab"
+            "id": "User.copy.644BA8F2",
+            "keys": "ctrl+c"
         },
         {
-            "id": "Terminal.ClosePane",
-            "keys": "ctrl+shift+w"
-        },
-        {
-            "id": "User.paste",
-            "keys": "ctrl+v"
+            "id": null,
+            "keys": "alt+shift+minus"
         },
         {
             "id": "User.find",
             "keys": "ctrl+shift+f"
         },
         {
+            "id": "User.paste",
+            "keys": "ctrl+v"
+        },
+        {
+            "id": "Terminal.ClosePane",
+            "keys": "ctrl+shift+w"
+        },
+        {
             "id": "User.splitPane.A6751878",
             "keys": "alt+shift+d"
+        },
+        {
+            "id": null,
+            "keys": "alt+down"
         },
         {
             "id": "Terminal.DuplicatePaneRight",
@@ -106,8 +110,36 @@
             "keys": "ctrl+alt+left"
         },
         {
+            "id": "Terminal.MoveFocusDown",
+            "keys": "ctrl+shift+down"
+        },
+        {
             "id": "Terminal.NextTab",
             "keys": "ctrl+alt+right"
+        },
+        {
+            "id": "Terminal.MoveFocusLeft",
+            "keys": "ctrl+shift+left"
+        },
+        {
+            "id": null,
+            "keys": "alt+left"
+        },
+        {
+            "id": "Terminal.MoveFocusRight",
+            "keys": "ctrl+shift+right"
+        },
+        {
+            "id": null,
+            "keys": "alt+right"
+        },
+        {
+            "id": "Terminal.MoveFocusUp",
+            "keys": "ctrl+shift+up"
+        },
+        {
+            "id": null,
+            "keys": "alt+up"
         }
     ],
     "newTabMenu": 
@@ -124,7 +156,7 @@
             {
                 "face": "NotoMono Nerd Font Mono"
             },
-            "opacity": 65,
+            "opacity": 65
         },
         "list": 
         [
