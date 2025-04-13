@@ -33,7 +33,7 @@ function edit-powershell-profile(){
 # Also, copying to an empty destination will create a file first
 
 Import-Module BitsTransfer
-function Copy-Item () {
+function cp () {
     [CmdletBinding()]
     Param
     (
@@ -230,8 +230,9 @@ function global:Reload-Profile{
 
 # r -> Reload profile
 
-if (Get-Alias -Definition "Invoke-History" | grep.exe -q 'r ->'){
-    Remove-Item -Force Alias:r $oldAlias 
+$exst = Get-Alias -Definition "Invoke-History" | grep.exe 'r ->'
+if ($exst.count -eq 1){
+    Remove-Item -Force Alias:r 
     Set-Alias -Name r -Value Reload-Profile
 }
 

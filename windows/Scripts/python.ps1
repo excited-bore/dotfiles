@@ -27,8 +27,8 @@ function python-twine-build-and-upload {
 
 function python-venv { 
     if (-not (Test-Path venv) -and -not (Test-Path .venv)) { 
-        python3 -m venv .venv 
-        . .venv\Scripts\Activate.ps1 
+        python -m venv .venv 
+        . .\.venv\Scripts\Activate.ps1 
     } elseif (Test-Path venv) { 
         . .\venv\Scripts\Activate.ps1 
     } elseif (Test-Path .venv) { 
