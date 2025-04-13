@@ -144,17 +144,17 @@ function git-commit() {
 
         local untraked amnd msg
 
-        reade -Q "CYAN" -i "y" -p "Add all untracked files? [Y/n]: " "y n" amnd
-        if [ "$amnd" == "y" ]; then
+        readyn -Y "CYAN" -p "Add all untracked files?" amnd
+        if [[ "$amnd" == "y" ]]; then
             git add -A
         fi
 
-        reade -Q "CYAN" -i "n" -p "Add to previous commit? [y/N]: " "y n" amnd
-        if [ "$amnd" == "y" ]; then
+        reade -N "CYAN" -n -p "Add to previous commit?" amnd
+        if [[ "$amnd" == "y" ]]; then
             git commit --amend
         fi
         
-        reade -Q "CYAN" -i '\\\"\\\"' -p "Give up a commit message: " '' msg
+        reade -Q "CYAN" -i '\\\"\\\"' -p "Give up a commit message: " msg
         if ! test -z "${msg}"; then
             git commit -am "${msg}";
         else
@@ -183,7 +183,7 @@ alias git-create-and-switch-branch="git checkout -b - "
 alias git-push-to-branch="git push -u origin "
 
 git-switch-commit() {
-    commit=$(git log --oneline --color=always | nl | fzf --ansi --track --no-sort --layout=reverse-list | awk '{print $2}');
+    commit=$(git --no-pager log --oneline --color=always | nl | fzf --ansi --track --no-sort --layout=reverse-list | awk '{print $2}');
     git checkout "$commit";
 }
 
@@ -248,47 +248,46 @@ git-backup-branch-and-reset-to-remote() {
     backp_branch=1;
     stash=false;
     
-    if [ ! -z "$1" ] && [[ ! $(gitListRemotes | grep -q $1) ]]; then
+    if ! test -z "$1" && [[ ! $(git remotes -v | grep -q $1) ]]; then
         echo "Use a legit remote or add it using 'git-add-remote-ssh' or 'git-add-remote-url'";
-    elif [ ! -z "$1" ];then
+    elif ! test -z "$1"; then
         remote=$1;
     fi
     echo "Using '$1' as remote\n";
     
-    if [ ! -z "$2" ] && [[ ! $(gitListBranches | grep -q $2) ]]; then
+    if ! test -z "$2" && [[ ! $(git branch --list | grep -q $2) ]]; then
         echo "Use a legit branch or add it using 'git-add-branch'";
-    elif [ ! -z "$2" ];then
+    elif ! test -z "$2"; then
         remote=$2;
     fi
     echo "Using '$2' as branch\n";
     
-    if [ ! -z "$3" ] && [ ! "$3" = true ]; then
+    if ! test -z "$3" && ! [[ "$3" == true ]]; then
         for cnt in $(git branch --list | grep --regex 'main.' | wc -l) ; do
-       $backp_branch+=1;
-    done
-
-    elif [ "$3" = true ];then
+            $backp_branch+=1;
+        done
+    elif [[ "$3" == true ]]; then
         stash=true;
     fi
 
-    if [ ! -z "$1" ] && [ ! -z "$2" ]; then
+    if ! test -z "$1" && ! test -z "$2"; then
         git checkout "$2";
         git stash ;
         git fetch --all ;
         git branch "$1" ;
         git reset --hard "$2" ;
-        if [ "$3" = true ]; then
+        if [[ "$3" = true ]]; then
             git stash pop;
         else
             echo "No uncomitted changes kept. They can be reapplied with 'git stash pop'"; 
         fi
-    elif [ ! -z "$1" ] && [ -z "$2"]; then
+    elif ! test -z "$1" && test -z "$2"; then
         git checkout main;
         git stash;
         git branch "$3" ;
         git fetch --all ;
         git reset --hard origin/main ;
-        if [ "$4" = true ]; then
+        if [[ "$4" == true ]]; then
             git checkout "$1";
             git stash pop;
         else    
@@ -303,9 +302,9 @@ alias git-remote-remove="git remote -v rm"
 alias git-remote-set-url="git remote -v set-url"
 
 function git-set-default-remote-branch() { 
-    if [ -z "$1" ] && [ -z "$2" ]; then
+    if test -z "$1"  && test -z "$2"; then
         git remote set-head origin main;
-    elif [ -z "$1" ]; then
+    elif test -z "$1"; then
         git remote set-head origin "$2";
     else
         git remote set-head "$1" "$2";
@@ -313,7 +312,7 @@ function git-set-default-remote-branch() {
 }
 
 function git-remote-get-default-branch() { 
-    if [ -z "$1" ]; then
+    if test -z "$1"; then
         git remote set-head origin -a;
     else 
         git remote set-head "$1" -a;
