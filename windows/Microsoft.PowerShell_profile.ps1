@@ -5,6 +5,11 @@ if (-Not (Get-Command sudo -errorAction SilentlyContinue)){
     Install-Module -Name Sudo
 }
 
+if (-Not (Get-Command jq -errorAction SilentlyContinue)){
+    Write-Host 'jq not found. Installing...'
+    winget install jqlang.jq
+}
+
 Import-Module $HOME\Documents\PowerShell\Modules\copy-to.psm1
 
 # Source every script in the 'Scripts' folder that ends on '.ps1'

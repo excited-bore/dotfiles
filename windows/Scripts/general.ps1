@@ -341,6 +341,26 @@ if (Test-Path 'C:\Program Files\VideoLAN\VLC\vlc.exe' -PathType Leaf){
     Set-Alias -Name vlc -Value 'C:\Program Files\VideoLAN\VLC\vlc.exe' 
 }
 
+# Invoke-Expression to eval
+Set-Alias -Name eval -Value "Invoke-Expression"
+
+# if wget.exe doesn't exist, Invoke-WebRequest alias for wget
+
+if (-not (Get-Command wget.exe -ErrorAction SilentlyContinue)){
+   Set-Alias -Name wget -Value 'Invoke-WebRequest' 
+}
+
+# Grep and Sed replacements
+# https://quisitive.com/using-sed-and-grep-in-powershell/
+
+if (-not (Get-Command grep.exe -ErrorAction SilentlyContinue)){
+   filter grep($keyword) { if (($_ | Out-String) -like "$keyword") { $_ } } 
+}
+
+if (-not (Get-Command sed.exe -ErrorAction SilentlyContinue)){
+    filter sed($before, $after) { %{$_ -replace $before,$after} }
+}
+
 function install-Ubuntu(){
     wsl.exe --install -d Ubuntu
 }

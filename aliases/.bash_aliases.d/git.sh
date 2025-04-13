@@ -6,7 +6,7 @@ fi
 if type wget &> /dev/null && type jq &> /dev/null; then
     function get-latest-releases-github(){
         if test -z "$@"; then
-            reade -Q 'GREEN' -p 'Github link: ' '' gtb_link
+            reade -Q 'GREEN' -p 'Github link: ' gtb_link
         else
             gtb_link="$@"
         fi
@@ -31,7 +31,7 @@ if type wget &> /dev/null && type jq &> /dev/null; then
            printf "Files: \n${cyan}$ltstv${normal}\n"
            #frst="$(echo $ltstv | awk '{print $1}')"  
            #ltstv="$(echo $ltstv | sed "s/\<$frst\> //g")" 
-           reade -Q 'CYAN' -p "Which one?: " "$ltstv" res 
+           reade -Q 'CYAN' -i "$ltstv" -p "Which one?: " res 
         fi
         
         if ! test -z $res; then
@@ -63,7 +63,7 @@ function git-add-ssh-key() {
         touch ~/.ssh/config;
     fi
     read -p "Give up name (Default:'id_keytype'): " name
-    reade -p "Give up keytype \(dsa \| ecdsa \| ecdsa-sk \| ed25519 (Default) \| ed25519-sk \| rsa\): " "dsa ecdsa ecdsa-sk ed25519 ed25519-sk rsa" keytype
+    reade -i "dsa ecdsa ecdsa-sk ed25519 ed25519-sk rsa" -p "Give up keytype \(dsa \| ecdsa \| ecdsa-sk \| ed25519 (Default) \| ed25519-sk \| rsa\): " keytype
     if [ -z $keytype ]; then
         keytype="ed25519"
     fi
