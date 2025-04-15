@@ -27,6 +27,18 @@ function edit-powershell-profile(){
 }
 
 
+#function Reade(){
+#    param (
+#        [CmdletBinding(PositionalBinding=$false)]
+#        [parameter(mandatory=$true, position=0)]$Prompt,
+#        [Parameter(Mandatory=$true)][string]$username,
+#        [string]$password = $( Read-Host "Input password, please" )
+#    )
+#    $wshell = New-Object -ComObject wscript.shell
+#    $wshell.SendKeys('dave'); $name = read-host -prompt 'What is your name'
+#}
+
+
 # Use 'BitTransfer' to copy items instead of Copy-item to reduce slow loadtimes
 # https://stackoverflow.com/questions/2434133/progress-during-large-file-copy-copy-item-write-progress
 

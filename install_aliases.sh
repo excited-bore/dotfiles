@@ -179,7 +179,7 @@ if [[ $ansr == "y" ]]; then
 
     printf "${CYAN}Set rm (remove) to:\n$prompt"
     reade -Q "GREEN" -i "$pre $ansrs" -p "$prompt2" ansr
-    if $([[ "$ansr" == "none" ]] || [ -z "$ansr" ]) &&  [[ "$rm_verb" == 'n' ]]; then
+    if [[ "$ansr" == "none" ]] && [[ "$rm_verb" == 'n' ]]; then
         sed -i 's|^alias rm="|#alias rm="|g' $genr
     else
         sed -i 's|.*alias cp="cp-trash -rv"|alias cp="cp-trash -rv"|g' $genr

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+SYSTEM_UPDATED="TRUE"
+
 if ! test -f checks/check_all.sh; then
     if ! type curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
@@ -28,56 +30,107 @@ environment-variables_r() {
     if sudo test -f /root/.bash_profile; then
         shell_profiles="$shell_profiles${CYAN}\t- /root/.bash_profile\n"
     fi
+    if sudo test -f /root/.zsh_profile; then
+        shell_profiles="$shell_profiles${CYAN}\t- /root/.zsh_profile\n"
+    fi
     if sudo test -f /root/.bashrc; then
         shell_rcs="$shell_rcs${GREEN}\t- /root/.bashrc\n"
     fi
-    prmpt="File(s):\n$shell_profiles${normal} get sourced at login\nFile ${MAGENTA}.profile${RED} won't get sourced at login${normal} if ${CYAN}.*shelltype*_profile (f.ex. .bash_profile)${normal} exists\nFile(s):\n${CYAN}$shell_rcs${normal} get sourced when starting a new *shelltype* shell\n"
+    if sudo test -f /root/.zshrc; then
+        shell_rcs="$shell_rcs${GREEN}\t- /root/.zshrc\n"
+    fi
+    prmpt="File(s):\n$shell_profiles${normal}${GREEN}should${normal} get sourced at login...\nHowever, if a ${CYAN}*shell*_profile${normal} (f.ex. .bash_profile) file exists, ${MAGENTA}.profile${RED} won't get sourced at login${normal}\nFile(s):\n${CYAN}$shell_rcs${normal}get sourced when starting a new *shell* shell (f.ex. ${CYAN}bash${normal} shell)\n"
+#Certain programs check the correct ${CYAN}*shell*_profile${normal}, others (by accident) only check ${MAGENTA}.profile${normal}..\n"
     printf "$prmpt"
 
-    if ! sudo grep -q "~/.environment.env" /root/.profile; then
+    if ! sudo grep -q "/root/.environment.env" /root/.profile; then
         readyn -p "Link .environment.env in ${YELLOW}/root/.profile${GREEN}?" prof
         if [[ $prof == 'y' ]]; then
-            printf "\n[ -f ~/.environment.env ] && source ~/.environment.env\n\n" | sudo tee -a /root/.profile 1> /dev/null
+            printf "\n[ -f /root/.environment.env ] && source /root/.environment.env\n\n" | sudo tee -a /root/.profile 1> /dev/null
         fi
     fi
-    if sudo test -f /root/.bash_profile; then
-        printf "\n${GREEN}Since file ${cyan}/root/.bash_profile${green} exists, ${cyan}bash${green} won't source ${magenta}/root/.profile${green} natively at login.\n${normal}"
-        reade -Q 'GREEN' -i 'prof path none' -p "Source $HOME/.profile in $HOME/.bash_profile or source $HOME/.environment.env directly in $HOME/.bash_profile? [Prof/path/none]: " bash_prof
-	prmpt="- Src = Just source $HOME/.environment.env in $HOME/.profile and $HOME/.bash_profile\n - del-prof = Copy everything from $HOME/.profile and also source $HOME/.environment in $HOME/.bash_profile and the delete $HOME/.profile?\n - del-shprof = Copy everything from $HOME/.bash_profile and also source $HOME/.environment.env in $HOME/.profile, then delete $HOME/.bash_profile?\n - link-prof = Source $HOME/.environment.env in $HOME/.profile, copy everything from $HOME/.bash_profile, then delete it but also add a symlink from $HOME/.profile to $HOME/.bash_profile\n"
-	if [[ $bash_prof == 'prof' ]]; then
-            if sudo grep -q '.bashrc' /root/.bash_profile && ! sudo grep -q "~/.profile" /root/.bash_profile; then
-                sudo sed -i 's|\(\[ -f ~/.bashrc \] && source ~/.bashrc\)|\[ -f \~/.profile \] \&\& source \~/.profile\n\n\1\n|g' /root/.bash_profile
-                sudo sed -i 's|\(\[\[ -f ~/.bashrc \]\] && . ~/.bashrc\)|\[ -f \~/.profile \] \&\& source \~/.profile\n\n\1\n|g' /root/.bash_profile
-            else
-                printf "\n[ -f ~/.profile ] && source ~/.profile\n\n" | sudo tee -a /root/.bash_profile 1> /dev/null
-            fi
-        elif [[ "$bash_prof" == 'path' ]]; then
-            if sudo grep -q '.bashrc' /root/.bash_profile && ! sudo grep -q "~/.environment.env" /root/.bash_profile; then
-                sudo sed -i 's|\(\[ -f ~/.bashrc \] && source ~/.bashrc\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' /root/.bash_profile
-                sudo sed -i 's|\(\[\[ -f ~/.bashrc \]\] && . ~/.bashrc\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' /root/.bash_profile
+    if test -f /root/.bash_profile || test -f /root/.zsh_profile; then
+        printf "\n${GREEN}Since a ${cyan}$HOME/.*shell*_profile${green} file exists, the shell in question won't source ${magenta}$HOME/.profile${green} natively at login.\n${normal}"
+         
+        if test -f /root/.bash_profile && ! sudo grep -q "/root/.environment.env" /root/.bash_profile; then
+            printf "${GREEN}Just source ${YELLOW}/root/.environment.env${normal} in ${YELLOW}/root/.bash_profile\n${normal}"
+            reade -Q GREEN -i 'source delete' -p "Or copy everything from ${YELLOW}/root/.bash_profile${GREEN} into ${YELLOW}/root/.profile${GREEN} and also delete ${YELLOW}/root/.bash_profile${GREEN}? [Source/delete]: " bprof_r 
 
-            else
-                printf "\n[ -f ~/.environment.env ] && source ~/.environment.env\n\n" | sudo tee -a /root/.bash_profile
+            if [[ $bprof_r == 'source' ]]; then
+                if ! sudo grep -q "/root/.environment.env" /root/.bash_profile; then 
+                    printf "\n[ -f /root/.environment.env ] && source /root/.environment.env\n\n" | sudo tee -a /root/.bash_profile
+                fi 
+            elif [[ $bprof_r == 'delete' ]]; then 
+                sudo cat /root/.bash_profile | sudo tee -a /root/.profile
+                readyn -p 'Check ~/.profile? (will remove /root/.bash_profile afterwards)' eprof
+                if [[ $eprofr == 'y' ]]; then
+                    sudo less /root/.profile 
+                fi
+                sudo rm /root/.bash_profile
             fi
         fi
-        if sudo test -f /root/.bashrc && ! sudo grep -q "~/.environment.env" /root/.bashrc; then
-            readyn -Y 'GREEN' -p "Source /root/.environment.env in /root/.bashrc?" bashrc
-            if [[ $bashrc == 'y' ]]; then
-                if sudo grep -q "[ -f ~/.bash_completion ]" /root/.bashrc; then
-                    sudo sed -i 's|\(\[ -f ~/.bash_completion \] \&\& source \~/.bash_completion\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' /root/.bashrc
-                elif sudo grep -q "[ -f ~/.bash_aliases ]" /root/.bashrc; then
-                    sudo sed -i 's|\(\[ -f ~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' /root/.bashrc
-                    sudo sed -i 's|\(if \[ -f ~/.bash_aliases \]; then\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' /root/.bashrc
-                elif sudo grep -q "[ -f ~/.keybinds ]" /root/.bashrc; then
-                    sudo sed -i 's|\(\[ -f ~/.keybinds \] \&\& source \~/.keybinds\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' /root/.bashrc
-                else
-                    printf "\n[ -f ~/.environment.env ] && source ~/.environment.env\n\n" | sudo tee -a /root/.bashrc
-                fi
+        
+        if test -f /root/.zsh_profile && ! sudo grep -q "/root/.environment.env" /root/.zsh_profile; then
+            printf "${GREEN}Just source $HOME/.environment.env in $HOME/.zsh_profile\n${normal}" 
+            reade -Q GREEN -i 'source delete' -p "Or copy everything from $HOME/.zsh_profile into $HOME/.profile and also delete $HOME/.zsh_profile? [Source/delete]: " zprof_r
+
+            if [[ $zprof_r == 'source' ]]; then
+                if ! sudo grep -q "/root/.environment.env" /root/.zsh_profile; then 
+                    printf "\n[ -f /root/.environment.env ] && source /root/.environment.env\n\n" | sudo tee -a /root/.zsh_profile
+                fi 
+            elif [[ $zprof_r == 'delete' ]]; then 
+                sudo cat /root/.zsh_profile | sudo tee -a /root/.profile
+                sudo rm /root/.zsh_profile
             fi
+        fi
+    fi
+
+    if test -f /root/.bash_profile && ! sudo grep -q "/root/.bash_profile" /root/.profile; then
+        readyn -p "Link /root/.bash_profile in /root/.profile?" bprofr
+        if [[ "$bprofr" == 'y' ]]; then
+            printf "\n[ -f /root/.bash_profile ] && source /root/.bash_profile\n\n" | sudo tee -a /root/.profile 
+        fi
+        unset bprofr
+    fi
+    if test -f /root/.zsh_profile && ! grep -q "/root/.zsh_profile" ~/.profile; then
+        readyn -p "Link /root/.zsh_profile in /root/.profile?" zprofr
+        if [[ "$zprofr" == 'y' ]]; then
+            printf "\n[ -f /root/.zsh_profile ] && source /root/.zsh_profile\n\n" | sudo tee -a /root/.profile
+        fi
+        unset zprofr
+    fi
+    if sudo test -f /root/.bashrc && ! sudo grep -q "~/.environment.env" /root/.bashrc; then
+        readyn -Y 'GREEN' -p "Source /root/.environment.env in /root/.bashrc?" bashrc
+        if [[ $bashrc == 'y' ]]; then
+            if sudo grep -q "[ -f ~/.bash_completion ]" /root/.bashrc; then
+                sudo sed -i 's|\(\[ -f ~/.bash_completion \] \&\& source \~/.bash_completion\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' /root/.bashrc
+            elif sudo grep -q "[ -f ~/.bash_aliases ]" /root/.bashrc; then
+                sudo sed -i 's|\(\[ -f ~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' /root/.bashrc
+                sudo sed -i 's|\(if \[ -f ~/.bash_aliases \]; then\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' /root/.bashrc
+            elif sudo grep -q "[ -f ~/.keybinds ]" /root/.bashrc; then
+                sudo sed -i 's|\(\[ -f ~/.keybinds \] \&\& source \~/.keybinds\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' /root/.bashrc
+            else
+                printf "\n[ -f ~/.environment.env ] && source ~/.environment.env\n\n" | sudo tee -a /root/.bashrc
+            fi
+        fi
+    fi
+    if test -f ~/.zshrc && ! sudo grep -q "/root/.environment.env" /root/.zshrc; then
+        readyn -p "Source /root/.environment.env in /root/.zhrc?" zshrc
+        if [[ $zshrc == 'y' ]]; then
+            #if grep -q "[ -f ~/.bash_completion ]" ~/.bashrc; then
+            #    sed -i 's|\(\[ -f ~/.bash_completion \] \&\& source \~/.bash_completion\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' ~/.bashrc
+            #elif grep -q "[ -f ~/.bash_aliases ]" ~/.bashrc || grep -q "~/.bash_aliases" ~/.bashrc; then
+            #    sed -i 's|\(\[ -f ~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' ~/.bashrc
+            #    sed -i 's|\(if \[ -f ~/.bash_aliases \]; then\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' ~/.bashrc
+            #elif grep -q "[ -f ~/.keybinds ]" ~/.bashrc; then
+            #    sed -i 's|\(\[ -f ~/.keybinds \] \&\& source \~/.keybinds\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' ~/.bashrc
+            #else
+            printf "\n[ -f /root/.environment.env ] && source /root/.environment.env\n\n" | sudo tee -a /root/.zshrc
+            #fi
         fi
         unset bash_prof_ex prmpt shell_profiles shell_rcs prof bashrc
-    fi
-
+    fi 
+    unset bash_prof_ex prmpt shell_profiles shell_rcs prof bashrc
 }
 
 environment-variables() {
@@ -87,13 +140,20 @@ environment-variables() {
     fi
     shell_profiles="${MAGENTA}\t- $HOME/.profile\n"
     shell_rcs=""
-    if test -f ~/.bash_profile; then
+    if sudo test -f ~/.bash_profile; then
         shell_profiles="$shell_profiles${CYAN}\t- $HOME/.bash_profile\n"
     fi
-    if test -f ~/.bashrc; then
+    if sudo test -f ~/.zsh_profile; then
+        shell_profiles="$shell_profiles${CYAN}\t- $HOME/.zsh_profile\n"
+    fi
+    if sudo test -f ~/.bashrc; then
         shell_rcs="$shell_rcs${GREEN}\t- $HOME/.bashrc\n"
     fi
-    prmpt="File(s):\n$shell_profiles${normal} get sourced at login\nFile ${MAGENTA}.profile${RED} won't get sourced at login${normal} if ${CYAN}.*shelltype*_profile(f.ex. .bash_profile)${normal} exists\nFile(s):\n${CYAN}$shell_rcs${normal} get sourced when starting a new *shelltype* shell\n"
+    if sudo test -f ~/.zshrc; then
+        shell_rcs="$shell_rcs${GREEN}\t- $HOME/.zshrc\n"
+    fi
+    prmpt="File(s):\n$shell_profiles${normal}${GREEN}should${normal} get sourced at login...\nHowever, if a ${CYAN}*shell*_profile${normal} (f.ex. .bash_profile) file exists, ${MAGENTA}.profile${RED} won't get sourced at login${normal}\nFile(s):\n${CYAN}$shell_rcs${normal}get sourced when starting a new *shell* shell (f.ex. ${CYAN}bash${normal} shell)\n"
+#Certain programs check the correct ${CYAN}*shell*_profile${normal}, others (by accident) only check ${MAGENTA}.profile${normal}..\n"
     printf "$prmpt"
 
     if ! grep -q "~/.environment.env" ~/.profile; then
@@ -103,43 +163,91 @@ environment-variables() {
         fi
         unset prof
     fi
+    if test -f ~/.bash_profile || test -f ~/.zsh_profile; then
+        printf "\n${GREEN}Since a ${cyan}$HOME/.*shell*_profile${green} file exists, the shell in question won't source ${magenta}$HOME/.profile${green} natively at login.\n${normal}"
+         
+        if test -f ~/.bash_profile && ! grep -q "~/.environment.env" ~/.bash_profile; then
+            printf "${GREEN}Just source $HOME/.environment.env in $HOME/.bash_profile\n${normal}"
+            reade -Q GREEN -i 'source delete' -p "Or copy everything from $HOME/.bash_profile into $HOME/.profile and also delete $HOME/.bash_profile? [Source/delete]: " bprof 
+
+            if [[ $bprof == 'source' ]]; then
+                if ! grep -q "~/.environment.env" ~/.bash_profile; then 
+                    printf "\n[ -f ~/.environment.env ] && source ~/.environment.env\n\n" >>~/.bash_profile
+                fi 
+            elif [[ $bprof == 'delete' ]]; then 
+                cat ~/.bash_profile | tee -a ~/.profile
+                readyn -p 'Check ~/.profile? (will remove ~/.bash_profile afterwards)' eprof
+                if [[ $eprof == 'y' ]]; then
+                    less ~/.profile 
+                fi
+                rm ~/.bash_profile
+            fi
+        fi
+        
+        if test -f ~/.zsh_profile && ! grep -q "~/.environment.env" ~/.zsh_profile; then
+            printf "${GREEN}Just source $HOME/.environment.env in $HOME/.zsh_profile\n${normal}"
+            reade -Q GREEN -i 'source delete' -p "Or copy everything from $HOME/.zsh_profile into $HOME/.profile and also delete $HOME/.zsh_profile? [Source/delete]: " zprof 
+
+            if [[ $zprof == 'source' ]]; then
+                if ! grep -q "~/.environment.env" ~/.zsh_profile; then 
+                    printf "\n[ -f ~/.environment.env ] && source ~/.environment.env\n\n" >>~/.zsh_profile
+                fi 
+            elif [[ $zprof == 'delete' ]]; then 
+                cat ~/.zsh_profile | tee -a ~/.profile
+                rm ~/.zsh_profile
+            fi
+        fi
+         
+    fi
+
     if test -f ~/.bash_profile && ! grep -q "~/.bash_profile" ~/.profile; then
         readyn -p "Link ~/.bash_profile in ~/.profile?" bprof
-        if [[ "$prof" == 'y' ]]; then
-            printf "\n[ -f ~/.bash_profile ] && source ~/.bash_profile\n\n" >>~/.profile
+        if [[ "$bprof" == 'y' ]]; then
+            printf "\n[ -f ~/.bash_profile ] && source ~/.bash_profile\n\n" >>~/.profile 
         fi
         unset bprof
     fi
-
-    if test -f ~/.bash_profile; then
-        printf "\n${GREEN}Since file ${cyan}$HOME/.bash_profile${green} exists, ${cyan}bash${green} won't source ${magenta}$HOME/.profile${green} natively at login.\n${normal}"
-        reade -Q 'GREEN' -i 'prof path none' -p "Source $HOME/.profile in $HOME/.bash_profile or source $HOME/.environment.env directly in $HOME/.bash_profile? [Prof/path/none]: " bash_prof
-        if [[ $bash_prof == 'prof' ]]; then
-            if ! grep -q "~/.profile" ~/.bash_profile; then
-                printf "\n[ -f ~/.profile ] && source ~/.profile\n\n" >>~/.bash_profile
-            fi
-        elif [[ $bash_prof == 'path' ]]; then
-            if ! grep -q "~/.environment.env" ~/.bash_profile; then
-                printf "\n[ -f ~/.environment.env ] && source ~/.environment.env\n\n" >>~/.bash_profile
-            fi
+    if test -f ~/.zsh_profile && ! grep -q "~/.zsh_profile" ~/.profile; then
+        readyn -p "Link ~/.zsh_profile in ~/.profile?" zprof
+        if [[ "$zprof" == 'y' ]]; then
+            printf "\n[ -f ~/.zsh_profile ] && source ~/.zsh_profile\n\n" >>~/.profile
         fi
-        if test -f ~/.bashrc && ! grep -q "~/.environment.env" ~/.bashrc; then
-            readyn -p "Source $HOME/.environment.env in $HOME/.bashrc?" bashrc
-            if [[ $bashrc == 'y' ]]; then
-                if grep -q "[ -f ~/.bash_completion ]" ~/.bashrc; then
-                    sed -i 's|\(\[ -f ~/.bash_completion \] \&\& source \~/.bash_completion\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' ~/.bashrc
-                elif grep -q "[ -f ~/.bash_aliases ]" ~/.bashrc || grep -q "~/.bash_aliases" ~/.bashrc; then
-                    sed -i 's|\(\[ -f ~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' ~/.bashrc
-                    sed -i 's|\(if \[ -f ~/.bash_aliases \]; then\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' ~/.bashrc
-                elif grep -q "[ -f ~/.keybinds ]" ~/.bashrc; then
-                    sed -i 's|\(\[ -f ~/.keybinds \] \&\& source \~/.keybinds\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' ~/.bashrc
-                else
-                    printf "\n[ -f ~/.environment.env ] && source ~/.environment.env\n\n" >>~/.bashrc
-                fi
+        unset bprof
+    fi
+        
+    if test -f ~/.bashrc && ! grep -q "~/.environment.env" ~/.bashrc; then
+        readyn -p "Source $HOME/.environment.env in $HOME/.bashrc?" bashrc
+        if [[ $bashrc == 'y' ]]; then
+            if grep -q "[ -f ~/.bash_completion ]" ~/.bashrc; then
+                sed -i 's|\(\[ -f ~/.bash_completion \] \&\& source \~/.bash_completion\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' ~/.bashrc
+            elif grep -q "[ -f ~/.bash_aliases ]" ~/.bashrc || grep -q "~/.bash_aliases" ~/.bashrc; then
+                sed -i 's|\(\[ -f ~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' ~/.bashrc
+                sed -i 's|\(if \[ -f ~/.bash_aliases \]; then\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' ~/.bashrc
+            elif grep -q "[ -f ~/.keybinds ]" ~/.bashrc; then
+                sed -i 's|\(\[ -f ~/.keybinds \] \&\& source \~/.keybinds\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' ~/.bashrc
+            else
+                printf "\n[ -f ~/.environment.env ] && source ~/.environment.env\n\n" >>~/.bashrc
             fi
         fi
         unset bash_prof_ex prmpt shell_profiles shell_rcs prof bashrc
     fi
+
+    if test -f ~/.zshrc && ! grep -q "~/.environment.env" ~/.zshrc; then
+        readyn -p "Source $HOME/.environment.env in $HOME/.zshrc?" zshrc
+        if [[ $zshrc == 'y' ]]; then
+            #if grep -q "[ -f ~/.bash_completion ]" ~/.bashrc; then
+            #    sed -i 's|\(\[ -f ~/.bash_completion \] \&\& source \~/.bash_completion\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' ~/.bashrc
+            #elif grep -q "[ -f ~/.bash_aliases ]" ~/.bashrc || grep -q "~/.bash_aliases" ~/.bashrc; then
+            #    sed -i 's|\(\[ -f ~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' ~/.bashrc
+            #    sed -i 's|\(if \[ -f ~/.bash_aliases \]; then\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' ~/.bashrc
+            #elif grep -q "[ -f ~/.keybinds ]" ~/.bashrc; then
+            #    sed -i 's|\(\[ -f ~/.keybinds \] \&\& source \~/.keybinds\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' ~/.bashrc
+            #else
+            printf "\n[ -f ~/.environment.env ] && source ~/.environment.env\n\n" >>~/.zshrc
+            #fi
+        fi
+        unset bash_prof_ex prmpt shell_profiles shell_rcs prof bashrc
+    fi 
 
     #if ! grep -q '.environment.env' /root/.bashrc && ! grep -q '.environment.env' $PROFILE_R; then
     yes-no-edit -f environment-variables_r -g "$pathvr" -p "Install .environment.env in /root/?" -i "e" -Q "YELLOW"
@@ -187,7 +295,7 @@ if [[ "$envvars" == "y" ]] && [[ "$1" == 'n' ]]; then
 
     #if ! grep -q '.environment.env' ~/.bashrc && ! grep -q '.environment.env' $PROFILE; then
     yes-no-edit -f environment-variables -g "$pathvr" -p "Install .environment.env in $HOME?" -i "e" -Q "GREEN"
-    printf "It's recommended to logout and login again to notice a change for ${MAGENTA}.profile${normal} and any ${CYAN}.*shelltype*_profiles\n${normal}"
+    printf "It's recommended to logout and login again to notice a change for ${MAGENTA}.profile${normal} and any ${CYAN}.*shell*_profiles\n${normal}"
     #fi
 
 elif [[ "$envvars" == "y" ]]; then
@@ -209,7 +317,7 @@ elif [[ "$envvars" == "y" ]]; then
 
     if ! grep -q '.environment.env' ~/.bashrc && ! grep -q '.environment.env' $PROFILE; then
         yes-no-edit -f environment-variables -g "$pathvr" -p "Install .environment.env in $HOME?" -i "e" -Q "GREEN"
-        printf "It's recommended to logout and login again to notice a change for ${MAGENTA}.profile${normal} and any ${CYAN}.*shelltype*_profiles\n${normal}"
+        printf "It's recommended to logout and login again to notice a change for ${MAGENTA}.profile${normal} and any ${CYAN}.*shell*_profiles\n${normal}"
     fi
 
     # Package Managers
@@ -568,7 +676,7 @@ elif [[ "$envvars" == "y" ]]; then
     fi
 
     yes-no-edit -f environment-variables -g "$pathvr" -p "Install .environment.env in $HOME?" -i "e" -Q "GREEN"
-    printf "It's recommended to logout and login again to notice a change for ${MAGENTA}.profile${normal} and any ${CYAN}.*shelltype*_profiles\n${normal}"
+    printf "It's recommended to logout and login again to notice a change for ${MAGENTA}.profile${normal} and any ${CYAN}.*shell*_profiles\n${normal}"
 
 fi
 

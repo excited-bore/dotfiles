@@ -37,7 +37,7 @@ if type pyenv &> /dev/null; then
     function pyenv-enable(){
          if test -z "$1" ; then
             reade -Q 'GREEN' -i "stable all" -p "What versions to list? [Stable/all]: " vers_all
-            if test $vers_all == 'stable'; then
+            if [[ $vers_all == 'stable' ]]; then
                 all="$(pyenv install -l | grep --color=never -E [[:space:]][0-9].*[0-9]$ | sed '/rc/d' | xargs| tr ' ' '\n' | tac)" 
                 frst="$(echo $all | awk '{print $1}')"
                 all="$(echo $all | sed "s/\<$frst\> //g")" 
@@ -53,11 +53,11 @@ if type pyenv &> /dev/null; then
         fi
          
         reade -Q 'GREEN' -i "global local" -p "Set python version globally or locally? [Global/local]: " ansr 
-        if test "$ansr" == 'global'; then
+        if [[ "$ansr" == 'global' ]]; then
             pyenv global "$vers" 
             readyn -p "Also set pyenv for shell? (only works if shell integration is enabled)" ansr
-            test "$ansr" == 'y' && pyenv shell "$vers"
-        elif test "$ansr" == 'local'; then
+            [[ "$ansr" == 'y' ]] && pyenv shell "$vers"
+        elif [[ "$ansr" == 'local' ]]; then
             pyenv local "$vers"
         fi
         printf "${bold}Version: ${normal}" 
@@ -68,7 +68,7 @@ if type pyenv &> /dev/null; then
         
          if test -z "$1" ; then
             reade -Q 'GREEN' -i "stable all" -p "What versions to list? [Stable/all]: " vers_all
-            if test $vers_all == 'stable'; then
+            if [[ $vers_all == 'stable' ]]; then
                 all="$(pyenv install -l | grep --color=never -E [[:space:]][0-9].*[0-9]$ | sed '/rc/d' | xargs| tr ' ' '\n' | tac)" 
                 frst="$(echo $all | awk '{print $1}')"
                 all="$(echo $all | sed "s/\<$frst\> //g")" 
@@ -91,10 +91,10 @@ if type pyenv &> /dev/null; then
             verss="$(pyenv completions global | sed '/--help/d' | sed '/system/d')" 
 
             [[ "${verss}" == *"$vers"* ]] && readyn -p "Python $vers is already installed. Reinstall?" ansr
-            if test "$ansr" == 'y'; then
+            if [[ "$ansr" == 'y' ]]; then
                 pyenv install "$vers" 
             fi
-            if ! test "$ansr" == 'y' || ! test $? == 0; then
+            if ! [[ "$ansr" == 'y' ]] || ! [[ $? == 0 ]]; then
                 return 0
             fi
             

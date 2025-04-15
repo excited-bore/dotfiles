@@ -272,7 +272,7 @@ function cp-trash(){
 }
 
 # Cp recursively and verbose
-alias cp="cp --recursive --verbose  --dereference"
+alias cp="xcp --glob --recursive --verbose  --dereference"
 alias cp-retrace-symlinks="cp --dereference --driver parblock"
 
 # mv (recursively native) verbose and only ask for interaction when overwriting newer files
