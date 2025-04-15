@@ -111,6 +111,36 @@ if [[ $ansr == "y" ]]; then
         else
             cp_xcp="cp"
         fi
+        readyn -p "Be recursive? (Recursive means copy everything inside directories without aborting)" -c '! type xcp &> /dev/null' cp_rq
+        if [[ "$cp_rq" == 'y' ]]; then
+            cp_r='--recursive'
+            #xcp_r="--recursive"
+        fi
+        readyn -p "Be verbose? (All info about copying process)" cp_vq
+        if [[ "$cp_vq" == 'y' ]]; then
+            cp_v='--verbose'
+            #xcp_v="--verbose"
+        fi
+
+        readyn -n -p "Never overwrite already present files?" cp_ovq
+        if [[ $cp_ovq == 'y' ]]; then
+            cp_ov='--no-clobber'
+            #xcp_ov="--no-clobber"
+        fi
+
+        readyn -p "Lookup files/directories of symlinks?" cp_derq
+        if [[ $cp_derq == 'y' ]]; then
+            cp_der='--dereference'
+            #xcp_der="--dereference"
+        fi
+        
+        
+        #if type xcp &> /dev/null && [[ $cp_xcpq == 'y' ]]; then
+            #sed -i 's|^alias cp=".*|alias cp="'"$cp_xcp $xcp_r $xcp_v $xcp_ov $xcp_der"' --"|g' $genr 
+        #else 
+            sed -i 's|^alias cp=".*|alias cp="'"$cp_xcp $cp_r $cp_v $cp_ov $cp_der"'"|g' $genr
+        #fi
+        #[[ "$cp_xcp" =~ 'xcp --glob' ]] && sed -i 's|^alias cp=".*|type xcp \&> /dev/null && alias cp="'"$cp_xcp $cp_r $cp_v $cp_ov $cp_der"' --" \|\| alias cp="cp "'"$cp_r $cp_v $cp_ov $cp_der"' --"|g' $genr || sed -i 's|^alias cp=".*|type xcp \&> /dev/null && alias cp="'"$cp_xcp $cp_r $cp_v $cp_ov $cp_der"' --"|g'
     fi
     readyn -p "Be recursive? (Recursive means copy everything inside directories without aborting)" cp_r
     if [[ "$cp_r" == 'y' ]]; then
@@ -171,7 +201,7 @@ if [[ $ansr == "y" ]]; then
 
     printf "${CYAN}Set rm (remove) to:\n$prompt"
     reade -Q "GREEN" -i "$pre $ansrs" -p "$prompt2" ansr
-    if $([[ "$ansr" == "none" ]] || [ -z "$ansr" ]) &&  [[ "$rm_verb" == 'n' ]]; then
+    if [[ "$ansr" == "none" ]] && [[ "$rm_verb" == 'n' ]]; then
         sed -i 's|^alias rm="|#alias rm="|g' $genr
     else
         sed -i 's|.*alias cp="cp-trash -rv"|alias cp="cp-trash -rv"|g' $genr
