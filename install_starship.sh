@@ -22,6 +22,9 @@ if [[ "y" == "$strship" ]]; then
     if ! grep -q "starship" ~/.bashrc; then
         echo "eval \"\$(starship init bash)\"" >>~/.bashrc
     fi
+    if ! grep -q "starship" ~/.zshrc; then
+        echo "eval \"\$(starship init zsh)\"" >>~/.zshrc
+    fi
     if ! test -f checks/check_completions_dir.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)"
     else
@@ -71,13 +74,14 @@ if [[ "y" == "$strship" ]]; then
             sudo curl -o /root/.bash_aliases.d/starship.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/starship.sh
         fi
         if type gio &>/dev/null && test -f /root/.bash_aliases.d/starship.sh~; then
-            sudo gio trash ~/.bash_aliases.d/starship.sh~
+            sudo gio trash /root/.bash_aliases.d/starship.sh~
         fi
     fi
 fi
 unset strship
 
-eval "$(starship init bash)"
+test -n "$BASH_VERSION" && eval "$(starship init bash)"
+test -n "$ZSH_VERSION" && eval "$(starship init zsh)"
 
 if ! test -f aliases/.bash_aliases.d/starship.sh; then
     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/starship.sh)"
@@ -90,5 +94,9 @@ if type fzf &>/dev/null; then
 elif ! type fzf &>/dev/null && test -f ~/.fzf.bash; then
     echo "No fzf found!!"
     [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+    starship-presets
+elif ! type fzf &> /dev/null && test -f ~/.fzf.zsh; then
+    echo "No fzf found!!"
+    [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
     starship-presets
 fi
