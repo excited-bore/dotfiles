@@ -247,10 +247,11 @@ if [[ "$langs" == 'y' ]]; then
     fi
 
     if type cpan &> /dev/null; then
-        printf "${CYAN}Perl uses cpan for the installation of modules and running this for the first time takes a while.\n${normal}"
+        printf "${CYAN}Perl uses cpan for the installation of modules and initializing perl modules for the first time can take a while.\n${normal}"
         readyn -p "Run it now and check whether neovim module is installed?" cpn
         if [[ "y" == $cpn ]]; then
-            cpan -l &> /dev/null
+            #printf "Pressing enter once in a while *seems* to speed up the process "
+            cpan -l
         else
             if ! type cpanm &>/dev/null || ! cpan -l 2>/dev/null | grep -q Neovim::Ext; then
                 readyn -p "Install nvim-perl?" perlscripts

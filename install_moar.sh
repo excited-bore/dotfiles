@@ -6,11 +6,19 @@ if ! test -f checks/check_all.sh; then
     if type curl &> /dev/null; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)"
     else
-        continue
+        printf "Curl not found and uninstallable. Exiting..."
+        return 1
     fi
 else
     . ./checks/check_all.sh
 fi
+
+if ! test -f checks/check_AUR.sh; then
+    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_AUR.sh)"
+else
+    . ./checks/check_AUR.sh
+fi
+
 
 answer=""
 

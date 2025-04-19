@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function reade() {
-    test -n "$ZSH_VERSION" && setopt err_return extended_glob local_options local_traps &&
+    test -n "$ZSH_VERSION" && setopt local_options err_return local_traps extended_glob &&
         HISTSIZE=1000 &&
         SAVEHIST=1000
 
@@ -166,11 +166,11 @@ function reade() {
             fi
         fi
 
+	local oldhist=''
         local color=""
         local args=''
         local tmpf=''
-        local oldhist=''
-        local eflag=0
+	local eflag=0
         local pre=''
         while getopts 'sS:b:e:i:p:Q:' flag; do
             case "${flag}" in
@@ -198,7 +198,7 @@ function reade() {
                 pre="$arg"
 
                 if ! test -z "$args"; then
-                    args=$(echo "$args" | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }')
+		    args=$(echo "$args" | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }')
                     args=$(echo "$args" | tr ' ' '\n')
 
                     tmpf=$(mktemp)
@@ -233,7 +233,10 @@ function reade() {
                         while IFS='' read -r LINE || [ -n "${LINE}" ]; do
                             print -S "${LINE}"
                         done <$tmpf
-                        fc -p "$tmpf"
+			# Write to current historyfile
+			fc -W
+			# Then load different one - no need to clear
+			fc -p "$tmpf"
                     fi
 
                     # https://unix.stackexchange.com/questions/265957/zsh-histfile-still-read-from-zsh-history
@@ -297,21 +300,14 @@ function reade() {
 
         test -n "$BASH_VERSION" &&
             trap "history -c; history -r $oldhist; command rm -f $tmpf; eval \"$oldtrps\"; test -n \"$oldtrps\" && eval \"$oldtrps\" || trap - SIGINT; exit 130" SIGINT
-        #exitfn() {
-        #    trap SIGINT
-        #    history -c
-        #    history -r $oldhist
-        #    command rm -f $tmpf
-        #    return
-        #} &&
-        #trap "exitfn" SIGINT
-
-        test -n "$ZSH_VERSION" &&
-            TRAPINT() {
-                fc -R "$oldhist"
-                command rm -f "$tmpf"
-                return $((128 + $1))
-            }
+        
+	test -n "$ZSH_VERSION" &&
+	   TRAPINT() {
+	      fc -IR $oldhist
+              fc -IR
+	      command rm -f "$tmpf"
+              return $((128 + $1))
+           }
 
         eval "${readstr}"
 
@@ -320,7 +316,7 @@ function reade() {
             history -r $oldhist
 
         test -n "$ZSH_VERSION" &&
-            fc -R $oldhist
+	    fc -IR $oldhist
 
         test -n "$oldtrps" &&
             eval "$oldtrps" ||
@@ -338,7 +334,7 @@ function reade() {
         if ! test -z "$@"; then
             eval "${@:$#:1}='$vvvvvvvvvv'"
         fi
-
+	
     else
         if [[ $# < 1 ]]; then
             echo "Give at least 1 variable up for reade(). "

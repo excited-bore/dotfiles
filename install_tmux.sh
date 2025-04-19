@@ -63,8 +63,8 @@ sed -i 's|^set -g @plugin|#set -g @plugin|g' $file
 sed -i 's|^run '\''~/.tmux/plugins/tpm/tpm'\''|#run '\''~/.tmux/plugins/tpm/tpm'\''|g' $file
 sed -i 's|^set -g @continuum-restore '\''on'\''|#set -g @continuum-restore '\''on'\''|g' $file
 
-readyn -p "Install tmux.conf? (tmux conf at ~/.tmux.conf) " tmuxc
-if [[ "$tmuxc" == "y" ]] || [ -z "$tmuxc" ]; then
+yes-no-edit -p "Install tmux.conf? (tmux conf at ~/.tmux.conf)" -g '$file' -i 'y' -Q 'GREEN' tmuxc
+if [[ "$tmuxc" == "y" ]]; then
     cp -bfv $file ~/
     if test -f $file~ && type gio &>/dev/null; then
         gio trash $file~
@@ -72,8 +72,8 @@ if [[ "$tmuxc" == "y" ]] || [ -z "$tmuxc" ]; then
 fi
 unset tmuxc
 
-readyn -p "Install tmux plugin manager? (tpm) " tmuxx
-if [[ "$tmuxx" == "y" ]] || [ -z "$tmuxx" ]; then
+readyn -p "Install tmux plugin manager? (tpm)" tmuxx
+if [[ "$tmuxx" == "y" ]]; then
     if ! [ -d ~/.tmux/plugins/tpm ]; then
         git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
     fi
@@ -88,7 +88,7 @@ fi
 unset tmuxx
 
 readyn -p "Install tmux clipboard plugin? (tmux-yank)" tmuxx
-if [[ "$tmuxx" == "y" ]] || [ -z "$tmuxx" ]; then
+if [[ "$tmuxx" == "y" ]]; then
     if ! type xclip &>/dev/null || ! type xsel &>/dev/null; then
         if [[ "$distro_base" == "Arch" ]] || [[ $distro_base == "Debian" ]]; then
             eval "${pac_ins}" xclip xsel
@@ -102,8 +102,8 @@ if [[ "$tmuxx" == "y" ]] || [ -z "$tmuxx" ]; then
 fi
 unset tmuxx
 
-readyn -p "Install tmux sensible settings plugin? (tmux-sensible) " tmuxx
-if [[ "$tmuxx" == "y" ]] || [ -z "$tmuxx" ]; then
+readyn -p "Install tmux sensible settings plugin? (tmux-sensible)" tmuxx
+if [[ "$tmuxx" == "y" ]]; then
     sed -i 's|#set -g @plugin '\''tmux-plugins/tmux-sensible'\''|set -g @plugin '\''tmux-plugins/tmux-sensible'\''|g' ~/.tmux.conf
     if ! grep -q "set -g @plugin 'tmux-plugins/tmux-sensible'" ~/.tmux.conf; then
         echo "# Like vim-sensible, just good settings to have overall" >>~/.tmux.conf
@@ -113,7 +113,7 @@ fi
 unset tmuxx
 
 readyn -p "Install tmux savepoint plugin? (tmux-resurrect)" tmuxx
-if [[ "$tmuxx" == "y" ]] || [ -z "$tmuxx" ]; then
+if [[ "$tmuxx" == "y" ]]; then
     sed -i 's|#set -g @plugin '\''tmux-plugins/tmux-resurrect'\''|set -g @plugin '\''tmux-plugins/tmux-resurrect'\''|g' ~/.tmux.conf
     if ! grep -q "set -g @plugin 'tmux-plugins/tmux-resurrect'" ~/.tmux.conf; then
         echo "# Restore tmux environment with savepoints" >>~/.tmux.conf
@@ -135,7 +135,7 @@ unset tmuxx
 
 if type nvim &>/dev/null && type kitty &>/dev/null; then
     readyn -p "Install vim-tmux-kitty navigator plugin? (tmux-sensible)" tmuxx
-    if [[ "$tmuxx" == "y" ]] || [ -z "$tmuxx" ]; then
+    if [[ "$tmuxx" == "y" ]]; then
         sed -i 's|#set -g @plugin '\''excited-bore/vim-tmux-kitty-navigator'\''|set -g @plugin '\''excited-bore/vim-tmux-kitty-navigator'\''|g' ~/.tmux.conf
         if ! grep -q "set -g @plugin 'excited-bore/vim-tmux-kitty-navigator'" ~/.tmux.conf; then
             echo "set -g @plugin 'excited-bore/vim-tmux-kitty-navigator'" >>~/.tmux.conf
@@ -180,7 +180,7 @@ unset tmuxx
 #unset tmuxx
 
 readyn -p "Install tmux completions?" tmuxx
-if [[ "$tmuxx" == "y" ]] || [ -z "$tmuxx" ]; then
+if [[ "$tmuxx" == "y" ]]; then
 
     if ! test -f checks/check_completions_dir.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)"
@@ -196,16 +196,16 @@ fi
 
 unset tmuxx
 
-readyn -Y 'YELLOW' -p "Install tmux completions at root? " tmuxx
-if [[ "$tmuxx" == "y" ]] || [ -z "$tmuxx" ]; then
+readyn -Y 'YELLOW' -p "Install tmux completions at root?" tmuxx
+if [[ "$tmuxx" == "y" ]]; then
     if ! [ -e /root/.bash_completion.d/tmux ]; then
         curl -s https://raw.githubusercontent.com/imomaliev/tmux-bash-completion/master/completions/tmux | sudo tee -a /root/.bash_completion.d/tmux &>/dev/null
     fi
 fi
 unset tmuxx
 
-readyn -p "Install tmux.sh at ~/.bash_aliases.d/? (tmux aliases) " tmuxx
-if [ -z "$tmuxx" ] || [[ "$tmuxx" == "y" ]]; then
+readyn -p "Install tmux.sh at ~/.bash_aliases.d/? (tmux aliases)" tmuxx
+if [[ "$tmuxx" == "y" ]]; then
     if test -f tmux/.bash_aliases.d/tmux.sh; then
         cp -bfv tmux/.bash_aliases.d/tmux.sh ~/.bash_aliases.d/
     else
@@ -218,7 +218,7 @@ fi
 unset tmuxx
 
 readyn -n -p "Set tmux at shell login for SSH? (Conflicts with vim-tmux-kitty navigator)" tmuxx
-if [ -z "$tmuxx" ] || [[ "$tmuxx" == "y" ]]; then
+if [[ "$tmuxx" == "y" ]]; then
     touch ~/.bash_aliases.d/tmux_startup.sh
     echo 'if [[ $- =~ i ]] && [[ -z "$TMUX" ]] && [[ -n "$SSH_TTY" ]]; then' >>~/.bash_aliases.d/tmux_startup.sh
     echo '  tmux attach-session -t ssh_tmux || tmux new-session -s ssh_tmux;' >>~/.bash_aliases.d/tmux_startup.sh

@@ -58,7 +58,7 @@ environment-variables_r() {
 
             if [[ $bprof_r == 'source' ]]; then
                 if ! sudo grep -q "/root/.environment.env" /root/.bash_profile; then 
-                    printf "\n[ -f /root/.environment.env ] && source /root/.environment.env\n\n" | sudo tee -a /root/.bash_profile
+                    printf "\n[ -f /root/.environment.env ] && source /root/.environment.env\n\n" | sudo tee -a /root/.bash_profile 1> /dev/null
                 fi 
             elif [[ $bprof_r == 'delete' ]]; then 
                 sudo cat /root/.bash_profile | sudo tee -a /root/.profile
@@ -76,7 +76,7 @@ environment-variables_r() {
 
             if [[ $zprof_r == 'source' ]]; then
                 if ! sudo grep -q "/root/.environment.env" /root/.zsh_profile; then 
-                    printf "\n[ -f /root/.environment.env ] && source /root/.environment.env\n\n" | sudo tee -a /root/.zsh_profile
+                    printf "\n[ -f /root/.environment.env ] && source /root/.environment.env\n\n" | sudo tee -a /root/.zsh_profile 1> /dev/null
                 fi 
             elif [[ $zprof_r == 'delete' ]]; then 
                 sudo cat /root/.zsh_profile | sudo tee -a /root/.profile
@@ -88,14 +88,14 @@ environment-variables_r() {
     if test -f /root/.bash_profile && ! sudo grep -q "/root/.bash_profile" /root/.profile; then
         readyn -p "Link /root/.bash_profile in /root/.profile?" bprofr
         if [[ "$bprofr" == 'y' ]]; then
-            printf "\n[ -f /root/.bash_profile ] && source /root/.bash_profile\n\n" | sudo tee -a /root/.profile 
+            printf "\n[ -f /root/.bash_profile ] && source /root/.bash_profile\n\n" | sudo tee -a /root/.profile 1> /dev/null
         fi
         unset bprofr
     fi
     if test -f /root/.zsh_profile && ! grep -q "/root/.zsh_profile" ~/.profile; then
         readyn -p "Link /root/.zsh_profile in /root/.profile?" zprofr
         if [[ "$zprofr" == 'y' ]]; then
-            printf "\n[ -f /root/.zsh_profile ] && source /root/.zsh_profile\n\n" | sudo tee -a /root/.profile
+            printf "\n[ -f /root/.zsh_profile ] && source /root/.zsh_profile\n\n" | sudo tee -a /root/.profile 1> /dev/null
         fi
         unset zprofr
     fi
@@ -110,7 +110,7 @@ environment-variables_r() {
             elif sudo grep -q "[ -f ~/.keybinds ]" /root/.bashrc; then
                 sudo sed -i 's|\(\[ -f ~/.keybinds \] \&\& source \~/.keybinds\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' /root/.bashrc
             else
-                printf "\n[ -f ~/.environment.env ] && source ~/.environment.env\n\n" | sudo tee -a /root/.bashrc
+                printf "\n[ -f ~/.environment.env ] && source ~/.environment.env\n\n" | sudo tee -a /root/.bashrc 1> /dev/null
             fi
         fi
     fi
@@ -125,7 +125,7 @@ environment-variables_r() {
             #elif grep -q "[ -f ~/.keybinds ]" ~/.bashrc; then
             #    sed -i 's|\(\[ -f ~/.keybinds \] \&\& source \~/.keybinds\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' ~/.bashrc
             #else
-            printf "\n[ -f /root/.environment.env ] && source /root/.environment.env\n\n" | sudo tee -a /root/.zshrc
+            printf "\n[ -f /root/.environment.env ] && source /root/.environment.env\n\n" | sudo tee -a /root/.zshrc 1> /dev/null
             #fi
         fi
         unset bash_prof_ex prmpt shell_profiles shell_rcs prof bashrc
@@ -416,7 +416,7 @@ elif [[ "$envvars" == "y" ]]; then
     fi
 
     readyn -p "Set EDITOR and VISUAL?" edtvsl
-    if [[ "$edtvsl" == "y" ]] || [ -z "$edtvsl" ]; then
+    if [[ "$edtvsl" == "y" ]]; then
         if type vi &>/dev/null; then
             editors="vi $editors"
             prmpt="$prmpt \tvi = Archaic and non-userfriendly editor\n"
@@ -483,7 +483,7 @@ elif [[ "$envvars" == "y" ]]; then
 
         # Make .txt file and output file
 
-        readyn -N 'CYAN' -n -p "Set VISUAL to '\\\\\$EDITOR'? (otherwise set manually again)" vis_ed
+        readyn -N 'CYAN' -n -p "Set VISUAL to the value of 'EDITOR'? (otherwise set manually again)" vis_ed
         if [[ $vis_ed == 'y' ]]; then
             sed -i 's|#export VISUAL=|export VISUAL=|g' $pathvr
             sed -i 's|export VISUAL=.*|export VISUAL=$EDITOR|g' $pathvr
@@ -507,7 +507,7 @@ elif [[ "$envvars" == "y" ]]; then
         unset vis_ed
 
         if grep -q "#export SUDO_EDITOR" $pathvr; then
-            readyn -p "Set SUDO_EDITOR to \\\\\$EDITOR?" sud_edt
+            readyn -p "Set SUDO_EDITOR to the value of 'EDITOR'?" sud_edt
             if [[ "$sud_edt" == "y" ]]; then
                 sed -i 's|#export SUDO_EDITOR.*|export SUDO_EDITOR=$EDITOR|g' $pathvr
             fi
@@ -516,11 +516,11 @@ elif [[ "$envvars" == "y" ]]; then
 
         if grep -q "#export SUDO_VISUAL" $pathvr; then
             printf "!! Warning: Certain visual code editors (like ${CYAN}'Visual Studio Code'${normal}) don't work properly when using ${RED}sudo${normal}\nIt might be better to keep using \$EDITOR depending on what \$VISUAL is configured as\n"
-            readyn -p "Set SUDO_VISUAL to \\\\\$EDITOR?" sud_vis
+            readyn -p "Set SUDO_VISUAL to the value of 'EDITOR'?" sud_vis
             if [[ "$sud_vis" == "y" ]]; then
                 sed -i 's|#export SUDO_VISUAL.*|export SUDO_VISUAL=$EDITOR|g' $pathvr
             else
-                readyn -p "Set SUDO_VISUAL to \\\\\$VISUAL?" sud_edt
+                readyn -p "Set SUDO_VISUAL to the value of 'VISUAL'?" sud_edt
                 if [[ "$sud_vis" == "y" ]]; then
                     sed -i 's|#export SUDO_VISUAL.*|export SUDO_VISUAL=$VISUAL|g' $pathvr
                 fi
