@@ -1,32 +1,17 @@
 echo "$(tput setaf 6)This script uses $(tput setaf 2)rlwrap$(tput setaf 6) and $(tput setaf 2)fzf$(tput sgr0).";
 
-if ! test -f checks/check_system.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
-else
-    . ./checks/check_system.sh
-fi
-
-if ! type update-system &> /dev/null; then
-    if ! test -f aliases/.bash_aliases.d/update-system.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)" 
+if ! test -f checks/check_all.sh; then
+    if type curl &>/dev/null; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        . ./aliases/.bash_aliases.d/update-system.sh
-         
+        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
+        return 1 || exit 1
     fi
-fi
-
-if test -z $SYSTEM_UPDATED; then
-    readyn -Y "CYAN" -p "Update system?" updatesysm
-    if test $updatesysm == "y"; then
-        update-system                     
-    fi
-fi
-
-if ! type reade &> /dev/null; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
 else
-    . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
+    . ./checks/check_all.sh
 fi
+
+get-script-dir SCRIPT_DIR
 
 if ! test -f checks/check_envvar.sh; then
      eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)" 
@@ -78,13 +63,13 @@ function git_hl(){
     
     reade -Q "GREEN" -i "$diff $diffs" -p "Diff filter: " diff
     if ! test -z $diff; then
-        reade -Q "CYAN" -i "y" -p "You selected $diff. Configure?" conf
-        if [ "$diff" == "delta" ]; then
+        readyn -Y "CYAN" -p "You selected $diff. Configure?" conf
+        if [[ "$diff" == "delta" ]]; then
             diff="delta --color-only --paging=never"
             
-            if test "y" == "$conf"; then
-                reade -Q "CYAN" -i "y" -p "Set syntax-theme" delta1
-                if test "$delta1" == 'y'; then
+            if [[ "y" == "$conf" ]]; then
+                readyn -Y "CYAN" -p "Set syntax theme for delta?" delta1
+                if [[ "$delta1" == 'y' ]]; then
                     echo "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Sollicitudin nibh sit amet commodo nulla facilisi. Sed cras ornare arcu dui vivamus arcu. Non quam lacus suspendisse faucibus interdum posuere lorem. Consequat ac felis donec et odio pellentesque. Elementum tempus egestas sed sed risus pretium quam. Neque viverra justo nec ultrices dui sapien eget mi proin. Varius vel pharetra vel turpis nunc eget lorem dolor sed. Mauris in aliquam sem fringilla ut morbi tincidunt augue. Cursus euismod quis viverra nibh cras. Diam sollicitudin tempor id eu. Lectus arcu bibendum at varius vel. Posuere morbi leo urna molestie at elementum eu facilisis. Condimentum lacinia quis vel eros. Dolor magna eget est lorem ipsum dolor sit amet consectetur. Ultrices dui sapien eget mi. A arcu cursus vitae congue mauris.
 
 In pellentesque massa placerat duis ultricies lacus sed turpis tincidunt. Dignissim diam quis enim lobortis scelerisque fermentum. Faucibus purus in massa tempor nec. Enim neque volutpat ac tincidunt. Penatibus et magnis dis parturient montes nascetur ridiculus. Ornare aenean euismod elementum nisi quis eleifend quam adipiscing. Elementum pulvinar etiam non quam lacus suspendisse faucibus interdum. Vel eros donec ac odio tempor orci dapibus ultrices. Tempus imperdiet nulla malesuada pellentesque elit eget gravida. In ante metus dictum at tempor commodo ullamcorper.
@@ -108,63 +93,63 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                     theme=$(printf "$(delta --list-syntax-themes | tail -n +1)" | fzf --reverse --border --border-label="Syntax theme")
                     theme=$(echo "$theme" | awk '{$1=""; print $0;}')
                     delta --syntax-theme "${theme:1}" $TMPDIR/dtest1 $TMPDIR/dtest2
-                    stty sane && reade -N "MAGENTA" -n -p "set as syntax theme? (will retry if no)" dltthme
-                    if test "$dltthme" == "n"; then
+                    stty sane && readyn -N "MAGENTA" -n -p "Set as syntax theme? (will retry if no)" dltthme
+                    if [[ "$dltthme" == "n" ]]; then
                        theme='' 
                     fi
                 done
                     pager=$pager" $theme"
                 fi
                 readyn -Y "CYAN" -p "Set linenumbers?" delta3
-                if test "y" == $delta3; then
+                if [[ "y" == $delta3 ]]; then
                     git config $global delta.linenumbers true
                 fi
                 
                 readyn -Y 'CYAN' -p "Side-by-side view?" delta3
-                if test "y" == $delta3; then
+                if [[ "y" == $delta3 ]]; then
                     git config $global delta.side-by-side true
                 fi
 
                 readyn -Y "CYAN" -p "Set to navigate? (Move between diff sections using n and N)" delta1
-                if test "y" == $delta1; then
+                if [[ "y" == $delta1 ]]; then
                     git config $global delta.navigate true
                 fi 
 
                 readyn -Y "CYAN"  -p "Set to dark?" delta2
-                if test "y" == $delta2; then
+                if [[ "y" == $delta2 ]]; then
                     git config $global delta.dark true
                 fi
 
                 readyn -Y "CYAN" -p "Set hyperlinks?" delta1
-                if test "y" == $delta1; then
+                if [[ "y" == $delta1 ]]; then
                     git config $global delta.hyperlinks true
                 fi
             fi
 
-        elif [ "$diff" == "diff-so-fancy" ]; then
+        elif [[ "$diff" == "diff-so-fancy" ]]; then
             diff="diff-so-fancy --patch"
             readyn -p "You selected $diff. Configure?" difffancy
-            if test "$difffancy" == "y"; then
+            if [[ "$difffancy" == "y" ]]; then
                 readyn -p "Should the first block of an empty line be colored. (Default: true)?" diffancy
-                if test "y" == $diffancy; then
+                if [[ "y" == $diffancy ]]; then
                     git config --bool $global diff-so-fancy.markEmptyLines true                    
                 else
                     git config --bool $global diff-so-fancy.markEmptyLines false                    
                 fi
                 readyn -Y "CYAN" -p "Simplify git header chunks to a more human readable format. (Default: true)" diffancy
-                if test "y" == $diffancy; then
+                if [[ "y" == $diffancy ]]; then
                     git config --bool $global diff-so-fancy.changeHunkIndicators true
                 else
                     git config --bool $global diff-so-fancy.changeHunkIndicators false
                 fi
                 readyn -Y "CYAN" -p "Should the pesky + or - at line-start be removed. (Default: true)" diffancy
-                if test "y" == $diffancy; then
+                if [[ "y" == $diffancy ]]; then
                     git config --bool $global diff-so-fancy.stripLeadingSymbols true
                 else
                     git config --bool $global diff-so-fancy.stripLeadingSymbols false
                 fi
                 readyn -Y "CYAN" -p "By default, the separator for the file header uses Unicode line-drawing characters. If this is causing output errors on your terminal, set this to false to use ASCII characters instead. (Default: true)" diffancy
-                if test "y" == $diffancy; then
+                if [[ "y" == $diffancy ]]; then
                     git config --bool $global diff-so-fancy.useUnicodeRuler true
                 else
                     git config --bool $global diff-so-fancy.useUnicodeRuler false
@@ -172,48 +157,48 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                 reade -Q "CYAN" -i "47 $(seq 1 100)" -p "By default, the separator for the file header spans the full width of the terminal. Use this setting to set the width of the file header manually. (Default: 47): " diffancy
                  # git log's commit header width
                 git config --global diff-so-fancy.rulerWidth $diffancy    
-            elif [ "$diff" == "riff" ]; then
+            elif [[ "$diff" == "riff" ]]; then
                 diff="riff --no-pager"
                 readyn -Y 'CYAN' -p "Ignore changes in amount of whitespace?" riff1
-                if test "$riff1" == 'y'; then
+                if [[ "$riff1" == 'y' ]]; then
                     diff=$diff" -b"
                 fi
                 readyn -Y "CYAN" -p "No special highlighting for lines that only add content?" riff1
-                if test "$riff1" == 'y'; then
+                if [[ "$riff1" == 'y' ]]; then
                     diff=$diff" --no-adds-only-special"
                 fi
             fi
-        elif [ "$diff" == "ydiff" ]; then
+        elif [[  "$diff" == "ydiff"  ]]; then
             diff=$diff" --color=auto"
             readyn -Y 'CYAN' -p "You selected $diff. Configure?" conf
-            if test "y" == "$conf"; then
+            if [[ "y" == "$conf" ]]; then
                 readyn -Y 'CYAN' -p "Enable side-by-side mode?" diffr1
-                if test "$diffr1" == 'y'; then
+                if [[ "$diffr1" == 'y' ]]; then
                     diff=$diff" --side-by-side"
                     readyn -Y "CYAN" -p "Wrap long lines in side-by-side view?" diffr1
-                    if test "$diffr1" == 'y'; then
+                    if [[ "$diffr1" == 'y' ]]; then
                         diff=$diff" --wrap"
                     fi        
                 fi
             fi
         elif [ "$diff" == "diffr" ]; then
             readyn -Y "CYAN" -p "You selected $diff. Configure?" conf
-            if test "y" == "$conf"; then
+            if [[ "y" == "$conf" ]]; then
                 readyn -Y "CYAN" -p "Set linenumber?" diffr1
-                if test "$diffr1" == 'y'; then
+                if [[ "$diffr1" == 'y' ]]; then
                     diff="diffr --line-numbers"
-                    readyn -Q "CYAN" -p "Set linenumber style? [compact/aligned/n]: " diffr1
-                    if test "$diffr1" == 'compact' || test "$diffr1" == 'aligned'; then
+                    reade -Q "CYAN" -i 'c a n' -p "Set linenumber style? [C(ompact)/a(ligned)/n]: " diffr1
+                    if [[ "$diffr1" == 'compact' ]] || [[ "$diffr1" == 'aligned' ]]; then
                         diff="diffr --line-numbers $diffr1"
                     fi
                 fi
             fi
-        elif [ "$diff" == "batdiff" ]; then
+        elif [[ "$diff" == "batdiff" ]]; then
               readyn -Y "CYAN" -p "You selected $diff. Configure?" conf
-              if test "y" == "$conf"; then 
+              if [[ "y" == "$conf" ]]; then 
                   diff="batdiff --staged --paging=never"
                   readyn -Y "CYAN" -p "Use delta config?" diffr1
-                  if test "$diffr1" == 'y'; then
+                  if [[ "$diffr1" == 'y' ]]; then
                         diff=$diff" --delta"
                   fi
             fi
@@ -242,7 +227,7 @@ else
 fi
 
 readyn -Y "YELLOW" -p "Turn off pager?" pipepager1
-if test "$pipepager1" == 'y'; then 
+if [[ "$pipepager1" == 'y' ]]; then 
      git config $global "$cpager" false  
 else
 #reade -Q "CYAN" -i "n" -p "Set $cpager to prevent paging? [N/y]: " "n" regpager ;
@@ -308,25 +293,25 @@ else
     fi
     
     
-    if test $pager == 'less'; then
+    if [[ $pager == 'less' ]]; then
         local ln="-R"
         readyn -p "You selected $pager. Quit if one screen?" pager1
-        if test $pager1 == 'y'; then
+        if [[ $pager1 == 'y' ]]; then
             ln=$ln"--quit-if-one-screen"
         fi
         readyn -Y "CYAN" -p "Set linenumbers for pager?" lne 
-        if test "$lne" == 'n'; then
+        if [[ "$lne" == 'n' ]]; then
            ln=$ln"-n"
         else
            ln=$ln"-N"
         fi
-    elif [ "$pager" == "moar" ]; then
+    elif [[ "$pager" == "moar" ]]; then
         readyn -Y "CYAN" -p "You chose $pager. Quit if on one screen?" pager1
-        if test $pager1 == 'y'; then
+        if [[ $pager1 == 'y' ]]; then
             pager=$pager' --quit-if-one-screen'
         fi
-        readyn -Y "CYAN" -p "You selected $pager. Set style? " pager1
-        if test $pager1 == 'y'; then
+        readyn -Y "CYAN" -p "You selected $pager. Set style?" pager1
+        if [[ $pager1 == 'y' ]]; then
             local theme
             local styles="abap\nalgol\nalgol_nu\napi\narduino\nautumn\naverage\nbase16-snazzy\nborland\nbw\ncatppuccin-frappe\ncatppuccin-latte\ncatppuccin-macchiato\ncatppuccin-mocha\ncolorful\ncompat\ndoom-one\ndoom-one2\ndracula\nemacs\nfriendly\nfruity\ngithub-dark\ngithub\ngruvbox-light\ngruvbox\nhr_high_contrast\nhrdark\nigor\nlovelace\nmanni\nmodus-operandi\nmodus-vivendi\nmonokai\nmonokailight\nmurphy\nnative\nnord\nonedark\nonesenterprise\nparaiso-dark\nparaiso-light\npastie\nperldoc\npygments\nrainbow_dash\nrose-pine-dawn\nrose-pine-moon\nrose-pine\nrrt\nsolarized-dark\nsolarized-dark256\nsolarized-light\nswapoff\ntango\ntrac\nvim\nvs\nvulcan\nwitchhazel\nxcode-dark\nxcode"
             echo "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Sollicitudin nibh sit amet commodo nulla facilisi. Sed cras ornare arcu dui vivamus arcu. Non quam lacus suspendisse faucibus interdum posuere lorem. Consequat ac felis donec et odio pellentesque. Elementum tempus egestas sed sed risus pretium quam. Neque viverra justo nec ultrices dui sapien eget mi proin. Varius vel pharetra vel turpis nunc eget lorem dolor sed. Mauris in aliquam sem fringilla ut morbi tincidunt augue. Cursus euismod quis viverra nibh cras. Diam sollicitudin tempor id eu. Lectus arcu bibendum at varius vel. Posuere morbi leo urna molestie at elementum eu facilisis. Condimentum lacinia quis vel eros. Dolor magna eget est lorem ipsum dolor sit amet consectetur. Ultrices dui sapien eget mi. A arcu cursus vitae congue mauris.
@@ -343,7 +328,7 @@ Condimentum lacinia quis vel eros donec ac. Nibh sed pulvinar proin gravida hend
                     style=$(printf "$styles" | fzf --reverse --border --border-label="Moar style")
                     moar --style "$style" $TMPDIR/dtest1
                     stty sane && readyn -Y "CYAN" -p "Set as style? (Will retry if no)" thme
-                    if test "$thme" == "n"; then
+                    if [[ "$thme" == "n" ]]; then
                        style='' 
                     fi
                 done
@@ -352,60 +337,52 @@ Condimentum lacinia quis vel eros donec ac. Nibh sed pulvinar proin gravida hend
             fi
             pager=$pager" $style"
         fi 
-        readyn -Y "CYAN" -i "y" -p "Show linenumber?" pager1
-        if test $pager1 == 'n'; then
+        readyn -Y "CYAN" -p "Show linenumber?" pager1
+        if [[ $pager1 == 'n' ]]; then
             pager=$pager' --no-linenumbers'
         fi
         readyn -Y "CYAN" -p "Wrap long lines?" pager1
-        if test $pager1 == 'y'; then
+        if [[ $pager1 == 'y' ]]; then
             pager=$pager' --wrap'
         fi
-    elif [ "$pager" == "nvimpager" ] || [ "$pager" == "vimpager" ] ; then
+    elif [[ "$pager" == "nvimpager" ]] || [[ "$pager" == "vimpager" ]] ; then
         echo "You selected $pager."
         colors="blue darkblue default delek desert elflord evening gruvbox habamax industry koehler lunaperch morning murphy pablo peachpuff quiet ron shine slate torte zellner"
-        if test "$pager" == "vimpager"; then
+        if [[ "$pager" == "vimpager" ]]; then
            colors=$colors" retrobox sorbet wildcharm zaibatsu" 
         fi
         pager="$pager"
         readyn -Y "CYAN" -p "Set colorscheme?" pager1
-        if [ "$pager1" == "y" ]; then
-             readyn -Y "CYAN" -i "default $colors" -p "Colorscheme: " color
+        if [[ "$pager1" == "y" ]]; then
+             reade -Y "CYAN" -i "default $colors" -p "Colorscheme: " color
             pager="$pager +'colorscheme $color'"
         fi
-    elif [ "$pager" == "riff" ]; then
+    elif [[ "$pager" == "riff" ]]; then
             pager="riff"
             readyn -Y "CYAN" -p "Ignore changes in amount of whitespace?" riff1
-            if test "$riff1" == 'y'; then
+            if [[ "$riff1" == 'y' ]]; then
                 pager=$pager" -b"
             fi
             readyn -Y "CYAN" -p "No special highlighting for lines that only add content?" riff1
             if test "$riff1" == 'y'; then
                 pager=$pager" --no-adds-only-special"
             fi
-    elif [ "$pager" == "diff-so-fancy" ] || [ "$pager" == "diffr" ] || [ "$pager" == "ydiff" ] || [ "$pager" == "delta" ] || [ "$pager" == "bat" ] || [ "$pager" == "batdiff" ] ; then
+    elif [[ "$pager" == "diff-so-fancy" ]] || [[ "$pager" == "diffr" ]] || [[ "$pager" == "ydiff" ]] || [[ "$pager" == "delta" ]] || [[ "$pager" == "bat" ]] || [[ "$pager" == "batdiff" ]] ; then
         local difffancy
-        local pre='y'
-        local prmpt='[Y/n]: ' 
-        local othr='n' 
-        if (test $pager == 'delta' || test $pager == 'diff-so-fancy') && echo $(git config $global --list --show-origin) | grep -q $pager; then
-            pre='n'
-            prmpt='[N/y]: ' 
-            othr='y' 
-        fi
-        reade -Q "CYAN" -i "$pre" -p "You selected $pager. Configure? $prmpt" "$othr" difffancy
-        if test "y" == "$difffancy"; then
-            if [ "$pager" == "bat" ] || [ "$pager" == "batdiff" ]; then 
+        reade -p "You selected $pager. Configure?" -c "(test $pager == 'delta' || test $pager == 'diff-so-fancy') && echo $(git config $global --list --show-origin) | grep -q $pager" difffancy
+        if [[ "y" == "$difffancy" ]]; then
+            if [[ "$pager" == "bat" ]] || [[ "$pager" == "batdiff" ]]; then 
                 local opts=""
                 readyn -Y "CYAN" -p "Set styles? (line numbers/grid)" delta2
                 local theme='changes'
-                if test "y" == $delta2; then
+                if [[ "y" == "$delta2" ]]; then
                     while : ; do
                         local style=''
                         style=$(printf "full\nauto\nplain\nchanges\nheader\nheader-filename\nheader-filesize\ngrid\nrule\nnumbers\nsnip\n" | fzf --border --border-label="Bat styles")
-                        stty sane && reade -Q "MAGENTA" -i "o" -p "Add to styles/Only use this style/Dont use? (Will retry if add) [A/o/n]: " "a o n" dltthme
-                        if test "$dltthme" == "a" ; then
+                        stty sane && reade -Q "MAGENTA" -i "o a n" -p "Add to styles/Only use this style/Dont use? (Will retry if add) [A/o/n]: " dltthme
+                        if [[ "$dltthme" == "a" ]] ; then
                             theme=$theme","$style
-                        elif test "$dltthme" == "o" ; then
+                        elif [[ "$dltthme" == "o" ]] ; then
                             theme=$theme","$style
                             break;
                         else
@@ -414,8 +391,8 @@ Condimentum lacinia quis vel eros donec ac. Nibh sed pulvinar proin gravida hend
                     done
                     opts=$opts" --style='$theme'"
                 fi 
-                reade -Y "CYAN" -p "Set syntax-theme?" delta1
-                if test "y" == $delta1; then
+                readyn -Y "CYAN" -p "Set syntax-theme?" delta1
+                if [[ "y" == $delta1 ]]; then
                     echo "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Sollicitudin nibh sit amet commodo nulla facilisi. Sed cras ornare arcu dui vivamus arcu. Non quam lacus suspendisse faucibus interdum posuere lorem. Consequat ac felis donec et odio pellentesque. Elementum tempus egestas sed sed risus pretium quam. Neque viverra justo nec ultrices dui sapien eget mi proin. Varius vel pharetra vel turpis nunc eget lorem dolor sed. Mauris in aliquam sem fringilla ut morbi tincidunt augue. Cursus euismod quis viverra nibh cras. Diam sollicitudin tempor id eu. Lectus arcu bibendum at varius vel. Posuere morbi leo urna molestie at elementum eu facilisis. Condimentum lacinia quis vel eros. Dolor magna eget est lorem ipsum dolor sit amet consectetur. Ultrices dui sapien eget mi. A arcu cursus vitae congue mauris.
 
 In pellentesque massa placerat duis ultricies lacus sed turpis tincidunt. Dignissim diam quis enim lobortis scelerisque fermentum. Faucibus purus in massa tempor nec. Enim neque volutpat ac tincidunt. Penatibus et magnis dis parturient montes nascetur ridiculus. Ornare aenean euismod elementum nisi quis eleifend quam adipiscing. Elementum pulvinar etiam non quam lacus suspendisse faucibus interdum. Vel eros donec ac odio tempor orci dapibus ultrices. Tempus imperdiet nulla malesuada pellentesque elit eget gravida. In ante metus dictum at tempor commodo ullamcorper.
@@ -430,7 +407,7 @@ Condimentum lacinia quis vel eros donec ac. Nibh sed pulvinar proin gravida hend
                     while test -z "$theme"; do
                         theme=$(bat --list-themes | fzf --border --border-label="Bat syntax themes" --preview="bat --theme={} --color=always $TMPDIR/dtest1")
                         stty sane && readyn -Y "MAGENTA" -p "Set $theme as syntax theme? (Will retry if no)" dltthme
-                        if test "$dltthme" == "n"; then
+                        if [[ "$dltthme" == "n" ]]; then
                            theme='' 
                         fi
                     done
@@ -438,9 +415,9 @@ Condimentum lacinia quis vel eros donec ac. Nibh sed pulvinar proin gravida hend
                 fi
 
                 readyn -n -N "CYAN" -p "Set to specific language? (Useful if you're using an obscure language that bat can't autodetect)" delta2
-                if test "y" == $delta2; then
-                    local theme=''
+                if [[ "y" == "$delta2" ]]; then
                     
+                    local theme=''
                     while test -z "$theme"; do
                         theme=$(bat --list-languages | fzf --border --border-label="Bat coding languages")
                         stty sane && reade -Q "MAGENTA" -i "y n s" -p "Set syntax to specifically use $theme as language? (Will retry if no - s to stop) [Y/n/s]: " dltthme
@@ -451,19 +428,19 @@ Condimentum lacinia quis vel eros donec ac. Nibh sed pulvinar proin gravida hend
                     opts=$opts" --language=$theme"
                 fi
                 pager=$pager" $opts"
-            elif [ "$pager" == "delta" ]; then
+            elif [[ "$pager" == "delta" ]]; then
                 readyn -Y "CYAN" -p "Set side-by-side view?" delta1
-                if test "y" == $delta1; then
+                if [[ "y" == $delta1 ]]; then
                     git config $global delta.side-by-side true
                 fi
 
-                readyn -Q "CYAN" -p "Set to navigate? (Move between diff sections using n and N)" delta1
-                if test "y" == $delta1; then
+                readyn -Y "CYAN" -p "Set to navigate? (Move between diff sections using n and N)" delta1
+                if [[ "y" == "$delta1" ]]; then
                     git config $global delta.navigate true
                 fi 
 
-                readyn -Q "CYAN" -p "Set syntax-theme?" delta1
-                if test "y" == $delta1; then
+                readyn -Y "CYAN" -p "Set syntax-theme?" delta1
+                if [[ "y" == $delta1 ]]; then
                     echo "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Sollicitudin nibh sit amet commodo nulla facilisi. Sed cras ornare arcu dui vivamus arcu. Non quam lacus suspendisse faucibus interdum posuere lorem. Consequat ac felis donec et odio pellentesque. Elementum tempus egestas sed sed risus pretium quam. Neque viverra justo nec ultrices dui sapien eget mi proin. Varius vel pharetra vel turpis nunc eget lorem dolor sed. Mauris in aliquam sem fringilla ut morbi tincidunt augue. Cursus euismod quis viverra nibh cras. Diam sollicitudin tempor id eu. Lectus arcu bibendum at varius vel. Posuere morbi leo urna molestie at elementum eu facilisis. Condimentum lacinia quis vel eros. Dolor magna eget est lorem ipsum dolor sit amet consectetur. Ultrices dui sapien eget mi. A arcu cursus vitae congue mauris.
 
 In pellentesque massa placerat duis ultricies lacus sed turpis tincidunt. Dignissim diam quis enim lobortis scelerisque fermentum. Faucibus purus in massa tempor nec. Enim neque volutpat ac tincidunt. Penatibus et magnis dis parturient montes nascetur ridiculus. Ornare aenean euismod elementum nisi quis eleifend quam adipiscing. Elementum pulvinar etiam non quam lacus suspendisse faucibus interdum. Vel eros donec ac odio tempor orci dapibus ultrices. Tempus imperdiet nulla malesuada pellentesque elit eget gravida. In ante metus dictum at tempor commodo ullamcorper.
@@ -496,42 +473,42 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                 fi
 
                 readyn -Y "CYAN" -p "Set to dark?" delta2
-                if test "y" == $delta2; then
+                if [[ "y" == "$delta2" ]]; then
                     git config $global delta.dark true
                 fi
 
                 readyn -Y "CYAN" -p "Set linenumbers?" delta3
-                if test "y" == $delta3; then
+                if [[ "y" == "$delta3" ]]; then
                     git config $global delta.linenumbers true
                 fi
 
-                reade -Y "CYAN" -p "Set hyperlinks?" delta1
-                if test "y" == $delta1; then
+                readyn -Y "CYAN" -p "Set hyperlinks?" delta1
+                if [[ "y" == $delta1 ]]; then
                     git config $global delta.hyperlinks true
                 fi
                 
-            elif [ "$pager" == "diff-so-fancy" ]; then
+            elif [[ "$pager" == "diff-so-fancy" ]]; then
 
                 readyn -Y "CYAN" -p "Should the first block of an empty line be colored. (Default: true)?" diffancy
-                if test "y" == $diffancy; then
+                if [[ "y" == $diffancy ]]; then
                     git config --bool $global diff-so-fancy.markEmptyLines true                    
                 else
                     git config --bool $global diff-so-fancy.markEmptyLines false                    
                 fi
                 readyn -Y "CYAN" -p "Simplify git header chunks to a more human readable format. (Default: true)" diffancy
-                if test "y" == $diffancy; then
+                if [[ "y" == $diffancy ]]; then
                     git config --bool $global diff-so-fancy.changeHunkIndicators true
                 else
                     git config --bool $global diff-so-fancy.changeHunkIndicators false
                 fi
                 readyn -Y "CYAN" -p "Should the pesky + or - at line-start be removed. (Default: true)" diffancy
-                if test "y" == $diffancy; then
+                if [[ "y" == $diffancy ]]; then
                     git config --bool $global diff-so-fancy.stripLeadingSymbols true
                 else
                     git config --bool $global diff-so-fancy.stripLeadingSymbols false
                 fi
                 readyn -Y "CYAN" -p "By default, the separator for the file header uses Unicode line-drawing characters. If this is causing output errors on your terminal, set this to false to use ASCII characters instead. (Default: true)" diffancy
-                if test "y" == $diffancy; then
+                if [[ "y" == $diffancy ]]; then
                     git config --bool $global diff-so-fancy.useUnicodeRuler true
                 else
                     git config --bool $global diff-so-fancy.useUnicodeRuler false
@@ -539,22 +516,22 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                 reade -Q "CYAN" -i "47 $(seq 1 100)" -p "By default, the separator for the file header spans the full width of the terminal. Use this setting to set the width of the file header manually. (Default: 47):" diffancy
                  # git log's commit header width
                 git config --global diff-so-fancy.rulerWidth $diffancy    
-            elif [ "$pager" == "ydiff" ]; then
+            elif [[ "$pager" == "ydiff" ]]; then
                 pager=$pager" --color=auto"
                 readyn -Y "CYAN" -p "Enable side-by-side mode?" diffr1
-                if test "$diffr1" == 'y'; then
+                if [[ "$diffr1" == 'y' ]]; then
                     pager=$pager" --side-by-side"
                     readyn -Y "CYAN" -p "Wrap long lines in side-by-side view?" diffr1
-                    if test "$diffr1" == 'y'; then
+                    if [[ "$diffr1" == 'y' ]]; then
                         pager=$pager" --wrap"
                     fi        
                 fi
-            elif [ "$pager" == "diffr" ]; then
+            elif [[ "$pager" == "diffr" ]]; then
                 reade -Y "CYAN" -p "Set linenumber?" diffr1
-                if test "$diffr1" == 'y'; then
+                if [[ "$diffr1" == 'y' ]]; then
                     pager="diffr --line-numbers"
-                    reade -Q "CYAN" -i "n compact aligned" -p "Set linenumber style? [compact/aligned/n]: " diffr1
-                    if test "$diffr1" == 'compact' || test "$diffr1" == 'aligned'; then
+                    reade -Q "CYAN" -i "compact aligned n" -p "Set linenumber style? [Compact/aligned/n]: " diffr1
+                    if [[ "$diffr1" == 'compact' ]] || [[ "$diffr1" == 'aligned' ]]; then
                         pager="diffr --line-numbers $diffr1"
                     fi
                 fi
@@ -565,9 +542,9 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
             #fi
 
             readyn -Y "CYAN" -p "$pager can work/works with a pager. Configure?" pipepager
-            if test "$pipepager" == 'y'; then
+            if [[ "$pipepager" == 'y' ]]; then
                 readyn -n -N "GREEN" -p "Turn off pager?" pipepager
-                if test "$pipepager" == 'n'; then
+                if [[ "$pipepager" == 'n' ]]; then
                     pagers="less more"
                     pagersf="less\nmore\n"
                     pager="less"
@@ -595,20 +572,20 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                     if [[ $diffancy =~ "less" ]]; then
                         local ln=""
                         readyn -Y "CYAN"-p "Quit if one screen?" lne 
-                        if test "$lne" == 'y'; then
+                        if [[ "$lne" == 'y' ]]; then
                            ln="--quit-if-one-screen"
                         fi
                         reade -n -N "CYAN" -p "Set linenumbers for pager?" lne 
-                        if test "$lne" == 'n'; then
+                        if [[ "$lne" == 'n' ]]; then
                            ln=$ln"-n"
                         else
                            ln=$ln"-N"
                         fi
-                        if test "$pager" == "ydiff"; then
+                        if [[ "$pager" == "ydiff" ]]; then
                             git config $global "$cpager" "ydiff --pager=less --pager-options=\"-R $ln\""         
-                        elif test "$pager" == "bat" || test "$pager" == "batdiff"; then
-                            readyn -Y "CYAN" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $ENVVAR? " pager1
-                            if test $pager1 == 'y'; then
+                        elif [[ "$pager" == "bat" ]] || [[ "$pager" == "batdiff" ]]; then
+                            readyn -Y "CYAN" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $ENVVAR?" pager1
+                            if [[ $pager1 == 'y' ]]; then
                                 if grep -q 'BAT_PAGER' $ENVVAR; then
                                     sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $ENVVAR
                                     sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='less -R $ln'|g" $ENVVAR                       
@@ -619,9 +596,9 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                             else
                                 git config $global "$cpager" "$pager --pager='less -R $ln'"
                             fi
-                        elif test "$pager" == "delta"; then
+                        elif [[ "$pager" == "delta" ]]; then
                             reade -Y "CYAN" -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $ENVVAR?" pager1
-                            if test $pager1 == 'y'; then
+                            if [[ $pager1 == 'y' ]]; then
                                 if grep -q 'DELTA_PAGER' $ENVVAR; then
                                     sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $ENVVAR
                                     sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='less -R $ln'|g" $ENVVAR                      
@@ -638,25 +615,25 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                     elif [[ $diffancy =~ "moar" ]]; then
                         local ln=""
                         readyn -Y "CYAN" -p "You selected $diffancy. Show linenumber?" pager1
-                        if test $pager1 == 'n'; then
+                        if [[ $pager1 == 'n' ]]; then
                             ln=$ln' --no-linenumbers'
                         fi
 
                         readyn -Y "CYAN" -p "Quit if one screen?" pager1
-                        if test $pager1 == 'y'; then
+                        if [[ $pager1 == 'y' ]]; then
                             ln=$ln' --quit-if-one-screen'
                         fi
 
                         readyn -n -N "CYAN" -p "Wrap long lines?" pager1
-                        if test $pager1 == 'y'; then
+                        if [[ $pager1 == 'y' ]]; then
                             ln=$ln' --wrap'
                         fi
 
-                        if test "$pager" == "ydiff"; then
+                        if [[ "$pager" == "ydiff" ]]; then
                             git config $global "$cpager" "ydiff --pager=moar --pager-options=\"$ln\""
-                        elif test "$pager" == "delta"; then
+                        elif [[ "$pager" == "delta" ]]; then
                             readyn -Y "CYAN" -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $ENVVAR?" pager1
-                            if test $pager1 == 'y'; then
+                            if [[ $pager1 == 'y' ]]; then
                                 if grep -q 'DELTA_PAGER' $ENVVAR; then
                                     sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $ENVVAR
                                     sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='moar $ln'|g" $ENVVAR                       
@@ -667,9 +644,9 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                             fi
                             git config $global "$cpager" "delta"
                             
-                        elif test "$pager" == "bat" || test "$pager" == "batdiff"; then
+                        elif [[ "$pager" == "bat" ]] || [[ "$pager" == "batdiff" ]]; then
                             readyn -Y "CYAN" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $ENVVAR?" pager1
-                            if test $pager1 == 'y'; then
+                            if [[ "$pager1" == 'y' ]]; then
                                 if grep -q 'BAT_PAGER' $ENVVAR; then
                                     sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $ENVVAR
                                     sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='moar $ln'|g" $ENVVAR                       
@@ -691,16 +668,16 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                            colors=$colors" retrobox sorbet wildcharm zaibatsu" 
                         fi
                         readyn -Y "CYAN" -p "Set colorscheme?" pager1
-                        if [ "$pager1" == "y" ]; then
-                            reade -Q "CYAN" -i "default" -p "Colorscheme: " "$colors" color
+                        if [[ "$pager1" == "y" ]]; then
+                            reade -Q "CYAN" -i "default $colors" -p "Colorscheme: " color
                             opts="$opts +'colorscheme $color'"
                         fi
 
-                        if test "$pager" == "ydiff"; then
+                        if [[ "$pager" == "ydiff" ]]; then
                             git config $global "$cpager" "ydiff --pager=nvimpager --pager-options='$opts'"
-                        elif test "$pager" == "delta"; then
-                            reade -Q "CYAN" -i "y" -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $ENVVAR? "" pager1
-                            if test $pager1 == 'y'; then
+                        elif [[ "$pager" == "delta" ]]; then
+                            readyn -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $ENVVAR?" pager1
+                            if [[ $pager1 == 'y' ]]; then
                                 if grep -q 'DELTA_PAGER' $ENVVAR; then
                                     sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $ENVVAR
                                     sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='nvimpager $opts'|g" $ENVVAR                      
@@ -711,9 +688,9 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                             else
                                 git config $global "$cpager" "delta --pager=\"nvimpager $opts\""
                             fi
-                        elif test "$pager" == "bat" || test "$pager" == "batdiff"; then
-                            reade -Q "CYAN" -i "y" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $ENVVAR? "" pager1
-                            if test $pager1 == 'y'; then
+                        elif [[ "$pager" == "bat" ]] || [[ "$pager" == "batdiff" ]]; then
+                            readyn -Y 'CYAN' -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $ENVVAR?" pager1
+                            if [[ "$pager1" == 'y' ]]; then
                                 if grep -q 'BAT_PAGER' $ENVVAR; then
                                     sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $ENVVAR
                                     sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='nvimpager $opts'|g" $ENVVAR                       
@@ -728,11 +705,11 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                             git config $global "$cpager" "$pager | nvimpager $opts"
                         fi
                     else
-                        if test "$pager" == "ydiff"; then
+                        if [[ "$pager" == "ydiff" ]]; then
                             git config $global "$cpager" "ydiff --pager=$diffancy"
-                        elif test "$pager" == "bat" || test "$pager" == "batdiff"; then
-                            reade -Q "CYAN" -i "y" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $ENVVAR? "" pager1
-                            if test $pager1 == 'y'; then
+                        elif [[ "$pager" == "bat" ]] || [[ "$pager" == "batdiff" ]]; then
+                            readyn -Y "CYAN" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $ENVVAR?" pager1
+                            if [[ "$pager1" == 'y' ]]; then
                                 if grep -q 'BAT_PAGER' $ENVVAR; then
                                     sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $ENVVAR
                                     sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='$diffancy'|g" $ENVVAR                       
@@ -743,9 +720,9 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                             else
                                 git config $global "$cpager" "batdiff --pager='$diffancy'"
                             fi
-                        elif test "$pager" == "delta"; then
-                            reade -Q "CYAN" -i "y" -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $ENVVAR? "" pager1
-                            if test $pager1 == 'y'; then
+                        elif [[ "$pager" == "delta" ]]; then
+                            readyn -Y "CYAN" -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $ENVVAR?" pager1
+                            if [[ "$pager1" == 'y' ]]; then
                                 if grep -q 'DELTA_PAGER' $ENVVAR; then
                                     sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $ENVVAR
                                     sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='$diffancy'|g" $ENVVAR                       
@@ -770,29 +747,29 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
             fi
         fi
 fi
-        reade -Q "GREEN" -i "$pager" -p "Pager: " "$pagers" pager;
+        reade -Q "GREEN" -i "$pager $pagers" -p "Pager: " pager;
         #pager="$(printf "$pagersf" | fzf --border --border-label="Pager" --reverse)"
         
-        if test $pager == 'less'; then
+        if [[ "$pager" == 'less' ]]; then
             local ln="-R"
-            reade -Q "CYAN" -i "y" -p "You selected $pager. Quit if one screen? "" pager1
-            if test $pager1 == 'y'; then
+            readyn -Y "CYAN" -p "You selected $pager. Quit if one screen?" pager1
+            if [[ "$pager1" == 'y' ]]; then
                 ln=$ln"--quit-if-one-screen"
             fi
-            reade -Q "CYAN" -i "n" -p "Set linenumbers for pager? [N/y]: " "y" lne 
-            if test "$lne" == 'n'; then
+            readyn -n -N "CYAN" -p "Set linenumbers for pager?" lne 
+            if [[ "$lne" == 'n' ]]; then
                ln=$ln"-n"
             else
                ln=$ln"-N"
             fi
             git config $global "$cpager" "$pager"  
-        elif [ "$pager" == "moar" ]; then
-            reade -Q "CYAN" -i "y" -p "You chose $pager. Quit if on one screen? "" pager1
-            if test $pager1 == 'y'; then
+        elif [[ "$pager" == "moar" ]]; then
+            readyn -Y "CYAN" -p "You chose $pager. Quit if on one screen?" pager1
+            if [[ $pager1 == 'y' ]]; then
                 pager=$pager' --quit-if-one-screen'
             fi
-            reade -Q "CYAN" -i "y" -p "You selected $pager. Set style? "" pager1
-            if test $pager1 == 'y'; then
+            readyn -Y "CYAN" -p "You selected $pager. Set style?" pager1
+            if [[ $pager1 == 'y' ]]; then
                 local theme
                 local styles="abap\nalgol\nalgol_nu\napi\narduino\nautumn\naverage\nbase16-snazzy\nborland\nbw\ncatppuccin-frappe\ncatppuccin-latte\ncatppuccin-macchiato\ncatppuccin-mocha\ncolorful\ncompat\ndoom-one\ndoom-one2\ndracula\nemacs\nfriendly\nfruity\ngithub-dark\ngithub\ngruvbox-light\ngruvbox\nhr_high_contrast\nhrdark\nigor\nlovelace\nmanni\nmodus-operandi\nmodus-vivendi\nmonokai\nmonokailight\nmurphy\nnative\nnord\nonedark\nonesenterprise\nparaiso-dark\nparaiso-light\npastie\nperldoc\npygments\nrainbow_dash\nrose-pine-dawn\nrose-pine-moon\nrose-pine\nrrt\nsolarized-dark\nsolarized-dark256\nsolarized-light\nswapoff\ntango\ntrac\nvim\nvs\nvulcan\nwitchhazel\nxcode-dark\nxcode"
                 echo "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Sollicitudin nibh sit amet commodo nulla facilisi. Sed cras ornare arcu dui vivamus arcu. Non quam lacus suspendisse faucibus interdum posuere lorem. Consequat ac felis donec et odio pellentesque. Elementum tempus egestas sed sed risus pretium quam. Neque viverra justo nec ultrices dui sapien eget mi proin. Varius vel pharetra vel turpis nunc eget lorem dolor sed. Mauris in aliquam sem fringilla ut morbi tincidunt augue. Cursus euismod quis viverra nibh cras. Diam sollicitudin tempor id eu. Lectus arcu bibendum at varius vel. Posuere morbi leo urna molestie at elementum eu facilisis. Condimentum lacinia quis vel eros. Dolor magna eget est lorem ipsum dolor sit amet consectetur. Ultrices dui sapien eget mi. A arcu cursus vitae congue mauris.
@@ -807,68 +784,59 @@ fi
                 while test -z "$style"; do
                     style=$(printf "$styles" | fzf --reverse --border --border-label="Moar style")
                     moar --style "$style" $TMPDIR/dtest1
-                    stty sane && reade -Q "CYAN" -i "n" -p "Set as style? (Will retry if no) [N/y]: " 'y' thme
-                    if test "$thme" == "n"; then
+                    stty sane && readyn -n -p "Set as style? (Will retry if no)" thme
+                    if [[ "$thme" == "n" ]]; then
                        style='' 
                     fi
                 done
                 pager=$pager" $style"
             fi 
-            reade -Q "CYAN" -i "n" -p "Show linenumber? [Y/n]: " "y" pager1
-            if test $pager1 == 'n'; then
+            readyn -Y "CYAN" -p "Show linenumber?" pager1
+            if [[ $pager1 == 'n' ]]; then
                 pager=$pager' --no-linenumbers'
             fi
-            reade -Q "CYAN" -i "n" -p "Wrap long lines? "" pager1
-            if test $pager1 == 'y'; then
+            readyn -n -N "CYAN" -p "Wrap long lines?" pager1
+            if [[ $pager1 == 'y' ]]; then
                 pager=$pager' --wrap'
             fi
             git config $global "$cpager" "$pager"  
-        elif [ "$pager" == "nvimpager" ] || [ "$pager" == "vimpager" ] ; then
+        elif [[ "$pager" == "nvimpager" ]] || [[ "$pager" == "vimpager" ]] ; then
             echo "You selected $pager."
             colors="blue darkblue default delek desert elflord evening gruvbox habamax industry koehler lunaperch morning murphy pablo peachpuff quiet ron shine slate torte zellner"
-            if test "$pager" == "vimpager"; then
+            if [[ "$pager" == "vimpager" ]]; then
                colors=$colors" retrobox sorbet wildcharm zaibatsu" 
             fi
             pager="$pager"
-            reade -Q "CYAN" -i "y" -p "Set colorscheme? "" pager1
-            if [ "$pager1" == "y" ]; then
-                reade -Q "CYAN" -i "default" -p "Colorscheme: " "$colors" color
+            readyn -y -Y "CYAN" -p "Set colorscheme?" pager1
+            if [[ "$pager1" == "y" ]]; then
+                readyn -y -Y "CYAN" -i "default $colors" -p "Colorscheme: " color
                 pager="$pager +'colorscheme $color'"
             fi
             git config $global "$cpager" "$pager"  
-        elif [ "$pager" == "riff" ]; then
+        elif [[ "$pager" == "riff" ]]; then
                 pager="riff"
-                reade -Q "CYAN" -i "y" -p "Ignore changes in amount of whitespace? [Y/n]: " riff1
-                if test "$riff1" == 'y'; then
+                readyn -y -Y "CYAN" -p "Ignore changes in amount of whitespace?" riff1
+                if [[ "$riff1" == 'y' ]]; then
                     pager=$pager" -b"
                 fi
-                reade -Q "CYAN" -i "y" -p "No special highlighting for lines that only add content? [Y/n]: " riff1
-                if test "$riff1" == 'y'; then
+                readyn -y -Y "CYAN" -p "No special highlighting for lines that only add content?" riff1
+                if [[ "$riff1" == 'y' ]]; then
                     pager=$pager" --no-adds-only-special"
                 fi
-        elif [ "$pager" == "diff-so-fancy" ] || [ "$pager" == "diffr" ] || [ "$pager" == "ydiff" ] || [ "$pager" == "delta" ] || [ "$pager" == "bat" ] || [ "$pager" == "batdiff" ] ; then
+        elif [[ "$pager" == "diff-so-fancy" ]] || [[ "$pager" == "diffr" ]] || [[ "$pager" == "ydiff" ]] || [[ "$pager" == "delta" ]] || [[ "$pager" == "bat" ]] || [[ "$pager" == "batdiff" ]] ; then
             local difffancy
-            local pre='y'
-            othr='n'
-            prmpt='[Y/n]: '
-            color='CYAN' 
-            if (test $pager == 'delta' || test $pager == 'diff-so-fancy') && echo $(git config $global --list --show-origin) | grep -q $pager; then
-                pre='n'
-                othr='y'
-                prmpt='[N/y]: '
-                color='YELLOW' 
-            fi
-            reade -Q "$color" -i "$pre" -p "You selected $pager. Configure? $prmpt" "$othr" difffancy
-            if test "y" == "$difffancy"; then
-                if [ "$pager" == "bat" ] || [ "$pager" == "batdiff" ]; then 
+            readyn -p "You selected $pager. Configure?" -c "(test $pager == 'delta' || test $pager == 'diff-so-fancy') && echo $(git config $global --list --show-origin) | grep -q $pager" difffancy
+            if [[ "y" == "$difffancy" ]]; then
+                if [[ "$pager" == "bat" ]] || [[ "$pager" == "batdiff" ]]; then 
                     local opts=""
-                    reade -Q "CYAN" -i "y" -p "Set styles? (line numbers/grid) "" delta2
+                    readyn -Y "CYAN" -p "Set styles? (line numbers/grid)" delta2
                     local theme='changes'
-                    if test "y" == $delta2; then
+                    if [[ "y" == $delta2 ]]; then
                         while : ; do
                             local style=''
                             style=$(printf "full\nauto\nplain\nchanges\nheader\nheader-filename\nheader-filesize\ngrid\nrule\nnumbers\nsnip\n" | fzf --border --border-label="Bat styles")
-                            stty sane && reade -Q "MAGENTA" -i "o" -p "Add to styles/Only use this style/Dont use? (Will retry if add) [A/o/n]: " "a o n" dltthme
+                            stty sane && 
+                                reade -Q "MAGENTA" -i "a o n" -p "Add to styles/Only use this style/Dont use? (Will retry if add) [A/o/n]: " dltthme
                             if test "$dltthme" == "a" ; then
                                 theme=$theme","$style
                             elif test "$dltthme" == "o" ; then
@@ -880,8 +848,8 @@ fi
                         done
                         opts=$opts" --style='$theme'"
                     fi 
-                    reade -Q "CYAN" -i "y" -p "Set syntax-theme "" delta1
-                    if test "y" == $delta1; then
+                    readyn -Y "CYAN" -p "Set syntax-theme" delta1
+                    if [[ "y" == "$delta1" ]]; then
                         echo "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Sollicitudin nibh sit amet commodo nulla facilisi. Sed cras ornare arcu dui vivamus arcu. Non quam lacus suspendisse faucibus interdum posuere lorem. Consequat ac felis donec et odio pellentesque. Elementum tempus egestas sed sed risus pretium quam. Neque viverra justo nec ultrices dui sapien eget mi proin. Varius vel pharetra vel turpis nunc eget lorem dolor sed. Mauris in aliquam sem fringilla ut morbi tincidunt augue. Cursus euismod quis viverra nibh cras. Diam sollicitudin tempor id eu. Lectus arcu bibendum at varius vel. Posuere morbi leo urna molestie at elementum eu facilisis. Condimentum lacinia quis vel eros. Dolor magna eget est lorem ipsum dolor sit amet consectetur. Ultrices dui sapien eget mi. A arcu cursus vitae congue mauris.
 
     In pellentesque massa placerat duis ultricies lacus sed turpis tincidunt. Dignissim diam quis enim lobortis scelerisque fermentum. Faucibus purus in massa tempor nec. Enim neque volutpat ac tincidunt. Penatibus et magnis dis parturient montes nascetur ridiculus. Ornare aenean euismod elementum nisi quis eleifend quam adipiscing. Elementum pulvinar etiam non quam lacus suspendisse faucibus interdum. Vel eros donec ac odio tempor orci dapibus ultrices. Tempus imperdiet nulla malesuada pellentesque elit eget gravida. In ante metus dictum at tempor commodo ullamcorper.
@@ -895,41 +863,41 @@ fi
                         
                         while test -z "$theme"; do
                             theme=$(bat --list-themes | fzf --border --border-label="Bat syntax themes" --preview="bat --theme={} --color=always $TMPDIR/dtest1")
-                            stty sane && reade -Q "MAGENTA" -i "n" -p "Set $theme as syntax theme? (Will retry if no) "" dltthme
-                            if test "$dltthme" == "n"; then
+                            stty sane && readyn -n -N "MAGENTA" -p "Set $theme as syntax theme? (Will retry if no)" dltthme
+                            if [[ "$dltthme" == "n" ]]; then
                                theme='' 
                             fi
                         done
                         opts=$opts" --theme=$theme"
                     fi
 
-                    reade -Q "CYAN" -i "n" -p "Set to specific language? (Useful if you're using an obscure language that bat can't autodetect) "" delta2
-                    if test "y" == $delta2; then
+                    readyn -n -p "Set to specific language? (Useful if you're using an obscure language that bat can't autodetect)" delta2
+                    if [[ "y" == "$delta2" ]]; then
                         local theme=''
                         
                         while test -z "$theme"; do
                             theme=$(bat --list-languages | fzf --border --border-label="Bat coding languages")
-                            stty sane && reade -Q "MAGENTA" -i "n" -p "Set syntax to specifically use $theme as language? (Will retry if no) "" dltthme
-                            if test "$dltthme" == "n"; then
+                            stty sane && readyn -n -N "MAGENTA" -p "Set syntax to specifically use $theme as language? (Will retry if no)" dltthme
+                            if [[ "$dltthme" == "n" ]]; then
                                theme='' 
                             fi
                         done
                         opts=$opts" --language=$theme"
                     fi
                     pager=$pager" $opts"
-                elif [ "$pager" == "delta" ]; then
-                    reade -Q "CYAN" -i "y" -p "Set side-by-side view? "" delta1
-                    if test "y" == $delta1; then
+                elif [[ "$pager" == "delta" ]]; then
+                    readyn -Y "CYAN" -p "Set side-by-side view?" delta1
+                    if [[ "y" == "$delta1" ]]; then
                         git config $global delta.side-by-side true
                     fi
 
-                    reade -Q "CYAN" -i "y" -p "Set to navigate? (Move between diff sections using n and N) "" delta1
-                    if test "y" == $delta1; then
+                    readyn -Y "CYAN" -p "Set to navigate? (Move between diff sections using n and N)" delta1
+                    if [[ "y" == "$delta1" ]]; then
                         git config $global delta.navigate true
                     fi 
 
-                    reade -Q "CYAN" -i "y" -p "Set syntax-theme "" delta1
-                    if test "y" == $delta1; then
+                    readyn -Y "CYAN" -p "Set syntax theme?" delta1
+                    if [[ "y" == "$delta1" ]]; then
                         echo "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Sollicitudin nibh sit amet commodo nulla facilisi. Sed cras ornare arcu dui vivamus arcu. Non quam lacus suspendisse faucibus interdum posuere lorem. Consequat ac felis donec et odio pellentesque. Elementum tempus egestas sed sed risus pretium quam. Neque viverra justo nec ultrices dui sapien eget mi proin. Varius vel pharetra vel turpis nunc eget lorem dolor sed. Mauris in aliquam sem fringilla ut morbi tincidunt augue. Cursus euismod quis viverra nibh cras. Diam sollicitudin tempor id eu. Lectus arcu bibendum at varius vel. Posuere morbi leo urna molestie at elementum eu facilisis. Condimentum lacinia quis vel eros. Dolor magna eget est lorem ipsum dolor sit amet consectetur. Ultrices dui sapien eget mi. A arcu cursus vitae congue mauris.
 
     In pellentesque massa placerat duis ultricies lacus sed turpis tincidunt. Dignissim diam quis enim lobortis scelerisque fermentum. Faucibus purus in massa tempor nec. Enim neque volutpat ac tincidunt. Penatibus et magnis dis parturient montes nascetur ridiculus. Ornare aenean euismod elementum nisi quis eleifend quam adipiscing. Elementum pulvinar etiam non quam lacus suspendisse faucibus interdum. Vel eros donec ac odio tempor orci dapibus ultrices. Tempus imperdiet nulla malesuada pellentesque elit eget gravida. In ante metus dictum at tempor commodo ullamcorper.
@@ -953,74 +921,74 @@ fi
                             theme=$(printf "$(delta --list-syntax-themes | tail -n +1)" | fzf --reverse --border --border-label="Syntax theme")
                             theme=$(echo "$theme" | awk '{$1=""; print $0;}')
                             delta --syntax-theme "${theme:1}" $TMPDIR/dtest1 $TMPDIR/dtest2
-                            stty sane && reade -Q "MAGENTA" -i "n" -p "Set as syntax theme? (Will retry if no) [N/y]: " "y" dltthme
-                            if test "$dltthme" == "n"; then
+                            stty sane && readyn -n -N "MAGENTA" -p "Set as syntax theme? (Will retry if no)" dltthme
+                            if [[ "$dltthme" == "n" ]]; then
                                theme='' 
                             fi
                         done
                         git config $global delta.syntax-theme "$theme"
                     fi
 
-                    reade -Q "CYAN" -i "y" -p "Set to dark? "" delta2
-                    if test "y" == $delta2; then
+                    readyn -Y "CYAN" -p "Set to dark?" delta2
+                    if [[ "y" == "$delta2" ]]; then
                         git config $global delta.dark true
                     fi
 
-                    reade -Q "CYAN" -i "y" -p "Set linenumbers? "" delta3
-                    if test "y" == $delta3; then
+                    readyn -Y "CYAN" -p "Set linenumbers?" delta3
+                    if [[ "y" == "$delta3" ]]; then
                         git config $global delta.linenumbers true
                     fi
 
-                    reade -Q "CYAN" -i "y" -p "Set hyperlinks? "" delta1
-                    if test "y" == $delta1; then
+                    readyn -Y "CYAN" -p "Set hyperlinks?" delta1
+                    if [[ "y" == "$delta1" ]]; then
                         git config $global delta.hyperlinks true
                     fi
                     
-                elif [ "$pager" == "diff-so-fancy" ]; then
+                elif [[ "$pager" == "diff-so-fancy" ]]; then
 
-                    reade -Q "CYAN" -i "y" -p "Should the first block of an empty line be colored. (Default: true)? "" diffancy
-                    if test "y" == $diffancy; then
+                    readyn -Y "CYAN" -p "Should the first block of an empty line be colored?" diffancy
+                    if [[ "y" == "$diffancy" ]]; then
                         git config --bool $global diff-so-fancy.markEmptyLines true                    
                     else
                         git config --bool $global diff-so-fancy.markEmptyLines false                    
                     fi
-                    reade -Q "CYAN" -i "y" -p "Simplify git header chunks to a more human readable format. (Default: true) "" diffancy
-                    if test "y" == $diffancy; then
+                    readyn -Y "CYAN" -p "Simplify git header chunks to a more human readable format?" diffancy
+                    if [[ "y" == $diffancy ]]; then
                         git config --bool $global diff-so-fancy.changeHunkIndicators true
                     else
                         git config --bool $global diff-so-fancy.changeHunkIndicators false
                     fi
-                    reade -Q "CYAN" -i "y" -p "Should the pesky + or - at line-start be removed. (Default: true) "" diffancy
-                    if test "y" == $diffancy; then
+                    readyn -Y "CYAN" -p "Should the pesky + or - at line-start be removed?" diffancy
+                    if [[ "y" == $diffancy ]]; then
                         git config --bool $global diff-so-fancy.stripLeadingSymbols true
                     else
                         git config --bool $global diff-so-fancy.stripLeadingSymbols false
                     fi
-                    reade -Q "CYAN" -i "y" -p "By default, the separator for the file header uses Unicode line-drawing characters. If this is causing output errors on your terminal, set this to false to use ASCII characters instead. (Default: true) "" diffancy
-                    if test "y" == $diffancy; then
+                    readyn -Y "CYAN" -p "By default, the separator for the file header uses Unicode line-drawing characters. If this is causing output errors on your terminal, set this to false to use ASCII characters instead?" diffancy
+                    if [[ "y" == "$diffancy" ]]; then
                         git config --bool $global diff-so-fancy.useUnicodeRuler true
                     else
                         git config --bool $global diff-so-fancy.useUnicodeRuler false
                     fi
-                    reade -Q "CYAN" -i "47" -p "By default, the separator for the file header spans the full width of the terminal. Use this setting to set the width of the file header manually. (Default: 47): " "$(seq 1 100)" diffancy
+                    reade -Q "CYAN" -i "47 $(seq 1 100)" -p "By default, the separator for the file header spans the full width of the terminal. Use this setting to set the width of the file header manually (Default: 47)?: " diffancy
                      # git log's commit header width
                     git config $global diff-so-fancy.rulerWidth $diffancy    
-                elif [ "$pager" == "ydiff" ]; then
+                elif [[ "$pager" == "ydiff" ]]; then
                     pager=$pager" --color=auto"
-                    reade -Q "CYAN" -i "y" -p "Enable side-by-side mode? [Y/n]: " 'n'  diffr1
-                    if test "$diffr1" == 'y'; then
+                    readyn -Y "CYAN" -p "Enable side-by-side mode?" diffr1
+                    if [[ "$diffr1" == 'y' ]]; then
                         pager=$pager" --side-by-side"
-                        reade -Q "CYAN" -i "y" -p "Wrap long lines in side-by-side view? [Y/n]: " 'n' diffr1
-                        if test "$diffr1" == 'y'; then
+                        readyn -Y "CYAN" -p "Wrap long lines in side-by-side view?" diffr1
+                        if [[ "$diffr1" == 'y' ]]; then
                             pager=$pager" --wrap"
                         fi        
                     fi
-                elif [ "$pager" == "diffr" ]; then
-                    reade -Q "CYAN" -i "y" -p "Set linenumber? [Y/n]: " 'n' diffr1
-                    if test "$diffr1" == 'y'; then
+                elif [[ "$pager" == "diffr" ]]; then
+                    readyn -Y "CYAN" -p "Set linenumber?" diffr1
+                    if [[ "$diffr1" == 'y' ]]; then
                         pager="diffr --line-numbers"
-                        reade -Q "CYAN" -i "n" -p "Set linenumber style? [compact/aligned/n]: " diffr1
-                        if test "$diffr1" == 'compact' || test "$diffr1" == 'aligned'; then
+                        reade -Q "MAGENTA" -i 'c a n' -p "Set linenumber style? [Compact/aligned/n]: " diffr1
+                        if [[ "$diffr1" == 'compact' ]] || [[ "$diffr1" == 'aligned' ]]; then
                             pager="diffr --line-numbers $diffr1"
                         fi
                     fi
@@ -1028,8 +996,8 @@ fi
 
 
             
-                reade -Q "YELLOW" -i "n" -p "Only use syntax highlighting and turn off pager? "" pipepager1
-                if test "$pipepager1" == 'y'; then 
+                readyn -n -N "YELLOW" -p "Only use syntax highlighting and turn off pager?" pipepager1
+                if [[ "$pipepager1" == 'y' ]]; then 
                     if [[ $pager =~ 'delta' ]] || [[ $pager =~ 'bat' ]] || [[ $pager =~ 'batdiff' ]]; then
                         git config $global "$cpager" "$pager --paging=never"  
                     elif [[ $pager =~ 'ydiff' ]]; then
@@ -1044,9 +1012,8 @@ fi
                         prompt="$pager alone won't page. Pipe to a pager? [Y/n]: "
                     fi
 
-                    reade -Q "CYAN" -i "y" -p "$prompt" "n" pipepager
-                    if test "$pipepager" == 'y'; then
-                    
+                    readyn -Y "CYAN" -p "$prompt" pipepager
+                    if [[ "$pipepager" == 'y' ]]; then
                         pagers="less more"
                         pagersf="less\nmore\n"
                         if type most &> /dev/null ; then
@@ -1066,25 +1033,25 @@ fi
                             pagersf=$pagersf"nvimpager\n"
                         fi
 
-                        reade -Q "GREEN" -i "$PAGER" -p "Pager: " "$pagers" diffancy
+                        reade -Q "GREEN" -i "$PAGER $pagers" -p "Pager: " diffancy
                         
                         if [[ "$diffancy" =~ "less" ]]; then
                             local ln=""
-                            reade -Q "CYAN" -i "y" -p "Quit if one screen? "" lne 
-                            if test "$lne" == 'y'; then
+                            readyn -Y "CYAN" -p "Quit if one screen?" lne 
+                            if [[ "$lne" == 'y' ]]; then
                                ln="--quit-if-one-screen"
                             fi
-                            reade -Q "CYAN" -i "n" -p "Set linenumbers for pager? "" lne 
-                            if test "$lne" == 'n'; then
+                            reade -n -N "CYAN" -p "Set linenumbers for pager?" lne 
+                            if [[ "$lne" == 'n' ]]; then
                                ln=$ln"-n"
                             else
                                ln=$ln"-N"
                             fi
                             if [[ "$pager" =~ "ydiff" ]]; then
                                 git config $global "$cpager" "ydiff --pager=less --pager-options=\"-R $ln\""         
-                            elif [[ "$pager" =~ "bat" || "$pager" =~ "batdiff" ]]; then
-                                reade -Q "CYAN" -i "y" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $ENVVAR? "" pager1
-                                if test $pager1 == 'y'; then
+                            elif [[ "$pager" =~ "bat" ]] || [[ "$pager" =~ "batdiff" ]]; then
+                                readyn -Y "CYAN" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $ENVVAR?" pager1
+                                if [[ $pager1 == 'y' ]]; then
                                     if grep -q 'BAT_PAGER' $ENVVAR; then
                                         sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $ENVVAR
                                         sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='less -R $ln'|g" $ENVVAR                       

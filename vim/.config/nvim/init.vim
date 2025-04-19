@@ -1275,13 +1275,17 @@ if has('x11')
     "" Paste with P if at beginning of line
     nnoremap <silent> <C-v> "+P
     "inoremap <silent> <C-c>   <C-\><C-o>^<C-\><C-o><Plug>OSCYankOperator_
+    nnoremap <C-d>  (col(".") ==? 1 ? '"+daw' : '"+diw') 
     
     inoremap <silent> <C-c> <C-\><C-o>^<C-\><C-o>"+yy
     inoremap <silent> <C-v> <C-\><C-o>"+P
-    
+    inoremap <expr> <C-d>   (col(".") ==? 1 ? '<C-\><C-o>"+daw' : '<C-\><C-o>"+diw')
+     
+
     "vnoremap <silent> <C-c> <Plug>OSCYankVisual
     vnoremap <silent> <C-c> "+yy
     vnoremap <silent> <C-v> "+Pl
+    vnoremap <C-d>  "+d 
  
 else
     nnoremap y "*^y
@@ -1315,16 +1319,25 @@ else
      " Copy entire line
     nnoremap <silent> <C-c> "*yy
     "nnoremap <silent> <C-c> <Plug>OSCYankOperator_
+    
     "" Paste with P if at beginning of line
     nnoremap <silent> <C-v> "*P
     "inoremap <silent> <C-c>   <C-\><C-o>^<C-\><C-o><Plug>OSCYankOperator_
     
+    "nnoremap <C-c>  "+^yg_ 
+    nnoremap <C-d>  (col(".") ==? 1 ? '"*daw' : '"*diw') 
+
     inoremap <silent> <C-c> <C-\><C-o>^<C-\><C-o>"*yy
     inoremap <silent> <C-v> <C-\><C-o>"*P
-    
+    "" Cut with a word instead of inner word if at beginning of line
+    inoremap <expr> <C-d>   (col(".") ==? 1 ? '<C-\><C-o>"*daw' : '<C-\><C-o>"*diw')
+   
+
     "vnoremap <silent> <C-c> <Plug>OSCYankVisual
     vnoremap <silent> <C-c> "*yy
     vnoremap <silent> <C-v> "*Pl
+    vnoremap <C-d>  "*d 
+ 
 endif
 
 nnoremap d "_d
@@ -1338,16 +1351,12 @@ nnoremap <A-d> cc
 vnoremap <A-d> c
 inoremap <A-d> <Esc>cc
 
-"nnoremap <C-c>  "+^yg_ 
-nnoremap <C-d>  (col(".") ==? 1 ? '<C-\><C-o>daw' : '<C-\><C-o>diw')
+
 
 """ Copy inner word except when on first line (copy a word)
 "inoremap <expr> <C-c>   (col(".") ==? 1 ? '<C-\><C-o>"+yaw' : '<C-\><C-o>"+yiw')
-"" Cut with a word instead of inner word if at beginning of line
-inoremap <expr> <C-d>   (col(".") ==? 1 ? '<C-\><C-o>daw' : '<C-\><C-o>diw')
 
 "vnoremap <C-c>  "+y
-vnoremap <C-d>  d 
 
 "" Normal mode => whole line
 "" Insert mode => word
