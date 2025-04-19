@@ -1268,7 +1268,21 @@ if has('x11')
     nnoremap P o<esc>"+P
     vnoremap p "+p  
     vnoremap P o<esc>"+P
-
+   
+    " Copy entire line
+    nnoremap <silent> <C-c> "+yy
+    "nnoremap <silent> <C-c> <Plug>OSCYankOperator_
+    "" Paste with P if at beginning of line
+    nnoremap <silent> <C-v> "+P
+    "inoremap <silent> <C-c>   <C-\><C-o>^<C-\><C-o><Plug>OSCYankOperator_
+    
+    inoremap <silent> <C-c> <C-\><C-o>^<C-\><C-o>"+yy
+    inoremap <silent> <C-v> <C-\><C-o>"+P
+    
+    "vnoremap <silent> <C-c> <Plug>OSCYankVisual
+    vnoremap <silent> <C-c> "+yy
+    vnoremap <silent> <C-v> "+Pl
+ 
 else
     nnoremap y "*^y
     nnoremap yy "*^yg_
@@ -1297,7 +1311,20 @@ else
     nnoremap P o<esc>"*P
     vnoremap p "*p  
     vnoremap P o<esc>"*P
-
+    
+     " Copy entire line
+    nnoremap <silent> <C-c> "*yy
+    "nnoremap <silent> <C-c> <Plug>OSCYankOperator_
+    "" Paste with P if at beginning of line
+    nnoremap <silent> <C-v> "*P
+    "inoremap <silent> <C-c>   <C-\><C-o>^<C-\><C-o><Plug>OSCYankOperator_
+    
+    inoremap <silent> <C-c> <C-\><C-o>^<C-\><C-o>"*yy
+    inoremap <silent> <C-v> <C-\><C-o>"*P
+    
+    "vnoremap <silent> <C-c> <Plug>OSCYankVisual
+    vnoremap <silent> <C-c> "*yy
+    vnoremap <silent> <C-v> "*Pl
 endif
 
 nnoremap d "_d
@@ -1310,6 +1337,17 @@ vnoremap D "_C
 nnoremap <A-d> cc
 vnoremap <A-d> c
 inoremap <A-d> <Esc>cc
+
+"nnoremap <C-c>  "+^yg_ 
+nnoremap <C-d>  (col(".") ==? 1 ? '<C-\><C-o>daw' : '<C-\><C-o>diw')
+
+""" Copy inner word except when on first line (copy a word)
+"inoremap <expr> <C-c>   (col(".") ==? 1 ? '<C-\><C-o>"+yaw' : '<C-\><C-o>"+yiw')
+"" Cut with a word instead of inner word if at beginning of line
+inoremap <expr> <C-d>   (col(".") ==? 1 ? '<C-\><C-o>daw' : '<C-\><C-o>diw')
+
+"vnoremap <C-c>  "+y
+vnoremap <C-d>  d 
 
 "" Normal mode => whole line
 "" Insert mode => word
@@ -1335,28 +1373,10 @@ if (!has('nvim') && !has('clipboard_working'))
     augroup END
 endif
 
-"nnoremap <C-c>  "+^yg_ 
-nnoremap <silent><C-c> ^<Plug>OSCYankOperator_
-nnoremap <silent><C-v> "+Pl
-nnoremap <C-d>  (col(".") ==? 1 ? '<C-\><C-o>daw' : '<C-\><C-o>diw')
-
-""" Copy inner word except when on first line (copy a word)
-"inoremap <expr> <C-c>   (col(".") ==? 1 ? '<C-\><C-o>"+yaw' : '<C-\><C-o>"+yiw')
-" Copy entire line
-inoremap <silent><C-c>   <C-\><C-o>^<C-\><C-o><Plug>OSCYankOperator_
-"" Paste with P if at beginning of line
-inoremap <silent> <C-v> <C-\><C-o>"+P
-"" Cut with a word instead of inner word if at beginning of line
-inoremap <expr> <C-d>   (col(".") ==? 1 ? '<C-\><C-o>daw' : '<C-\><C-o>diw')
-
-"vnoremap <C-c>  "+y
-vnoremap <C-c> <Plug>OSCYankVisual
-vnoremap <silent> <C-v> "+Pl
-vnoremap <C-d>  d 
 
 vnoremap w iW
 vnoremap W aW
 
 
-cnoremap <C-c> <C-f>
-cnoremap <C-v> <C-r><C-o>"
+"cnoremap <C-c> <C-f>
+"cnoremap <C-v> <C-r><C-o>"
