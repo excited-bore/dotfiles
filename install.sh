@@ -402,6 +402,23 @@ unset pycomp
 
 get-script-dir SCRIPT_DIR
 
+# Xresources
+
+xterm=$SCRIPT_DIR/xterm/.Xresources
+if ! test -f $SCRIPT_DIR/xterm/.Xresources; then
+    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/xterm/.Xresources
+    xterm=$tmp
+fi
+
+xresources_r() {
+    sudo cp -fv $xterm /root/.Xresources
+}
+xresources() {
+    cp -fv $xterm ~/.Xresources
+    yes-no-edit -f xresources_r -g "$xterm" -p "Install .Xresources at /root/?" -i "e" -Q "RED"
+}
+yes-no-edit -f xresources -g "$xterm" -p "Install .Xresources at ~/? (Xterm configuration)" -i "e" -Q "YELLOW"
+
 # Shell-keybinds
 
 binds=$SCRIPT_DIR/keybinds/.inputrc
@@ -527,23 +544,6 @@ test -n $BASH_VERSION && source ~/.bashrc &>/dev/null
 test -n $ZSH_VERSION && source ~/.zshrc &>/dev/null
 
 get-script-dir SCRIPT_DIR
-
-# Xresources
-
-xterm=$SCRIPT_DIR/xterm/.Xresources
-if ! test -f $SCRIPT_DIR/xterm/.Xresources; then
-    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/xterm/.Xresources
-    xterm=$tmp
-fi
-
-xresources_r() {
-    sudo cp -fv $xterm /root/.Xresources
-}
-xresources() {
-    cp -fv $xterm ~/.Xresources
-    yes-no-edit -f xresources_r -g "$xterm" -p "Install .Xresources at /root/?" -i "e" -Q "RED"
-}
-yes-no-edit -f xresources -g "$xterm" -p "Install .Xresources at ~/? (Xterm configuration)" -i "e" -Q "YELLOW"
 
 # Bash Preexec
 

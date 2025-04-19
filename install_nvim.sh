@@ -20,7 +20,7 @@ else
 fi
 
 #. $DIR/setup_git_build_from_source.sh "y" "neovim" "https://github.com" "neovim/neovim" "stable" "sudo apt update; eval "$pac_ins ninja-build gettext libtool libtool-bin cmake g++ pkg-config unzip curl doxygen" "make CMAKE_BUILD_TYPE=RelWithDebInfo; sudo make install" "sudo make uninstall" "make distclean; make deps" "y""
-    
+
 vrs=10
 if [[ "$distro_base" == "Debian" ]]; then
     vrs=$(apt search neovim 2>/dev/null | awk 'NR>2 {print;}' | grep '^neovim/' | awk '{print $2}' | sed 's/~.*//g' | sed 's|\(.*\..*\)\..*|\1|g')
@@ -35,8 +35,8 @@ if [[ "$distro_base" == "Debian" ]] && [[ $vrs < 0.8 ]]; then
             sudo apt remove neovim
         fi
     fi
-    
-    if ! type nvim &> /dev/null; then
+
+    if ! type nvim &>/dev/null; then
         readyn -n -p "Still wish to install through apt?" nvmapt
         if [[ "y" == $nvmapt ]]; then
             eval "${pac_ins}" neovim
@@ -239,28 +239,27 @@ if [[ "$langs" == 'y' ]]; then
 
     #printf "${CYAN}Checking whether perl modules for nvim are installed means initializing cpan ([perl package manager)${normal}\n"
 
-    if ! type cpan &> /dev/null; then
+    if ! type cpan &>/dev/null; then
         readyn -p "Install Perl and cpanminus?" perlins
         if [[ $perlins == 'y' ]]; then
             eval "${pac_ins}" perl cpanminus
         fi
     fi
 
-    if type cpan &> /dev/null; then
+    if type cpan &>/dev/null; then
         printf "${CYAN}Perl uses cpan for the installation of modules and initializing perl modules for the first time can take a while.\n${normal}"
         readyn -p "Run it now and check whether neovim module is installed?" cpn
         if [[ "y" == $cpn ]]; then
             #printf "Pressing enter once in a while *seems* to speed up the process "
             cpan -l
-        else
             if ! type cpanm &>/dev/null || ! cpan -l 2>/dev/null | grep -q Neovim::Ext; then
                 readyn -p "Install nvim-perl?" perlscripts
                 if [[ "y" == $perlscripts ]]; then
-                    if ! type cpanm &> /dev/null; then
+                    if ! type cpanm &>/dev/null; then
                         eval "${pac_ins}" cpanminus
                     fi
                     /usr/bin/vendor_perl/cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
-                    sudo /usr/bin/vendor_perl/cpanm --sudo -n Neovim::Ext      
+                    sudo /usr/bin/vendor_perl/cpanm --sudo -n Neovim::Ext
                 fi
             fi
         fi
@@ -321,7 +320,7 @@ function instvim_r() {
     if ! sudo test -d /root/.config/nvim/; then
         sudo mkdir -p /root/.config/nvim/
     fi
-    sudo cp -bfv $dir/* /root/.config/nvim/
+    sudo cp -fv --backup auto $dir/* /root/.config/nvim/
     if sudo test -n "$(ls /root/.config/nvim/*~ &>/dev/null)"; then
         sudo bash -c 'gio trash /root/.config/nvim/*~'
     fi
@@ -335,8 +334,8 @@ function instvim_r() {
         sudo sed -i 's|.export MYVIMRC="|export MYVIMRC=~/.config/nvim/init.vim "|g' $ENVVAR_R
         sudo sed -i 's|.export MYGVIMRC="|export MYGVIMRC=~/.config/nvim/init.vim "|g' $ENVVAR_R
     else
-        printf "export MYVIMRC=~/.config/nvim/init.vim\n" | sudo tee -a $ENVVAR_R &> /dev/null
-        printf "export MYGVIMRC=~/.config/nvim/init.vim\n" | sudo tee -a $ENVVAR_R &> /dev/null
+        printf "export MYVIMRC=~/.config/nvim/init.vim\n" | sudo tee -a $ENVVAR_R &>/dev/null
+        printf "export MYGVIMRC=~/.config/nvim/init.vim\n" | sudo tee -a $ENVVAR_R &>/dev/null
     fi
 
     readyn -p "Set nvim as default for root EDITOR? " vimrc
@@ -344,7 +343,7 @@ function instvim_r() {
         if sudo grep -q "EDITOR" $ENVVAR_R; then
             sudo sed -i "s|.export EDITOR=.*|export EDITOR=$(where_cmd nvim)|g" $ENVVAR_R
         else
-            printf "export EDITOR=$(where_cmd nvim)\n" | sudo tee -a $ENVVAR_R &> /dev/null 
+            printf "export EDITOR=$(where_cmd nvim)\n" | sudo tee -a $ENVVAR_R &>/dev/null
         fi
     fi
     unset vimrc
@@ -354,7 +353,7 @@ function instvim_r() {
         if sudo grep -q "VISUAL" $ENVVAR_R; then
             sudo sed -i "s|.export VISUAL=*|export VISUAL=$(where_cmd nvim)|g" $ENVVAR_R
         else
-            printf "export VISUAL=$(where_cmd nvim)\n" | sudo tee -a $ENVVAR_R &> /dev/null
+            printf "export VISUAL=$(where_cmd nvim)\n" | sudo tee -a $ENVVAR_R &>/dev/null
         fi
     fi
     unset vimrc
@@ -372,7 +371,7 @@ function instvim() {
         mkdir ~/.config/nvim/
     fi
 
-    cp -bfv $dir/* ~/.config/nvim/
+    cp -fv --backup auto $dir/* ~/.config/nvim/
 
     if test -n "$(ls ~/.config/nvim/*~ &>/dev/null)"; then
         gio trash ~/.config/nvim/*~
