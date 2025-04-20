@@ -13,19 +13,9 @@ else
     . ./checks/check_all.sh
 fi
 
-function get-script-dir() {
-    if test -n "$BASH_VERSION"; then
-        #[[ $0 != $BASH_SOURCE ]] && 
-            #SCRIPT_DIR="$( dirname "${BASH_SOURCE[0]}" )" || 
-            SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-    elif test -n "$ZSH_VERSION"; then
-        SCRIPT_DIR="${0:A:h}"
-    fi
-    eval "$1=$SCRIPT_DIR"
-}
-
-
-get-script-dir SCRIPT_DIR
+test -n "$BASH_VERSION" &&
+    get-script-dir "${BASH_SOURCE[0]}" SCRIPT_DIR ||
+    get-script-dir SCRIPT_DIR 
 
 if ! type rlwrap &>/dev/null; then
     if ! test -f $SCRIPT_DIR/checks/check_rlwrap.sh; then
@@ -79,7 +69,9 @@ if test -d /etc/modprobe.d && ! test -f /etc/modprobe.d/nobeep.conf; then
 fi
 unset sym1 sym2 sym3 beep
 
-get-script-dir SCRIPT_DIR
+test -n "$BASH_VERSION" &&
+    get-script-dir "${BASH_SOURCE[0]}" SCRIPT_DIR ||
+    get-script-dir SCRIPT_DIR 
 
 # Environment variables
 
@@ -252,7 +244,9 @@ if ! sudo test -f /etc/polkit/49-nopasswd_global.pkla && ! sudo test -f /etc/pol
     unset plkit
 fi
 
-get-script-dir SCRIPT_DIR
+test -n "$BASH_VERSION" &&
+    get-script-dir "${BASH_SOURCE[0]}" SCRIPT_DIR ||
+    get-script-dir SCRIPT_DIR 
 
 if ! test -f $SCRIPT_DIR/checks/check_envvar.sh; then
     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)"
@@ -412,7 +406,9 @@ if [[ "y" == "$pycomp" ]]; then
 fi
 unset pycomp
 
-get-script-dir SCRIPT_DIR
+test -n "$BASH_VERSION" &&
+    get-script-dir "${BASH_SOURCE[0]}" SCRIPT_DIR ||
+    get-script-dir SCRIPT_DIR 
 
 # Xresources
 
@@ -556,7 +552,9 @@ fi
 test -n $BASH_VERSION && source ~/.bashrc &>/dev/null
 test -n $ZSH_VERSION && source ~/.zshrc &>/dev/null
 
-get-script-dir SCRIPT_DIR
+test -n "$BASH_VERSION" &&
+    get-script-dir "${BASH_SOURCE[0]}" SCRIPT_DIR ||
+    get-script-dir SCRIPT_DIR 
 
 # Bash Preexec
 

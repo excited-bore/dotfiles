@@ -1,46 +1,28 @@
 #!/bin/bash
 
 #https://bbs.archlinux.org/viewtopic.php?id=271850
-if ! test -f checks/check_system.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
-else
-    . ./checks/check_system.sh
-fi
-
-if ! type reade &> /dev/null; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
-else
-    . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
-fi 
-
-
-if ! type update-system &> /dev/null; then
-    if ! test -f aliases/.bash_aliases.d/update-system.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)" 
+if ! test -f checks/check_all.sh; then
+    if type curl &>/dev/null; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        . ./aliases/.bash_aliases.d/update-system.sh
+        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
+        return 1 || exit 1
     fi
+else
+    . ./checks/check_all.sh
 fi
 
-if test -z $SYSTEM_UPDATED; then
-    readyn -Y "CYAN" -p "Update system?" updatesysm
-    if test $updatesysm == "y"; then
-        update-system                     
-    fi
-fi
-
-if [ "$distro" == "Manjaro" ]; then
+if [[ "$distro" == "Manjaro" ]]; then
     eval "$pac_ins pipewire pipewire-jack wireplumber pipewire-pulse manjaro-pipewire"
-elif [ "$distro_base" == "Arch" ]; then
+elif [[ "$distro_base" == "Arch" ]]; then
     eval "$pac_ins pipewire pipewire-jack wireplumber pipewire-pulse"
-elif [ "$distro_base" == "Debian" ]; then
+elif [[ "$distro_base" == "Debian" ]]; then
     eval "$pac_ins pipewire pipewire-jack wireplumber pipewire-pulse"
 fi 
 
 if ! test -f ~/.bash_completion.d/pipewire; then
- 
-    reade -Q 'GREEN' -i 'y' -p "Install pipewire completions (pw-cli, wpctl)? [Y/n]: " 'n' comps
-    if test $comps == 'y'; then
+    readyn 'GREEN' -p "Install pipewire completions (pw-cli, wpctl)?" comps
+    if [[ $comps == 'y' ]]; then
 
         if ! test -f checks/check_completions_dir.sh; then
              eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)" 
@@ -53,17 +35,15 @@ if ! test -f ~/.bash_completion.d/pipewire; then
             tmp1=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/pipewire/.bash_completion.d/pipewire 
             pipewire_cmp=$tmp1
         fi
-
-        cp -fv $pipewire_cmp ~/.bash_completion.d/ 
-
+        cp -f $pipewire_cmp ~/.bash_completion.d/ 
     fi
 fi
 
 mkdir -p ~/.config/wireplumber/wireplumber.conf.d/
 
 if echo $(wpctl status) | grep -q 'HMDI'; then
-    reade -Q 'GREEN' -i 'y' -p "Unlist all HDMI audio devices from pipewire? [Y/n]: " 'n' unlst_hdmi
-    if test "$unlst_hdmi" == 'y'; then
+    readyn -p "Unlist all HDMI audio devices from pipewire?" unlst_hdmi
+    if [[ "$unlst_hdmi" == 'y' ]]; then
         hdmi_f="$HOME/.config/wireplumber/wireplumber.conf.d/51-HDMI-disable.conf"  
         touch hdmi_f 
         printf "monitor.alsa.rules = [
@@ -88,10 +68,10 @@ fi
 if type systemctl &> /dev/null && ! test -f /etc/systemd/user/pipewire-load-switch-on-connect.service; then
     #printf "${CYAN}You should test first whether sounds autoswitches when connected${normal}\n"
     readyn -p "Create 'USB-audiodevice-autoswitch-on-connect' configuration file?" auto_s
-    if test $auto_s == 'y'; then
+    if [[ $auto_s == 'y' ]]; then
         mkdir -p ~/.config/pipewire/pipewire-pulse.conf.d/
         conf=~/.config/pipewire/pipewire-pulse.conf.d/switch-on-connect.conf
-        if [ ! -e $conf ] || ! grep -q "# override for pipewire-pulse.conf file" $conf; then
+        if ! [ -e $conf ] || ! grep -q "# override for pipewire-pulse.conf file" $conf; then
             echo "# override for pipewire-pulse.conf file" >> $conf
             echo "pulse.cmd = [" >> $conf
             echo "  { cmd = \"load-module\" args = \"module-always-sink\" flags = [ ] }" >> $conf
@@ -146,7 +126,7 @@ fi
 if ! test -f $HOME/.config/wireplumber/wireplumber.conf.d/51-dualshock4-disable.conf; then
     mkdir -p ~/.config/wireplumber/wireplumber.conf.d/
     readyn -p "Unlist dualshock 4 audio sources from pipewire? (prevents usb-autoconnect from triggering)" ds4
-    if [ -z $ds4 ] || [ "y" == $ds4 ] || [ "y" == $ds4 ]; then
+    if [[ "y" == $ds4 ]] || [[ "Y" == $ds4 ]]; then
         touch $HOME/.config/wireplumber/wireplumber.conf.d/51-dualshock4-disable.conf   
         printf "monitor.alsa.rules = [
   {
@@ -218,8 +198,8 @@ fi
 if ! type qwpgraph &> /dev/null; then
     readyn -p "Install patchbay interface 'qpwgraph'? (create and manage audiostreams)" patchb
     if test "$patchb" == 'y'; then
-        if test "$distro_base" == 'Arch' || test "$distro_base" == 'Debian'; then
-            ${pac_ins} qpwgraph
+        if [[ "$distro_base" == 'Arch' ]] || [[ "$distro_base" == 'Debian' ]]; then
+            eval "${pac_ins} qpwgraph"
         fi
     fi
     unset patchb 
@@ -227,21 +207,24 @@ fi
 
 if ! type easyeffects &> /dev/null; then
     readyn -p "Install sound effect configurator 'easyeffects'? (Enable/disable audio effects on audiostreams)" ezff
-    if test "$ezff" == 'y'; then
-        if test "$distro_base" == 'Arch' || test "$distro_base" == 'Debian'; then
-            ${pac_ins} easyeffects
+    if [[ "$ezff" == 'y' ]]; then
+        if [[ "$distro_base" == 'Arch' ]] || [[ "$distro_base" == 'Debian' ]]; then
+            eval "${pac_ins} easyeffects"
         fi
     fi
     unset ezff 
 fi
 
+test -n "$BASH_VERSION" &&
+    get-script-dir "${BASH_SOURCE[0]}" SCRIPT_DIR ||
+    get-script-dir SCRIPT_DIR 
 
-file=pipewire/.bash_aliases.d/pipewire.sh
-file1=pipewire/.bash_completion.d/pipewire
+file=$SCRIPT_DIR/pipewire/.bash_aliases.d/pipewire.sh
+file1=$SCRIPT_DIR/pipewire/.bash_completion.d/pipewire
 if ! test -f $file || ! test -f $file1; then
     tmpd=$(mktemp -d)
-     wget -P $tmpd https://raw.githubusercontent.com/excited-bore/dotfiles/main/pipewire/.bash_aliases.d/pipewire.sh
-     wget -P $tmpd https://raw.githubusercontent.com/excited-bore/dotfiles/main/pipewire/.bash_completions.d/pipewire
+    wget -P $tmpd https://raw.githubusercontent.com/excited-bore/dotfiles/main/pipewire/.bash_aliases.d/pipewire.sh
+    wget -P $tmpd https://raw.githubusercontent.com/excited-bore/dotfiles/main/pipewire/.bash_completions.d/pipewire
     file=$tmpd/pipewire.sh
     file1=$tmpd/pipewire
 fi
@@ -260,8 +243,8 @@ yes-no-edit -f pipewiresh -g "$file $file1" -p "Install pipewire aliases at ~/.b
 
 
 if type systemctl &> /dev/null; then
-    reade -Q 'GREEN' -i 'y' -p 'Restart pipewire service(s)? [Y/n]: ' 'n' rs_pwr
-    if test "$rs_pwr" == 'y'; then
+    readyn -p 'Restart pipewire service(s)?' rs_pwr
+    if [[ "$rs_pwr" == 'y' ]]; then
        systemctl restart --user wireplumber pipewire pipewire-pulse 
        systemctl status --user wireplumber pipewire pipewire-pulse 
     fi

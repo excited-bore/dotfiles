@@ -120,15 +120,24 @@ if test -z $SYSTEM_UPDATED; then
     export SYSTEM_UPDATED="TRUE"
 fi
 
+
 function get-script-dir() {
     if test -n "$BASH_VERSION"; then
         #[[ $0 != $BASH_SOURCE ]] && 
-            #SCRIPT_DIR="$( dirname "${BASH_SOURCE[0]}" )" || 
-            SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+            #SCRIPT_DIR="$( dirname "${BASH_SOURCE[0]}" )" ||
+            if test -z "$1"; then
+                SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+            else
+                SCRIPT_DIR=$( cd -- "$( dirname -- "$1" )" &> /dev/null && pwd )
+            fi
     elif test -n "$ZSH_VERSION"; then
         SCRIPT_DIR="${0:A:h}"
     fi
-    eval "$1=$SCRIPT_DIR"
+    if test -z "$2"; then
+        eval "$1=$SCRIPT_DIR"
+    else
+        eval "$2=$SCRIPT_DIR"
+    fi
 }
 
 # https://stackoverflow.com/questions/4023830/how-to-compare-two-strings-in-dot-separated-version-format-in-bash

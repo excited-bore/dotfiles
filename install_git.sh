@@ -30,8 +30,8 @@ fi
 function git_hl() {
     if ! test -z "$1"; then
         cmd="$1"
-    else
-        cmd="git config --global interactive.difffilter"
+    #else
+    #    cmd="git config $global interactive.difffilter"
     fi
 
     local diffs=""
@@ -92,13 +92,13 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                     while test -z "$theme"; do
                         theme=$(printf "$(delta --list-syntax-themes | tail -n +1)" | fzf --reverse --border --border-label="Syntax theme")
                         theme=$(echo "$theme" | awk '{$1=""; print $0;}')
-                        delta --syntax-theme "${theme:1}" $TMPDIR/dtest1 $TMPDIR/dtest2
+                        delta --syntax-theme $theme $TMPDIR/dtest1 $TMPDIR/dtest2
                         stty sane && readyn -N "MAGENTA" -n -p "Set as syntax theme? (will retry if no)" dltthme
                         if [[ "$dltthme" == "n" ]]; then
                             theme=''
                         fi
                     done
-                    pager=$pager" $theme"
+                    git config $global delta.syntax-theme $theme
                 fi
                 readyn -Y "CYAN" -p "Set linenumbers?" delta3
                 if [[ "y" == $delta3 ]]; then
@@ -170,8 +170,8 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
             fi
         elif [[ "$diff" == "ydiff" ]]; then
             diff=$diff" --color=auto"
-            readyn -Y 'CYAN' -p "You selected $diff. Configure?" conf
-            if [[ "y" == "$conf" ]]; then
+            #readyn -Y 'CYAN' -p "You selected $diff. Configure?" conf
+            #if [[ "y" == "$conf" ]]; then
                 readyn -Y 'CYAN' -p "Enable side-by-side mode?" diffr1
                 if [[ "$diffr1" == 'y' ]]; then
                     diff=$diff" --side-by-side"
@@ -180,10 +180,10 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                         diff=$diff" --wrap"
                     fi
                 fi
-            fi
+            #fi
         elif [ "$diff" == "diffr" ]; then
-            readyn -Y "CYAN" -p "You selected $diff. Configure?" conf
-            if [[ "y" == "$conf" ]]; then
+            #readyn -Y "CYAN" -p "You selected $diff. Configure?" conf
+            #if [[ "y" == "$conf" ]]; then
                 readyn -Y "CYAN" -p "Set linenumber?" diffr1
                 if [[ "$diffr1" == 'y' ]]; then
                     diff="diffr --line-numbers"
@@ -192,29 +192,33 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                         diff="diffr --line-numbers $diffr1"
                     fi
                 fi
-            fi
+            #fi
         elif [[ "$diff" == "batdiff" ]]; then
-            readyn -Y "CYAN" -p "You selected $diff. Configure?" conf
-            if [[ "y" == "$conf" ]]; then
+            #readyn -Y "CYAN" -p "You selected $diff. Configure?" conf
+            #if [[ "y" == "$conf" ]]; then
                 diff="batdiff --staged --paging=never"
                 readyn -Y "CYAN" -p "Use delta config?" diffr1
                 if [[ "$diffr1" == 'y' ]]; then
                     diff=$diff" --delta"
                 fi
-            fi
+            #fi
         fi
     fi
 
-    if [[ "$cmd" =~ 'difffilter' ]]; then
-        eval "$cmd $diff"
-    elif [[ "$cmd" =~ 'lazygit' ]]; then
-        sed -i 's|useConfig:|#useConfig:|g' ~/.config/lazygit/config.yml
-        if ! grep -q "pager" ~/.config/lazygit/config.yml; then
-            sed -i 's|\(paging:\)|\1\n    pager: '"$diff"'|g' ~/.config/lazygit/config.yml
-        else
-            sed -i 's|pager:.*|pager: '"$diff"'|g' ~/.config/lazygit/config.yml
+    if test -n "$cmd"; then
+        if [[ "$cmd" =~ 'difffilter' ]]; then
+            diff="$(echo $diff | awk '{print $1;}')" 
+            eval "$cmd $diff"
+        elif [[ "$cmd" =~ 'lazygit' ]]; then
+            sed -i 's|useConfig:|#useConfig:|g' ~/.config/lazygit/config.yml
+            if ! grep -q "pager" ~/.config/lazygit/config.yml; then
+                sed -i 's|\(paging:\)|\1\n    pager: '"$diff"'|g' ~/.config/lazygit/config.yml
+            else
+                sed -i 's|pager:.*|pager: '"$diff"'|g' ~/.config/lazygit/config.yml
+            fi
         fi
     fi
+    
 }
 
 git_pager() {
@@ -226,7 +230,7 @@ git_pager() {
         global="--global"
     fi
 
-    readyn -Y "YELLOW" -p "Turn off pager?" pipepager1
+    readyn -n -p "Turn off $cpager?" -c "[[ $cpager == 'pager.show' ]]" pipepager1
     if [[ "$pipepager1" == 'y' ]]; then
         git config $global "$cpager" false
     else
@@ -291,6 +295,11 @@ git_pager() {
             pagersf=$pagersf"delta\n"
             pager="delta"
         fi
+    
+        printf "${GREEN}Installed tools that could serve as pagers${normal}:\n"
+        printf "${CYAN}$pagersf${normal}"
+
+        reade -Q "green" -i "$pagers" -p "Which one used for ${GREEN}$cpager?:${normal} " pager
 
         if [[ $pager == 'less' ]]; then
             local ln="-R"
@@ -309,7 +318,7 @@ git_pager() {
             if [[ $pager1 == 'y' ]]; then
                 pager=$pager' --quit-if-one-screen'
             fi
-            readyn -Y "CYAN" -p "You selected $pager. Set style?" pager1
+            readyn -Y "CYAN" -p "Set moar's theme / style?" pager1
             if [[ $pager1 == 'y' ]]; then
                 local theme
                 local styles="abap\nalgol\nalgol_nu\napi\narduino\nautumn\naverage\nbase16-snazzy\nborland\nbw\ncatppuccin-frappe\ncatppuccin-latte\ncatppuccin-macchiato\ncatppuccin-mocha\ncolorful\ncompat\ndoom-one\ndoom-one2\ndracula\nemacs\nfriendly\nfruity\ngithub-dark\ngithub\ngruvbox-light\ngruvbox\nhr_high_contrast\nhrdark\nigor\nlovelace\nmanni\nmodus-operandi\nmodus-vivendi\nmonokai\nmonokailight\nmurphy\nnative\nnord\nonedark\nonesenterprise\nparaiso-dark\nparaiso-light\npastie\nperldoc\npygments\nrainbow_dash\nrose-pine-dawn\nrose-pine-moon\nrose-pine\nrrt\nsolarized-dark\nsolarized-dark256\nsolarized-light\nswapoff\ntango\ntrac\nvim\nvs\nvulcan\nwitchhazel\nxcode-dark\nxcode"
@@ -326,7 +335,7 @@ Condimentum lacinia quis vel eros donec ac. Nibh sed pulvinar proin gravida hend
                     while test -z "$style"; do
                         style=$(printf "$styles" | fzf --reverse --border --border-label="Moar style")
                         moar --style "$style" $TMPDIR/dtest1
-                        stty sane && readyn -Y "CYAN" -p "Set as style? (Will retry if no)" thme
+                        stty sane && readyn -Y "MAGENTA" -p "Set as style? (Will retry if no)" thme
                         if [[ "$thme" == "n" ]]; then
                             style=''
                         fi
@@ -368,7 +377,7 @@ Condimentum lacinia quis vel eros donec ac. Nibh sed pulvinar proin gravida hend
             fi
         elif [[ "$pager" == "diff-so-fancy" ]] || [[ "$pager" == "diffr" ]] || [[ "$pager" == "ydiff" ]] || [[ "$pager" == "delta" ]] || [[ "$pager" == "bat" ]] || [[ "$pager" == "batdiff" ]]; then
             local difffancy
-            reade -p "You selected $pager. Configure?" -c "(test $pager == 'delta' || test $pager == 'diff-so-fancy') && echo $(git config $global --list --show-origin) | grep -q $pager" difffancy
+            readyn -p "You selected $pager. Configure?" -c "([[ $pager == 'delta' ]] || [[ $pager == 'diff-so-fancy' ]]) && echo '$(git config $global --list --show-origin)' | grep -q $pager" difffancy
             if [[ "y" == "$difffancy" ]]; then
                 if [[ "$pager" == "bat" ]] || [[ "$pager" == "batdiff" ]]; then
                     local opts=""
@@ -540,7 +549,7 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                 #    prompt=""
                 #fi
 
-                readyn -Y "CYAN" -p "$pager can work/works with a pager. Configure?" pipepager
+                readyn -Y "CYAN" -p "$pager is a non-pager tool, but allows for a configurable pager. Set manually?" pipepager
                 if [[ "$pipepager" == 'y' ]]; then
                     readyn -n -N "GREEN" -p "Turn off pager?" pipepager
                     if [[ "$pipepager" == 'n' ]]; then
@@ -746,7 +755,8 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                 fi
             fi
         fi
-        reade -Q "GREEN" -i "$pager $pagers" -p "Pager: " pager
+        #reade -Q "GREEN" -i "$pager $pagers" -p "Pager: " pager
+        pager=''
         #pager="$(printf "$pagersf" | fzf --border --border-label="Pager" --reverse)"
 
         if [[ "$pager" == 'less' ]]; then
@@ -767,7 +777,7 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
             if [[ $pager1 == 'y' ]]; then
                 pager=$pager' --quit-if-one-screen'
             fi
-            readyn -Y "CYAN" -p "You selected $pager. Set style?" pager1
+            readyn -Y "CYAN" -p "Set moar's colorscheme / style?" pager1
             if [[ $pager1 == 'y' ]]; then
                 local theme
                 local styles="abap\nalgol\nalgol_nu\napi\narduino\nautumn\naverage\nbase16-snazzy\nborland\nbw\ncatppuccin-frappe\ncatppuccin-latte\ncatppuccin-macchiato\ncatppuccin-mocha\ncolorful\ncompat\ndoom-one\ndoom-one2\ndracula\nemacs\nfriendly\nfruity\ngithub-dark\ngithub\ngruvbox-light\ngruvbox\nhr_high_contrast\nhrdark\nigor\nlovelace\nmanni\nmodus-operandi\nmodus-vivendi\nmonokai\nmonokailight\nmurphy\nnative\nnord\nonedark\nonesenterprise\nparaiso-dark\nparaiso-light\npastie\nperldoc\npygments\nrainbow_dash\nrose-pine-dawn\nrose-pine-moon\nrose-pine\nrrt\nsolarized-dark\nsolarized-dark256\nsolarized-light\nswapoff\ntango\ntrac\nvim\nvs\nvulcan\nwitchhazel\nxcode-dark\nxcode"
@@ -925,7 +935,7 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                                 theme=''
                             fi
                         done
-                        git config $global delta.syntax-theme "$theme"
+                        git config $global delta.syntax-theme $theme
                     fi
 
                     readyn -Y "CYAN" -p "Set to dark?" delta2
@@ -1256,7 +1266,7 @@ gitt() {
         touch .gitconfig
     fi
 
-    readyn -p "Configure git name?" -c "! test -z $(git config $global --list | grep 'user.name' | awk 'BEGIN { FS = "=" } ;{print $2;}')" gitname
+    readyn -p "Configure git name?" -c "test -z $(git config $global --list | grep -q 'user.name' | awk 'BEGIN { FS = "=" } ;{print $2;}')" gitname
     if [[ "y" == $gitname ]]; then
         reade -Q "CYAN" -p "Name: " name
         if [ ! -z $name ]; then
@@ -1264,7 +1274,7 @@ gitt() {
         fi
     fi
 
-    readyn -p "Configure git email?" -c "! test -z $(git config $global --list | grep 'user.email' | awk 'BEGIN { FS = "=" } ;{print $2;}')" gitmail
+    readyn -p "Configure git email?" -c "test -z $(git config $global --list | grep -q 'user.email' | awk 'BEGIN { FS = "=" } ;{print $2;}')" gitmail
     if [[ "y" == $gitmail ]]; then
         reade -Q "CYAN" -p "Email: " mail
         if [ ! -z $mail ]; then
@@ -1272,7 +1282,7 @@ gitt() {
         fi
     fi
 
-    readyn -p 'Configure git to look for ssh:// instead of https:// when f.ex. pulling/pushing?' -c "! test -z $(git config $global --list | grep url.ssh://git@github.com/.insteadof= | awk 'BEGIN { FS = "=" } ;{print $2;}')" githttpee
+    readyn -p 'Configure git to look for ssh:// instead of https:// when f.ex. pulling/pushing?' -c "test -z $(git config $global --list | grep -q url.ssh://git@github.com/.insteadof= | awk 'BEGIN { FS = "=" } ;{print $2;}')" githttpee
     if [[ "y" == $githttpee ]]; then
         git config $global url.ssh://git@github.com/.insteadOf https://github.com/
     fi
@@ -1280,7 +1290,7 @@ gitt() {
 
     # https://www.youtube.com/watch?v=aolI_Rz0ZqY
 
-    readyn -p "Configure git to remember resolved mergeconflicts for reuse?" -c "! test -z $(git config $global --list | grep -q 'rerere.enabled' | awk 'BEGIN { FS = "=" } ;{print $2;}')" gitrerere
+    readyn -p "Configure git to remember resolved mergeconflicts for reuse?" -c "test -z $(git config $global --list | grep -q 'rerere.enabled' | awk 'BEGIN { FS = "=" } ;{print $2;}')" gitrerere
     if [[ "y" == $gitrerere ]]; then
         git config "$global" rerere.enabled true
     fi
@@ -1366,28 +1376,27 @@ gitt() {
                     fi
                 fi
             fi
-
-            readyn -p "Set core.pager?" -c "test -z $(git config $global --list | grep 'core.pager' | awk 'BEGIN { FS = "=" } ;{print $2;}')" pager
-            if [[ $pager == 'y' ]]; then
-                git_pager "core.pager" "$global"
-            fi
-            readyn -p "Set pager.diff?" -c "test -z $(git config $global --list | grep 'pager.diff' | awk 'BEGIN { FS = "=" } ;{print $2;}')" pager
-            if [[ $pager == 'y' ]]; then
-                git_pager "pager.diff" "$global"
-            fi
-            readyn -p "Set pager.difftool?" -c "test -z $(git config $global --list | grep 'pager.difftool' | awk 'BEGIN { FS = "=" } ;{print $2;}')" pager
-            if [[ $pager == 'y' ]]; then
-                git_pager "pager.difftool" "$global"
-            fi
-            readyn -p "Set pager.show?" "test -z $(git config $global --list | grep 'pager.show' | awk 'BEGIN { FS = "=" } ;{print $2;}')" pager
-            if [[ $pager == 'y' ]]; then
-                git_pager "pager.show" "$global"
-            fi
-            readyn -p "Set pager.log?" -c "test -z $(git config $global --list | grep 'pager.log' | awk 'BEGIN { FS = "=" } ;{print $2;}')" pager
-            if [[ $pager == 'y' ]]; then
-                git_pager "pager.log" "$global"
-            fi
-
+        fi
+        
+        readyn -p "Set core.pager?" -c "test -n \"$(git config $global --list | grep 'core.pager' | awk 'BEGIN { FS = "=" }; {print $2;}')\"" pager
+        if [[ $pager == 'y' ]]; then
+            git_pager "core.pager" "$global"
+        fi
+        readyn -p "Set pager.diff?" -c "test -n \"$(git config $global --list | grep 'pager.diff' | awk 'BEGIN { FS = "=" }; {print $2;}')\"" pager
+        if [[ $pager == 'y' ]]; then
+            git_pager "pager.diff" "$global"
+        fi
+        readyn -p "Set pager.difftool?" -c "test -n \"$(git config $global --list | grep 'pager.difftool' | awk 'BEGIN { FS = "=" }; {print $2;}')\"" pager
+        if [[ $pager == 'y' ]]; then
+            git_pager "pager.difftool" "$global"
+        fi
+        readyn -p "Set pager.show?" -c "test -n \"$(git config $global --list | grep 'pager.show' | awk 'BEGIN { FS = "=" }; {print $2;}')\"" pager
+        if [[ $pager == 'y' ]]; then
+            git_pager "pager.show" "$global"
+        fi
+        readyn -p "Set pager.log?" -c "test -n \"$(git config $global --list | grep 'pager.log' | awk 'BEGIN { FS = "=" } ;{print $2;}')\"" pager
+        if [[ $pager == 'y' ]]; then
+            git_pager "pager.log" "$global"
         fi
     fi
     #confs="$(cur="pager." && compgen -F _git_config 2> /dev/null)"
@@ -1420,7 +1429,7 @@ gitt() {
     fi
 
     if ! test -z "$diffs"; then
-        readyn -Y "CYAN" -p "Configure custom interactive diff filter?" -c "test -z $(git config $global --list | grep 'interactive.difffilter' | awk 'BEGIN { FS = "=" } ;{print $2;}')" gitdiff1
+        readyn -p "Configure custom interactive diff filter?" -c "test -n \"$(git config $global --list | grep 'interactive.difffilter' | awk 'BEGIN { FS = "=" } ;{print $2;}')\"" gitdiff1
         if [[ "y" == "$gitdiff1" ]]; then
             git_hl "git config $global interactive.difffilter"
         fi
@@ -1543,7 +1552,7 @@ gitt() {
                 git config "$global" merge.tool vimdiff
             elif [[ "$editor" == "gvim" ]]; then
                 git config "$global" merge.tool gvimdiff
-            elif [["$editor" == "nvim" ]]; then
+            elif [[ "$editor" == "nvim" ]]; then
                 git config "$global" merge.tool nvimdiff
             elif [[ "$editor" == "emacs" ]]; then
                 git config "$global" merge.tool emerge
@@ -1582,7 +1591,7 @@ gitt() {
         fi
     fi
 
-    reade -Y "CYAN" -p "Set merge conflictsstyle?" -c "test -z $(git config $global --list | grep 'merge.conflictsstyle' | awk 'BEGIN { FS = "=" } ;{print $2;}')" conflict
+    readyn -Y "CYAN" -p "Set merge conflictsstyle?" -c "test -z $(git config $global --list | grep 'merge.conflictsstyle' | awk 'BEGIN { FS = "=" } ;{print $2;}')" conflict
     if [[ $conflict == "y" ]]; then
         reade -Q "GREEN" -i "diff3 diff diff1 diff2" -p "Conflictsstyle: " cstyle
         if ! test -z "$cstyle"; then
