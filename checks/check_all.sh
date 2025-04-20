@@ -1,5 +1,3 @@
-#!/bin/bash
-
 [[ "$1" == 'n' ]] && SYSTEM_UPDATED='TRUE'
 
 # Allow sudo aliases
@@ -123,10 +121,11 @@ if test -z $SYSTEM_UPDATED; then
 fi
 
 function get-script-dir() {
-    if test -z $ZSH_VERSION; then
-        #[[ $0 != $BASH_SOURCE ]] && SCRIPT_DIR="$( dirname "${BASH_SOURCE[0]}" )" || SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-        SCRIPT_DIR=$(dirname "$0")
-    else
+    if test -n "$BASH_VERSION"; then
+        #[[ $0 != $BASH_SOURCE ]] && 
+            #SCRIPT_DIR="$( dirname "${BASH_SOURCE[0]}" )" || 
+            SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+    elif test -n "$ZSH_VERSION"; then
         SCRIPT_DIR="${0:A:h}"
     fi
     eval "$1=$SCRIPT_DIR"
