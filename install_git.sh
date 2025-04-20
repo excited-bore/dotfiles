@@ -1272,7 +1272,7 @@ gitt() {
         fi
     fi
 
-    readyn -p 'Configure git to look for ssh:// instead of https:// when f.ex. pulling/pushing?' -c "! test -z $(git config $global --list | grep url.ssh://git@github.com/.insteadof= | awk 'BEGIN { FS = \"=\" } ;{print $2;}')" githttpee
+    readyn -p 'Configure git to look for ssh:// instead of https:// when f.ex. pulling/pushing?' -c "! test -z $(git config $global --list | grep url.ssh://git@github.com/.insteadof= | awk 'BEGIN { FS = "=" } ;{print $2;}')" githttpee
     if [[ "y" == $githttpee ]]; then
         git config $global url.ssh://git@github.com/.insteadOf https://github.com/
     fi
@@ -1280,7 +1280,7 @@ gitt() {
 
     # https://www.youtube.com/watch?v=aolI_Rz0ZqY
 
-    readyn -p "Configure git to remember resolved mergeconflicts for reuse? $prmpt" "! test -z $(git config $global --list | grep -q 'rerere.enabled' | awk 'BEGIN { FS = "=" } ;{print $2;}')" gitrerere
+    readyn -p "Configure git to remember resolved mergeconflicts for reuse?" -c "! test -z $(git config $global --list | grep -q 'rerere.enabled' | awk 'BEGIN { FS = "=" } ;{print $2;}')" gitrerere
     if [[ "y" == $gitrerere ]]; then
         git config "$global" rerere.enabled true
     fi
