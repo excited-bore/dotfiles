@@ -13,6 +13,18 @@ else
     . ./checks/check_all.sh
 fi
 
+function get-script-dir() {
+    if test -n "$BASH_VERSION"; then
+        #[[ $0 != $BASH_SOURCE ]] && 
+            #SCRIPT_DIR="$( dirname "${BASH_SOURCE[0]}" )" || 
+            SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+    elif test -n "$ZSH_VERSION"; then
+        SCRIPT_DIR="${0:A:h}"
+    fi
+    eval "$1=$SCRIPT_DIR"
+}
+
+
 get-script-dir SCRIPT_DIR
 
 if ! type rlwrap &>/dev/null; then
@@ -337,7 +349,7 @@ unset h
 
 # Eza prompt
 
-readyn -p "Install eza? (A modern replacement for ls)" -c "type eza &> /dev/null" rmp
+readyn -p "Install eza? (A modern replacement for ls)" -c "! type eza &> /dev/null" rmp
 
 if [[ "y" == "$rmp" ]]; then
     if ! test -f $SCRIPT_DIR/install_eza.sh; then
@@ -405,7 +417,8 @@ get-script-dir SCRIPT_DIR
 # Xresources
 
 xterm=$SCRIPT_DIR/xterm/.Xresources
-if ! test -f $SCRIPT_DIR/xterm/.Xresources; then
+
+if ! test -f $xterm; then
     tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/xterm/.Xresources
     xterm=$tmp
 fi
