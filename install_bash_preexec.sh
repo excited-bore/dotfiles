@@ -12,41 +12,35 @@ else
 fi
 
 if ! test -f ~/.bash_preexec; then
-    curl -s -o ~/.bash_preexec https://raw.githubusercontent.com/rcaloras/bash-preexec/master/bash-preexec.sh 
+    curl -s -o ~/.bash_preexec https://raw.githubusercontent.com/rcaloras/bash-preexec/master/bash-preexec.sh
 fi
 
-if grep -q '~/.bash_preexec' $PROFILE; then
-    printf "\n[ -f ~/.bash_preexec ] && source ~/.bash_preexec\n\n" >> $PROFILE
-    #if grep -q "[ -f ~/.environment.env ]" ~/.bashrc; then
-    #     sed -i 's|\(\[ -f ~/.environment.env \] \&\& source \~/.environment.env\)|\[ -f ~/.bash_preexec \] \&\& source ~/.bash_preexec\n\1\n\n|g' ~/.bashrc
-    #elif grep -q "[ -f ~/.bash_completion ]" ~/.bashrc; then
-    #     sed -i 's|\(\[ -f ~/.bash_completion \] \&\& source \~/.bash_completion\)|\[ -f ~/.bash_preexec \] \&\& source ~/.bash_preexec\n\n\1\n|g' ~/.bashrc
-    #elif grep -q "[ -f ~/.bash_aliases ]" ~/.bashrc; then
-    #     sed -i 's|\(\[ -f ~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\[ -f ~/.bash_preexec \] \&\& source ~/.bash_preexec\n\n\1\n|g' ~/.bashrc
-    #elif grep -q "[ -f ~/.keybinds ]" ~/.bashrc; then
-    #     sed -i 's|\(\[ -f ~/.keybinds \] \&\& source \~/.keybinds\)|\[ -f ~/.bash_preexec \] \&\& source ~/.bash_preexec\n\n\1\n|g' ~/.bashrc
-    #fi
+if ! [[ "$(tail -1 ~/.bash_profile)" =~ '~/.bash_preexec' ]]; then
+    sed -i 'r/[ -f ~/.bash_preexec ] && source ~/.bash_preexec' ~/.bash_profile
+    printf "\n[ -f ~/.bash_preexec ] && source ~/.bash_preexec\n" >>~/.bash_profile
+fi
+
+if ! [[ "$(tail -1 ~/.bashrc)" =~ '~/.bash_preexec' ]]; then
+    sed -i 'r/[ -f ~/.bash_preexec ] && source ~/.bash_preexec' ~/.bashrc
+    printf "\n[ -f ~/.bash_preexec ] && source ~/.bash_preexec\n" >>~/.bashrc
 fi
 
 if test -d /root/; then
     readyn -p '(Check and) Install pre-execution hooks for /root as well?' bash_r
-    if [[ $bash_r == 'y' ]]; then
+    if [[ "$bash_r" == 'y' ]]; then
         if ! test -f /root/.bash_preexec; then
             sudo curl -s -o /root/.bash_preexec https://raw.githubusercontent.com/rcaloras/bash-preexec/master/bash-preexec.sh
         fi
-        if ! sudo grep -q '~/.bash_preexec' $PROFILE_R; then
-            printf "\n[ -f ~/.bash_preexec ] && source ~/.bash_preexec\n\n" | sudo tee -a $PROFILE_R 1> /dev/null
-            #if sudo grep -q "[ -f /root/.environment.env ]" /root/.bashrc; then
-            #   sudo sed -i 's|\(\[ -f /root/.environment.env \] \&\& source \/root/.environment.env\)|\[ -f /root/.bash_preexec \] \&\& source /root/.bash_preexec\n\1\n\n|g' /root/.bashrc
-            #elif sudo grep -q "[ -f /root/.bash_completion ]" /root/.bashrc; then
-            #     sudo sed -i 's|\(\[ -f /root/.bash_completion \] \&\& source \/root/.bash_completion\)|\[ -f /root/.bash_preexec \] \&\& source /root/.bash_preexec\n\n\1\n|g' /root/.bashrc
-            #elif sudo grep -q "[ -f /root/.bash_aliases ]" /root/.bashrc; then
-            #     sudo sed -i 's|\(\[ -f /root/.bash_aliases \] \&\& source \/root/.bash_aliases\)|\[ -f /root/.bash_preexec \] \&\& source /root/.bash_preexec\n\n\1\n|g' /root/.bashrc
-            #elif sudo grep -q "[ -f /root/.keybinds ]" /root/.bashrc; then
-            #     sudo sed -i 's|\(\[ -f /root/.keybinds \] \&\& source \/root/.keybinds\)|\[ -f /root/.bash_preexec \] \&\& source /root/.bash_preexec\n\n\1\n|g' /root/.bashrc
-            #else
-            #fi
+        if ! [[ "$(sudo tail -1 /root/.bash_profile)" =~ '~/.bash_preexec' ]]; then
+            sudo sed -i 'r/[ -f ~/.bash_preexec ] && source ~/.bash_preexec' /root/.bash_profile
+            printf "\n[ -f ~/.bash_preexec ] && source ~/.bash_preexec\n" | sudo tee -a /root/.bash_profile
         fi
+
+        if ! [[ "$(sudo tail -1 /root/.bashrc)" =~ '~/.bash_preexec' ]]; then
+            sudo sed -i 'r/[ -f ~/.bash_preexec ] && source ~/.bash_preexec' /root/.bashrc
+            printf "\n[ -f ~/.bash_preexec ] && source ~/.bash_preexec\n" | sudo tee -a /root/.bashrc
+        fi
+
     fi
-    unset bash_r 
+    unset bash_r
 fi
