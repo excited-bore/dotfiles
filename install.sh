@@ -13,9 +13,8 @@ else
     . ./checks/check_all.sh
 fi
 
-test -n "$BASH_VERSION" &&
-    get-script-dir "${BASH_SOURCE[0]}" SCRIPT_DIR ||
-    get-script-dir SCRIPT_DIR 
+#get-script-dir $0 SCRIPT_DIR 
+SCRIPT_DIR=$(pwd)
 
 if ! type rlwrap &>/dev/null; then
     if ! test -f $SCRIPT_DIR/checks/check_rlwrap.sh; then
@@ -69,9 +68,8 @@ if test -d /etc/modprobe.d && ! test -f /etc/modprobe.d/nobeep.conf; then
 fi
 unset sym1 sym2 sym3 beep
 
-test -n "$BASH_VERSION" &&
-    get-script-dir "${BASH_SOURCE[0]}" SCRIPT_DIR ||
-    get-script-dir SCRIPT_DIR 
+#get-script-dir $0 SCRIPT_DIR 
+SCRIPT_DIR=$(pwd)
 
 # Environment variables
 
@@ -244,9 +242,8 @@ if ! sudo test -f /etc/polkit/49-nopasswd_global.pkla && ! sudo test -f /etc/pol
     unset plkit
 fi
 
-test -n "$BASH_VERSION" &&
-    get-script-dir "${BASH_SOURCE[0]}" SCRIPT_DIR ||
-    get-script-dir SCRIPT_DIR 
+#get-script-dir $0 SCRIPT_DIR 
+SCRIPT_DIR=$(pwd)
 
 if ! test -f $SCRIPT_DIR/checks/check_envvar.sh; then
     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)"
@@ -343,7 +340,7 @@ unset h
 
 # Eza prompt
 
-readyn -p "Install eza? (A modern replacement for ls)" -c "! type eza &> /dev/null" rmp
+readyn -p "Install eza? (A modern replacement for ls)" -c "type eza &> /dev/null" rmp
 
 if [[ "y" == "$rmp" ]]; then
     if ! test -f $SCRIPT_DIR/install_eza.sh; then
@@ -358,7 +355,7 @@ unset rmp
 
 readyn -p "Install xcp? (cp but faster and with progress bar)" -c "type xcp &> /dev/null" rmp
 
-if [[ -z "$rmp" ]] || [[ "y" == "$rmp" ]]; then
+if [[ "y" == "$rmp" ]]; then
     if ! test -f $SCRIPT_DIR/install_xcp.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_xcp.sh)"
     else
@@ -406,9 +403,8 @@ if [[ "y" == "$pycomp" ]]; then
 fi
 unset pycomp
 
-test -n "$BASH_VERSION" &&
-    get-script-dir "${BASH_SOURCE[0]}" SCRIPT_DIR ||
-    get-script-dir SCRIPT_DIR 
+#get-script-dir $0 SCRIPT_DIR 
+SCRIPT_DIR=$(pwd)
 
 # Xresources
 
@@ -552,9 +548,8 @@ fi
 test -n $BASH_VERSION && source ~/.bashrc &>/dev/null
 test -n $ZSH_VERSION && source ~/.zshrc &>/dev/null
 
-test -n "$BASH_VERSION" &&
-    get-script-dir "${BASH_SOURCE[0]}" SCRIPT_DIR ||
-    get-script-dir SCRIPT_DIR 
+#get-script-dir $0 SCRIPT_DIR 
+SCRIPT_DIR=$(pwd)
 
 # Bash Preexec
 
@@ -958,11 +953,11 @@ if ! [[ $(sudo passwd -S | awk '{print $2}') == 'L' ]]; then
 fi
 
 echo "${cyan}${bold}Source .bashrc 'source ~/.bashrc' and you can check all aliases with 'alias'"
-echo "${green}${bold}Done!"
+echo "${green}${bold}Done!${normal}"
 readyn -p 'List all aliases?' allis
 [[ "$allis" == 'y' ]] && (
-    [[ -n $BASH_VERSION ]] && set -o posix
-    [[ -n $ZSH_VERSION ]] && set -o posixaliases
+    [ -n $BASH_VERSION ] && set -o posix
+    [ -n $ZSH_VERSION ] && set -o posixaliases
     alias
 ) | $PAGER
 unset allis

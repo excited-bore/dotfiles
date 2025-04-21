@@ -122,21 +122,23 @@ fi
 
 
 function get-script-dir() {
+    SOURCE=$0
+    test -n "$1" && SOURCE=$1 
     if test -n "$BASH_VERSION"; then
-        #[[ $0 != $BASH_SOURCE ]] && 
-            #SCRIPT_DIR="$( dirname "${BASH_SOURCE[0]}" )" ||
-            if test -z "$1"; then
-                SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-            else
-                SCRIPT_DIR=$( cd -- "$( dirname -- "$1" )" &> /dev/null && pwd )
-            fi
+        SOURCE=$(cd -- "$(dirname -- "$SOURCE")" &> /dev/null && pwd ) 
+        #while [ -h "$SOURCE" ]; do # Resolve $SOURCE until the file is no longer a symlink
+        #    DIR=$(command cd -P "$(dirname "$SOURCE")" && pwd)
+        #    SOURCE=$(readlink "$SOURCE")
+        #    [[ $SOURCE != /* ]] && SOURCE=$DIR/$SOURCE # If $SOURCE was a relative symlink, resolve it relative to the symlink base directory
+        #done
+        #DIR=$(command cd -P "$(dirname "$SOURCE")" && pwd)
     elif test -n "$ZSH_VERSION"; then
-        SCRIPT_DIR="${0:A:h}"
+        SOURCE="${0:A:h}"
     fi
-    if test -z "$2"; then
-        eval "$1=$SCRIPT_DIR"
+    if ! test -z $2; then
+        eval "$2=$SOURCE"
     else
-        eval "$2=$SCRIPT_DIR"
+        eval "$1=$SOURCE"
     fi
 }
 

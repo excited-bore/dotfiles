@@ -11,12 +11,12 @@ else
 fi
 
 if ! type xcp &> /dev/null; then
-	if ! type cargo &> /dev/null; then
-		if ! test -f install_cargo.sh; then
-    			eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)"
-		else
-   			. ./install_cargo.sh
-		fi
-	fi
-	cargo install xcp
+    if ! type cargo &> /dev/null || ! [[ $PATH =~ '/.cargo/bin' ]] ; then
+        if ! test -f install_cargo.sh; then
+            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)"
+        else
+            . ./install_cargo.sh
+        fi
+    fi
+    cargo install xcp
 fi
