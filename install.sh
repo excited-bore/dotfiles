@@ -446,9 +446,9 @@ shell-keybinds_r() {
     if test -f /root/.environment.env; then
         sudo sed -i 's|#export INPUTRC.*|export INPUTRC=~/.inputrc|g' /root/.environment.env
     fi
-    sudo cp -fv $binds1 /root/.keybinds.d/
-    sudo cp -fv $binds2 /root/.keybinds
-    sudo cp -fv $binds /root/
+    sudo cp -f $binds1 /root/.keybinds.d/
+    sudo cp -f $binds2 /root/.keybinds
+    sudo cp -f $binds /root/
     if test -f /root/.bashrc && ! grep -q '[ -f /root/.keybinds ]' /root/.bashrc; then
         if grep -q '[ -f /root/.bash_aliases ]' /root/.bashrc; then
             sed -i 's|\(\[ -f \/root/.bash_aliases \] \&\& source \/root/.bash_aliases\)|\1\n\[ -f \/root/.keybinds \] \&\& source \/root/.keybinds\n|g' /root/.bashrc
@@ -495,9 +495,9 @@ shell-keybinds() {
         fi
     fi
 
-    cp -fv $binds1 ~/.keybinds.d/
-    cp -fv $binds2 ~/.keybinds
-    cp -fv $binds ~/
+    cp -f $binds1 ~/.keybinds.d/
+    cp -f $binds2 ~/.keybinds
+    cp -f $binds ~/
 
     if test -f ~/.bashrc && ! grep -q '\[ -f ~/.keybinds \]' ~/.bashrc; then
         if grep -q '\[ -f ~/.bash_aliases \]' ~/.bashrc; then
@@ -531,7 +531,7 @@ yes-no-edit -f shell-keybinds -g "$binds $binds2 $binds1" -p "Install .inputrc a
 # Aliases
 
 readyn -p "Install bash aliases and other config?" scripts
-if [[ "y" == $scripts ]]; then
+if [[ "y" == "$scripts" ]]; then
 
     if ! test -f $SCRIPT_DIR/checks/check_aliases_dir.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)"
@@ -566,7 +566,7 @@ unset bash_preexec
 # Pipewire (better sound)
 
 readyn -p "Install and configure pipewire? (sound system - pulseaudio replacement)" -c 'type wireplumber &> /dev/null && test -f ~/.config/pipewire/pipewire-pulse.conf.d/switch-on-connect.conf;' pipew
-if [[ $pipew == "y" ]]; then
+if [[ "$pipew" == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_pipewire.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipewire.sh)"
     else
@@ -579,7 +579,7 @@ unset pipew
 
 readyn -p "Install moar? (Custom pager/less replacement - awesome default options)" -c 'type moar &> /dev/null;' moar
 
-if [[ $moar == "y" ]]; then
+if [[ "$moar" == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_moar.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_moar.sh)"
     else
@@ -728,7 +728,7 @@ unset tmx
 
 readyn -p "Install Bat? (Cat clone with syntax highlighting)" -c "type bat &> /dev/null || type batcat &> /dev/null" bat
 
-if [[ -z $bat ]] || [[ "Y" == $bat ]] || [[ $bat == "y" ]]; then
+if [[ "Y" == $bat ]] || [[ $bat == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_bat.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bat.sh)"
     else
@@ -789,7 +789,7 @@ unset zoxs
 # Starship
 
 readyn -p "Install Starship? (Snazzy looking prompt)" -c "type starship &> /dev/null" strshp
-if [[ $strshp == "y" ]]; then
+if [[ "$strshp" == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_starship.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_starship.sh)"
     else
@@ -872,7 +872,7 @@ unset git_ins
 # Exiftool (Metadata wiper)
 
 readyn -p "Install exiftool? (Metadata wiper for files)" -c "type exiftool &> /dev/null" exif_t
-if [[ -z $exif_t ]] || [[ "Y" == $exif_t ]] || [[ $exif_t == "y" ]]; then
+if [[ "Y" == "$exif_t" ]] || [[ "$exif_t" == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_exiftool.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_exiftool.sh)"
     else
@@ -942,8 +942,33 @@ else
 fi
 #fi
 
+# Check one last time if ~/.bash_preexec - for both $USER and root - is the last line in their ~/.bash_profile and ~/.bashrc
+
+if grep -q '~/.bash_preexec' ~/.bash_profile && ! [[ "$(tail -1 ~/.bash_profile)" =~ '~/.bash_preexec' ]]; then
+    sed -i 'r/[ -f ~/.bash_preexec ] && source ~/.bash_preexec' ~/.bash_profile
+    printf "\n[ -f ~/.bash_preexec ] && source ~/.bash_preexec\n" >>~/.bash_profile
+fi
+
+if grep -q '~/.bash_preexec' ~/.bash_profile && ! [[ "$(tail -1 ~/.bashrc)" =~ '~/.bash_preexec' ]]; then
+    sed -i 'r/[ -f ~/.bash_preexec ] && source ~/.bash_preexec' ~/.bashrc
+    printf "\n[ -f ~/.bash_preexec ] && source ~/.bash_preexec\n" >>~/.bashrc
+fi
+
+if test -d /root/; then
+    if sudo grep -q '~/.bash_preexec' /root/.bash_profile &&  ! [[ "$(sudo tail -1 /root/.bash_profile)" =~ '~/.bash_preexec' ]]; then
+        sudo sed -i 'r/[ -f ~/.bash_preexec ] && source ~/.bash_preexec' /root/.bash_profile
+        printf "\n[ -f ~/.bash_preexec ] && source ~/.bash_preexec\n" | sudo tee -a /root/.bash_profile
+    fi
+
+    if sudo grep -q '~/.bash_preexec' /root/.bashrc && ! [[ "$(sudo tail -1 /root/.bashrc)" =~ '~/.bash_preexec' ]]; then
+        sudo sed -i 'r/[ -f ~/.bash_preexec ] && source ~/.bash_preexec' /root/.bashrc
+        printf "\n[ -f ~/.bash_preexec ] && source ~/.bash_preexec\n" | sudo tee -a /root/.bashrc
+    fi
+fi
+
+
 echo "Next $(tput setaf 1)sudo$(tput sgr0) will check whether root account is enabled"
-if ! [[ $(sudo passwd -S | awk '{print $2}') == 'L' ]]; then
+if ! [[ "$(sudo passwd -S | awk '{print $2}')" == 'L' ]]; then
     printf "${CYAN}One more thing before finishing off${normal}: the ${RED}root${normal} account is still enabled.\n${RED1}This can be considered a security risk!!${normal}\n"
     readyn -Y 'YELLOW' -p 'Disable root account? (Enable again by giving up a password with \\"sudo passwd root\\")' root_dis
     if [[ "$root_dis" == 'y' ]]; then
@@ -956,8 +981,8 @@ echo "${cyan}${bold}Source .bashrc 'source ~/.bashrc' and you can check all alia
 echo "${green}${bold}Done!${normal}"
 readyn -p 'List all aliases?' allis
 [[ "$allis" == 'y' ]] && (
-    [ -n $BASH_VERSION ] && set -o posix
-    [ -n $ZSH_VERSION ] && set -o posixaliases
+    [ -n "$BASH_VERSION" ] && set -o posix
+    [ -n "$ZSH_VERSION" ] && set -o posixaliases
     alias
 ) | $PAGER
 unset allis

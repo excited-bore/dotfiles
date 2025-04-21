@@ -34,7 +34,7 @@ if ! [ -e ~/.bash_completion.d/complete_alias ]; then
 fi
 
 readyn -p "Install bash completions for aliases in /root/.bash_completion.d?" rcompl
-if [ -z $rcompl ] || [[ "y" == $rcompl ]]; then
+if [[ "y" == $rcompl ]]; then
     echo "Next $(tput setaf 1)sudo$(tput sgr0) will install 'complete_alias' in '/root/.bash_completion.d/'"
 
     if ! sudo test -e /root/.bash_completion.d/complete_alias; then

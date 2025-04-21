@@ -425,4 +425,29 @@ variti() {
 }
 yes-no-edit -f variti -g "$variti" -p "Install variety.sh at ~/.bash_aliases.d/ (aliases for a variety of tools)?" -i "y" -Q "GREEN"
 
+# Check one last time if ~/.bash_preexec - for both $USER and root - is the last line in their ~/.bash_profile and ~/.bashrc
+
+if grep -q '~/.bash_preexec' ~/.bash_profile && ! [[ "$(tail -1 ~/.bash_profile)" =~ '~/.bash_preexec' ]]; then
+    sed -i 'r/[ -f ~/.bash_preexec ] && source ~/.bash_preexec' ~/.bash_profile
+    printf "\n[ -f ~/.bash_preexec ] && source ~/.bash_preexec\n" >>~/.bash_profile
+fi
+
+if grep -q '~/.bash_preexec' ~/.bash_profile && ! [[ "$(tail -1 ~/.bashrc)" =~ '~/.bash_preexec' ]]; then
+    sed -i 'r/[ -f ~/.bash_preexec ] && source ~/.bash_preexec' ~/.bashrc
+    printf "\n[ -f ~/.bash_preexec ] && source ~/.bash_preexec\n" >>~/.bashrc
+fi
+
+if test -d /root/; then
+    if sudo grep -q '~/.bash_preexec' /root/.bash_profile &&  ! [[ "$(sudo tail -1 /root/.bash_profile)" =~ '~/.bash_preexec' ]]; then
+        sudo sed -i 'r/[ -f ~/.bash_preexec ] && source ~/.bash_preexec' /root/.bash_profile
+        printf "\n[ -f ~/.bash_preexec ] && source ~/.bash_preexec\n" | sudo tee -a /root/.bash_profile
+    fi
+
+    if sudo grep -q '~/.bash_preexec' /root/.bashrc && ! [[ "$(sudo tail -1 /root/.bashrc)" =~ '~/.bash_preexec' ]]; then
+        sudo sed -i 'r/[ -f ~/.bash_preexec ] && source ~/.bash_preexec' /root/.bashrc
+        printf "\n[ -f ~/.bash_preexec ] && source ~/.bash_preexec\n" | sudo tee -a /root/.bashrc
+    fi
+fi
+
+
 source ~/.bashrc &>/dev/null

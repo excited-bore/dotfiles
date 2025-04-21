@@ -6,9 +6,13 @@
 # type sudo &>/dev/null &&
 #    alias sudo='sudo '
 
-# Wget only uses (encrypted) https
+# Wget only uses https - encrypted http
 type wget &>/dev/null &&
     alias wget='wget --https-only '
+
+# Make sure cp copies forceably (without asking conforirmation when overwriting) and verbosely
+! (alias | grep -q "alias cp='cp -*f*v*" || alias | grep -q "alias cp='cp -*v*f*" ) &&
+    alias cp='cp -fv'
 
 # https://stackoverflow.com/questions/5412761/using-colors-with-printf
 # Execute (during printf) for colored prompt
