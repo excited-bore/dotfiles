@@ -13,7 +13,7 @@ else
     . ./checks/check_all.sh
 fi
 
-if ! test -f ~/.bash_preexec; then
+if ! test -f ~/.bash_preexec.sh; then
     curl -s -o ~/.bash_preexec.sh https://raw.githubusercontent.com/rcaloras/bash-preexec/master/bash-preexec.sh
 fi
 
