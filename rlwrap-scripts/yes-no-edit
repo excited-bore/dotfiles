@@ -112,15 +112,15 @@ function yes-no-edit() {
              
             Set to 'Yes' prompt with 2 optional, comma-separated arguments 
             Pregiven is 'y' without argument, otherwise first becomes pregiven. This is the default. 
-            Second optional is the prefill word in coloured prompt ([Word]), otherwise defaults to '${GREEN}[${underline_on}Y${underline_off}es/${underline_on}e${underline_off}(dit)/${underline_on}n${underline_off}o]:${normal} '
+            Second optional is the prefill word in coloured prompt ([Word]), otherwise defaults to '${GREEN}[${underline_on}Y${underline_off}(es)/${underline_on}e${underline_off}(dit)/${underline_on}n${underline_off}(o)]:${normal} '
 
         -n, --no [ ${underline_on}prefill${underline_off} ], [[ ${underline_on}prefill-prompt${underline_off} ]] 
             Same as for --yes but 'no' variant
-            Default pregiven is 'n', prompt word in prompt defaults to '[${underline_on}N${underline_off}o/${underline_on}e${underline_off}(dit)/${underline_on}y${underline_off}es]: ' when only '--no' is supplied
+            Default pregiven is 'n', prompt word in prompt defaults to '${ORANGE}[${underline_on}N${underline_off}(o)/${underline_on}e${underline_off}(dit)/${underline_on}y${underline_off}(es)]: ${normal}' when only '--no' is supplied
         -e, --edit [ ${underline_on}prefill${underline_off} ], [[ ${underline_on}prefill-prompt${underline_off} ]] 
             Same as for --yes but 'edit' variant
-            Default pregiven is 'e', prompt word in prompt defaults to '${GREEN}[${underline_on}E${underline_off}(dit)/${underline_on}y${underline_off}(es)/${underline_on}n${underline_off}o]: ${normal}' when only '--edit' is supplied
-            If '--no' with '--edit' are active => '[${ORANGE}${underline_on}E${underline_off}(dit)/${underline_on}n${underline_off}(o)/${underline_on}y${underline_off}es]: ${normal}' 
+            Default pregiven is 'e', prompt word in prompt defaults to '${YELLOW}[${underline_on}E${underline_off}(dit)/${underline_on}y${underline_off}(es)/${underline_on}n${underline_off}(o)]: ${normal}' when only '--edit' is supplied
+            If '--no' with '--edit' are active => '${ORANGE}[${underline_on}E${underline_off}(dit)/${underline_on}n${underline_off}(o)/${underline_on}y${underline_off}(es)]: ${normal}' 
             If neither '--no' or '--yes' are active => yes-prompt 
             
         -E, --editor EDITOR 
