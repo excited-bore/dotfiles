@@ -105,8 +105,8 @@ function readyn(){
 
         -c, --condition ${underline_on}CONDITION${underline_off} 
 
-            Set the prefix to '[${underline_on}N${underline_off}o/${underline_on}y${underline_off}es]: ' if the given condition is true  
-            If you only want the '[${underline_on}N${underline_off}o/${underline_on}y${underline_off}es]: ' prompt to be applicable when a given condition is active then give it up '--no' an argument in a string. 
+            Set the prefix to '[${underline_on}Y${underline_off}(es)/${underline_on}n${underline_off}o]: ' only if the given condition is true, 
+            otherwise will set '[${underline_on}N${underline_off}(o)/${underline_on}y${underline_off}(es)]: '  
 
         -Y, --yes-colour ${underline_on}COLOUR${underline_off}
             Default: ${GREEN}GREEN${normal} 
@@ -273,13 +273,22 @@ function readyn(){
         othr=$pre_y 
     fi
 
-    if ! test -z "$condition" && eval "${condition}"; then
-        [[ "$prmptn" == "${underline_on}n${underline_off}o" ]] && prmptn="${underline_on}N${underline_off}o"  
-        [[ "$prmpty" == "${underline_on}Y${underline_off}es" ]] && prmpty="${underline_on}y${underline_off}es"  
-        prmpt1=" [$prmptn/$prmpty]: "
-        color="$ncolor"
-        pre=$pre_n 
-        othr=$pre_y 
+    if ! test -z "$condition"; then 
+        if eval "${condition}"; then
+            [[ "$prmptn" == "${underline_on}n${underline_off}o" ]] && prmptn="${underline_on}n${underline_off}o"  
+            [[ "$prmpty" == "${underline_on}Y${underline_off}es" ]] && prmpty="${underline_on}Y${underline_off}es"  
+            prmpt1=" [$prmpty/$prmptn]: "
+            color="$ycolor"
+            pre=$pre_y 
+            othr=$pre_n 
+        else
+            [[ "$prmptn" == "${underline_on}n${underline_off}o" ]] && prmptn="${underline_on}N${underline_off}o"  
+            [[ "$prmpty" == "${underline_on}Y${underline_off}es" ]] && prmpty="${underline_on}y${underline_off}es"  
+            prmpt1=" [$prmptn/$prmpty]: "
+            color="$ncolor"
+            pre=$pre_n 
+            othr=$pre_y
+        fi
     fi
 
     if ! test -z "$auto"; then

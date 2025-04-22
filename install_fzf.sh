@@ -268,7 +268,7 @@ if ! test -f /usr/bin/rifle || ! test -f ~/.bash_aliases.d/fzf-rifle.sh && grep 
 fi
 unset fzf_f
 
-#readyn -p "Add shortcut for riflesearch on Ctrl-F? (Fzf and paste in console) "" fzf_t
+#readyn -p "Add shortcut for riflesearch on Ctrl-F? (Fzf and paste in console)" fzf_t
 #if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ] ; then
 #    #sed -i 's|# CTRL-T|# CTRL-F|g' ~/.fzf/shell/key-bindings.bash
 #
@@ -279,7 +279,7 @@ unset fzf_f
 #    #sed -i 's|bind -m vi-insert -x '\''"\\C-t": |bind -m vi-insert -x '\''"\\C-f": |g' ~/.fzf/shell/key-bindings.bash
 #fi
 
-# readyn -p "Change Alt-C shortcut to Ctrl-S for fzf cd? [Y/n]:" "n" fzf_t
+# readyn -p "Change Alt-C shortcut to Ctrl-S for fzf cd?" fzf_t
 # if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ]; then
 #     sed -i 's|# ALT-C - cd into the selected directory|# CTRL-S - cd into the selected directory|g' ~/.fzf/shell/key-bindings.bash
 #     sed -i 's|\\ec|\\C-s|g'  ~/.fzf/shell/key-bindings.bash

@@ -230,7 +230,7 @@ git_pager() {
         global="--global"
     fi
 
-    readyn -n -p "Turn off $cpager?" -c "[[ $cpager == 'pager.show' ]]" pipepager1
+    readyn -p "Turn off $cpager?" -c "[[ $cpager == 'pager.show' ]]" pipepager1
     if [[ "$pipepager1" == 'y' ]]; then
         git config $global "$cpager" false
     else
@@ -377,7 +377,7 @@ Condimentum lacinia quis vel eros donec ac. Nibh sed pulvinar proin gravida hend
             fi
         elif [[ "$pager" == "diff-so-fancy" ]] || [[ "$pager" == "diffr" ]] || [[ "$pager" == "ydiff" ]] || [[ "$pager" == "delta" ]] || [[ "$pager" == "bat" ]] || [[ "$pager" == "batdiff" ]]; then
             local difffancy
-            readyn -p "You selected $pager. Configure?" -c "([[ $pager == 'delta' ]] || [[ $pager == 'diff-so-fancy' ]]) && echo '$(git config $global --list --show-origin)' | grep -q $pager" difffancy
+            readyn -p "You selected $pager. Configure?" -c "(! [[ $pager == 'delta' ]] && ! [[ $pager == 'diff-so-fancy' ]]) || test -z '$(git config $global --list --show-origin)'" difffancy
             if [[ "y" == "$difffancy" ]]; then
                 if [[ "$pager" == "bat" ]] || [[ "$pager" == "batdiff" ]]; then
                     local opts=""
@@ -834,7 +834,7 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
             fi
         elif [[ "$pager" == "diff-so-fancy" ]] || [[ "$pager" == "diffr" ]] || [[ "$pager" == "ydiff" ]] || [[ "$pager" == "delta" ]] || [[ "$pager" == "bat" ]] || [[ "$pager" == "batdiff" ]]; then
             local difffancy
-            readyn -p "You selected $pager. Configure?" -c "(test $pager == 'delta' || test $pager == 'diff-so-fancy') && echo $(git config $global --list --show-origin) | grep -q $pager" difffancy
+            readyn -p "You selected $pager. Configure?" -c "(! [[ $pager == 'delta' ]] && ! [[ $pager == 'diff-so-fancy' ]]) || test -z \"$(git config $global --list --show-origin)\"" difffancy
             if [[ "y" == "$difffancy" ]]; then
                 if [[ "$pager" == "bat" ]] || [[ "$pager" == "batdiff" ]]; then
                     local opts=""
@@ -1266,7 +1266,7 @@ gitt() {
         touch .gitconfig
     fi
 
-    readyn -p "Configure git name?" -c "test -z $(git config $global --list | grep -q 'user.name' | awk 'BEGIN { FS = "=" } ;{print $2;}')" gitname
+    readyn -p "Configure git name?" -c "test -z $(git config $global --list | grep 'user.name' | awk 'BEGIN { FS = "=" }; {print $2;}')" gitname
     if [[ "y" == $gitname ]]; then
         reade -Q "CYAN" -p "Name: " name
         if [ ! -z $name ]; then
@@ -1274,7 +1274,7 @@ gitt() {
         fi
     fi
 
-    readyn -p "Configure git email?" -c "test -z $(git config $global --list | grep -q 'user.email' | awk 'BEGIN { FS = "=" } ;{print $2;}')" gitmail
+    readyn -p "Configure git email?" -c "test -z $(git config $global --list | grep 'user.email' | awk 'BEGIN { FS = "=" } ;{print $2;}')" gitmail
     if [[ "y" == $gitmail ]]; then
         reade -Q "CYAN" -p "Email: " mail
         if [ ! -z $mail ]; then
@@ -1282,7 +1282,7 @@ gitt() {
         fi
     fi
 
-    readyn -p 'Configure git to look for ssh:// instead of https:// when f.ex. pulling/pushing?' -c "test -z $(git config $global --list | grep -q url.ssh://git@github.com/.insteadof= | awk 'BEGIN { FS = "=" } ;{print $2;}')" githttpee
+    readyn -p 'Configure git to look for ssh:// instead of https:// when f.ex. pulling/pushing?' -c "test -z $(git config $global --list | grep 'url.ssh://git@github.com/.insteadof=' | awk 'BEGIN { FS = "=" }; {print $2;}')" githttpee
     if [[ "y" == $githttpee ]]; then
         git config $global url.ssh://git@github.com/.insteadOf https://github.com/
     fi
@@ -1290,7 +1290,7 @@ gitt() {
 
     # https://www.youtube.com/watch?v=aolI_Rz0ZqY
 
-    readyn -p "Configure git to remember resolved mergeconflicts for reuse?" -c "test -z $(git config $global --list | grep -q 'rerere.enabled' | awk 'BEGIN { FS = "=" } ;{print $2;}')" gitrerere
+    readyn -p "Configure git to remember resolved mergeconflicts for reuse?" -c "test -z $(git config $global --list | grep 'rerere.enabled' | awk 'BEGIN { FS = "=" } ;{print $2;}')" gitrerere
     if [[ "y" == $gitrerere ]]; then
         git config "$global" rerere.enabled true
     fi
@@ -1378,23 +1378,23 @@ gitt() {
             fi
         fi
         
-        readyn -p "Set core.pager?" -c "test -n \"$(git config $global --list | grep 'core.pager' | awk 'BEGIN { FS = "=" }; {print $2;}')\"" pager
+        readyn -p "Set core.pager?" -c "test -z \"$(git config $global --list | grep 'core.pager' | awk 'BEGIN { FS = "=" }; {print $2;}')\"" pager
         if [[ $pager == 'y' ]]; then
             git_pager "core.pager" "$global"
         fi
-        readyn -p "Set pager.diff?" -c "test -n \"$(git config $global --list | grep 'pager.diff' | awk 'BEGIN { FS = "=" }; {print $2;}')\"" pager
+        readyn -p "Set pager.diff?" -c "test -z \"$(git config $global --list | grep 'pager.diff' | awk 'BEGIN { FS = "=" }; {print $2;}')\"" pager
         if [[ $pager == 'y' ]]; then
             git_pager "pager.diff" "$global"
         fi
-        readyn -p "Set pager.difftool?" -c "test -n \"$(git config $global --list | grep 'pager.difftool' | awk 'BEGIN { FS = "=" }; {print $2;}')\"" pager
+        readyn -p "Set pager.difftool?" -c "test -z \"$(git config $global --list | grep 'pager.difftool' | awk 'BEGIN { FS = "=" }; {print $2;}')\"" pager
         if [[ $pager == 'y' ]]; then
             git_pager "pager.difftool" "$global"
         fi
-        readyn -p "Set pager.show?" -c "test -n \"$(git config $global --list | grep 'pager.show' | awk 'BEGIN { FS = "=" }; {print $2;}')\"" pager
+        readyn -p "Set pager.show?" -c "test -z \"$(git config $global --list | grep 'pager.show' | awk 'BEGIN { FS = "=" }; {print $2;}')\"" pager
         if [[ $pager == 'y' ]]; then
             git_pager "pager.show" "$global"
         fi
-        readyn -p "Set pager.log?" -c "test -n \"$(git config $global --list | grep 'pager.log' | awk 'BEGIN { FS = "=" } ;{print $2;}')\"" pager
+        readyn -p "Set pager.log?" -c "test -z \"$(git config $global --list | grep 'pager.log' | awk 'BEGIN { FS = "=" } ;{print $2;}')\"" pager
         if [[ $pager == 'y' ]]; then
             git_pager "pager.log" "$global"
         fi
@@ -1429,7 +1429,7 @@ gitt() {
     fi
 
     if ! test -z "$diffs"; then
-        readyn -p "Configure custom interactive diff filter?" -c "test -n \"$(git config $global --list | grep 'interactive.difffilter' | awk 'BEGIN { FS = "=" } ;{print $2;}')\"" gitdiff1
+        readyn -p "Configure custom interactive diff filter?" -c "test -z \"$(git config $global --list | grep 'interactive.difffilter' | awk 'BEGIN { FS = "=" } ;{print $2;}')\"" gitdiff1
         if [[ "y" == "$gitdiff1" ]]; then
             git_hl "git config $global interactive.difffilter"
         fi
@@ -1464,7 +1464,7 @@ gitt() {
         diff="difftastic"
     fi
 
-    readyn -Y "CYAN" -p "Set color.ui? (Git color behaviour)" -c "test -z $(git config $global --list | grep 'color.ui' | awk 'BEGIN { FS = "=" } ;{print $2;}')" editor
+    readyn -Y "CYAN" -p "Set color.ui? (Git color behaviour)" -c "test -z $(git config $global --list | grep 'color.ui' | awk 'BEGIN { FS = "=" }; {print $2;}')" editor
     if [[ "y" == "$editor" ]]; then
         reade -Q "CYAN" -i "true false auto always" -p "Color.ui (Default: auto): " editor
         if [[ "$editor" == "auto" ]] || [[ "$editor" == "false" ]] || [[ "$editor" == "true" ]] || [[ "$editor" == "always" ]]; then
@@ -1473,7 +1473,7 @@ gitt() {
     fi
     unset editor
 
-    readyn -Y "CYAN" -p "Set default editor?: " -c "test -z $(git config $global --list | grep 'core.editor' | awk 'BEGIN { FS = "=" } ;{print $2;}')" editor
+    readyn -Y "CYAN" -p "Set default editor?: " -c "test -z $(git config $global --list | grep 'core.editor' | awk 'BEGIN { FS = "=" }; {print $2;}')" editor
     if [[ "y" == "$editor" ]]; then
         unset editor
         reade -Q "CYAN" -i "$editor $editors" -p "Editor: " editor

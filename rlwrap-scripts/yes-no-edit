@@ -114,18 +114,34 @@ function yes-no-edit() {
             Pregiven is 'y' without argument, otherwise first becomes pregiven. This is the default. 
             Second optional is the prefill word in coloured prompt ([Word]), otherwise defaults to '${GREEN}[${underline_on}Y${underline_off}(es)/${underline_on}e${underline_off}(dit)/${underline_on}n${underline_off}(o)]:${normal} '
 
+        -Y, --yes-colour ${underline_on}COLOUR${underline_off}
+            
+            Default: ${GREEN}GREEN${normal} 
+
+            Only active if --yes(Default)/--no applicable. 
+            Use  one  of  the  colour names black, red, green, yellow, blue, cyan, purple (=magenta) or white, or an ANSI-conformant <colour_spec> to colour any prompt displayed  by  command.\n\tAn uppercase colour name (Yellow or YELLOW ) gives a bold prompt.\n Prompts that already contain (colour) escape sequences or one of the readline \"ignore markers\" (ASCII 0x01 and 0x02) are not coloured. 
+
         -n, --no [ ${underline_on}prefill${underline_off} ], [[ ${underline_on}prefill-prompt${underline_off} ]] 
             Same as for --yes but 'no' variant
             Default pregiven is 'n', prompt word in prompt defaults to '${ORANGE}[${underline_on}N${underline_off}(o)/${underline_on}e${underline_off}(dit)/${underline_on}y${underline_off}(es)]: ${normal}' when only '--no' is supplied
+        
+        -N, --no-colour ${underline_on}COLOUR${underline_off}
+            
+            Default: ${ORANGE}ORANGE${normal} 
+        
         -e, --edit [ ${underline_on}prefill${underline_off} ], [[ ${underline_on}prefill-prompt${underline_off} ]] 
             Same as for --yes but 'edit' variant
             Default pregiven is 'e', prompt word in prompt defaults to '${YELLOW}[${underline_on}E${underline_off}(dit)/${underline_on}y${underline_off}(es)/${underline_on}n${underline_off}(o)]: ${normal}' when only '--edit' is supplied
             If '--no' with '--edit' are active => '${ORANGE}[${underline_on}E${underline_off}(dit)/${underline_on}n${underline_off}(o)/${underline_on}y${underline_off}(es)]: ${normal}' 
             If neither '--no' or '--yes' are active => yes-prompt 
             
-        -E, --editor EDITOR 
+        -E, --editor EDITOR  
          
-            What editor to use. Looks at \$EDITOR if not given, otherwise will look whether nvim, vim, nano or vi exists. Not applicable if 'edit' option is replaced by another command with -o/--other.        
+            What editor to use. Looks at \$EDITOR if not given, otherwise will look whether nvim, vim, nano or vi exists. Not applicable if 'edit' option is replaced by another command with -o/--other.
+
+        -O, --edit-colour [ ${underline_on}COLOUR${underline_off} ] 
+
+            Default: ${YELLOW}YELLOW${normal} 
 
         -o, --other COMMAND, PROMPTDESCRIPTION [, REPLACEEDIT (Y/n)], [[ FIRST (y/N)]]
             
@@ -133,11 +149,10 @@ function yes-no-edit() {
 
             For example: 'yes-no-edit --other=less,\"pager\",n' would add '[${bold}Y(es)${normal}/n(o)/e(dit)/p(ager)]: ' to the prompt and use less if 'p' was given'
         
-
        -c, --condition ${underline_on}CONDITION${underline_off} 
 
-            Set the prefix to '[${underline_on}N${underline_off}o/${underline_on}e${underline_off}(dit)/${underline_on}y${underline_off}es]: ' if the given condition is true  
-            If you only want the '[${underline_on}N${underline_off}o/${underline_on}e${underline_off}(dit)/${underline_on}y${underline_off}es]: ' prompt to be applicable when a given condition is active then give it up '--no' an argument in a string. 
+            Set the prefix to '${GREEN}[${underline_on}Y${underline_off}(es)/${underline_on}e${underline_off}(dit)/${underline_on}n${underline_off}(o)]: ${normal}' only if the given condition is true,
+            otherwise will set to '${ORANGE}[${underline_on}N${underline_off}(o)/${underline_on}e${underline_off}(dit)/${underline_on}y${underline_off}(es)]: ${normal}'
 
        -g, --files-to-edit SPACESEPERATED-FILESTRING 
          
@@ -155,15 +170,6 @@ function yes-no-edit() {
        -P, --dont-add-prompt
 
             At default something along the lines of '[${bold}Y(es)${normal}/n(o)/e(dit)]: ' will be added at the end of the prompt. With this option, that won't be the case.
-
-       -i, --default-inserted YES(Default)/EDIT/NO(/OTHERDESCRIPTION)
-        
-            What's the first prefilled and first in the string that's highlighted in bold at the end of the prompt? (this would be nullified if -d,--dont-ask-prompt is supplied) 
-
-            At default this is '[${bold}Y(es)${normal}/n(o)/e(dit)]: ' 
-            If --default-inserted='no' is given, it would become '[${bold}N(o)${normal}/(y)es/e(dit)]: '  
-            If --default-inserted='edit' is given, it would become '[${bold}E(dit)${normal}/(y)es/n(o)]: '
-            If \"yes-no-edit --other=less,'pager' --default-inserted=pager \" is given without adding -d/--dont-add-prompt, it would become ''[${bold}P(ager)${normal}/(y)es/n(o)]: '   
 
        -Q, --colour COLOURSTRING
 
@@ -198,11 +204,16 @@ function yes-no-edit() {
         '--break-chars')        set -- "$@" '-b' ;;
         '--condition')          set -- "$@" '-c' ;;
         '--dont-askagain')      set -- "$@" '-d' ;;
+        '--yes')                set -- "$@" '-y' ;;
+        '--yes-colour')         set -- "$@" '-Y' ;;
+        '--no')                 set -- "$@" '-n' ;;
+        '--no-colour')          set -- "$@" '-N' ;;
+        '--edit')               set -- "$@" '-e' ;;
         '--editor')             set -- "$@" '-E' ;;
+        '--edit-colour')        set -- "$@" '-O' ;;
+        '--other')              set -- "$@" '-o' ;;
         '--function')           set -- "$@" '-f' ;;
         '--files-to-edit')      set -- "$@" '-g' ;;
-        '--default-inserted')   set -- "$@" '-i' ;;
-        '--other')              set -- "$@" '-o' ;;
         '--prompt')             set -- "$@" '-p' ;;
         '--dont-add-prompt')    set -- "$@" '-P' ;;
         '--colour')             set -- "$@" '-Q' ;;
@@ -233,7 +244,7 @@ function yes-no-edit() {
         local functn=""
         local files=""
 
-        while getopts 'Pb:c:d:o:Q:i:E:g:f:p:' flag; do
+        while getopts 'Pb:c:d:y:E:o:Q:g:f:p:' flag; do
             case "${flag}" in
             b) ;;
             c)  
@@ -282,6 +293,29 @@ function yes-no-edit() {
                 unset j i
                 [[ ${OPTARG} =~ ^-.* ]] && OPTIND=$(($OPTIND - 1))
                 ;;
+           y)  
+                 preff='y'
+                 args='' 
+                 if [[ "${OPTARG}" ]] && ! [[ "${OPTARG}" == '--' ]] && ! [[ ${OPTARG} =~ ^-.* ]]; then
+
+                    # disable glob 
+                    set -f 
+
+                    # split on space characters 
+                    IFS=',' 
+
+                    args=($OPTARG);
+                    pre_y="${args[0]}" 
+                    ! test -z "${args[1]}" && prmpty="${args[1]}" 
+                else
+                    pre='y' 
+                    if [[ ${OPTARG} =~ -.* ]]; then
+                        OPTIND=$(($OPTIND - 1)) 
+                    fi
+                fi
+                ;;
+
+ 
             E)
                 test -z "${OPTARG}" &&
                     printf "The flag -E/--editor requires an argument, namely an editor name\n" &&
@@ -379,8 +413,8 @@ function yes-no-edit() {
 
         if test -z "$files"; then
             if [[ $# -eq 1 ]] || [[ $# -gt 1 ]]; then
-                ! test -z "$functn" && test $# -gt 1 && files="${@:$#:2}" ||
-                    test $# -eq 1 && files="${@:$#:1}"
+                ! test -z "$functn" && [[ $# -gt 1 ]] && files="${@:$#:2}" ||
+                    [[ $# -eq 1 ]] && files="${@:$#:1}"
             else
                 printf "String with seperated file(s) to edit/use commands on (if -g/--files-to-edit has not been given\n Exiting\n"
                 return 0
@@ -399,14 +433,23 @@ function yes-no-edit() {
             fi
         fi
     
-        if ! test -z "$condition" && eval "${condition}"; then
-            [[ "$prmptn" == "${underline_on}n${underline_off}o" ]] && prmptn="${underline_on}N${underline_off}o"  
-            [[ "$prmpty" == "${underline_on}Y${underline_off}es" ]] && prmpty="${underline_on}y${underline_off}es"  
-            prmpt1=" [$prmptn/$prmpty]: "
-            color="$ncolor"
-            pre=$pre_n 
-            othr=$pre_y 
-        fi 
+        if ! test -z "$condition"; then 
+            if eval "${condition}"; then
+                [[ "$prmptn" == "${underline_on}n${underline_off}o" ]] && prmptn="${underline_on}n${underline_off}o"  
+                [[ "$prmpty" == "${underline_on}Y${underline_off}es" ]] && prmpty="${underline_on}Y${underline_off}es"  
+                prmpt1=" [$prmpty/$prmptn]: "
+                color="$ycolor"
+                pre=$pre_y 
+                othr=$pre_n 
+            else
+                [[ "$prmptn" == "${underline_on}n${underline_off}o" ]] && prmptn="${underline_on}N${underline_off}o"  
+                [[ "$prmpty" == "${underline_on}Y${underline_off}es" ]] && prmpty="${underline_on}y${underline_off}es"  
+                prmpt1=" [$prmptn/$prmpty]: "
+                color="$ncolor"
+                pre=$pre_n 
+                othr=$pre_y
+            fi
+        fi
 
         test -z "$noprompt" && prmpt2="$prmpt$prmpt1" || prmpt2="$prmpt"
 
