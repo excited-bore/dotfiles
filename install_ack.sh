@@ -6,17 +6,17 @@ else
     . ./checks/check_all.sh
 fi
 
-if ! test -f checks/check_aur.sh; then
-    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aur.sh)" 
+if ! test -f checks/check_AUR.sh; then
+    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_AUR.sh)" 
 else
-    . ./checks/check_aur.sh
+    . ./checks/check_AUR.sh
 fi
 
 
 if ! type ack &> /dev/null; then
-    if ! test -z "$AUR_ins"; then
+    if test -n "$AUR_ins"; then
         eval "${AUR_ins}" ack 
-    elif ! test -z "$pac_ins"; then
+    elif test -n "$pac_ins"; then
         printf "Gonna try to install ack through the regular packagemanager\n"
         eval "${pac_ins}" ack
     fi
