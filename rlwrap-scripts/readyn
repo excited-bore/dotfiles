@@ -18,6 +18,7 @@ function readyn(){
     
     local red=$(tput setaf 1)
     local red1=$(tput setaf 9)
+    local orange=$(tput setaf 166)
     local green=$(tput setaf 2)
     local green1=$(tput setaf 10)
     local yellow=$(tput setaf 3)
@@ -35,6 +36,7 @@ function readyn(){
 
     local RED=$(tput setaf 1 && tput bold)
     local RED1=$(tput setaf 9 && tput bold)
+    local ORANGE=$(tput setaf 166 && tput bold)
     local GREEN=$(tput setaf 2 && tput bold)
     local GREEN1=$(tput setaf 10 && tput bold)
     local YELLOW=$(tput setaf 3 && tput bold)
@@ -49,6 +51,7 @@ function readyn(){
     local WHITE1=$(tput setaf 15 && tput bold)
     local BLACK=$(tput setaf 16 && tput bold)
     local GREY=$(tput setaf 8 && tput bold)
+
 
     local bold=$(tput bold)
     local underline_on=$(tput smul)
@@ -102,8 +105,8 @@ function readyn(){
 
         -c, --condition ${underline_on}CONDITION${underline_off} 
 
-            At default will prefer to prompt the '--no' flag over the '--yes' flag. 
-            If you only want the '--no' prompt to be applicable when a given condition is active then give it up as an argument in a string. 
+            Set the prefix to '[${underline_on}N${underline_off}o/${underline_on}y${underline_off}es]: ' if the given condition is true  
+            If you only want the '[${underline_on}N${underline_off}o/${underline_on}y${underline_off}es]: ' prompt to be applicable when a given condition is active then give it up '--no' an argument in a string. 
 
         -Y, --yes-colour ${underline_on}COLOUR${underline_off}
             Default: ${GREEN}GREEN${normal} 

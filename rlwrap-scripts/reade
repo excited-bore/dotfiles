@@ -7,6 +7,7 @@ function reade() {
 
     local red=$(tput setaf 1)
     local red1=$(tput setaf 9)
+    local orange=$(tput setaf 166)
     local green=$(tput setaf 2)
     local green1=$(tput setaf 10)
     local yellow=$(tput setaf 3)
@@ -24,6 +25,7 @@ function reade() {
 
     local RED=$(tput setaf 1 && tput bold)
     local RED1=$(tput setaf 9 && tput bold)
+    local ORANGE=$(tput setaf 166 && tput bold)
     local GREEN=$(tput setaf 2 && tput bold)
     local GREEN1=$(tput setaf 10 && tput bold)
     local YELLOW=$(tput setaf 3 && tput bold)
@@ -38,6 +40,7 @@ function reade() {
     local WHITE1=$(tput setaf 15 && tput bold)
     local BLACK=$(tput setaf 16 && tput bold)
     local GREY=$(tput setaf 8 && tput bold)
+
 
     local bold=$(tput bold)
     local underline_on=$(tput smul)
