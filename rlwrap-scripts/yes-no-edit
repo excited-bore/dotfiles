@@ -28,6 +28,7 @@ function yes-no-edit() {
 
     local red=$(tput setaf 1)
     local red1=$(tput setaf 9)
+    local orange=$(tput setaf 166)
     local green=$(tput setaf 2)
     local green1=$(tput setaf 10)
     local yellow=$(tput setaf 3)
@@ -45,6 +46,7 @@ function yes-no-edit() {
 
     local RED=$(tput setaf 1 && tput bold)
     local RED1=$(tput setaf 9 && tput bold)
+    local ORANGE=$(tput setaf 166 && tput bold)
     local GREEN=$(tput setaf 2 && tput bold)
     local GREEN1=$(tput setaf 10 && tput bold)
     local YELLOW=$(tput setaf 3 && tput bold)
@@ -98,25 +100,44 @@ function yes-no-edit() {
             
             Print version and exit
 
-        -d, --dont-add-prompt
-
-            At default something along the lines of '[${bold}Y(es)${normal}/n(o)/e(dit)]: ' will be added at the end of the prompt. With this option, that won't be the case.
-
-        -o, --other COMMAND, PROMPTDESCRIPTION [, REPLACEEDIT (Y/n)]
-            
-            Supply another kind of command other then 'edit' to perform together with the description of what's supposed to be done in string format as to be added to the prompt as long as -d/--dont-add-prompt is not supplied. There's a last option not to replace edit with this new command 
-
-            For example: 'yes-no-edit --other=less,\"pager\",n' would add '[${bold}Y(es)${normal}/n(o)/e(dit)/p(ager)]: ' to the prompt and use less if 'p' was given'
-
-        -n, --no-askagain [ Y/N STRING ] 
+        -d, --dont-askagain [ Y/N STRING ] 
 
             Normally after prompted once and edit/other is chosen, it will repeat the prompt (while showing the diffs if edited). With -n, --noaskagain it will ask one last yes/no question and then quit (and if -f/--function is not empty, it will execute said function if yes is answered)
             It takes the optional string argument of what is pregiven with this second question: (y)es (default) or (n)o.
             f.ex. yes-no-edit --no-askagain='n'
-        
-       -e, --editor EDITOR 
+
+        -y, --yes [ ${underline_on}prefill${underline_off} ], [[ ${underline_on}prefill-prompt${underline_off} ]] 
+           
+            What's the first prefilled and first in the string that's highlighted in bold at the end of the prompt? (this would be nullified if -d,--dont-ask-prompt is supplied) 
+             
+            Set to 'Yes' prompt with 2 optional, comma-separated arguments 
+            Pregiven is 'y' without argument, otherwise first becomes pregiven. This is the default. 
+            Second optional is the prefill word in coloured prompt ([Word]), otherwise defaults to '${GREEN}[${underline_on}Y${underline_off}es/${underline_on}e${underline_off}(dit)/${underline_on}n${underline_off}o]:${normal} '
+
+        -n, --no [ ${underline_on}prefill${underline_off} ], [[ ${underline_on}prefill-prompt${underline_off} ]] 
+            Same as for --yes but 'no' variant
+            Default pregiven is 'n', prompt word in prompt defaults to '[${underline_on}N${underline_off}o/${underline_on}e${underline_off}(dit)/${underline_on}y${underline_off}es]: ' when only '--no' is supplied
+        -e, --edit [ ${underline_on}prefill${underline_off} ], [[ ${underline_on}prefill-prompt${underline_off} ]] 
+            Same as for --yes but 'edit' variant
+            Default pregiven is 'e', prompt word in prompt defaults to '${GREEN}[${underline_on}E${underline_off}(dit)/${underline_on}y${underline_off}(es)/${underline_on}n${underline_off}o]: ${normal}' when only '--edit' is supplied
+            If '--no' with '--edit' are active => '[${ORANGE}${underline_on}E${underline_off}(dit)/${underline_on}n${underline_off}(o)/${underline_on}y${underline_off}es]: ${normal}' 
+            If neither '--no' or '--yes' are active => yes-prompt 
+            
+        -E, --editor EDITOR 
          
             What editor to use. Looks at \$EDITOR if not given, otherwise will look whether nvim, vim, nano or vi exists. Not applicable if 'edit' option is replaced by another command with -o/--other.        
+
+        -o, --other COMMAND, PROMPTDESCRIPTION [, REPLACEEDIT (Y/n)], [[ FIRST (y/N)]]
+            
+            Supply another kind of command other then 'edit' to perform together with the description of what's supposed to be done in string format as to be added to the prompt as long as -d/--dont-add-prompt is not supplied. There's a last option not to replace edit with this new command 
+
+            For example: 'yes-no-edit --other=less,\"pager\",n' would add '[${bold}Y(es)${normal}/n(o)/e(dit)/p(ager)]: ' to the prompt and use less if 'p' was given'
+        
+
+       -c, --condition ${underline_on}CONDITION${underline_off} 
+
+            Set the prefix to '[${underline_on}N${underline_off}o/${underline_on}e${underline_off}(dit)/${underline_on}y${underline_off}es]: ' if the given condition is true  
+            If you only want the '[${underline_on}N${underline_off}o/${underline_on}e${underline_off}(dit)/${underline_on}y${underline_off}es]: ' prompt to be applicable when a given condition is active then give it up '--no' an argument in a string. 
 
        -g, --files-to-edit SPACESEPERATED-FILESTRING 
          
@@ -124,16 +145,20 @@ function yes-no-edit() {
        
        -f, --function FUNCTION
             
-           If supplied, no returnvar will be given but instead the supplied function will be executed when 'yes' is prompted.   
+            If supplied, no returnvar will be given but instead the supplied function will be executed when 'yes' is prompted.   
 
        -p, --prompt PROMPTSTRING 
              
-       String to be given as prompt. At default something along the lines of '[${bold}Y(es)${normal}/n(o)/e(dit)]: ' will be added at the end of the prompt if -d/--dont-add-prompt is not supplied. 
+            String to be given as prompt. At default something along the lines of '[${bold}Y(es)${normal}/n(o)/e(dit)]: ' will be added at the end of the prompt if -d/--dont-add-prompt is not supplied. 
             This last part will also be shown in the colour/style supplied by -Q/--colour.
+
+       -P, --dont-add-prompt
+
+            At default something along the lines of '[${bold}Y(es)${normal}/n(o)/e(dit)]: ' will be added at the end of the prompt. With this option, that won't be the case.
 
        -i, --default-inserted YES(Default)/EDIT/NO(/OTHERDESCRIPTION)
         
-       What's the first prefilled and first in the string that's highlighted in bold at the end of the prompt? (this would be nullified if -d,--dont-ask-prompt is supplied) 
+            What's the first prefilled and first in the string that's highlighted in bold at the end of the prompt? (this would be nullified if -d,--dont-ask-prompt is supplied) 
 
             At default this is '[${bold}Y(es)${normal}/n(o)/e(dit)]: ' 
             If --default-inserted='no' is given, it would become '[${bold}N(o)${normal}/(y)es/e(dit)]: '  
@@ -170,17 +195,18 @@ function yes-no-edit() {
     for arg in "$@"; do
         shift
         case "$arg" in
-        '--break-chars') set -- "$@" '-b' ;;
-        '--dont-add-prompt') set -- "$@" '-d' ;;
-        '--editor') set -- "$@" '-e' ;;
-        '--function') set -- "$@" '-f' ;;
-        '--files-to-edit') set -- "$@" '-g' ;;
-        '--default-inserted') set -- "$@" '-i' ;;
-        '--no-askagain') set -- "$@" '-n' ;;
-        '--other') set -- "$@" '-o' ;;
-        '--prompt') set -- "$@" '-p' ;;
-        '--colour') set -- "$@" '-Q' ;;
-        *) set -- "$@" "$arg" ;;
+        '--break-chars')        set -- "$@" '-b' ;;
+        '--condition')          set -- "$@" '-c' ;;
+        '--dont-askagain')      set -- "$@" '-d' ;;
+        '--editor')             set -- "$@" '-E' ;;
+        '--function')           set -- "$@" '-f' ;;
+        '--files-to-edit')      set -- "$@" '-g' ;;
+        '--default-inserted')   set -- "$@" '-i' ;;
+        '--other')              set -- "$@" '-o' ;;
+        '--prompt')             set -- "$@" '-p' ;;
+        '--dont-add-prompt')    set -- "$@" '-P' ;;
+        '--colour')             set -- "$@" '-Q' ;;
+        *)                      set -- "$@" "$arg" ;;
         esac
     done
 
@@ -193,6 +219,7 @@ function yes-no-edit() {
         local pre="y"
         local choices=("y" "n" "e")
         local choicesp=("y(es)" "n(o)" "e(dit)")
+        local condition='' 
         local prmpt=''
         local prmpt1=''
         local color=""
@@ -206,11 +233,26 @@ function yes-no-edit() {
         local functn=""
         local files=""
 
-        while getopts 'db:n:o:Q:i:e:g:f:p:' flag; do
+        while getopts 'Pb:c:d:o:Q:i:E:g:f:p:' flag; do
             case "${flag}" in
             b) ;;
-            d) noprompt='y'
+            c)  
+                if [[ "${OPTARG}" ]] && ! [[ "${OPTARG}" == '--' ]] && ! [[ ${OPTARG} =~ ^-.* ]]; then
+                    condition="${OPTARG}"
+                fi 
+                if [[ ${OPTARG} =~ ^-.* ]]; then
+                    OPTIND=$(($OPTIND - 1)) 
+                fi 
+                ;; 
+            d)
+                if ! test -z ${OPTARG} && [[ ${OPTARG} == 'n' || ${OPTARG} == 'y' ]]; then
+                    norepeat=${OPTARG}
+                else
+                    norepeat='y'
+                fi
+                [[ ${OPTARG} =~ ^-.* ]] && OPTIND=$(($OPTIND - 1))
                 ;;
+           
             o)
                 local j=0
                 for i in $(echo ${OPTARG} | sed "s/,/ /g"); do
@@ -240,9 +282,9 @@ function yes-no-edit() {
                 unset j i
                 [[ ${OPTARG} =~ ^-.* ]] && OPTIND=$(($OPTIND - 1))
                 ;;
-            e)
+            E)
                 test -z "${OPTARG}" &&
-                    printf "The flag -e/--editor requires an argument, namely an editor name\n" &&
+                    printf "The flag -E/--editor requires an argument, namely an editor name\n" &&
                     return 0 ||
                     YES_NO_EDITOR="${OPTARG}"
                 ;;
@@ -321,19 +363,14 @@ function yes-no-edit() {
             p)
                 prmpt="${OPTARG}"
                 ;;
+            P) 
+                noprompt='y'
+                ;;
             g)
                 test -z "${OPTARG}" &&
                     printf "This flag requires a string with files to edit/review\n" &&
                     return 0 ||
                     files="${OPTARG[@]}"
-                ;;
-            n)
-                if ! test -z ${OPTARG} && [[ ${OPTARG} == 'n' || ${OPTARG} == 'y' ]]; then
-                    norepeat=${OPTARG}
-                else
-                    norepeat='y'
-                fi
-                [[ ${OPTARG} =~ ^-.* ]] && OPTIND=$(($OPTIND - 1))
                 ;;
             esac
         done
@@ -361,6 +398,15 @@ function yes-no-edit() {
                 YES_NO_EDITOR='vi'
             fi
         fi
+    
+        if ! test -z "$condition" && eval "${condition}"; then
+            [[ "$prmptn" == "${underline_on}n${underline_off}o" ]] && prmptn="${underline_on}N${underline_off}o"  
+            [[ "$prmpty" == "${underline_on}Y${underline_off}es" ]] && prmpty="${underline_on}y${underline_off}es"  
+            prmpt1=" [$prmptn/$prmpty]: "
+            color="$ncolor"
+            pre=$pre_n 
+            othr=$pre_y 
+        fi 
 
         test -z "$noprompt" && prmpt2="$prmpt$prmpt1" || prmpt2="$prmpt"
 

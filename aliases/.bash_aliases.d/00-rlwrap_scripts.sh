@@ -50,6 +50,7 @@ function compare-tput-escape_color(){
 
 red=$(tput setaf 1)
 red1=$(tput setaf 9)
+orange=$(tput setaf 166)
 green=$(tput setaf 2)
 green1=$(tput setaf 10)
 yellow=$(tput setaf 3)
@@ -67,6 +68,7 @@ grey=$(tput setaf 8)
 
 RED=$(tput setaf 1 && tput bold)
 RED1=$(tput setaf 9 && tput bold)
+ORANGE=$(tput setaf 166 && tput bold)
 GREEN=$(tput setaf 2 && tput bold)
 GREEN1=$(tput setaf 10 && tput bold)
 YELLOW=$(tput setaf 3 && tput bold)
@@ -81,6 +83,7 @@ WHITE=$(tput setaf 7 && tput bold)
 WHITE1=$(tput setaf 15 && tput bold)
 BLACK=$(tput setaf 16 && tput bold)
 GREY=$(tput setaf 8 && tput bold)
+
 
 bold=$(tput bold)
 underline_on=$(tput smul)
