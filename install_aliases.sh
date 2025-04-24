@@ -36,18 +36,18 @@ readeu() {
     cp -f $reade ~/.bash_aliases.d/01-reade.sh
     cp -f $readyn ~/.bash_aliases.d/02-readyn.sh
     cp -f $yesnoedit ~/.bash_aliases.d/03-yes-no-edit.sh
-    yes-no-edit -f reade_r -g "$reade $readyn $yesnoedit $rlwrpscrpt" -p "Install reade, readyn and yes-no-edit at /root/.bash_aliases.d/?" -i "y" -Q "YELLOW"
+    yes-no-edit -y -Y "YELLOW" -f reade_r -g "$reade $readyn $yesnoedit $rlwrpscrpt" -p "Install reade, readyn and yes-no-edit at /root/.bash_aliases.d/?" 
 }
-yes-no-edit -f readeu -g "$reade $readyn $yesnoedit $rlwrpscrpt" -p "Install reade, readyn, yes-no-edit and rlwrap_scripts at ~/.bash_aliases.d/ (rlwrap/read functions that are used in other aliases)? " -i "y" -Q "GREEN"
+yes-no-edit -y -f readeu -g "$reade $readyn $yesnoedit $rlwrpscrpt" -p "Install reade, readyn, yes-no-edit and rlwrap_scripts at ~/.bash_aliases.d/ (rlwrap/read functions that are used in other aliases)? "
 
 csysm_r() {
     sudo cp -f $csysm /root/.bash_aliases.d/04-check_system.sh
 }
 csysm() {
     cp -f $csysm ~/.bash_aliases.d/04-check_system.sh
-    yes-no-edit -f csysm_r -g "$csysm" -p "Install check_system.sh at /root/?" -i "y" -Q "YELLOW"
+    yes-no-edit -y -Q "YELLOW" -f csysm_r -g "$csysm" -p "Install check_system.sh at /root/?" 
 }
-yes-no-edit -f csysm -g "$csysm" -p "Install check_system.sh at ~/.bash_aliases.d/ (do a checkup on what kind of system this is - used for later scripts)?" -i "y" -Q "GREEN"
+yes-no-edit -y -f csysm -g "$csysm" -p "Install check_system.sh at ~/.bash_aliases.d/ (do a checkup on what kind of system this is - used for later scripts)?" 
 
 genr=aliases/.bash_aliases.d/general.sh
 genrc=aliases/.bash_completion.d/general
@@ -234,9 +234,9 @@ if [[ $ansr == "y" ]]; then
     general() {
         cp -f $genr ~/.bash_aliases.d/
         cp -f $genrc ~/.bash_completion.d/
-        yes-no-edit -f general_r -g "$genr $genrc" -p "Install general.sh at /root/?" -i "y" -Q "YELLOW"
+        yes-no-edit -y -Y 'YELLOW' -f general_r -p "Install general.sh at /root/?" -g "$genr $genrc"
     }
-    yes-no-edit -f general -g "$genr $genrc" -p "Install general.sh at ~/?" -i "y" -Q "GREEN"
+    yes-no-edit -p "Install general.sh at ~/?" -f general -g "$genr $genrc"
 fi
 
 pre='both'

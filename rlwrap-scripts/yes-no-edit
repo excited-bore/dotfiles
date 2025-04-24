@@ -230,12 +230,12 @@ function yes-no-edit() {
         return 0
     else
         local pre="y"
-        local choices=("y" "n" "e")
-        local choicesp=("y(es)" "n(o)" "e(dit)")
+        local choices=("y" "e" "n")
+        local choicesp=("y(es)" "e(dit)" "n(o)")
         local condition='' 
         local prmpt=''
         local prmpt1=''
-        local yflag="" 
+        local yflag="y" 
         local nflag="" 
         local eflag="" 
         local oflag=""
@@ -244,10 +244,10 @@ function yes-no-edit() {
         local editreplaced='n'
         local othercmd=''
         local other=''
-        local ycolor="${GREEN}" 
-        local ncolor="${ORANGE}" 
-        local ecolor="${YELLOW}" 
-        local ocolor="${YELLOW}"
+        local ycolor="GREEN" 
+        local ncolor="ORANGE" 
+        local ecolor="YELLOW" 
+        local ocolor="YELLOW"
         local first=''
         local noprompt=''
         local norepeat=''
@@ -285,19 +285,21 @@ function yes-no-edit() {
                    IFS=',' 
  
                    args=($OPTARG);
-                   test -n "$BASH_VERSION" &&
+                   if test -n "$BASH_VERSION"; then
                         test -n "${args[0]}" && 
-                        eflag="${args[0]}" &&
-                        choices[0]="${args[0]}" && 
+                            yflag="${args[0]}" &&
+                            choices[0]="${args[0]}"
                         test -n "${args[1]}" && 
-                        choicesp[0]="${args[1]}"
+                            choicesp[0]="${args[1]}"
+                   fi
 
-                   test -n "$ZSH_VERSION" &&
+                   if test -n "$ZSH_VERSION"; then
                         test -n "${args[1]}" && 
-                        eflag="${args[1]}" &&
-                        choices[1]="${args[1]}" && 
+                            yflag="${args[1]}" &&
+                            choices[1]="${args[1]}"
                         test -n "${args[2]}" && 
-                        choicesp[1]="${args[2]}" 
+                            choicesp[1]="${args[2]}" 
+                   fi
                 else
                     if [[ ${OPTARG} =~ -.* ]]; then
                         OPTIND=$(($OPTIND - 1)) 
@@ -308,7 +310,6 @@ function yes-no-edit() {
                  local args='' 
                  nflag='n'
                  if [[ "${OPTARG}" ]] && ! [[ "${OPTARG}" == '--' ]] && ! [[ ${OPTARG} =~ ^-.* ]]; then
-
                    # disable glob 
                    set -f 
 
@@ -316,19 +317,21 @@ function yes-no-edit() {
                    IFS=',' 
  
                    args=($OPTARG);
-                   test -n "$BASH_VERSION" &&
+                   if test -n "$BASH_VERSION"; then
                         test -n "${args[0]}" && 
-                        eflag="${args[0]}" && 
-                        choices[1]="${args[0]}" && 
+                            nflag="${args[0]}" && 
+                            choices[1]="${args[0]}"  
                         test -n "${args[1]}" && 
-                        choicesp[1]="${args[1]}"
+                            choicesp[1]="${args[1]}"
+                   fi
 
-                   test -n "$ZSH_VERSION" &&
+                   if test -n "$ZSH_VERSION"; then
                         test -n "${args[1]}" && 
-                        eflag="${args[1]}" && 
-                        choices[2]="${args[1]}" && 
+                            nflag="${args[1]}" && 
+                            choices[2]="${args[1]}" 
                         test -n "${args[2]}" && 
-                        choicesp[2]="${args[2]}" 
+                            choicesp[2]="${args[2]}" 
+                   fi
                 else
                     if [[ ${OPTARG} =~ -.* ]]; then
                         OPTIND=$(($OPTIND - 1)) 
@@ -347,19 +350,20 @@ function yes-no-edit() {
                    IFS=',' 
  
                    args=($OPTARG);
-                   test -n "$BASH_VERSION" &&
+                   if test -n "$BASH_VERSION"; then
                         test -n "${args[0]}" &&
-                        eflag="${args[0]}" &&
-                        choices[2]="${args[0]}" && 
+                            eflag="${args[0]}" &&
+                            choices[2]="${args[0]}"
                         test -n "${args[1]}" && 
-                        choicesp[2]="${args[1]}"
-
-                   test -n "$ZSH_VERSION" &&
+                            choicesp[2]="${args[1]}"
+                   fi
+                   if test -n "$ZSH_VERSION"; then
                         test -n "${args[1]}" &&
-                        eflag="${args[1]}" &&
-                        choices[3]="${args[1]}" && 
+                            eflag="${args[1]}" &&
+                            choices[3]="${args[1]}" 
                         test -n "${args[2]}" && 
-                        choicesp[3]="${args[2]}" 
+                            choicesp[3]="${args[2]}" 
+                   fi
                 else
                     if [[ ${OPTARG} =~ -.* ]]; then
                         OPTIND=$(($OPTIND - 1)) 
@@ -404,7 +408,7 @@ function yes-no-edit() {
                 [[ ${OPTARG} =~ ^-.* ]] && OPTIND=$(($OPTIND - 1))
                 ;;
                 
-             Y) if [[ "${OPTARG}" ]] && ! [[ "${OPTARG}" == '--' ]] && ! [[ ${OPTARG} =~ ^-.* ]]; then 
+             Y) if [ -n "${OPTARG}" ] && ! [[ "${OPTARG}" == '--' ]] && ! [[ ${OPTARG} =~ ^-.* ]]; then 
                     ycolor="${OPTARG}";
                 fi
                 if [[ ${OPTARG} =~ ^-.* ]]; then
@@ -455,6 +459,7 @@ function yes-no-edit() {
             esac
         done
 
+
         shift $((OPTIND - 1))
 
         if test -z "$files"; then
@@ -478,81 +483,103 @@ function yes-no-edit() {
                 YES_NO_EDITOR='vi'
             fi
         fi
-         
+
         if test -z "$noprompt"; then
 
-            test -n "$BASH_VERSION" && 
+            if test -n "$BASH_VERSION"; then 
             
-            # Bash variant - list arrays
-            if [ -n "$yflag" ]; then
-                i=0
-            elif [ -n "$nflag" ] || (test -n "$condition" && ! eval "${condition}"); then 
-                i=1 
-            elif [ -n "$eflag" ] || ([[ $editreplaced == 'y' ]] && [ -n $oflag]); then
-                i=2 
-            elif [ -n "$oflag" ] && [[ $editreplaced == 'n' ]]; then 
-                i=3
-            fi &&
+                # Bash variant - list arrays
+                local i=0
+                local o op 
+                ! [ -z "$oflag" ] && o="${choices[3]}" && op="${choicesp[3]}"
+                if [ -n "$yflag" ]; then
+                    i=0 
+                    color="$ycolor"
+                fi 
+                if [ -n "$nflag" ] || (test -n "$condition" && ! eval "${condition}"); then 
+                    nflag='n'
+                    color="$ncolor"
+                    i=0 
+                    choices=("${choices[2]}" "${choices[1]}" "${choices[0]}") 
+                    choicesp=("${choicesp[2]}" "${choicesp[1]}" "${choicesp[0]}" )
+                fi 
+                if [ -n "$eflag" ] || ([[ $editreplaced == 'y' ]] && [ -n $oflag]); then
+                    color=$ecolor
+                    i=0
+                    #if test -n "$nflag"; then
+                        choices=(${choices[1]} "${choices[0]}" "${choices[2]}") 
+                        choicesp=(${choicesp[1]} "${choicesp[0]}" "${choicesp[2]}") 
+                    #else
+                    #    choices=(${choices[1]} "${choices[0]}" "${choices[2]}")
+                    #    choicesp=(${choicesp[1]} "${choicesp[0]}" "${choicesp[2]}")
+                    #fi
+                fi 
+                if [ -n "$oflag" ] && [[ $editreplaced == 'n' ]]; then 
+                    i=3 
+                    color=$ocolor
+                fi 
 
-            prmpt1=" [${bold}${choicesp[$i]^}" && 
-            unset choicesp[$i] &&
-            for i in "${!choicesp[@]}"; do                          
-                prmpt1="$prmpt1/${choicesp[$i]}" 
-                unset $choicesp[$i]; 
-            done && i=0
-
+                prmpt1=" [${bold}${choicesp[$i]^}"  
+                unset choicesp[$i] 
+                for j in "${!choicesp[@]}"; do                          
+                    #if ! [[ $j == $i ]]; then 
+                        prmpt1="$prmpt1/${choicesp[$j]}" 
+                        unset $choicesp[$j];
+                    #fi
+                done
+            fi
+             
         #    # ZSH can't do ${string^} text substition like bash
         #    # (capitalize the first letter in a string)
-            test -n "$ZSH_VERSION" && 
-            
-            if [ -n "$yflag" ]; then
-                i=1
-            elif [ -n "$nflag" ] || (test -n "$condition" && ! eval "${condition}"); then 
-                i=2 
-            elif [ -n "$eflag" ] || ([[ $editreplaced == 'y' ]] && [ -n $oflag]); then
-                i=3 
-            elif [ -n "$oflag" ] && [[ $editreplaced == 'n' ]]; then 
-                i=4
-            fi
+            if test -n "$ZSH_VERSION"; then 
+                local i=1 
+                local o op 
+                ! [ -z "$oflag" ] && o="${choices[4]}" && op="${choicesp[4]}" 
                 
-            local fst="$(tr '[:lower:]' '[:upper:]' <<<${choicesp[$indice]:0:1})${choicesp[$indice]:1}" &&
-            prmpt1=" [${bold}$fst" && 
-            choicesp[$indice]=() && 
-            for i in "${choicesp[@]}"; do
-                prmpt1="$prmpt1/$i" 
-                choicesp[${choicesp[(i)$i]}]=() 
-            done && i=0
-
+                if [ -n "$yflag" ]; then
+                    i=1 
+                    color="$ycolor"
+                fi 
+                if [ -n "$nflag" ] || (test -n "$condition" && ! eval "${condition}"); then 
+                    nflag='n'
+                    color="$ncolor"
+                    i=1 
+                    choices=("${choices[$i]}" "${choices[2]}" "${choices[1]}") 
+                    choicesp=("${choicesp[$i]}" "${choicesp[2]}" "${choicesp[1]}")
+                fi 
+                if [ -n "$eflag" ] || ([[ $editreplaced == 'y' ]] && [ -n $oflag]); then
+                    color="$ecolor"
+                    i=1 
+                    #if test -n "$nflag"; then
+                        choices=(${choices[2]} "${choices[1]}" "${choices[3]}") 
+                        choicesp=(${choicesp[2]} "${choicesp[1]}" "${choicesp[3]}") 
+                    #else
+                    #    choices=(${choices[2]} "${choices[3]}" "${choices[1]}")  
+                    #    choicesp=(${choicesp[2]} "${choicesp[3]}" "${choicesp[1]}")
+                    #fi
+                fi 
+                if [ -n "$oflag" ] && [[ $editreplaced == 'n' ]]; then 
+                    i=4 
+                    color="$ocolor"
+                fi 
+                    
+                local fst="$(tr '[:lower:]' '[:upper:]' <<<${choicesp[$indice]:0:1})${choicesp[$indice]:1}" 
+                prmpt1=" [${bold}$fst" 
+                choicesp[$i]=() 
+                for i in "${choicesp[@]}"; do
+                    prmpt1="$prmpt1/$i" 
+                    choicesp[${choicesp[(i)$i]}]=() 
+                done 
+            fi    
             prmpt1="$prmpt1]:${normal} "
         fi
-
-
-        #local i j
-        #! test -z "$condition" && ! eval "${condition}" &&
-        #    i=0 && 
-        #    j=1
-        #test -n "$BASH_VERSION" && 
-        #i=0 && pre="$choices[$i]" && unset choices[$i] &&
-        #choices=("$pre" ${choices[@]}) &&
-        #choicesp[$i]="${choicesp[$i]^}"
-        #test -n "$ZSH_VERSION" &&
-        #j=1 && pre=$choices[$j] && unset choices[$j] &&
-        #choices=("$pre" ${choices[@]}) &&
-        ## Zsh first letter capitalization "${(C)var}" doesn't work with w(ord) 
-        ##i=1 && choicesp[$i]="${(C)choicesp[$i]}"
-        #choicesp[$i]=$(echo $choicesp[$i] | awk '{ print toupper(substr($0,1,1)) substr($0,2) }')
-        #prmpt1=" [${bold}$choicesp[$i]" && i=$(($i+1))
-        #test -n "$BASH_VERSION" && choicesp[$i]="${choicesp[$i],,}"  
-        #test -n "$ZSH_VERSION" && choicesp[$j]="${choicesp[$j]:l}" 
-        #prmpt1="$prmpt1$choicesp[$i]" && i=$(($i+1))
-        #test -n "$BASH_VERSION" && choicesp[$i]="${choicesp[$i],,}"  
-        #test -n "$ZSH_VERSION" && choicesp[$j]="${choicesp[$j]:l}" 
-        #prmpt1="$prmpt1$choicesp[$i]]: " && i=$(($i+1))
-        #color="$ncolor"
 
         test -z "$noprompt" && 
             prmpt2="$prmpt$prmpt1" || 
             prmpt2="$prmpt"
+
+        [[ $color == 'orange' ]] && color='yellow' 
+        [[ $color == 'ORANGE' ]] && color='YELLOW' 
 
         test -z $color && reade -i "${choices[*]}" -p "$prmpt2" vvvvvvvvvv ||
             reade -Q $color -i "${choices[*]}" -p "$prmpt2" vvvvvvvvvv
