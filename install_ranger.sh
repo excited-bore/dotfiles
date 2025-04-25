@@ -89,7 +89,7 @@ rangr_cnf() {
         fi
     fi
 }
-yes-no-edit -f rangr_cnf -g "$dir/rc.conf $dir/rifle.conf $dir/scope.sh" -p "Install predefined configuration (rc.conf,rifle.conf and scope.sh at ~/.config/ranger/)? " -i "e" -Q "GREEN"
+yes-edit-no -f rangr_cnf -g "$dir/rc.conf $dir/rifle.conf $dir/scope.sh" -p "Install predefined configuration (rc.conf,rifle.conf and scope.sh at ~/.config/ranger/)? " -e
 
 readyn -p "F2 for Ranger?" rf2
 if [[ -z "$rf2" ]] || [[ "y" == "$rf2" ]]; then

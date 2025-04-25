@@ -44,10 +44,10 @@ if type ffmpeg &>/dev/null; then
 
     function ins_ffmpg() {
         cp -vf $ffmpgsh ~/.bash_aliases.d/nix.sh
-        yes-no-edit -f ins_ffmpg_r -g "$ffmpgsh" -p "Install ffmpeg.sh to /root? (nix bash aliases)" -i "y" -Q "GREEN"
+        yes-edit-no -Y 'YELLOW' -f ins_ffmpg_r -g "$ffmpgsh" -p "Install ffmpeg.sh to /root? (nix bash aliases)"
     }
 
-    yes-no-edit -f ins_ffmpg -g "$ffmpgsh" -p "Install ffmpeg.sh to $HOME? (nix bash aliases)" -i "y" -Q "GREEN"
+    yes-edit-no -f ins_ffmpg -g "$ffmpgsh" -p "Install ffmpeg.sh to $HOME? (nix bash aliases)" 
 
     unset ffmpgsh
 fi

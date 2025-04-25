@@ -53,9 +53,9 @@ if type nix &> /dev/null; then
 
     function ins_nix(){
         cp -vf $nixsh ~/.bash_aliases.d/nix.sh
-        yes-no-edit -f ins_nix_r -g "$nixsh" -p "Install nix.sh to /root? (nix bash aliases)" -i "y" -Q "GREEN"; 
+        yes-edit-no -f ins_nix_r -g "$nixsh" -p "Install nix.sh to /root? (nix bash aliases)" 
     }	
-    yes-no-edit -f ins_nix -g "$nixsh" -p "Install nix.sh to $HOME? (nix bash aliases)" -i "y" -Q "GREEN"
+    yes-edit-no -f ins_nix -g "$nixsh" -p "Install nix.sh to $HOME? (nix bash aliases)"
     unset nixsh	
 
     if [[ $distro == "Raspbian" && $(uname -m) == "aarch64" ]]; then

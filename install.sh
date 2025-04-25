@@ -420,9 +420,9 @@ xresources_r() {
 }
 xresources() {
     cp -fv $xterm ~/.Xresources
-    yes-no-edit -f xresources_r -g "$xterm" -p "Install .Xresources at /root/?" -i "e" -Q "RED"
+    yes-edit-no -f xresources_r -g "$xterm" -p "Install .Xresources at /root/?" -e -Q "RED"
 }
-yes-no-edit -f xresources -g "$xterm" -p "Install .Xresources at ~/? (Xterm configuration)" -i "e" -Q "YELLOW"
+yes-edit-no -f xresources -g "$xterm" -p "Install .Xresources at ~/? (Xterm configuration)" -e -Q "YELLOW"
 
 # Shell-keybinds
 
@@ -511,14 +511,14 @@ shell-keybinds() {
         sed -i 's|#export INPUTRC.*|export INPUTRC=~/.inputrc|g' ~/.environment.env
     fi
     unset vimde vivisual xterm
-    yes-no-edit -f shell-keybinds_r -g "$binds $binds2 $binds1" -p "Install .inputrc and keybinds.bash at /root/ and /root/.keybinds.d/?" -i "y" -Q "YELLOW"
+    yes-edit-no -Y "YELLOW" -f shell-keybinds_r -g "$binds $binds2 $binds1" -p "Install .inputrc and keybinds.bash at /root/ and /root/.keybinds.d/?" 
 }
 
-yes-no-edit -f shell-keybinds -g "$binds $binds2 $binds1" -p "Install .inputrc and keybinds.bash at ~/ and ~/.keybinds.d/? (keybinds configuration)" -i "y" -Q "GREEN"
+yes-edit-no -f shell-keybinds -g "$binds $binds2 $binds1" -p "Install .inputrc and keybinds.bash at ~/ and ~/.keybinds.d/? (keybinds configuration)"
 
 # Rlwrap scripts
 
-#readyn -p "Install reade, readyn and yes-no-edit?" -c 'test -f ~/.bash_aliases.d/reade' insrde
+#readyn -p "Install reade, readyn and yes-edit-no?" -c 'test -f ~/.bash_aliases.d/reade' insrde
 #if test "$insrde" == 'y'; then
 #    if ! test -f install_reade_readyn.sh; then
 #         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_reade_readyn.sh)"
@@ -553,7 +553,7 @@ SCRIPT_DIR=$(pwd)
 
 # Bash Preexec
 
-readyn -p "Install pre-execution hooks for bash in ~/.bash_preexec?" -c "! test -f ~/.bash_preexec || ! test -f /root/.bash_preexec" bash_preexec
+readyn -p "Install pre-execution hooks for bash in ~/.bash_preexec?" -c "! test -f ~/.bash_preexec.sh || ! test -f /root/.bash_preexec.sh" bash_preexec
 if [[ "y" == "$bash_preexec" ]]; then
     if ! test -f $SCRIPT_DIR/install_bash_preexec.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bash_preexec.sh)"

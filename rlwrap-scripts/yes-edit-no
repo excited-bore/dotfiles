@@ -10,16 +10,16 @@ else
 fi
 
 ! test -f $SCRIPT_DIR/reade && ! test -f $SCRIPT_DIR/01-reade.sh &&
-    printf "'reade' needs to be in the same folder as 'yes-no-edit' for it to work\n" ||
+    printf "'reade' needs to be in the same folder as 'yes-edit-no' for it to work\n" ||
     test -f $SCRIPT_DIR/reade && source $SCRIPT_DIR/reade ||
     test -f $SCRIPT_DIR/01-reade.sh && source $SCRIPT_DIR/01-reade.sh &>/dev/null
 
 ! test -f $SCRIPT_DIR/readyn && ! test -f $SCRIPT_DIR/02-readyn.sh &&
-    printf "'readyn' needs to be in the same folder as 'yes-no-edit' for it to work\n" ||
+    printf "'readyn' needs to be in the same folder as 'yes-edit-no' for it to work\n" ||
     test -f $SCRIPT_DIR/readyn && source $SCRIPT_DIR/readyn ||
     test -f $SCRIPT_DIR/02-readyn.sh && source $SCRIPT_DIR/02-readyn.sh &>/dev/null
 
-function yes-no-edit() {
+function yes-edit-no() {
 
     ! test -z $ZSH_VERSION &&
         #emulate sh &&
@@ -80,7 +80,7 @@ function yes-no-edit() {
 
     local VERSION='1.0'
 
-    local hlpstr="${bold}YES-NO-EDIT${normal} [ -h/--help ] [ -v/--version] [ -d/--dont-add-prompt ] [ -o/--other COMMAND, PROMPTDESCRIPTION [, REPLACEEDIT (Y/n)]] [ -n/--no-askagain [ Y(Default)/N ] ] [ -e/--editor EDITOR ]  [ -g/--files-to-edit SPACESEPERATED-FILESTRING ] [ -i/--default-inserted YES(Default)/EDIT/NO(/OTHERDESCRIPTION) ] [ -p/--prompt PROMPTSTRING ] [ -Q/--colour COLOURSTRING ] [ -b/--break-chars BREAKCHARS-STRING ] [ -f/--function FUNCTION ] [ ${bold}SPACESEPARATED FILE(S)STRING${normal} ] [ ${bold}RETURNVAR${normal} ] 
+    local hlpstr="${bold}YES-EDIT-NO${normal} [ -h/--help ] [ -v/--version] [ -d/--dont-askagain ] [ -y/--yes [ PREFILL [, PREFILLPROMPT ]] [ -Y/--yes-colour [ COLOUR ]] [ -n/--no [ PREFILL [, PREFILLPROMPT ]] [ -N/--no-colour [ COLOUR ]] [ -e/--edit [ PREFILL [, PREFILLPROMPT ]] [ -E/--editor EDITOR ] [ -Q/--edit-colour [ COLOUR ]] [ -o/--other COMMAND, PROMPTDESCRIPTION [, REPLACEEDIT (Y/n)]] [ -n/--no-askagain [ Y(Default)/N ] ] [ -e/--editor EDITOR ]  [ -g/--files-to-edit SPACESEPERATED-FILESTRING ] [ -p/--prompt PROMPTSTRING ] [ -Q/--colour COLOURSTRING ] [ -b/--break-chars BREAKCHARS-STRING ] [ -f/--function FUNCTION ] [ ${bold}SPACESEPARATED FILE(S)STRING${normal} ] [ ${bold}RETURNVAR${normal} ] 
 
         Simplifies prompt for ${bold}read/rlwrap${normal} specifically for when file(s) need to be reviewed before installation 
         - repeats prompt as long neither 'yes' nor 'no' is chosen 
@@ -104,7 +104,7 @@ function yes-no-edit() {
 
             Normally after prompted once and edit/other is chosen, it will repeat the prompt (while showing the diffs if edited). With -n, --noaskagain it will ask one last yes/no question and then quit (and if -f/--function is not empty, it will execute said function if yes is answered)
             It takes the optional string argument of what is pregiven with this second question: (y)es (default) or (n)o.
-            f.ex. yes-no-edit --no-askagain='n'
+            f.ex. yes-edit-no --no-askagain='n'
 
         -y, --yes [ ${underline_on}prefill${underline_off} ], [[ ${underline_on}prefill-prompt${underline_off} ]] 
            
@@ -136,12 +136,6 @@ function yes-no-edit() {
             '--edit' precedes everything 
             If neither '--no', '--edit' or '--yes' are active => yes-prompt 
             
-        -o, --other COMMAND, PROMPTDESCRIPTION [, REPLACEEDIT (Y/n)], [[ FIRST (y/N)]]
-            
-            Supply another kind of command other then 'edit' to perform together with the description of what's supposed to be done in string format as to be added to the prompt as long as -d/--dont-add-prompt is not supplied. There's a last option not to replace edit with this new command
-            Precedes every other option if the 4th option is 'y'
-
-            For example: 'yes-no-edit --other=less,\"pager\",n' would add '[${bold}Y(es)${normal}/n(o)/e(dit)/p(ager)]: ' to the prompt and use less if 'p' was given'
         -E, --editor EDITOR  
          
             What editor to use. Looks at \$EDITOR if not given, otherwise will look whether nvim, vim, nano or vi exists. Not applicable if 'edit' option is replaced by another command with -o/--other.
@@ -150,6 +144,12 @@ function yes-no-edit() {
 
             Default: ${YELLOW}YELLOW${normal} 
 
+        -o, --other COMMAND, PROMPTDESCRIPTION [, REPLACEEDIT (Y/n)], [[ FIRST (y/N)]]
+            
+            Supply another kind of command other then 'edit' to perform together with the description of what's supposed to be done in string format as to be added to the prompt as long as -d/--dont-add-prompt is not supplied. There's a last option not to replace edit with this new command
+            Precedes every other option if the 4th option is 'y'
+
+            For example: 'yes-edit-no --other=less,\"pager\",n' would add '[${bold}Y(es)${normal}/n(o)/e(dit)/p(ager)]: ' to the prompt and use less if 'p' was given'
 
         -O, --other-colour [ ${underline_on}COLOUR${underline_off} ] 
 
@@ -224,7 +224,7 @@ function yes-no-edit() {
     done
 
     if [[ -z "$1" ]] || [[ -z "$2" ]]; then
-        printf "yes-no-edit needs at least 2 parameters.
+        printf "yes-edit-no needs at least 2 parameters.
         1) String with seperated file(s) to edit/use commands on (if -g/--files-to-edit is not used yet)
         2) Returnvar (if 'yes/no' is passed - only necessary if -f/--function is not used)\n"
         return 0
@@ -394,11 +394,11 @@ function yes-no-edit() {
                         YES_NO_EDITOR="$othercmd"
                         editreplaced='y'
                         [[ " ${choices[*]} " =~ " e " ]] && 
-                            test -n "$BASH_VERSION" && unset $choices[2] ||
-                            test -n "$ZSH_VERSION" && unset $choices[3]
+                            test -n "$BASH_VERSION" && unset ${choices[2]} ||
+                            test -n "$ZSH_VERSION" && unset ${choices[3]}
                         [[ " ${choicesp[*]} " =~ " e(dit) " ]] &&
-                            test -n "$BASH_VERSION" && unset $choices[2] ||
-                            test -n "$ZSH_VERSION" && unset $choices[3]
+                            test -n "$BASH_VERSION" && unset ${choices[2]} ||
+                            test -n "$ZSH_VERSION" && unset ${choices[3]}
                     elif [[ $j == 4 ]] && ! test -z "$i"; then
                         ofirst='y' 
                     fi
@@ -524,7 +524,7 @@ function yes-no-edit() {
                 for j in "${!choicesp[@]}"; do                          
                     #if ! [[ $j == $i ]]; then 
                         prmpt1="$prmpt1/${choicesp[$j]}" 
-                        unset $choicesp[$j];
+                        unset ${choicesp[$j]}
                     #fi
                 done
             fi
