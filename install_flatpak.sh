@@ -33,7 +33,7 @@ if ! type flatpak &> /dev/null; then
     fi
 fi
 
-if type flatpak &> /dev/null; then
+if type flatpak &> /dev/null && test -z "$FLATPAK"; then
     readyn -p "Add flatpak dirs to path? (XDG_DATA_DIRS)" flpkvrs 
     if [[ "$flpkvrs" == "y" ]]; then
         if grep -q "FLATPAK" $ENVVAR; then
@@ -53,11 +53,11 @@ unset flpkvrs
 
 if ! test -f ~/.bash_aliases.d/flatpacks.sh; then
     readyn -p "Install flatpackwrapper? (For one-word flatpak aliases in terminal)" pam
-    if test -z $pam || [[ "y" == $pam ]]; then
+    if [[ "y" == $pam ]]; then
         if ! test -f install_bashalias_completions.sh; then
              eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bashalias_completions.sh)" 
         else
-             ./install_bashalias_completions.sh
+             . ./install_bashalias_completions.sh
         fi
 
         if test -f flatpak/.bash_aliases.d/flatpacks.sh; then
@@ -69,7 +69,7 @@ if ! test -f ~/.bash_aliases.d/flatpacks.sh; then
         fi
          
         if ! test -f ~/.bash_aliases.d/flatpacks.sh; then
-            cp -bfv $file ~/.bash_aliases.d/ 
+            cp -fv --backup auto $file ~/.bash_aliases.d/ 
             source ~/.bash_aliases.d/flatpacks.sh 
         fi
     fi    
@@ -78,18 +78,14 @@ unset pam file
 
 if ! echo $(flatpak list --columns=name) | grep -q "Flatseal"; then
     readyn -p "Install GUI for configuring flatpak permissions - flatseal?" fltseal
-    if test -z $fltseal || [[ "y" == $fltseal ]]; then
+    if [[ "y" == $fltseal ]]; then
         flatpak install flatseal
     fi
 fi
 unset fltseal
 
-localauth=$(test -d /etc/polkit-1/localauthority/50-local.d && ! test -f /etc/polkit-1/localauthority/50-local.d/90-nopasswd_global.pkla)
-localauth_conf=$(test -d /etc/polkit-1/localauthority.conf.d/ && ! test -f /etc/polkit-1/localauthority.conf.d/90-nopasswd_global.conf)
-rules_d=$(test -d /etc/polkit-1/rules.d/ && ! test -f /etc/polkit-1/rules.d/90-nopasswd_global.rules)
-
-if $localauth || $localauth_conf || $rules_d; then
-    readyn -p "Run installer for no password with pam?" pam
+if ! sudo test -f /etc/polkit/49-nopasswd_global.pkla && ! sudo test -f /etc/polkit-1/localauthority.conf.d/90-nopasswd_global.conf && ! sudo test -f /etc/polkit-1/rules.d/90-nopasswd_global.rules; then
+    readyn -p "Run installer for no password with pam / polkit?" pam
     if [[ "y" == $pam ]]; then
         if ! test -f install_polkit_wheel.sh; then
              eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_polkit_wheel.sh)" 

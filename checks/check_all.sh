@@ -155,11 +155,13 @@ function version-higher() {
     local IFS=.
     local i ver1=($1) ver2=($2)
     # fill empty fields in ver1 with zeros
+    test -n "$BASH_VERSION" && local j=0 
+    test -n "$ZSH_VERSION" && local j=1 
     for ((i = ${#ver1[@]}; i < ${#ver2[@]}; i++)); do
-        ver1[i]=0
+        ver1[i]=$j
     done
-    for ((i = 0; i < ${#ver1[@]}; i++)); do
-        if ((10#${ver1[i]:=0} > 10#${ver2[i]:=0})); then
+    for ((i = $j; i < ${#ver1[@]}; i++)); do
+        if ((10#${ver1[i]:=$j} > 10#${ver2[i]:=$j})); then
             return 0
         fi
         if ((10#${ver1[i]} < 10#${ver2[i]})); then
