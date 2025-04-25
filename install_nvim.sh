@@ -301,6 +301,7 @@ fi
 
 unset ast_ins
 
+dir=vim/.config/nvim
 if ! test -d vim/; then
     tmpdir=$(mktemp -d -t nvim-XXXXXXXXXX)
     tmpfile=$(mktemp)
@@ -308,8 +309,6 @@ if ! test -d vim/; then
     chmod u+x "$tmpfile"
     eval $tmpfile https://github.com/excited-bore/dotfiles/tree/main/vim/.config/nvim $tmpdir
     dir=$tmpdir/vim/.config/nvim
-else
-    dir=vim/.config/nvim
 fi
 
 if ! grep -q "\"Plugin 'Exafunction/codeium.vim'" "$dir/init.vim"; then
@@ -448,9 +447,9 @@ vimsh_r() {
 vimsh() {
     cp -fv $file ~/.bash_aliases.d/
     cp -fv $file1 ~/.bash_completion.d/
-    yes-edit-no -f vimsh_r -g "$dir/vim_nvim.sh $dir1/vim_nvim" -p "Install vim aliases at /root/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)?" 
+    yes-edit-no -f vimsh_r -g "$file $file1" -p "Install vim aliases at /root/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)?" 
 }
-yes-edit-no -f vimsh -g "$dir/vim_nvim.sh $dir1/vim_nvim" -p "Install vim aliases at ~/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)?"
+yes-edit-no -f vimsh -g "$file $file1" -p "Install vim aliases at ~/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)?"
 
 if ! type nvimpager &>/dev/null; then
     readyn -n -p "Install nvimpager?" vimrc
@@ -458,7 +457,7 @@ if ! type nvimpager &>/dev/null; then
         if ! test -f install_nvimpager.sh; then
             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nvimpager.sh)"
         else
-            ./install_nvimpager.sh
+            . ./install_nvimpager.sh
         fi
     fi
 fi

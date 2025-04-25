@@ -70,7 +70,7 @@ if ! test -f ~/.bash_aliases.d/flatpacks.sh; then
          
         if ! test -f ~/.bash_aliases.d/flatpacks.sh; then
             cp -fv --backup auto $file ~/.bash_aliases.d/ 
-            source ~/.bash_aliases.d/flatpacks.sh 
+            test -n "$BASH_VERSION" && source ~/.bash_aliases.d/flatpacks.sh 
         fi
     fi    
 fi
@@ -86,12 +86,12 @@ unset fltseal
 
 if ! sudo test -f /etc/polkit/49-nopasswd_global.pkla && ! sudo test -f /etc/polkit-1/localauthority.conf.d/90-nopasswd_global.conf && ! sudo test -f /etc/polkit-1/rules.d/90-nopasswd_global.rules; then
     readyn -p "Run installer for no password with pam / polkit?" pam
-    if [[ "y" == $pam ]]; then
+    if [[ "y" == "$pam" ]]; then
         if ! test -f install_polkit_wheel.sh; then
              eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_polkit_wheel.sh)" 
         else
-            ./install_polkit_wheel.sh
+            . ./install_polkit_wheel.sh
         fi
     fi
+    unset pam
 fi
-unset pam

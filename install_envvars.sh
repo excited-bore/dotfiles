@@ -86,7 +86,7 @@ environment-variables_r() {
     fi
 
     if test -f /root/.bash_profile && ! sudo grep -q "/root/.bash_profile" /root/.profile; then
-        readyn -p "Link /root/.bash_profile in /root/.profile?" bprofr
+        readyn -n -p "Link /root/.bash_profile in /root/.profile?" bprofr
         if [[ "$bprofr" == 'y' ]]; then
             printf "\n[ -f /root/.bash_profile ] && source /root/.bash_profile\n\n" | sudo tee -a /root/.profile 1> /dev/null
         fi
@@ -201,7 +201,7 @@ environment-variables() {
     fi
 
     if test -f ~/.bash_profile && ! grep -q "~/.bash_profile" ~/.profile; then
-        readyn -p "Link ~/.bash_profile in ~/.profile?" bprof
+        readyn -n -p "Link ~/.bash_profile in ~/.profile?" bprof
         if [[ "$bprof" == 'y' ]]; then
             printf "\n[ -f ~/.bash_profile ] && source ~/.bash_profile\n\n" >>~/.profile 
         fi
