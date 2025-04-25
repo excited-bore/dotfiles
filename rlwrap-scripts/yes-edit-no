@@ -422,21 +422,24 @@ function yes-edit-no() {
                     OPTIND=$(($OPTIND - 1)) 
                 fi 
                 ;;
-            E)
-                test -z "${OPTARG}" &&
+            E) test -z "${OPTARG}" &&
                     printf "The flag -E/--editor requires an argument, namely an editor name\n" &&
                     return 0 ||
                     YES_NO_EDITOR="${OPTARG}"
                 ;;
-            O) if [[ "${OPTARG}" ]] && ! [[ "${OPTARG}" == '--' ]] && ! [[ ${OPTARG} =~ ^-.* ]]; then
+            Q) if [[ "${OPTARG}" ]] && ! [[ "${OPTARG}" == '--' ]] && ! [[ ${OPTARG} =~ ^-.* ]]; then
                     ecolor="${OPTARG}";
                 fi
                 if [[ ${OPTARG} =~ ^-.* ]]; then
                     OPTIND=$(($OPTIND - 1)) 
                 fi 
                 ;; 
-            Q)
-                color="${OPTARG}"
+            O) if [[ "${OPTARG}" ]] && ! [[ "${OPTARG}" == '--' ]] && ! [[ ${OPTARG} =~ ^-.* ]]; then
+                    ocolor="${OPTARG}";
+                fi
+                if [[ ${OPTARG} =~ ^-.* ]]; then
+                    OPTIND=$(($OPTIND - 1)) 
+                fi
                 ;;
             f)
                 test -z "${OPTARG}" &&
@@ -458,7 +461,6 @@ function yes-edit-no() {
                 ;;
             esac
         done
-
 
         shift $((OPTIND - 1))
 
@@ -528,7 +530,7 @@ function yes-edit-no() {
                     #fi
                 done
             fi
-             
+            
         #    # ZSH can't do ${string^} text substition like bash
         #    # (capitalize the first letter in a string)
             if test -n "$ZSH_VERSION"; then 
@@ -544,10 +546,10 @@ function yes-edit-no() {
                     nflag='n'
                     color="$ncolor"
                     i=1 
-                    choices=("${choices[$i]}" "${choices[2]}" "${choices[1]}") 
-                    choicesp=("${choicesp[$i]}" "${choicesp[2]}" "${choicesp[1]}")
+                    choices=("${choices[3]}" "${choices[2]}" "${choices[1]}") 
+                    choicesp=("${choicesp[3]}" "${choicesp[2]}" "${choicesp[1]}")
                 fi 
-                if [ -n "$eflag" ] || ([[ $editreplaced == 'y' ]] && [ -n $oflag]); then
+                if [ -n "$eflag" ] || ([[ $editreplaced == 'y' ]] && [ -n "$oflag"]); then
                     color="$ecolor"
                     i=1 
                     #if test -n "$nflag"; then
@@ -588,7 +590,7 @@ function yes-edit-no() {
         vvvvvvvvvv=$(echo "$vvvvvvvvvv" | tr '[:upper:]' '[:lower:]')
 
         if [[ "$vvvvvvvvvv" == 'e' ]]; then
-            ${YES_NO_EDITOR} ${files[*]}
+            eval "${YES_NO_EDITOR} ${files[*]}"
         elif ! test -z "$first" && [[ "$vvvvvvvvvv" == "$first" ]]; then
             ${othercmd} ${files[*]}
         fi
@@ -622,7 +624,8 @@ function yes-edit-no() {
                 [[ "$vvvvvvvvvv" == 'y' ]] || [[ "$vvvvvvvvvv" == 'n' ]] && break
 
                 if [[ "$vvvvvvvvvv" == 'e' ]]; then
-                    ${YES_NO_EDITOR} ${files[*]}
+                    #echo ${files[*]}
+                    eval "${YES_NO_EDITOR} ${files[*]}"
                 elif test -n "$first" && [[ "$vvvvvvvvvv" == "$first" ]]; then
                     ${othercmd} ${files[*]}
                 fi

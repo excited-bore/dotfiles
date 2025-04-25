@@ -302,7 +302,7 @@ function reade() {
         # https://stackoverflow.com/questions/14702148/how-to-fire-a-command-when-a-shell-script-is-interrupted
 
         test -n "$BASH_VERSION" &&
-            trap "history -c; history -r $oldhist; command rm -f $tmpf; eval \"$oldtrps\"; test -n \"$oldtrps\" && eval \"$oldtrps\" || trap - SIGINT; exit 130" SIGINT
+            trap "history -c; history -r $oldhist; command rm -f $tmpf; test -n \"$oldtrps\" && eval \"$oldtrps\" || trap - SIGINT; return" SIGINT
         
 	test -n "$ZSH_VERSION" &&
 	   TRAPINT() {
@@ -321,9 +321,11 @@ function reade() {
         test -n "$ZSH_VERSION" &&
 	    fc -IR $oldhist
 
-        test -n "$oldtrps" &&
-            eval "$oldtrps" ||
+        if test -n "$oldtrps"; then
+            eval "$oldtrps"
+        else
             trap - SIGINT
+        fi
 
         [ -e "$tmpf" ] && command rm -f $tmpf
 

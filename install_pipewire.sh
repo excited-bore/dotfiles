@@ -21,7 +21,7 @@ elif [[ "$distro_base" == "Debian" ]]; then
 fi 
 
 if ! test -f ~/.bash_completion.d/pipewire; then
-    readyn 'GREEN' -p "Install pipewire completions (pw-cli, wpctl)?" comps
+    readyn -p "Install pipewire completions (pw-cli, wpctl)?" comps
     if [[ $comps == 'y' ]]; then
 
         if ! test -f checks/check_completions_dir.sh; then

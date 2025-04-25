@@ -110,15 +110,14 @@ fi
 
 if ! test -d ~/.config/ranger/plugins/devicons2; then
     readyn -p "Install ranger (dev)icons? (ranger plugin at ~/.conf/ranger/plugins)" rplg
-    if [ -z $rplg ] || [[ "y" == $rplg ]]; then
+    if [[ "y" == $rplg ]]; then
         mkdir -p ~/.config/ranger/plugins
         git clone https://github.com/cdump/ranger-devicons2 ~/.config/ranger/plugins/devicons2
         if [[ "$distro" == "Arch" ]]; then
             eval "${pac_ins}" ttf-nerd-fonts-symbols-common ttf-nerd-fonts-symbols ttf-nerd-fonts-symbols-mono
         elif [[ "$distro_base" == "Debian" ]]; then
-
             readyn -p "Install Nerdfonts from binary - no apt? (Special FontIcons)" nrdfnts
-            if [ -z $nrdfnts ] || [[ "Y" == $nrdfnts ]] || [[ $nrdfnts == "y" ]]; then
+            if [[ $nrdfnts == "y" ]]; then
                 if ! test -f ./install_nerdfonts.sh; then
                     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nerdfonts.sh)"
                 else

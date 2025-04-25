@@ -83,7 +83,7 @@ function git-add-ssh-key() {
 git-https-to-ssh(){
     if [ -z $1 ]; then
         echo "You should give up the name of a remote";
-        read -p "Do you want me to look for 'origin'? [Y/n]" resp
+        readyn -p "Do you want me to look for 'origin'?" resp
         if [ -z $resp ]; then
             gitRm=$(git remote get-url origin | sed 's,.*.com/,git@github.com:,g'); git remote -v set-url origin $gitRm;
             git remote get-url origin;
@@ -97,7 +97,7 @@ git-https-to-ssh(){
 git-ssh-to-https(){
     if [ -z $1 ]; then
         echo "You should give up the name of a remote";
-        read -p "Do you want me to look for 'origin'? [Y/n]:" resp
+        readyn -p "Do you want me to look for 'origin'?" resp
         if [[ -z $resp  ||  "y" == $resp ]] ; then
             gitRm=$(git remote get-url origin | sed 's,.*.com:,https://github.com/,g'); git remote -v set-url origin $gitRm;
             git remote get-url origin;

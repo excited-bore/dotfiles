@@ -14,25 +14,25 @@ fi
 
 gitignd=$(mktemp -d)
 globl="local"
-if [ "$1" == 'local' ] || [ 'global' == "$1" ]; then
+if [[ "$1" == 'local' ]] || [[ 'global' == "$1" ]]; then
     git clone https://github.com/github/gitignore $gitignd/gitignore
     globl="$1"
 else
     readyn -p "Download template gitignores, choose and install?" gitgn 
-    if [ "y" == "$gitgn" ]; then
+    if [[ "y" == "$gitgn" ]]; then
         git clone https://github.com/github/gitignore $gitignd/gitignore
-        reade -Q "GREEN" -i "local" -p "Install globally or locally? ( ./ vs ~/.config/git/ignore ) [Local/global]: " "global local" globl
+        reade -Q "GREEN" -i "local global" -p "Install globally or locally? ( ./ vs ~/.config/git/ignore ) [Local/global]: " globl
     fi
-    if [ "$globl" == "global" ]; then
-       if [ ! -d ~/.config/git/ ]; then
+    if [[ "$globl" == "global" ]]; then
+       if ! [ -d ~/.config/git/ ]; then
            mkdir ~/.config/git/ 
         fi
-        if [ ! -f ~/.config/git/ignore ]; then
+        if ! [ -f ~/.config/git/ignore ]; then
            touch ~/.config/git/ignore
         fi
         ignfl=~/.config/git/ignore
     else
-        if [ ! -f .gitignore ]; then
+        if ! [ -f .gitignore ]; then
            touch .gitignore
         fi
         ignfl=.gitignore
@@ -40,12 +40,12 @@ else
 
     (cd $gitignd/gitignore
     gitign=''
-    if [ "$globl" == "global" ]; then
+    if [[ "$globl" == "global" ]]; then
         cd Global
     fi
-    while [ ! "$gitign" == "Stop" ] && [ ! "$gitign" == "AllGlobal" ] ; do
-        if [ "$gitign" == "Toggle" ]; then
-            if [ $(pwd) == $gitignd/gitignore ]; then
+    while ! [[ "$gitign" == "Stop" ]] && ! [[ "$gitign" == "AllGlobal" ]] ; do
+        if [[ "$gitign" == "Toggle" ]]; then
+            if [[ $(pwd) == $gitignd/gitignore ]]; then
                 cd $gitignd/gitignore/Global
                 printf "To global templates\n" 
             else
@@ -64,7 +64,7 @@ else
             fi
         fi
     done
-    if [ "$gitign" == "AllGlobal" ]; then
+    if [[ "$gitign" == "AllGlobal" ]]; then
         echo "" > "$ignfl"
         cd $gitignd/gitignore/Global
         FILES=$PWD/*

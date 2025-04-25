@@ -387,7 +387,7 @@ Condimentum lacinia quis vel eros donec ac. Nibh sed pulvinar proin gravida hend
                         while :; do
                             local style=''
                             style=$(printf "full\nauto\nplain\nchanges\nheader\nheader-filename\nheader-filesize\ngrid\nrule\nnumbers\nsnip\n" | fzf --border --border-label="Bat styles")
-                            stty sane && reade -Q "MAGENTA" -i "o a n" -p "Add to styles/Only use this style/Dont use? (Will retry if add) [A/o/n]: " dltthme
+                            stty sane && reade -Q "MAGENTA" -i "a o n" -p "Add to styles/Only use this style/Dont use? (Will retry if add) [A/o/n]: " dltthme
                             if [[ "$dltthme" == "a" ]]; then
                                 theme=$theme","$style
                             elif [[ "$dltthme" == "o" ]]; then
@@ -1282,7 +1282,7 @@ gitt() {
         fi
     fi
 
-    readyn -p 'Configure git to look for ssh:// instead of https:// when f.ex. pulling/pushing?' -c "test -z $(git config $global --list | grep 'url.ssh://git@github.com/.insteadof=' | awk 'BEGIN { FS = "=" }; {print $2;}')" githttpee
+    readyn -p 'Configure git to look for ssh:// instead of https:// when f.ex. cloning/pulling/pushing?' -c "! [[ $global =~ 'global' ]] && test -z $(git config $global --list | grep 'url.ssh://git@github.com/.insteadof=' | awk 'BEGIN { FS = "=" }; {print $2;}')" githttpee
     if [[ "y" == $githttpee ]]; then
         git config $global url.ssh://git@github.com/.insteadOf https://github.com/
     fi
@@ -1614,11 +1614,14 @@ gitt() {
     fi
 
     if ! type lazygit &>/dev/null; then
-        if ! test -f install_lazygit.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_lazygit.sh)"
-        else
-            . ./install_lazygit.sh
-        fi
+        readyn -p "Install lazygit? (git TUI - terminal user interface)" gitlaz
+        if [[ "y" == "$gitlaz" ]]; then
+            if ! test -f install_lazygit.sh; then
+                eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_lazygit.sh)"
+            else
+                . ./install_lazygit.sh
+            fi
+        fi 
     fi
 
     #local diffpre="n"

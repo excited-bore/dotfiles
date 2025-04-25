@@ -251,7 +251,7 @@ else
     . $SCRIPT_DIR/checks/check_envvar.sh
 fi
 
-if ! test -f $SCRIPT_DIR/checks/check_completions_dir.sh; then
+if ! test -f $SCRIPT_DIR/checks/checkn_completions_dir.sh; then
     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)"
 else
     . $SCRIPT_DIR/checks/check_completions_dir.sh
@@ -381,7 +381,7 @@ unset rmp
 # Bash alias completions
 # v
 
-readyn -p "Install bash completions for aliases in ~/.bash_completion.d?" -c "! test -f ~/.bash_completion.d/complete_alias && test -f /root/.bash_completion.d/complete_alias" compl
+readyn -p "Install bash completions for aliases in ~/.bash_completion.d?" -c "! test -f ~/.bash_completion.d/complete_alias" compl
 if [[ "y" == "$compl" ]]; then
     if ! test -f $SCRIPT_DIR/install_bashalias_completions.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bashalias_completions.sh)"
@@ -420,9 +420,41 @@ xresources_r() {
 }
 xresources() {
     cp -fv $xterm ~/.Xresources
-    yes-edit-no -f xresources_r -g "$xterm" -p "Install .Xresources at /root/?" -e -Q "RED"
-}
+    yes-edit-no -f xresources_r -g "$xterm" -p "Install .Xresources at /root/?" -e -n -Q "RED"
+}	
 yes-edit-no -f xresources -g "$xterm" -p "Install .Xresources at ~/? (Xterm configuration)" -e -Q "YELLOW"
+
+# Rlwrap scripts
+
+#readyn -p "Install reade, readyn and yes-edit-no?" -c 'test -f ~/.bash_aliases.d/reade' insrde
+#if test "$insrde" == 'y'; then
+#    if ! test -f install_reade_readyn.sh; then
+#         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_reade_readyn.sh)"
+#    else
+#        ./install_reade_readyn.sh
+#    fi
+#fi
+#unset insrde
+
+# Aliases
+
+readyn -p "Install bash aliases and other config?" scripts
+if [[ "y" == "$scripts" ]]; then
+
+    if ! test -f $SCRIPT_DIR/checks/check_aliases_dir.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)"
+    else
+        . $SCRIPT_DIR/checks/check_aliases_dir.sh
+    fi
+    if ! test -f $SCRIPT_DIR/install_aliases.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/install_aliases.sh)"
+    else
+        . $SCRIPT_DIR/install_aliases.sh
+    fi
+fi
+
+test -n "$BASH_VERSION" && source ~/.bashrc &>/dev/null
+test -n "$ZSH_VERSION" && source ~/.zshrc &>/dev/null
 
 # Shell-keybinds
 
@@ -471,7 +503,7 @@ shell-keybinds() {
 
     printf "${cyan}You can always switch between vi/emacs mode with ${CYAN}Ctrl-o${normal}\n"
 
-    readyn -Y "YELLOW" -p "Startup in vi-mode instead of emacs mode? (might cause issues with pasteing)" vimde
+    readyn -Y "MAGENTA" -p "Startup in vi-mode instead of emacs mode? (might cause issues with pasteing)" vimde
 
     sed -i "s|^set editing-mode .*|#set editing-mode vi|g" $binds
 
@@ -499,7 +531,7 @@ shell-keybinds() {
     cp -f $binds2 ~/.keybinds
     cp -f $binds ~/
 
-    if test -f ~/.bashrc && ! grep -q '\[ -f ~/.keybinds \]' ~/.bashrc; then
+    if test -f ~/.bashrc && ! grep -q '~/.keybinds' ~/.bashrc; then
         if grep -q '\[ -f ~/.bash_aliases \]' ~/.bashrc; then
             sed -i 's|\(\[ -f \~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\1\n\n\[ -f \~/.keybinds \] \&\& source \~/.keybinds\n|g' ~/.bashrc
         else
@@ -515,38 +547,6 @@ shell-keybinds() {
 }
 
 yes-edit-no -f shell-keybinds -g "$binds $binds2 $binds1" -p "Install .inputrc and keybinds.bash at ~/ and ~/.keybinds.d/? (keybinds configuration)"
-
-# Rlwrap scripts
-
-#readyn -p "Install reade, readyn and yes-edit-no?" -c 'test -f ~/.bash_aliases.d/reade' insrde
-#if test "$insrde" == 'y'; then
-#    if ! test -f install_reade_readyn.sh; then
-#         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_reade_readyn.sh)"
-#    else
-#        ./install_reade_readyn.sh
-#    fi
-#fi
-#unset insrde
-
-# Aliases
-
-readyn -p "Install bash aliases and other config?" scripts
-if [[ "y" == "$scripts" ]]; then
-
-    if ! test -f $SCRIPT_DIR/checks/check_aliases_dir.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)"
-    else
-        . $SCRIPT_DIR/checks/check_aliases_dir.sh
-    fi
-    if ! test -f $SCRIPT_DIR/install_aliases.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/install_aliases.sh)"
-    else
-        . $SCRIPT_DIR/install_aliases.sh
-    fi
-fi
-
-test -n "$BASH_VERSION" && source ~/.bashrc &>/dev/null
-test -n "$ZSH_VERSION" && source ~/.zshrc &>/dev/null
 
 #get-script-dir $0 SCRIPT_DIR
 SCRIPT_DIR=$(pwd)
@@ -565,7 +565,7 @@ unset bash_preexec
 
 # Pipewire (better sound)
 
-readyn -p "Install and configure pipewire? (sound system - pulseaudio replacement)" -c '! type wireplumber &> /dev/null && test -f ~/.config/pipewire/pipewire-pulse.conf.d/switch-on-connect.conf;' pipew
+readyn -p "Install and configure pipewire? (sound system - pulseaudio replacement)" -c '! type wireplumber &> /dev/null || ! test -f ~/.config/pipewire/pipewire-pulse.conf.d/switch-on-connect.conf;' pipew
 if [[ "$pipew" == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_pipewire.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipewire.sh)"
@@ -590,7 +590,7 @@ unset moar
 
 # Nano (Editor)
 
-readyn -p "Install nano + config? (Simple terminal editor)" -c "! type nano &> /dev/null && test -f ~/.nanorc &> /dev/null" nno
+readyn -p "Install nano + config? (Simple terminal editor)" -c "! type nano &> /dev/null || ! test -f ~/.nanorc &> /dev/null" nno
 
 if [[ "y" == "$nno" ]]; then
     if ! test -f $SCRIPT_DIR/install_nano.sh; then
@@ -739,7 +739,7 @@ unset bat
 
 # Neofetch
 
-readyn -p "Install neofetch/fastfetch/screenFetch)? (Terminal taskmanager - system information tool)" -c "! type neofetch &> /dev/null && ! type fastfetch &> /dev/null && ! type screenfetch &> /dev/null" tojump
+readyn -p "Install neofetch/fastfetch/screenFetch)? (Terminal taskmanager - system information tool)" -c "! type fastfetch &> /dev/null && ! type screenfetch &> /dev/null" tojump
 
 if [[ "$tojump" == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_neofetch_onefetch.sh; then
@@ -969,7 +969,7 @@ fi
 echo "Next $(tput setaf 1)sudo$(tput sgr0) will check whether root account is enabled"
 if ! [[ "$(sudo passwd -S | awk '{print $2}')" == 'L' ]]; then
     printf "${CYAN}One more thing before finishing off${normal}: the ${RED}root${normal} account is still enabled.\n${RED1}This can be considered a security risk!!${normal}\n"
-    readyn -Y 'YELLOW' -p 'Disable root account? (Enable again by giving up a password with \\"sudo passwd root\\")' root_dis
+    readyn -n -p 'Disable root account? (Enable again by giving up a password with \\"sudo passwd root\\")' root_dis
     if [[ "$root_dis" == 'y' ]]; then
         sudo passwd -l root
     fi
@@ -979,9 +979,9 @@ fi
 echo "${cyan}${bold}Source .bashrc 'source ~/.bashrc' and you can check all aliases with 'alias'"
 echo "${green}${bold}Done!${normal}"
 readyn -p 'List all aliases?' allis
-[[ "$allis" == 'y' ]] && (
+if [[ "$allis" == 'y' ]]; then
     [ -n "$BASH_VERSION" ] && set -o posix
     [ -n "$ZSH_VERSION" ] && set -o posixaliases
-    alias
-) | $PAGER
+    alias| $PAGER
+fi
 unset allis
