@@ -12,9 +12,15 @@ if [ ! -d ~/.bash_aliases.d/ ]; then
     mkdir ~/.bash_aliases.d/
 fi
 
-if ! grep -q ".bash_aliases" ~/.bashrc; then
-    echo '[ -f ~/.bash_aliases ] && source ~/.bash_aliases' >> ~/.bashrc
+
+if test -f ~/.bashrc && ! grep -q '~/.bash_aliases' ~/.bashrc; then
+    if grep -q '\[ -f ~/.keybinds \]' ~/.bashrc; then
+        sed -i 's|\(\[ -f \~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\1\n\n\[ -f \~/.keybinds \] \&\& source \~/.keybinds\n|g' ~/.bashrc
+    else
+        echo '[ -f ~/.bash_aliases ] && source ~/.bash_aliases' >>~/.bashrc
+    fi
 fi
+
 
 #if ! grep -q "shopt -s expand_aliases" ~/.bashrc; then
 #    echo "shopt -s expand_aliases" >> ~/.bashrc
@@ -30,11 +36,16 @@ fi
 #fi
 
 
-if ! sudo test -f /root/.bash_aliases; then
-    echo "Next $(tput setaf 1)sudo$(tput sgr0) will install '.bash_aliases.d' in /root and source it with '/root/.bash_aliases' "
-    sudo cp -fv ~/.bash_aliases /root/
-    if ! sudo grep -q ".bash_aliases" /root/.bashrc; then
-        printf "[ -f ~/.bash_aliases ] && source ~/.bash_aliases \n" | sudo tee -a /root/.bashrc > /dev/null
+echo "Next $(tput setaf 1)sudo$(tput sgr0) will install '.bash_aliases.d' in /root and source it with '/root/.bash_aliases' in /root/.bashrc"
+sudo cp -fv ~/.bash_aliases /root/
+if ! sudo grep -q ".bash_aliases" /root/.bashrc; then
+    printf "[ -f ~/.bash_aliases ] && source ~/.bash_aliases \n" | sudo tee -a /root/.bashrc > /dev/null
+fi
+if sudo test -f /root/.bashrc && ! sudo grep -q '~/.bash_aliases' /root/.bashrc; then
+    if sudo grep -q '\[ -f ~/.keybinds \]' /root/.bashrc; then
+        sudo sed -i 's|\(\[ -f \~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\1\n\n\[ -f \~/.keybinds \] \&\& source \~/.keybinds\n|g' /root/.bashrc
+    else
+        printf '[ -f ~/.bash_aliases ] && source ~/.bash_aliases\n' | sudo tee -a ~/.bashrc &> /dev/null
     fi
 fi
 

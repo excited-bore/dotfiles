@@ -424,6 +424,38 @@ xresources() {
 }	
 yes-edit-no -f xresources -g "$xterm" -p "Install .Xresources at ~/? (Xterm configuration)" -e -Q "YELLOW"
 
+# Rlwrap scripts
+
+#readyn -p "Install reade, readyn and yes-edit-no?" -c 'test -f ~/.bash_aliases.d/reade' insrde
+#if test "$insrde" == 'y'; then
+#    if ! test -f install_reade_readyn.sh; then
+#         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_reade_readyn.sh)"
+#    else
+#        ./install_reade_readyn.sh
+#    fi
+#fi
+#unset insrde
+
+# Aliases
+
+readyn -p "Install bash aliases and other config?" scripts
+if [[ "y" == "$scripts" ]]; then
+
+    if ! test -f $SCRIPT_DIR/checks/check_aliases_dir.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)"
+    else
+        . $SCRIPT_DIR/checks/check_aliases_dir.sh
+    fi
+    if ! test -f $SCRIPT_DIR/install_aliases.sh; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/install_aliases.sh)"
+    else
+        . $SCRIPT_DIR/install_aliases.sh
+    fi
+fi
+
+test -n "$BASH_VERSION" && source ~/.bashrc &>/dev/null
+test -n "$ZSH_VERSION" && source ~/.zshrc &>/dev/null
+
 # Shell-keybinds
 
 binds=$SCRIPT_DIR/keybinds/.inputrc
@@ -471,7 +503,7 @@ shell-keybinds() {
 
     printf "${cyan}You can always switch between vi/emacs mode with ${CYAN}Ctrl-o${normal}\n"
 
-    readyn -Y "YELLOW" -p "Startup in vi-mode instead of emacs mode? (might cause issues with pasteing)" vimde
+    readyn -Y "MAGENTA" -p "Startup in vi-mode instead of emacs mode? (might cause issues with pasteing)" vimde
 
     sed -i "s|^set editing-mode .*|#set editing-mode vi|g" $binds
 
@@ -499,7 +531,7 @@ shell-keybinds() {
     cp -f $binds2 ~/.keybinds
     cp -f $binds ~/
 
-    if test -f ~/.bashrc && ! grep -q '\[ -f ~/.keybinds \]' ~/.bashrc; then
+    if test -f ~/.bashrc && ! grep -q '~/.keybinds' ~/.bashrc; then
         if grep -q '\[ -f ~/.bash_aliases \]' ~/.bashrc; then
             sed -i 's|\(\[ -f \~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\1\n\n\[ -f \~/.keybinds \] \&\& source \~/.keybinds\n|g' ~/.bashrc
         else
@@ -515,38 +547,6 @@ shell-keybinds() {
 }
 
 yes-edit-no -f shell-keybinds -g "$binds $binds2 $binds1" -p "Install .inputrc and keybinds.bash at ~/ and ~/.keybinds.d/? (keybinds configuration)"
-
-# Rlwrap scripts
-
-#readyn -p "Install reade, readyn and yes-edit-no?" -c 'test -f ~/.bash_aliases.d/reade' insrde
-#if test "$insrde" == 'y'; then
-#    if ! test -f install_reade_readyn.sh; then
-#         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_reade_readyn.sh)"
-#    else
-#        ./install_reade_readyn.sh
-#    fi
-#fi
-#unset insrde
-
-# Aliases
-
-readyn -p "Install bash aliases and other config?" scripts
-if [[ "y" == "$scripts" ]]; then
-
-    if ! test -f $SCRIPT_DIR/checks/check_aliases_dir.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)"
-    else
-        . $SCRIPT_DIR/checks/check_aliases_dir.sh
-    fi
-    if ! test -f $SCRIPT_DIR/install_aliases.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/install_aliases.sh)"
-    else
-        . $SCRIPT_DIR/install_aliases.sh
-    fi
-fi
-
-test -n "$BASH_VERSION" && source ~/.bashrc &>/dev/null
-test -n "$ZSH_VERSION" && source ~/.zshrc &>/dev/null
 
 #get-script-dir $0 SCRIPT_DIR
 SCRIPT_DIR=$(pwd)
