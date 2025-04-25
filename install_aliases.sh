@@ -449,4 +449,6 @@ if test -d /root/; then
     fi
 fi
 
-source ~/.bashrc &>/dev/null
+test -n "$BASH_VERSION" && source ~/.bashrc &>/dev/null
+test -n "$ZSH_VERSION" && source ~/.zshrc &>/dev/null
+

@@ -540,7 +540,7 @@ function yes-edit-no() {
                     i=1 
                     color="$ycolor"
                 fi 
-                if [ -n "$nflag" ] || (test -n "$condition" && ! eval "${condition}"); then 
+                if [ -n "$nflag" ] || (test -n "$condition" && ! eval "$condition"); then 
                     nflag='n'
                     color="$ncolor"
                     i=1 
@@ -562,8 +562,8 @@ function yes-edit-no() {
                     i=4 
                     color="$ocolor"
                 fi 
-                    
-                local fst="$(tr '[:lower:]' '[:upper:]' <<<${choicesp[$indice]:0:1})${choicesp[$indice]:1}" 
+                   
+                local fst="$(sed 's/\([[:alpha:]](\)/\U\1/' <<<${choicesp[$i]})" 
                 prmpt1=" [${bold}$fst" 
                 choicesp[$i]=() 
                 for i in "${choicesp[@]}"; do

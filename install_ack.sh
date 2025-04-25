@@ -28,5 +28,5 @@ if ! type ack &> /dev/null; then
         unset b 
     fi
 fi
-
-type ack &> /dev/null && ack --help
+test -z "$PAGER" && PAGER=less
+type ack &> /dev/null && ack --help | $PAGER

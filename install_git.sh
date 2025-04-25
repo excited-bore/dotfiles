@@ -473,7 +473,7 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                             theme=$(echo "$theme" | awk '{$1=""; print $0;}')
                             delta --syntax-theme "${theme:1}" $TMPDIR/dtest1 $TMPDIR/dtest2
                             stty sane && readyn -N "MAGENTA" -n -p "Set as syntax theme? (Will retry if no)" dltthme
-                            if test "$dltthme" == "n"; then
+                            if [[ "$dltthme" == "n" ]]; then
                                 theme=''
                             fi
                         done
@@ -549,7 +549,7 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                 #    prompt=""
                 #fi
 
-                readyn -Y "CYAN" -p "$pager is a non-pager tool, but allows for a configurable pager. Set manually?" pipepager
+                readyn -Y "CYAN" -p "$pager is a diff tool that allows for a configurable pager. Configure?" pipepager
                 if [[ "$pipepager" == 'y' ]]; then
                     readyn -n -N "GREEN" -p "Turn off pager?" pipepager
                     if [[ "$pipepager" == 'n' ]]; then
@@ -1583,7 +1583,7 @@ gitt() {
         fi
     fi
 
-    readyn -Y "CYAN" -p "Set mergetool prompt?" -c "test -z $(git config $global --list | grep 'mergetool.prompt' | awk 'BEGIN { FS = "=" } ;{print $2;}')" conflict
+    readyn -Y "CYAN" -p "Set mergetool prompt?" -c "test -z $(git config $global --list | grep 'mergetool.prompt' | awk 'BEGIN { FS = "=" } ;{print $2;}')" Configure    
     if [[ $conflict == "y" ]]; then
         reade -Q "GREEN" -i "false true" -p "Prompt?: " prompt
         if ! test -z "$cstyle"; then

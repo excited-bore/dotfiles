@@ -13,7 +13,7 @@ else
     . ./checks/check_all.sh
 fi
 
-#get-script-dir $0 SCRIPT_DIR 
+#get-script-dir $0 SCRIPT_DIR
 SCRIPT_DIR=$(pwd)
 
 if ! type rlwrap &>/dev/null; then
@@ -68,7 +68,7 @@ if test -d /etc/modprobe.d && ! test -f /etc/modprobe.d/nobeep.conf; then
 fi
 unset sym1 sym2 sym3 beep
 
-#get-script-dir $0 SCRIPT_DIR 
+#get-script-dir $0 SCRIPT_DIR
 SCRIPT_DIR=$(pwd)
 
 # Environment variables
@@ -242,7 +242,7 @@ if ! sudo test -f /etc/polkit/49-nopasswd_global.pkla && ! sudo test -f /etc/pol
     unset plkit
 fi
 
-#get-script-dir $0 SCRIPT_DIR 
+#get-script-dir $0 SCRIPT_DIR
 SCRIPT_DIR=$(pwd)
 
 if ! test -f $SCRIPT_DIR/checks/check_envvar.sh; then
@@ -275,7 +275,7 @@ fi
 
 #if ! type flatpak &> /dev/null; then
 #printf "%s\n" "${blue}No flatpak detected. (Independent package manager from Red Hat)${normal}"
-readyn -p "Install (or just configure) Flatpak?" insflpk
+readyn -p "Install (or just configure) Flatpak?" -c "test -z \"$FLATPAK\"" insflpk
 if [[ "y" == "$insflpk" ]]; then
     if ! test -f $SCRIPT_DIR/install_flatpak.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_flatpak.sh)"
@@ -403,7 +403,7 @@ if [[ "y" == "$pycomp" ]]; then
 fi
 unset pycomp
 
-#get-script-dir $0 SCRIPT_DIR 
+#get-script-dir $0 SCRIPT_DIR
 SCRIPT_DIR=$(pwd)
 
 # Xresources
@@ -511,7 +511,7 @@ shell-keybinds() {
         sed -i 's|#export INPUTRC.*|export INPUTRC=~/.inputrc|g' ~/.environment.env
     fi
     unset vimde vivisual xterm
-    yes-edit-no -Y "YELLOW" -f shell-keybinds_r -g "$binds $binds2 $binds1" -p "Install .inputrc and keybinds.bash at /root/ and /root/.keybinds.d/?" 
+    yes-edit-no -Y "YELLOW" -f shell-keybinds_r -g "$binds $binds2 $binds1" -p "Install .inputrc and keybinds.bash at /root/ and /root/.keybinds.d/?"
 }
 
 yes-edit-no -f shell-keybinds -g "$binds $binds2 $binds1" -p "Install .inputrc and keybinds.bash at ~/ and ~/.keybinds.d/? (keybinds configuration)"
@@ -545,10 +545,10 @@ if [[ "y" == "$scripts" ]]; then
     fi
 fi
 
-test -n $BASH_VERSION && source ~/.bashrc &>/dev/null
-test -n $ZSH_VERSION && source ~/.zshrc &>/dev/null
+test -n "$BASH_VERSION" && source ~/.bashrc &>/dev/null
+test -n "$ZSH_VERSION" && source ~/.zshrc &>/dev/null
 
-#get-script-dir $0 SCRIPT_DIR 
+#get-script-dir $0 SCRIPT_DIR
 SCRIPT_DIR=$(pwd)
 
 # Bash Preexec
@@ -764,7 +764,7 @@ unset tojump
 
 # Autojump
 
-readyn -p "Install autojump? (jump to folders using 'bookmarks' - j_ )" -n -c "! type autojump &> /dev/null" tojump
+readyn -p "Install autojump? (jump to folders using 'bookmarks' - j_ )" -c "! type autojump &> /dev/null" tojump
 if [[ "$tojump" == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_autojump.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_autojump.sh)"
@@ -955,7 +955,7 @@ if grep -q '~/.bash_preexec.sh' ~/.bash_profile && ! [[ "$(tail -1 ~/.bashrc)" =
 fi
 
 if test -d /root/; then
-    if sudo grep -q '~/.bash_preexec.sh' /root/.bash_profile &&  ! [[ "$(sudo tail -1 /root/.bash_profile)" =~ '~/.bash_preexec' ]]; then
+    if sudo grep -q '~/.bash_preexec.sh' /root/.bash_profile && ! [[ "$(sudo tail -1 /root/.bash_profile)" =~ '~/.bash_preexec' ]]; then
         sudo sed -i 'r/[ -f ~/.bash_preexec.sh ] && source ~/.bash_preexec.sh' /root/.bash_profile
         printf "\n[ -f ~/.bash_preexec.sh ] && source ~/.bash_preexec.sh\n" | sudo tee -a /root/.bash_profile
     fi
@@ -965,7 +965,6 @@ if test -d /root/; then
         printf "\n[ -f ~/.bash_preexec.sh ] && source ~/.bash_preexec.sh\n" | sudo tee -a /root/.bashrc
     fi
 fi
-
 
 echo "Next $(tput setaf 1)sudo$(tput sgr0) will check whether root account is enabled"
 if ! [[ "$(sudo passwd -S | awk '{print $2}')" == 'L' ]]; then
