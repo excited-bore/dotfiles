@@ -237,9 +237,9 @@ pipewire_r(){
 pipewiresh(){
     cp -fv $file ~/.bash_aliases.d/;
     cp -fv $file1 ~/.bash_completion.d/;
-    yes-no-edit -f pipewire_r -g "$file $file1" -p "Install pipewire aliases at /root/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)?" -i "y" -Q "GREEN"
+    yes-edit-no -f pipewire_r -g "$file $file1" -p "Install pipewire aliases at /root/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)?"
 }
-yes-no-edit -f pipewiresh -g "$file $file1" -p "Install pipewire aliases at ~/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)? " -i "y" -Q "GREEN"
+yes-edit-no -f pipewiresh -g "$file $file1" -p "Install pipewire aliases at ~/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)?"
 
 
 if type systemctl &> /dev/null; then

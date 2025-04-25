@@ -90,11 +90,11 @@ if ! type readyn &>/dev/null; then
     fi
 fi
 
-if ! type yes-no-edit &>/dev/null; then
-    if test -f rlwrap-scripts/yes-no-edit; then
-        . ./rlwrap-scripts/yes-no-edit 1>/dev/null
+if ! type yes-edit-no &>/dev/null; then
+    if test -f rlwrap-scripts/yes-edit-no; then
+        . ./rlwrap-scripts/yes-edit-no 1>/dev/null
     else
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/yes-no-edit)" &>/dev/null
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/yes-edit-no)" &>/dev/null
     fi
 fi
 

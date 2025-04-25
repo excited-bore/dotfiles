@@ -250,7 +250,7 @@ environment-variables() {
     fi 
 
     #if ! grep -q '.environment.env' /root/.bashrc && ! grep -q '.environment.env' $PROFILE_R; then
-    yes-no-edit -f environment-variables_r -g "$pathvr" -p "Install .environment.env in /root/?" -i "e" -Q "YELLOW"
+    yes-edit-no -f environment-variables_r -g "$pathvr" -p "Install .environment.env in /root/?" -e -Q "YELLOW"
     #fi
 }
 
@@ -294,7 +294,7 @@ if [[ "$envvars" == "y" ]] && [[ "$1" == 'n' ]]; then
     sed 's|#export TMPDIR|export TMPDIR|' -i $pathvr
 
     #if ! grep -q '.environment.env' ~/.bashrc && ! grep -q '.environment.env' $PROFILE; then
-    yes-no-edit -f environment-variables -g "$pathvr" -p "Install .environment.env in $HOME?" -i "e" -Q "GREEN"
+    yes-edit-no -f environment-variables -g "$pathvr" -p "Install .environment.env in $HOME?" -e 
     printf "It's recommended to logout and login again to notice a change for ${MAGENTA}.profile${normal} and any ${CYAN}.*shell*_profiles\n${normal}"
     #fi
 
@@ -316,7 +316,7 @@ elif [[ "$envvars" == "y" ]]; then
     sed 's|#export TMPDIR|export TMPDIR|' -i $pathvr
 
     if ! grep -q '.environment.env' ~/.bashrc && ! grep -q '.environment.env' $PROFILE; then
-        yes-no-edit -f environment-variables -g "$pathvr" -p "Install .environment.env in $HOME?" -i "e" -Q "GREEN"
+        yes-edit-no -f environment-variables -g "$pathvr" -p "Install .environment.env in $HOME?" -e
         printf "It's recommended to logout and login again to notice a change for ${MAGENTA}.profile${normal} and any ${CYAN}.*shell*_profiles\n${normal}"
     fi
 
@@ -675,7 +675,7 @@ elif [[ "$envvars" == "y" ]]; then
         sed -i 's/^#export LIBVIRT_DEFAULT_URI/export LIBVIRT_DEFAULT_URI/' $pathvr
     fi
 
-    yes-no-edit -f environment-variables -g "$pathvr" -p "Install .environment.env in $HOME?" -i "e" -Q "GREEN"
+    yes-edit-no -f environment-variables -g "$pathvr" -p "Install .environment.env in $HOME?" -e 
     printf "It's recommended to logout and login again to notice a change for ${MAGENTA}.profile${normal} and any ${CYAN}.*shell*_profiles\n${normal}"
 
 fi

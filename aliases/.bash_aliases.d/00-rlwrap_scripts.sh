@@ -127,13 +127,13 @@ if ! type readyn &> /dev/null; then
     fi
 fi
 
-if ! type yes-no-edit &> /dev/null; then
-    if test -f $SCRIPT_DIR/../rlwrap-scripts/yes-no-edit; then
-        . $SCRIPT_DIR/../rlwrap-scripts/yes-no-edit 1> /dev/null
-    elif test -f $SCRIPT_DIR/03-yes-no-edit.sh; then
-        . $SCRIPT_DIR/03-yes-no-edit.sh 1> /dev/null
+if ! type yes-edit-no &> /dev/null; then
+    if test -f $SCRIPT_DIR/../rlwrap-scripts/yes-edit-no; then
+        . $SCRIPT_DIR/../rlwrap-scripts/yes-edit-no 1> /dev/null
+    elif test -f $SCRIPT_DIR/03-yes-edit-no.sh; then
+        . $SCRIPT_DIR/03-yes-edit-no.sh 1> /dev/null
     else
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/yes-no-edit)" &> /dev/null 
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/yes-edit-no)" &> /dev/null 
     fi
 fi
 

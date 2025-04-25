@@ -420,9 +420,9 @@ function instvim() {
     if [[ $vimrc == 'y' ]]; then
         ln -s ~/.config/nvim/init.vim ~/.vimrc
     fi
-    yes-no-edit -f instvim_r -g "$dir/init.vim $dir/init.lua.vim $dir/plug_lazy_adapter.vim" -p "Install (neo)vim readconfigs at /root/.config/nvim/ ? (init.vim, init.lua, etc..)" -i "e" -Q "YELLOW"
+    yes-edit-no -f instvim_r -g "$dir/init.vim $dir/init.lua.vim $dir/plug_lazy_adapter.vim" -p "Install (neo)vim readconfigs at /root/.config/nvim/ ? (init.vim, init.lua, etc..)" -e -Q "YELLOW"
 }
-yes-no-edit -f instvim -g "$dir/init.vim $dir/init.lua.vim $dir/plug_lazy_adapter.vim" -p "Install (neo)vim readconfigs at ~/.config/nvim/ ? (init.vim, init.lua, etc..)" -i "e" -Q "GREEN"
+yes-edit-no -f instvim -g "$dir/init.vim $dir/init.lua.vim $dir/plug_lazy_adapter.vim" -p "Install (neo)vim readconfigs at ~/.config/nvim/ ? (init.vim, init.lua, etc..)" -e
 
 unset dir tmpdir tmpfile
 
@@ -448,9 +448,9 @@ vimsh_r() {
 vimsh() {
     cp -fv $file ~/.bash_aliases.d/
     cp -fv $file1 ~/.bash_completion.d/
-    yes-no-edit -f vimsh_r -g "$dir/vim_nvim.sh $dir1/vim_nvim" -p "Install vim aliases at /root/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)?" -i "y" -Q "GREEN"
+    yes-edit-no -f vimsh_r -g "$dir/vim_nvim.sh $dir1/vim_nvim" -p "Install vim aliases at /root/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)?" 
 }
-yes-no-edit -f vimsh -g "$dir/vim_nvim.sh $dir1/vim_nvim" -p "Install vim aliases at ~/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)?" -i "y" -Q "GREEN"
+yes-edit-no -f vimsh -g "$dir/vim_nvim.sh $dir1/vim_nvim" -p "Install vim aliases at ~/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)?"
 
 if ! type nvimpager &>/dev/null; then
     readyn -n -p "Install nvimpager?" vimrc

@@ -23,7 +23,7 @@ if sudo test -d /etc/polkit-1/localauthority/50-local.d/ && ! sudo test -f /etc/
     function localauth_conf(){
         sudo cp -bfv $file /etc/polkit-1/localauthority/50-local.d/90-nopasswd_global.pkla
     } 
-    yes-no-edit -f localauth_conf -g "$file" -p "Install $file at /etc/polkit-1/localauthority/50-local.d/?" -i "y" -Q "GREEN"; 
+    yes-edit-no -f localauth_conf -g "$file" -p "Install $file at /etc/polkit-1/localauthority/50-local.d/?"  
     unset file 
 fi
 
@@ -37,7 +37,7 @@ if sudo test -d /etc/polkit-1/localauthority.conf.d/ && ! sudo test -f /etc/polk
     function localauth_conf_d(){
         sudo cp -fbv $file /etc/polkit-1/localauthority.conf.d/90-nopasswd_global.conf
     } 
-    yes-no-edit -f localauth_conf_d -g "$file" -p "Install $file at /etc/polkit-1/localauthority.conf.d?" -i "y" -Q "GREEN"; 
+    yes-edit-no -f localauth_conf_d -g "$file" -p "Install $file at /etc/polkit-1/localauthority.conf.d?" 
     unset file 
 fi
 
@@ -51,6 +51,6 @@ if sudo test -d /etc/polkit-1/rules.d/ && ! sudo test -f /etc/polkit-1/rules.d/9
     function rules_conf(){
         sudo cp -fbv $file /etc/polkit-1/rules.d/90-nopasswd_global.rules
     } 
-    yes-no-edit -f rules_conf -g "$file" -p "Install $file at/etc/polkit-1/rules.d/?" -i "y" -Q "GREEN"; 
+    yes-edit-no -f rules_conf -g "$file" -p "Install $file at/etc/polkit-1/rules.d/?"  
     unset file 
 fi

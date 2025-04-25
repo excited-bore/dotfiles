@@ -63,7 +63,7 @@ sed -i 's|^set -g @plugin|#set -g @plugin|g' $file
 sed -i 's|^run '\''~/.tmux/plugins/tpm/tpm'\''|#run '\''~/.tmux/plugins/tpm/tpm'\''|g' $file
 sed -i 's|^set -g @continuum-restore '\''on'\''|#set -g @continuum-restore '\''on'\''|g' $file
 
-yes-no-edit -p "Install tmux.conf? (tmux conf at ~/.tmux.conf)" -g '$file' -i 'y' -Q 'GREEN' tmuxc
+yes-edit-no -p "Install tmux.conf? (tmux conf at ~/.tmux.conf)" -g '$file' tmuxc
 if [[ "$tmuxc" == "y" ]]; then
     cp -bfv $file ~/
     if test -f $file~ && type gio &>/dev/null; then
