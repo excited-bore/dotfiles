@@ -1,50 +1,35 @@
-if ! test -f checks/check_system.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
-else
-    . ./checks/check_system.sh
-fi
-if ! test -f checks/check_rlwrap.sh; then
-    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_rlwrap.sh)" 
-else
-    . ./checks/check_rlwrap.sh
-fi
+#!/bin/bash
 
-if ! type update-system &> /dev/null; then
-    if ! test -f aliases/.bash_aliases.d/update-system.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)" 
+if ! test -f checks/check_all.sh; then
+    if type curl &>/dev/null; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        . ./aliases/.bash_aliases.d/update-system.sh
+        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
+        return 1 || exit 1
     fi
-fi
-
-if test -z $SYSTEM_UPDATED; then
-    readyn -Y "CYAN" -p "Update system?" updatesysm
-    if test $updatesysm == "y"; then
-        update-system                     
-    fi
+else
+    . ./checks/check_all.sh
 fi
 
 if ! test -f install_docker.sh; then
-    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_docker.sh)" 
+    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_docker.sh)
 else
     . ./install_docker.sh
 fi
 
-if test $distro == "Arch" || test $distro == "Manjaro"; then
-    eval "$pac_ins docker-compose"
-elif [ $distro_base == "Debian" ]; then
+if test -n "$pac_ins"; then
     eval "$pac_ins docker-compose"
 fi
 
 last=$(pwd)
 
-read -p "This script will create directory 'Applications/docker' in homefolder for pi-hole files. Ok? [Y/n]:" apps
-if [ -z $apps ] || [ "y" == $apps ] || [ "Y" == $apps ]; then
+readyn -p "This script will create directory 'Applications/docker' in homefolder for pi-hole files. Ok?" apps
+if [[ "y" == $apps ]]; then
     mkdir ~/Applications/docker
     cd ~/Applications/docker
-else 
-    while [ ! -d $dir ]; do 
-        read -e -p "Where to install then? Give up dir: " dir
+else
+    while ! [ -d $dir ]; do
+        reade -p "Where to install then? Give up dir: " -e dir
     done
     cd $dir
 fi
@@ -56,12 +41,12 @@ cd ./docker-pi-hole
 readecomp=("Africa/Abidjan" "Africa/Accra" "Africa/Addis_Ababa " "America/Chicago" "Europe/Brussels" "Europe/London" "Europe/Zurich")
 Tz=$(rlwrap -S 'Timezone? : ' -b " " -f <(echo "${readecomp[@]}") -o cat)
 
-read -p "Use pi-hole as DHCP server? (Not needed if running only local) [Y/n]: " dhcp
+readyn -p "Use pi-hole as DHCP server? (Not needed if running only local)" dhcp
 
 while [ -z $pswd ]; do
     read -s -p "Password?: " pswd
 done
-echo ""
+echo
 
 rply=$(hostname -i | cut -d ' ' -f1)
 
@@ -74,7 +59,7 @@ fi
 
 cp examples/docker-compose.yml.example docker-compose.yml
 sed -i "s,\(  - \"67:67/udp\"\),#\1,g" docker-compose.yml
-if [ -z $dhcp ] || [ "y" == $dhcp ] || [ "Y" == $dhcp ]; then
+if [[ "y" == $dhcp ]]; then
     sed -i "s,\(# For DHCP it is recommended to remove these ports and instead add: network_mode: \"host\"\),\1\n\tnetwork_mode: \"host\",g" docker-compose.yml
     sed -i "s,\(  - \"53:53/tcp\"\),#\1,g" docker-compose.yml
     sed -i "s,\(  - \"53:53/udp\"\),#\1,g" docker-compose.yml
@@ -88,15 +73,16 @@ sed -i "s,# WEBPASSWORD: 'set a secure password here or it will be random',WEBPA
 
 echo "Showing configuration before start"
 sleep 5
+test -z $EDITOR && EDITOR=/usr/bin/nano
 $EDITOR docker-compose.yml
 
 sudo systemctl start docker
 docker-compose up -d
 
-read -p "Enable docker on startup? [Y/n]: " nable
-if [ -z $nable ] || [ "y" == $nable ] || [ "Y" == $nable ]; then
+readyn -p "Enable docker on startup?" nable
+if [[ "y" == $nable ]]; then
     sudo systemctl enable --now docker
-fi    
+fi
 echo "Done!"
 
 cd $last

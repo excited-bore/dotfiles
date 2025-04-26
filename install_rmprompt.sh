@@ -1,14 +1,17 @@
-#if ! test -f checks/check_system.sh; then
-#     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
-#else
-#    . checks/check_system.sh
-#fi
-#
-#if ! type reade &> /dev/null; then
-#     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
-#else
-#    . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
-#fi
+#!/bin/bash
+
+SYSTEM_UPDATED='true'
+
+if ! test -f checks/check_all.sh; then
+    if type curl &>/dev/null; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
+    else
+        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
+        return 1 || exit 1
+    fi
+else
+    . ./checks/check_all.sh
+fi
 
 file=rm-prmpt/rm-prompt
 if ! test -f $file; then
@@ -16,10 +19,16 @@ if ! test -f $file; then
     file=$tmp
 fi
 
+echo "Next $(tput setaf 1)sudo$(tput sgr0) will install $(tput setaf 2)rm-prompt$(tput sgr0) inside $(tput bold)/usr/bin/$(tput sgr0)"
+yes-edit-no -g "$file" -p 'Install rm-prompt?' -c '! hash rm-prompt &> /dev/null' nstll
+if [[ $nstll == 'y' ]]; then
+    sudo install -Dm777 $file -t "/usr/bin/" 
+    rm-prompt --help 
+fi
+
+
 #if ! type rm-prompt &> /dev/null; then
     #reade -Q 'GREEN' -i 'y' -p 'Install rm-prompt? (Rm but prompts files before deletion) [Y/n]: ' 'n' rm_ins
     #if test $rm_ins == 'y'; then
-        echo "Next $(tput setaf 1)sudo$(tput sgr0) will install $(tput setaf 2)rm-prompt$(tput sgr0) inside $(tput bold)/usr/bin/$(tput sgr0)"
-        sudo install -Dm777 $file -t "/usr/bin/" 
     #fi
 #fi

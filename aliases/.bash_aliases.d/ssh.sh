@@ -5,15 +5,17 @@ fi
 
 # SSH in Kitty only really w
 #[ "$TERM" = "xterm-kitty" ] && alias ssh="kitty +kitten ssh -R 50000:${KITTY_LISTEN_ON#*:}"
-[ "$TERM" = "xterm-kitty" ] && alias ssh="kitty +kitten ssh"
+[[ "$TERM" = "xterm-kitty" ]] && alias ssh="kitty +kitten ssh"
 
 # For Xclip, we need X11 to function properly  
 # Even if X11 fowarding is setup, x11 still needs a display
 # So we need to set the DISPLAY to the host's (you) by passing your IP to DISPLAY before connecting
-if test $X11_WAY == 'x11' && type nmcli &> /dev/null; then
-    addr=$(nmcli device show | grep IP4.ADDR | awk 'NR==1{print $2}'| sed 's|\(.*\)/.*|\1|')
-fi
 
+if [[ $machine == 'Linux' ]]; then
+    if [[ $X11_WAY == 'x11' ]] && type nmcli &> /dev/null; then
+        addr=$(nmcli device show | grep IP4.ADDR | awk 'NR==1{print $2}'| sed 's|\(.*\)/.*|\1|')
+    fi
+fi
 alias smv="rsync -avz --remove-source-files -e ssh "
 
 # To prevent 'failed to preserve ownership' errors

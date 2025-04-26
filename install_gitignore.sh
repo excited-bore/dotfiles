@@ -1,38 +1,38 @@
-# !/bin/bash
+#!/bin/bash
 
-if ! test -f checks/check_system.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
+if ! test -f checks/check_all.sh; then
+    if type curl &>/dev/null; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
+    else
+        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
+        return 1 || exit 1
+    fi
 else
-    . ./checks/check_system.sh
+    . ./checks/check_all.sh
 fi
-
-if ! type reade &> /dev/null; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
-else
-    . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
-fi
+local gitign comp1 comp2 globl
 
 gitignd=$(mktemp -d)
 globl="local"
-if [ "$1" == 'local' ] || [ 'global' == "$1" ]; then
+if [[ "$1" == 'local' ]] || [[ 'global' == "$1" ]]; then
     git clone https://github.com/github/gitignore $gitignd/gitignore
     globl="$1"
 else
     readyn -p "Download template gitignores, choose and install?" gitgn 
-    if [ "y" == "$gitgn" ]; then
+    if [[ "y" == "$gitgn" ]]; then
         git clone https://github.com/github/gitignore $gitignd/gitignore
-        reade -Q "GREEN" -i "local" -p "Install globally or locally? ( ./ vs ~/.config/git/ignore ) [Local/global]: " "global local" globl
+        reade -Q "GREEN" -i "local global" -p "Install globally or locally? ( ./ vs ~/.config/git/ignore ) [Local/global]: " globl
     fi
-    if [ "$globl" == "global" ]; then
-       if [ ! -d ~/.config/git/ ]; then
+    if [[ "$globl" == "global" ]]; then
+       if ! [ -d ~/.config/git/ ]; then
            mkdir ~/.config/git/ 
         fi
-        if [ ! -f ~/.config/git/ignore ]; then
+        if ! [ -f ~/.config/git/ignore ]; then
            touch ~/.config/git/ignore
         fi
         ignfl=~/.config/git/ignore
     else
-        if [ ! -f .gitignore ]; then
+        if ! [ -f .gitignore ]; then
            touch .gitignore
         fi
         ignfl=.gitignore
@@ -40,12 +40,12 @@ else
 
     (cd $gitignd/gitignore
     gitign=''
-    if [ "$globl" == "global" ]; then
+    if [[ "$globl" == "global" ]]; then
         cd Global
     fi
-    while [ ! "$gitign" == "Stop" ] && [ ! "$gitign" == "AllGlobal" ] ; do
-        if [ "$gitign" == "Toggle" ]; then
-            if [ $(pwd) == $gitignd/gitignore ]; then
+    while ! [[ "$gitign" == "Stop" ]] && ! [[ "$gitign" == "AllGlobal" ]] ; do
+        if [[ "$gitign" == "Toggle" ]]; then
+            if [[ $(pwd) == $gitignd/gitignore ]]; then
                 cd $gitignd/gitignore/Global
                 printf "To global templates\n" 
             else
@@ -64,7 +64,7 @@ else
             fi
         fi
     done
-    if [ "$gitign" == "AllGlobal" ]; then
+    if [[ "$gitign" == "AllGlobal" ]]; then
         echo "" > "$ignfl"
         cd $gitignd/gitignore/Global
         FILES=$PWD/*
@@ -75,6 +75,5 @@ else
             unset $ign
         done
     fi)
-    unset gitign comp1 comp2 globl
     $EDITOR $ignfl
 fi

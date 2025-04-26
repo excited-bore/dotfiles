@@ -11,11 +11,11 @@ else
     . ./checks/check_all.sh
 fi
 
-get-script-dir SCRIPT_DIR
+SCRIPT_DIR=$(get-script-dir)
 
 
 if ! test -f checks/check_envvar_aliases_completions_keybinds.sh; then
-    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar_aliases_completions_keybinds.sh)"
+    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar_aliases_completions_keybinds.sh)
 else
     . ./checks/check_envvar_aliases_completions_keybinds.sh
 fi
@@ -34,7 +34,7 @@ if ! [ -e ~/.bash_completion.d/complete_alias ]; then
 fi
 
 readyn -p "Install bash completions for aliases in /root/.bash_completion.d?" rcompl
-if [ -z $rcompl ] || [[ "y" == $rcompl ]]; then
+if [[ "y" == $rcompl ]]; then
     echo "Next $(tput setaf 1)sudo$(tput sgr0) will install 'complete_alias' in '/root/.bash_completion.d/'"
 
     if ! sudo test -e /root/.bash_completion.d/complete_alias; then

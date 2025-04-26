@@ -11,11 +11,11 @@ else
     . ./checks/check_all.sh
 fi
 
-get-script-dir DIR 
+DIR=$(get-script-dir) 
 
-if ! type cargo &> /dev/null; then
+if ! hash cargo &> /dev/null || ! [[ $PATH =~ '/.cargo/bin' ]] || (hash rustc &> /dev/null && [[ $(rustc -V | awk '{print $2}') < 1.81.0 ]]); then
     if ! test -f $DIR/install_cargo.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)"
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)
     else
        . $DIR/install_cargo.sh
     fi
@@ -23,14 +23,14 @@ fi
 
 type eza &> /dev/null && ezv=$(eza -v | awk 'NR==2{print $1;}' | tr 'v' ' ')
 carv=$(cargo search 'eza = # A modern replacement for ls' | awk 'NR==1{print $3;}' | tr '"' ' ')
-
-if ! type eza &> /dev/null || version-higher $carv $ezv; then
-    if type eza &> /dev/null && ! test -z "$pac_rm"; then
+if ! command -v eza &> /dev/null || ! test -z $ezv && version-higher $carv $ezv; then
+    if command -v eza &> /dev/null && ! test -z "$pac_rm"; then
         yes | eval "${pac_rm}" eza   
     else
         printf "Installing cargo version for eza (latest) but unable to remove current version for eza.\n Package manager probably unkown, try uninstalling manually.\n"
     fi
     cargo install --locked eza  
+    eza --help | $PAGER 
     #if test $distro_base == 'Arch'; then
     #    eval "$pac_ins eza"
     #elif test $distro_base == 'Debian'; then
@@ -61,16 +61,17 @@ if ! type eza &> /dev/null || version-higher $carv $ezv; then
     #    cargo install eza 
     #fi
 fi
+unset ezv carv
 
 if ! test -f ~/.bash_completion.d/eza; then
    readyn -p 'Install bash completions for eza?' bash_cm  
    if [[ $bash_cm == 'y' ]]; then
         if ! test -f checks/check_completions_dir.sh; then
-             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)" 
+             source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh) 
         else
             . ./checks/check_completions_dir.sh
         fi
-        wget -P ~/.bash_completion.d/ https://raw.githubusercontent.com/eza-community/eza/refs/heads/main/completions/bash/eza
+        echo $(curl  https://raw.githubusercontent.com/eza-community/eza/refs/heads/main/completions/bash/eza) > ~/.bash_completion.d/eza
    fi
 fi
 unset bash_cm

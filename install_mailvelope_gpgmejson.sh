@@ -6,17 +6,18 @@ printf " Based on: ${CYAN} https://github.com/mailvelope/mailvelope/wiki/Creatin
  # https://github.com/mailvelope/mailvelope/wiki/Creating-the-app-manifest-file-on-macOS-and-Linux
  # No idea what im doing wrong?
 
-if ! test -f checks/check_system.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
+if ! test -f checks/check_all.sh; then
+    if type curl &>/dev/null; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
+    else
+        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
+        return 1 || exit 1
+    fi
 else
-    . ./checks/check_system.sh
+    . ./checks/check_all.sh
 fi
 
-if ! type reade &> /dev/null; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
-else
-    . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
-fi
+SCRIPT_DIR=$(get-script-dir)
 
 if ! type gpgme-json &> /dev/null; then
     echo "Install gpgme-json first"
@@ -24,10 +25,12 @@ if ! type gpgme-json &> /dev/null; then
 fi
 gpgme_json="$(whereis gpgme-json | awk '{print $2;}')"
 
-if test $machine == 'Mac'; then
+local mozilla edge brave ggl 
+
+if [[ $machine == 'Mac' ]]; then
     if test -d ~/Library/Application Support/Google/Chrome && ! test -f ~/Library/Application Support/Google/Chrome/NativeMessagingHosts/gpgmejson.json; then
-        reade -Q "BLUE" -i "y" -p "Add gpgme-json for google chrome based browsers? "" ggl
-        if test $ggl == 'y'; then
+        readyn -Y "BLUE" -p "Add gpgme-json for google chrome based browsers?" ggl
+        if [[ $ggl == 'y' ]]; then
             file="{ 
           \"name\": \"gpgmejson\", 
           \"description\": \"JavaScript binding for GnuPG\", 
@@ -41,8 +44,8 @@ if test $machine == 'Mac'; then
     fi
 
     if test -d ~/Library/Application Support/Microsoft Edge && ! test -f ~/Library/Application Support/Microsoft Edge/NativeMessagingHosts/gpgmejson.json; then
-        reade -Q "BLUE" -i "y" -p "Add gpgme-json for Edge? [Y/n]:" "n" edge
-        if test $edge == 'y'; then
+        readyn -Y "BLUE" -p "Add gpgme-json for Edge?" edge
+        if [[ $edge == 'y' ]]; then
             file="{ 
           \"name\": \"gpgmejson\", 
           \"description\": \"JavaScript binding for GnuPG\", 
@@ -55,8 +58,8 @@ if test $machine == 'Mac'; then
         fi
     fi
     if test -d ~/Library/Application Support/Mozilla && ! test -f ~/Library/Application Support/Mozilla/NativeMessagingHosts/NativeMessagingHosts/gpgmejson.json; then
-        reade -Q "BLUE" -i "y" -p "Add gpgme-json for firefox? "" mozilla
-        if test $mozilla == 'y'; then
+        readyn -Y "BLUE" -p "Add gpgme-json for firefox?" mozilla
+        if [[ $mozilla == 'y' ]]; then
             file="{ 
           \"name\": \"gpgmejson\", 
           \"description\": \"JavaScript binding for GnuPG\", 
@@ -68,10 +71,10 @@ if test $machine == 'Mac'; then
             echo $file > ~/Library/Application Support/Mozilla/NativeMessagingHosts/gpgmejson.json
         fi
     fi
-elif test $machine == 'Linux'; then
+elif [[ $machine == 'Linux' ]]; then
     if test -d ~/.config/google-chrome/ && ! test -f ~/.config/google-chrome/NativeMessagingHosts/gpgmejson.json; then
-        reade -Q "BLUE" -i "y" -p "Add gpgme-json for google chrome based browsers? "" ggl
-        if test $ggl == 'y'; then
+        readyn -Y "BLUE" -p "Add gpgme-json for google chrome based browsers?" ggl
+        if [[ $ggl == 'y' ]]; then
             file="{ 
           \"name\": \"gpgmejson\", 
           \"description\": \"JavaScript binding for GnuPG\", 
@@ -84,8 +87,8 @@ elif test $machine == 'Linux'; then
         fi
     fi
     if test -d ~/.config/BraveSoftware/Brave-Browser/ && ! test -f ~/.config/BraveSoftware/Brave-Browser/NativeMessagingHosts/gpgmejson.json; then
-        reade -Q "BLUE" -i "y" -p "Add gpgme-json for brave browser? "" brave
-        if test $brave == 'y'; then
+        readyn -Y "BLUE"  -p "Add gpgme-json for brave browser?" brave
+        if [[ $brave == 'y' ]]; then
             file="{ 
           \"name\": \"gpgmejson\", 
           \"description\": \"JavaScript binding for GnuPG\", 
@@ -98,8 +101,8 @@ elif test $machine == 'Linux'; then
         fi
     fi
     if test -d ~/.config/microsoft-edge/ && ! test -f ~/.config/microsoft-edge/NativeMessagingHosts/gpgmejson.json; then
-        reade -Q "BLUE" -i "y" -p "Add gpgme-json for Edge? "" edge
-        if test $edge == 'y'; then
+        readyn -Y "BLUE" -p "Add gpgme-json for Edge?" edge
+        if [[ $edge == 'y' ]]; then
             file="{
           \"name\": \"gpgmejson\", 
           \"description\": \"JavaScript binding for GnuPG\", 
@@ -112,8 +115,8 @@ elif test $machine == 'Linux'; then
         fi
     fi
     if test -d ~/.mozilla/ && ! test -f ~/.mozilla/native-messaging-hosts/gpgmejson.json; then
-        reade -Q "BLUE" -i "y" -p "Add gpgme-json for firefox? "" mozilla
-        if test $mozilla == 'y'; then
+        readyn -Y "BLUE" -p "Add gpgme-json for firefox?" mozilla
+        if [[ $mozilla == 'y' ]]; then
             file="{
           \"name\": \"gpgmejson\", 
           \"description\": \"JavaScript binding for GnuPG\", 
@@ -132,4 +135,3 @@ else
 fi
 
 
-unset mozilla edge brave ggl 

@@ -18,7 +18,7 @@ if ! type pipx &>/dev/null; then
         if [[ "$machine" == 'Mac' ]] && type brew &>/dev/null; then
             echo "This next $(tput setaf 1)sudo$(tput sgr0) will install pipx"
             brew install python python-pipx
-            if [[ $(pipx --version) < 1.6.0 ]]; then
+            if awk "BEGIN {exit !($(pipx --version) < 1.6.0)}"; then
                 pipx install pipx
                 pipx upgrade pipx
                 brew uninstall pipx
@@ -28,7 +28,7 @@ if ! type pipx &>/dev/null; then
         elif [[ "$distro_base" == "Arch" ]]; then
             echo "This next $(tput setaf 1)sudo$(tput sgr0) will install pipx"
             eval "${pac_ins}" python-pipx
-            if [[ $(pipx --version) < 1.6.0 ]]; then
+            if awk "BEGIN {exit !($(pipx --version) < 1.6.0)}"; then
                 pipx install pipx
                 pipx upgrade pipx
                 sudo pacman -Rs pipx
@@ -38,7 +38,7 @@ if ! type pipx &>/dev/null; then
         elif [[ "$distro_base" == "Debian" ]]; then
             echo "This next $(tput setaf 1)sudo$(tput sgr0) will install pipx"
             eval "${pac_ins}" pipx
-            if [[ $(pipx --version) < 1.6.0 ]]; then
+            if awk "BEGIN {exit !($(pipx --version) < 1.6.0)}"; then
                 pipx install pipx
                 pipx upgrade pipx
                 sudo apt purge --autoremove -y pipx

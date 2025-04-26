@@ -11,7 +11,7 @@ else
     . ./checks/check_all.sh
 fi
 
-get-script-dir SCRIPT_DIR
+SCRIPT_DIR=$(get-script-dir)
 
 if ! type kitty &>/dev/null; then
     if [[ "$distro_base" == "Arch" ]] || [[ "$distro_base" == "Debian" ]]; then
@@ -21,6 +21,8 @@ if ! type kitty &>/dev/null; then
         fi
     fi
 fi
+
+kitty --help | $PAGER
 
 if [[ "$distro_base" == 'Arch' ]] && ! ls /usr/share/fonts/noto | grep -i -q emoji; then
     readyn -p 'Install noto-emoji font for kitty?' emoji
@@ -172,9 +174,9 @@ if [[ $ktty_cnf == 'y' ]]; then
                 prompt="$j-th layout in list? "
             fi
 
-            local frst="$(echo "$lays" | awk '{print $1}')"
-            local layouts1=$(echo "$lays" | sed "s/\<"$frst"\> //g")
-            local layout_p=$(echo "$lays" | tr ' ' '/')
+            frst="$(echo "$lays" | awk '{print $1}')"
+            layouts1=$(echo "$lays" | sed "s/\<"$frst"\> //g")
+            layout_p=$(echo "$lays" | tr ' ' '/')
 
             test -z "$ZSH_VERSION" &&
 
@@ -191,12 +193,12 @@ if [[ $ktty_cnf == 'y' ]]; then
                 readyn -p "Set position new window?" ktty_splt1
 
                 if [[ $ktty_splt1 == 'y' ]]; then
-                    reade -Q "GREEN" -i "default hsplit vsplit before after" -p "Position new window: [Default/hsplit/vsplit/before/after]: " ktty_pos
+                    reade -Q "GREEN" -i "hsplit vsplit default before after" -p "Position new window: [Hsplit/vsplit/default/before/after]: " ktty_pos
                     sed -i "s|map kitty_mod+enter[^+].*|map kitty_mod+enter launch --location=$ktty_pos|g" $dir/kitty.conf
                 fi
                 readyn -p "Add shortcut for new window pos on ctrl+shift+alt+enter?" ktty_splt2
                 if [[ $ktty_splt2 == 'y' ]]; then
-                    reade -Q "GREEN" -i "hsplit vsplit before after" -p "Position new window: [Hsplit/vsplit/before/after]: " ktty_pos
+                    reade -Q "GREEN" -i "vsplit hsplit before after" -p "Position new window: [Vsplit/hsplit/before/after]: " ktty_pos
                     sed -i "s|map kitty_mod+alt+enter.*|map kitty_mod+alt+enter launch --location=$ktty_pos|g" $dir/kitty.conf
                 fi
 
@@ -241,7 +243,7 @@ if [[ $ktty_cnf == 'y' ]]; then
     function kitty_conf() {
         mkdir -p ~/.config/kitty
         cp -bvf $dir/kitty.conf ~/.config/kitty/kitty.conf
-        cp -vbf $dir/ssh.conf ~/.config/kitty/ssh.conf
+        cp -bvf $dir/ssh.conf ~/.config/kitty/ssh.conf
         if type gio &>/dev/null && [ -f ~/.config/kitty/kitty.conf~ ]; then
             gio trash ~/.config/kitty/kitty.conf~
         fi
@@ -249,14 +251,14 @@ if [[ $ktty_cnf == 'y' ]]; then
             gio trash ~/.config/kitty/ssh.conf~
         fi
     }
-    yes-no-edit -f kitty_conf -g "$dir/kitty.conf $dir/ssh.conf" -p "Install kitty.conf and ssh.conf at ~/.config/kitty?" -i "e" -Q "GREEN"
+    yes-edit-no -f kitty_conf -g "$dir/kitty.conf $dir/ssh.conf" -p "Install kitty.conf and ssh.conf at ~/.config/kitty?" -e
 fi
 unset ktty_conf
 
 readyn -p "Install kitty aliases? (at ~/.bash_aliases.d/kitty.sh)" kittn
 if [[ "y" == "$kittn" ]]; then
     if ! test -f checks/check_aliases_dir.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)"
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)
     else
         . ./checks/check_aliases_dir.sh
     fi
@@ -268,12 +270,14 @@ fi
 unset kittn
 
 # TODO: Get sed warnings gone
-if [ -f ~/.environment.env ]; then
-    sed -i 's|^.\(export KITTY_PATH=~/.local/bin/:~/.local/kitty.app/bin/\)|\1|g' ~/.environment.env
-    sed -i 's|^.\(export PATH=$KITTY_PATH:$PATH\)|\1|g' ~/.environment.env
-    #sed -i 's|^.\(if \[\[ \$SSH_TTY \]\] .*\)|\1|g' $ENVVAR
-    #sed -i 's|^.\(export KITTY_PORT=.*\)|\1|g' $ENVVAR
-    #sed -i 's|^.\(fi\)|\1|g' $ENVVAR
+if grep -q '# KITTY' $ENV; then
+    sed -i 's|^.\(export KITTY_PATH=~/.local/bin/:~/.local/kitty.app/bin/\)|\1|g' $ENV
+    sed -i 's|^.\(export PATH=$PATH:$KITTY_PATH\)|\1|g' $ENV
+    #sed -i 's|^.\(if \[\[ \$SSH_TTY \]\] .*\)|\1|g' $ENV
+    #sed -i 's|^.\(export KITTY_PORT=.*\)|\1|g' $ENV
+    #sed -i 's|^.\(fi\)|\1|g' $ENV
+else
+    printf "# KITTY\nexport KITTY_PATH=~/.local/bin/:~/.local/kitty.app/bin\nexport PATH=\$PATH:\$KITTY_PATH\n" $ENV
 fi
 
 #if [ -x "$(command -v xdg-open)" ]; then

@@ -11,12 +11,12 @@ else
     . ./checks/check_all.sh
 fi
 
-get-script-dir SCRIPT_DIR
+SCRIPT_DIR=$(get-script-dir)
 
 if ! type ast-grep &>/dev/null; then
-    if ! type cargo &>/dev/null; then
+    if ! type cargo &>/dev/null || ! [[ $PATH =~ '/.cargo/bin' ]]; then
         if ! test -f install_cargo.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)"
+            source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)
         else
             . ./install_cargo.sh
         fi
@@ -28,3 +28,5 @@ if ! type ast-grep &>/dev/null; then
         echo "$(ast-grep completions bash)" >~/.bash_completion.d/ast-grep
     fi
 fi
+
+ast-grep --help | $PAGER

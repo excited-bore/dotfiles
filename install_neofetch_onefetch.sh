@@ -11,7 +11,7 @@ else
     . ./checks/check_all.sh
 fi
 
-get-script-dir SCRIPT_DIR
+SCRIPT_DIR=$(get-script-dir)
 
 if ! type neofetch &>/dev/null && ! type fastfetch &>/dev/null && ! type screenFetch &>/dev/null; then
     #readyn -p "Install neofetch/fastfetch/screenFetch? "" sym2
@@ -36,7 +36,8 @@ if ! type neofetch &>/dev/null && ! type fastfetch &>/dev/null && ! type screenF
                 mkdir -p ~/.config/neofetch
                 cp -fbv $file ~/.config/neofetch/
             }
-            yes-no-edit -f neofetch_conf -g "$file" -p "Install neofetch config.conf at $HOME/.config/neofetch/?" -i "y" -Q "GREEN"
+            yes-edit-no -f neofetch_conf -g "$file" -p "Install neofetch config.conf at $HOME/.config/neofetch/?"
+            neofetch
         fi
     elif [[ "$sym2" == "fast" ]]; then
         if [[ $distro_base == "Debian" ]]; then
@@ -58,10 +59,12 @@ if ! type neofetch &>/dev/null && ! type fastfetch &>/dev/null && ! type screenF
         elif [[ $distro_base == "Arch" ]]; then
             eval "${pac_ins}" fastfetch
         fi
+        fastfetch
     elif [[ "$sym2" == "screen" ]]; then
         if [[ $distro_base == "Debian" ]] || [[ $distro_base == "Arch" ]]; then
             eval "${pac_ins}" screenfetch
         fi
+        screenfetch
     fi
 fi
 
@@ -90,5 +93,6 @@ if ! type onefetch &>/dev/null; then
             curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
             cargo install onefetch
         fi
+        onefetch
     fi
 fi

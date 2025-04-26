@@ -12,13 +12,13 @@ else
 fi
 
 if ! test -f checks/check_appimage_ready.sh; then
-    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_appimage_ready.sh)"
+    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_appimage_ready.sh)
 else
     . ./checks/check_appimage_ready.sh
 fi
 
 if ! test -f aliases/.bash_aliases.d/package_managers.sh; then
-    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/package_managers.sh)"
+    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/package_managers.sh)
 else
     source aliases/.bash_aliases.d/package_managers.sh
 fi
@@ -26,7 +26,16 @@ fi
 if ! type AppImageLauncher &>/dev/null; then
     echo "This next $(tput setaf 1)sudo$(tput sgr0) will install Appimagelauncher"
     if [[ $distro_base == "Arch" ]]; then
-        eval "$pac_ins appimagelauncher"
+        if test -z "$AUR_ins"; then
+            if ! test -f checks/check_AUR.sh; then
+                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_AUR.sh)
+            else
+                source checks/check_AUR.sh
+            fi
+        fi
+
+        eval "$AUR_ins appimagelauncher"
+
     elif [[ $distro_base == "Debian" ]]; then
         if type add-apt-repository &>/dev/null && [[ $(check-ppa ppa:appimagelauncher-team/stable) =~ 'OK' ]]; then
             sudo add-apt-repository ppa:appimagelauncher-team/stable

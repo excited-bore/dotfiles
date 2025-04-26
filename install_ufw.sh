@@ -11,7 +11,7 @@ else
     . ./checks/check_all.sh
 fi
 
-get-script-dir SCRIPT_DIR
+SCRIPT_DIR=$(get-script-dir)
 
 if ! type ufw &>/dev/null; then
     if [[ "$distro_base" == "Arch" ]] || [[ $distro_base == "Debian" ]]; then

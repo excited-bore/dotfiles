@@ -1,14 +1,37 @@
-#!/bin/bash
-
 [[ "$1" == 'n' ]] && SYSTEM_UPDATED='TRUE'
 
-# https://unix.stackexchange.com/questions/139231/keep-aliases-when-i-use-sudo-bash
-if type sudo &>/dev/null; then
-    alias sudo='sudo '
-fi
-if type wget &>/dev/null; then
-    alias wget='wget --https-only '
-fi
+READE_NOSTYLE='filecomp-only'
+
+# Make sure cp copies forceably (without asking confirmation when overwriting) and verbosely
+[[ "$(type cp)" =~ 'aliased' ]] &&
+    unalias cp 
+alias cp='cp -fv'
+
+# Make sure mv moves forceably (without asking confirmation when overwriting) and verbosely
+[[ "$(type mv)" =~ 'aliased' ]] && 
+    unalias mv 
+alias mv='mv -fv'
+
+# Make sure rm removes forceably, recursively and verbosely 
+[[ "$(type rm)" =~ 'aliased' ]] &&
+    unalias rm 
+alias rm='rm -rfv'
+
+# Make sure sudo isn't aliased to something weird
+command -v sudo &>/dev/null && [[ "$(type sudo)" =~ 'aliased' ]] &&
+    unalias sudo
+
+# Wget only uses https - encrypted http
+command -v wget &>/dev/null && [[ "$(type wget)" =~ 'aliased' ]] &&
+    unalias wget 
+alias wget='wget --https-only'
+
+# Less does raw control chars
+alias less='less -R'
+
+#! type wget &> /dev/null && command -v brew &> /dev/null &&
+#    brew install wget 
+
 
 # https://stackoverflow.com/questions/5412761/using-colors-with-printf
 # Execute (during printf) for colored prompt
@@ -74,7 +97,7 @@ if ! type reade &>/dev/null; then
     if test -f rlwrap-scripts/reade; then
         . ./rlwrap-scripts/reade 1>/dev/null
     else
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade)" &>/dev/null
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade) &>/dev/null
     fi
 fi
 
@@ -82,55 +105,68 @@ if ! type readyn &>/dev/null; then
     if test -f rlwrap-scripts/readyn; then
         . ./rlwrap-scripts/readyn 1>/dev/null
     else
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/readyn)" &>/dev/null
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/readyn) &>/dev/null
     fi
 fi
 
-if ! type yes-no-edit &>/dev/null; then
-    if test -f rlwrap-scripts/yes-no-edit; then
-        . ./rlwrap-scripts/yes-no-edit 1>/dev/null
+if ! type yes-edit-no &>/dev/null; then
+    if test -f rlwrap-scripts/yes-edit-no; then
+        . ./rlwrap-scripts/yes-edit-no 1>/dev/null
     else
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/yes-no-edit)" &>/dev/null
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/yes-edit-no) &>/dev/null
     fi
 fi
 
 if ! test -f checks/check_system.sh; then
     if type curl &>/dev/null; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)"
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)
     fi
 else
     . ./checks/check_system.sh
 fi
 
+# printf "${green} Will now start with updating system ${normal}\n"
+
 if ! type update-system &>/dev/null; then
     if ! test -f aliases/.bash_aliases.d/update-system.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)"
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)
     else
         . ./aliases/.bash_aliases.d/update-system.sh
     fi
 fi
 
-# printf "${green} Will now start with updating system ${normal}\n"
 
 if test -z $SYSTEM_UPDATED; then
     readyn -Y "CYAN" -p "Update system?" updatesysm
     if [[ "$updatesysm" == "y" ]]; then
         update-system-yes
-        export SYSTEM_UPDATED="TRUE"
-    else
-        export SYSTEM_UPDATED="TRUE"
     fi
+    export SYSTEM_UPDATED="TRUE"
 fi
 
-function get-script-dir() {
-    if test -z $ZSH_VERSION; then
-        #[[ $0 != $BASH_SOURCE ]] && SCRIPT_DIR="$( dirname "${BASH_SOURCE[0]}" )" || SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-        SCRIPT_DIR=$(dirname "$0")
-    else
-        SCRIPT_DIR="${0:A:h}"
-    fi
-    eval "$1=$SCRIPT_DIR"
-}
+
+alias get-script-dir='cd "$( dirname "$-1" )" && pwd'
+
+#function get-script-dir() {
+#    SOURCE=$0
+#    test -n "$1" && SOURCE=$1 
+#    if test -n "$BASH_VERSION"; then
+#        SOURCE=$(cd -- "$(dirname -- "$SOURCE")" &> /dev/null && pwd ) 
+#        #while [ -h "$SOURCE" ]; do # Resolve $SOURCE until the file is no longer a symlink
+#        #    DIR=$(command cd -P "$(dirname "$SOURCE")" && pwd)
+#        #    SOURCE=$(readlink "$SOURCE")
+#        #    [[ $SOURCE != /* ]] && SOURCE=$DIR/$SOURCE # If $SOURCE was a relative symlink, resolve it relative to the symlink base directory
+#        #done
+#        #DIR=$(command cd -P "$(dirname "$SOURCE")" && pwd)
+#    elif test -n "$ZSH_VERSION"; then
+#        SOURCE="${0:A:h}"
+#    fi
+#    if ! test -z $2; then
+#        eval "$2=$SOURCE"
+#    else
+#        eval "$1=$SOURCE"
+#    fi
+#}
 
 # https://stackoverflow.com/questions/4023830/how-to-compare-two-strings-in-dot-separated-version-format-in-bash
 
@@ -141,11 +177,13 @@ function version-higher() {
     local IFS=.
     local i ver1=($1) ver2=($2)
     # fill empty fields in ver1 with zeros
+    test -n "$BASH_VERSION" && local j=0 
+    test -n "$ZSH_VERSION" && local j=1 
     for ((i = ${#ver1[@]}; i < ${#ver2[@]}; i++)); do
-        ver1[i]=0
+        ver1[i]=$j
     done
-    for ((i = 0; i < ${#ver1[@]}; i++)); do
-        if ((10#${ver1[i]:=0} > 10#${ver2[i]:=0})); then
+    for ((i = $j; i < ${#ver1[@]}; i++)); do
+        if ((10#${ver1[i]:=$j} > 10#${ver2[i]:=$j})); then
             return 0
         fi
         if ((10#${ver1[i]} < 10#${ver2[i]})); then

@@ -1,10 +1,10 @@
 #!/bin/bash 
- 
+
 [[ $0 != $BASH_SOURCE ]] && SCRIPT_DIR="$( dirname "${BASH_SOURCE[0]}" )" || SCRIPT_DIR="$( cd "$( dirname "$-1" )" && pwd )" 
  
 if ! test -f $SCRIPT_DIR/../checks/check_all.sh; then 
     if type curl &> /dev/null; then 
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)"  
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)  
     else  
         continue  
     fi 

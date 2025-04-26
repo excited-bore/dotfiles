@@ -7,7 +7,7 @@ fi
 
 #if ! type reade &> /dev/null; then
 #    if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
-#        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
+#        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh) 
 #    elif test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh~/.bash_aliases.d/00-rlwrap_scripts.sh; then
 #       source ~/.bash_aliases.d/00-rlwrap_scripts.sh
 #    else
@@ -19,7 +19,7 @@ fi
 
 #if test -z "$distro"; then 
 #    if ! test -f checks/check_system.sh; then
-#         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
+#         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh) 
 #    else
 #        . ./checks/check_system.sh
 #    fi
@@ -27,7 +27,7 @@ fi
 #
 #if type pamac &> /dev/null && grep -q '#EnableAUR' /etc/pamac.conf; then
 #    if ! test -f checks/clheck_pamac.sh; then
-#         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pamac.sh)" 
+#         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pamac.sh) 
 #    else
 #        . ./checks/check_pamac.sh
 #    fi
@@ -116,14 +116,20 @@ function update-system() {
         fi
     fi
 
-    if [[ $machine == 'Mac' ]] && ! type brew &> /dev/null; then
+    if [[ $machine == 'Mac' ]] && ! hash brew &> /dev/null; then
         printf "${GREEN}Homebrew is a commandline package manager (like the Appstore) that works as an opensource alternative to the Appstore\nGui applications are available for it as well\n${normal}"
         readyn -y 'CYAN' -p 'Install brew?' brew
         if [[ $brew == 'y' ]]; then
             if ! test -f install_brew.sh; then
-                 eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_brew.sh)" 
+                 source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_brew.sh)
             else
-                ./install_brew.sh
+                . ./install_brew.sh
+            fi
+        fi
+        if ! hash wget &> /dev/null; then
+            readyn -p "Wget is a commandline tool that's used to download files from the internet and is used throughout these scripts. Install?" wget_brw
+            if [[ $wget_brw == 'y' ]]; then
+                brew install wget 
             fi
         fi
     elif [[ $machine == 'Windows' ]] && [[ $win_bash_shell == 'Git' ]] && ! test -d "/c/cygwin$ARCH_WIN" && ! test -d '/c/git-sdk-32' && ! type wsl &> /dev/null; then
@@ -131,16 +137,16 @@ function update-system() {
         reade -Q 'CYAN' -i 'wsl sdk cyg n' -p 'Install WSL, git SDK, Cygwin? [Wsl/sdk/cyg/n]: ' cyg
         if [[ "$cyg" == 'cyg' ]]; then
             if ! test -f install_cygwin.sh; then
-                 eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cygwin.sh)" 
+                 source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cygwin.sh) 
             else
-                ./install_cygwin.sh
+                . ./install_cygwin.sh
             fi
             printf "${CYAN}Don't forget to open up Cygwin terminal and restart this script (cd /cygdrive/c to go to C:/ drive and navigate to dotfiles repo)${normal}\n"
         elif [[ $cyg == 'sdk' ]]; then
             if ! test -f install_git_sdk.sh; then
-                 eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_git_sdk.sh)" 
+                 source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_git_sdk.sh) 
             else
-                ./install_git_sdk.sh
+                . ./install_git_sdk.sh
             fi
             printf "${CYAN}Don't forget to open up Git SDK and restart this script${normal}\n"
         else
@@ -153,12 +159,16 @@ function update-system() {
     #echo "This next $(tput setaf 1)sudo$(tput sgr0) will try to update the packages for your system using the package managers it knows";
 
     if [[ $machine == 'Mac' ]]; then
+        
         echo "This next $(tput setaf 1)sudo$(tput sgr0) will try to update the packages for your system using the package managers it knows";
+       
         pac=softwareupdate
+        
         sudo softwareupdate -i -a
-        if type brew &> /dev/null; then
+       
+        if hash brew &> /dev/null; then
             pac=brew       
-            if type yes &> /dev/null && ! test -z "$YES" ;then
+            if hash yes &> /dev/null && test -n "$YES" ;then
                 yes | brew update  
                 yes | brew upgrade 
             else
@@ -166,7 +176,9 @@ function update-system() {
                 brew upgrade
             fi
         fi
+    
     elif [[ "$pac" == "apt" ]] || [[ "$pac" == "nala" ]]; then
+        
         if ! test -z "$YES"; then
             if [[ "$pac" == "apt" ]]; then
                 eval ${pac_up} -y
@@ -176,6 +188,7 @@ function update-system() {
         else
             eval "${pac_up}"
         fi
+       
         hdrs="linux-headers-$(uname -r)"
         if test -z "$(apt list --installed 2> /dev/null | grep $hdrs)"; then
             
@@ -186,15 +199,15 @@ function update-system() {
                 eval "${pac_ins} $hdrs"
             fi
         fi
+
         echo "This next $(tput setaf 1)sudo$(tput sgr0) will try to update the packages for your system using the package managers it knows";
         
         ! test -z "$YES" && flag='--auto' || flag=''
         
         readyn $flag -p "Upgrade system?" upgrd
-        if [[ $upgrd == 'y' ]];then
 
+        if [[ $upgrd == 'y' ]];then
             if ! test -z "$YES"; then 
-                
                 if [[ "$pac" == "apt" ]]; then
                     eval "sudo ${pac} upgrade -y"
                 else
@@ -204,6 +217,9 @@ function update-system() {
             else            
                 eval "sudo ${pac} upgrade" 
             fi
+            
+            eval "${pac_up} -y"            
+        
         fi
  
         if apt --dry-run autoremove 2> /dev/null | grep -Po '^Remv \K[^ ]+'; then
@@ -211,6 +227,7 @@ function update-system() {
             ! test -z "$YES" && flag='--auto' || flag=''
             
             readyn $flag -p 'Autoremove unneccesary packages?' remove
+       
             if [[ "$remove" == 'y' ]]; then
                 if ! test -z "$YES"; then
                     if [[ "$pac" == "apt" ]]; then
@@ -223,9 +240,13 @@ function update-system() {
                 fi
             fi
         fi
+    
     elif [[ "$pac" == "apk" ]]; then
+       
         apk update
+
     elif [[ "$pac" == "pacman" ]]; then
+   
         if ! test -z "$AUR_up"; then
             if ! test -z "$YES"; then 
                 if [[ "$AUR_up" == "pamac update" ]]; then
@@ -257,13 +278,17 @@ function update-system() {
         fi
        
         ! test -z "$YES" && flag='--auto' || flag=''
-       	
-	[[ "$distro_base" == 'Debian' ]] && clean=' (/Autoremove) ' || clean='' 
-
-        readyn $flag -p "Clean$clean unnessecary orphan packages?" cachcln
+       
+        local cachcln 
+        
+        readyn $flag -p "Clean / autoremove orphan packages - dependencies that aren't used by any package?" cachcln
+        
         if [[ $cachcln == 'y' ]]; then
-            if ! [[ -z "$AUR_clean" ]]; then
-                if ! test -z "$YES"; then 
+            
+            if [ -n "$AUR_clean" ]; then
+                
+                if test -n "$YES"; then 
+                    
                     if [[ "$AUR" == "pamac" ]]; then
                         pamac clean --no-confirm
                     else
@@ -272,36 +297,44 @@ function update-system() {
                 else
                     eval "$AUR_clean"
                 fi
-	   elif ! test -z $pac_clean; then
-            	if ! test -z "$YES"; then 
-		    eval "yes | $pac_clean"  
-            	else
+	   
+            elif test -n "$pac_clean"; then
+            	
+                if test -n "$YES"; then 
+                    if [[ "$pac" == "pacman" ]]; then
+                        eval "$pac_clean --noconfirm"  
+                    else
+                        eval "yes | $pac_clean"                   
+                    fi
+                else
                     eval "$pac_clean"
                 fi
 	    fi
         fi
-        unset cachcln 
+        
     elif [[ "$distro" == "Gentoo" ]]; then
         #TODO Add update cycle for Gentoo systems
         continue
-    # https://en.opensuse.org/System_Updates
+    
     elif [[ "$pac" == "zypper_leap" ]]; then
+    # https://en.opensuse.org/System_Updates
         echo "This next $(tput setaf 1)sudo$(tput sgr0) will try to update the packages for your system using the package managers it knows";
         if ! test -z "$YES"; then 
             yes | sudo zypper up
         else
             sudo zypper up
         fi
+
     elif [[ "$pac" == "zypper_tumble" ]]; then
         echo "This next $(tput setaf 1)sudo$(tput sgr0) will try to update the packages for your system using the package managers it knows";
-        if ! test -z "$YES"; then 
+        if test -n "$YES"; then 
             yes | sudo zypper dup
         else
             sudo zypper dup
         fi
 
     elif [[ "$pac" == "yum" ]]; then
-        if ! test -z "$YES"; then 
+        if test -n "$YES"; then 
             yes | yum update
         else
             yum update
@@ -311,7 +344,7 @@ function update-system() {
     unset hdrs hdrs_ins 
 
     if type flatpak &> /dev/null; then
-	if ! test -z "$YES"; then 
+	if test -n "$YES"; then 
             flatpak update -y
         else
             flatpak update
@@ -326,7 +359,7 @@ function update-system() {
         fi
     fi
 
-    if ! test -z "$YES"; then
+    if test -n "$YES"; then
         YES="--auto" 
     fi
 

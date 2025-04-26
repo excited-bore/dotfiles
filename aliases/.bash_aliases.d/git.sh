@@ -6,7 +6,7 @@ fi
 if type wget &> /dev/null && type jq &> /dev/null; then
     function get-latest-releases-github(){
         if test -z "$@"; then
-            reade -Q 'GREEN' -p 'Github link: ' '' gtb_link
+            reade -Q 'GREEN' -p 'Github link: ' gtb_link
         else
             gtb_link="$@"
         fi
@@ -15,26 +15,36 @@ if type wget &> /dev/null && type jq &> /dev/null; then
             return 1
         fi
          
-        new_url="$(echo "$(echo "$gtb_link" | sed 's|https://github.com|https://api.github.com/repos|g')/releases/latest")" 
-        ltstv=$(curl -sL "$new_url" | jq -r ".assets" | grep --color=never "name" | sed 's/"name"://g' | tr '"' ' ' | tr ',' ' ' | sed 's/[[:space:]]//g')
-        versn=$(curl -sL "$new_url" | jq -r '.tag_name')
-        link="$gtb_link/releases/download/$versn/" 
 
-        if test -z $ltstv; then
-            printf "${red}No releases found.${normal}\n"
+        new_url="$(echo "$gtb_link" | sed 's|https://github.com|https://api.github.com/repos|g')"
+        if ! [[ $gtb_link =~ '/releases' ]]; then
+            new_url="$new_url/releases"
+        fi
+
+        ltstv=$(curl -sL "$new_url" | jq '.[0]' -r | jq -r '.assets' | grep --color=never "name" | sed 's/"name"://g' | tr '"' ' ' | tr ',' ' ' | sed 's/[[:space:]]//g')
+        versn=$(curl -sL "$new_url" | jq '.[0]' -r | jq -r '.tag_name')
+
+        if [[ $gtb_link =~ '/releases' ]]; then
+            link="$gtb_link/download/$versn/" 
+        else
+            link="$gtb_link/releases/download/$versn/" 
+        fi
+
+        if test -z "$ltstv"; then
+            printf "${red}No releases found when analyzing ${CYAN}'$new_url'.${normal}\n"
             return 1 
         fi
 
-        if type fzf &> /dev/null; then
+        if command -v fzf &> /dev/null; then
             res="$(echo "$ltstv" | fzf --multi --reverse --height 50%)"
         else
            printf "Files: \n${cyan}$ltstv${normal}\n"
            #frst="$(echo $ltstv | awk '{print $1}')"  
            #ltstv="$(echo $ltstv | sed "s/\<$frst\> //g")" 
-           reade -Q 'CYAN' -p "Which one?: " "$ltstv" res 
+           reade -Q 'CYAN' -i "$ltstv" -p "Which one?: " res 
         fi
         
-        if ! test -z $res; then
+        if test -n $res; then
             reade -Q 'GREEN' -i "$HOME/Downloads" -p "Download Folder?: " -e dir
             wget -P $dir "$link$res"
         fi
@@ -63,7 +73,7 @@ function git-add-ssh-key() {
         touch ~/.ssh/config;
     fi
     read -p "Give up name (Default:'id_keytype'): " name
-    reade -p "Give up keytype \(dsa \| ecdsa \| ecdsa-sk \| ed25519 (Default) \| ed25519-sk \| rsa\): " "dsa ecdsa ecdsa-sk ed25519 ed25519-sk rsa" keytype
+    reade -i "dsa ecdsa ecdsa-sk ed25519 ed25519-sk rsa" -p "Give up keytype \(dsa \| ecdsa \| ecdsa-sk \| ed25519 (Default) \| ed25519-sk \| rsa\): " keytype
     if [ -z $keytype ]; then
         keytype="ed25519"
     fi
@@ -83,8 +93,8 @@ function git-add-ssh-key() {
 git-https-to-ssh(){
     if [ -z $1 ]; then
         echo "You should give up the name of a remote";
-        read -p "Do you want me to look for 'origin'? [Y/n]" resp
-        if [ -z $resp ]; then
+        readyn -p "Do you want me to look for 'origin'?" resp
+        if [[ $resp == 'y' ]]; then
             gitRm=$(git remote get-url origin | sed 's,.*.com/,git@github.com:,g'); git remote -v set-url origin $gitRm;
             git remote get-url origin;
         fi        
@@ -97,8 +107,8 @@ git-https-to-ssh(){
 git-ssh-to-https(){
     if [ -z $1 ]; then
         echo "You should give up the name of a remote";
-        read -p "Do you want me to look for 'origin'? [Y/n]:" resp
-        if [[ -z $resp  ||  "y" == $resp ]] ; then
+        readyn -p "Do you want me to look for 'origin'?" resp
+        if [[ $resp == 'y' ]]; then
             gitRm=$(git remote get-url origin | sed 's,.*.com:,https://github.com/,g'); git remote -v set-url origin $gitRm;
             git remote get-url origin;
         fi        
@@ -144,17 +154,17 @@ function git-commit() {
 
         local untraked amnd msg
 
-        reade -Q "CYAN" -i "y" -p "Add all untracked files? [Y/n]: " "y n" amnd
-        if [ "$amnd" == "y" ]; then
+        readyn -Y "CYAN" -p "Add all untracked files?" amnd
+        if [[ "$amnd" == "y" ]]; then
             git add -A
         fi
 
-        reade -Q "CYAN" -i "n" -p "Add to previous commit? [y/N]: " "y n" amnd
-        if [ "$amnd" == "y" ]; then
+        reade -N "CYAN" -n -p "Add to previous commit?" amnd
+        if [[ "$amnd" == "y" ]]; then
             git commit --amend
         fi
         
-        reade -Q "CYAN" -i '\\\"\\\"' -p "Give up a commit message: " '' msg
+        reade -Q "CYAN" -i '\\\"\\\"' -p "Give up a commit message: " msg
         if ! test -z "${msg}"; then
             git commit -am "${msg}";
         else
@@ -183,7 +193,7 @@ alias git-create-and-switch-branch="git checkout -b - "
 alias git-push-to-branch="git push -u origin "
 
 git-switch-commit() {
-    commit=$(git log --oneline --color=always | nl | fzf --ansi --track --no-sort --layout=reverse-list | awk '{print $2}');
+    commit=$(git --no-pager log --oneline --color=always | nl | fzf --ansi --track --no-sort --layout=reverse-list | awk '{print $2}');
     git checkout "$commit";
 }
 
@@ -248,47 +258,46 @@ git-backup-branch-and-reset-to-remote() {
     backp_branch=1;
     stash=false;
     
-    if [ ! -z "$1" ] && [[ ! $(gitListRemotes | grep -q $1) ]]; then
+    if ! test -z "$1" && [[ ! $(git remotes -v | grep -q $1) ]]; then
         echo "Use a legit remote or add it using 'git-add-remote-ssh' or 'git-add-remote-url'";
-    elif [ ! -z "$1" ];then
+    elif ! test -z "$1"; then
         remote=$1;
     fi
     echo "Using '$1' as remote\n";
     
-    if [ ! -z "$2" ] && [[ ! $(gitListBranches | grep -q $2) ]]; then
+    if ! test -z "$2" && [[ ! $(git branch --list | grep -q $2) ]]; then
         echo "Use a legit branch or add it using 'git-add-branch'";
-    elif [ ! -z "$2" ];then
+    elif ! test -z "$2"; then
         remote=$2;
     fi
     echo "Using '$2' as branch\n";
     
-    if [ ! -z "$3" ] && [ ! "$3" = true ]; then
+    if ! test -z "$3" && ! [[ "$3" == true ]]; then
         for cnt in $(git branch --list | grep --regex 'main.' | wc -l) ; do
-       $backp_branch+=1;
-    done
-
-    elif [ "$3" = true ];then
+            $backp_branch+=1;
+        done
+    elif [[ "$3" == true ]]; then
         stash=true;
     fi
 
-    if [ ! -z "$1" ] && [ ! -z "$2" ]; then
+    if ! test -z "$1" && ! test -z "$2"; then
         git checkout "$2";
         git stash ;
         git fetch --all ;
         git branch "$1" ;
         git reset --hard "$2" ;
-        if [ "$3" = true ]; then
+        if [[ "$3" = true ]]; then
             git stash pop;
         else
             echo "No uncomitted changes kept. They can be reapplied with 'git stash pop'"; 
         fi
-    elif [ ! -z "$1" ] && [ -z "$2"]; then
+    elif ! test -z "$1" && test -z "$2"; then
         git checkout main;
         git stash;
         git branch "$3" ;
         git fetch --all ;
         git reset --hard origin/main ;
-        if [ "$4" = true ]; then
+        if [[ "$4" == true ]]; then
             git checkout "$1";
             git stash pop;
         else    
@@ -303,9 +312,9 @@ alias git-remote-remove="git remote -v rm"
 alias git-remote-set-url="git remote -v set-url"
 
 function git-set-default-remote-branch() { 
-    if [ -z "$1" ] && [ -z "$2" ]; then
+    if test -z "$1"  && test -z "$2"; then
         git remote set-head origin main;
-    elif [ -z "$1" ]; then
+    elif test -z "$1"; then
         git remote set-head origin "$2";
     else
         git remote set-head "$1" "$2";
@@ -313,7 +322,7 @@ function git-set-default-remote-branch() {
 }
 
 function git-remote-get-default-branch() { 
-    if [ -z "$1" ]; then
+    if test -z "$1"; then
         git remote set-head origin -a;
     else 
         git remote set-head "$1" -a;

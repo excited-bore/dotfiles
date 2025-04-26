@@ -1,55 +1,46 @@
-# DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-if ! test -f checks/check_system.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
-else
-    . ./checks/check_system.sh
-fi
+#!/bin/bash
 
-if ! test -f checks/check_envvar.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
+if ! test -f checks/check_all.sh; then
+    if type curl &>/dev/null; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
+    else
+        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
+        return 1 || exit 1
+    fi
 else
-    . ./checks/check_system.sh
+    . ./checks/check_all.sh
 fi
 
 if ! test -f checks/check_completions_dir.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)" 
+     source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh) 
 else
     . ./checks/check_completions_dir.sh
 fi
 
-if ! type update-system &> /dev/null; then
-    if ! test -f aliases/.bash_aliases.d/update-system.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)" 
-    else
-        . ./aliases/.bash_aliases.d/update-system.sh
-    fi
-    update-system
+if ! test -f checks/check_AUR.sh; then
+     source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_AUR.sh)
 else
-    readyn -Y "CYAN" -p "Update system?" updatesysm
-    if test $updatesysm == "y"; then
-        update-system                     
-    fi
-fi  
+    . ./checks/check_AUR.sh
+fi
 
 if ! test -f install_go.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_go.sh)" 
+     source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_go.sh)
 else
-    ./install_go.sh
-fi
-if ! test -f install_docker.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_docker.sh)" 
-else
-    ./install_docker.sh
+    . ./install_go.sh
 fi
 
-if [ $distro == "Manjaro" ]; then
-    pamac install apx
-elif test $distro_base == "Arch"; then
+if ! test -f install_docker.sh; then
+     source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_docker.sh)
+else
+    . ./install_docker.sh
+fi
+
+if [[ $distro_base == "Arch" ]]; then
     #TODO integrate different AUR launchers
     eval "$AUR_ins apx" 
     #echo "Install with apx with AUR launcher of choice (f.ex. yay, pamac)"
     #return 0
-elif test $distro_base == "Debian"; then
+elif [[ $distro_base == "Debian" ]]; then
     git clone https://github.com/Vanilla-OS/apx $TMPDIR/apx
     go build $TMPDIR/apx
     sudo install -Dm755 "$TMPDIR/apx/apx" "/usr/bin/apx"
@@ -58,7 +49,7 @@ elif test $distro_base == "Debian"; then
     sudo install -Dm644 "$TMPDIR/apx/config/config.json" "/etc/apx/config.json"
     sudo sed -i "s,\(\"distroboxpath\": \"\).*,\1/home/$USER/.local/bin/distrobox\",g" /etc/apx/config.json
     if ! test -f install_distrobox.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_distrobox.sh)" 
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_distrobox.sh) 
      else
         . ./install_distrobox.sh
     fi
@@ -75,4 +66,6 @@ apx completion bash > ~/.bash_completion.d/complete-apx
 #    echo ". ~/.bash_completion.d/complete_apx" >> ~/.bashrc
 #fi
 
-source ~/.bashrc
+test -n $BASH_VERSION && source ~/.bashrc
+test -n $ZSH_VERSION && source ~/.zshrc
+

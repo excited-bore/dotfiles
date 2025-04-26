@@ -11,7 +11,7 @@ else
     . ./checks/check_all.sh
 fi
 
-get-script-dir SCRIPT_DIR
+SCRIPT_DIR=$(get-script-dir)
 
 if ! type nano &>/dev/null; then
     if [[ "$distro_base" == "Arch" ]]; then
@@ -20,6 +20,8 @@ if ! type nano &>/dev/null; then
         eval "${pac_ins}" nano
     fi
 fi
+
+nano --help | $PAGER
 
 if ! test -f ~/.nanorc; then
     readyn -p 'Install nanorc (config) at $HOME?' nsrc

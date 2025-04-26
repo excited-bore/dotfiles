@@ -11,7 +11,7 @@ else
     . ./checks/check_all.sh
 fi
 
-get-script-dir SCRIPT_DIR
+SCRIPT_DIR=$(get-script-dir)
 
 RIFLE_INS=""
 if type rifle &>/dev/null && ! type ranger &>/dev/null; then
@@ -25,6 +25,8 @@ if ! type ranger &>/dev/null; then
         eval "${pac_ins}" ranger
     fi
 fi
+
+ranger --help | $PAGER
 
 if ! test -z $RIFLE_INS; then
     sudo mv -f $RIFLE_INS/rifle /usr/bin/rifle
@@ -42,13 +44,14 @@ fi
 
 #ranger --copy-config=all
 ranger --confdir=/home/$USER/.config/ranger --copy-config=all
-if [[ $ENVVAR == ~/.environment.env ]]; then
-    sed -i 's|#export RANGER_LOAD_DEFAULT_RC=|export RANGER_LOAD_DEFAULT_RC=|g' $ENVVAR
-    sudo sed -i 's|#export RANGER_LOAD_DEFAULT_RC=|export RANGER_LOAD_DEFAULT_RC=|g' $ENVVAR_R
+if [[ $ENV == ~/.environment ]]; then
+    sed -i 's|#export RANGER_LOAD_DEFAULT_RC=|export RANGER_LOAD_DEFAULT_RC=|g' $ENV
+    sudo sed -i 's|#export RANGER_LOAD_DEFAULT_RC=|export RANGER_LOAD_DEFAULT_RC=|g' $ENV_R
 else
-    echo "export RANGER_LOAD_DEFAULT_RC=FALSE" >>$ENVVAR
-    printf "export RANGER_LOAD_DEFAULT_RC=FALSE\n" | sudo tee -a $ENVVAR_R
+    echo "export RANGER_LOAD_DEFAULT_RC=FALSE" >>$ENV
+    printf "export RANGER_LOAD_DEFAULT_RC=FALSE\n" | sudo tee -a $ENV_R
 fi
+
 if [ -d ~/.bash_aliases.d/ ]; then
     if test -f ranger/.bash_aliases.d/ranger.sh; then
         cp -bfv ranger/.bash_aliases.d/ranger.sh ~/.bash_aliases.d/ranger.sh
@@ -89,7 +92,7 @@ rangr_cnf() {
         fi
     fi
 }
-yes-no-edit -f rangr_cnf -g "$dir/rc.conf $dir/rifle.conf $dir/scope.sh" -p "Install predefined configuration (rc.conf,rifle.conf and scope.sh at ~/.config/ranger/)? " -i "e" -Q "GREEN"
+yes-edit-no -f rangr_cnf -g "$dir/rc.conf $dir/rifle.conf $dir/scope.sh" -p "Install predefined configuration (rc.conf,rifle.conf and scope.sh at ~/.config/ranger/)? " -e
 
 readyn -p "F2 for Ranger?" rf2
 if [[ -z "$rf2" ]] || [[ "y" == "$rf2" ]]; then
@@ -110,17 +113,16 @@ fi
 
 if ! test -d ~/.config/ranger/plugins/devicons2; then
     readyn -p "Install ranger (dev)icons? (ranger plugin at ~/.conf/ranger/plugins)" rplg
-    if [ -z $rplg ] || [[ "y" == $rplg ]]; then
+    if [[ "y" == $rplg ]]; then
         mkdir -p ~/.config/ranger/plugins
         git clone https://github.com/cdump/ranger-devicons2 ~/.config/ranger/plugins/devicons2
         if [[ "$distro" == "Arch" ]]; then
             eval "${pac_ins}" ttf-nerd-fonts-symbols-common ttf-nerd-fonts-symbols ttf-nerd-fonts-symbols-mono
         elif [[ "$distro_base" == "Debian" ]]; then
-
             readyn -p "Install Nerdfonts from binary - no apt? (Special FontIcons)" nrdfnts
-            if [ -z $nrdfnts ] || [[ "Y" == $nrdfnts ]] || [[ $nrdfnts == "y" ]]; then
+            if [[ $nrdfnts == "y" ]]; then
                 if ! test -f ./install_nerdfonts.sh; then
-                    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nerdfonts.sh)"
+                    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nerdfonts.sh)
                 else
                     . ./install_nerdfonts.sh
                 fi

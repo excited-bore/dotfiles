@@ -1,12 +1,13 @@
 #!/bin/bash
 
 function reade() {
-    test -n "$ZSH_VERSION" && setopt err_return extended_glob local_options local_traps &&
+    test -n "$ZSH_VERSION" && setopt local_options err_return local_traps extended_glob &&
         HISTSIZE=1000 &&
         SAVEHIST=1000
 
     local red=$(tput setaf 1)
     local red1=$(tput setaf 9)
+    local orange=$(tput setaf 166)
     local green=$(tput setaf 2)
     local green1=$(tput setaf 10)
     local yellow=$(tput setaf 3)
@@ -24,6 +25,7 @@ function reade() {
 
     local RED=$(tput setaf 1 && tput bold)
     local RED1=$(tput setaf 9 && tput bold)
+    local ORANGE=$(tput setaf 166 && tput bold)
     local GREEN=$(tput setaf 2 && tput bold)
     local GREEN1=$(tput setaf 10 && tput bold)
     local YELLOW=$(tput setaf 3 && tput bold)
@@ -38,6 +40,7 @@ function reade() {
     local WHITE1=$(tput setaf 15 && tput bold)
     local BLACK=$(tput setaf 16 && tput bold)
     local GREY=$(tput setaf 8 && tput bold)
+
 
     local bold=$(tput bold)
     local underline_on=$(tput smul)
@@ -55,11 +58,14 @@ function reade() {
     local underline=$(tput ul)
     local italic=$(tput it)
 
-    local VERSION='1.0'
+    local VERSION='2.0'
 
     unset READE_VALUE
 
-    local hlpstr="${bold}reade${normal} [ -h/--help ] [ -v/--version] [ -i/--pregiven PREGIVEN ] [ -e/--file-completion ]  [ -s/--no-echo ] [ -p/--prompt PROMPTSTRING ] [ -Q/--colour COLOURSTRING ] [ -b/--break-chars BREAKCHARS-STRING ] ${bold}CHOICES-STRING${normal}  ${bold}returnvar${normal}\n
+    local hlpstr="${bold}READE${normal} [ -h / --help ] [ -v / --version] [ -i / --pregiven PREGIVEN(S) SPACESEPARATED STRING ] [ -e / --file-completion ]  [ -s / --no-echo ] [ -p / --prompt PROMPTSTRING ] [ -Q / --colour COLOURSTRING ] [ -r / --read-no-style ('nocomp'/'filecomp-only') ] [ -b/--break-chars BREAKCHARS-STRING ] ${bold}returnvar${normal}
+   
+   reade version $VERSION
+
    Simplifies prompt for ${bold}read/rlwrap${normal}: Will use 'rlwrap' if it is installed, otherwise resorts to 'read' 
    Takes at least one argument, otherwise will prompt help page.
 
@@ -93,10 +99,31 @@ function reade() {
 
         Use filecompletions. 
         Will stop using rlwrap if it is installed because 'rlwrap' doesn't properly add slashed before spaces in filenames/directorynames and will use 'read -e' which does properly do this instead
-    
-   -b ${underline_on}list_of_characters${underline_off} 
+   
+    -r, --read-no-style [ OPTION - ${bold}'nocomp'/'filecomp-only'${normal} ] 
 
-       (From rlwrap manual) Consider  the specified characters word-breaking (whitespace is always word-breaking). This determines what is considered a \"word\", both when completing and when building a completion word list from files specified by -f options following (not preceding!) it.\n Default list (){}[],'+-=&^%%\$#@\";|\ \n Unless -c is specified, / and . (period) are included in the default list\n\n"
+        This will stop read from using ${GREEN}colors${normal}/${bold}${underline_on}styles${normal} when applied.
+        
+        As read is pretty archaic and has been broken for a while, having a colorized 'read -p' prompt that uses prefixes/autocomp while obtaining bashhistory from readline using the '-e' flag can be problematic because cycling enough times through the given options will cause part of the option to 'stick' to the prompt - essentially breaking the prompt.
+        This is why most reade colorized prompts have their autocompletion underneath the prompt when rlwrap is not installed - it uses 'printf PROMPT' instead of using 'read -p PROMPT' 
+        (!! ${bold}even when no color is supplied, since color/style can still supplied as a part of a given prompt so this is suspected${normal} !!). 
+        
+        This flag ${bold}${underline_on}mitigates that${normal}, which will remove all applied colors/styles and thus mitigate the need to avoid using 'read -p' 
+        (with an extra style removing check on the supplied prompt to make sure no style is passed).
+        
+        No option will set never set a style
+        Option (optional) can be one of these: 
+            - 'filecomp-only' will cause reade to only remove colors/styles when using read's filecompletion flag '-e'.
+            - 'nocomp' will ${bold}not${normal} remove colors/styles but will instead read will opt to never use multiple autocompletion (to avoid moving arrowkeys up and down breaking prompts) ${bold}apart from the first pregiven/prefix ${underline_on}which will be returned if flag is supplied and answer is empty${normal} 
+
+        There's also a environment variable READE_NOSTYLE that can be set beforehand with options: 'true', 'false', 'nocomp', 'filecomp-only'
+        This flag will preceed the option set with READE_NOSTYLE. 
+    
+   -b, --break=chars ${underline_on}list_of_characters${underline_off} 
+
+       (From rlwrap manual) Consider  the specified characters word-breaking (whitespace is always word-breaking). This determines what is considered a \"word\", both when completing and when building a completion word list from files specified by -f options following (not preceding!) it.\n Default list (){}[],'+-=&^%%\$#@\";|\ \n Unless -c is specified, / and . (period) are included in the default list
+       
+       ${bold}( This option is kind of broken )${bold}\n\n"
 
     while :; do
         case $1 in
@@ -120,23 +147,45 @@ function reade() {
     for arg in "$@"; do
         shift
         case "$arg" in
-        '--break-chars') set -- "$@" '-b' ;;
-        '--colour') set -- "$@" '-Q' ;;
-        '--prompt') set -- "$@" '-p' ;;
-        '--file-completions') set -- "$@" '-e' ;;
-        '--pre-given') set -- "$@" '-i' ;;
-        '--no-echo') set -- "$@" '-s' ;;
-        *) set -- "$@" "$arg" ;;
+            '--break-chars')        set -- "$@" '-b' ;;
+            '--colour')             set -- "$@" '-Q' ;;
+            '--prompt')             set -- "$@" '-p' ;;
+            '--file-completions')   set -- "$@" '-e' ;;
+            '--pre-given')          set -- "$@" '-i' ;;
+            '--read-no-style')      set -- "$@" '-r' ;; 
+            '--no-echo')            set -- "$@" '-s' ;;
+            *)                      set -- "$@" "$arg" ;;
         esac
     done
 
     local fcomp='n'
+    local nostyle='n'
     local noecho='n'
 
-    while getopts 'sS:b:e:i:p:Q:' flag; do
+    if [[ "$READE_NOSTYLE" ]]; then
+        [[ "$READE_NOSTYLE" == 'false' ]] && nostyle='n'  
+        [[ "$READE_NOSTYLE" == 'true' ]] && nostyle='y'
+        [[ "$READE_NOSTYLE" == 'nocomp' ]] && nostyle='c'  
+        [[ "$READE_NOSTYLE" == 'filecomp-only' ]] && nostyle='f'  
+    fi
+
+    while getopts 'rs:b:e:i:p:Q:r:' flag; do
         case "${flag}" in
         e)
             fcomp='y'
+            ;;
+        r)
+            nostyle='y'
+            if [[ "${OPTARG}" ]]; then
+                if [[ "${OPTARG}" == 'nocomp' ]]; then
+                    nostyle= 'c'
+                elif [[ "${OPTARG}" == 'filecomp-only' ]]; then
+                    nostyle='f'
+                else
+                    echo "${red}'${OPTARG}'${normal} is not an option for -r, --read-no-style"
+                    return 1
+                fi
+            fi
             ;;
         s)
             noecho='y'
@@ -146,14 +195,14 @@ function reade() {
 
     local rlwrap_installable='y'
 
-    if [[ $(uname -s) =~ 'MINGW' ]] && ! type pacman &>/dev/null; then
+    if [[ $(uname -s) =~ 'MINGW' ]] && ! type hash &>/dev/null; then
         rlwrap_installable='n'
     fi
 
-    if ! type rlwrap &>/dev/null || [[ "$fcomp" == 'y' ]] || [[ "$rlwrap_installable" == 'n' ]]; then
-      
-        local readstr='' 
-        
+    if ! hash rlwrap &>/dev/null || [[ "$fcomp" == 'y' ]] || [[ "$rlwrap_installable" == 'n' ]]; then
+
+        local readstr=''
+
         if test -n "$BASH_VERSION"; then
             readstr="read -r vvvvvvvvvv"
         fi
@@ -165,14 +214,14 @@ function reade() {
                 readstr="vvvvvvvvvv=''; vared vvvvvvvvvv"
             fi
         fi
-        
+     
+	local oldhist=''
         local color=""
         local args=''
         local tmpf=''
-        local oldhist=''
-        local eflag=0
+	local eflag=0
         local pre=''
-        while getopts 'sS:b:e:i:p:Q:' flag; do
+        while getopts 'rsS:b:e:i:p:Q:' flag; do
             case "${flag}" in
             b) ;;
             e)
@@ -188,54 +237,65 @@ function reade() {
                 arg="$(echo ${OPTARG} | awk '{print $1;}')"
                 args="$(echo ${OPTARG} | sed "s/\<$arg\> //g")"
 
+                local eflag='-e' 
+
+                [[ $nostyle == 'c' ]] && eflag=''
+
                 if test -n "$BASH_VERSION"; then
-                    readstr=$(echo "$readstr" | sed 's|read |read -e -i "'"$arg"'" |g')
-                fi 
-                
+                    readstr=$(echo "$readstr" | sed 's|read |read '"$eflag"' -i "'"$arg"'" |g')
+                fi
+
                 if test -n "$ZSH_VERSION" && [[ $noecho == 'n' ]]; then
                     readstr=$(echo "$readstr" | sed 's|vvvvvvvvvv=.*; vared|vvvvvvvvvv=""; vared -h|g')
                 fi
                 pre="$arg"
 
-                if ! test -z "$args"; then
+                if test -n "$args" && ! [[ "$nostyle" == 'c' ]]; then
                     args=$(echo "$args" | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }')
                     args=$(echo "$args" | tr ' ' '\n')
 
                     tmpf=$(mktemp)
 
                     echo "$args" >"$tmpf"
-                  
-                    test -e $HISTFILE &&
-                        oldhist=$HISTFILE
 
-                    ! test -e $HISTFILE && test -n $BASH_VERSION && test -f ~/.bash_history && test -n "$(cat ~/.bash_history)" &&
-                        oldhist=~/.bash_history 
+                    #test -e $HISTFILE &&
 
-                    ! test -e $HISTFILE && test -n $ZSH_VERSION && test -f ~/.zhistory && test -n "$(cat ~/.zhistory)" &&
-                        oldhist=~/.zhistory 
-                     
-                    if ! test -e "$HISTFILE"; then
-                        oldhist=$(mktemp)
-                        echo $(history | awk '{$1=""; print; }') > $oldhist
-                    fi
-                
-		    if test -n "$BASH_VERSION"; then
+                    #! test -e $HISTFILE && test -n $BASH_VERSION && test -f ~/.bash_history && test -n "$(cat ~/.bash_history)" &&
+                    #    oldhist=~/.bash_history
+
+                    #if test -n $ZSH_VERSION; then
+                    #    if [[ $machine == 'Mac' ]] && test -f ~/.zsh_history && test -n "$(cat ~/.zsh_history)"; then
+                    #        oldhist=~/.zsh_history
+                    #    elif test -f ~/.zhistory && test -n "$(cat ~/.zhistory)"; then
+                    #        oldhist=~/.zhistory
+                    #    fi
+                    #fi
+
+                    #if ! test -e "$HISTFILE"; then
+                    oldhist=$(mktemp)
+                    echo -e "$(history | awk '{$1=""; print;}')" > $oldhist
+                    #fi
+
+                    if test -n "$BASH_VERSION"; then
                         while IFS='' read -r LINE || [ -n "${LINE}" ]; do
                             history -s "${LINE}"
                         done <"$tmpf"
                         history -c
                         history -r $tmpf
                     fi
-                    
+
                     if test -n "$ZSH_VERSION"; then
                         echo "$arg" >>"$tmpf"
 
                         while IFS='' read -r LINE || [ -n "${LINE}" ]; do
                             print -S "${LINE}"
-                        done < $tmpf
-                        fc -p "$tmpf"
+                        done <$tmpf
+			# Write to current historyfile
+			fc -W
+			# Then load different one - no need to clear
+			fc -p "$tmpf"
                     fi
-                    
+
                     # https://unix.stackexchange.com/questions/265957/zsh-histfile-still-read-from-zsh-history
                 fi
                 ;;
@@ -264,11 +324,29 @@ function reade() {
                 ;;
             p)
                 if test -n "$BASH_VERSION"; then
-                    test -z "$color" &&
-                        readstr=$(echo "$readstr" | sed 's|read |printf "'"${OPTARG}"'\n"; read |g') ||
+                    
+                    if [[ $nostyle == 'y' ]] || ([[ $nostyle == 'f' ]] && [[ $fcomp == 'y' ]]); then 
+                       
+                        # Removing other styles and colours from prompt using sed
+                        # https://stackoverflow.com/questions/58096998/how-to-remove-color-style-format-from-a-variable 
+                        
+                        local pre="$(echo shopt | grep 'extglob' | awk '{print $2;}')"
+                        shopt -s extglob
+                        OPTARG="${OPTARG//$'\e'[\[(]*([0-9;])[@-n]/}"
+                        readstr=$(echo "$readstr" | sed 's|read |read -p "'"${OPTARG}"'" |g')
+                        
+                        [[ "$pre" == 'off' ]] && 
+                            shopt -u extglob 
+                    
+                    elif [[ $nostyle == 'c' ]]; then
+                        readstr=$(echo "$readstr" | sed 's|read |read -p "'"${color}${OPTARG}${normal}"'" |g')
+                    elif test -z "$color"; then
+                        readstr=$(echo "$readstr" | sed 's|read |printf "'"${OPTARG}"'\n"; read |g') 
+                    else
                         readstr=$(echo "$readstr" | sed 's|read |printf "'"${color}${OPTARG}${normal}"'\n"; read |g')
-                fi 
-                
+                    fi
+                fi
+
                 if test -n "$ZSH_VERSION"; then
                     if [[ $noecho == 'y' ]]; then
                         test -z "$color" &&
@@ -290,43 +368,40 @@ function reade() {
         done
 
         shift $((OPTIND - 1))
-        
-        local oldtrps="$(trap)" 
-      
-        # https://stackoverflow.com/questions/14702148/how-to-fire-a-command-when-a-shell-script-is-interrupted 
+
+        local oldtrps="$(trap)"
+
+        # https://stackoverflow.com/questions/14702148/how-to-fire-a-command-when-a-shell-script-is-interrupted
 
         test -n "$BASH_VERSION" &&
-        trap "history -c; history -r $oldhist; command rm -f $tmpf; eval \"$oldtrps\"; return 1" SIGINT 
-        #exitfn() {
-        #    trap SIGINT
-        #    history -c
-        #    history -r $oldhist
-        #    command rm -f $tmpf 
-        #    return
-        #} &&
-        #trap "exitfn" SIGINT 
+            trap "history -c; history -r $oldhist; command rm -f $tmpf; test -n \"$oldtrps\" && eval \"$oldtrps\" || trap - SIGINT; return" SIGINT
         
-        test -n "$ZSH_VERSION" && 
-        TRAPINT() {
-            fc -R $oldhist 
-            command rm -f $tmpf
-            return $((128+$1)) 
-        }
+	test -n "$ZSH_VERSION" &&
+	   TRAPINT() {
+	      fc -IR $oldhist
+              fc -IR
+	      command rm -f "$tmpf"
+              return $((128 + $1))
+           }
 
         eval "${readstr}"
 
-        test -n "$BASH_VERSION" && 
-            history -c && 
+        test -n "$BASH_VERSION" &&
+            history -c &&
             history -r $oldhist
-            trap SIGINT
-     
-        test -n "$ZSH_VERSION" && 
-            fc -R $oldhist
-        
-        eval "$oldtrps"
-        
+
+        test -n "$ZSH_VERSION" &&
+	    fc -IR $oldhist
+             
+
+        if test -n "$oldtrps"; then
+            eval "$oldtrps"
+        else
+            trap - SIGINT
+        fi
+
         [ -e "$tmpf" ] && command rm -f $tmpf
-        
+
         if ! test -z "$pre" && test -z "$vvvvvvvvvv" || [[ "$vvvvvvvvvv" == "" ]]; then
             vvvvvvvvvv="$pre"
         fi
@@ -334,15 +409,15 @@ function reade() {
         export READE_VALUE="$vvvvvvvvvv"
         export REPLY="$vvvvvvvvvv"
 
-        if ! test -z "$@"; then
+        if test -n "$@"; then
             eval "${@:$#:1}='$vvvvvvvvvv'"
         fi
-
+	
     else
         if [[ $# < 1 ]]; then
             echo "Give at least 1 variable up for reade(). "
             echo "- A variable for the return string"
-            return 0
+            return 1
         fi
 
         local breaklines=''
@@ -365,7 +440,7 @@ function reade() {
                 frst="$(echo ${OPTARG} | awk '{print $1}')"
                 rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-P \"$frst\" |g")
                 args=$(echo ${OPTARG} | sed "s|\<$frst\> ||g")
-                ! test -z "$args" &&
+                test -n "$args" &&
                     args=$(echo $args | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }') &&
                     args=$(echo $args | tr ' ' '\n') &&
                     tmpf=$(mktemp) &&

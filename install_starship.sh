@@ -1,29 +1,34 @@
 #!/usr/bin/env bash
 
-if ! test -f checks/check_all.sh; then
-    if type curl &>/dev/null; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
-    else
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-        return 1 || exit 1
-    fi
-else
-    . ./checks/check_all.sh
+if ! test -f checks/check_all.sh; then 
+    if command -v curl &> /dev/null; then 
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)  
+    else  
+        continue  
+    fi 
+else 
+    . ./checks/check_all.sh 
 fi
 
-get-script-dir SCRIPT_DIR
+SCRIPT_DIR=$(pwd)
 
 # https://unix.stackexchange.com/questions/690233/piping-yes-when-running-scripts-from-curl
 
 sh -c "$(curl -fsSL https://starship.rs/install.sh)" -y -f
 
-readyn -p "Install starship.sh for user?" strship
+readyn -p "Install starship for user?" strship
 if [[ "y" == "$strship" ]]; then
-    if ! grep -q "starship" ~/.bashrc; then
-        echo "eval \"\$(starship init bash)\"" >>~/.bashrc
+    # It's best that starship is initialized on the last line
+    # Otherwise it doesn't play nice with ~/.bash_preexec.sh
+    if grep -q "starship" ~/.bashrc; then
+        sed -i '/starship init bash/d' ~/.bashrc 
+    fi
+    printf "\neval \"\$(starship init bash)\"\n" >>~/.bashrc
+    if ! grep -q "starship" ~/.zshrc; then
+        printf "\neval \"\$(starship init zsh)\"\n" >>~/.zshrc
     fi
     if ! test -f checks/check_completions_dir.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)"
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)
     else
         . ./checks/check_completions_dir.sh
     fi
@@ -40,7 +45,7 @@ if [[ "y" == "$strship" ]]; then
         fi
 
         if type gio &>/dev/null && test -f ~/.bash_aliases.d/starship.sh~; then
-            gio trash ~/.bash_aliases.d/starship.sh~
+            gio trash ~/.bash_aliases.d/starship.sh~*
         fi
     fi
 fi
@@ -49,7 +54,7 @@ unset strship
 readyn -p "Install starship.sh for root?" strship
 if [[ "y" == "$strship" ]]; then
     if ! sudo grep -q "starship" /root/.bashrc; then
-        printf "eval \"\$(starship init bash)\"\n" | sudo tee -a /root/.bashrc &>/dev/null
+        printf "\neval \"\$(starship init bash)\"\n" | sudo tee -a /root/.bashrc &>/dev/null
         #if sudo grep -q '[ -f .bash_preexec ]' /root/.bashrc; then
         #sudo sed -i '/eval "$(starship init bash)"/d' /root/.bashrc
         #sudo sed -i 's|\(\[ -f ~/.bash_preexec \] \&\& source \~/.bash_preexec\)|\neval "$(starship init bash)"\n\1\n|g' /root/.bashrc
@@ -58,7 +63,7 @@ if [[ "y" == "$strship" ]]; then
     fi
 
     if ! test -f checks/check_completions_dir.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)"
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)
     else
         . ./checks/check_completions_dir.sh
     fi
@@ -66,21 +71,33 @@ if [[ "y" == "$strship" ]]; then
     starship completions bash | sudo tee -a /root/.bash_completion.d/starship &>/dev/null
     if [ -d /root/.bash_aliases.d/ ]; then
         if test -f aliases/.bash_aliases.d/starship.sh; then
-            sudo cp -bfv aliases/.bash_aliases.d/starship.sh /root/.bash_aliases.d/
+            sudo cp -fbv  aliases/.bash_aliases.d/starship.sh /root/.bash_aliases.d/
         else
             sudo curl -o /root/.bash_aliases.d/starship.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/starship.sh
         fi
         if type gio &>/dev/null && test -f /root/.bash_aliases.d/starship.sh~; then
-            sudo gio trash ~/.bash_aliases.d/starship.sh~
+            sudo gio trash /root/.bash_aliases.d/starship.sh~*
         fi
     fi
 fi
 unset strship
 
-eval "$(starship init bash)"
+if ! test -f ./checks/check_bash_source_order.sh; then
+    if type curl &>/dev/null; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_bash_source_order.sh)
+    else
+        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
+        return 1 || exit 1
+    fi
+else
+    . ./checks/check_bash_source_order.sh
+fi
+
+test -n "$BASH_VERSION" && eval "$(starship init bash)"
+test -n "$ZSH_VERSION" && eval "$(starship init zsh)"
 
 if ! test -f aliases/.bash_aliases.d/starship.sh; then
-    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/starship.sh)"
+    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/starship.sh)
 else
     . ./aliases/.bash_aliases.d/starship.sh
 fi
@@ -90,5 +107,9 @@ if type fzf &>/dev/null; then
 elif ! type fzf &>/dev/null && test -f ~/.fzf.bash; then
     echo "No fzf found!!"
     [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+    starship-presets
+elif ! type fzf &> /dev/null && test -f ~/.fzf.zsh; then
+    echo "No fzf found!!"
+    [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
     starship-presets
 fi

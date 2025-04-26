@@ -16,7 +16,8 @@ function starship-presets() {
             printf '\n[directory]\nhome_symbol = "'"$HOME"'"' >> ~/.config/starship.toml
         fi
     fi
-    source ~/.bashrc
+    test -n "$BASH_VERSION" && source ~/.bashrc
+    test -n "$ZSH_VERSION" && source ~/.zshrc
     unset hmdir
     readyn -p "Set prompt identical for root?" hmdir
     if [[ "$hmdir" == "y" ]]; then
@@ -33,5 +34,7 @@ function starship-uninstall() {
     file="$(whereis starship | awk '{print $2}')"
     sudo rm $file 
     sed -i '/eval "$(starship init bash)"/d' ~/.bashrc
-    source .bashrc
+    sed -i '/eval "$(starship init zsh)"/d' ~/.zshrc
+    test -n "$BASH_VERSION" && source ~/.bashrc
+    test -n "$ZSH_VERSION" && source ~/.zshrc
 }

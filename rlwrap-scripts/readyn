@@ -18,6 +18,7 @@ function readyn(){
     
     local red=$(tput setaf 1)
     local red1=$(tput setaf 9)
+    local orange=$(tput setaf 166)
     local green=$(tput setaf 2)
     local green1=$(tput setaf 10)
     local yellow=$(tput setaf 3)
@@ -35,6 +36,7 @@ function readyn(){
 
     local RED=$(tput setaf 1 && tput bold)
     local RED1=$(tput setaf 9 && tput bold)
+    local ORANGE=$(tput setaf 166 && tput bold)
     local GREEN=$(tput setaf 2 && tput bold)
     local GREEN1=$(tput setaf 10 && tput bold)
     local YELLOW=$(tput setaf 3 && tput bold)
@@ -49,6 +51,7 @@ function readyn(){
     local WHITE1=$(tput setaf 15 && tput bold)
     local BLACK=$(tput setaf 16 && tput bold)
     local GREY=$(tput setaf 8 && tput bold)
+
 
     local bold=$(tput bold)
     local underline_on=$(tput smul)
@@ -66,12 +69,15 @@ function readyn(){
     local underline=$(tput ul)
     local italic=$(tput it)
 
-    local VERSION='1.0' 
+    local VERSION='2.0' 
 
     while :; do
         case $1 in
             -h|-\?|--help|'')
-                printf "     ${bold}readyn${normal} [ -h/--help ] [ -v/--version ]  [ -y/--yes [ PREFILL ] ]  [ -n/--no [ CONDITION ] ] [ -p/--prompt PROMPTSTRING ] [ -Q/--colour COLOURSTRING ]  [ -b/--break-chars BREAK-CHARS ] [ returnvar ]\n
+                printf "${bold}READYN${normal} [ -h/--help ] [ -v/--version ]  [ -y/--yes [ PREFILL ] ]  [ -n/--no [ CONDITION ] ]  [ -p/--prompt PROMPTSTRING ] [ -Q/--colour COLOURSTRING ] [ -r / --read-no-style [ NOCOMP ] ]  [ -b/--break-chars BREAK-CHARS ]  returnvar\n
+        
+         readyn version $VERSION
+               
          Simplifies yes/no prompt for ${bold}reade${normal}. 
          Takes at least one argument, otherwise will prompt help page.
          
@@ -102,8 +108,8 @@ function readyn(){
 
         -c, --condition ${underline_on}CONDITION${underline_off} 
 
-            At default will prefer to prompt the '--no' flag over the '--yes' flag. 
-            If you only want the '--no' prompt to be applicable when a given condition is active then give it up as an argument in a string. 
+            Set the prefix to '[${underline_on}Y${underline_off}(es)/${underline_on}n${underline_off}o]: ' only if the given condition is true, 
+            otherwise will set '[${underline_on}N${underline_off}(o)/${underline_on}y${underline_off}(es)]: '  
 
         -Y, --yes-colour ${underline_on}COLOUR${underline_off}
             Default: ${GREEN}GREEN${normal} 
@@ -116,7 +122,26 @@ function readyn(){
 
         -a, --auto 
             
-            Fill in with the pregiven immediately
+            Fill in with the pregiven immediately. Usefull when running variants of scripts that use readyn and are supposed to automatically fill in a default answer.
+
+        -r, --read-no-style [ NOCOMP - ${bold}'0'${normal}/'1' ] 
+
+            This will stop read from using ${GREEN}colors${normal}/${bold}${underline_on}styles${normal} when applied.
+        
+            As read is pretty archaic and has been broken for a while, having a colorized 'read -p' prompt that uses prefixes/autocomp while obtaining bashhistory from readline using the '-e' flag can be problematic because cycling enough times through the given options will cause part of the option to 'stick' to the prompt - essentially breaking the prompt.
+            This is why most reade/readyn colorized prompts have their autocompletion underneath the prompt when rlwrap is not installed - - it uses 'printf PROMPT' instead of using 'read -p PROMPT' 
+            (!! ${bold}even when no color is supplied, since color/style can still supplied as a part of a given prompt so this is suspected${normal} !!). 
+            
+            This flag ${bold}${underline_on}mitigates that${normal}, which will remove all applied colors/styles and thus mitigate the need to avoid using 'read -p' 
+            (with an extra style removing check on the supplied prompt to make sure no style is passed).
+            
+            No option will set never set a style
+            Nocomp (optional) can be one '0' (Default) or '1'. 
+            If set it will ${bold}not${normal} remove colors/styles but will instead read will opt to never use multiple autocompletion (to avoid moving arrowkeys up and down breaking prompts) ${bold}apart from the first pregiven/prefix ${underline_on}which will be returned if flag is supplied and answer is empty${normal} 
+
+            There's also a environment variable READE_NOSTYLE that can be set beforehand with options: 'true', 'false', 'nocomp', 'filecomp-only'
+            This flag will preceed the option set with READE_NOSTYLE.
+            Readyn will ignore READE_NOSTYLE when set to 'filecomp-only' 
 
         -b ${underline_on}list_of_characters${underline_off} 
 
@@ -124,7 +149,10 @@ function readyn(){
             Consider  the specified characters word-breaking (whitespace is always word-breaking). 
             This determines what is considered a \"word\", both when completing and when building a completion word list from files specified by -f options following (not preceding!) it.
             Default list (){}[],'+-=&^%%\$#@\";|\  
-            Unless -c is specified, / and . (period) are included in the default list\n\n"
+            Unless -c is specified, / and . (period) are included in the default list
+            
+            ${bold}( This option is kind of broken )${bold}\n\n"
+            
             return 0
           ;;
           -v|--version) 
@@ -138,7 +166,6 @@ function readyn(){
        esac
     done && OPTIND=1;
 
-
     #https://stackoverflow.com/questions/12022592/how-can-i-use-long-options-with-the-bash-getopts-builtin
 
     for arg in "$@"; do
@@ -151,10 +178,11 @@ function readyn(){
         '--no-colour')         set -- "$@" '-N'   ;;
         '--prompt')            set -- "$@" '-p'   ;;
         '--condition')         set -- "$@" '-c'   ;;
+        '--read-no-style')     set -- "$@" '-r'   ;; 
         '--break-chars')       set -- "$@" '-b'   ;;
         *)                     set -- "$@" "$arg" ;;
       esac
-    done 
+    done  
    
     local breaklines=''
     local condition='' 
@@ -171,9 +199,11 @@ function readyn(){
     local color="$ycolor" 
     local ygivn=0, ngivn=0 
     local auto=''
+    local nostyle=''
+
 
     OPTIND=1
-    while getopts 'anyb:Y:N:c:p:y:n:' flag; do
+    while getopts 'anyrb:Y:N:c:p:y:n:r:' flag; do
         case "${flag}" in
              a)  auto='y' 
                  ;;
@@ -245,8 +275,15 @@ function readyn(){
                     fi
                 fi
                 ;; 
-
-              c) if [[ "${OPTARG}" ]] && ! [[ "${OPTARG}" == '--' ]] && ! [[ ${OPTARG} =~ ^-.* ]]; then
+             r) nostyle='-r' 
+                if [[ "${OPTARG}" == 1 ]] && ! [[ "${OPTARG}" == '--' ]] && ! [[ ${OPTARG} =~ ^-.* ]]; then 
+                    nostyle='-r "nocomp"';
+                fi 
+                if [[ ${OPTARG} =~ ^-.* ]]; then
+                    OPTIND=$(($OPTIND - 1)) 
+                fi
+                ;;
+             c) if [[ "${OPTARG}" ]] && ! [[ "${OPTARG}" == '--' ]] && ! [[ ${OPTARG} =~ ^-.* ]]; then
                     condition="${OPTARG}"
                 fi 
                 if [[ ${OPTARG} =~ ^-.* ]]; then
@@ -270,32 +307,44 @@ function readyn(){
         othr=$pre_y 
     fi
 
-    if ! test -z "$condition" && eval "${condition}"; then
-        [[ "$prmptn" == "${underline_on}n${underline_off}o" ]] && prmptn="${underline_on}N${underline_off}o"  
-        [[ "$prmpty" == "${underline_on}Y${underline_off}es" ]] && prmpty="${underline_on}y${underline_off}es"  
-        prmpt1=" [$prmptn/$prmpty]: "
-        color="$ncolor"
-        pre=$pre_n 
-        othr=$pre_y 
+    if ! test -z "$condition"; then 
+        if eval "${condition}"; then
+            [[ "$prmptn" == "${underline_on}n${underline_off}o" ]] && prmptn="${underline_on}n${underline_off}o"  
+            [[ "$prmpty" == "${underline_on}Y${underline_off}es" ]] && prmpty="${underline_on}Y${underline_off}es"  
+            prmpt1=" [$prmpty/$prmptn]: "
+            color="$ycolor"
+            pre=$pre_y 
+            othr=$pre_n 
+        else
+            [[ "$prmptn" == "${underline_on}n${underline_off}o" ]] && prmptn="${underline_on}N${underline_off}o"  
+            [[ "$prmpty" == "${underline_on}Y${underline_off}es" ]] && prmpty="${underline_on}y${underline_off}es"  
+            prmpt1=" [$prmptn/$prmpty]: "
+            color="$ncolor"
+            pre=$pre_n 
+            othr=$pre_y
+        fi
     fi
 
     if ! test -z "$auto"; then
         if test -z "$prmpt"; then
-            test -z $ZSH_VERSION &&
-                printf "${!color}$prmpt1$pre${normal}\n" ||
+            test -n "$BASH_VERSION" &&
+                printf "${!color}$prmpt1$pre${normal}\n"; 
+            test -n "$ZSH_VERSION" &&
                 printf "${(P)color}$prmpt1$pre${normal}\n";   
         else
-            test -z $ZSH_VERSION &&
-                printf "${!color}$prmpt$prmpt1$pre${normal}\n" || 
+
+            test -n "$BASH_VERSION" &&
+                printf "${!color}$prmpt$prmpt1$pre${normal}\n"; 
+            test -n "$ZSH_VERSION" &&
                 printf "${(P)color}$prmpt$prmpt1$pre${normal}\n";   
 
         fi
         vvvvvvvvvv=$pre 
     else
         if test -z "$prmpt"; then
-            reade -Q "$color" $breaklines -i "$pre $othr" -p "$prmpt1" vvvvvvvvvv;   
+            reade -Q "$color" $nostyle $breaklines -i "$pre $othr" -p "$prmpt1" vvvvvvvvvv;   
         else
-            reade -Q "$color" $breaklines -i "$pre $othr" -p "$prmpt$prmpt1" vvvvvvvvvv;    
+            reade -Q "$color" $nostyle $breaklines -i "$pre $othr" -p "$prmpt$prmpt1" vvvvvvvvvv;    
         fi
          
     fi 

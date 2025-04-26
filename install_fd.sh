@@ -14,7 +14,7 @@ fi
 if ! type fd &> /dev/null; then
     if [[ $distro_base == "Arch" ]]; then
         eval "$pac_ins fd"
-    elif [[] $distro_base == "Debian" ]]; then
+    elif [[ $distro_base == "Debian" ]]; then
         eval "$pac_ins fd-find"
         if ! test -f ~/.local/bin/fd; then
             ln -s $(which fdfind) ~/.local/bin/fd
@@ -25,7 +25,7 @@ fi
 # TODO: Make better check: https://github.com/sharkdp/fd
 if type fd-find &> /dev/null || type fd &> /dev/null; then
     echo "${green}Fd can read from global gitignore file${normal}"
-    reade -Q "YELLOW" -i "n" -p "Generate global gitignore using 'themed' templates? (https://github.com/github/gitignore) [N/y]: " "y" fndgbl
+    readyn -n -p "Generate global gitignore using 'themed' templates? (https://github.com/github/gitignore)" fndgbl
     if [[ $fndgbl == 'y' ]]; then
         if ! test -f install_gitignore.sh; then
             b=$(mktemp)

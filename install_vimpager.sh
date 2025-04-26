@@ -1,34 +1,16 @@
-if ! test -f checks/check_system.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
-else
-    . ./checks/check_system.sh
-fi
+#!/bin/bash
 
-if ! type update-system &> /dev/null; then
-    if ! test -f aliases/.bash_aliases.d/update-system.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)" 
+if ! test -f checks/check_all.sh; then
+    if type curl &>/dev/null; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        . ./aliases/.bash_aliases.d/update-system.sh
+        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
+        return 1 || exit 1
     fi
-    update-system
 else
-    readyn -Y "CYAN" -p "Update system?" updatesysm
-    if test $updatesysm == "y"; then
-        update-system                     
-    fi
-fi 
-
-if ! type reade &> /dev/null; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
-else
-    . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
+    . ./checks/check_all.sh
 fi
 
-if ! test -f checks/check_envvar.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)" 
-else
-    . ./checks/check_envvar.sh
-fi
 
 if type nvimpager &> /dev/null; then
     if test $distro_base == "Debian"; then
@@ -51,43 +33,42 @@ if type nvimpager &> /dev/null; then
 fi
 
 readyn -p "Set .vimrc as default vimpager read config for $USER?" conf
-if test "$conf" == "y"; then
-    if grep -q "VIMPAGER_RC" $ENVVAR; then 
-        sed -i "s|.export VIMPAGER_RC=|export VIMPAGER_RC=|g" $ENVVAR
-        sed -i "s|export VIMPAGER_RC=.*|export VIMPAGER_RC=~/.vimrc|g" $ENVVAR
+if [[ "$conf" == "y" ]]; then
+    if grep -q "VIMPAGER_RC" $ENV; then 
+        sed -i "s|.export VIMPAGER_RC=|export VIMPAGER_RC=|g" $ENV
+        sed -i "s|export VIMPAGER_RC=.*|export VIMPAGER_RC=~/.vimrc|g" $ENV
     else
-        printf "\n# VIMPAGER\nexport VIMPAGER_RC=~/.vimrc\n" >> $ENVVAR
+        printf "\n# VIMPAGER\nexport VIMPAGER_RC=~/.vimrc\n" >> $ENV
     fi
 fi
 
 readyn -p "Set vimpager as default pager for $USER?" moar_usr
 if [ -z "$moar_usr" ] || [ "y" == "$moar_usr" ] || [ "Y" == "$moar_usr" ]; then
-    if grep -q " PAGER=" $ENVVAR; then 
-        sed -i "s|.export PAGER=|export PAGER=|g" $ENVVAR
-        sed -i "s|export PAGER=.*|export PAGER=$(whereis vimpager | awk '{print $2;}')|g" $ENVVAR
+    if grep -q " PAGER=" $ENV; then 
+        sed -i "s|.export PAGER=|export PAGER=|g" $ENV
+        sed -i "s|export PAGER=.*|export PAGER=$(whereis vimpager | awk '{print $2;}')|g" $ENV
     else
-        printf "export PAGER=$(whereis vimpager | awk '{print $2;}')\n" >> $ENVVAR
+        printf "export PAGER=$(whereis vimpager | awk '{print $2;}')\n" >> $ENV
     fi
 fi
 
 reade -Q 'YELLOW' -i 'y' -p "Set .vimrc as default vimpager read config for root?" conf
 if test "$conf" == "y"; then
-    if sudo grep -q "VIMPAGER_RC" $ENVVAR_R; then 
-        sudo sed -i "s|.export VIMPAGER_RC=|export VIMPAGER_RC=|g" $ENVVAR_R
-        sudo sed -i "s|export VIMPAGER_RC=.*|export VIMPAGER_RC=~/.vimrc|g" $ENVVAR_R
+    if sudo grep -q "VIMPAGER_RC" $ENV_R; then 
+        sudo sed -i "s|.export VIMPAGER_RC=|export VIMPAGER_RC=|g" $ENV_R
+        sudo sed -i "s|export VIMPAGER_RC=.*|export VIMPAGER_RC=~/.vimrc|g" $ENV_R
     else
-        printf "\n# VIMPAGER\nexport VIMPAGER_RC=~/.vimrc\n" | sudo tee -a $ENVVAR_R &> /dev/null
+        printf "\n# VIMPAGER\nexport VIMPAGER_RC=~/.vimrc\n" | sudo tee -a $ENV_R &> /dev/null
     fi
 fi
 
-    
 reade -Q "YELLOW" -i "y" -p "Set vimpager default pager for root?" moar_root
 if [ -z "$moar_root" ] || [ "y" == "$moar_root" ] || [ "Y" == "$moar_root" ]; then
-    if sudo grep -q " PAGER=" $ENVVAR_R; then
-        sudo sed -i "s|.export PAGER=|export PAGER=|g" $ENVVAR_R
-        sudo sed -i "s|export PAGER=.*|export PAGER=$(whereis vimpager | awk '{print $2;}')|g" $ENVVAR_R
+    if sudo grep -q " PAGER=" $ENV_R; then
+        sudo sed -i "s|.export PAGER=|export PAGER=|g" $ENV_R
+        sudo sed -i "s|export PAGER=.*|export PAGER=$(whereis vimpager | awk '{print $2;}')|g" $ENV_R
     else
-        printf "export PAGER=$(whereis vimpager | awk '{print $2;}')\n" | sudo tee -a $ENVVAR_R &> /dev/null
+        printf "export PAGER=$(whereis vimpager | awk '{print $2;}')\n" | sudo tee -a $ENV_R &> /dev/null
     fi
 fi
 

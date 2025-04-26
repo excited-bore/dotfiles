@@ -11,7 +11,7 @@ else
     . ./checks/check_all.sh
 fi
 
-get-script-dir SCRIPT_DIR
+SCRIPT_DIR=$(get-script-dir)
 
 if ! type testdisk &>/dev/null; then
     echo "This next $(tput setaf 1)sudo$(tput sgr0) will install testdisk"
