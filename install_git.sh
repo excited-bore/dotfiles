@@ -1,3 +1,5 @@
+#/bin/bash
+
 echo "$(tput setaf 6)This script uses $(tput setaf 2)rlwrap$(tput setaf 6) and $(tput setaf 2)fzf$(tput sgr0)."
 
 if ! test -f checks/check_all.sh; then
@@ -11,7 +13,8 @@ else
     . ./checks/check_all.sh
 fi
 
-get-script-dir SCRIPT_DIR
+SCRIPT_DIR=$(pwd)
+
 
 if ! test -f checks/check_envvar.sh; then
     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)"
@@ -27,59 +30,9 @@ fi
 #    fi
 #fi
 
-function git_hl() {
-    if ! test -z "$1"; then
-        cmd="$1"
-    #else
-    #    cmd="git config $global interactive.difffilter"
-    fi
+test -z $TMPDIR && TMPDIR=$(mktemp -d)
 
-    local diffs=""
-    local diff=""
-    if type delta &>/dev/null; then
-        diffs=$diffs" delta"
-        diff="delta"
-    fi
-    if type ydiff &>/dev/null; then
-        diffs=$diffs" ydiff"
-        diff="delta"
-    fi
-    if type riff &>/dev/null; then
-        diffs=$diffs" riff"
-        diff="riff"
-    fi
-    if type diffr &>/dev/null; then
-        diffs=$diffs" diffr"
-        diff="diffr"
-    fi
-    if type diff-so-fancy &>/dev/null; then
-        diffs=$diffs" diff-so-fancy"
-        diff="diff-so-fancy"
-    fi
-    if type batdiff &>/dev/null; then
-        diffs=$diffs" batdiff"
-        diff="batdiff"
-    fi
-
-    reade -Q "GREEN" -i "$diff $diffs" -p "Diff filter: " diff
-    if ! test -z $diff; then
-        readyn -Y "CYAN" -p "You selected $diff. Configure?" conf
-        if [[ "$diff" == "delta" ]]; then
-            diff="delta --color-only --paging=never"
-
-            if [[ "y" == "$conf" ]]; then
-                readyn -Y "CYAN" -p "Set syntax theme for delta?" delta1
-                if [[ "$delta1" == 'y' ]]; then
-                    echo "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Sollicitudin nibh sit amet commodo nulla facilisi. Sed cras ornare arcu dui vivamus arcu. Non quam lacus suspendisse faucibus interdum posuere lorem. Consequat ac felis donec et odio pellentesque. Elementum tempus egestas sed sed risus pretium quam. Neque viverra justo nec ultrices dui sapien eget mi proin. Varius vel pharetra vel turpis nunc eget lorem dolor sed. Mauris in aliquam sem fringilla ut morbi tincidunt augue. Cursus euismod quis viverra nibh cras. Diam sollicitudin tempor id eu. Lectus arcu bibendum at varius vel. Posuere morbi leo urna molestie at elementum eu facilisis. Condimentum lacinia quis vel eros. Dolor magna eget est lorem ipsum dolor sit amet consectetur. Ultrices dui sapien eget mi. A arcu cursus vitae congue mauris.
-
-In pellentesque massa placerat duis ultricies lacus sed turpis tincidunt. Dignissim diam quis enim lobortis scelerisque fermentum. Faucibus purus in massa tempor nec. Enim neque volutpat ac tincidunt. Penatibus et magnis dis parturient montes nascetur ridiculus. Ornare aenean euismod elementum nisi quis eleifend quam adipiscing. Elementum pulvinar etiam non quam lacus suspendisse faucibus interdum. Vel eros donec ac odio tempor orci dapibus ultrices. Tempus imperdiet nulla malesuada pellentesque elit eget gravida. In ante metus dictum at tempor commodo ullamcorper.
-
-Feugiat sed lectus vestibulum mattis ullamcorper velit sed ullamcorper. Aliquet nibh praesent tristique magna sit amet purus. Dignissim diam quis enim lobortis scelerisque. Turpis egestas sed tempus urna et. Est sit amet facilisis magna. At tellus at urna condimentum mattis pellentesque. Bibendum ut tristique et egestas quis ipsum suspendisse ultrices. Diam sollicitudin tempor id eu. Vulputate sapien nec sagittis aliquam malesuada bibendum arcu vitae elementum. Aliquet nibh praesent tristique magna sit. Dictum fusce ut placerat orci nulla pellentesque dignissim enim. Laoreet sit amet cursus sit amet dictum. Amet consectetur adipiscing elit duis tristique. Phasellus vestibulum lorem sed risus ultricies tristique nulla aliquet.
-
-Eu augue ut lectus arcu bibendum at varius vel pharetra. Urna nunc id cursus metus. Massa eget egestas purus viverra. Ornare quam viverra orci sagittis eu volutpat odio facilisis. Ornare arcu dui vivamus arcu felis bibendum. Sollicitudin aliquam ultrices sagittis orci a. In eu mi bibendum neque egestas congue quisque egestas diam. Consectetur adipiscing elit duis tristique sollicitudin nibh sit amet commodo. Risus in hendrerit gravida rutrum quisque non. Justo eget magna fermentum iaculis eu. Ut consequat semper viverra nam libero justo laoreet sit. Vel pretium lectus quam id leo in vitae turpis. Praesent semper feugiat nibh sed pulvinar.
-
-Condimentum lacinia quis vel eros donec ac. Nibh sed pulvinar proin gravida hendrerit lectus a. Volutpat consequat mauris nunc congue nisi vitae suscipit tellus. Mi tempus imperdiet nulla malesuada pellentesque elit eget. Scelerisque in dictum non consectetur. Ac ut consequat semper viverra nam libero justo laoreet sit. Lectus magna fringilla urna porttitor rhoncus. Integer vitae justo eget magna fermentum. Nisl pretium fusce id velit ut. In aliquam sem fringilla ut morbi tincidunt augue. Vitae tempus quam pellentesque nec nam aliquam sem et. Eget mauris pharetra et ultrices neque. At augue eget arcu dictum. Eget duis at tellus at. Mauris ultrices eros in cursus turpis massa tincidunt dui. Aliquet nec ullamcorper sit amet. Eu feugiat pretium nibh ipsum consequat nisl vel pretium lectus." >$TMPDIR/dtest1
-                    echo "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Malesuada fames ac turpis egestas sed tempus urna. Maecenas volutpat blandit aliquam etiam erat velit scelerisque in. Cras fermentum odio eu feugiat pretium nibh ipsum consequat. Nam aliquam sem et tortor consequat id. Habitasse platea dictumst vestibulum rhoncus est pellentesque. Pellentesque habitant morbi tristique senectus et netus et malesuada fames. Mattis molestie a iaculis at erat pellentesque adipiscing. Condimentum lacinia quis vel eros donec ac odio. Vitae congue eu consequat ac. Netus et malesuada fames ac. Sed euismod nisi porta lorem mollis aliquam. Rhoncus est pellentesque elit ullamcorper dignissim cras. Aliquet nibh praesent tristique magna sit amet purus. Odio ut sem nulla pharetra diam sit amet nisl. Bibendum est ultricies integer quis auctor elit sed vulputate mi. Viverra ipsum nunc aliquet bibendum enim facilisis gravida neque convallis.
+echo "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Malesuada fames ac turpis egestas sed tempus urna. Maecenas volutpat blandit aliquam etiam erat velit scelerisque in. Cras fermentum odio eu feugiat pretium nibh ipsum consequat. Nam aliquam sem et tortor consequat id. Habitasse platea dictumst vestibulum rhoncus est pellentesque. Pellentesque habitant morbi tristique senectus et netus et malesuada fames. Mattis molestie a iaculis at erat pellentesque adipiscing. Condimentum lacinia quis vel eros donec ac odio. Vitae congue eu consequat ac. Netus et malesuada fames ac. Sed euismod nisi porta lorem mollis aliquam. Rhoncus est pellentesque elit ullamcorper dignissim cras. Aliquet nibh praesent tristique magna sit amet purus. Odio ut sem nulla pharetra diam sit amet nisl. Bibendum est ultricies integer quis auctor elit sed vulputate mi. Viverra ipsum nunc aliquet bibendum enim facilisis gravida neque convallis.
 
 Sociis natoque penatibus et magnis dis parturient montes. Ornare suspendisse sed nisi lacus sed viverra tellus. Eu augue ut lectus arcu bibendum at varius vel. Morbi leo urna molestie at elementum eu facilisis sed. Integer quis auctor elit sed vulputate mi. At varius vel pharetra vel. Ut consequat semper viverra nam libero. Metus vulputate eu scelerisque felis. In hendrerit gravida rutrum quisque non tellus orci. Eget gravida cum sociis natoque penatibus et magnis. Nec tincidunt praesent semper feugiat nibh sed. Id velit ut tortor pretium. Nibh cras pulvinar mattis nunc sed blandit. Augue neque gravida in fermentum et sollicitudin ac orci phasellus. Ut porttitor leo a diam sollicitudin tempor id. Nec feugiat nisl pretium fusce id velit. Amet purus gravida quis blandit turpis cursus in. Blandit libero volutpat sed cras ornare.
 
@@ -87,45 +40,122 @@ Vestibulum sed arcu non odio euismod lacinia. Cursus in hac habitasse platea dic
 
 Tortor aliquam nulla facilisi cras fermentum. A arcu cursus vitae congue mauris rhoncus. Ac orci phasellus egestas tellus rutrum tellus. Eget sit amet tellus cras. Ornare lectus sit amet est placerat in egestas erat. Dis parturient montes nascetur ridiculus. Ut eu sem integer vitae. Viverra orci sagittis eu volutpat odio facilisis mauris sit amet. Enim eu turpis egestas pretium aenean pharetra magna ac. Molestie nunc non blandit massa enim. Felis imperdiet proin fermentum leo vel orci porta non. Nibh mauris cursus mattis molestie a iaculis at erat. Elementum nibh tellus molestie nunc non blandit massa enim nec. Fringilla est ullamcorper eget nulla facilisi etiam dignissim diam quis. Lectus magna fringilla urna porttitor. Dictum fusce ut placerat orci nulla pellentesque dignissim enim. Sed id semper risus in. Nascetur ridiculus mus mauris vitae ultricies.
 
-Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placerat in egestas erat imperdiet sed euismod nisi porta. Nulla aliquet porttitor lacus luctus accumsan. Consequat semper viverra nam libero justo laoreet. Ut diam quam nulla porttitor massa id neque aliquam vestibulum. Cursus metus aliquam eleifend mi. Viverra nam libero justo laoreet sit amet. Malesuada fames ac turpis egestas maecenas pharetra convallis posuere morbi. Orci ac auctor augue mauris augue neque gravida. Sed libero enim sed faucibus turpis in eu mi bibendum. Tellus pellentesque eu tincidunt tortor aliquam nulla facilisi cras fermentum. Scelerisque purus semper eget duis at tellus at urna. Pellentesque habitant morbi tristique senectus. In metus vulputate eu scelerisque felis imperdiet proin fermentum leo. Vulputate mi sit amet mauris commodo quis imperdiet massa tincidunt." >$TMPDIR/dtest2
-                    local theme=''
-                    while test -z "$theme"; do
+Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placerat in egestas erat imperdiet sed euismod nisi porta. Nulla aliquet porttitor lacus luctus accumsan. Consequat semper viverra nam libero justo laoreet. Ut diam quam nulla porttitor massa id neque aliquam vestibulum. Cursus metus aliquam eleifend mi. Viverra nam libero justo laoreet sit amet. Malesuada fames ac turpis egestas maecenas pharetra convallis posuere morbi. Orci ac auctor augue mauris augue neque gravida. Sed libero enim sed faucibus turpis in eu mi bibendum. Tellus pellentesque eu tincidunt tortor aliquam nulla facilisi cras fermentum. Scelerisque purus semper eget duis at tellus at urna. Pellentesque habitant morbi tristique senectus. In metus vulputate eu scelerisque felis imperdiet proin fermentum leo. Vulputate mi sit amet mauris commodo quis imperdiet massa tincidunt." > $TMPDIR/test1
+
+echo "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce gravida, neque id eleifend hendrerit, ex arcu tincidunt nunc, at ullamcorper turpis arcu at erat. Maecenas dapibus nisi nibh, nec semper lacus luctus ut. Pellentesque nisi sem, malesuada hendrerit fermentum non, fermentum vitae eros. Pellentesque sodales felis massa, sit amet lobortis tellus ultrices in. Curabitur ornare est vel dui maximus fringilla. Vestibulum mattis elit mauris, ac scelerisque velit tincidunt sed. Quisque non ligula quis purus feugiat tempor vitae in risus. Vestibulum fermentum dolor lacus, non porta enim rhoncus feugiat. Fusce et ullamcorper tellus. Duis volutpat, turpis sit amet blandit sollicitudin, erat augue iaculis nisl, at porta nibh mauris eu ex. In ac sem id augue feugiat imperdiet at sit amet magna. Vestibulum fringilla, ante in posuere blandit, mauris quam blandit dui, ut tristique metus ex et nulla. Fusce a mattis est. Vestibulum facilisis nec lacus ornare faucibus. Nunc rhoncus tempor nibh sit amet porta. In hac habitasse platea dictumst.
+
+Ut sollicitudin nulla fringilla libero vulputate, in facilisis risus posuere. Proin fermentum lacinia est sed tempor. Sed convallis nibh sapien, in posuere quam rhoncus in. Etiam aliquet blandit est, a maximus ex. Donec congue lacus in justo luctus euismod. Duis in nunc ac massa gravida efficitur. Mauris gravida quis massa quis gravida. Curabitur suscipit ultricies mi ut posuere. Ut cursus augue tellus, vitae porttitor libero sollicitudin at. Pellentesque malesuada mi non sem ultrices, a malesuada sapien efficitur. Nam euismod, turpis quis eleifend fermentum, felis arcu varius massa, vitae cursus erat tellus ut arcu.
+
+
+
+        readyn -Y "CYAN" -p "You selected $diff. Configure?" -c "test -z $(git config --list | grep 'delta')" conf
+Donec pharetra vitae nibh ac suscipit. Donec vel lorem augue. Ut vitae leo risus. Suspendisse potenti. Ut eget diam sit amet lacus molestie blandit ut sodales justo. Donec vehicula hendrerit eros. Maecenas a cursus est, quis dictum augue. Proin malesuada lacus in scelerisque convallis. Phasellus non ornare augue, sit amet mollis ex. Etiam eu eros felis. Donec porttitor nulla velit, et egestas odio vehicula et. Sed interdum imperdiet urna, et lobortis sapien finibus ac. Curabitur vitae ipsum vitae nulla imperdiet venenatis. Donec maximus laoreet commodo. Nunc efficitur, eros eu lacinia porta, odio tortor mollis diam, at volutpat ligula augue eu nulla.
+
+Nullam aliquam, lorem eget vehicula congue, lorem tellus commodo justo, vitae vehicula diam sapien in est. Nullam sit amet ligula tempus, pulvinar diam eget, blandit dui. Sed nec euismod tellus, ac laoreet magna. Praesent facilisis dapibus massa sit amet aliquam. Aliquam luctus id erat a convallis. Donec vel quam cursus sem auctor tempus vitae vitae est. Praesent blandit semper lectus, in condimentum eros varius nec. Maecenas scelerisque non magna et commodo. Quisque congue venenatis est. Duis porttitor ornare aliquam. Integer vel auctor tortor. Donec purus quam, molestie et fringilla eu, volutpat sit amet tortor. Nam faucibus, risus vitae dapibus iaculis, nulla leo sollicitudin sem, nec aliquam diam mauris at turpis. Duis iaculis ac turpis et maximus. Sed at quam mauris. " > $TMPDIR/test2
+
+loremIpsum1=$TMPDIR/test1
+loremIpsum2=$TMPDIR/test2
+
+function git_hl() {
+    if ! test -z "$1"; then
+        cmd="$1"
+    #else
+    #    cmd="git config $global interactive.difffilter"
+    fi
+    local diffs=""
+    local diff=""
+    if type batdiff &>/dev/null && ! [[ $cmd =~ 'lazygit' ]]; then
+        diffs=$diffs" batdiff"
+        diff="batdiff"
+    fi
+    if type ydiff &>/dev/null; then
+        diffs=$diffs" ydiff"
+        diff="delta"
+    fi
+    if type riff &>/dev/null && ! [[ $cmd =~ 'lazygit' ]]; then
+        diffs=$diffs" riff"
+        diff="riff"
+    fi
+    if type diffr &>/dev/null && ! [[ $cmd =~ 'lazygit' ]]; then
+        diffs=$diffs" diffr"
+        diff="diffr"
+    fi
+    if type diff-so-fancy &>/dev/null; then
+        diffs=$diffs" diff-so-fancy"
+        diff="diff-so-fancy"
+    fi
+    if type delta &>/dev/null; then
+        diffs=$diffs" delta"
+        diff="delta"
+    fi
+
+    reade -Q "GREEN" -i "$diff $diffs" -p "Diff filter: " diff
+    if test -n "$diff"; then
+        readyn -Y "CYAN" -p "You selected $diff. Configure?" conf
+        if [[ "$diff" == "delta" ]]; then
+            local diff="delta --paging=never"
+            local opts=''
+            if [[ "y" == "$conf" ]]; then
+                local theme=''
+                while test -z "$theme"; do
+
+                    readyn -Y "CYAN" -p "Set syntax theme for delta?" delta1
+                    if [[ "$delta1" == 'y' ]]; then
                         theme=$(printf "$(delta --list-syntax-themes | tail -n +1)" | fzf --reverse --border --border-label="Syntax theme")
                         theme=$(echo "$theme" | awk '{$1=""; print $0;}')
-                        delta --syntax-theme $theme $TMPDIR/dtest1 $TMPDIR/dtest2
-                        stty sane && readyn -N "MAGENTA" -n -p "Set as syntax theme? (will retry if no)" dltthme
-                        if [[ "$dltthme" == "n" ]]; then
-                            theme=''
+                        theme="${theme:1}"
+                    fi
+
+                    readyn -Y "CYAN" -p "Set linenumbers?" delta3
+                    if [[ "y" == $delta3 ]]; then
+                        git config $global delta.linenumbers true
+                        opts="$opts --line-numbers" 
+                    elif [[ "n" == $delta3 ]]; then
+                        git config $global delta.linenumbers false
+                    fi
+
+                    readyn -Y "CYAN" -p "Set to dark?" delta2
+                    if [[ "y" == $delta2 ]]; then
+                        git config $global delta.dark true
+                        opts="$opts --dark" 
+                    elif [[ "n" == $delta2 ]]; then
+                        git config $global delta.dark false
+                    fi
+
+                    readyn -Y 'CYAN' -p "Side-by-side view?" delta3
+                    if [[ "y" == $delta3 ]]; then
+                        git config $global delta.side-by-side true
+                        opts="$opts --side-by-side" 
+                    elif [[ "n" == $delta3 ]]; then
+                        git config $global delta.side-by-side false
+                    fi
+
+                    if ! [[ "$cmd" =~ 'lazygit' ]]; then 
+                        readyn -Y "CYAN" -p "Set to navigate? (Move between diff sections using n and N)" delta1
+                        if [[ "y" == $delta1 ]]; then
+                            git config $global delta.navigate true
+                        elif [[ "n" == $delta1 ]]; then
+                            git config $global delta.navigate false
                         fi
-                    done
-                    git config $global delta.syntax-theme $theme
-                fi
-                readyn -Y "CYAN" -p "Set linenumbers?" delta3
-                if [[ "y" == $delta3 ]]; then
-                    git config $global delta.linenumbers true
-                fi
+                    fi
 
-                readyn -Y 'CYAN' -p "Side-by-side view?" delta3
-                if [[ "y" == $delta3 ]]; then
-                    git config $global delta.side-by-side true
-                fi
+                    readyn -Y "CYAN" -p "Set hyperlinks?" delta1
+                    if [[ "y" == $delta1 ]]; then
+                        git config $global delta.hyperlinks true
+                        opts="$opts --hyperlinks" 
+                    elif [[ "y" == $delta1 ]]; then
+                        git config $global delta.hyperlinks false
+                    fi
 
-                readyn -Y "CYAN" -p "Set to navigate? (Move between diff sections using n and N)" delta1
-                if [[ "y" == $delta1 ]]; then
-                    git config $global delta.navigate true
-                fi
-
-                readyn -Y "CYAN" -p "Set to dark?" delta2
-                if [[ "y" == $delta2 ]]; then
-                    git config $global delta.dark true
-                fi
-
-                readyn -Y "CYAN" -p "Set hyperlinks?" delta1
-                if [[ "y" == $delta1 ]]; then
-                    git config $global delta.hyperlinks true
-                fi
+                    delta --syntax-theme "$theme" --pager 'less -R' $TMPDIR/test1 $TMPDIR/test2
+                    readyn -N "MAGENTA" -n -p "Is this ok? (will retry if no)" dltthme
+                    if [[ "$dltthme" == "n" ]]; then
+                        theme=''
+                    fi
+                done
+                opts="$opts --syntax-theme $theme" 
+                git config $global --replace-all delta.syntax-theme "$theme"
             fi
-
         elif [[ "$diff" == "diff-so-fancy" ]]; then
             diff="diff-so-fancy --patch"
             readyn -p "You selected $diff. Configure?" difffancy
@@ -204,18 +234,24 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
             #fi
         fi
     fi
-
-    if test -n "$cmd"; then
+    if ! test -z "$cmd"; then
         if [[ "$cmd" =~ 'difffilter' ]]; then
             diff="$(echo $diff | awk '{print $1;}')" 
             eval "$cmd $diff"
         elif [[ "$cmd" =~ 'lazygit' ]]; then
-            sed -i 's|useConfig:|#useConfig:|g' ~/.config/lazygit/config.yml
-            if ! grep -q "pager" ~/.config/lazygit/config.yml; then
-                sed -i 's|\(paging:\)|\1\n    pager: '"$diff"'|g' ~/.config/lazygit/config.yml
-            else
-                sed -i 's|pager:.*|pager: '"$diff"'|g' ~/.config/lazygit/config.yml
+             
+            if ! test -f ~/.config/lazygit/config.yml; then
+                touch ~/.config/lazygit/config.yml 
             fi
+            if ! grep -q 'pager: *'  ~/.config/lazygit/config.yml; then
+                #sed -i '1s/^/git:\n paging:\n   colorArg: always\n   pager: '$diff'\n/' ~/.config/lazygit/config.yml
+                printf "git:\n paging:\n   useConfig: false\n   colorArg: always\n   pager: $diff$opts\n" >> ~/.config/lazygit/config.yml 
+            else
+                sed -i 's/^[ \t]*pager:*.*/   pager: '"$diff$opts"'/g' ~/.config/lazygit/config.yml
+            fi
+            #sed -i 's|pager:.*|pager: '"$diff"'|g' ~/.config/lazygit/config.yml
+            #    printf 'paging:\n    pager: '"$diff\n" >> 
+                #sed -i 's|#pager|  pager: '"$diff"'|g' ~/.config/lazygit/config.yml
         fi
     fi
     
@@ -322,19 +358,10 @@ git_pager() {
             if [[ $pager1 == 'y' ]]; then
                 local theme
                 local styles="abap\nalgol\nalgol_nu\napi\narduino\nautumn\naverage\nbase16-snazzy\nborland\nbw\ncatppuccin-frappe\ncatppuccin-latte\ncatppuccin-macchiato\ncatppuccin-mocha\ncolorful\ncompat\ndoom-one\ndoom-one2\ndracula\nemacs\nfriendly\nfruity\ngithub-dark\ngithub\ngruvbox-light\ngruvbox\nhr_high_contrast\nhrdark\nigor\nlovelace\nmanni\nmodus-operandi\nmodus-vivendi\nmonokai\nmonokailight\nmurphy\nnative\nnord\nonedark\nonesenterprise\nparaiso-dark\nparaiso-light\npastie\nperldoc\npygments\nrainbow_dash\nrose-pine-dawn\nrose-pine-moon\nrose-pine\nrrt\nsolarized-dark\nsolarized-dark256\nsolarized-light\nswapoff\ntango\ntrac\nvim\nvs\nvulcan\nwitchhazel\nxcode-dark\nxcode"
-                echo "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Sollicitudin nibh sit amet commodo nulla facilisi. Sed cras ornare arcu dui vivamus arcu. Non quam lacus suspendisse faucibus interdum posuere lorem. Consequat ac felis donec et odio pellentesque. Elementum tempus egestas sed sed risus pretium quam. Neque viverra justo nec ultrices dui sapien eget mi proin. Varius vel pharetra vel turpis nunc eget lorem dolor sed. Mauris in aliquam sem fringilla ut morbi tincidunt augue. Cursus euismod quis viverra nibh cras. Diam sollicitudin tempor id eu. Lectus arcu bibendum at varius vel. Posuere morbi leo urna molestie at elementum eu facilisis. Condimentum lacinia quis vel eros. Dolor magna eget est lorem ipsum dolor sit amet consectetur. Ultrices dui sapien eget mi. A arcu cursus vitae congue mauris.
-
-In pellentesque massa placerat duis ultricies lacus sed turpis tincidunt. Dignissim diam quis enim lobortis scelerisque fermentum. Faucibus purus in massa tempor nec. Enim neque volutpat ac tincidunt. Penatibus et magnis dis parturient montes nascetur ridiculus. Ornare aenean euismod elementum nisi quis eleifend quam adipiscing. Elementum pulvinar etiam non quam lacus suspendisse faucibus interdum. Vel eros donec ac odio tempor orci dapibus ultrices. Tempus imperdiet nulla malesuada pellentesque elit eget gravida. In ante metus dictum at tempor commodo ullamcorper.
-
-Feugiat sed lectus vestibulum mattis ullamcorper velit sed ullamcorper. Aliquet nibh praesent tristique magna sit amet purus. Dignissim diam quis enim lobortis scelerisque. Turpis egestas sed tempus urna et. Est sit amet facilisis magna. At tellus at urna condimentum mattis pellentesque. Bibendum ut tristique et egestas quis ipsum suspendisse ultrices. Diam sollicitudin tempor id eu. Vulputate sapien nec sagittis aliquam malesuada bibendum arcu vitae elementum. Aliquet nibh praesent tristique magna sit. Dictum fusce ut placerat orci nulla pellentesque dignissim enim. Laoreet sit amet cursus sit amet dictum. Amet consectetur adipiscing elit duis tristique. Phasellus vestibulum lorem sed risus ultricies tristique nulla aliquet.
-
-Eu augue ut lectus arcu bibendum at varius vel pharetra. Urna nunc id cursus metus. Massa eget egestas purus viverra. Ornare quam viverra orci sagittis eu volutpat odio facilisis. Ornare arcu dui vivamus arcu felis bibendum. Sollicitudin aliquam ultrices sagittis orci a. In eu mi bibendum neque egestas congue quisque egestas diam. Consectetur adipiscing elit duis tristique sollicitudin nibh sit amet commodo. Risus in hendrerit gravida rutrum quisque non. Justo eget magna fermentum iaculis eu. Ut consequat semper viverra nam libero justo laoreet sit. Vel pretium lectus quam id leo in vitae turpis. Praesent semper feugiat nibh sed pulvinar.
-
-Condimentum lacinia quis vel eros donec ac. Nibh sed pulvinar proin gravida hendrerit lectus a. Volutpat consequat mauris nunc congue nisi vitae suscipit tellus. Mi tempus imperdiet nulla malesuada pellentesque elit eget. Scelerisque in dictum non consectetur. Ac ut consequat semper viverra nam libero justo laoreet sit. Lectus magna fringilla urna porttitor rhoncus. Integer vitae justo eget magna fermentum. Nisl pretium fusce id velit ut. In aliquam sem fringilla ut morbi tincidunt augue. Vitae tempus quam pellentesque nec nam aliquam sem et. Eget mauris pharetra et ultrices neque. At augue eget arcu dictum. Eget duis at tellus at. Mauris ultrices eros in cursus turpis massa tincidunt dui. Aliquet nec ullamcorper sit amet. Eu feugiat pretium nibh ipsum consequat nisl vel pretium lectus." >$TMPDIR/dtest1
                 if type moar &>/dev/null; then
                     while test -z "$style"; do
                         style=$(printf "$styles" | fzf --reverse --border --border-label="Moar style")
-                        moar --style "$style" $TMPDIR/dtest1
+                        moar --style "$style" $TMPDIR/test1
                         stty sane && readyn -Y "MAGENTA" -p "Set as style? (Will retry if no)" thme
                         if [[ "$thme" == "n" ]]; then
                             style=''
@@ -401,19 +428,10 @@ Condimentum lacinia quis vel eros donec ac. Nibh sed pulvinar proin gravida hend
                     fi
                     readyn -Y "CYAN" -p "Set syntax-theme?" delta1
                     if [[ "y" == $delta1 ]]; then
-                        echo "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Sollicitudin nibh sit amet commodo nulla facilisi. Sed cras ornare arcu dui vivamus arcu. Non quam lacus suspendisse faucibus interdum posuere lorem. Consequat ac felis donec et odio pellentesque. Elementum tempus egestas sed sed risus pretium quam. Neque viverra justo nec ultrices dui sapien eget mi proin. Varius vel pharetra vel turpis nunc eget lorem dolor sed. Mauris in aliquam sem fringilla ut morbi tincidunt augue. Cursus euismod quis viverra nibh cras. Diam sollicitudin tempor id eu. Lectus arcu bibendum at varius vel. Posuere morbi leo urna molestie at elementum eu facilisis. Condimentum lacinia quis vel eros. Dolor magna eget est lorem ipsum dolor sit amet consectetur. Ultrices dui sapien eget mi. A arcu cursus vitae congue mauris.
-
-In pellentesque massa placerat duis ultricies lacus sed turpis tincidunt. Dignissim diam quis enim lobortis scelerisque fermentum. Faucibus purus in massa tempor nec. Enim neque volutpat ac tincidunt. Penatibus et magnis dis parturient montes nascetur ridiculus. Ornare aenean euismod elementum nisi quis eleifend quam adipiscing. Elementum pulvinar etiam non quam lacus suspendisse faucibus interdum. Vel eros donec ac odio tempor orci dapibus ultrices. Tempus imperdiet nulla malesuada pellentesque elit eget gravida. In ante metus dictum at tempor commodo ullamcorper.
-
-Feugiat sed lectus vestibulum mattis ullamcorper velit sed ullamcorper. Aliquet nibh praesent tristique magna sit amet purus. Dignissim diam quis enim lobortis scelerisque. Turpis egestas sed tempus urna et. Est sit amet facilisis magna. At tellus at urna condimentum mattis pellentesque. Bibendum ut tristique et egestas quis ipsum suspendisse ultrices. Diam sollicitudin tempor id eu. Vulputate sapien nec sagittis aliquam malesuada bibendum arcu vitae elementum. Aliquet nibh praesent tristique magna sit. Dictum fusce ut placerat orci nulla pellentesque dignissim enim. Laoreet sit amet cursus sit amet dictum. Amet consectetur adipiscing elit duis tristique. Phasellus vestibulum lorem sed risus ultricies tristique nulla aliquet.
-
-Eu augue ut lectus arcu bibendum at varius vel pharetra. Urna nunc id cursus metus. Massa eget egestas purus viverra. Ornare quam viverra orci sagittis eu volutpat odio facilisis. Ornare arcu dui vivamus arcu felis bibendum. Sollicitudin aliquam ultrices sagittis orci a. In eu mi bibendum neque egestas congue quisque egestas diam. Consectetur adipiscing elit duis tristique sollicitudin nibh sit amet commodo. Risus in hendrerit gravida rutrum quisque non. Justo eget magna fermentum iaculis eu. Ut consequat semper viverra nam libero justo laoreet sit. Vel pretium lectus quam id leo in vitae turpis. Praesent semper feugiat nibh sed pulvinar.
-
-Condimentum lacinia quis vel eros donec ac. Nibh sed pulvinar proin gravida hendrerit lectus a. Volutpat consequat mauris nunc congue nisi vitae suscipit tellus. Mi tempus imperdiet nulla malesuada pellentesque elit eget. Scelerisque in dictum non consectetur. Ac ut consequat semper viverra nam libero justo laoreet sit. Lectus magna fringilla urna porttitor rhoncus. Integer vitae justo eget magna fermentum. Nisl pretium fusce id velit ut. In aliquam sem fringilla ut morbi tincidunt augue. Vitae tempus quam pellentesque nec nam aliquam sem et. Eget mauris pharetra et ultrices neque. At augue eget arcu dictum. Eget duis at tellus at. Mauris ultrices eros in cursus turpis massa tincidunt dui. Aliquet nec ullamcorper sit amet. Eu feugiat pretium nibh ipsum consequat nisl vel pretium lectus." >$TMPDIR/dtest1
                         local theme=''
 
                         while test -z "$theme"; do
-                            theme=$(bat --list-themes | fzf --border --border-label="Bat syntax themes" --preview="bat --theme={} --color=always $TMPDIR/dtest1")
+                            theme=$(bat --list-themes | fzf --border --border-label="Bat syntax themes" --preview="bat --theme={} --color=always $TMPDIR/test1")
                             stty sane && readyn -Y "MAGENTA" -p "Set $theme as syntax theme? (Will retry if no)" dltthme
                             if [[ "$dltthme" == "n" ]]; then
                                 theme=''
@@ -429,7 +447,7 @@ Condimentum lacinia quis vel eros donec ac. Nibh sed pulvinar proin gravida hend
                         while test -z "$theme"; do
                             theme=$(bat --list-languages | fzf --border --border-label="Bat coding languages")
                             stty sane && reade -Q "MAGENTA" -i "y n s" -p "Set syntax to specifically use $theme as language? (Will retry if no - s to stop) [Y/n/s]: " dltthme
-                            if test "$dltthme" == "n"; then
+                            if [[ "$dltthme" == "n" ]]; then
                                 theme=''
                             fi
                         done
@@ -449,29 +467,11 @@ Condimentum lacinia quis vel eros donec ac. Nibh sed pulvinar proin gravida hend
 
                     readyn -Y "CYAN" -p "Set syntax-theme?" delta1
                     if [[ "y" == $delta1 ]]; then
-                        echo "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Sollicitudin nibh sit amet commodo nulla facilisi. Sed cras ornare arcu dui vivamus arcu. Non quam lacus suspendisse faucibus interdum posuere lorem. Consequat ac felis donec et odio pellentesque. Elementum tempus egestas sed sed risus pretium quam. Neque viverra justo nec ultrices dui sapien eget mi proin. Varius vel pharetra vel turpis nunc eget lorem dolor sed. Mauris in aliquam sem fringilla ut morbi tincidunt augue. Cursus euismod quis viverra nibh cras. Diam sollicitudin tempor id eu. Lectus arcu bibendum at varius vel. Posuere morbi leo urna molestie at elementum eu facilisis. Condimentum lacinia quis vel eros. Dolor magna eget est lorem ipsum dolor sit amet consectetur. Ultrices dui sapien eget mi. A arcu cursus vitae congue mauris.
-
-In pellentesque massa placerat duis ultricies lacus sed turpis tincidunt. Dignissim diam quis enim lobortis scelerisque fermentum. Faucibus purus in massa tempor nec. Enim neque volutpat ac tincidunt. Penatibus et magnis dis parturient montes nascetur ridiculus. Ornare aenean euismod elementum nisi quis eleifend quam adipiscing. Elementum pulvinar etiam non quam lacus suspendisse faucibus interdum. Vel eros donec ac odio tempor orci dapibus ultrices. Tempus imperdiet nulla malesuada pellentesque elit eget gravida. In ante metus dictum at tempor commodo ullamcorper.
-
-Feugiat sed lectus vestibulum mattis ullamcorper velit sed ullamcorper. Aliquet nibh praesent tristique magna sit amet purus. Dignissim diam quis enim lobortis scelerisque. Turpis egestas sed tempus urna et. Est sit amet facilisis magna. At tellus at urna condimentum mattis pellentesque. Bibendum ut tristique et egestas quis ipsum suspendisse ultrices. Diam sollicitudin tempor id eu. Vulputate sapien nec sagittis aliquam malesuada bibendum arcu vitae elementum. Aliquet nibh praesent tristique magna sit. Dictum fusce ut placerat orci nulla pellentesque dignissim enim. Laoreet sit amet cursus sit amet dictum. Amet consectetur adipiscing elit duis tristique. Phasellus vestibulum lorem sed risus ultricies tristique nulla aliquet.
-
-Eu augue ut lectus arcu bibendum at varius vel pharetra. Urna nunc id cursus metus. Massa eget egestas purus viverra. Ornare quam viverra orci sagittis eu volutpat odio facilisis. Ornare arcu dui vivamus arcu felis bibendum. Sollicitudin aliquam ultrices sagittis orci a. In eu mi bibendum neque egestas congue quisque egestas diam. Consectetur adipiscing elit duis tristique sollicitudin nibh sit amet commodo. Risus in hendrerit gravida rutrum quisque non. Justo eget magna fermentum iaculis eu. Ut consequat semper viverra nam libero justo laoreet sit. Vel pretium lectus quam id leo in vitae turpis. Praesent semper feugiat nibh sed pulvinar.
-
-Condimentum lacinia quis vel eros donec ac. Nibh sed pulvinar proin gravida hendrerit lectus a. Volutpat consequat mauris nunc congue nisi vitae suscipit tellus. Mi tempus imperdiet nulla malesuada pellentesque elit eget. Scelerisque in dictum non consectetur. Ac ut consequat semper viverra nam libero justo laoreet sit. Lectus magna fringilla urna porttitor rhoncus. Integer vitae justo eget magna fermentum. Nisl pretium fusce id velit ut. In aliquam sem fringilla ut morbi tincidunt augue. Vitae tempus quam pellentesque nec nam aliquam sem et. Eget mauris pharetra et ultrices neque. At augue eget arcu dictum. Eget duis at tellus at. Mauris ultrices eros in cursus turpis massa tincidunt dui. Aliquet nec ullamcorper sit amet. Eu feugiat pretium nibh ipsum consequat nisl vel pretium lectus." >$TMPDIR/dtest1
-                        echo "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Malesuada fames ac turpis egestas sed tempus urna. Maecenas volutpat blandit aliquam etiam erat velit scelerisque in. Cras fermentum odio eu feugiat pretium nibh ipsum consequat. Nam aliquam sem et tortor consequat id. Habitasse platea dictumst vestibulum rhoncus est pellentesque. Pellentesque habitant morbi tristique senectus et netus et malesuada fames. Mattis molestie a iaculis at erat pellentesque adipiscing. Condimentum lacinia quis vel eros donec ac odio. Vitae congue eu consequat ac. Netus et malesuada fames ac. Sed euismod nisi porta lorem mollis aliquam. Rhoncus est pellentesque elit ullamcorper dignissim cras. Aliquet nibh praesent tristique magna sit amet purus. Odio ut sem nulla pharetra diam sit amet nisl. Bibendum est ultricies integer quis auctor elit sed vulputate mi. Viverra ipsum nunc aliquet bibendum enim facilisis gravida neque convallis.
-
-Sociis natoque penatibus et magnis dis parturient montes. Ornare suspendisse sed nisi lacus sed viverra tellus. Eu augue ut lectus arcu bibendum at varius vel. Morbi leo urna molestie at elementum eu facilisis sed. Integer quis auctor elit sed vulputate mi. At varius vel pharetra vel. Ut consequat semper viverra nam libero. Metus vulputate eu scelerisque felis. In hendrerit gravida rutrum quisque non tellus orci. Eget gravida cum sociis natoque penatibus et magnis. Nec tincidunt praesent semper feugiat nibh sed. Id velit ut tortor pretium. Nibh cras pulvinar mattis nunc sed blandit. Augue neque gravida in fermentum et sollicitudin ac orci phasellus. Ut porttitor leo a diam sollicitudin tempor id. Nec feugiat nisl pretium fusce id velit. Amet purus gravida quis blandit turpis cursus in. Blandit libero volutpat sed cras ornare.
-
-Vestibulum sed arcu non odio euismod lacinia. Cursus in hac habitasse platea dictumst quisque sagittis. Augue eget arcu dictum varius duis at consectetur. Eget egestas purus viverra accumsan in nisl nisi scelerisque eu. Turpis tincidunt id aliquet risus feugiat. Ultrices gravida dictum fusce ut placerat orci. Ullamcorper a lacus vestibulum sed arcu non odio euismod. Dictum fusce ut placerat orci nulla pellentesque dignissim enim. Arcu cursus vitae congue mauris rhoncus aenean vel elit scelerisque. Ornare quam viverra orci sagittis. Tincidunt nunc pulvinar sapien et ligula. Malesuada pellentesque elit eget gravida cum sociis. Non nisi est sit amet facilisis magna etiam. Mauris cursus mattis molestie a iaculis at erat. Praesent tristique magna sit amet. Blandit aliquam etiam erat velit scelerisque in. Urna et pharetra pharetra massa massa ultricies mi. Ultricies leo integer malesuada nunc vel risus commodo. Pellentesque adipiscing commodo elit at imperdiet dui accumsan sit amet.
-
-Tortor aliquam nulla facilisi cras fermentum. A arcu cursus vitae congue mauris rhoncus. Ac orci phasellus egestas tellus rutrum tellus. Eget sit amet tellus cras. Ornare lectus sit amet est placerat in egestas erat. Dis parturient montes nascetur ridiculus. Ut eu sem integer vitae. Viverra orci sagittis eu volutpat odio facilisis mauris sit amet. Enim eu turpis egestas pretium aenean pharetra magna ac. Molestie nunc non blandit massa enim. Felis imperdiet proin fermentum leo vel orci porta non. Nibh mauris cursus mattis molestie a iaculis at erat. Elementum nibh tellus molestie nunc non blandit massa enim nec. Fringilla est ullamcorper eget nulla facilisi etiam dignissim diam quis. Lectus magna fringilla urna porttitor. Dictum fusce ut placerat orci nulla pellentesque dignissim enim. Sed id semper risus in. Nascetur ridiculus mus mauris vitae ultricies.
-
-Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placerat in egestas erat imperdiet sed euismod nisi porta. Nulla aliquet porttitor lacus luctus accumsan. Consequat semper viverra nam libero justo laoreet. Ut diam quam nulla porttitor massa id neque aliquam vestibulum. Cursus metus aliquam eleifend mi. Viverra nam libero justo laoreet sit amet. Malesuada fames ac turpis egestas maecenas pharetra convallis posuere morbi. Orci ac auctor augue mauris augue neque gravida. Sed libero enim sed faucibus turpis in eu mi bibendum. Tellus pellentesque eu tincidunt tortor aliquam nulla facilisi cras fermentum. Scelerisque purus semper eget duis at tellus at urna. Pellentesque habitant morbi tristique senectus. In metus vulputate eu scelerisque felis imperdiet proin fermentum leo. Vulputate mi sit amet mauris commodo quis imperdiet massa tincidunt." >$TMPDIR/dtest2
                         local theme=''
                         while test -z "$theme"; do
                             theme=$(printf "$(delta --list-syntax-themes | tail -n +1)" | fzf --reverse --border --border-label="Syntax theme")
                             theme=$(echo "$theme" | awk '{$1=""; print $0;}')
-                            delta --syntax-theme "${theme:1}" $TMPDIR/dtest1 $TMPDIR/dtest2
+                            delta --syntax-theme "${theme:1}" $TMPDIR/test1 $TMPDIR/test2
                             stty sane && readyn -N "MAGENTA" -n -p "Set as syntax theme? (Will retry if no)" dltthme
                             if [[ "$dltthme" == "n" ]]; then
                                 theme=''
@@ -781,18 +781,9 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
             if [[ $pager1 == 'y' ]]; then
                 local theme
                 local styles="abap\nalgol\nalgol_nu\napi\narduino\nautumn\naverage\nbase16-snazzy\nborland\nbw\ncatppuccin-frappe\ncatppuccin-latte\ncatppuccin-macchiato\ncatppuccin-mocha\ncolorful\ncompat\ndoom-one\ndoom-one2\ndracula\nemacs\nfriendly\nfruity\ngithub-dark\ngithub\ngruvbox-light\ngruvbox\nhr_high_contrast\nhrdark\nigor\nlovelace\nmanni\nmodus-operandi\nmodus-vivendi\nmonokai\nmonokailight\nmurphy\nnative\nnord\nonedark\nonesenterprise\nparaiso-dark\nparaiso-light\npastie\nperldoc\npygments\nrainbow_dash\nrose-pine-dawn\nrose-pine-moon\nrose-pine\nrrt\nsolarized-dark\nsolarized-dark256\nsolarized-light\nswapoff\ntango\ntrac\nvim\nvs\nvulcan\nwitchhazel\nxcode-dark\nxcode"
-                echo "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Sollicitudin nibh sit amet commodo nulla facilisi. Sed cras ornare arcu dui vivamus arcu. Non quam lacus suspendisse faucibus interdum posuere lorem. Consequat ac felis donec et odio pellentesque. Elementum tempus egestas sed sed risus pretium quam. Neque viverra justo nec ultrices dui sapien eget mi proin. Varius vel pharetra vel turpis nunc eget lorem dolor sed. Mauris in aliquam sem fringilla ut morbi tincidunt augue. Cursus euismod quis viverra nibh cras. Diam sollicitudin tempor id eu. Lectus arcu bibendum at varius vel. Posuere morbi leo urna molestie at elementum eu facilisis. Condimentum lacinia quis vel eros. Dolor magna eget est lorem ipsum dolor sit amet consectetur. Ultrices dui sapien eget mi. A arcu cursus vitae congue mauris.
-
-    In pellentesque massa placerat duis ultricies lacus sed turpis tincidunt. Dignissim diam quis enim lobortis scelerisque fermentum. Faucibus purus in massa tempor nec. Enim neque volutpat ac tincidunt. Penatibus et magnis dis parturient montes nascetur ridiculus. Ornare aenean euismod elementum nisi quis eleifend quam adipiscing. Elementum pulvinar etiam non quam lacus suspendisse faucibus interdum. Vel eros donec ac odio tempor orci dapibus ultrices. Tempus imperdiet nulla malesuada pellentesque elit eget gravida. In ante metus dictum at tempor commodo ullamcorper.
-
-    Feugiat sed lectus vestibulum mattis ullamcorper velit sed ullamcorper. Aliquet nibh praesent tristique magna sit amet purus. Dignissim diam quis enim lobortis scelerisque. Turpis egestas sed tempus urna et. Est sit amet facilisis magna. At tellus at urna condimentum mattis pellentesque. Bibendum ut tristique et egestas quis ipsum suspendisse ultrices. Diam sollicitudin tempor id eu. Vulputate sapien nec sagittis aliquam malesuada bibendum arcu vitae elementum. Aliquet nibh praesent tristique magna sit. Dictum fusce ut placerat orci nulla pellentesque dignissim enim. Laoreet sit amet cursus sit amet dictum. Amet consectetur adipiscing elit duis tristique. Phasellus vestibulum lorem sed risus ultricies tristique nulla aliquet.
-
-    Eu augue ut lectus arcu bibendum at varius vel pharetra. Urna nunc id cursus metus. Massa eget egestas purus viverra. Ornare quam viverra orci sagittis eu volutpat odio facilisis. Ornare arcu dui vivamus arcu felis bibendum. Sollicitudin aliquam ultrices sagittis orci a. In eu mi bibendum neque egestas congue quisque egestas diam. Consectetur adipiscing elit duis tristique sollicitudin nibh sit amet commodo. Risus in hendrerit gravida rutrum quisque non. Justo eget magna fermentum iaculis eu. Ut consequat semper viverra nam libero justo laoreet sit. Vel pretium lectus quam id leo in vitae turpis. Praesent semper feugiat nibh sed pulvinar.
-
-    Condimentum lacinia quis vel eros donec ac. Nibh sed pulvinar proin gravida hendrerit lectus a. Volutpat consequat mauris nunc congue nisi vitae suscipit tellus. Mi tempus imperdiet nulla malesuada pellentesque elit eget. Scelerisque in dictum non consectetur. Ac ut consequat semper viverra nam libero justo laoreet sit. Lectus magna fringilla urna porttitor rhoncus. Integer vitae justo eget magna fermentum. Nisl pretium fusce id velit ut. In aliquam sem fringilla ut morbi tincidunt augue. Vitae tempus quam pellentesque nec nam aliquam sem et. Eget mauris pharetra et ultrices neque. At augue eget arcu dictum. Eget duis at tellus at. Mauris ultrices eros in cursus turpis massa tincidunt dui. Aliquet nec ullamcorper sit amet. Eu feugiat pretium nibh ipsum consequat nisl vel pretium lectus." >$TMPDIR/dtest1
                 while test -z "$style"; do
                     style=$(printf "$styles" | fzf --reverse --border --border-label="Moar style")
-                    moar --style "$style" $TMPDIR/dtest1
+                    moar --style "$style" $TMPDIR/test1
                     stty sane && readyn -n -p "Set as style? (Will retry if no)" thme
                     if [[ "$thme" == "n" ]]; then
                         style=''
@@ -859,19 +850,10 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
                     fi
                     readyn -Y "CYAN" -p "Set syntax-theme" delta1
                     if [[ "y" == "$delta1" ]]; then
-                        echo "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Sollicitudin nibh sit amet commodo nulla facilisi. Sed cras ornare arcu dui vivamus arcu. Non quam lacus suspendisse faucibus interdum posuere lorem. Consequat ac felis donec et odio pellentesque. Elementum tempus egestas sed sed risus pretium quam. Neque viverra justo nec ultrices dui sapien eget mi proin. Varius vel pharetra vel turpis nunc eget lorem dolor sed. Mauris in aliquam sem fringilla ut morbi tincidunt augue. Cursus euismod quis viverra nibh cras. Diam sollicitudin tempor id eu. Lectus arcu bibendum at varius vel. Posuere morbi leo urna molestie at elementum eu facilisis. Condimentum lacinia quis vel eros. Dolor magna eget est lorem ipsum dolor sit amet consectetur. Ultrices dui sapien eget mi. A arcu cursus vitae congue mauris.
-
-    In pellentesque massa placerat duis ultricies lacus sed turpis tincidunt. Dignissim diam quis enim lobortis scelerisque fermentum. Faucibus purus in massa tempor nec. Enim neque volutpat ac tincidunt. Penatibus et magnis dis parturient montes nascetur ridiculus. Ornare aenean euismod elementum nisi quis eleifend quam adipiscing. Elementum pulvinar etiam non quam lacus suspendisse faucibus interdum. Vel eros donec ac odio tempor orci dapibus ultrices. Tempus imperdiet nulla malesuada pellentesque elit eget gravida. In ante metus dictum at tempor commodo ullamcorper.
-
-    Feugiat sed lectus vestibulum mattis ullamcorper velit sed ullamcorper. Aliquet nibh praesent tristique magna sit amet purus. Dignissim diam quis enim lobortis scelerisque. Turpis egestas sed tempus urna et. Est sit amet facilisis magna. At tellus at urna condimentum mattis pellentesque. Bibendum ut tristique et egestas quis ipsum suspendisse ultrices. Diam sollicitudin tempor id eu. Vulputate sapien nec sagittis aliquam malesuada bibendum arcu vitae elementum. Aliquet nibh praesent tristique magna sit. Dictum fusce ut placerat orci nulla pellentesque dignissim enim. Laoreet sit amet cursus sit amet dictum. Amet consectetur adipiscing elit duis tristique. Phasellus vestibulum lorem sed risus ultricies tristique nulla aliquet.
-
-    Eu augue ut lectus arcu bibendum at varius vel pharetra. Urna nunc id cursus metus. Massa eget egestas purus viverra. Ornare quam viverra orci sagittis eu volutpat odio facilisis. Ornare arcu dui vivamus arcu felis bibendum. Sollicitudin aliquam ultrices sagittis orci a. In eu mi bibendum neque egestas congue quisque egestas diam. Consectetur adipiscing elit duis tristique sollicitudin nibh sit amet commodo. Risus in hendrerit gravida rutrum quisque non. Justo eget magna fermentum iaculis eu. Ut consequat semper viverra nam libero justo laoreet sit. Vel pretium lectus quam id leo in vitae turpis. Praesent semper feugiat nibh sed pulvinar.
-
-    Condimentum lacinia quis vel eros donec ac. Nibh sed pulvinar proin gravida hendrerit lectus a. Volutpat consequat mauris nunc congue nisi vitae suscipit tellus. Mi tempus imperdiet nulla malesuada pellentesque elit eget. Scelerisque in dictum non consectetur. Ac ut consequat semper viverra nam libero justo laoreet sit. Lectus magna fringilla urna porttitor rhoncus. Integer vitae justo eget magna fermentum. Nisl pretium fusce id velit ut. In aliquam sem fringilla ut morbi tincidunt augue. Vitae tempus quam pellentesque nec nam aliquam sem et. Eget mauris pharetra et ultrices neque. At augue eget arcu dictum. Eget duis at tellus at. Mauris ultrices eros in cursus turpis massa tincidunt dui. Aliquet nec ullamcorper sit amet. Eu feugiat pretium nibh ipsum consequat nisl vel pretium lectus." >$TMPDIR/dtest1
                         local theme=''
 
                         while test -z "$theme"; do
-                            theme=$(bat --list-themes | fzf --border --border-label="Bat syntax themes" --preview="bat --theme={} --color=always $TMPDIR/dtest1")
+                            theme=$(bat --list-themes | fzf --border --border-label="Bat syntax themes" --preview="bat --theme={} --color=always $TMPDIR/test1")
                             stty sane && readyn -n -N "MAGENTA" -p "Set $theme as syntax theme? (Will retry if no)" dltthme
                             if [[ "$dltthme" == "n" ]]; then
                                 theme=''
@@ -907,29 +889,11 @@ Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placer
 
                     readyn -Y "CYAN" -p "Set syntax theme?" delta1
                     if [[ "y" == "$delta1" ]]; then
-                        echo "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Sollicitudin nibh sit amet commodo nulla facilisi. Sed cras ornare arcu dui vivamus arcu. Non quam lacus suspendisse faucibus interdum posuere lorem. Consequat ac felis donec et odio pellentesque. Elementum tempus egestas sed sed risus pretium quam. Neque viverra justo nec ultrices dui sapien eget mi proin. Varius vel pharetra vel turpis nunc eget lorem dolor sed. Mauris in aliquam sem fringilla ut morbi tincidunt augue. Cursus euismod quis viverra nibh cras. Diam sollicitudin tempor id eu. Lectus arcu bibendum at varius vel. Posuere morbi leo urna molestie at elementum eu facilisis. Condimentum lacinia quis vel eros. Dolor magna eget est lorem ipsum dolor sit amet consectetur. Ultrices dui sapien eget mi. A arcu cursus vitae congue mauris.
-
-    In pellentesque massa placerat duis ultricies lacus sed turpis tincidunt. Dignissim diam quis enim lobortis scelerisque fermentum. Faucibus purus in massa tempor nec. Enim neque volutpat ac tincidunt. Penatibus et magnis dis parturient montes nascetur ridiculus. Ornare aenean euismod elementum nisi quis eleifend quam adipiscing. Elementum pulvinar etiam non quam lacus suspendisse faucibus interdum. Vel eros donec ac odio tempor orci dapibus ultrices. Tempus imperdiet nulla malesuada pellentesque elit eget gravida. In ante metus dictum at tempor commodo ullamcorper.
-
-    Feugiat sed lectus vestibulum mattis ullamcorper velit sed ullamcorper. Aliquet nibh praesent tristique magna sit amet purus. Dignissim diam quis enim lobortis scelerisque. Turpis egestas sed tempus urna et. Est sit amet facilisis magna. At tellus at urna condimentum mattis pellentesque. Bibendum ut tristique et egestas quis ipsum suspendisse ultrices. Diam sollicitudin tempor id eu. Vulputate sapien nec sagittis aliquam malesuada bibendum arcu vitae elementum. Aliquet nibh praesent tristique magna sit. Dictum fusce ut placerat orci nulla pellentesque dignissim enim. Laoreet sit amet cursus sit amet dictum. Amet consectetur adipiscing elit duis tristique. Phasellus vestibulum lorem sed risus ultricies tristique nulla aliquet.
-
-    Eu augue ut lectus arcu bibendum at varius vel pharetra. Urna nunc id cursus metus. Massa eget egestas purus viverra. Ornare quam viverra orci sagittis eu volutpat odio facilisis. Ornare arcu dui vivamus arcu felis bibendum. Sollicitudin aliquam ultrices sagittis orci a. In eu mi bibendum neque egestas congue quisque egestas diam. Consectetur adipiscing elit duis tristique sollicitudin nibh sit amet commodo. Risus in hendrerit gravida rutrum quisque non. Justo eget magna fermentum iaculis eu. Ut consequat semper viverra nam libero justo laoreet sit. Vel pretium lectus quam id leo in vitae turpis. Praesent semper feugiat nibh sed pulvinar.
-
-    Condimentum lacinia quis vel eros donec ac. Nibh sed pulvinar proin gravida hendrerit lectus a. Volutpat consequat mauris nunc congue nisi vitae suscipit tellus. Mi tempus imperdiet nulla malesuada pellentesque elit eget. Scelerisque in dictum non consectetur. Ac ut consequat semper viverra nam libero justo laoreet sit. Lectus magna fringilla urna porttitor rhoncus. Integer vitae justo eget magna fermentum. Nisl pretium fusce id velit ut. In aliquam sem fringilla ut morbi tincidunt augue. Vitae tempus quam pellentesque nec nam aliquam sem et. Eget mauris pharetra et ultrices neque. At augue eget arcu dictum. Eget duis at tellus at. Mauris ultrices eros in cursus turpis massa tincidunt dui. Aliquet nec ullamcorper sit amet. Eu feugiat pretium nibh ipsum consequat nisl vel pretium lectus." >$TMPDIR/dtest1
-                        echo "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Malesuada fames ac turpis egestas sed tempus urna. Maecenas volutpat blandit aliquam etiam erat velit scelerisque in. Cras fermentum odio eu feugiat pretium nibh ipsum consequat. Nam aliquam sem et tortor consequat id. Habitasse platea dictumst vestibulum rhoncus est pellentesque. Pellentesque habitant morbi tristique senectus et netus et malesuada fames. Mattis molestie a iaculis at erat pellentesque adipiscing. Condimentum lacinia quis vel eros donec ac odio. Vitae congue eu consequat ac. Netus et malesuada fames ac. Sed euismod nisi porta lorem mollis aliquam. Rhoncus est pellentesque elit ullamcorper dignissim cras. Aliquet nibh praesent tristique magna sit amet purus. Odio ut sem nulla pharetra diam sit amet nisl. Bibendum est ultricies integer quis auctor elit sed vulputate mi. Viverra ipsum nunc aliquet bibendum enim facilisis gravida neque convallis.
-
-    Sociis natoque penatibus et magnis dis parturient montes. Ornare suspendisse sed nisi lacus sed viverra tellus. Eu augue ut lectus arcu bibendum at varius vel. Morbi leo urna molestie at elementum eu facilisis sed. Integer quis auctor elit sed vulputate mi. At varius vel pharetra vel. Ut consequat semper viverra nam libero. Metus vulputate eu scelerisque felis. In hendrerit gravida rutrum quisque non tellus orci. Eget gravida cum sociis natoque penatibus et magnis. Nec tincidunt praesent semper feugiat nibh sed. Id velit ut tortor pretium. Nibh cras pulvinar mattis nunc sed blandit. Augue neque gravida in fermentum et sollicitudin ac orci phasellus. Ut porttitor leo a diam sollicitudin tempor id. Nec feugiat nisl pretium fusce id velit. Amet purus gravida quis blandit turpis cursus in. Blandit libero volutpat sed cras ornare.
-
-    Vestibulum sed arcu non odio euismod lacinia. Cursus in hac habitasse platea dictumst quisque sagittis. Augue eget arcu dictum varius duis at consectetur. Eget egestas purus viverra accumsan in nisl nisi scelerisque eu. Turpis tincidunt id aliquet risus feugiat. Ultrices gravida dictum fusce ut placerat orci. Ullamcorper a lacus vestibulum sed arcu non odio euismod. Dictum fusce ut placerat orci nulla pellentesque dignissim enim. Arcu cursus vitae congue mauris rhoncus aenean vel elit scelerisque. Ornare quam viverra orci sagittis. Tincidunt nunc pulvinar sapien et ligula. Malesuada pellentesque elit eget gravida cum sociis. Non nisi est sit amet facilisis magna etiam. Mauris cursus mattis molestie a iaculis at erat. Praesent tristique magna sit amet. Blandit aliquam etiam erat velit scelerisque in. Urna et pharetra pharetra massa massa ultricies mi. Ultricies leo integer malesuada nunc vel risus commodo. Pellentesque adipiscing commodo elit at imperdiet dui accumsan sit amet.
-
-    Tortor aliquam nulla facilisi cras fermentum. A arcu cursus vitae congue mauris rhoncus. Ac orci phasellus egestas tellus rutrum tellus. Eget sit amet tellus cras. Ornare lectus sit amet est placerat in egestas erat. Dis parturient montes nascetur ridiculus. Ut eu sem integer vitae. Viverra orci sagittis eu volutpat odio facilisis mauris sit amet. Enim eu turpis egestas pretium aenean pharetra magna ac. Molestie nunc non blandit massa enim. Felis imperdiet proin fermentum leo vel orci porta non. Nibh mauris cursus mattis molestie a iaculis at erat. Elementum nibh tellus molestie nunc non blandit massa enim nec. Fringilla est ullamcorper eget nulla facilisi etiam dignissim diam quis. Lectus magna fringilla urna porttitor. Dictum fusce ut placerat orci nulla pellentesque dignissim enim. Sed id semper risus in. Nascetur ridiculus mus mauris vitae ultricies.
-
-    Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placerat in egestas erat imperdiet sed euismod nisi porta. Nulla aliquet porttitor lacus luctus accumsan. Consequat semper viverra nam libero justo laoreet. Ut diam quam nulla porttitor massa id neque aliquam vestibulum. Cursus metus aliquam eleifend mi. Viverra nam libero justo laoreet sit amet. Malesuada fames ac turpis egestas maecenas pharetra convallis posuere morbi. Orci ac auctor augue mauris augue neque gravida. Sed libero enim sed faucibus turpis in eu mi bibendum. Tellus pellentesque eu tincidunt tortor aliquam nulla facilisi cras fermentum. Scelerisque purus semper eget duis at tellus at urna. Pellentesque habitant morbi tristique senectus. In metus vulputate eu scelerisque felis imperdiet proin fermentum leo. Vulputate mi sit amet mauris commodo quis imperdiet massa tincidunt." >$TMPDIR/dtest2
                         local theme=''
                         while test -z "$theme"; do
                             theme=$(printf "$(delta --list-syntax-themes | tail -n +1)" | fzf --reverse --border --border-label="Syntax theme")
                             theme=$(echo "$theme" | awk '{$1=""; print $0;}')
-                            delta --syntax-theme "${theme:1}" $TMPDIR/dtest1 $TMPDIR/dtest2
+                            delta --syntax-theme "${theme:1}" $TMPDIR/test1 $TMPDIR/test2
                             stty sane && readyn -n -N "MAGENTA" -p "Set as syntax theme? (Will retry if no)" dltthme
                             if [[ "$dltthme" == "n" ]]; then
                                 theme=''
@@ -1300,81 +1264,10 @@ gitt() {
     if [[ "$wpager" == "y" ]]; then
         readyn -n -p "Install custom diff syntax highlighter?" gitpgr
         if [[ "$gitpgr" == "y" ]]; then
-            reade -Q "GREEN" -i "delta diff-so-fancy riff ydiff diffr difftastic" -p "Which to install? [Delta/diff-so-fancy/riff/ydiff/difftastic/diffr]: " pager
-            if [[ $pager == "bat" ]]; then
-                if ! test -f install_bat.sh; then
-                    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bat.sh)"
-                else
-                    . ./install_bat.sh
-                fi
-
-            elif [[ $pager == "moar" ]]; then
-                if ! test -f install_moar.sh; then
-                    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_moar.sh)"
-                else
-                    . ./install_moar.sh
-                fi
-            elif [[ $pager == "most" ]]; then
-                if ! test -f install_most.sh; then
-                    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_most.sh)"
-                else
-                    . ./install_most.sh
-                fi
-            elif [[ $pager == "riff" ]]; then
-                if ! test -f install_cargo.sh; then
-                    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)"
-                else
-                    . ./install_cargo.sh
-                fi
-                cargo install --locked riffdiff
-            elif [[ $pager == "difftastic" ]]; then
-                if ! test -f install_cargo.sh; then
-                    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)"
-                else
-                    . ./install_cargo.sh
-                fi
-                cargo install --locked difftastic
-            elif [[ $pager == "diffr" ]]; then
-                if ! test -f install_cargo.sh; then
-                    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)"
-                else
-                    . ./install_cargo.sh
-                fi
-                cargo install --locked diffr
-            elif [[ $pager == "nvimpager" ]]; then
-                if ! test -f install_nvimpager.sh; then
-                    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nvimpager.sh)"
-                else
-                    . ./install_nvimpager.sh
-                fi
-            fi
-            if [[ "$distro_base" == "Arch" ]]; then
-                if [[ $pager == "diff-so-fancy" ]]; then
-                    eval "$pac_ins diff-so-fancy"
-                elif [[ $pager == "delta" ]]; then
-                    eval "$pac_ins git-delta"
-                elif [[ $pager == "ydiff" ]]; then
-                    if ! type pipx &>/dev/null && ! test -f install_pipx.sh; then
-                        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)"
-                    elif ! type pipx &>/dev/null; then
-                        . ./install_pipx.sh
-                    fi
-                    pipx install --upgrade ydiff
-                elif [[ "$distro_base" == "Debian" ]]; then
-                    if [[ $pager == "diff-so-fancy" ]]; then
-                        eval "$pac_ins npm"
-                        sudo npm -g install diff-so-fancy
-                    elif [[ $pager == "delta" ]]; then
-                        eval "$pac_ins git-delta"
-                    elif [[ $pager == "ydiff" ]]; then
-                        if ! type pipx &>/dev/null && ! test -f install_pipx.sh; then
-                            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)"
-                        elif ! type pipx &>/dev/null; then
-                            . ./install_pipx.sh
-                        fi
-                        pipx install --upgrade ydiff
-                    fi
-                fi
+            if ! test -f install_differ_pager.sh; then
+                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_differ_pager.sh)
+            else
+                . ./install_differ_pager.sh
             fi
         fi
         
@@ -1384,7 +1277,8 @@ gitt() {
         fi
         readyn -p "Set pager.diff?" -c "test -z \"$(git config $global --list | grep 'pager.diff' | awk 'BEGIN { FS = "=" }; {print $2;}')\"" pager
         if [[ $pager == 'y' ]]; then
-            git_pager "pager.diff" "$global"
+
+            pager "pager.diff" "$global"
         fi
         readyn -p "Set pager.difftool?" -c "test -z \"$(git config $global --list | grep 'pager.difftool' | awk 'BEGIN { FS = "=" }; {print $2;}')\"" pager
         if [[ $pager == 'y' ]]; then
@@ -1629,12 +1523,21 @@ gitt() {
     #    diffpre="y"
     #fi
 
-    if ! type lazygit &>/dev/null || ! grep -q 'pager:' ~/.config/lazygit/config.yml; then
-        readyn -Y "CYAN" -p "Configure custom interactive diff filter for Lazygit?" gitdiff1
-        if [[ "y" == "$gitdiff1" ]]; then
-            git_hl "lazygit"
-        fi
-    fi
+    #if ! type lazygit &>/dev/null || ! grep -q 'pager:' ~/.config/lazygit/config.yml; then
+    #    readyn -Y "CYAN" -p "Configure custom interactive diff filter for Lazygit?" gitdiff1
+    #    if [[ "y" == "$gitdiff1" ]]; then
+    #        readyn -n -p "Install custom diff syntax highlighter?" gitpgr
+    #        if [[ "$gitpgr" == "y" ]]; then
+    #            if ! test -f install_differ_pager.sh; then
+    #                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_differ_pager.sh)
+    #            else
+    #                . ./install_differ_pager.sh
+    #            fi
+    #        fi
+    #         
+    #        git_hl "lazygit"
+    #    fi
+    #fi
 
     # FZF is cool but ripgrep-dir is cooler
 
@@ -1668,4 +1571,4 @@ gitt() {
     unset gitdiff diff gitmerge merge amt rslt gitcnf gitign
 }
 
-gitt "$@"
+test -e "$1" && gitt "$1"

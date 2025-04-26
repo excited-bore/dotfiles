@@ -161,7 +161,10 @@ set ttimeout ttimeoutlen=200
 "
 " If vim is accessed over ssh though, be carefull for using this. Xclip can be
 " troublesome so test this setting to see that this is your possible problem 
-set clipboard+=unnamedplus
+
+if has("unnamedplus")
+    set clipboard=unnamedplus
+endif
 
 " Indentation settings according to personal preference.
 
@@ -177,7 +180,6 @@ set diffopt+=iwhite
 
 " Different visual block mode
 " set virtualedit=all    
-
 
 " Ctags
 " Set tags for use with ctags
@@ -1240,7 +1242,7 @@ inoremap <M-h> <C-\><C-o>:%s,,,gc<Left><Left><Left><Left>
 vnoremap <M-h> y:%s,<C-r>",,gc<Left><Left><Left>
 cnoremap <M-h> <C-e><C-u>nohl<CR>:<Esc>
 
-if has('x11')
+if has('unnamedplus')
     nnoremap y "+^y
     nnoremap yy "+^yg_
     nnoremap Y "+^Y
@@ -1271,6 +1273,7 @@ if has('x11')
    
     " Copy entire line
     nnoremap <silent> <C-c> "+yy
+     
     "nnoremap <silent> <C-c> <Plug>OSCYankOperator_
     "" Paste with P if at beginning of line
     nnoremap <silent> <C-v> "+P
@@ -1283,7 +1286,7 @@ if has('x11')
      
 
     "vnoremap <silent> <C-c> <Plug>OSCYankVisual
-    vnoremap <silent> <C-c> "+yy
+    vnoremap <silent> <C-c> "+y
     vnoremap <silent> <C-v> "+Pl
     vnoremap <C-d>  "+d 
  
@@ -1334,7 +1337,7 @@ else
    
 
     "vnoremap <silent> <C-c> <Plug>OSCYankVisual
-    vnoremap <silent> <C-c> "*yy
+    vnoremap <silent> <C-c> "*y
     vnoremap <silent> <C-v> "*Pl
     vnoremap <C-d>  "*d 
  

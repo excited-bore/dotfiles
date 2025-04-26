@@ -11,7 +11,7 @@ else
     . ./checks/check_all.sh
 fi
 
-get-script-dir SCRIPT_DIR
+SCRIPT_DIR=$(pwd)
 
 if ! type lazygit &>/dev/null; then
     if [[ "$distro_base" == "Arch" ]]; then
@@ -34,6 +34,36 @@ if ! type lazygit &>/dev/null; then
     lazygit --version
     unset nstll
 fi
+
+file=lazygit/.config/lazygit/config.yml.example 
+if ! test -f $file; then
+    file=$(curl -fsSL -o ~/.config/lazygit/config.yml.example https://raw.githubusercontent.com/excited-bore/dotfiles/main/lazygit/.config/lazygit/ )
+fi
+
+readyn -p 'Configure lazygit?' conflazy
+if [[ 'y' == $conflazy ]]; then
+    function cp_lazy_conf(){ mkdir -p ~/.config/lazygit/; cp -f $file ~/.config/lazygit/config.yml.example; }
+    yes-edit-no -g "$file" -p 'Copy an example lazygit yaml config file into ~/.config/lazygit/?' -f cp_lazy_conf 
+    if ! test -f install_differ_pager.sh; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_git.sh)
+    else
+        . ./install_git.sh
+    fi
+
+    readyn -Y "CYAN" -p "Configure custom interactive diff filter for Lazygit?" gitdiff1
+    if [[ "y" == "$gitdiff1" ]]; then
+        readyn -n -p "Install custom diff syntax highlighter?" gitpgr
+        if [[ "$gitpgr" == "y" ]]; then
+            if ! test -f install_differ_pager.sh; then
+                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_differ_pager.sh)
+            else
+                . ./install_differ_pager.sh
+            fi
+        fi
+        git_hl "lazygit"
+    fi
+fi
+
 
 #if ! type copy-to &>/dev/null; then
 #    readyn -p "Install copy-to?" cpcnf

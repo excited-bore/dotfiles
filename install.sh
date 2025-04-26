@@ -673,7 +673,7 @@ if [[ "y" == "$git_ins" ]]; then
         ins_git=$(mktemp)
         curl -o $ins_git https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_git.sh
         chmod u+x "$ins_git"
-        eval "$ins_git" 'global'
+        eval "$ins_git 'global'"
     else
         . $SCRIPT_DIR/install_git.sh 'global'
     fi
@@ -690,6 +690,7 @@ if [[ "y" == "$git_ins" ]]; then
     else
         . $SCRIPT_DIR/install_lazygit.sh
     fi
+    
 fi
 unset git_ins
 

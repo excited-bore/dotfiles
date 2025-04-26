@@ -11,22 +11,13 @@ else
     . ./checks/check_all.sh
 fi
 
-get-script-dir SCRIPT_DIR
-
 if ! type autojump &>/dev/null; then
     if [[ "$distro_base" == "Arch" ]]; then
-        if test -z "$AUR_ins"; then
-            readyn -p 'No AUR helper found. Install yay?' ins_yay
-            if [[ "$ins_yay" == 'y' ]]; then
-                if ! test -f AUR_insers/install_yay.sh; then
-                    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/AUR_insers/install_yay.sh)"
-                else
-                    . ./AUR_insers/install_yay.sh
-                fi
+            if ! test -f checks/check_AUR.sh; then
+                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_AUR.sh)
+            else
+                . ./checks/check_AUR.sh
             fi
-            unset ins_yay
-            yay -S autojump
-        else
             eval "${AUR_ins}" autojump
         fi
     elif [[ $distro_base == "Debian" ]]; then
