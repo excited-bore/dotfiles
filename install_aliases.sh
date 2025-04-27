@@ -310,6 +310,7 @@ unset int_r sig
 bashc=aliases/.bash_aliases.d/bash.sh
 update_sysm=aliases/.bash_aliases.d/update-system.sh
 pacmn=aliases/.bash_aliases.d/package_managers.sh
+rgrp=aliases/.bash_aliases.d/ripgrep-directory.sh
 [[ $distro == "Manjaro" ]] && manjaro=aliases/.bash_aliases.d/manjaro.sh
 type systemctl &>/dev/null && systemd=aliases/.bash_aliases.d/systemctl.sh
 type sudo &>/dev/null && dosu=aliases/.bash_aliases.d/sudo.sh
@@ -319,12 +320,13 @@ ps1=aliases/.bash_aliases.d/PS1_colours.sh
 variti=aliases/.bash_aliases.d/variety.sh
 type python &>/dev/null && pthon=aliases/.bash_aliases.d/python.sh
 if ! test -d aliases/.bash_aliases.d/; then
-    tmp1=$(mktemp) && curl -o $tmp1 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh && update_sysm=$tmp1
     tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/bash.sh && bash=$tmp
+    tmp1=$(mktemp) && curl -o $tmp1 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh && update_sysm=$tmp1
+    rgrp=$(mktemp) && curl -o $rgrp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/ripgrep-directory.sh 
+    tmp3=$(mktemp) && curl -o $tmp4 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/package_managers.sh && pacmn=$tmp4
     [[ $distro == "Manjaro" ]] && tmp7=$(mktemp) && curl -o $tmp7 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/manjaro.sh && manjaro=$tmp7
-    tmp4=$(mktemp) && curl -o $tmp4 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/package_managers.sh && pacmn=$tmp4
     type systemctl &>/dev/null && tmp2=$(mktemp) && curl -o $tmp2 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/systemctl.sh && systemd=$tmp2
-    type sudo &>/dev/null && tpac_insmp3=$(mktemp) && curl -o $tmp3 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/sudo.sh && dosu=$tmp3
+    type sudo &>/dev/null && tmp3=$(mktemp) && curl -o $tmp3 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/sudo.sh && dosu=$tmp3
     type git &>/dev/null && tmp10=$(mktemp) && curl -o $tmp10 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/git.sh && gits=$tmp5
     type ssh &>/dev/null && tmp5=$(mktemp) && curl -o $tmp5 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/ssh.sh && sshs=$tmp5
     tmp6=$(mktemp) && curl -o $tmp6 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/ps1.sh && ps1=$tmp6
@@ -360,6 +362,16 @@ packman() {
     yes-edit-no -Y 'YELLOW' -f packman_r -g "$pacmn" -p "Install package_managers.sh at /root/.bash_aliases.d/?"
 }
 yes-edit-no -f packman -g "$pacmn" -p "Install package_managers.sh at ~/.bash_aliases.d/ (package manager aliases)?" 
+
+rgrep_r() {
+    sudo cp -f $rgrep /root/.bash_aliases.d/
+}
+rgrep() {
+    cp -f $rgrep ~/.bash_aliases.d/
+    yes-edit-no -Y 'YELLOW' -f rgrep_r -g "$rgrp" -p "Install ripgrep-directory.sh at /root/.bash_aliases.d/?"
+}
+yes-edit-no -f rgrep -g "$rgrp" -p "Install ripgrep-directory.sh at ~/.bash_aliases.d/ (search files through pattern in directory)?" 
+
 
 if [[ "$distro" == "Manjaro" ]]; then
     manj_r() {
