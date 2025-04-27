@@ -73,7 +73,7 @@ if [[ "$distro_base" == "Arch" ]]; then
         elif ! type pipx &>/dev/null; then
             . ./install_pipx.sh
         fi
-        pipx install --upgrade ydiff
+        pipx install ydiff
     fi
 elif [[ "$distro_base" == "Debian" ]]; then
     if [[ $pager == "diff-so-fancy" ]]; then
@@ -87,7 +87,7 @@ elif [[ "$distro_base" == "Debian" ]]; then
         elif ! type pipx &>/dev/null; then
             . ./install_pipx.sh
         fi
-        pipx install --upgrade ydiff
+        pipx install ydiff
     fi
 fi
 

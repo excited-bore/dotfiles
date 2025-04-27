@@ -63,38 +63,37 @@ function git_hl() {
     #    cmd="git config $global interactive.difffilter"
     fi
     local diffs=""
-    local diff=""
     if type batdiff &>/dev/null && ! [[ $cmd =~ 'lazygit' ]]; then
         diffs=$diffs" batdiff"
-        diff="batdiff"
-    fi
-    if type ydiff &>/dev/null; then
-        diffs=$diffs" ydiff"
-        diff="delta"
     fi
     if type riff &>/dev/null && ! [[ $cmd =~ 'lazygit' ]]; then
         diffs=$diffs" riff"
-        diff="riff"
     fi
     if type diffr &>/dev/null && ! [[ $cmd =~ 'lazygit' ]]; then
         diffs=$diffs" diffr"
-        diff="diffr"
+    fi
+    if type ydiff &>/dev/null; then
+        diffs=$diffs" ydiff"
     fi
     if type diff-so-fancy &>/dev/null; then
         diffs=$diffs" diff-so-fancy"
-        diff="diff-so-fancy"
     fi
     if type delta &>/dev/null; then
         diffs=$diffs" delta"
-        diff="delta"
     fi
 
-    reade -Q "GREEN" -i "$diff $diffs" -p "Diff filter: " diff
+    diffp="$(echo $diffs | sed 's/ /\n\t- /g')"  
+
+    printf "${GREEN}Diff highlighting tools:${CYAN}\n\t- $diffp${normal}\n" 
+
+    reade -Q "GREEN" -i "$diffs" -p "Diff filter: " diff
     if test -n "$diff"; then
-        readyn -Y "CYAN" -p "You selected $diff. Configure?" conf
         if [[ "$diff" == "delta" ]]; then
             local diff="delta --paging=never"
             local opts=''
+            local colorArg='always'
+            local side='n' 
+            readyn -Y "CYAN" -p "You selected $diff. Configure?" conf
             if [[ "y" == "$conf" ]]; then
                 local theme=''
                 while test -z "$theme"; do
@@ -126,6 +125,7 @@ function git_hl() {
                     if [[ "y" == $delta3 ]]; then
                         git config $global delta.side-by-side true
                         opts="$opts --side-by-side" 
+                        side='y' 
                     elif [[ "n" == $delta3 ]]; then
                         git config $global delta.side-by-side false
                     fi
@@ -147,46 +147,53 @@ function git_hl() {
                         git config $global delta.hyperlinks false
                     fi
 
-                    delta --syntax-theme "$theme" --pager 'less -R' $TMPDIR/test1 $TMPDIR/test2
+                    delta $opts --syntax-theme "$theme" --pager 'less -R' $TMPDIR/test1 $TMPDIR/test2
                     readyn -N "MAGENTA" -n -p "Is this ok? (will retry if no)" dltthme
                     if [[ "$dltthme" == "n" ]]; then
                         theme=''
                     fi
                 done
                 opts="$opts --syntax-theme $theme" 
+                [[ $cmd =~ 'difffilter' ]] && opts='' 
                 git config $global --replace-all delta.syntax-theme "$theme"
             fi
         elif [[ "$diff" == "diff-so-fancy" ]]; then
-            diff="diff-so-fancy --patch"
-            readyn -p "You selected $diff. Configure?" difffancy
-            if [[ "$difffancy" == "y" ]]; then
-                readyn -p "Should the first block of an empty line be colored. (Default: true)?" diffancy
-                if [[ "y" == $diffancy ]]; then
-                    git config --bool $global diff-so-fancy.markEmptyLines true
-                else
-                    git config --bool $global diff-so-fancy.markEmptyLines false
+            local diff="diff-so-fancy"
+            if [[ "$cmd" =~ 'difffilter' ]]; then
+                opts=' --patch'
+                readyn -p "You selected $diff. Configure?" difffancy
+                if [[ "$difffancy" == "y" ]]; then
+                    readyn -p "Should the first block of an empty line be colored. (Default: true)?" diffancy
+                    if [[ "y" == $diffancy ]]; then
+                        git config --bool $global diff-so-fancy.markEmptyLines true
+                    else
+                        git config --bool $global diff-so-fancy.markEmptyLines false
+                    fi
+                    readyn -Y "CYAN" -p "Simplify git header chunks to a more human readable format. (Default: true)" diffancy
+                    if [[ "y" == $diffancy ]]; then
+                        git config --bool $global diff-so-fancy.changeHunkIndicators true
+                    else
+                        git config --bool $global diff-so-fancy.changeHunkIndicators false
+                    fi
+                    readyn -Y "CYAN" -p "Should the pesky + or - at line-start be removed. (Default: true)" diffancy
+                    if [[ "y" == $diffancy ]]; then
+                        git config --bool $global diff-so-fancy.stripLeadingSymbols true
+                    else
+                        git config --bool $global diff-so-fancy.stripLeadingSymbols false
+                    fi
+                    readyn -Y "CYAN" -p "By default, the separator for the file header uses Unicode line-drawing characters. If this is causing output errors on your terminal, set this to false to use ASCII characters instead. (Default: true)" diffancy
+                    if [[ "y" == $diffancy ]]; then
+                        git config --bool $global diff-so-fancy.useUnicodeRuler true
+                    else
+                        git config --bool $global diff-so-fancy.useUnicodeRuler false
+                    fi
+                    reade -Q "CYAN" -i "47 $(seq 1 100)" -p "By default, the separator for the file header spans the full width of the terminal. Use this setting to set the width of the file header manually. (Default: 47): " diffancy
+                    # git log's commit header width
+                    re='^[0-9]+$'
+                    if [[ $diffancy =~ $re ]] ; then
+                        git config --global diff-so-fancy.rulerWidth $diffancy
+                    fi
                 fi
-                readyn -Y "CYAN" -p "Simplify git header chunks to a more human readable format. (Default: true)" diffancy
-                if [[ "y" == $diffancy ]]; then
-                    git config --bool $global diff-so-fancy.changeHunkIndicators true
-                else
-                    git config --bool $global diff-so-fancy.changeHunkIndicators false
-                fi
-                readyn -Y "CYAN" -p "Should the pesky + or - at line-start be removed. (Default: true)" diffancy
-                if [[ "y" == $diffancy ]]; then
-                    git config --bool $global diff-so-fancy.stripLeadingSymbols true
-                else
-                    git config --bool $global diff-so-fancy.stripLeadingSymbols false
-                fi
-                readyn -Y "CYAN" -p "By default, the separator for the file header uses Unicode line-drawing characters. If this is causing output errors on your terminal, set this to false to use ASCII characters instead. (Default: true)" diffancy
-                if [[ "y" == $diffancy ]]; then
-                    git config --bool $global diff-so-fancy.useUnicodeRuler true
-                else
-                    git config --bool $global diff-so-fancy.useUnicodeRuler false
-                fi
-                reade -Q "CYAN" -i "47 $(seq 1 100)" -p "By default, the separator for the file header spans the full width of the terminal. Use this setting to set the width of the file header manually. (Default: 47): " diffancy
-                # git log's commit header width
-                git config --global diff-so-fancy.rulerWidth $diffancy
             elif [[ "$diff" == "riff" ]]; then
                 diff="riff --no-pager"
                 readyn -Y 'CYAN' -p "Ignore changes in amount of whitespace?" riff1
@@ -199,18 +206,21 @@ function git_hl() {
                 fi
             fi
         elif [[ "$diff" == "ydiff" ]]; then
-            diff=$diff" --color=auto"
-            #readyn -Y 'CYAN' -p "You selected $diff. Configure?" conf
-            #if [[ "y" == "$conf" ]]; then
+            opts=' --color=auto --width={{columnWidth}}'
+            colorArg='never' 
+            [[ "$cmd" =~ 'lazygit' ]] && opts=$opts" -p cat"  
+            readyn -Y 'CYAN' -p "You selected $diff. Configure?" conf
+            if [[ "y" == "$conf" ]]; then
                 readyn -Y 'CYAN' -p "Enable side-by-side mode?" diffr1
                 if [[ "$diffr1" == 'y' ]]; then
-                    diff=$diff" --side-by-side"
+                    opts=$opts" --side-by-side"
+                    side='y' 
                     readyn -Y "CYAN" -p "Wrap long lines in side-by-side view?" diffr1
                     if [[ "$diffr1" == 'y' ]]; then
-                        diff=$diff" --wrap"
+                        opts=$opts" --wrap"
                     fi
                 fi
-            #fi
+            fi
         elif [ "$diff" == "diffr" ]; then
             #readyn -Y "CYAN" -p "You selected $diff. Configure?" conf
             #if [[ "y" == "$conf" ]]; then
@@ -234,21 +244,43 @@ function git_hl() {
             #fi
         fi
     fi
+
+    local sidpanelw='0.333' 
+    if [[ $cmd =~ 'lazygit' ]] && [[ $side == 'y' ]]; then
+        printf "${GREEN}Side-by-side selected. This might take up a bit more space in the diff panel for lazygit.\n${normal}" 
+        readyn -p "Set side panel width (left side panels - Default 0.333)" sidepn
+        if [[ $sidepn == 'y' ]]; then
+            reade -Q 'GREEN' -i "$(echo "$(seq .01 .01 .33)" | tac)" -p 'Side pane width: ' sidepnw 
+            re='^[+-]?[0-9]*\.?[0-9]+$'
+            if [[ $sidepnw =~ $re ]] ; then
+                sidepanelw=$sidepnw
+            fi 
+        fi
+    
+    fi
+
     if ! test -z "$cmd"; then
         if [[ "$cmd" =~ 'difffilter' ]]; then
             diff="$(echo $diff | awk '{print $1;}')" 
-            eval "$cmd $diff"
+            eval "$cmd $diff$opts"
         elif [[ "$cmd" =~ 'lazygit' ]]; then
              
             if ! test -f ~/.config/lazygit/config.yml; then
                 touch ~/.config/lazygit/config.yml 
             fi
+            if ! grep -q 'sidePanelWidth: *'  ~/.config/lazygit/config.yml; then
+                printf "gui:\n sidePanelWidth: $sidepanelw\n" >> ~/.config/lazygit/config.yml 
+            else
+                sed -i 's/^[ \t]*sidePanelWidth:*.*/ sidePanelWidth: '"$sidepanelw"'/g' ~/.config/lazygit/config.yml
+            fi 
             if ! grep -q 'pager: *'  ~/.config/lazygit/config.yml; then
                 #sed -i '1s/^/git:\n paging:\n   colorArg: always\n   pager: '$diff'\n/' ~/.config/lazygit/config.yml
-                printf "git:\n paging:\n   useConfig: false\n   colorArg: always\n   pager: $diff$opts\n" >> ~/.config/lazygit/config.yml 
+                printf "git:\n paging:\n   useConfig: false\n   colorArg: $colorArg\n   pager: $diff$opts\n" >> ~/.config/lazygit/config.yml 
             else
+                sed -i 's/^[ \t]*colorArg:*.*/   colorArg: '"$colorArg"'/g' ~/.config/lazygit/config.yml
                 sed -i 's/^[ \t]*pager:*.*/   pager: '"$diff$opts"'/g' ~/.config/lazygit/config.yml
             fi
+            
             #sed -i 's|pager:.*|pager: '"$diff"'|g' ~/.config/lazygit/config.yml
             #    printf 'paging:\n    pager: '"$diff\n" >> 
                 #sed -i 's|#pager|  pager: '"$diff"'|g' ~/.config/lazygit/config.yml
