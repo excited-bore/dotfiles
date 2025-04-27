@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if [ ! -f ~/.bash_aliases ]; then
+if ! [ -f ~/.bash_aliases ]; then
     if ! test -f aliases/.bash_aliases; then
         curl -o ~/.bash_aliases https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases  
     else
@@ -8,7 +8,7 @@ if [ ! -f ~/.bash_aliases ]; then
     fi 
 fi
 
-if [ ! -d ~/.bash_aliases.d/ ]; then
+if ! [ -d ~/.bash_aliases.d/ ]; then
     mkdir ~/.bash_aliases.d/
 fi
 
@@ -37,7 +37,13 @@ fi
 
 
 echo "Next $(tput setaf 1)sudo$(tput sgr0) will install '.bash_aliases.d' in /root and source it with '/root/.bash_aliases' in /root/.bashrc"
-sudo cp -fv ~/.bash_aliases /root/
+if ! [ -f /root/.bash_aliases ]; then
+    if ! test -f aliases/.bash_aliases; then
+        sudo curl -o /root/.bash_aliases https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases  
+    else
+        sudo cp -fv aliases/.bash_aliases /root/
+    fi 
+fi
 if ! sudo grep -q ".bash_aliases" /root/.bashrc; then
     printf "[ -f ~/.bash_aliases ] && source ~/.bash_aliases \n" | sudo tee -a /root/.bashrc > /dev/null
 fi
@@ -49,26 +55,13 @@ if sudo test -f /root/.bashrc && ! sudo grep -q '~/.bash_aliases' /root/.bashrc;
     fi
 fi
 
-# Check one last time if ~/.bash_preexec - for both $USER and root - is the last line in their ~/.bash_profile and ~/.bashrc
-
-if grep -q '~/.bash_preexec.sh' ~/.bash_profile && ! [[ "$(tail -1 ~/.bash_profile)" =~ '~/.bash_preexec' ]]; then
-    sed -i '/[ -f ~\/.bash_preexec.sh ] && source ~\/.bash_preexec.sh/d' ~/.bash_profile
-    printf "\n[ -f ~/.bash_preexec.sh ] && source ~/.bash_preexec.sh\n" >>~/.bash_profile
-fi
-
-if grep -q '~/.bash_preexec.sh' ~/.bash_profile && ! [[ "$(tail -1 ~/.bashrc)" =~ '~/.bash_preexec' ]]; then
-    sed -i '/[ -f ~\/.bash_preexec.sh ] && source ~\/.bash_preexec.sh/d' ~/.bashrc
-    printf "\n[ -f ~/.bash_preexec.sh ] && source ~/.bash_preexec.sh\n" >>~/.bashrc
-fi
-
-if test -d /root/; then
-    if sudo grep -q '~/.bash_preexec.sh' /root/.bash_profile &&  ! [[ "$(sudo tail -1 /root/.bash_profile)" =~ '~/.bash_preexec' ]]; then
-        sudo sed -i 'r/[ -f ~/.bash_preexec.sh ] && source ~/.bash_preexec.sh' /root/.bash_profile
-        printf "\n[ -f ~/.bash_preexec.sh ] && source ~/.bash_preexec.sh\n" | sudo tee -a /root/.bash_profile
+if ! test -f ./checks/check_bash_source_order.sh; then
+    if type curl &>/dev/null; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_bash_source_order.sh)
+    else
+        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
+        return 1 || exit 1
     fi
-
-    if sudo grep -q '~/.bash_preexec.sh' /root/.bashrc && ! [[ "$(sudo tail -1 /root/.bashrc)" =~ '~/.bash_preexec' ]]; then
-        sudo sed -i '/[ -f ~\/.bash_preexec.sh ] && source ~\/.bash_preexec.sh/d' /root/.bashrc
-        printf "\n[ -f ~/.bash_preexec.sh ] && source ~/.bash_preexec.sh\n" | sudo tee -a /root/.bashrc
-    fi
+else
+    . ./checks/check_bash_source_order.sh
 fi
