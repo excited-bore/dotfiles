@@ -14,7 +14,7 @@ fi
 SCRIPT_DIR=$(pwd)
 
 
-reade -Q "GREEN" -i "delta diff-so-fancy riff ydiff diffr difftastic" -p "Which to install? [Delta/diff-so-fancy/riff/ydiff/difftastic/diffr]: " pager
+reade -Q "GREEN" -i "delta difftastic diff-so-fancy riff ydiff diffr colordiff" -p "Which to install? [Delta/diff-so-fancy/riff/ydiff/difftastic/diffr/colordiff]: " pager
 
 if [[ $pager == "bat" ]]; then
     if ! test -f install_bat.sh; then
@@ -51,6 +51,8 @@ fi
 if [[ "$distro_base" == "Arch" ]]; then
     if [[ $pager == "diff-so-fancy" ]]; then
         eval "$pac_ins diff-so-fancy"
+    elif [[ $pager == "colordiff" ]]; then
+        eval "$pac_ins colordiff"
     elif [[ $pager == "delta" ]]; then
         eval "$pac_ins git-delta"
     elif [[ $pager == "ydiff" ]]; then
@@ -65,6 +67,8 @@ elif [[ "$distro_base" == "Debian" ]]; then
     if [[ $pager == "diff-so-fancy" ]]; then
         eval "$pac_ins npm"
         sudo npm -g install diff-so-fancy
+    elif [[ $pager == "colordiff" ]]; then
+        eval "$pac_ins colordiff"
     elif [[ $pager == "delta" ]]; then
         eval "$pac_ins git-delta"
     elif [[ $pager == "ydiff" ]]; then
