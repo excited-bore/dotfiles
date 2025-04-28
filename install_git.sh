@@ -70,7 +70,7 @@ function git_hl() {
         diffs=$diffs" diff-so-fancy"
     fi
     if type difft &>/dev/null; then
-        diffs=$diffs" difft"
+        diffs=$diffs" difftastic"
     fi
     if type ydiff &>/dev/null; then
         diffs=$diffs" ydiff"
@@ -234,17 +234,24 @@ function git_hl() {
             if [[ "y" == "$conf" ]]; then
                 readyn -Y "CYAN" -p "Set linenumber?" diffr1
                 if [[ "$diffr1" == 'y' ]]; then
-                    diff="diffr --line-numbers"
-                    reade -Q "CYAN" -i 'c a n' -p "Set linenumber style? [C(ompact)/a(ligned)/n]: " diffr1
-                    if [[ "$diffr1" == 'compact' ]] || [[ "$diffr1" == 'aligned' ]]; then
-                        diff="diffr --line-numbers $diffr1"
+                    printf "${green}Style is optional.[Default]
+\t - ${CYAN}Compact:${green} Take as little width as possible.
+\t - ${CYAN}Aligned:${green} Align to tab stops (useful if tab is used for indentation).${normal}\n" 
+                    reade -Q "CYAN" -i 'c a n' -p "Set linenumber style? [C(ompact)/a(ligned)/n(o)]: " diffr1
+                    if [[ "$diffr1" == 'c' ]] || [[ "$diffr1" == 'a' ]]; then
+                       [[ "$diffr1" == 'c' ]] && diffr1='compact'  
+                       [[ "$diffr1" == 'a' ]] && diffr1='aligned'  
+                        opts=" --line-numbers $diffr1"
+                    else
+                        opts=" --line-numbers"
                     fi
                 fi
             fi
-        elif [[ "$diff" == "difft" ]]; then
-            readyn -Y "CYAN" -p "You selected $diff(astic). Configure?" conf
+        elif [[ "$diff" == "difftastic" ]]; then
+            diff='difft' 
             extrn='y' 
             opts=' --color=always'
+            readyn -Y "CYAN" -p "You selected difftastic. Configure?" conf
             if [[ "y" == "$conf" ]]; then
                 readyn -Y 'CYAN' -p "Set side-by-side mode? (Default: side-by-side)" diffr1
                 if [[ "$diffr1" == 'y' ]]; then
@@ -322,7 +329,7 @@ function git_hl() {
         fi
     fi
 
-    local sidpanelw='0.333' 
+    local sidepanelw='0.333' 
     if [[ $cmd =~ 'lazygit' ]] && [[ "$side" == 'y' ]]; then
         printf "${GREEN}Side-by-side selected. This might take up a bit more space in the diff panel for lazygit.\n${normal}" 
         readyn -p "Set side panel width (left side panels - Default 0.333)" sidepn
@@ -353,7 +360,6 @@ function git_hl() {
             fi
 
             if ! grep -q 'git:' ~/.config/lazygit/config.yml; then
-                #sed -i '1s/^/git:\n paging:\n   colorArg: always\n   pager: '$diff'\n/' ~/.config/lazygit/config.yml 
                 if [[ "$extrn" == 'n' ]]; then
                     printf "git:\n paging:\n   useConfig: false\n   colorArg: $colorArg\n   pager: $diff$opts\n" >> ~/.config/lazygit/config.yml 
                 else 
@@ -368,8 +374,9 @@ function git_hl() {
                 fi
             else
                 if [[ "$extrn" == 'n' ]]; then
+                    sed -i '/externalDiffCommand:.*/d' ~/.config/lazygit/config.yml
                     if ! grep -q 'pager:' ~/.config/lazygit/config.yml; then
-                        sed -i 's/\(paging:\)/\1\n   useConfig: false\n   colorArg: '$colorArg'\n   pager: '$diff$opts'\n /g' ~/.config/lazygit/config.yml
+                        sed -i 's/\(paging:\)/\1\n   useConfig: false\n   colorArg: '$colorArg'\n   pager: '"$diff$opts"'\n /g' ~/.config/lazygit/config.yml
                     else 
                         sed -i 's/^[ \t]*colorArg:*.*/   colorArg: '"$colorArg"'/g' ~/.config/lazygit/config.yml
                         sed -i 's/^[ \t]*pager:*.*/   pager: '"$diff$opts"'/g' ~/.config/lazygit/config.yml
@@ -382,12 +389,13 @@ function git_hl() {
                     fi
                 fi
             fi
-           
+
+            # Cleanup - remove empty lines
+            sed -i '/^[[:space:]]*$/d' ~/.config/lazygit/config.yml 
+
+            # Then show changes
             printf "${GREEN}'$HOME/.config/lazygit/config.yml'${normal}\n" 
             cat -b ~/.config/lazygit/config.yml 
-            #sed -i 's|pager:.*|pager: '"$diff"'|g' ~/.config/lazygit/config.yml
-            #    printf 'paging:\n    pager: '"$diff\n" >> 
-                #sed -i 's|#pager|  pager: '"$diff"'|g' ~/.config/lazygit/config.yml
         fi
     fi
     
