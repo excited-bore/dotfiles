@@ -14,7 +14,8 @@ fi
 SCRIPT_DIR=$(pwd)
 
 
-reade -Q "GREEN" -i "delta diff-so-fancy riff ydiff diffr difftastic" -p "Which to install? [Delta/diff-so-fancy/riff/ydiff/difftastic/diffr]: " pager
+reade -Q "GREEN" -i "delta difftastic diff-so-fancy riff ydiff diffr colordiff" -p "Which to install? [Delta/diff-so-fancy/riff/ydiff/difftastic/diffr/colordiff]: " pager
+
 if [[ $pager == "bat" ]]; then
     if ! test -f install_bat.sh; then
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bat.sh)"
@@ -22,18 +23,6 @@ if [[ $pager == "bat" ]]; then
         . ./install_bat.sh
     fi
 
-elif [[ $pager == "moar" ]]; then
-    if ! test -f install_moar.sh; then
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_moar.sh)"
-    else
-        . ./install_moar.sh
-    fi
-elif [[ $pager == "most" ]]; then
-    if ! test -f install_most.sh; then
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_most.sh)"
-    else
-        . ./install_most.sh
-    fi
 elif [[ $pager == "riff" ]]; then
     if ! test -f install_cargo.sh; then
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)"
@@ -41,6 +30,7 @@ elif [[ $pager == "riff" ]]; then
         . ./install_cargo.sh
     fi
     cargo install --locked riffdiff
+
 elif [[ $pager == "difftastic" ]]; then
     if ! test -f install_cargo.sh; then
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)"
@@ -48,6 +38,7 @@ elif [[ $pager == "difftastic" ]]; then
         . ./install_cargo.sh
     fi
     cargo install --locked difftastic
+
 elif [[ $pager == "diffr" ]]; then
     if ! test -f install_cargo.sh; then
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)"
@@ -55,16 +46,13 @@ elif [[ $pager == "diffr" ]]; then
         . ./install_cargo.sh
     fi
     cargo install --locked diffr
-elif [[ $pager == "nvimpager" ]]; then
-    if ! test -f install_nvimpager.sh; then
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nvimpager.sh)"
-    else
-        . ./install_nvimpager.sh
-    fi
 fi
+
 if [[ "$distro_base" == "Arch" ]]; then
     if [[ $pager == "diff-so-fancy" ]]; then
         eval "$pac_ins diff-so-fancy"
+    elif [[ $pager == "colordiff" ]]; then
+        eval "$pac_ins colordiff"
     elif [[ $pager == "delta" ]]; then
         eval "$pac_ins git-delta"
     elif [[ $pager == "ydiff" ]]; then
@@ -79,6 +67,8 @@ elif [[ "$distro_base" == "Debian" ]]; then
     if [[ $pager == "diff-so-fancy" ]]; then
         eval "$pac_ins npm"
         sudo npm -g install diff-so-fancy
+    elif [[ $pager == "colordiff" ]]; then
+        eval "$pac_ins colordiff"
     elif [[ $pager == "delta" ]]; then
         eval "$pac_ins git-delta"
     elif [[ $pager == "ydiff" ]]; then
