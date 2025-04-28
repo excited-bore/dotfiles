@@ -160,7 +160,7 @@ function git_hl() {
                 git config $global --replace-all delta.syntax-theme "$theme"
             fi
         elif [[ "$diff" == "diff-so-fancy" ]]; then
-            local diff="diff-so-fancy"
+           
             if [[ "$cmd" =~ 'difffilter' ]]; then
                 opts=' --patch'
                 readyn -p "You selected $diff. Configure?" difffancy
@@ -198,8 +198,8 @@ function git_hl() {
                 fi
             fi
         elif [[ "$diff" == "riff" ]]; then
-            opts=' --no-pager --color=auto' 
             
+            opts=' --no-pager --color=on' 
             reade -Q 'CYAN' -i 'n m a' -p "Ignore changes in amount of whitespace / ignore all whitespace? (Default: none) [N(o)/(a)m(ount)/a(ll)]: " riff1
             if [[ "$riff1" == 'm' ]]; then
                 opts=$opts" --ignore-space-change"
@@ -213,6 +213,7 @@ function git_hl() {
             elif [[ "$riff1" == 'e' ]]; then
                 opts=$opts" --unchanged-style=experimental"
             fi
+
         elif [[ "$diff" == "ydiff" ]]; then
             opts=' --color=auto --width={{columnWidth}}'
             colorArg='never' 
@@ -229,7 +230,9 @@ function git_hl() {
                     fi
                 fi
             fi
+
         elif [ "$diff" == "diffr" ]; then
+
             readyn -Y "CYAN" -p "You selected $diff. Configure?" conf
             if [[ "y" == "$conf" ]]; then
                 readyn -Y "CYAN" -p "Set linenumber?" diffr1
@@ -381,7 +384,7 @@ function git_hl() {
                         sed -i 's/^[ \t]*colorArg:*.*/   colorArg: '"$colorArg"'/g' ~/.config/lazygit/config.yml
                         sed -i 's/^[ \t]*pager:*.*/   pager: '"$diff$opts"'/g' ~/.config/lazygit/config.yml
                     fi
-                elif [[ $extrn == 'y' ]]; then
+                elif [[ "$extrn" == 'y' ]]; then
                     if ! grep -q 'externalDiffCommand:'  ~/.config/lazygit/config.yml; then
                         sed -i 's/\(paging:\)/\1\n   externalDiffCommand: '"$diff$opts"'\n/g' ~/.config/lazygit/config.yml
                     else
@@ -403,6 +406,7 @@ function git_hl() {
 
 git_pager() {
     local gitpgr cpager pager pagers global regpager colors
+
     cpager="$1"
     if ! test -z "$2"; then
         global="$2"
@@ -410,7 +414,7 @@ git_pager() {
         global="--global"
     fi
 
-    readyn -p "Turn off $cpager?" -c "[[ $cpager == 'pager.show' ]]" pipepager1
+    readyn -n -p "Turn off $cpager?" pipepager1
     if [[ "$pipepager1" == 'y' ]]; then
         git config $global "$cpager" false
     else
@@ -418,158 +422,183 @@ git_pager() {
         #regpager="$(printf "yes\nno\n" | fzf --border --border-label="Set pager instead of output only?" --reverse)"
         #if test "$regpager" == "n"; then
 
-        pagers="cat less more"
-        pagersf="cat\nless\nmore\n"
-        pager="less"
+        local pagers pagersf pager diffs diffsf 
 
-        if type most &>/dev/null; then
-            pagers=$pagers" most"
-            pagersf=$pagersf"most\n"
-        fi
-        if type moar &>/dev/null; then
-            pagers=$pagers" moar"
-            pagersf=$pagersf"moar\n"
-            pager="moar"
-        fi
-        if type bat &>/dev/null; then
-            pagers=$pagers" bat"
-            pagersf=$pagersf"bat\n"
-        fi
-        if type batdiff &>/dev/null; then
-            pagers=$pagers" batdiff"
-            pagersf=$pagersf"batdiff\n"
-            pager="batdiff"
-        fi
+         if [[ "$cpager" == 'pager.diff' ]] || [[ "$cpager" == 'pager.show' ]]; then
+            diffs='diff-highlight'  
+            diffsf='\t - diff-highlight\n' 
+            if type delta &>/dev/null; then
+                diffs=$diffs" delta"
+                diffsf=$diffsf"\t - delta\n"
+            fi
+            if type ydiff &>/dev/null; then
+                diffs=$diffs" ydiff"
+                diffsf=$diffsf"\t - ydiff\n"
+            fi
+            if type riff &>/dev/null; then
+                diffs=$diffs" riff"
+                diffsf=$diffsf"\t - riff\n"
+            fi
+            if type diff-so-fancy &>/dev/null; then
+                diffs=$diffs" diff-so-fancy"
+                diffsf=$diffsf"\t - diff-so-fancy\n"
+            fi
+            if type diffr &>/dev/null; then
+                diffs=$diffs" diffr"
+                diffsf=$diffsf"\t - diffr\n"
+            fi
+           
+            printf "${GREEN}Installed diff-pagers / diff highlighting syntax tools${normal}:\n"
+            printf "${CYAN}$diffsf${normal}"
+
+        fi 
+
+        #if type batdiff &>/dev/null; then
+        #    pagers=$pagers" batdiff"
+        #    pagersf=$pagersf" - batdiff\n"
+        #    pager="batdiff"
+        #fi
         if type vimpager &>/dev/null; then
             pagers=$pagers" vimpager"
-            pagersf=$pagersf"vimpager\n"
-            pager="vimpager"
+            pagersf=$pagersf"\t - vimpager\n"
         fi
         if type nvimpager &>/dev/null; then
             pagers=$pagers" nvimpager"
-            pagersf=$pagersf"nvimpager\n"
-            pager="nvimpager"
+            pagersf=$pagersf"\t - nvimpager\n"
         fi
-        if type ydiff &>/dev/null; then
-            pagers=$pagers" ydiff"
-            pagersf=$pagersf"ydiff\n"
-            pager="ydiff"
+        if type most &>/dev/null; then
+            pagers=$pagers" most"
+            pagersf=$pagersf"\t - most\n"
         fi
-        if type diffr &>/dev/null; then
-            pagers=$pagers" diffr"
-            pagersf=$pagersf"diffr\n"
-            pager="diffr"
+        if type bat &>/dev/null; then
+            pagers=$pagers" bat"
+            pagersf=$pagersf"\t - bat\n"
         fi
-        if type riff &>/dev/null; then
-            pagers=$pagers" riff"
-            pagersf=$pagersf"riff\n"
-            pager="riff"
+        if type moar &>/dev/null; then
+            pagers=$pagers" moar"
+            pagersf=$pagersf"\t - moar\n"
         fi
-        if type diff-so-fancy &>/dev/null; then
-            pagers=$pagers" diff-so-fancy"
-            pagersf=$pagersf"diff-so-fancy\n"
-            pager="diff-so-fancy"
-        fi
-        if type delta &>/dev/null; then
-            pagers=$pagers" delta"
-            pagersf=$pagersf"delta\n"
-            pager="delta"
-        fi
+        
+        pagers=$pagers" less cat more"
+        pagersf=$pagersf"\t - less\n\t - cat\n\t - more\n"
     
-        printf "${GREEN}Installed tools that could serve as pagers${normal}:\n"
+        printf "${GREEN}Installed pagers${normal}:\n"
         printf "${CYAN}$pagersf${normal}"
-
-        reade -Q "green" -i "$pagers" -p "Which one used for ${GREEN}$cpager?:${normal} " pager
+        
+        reade -Q "green" -i "$diffs $pagers" -p "Which one used for ${GREEN}$cpager?:${normal} " pager
 
         if [[ $pager == 'less' ]]; then
             local ln="-R"
             readyn -p "You selected $pager. Quit if one screen?" pager1
             if [[ $pager1 == 'y' ]]; then
-                ln=$ln"--quit-if-one-screen"
+                ln=$ln" --quit-if-one-screen"
             fi
-            readyn -Y "CYAN" -p "Set linenumbers for pager?" lne
+            readyn -p "Set linenumbers for pager?" lne
             if [[ "$lne" == 'n' ]]; then
-                ln=$ln"-n"
+                ln=$ln" -n"
             else
-                ln=$ln"-N"
+                ln=$ln" -N"
             fi
+        
+            readyn -p "Keep less from making sound?" lne
+            if [[ "$lne" == 'y' ]]; then
+                ln=$ln" --QUIET"
+            fi
+
         elif [[ "$pager" == "moar" ]]; then
-            readyn -Y "CYAN" -p "You chose $pager. Quit if on one screen?" pager1
-            if [[ $pager1 == 'y' ]]; then
-                pager=$pager' --quit-if-one-screen'
+
+            readyn -Y 'CYAN' -p "You chose $pager. Configure?" moar_cnf
+            if [[ $moar_cnf == 'y' ]]; then
+
+                while : ; do
+
+                    readyn -Y "CYAN" -p "Quit if on one screen?" pager1
+                    if [[ $pager1 == 'y' ]]; then
+                        pager=$pager' --quit-if-one-screen'
+                    fi
+
+                    readyn -Y "CYAN" -p "Set moar's theme / style?" pager1
+                    if [[ $pager1 == 'y' ]]; then
+
+                        # Showing style changes using fzf's --preview doesn't work with moar,
+                        # so it's this mess
+                        local style 
+                        local thme='n'
+                        local styles="abap\nalgol\nalgol_nu\napi\narduino\nautumn\naverage\nbase16-snazzy\nborland\nbw\ncatppuccin-frappe\ncatppuccin-latte\ncatppuccin-macchiato\ncatppuccin-mocha\ncolorful\ncompat\ndoom-one\ndoom-one2\ndracula\nemacs\nfriendly\nfruity\ngithub-dark\ngithub\ngruvbox-light\ngruvbox\nhr_high_contrast\nhrdark\nigor\nlovelace\nmanni\nmodus-operandi\nmodus-vivendi\nmonokai\nmonokailight\nmurphy\nnative\nnord\nonedark\nonesenterprise\nparaiso-dark\nparaiso-light\npastie\nperldoc\npygments\nrainbow_dash\nrose-pine-dawn\nrose-pine-moon\nrose-pine\nrrt\nsolarized-dark\nsolarized-dark256\nsolarized-light\nswapoff\ntango\ntrac\nvim\nvs\nvulcan\nwitchhazel\nxcode-dark\nxcode"
+                        while [[ $thme == 'n' ]]; do
+                            style=$(printf "$styles" | fzf --reverse --border --border-label="Moar style" --preview="moar --style={} $TMPDIR/test1")
+                            MOAR='' moar --style="$style" $TMPDIR/test1
+                            readyn -n -N "MAGENTA" -p "Set as style? (Will retry if no)" thme
+                        done
+                        pager=$pager" --style=$style"
+                        style='' 
+                    fi
+
+                    readyn -Y "CYAN" -p "Show linenumber?" pager1
+                    if [[ $pager1 == 'n' ]]; then
+                        pager=$pager' --no-linenumbers'
+                    fi
+
+                    readyn -Y "CYAN" -p "Wrap long lines?" pager1
+                    if [[ $pager1 == 'y' ]]; then
+                        pager=$pager' --wrap'
+                    fi
+                    
+                    $pager $TMPDIR/test1 
+        
+                    readyn -Y "MAGENTA" -p "Is this ok? (Will retry if no)" moar_ok
+
+                    [[ $moar_ok == 'y' ]] && break
+
+                done 
+
             fi
-            readyn -Y "CYAN" -p "Set moar's theme / style?" pager1
-            if [[ $pager1 == 'y' ]]; then
-                local theme
-                local styles="abap\nalgol\nalgol_nu\napi\narduino\nautumn\naverage\nbase16-snazzy\nborland\nbw\ncatppuccin-frappe\ncatppuccin-latte\ncatppuccin-macchiato\ncatppuccin-mocha\ncolorful\ncompat\ndoom-one\ndoom-one2\ndracula\nemacs\nfriendly\nfruity\ngithub-dark\ngithub\ngruvbox-light\ngruvbox\nhr_high_contrast\nhrdark\nigor\nlovelace\nmanni\nmodus-operandi\nmodus-vivendi\nmonokai\nmonokailight\nmurphy\nnative\nnord\nonedark\nonesenterprise\nparaiso-dark\nparaiso-light\npastie\nperldoc\npygments\nrainbow_dash\nrose-pine-dawn\nrose-pine-moon\nrose-pine\nrrt\nsolarized-dark\nsolarized-dark256\nsolarized-light\nswapoff\ntango\ntrac\nvim\nvs\nvulcan\nwitchhazel\nxcode-dark\nxcode"
-                if type moar &>/dev/null; then
-                    while test -z "$style"; do
-                        style=$(printf "$styles" | fzf --reverse --border --border-label="Moar style")
-                        moar --style "$style" $TMPDIR/test1
-                        stty sane && readyn -Y "MAGENTA" -p "Set as style? (Will retry if no)" thme
-                        if [[ "$thme" == "n" ]]; then
-                            style=''
-                        fi
-                    done
-                else
-                    style=$(printf "$styles" | fzf --reverse --border --border-label="Moar style")
-                fi
-                pager=$pager" $style"
-            fi
-            readyn -Y "CYAN" -p "Show linenumber?" pager1
-            if [[ $pager1 == 'n' ]]; then
-                pager=$pager' --no-linenumbers'
-            fi
-            readyn -Y "CYAN" -p "Wrap long lines?" pager1
-            if [[ $pager1 == 'y' ]]; then
-                pager=$pager' --wrap'
-            fi
+
         elif [[ "$pager" == "nvimpager" ]] || [[ "$pager" == "vimpager" ]]; then
+
             echo "You selected $pager."
             colors="blue darkblue default delek desert elflord evening gruvbox habamax industry koehler lunaperch morning murphy pablo peachpuff quiet ron shine slate torte zellner"
             if [[ "$pager" == "vimpager" ]]; then
                 colors=$colors" retrobox sorbet wildcharm zaibatsu"
             fi
             pager="$pager"
+
             readyn -Y "CYAN" -p "Set colorscheme?" pager1
             if [[ "$pager1" == "y" ]]; then
                 reade -Y "CYAN" -i "default $colors" -p "Colorscheme: " color
                 pager="$pager +'colorscheme $color'"
             fi
-        elif [[ "$pager" == "riff" ]]; then
-            pager="riff"
-            readyn -Y "CYAN" -p "Ignore changes in amount of whitespace?" riff1
-            if [[ "$riff1" == 'y' ]]; then
-                pager=$pager" -b"
-            fi
-            readyn -Y "CYAN" -p "No special highlighting for lines that only add content?" riff1
-            if test "$riff1" == 'y'; then
-                pager=$pager" --no-adds-only-special"
-            fi
-        elif [[ "$pager" == "diff-so-fancy" ]] || [[ "$pager" == "diffr" ]] || [[ "$pager" == "ydiff" ]] || [[ "$pager" == "delta" ]] || [[ "$pager" == "bat" ]] || [[ "$pager" == "batdiff" ]]; then
+
+        elif [[ "$pager" == "bat" ]] || [[ "$pager" == "delta" ]] || [[ "$pager" == "diff-so-fancy" ]] || [[ "$pager" == "ydiff" ]] || [[ "$pager" == "diffr" ]]; then
+
             local difffancy
-            readyn -p "You selected $pager. Configure?" -c "(! [[ $pager == 'delta' ]] && ! [[ $pager == 'diff-so-fancy' ]]) || test -z '$(git config $global --list --show-origin)'" difffancy
+            readyn -p "You selected $pager. Configure?" -c "test -z '$(git config $global --list --show-origin | grep bat)'" difffancy
             if [[ "y" == "$difffancy" ]]; then
-                if [[ "$pager" == "bat" ]] || [[ "$pager" == "batdiff" ]]; then
-                    local opts=""
-                    readyn -Y "CYAN" -p "Set styles? (line numbers/grid)" delta2
-                    local theme='changes'
+
+                local opts=""
+
+                if [[ "$pager" == "bat" ]]; then
+
+                    readyn -Y "CYAN" -p "Set styles? (features like line numbers/grid spacing)" delta2
                     if [[ "y" == "$delta2" ]]; then
-                        while :; do
-                            local style=''
-                            style=$(printf "full\nauto\nplain\nchanges\nheader\nheader-filename\nheader-filesize\ngrid\nrule\nnumbers\nsnip\n" | fzf --border --border-label="Bat styles")
-                            stty sane && reade -Q "MAGENTA" -i "a o n" -p "Add to styles/Only use this style/Dont use? (Will retry if add) [A/o/n]: " dltthme
-                            if [[ "$dltthme" == "a" ]]; then
-                                theme=$theme","$style
-                            elif [[ "$dltthme" == "o" ]]; then
-                                theme=$theme","$style
-                                break
-                            else
-                                break
-                            fi
-                        done
-                        opts=$opts" --style='$theme'"
+                        local style 
+                        printf "\t* default: enables recommended style components (default).
+\t* full: enables all available components.
+\t* auto: same as 'default', unless the output is piped.
+\t* plain: disables all available components.
+\t* changes: show Git modification markers.
+\t* header: alias for 'header-filename'.
+\t* header-filename: show filenames before the content.
+\t* header-filesize: show file sizes before the content.
+\t* grid: vertical/horizontal lines to separate side bar
+\t        and the header from the content.
+\t* rule: horizontal lines to delimit files.
+\t* numbers: show line numbers in the side bar.
+\t* snip: draw separation lines between distinct line ranges.\n" 
+reade -Q 'GREEN' -i 'default full auto plain changes header header-filename header-filesize grid rule numbers snip' -p 'Style (multiple comma separated - numbers,changes): ' style 
+                        opts=$opts" --style='$style'"
                     fi
+
                     readyn -Y "CYAN" -p "Set syntax-theme?" delta1
                     if [[ "y" == $delta1 ]]; then
                         local theme=''
@@ -597,47 +626,84 @@ git_pager() {
                         done
                         opts=$opts" --language=$theme"
                     fi
-                    pager=$pager" $opts"
+
+                elif [[ "$pager" == "riff" ]]; then
+
+                    opts=' --color=on' 
+                    reade -Q 'CYAN' -i 'n m a' -p "Ignore changes in amount of whitespace / ignore all whitespace? (Default: none) [N(o)/(a)m(ount)/a(ll)]: " riff1
+                    if [[ "$riff1" == 'm' ]]; then
+                        opts=$opts" --ignore-space-change"
+                    elif [[ "$riff1" == 'a' ]]; then 
+                        opts=$opts" --ignore-all-space"
+                    fi
+
+                    reade -Q "CYAN" -i 'y n e' -p "How will unchanged line parts be styled? (Default: none) [Y(ellow)/n(one)/e(xperimental)]: " riff1
+                    if [[ "$riff1" == 'y' ]]; then
+                        opts=$opts" --unchanged-style=yellow"
+                    elif [[ "$riff1" == 'e' ]]; then
+                        opts=$opts" --unchanged-style=experimental"
+                    fi
+
                 elif [[ "$pager" == "delta" ]]; then
-                    readyn -Y "CYAN" -p "Set side-by-side view?" delta1
-                    if [[ "y" == $delta1 ]]; then
-                        git config $global delta.side-by-side true
-                    fi
 
-                    readyn -Y "CYAN" -p "Set to navigate? (Move between diff sections using n and N)" delta1
-                    if [[ "y" == "$delta1" ]]; then
-                        git config $global delta.navigate true
-                    fi
+                    local opt1s='' 
+                    while test -z "$opt1s"; do
 
-                    readyn -Y "CYAN" -p "Set syntax-theme?" delta1
-                    if [[ "y" == $delta1 ]]; then
-                        local theme=''
-                        while test -z "$theme"; do
-                            theme=$(printf "$(delta --list-syntax-themes | tail -n +1)" | fzf --reverse --border --border-label="Syntax theme" --preview="delta --syntax-theme={} $TMPDIR/test1 $TMPDIR/test2")
-                            theme=$(echo "$theme" | awk '{$1=""; print $0;}')
-                            delta --syntax-theme "${theme:1}" $TMPDIR/test1 $TMPDIR/test2
-                            stty sane && readyn -N "MAGENTA" -n -p "Set as syntax theme? (Will retry if no)" dltthme
-                            if [[ "$dltthme" == "n" ]]; then
-                                theme=''
+                        readyn -Y "CYAN" -p "Set syntax theme for delta?" delta1
+                        if [[ "$delta1" == 'y' ]]; then
+                            theme=$(printf "$(delta --list-syntax-themes | tail -n +1 | awk '{$1="";print;}' | sed 's/ //')" | fzf --reverse --border --border-label="Syntax theme" --preview="delta --syntax-theme={} $TMPDIR/test1 $TMPDIR/test2")
+                            opt1s=" --syntax-theme='$theme'"
+                        fi
+
+                        readyn -Y "CYAN" -p "Set linenumbers?" delta3
+                        if [[ "y" == $delta3 ]]; then
+                            git config $global delta.linenumbers true
+                            opt1s="$opt1s --line-numbers" 
+                        elif [[ "n" == $delta3 ]]; then
+                            git config $global delta.linenumbers false
+                        fi
+
+                        readyn -Y "CYAN" -p "Set to dark?" delta2
+                        if [[ "y" == $delta2 ]]; then
+                            git config $global delta.dark true
+                            opt1s="$opt1s --dark" 
+                        elif [[ "n" == $delta2 ]]; then
+                            git config $global delta.dark false
+                        fi
+
+                        readyn -n -N 'BLUE' -p "Side-by-side view?" delta3
+                        if [[ "y" == $delta3 ]]; then
+                            git config $global delta.side-by-side true
+                            opt1s="$opt1s --side-by-side" 
+                        elif [[ "n" == $delta3 ]]; then
+                            git config $global delta.side-by-side false
+                        fi
+
+                        if ! [[ "$cmd" =~ 'lazygit' ]]; then 
+                            readyn -Y "CYAN" -p "Set to navigate? (Move between diff sections using n and N)" delta1
+                            if [[ "y" == $delta1 ]]; then
+                                git config $global delta.navigate true
+                            elif [[ "n" == $delta1 ]]; then
+                                git config $global delta.navigate false
                             fi
-                        done
-                        git config $global delta.syntax-theme "$theme"
-                    fi
+                        fi
 
-                    readyn -Y "CYAN" -p "Set to dark?" delta2
-                    if [[ "y" == "$delta2" ]]; then
-                        git config $global delta.dark true
-                    fi
+                        readyn -Y "CYAN" -p "Set hyperlinks?" delta1
+                        if [[ "y" == $delta1 ]]; then
+                            git config $global delta.hyperlinks true
+                            opt1s="$opt1s --hyperlinks" 
+                        elif [[ "y" == $delta1 ]]; then
+                            git config $global delta.hyperlinks false
+                        fi
 
-                    readyn -Y "CYAN" -p "Set linenumbers?" delta3
-                    if [[ "y" == "$delta3" ]]; then
-                        git config $global delta.linenumbers true
-                    fi
+                        eval "delta $opt1s -- $TMPDIR/test1 $TMPDIR/test2"
+                        readyn -N "MAGENTA" -n -p "Is this ok? (will retry if no)" dltthme
+                        if [[ "$dltthme" == "n" ]]; then
+                            opt1s=''
+                        fi
 
-                    readyn -Y "CYAN" -p "Set hyperlinks?" delta1
-                    if [[ "y" == $delta1 ]]; then
-                        git config $global delta.hyperlinks true
-                    fi
+                    done
+                    git config $global --replace-all delta.syntax-theme "$theme"
 
                 elif [[ "$pager" == "diff-so-fancy" ]]; then
 
@@ -668,23 +734,40 @@ git_pager() {
                     reade -Q "CYAN" -i "47 $(seq 1 100)" -p "By default, the separator for the file header spans the full width of the terminal. Use this setting to set the width of the file header manually. (Default: 47):" diffancy
                     # git log's commit header width
                     git config --global diff-so-fancy.rulerWidth $diffancy
+
                 elif [[ "$pager" == "ydiff" ]]; then
-                    pager=$pager" --color=auto"
+
+                    opts=$opts" --color=always"
+
                     readyn -Y "CYAN" -p "Enable side-by-side mode?" diffr1
                     if [[ "$diffr1" == 'y' ]]; then
-                        pager=$pager" --side-by-side"
+                        opts=$opts" --side-by-side"
+
                         readyn -Y "CYAN" -p "Wrap long lines in side-by-side view?" diffr1
                         if [[ "$diffr1" == 'y' ]]; then
-                            pager=$pager" --wrap"
+                            opts=$opts" --wrap"
                         fi
+
                     fi
+
                 elif [[ "$pager" == "diffr" ]]; then
-                    reade -Y "CYAN" -p "Set linenumber?" diffr1
-                    if [[ "$diffr1" == 'y' ]]; then
-                        pager="diffr --line-numbers"
-                        reade -Q "CYAN" -i "compact aligned n" -p "Set linenumber style? [Compact/aligned/n]: " diffr1
-                        if [[ "$diffr1" == 'compact' ]] || [[ "$diffr1" == 'aligned' ]]; then
-                            pager="diffr --line-numbers $diffr1"
+
+                    readyn -Y "CYAN" -p "You selected $diff. Configure?" conf
+                    if [[ "y" == "$conf" ]]; then
+
+                        readyn -Y "CYAN" -p "Set linenumber?" diffr1
+                        if [[ "$diffr1" == 'y' ]]; then
+
+                            printf "${green}Style is optional.[Default]\n\t - ${CYAN}Compact:${green} Take as little width as possible.\n\t - ${CYAN}Aligned:${green} Align to tab stops (useful if tab is used for indentation).${normal}\n" 
+
+                            reade -Q "CYAN" -i 'c a n' -p "Set linenumber style? [C(ompact)/a(ligned)/n(o)]: " diffr1
+                            if [[ "$diffr1" == 'c' ]] || [[ "$diffr1" == 'a' ]]; then
+                               [[ "$diffr1" == 'c' ]] && diffr1='compact'  
+                               [[ "$diffr1" == 'a' ]] && diffr1='aligned'  
+                                opts=" --line-numbers $diffr1"
+                            else
+                                opts=" --line-numbers"
+                            fi
                         fi
                     fi
                 fi
@@ -693,80 +776,59 @@ git_pager() {
                 #    prompt=""
                 #fi
 
-                readyn -Y "CYAN" -p "$pager is a diff tool that allows for a configurable pager. Configure?" pipepager
+                printf "${GREEN}$pager${green} still has an internal pager that's configurable.\n${normal}                
+${CYAN}Options:${normal} 
+${CYAN}\t1)${normal}${green} Leave/set to core.pager/\$PAGER but without line-numbers, sound and colours on always
+${CYAN}\t2)${normal}${green} Leave/set to specifically chosen pager and go over options
+${CYAN}\t3)${normal}${green} Leave/set as core.pager/\$PAGER
+${CYAN}\t4)${normal}${green} Disable pager/just highlight\n${normal}"
+
+                reade -Q "GREEN" -i '' -p "What to do []?" pipepager
+
                 if [[ "$pipepager" == 'y' ]]; then
-                    readyn -n -N "GREEN" -p "Turn off pager?" pipepager
+
+                    readyn -n -p "Turn off pager?" pipepager
+
                     if [[ "$pipepager" == 'n' ]]; then
-                        pagers="less more"
-                        pagersf="less\nmore\n"
-                        pager="less"
-                        if type most &>/dev/null; then
-                            pagers=$pagers" most"
-                            pagersf=$pagersf"most\n"
-                        fi
-                        if type moar &>/dev/null; then
-                            pagers=$pagers" moar"
-                            pagersf=$pagersf"moar\n"
-                            pager="moar"
-                        fi
-                        if type vimpager &>/dev/null; then
-                            pagers=$pagers" vimpager"
-                            pagersf=$pagersf"vimpager\n"
-                            pager="vimpager"
-                        fi
-                        if type nvimpager &>/dev/null; then
-                            pagers=$pagers" nvimpager"
-                            pagersf=$pagersf"nvimpager\n"
-                            pager="nvimpager"
+
+                        local pgr=$PAGER
+                        readyn -p 'Use \\\$PAGER ($PAGER) for this?' use_pager 
+
+                        if [[ $use_pager == 'n' ]] then
+                            pagersp=$(echo "$pagersf" | sed 's,\\t - bat\\n,,g') 
+                            pagers=$(echo "$pagers" | sed 's, bat,,g') 
+                            printf "${GREEN}Installed tools that could serve as pagers${normal}:\n"
+                            printf "${CYAN}$pagersp${normal}\n"
+
+                            reade -Q "GREEN" -i "$pagers" -p "Pager: " pgr
                         fi
 
-                        reade -Q "GREEN" -i "$PAGER $pagers" -p "Pager: " diffancy
-                        if [[ $diffancy =~ "less" ]]; then
-                            local ln=""
+                        local ln=""
+                        if [[ $pgr =~ "less" ]]; then
+
+                            pgr='less'
+                            ln=' -R'
                             readyn -Y "CYAN"-p "Quit if one screen?" lne
                             if [[ "$lne" == 'y' ]]; then
-                                ln="--quit-if-one-screen"
+                                ln=" --quit-if-one-screen"
                             fi
+
                             reade -n -N "CYAN" -p "Set linenumbers for pager?" lne
                             if [[ "$lne" == 'n' ]]; then
-                                ln=$ln"-n"
+                                ln=$ln" -n"
                             else
-                                ln=$ln"-N"
+                                ln=$ln" -N"
                             fi
-                            if [[ "$pager" == "ydiff" ]]; then
-                                git config $global "$cpager" "ydiff --pager=less --pager-options=\"-R $ln\""
-                            elif [[ "$pager" == "bat" ]] || [[ "$pager" == "batdiff" ]]; then
-                                readyn -Y "CYAN" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $ENVVAR?" pager1
-                                if [[ $pager1 == 'y' ]]; then
-                                    if grep -q 'BAT_PAGER' $ENVVAR; then
-                                        sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $ENVVAR
-                                        sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='less -R $ln'|g" $ENVVAR
-                                    else
-                                        printf "# BAT\nexport BAT_PAGER='less -R $ln'\n" >>$ENVVAR
-                                    fi
-                                    git config $global "$cpager" "$pager"
-                                else
-                                    git config $global "$cpager" "$pager --pager='less -R $ln'"
-                                fi
-                            elif [[ "$pager" == "delta" ]]; then
-                                reade -Y "CYAN" -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $ENVVAR?" pager1
-                                if [[ $pager1 == 'y' ]]; then
-                                    if grep -q 'DELTA_PAGER' $ENVVAR; then
-                                        sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $ENVVAR
-                                        sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='less -R $ln'|g" $ENVVAR
-                                    else
-                                        printf "# DELTA\nexport DELTA_PAGER='less -R $ln'\n" >>$ENVVAR
-                                    fi
-                                    git config $global "$cpager" "delta"
-                                else
-                                    git config $global "$cpager" "delta --pager=less $ln"
-                                fi
-                            else
-                                git config $global "$cpager" "$pager | less -RF $ln"
-                            fi
-                        elif [[ $diffancy =~ "moar" ]]; then
-                            local ln=""
-                            readyn -Y "CYAN" -p "You selected $diffancy. Show linenumber?" pager1
+   
+                            readyn -p "Keep less from making sound?" lne
+                            if [[ "$lne" == 'y' ]]; then
+                                ln=$ln" --QUIET"
+                            fi 
+
+                        elif [[ $pgr =~ "moar" ]]; then
+
+                            printf "${CYAN}You selected ${GREEN}moar${normal}\n"
+                            readyn -n -N 'BLUE' -p "Show linenumber?" pager1
                             if [[ $pager1 == 'n' ]]; then
                                 ln=$ln' --no-linenumbers'
                             fi
@@ -776,584 +838,89 @@ git_pager() {
                                 ln=$ln' --quit-if-one-screen'
                             fi
 
-                            readyn -n -N "CYAN" -p "Wrap long lines?" pager1
+                            readyn -n -N "BLUE" -p "Wrap long lines?" pager1
                             if [[ $pager1 == 'y' ]]; then
                                 ln=$ln' --wrap'
                             fi
-
-                            if [[ "$pager" == "ydiff" ]]; then
-                                git config $global "$cpager" "ydiff --pager=moar --pager-options=\"$ln\""
-                            elif [[ "$pager" == "delta" ]]; then
-                                readyn -Y "CYAN" -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $ENVVAR?" pager1
-                                if [[ $pager1 == 'y' ]]; then
-                                    if grep -q 'DELTA_PAGER' $ENVVAR; then
-                                        sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $ENVVAR
-                                        sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='moar $ln'|g" $ENVVAR
-                                    else
-                                        printf "# DELTA\nexport DELTA_PAGER='moar $ln'\n" >>$ENVVAR
-                                    fi
-                                    git config $global "$cpager" "$pager --pager='moar $ln'"
-                                fi
-                                git config $global "$cpager" "delta"
-
-                            elif [[ "$pager" == "bat" ]] || [[ "$pager" == "batdiff" ]]; then
-                                readyn -Y "CYAN" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $ENVVAR?" pager1
-                                if [[ "$pager1" == 'y' ]]; then
-                                    if grep -q 'BAT_PAGER' $ENVVAR; then
-                                        sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $ENVVAR
-                                        sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='moar $ln'|g" $ENVVAR
-                                    else
-                                        printf "# BAT\nexport BAT_PAGER='moar $ln'\n" >>$ENVVAR
-                                    fi
-                                    git config $global "$cpager" "$pager"
-                                else
-                                    git config $global "$cpager" "$pager --pager=moar $ln"
-                                fi
-                                git config $global "$cpager" "$pager --pager='moar $ln'"
-                            else
-                                git config $global "$cpager" "$pager | moar $ln"
-                            fi
-                        elif [[ "$diffancy" =~ "nvimpager" ]] || [[ "$diffancy" =~ "vimpager" ]]; then
-                            opts=""
+                        elif [[ "$pgr" =~ "nvimpager" ]] || [[ "$pgr" =~ "vimpager" ]]; then
+                            ln=""
                             colors="blue darkblue default delek desert elflord evening gruvbox habamax industry koehler lunaperch morning murphy pablo peachpuff quiet ron shine slate torte zellner"
                             if [[ "$pager" =~ "vimpager" ]]; then
                                 colors=$colors" retrobox sorbet wildcharm zaibatsu"
                             fi
+
                             readyn -Y "CYAN" -p "Set colorscheme?" pager1
                             if [[ "$pager1" == "y" ]]; then
                                 reade -Q "CYAN" -i "default $colors" -p "Colorscheme: " color
-                                opts="$opts +'colorscheme $color'"
-                            fi
+                                ln="$ln +'colorscheme $color'"
+                            fi 
+                        fi 
 
-                            if [[ "$pager" == "ydiff" ]]; then
-                                git config $global "$cpager" "ydiff --pager=nvimpager --pager-options='$opts'"
-                            elif [[ "$pager" == "delta" ]]; then
-                                readyn -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $ENVVAR?" pager1
-                                if [[ $pager1 == 'y' ]]; then
-                                    if grep -q 'DELTA_PAGER' $ENVVAR; then
-                                        sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $ENVVAR
-                                        sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='nvimpager $opts'|g" $ENVVAR
-                                    else
-                                        printf "# DELTA\nexport DELTA_PAGER='nvimpager $opts'\n" >>$ENVVAR
-                                    fi
-                                    git config $global "$cpager" "delta"
+                        if [[ "$pager" == "bat" ]]; then
+
+                            printf "${CYAN}$pager${GREEN} can:${normal}${green}\n\t - Can be configured using the environment variable \\\$BAT_PAGER by setting it to '$pgr $ln' in $ENVVAR(\\\$BAT_PAGER: $BAT_PAGER)\n\t - Uses the option '--pager' for setting a pager - '--pager='$pgr $ln'' in gitconfig\n${normal}\n" 
+
+                            reade -Q "GREEN" -i 'batpager gitconfig' -p "Which? [Batpager/gitconfig]: " pager1
+                            if [[ $pager1 == 'batpager' ]]; then
+                                if grep -q 'BAT_PAGER' $ENVVAR; then
+                                    sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $ENVVAR
+                                    sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='$pgr $ln'|g" $ENVVAR
                                 else
-                                    git config $global "$cpager" "delta --pager=\"nvimpager $opts\""
+                                    printf "# BAT\nexport BAT_PAGER='$pgr $ln'\n" >>$ENVVAR
                                 fi
-                            elif [[ "$pager" == "bat" ]] || [[ "$pager" == "batdiff" ]]; then
-                                readyn -Y 'CYAN' -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $ENVVAR?" pager1
-                                if [[ "$pager1" == 'y' ]]; then
-                                    if grep -q 'BAT_PAGER' $ENVVAR; then
-                                        sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $ENVVAR
-                                        sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='nvimpager $opts'|g" $ENVVAR
-                                    else
-                                        printf "# BAT\nexport BAT_PAGER='nvimpager $opts'\n" >>$ENVVAR
-                                    fi
-                                    git config $global "$cpager" "$pager"
+                                git config $global "$cpager" "$pager$opts"
+                            elif [[ $pager1 == 'gitconfig' ]]; then   
+                                git config $global "$cpager" "$pager --pager='$pgr $ln'"
+                            fi
+
+                        elif [[ "$pager" == "delta" ]]; then
+
+                            printf "${CYAN}$pager${GREEN} can:${normal}${green}\n\t - Can be configured using the environment variable \\\$DELTA_PAGER by setting it to '$pgr $ln' in $ENVVAR(\\\$BAT_PAGER: $BAT_PAGER)\n\t - Can be also be configured using the environment variable \\\$BAT_PAGER when \\\$DELTA_PAGER is empty - (\\\$DELTA_PAGER: $DELTA_PAGER)\n - Uses the option '--pager' for setting a pager - '--pager='$pgr $ln'' in gitconfig\n${normal}\n" 
+
+                            reade -Q "GREEN" -i 'deltapager batpager gitconfig' -p "Which? [Deltapager/batpager/gitconfig]: " pager1
+                            if [[ $pager1 == 'deltapager' ]]; then
+                                if grep -q 'DELTA_PAGER' $ENVVAR; then
+                                    sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $ENVVAR
+                                    sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='$pgr $ln'|g" $ENVVAR
                                 else
-                                    git config $global "$cpager" "$pager --pager=\"nvimpager $opts\""
-                                fi
-                            else
-                                git config $global "$cpager" "$pager | nvimpager $opts"
-                            fi
-                        else
-                            if [[ "$pager" == "ydiff" ]]; then
-                                git config $global "$cpager" "ydiff --pager=$diffancy"
-                            elif [[ "$pager" == "bat" ]] || [[ "$pager" == "batdiff" ]]; then
-                                readyn -Y "CYAN" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $ENVVAR?" pager1
-                                if [[ "$pager1" == 'y' ]]; then
-                                    if grep -q 'BAT_PAGER' $ENVVAR; then
-                                        sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $ENVVAR
-                                        sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='$diffancy'|g" $ENVVAR
-                                    else
-                                        printf "# BAT\nexport BAT_PAGER='$diffancy'\n" >>$ENVVAR
-                                    fi
-                                    git config $global "$cpager" "batdiff"
-                                else
-                                    git config $global "$cpager" "batdiff --pager='$diffancy'"
-                                fi
-                            elif [[ "$pager" == "delta" ]]; then
-                                readyn -Y "CYAN" -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $ENVVAR?" pager1
-                                if [[ "$pager1" == 'y' ]]; then
-                                    if grep -q 'DELTA_PAGER' $ENVVAR; then
-                                        sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $ENVVAR
-                                        sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='$diffancy'|g" $ENVVAR
-                                    else
-                                        printf "# DELTA\nexport DELTA_PAGER='$diffancy'\n" >>$ENVVAR
-                                    fi
-                                    git config $global "$cpager" "delta"
-                                else
-                                    git config $global "$cpager" "delta --pager=$diffancy"
-                                fi
-                            else
-                                git config $global "$cpager" "$pager | $diffancy"
-                            fi
-                        fi
-                    elif [[ $pager =~ 'delta' ]] || [[ $pager =~ 'bat' ]] || [[ $pager =~ 'batdiff' ]]; then
-                        git config $global "$cpager" "$pager --paging=never"
-                    elif [[ $pager =~ 'ydiff' ]]; then
-                        git config $global "$cpager" "$pager --pager=cat"
-                    else
-                        git config $global "$cpager" "$pager"
-                    fi
-                fi
-            fi
-        fi
-        #reade -Q "GREEN" -i "$pager $pagers" -p "Pager: " pager
-        pager=''
-        #pager="$(printf "$pagersf" | fzf --border --border-label="Pager" --reverse)"
-
-        if [[ "$pager" == 'less' ]]; then
-            local ln="-R"
-            readyn -Y "CYAN" -p "You selected $pager. Quit if one screen?" pager1
-            if [[ "$pager1" == 'y' ]]; then
-                ln=$ln"--quit-if-one-screen"
-            fi
-            readyn -n -N "CYAN" -p "Set linenumbers for pager?" lne
-            if [[ "$lne" == 'n' ]]; then
-                ln=$ln"-n"
-            else
-                ln=$ln"-N"
-            fi
-            git config $global "$cpager" "$pager"
-        elif [[ "$pager" == "moar" ]]; then
-            readyn -Y "CYAN" -p "You chose $pager. Quit if on one screen?" pager1
-            if [[ $pager1 == 'y' ]]; then
-                pager=$pager' --quit-if-one-screen'
-            fi
-            readyn -Y "CYAN" -p "Set moar's colorscheme / style?" pager1
-            if [[ $pager1 == 'y' ]]; then
-                local theme
-                local styles="abap\nalgol\nalgol_nu\napi\narduino\nautumn\naverage\nbase16-snazzy\nborland\nbw\ncatppuccin-frappe\ncatppuccin-latte\ncatppuccin-macchiato\ncatppuccin-mocha\ncolorful\ncompat\ndoom-one\ndoom-one2\ndracula\nemacs\nfriendly\nfruity\ngithub-dark\ngithub\ngruvbox-light\ngruvbox\nhr_high_contrast\nhrdark\nigor\nlovelace\nmanni\nmodus-operandi\nmodus-vivendi\nmonokai\nmonokailight\nmurphy\nnative\nnord\nonedark\nonesenterprise\nparaiso-dark\nparaiso-light\npastie\nperldoc\npygments\nrainbow_dash\nrose-pine-dawn\nrose-pine-moon\nrose-pine\nrrt\nsolarized-dark\nsolarized-dark256\nsolarized-light\nswapoff\ntango\ntrac\nvim\nvs\nvulcan\nwitchhazel\nxcode-dark\nxcode"
-                while test -z "$style"; do
-                    style=$(printf "$styles" | fzf --reverse --border --border-label="Moar style")
-                    moar --style "$style" $TMPDIR/test1
-                    stty sane && readyn -n -p "Set as style? (Will retry if no)" thme
-                    if [[ "$thme" == "n" ]]; then
-                        style=''
-                    fi
-                done
-                pager=$pager" $style"
-            fi
-            readyn -Y "CYAN" -p "Show linenumber?" pager1
-            if [[ $pager1 == 'n' ]]; then
-                pager=$pager' --no-linenumbers'
-            fi
-            readyn -n -N "CYAN" -p "Wrap long lines?" pager1
-            if [[ $pager1 == 'y' ]]; then
-                pager=$pager' --wrap'
-            fi
-            git config $global "$cpager" "$pager"
-        elif [[ "$pager" == "nvimpager" ]] || [[ "$pager" == "vimpager" ]]; then
-            echo "You selected $pager."
-            colors="blue darkblue default delek desert elflord evening gruvbox habamax industry koehler lunaperch morning murphy pablo peachpuff quiet ron shine slate torte zellner"
-            if [[ "$pager" == "vimpager" ]]; then
-                colors=$colors" retrobox sorbet wildcharm zaibatsu"
-            fi
-            pager="$pager"
-            readyn -y -Y "CYAN" -p "Set colorscheme?" pager1
-            if [[ "$pager1" == "y" ]]; then
-                readyn -y -Y "CYAN" -i "default $colors" -p "Colorscheme: " color
-                pager="$pager +'colorscheme $color'"
-            fi
-            git config $global "$cpager" "$pager"
-        elif [[ "$pager" == "riff" ]]; then
-            pager="riff"
-            readyn -y -Y "CYAN" -p "Ignore changes in amount of whitespace?" riff1
-            if [[ "$riff1" == 'y' ]]; then
-                pager=$pager" -b"
-            fi
-            readyn -y -Y "CYAN" -p "No special highlighting for lines that only add content?" riff1
-            if [[ "$riff1" == 'y' ]]; then
-                pager=$pager" --no-adds-only-special"
-            fi
-        elif [[ "$pager" == "diff-so-fancy" ]] || [[ "$pager" == "diffr" ]] || [[ "$pager" == "ydiff" ]] || [[ "$pager" == "delta" ]] || [[ "$pager" == "bat" ]] || [[ "$pager" == "batdiff" ]]; then
-            local difffancy
-            readyn -p "You selected $pager. Configure?" -c "(! [[ $pager == 'delta' ]] && ! [[ $pager == 'diff-so-fancy' ]]) || test -z \"$(git config $global --list --show-origin)\"" difffancy
-            if [[ "y" == "$difffancy" ]]; then
-                if [[ "$pager" == "bat" ]] || [[ "$pager" == "batdiff" ]]; then
-                    local opts=""
-                    readyn -Y "CYAN" -p "Set styles? (line numbers/grid)" delta2
-                    local theme='changes'
-                    if [[ "y" == $delta2 ]]; then
-                        while :; do
-                            local style=''
-                            style=$(printf "full\nauto\nplain\nchanges\nheader\nheader-filename\nheader-filesize\ngrid\nrule\nnumbers\nsnip\n" | fzf --border --border-label="Bat styles")
-                            stty sane &&
-                                reade -Q "MAGENTA" -i "a o n" -p "Add to styles/Only use this style/Dont use? (Will retry if add) [A/o/n]: " dltthme
-                            if test "$dltthme" == "a"; then
-                                theme=$theme","$style
-                            elif test "$dltthme" == "o"; then
-                                theme=$theme","$style
-                                break
-                            else
-                                break
-                            fi
-                        done
-                        opts=$opts" --style='$theme'"
-                    fi
-                    readyn -Y "CYAN" -p "Set syntax-theme" delta1
-                    if [[ "y" == "$delta1" ]]; then
-                        local theme=''
-
-                        while test -z "$theme"; do
-                            theme=$(bat --list-themes | fzf --border --border-label="Bat syntax themes" --preview="bat --theme={} --color=always $TMPDIR/test1")
-                            stty sane && readyn -n -N "MAGENTA" -p "Set $theme as syntax theme? (Will retry if no)" dltthme
-                            if [[ "$dltthme" == "n" ]]; then
-                                theme=''
-                            fi
-                        done
-                        opts=$opts" --theme=$theme"
-                    fi
-
-                    readyn -n -p "Set to specific language? (Useful if you're using an obscure language that bat can't autodetect)" delta2
-                    if [[ "y" == "$delta2" ]]; then
-                        local theme=''
-
-                        while test -z "$theme"; do
-                            theme=$(bat --list-languages | fzf --border --border-label="Bat coding languages")
-                            stty sane && readyn -n -N "MAGENTA" -p "Set syntax to specifically use $theme as language? (Will retry if no)" dltthme
-                            if [[ "$dltthme" == "n" ]]; then
-                                theme=''
-                            fi
-                        done
-                        opts=$opts" --language=$theme"
-                    fi
-                    pager=$pager" $opts"
-                elif [[ "$pager" == "delta" ]]; then
-                    readyn -Y "CYAN" -p "Set side-by-side view?" delta1
-                    if [[ "y" == "$delta1" ]]; then
-                        git config $global delta.side-by-side true
-                    fi
-
-                    readyn -Y "CYAN" -p "Set to navigate? (Move between diff sections using n and N)" delta1
-                    if [[ "y" == "$delta1" ]]; then
-                        git config $global delta.navigate true
-                    fi
-
-                    readyn -Y "CYAN" -p "Set syntax theme?" delta1
-                    if [[ "y" == "$delta1" ]]; then
-                        local theme=''
-                        while test -z "$theme"; do
-                            theme=$(printf "$(delta --list-syntax-themes | tail -n +1)" | fzf --reverse --border --border-label="Syntax theme")
-                            theme=$(echo "$theme" | awk '{$1=""; print $0;}')
-                            delta --syntax-theme "${theme:1}" $TMPDIR/test1 $TMPDIR/test2
-                            stty sane && readyn -n -N "MAGENTA" -p "Set as syntax theme? (Will retry if no)" dltthme
-                            if [[ "$dltthme" == "n" ]]; then
-                                theme=''
-                            fi
-                        done
-                        git config $global delta.syntax-theme $theme
-                    fi
-
-                    readyn -Y "CYAN" -p "Set to dark?" delta2
-                    if [[ "y" == "$delta2" ]]; then
-                        git config $global delta.dark true
-                    fi
-
-                    readyn -Y "CYAN" -p "Set linenumbers?" delta3
-                    if [[ "y" == "$delta3" ]]; then
-                        git config $global delta.linenumbers true
-                    fi
-
-                    readyn -Y "CYAN" -p "Set hyperlinks?" delta1
-                    if [[ "y" == "$delta1" ]]; then
-                        git config $global delta.hyperlinks true
-                    fi
-
-                elif [[ "$pager" == "diff-so-fancy" ]]; then
-
-                    readyn -Y "CYAN" -p "Should the first block of an empty line be colored?" diffancy
-                    if [[ "y" == "$diffancy" ]]; then
-                        git config --bool $global diff-so-fancy.markEmptyLines true
-                    else
-                        git config --bool $global diff-so-fancy.markEmptyLines false
-                    fi
-                    readyn -Y "CYAN" -p "Simplify git header chunks to a more human readable format?" diffancy
-                    if [[ "y" == $diffancy ]]; then
-                        git config --bool $global diff-so-fancy.changeHunkIndicators true
-                    else
-                        git config --bool $global diff-so-fancy.changeHunkIndicators false
-                    fi
-                    readyn -Y "CYAN" -p "Should the pesky + or - at line-start be removed?" diffancy
-                    if [[ "y" == $diffancy ]]; then
-                        git config --bool $global diff-so-fancy.stripLeadingSymbols true
-                    else
-                        git config --bool $global diff-so-fancy.stripLeadingSymbols false
-                    fi
-                    readyn -Y "CYAN" -p "By default, the separator for the file header uses Unicode line-drawing characters. If this is causing output errors on your terminal, set this to false to use ASCII characters instead?" diffancy
-                    if [[ "y" == "$diffancy" ]]; then
-                        git config --bool $global diff-so-fancy.useUnicodeRuler true
-                    else
-                        git config --bool $global diff-so-fancy.useUnicodeRuler false
-                    fi
-                    reade -Q "CYAN" -i "47 $(seq 1 100)" -p "By default, the separator for the file header spans the full width of the terminal. Use this setting to set the width of the file header manually (Default: 47)?: " diffancy
-                    # git log's commit header width
-                    git config $global diff-so-fancy.rulerWidth $diffancy
-                elif [[ "$pager" == "ydiff" ]]; then
-                    pager=$pager" --color=auto"
-                    readyn -Y "CYAN" -p "Enable side-by-side mode?" diffr1
-                    if [[ "$diffr1" == 'y' ]]; then
-                        pager=$pager" --side-by-side"
-                        readyn -Y "CYAN" -p "Wrap long lines in side-by-side view?" diffr1
-                        if [[ "$diffr1" == 'y' ]]; then
-                            pager=$pager" --wrap"
-                        fi
-                    fi
-                elif [[ "$pager" == "diffr" ]]; then
-                    readyn -Y "CYAN" -p "Set linenumber?" diffr1
-                    if [[ "$diffr1" == 'y' ]]; then
-                        pager="diffr --line-numbers"
-                        reade -Q "MAGENTA" -i 'c a n' -p "Set linenumber style? [Compact/aligned/n]: " diffr1
-                        if [[ "$diffr1" == 'compact' ]] || [[ "$diffr1" == 'aligned' ]]; then
-                            pager="diffr --line-numbers $diffr1"
-                        fi
-                    fi
-                fi
-
-                readyn -n -N "YELLOW" -p "Only use syntax highlighting and turn off pager?" pipepager1
-                if [[ "$pipepager1" == 'y' ]]; then
-                    if [[ $pager =~ 'delta' ]] || [[ $pager =~ 'bat' ]] || [[ $pager =~ 'batdiff' ]]; then
-                        git config $global "$cpager" "$pager --paging=never"
-                    elif [[ $pager =~ 'ydiff' ]]; then
-                        git config $global "$cpager" "$pager --pager=cat"
-                    else
-                        git config $global "$cpager" "$pager"
-                    fi
-                else
-
-                    prompt="Configure $pager's pager settings? [Y/n]: "
-                    if [[ "$pager" =~ "diff-so-fancy" ]] || [[ "$pager" =~ "diffr" ]]; then
-                        prompt="$pager alone won't page. Pipe to a pager? [Y/n]: "
-                    fi
-
-                    readyn -Y "CYAN" -p "$prompt" pipepager
-                    if [[ "$pipepager" == 'y' ]]; then
-                        pagers="less more"
-                        pagersf="less\nmore\n"
-                        if type most &>/dev/null; then
-                            pagers=$pagers" most"
-                            pagersf=$pagersf"most\n"
-                        fi
-                        if type moar &>/dev/null; then
-                            pagers=$pagers" moar"
-                            pagersf=$pagersf"moar\n"
-                        fi
-                        if type vimpager &>/dev/null; then
-                            pagers=$pagers" vimpager"
-                            pagersf=$pagersf"vimpager\n"
-                        fi
-                        if type nvimpager &>/dev/null; then
-                            pagers=$pagers" nvimpager"
-                            pagersf=$pagersf"nvimpager\n"
-                        fi
-
-                        reade -Q "GREEN" -i "$PAGER $pagers" -p "Pager: " diffancy
-
-                        if [[ "$diffancy" =~ "less" ]]; then
-                            local ln=""
-                            readyn -Y "CYAN" -p "Quit if one screen?" lne
-                            if [[ "$lne" == 'y' ]]; then
-                                ln="--quit-if-one-screen"
-                            fi
-                            reade -n -N "CYAN" -p "Set linenumbers for pager?" lne
-                            if [[ "$lne" == 'n' ]]; then
-                                ln=$ln"-n"
-                            else
-                                ln=$ln"-N"
-                            fi
-                            if [[ "$pager" =~ "ydiff" ]]; then
-                                git config $global "$cpager" "ydiff --pager=less --pager-options=\"-R $ln\""
-                            elif [[ "$pager" =~ "bat" ]] || [[ "$pager" =~ "batdiff" ]]; then
-                                readyn -Y "CYAN" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $ENVVAR?" pager1
-                                if [[ $pager1 == 'y' ]]; then
-                                    if grep -q 'BAT_PAGER' $ENVVAR; then
-                                        sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $ENVVAR
-                                        sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='less -R $ln'|g" $ENVVAR
-                                    else
-                                        printf "\n# BAT\nexport BAT_PAGER='less -R $ln'\n" >>$ENVVAR
-                                    fi
-                                    git config $global "$cpager" "$pager"
-                                else
-                                    git config $global "$cpager" "$pager --pager='less -R $ln'"
-                                fi
-                            elif [[ "$pager" =~ "delta" ]]; then
-                                readyn -Y "CYAN" -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $ENVVAR?" pager1
-                                if [[ $pager1 == 'y' ]]; then
-                                    if grep -q 'DELTA_PAGER' $ENVVAR; then
-                                        sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $ENVVAR
-                                        sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='less -R $ln'|g" $ENVVAR
-                                    else
-                                        printf "\n# DELTA\nexport DELTA_PAGER='less -R $ln'\n" >>$ENVVAR
-                                    fi
-                                    git config $global "$cpager" "delta"
-                                else
-                                    git config $global "$cpager" "delta --pager=less $ln"
-                                fi
-                            else
-                                git config $global "$cpager" "$pager | less -RF $ln"
-                            fi
-                        elif [[ "$diffancy" =~ "moar" ]]; then
-                            local ln=""
-                            readyn -Y "CYAN" -p "You selected $diffancy. Show linenumber?" pager1
-                            if [[ $pager1 == 'n' ]]; then
-                                ln=$ln' --no-linenumbers'
-                            fi
-
-                            readyn -Y "CYAN" -p "Quit if one screen?" pager1
-                            if [[ $pager1 == 'y' ]]; then
-                                ln=$ln' --quit-if-one-screen'
-                            fi
-
-                            readyn -n -N "CYAN" -p "Wrap long lines?" pager1
-                            if [[ $pager1 == 'y' ]]; then
-                                ln=$ln' --wrap'
-                            fi
-
-                            if [[ "$pager" =~ "ydiff" ]]; then
-                                git config $global "$cpager" "ydiff --pager=moar --pager-options=\"$ln\""
-                            elif [[ "$pager" =~ "delta" ]]; then
-                                readyn -Y "CYAN" -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $ENVVAR?" pager1
-                                if [[ $pager1 == 'y' ]]; then
-                                    if grep -q 'DELTA_PAGER' $ENVVAR; then
-                                        sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $ENVVAR
-                                        sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='moar $ln'|g" $ENVVAR
-                                    else
-                                        printf "\n# DELTA\nexport DELTA_PAGER='moar $ln'\n" >>$ENVVAR
-                                    fi
-                                    git config $global "$cpager" "$pager --pager='moar $ln'"
+                                    printf "# DELTA\nexport DELTA_PAGER='$pgr $ln'\n" >>$ENVVAR
                                 fi
                                 git config $global "$cpager" "delta"
 
-                            elif [[ "$pager" =~ "bat" || "$pager" =~ "batdiff" ]]; then
-                                readyn -Y "CYAN" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $ENVVAR?" pager1
-                                if [[ "$pager1" == 'y' ]]; then
-                                    if grep -q 'BAT_PAGER' $ENVVAR; then
-                                        sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $ENVVAR
-                                        sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='moar $ln'|g" $ENVVAR
-                                    else
-                                        printf "\n# BAT\nexport BAT_PAGER='moar $ln'\n" >>$ENVVAR
-                                    fi
-                                    git config $global "$cpager" "$pager"
+                            elif [[ $pager1 == 'batpager' ]]; then
+                                if grep -q 'BAT_PAGER' $ENVVAR; then
+                                    sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $ENVVAR
+                                    sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='$pgr $ln'|g" $ENVVAR
                                 else
-                                    git config $global "$cpager" "$pager --pager='moar $ln'"
+                                    printf "# BAT\nexport BAT_PAGER='$pgr $ln'\n" >>$ENVVAR
                                 fi
+                                git config $global "$cpager" "delta" 
                             else
-                                git config $global "$cpager" "$pager | moar $ln"
-                            fi
-                        elif [[ "$diffancy" =~ "nvimpager" ]] || [[ "$diffancy" =~ "vimpager" ]]; then
-                            opts=""
-                            colors="blue darkblue default delek desert elflord evening gruvbox habamax industry koehler lunaperch morning murphy pablo peachpuff quiet ron shine slate torte zellner"
-                            if [[ "$pager" =~ "vimpager" ]]; then
-                                colors=$colors" retrobox sorbet wildcharm zaibatsu"
-                            fi
-                            readyn -Y "CYAN" -p "Set colorscheme?" pager1
-                            if [ "$pager1" == "y" ]; then
-                                reade -Q "CYAN" -i "default $colors" -p "Colorscheme: " color
-                                opts="$opts +'colorscheme $color'"
+                                git config $global "$cpager" "delta --pager='$pgr $ln'"
                             fi
 
-                            if [[ "$pager" =~ "ydiff" ]]; then
-                                git config $global "$cpager" "ydiff --pager=nvimpager --pager-options='$opts'"
-                            elif [[ "$pager" =~ "delta" ]]; then
-                                readyn -Y "CYAN" -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $ENVVAR?" pager1
-                                if [[ $pager1 == 'y' ]]; then
-                                    if grep -q 'DELTA_PAGER' $ENVVAR; then
-                                        sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $ENVVAR
-                                        sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='nvimpager $opts'|g" $ENVVAR
-                                    else
-                                        printf "\n# DELTA\nexport DELTA_PAGER='nvimpager $opts'\n" >>$ENVVAR
-                                    fi
-                                    git config $global "$cpager" "delta"
-                                else
-                                    git config $global "$cpager" "delta --pager=\"nvimpager $opts\""
-                                fi
-                            elif [[ "$pager" =~ "bat" ]] || [[ "$pager" =~ "batdiff" ]]; then
-                                readyn -Y "CYAN" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $ENVVAR?" pager1
-                                if [[ $pager1 == 'y' ]]; then
-                                    if grep -q 'BAT_PAGER' $ENVVAR; then
-                                        sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $ENVVAR
-                                        sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='nvimpager $opts'|g" $ENVVAR
-                                    else
-                                        printf "\n# BAT\nexport BAT_PAGER='nvimpager $opts'\n" >>$ENVVAR
-                                    fi
-                                    git config $global "$cpager" "$pager"
-                                else
-                                    git config $global "$cpager" "$pager --pager='nvimpager $opts'"
-                                fi
-                            else
-                                git config $global "$cpager" "$pager | nvimpager $opts"
-                            fi
+                        elif [[ "$pager" == "ydiff" ]]; then
+                            git config $global "$cpager" "ydiff --pager=$pgr --pager-options=\"$ln\""
+
                         else
-                            if [[ "$pager" =~ "ydiff" ]]; then
-                                git config $global "$cpager" "ydiff --pager=$diffancy"
-                            elif [[ "$pager" =~ "bat" || "$pager" =~ "batdiff" ]]; then
-                                readyn -Y "CYAN" -p "$pager uses an environment variable BAT_PAGER to set it's pager. Configure and put in $ENVVAR?" pager1
-                                if [[ $pager1 == 'y' ]]; then
-                                    if grep -q 'BAT_PAGER' $ENVVAR; then
-                                        sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $ENVVAR
-                                        sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='$diffancy'|g" $ENVVAR
-                                    else
-                                        printf "\n# BAT\nexport BAT_PAGER='$diffancy'\n" >>$ENVVAR
-                                    fi
-                                    git config $global "$cpager" "batdiff"
-                                else
-                                    git config $global "$cpager" "batdiff --pager='$diffancy'"
-                                fi
-                            elif [[ "$pager" =~ "delta" ]]; then
-                                readyn -Y "CYAN" -p "Delta uses an environment variable DELTA_PAGER to set it's pager. Configure and put in $ENVVAR?" pager1
-                                if [[ $pager1 == 'y' ]]; then
-                                    if grep -q 'DELTA_PAGER' $ENVVAR; then
-                                        sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $ENVVAR
-                                        sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='$diffancy'|g" $ENVVAR
-                                    else
-                                        printf "\n# DELTA\nexport DELTA_PAGER='$diffancy'\n" >>$ENVVAR
-                                    fi
-                                    git config $global "$cpager" "delta"
-                                else
-                                    git config $global "$cpager" "delta --pager=$diffancy"
-                                fi
-                            else
-                                git config $global "$cpager" "$pager | $diffancy"
-                            fi
+                            [[ $pgr =~ 'less' ]] && ln="$ln -F" 
+                            git config $global "$cpager" "$pager | $pgr $ln"
                         fi
-                    fi
+                   fi
+
+                else
+                    git config $global "$cpager" "$pager --paging=never"
                 fi
             fi
-
         fi
     fi
-
-    #git config "$global" "$cpager" "$pager" ;
-    #elif test "$regpager" == "y"; then
-    #    pagers="cat"
-    #    pager="cat"
-    #    if type bat &> /dev/null; then
-    #        pagers=$pagers" bat"
-    #    fi
-    #    if type batdiff &> /dev/null; then
-    #        pagers=$pagers" batdiff"
-    #    fi
-    #    reade -Q "CYAN" -i "cat" -p "Pager: " "$pagers" pager;
-    #    if [ $pager == "bat" ]; then
-    #        pager="bat --paging=never"
-    #    fi
-    #    if [ $pager == "batdiff" ]; then
-    #        pager="batdiff --paging=never"
-    #    fi
-    #    git config "$global" "$cpager" "$pager"
-    #fi
 }
 
 gitt() {
     if ! type git &>/dev/null; then
         readyn -p "Install git?" nstll
         if [[ "$nstll" == "y" ]]; then
-            if [[ $distro_base == "Arch" ]]; then
-                eval "$pac_ins git"
-            elif [[ "$distro_base" == "Debian" ]]; then
-                eval "$pac_ins git"
-            fi
+            eval "$pac_ins git"
         fi
     fi
 
@@ -1390,43 +957,123 @@ gitt() {
         fi
     fi
 
-    readyn -p 'Configure git to look for ssh:// instead of https:// when f.ex. cloning/pulling/pushing?' -c "! [[ $global =~ 'global' ]] && test -z $(git config $global --list | grep 'url.ssh://git@github.com/.insteadof=' | awk 'BEGIN { FS = "=" }; {print $2;}')" githttpee
-    if [[ "y" == $githttpee ]]; then
-        git config $global url.ssh://git@github.com/.insteadOf https://github.com/
-    fi
-    unset gihttpee
-
     # https://www.youtube.com/watch?v=aolI_Rz0ZqY
-
     readyn -p "Configure git to remember resolved mergeconflicts for reuse?" -c "test -z $(git config $global --list | grep 'rerere.enabled' | awk 'BEGIN { FS = "=" } ;{print $2;}')" gitrerere
     if [[ "y" == $gitrerere ]]; then
         git config "$global" rerere.enabled true
     fi
 
-    local gitpgr pager wpager
-    readyn -Y "CYAN" -p "Configure pager for git core, diff, show and log?" wpager
-    if [[ "$wpager" == "y" ]]; then
-        readyn -n -p "Install custom diff syntax highlighter?" gitpgr
+    readyn -p 'Configure git to look for ssh:// instead of https:// when f.ex. cloning/pulling/pushing?' -c "! [[ $global =~ 'global' ]] && test -z $(git config $global --list | grep 'url.ssh://git@github.com/.insteadof=' | awk 'BEGIN { FS = "=" }; {print $2;}')" githttpee
+    if [[ "y" == $githttpee ]]; then
+        git config $global url.ssh://git@github.com/.insteadOf https://github.com/
+    fi
+    
+    unset gihttpee gitrerere mail name
+
+
+    local diffs diffsf
+    if type delta &>/dev/null; then
+        diffs=$diffs" delta"
+        diffsf=$diffsf"\t - delta\n"
+    fi
+    if type diff-so-fancy &>/dev/null; then
+        diffs=$diffs" diff-so-fancy"
+        diffsf=$diffsf"\t - diff-so-fancy\n"
+    fi
+    if type ydiff &>/dev/null; then
+        diffs=$diffs" ydiff"
+        diffsf=$diffsf"\t - ydiff\n"
+    fi
+    if type riff &>/dev/null; then
+        diffs=$diffs" riff"
+        diffsf=$diffsf"\t - riff\n"
+    fi
+    if type diffr &>/dev/null; then
+        diffs=$diffs" diffr"
+        diffsf=$diffsf"\t - diffr\n"
+    fi
+    if type batdiff &>/dev/null; then
+        diffs=$diffs" batdiff"
+        diffsf=$diffsf"\t - batdiff\n"
+    fi
+
+    printf "${GREEN}Installed tools that could serve as diff highlighters${normal}:\n"
+    printf "${CYAN}$diffsf${normal}" 
+
+    readyn -p "Configure custom interactive diff filter?" -c "test -z \"$(git config $global --list | grep 'interactive.difffilter' | awk 'BEGIN { FS = "=" }; {print $2;}')\"" gitdiff1
+    if [[ "y" == "$gitdiff1" ]]; then
+        readyn -p "Install custom diff syntax highlighter?" -c "test -z '$diffs'" gitpgr
         if [[ "$gitpgr" == "y" ]]; then
-            if ! test -f install_differ_pager.sh; then
-                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_differ_pager.sh)
+            if ! test -f install_differ.sh; then
+                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_differ.sh)
             else
-                . ./install_differ_pager.sh
+                . ./install_differ.sh
             fi
         fi
-        
+        git_hl "git config $global interactive.difffilter"
+    fi
+
+    local pagersf pager 
+
+    if type vimpager &>/dev/null; then
+        pagers=$pagers" vimpager"
+        pagersf=$pagersf"\t - vimpager\n"
+    fi
+    if type nvimpage retrosynth r &>/dev/null; then
+        pagers=$pagers" nvimpager"
+        pagersf=$pagersf"\t - nvimpager\n"
+    fi
+    if type most &>/dev/null; then
+        pagers=$pagers" most"
+        pagersf=$pagersf"\t - most\n"
+    fi
+    if type bat &>/dev/null; then
+        pagers=$pagers" bat"
+        pagersf=$pagersf"\t - bat\n"
+    fi
+    if type moar &>/dev/null; then
+        pagers=$pagers" moar"
+        pagersf=$pagersf"\t - moar\n"
+    fi
+    
+    pagers=$pagers" less cat more"
+    pagersf=$pagersf"\t - less\n\t - cat\n\t - more\n"
+
+
+    local gitpgr pager wpager
+    readyn -p "Configure pager for ${BLUE}core.pager${GREEN}, ${CYAN}pager.diff${GREEN}, ${CYAN}pager.show${GREEN} and ${CYAN}pager.log${GREEN}?" wpager
+    if [[ "$wpager" == "y" ]]; then
+        printf "${GREEN}Installed tools that could serve as pagers${normal}:\n"
+        printf "${CYAN}$pagersf${normal}"
+        readyn -n -p "Install custom pager?" gitpgr
+        if [[ "$gitpgr" == "y" ]]; then
+            if ! test -f install_pager.sh; then
+                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pager.sh)
+            else
+                . ./install_pager.sh
+            fi
+        fi
+
+        printf "${GREEN}Installed tools that could serve as diff highlighters${normal}:\n"
+        printf "${CYAN}$diffsf${normal}" 
+         
+        readyn -p "Install custom diff syntax highlighter?" -c "test -z '$diffs'" gitpgr
+        if [[ "$gitpgr" == "y" ]]; then
+            if ! test -f install_differ.sh; then
+                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_differ.sh)
+            else
+                . ./install_differ.sh
+            fi
+        fi
+         
+
         readyn -p "Set core.pager?" -c "test -z \"$(git config $global --list | grep 'core.pager' | awk 'BEGIN { FS = "=" }; {print $2;}')\"" pager
         if [[ $pager == 'y' ]]; then
             git_pager "core.pager" "$global"
         fi
         readyn -p "Set pager.diff?" -c "test -z \"$(git config $global --list | grep 'pager.diff' | awk 'BEGIN { FS = "=" }; {print $2;}')\"" pager
         if [[ $pager == 'y' ]]; then
-
-            pager "pager.diff" "$global"
-        fi
-        readyn -p "Set pager.difftool?" -c "test -z \"$(git config $global --list | grep 'pager.difftool' | awk 'BEGIN { FS = "=" }; {print $2;}')\"" pager
-        if [[ $pager == 'y' ]]; then
-            git_pager "pager.difftool" "$global"
+            git_pager "pager.diff" "$global" 'y'
         fi
         readyn -p "Set pager.show?" -c "test -z \"$(git config $global --list | grep 'pager.show' | awk 'BEGIN { FS = "=" }; {print $2;}')\"" pager
         if [[ $pager == 'y' ]]; then
@@ -1436,42 +1083,12 @@ gitt() {
         if [[ $pager == 'y' ]]; then
             git_pager "pager.log" "$global"
         fi
+        #readyn -p "Set pager.difftool?" -c "test -z \"$(git config $global --list | grep 'pager.difftool' | awk 'BEGIN { FS = "=" }; {print $2;}')\"" pager
+        #if [[ $pager == 'y' ]]; then
+        #    git_pager "pager.difftool" "$global"
+        #fi
     fi
     #confs="$(cur="pager." && compgen -F _git_config 2> /dev/null)"
-
-    local diffs=""
-    local diff=""
-    if type delta &>/dev/null; then
-        diffs=$diffs" delta"
-        diff="delta"
-    fi
-    if type ydiff &>/dev/null; then
-        diffs=$diffs" ydiff"
-        diff="delta"
-    fi
-    if type riff &>/dev/null; then
-        diffs=$diffs" riff"
-        diff="riff"
-    fi
-    if type diffr &>/dev/null; then
-        diffs=$diffs" diffr"
-        diff="diffr"
-    fi
-    if type diff-so-fancy &>/dev/null; then
-        diffs=$diffs" diff-so-fancy"
-        diff="diff-so-fancy"
-    fi
-    if type batdiff &>/dev/null; then
-        diffs=$diffs" batdiff"
-        diff="batdiff"
-    fi
-
-    if ! test -z "$diffs"; then
-        readyn -p "Configure custom interactive diff filter?" -c "test -z \"$(git config $global --list | grep 'interactive.difffilter' | awk 'BEGIN { FS = "=" } ;{print $2;}')\"" gitdiff1
-        if [[ "y" == "$gitdiff1" ]]; then
-            git_hl "git config $global interactive.difffilter"
-        fi
-    fi
 
     local editor editors diffs diff difftool mergetool cstyle prompt
     editors="nano vi"
@@ -1715,4 +1332,4 @@ gitt() {
     unset gitdiff diff gitmerge merge amt rslt gitcnf gitign
 }
 
-test -e "$1" && gitt "$1"
+test -n "$1" && gitt "$1"
