@@ -84,7 +84,7 @@ git-https-to-ssh(){
     if [ -z $1 ]; then
         echo "You should give up the name of a remote";
         readyn -p "Do you want me to look for 'origin'?" resp
-        if [ -z $resp ]; then
+        if [[ $resp == 'y' ]]; then
             gitRm=$(git remote get-url origin | sed 's,.*.com/,git@github.com:,g'); git remote -v set-url origin $gitRm;
             git remote get-url origin;
         fi        
@@ -98,7 +98,7 @@ git-ssh-to-https(){
     if [ -z $1 ]; then
         echo "You should give up the name of a remote";
         readyn -p "Do you want me to look for 'origin'?" resp
-        if [[ -z $resp  ||  "y" == $resp ]] ; then
+        if [[ $resp == 'y' ]]; then
             gitRm=$(git remote get-url origin | sed 's,.*.com:,https://github.com/,g'); git remote -v set-url origin $gitRm;
             git remote get-url origin;
         fi        
