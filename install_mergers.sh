@@ -29,6 +29,7 @@ if [[ $merger == 'nvim' ]] ;then
             . ./install_neovim.sh
         fi 
    fi
+
 elif [[ $merger == 'vscode' ]] ;then
    if ! type code &> /dev/null; then
         if ! test -f install_visual_studio_code.sh; then
