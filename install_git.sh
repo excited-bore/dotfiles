@@ -63,23 +63,26 @@ function git_hl() {
     #    cmd="git config $global interactive.difffilter"
     fi
     local diffs=""
-    if type batdiff &>/dev/null && ! [[ $cmd =~ 'lazygit' ]]; then
-        diffs=$diffs" batdiff"
-    fi
-    if type riff &>/dev/null && ! [[ $cmd =~ 'lazygit' ]]; then
-        diffs=$diffs" riff"
-    fi
-    if type diffr &>/dev/null && ! [[ $cmd =~ 'lazygit' ]]; then
-        diffs=$diffs" diffr"
-    fi
-    if type ydiff &>/dev/null; then
-        diffs=$diffs" ydiff"
+    if type delta &>/dev/null; then
+        diffs=$diffs" delta"
     fi
     if type diff-so-fancy &>/dev/null; then
         diffs=$diffs" diff-so-fancy"
     fi
-    if type delta &>/dev/null; then
-        diffs=$diffs" delta"
+    if type difft &>/dev/null; then
+        diffs=$diffs" difft"
+    fi
+    if type ydiff &>/dev/null; then
+        diffs=$diffs" ydiff"
+    fi
+    if type riff &>/dev/null; then
+        diffs=$diffs" riff"
+    fi
+    if type diffr &>/dev/null; then
+        diffs=$diffs" diffr"
+    fi
+    if type batdiff &>/dev/null; then
+        diffs=$diffs" batdiff"
     fi
 
     diffp="$(echo $diffs | sed 's/ /\n\t- /g')"  
@@ -88,27 +91,27 @@ function git_hl() {
 
     reade -Q "GREEN" -i "$diffs" -p "Diff filter: " diff
     if test -n "$diff"; then
+        local opts=''
+        local colorArg='always'
+        local side='n'
+        local extrn='n'
         if [[ "$diff" == "delta" ]]; then
-            local diff="delta --paging=never"
-            local opts=''
-            local colorArg='always'
-            local side='n' 
+            opts=' --paging=never'
             readyn -Y "CYAN" -p "You selected $diff. Configure?" conf
             if [[ "y" == "$conf" ]]; then
-                local theme=''
-                while test -z "$theme"; do
-
+                local opt1s='' 
+                while test -z "$opt1s"; do
+                    side='n' 
                     readyn -Y "CYAN" -p "Set syntax theme for delta?" delta1
                     if [[ "$delta1" == 'y' ]]; then
-                        theme=$(printf "$(delta --list-syntax-themes | tail -n +1)" | fzf --reverse --border --border-label="Syntax theme")
-                        theme=$(echo "$theme" | awk '{$1=""; print $0;}')
-                        theme="${theme:1}"
+                        theme=$(printf "$(delta --list-syntax-themes | tail -n +1 | awk '{$1="";print;}' | sed 's/ //')" | fzf --reverse --border --border-label="Syntax theme" --preview="delta --syntax-theme={} $TMPDIR/test1 $TMPDIR/test2")
+                        opt1s=" --syntax-theme='$theme'"
                     fi
 
                     readyn -Y "CYAN" -p "Set linenumbers?" delta3
                     if [[ "y" == $delta3 ]]; then
                         git config $global delta.linenumbers true
-                        opts="$opts --line-numbers" 
+                        opt1s="$opt1s --line-numbers" 
                     elif [[ "n" == $delta3 ]]; then
                         git config $global delta.linenumbers false
                     fi
@@ -116,15 +119,15 @@ function git_hl() {
                     readyn -Y "CYAN" -p "Set to dark?" delta2
                     if [[ "y" == $delta2 ]]; then
                         git config $global delta.dark true
-                        opts="$opts --dark" 
+                        opt1s="$opt1s --dark" 
                     elif [[ "n" == $delta2 ]]; then
                         git config $global delta.dark false
                     fi
 
-                    readyn -Y 'CYAN' -p "Side-by-side view?" delta3
+                    readyn -n -N 'BLUE' -p "Side-by-side view?" delta3
                     if [[ "y" == $delta3 ]]; then
                         git config $global delta.side-by-side true
-                        opts="$opts --side-by-side" 
+                        opt1s="$opt1s --side-by-side" 
                         side='y' 
                     elif [[ "n" == $delta3 ]]; then
                         git config $global delta.side-by-side false
@@ -142,19 +145,18 @@ function git_hl() {
                     readyn -Y "CYAN" -p "Set hyperlinks?" delta1
                     if [[ "y" == $delta1 ]]; then
                         git config $global delta.hyperlinks true
-                        opts="$opts --hyperlinks" 
+                        opt1s="$opt1s --hyperlinks" 
                     elif [[ "y" == $delta1 ]]; then
                         git config $global delta.hyperlinks false
                     fi
-
-                    delta $opts --syntax-theme "$theme" --pager 'less -R' $TMPDIR/test1 $TMPDIR/test2
+                    eval "delta $opt1s -- $TMPDIR/test1 $TMPDIR/test2"
                     readyn -N "MAGENTA" -n -p "Is this ok? (will retry if no)" dltthme
                     if [[ "$dltthme" == "n" ]]; then
-                        theme=''
+                        opt1s=''
                     fi
                 done
-                opts="$opts --syntax-theme $theme" 
-                [[ $cmd =~ 'difffilter' ]] && opts='' 
+                opts="$opts$opt1s" 
+                [[ $cmd =~ 'difffilter' ]] && opts=' --paging=never' 
                 git config $global --replace-all delta.syntax-theme "$theme"
             fi
         elif [[ "$diff" == "diff-so-fancy" ]]; then
@@ -194,16 +196,22 @@ function git_hl() {
                         git config --global diff-so-fancy.rulerWidth $diffancy
                     fi
                 fi
-            elif [[ "$diff" == "riff" ]]; then
-                diff="riff --no-pager"
-                readyn -Y 'CYAN' -p "Ignore changes in amount of whitespace?" riff1
-                if [[ "$riff1" == 'y' ]]; then
-                    diff=$diff" -b"
-                fi
-                readyn -Y "CYAN" -p "No special highlighting for lines that only add content?" riff1
-                if [[ "$riff1" == 'y' ]]; then
-                    diff=$diff" --no-adds-only-special"
-                fi
+            fi
+        elif [[ "$diff" == "riff" ]]; then
+            opts=' --no-pager --color=auto' 
+            
+            reade -Q 'CYAN' -i 'n m a' -p "Ignore changes in amount of whitespace / ignore all whitespace? (Default: none) [N(o)/(a)m(ount)/a(ll)]: " riff1
+            if [[ "$riff1" == 'm' ]]; then
+                opts=$opts" --ignore-space-change"
+            elif [[ "$riff1" == 'a' ]]; then 
+                opts=$opts" --ignore-all-space"
+            fi
+
+            reade -Q "CYAN" -i 'y n e' -p "How will unchanged line parts be styled? (Default: none) [Y(ellow)/n(one)/e(xperimental)]: " riff1
+            if [[ "$riff1" == 'y' ]]; then
+                opts=$opts" --unchanged-style=yellow"
+            elif [[ "$riff1" == 'e' ]]; then
+                opts=$opts" --unchanged-style=experimental"
             fi
         elif [[ "$diff" == "ydiff" ]]; then
             opts=' --color=auto --width={{columnWidth}}'
@@ -222,8 +230,8 @@ function git_hl() {
                 fi
             fi
         elif [ "$diff" == "diffr" ]; then
-            #readyn -Y "CYAN" -p "You selected $diff. Configure?" conf
-            #if [[ "y" == "$conf" ]]; then
+            readyn -Y "CYAN" -p "You selected $diff. Configure?" conf
+            if [[ "y" == "$conf" ]]; then
                 readyn -Y "CYAN" -p "Set linenumber?" diffr1
                 if [[ "$diffr1" == 'y' ]]; then
                     diff="diffr --line-numbers"
@@ -232,21 +240,90 @@ function git_hl() {
                         diff="diffr --line-numbers $diffr1"
                     fi
                 fi
-            #fi
+            fi
+        elif [[ "$diff" == "difft" ]]; then
+            readyn -Y "CYAN" -p "You selected $diff(astic). Configure?" conf
+            extrn='y' 
+            opts=' --color=always'
+            if [[ "y" == "$conf" ]]; then
+                readyn -Y 'CYAN' -p "Set side-by-side mode? (Default: side-by-side)" diffr1
+                if [[ "$diffr1" == 'y' ]]; then
+                    printf "${GREEN}\t - ${CYAN}Side-by-side${green}: Display the before file and the after file in two separate columns, with line numbers aligned according to unchanged content. If a change is exclusively additions or exclusively removals, use a single column.
+\t - ${CYAN}Side-by-side-show-both${green}: The same as side-by-side, but always uses two columns.
+\t - ${CYAN}Inline${green}: A single column display, closer to traditional diff display.\n${normal}"
+                    reade -Q 'GREEN' -i 's b i' -p 'Display [S(ide-by-side)/(side-by-side-)b(oth)/i(nline)]: ' disp
+                    if [[ $disp == 's' ]]; then
+                        opts=$opts" --display=side-by-side"
+                        side='y' 
+                    elif [[ $disp == 'b' ]]; then
+                        opts=$opts" --display=side-by-side-show-both" 
+                        side='y' 
+                    elif [[ $disp == 'i' ]]; then
+                        opts=$opts" --display=inline" 
+                    fi
+                fi
+                readyn -Y 'CYAN' -p "Set context? (Lines before and after changed lines - Default: 3)" diffr1
+                if [[ $diffr1 == 'y' ]]; then
+                    reade -Q 'GREEN' -i '3 2 1 4 5 6 7 8' -p 'Context: ' cntxt
+                    re='^[0-9]+$'
+                    if [[ $cntxt =~ $re ]]; then
+                        opts="$opts --context=$cntxt" 
+                    fi
+                fi
+                
+                readyn -Y 'CYAN' -p "Skip unchanged files when diffing?" diffr3
+                if [[ $diffr3 == 'y' ]]; then
+                    opts="$opts --skip-unchanged" 
+                fi
+
+                readyn -Y 'CYAN' -p "Ignore changed comments when diffing?" diffr2
+                if [[ $diffr2 == 'y' ]]; then
+                    opts="$opts --ignore-comments" 
+                fi
+
+                readyn -n -N 'BLUE' -p "Set background? (Default: dark)" diffr4
+                if [[ $diffr4 == 'y' ]]; then
+                    reade -Q 'GREEN' -i 'd l' -p 'Background [D(ark)/l(ight)]: ' bac
+                    if [[ $bac == 'd' ]]; then
+                        opts="$opts --background=dark"
+                    elif [[ $bac == 'l' ]]; then 
+                        opts="$opts --background=light"
+                    fi
+                fi
+
+                readyn -n -N 'BLUE' -p "Disable carriage return - '\\\n\\\r' - stripping when diffing files in windows?" diffr6
+                if [[ $diffr6 == 'y' ]]; then
+                    opts="$opts --strip-cr=off" 
+                fi
+
+                readyn -n -N 'BLUE' -p "Disable syntax highlighting?" diffr5
+                if [[ $diffr5 == 'y' ]]; then
+                    opts="$opts --syntax-highlight=off" 
+                fi
+
+            fi
         elif [[ "$diff" == "batdiff" ]]; then
-            #readyn -Y "CYAN" -p "You selected $diff. Configure?" conf
-            #if [[ "y" == "$conf" ]]; then
-                diff="batdiff --staged --paging=never"
-                readyn -Y "CYAN" -p "Use delta config?" diffr1
+            readyn -Y "CYAN" -p "You selected $diff. Configure?" conf
+            opts=" --paging=never"
+            if [[ "y" == "$conf" ]]; then
+                readyn -n -N "BLUE" -p "Set amount of extra lines above and under changes in codeblocks (Default: 2)?" batdiff1
+                if [[ "$batdiff1" == 'y' ]]; then
+                    reade -Q 'GREEN' -i "$(seq 2 10)" -p 'Context: ' cntxt 
+                    re='^[0-9]+$'
+                    if [[ $cntxt =~ $re ]]; then
+                        opts=$opts" --diff-context $cntxt" 
+                    fi
+                fi
+                readyn -Y "BLUE" -p "Use ${GREEN}delta${BLUE} config?" diffr1
                 if [[ "$diffr1" == 'y' ]]; then
                     diff=$diff" --delta"
                 fi
-            #fi
+            fi
         fi
     fi
 
     local sidpanelw='0.333' 
-    if [[ $cmd =~ 'lazygit' ]] && [[ $side == 'y' ]]; then
+    if [[ $cmd =~ 'lazygit' ]] && [[ "$side" == 'y' ]]; then
         printf "${GREEN}Side-by-side selected. This might take up a bit more space in the diff panel for lazygit.\n${normal}" 
         readyn -p "Set side panel width (left side panels - Default 0.333)" sidepn
         if [[ $sidepn == 'y' ]]; then
@@ -264,23 +341,50 @@ function git_hl() {
             diff="$(echo $diff | awk '{print $1;}')" 
             eval "$cmd $diff$opts"
         elif [[ "$cmd" =~ 'lazygit' ]]; then
-             
             if ! test -f ~/.config/lazygit/config.yml; then
                 touch ~/.config/lazygit/config.yml 
             fi
-            if ! grep -q 'sidePanelWidth: *'  ~/.config/lazygit/config.yml; then
-                printf "gui:\n sidePanelWidth: $sidepanelw\n" >> ~/.config/lazygit/config.yml 
-            else
-                sed -i 's/^[ \t]*sidePanelWidth:*.*/ sidePanelWidth: '"$sidepanelw"'/g' ~/.config/lazygit/config.yml
-            fi 
-            if ! grep -q 'pager: *'  ~/.config/lazygit/config.yml; then
-                #sed -i '1s/^/git:\n paging:\n   colorArg: always\n   pager: '$diff'\n/' ~/.config/lazygit/config.yml
-                printf "git:\n paging:\n   useConfig: false\n   colorArg: $colorArg\n   pager: $diff$opts\n" >> ~/.config/lazygit/config.yml 
-            else
-                sed -i 's/^[ \t]*colorArg:*.*/   colorArg: '"$colorArg"'/g' ~/.config/lazygit/config.yml
-                sed -i 's/^[ \t]*pager:*.*/   pager: '"$diff$opts"'/g' ~/.config/lazygit/config.yml
+            if test -n "$sidepanelw"; then
+                if ! grep -q 'sidePanelWidth:'  ~/.config/lazygit/config.yml; then
+                    printf "gui:\n sidePanelWidth: $sidepanelw\n" >> ~/.config/lazygit/config.yml 
+                else
+                    sed -i 's/^[ \t]*sidePanelWidth:*.*/ sidePanelWidth: '"$sidepanelw"'/g' ~/.config/lazygit/config.yml
+                fi
             fi
-            
+
+            if ! grep -q 'git:' ~/.config/lazygit/config.yml; then
+                #sed -i '1s/^/git:\n paging:\n   colorArg: always\n   pager: '$diff'\n/' ~/.config/lazygit/config.yml 
+                if [[ "$extrn" == 'n' ]]; then
+                    printf "git:\n paging:\n   useConfig: false\n   colorArg: $colorArg\n   pager: $diff$opts\n" >> ~/.config/lazygit/config.yml 
+                else 
+                    printf "git:\n paging:\n   externalDiffCommand: $diff$opts\n" >> ~/.config/lazygit/config.yml 
+                fi
+            elif ! grep -q 'paging:' ~/.config/lazygit/config.yml; then
+                if [[ "$extrn" == 'n' ]]; then
+                    sed -i 's/\(git:\)/\1\n paging:\n   useConfig: false\n   colorArg: '$colorArg'\n   pager: '"$diff$opts"'\n /g' ~/.config/lazygit/config.yml
+                else
+                    sed -i 's/\(git:\)/\1\n paging:\n   externalDiffCommand: '$colorArg'\n/g' ~/.config/lazygit/config.yml
+
+                fi
+            else
+                if [[ "$extrn" == 'n' ]]; then
+                    if ! grep -q 'pager:' ~/.config/lazygit/config.yml; then
+                        sed -i 's/\(paging:\)/\1\n   useConfig: false\n   colorArg: '$colorArg'\n   pager: '$diff$opts'\n /g' ~/.config/lazygit/config.yml
+                    else 
+                        sed -i 's/^[ \t]*colorArg:*.*/   colorArg: '"$colorArg"'/g' ~/.config/lazygit/config.yml
+                        sed -i 's/^[ \t]*pager:*.*/   pager: '"$diff$opts"'/g' ~/.config/lazygit/config.yml
+                    fi
+                elif [[ $extrn == 'y' ]]; then
+                    if ! grep -q 'externalDiffCommand:'  ~/.config/lazygit/config.yml; then
+                        sed -i 's/\(paging:\)/\1\n   externalDiffCommand: '"$diff$opts"'\n/g' ~/.config/lazygit/config.yml
+                    else
+                        sed -i 's/^[ \t]*externalDiffCommand:*.*/   externalDiffCommand: '"$diff$opts"'\n/g' ~/.config/lazygit/config.yml
+                    fi
+                fi
+            fi
+           
+            printf "${GREEN}'$HOME/.config/lazygit/config.yml'${normal}\n" 
+            cat -b ~/.config/lazygit/config.yml 
             #sed -i 's|pager:.*|pager: '"$diff"'|g' ~/.config/lazygit/config.yml
             #    printf 'paging:\n    pager: '"$diff\n" >> 
                 #sed -i 's|#pager|  pager: '"$diff"'|g' ~/.config/lazygit/config.yml
@@ -501,7 +605,7 @@ git_pager() {
                     if [[ "y" == $delta1 ]]; then
                         local theme=''
                         while test -z "$theme"; do
-                            theme=$(printf "$(delta --list-syntax-themes | tail -n +1)" | fzf --reverse --border --border-label="Syntax theme")
+                            theme=$(printf "$(delta --list-syntax-themes | tail -n +1)" | fzf --reverse --border --border-label="Syntax theme" --preview="delta --syntax-theme={} $TMPDIR/test1 $TMPDIR/test2")
                             theme=$(echo "$theme" | awk '{$1=""; print $0;}')
                             delta --syntax-theme "${theme:1}" $TMPDIR/test1 $TMPDIR/test2
                             stty sane && readyn -N "MAGENTA" -n -p "Set as syntax theme? (Will retry if no)" dltthme
