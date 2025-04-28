@@ -572,7 +572,8 @@ elif [[ "$envvars" == "y" ]]; then
     unset dsply
 
     if type go &>/dev/null; then
-        sed -i 's|#export GOPATH|export GOPATH|' $pathvr
+        #sed -i 's|#export GOPATH|export GOPATH|' $pathvr
+        sed -i 's|#export PATH=$PATH:$GOPATH|export PATH=$PATH:$GOPATH|' $pathvr
     fi
     unset snapvrs
 
