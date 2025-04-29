@@ -125,26 +125,28 @@ if test -z $SYSTEM_UPDATED; then
 fi
 
 
-function get-script-dir() {
-    SOURCE=$0
-    test -n "$1" && SOURCE=$1 
-    if test -n "$BASH_VERSION"; then
-        SOURCE=$(cd -- "$(dirname -- "$SOURCE")" &> /dev/null && pwd ) 
-        #while [ -h "$SOURCE" ]; do # Resolve $SOURCE until the file is no longer a symlink
-        #    DIR=$(command cd -P "$(dirname "$SOURCE")" && pwd)
-        #    SOURCE=$(readlink "$SOURCE")
-        #    [[ $SOURCE != /* ]] && SOURCE=$DIR/$SOURCE # If $SOURCE was a relative symlink, resolve it relative to the symlink base directory
-        #done
-        #DIR=$(command cd -P "$(dirname "$SOURCE")" && pwd)
-    elif test -n "$ZSH_VERSION"; then
-        SOURCE="${0:A:h}"
-    fi
-    if ! test -z $2; then
-        eval "$2=$SOURCE"
-    else
-        eval "$1=$SOURCE"
-    fi
-}
+alias get-script-dir='[[ $0 != $BASH_SOURCE ]] && dirname "${BASH_SOURCE[0]}" || cd "$( dirname "$-1" )" && pwd'
+
+#function get-script-dir() {
+#    SOURCE=$0
+#    test -n "$1" && SOURCE=$1 
+#    if test -n "$BASH_VERSION"; then
+#        SOURCE=$(cd -- "$(dirname -- "$SOURCE")" &> /dev/null && pwd ) 
+#        #while [ -h "$SOURCE" ]; do # Resolve $SOURCE until the file is no longer a symlink
+#        #    DIR=$(command cd -P "$(dirname "$SOURCE")" && pwd)
+#        #    SOURCE=$(readlink "$SOURCE")
+#        #    [[ $SOURCE != /* ]] && SOURCE=$DIR/$SOURCE # If $SOURCE was a relative symlink, resolve it relative to the symlink base directory
+#        #done
+#        #DIR=$(command cd -P "$(dirname "$SOURCE")" && pwd)
+#    elif test -n "$ZSH_VERSION"; then
+#        SOURCE="${0:A:h}"
+#    fi
+#    if ! test -z $2; then
+#        eval "$2=$SOURCE"
+#    else
+#        eval "$1=$SOURCE"
+#    fi
+#}
 
 # https://stackoverflow.com/questions/4023830/how-to-compare-two-strings-in-dot-separated-version-format-in-bash
 
