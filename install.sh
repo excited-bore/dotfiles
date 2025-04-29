@@ -572,7 +572,7 @@ if [[ "$pipew" == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_pipewire.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipewire.sh)"
     else
-        $SCRIPT_DIR/install_pipewire.sh
+        . $SCRIPT_DIR/install_pipewire.sh
     fi
 fi
 unset pipew
