@@ -14,7 +14,7 @@ fi
 SCRIPT_DIR=$(pwd)
 
 
-reade -Q "GREEN" -i "delta difftastic diff-so-fancy riff ydiff diffr colordiff" -p "Which to install? [Delta/diff-so-fancy/riff/ydiff/difftastic/diffr/colordiff]: " pager
+reade -Q "GREEN" -i "delta difftastic diff-so-fancy riff ydiff diffr colordiff" -p "Which to install? [Delta/difftastic/diff-so-fancy/riff/ydiff/diffr/colordiff]: " pager
 
 if [[ $pager == "bat" ]]; then
     if ! test -f install_bat.sh; then
