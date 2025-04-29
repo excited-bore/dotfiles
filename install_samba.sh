@@ -1,50 +1,47 @@
-if ! test -f checks/check_system.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
-else
-    . ./checks/check_system.sh
-fi
+#!/bin/bash
 
-if ! type update-system &> /dev/null; then
-    if ! test -f aliases/.bash_aliases.d/update-system.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)" 
+if ! test -f checks/check_all.sh; then
+    if type curl &>/dev/null; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        . ./aliases/.bash_aliases.d/update-system.sh
+        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
+        return 1 || exit 1
     fi
+else
+    . ./checks/check_all.sh
 fi
 
-if test -z $SYSTEM_UPDATED; then
-    readyn -Y "CYAN" -p "Update system?" updatesysm
-    if test $updatesysm == "y"; then
-        update-system                     
-    fi
-fi
-if ! type reade &> /dev/null; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
-else
-    . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
-fi
 
 if ! command -v samba &> /dev/null; then
-    if test "$distro" == "Arch" || test "$distro" == "Manjaro"; then
+    if [[ "$distro_base" == "Arch" ]]
+
         eval "$pac_ins samba"
-    elif [ $distro_base == "Debian" ];then
-        eval "$pac_ins samba samba-common  "
+
+        if [[ "$distro" == "Manjaro" ]]; then
+            pamac install manjaro-settings-samba
+        fi
+
+        if type thunar &> /dev/null; then
+            eval "$pac_ins thunar-shares-plugin"
+        fi
+    elif [[ $distro_base == "Debian" ]];then
+        eval "$pac_ins samba samba-common"
     fi
 fi
 
 sudo usermod -aG sambashare $USER
 
-wordcomp=""
+local wordcomp
 for i in $(seq 1 7); do
     for j in $(seq 1 7); do
-        for k in $(seq 1 7); do  
+        for k in $(seq 1 7); do
             wordcomp="$wordcomp 0$i$j$k"
         done
     done
 done
 
 reade -Q "GREEN" -p "Drive name: (doesn't matter): "  drive
-if ! test "$drive"; then
+if ! [ "$drive" ]; then
     printf "${red}Drive name can't be empty\n${normal}"
     #exit 1
 elif sudo grep -q "$drive" /etc/samba/smb.conf; then
@@ -58,19 +55,19 @@ readyn -p "Public" public
 reade -Q "GREEN" -i "0777 $wordcomp" -p "Create file mask (Default: 0777): " fmask
 reade -Q "GREEN" -i "0777 $wordcomp" -p "Directory mask (Default: 0777): " dmask
 
-if [[ -z $write || "y" == $write ]]; then
+if [[ "y" == $write ]]; then
     write="yes"
 else
     write="no"
 fi
 
-if [[ -z $browse || "y" == $browse ]]; then
+if [[ "y" == $browse ]]; then
     browse="yes"
 else
     browse="no"
 fi
 
-if [[ -z $public || "y" == $public ]]; then
+if [[ "y" == $public ]]; then
     public="yes"
 else
     public="no"
@@ -108,7 +105,7 @@ if ! test "$usr" ; then
     usr=$USER
 fi
 
-if test "$nopswd" == "y"; then
+if [[ "$nopswd" == "y" ]]; then
     if ! sudo grep -q 'null passwords' /etc/samba/smb.conf; then
         sudo sed -i 's|\(####### Authentication #######\)|\1\n\nnull passwords = yes|g' /etc/samba/smb.conf
     fi

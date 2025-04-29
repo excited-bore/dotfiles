@@ -14,7 +14,7 @@ fi
 SCRIPT_DIR=$(get-script-dir)
 
 if ! test -f checks/check_aliases_dir.sh; then
-    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)"
+    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)
 else
     . ./checks/check_aliases_dir.sh
 fi
@@ -36,7 +36,7 @@ if ! type ffmpeg &>/dev/null; then
     readyn -p 'Install ffmpeg (usefull for video/audio conversion)?' ffmpeg
     if [[ $ffmpeg == 'y' ]]; then
         if ! test -f install_ffmpeg.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/install_ffmpeg.sh)"
+            source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/install_ffmpeg.sh)
         else
             . ./install_ffmpeg.sh
         fi

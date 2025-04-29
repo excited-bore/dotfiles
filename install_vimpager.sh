@@ -1,34 +1,16 @@
-if ! test -f checks/check_system.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
-else
-    . ./checks/check_system.sh
-fi
+#!/bin/bash
 
-if ! type update-system &> /dev/null; then
-    if ! test -f aliases/.bash_aliases.d/update-system.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)" 
+if ! test -f checks/check_all.sh; then
+    if type curl &>/dev/null; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        . ./aliases/.bash_aliases.d/update-system.sh
+        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
+        return 1 || exit 1
     fi
-    update-system
 else
-    readyn -Y "CYAN" -p "Update system?" updatesysm
-    if test $updatesysm == "y"; then
-        update-system                     
-    fi
-fi 
-
-if ! type reade &> /dev/null; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
-else
-    . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
+    . ./checks/check_all.sh
 fi
 
-if ! test -f checks/check_envvar.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)" 
-else
-    . ./checks/check_envvar.sh
-fi
 
 if type nvimpager &> /dev/null; then
     if test $distro_base == "Debian"; then
@@ -51,7 +33,7 @@ if type nvimpager &> /dev/null; then
 fi
 
 readyn -p "Set .vimrc as default vimpager read config for $USER?" conf
-if test "$conf" == "y"; then
+if [[ "$conf" == "y" ]]; then
     if grep -q "VIMPAGER_RC" $ENVVAR; then 
         sed -i "s|.export VIMPAGER_RC=|export VIMPAGER_RC=|g" $ENVVAR
         sed -i "s|export VIMPAGER_RC=.*|export VIMPAGER_RC=~/.vimrc|g" $ENVVAR
@@ -80,7 +62,6 @@ if test "$conf" == "y"; then
     fi
 fi
 
-    
 reade -Q "YELLOW" -i "y" -p "Set vimpager default pager for root?" moar_root
 if [ -z "$moar_root" ] || [ "y" == "$moar_root" ] || [ "Y" == "$moar_root" ]; then
     if sudo grep -q " PAGER=" $ENVVAR_R; then

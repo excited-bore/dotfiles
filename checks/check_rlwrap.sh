@@ -1,12 +1,16 @@
 #!/bin/bash
 
-#DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-
-if ! test -f checks/check_system.sh; then
-    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)"
+if ! test -f checks/check_all.sh; then
+    if type curl &>/dev/null; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
+    else
+        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
+        return 1 || exit 1
+    fi
 else
-    . ./checks/check_system.sh
+    . ./checks/check_all.sh
 fi
+
 
 if ! type rlwrap &>/dev/null; then
     readyn -p "Install rlwrap? (Offers autocompletion for input prompts - keyboard up/down)" answr

@@ -11,6 +11,7 @@ else
     . ./checks/check_all.sh
 fi
 
+local tmuxx tmuux tmuxxx
 SCRIPT_DIR=$(get-script-dir)
 
 if ! type tmux &>/dev/null; then
@@ -183,26 +184,26 @@ readyn -p "Install tmux completions?" tmuxx
 if [[ "$tmuxx" == "y" ]]; then
 
     if ! test -f checks/check_completions_dir.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)"
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)
     else
         . ./checks/check_completions_dir.sh
     fi
 
     if ! [ -e ~/.bash_completion.d/tmux ]; then
         curl https://raw.githubusercontent.com/imomaliev/tmux-bash-completion/master/completions/tmux >~/.bash_completion.d/tmux 2>/dev/null
-        [[ "$SSHELL" == 'bash' ]] && source ~/.bashrc
+        test -n "$BASH_VERSION" && source ~/.bashrc
+        test -n "$ZSH_VERSION" && source ~/.zshrc
     fi
 fi
 
 unset tmuxx
 
-readyn -Y 'YELLOW' -p "Install tmux completions at root?" tmuxx
-if [[ "$tmuxx" == "y" ]]; then
+readyn -Y 'YELLOW' -p "Install tmux completions at root?" tmuux
+if [[ "$tmuux" == "y" ]]; then
     if ! [ -e /root/.bash_completion.d/tmux ]; then
         curl -s https://raw.githubusercontent.com/imomaliev/tmux-bash-completion/master/completions/tmux | sudo tee -a /root/.bash_completion.d/tmux &>/dev/null
     fi
 fi
-unset tmuxx
 
 readyn -p "Install tmux.sh at ~/.bash_aliases.d/? (tmux aliases)" tmuxx
 if [[ "$tmuxx" == "y" ]]; then
@@ -215,16 +216,14 @@ if [[ "$tmuxx" == "y" ]]; then
         gio trash ~/.bash_aliases.d/tmux.sh~
     fi
 fi
-unset tmuxx
 
-readyn -n -p "Set tmux at shell login for SSH? (Conflicts with vim-tmux-kitty navigator)" tmuxx
-if [[ "$tmuxx" == "y" ]]; then
+readyn -n -p "Set tmux at shell login for SSH? (Conflicts with vim-tmux-kitty navigator)" tmuxxx
+if [[ "$tmuxxx" == "y" ]]; then
     touch ~/.bash_aliases.d/tmux_startup.sh
     echo 'if [[ $- =~ i ]] && [[ -z "$TMUX" ]] && [[ -n "$SSH_TTY" ]]; then' >>~/.bash_aliases.d/tmux_startup.sh
     echo '  tmux attach-session -t ssh_tmux || tmux new-session -s ssh_tmux;' >>~/.bash_aliases.d/tmux_startup.sh
     echo 'fi' >>~/.bash_aliases.d/tmux_startup.sh
 fi
-unset tmuxx
 
 tmux source-file ~/.tmux.conf
 . ~/.tmux/plugins/tpm/bin/install_plugins

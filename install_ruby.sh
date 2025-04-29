@@ -2,13 +2,15 @@
 
 if ! test -f checks/check_all.sh; then
     if type curl &>/dev/null; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)"
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         continue
     fi
 else
     . ./checks/check_all.sh
 fi
+
+local latest vers all
 
 if ! type ruby &>/dev/null || ! type gem &> /dev/null || ! type rbenv &> /dev/null; then
     if [[ "$distro_base" == "Arch" ]]; then
@@ -29,8 +31,11 @@ if ! type ruby &>/dev/null || ! type gem &> /dev/null || ! type rbenv &> /dev/nu
 
 fi
 
-[[ "$SSHELL" == "bash" ]] && source ~/.bashrc
-[[ "$SSHELL" == "zsh" ]] && source ~/.zshrc &>/dev/null
+test -n "$BASH_VERSION" && source ~/.bashrc
+test -n "$ZSH_VERSION" && source ~/.zshrc
+
+printf "Ruby version: "
+ruby --version
 
 #if type rbenv &>/dev/null; then
 #    all="$(rbenv install -l)"
@@ -45,10 +50,7 @@ fi
 #        rbenv shell "$vers" &>/dev/null
 #    fi
 #fi
-unset latest vers all
 
-printf "Ruby version: "
-ruby --version
 
 #rver=$(echo $(ruby --version) | awk '{print $2}' | cut -d. -f-2)'.0'
 #paths=$(gem environment | awk '/- GEM PATH/{flag=1;next}/- GEM CONFIGURATION/{flag=0}flag' | sed 's|     - ||g' | paste -s -d ':')

@@ -2,13 +2,14 @@
 
 if ! test -f checks/check_all.sh; then
     if type curl &> /dev/null; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)"
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         continue
     fi
 else
     . ./checks/check_all.sh
 fi
+
 if [[ "$distro_base" == "Arch" ]]; then
     eval "${pac_ins} make cmake"
 elif [[ "$distro_base" == "Debian" ]]; then

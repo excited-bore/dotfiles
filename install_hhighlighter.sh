@@ -2,7 +2,7 @@
 
 if ! type ack &> /dev/null; then
     if ! test -f install_ack.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ack.sh)" 
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ack.sh)
     else
         ./install_ack.sh
     fi 

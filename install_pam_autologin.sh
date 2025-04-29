@@ -1,29 +1,26 @@
-if ! test -f checks/check_system.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
-else
-    . ./checks/check_system.sh
-fi
+#!/bin/bash
 
-if ! type update-system &> /dev/null; then
-    if ! test -f aliases/.bash_aliases.d/update-system.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)" 
+if ! test -f checks/check_all.sh; then
+    if type curl &>/dev/null; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        . ./aliases/.bash_aliases.d/update-system.sh
+        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
+        return 1 || exit 1
     fi
-    update-system
 else
-    readyn -Y "CYAN" -p "Update system?" updatesysm
-    if test $updatesysm == "y"; then
-        update-system                     
-    fi
+    . ./checks/check_all.sh
 fi
 
-if [ "$distro" == "Manjaro" ]; then
-    pamac install pam_autologin
-elif test "$distro" == "Arch" && ! test "$AUR_ins" == ""; then
-    ${AUR_ins} pam_autologin
+if ! test -f checks/check_AUR.sh; then
+    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_AUR.sh)
+else
+    . ./checks/check_AUR.sh
 fi
 
-if ! sudo grep -q "pam_autologin.so" /etc/pam.d/login; then 
+if ! test -z "$AUR_ins"; then
+    eval "${AUR_ins} pam_autologin"
+fi
+
+if ! sudo grep -q "pam_autologin.so" /etc/pam.d/login; then
     sudo sed -i 's|\(#%PAM-1.0\)|\1\nauth       required        pam_autologin.so always|g' /etc/pam.d/login
 fi

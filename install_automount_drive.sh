@@ -1,19 +1,20 @@
 #!/bin/bash
 
-#DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 # https://unix.stackexchange.com/questions/278631/bash-script-auto-complete-for-user-input-based-on-array-data
 
-if ! test -f rlwrap-scripts/reade; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade)" &> /dev/null 
+if ! test -f checks/check_all.sh; then
+    if type curl &>/dev/null; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
+    else
+        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
+        return 1 || exit 1
+    fi
 else
-    . ./rlwrap-scripts/reade &> /dev/null
+    . ./checks/check_all.sh
 fi
 
-if ! test -f rlwrap-scripts/readyn; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/readyn)" &> /dev/null 
-else
-    . ./rlwrap-scripts/readyn &> /dev/null
-fi
+local SCRIPT_DIR=$(get-script-dir)
+local readecomp drives drive mnt uuid type_fs attr chown_stff ok
 
 lsblk --all --exclude 7 -o NAME,SIZE,FSTYPE,MOUNTPOINT,LABEL,UUID
 
@@ -29,9 +30,13 @@ drives="${readecomp[@]}"
 reade -Q "GREEN" -i "/dev/ $drives" -p "Choose drive to mount: " drive
 reade -Q "GREEN" -i "/mnt" -p "Mount point? (will make if not exists): " -e mnt
 
-if [ ! -d $mnt ]; then
-    sudo mkdir -p $mnt
-    echo "Created $mnt"
+if ! [ -d $mnt ]; then
+    if ! mkdir -vp $mnt; then
+        readyn -Y 'YELLOW' -p "Creation $mnt failed. Use sudo to create $mnt?" cre_sud
+        if [[ $cre_sud == 'y' ]]; then
+            sudo mkdir -vp $mnt
+        fi
+    fi
 fi
 
 uuid=$(sudo blkid | grep $drive | perl -pe 's|.*?UUID="(.*?)".*|UUID=\1|')
@@ -46,16 +51,16 @@ else
     exit 1
 fi
 
-if test "$type_fs" == "ext4"; then
-    readyn -p "Set permissions for $mnt to $USER:$USER using 'sudo chown -R'?: " chown_stff
-    if test "$chown_stff" == "y"; then
+if [[ "$type_fs" == "ext4" ]]; then
+    readyn -p "Set permissions for $mnt to $USER:$USER using 'sudo chown -R'?" chown_stff
+    if [[ "$chown_stff" == "y" ]]; then
         sudo chown -R $USER:$USER $mnt
     fi
 fi
 
 readyn -Y 'YELLOW' -p "Will write '$uuid $mnt $type_fs $attr' to /etc/fstab. Ok?" ok
-if [ -z $ok ] || [ $ok == "y" ]; then
-   echo "$uuid $mnt $type_fs $attr" | sudo tee -a /etc/fstab 
+if [[ $ok == "y" ]]; then
+   echo "$uuid $mnt $type_fs $attr" | sudo tee -a /etc/fstab
 fi
 
 printf "\n${bold}Currently in /etc/fstab: ${normal}\n"

@@ -11,7 +11,7 @@ else
     . ./checks/check_all.sh
 fi
 
-SCRIPT_DIR=$(pwd)
+SCRIPT_DIR=$(get-script-dir)
 
 if ! type lazygit &>/dev/null; then
     if [[ "$distro_base" == "Arch" ]]; then
@@ -21,9 +21,7 @@ if ! type lazygit &>/dev/null; then
             eval "${pac_ins}" lazygit
         else
             if ! type curl &>/dev/null; then
-                #if [[ $distro_base == 'Debian' ]] || [[ $distro_base == 'Arch' ]]; then
-                eval "${pac_ins}" curl
-                #fi
+                eval "${pac_ins} curl"
             fi
             LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po --color=never '"tag_name": "v\K[^"]*')
             wget -O $TMPDIR/lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
@@ -81,7 +79,7 @@ fi
 #        readyn -p "Set up an alias so copy-to does a 'run all' when starting up lazygit?" nstll
 #        if [[ "$nstll" == "y" ]]; then
 #            if ! test -f checks/check_aliases_dir.sh; then
-#                eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)"
+#                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)
 #            else
 #                . ./checks/check_aliases_dir.sh
 #            fi

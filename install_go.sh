@@ -24,7 +24,6 @@ if ! type go &> /dev/null; then
         command rm -rf /usr/local/go 
         latest=$(curl -sL "https://github.com/golang/go/tags" | grep "/golang/go/releases/tag" | perl -pe 's|.*/golang/go/releases/tag/(.*?)".*|\1|' | uniq | awk 'NR==1{max=$1;print $0; exit;}')
         file="$latest.linux-$arch.tar.gz"
-        
         checksum=$(curl -sL "https://golang.google.cn/dl/" | awk 'BEGIN{FS="\n"; RS=""} $0 ~ /'$file'/ &&  $0 ~ /<\/tt>/ {print $0;}' | grep "<tt>" | sed "s,.*<tt>\(.*\)</tt>.*,\1,g")
         if ! type go &> /dev/null || ! [[ "$(go version)" =~ $latest ]]; then
             wget -P $TMPDIR https://golang.google.cn/dl/$file
@@ -53,7 +52,7 @@ if ! type go &> /dev/null; then
             #    echo "export PATH=\$PATH:\$GOROOT" >> $ENVVAR
             #fi
         fi
-    fi    
+    fi
 fi
 
 if echo $(go env) | grep -q "GOPATH=$HOME/go"; then
@@ -62,7 +61,7 @@ if echo $(go env) | grep -q "GOPATH=$HOME/go"; then
         reade -Q "CYAN" -i "$HOME/.local" -p "GOPATH: " -e gopth
         #echo "${CYAN}Only GOPATH is necessary. Setting GOROOT is usually for development reasons${normal}"
         #reade -Q "CYAN" -p "Set custom GOROOT? (Go tools, empty means leave default): " -e goroot
-        
+
         go env -w GO111MODULE=auto
         go env -w GOPATH=$gopth
          #if grep -q "GOPATH" $ENVVAR; then

@@ -1,19 +1,18 @@
-if ! test -f checks/check_envvar.sh; then
-    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)" 
+#!/bin/bash
+
+if ! test -f checks/check_all.sh; then
+    if type curl &>/dev/null; then
+        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)"
+    else
+        continue
+    fi
 else
-    . ./checks/check_envvar.sh
-fi
-if ! test -f checks/check_system.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
-else
-    . ./checks/check_system.sh
+    . ./checks/check_all.sh
 fi
 
-if [ "$distro" == "Manjaro" ]; then
-    pamac install virt-manager qemu bridge-utils spice-vdagent
-elif [ "$distro_base" == "Debian" ]; then
+if [[ "$distro_base" == "Debian" ]]; then
     eval "$pac_ins -y qemu-kvm libvirt-bin bridge-utils virt-manager qemu virt-viewer spice-vdagent"
-elif [ "$distro" == "Arch" ]; then
+elif [[ "$distro" == "Arch" ]]; then
     eval "$pac_ins virt-manager qemu bridge-utils spice-vdagent"
 fi
 

@@ -1,43 +1,34 @@
 #!/usr/bin/env bash
-if ! test -f checks/check_system.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
-else
-    . ./checks/check_system.sh
-fi
 
-if ! type update-system &> /dev/null; then
-    if ! test -f aliases/.bash_aliases.d/update-system.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)" 
+if ! test -f checks/check_all.sh; then
+    if type curl &>/dev/null; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        . ./aliases/.bash_aliases.d/update-system.sh
+        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
+        return 1 || exit 1
     fi
+else
+    . ./checks/check_all.sh
 fi
 
-if test -z $SYSTEM_UPDATED; then
-    readyn -Y "CYAN" -p "Update system?" updatesysm
-    if test $updatesysm == "y"; then
-        update-system                     
-    fi
-fi
-
-if test $distro == "Arch" || test $distro == "Manjaro"; then
+if [[ $distro_base == "Arch" ]]; then
     eval "$pac_ins opendoas "
-elif test $distro_base == "Debian"; then
+elif [[ $distro_base == "Debian" ]]; then
     eval "$pac_ins doas"
-fi 
+fi
 
 sed -i "s/user/$USER/g" doas/doas.conf
 sudo cp -f doas/doas.conf /etc/doas.conf
 
 #./install_polkit_wheel.sh
 
-read -p "Install doas.sh? (~/.bash_aliases.d/doas.sh) [Y/n]:" doas
+readyn -p "Install doas.sh? (~/.bash_aliases.d/doas.sh)" doas
 if [ -z $doas ]; then 
-    if [ ! -d ~/.bash_aliases.d/ ]; then
+    if ! [ -d ~/.bash_aliases.d/ ]; then
         mkdir ~/.bash_aliases.d/
     fi
     cp -f doas/doas.sh ~/.bash_aliases.d/doas.sh
-    read -p "Install doas.sh globally? (/root/.bash_aliases.d/doas.sh [Y/n]:" gdoas  
+    readyn -p "Install doas.sh globally? (/root/.bash_aliases.d/doas.sh" gdoas
     if [ -z $gdoas ]; then
         if ! sudo test -d ~/.bash_aliases.d/ ; then
             sudo mkdir /root/.bash_aliases.d/
