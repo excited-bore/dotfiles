@@ -17,14 +17,14 @@ SCRIPT_DIR=$(pwd)
 
 
 if ! test -f checks/check_envvar.sh; then
-    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)"
+    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)
 else
     . ./checks/check_envvar.sh
 fi
 
 #if ! type fzf &> /dev/null ; then
 #   if ! test -f ./install_fzf.sh; then
-#        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/install_fzf.sh)"
+#        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/install_fzf.sh)
 #    else
 #        ./install_fzf.sh
 #    fi
@@ -1300,7 +1300,7 @@ gitt() {
         readyn -p "Install lazygit? (git TUI - terminal user interface)" gitlaz
         if [[ "y" == "$gitlaz" ]]; then
             if ! test -f install_lazygit.sh; then
-                eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_lazygit.sh)"
+                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_lazygit.sh)
             else
                 . ./install_lazygit.sh
             fi
@@ -1334,7 +1334,7 @@ gitt() {
     #    readyn -p "Install fzf-git? (Extra fzf stuff on leader-key C-g): "" gitfzf
     #    if [ "$fzfgit" == "y" ]; then
     #        if ! test -f checks/check_aliases_dir.sh; then
-    #            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)"
+    #            source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)
     #        else
     #           . ./checks/check_aliases_dir.sh
     #        fi
@@ -1346,7 +1346,7 @@ gitt() {
     readyn -p "Install git.sh? (Git aliases)" gitals
     if [[ "$gitals" == "y" ]]; then
         if ! test -f checks/check_aliases_dir.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)"
+            source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)
         else
             . ./checks/check_aliases_dir.sh
         fi

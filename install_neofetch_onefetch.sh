@@ -11,7 +11,7 @@ else
     . ./checks/check_all.sh
 fi
 
-get-script-dir SCRIPT_DIR
+SCRIPT_DIR=$(get-script-dir)
 
 if ! type neofetch &>/dev/null && ! type fastfetch &>/dev/null && ! type screenFetch &>/dev/null; then
     #readyn -p "Install neofetch/fastfetch/screenFetch? "" sym2

@@ -18,14 +18,14 @@ reade -Q "GREEN" -i "delta difftastic diff-so-fancy riff ydiff diffr colordiff" 
 
 if [[ $pager == "bat" ]]; then
     if ! test -f install_bat.sh; then
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bat.sh)"
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bat.sh)
     else
         . ./install_bat.sh
     fi
 
 elif [[ $pager == "riff" ]]; then
     if ! test -f install_cargo.sh; then
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)"
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)
     else
         . ./install_cargo.sh
     fi
@@ -33,7 +33,7 @@ elif [[ $pager == "riff" ]]; then
 
 elif [[ $pager == "difftastic" ]]; then
     if ! test -f install_cargo.sh; then
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)"
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)
     else
         . ./install_cargo.sh
     fi
@@ -41,7 +41,7 @@ elif [[ $pager == "difftastic" ]]; then
 
 elif [[ $pager == "diffr" ]]; then
     if ! test -f install_cargo.sh; then
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)"
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)
     else
         . ./install_cargo.sh
     fi
@@ -57,7 +57,7 @@ if [[ "$distro_base" == "Arch" ]]; then
         eval "$pac_ins git-delta"
     elif [[ $pager == "ydiff" ]]; then
         if ! type pipx &>/dev/null && ! test -f install_pipx.sh; then
-            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)"
+            source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)
         elif ! type pipx &>/dev/null; then
             . ./install_pipx.sh
         fi
@@ -73,7 +73,7 @@ elif [[ "$distro_base" == "Debian" ]]; then
         eval "$pac_ins git-delta"
     elif [[ $pager == "ydiff" ]]; then
         if ! type pipx &>/dev/null && ! test -f install_pipx.sh; then
-            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)"
+            source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)
         elif ! type pipx &>/dev/null; then
             . ./install_pipx.sh
         fi

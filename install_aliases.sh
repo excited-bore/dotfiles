@@ -24,7 +24,7 @@ fi
     unalias cp && alias cp='cp -fv'
 
 
-get-script-dir SCRIPT_DIR
+SCRIPT_DIR=$(get-script-dir)
 
 rlwrpscrpt=aliases/.bash_aliases.d/00-rlwrap_scripts.sh
 reade=rlwrap-scripts/reade

@@ -11,7 +11,7 @@ else
     . ./checks/check_all.sh
 fi
 
-get-script-dir SCRIPT_DIR
+SCRIPT_DIR=$(get-script-dir)
 
 if ! type kitty &>/dev/null; then
     if [[ "$distro_base" == "Arch" ]] || [[ "$distro_base" == "Debian" ]]; then
@@ -256,7 +256,7 @@ unset ktty_conf
 readyn -p "Install kitty aliases? (at ~/.bash_aliases.d/kitty.sh)" kittn
 if [[ "y" == "$kittn" ]]; then
     if ! test -f checks/check_aliases_dir.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)"
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)
     else
         . ./checks/check_aliases_dir.sh
     fi

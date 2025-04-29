@@ -25,7 +25,7 @@ if ! test -f ~/.bash_completion.d/pipewire; then
     if [[ $comps == 'y' ]]; then
 
         if ! test -f checks/check_completions_dir.sh; then
-             eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)" 
+             source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh) 
         else
             . ./checks/check_completions_dir.sh
         fi
@@ -215,9 +215,7 @@ if ! type easyeffects &> /dev/null; then
     unset ezff 
 fi
 
-test -n "$BASH_VERSION" &&
-    get-script-dir "${BASH_SOURCE[0]}" SCRIPT_DIR ||
-    get-script-dir SCRIPT_DIR 
+SCRIPT_DIR=$(get-script-dir) 
 
 file=$SCRIPT_DIR/pipewire/.bash_aliases.d/pipewire.sh
 file1=$SCRIPT_DIR/pipewire/.bash_completion.d/pipewire

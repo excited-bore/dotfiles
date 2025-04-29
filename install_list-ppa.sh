@@ -1,24 +1,23 @@
 #!/usr/bin/env bash
 
-if ! type reade &> /dev/null; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
+if ! test -f checks/check_all.sh; then
+    if type curl &>/dev/null; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
+    else
+        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
+        return 1 || exit 1
+    fi
 else
-    . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
-fi
-
-if ! test -f checks/check_system.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
-else
-    . checks/check_system.sh
+    . ./checks/check_all.sh
 fi
 
 if ! type list-ppa &> /dev/null || [[ $(pipx list 2> /dev/null | grep list-ppa | awk '{print $4}') =~ 'C:' ]] then
     printf "${CYAN}list-ppa${normal} is not installed (python cmd tool for listing ppas from 'launchpad.net'\n"
-    reade -Q 'GREEN' -i 'y' -p "Install list-ppa? [Y/n]: " 'n' ppa_ins
+    readyn -p "Install list-ppa?" ppa_ins
     if [[ $ppa_ins == 'y' ]]; then
         if ! type pipx &> /dev/null; then
             if ! test -f install_pipx.sh; then
-                eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)" 
+                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh) 
             else
                 . ./install_pipx.sh
             fi  

@@ -11,7 +11,7 @@ else
     . ./checks/check_all.sh
 fi
 
-get-script-dir SCRIPT_DIR
+SCRIPT_DIR=$(get-script-dir)
 
 if ! type thefuck &>/dev/null; then
     if [[ $machine == 'Mac' ]] && type brew &>/dev/null; then

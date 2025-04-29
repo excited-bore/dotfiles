@@ -1,21 +1,21 @@
-if ! test -f checks/check_system.sh; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
-else
-    . ./checks/check_system.sh
+#!/bin/bash
+
+if ! test -f checks/check_all.sh; then 
+    if command -v curl &> /dev/null; then 
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)  
+    else  
+        continue  
+    fi 
+else 
+    . ./checks/check_all.sh 
 fi
-if ! type reade &> /dev/null; then
-     eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
-else
-    . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
-fi 
 
-
-if ! type lowfi &> /dev/null; then
-    if ! type npm &> /dev/null; then
+if ! command -v lowfi &> /dev/null; then
+    if ! command -v npm &> /dev/null; then
        if ! test -f install_npm.sh; then
-           eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_npm.sh)" 
+           source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_npm.sh) 
        else
-           ./install_npm.sh 
+           . ./install_npm.sh 
        fi 
     else 
         sudo npm -g update 

@@ -15,8 +15,6 @@ fi
 
 SCRIPT_DIR=$(get-script-dir)
 
-echo $SCRIPT_DIR
-
 if ! type rlwrap &>/dev/null; then
     if ! test -f $SCRIPT_DIR/checks/check_rlwrap.sh; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_rlwrap.sh)

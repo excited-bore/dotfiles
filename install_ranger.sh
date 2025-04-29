@@ -11,7 +11,7 @@ else
     . ./checks/check_all.sh
 fi
 
-get-script-dir SCRIPT_DIR
+SCRIPT_DIR=$(get-script-dir)
 
 RIFLE_INS=""
 if type rifle &>/dev/null && ! type ranger &>/dev/null; then
@@ -119,7 +119,7 @@ if ! test -d ~/.config/ranger/plugins/devicons2; then
             readyn -p "Install Nerdfonts from binary - no apt? (Special FontIcons)" nrdfnts
             if [[ $nrdfnts == "y" ]]; then
                 if ! test -f ./install_nerdfonts.sh; then
-                    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nerdfonts.sh)"
+                    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nerdfonts.sh)
                 else
                     . ./install_nerdfonts.sh
                 fi

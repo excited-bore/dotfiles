@@ -11,7 +11,7 @@ else
     . ./checks/check_all.sh
 fi
 
-get-script-dir SCRIPT_DIR
+SCRIPT_DIR=$(get-script-dir)
 
 if ! type ast-grep &>/dev/null; then
     if ! type cargo &>/dev/null || ! [[ $PATH =~ '/.cargo/bin' ]]; then

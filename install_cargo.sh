@@ -10,8 +10,7 @@ else
     . ./checks/check_all.sh
 fi
 
-#get-script-dir SCRIPT_DIR
-DIR=$(pwd)
+DIR=$(get-script-dir)
 
 #if ! type cargo &> /dev/null; then
 #    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh

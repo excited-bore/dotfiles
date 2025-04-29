@@ -11,10 +11,10 @@ else
     . ./checks/check_all.sh
 fi
 
-get-script-dir SCRIPT_DIR
+SCRIPT_DIR=$(get-script-dir)
 
 if ! test -f checks/check_envvar_aliases_completions_keybinds.sh; then
-    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar_aliases_completions_keybinds.sh)"
+    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar_aliases_completions_keybinds.sh)
 else
     . ./checks/check_envvar_aliases_completions_keybinds.sh
 fi
@@ -70,7 +70,7 @@ if ! type fd-find &>/dev/null && ! type fd &>/dev/null; then
     readyn -p "Install fd and use for fzf? (Faster find)" fdr
     if [[ "$fdr" == "y" ]]; then
         if ! test -f install_fd.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fd.sh)"
+            source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fd.sh)
         else
             . ./install_fd.sh
         fi
@@ -86,7 +86,7 @@ if ! type bat &>/dev/null; then
     readyn -p "Install bat? (File previews/thumbnails for riflesearch)" bat
     if [[ "$bat" == "y" ]]; then
         if ! test -f install_bat.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bat.sh)"
+            source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bat.sh)
         else
             . ./install_bat.sh
         fi
@@ -99,7 +99,7 @@ if ! type tree &>/dev/null; then
     readyn -p "Install tree? (Builtin cd shortcut gets a nice directory tree preview ) " tree
     if [[ "$tree" == "y" ]]; then
         if ! test -f install_tree.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_tree.sh)"
+            source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_tree.sh)
         else
             . ./install_tree.sh
         fi
@@ -112,7 +112,7 @@ if ! type ffmpegthumbnailer &>/dev/null; then
     readyn -p "Install ffmpegthumbnailer? (Video thumbnails for riflesearch)" ffmpg
     if [[ "$ffmpg" == "y" ]]; then
         if ! test -f install_ffmpegthumbnailer.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ffmpegthumbnailer.sh)"
+            source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ffmpegthumbnailer.sh)
         else
             . ./install_ffmpegthumbnailer.sh
         fi
@@ -127,7 +127,7 @@ if ! type rg &>/dev/null; then
     readyn -p "Install ripgrep? (Recursive grep, opens possibility for line by line fzf )" rpgrp
     if [[ "$rpgrp" == "y" ]]; then
         if ! test -f install_ripgrep.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ripgrep.sh)"
+            source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ripgrep.sh)
         else
             . ./install_ripgrep.sh
         fi
@@ -293,7 +293,7 @@ if ! test -f ~/.bash_aliases.d/docker-fzf.sh; then
     readyn -p "Install fzf-docker (fzf aliases for docker)?" fzf_d
     if [[ "$fzf_d" == "y" ]]; then
         if ! test -f checks/check_aliases_dir.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)"
+            source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)
         else
             . ./checks/check_aliases_dir.sh
         fi

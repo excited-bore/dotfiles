@@ -2,7 +2,7 @@
 
 if ! test -f checks/check_all.sh; then
     if type curl &> /dev/null; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)"
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         continue
     fi
@@ -11,7 +11,7 @@ else
 fi
 
 if ! type pyenv &> /dev/null; then
-    if [[ $machine == 'Mac' ]] && type brew &> /dev/null; then
+    if [[ $machine == 'Mac' ]] && command -v brew &> /dev/null; then
         brew install pyenv 
     elif [[ "$distro_base" == "Arch" ]]; then
         eval "${pac_ins} pyenv"

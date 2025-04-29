@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
 
-if ! test -f checks/check_all.sh; then
-    if type curl &>/dev/null; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
-    else
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-        return 1 || exit 1
-    fi
-else
-    . ./checks/check_all.sh
+if ! test -f checks/check_all.sh; then 
+    if command -v curl &> /dev/null; then 
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)  
+    else  
+        continue  
+    fi 
+else 
+    . ./checks/check_all.sh 
 fi
 
 SCRIPT_DIR=$(pwd)
@@ -29,7 +28,7 @@ if [[ "y" == "$strship" ]]; then
         printf "\neval \"\$(starship init zsh)\"\n" >>~/.zshrc
     fi
     if ! test -f checks/check_completions_dir.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)"
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)
     else
         . ./checks/check_completions_dir.sh
     fi
@@ -64,7 +63,7 @@ if [[ "y" == "$strship" ]]; then
     fi
 
     if ! test -f checks/check_completions_dir.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)"
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)
     else
         . ./checks/check_completions_dir.sh
     fi
@@ -98,7 +97,7 @@ test -n "$BASH_VERSION" && eval "$(starship init bash)"
 test -n "$ZSH_VERSION" && eval "$(starship init zsh)"
 
 if ! test -f aliases/.bash_aliases.d/starship.sh; then
-    eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/starship.sh)"
+    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/starship.sh)
 else
     . ./aliases/.bash_aliases.d/starship.sh
 fi
