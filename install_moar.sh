@@ -58,7 +58,7 @@ if ! command -v moar &> /dev/null; then
         fi
     fi
 fi
-
+moar --help | $PAGER
 
 readyn -p "Set moar as default pager for $USER?" moar_usr
 if [[ "y" == "$moar_usr" ]]; then

@@ -11,7 +11,7 @@ else
     . ./checks/check_all.sh
 fi
 
-DIR=$(pwd) 
+DIR=$(get-script-dir) 
 
 if ! type cargo &> /dev/null || ! [[ $PATH =~ '/.cargo/bin' ]]; then
     if ! test -f $DIR/install_cargo.sh; then
@@ -21,7 +21,6 @@ if ! type cargo &> /dev/null || ! [[ $PATH =~ '/.cargo/bin' ]]; then
     fi
 fi
 
-local ezv carv
 type eza &> /dev/null && ezv=$(eza -v | awk 'NR==2{print $1;}' | tr 'v' ' ')
 carv=$(cargo search 'eza = # A modern replacement for ls' | awk 'NR==1{print $3;}' | tr '"' ' ')
 if ! command -v eza &> /dev/null || ! test -z $ezv && version-higher $carv $ezv; then
@@ -31,6 +30,7 @@ if ! command -v eza &> /dev/null || ! test -z $ezv && version-higher $carv $ezv;
         printf "Installing cargo version for eza (latest) but unable to remove current version for eza.\n Package manager probably unkown, try uninstalling manually.\n"
     fi
     cargo install --locked eza  
+    eza --help | $PAGER 
     #if test $distro_base == 'Arch'; then
     #    eval "$pac_ins eza"
     #elif test $distro_base == 'Debian'; then
@@ -61,6 +61,7 @@ if ! command -v eza &> /dev/null || ! test -z $ezv && version-higher $carv $ezv;
     #    cargo install eza 
     #fi
 fi
+unset ezv carv
 
 if ! test -f ~/.bash_completion.d/eza; then
    readyn -p 'Install bash completions for eza?' bash_cm  
@@ -70,7 +71,7 @@ if ! test -f ~/.bash_completion.d/eza; then
         else
             . ./checks/check_completions_dir.sh
         fi
-        wget -P ~/.bash_completion.d/ https://raw.githubusercontent.com/eza-community/eza/refs/heads/main/completions/bash/eza
+        echo $(curl  https://raw.githubusercontent.com/eza-community/eza/refs/heads/main/completions/bash/eza) > ~/.bash_completion.d/eza
    fi
 fi
 unset bash_cm

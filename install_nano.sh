@@ -21,6 +21,8 @@ if ! type nano &>/dev/null; then
     fi
 fi
 
+nano --help | $PAGER
+
 if ! test -f ~/.nanorc; then
     readyn -p 'Install nanorc (config) at $HOME?' nsrc
     if [[ $nsrc == 'y' ]]; then

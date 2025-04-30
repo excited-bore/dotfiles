@@ -29,9 +29,9 @@ if ! type lazygit &>/dev/null; then
             sudo install $TMPDIR/lazygit /usr/local/bin
         fi
     fi
-    lazygit --version
     unset nstll
 fi
+lazygit --help | $PAGER
 
 file=lazygit/.config/lazygit/config.yml.example 
 if ! test -f $file; then
@@ -41,7 +41,7 @@ fi
 readyn -p 'Configure lazygit?' conflazy
 if [[ 'y' == $conflazy ]]; then
     function cp_lazy_conf(){ mkdir -p ~/.config/lazygit/; cp -f $file ~/.config/lazygit/config.yml.example; }
-    yes-edit-no -g "$file" -p 'Copy an example lazygit yaml config file into ~/.config/lazygit/?' -f cp_lazy_conf -c "! test -f ~/.config/lazygit/config.yml.example || ! test -z $(diff ~/.config/lazygit/config.yml.example $file)" 
+    yes-edit-no -g "$file" -p 'Copy an example lazygit yaml config file into ~/.config/lazygit/?' -f cp_lazy_conf -c "! test -f ~/.config/lazygit/config.yml.example || ! test -z $(diff ~/.config/lazygit/config.yml.example $file) &> /dev/null" 
     if ! test -f install_differ_pager.sh; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_git.sh)
     else

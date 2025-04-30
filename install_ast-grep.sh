@@ -28,3 +28,5 @@ if ! type ast-grep &>/dev/null; then
         echo "$(ast-grep completions bash)" >~/.bash_completion.d/ast-grep
     fi
 fi
+
+ast-grep --help | $PAGER

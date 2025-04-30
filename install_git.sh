@@ -345,7 +345,7 @@ function git_hl() {
         readyn -p "Set side panel width (left side panels - Default 0.333)" sidepn
         if [[ $sidepn == 'y' ]]; then
             reade -Q 'GREEN' -i "$(echo "$(seq .01 .01 .33)" | tac)" -p 'Side pane width: ' sidepnw 
-            re='^[+-]?[0-9]*\.?[0-9]+$'
+            re='^[+-]?[0-9]*\.|,?[0-9]+$'
             if [[ $sidepnw =~ $re ]] ; then
                 sidepanelw=$sidepnw
             fi 
@@ -405,7 +405,7 @@ function git_hl() {
 
             # Then show changes
             printf "${GREEN}'$HOME/.config/lazygit/config.yml'${normal}\n" 
-            cat -b ~/.config/lazygit/config.yml 
+            cat -b ~/.config/lazygit/config.yml | $PAGER 
         fi
     fi
     
@@ -557,7 +557,7 @@ git_pager() {
 
     elif [[ "$pager" == "nvimpager" ]] || [[ "$pager" == "vimpager" ]]; then
 
-        echo "You selected $pager."
+        echo "${CYAN}You selected $pager.${normal}"
         colors="blue darkblue default delek desert elflord evening gruvbox habamax industry koehler lunaperch morning murphy pablo peachpuff quiet ron shine slate torte zellner"
         if [[ "$pager" == "vimpager" ]]; then
             colors=$colors" retrobox sorbet wildcharm zaibatsu"
@@ -566,7 +566,7 @@ git_pager() {
 
         readyn -Y "CYAN" -p "Set colorscheme?" pager1
         if [[ "$pager1" == "y" ]]; then
-            reade -Y "CYAN" -i "default $colors" -p "Colorscheme: " color
+            reade -Q "CYAN" -i "default $colors" -p "Colorscheme: " color
             pager="$pager +'colorscheme $color'"
         fi
 
@@ -1012,7 +1012,7 @@ gitt() {
         pagers=$pagers" vimpager"
         pagersf=$pagersf"\t - vimpager\n"
     fi
-    if type nvimpage retrosynth r &>/dev/null; then
+    if type nvimpager &>/dev/null; then
         pagers=$pagers" nvimpager"
         pagersf=$pagersf"\t - nvimpager\n"
     fi
@@ -1222,7 +1222,7 @@ gitt() {
     if [[ $conflict == "y" ]]; then
         reade -Q "GREEN" -i "false true" -p "Prompt?: " prompt
         if ! test -z "$cstyle"; then
-            git config difftool.prompt "$prompt"
+            git config $global difftool.prompt "$prompt"
         fi
     fi
 
@@ -1270,7 +1270,7 @@ gitt() {
     if [[ $conflict == "y" ]]; then
         reade -Q "GREEN" -i "false true" -p "Prompt?: " prompt
         if ! test -z "$cstyle"; then
-            git config mergetool.prompt "$prompt"
+            git config $global mergetool.prompt "$prompt"
         fi
     fi
 

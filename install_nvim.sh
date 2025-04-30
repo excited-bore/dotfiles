@@ -165,6 +165,8 @@ else
     eval "${pac_ins}" neovim
 fi
 
+nvim --help | $PAGER
+
 if [[ $X11_WAY == 'x11' ]] && ! type xclip &>/dev/null; then
     readyn -p "Install nvim clipboard? (xsel xclip)" clip
     if [[ "y" == "$clip" ]]; then

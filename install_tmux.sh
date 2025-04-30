@@ -11,7 +11,6 @@ else
     . ./checks/check_all.sh
 fi
 
-local tmuxx tmuux tmuxxx
 SCRIPT_DIR=$(get-script-dir)
 
 if ! type tmux &>/dev/null; then
@@ -19,6 +18,8 @@ if ! type tmux &>/dev/null; then
         eval "${pac_ins}" tmux
     fi
 fi
+
+tmux --help | $PAGER
 
 #if [ ! -d ~/.bash_aliases.d/ ]; then
 #   mkdir ~/.bash_aliases.d/
@@ -204,6 +205,7 @@ if [[ "$tmuux" == "y" ]]; then
         curl -s https://raw.githubusercontent.com/imomaliev/tmux-bash-completion/master/completions/tmux | sudo tee -a /root/.bash_completion.d/tmux &>/dev/null
     fi
 fi
+unset tmuux
 
 readyn -p "Install tmux.sh at ~/.bash_aliases.d/? (tmux aliases)" tmuxx
 if [[ "$tmuxx" == "y" ]]; then
@@ -216,6 +218,7 @@ if [[ "$tmuxx" == "y" ]]; then
         gio trash ~/.bash_aliases.d/tmux.sh~
     fi
 fi
+unset tmuxx
 
 readyn -n -p "Set tmux at shell login for SSH? (Conflicts with vim-tmux-kitty navigator)" tmuxxx
 if [[ "$tmuxxx" == "y" ]]; then
@@ -224,6 +227,7 @@ if [[ "$tmuxxx" == "y" ]]; then
     echo '  tmux attach-session -t ssh_tmux || tmux new-session -s ssh_tmux;' >>~/.bash_aliases.d/tmux_startup.sh
     echo 'fi' >>~/.bash_aliases.d/tmux_startup.sh
 fi
+unset tmuxxx
 
 tmux source-file ~/.tmux.conf
 . ~/.tmux/plugins/tpm/bin/install_plugins

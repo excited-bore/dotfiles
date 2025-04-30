@@ -579,7 +579,7 @@ if [[ "$moar" == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_moar.sh; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_moar.sh)
     else
-        $SCRIPT_DIR/install_moar.sh
+        . $SCRIPT_DIR/install_moar.sh
     fi
 fi
 unset moar
@@ -678,7 +678,7 @@ unset git_ins
 
 # Lazygit
 
-readyn -p "Install lazygit?" -c "! type lazygit &> /dev/null" git_ins
+readyn -p "Install Lazygit?" -c "! type lazygit &> /dev/null" git_ins
 if [[ "y" == "$git_ins" ]]; then
 
     if ! test -f $SCRIPT_DIR/install_lazygit.sh; then

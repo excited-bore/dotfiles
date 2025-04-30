@@ -21,5 +21,6 @@ fi
     #if test $rm_ins == 'y'; then
         echo "Next $(tput setaf 1)sudo$(tput sgr0) will install $(tput setaf 2)rm-prompt$(tput sgr0) inside $(tput bold)/usr/bin/$(tput sgr0)"
         sudo install -Dm777 $file -t "/usr/bin/" 
+        rm-prompt --help 
     #fi
 #fi

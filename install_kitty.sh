@@ -22,6 +22,8 @@ if ! type kitty &>/dev/null; then
     fi
 fi
 
+kitty --help | $PAGER
+
 if [[ "$distro_base" == 'Arch' ]] && ! ls /usr/share/fonts/noto | grep -i -q emoji; then
     readyn -p 'Install noto-emoji font for kitty?' emoji
     if [[ $emoji == 'y' ]]; then
@@ -191,7 +193,7 @@ if [[ $ktty_cnf == 'y' ]]; then
                 readyn -p "Set position new window?" ktty_splt1
 
                 if [[ $ktty_splt1 == 'y' ]]; then
-                    reade -Q "GREEN" -i "default hsplit vsplit before after" -p "Position new window: [Default/hsplit/vsplit/before/after]: " ktty_pos
+                    reade -Q "GREEN" -i "hsplit vsplit default before after" -p "Position new window: [Hsplit/vsplit/default/before/after]: " ktty_pos
                     sed -i "s|map kitty_mod+enter[^+].*|map kitty_mod+enter launch --location=$ktty_pos|g" $dir/kitty.conf
                 fi
                 readyn -p "Add shortcut for new window pos on ctrl+shift+alt+enter?" ktty_splt2

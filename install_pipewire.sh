@@ -196,8 +196,8 @@ fi
 
 
 if ! type qwpgraph &> /dev/null; then
-    readyn -p "Install patchbay interface 'qpwgraph'? (create and manage audiostreams)" patchb
-    if test "$patchb" == 'y'; then
+    readyn -p "Install patchbay interface 'qpwgraph'? (create and manage audiostreams)" -c "! type patchbay &> /dev/null" patchb
+    if [[ "$patchb" == 'y' ]]; then
         if [[ "$distro_base" == 'Arch' ]] || [[ "$distro_base" == 'Debian' ]]; then
             eval "${pac_ins} qpwgraph"
         fi

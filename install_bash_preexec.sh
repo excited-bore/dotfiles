@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-local bash_r
 test -n "$1" && bash_r='y'
 
 SYSTEM_UPDATED='TRUE'

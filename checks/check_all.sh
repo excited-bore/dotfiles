@@ -125,7 +125,7 @@ if test -z $SYSTEM_UPDATED; then
 fi
 
 
-alias get-script-dir='[[ $0 != $BASH_SOURCE ]] && dirname "${BASH_SOURCE[0]}" || cd "$( dirname "$-1" )" && pwd'
+alias get-script-dir='cd "$( dirname "$-1" )" && pwd'
 
 #function get-script-dir() {
 #    SOURCE=$0

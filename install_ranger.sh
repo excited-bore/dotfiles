@@ -26,6 +26,8 @@ if ! type ranger &>/dev/null; then
     fi
 fi
 
+ranger --help | $PAGER
+
 if ! test -z $RIFLE_INS; then
     sudo mv -f $RIFLE_INS/rifle /usr/bin/rifle
 fi

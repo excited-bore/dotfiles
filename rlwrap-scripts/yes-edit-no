@@ -80,7 +80,7 @@ function yes-edit-no() {
 
     local VERSION='1.0'
 
-    local hlpstr="${bold}YES-EDIT-NO${normal} [ -h/--help ] [ -v/--version] [ -d/--dont-askagain ] [ -y/--yes [ PREFILL [, PREFILLPROMPT ]] [ -Y/--yes-colour [ COLOUR ]] [ -n/--no [ PREFILL [, PREFILLPROMPT ]] [ -N/--no-colour [ COLOUR ]] [ -e/--edit [ PREFILL [, PREFILLPROMPT ]] [ -E/--editor EDITOR ] [ -Q/--edit-colour [ COLOUR ]] [ -o/--other COMMAND, PROMPTDESCRIPTION [, REPLACEEDIT (Y/n)]] [ -n/--no-askagain [ Y(Default)/N ] ] [ -e/--editor EDITOR ]  [ -g/--files-to-edit SPACESEPERATED-FILESTRING ] [ -p/--prompt PROMPTSTRING ] [ -Q/--colour COLOURSTRING ] [ -b/--break-chars BREAKCHARS-STRING ] [ -f/--function FUNCTION ] [ ${bold}SPACESEPARATED FILE(S)STRING${normal} ] [ ${bold}RETURNVAR${normal} ] 
+    local hlpstr="${bold}YES-EDIT-NO${normal} [ -h/--help ] [ -v/--version] [ -d/--dont-askagain ] [ -y/--yes [ PREFILL [, PREFILLPROMPT ]] [ -Y/--yes-colour [ COLOUR ]] [ -n/--no [ PREFILL [, PREFILLPROMPT ]] [ -N/--no-colour [ COLOUR ]] [ -e/--edit [ PREFILL [, PREFILLPROMPT ]] [ -E/--editor EDITOR ] [ -Q/--edit-colour [ COLOUR ]] [ -o/--other COMMAND, PROMPTDESCRIPTION [, REPLACEEDIT (Y/n)]] [ -n/--no-askagain [ Y(Default)/N ] ] [ -e/--editor EDITOR ]  [ -g/--files-to-edit SPACESEPERATED-FILESTRING ] [ -p/--prompt PROMPTSTRING ] [ -Q/--colour COLOURSTRING ] [ -b/--break-chars BREAKCHARS-STRING ] [ -f/--function FUNCTION ] [ -c/--condition CONDITION ]  [ ${bold}SPACESEPARATED FILE(S)STRING${normal} ] [ ${bold}RETURNVAR${normal} ] 
 
         Simplifies prompt for ${bold}read/rlwrap${normal} specifically for when file(s) need to be reviewed before installation 
         - repeats prompt as long neither 'yes' nor 'no' is chosen 
@@ -498,7 +498,7 @@ function yes-edit-no() {
                     i=0 
                     color="$ycolor"
                 fi 
-                if [ -n "$nflag" ] || (test -n "$condition" && ! eval "${condition}"); then 
+                if [ -n "$nflag" ] || (test -n "$condition" && eval "${condition}"); then 
                     nflag='n'
                     color="$ncolor"
                     i=0 
