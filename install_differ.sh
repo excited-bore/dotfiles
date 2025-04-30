@@ -11,8 +11,7 @@ else
     . ./checks/check_all.sh
 fi
 
-SCRIPT_DIR=$(pwd)
-
+SCRIPT_DIR=$(get-script-dir)
 
 reade -Q "GREEN" -i "delta difftastic diff-so-fancy riff ydiff diffr colordiff" -p "Which to install? [Delta/difftastic/diff-so-fancy/riff/ydiff/diffr/colordiff]: " pager
 
@@ -80,4 +79,3 @@ elif [[ "$distro_base" == "Debian" ]]; then
         pipx install ydiff
     fi
 fi
-

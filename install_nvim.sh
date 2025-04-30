@@ -167,16 +167,18 @@ fi
 
 nvim --help | $PAGER
 
-if [[ $X11_WAY == 'x11' ]] && ! type xclip &>/dev/null; then
-    readyn -p "Install nvim clipboard? (xsel xclip)" clip
-    if [[ "y" == "$clip" ]]; then
-        eval "${pac_ins}" install xsel xclip
-        echo "${green} If this is for use with ssh on serverside, X11 needs to be forwarded"
-        echo "${green} At clientside, 'ForwardX11 yes' also needs to be put in ~/.ssh/config under Host"
-        echo "${green} Connection also need to start with -X flag (ssh -X ..@..)${normal}"
-        readyn -p "Forward X11 in /etc/ssh/sshd.config?" x11f
-        if test -z "$x11f" || [[ "y" == "$x11f" ]]; then
-            sudo sed -i 's|.X11Forwarding yes|X11Forwarding yes|g' /etc/ssh/sshd.config
+if [[ $machine == 'Linux' ]]; then
+    if [[ $X11_WAY == 'x11' ]] && ! type xclip &>/dev/null; then
+        readyn -p "Install nvim clipboard? (xsel xclip)" clip
+        if [[ "y" == "$clip" ]]; then
+            eval "${pac_ins}" install xsel xclip
+            echo "${green} If this is for use with ssh on serverside, X11 needs to be forwarded"
+            echo "${green} At clientside, 'ForwardX11 yes' also needs to be put in ~/.ssh/config under Host"
+            echo "${green} Connection also need to start with -X flag (ssh -X ..@..)${normal}"
+            readyn -p "Forward X11 in /etc/ssh/sshd.config?" x11f
+            if test -z "$x11f" || [[ "y" == "$x11f" ]]; then
+                sudo sed -i 's|.X11Forwarding yes|X11Forwarding yes|g' /etc/ssh/sshd.config
+            fi
         fi
     fi
 fi

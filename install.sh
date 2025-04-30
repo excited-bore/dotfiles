@@ -99,13 +99,15 @@ if test -z "$(eval "$pac_ls_ins zip 2> /dev/null")" || test -z "$(eval "$pac_ls_
     unset nzp_ins
 fi
 
-if [[ "$X11_WAY" == 'x11' ]] && (! type xclip &>/dev/null || ! type xsel &>/dev/null); then
-    printf "${CYAN}xclip${normal} and/or ${CYAN}xsel${normal} are not installed (clipboard tools for X11 based systems)\n"
-    readyn -p "Install xclip and xsel?" nzp_ins
-    if [[ $nzp_ins == 'y' ]]; then
-        eval "${pac_ins}" xclip xsel
+if [[ $machine == 'Linux' ]]; then
+    if [[ "$X11_WAY" == 'x11' ]] && (! type xclip &>/dev/null || ! type xsel &>/dev/null); then
+        printf "${CYAN}xclip${normal} and/or ${CYAN}xsel${normal} are not installed (clipboard tools for X11 based systems)\n"
+        readyn -p "Install xclip and xsel?" nzp_ins
+        if [[ $nzp_ins == 'y' ]]; then
+            eval "${pac_ins}" xclip xsel
+        fi
+        unset nzp_ins
     fi
-    unset nzp_ins
 fi
 
 if [[ $distro_base == 'Debian' ]]; then
@@ -416,7 +418,7 @@ xresources_r() {
 xresources() {
     cp -fv $xterm ~/.Xresources
     yes-edit-no -f xresources_r -g "$xterm" -p "Install .Xresources at /root/?" -e -n -Q "RED"
-}	
+}
 yes-edit-no -f xresources -g "$xterm" -p "Install .Xresources at ~/? (Xterm configuration)" -e -Q "YELLOW"
 
 # Rlwrap scripts
@@ -686,7 +688,7 @@ if [[ "y" == "$git_ins" ]]; then
     else
         . $SCRIPT_DIR/install_lazygit.sh
     fi
-    
+
 fi
 unset git_ins
 
@@ -968,6 +970,6 @@ readyn -p 'List all aliases?' allis
 if [[ "$allis" == 'y' ]]; then
     [ -n "$BASH_VERSION" ] && set -o posix
     [ -n "$ZSH_VERSION" ] && set -o posixaliases
-    alias| $PAGER
+    alias | $PAGER
 fi
 unset allis

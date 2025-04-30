@@ -155,20 +155,22 @@ if ! type rg &>/dev/null; then
 fi
 
 # XCLIP
-if [[ "$X11_WAY" == 'x11' ]] && (! type xclip &>/dev/null || ! type xsel &> /dev/null ); then
-    readyn -p "Install xclip? (Clipboard tool for Ctrl-R/Reverse history shortcut)" xclipp
-    if [[ "$xclipp" == "y" ]]; then
-        eval "${pac_ins} xclip xsel" 
-    fi
-    if [[ $ENVVAR == ~/.environment.env ]]; then
-        sed -i 's|#export FZF_CTRL_R_OPTS=|export FZF_CTRL_R_OPTS=|g' $ENVVAR
-    elif ! grep -q "export FZF_CTRL_R_OPTS=" $ENVVAR; then
-        printf "\nexport FZF_CTRL_R_OPTS=\" --preview 'echo {}' --preview-window up:3:hidden:wrap --bind 'ctrl-t:toggle-preview' --bind 'alt-c:execute-silent(echo -n {2..} | xclip -i -sel c)+abort' --color header:italic --header 'Press ALT-C to copy command into clipboard'\"" >>$ENVVAR &>/dev/null
-    fi
-    if [[ $ENVVAR_R == /root/.environment.env ]]; then
-        sudo sed -i 's|#export FZF_CTRL_R_OPTS==|export FZF_CTRL_R_OPTS=|g' $ENVVAR_R
-    elif ! sudo grep -q "export FZF_CTRL_R_OPTS" $ENVVAR_R; then
-        printf "\nexport FZF_CTRL_R_OPTS=\" --preview 'echo {}' --preview-window up:3:hidden:wrap --bind 'ctrl-t:toggle-preview' --bind 'alt-c:execute-silent(echo -n {2..} | xclip -i -sel c)+abort' --color header:italic --header 'Press ALT-C to copy command into clipboard'\"" | sudo tee -a $ENVVAR_R
+if [[ $machine == 'Linux' ]]; then
+    if [[ "$X11_WAY" == 'x11' ]] && (! type xclip &>/dev/null || ! type xsel &>/dev/null); then
+        readyn -p "Install xclip? (Clipboard tool for Ctrl-R/Reverse history shortcut)" xclipp
+        if [[ "$xclipp" == "y" ]]; then
+            eval "${pac_ins} xclip xsel"
+        fi
+        if [[ $ENVVAR == ~/.environment.env ]]; then
+            sed -i 's|#export FZF_CTRL_R_OPTS=|export FZF_CTRL_R_OPTS=|g' $ENVVAR
+        elif ! grep -q "export FZF_CTRL_R_OPTS=" $ENVVAR; then
+            printf "\nexport FZF_CTRL_R_OPTS=\" --preview 'echo {}' --preview-window up:3:hidden:wrap --bind 'ctrl-t:toggle-preview' --bind 'alt-c:execute-silent(echo -n {2..} | xclip -i -sel c)+abort' --color header:italic --header 'Press ALT-C to copy command into clipboard'\"" >>$ENVVAR &>/dev/null
+        fi
+        if [[ $ENVVAR_R == /root/.environment.env ]]; then
+            sudo sed -i 's|#export FZF_CTRL_R_OPTS==|export FZF_CTRL_R_OPTS=|g' $ENVVAR_R
+        elif ! sudo grep -q "export FZF_CTRL_R_OPTS" $ENVVAR_R; then
+            printf "\nexport FZF_CTRL_R_OPTS=\" --preview 'echo {}' --preview-window up:3:hidden:wrap --bind 'ctrl-t:toggle-preview' --bind 'alt-c:execute-silent(echo -n {2..} | xclip -i -sel c)+abort' --color header:italic --header 'Press ALT-C to copy command into clipboard'\"" | sudo tee -a $ENVVAR_R
+        fi
     fi
 fi
 unset xclip
