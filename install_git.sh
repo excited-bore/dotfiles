@@ -287,16 +287,6 @@ function git_hl() {
                         opts="$opts --context=$cntxt" 
                     fi
                 fi
-                
-                readyn -Y 'CYAN' -p "Skip unchanged files when diffing?" diffr3
-                if [[ $diffr3 == 'y' ]]; then
-                    opts="$opts --skip-unchanged" 
-                fi
-
-                readyn -Y 'CYAN' -p "Ignore changed comments when diffing?" diffr2
-                if [[ $diffr2 == 'y' ]]; then
-                    opts="$opts --ignore-comments" 
-                fi
 
                 readyn -n -N 'BLUE' -p "Set background? (Default: dark)" diffr4
                 if [[ $diffr4 == 'y' ]]; then
@@ -307,6 +297,17 @@ function git_hl() {
                         opts="$opts --background=light"
                     fi
                 fi
+                
+                readyn -n -N 'BLUE' -p "Ignore changed comments when diffing?" diffr2
+                if [[ $diffr2 == 'y' ]]; then
+                    opts="$opts --ignore-comments" 
+                fi
+                
+                readyn -n -N 'BLUE' -p "Skip unchanged files when diffing? (!! This includes things like adding/removing executable flag !!)" diffr3
+                if [[ $diffr3 == 'y' ]]; then
+                    opts="$opts --skip-unchanged" 
+                fi
+
 
                 readyn -n -N 'BLUE' -p "Disable carriage return - '\\\n\\\r' - stripping when diffing files in windows?" diffr6
                 if [[ $diffr6 == 'y' ]]; then
@@ -345,7 +346,9 @@ function git_hl() {
         readyn -p "Set side panel width (left side panels - Default 0.333)" sidepn
         if [[ $sidepn == 'y' ]]; then
             reade -Q 'GREEN' -i "$(echo "$(seq .01 .01 .33)" | tac)" -p 'Side pane width: ' sidepnw 
-            re='^[+-]?[0-9]*\.|,?[0-9]+$'
+            # Seq why no keep float symbol :C 
+            sidepnw=$(echo $sidepnw | sed 's/,/./g') 
+            re='^[+-]?[0-9]*\.?[0-9]+$'
             if [[ $sidepnw =~ $re ]] ; then
                 sidepanelw=$sidepnw
             fi 
