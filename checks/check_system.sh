@@ -351,7 +351,7 @@ elif test -f /etc/arch-release && [[ $distro == / ]]; then
     distro_base="Arch"
     distro="Arch"
 
-elif test -f == /etc/rpi-issue && [[ $distro == / ]]; then
+elif test -f /etc/rpi-issue && [[ $distro == / ]]; then
 
     pac="apt"
     pac_ins="sudo apt install"
@@ -367,7 +367,7 @@ elif test -f == /etc/rpi-issue && [[ $distro == / ]]; then
     distro_base="Debian"
     distro="Raspbian"
 
-elif test -f == /etc/debian_version && [[ $distro == / ]]; then
+elif test -f /etc/debian_version && [[ $distro == / ]]; then
     pac="apt"
     pac_ins="sudo apt install"
     pac_up="sudo apt update"
