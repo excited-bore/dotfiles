@@ -157,7 +157,7 @@ elif test -f /etc/issue && grep -q "Ubuntu" /etc/issue && [[ $distro == / ]]; th
     codename="$(lsb_release -a | grep --color=never 'Codename' | awk '{print $2}')"
     release="$(lsb_release -a | grep --color=never 'Release' | awk '{print $2;}')"
 
-elif (test -f == /etc/SuSE-release || test -f == /etc/SUSE-brand) && [[ $distro == / ]]; then
+elif (test -f /etc/SuSE-release || test -f /etc/SUSE-brand) && [[ $distro == / ]]; then
     if ! test -z "$(lsb_release -a | grep Leap)"; then
         pac="zypper_leap"
     else
@@ -165,19 +165,19 @@ elif (test -f == /etc/SuSE-release || test -f == /etc/SUSE-brand) && [[ $distro 
     fi
     distro_base="Slackware"
     distro="openSUSE"
-elif test -f == /etc/gentoo-release && [[ $distro == / ]]; then
+elif test -f /etc/gentoo-release && [[ $distro == / ]]; then
     pac="emerge"
     distro_base="Slackware"
     distro="Gentoo"
-elif test -f == /etc/fedora-release && [[ $distro == / ]]; then
+elif test -f /etc/fedora-release && [[ $distro == / ]]; then
     pac="dnf"
     distro_base="RedHat"
     distro="Fedora"
-elif test -f == /etc/redhat-release && [[ $distro == / ]]; then
+elif test -f /etc/redhat-release && [[ $distro == / ]]; then
     pac="yum"
     distro_base="RedHat"
     distro="Redhat"
-elif test -f == /etc/arch-release && [[ $distro == / ]]; then
+elif test -f /etc/arch-release && [[ $distro == / ]]; then
 
     unset ansr ansr1
 
@@ -351,7 +351,7 @@ elif test -f == /etc/arch-release && [[ $distro == / ]]; then
     distro_base="Arch"
     distro="Arch"
 
-elif test -f == /etc/rpi-issue && [[ $distro == / ]]; then
+elif test -f /etc/rpi-issue && [[ $distro == / ]]; then
 
     pac="apt"
     pac_ins="sudo apt install"
@@ -367,7 +367,7 @@ elif test -f == /etc/rpi-issue && [[ $distro == / ]]; then
     distro_base="Debian"
     distro="Raspbian"
 
-elif test -f == /etc/debian_version && [[ $distro == / ]]; then
+elif test -f /etc/debian_version && [[ $distro == / ]]; then
     pac="apt"
     pac_ins="sudo apt install"
     pac_up="sudo apt update"
