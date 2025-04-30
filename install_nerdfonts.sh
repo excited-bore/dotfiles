@@ -16,7 +16,7 @@ if ! [ -d  ~/.local/share/fonts ]; then
 fi
 
 if ! type jq &> /dev/null; then
-    elif [[ $distro_base == "Debian" ]] || [[ $distro_base == "Arch" ]]; then
+    if [[ $distro_base == "Debian" ]] || [[ $distro_base == "Arch" ]]; then
         eval "$pac_ins jq"
     fi
 fi

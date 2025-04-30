@@ -510,25 +510,7 @@ function rm-prompt(){
     local dirss=0
     local exitmeyesplease=0 
     local itms 
-    for itm in "$@"; do
-
-        # Omit trailing slash '/' because 'test -L' otherwise does not recognize directory symlinks
-
-        test -d "$itm" && itm="${itm%/}" 
-
-        if ! test -e "$itm" && ! test -L "$itm"; then
-           printf "${red}${bold}'$itm'${normal}${red} does not exist\n"
-           return 1 
-       elif test -L "$itm"; then
-           symlinks="$(($symlinks + 1))"      
-       elif test -d "$itm"; then
-           dirss=$(($dirss + 1))
-        else
-           files="$(($files + 1))"
-        fi
-        itms="$itms $itm"  
-    done 
-
+    
     for itm in "$@"; do
        if test -d "$itm"; then
            eval "$RMPROMPT_LS_DIR_CMD -- \"$itm\"" 
@@ -537,16 +519,36 @@ function rm-prompt(){
        fi
     done | $RMPROMPT_PAGER 
 
-    if test -e "$itm"; then   
-        [[ $files > 0 ]] && files="${RED}$files${YELLOW}" || files="${CYAN}$files${YELLOW}" 
-        [[ $symlinks > 0 ]] && symlinks="${RED}$symlinks${YELLOW}" || symlinks="${CYAN}$symlinks${YELLOW}"
-        [[ $dirss > 0 ]] && dirss="${RED}$dirss${YELLOW}" || dirss="${CYAN}$dirss${YELLOW}" 
-        
-        if [[ $files > 0 ]] || [[ $symlinks > 0 ]] || [[ $dirss > 0 ]]; then
-            reade -Q 'YELLOW' -i 'y n' -p "Remove all $symlinks symlink(s), $files file(s) and all $dirss directory(s)? [Y/n]: " rm_stff
-            if [[ "$rm_stff" == 'y' ]]; then
-                command rm -f $RMPROMPT_RM_OPT -- $itms 
-            fi
+    files=$(($files + $(find "$@" -type f | wc -l)))  
+    symlinks=$(($symlinks + $(find "$@" -type l | wc -l)))  
+    dirss=$(($dirss + $(find "$@" -type d | wc -l)))  
+    #for itm in "$@"; do
+
+    #    # Omit trailing slash '/' because 'test -L' otherwise does not recognize directory symlinks
+
+    #    test -d "$itm" && itm="${itm%/}" 
+
+    #    if ! test -e "$itm" && ! test -L "$itm"; then
+    #       printf "${red}${bold}'$itm'${normal}${red} does not exist\n"
+    #       return 1 
+    #    elif test -L "$itm"; then
+    #       symlinks="$(($symlinks + 1))"      
+    #    elif test -d "$itm"; then
+    #        dirss=$(($dirss + 1))
+    #    else
+    #        files="$(($files + 1))"
+    #    fi
+    #    itms="$itms $itm"  
+    #done 
+
+    [[ $files > 0 ]] && files="${RED}$files${YELLOW}" || files="${CYAN}$files${YELLOW}" 
+    [[ $symlinks > 0 ]] && symlinks="${RED}$symlinks${YELLOW}" || symlinks="${CYAN}$symlinks${YELLOW}"
+    [[ $dirss > 0 ]] && dirss="${RED}$dirss${YELLOW}" || dirss="${CYAN}$dirss${YELLOW}" 
+    
+    if [[ $files > 0 ]] || [[ $symlinks > 0 ]] || [[ $dirss > 0 ]]; then
+        reade -Q 'YELLOW' -i 'y n' -p "Remove all $symlinks symlink(s), $files file(s) and all $dirss directory(s)? [Y/n]: " rm_stff
+        if [[ "$rm_stff" == 'y' ]]; then
+            command rm -f $RMPROMPT_RM_OPT -- $itms 
         fi
     fi
     unset rm_stff dirss files i itm
