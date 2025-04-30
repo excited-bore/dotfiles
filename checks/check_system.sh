@@ -403,17 +403,17 @@ elif [[ $machine == 'Mac' ]]; then
     arch_cmd="sysctl -n machdep.cpu.brand_string"
 fi
 
-if ${arch_cmd} | grep -q "Intel"; then
+if eval "${arch_cmd} | grep -q 'Intel'"; then
     arch="386"
-elif ${arch_cmd} | grep -q "AMD"; then
+elif eval "${arch_cmd} | grep -q 'AMD'"; then
     if lscpu | grep -q "x86_64"; then
         arch="amd64"
     else
         arch="amd32"
     fi
-elif ${arch_cmd} | grep -q "armv"; then
+elif eval "${arch_cmd} | grep -q 'armv'"; then
     arch="armv7l"
-elif ${arch_cmd} | grep -q "aarch"; then
+elif eval "${arch_cmd} | grep -q 'aarch'"; then
     arch="arm64"
 fi
 
