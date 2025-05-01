@@ -21,9 +21,6 @@ if ! type rlwrap &>/dev/null; then
             apt-cyg install rlwrap
         elif [[ $machine == 'Mac' ]] && type brew &>/dev/null; then
             brew install rlwrap
-        elif [[ $(uname -s) =~ 'CYGWIN' ]] && type apt-cyg &>/dev/null; then
-            apt-cyg install rlwrap
-
         elif [[ "$distro_base" == "Debian" ]] || [[ "$distro_base" == "Arch" ]]; then
             eval "${pac_ins} rlwrap"
         else
