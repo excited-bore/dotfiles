@@ -223,7 +223,7 @@ function reade() {
 
                     #if ! test -e "$HISTFILE"; then
                     oldhist=$(mktemp)
-                    printf $(history -n) > $oldhist
+                    printf "$(history | awk '{$1=""; print;}')" > $oldhist
                     #fi
 
                     if test -n "$BASH_VERSION"; then
