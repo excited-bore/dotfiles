@@ -19,14 +19,20 @@ if ! type rlwrap &>/dev/null; then
             pacman -S rlwrap
         elif [[ $(uname -s) =~ 'CYGWIN' ]] && type apt-cyg &>/dev/null; then
             apt-cyg install rlwrap
+        elif [[ $machine == 'Mac' ]] && type brew &>/dev/null; then
+            brew install rlwrap
+        elif [[ $(uname -s) =~ 'CYGWIN' ]] && type apt-cyg &>/dev/null; then
+            apt-cyg install rlwrap
+
         elif [[ "$distro_base" == "Debian" ]] || [[ "$distro_base" == "Arch" ]]; then
             eval "${pac_ins} rlwrap"
         else
             if type git &>/dev/null && type make &>/dev/null; then
+                test -z $TMPDIR && TMPDIR=$(mktemp -d) 
                 (
                     cd $TMPDIR
-                    git clone https://github.com/hanslub42/rlwrap
-                    cd rlwrap
+                    git clone https://github.com/hanslub42/rlwrap $TMPDIR
+                    cd $TMPDIR/rlwrap
                     ./configure
                     make
                     if type sudo &>/dev/null; then
@@ -34,6 +40,8 @@ if ! type rlwrap &>/dev/null; then
                     else
                         make install
                     fi
+                    cd ..
+                    command rm -r rlwrap/
                 )
             fi
         fi
