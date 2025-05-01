@@ -208,24 +208,23 @@ function reade() {
 
                     echo "$args" >"$tmpf"
 
-                    test -e $HISTFILE &&
-                        oldhist=$HISTFILE
+                    #test -e $HISTFILE &&
 
-                    ! test -e $HISTFILE && test -n $BASH_VERSION && test -f ~/.bash_history && test -n "$(cat ~/.bash_history)" &&
-                        oldhist=~/.bash_history
+                    #! test -e $HISTFILE && test -n $BASH_VERSION && test -f ~/.bash_history && test -n "$(cat ~/.bash_history)" &&
+                    #    oldhist=~/.bash_history
 
-                    if ! test -e $HISTFILE && test -n $ZSH_VERSION; then
-                        if test -f ~/.zhistory && test -n "$(cat ~/.zhistory)"; then
-                            oldhist=~/.zhistory
-                        elif test -f ~/.zsh_history && test -n "$(cat ~/.zsh_history)"; then
-                            oldhist=~/.zsh_history
-                        fi
-                    fi
+                    #if test -n $ZSH_VERSION; then
+                    #    if [[ $machine == 'Mac' ]] && test -f ~/.zsh_history && test -n "$(cat ~/.zsh_history)"; then
+                    #        oldhist=~/.zsh_history
+                    #    elif test -f ~/.zhistory && test -n "$(cat ~/.zhistory)"; then
+                    #        oldhist=~/.zhistory
+                    #    fi
+                    #fi
 
-                    if ! test -e "$HISTFILE"; then
-                        oldhist=$(mktemp)
-                        echo $(history | awk '{$1=""; print; }') >$oldhist
-                    fi
+                    #if ! test -e "$HISTFILE"; then
+                    oldhist=$(mktemp)
+                    printf $(history -n) > $oldhist
+                    #fi
 
                     if test -n "$BASH_VERSION"; then
                         while IFS='' read -r LINE || [ -n "${LINE}" ]; do
