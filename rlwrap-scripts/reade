@@ -214,8 +214,13 @@ function reade() {
                     ! test -e $HISTFILE && test -n $BASH_VERSION && test -f ~/.bash_history && test -n "$(cat ~/.bash_history)" &&
                         oldhist=~/.bash_history
 
-                    ! test -e $HISTFILE && test -n $ZSH_VERSION && test -f ~/.zhistory && test -n "$(cat ~/.zhistory)" &&
-                        oldhist=~/.zhistory
+                    if ! test -e $HISTFILE && test -n $ZSH_VERSION; then
+                        if test -f ~/.zhistory && test -n "$(cat ~/.zhistory)"; then
+                            oldhist=~/.zhistory
+                        elif test -f ~/.zsh_history && test -n "$(cat ~/.zsh_history)"; then
+                            oldhist=~/.zsh_history
+                        fi
+                    fi
 
                     if ! test -e "$HISTFILE"; then
                         oldhist=$(mktemp)
@@ -319,8 +324,7 @@ function reade() {
             history -r $oldhist
 
         test -n "$ZSH_VERSION" &&
-	    fc -IR $oldhist &&
-            fc -IR
+	    fc -IR $oldhist
              
 
         if test -n "$oldtrps"; then
