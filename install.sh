@@ -943,16 +943,16 @@ fi
 
 # Check one last time if ~/.bash_preexec - for both $USER and root - is the last line in their ~/.bash_profile and ~/.bashrc
 
-if ! test -f ./checks/check_bash_source_order.sh; then
-    if type curl &>/dev/null; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_bash_source_order.sh)
-    else
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-        return 1 || exit 1
-    fi
-else
-    . ./checks/check_bash_source_order.sh
-fi
+#if ! test -f ./checks/check_bash_source_order.sh; then
+#    if type curl &>/dev/null; then
+#        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_bash_source_order.sh)
+#    else
+#        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
+#        return 1 || exit 1
+#    fi
+#else
+#    . ./checks/check_bash_source_order.sh
+#fi
 
 echo "Next $(tput setaf 1)sudo$(tput sgr0) will check whether root account is enabled"
 if ! [[ "$(sudo passwd -S | awk '{print $2}')" == 'L' ]]; then
