@@ -7,7 +7,7 @@ fi
 
 #if ! type reade &> /dev/null; then
 #    if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
-#        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)" 
+#        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh) 
 #    elif test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh~/.bash_aliases.d/00-rlwrap_scripts.sh; then
 #       source ~/.bash_aliases.d/00-rlwrap_scripts.sh
 #    else
@@ -19,7 +19,7 @@ fi
 
 #if test -z "$distro"; then 
 #    if ! test -f checks/check_system.sh; then
-#         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)" 
+#         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh) 
 #    else
 #        . ./checks/check_system.sh
 #    fi
@@ -27,7 +27,7 @@ fi
 #
 #if type pamac &> /dev/null && grep -q '#EnableAUR' /etc/pamac.conf; then
 #    if ! test -f checks/clheck_pamac.sh; then
-#         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pamac.sh)" 
+#         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pamac.sh) 
 #    else
 #        . ./checks/check_pamac.sh
 #    fi
@@ -139,14 +139,14 @@ function update-system() {
             if ! test -f install_cygwin.sh; then
                  source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cygwin.sh) 
             else
-                ./install_cygwin.sh
+                . ./install_cygwin.sh
             fi
             printf "${CYAN}Don't forget to open up Cygwin terminal and restart this script (cd /cygdrive/c to go to C:/ drive and navigate to dotfiles repo)${normal}\n"
         elif [[ $cyg == 'sdk' ]]; then
             if ! test -f install_git_sdk.sh; then
-                 eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_git_sdk.sh)" 
+                 source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_git_sdk.sh) 
             else
-                ./install_git_sdk.sh
+                . ./install_git_sdk.sh
             fi
             printf "${CYAN}Don't forget to open up Git SDK and restart this script${normal}\n"
         else
@@ -231,6 +231,7 @@ function update-system() {
         fi
     elif [[ "$pac" == "apk" ]]; then
         apk update
+
     elif [[ "$pac" == "pacman" ]]; then
         if ! test -z "$AUR_up"; then
             if ! test -z "$YES"; then 
@@ -264,9 +265,7 @@ function update-system() {
        
         ! test -z "$YES" && flag='--auto' || flag=''
        	
-	[[ "$distro_base" == 'Debian' ]] && clean=' (/Autoremove) ' || clean='' 
-
-        readyn $flag -p "Clean$clean unnessecary orphan packages?" cachcln
+        readyn $flag -p "Clean / autoremove orphan packages - dependencies that aren't used by any package?" cachcln
         if [[ $cachcln == 'y' ]]; then
             if ! [[ -z "$AUR_clean" ]]; then
                 if ! test -z "$YES"; then 
@@ -287,17 +286,20 @@ function update-system() {
 	    fi
         fi
         unset cachcln 
+
     elif [[ "$distro" == "Gentoo" ]]; then
         #TODO Add update cycle for Gentoo systems
         continue
-    # https://en.opensuse.org/System_Updates
+    
     elif [[ "$pac" == "zypper_leap" ]]; then
+    # https://en.opensuse.org/System_Updates
         echo "This next $(tput setaf 1)sudo$(tput sgr0) will try to update the packages for your system using the package managers it knows";
         if ! test -z "$YES"; then 
             yes | sudo zypper up
         else
             sudo zypper up
         fi
+
     elif [[ "$pac" == "zypper_tumble" ]]; then
         echo "This next $(tput setaf 1)sudo$(tput sgr0) will try to update the packages for your system using the package managers it knows";
         if ! test -z "$YES"; then 

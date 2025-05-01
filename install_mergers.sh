@@ -11,8 +11,7 @@ else
     . ./checks/check_all.sh
 fi
 
-SCRIPT_DIR=$(pwd)
-
+SCRIPT_DIR=$(get-script-dir)
 
 reade -Q "GREEN" -i "vscode mergiraf fac meld kompare kdiff3 p4merge sublime nvim" -p "Which to install? [Vscode/mergiraf/fac(fixallconflicts)/meld/kdiff3/kompare/p4merge/sublime(sublime merge)/nvim]: " merger
 

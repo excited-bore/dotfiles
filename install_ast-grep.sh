@@ -16,7 +16,7 @@ SCRIPT_DIR=$(get-script-dir)
 if ! type ast-grep &>/dev/null; then
     if ! type cargo &>/dev/null || ! [[ $PATH =~ '/.cargo/bin' ]]; then
         if ! test -f install_cargo.sh; then
-            eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)"
+            source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)
         else
             . ./install_cargo.sh
         fi
