@@ -105,12 +105,12 @@ alias dirs-col="dirs -v | column -c $COLUMNS"
 alias dirs-col-pretty="dirs -v | column -c $COLUMNS | sed -e 's/ 0 \\([^\t]*\\)/'\${GREEN}' 0 \\1'\${normal}'/'"
 
 #'Silent' clear
-if type starship &>/dev/null && grep -q 'starship' ~/.bashrc && (grep -q '\\n' ~/.config/starship.toml || grep -q 'line_break' ~/.config/starship.toml || ! head -n 1 ~/.config/starship.toml | grep -q 'format'); then
+if command -v starship &>/dev/null && grep -q "^eval \"\$(starship init bash)\"" ~/.bashrc && (grep -q '\\n' ~/.config/starship.toml || grep -q 'line_break' ~/.config/starship.toml || ! head -n 1 ~/.config/starship.toml | grep -q 'format'); then
     alias _="tput cuu1 && tput cuu1 && tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null"
     alias _.="tput cuu1 && tput cuu1 && tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i < \$(dirs -v | column -c \${COLUMNS} | wc -l) ; i++)); do tput cuu1; done && dirs-col-pretty && history -d -1 &>/dev/null"
-elif type starship &>/dev/null && grep -q 'starship' ~/.bashrc; then
+elif command -v starship &>/dev/null && grep -q "^eval \"\$(starship init bash)\"" ~/.bashrc; then
     alias _="tput cuu1 && tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null"
-    alias _.="tput cuu1 && tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i <= \$(dirs -v | column -c \${COLUMNS} | wc -l) ; i++)); do tput cuu1; done && tput cuu1 && dirs-col-pretty && tput rc && history -d -1 &>/dev/null"
+    alias _.="tput cuu1 && tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i <= \$(dirs -v | column -c \${columns} | wc -l) ; i++)); do tput cuu1; done && tput cuu1 && dirs-col-pretty && tput rc && history -d -1 &>/dev/null"
 else
     alias _="tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null"
     alias _.="tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i <= \$(dirs -v | column -c \${COLUMNS} | wc -l) ; i++)); do tput cuu1; done && dirs-col-pretty && tput rc && history -d -1 &>/dev/null"

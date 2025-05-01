@@ -2,7 +2,7 @@
 
 if ! test -f checks/check_all.sh; then
     if type curl &>/dev/null; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)"
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         continue
     fi
@@ -11,7 +11,7 @@ else
 fi
 
 if [[ "$distro_base" == "Debian" ]]; then
-    eval "$pac_ins -y qemu-kvm libvirt-bin bridge-utils virt-manager qemu virt-viewer spice-vdagent"
+    sudo apt install -y qemu-kvm libvirt-bin bridge-utils virt-manager qemu virt-viewer spice-vdagent
 elif [[ "$distro" == "Arch" ]]; then
     eval "$pac_ins virt-manager qemu bridge-utils spice-vdagent"
 fi

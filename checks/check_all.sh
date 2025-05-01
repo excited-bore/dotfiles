@@ -81,7 +81,7 @@ if ! type reade &>/dev/null; then
     if test -f rlwrap-scripts/reade; then
         . ./rlwrap-scripts/reade 1>/dev/null
     else
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade)" &>/dev/null
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade) &>/dev/null
     fi
 fi
 
@@ -89,7 +89,7 @@ if ! type readyn &>/dev/null; then
     if test -f rlwrap-scripts/readyn; then
         . ./rlwrap-scripts/readyn 1>/dev/null
     else
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/readyn)" &>/dev/null
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/readyn) &>/dev/null
     fi
 fi
 
@@ -97,13 +97,13 @@ if ! type yes-edit-no &>/dev/null; then
     if test -f rlwrap-scripts/yes-edit-no; then
         . ./rlwrap-scripts/yes-edit-no 1>/dev/null
     else
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/yes-edit-no)" &>/dev/null
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/yes-edit-no) &>/dev/null
     fi
 fi
 
 if ! test -f checks/check_system.sh; then
     if type curl &>/dev/null; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)"
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)
     fi
 else
     . ./checks/check_system.sh
@@ -113,7 +113,7 @@ fi
 
 if ! type update-system &>/dev/null; then
     if ! test -f aliases/.bash_aliases.d/update-system.sh; then
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)"
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)
     else
         . ./aliases/.bash_aliases.d/update-system.sh
     fi

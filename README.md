@@ -21,7 +21,7 @@ source ./install.sh
 If you don't have the github cloned/downloaded, you could try to run this command (though experimental, not catastrophically) to get the same effect:  
 
 ```
-eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install.sh)"
+source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install.sh)
 ```
 
 Creates `.environment.env` for global environment variables (Helps setting up variables for MAN,LESS,PAGER,EDITOR/VISUAL,SYSTEMD,XDG, etc..)  
@@ -76,17 +76,53 @@ Also helps configuring global gitconfig and global gitignore, and gives the opti
 
 
 ## Install_git.sh
-Script to automate setting up pagers, syntax highlighters, lazygit and copy-to. Works remotely with
+Script to automate setting up pagers, syntax highlighters and a variety of git options. Adds aliases like 'git-https-to-ssh' and 'git-add-ssh-key'.  
+For trying out this script while setting global git options, try:
 
 ```
-eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install.sh)"
+source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_git.sh) 'global'
+```
+Replace 'global' with 'local' for local options  
+
+
+## Install_lazygit.sh
+Script to automate setting up lazygit and different internal diff highlighters. Works remotely with
+
+```
+source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_lazygit.sh)
+```
+
+## update-system.sh
+System updater. Try it out with:
+
+```
+source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh) && update-system-yes
+```
+
+## Install_aliases.sh
+Script to automate setting up bash aliases. Try it out with:
+
+```
+source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_aliases.sh)
+```
+
+## Install_go.sh
+Script to automate installation of go, included for installation on distributions with less up-to-date go versions
+
+```
+source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_go.sh)
+```
+
+## Install_pyenv.sh
+Script to automate installation of pyenv, gives a selection of versions to choose from using a nice prompt
+
+```
+source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pyenv.sh)
 ```
 
 ## Install_gitignore.sh
 Script to automate setting up local or global gitignore using templates from https://github.com/github/gitignore
 
-## Install_go.sh
-Script to automate installation of go, included for installation on distributions with less up-to-date go versions 
 
 ## Install_flatpak.sh
 Installs flatpak with the added option to set flatpak-wrappers for commandline and install https://github.com/tchx84/Flatseal alongside

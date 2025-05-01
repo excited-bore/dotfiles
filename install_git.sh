@@ -13,7 +13,7 @@ else
     . ./checks/check_all.sh
 fi
 
-SCRIPT_DIR=$(pwd)
+SCRIPT_DIR=$(get-script-dir)
 
 
 if ! test -f checks/check_envvar.sh; then
@@ -46,9 +46,6 @@ echo "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce gravida, ne
 
 Ut sollicitudin nulla fringilla libero vulputate, in facilisis risus posuere. Proin fermentum lacinia est sed tempor. Sed convallis nibh sapien, in posuere quam rhoncus in. Etiam aliquet blandit est, a maximus ex. Donec congue lacus in justo luctus euismod. Duis in nunc ac massa gravida efficitur. Mauris gravida quis massa quis gravida. Curabitur suscipit ultricies mi ut posuere. Ut cursus augue tellus, vitae porttitor libero sollicitudin at. Pellentesque malesuada mi non sem ultrices, a malesuada sapien efficitur. Nam euismod, turpis quis eleifend fermentum, felis arcu varius massa, vitae cursus erat tellus ut arcu.
 
-
-
-        readyn -Y "CYAN" -p "You selected $diff. Configure?" -c "test -z $(git config --list | grep 'delta')" conf
 Donec pharetra vitae nibh ac suscipit. Donec vel lorem augue. Ut vitae leo risus. Suspendisse potenti. Ut eget diam sit amet lacus molestie blandit ut sodales justo. Donec vehicula hendrerit eros. Maecenas a cursus est, quis dictum augue. Proin malesuada lacus in scelerisque convallis. Phasellus non ornare augue, sit amet mollis ex. Etiam eu eros felis. Donec porttitor nulla velit, et egestas odio vehicula et. Sed interdum imperdiet urna, et lobortis sapien finibus ac. Curabitur vitae ipsum vitae nulla imperdiet venenatis. Donec maximus laoreet commodo. Nunc efficitur, eros eu lacinia porta, odio tortor mollis diam, at volutpat ligula augue eu nulla.
 
 Nullam aliquam, lorem eget vehicula congue, lorem tellus commodo justo, vitae vehicula diam sapien in est. Nullam sit amet ligula tempus, pulvinar diam eget, blandit dui. Sed nec euismod tellus, ac laoreet magna. Praesent facilisis dapibus massa sit amet aliquam. Aliquam luctus id erat a convallis. Donec vel quam cursus sem auctor tempus vitae vitae est. Praesent blandit semper lectus, in condimentum eros varius nec. Maecenas scelerisque non magna et commodo. Quisque congue venenatis est. Duis porttitor ornare aliquam. Integer vel auctor tortor. Donec purus quam, molestie et fringilla eu, volutpat sit amet tortor. Nam faucibus, risus vitae dapibus iaculis, nulla leo sollicitudin sem, nec aliquam diam mauris at turpis. Duis iaculis ac turpis et maximus. Sed at quam mauris. " > $TMPDIR/test2
@@ -1001,6 +998,16 @@ gitt() {
         git config "$global" rerere.enabled true
     fi
 
+    readyn -p "Set color.ui? (Git color behaviour)" -c "test -z $(git config $global --list | grep 'color.ui' | awk 'BEGIN { FS = "=" }; {print $2;}')" colrs
+    if [[ "y" == "$colrs" ]]; then
+        reade -Q "CYAN" -i "always auto true false" -p "Color.ui (Default: auto): " colrs
+        if [[ "$colrs" == "auto" ]] || [[ "$colrs" == "false" ]] || [[ "$colrs" == "true" ]] || [[ "$colrs" == "always" ]]; then
+            git config "$global" color.ui "$colrs"
+        fi
+    fi
+    unset colrs
+
+
     readyn -p 'Configure git to look for ssh:// instead of https:// when f.ex. cloning/pulling/pushing?' -c "! [[ $global =~ 'global' ]] && test -z $(git config $global --list | grep 'url.ssh://git@github.com/.insteadof=' | awk 'BEGIN { FS = "=" }; {print $2;}')" githttpee
     if [[ "y" == $githttpee ]]; then
         git config $global url.ssh://git@github.com/.insteadOf https://github.com/
@@ -1038,7 +1045,7 @@ gitt() {
 
     local gitpgr pager wpager
 
-    readyn -p "Configure pager for ${CYAN}core.pager${GREEN} and ${CYAN}pager.log${GREEN}?" wpager
+    readyn -p "Configure pager for ${CYAN}core.pager${GREEN}" wpager
     if [[ "$wpager" == "y" ]]; then
 
         printf "${GREEN}Installed tools that could serve as pagers${normal}:\n"
@@ -1056,10 +1063,6 @@ gitt() {
         readyn -p "Configure core.pager (default pager for most interactions)?" -c "test -z \"$(git config $global --list | grep 'core.pager' | awk 'BEGIN { FS = "=" }; {print $2;}')\"" pager
         if [[ $pager == 'y' ]]; then
             git_pager "core.pager" "$global"
-        fi
-        readyn -p "Configure pager.log (pager used for reading logs)?" -c "test -z \"$(git config $global --list | grep 'pager.log' | awk 'BEGIN { FS = "=" } ;{print $2;}')\"" pager
-        if [[ $pager == 'y' ]]; then
-            git_pager "pager.log" "$global"
         fi
     fi
 
@@ -1096,16 +1099,27 @@ gitt() {
 
         printf "${GREEN}Installed tools that could serve as diff highlighters${normal}:\n"
         printf "${CYAN}$diffsf${normal}" 
-         
+        
+        #readyn -p "Set a different diff command (Set default diff command)?" -c "test -z \"$(git config $global --list | grep 'diff.external' | awk 'BEGIN { FS = "=" }; {print $2;}')\"" pager
+        #if [[ $pager == 'y' ]]; then
+        #    git_pager "diff.external" "$global" 'y'
+        #fi
 
         readyn -p "Configure pager.diff (Shows changes to files relative to last commit)?" -c "test -z \"$(git config $global --list | grep 'pager.diff' | awk 'BEGIN { FS = "=" }; {print $2;}')\"" pager
         if [[ $pager == 'y' ]]; then
             git_pager "pager.diff" "$global" 'y'
         fi
+
         readyn -p "Configure pager.show? (Shows changes to objects like commits - defaults to last commit)" -c "test -z \"$(git config $global --list | grep 'pager.show' | awk 'BEGIN { FS = "=" }; {print $2;}')\"" pager
         if [[ $pager == 'y' ]]; then
             git_pager "pager.show" "$global"
         fi
+
+        readyn -p "Configure pager.log (pager used for reading logs)?" -c "test -z \"$(git config $global --list | grep 'pager.log' | awk 'BEGIN { FS = "=" } ;{print $2;}')\"" pager
+        if [[ $pager == 'y' ]]; then
+            git_pager "pager.log" "$global"
+        fi
+    
 
         readyn -p "Configure custom interactive diff filter? (When f.ex. git add --patch shows a colorized diff, the diff will be piped into this command)" -c "test -z \"$(git config $global --list | grep 'interactive.difffilter' | awk 'BEGIN { FS = "=" }; {print $2;}')\"" gitdiff1
         if [[ "y" == "$gitdiff1" ]]; then
@@ -1150,15 +1164,6 @@ gitt() {
         diff="difftastic"
     fi
 
-    readyn -Y "CYAN" -p "Set color.ui? (Git color behaviour)" -c "test -z $(git config $global --list | grep 'color.ui' | awk 'BEGIN { FS = "=" }; {print $2;}')" editor
-    if [[ "y" == "$editor" ]]; then
-        reade -Q "CYAN" -i "true false auto always" -p "Color.ui (Default: auto): " editor
-        if [[ "$editor" == "auto" ]] || [[ "$editor" == "false" ]] || [[ "$editor" == "true" ]] || [[ "$editor" == "always" ]]; then
-            git config "$global" color.ui "$editor"
-        fi
-    fi
-    unset editor
-
     readyn -Y "CYAN" -p "Set default editor?: " -c "test -z $(git config $global --list | grep 'core.editor' | awk 'BEGIN { FS = "=" }; {print $2;}')" editor
     if [[ "y" == "$editor" ]]; then
         unset editor
@@ -1188,10 +1193,10 @@ gitt() {
                 git config "$global" difftool.vscode.cmd 'code --wait --diff $LOCAL $REMOTE'
                 git config "$global" diff.tool vscode
             elif [[ "$editor" == "difftastic" ]]; then
-                git config "$global" diff.tool difftastic
-                git config "$global" difftool.pager true
-                git config "$global" difftool.prompt false
                 git config "$global" difftool.difftastic.cmd 'difft $LOCAL $REMOTE'
+                git config "$global" diff.tool difftastic
+                #git config "$global" difftool.pager true
+                git config "$global" difftool.prompt false
             fi
         fi
     fi
@@ -1221,12 +1226,11 @@ gitt() {
         fi
     fi
 
-    readyn -Y "CYAN" -p "Set difftool prompt?" -c "test -z $(git config $global --list | grep 'difftool.prompt' | awk 'BEGIN { FS = "=" } ;{print $2;}')" conflict
+    readyn -n -N "BLUE" -p "Allow difftool prompt?" conflict    
     if [[ $conflict == "y" ]]; then
-        reade -Q "GREEN" -i "false true" -p "Prompt?: " prompt
-        if ! test -z "$cstyle"; then
-            git config $global difftool.prompt "$prompt"
-        fi
+        git config $global difftool.prompt "true"
+    else
+        git config $global difftool.prompt "false"
     fi
 
     readyn -Y "CYAN" -p "Set mergetool?" -c "test -z $(git config $global --list | grep 'merge.tool' | awk 'BEGIN { FS = "=" } ;{print $2;}')" difftool
@@ -1269,12 +1273,11 @@ gitt() {
         fi
     fi
 
-    readyn -Y "CYAN" -p "Set mergetool prompt?" -c "test -z $(git config $global --list | grep 'mergetool.prompt' | awk 'BEGIN { FS = "=" } ;{print $2;}')" Configure    
+    readyn -n -N "BLUE" -p "Allow mergetool prompt?" conflict    
     if [[ $conflict == "y" ]]; then
-        reade -Q "GREEN" -i "false true" -p "Prompt?: " prompt
-        if ! test -z "$cstyle"; then
-            git config $global mergetool.prompt "$prompt"
-        fi
+        git config $global mergetool.prompt "true"
+    else
+        git config $global mergetool.prompt "false"
     fi
 
     readyn -Y "CYAN" -p "Set merge conflictsstyle?" -c "test -z $(git config $global --list | grep 'merge.conflictsstyle' | awk 'BEGIN { FS = "=" } ;{print $2;}')" conflict
