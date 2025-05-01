@@ -15,17 +15,27 @@ if type wget &> /dev/null && type jq &> /dev/null; then
             return 1
         fi
          
-        new_url="$(echo "$(echo "$gtb_link" | sed 's|https://github.com|https://api.github.com/repos|g')/releases/latest")" 
-        ltstv=$(curl -sL "$new_url" | jq -r ".assets" | grep --color=never "name" | sed 's/"name"://g' | tr '"' ' ' | tr ',' ' ' | sed 's/[[:space:]]//g')
-        versn=$(curl -sL "$new_url" | jq -r '.tag_name')
-        link="$gtb_link/releases/download/$versn/" 
 
-        if test -z $ltstv; then
-            printf "${red}No releases found.${normal}\n"
+        new_url="$(echo "$gtb_link" | sed 's|https://github.com|https://api.github.com/repos|g')"
+        if ! [[ $gtb_link =~ '/releases' ]]; then
+            new_url="$new_url/releases"
+        fi
+
+        ltstv=$(curl -sL "$new_url" | jq '.[0]' -r | jq -r '.assets' | grep --color=never "name" | sed 's/"name"://g' | tr '"' ' ' | tr ',' ' ' | sed 's/[[:space:]]//g')
+        versn=$(curl -sL "$new_url" | jq '.[0]' -r | jq -r '.tag_name')
+
+        if [[ $gtb_link =~ '/releases' ]]; then
+            link="$gtb_link/download/$versn/" 
+        else
+            link="$gtb_link/releases/download/$versn/" 
+        fi
+
+        if test -z "$ltstv"; then
+            printf "${red}No releases found when analyzing ${CYAN}'$new_url'.${normal}\n"
             return 1 
         fi
 
-        if type fzf &> /dev/null; then
+        if command -v fzf &> /dev/null; then
             res="$(echo "$ltstv" | fzf --multi --reverse --height 50%)"
         else
            printf "Files: \n${cyan}$ltstv${normal}\n"
@@ -34,7 +44,7 @@ if type wget &> /dev/null && type jq &> /dev/null; then
            reade -Q 'CYAN' -i "$ltstv" -p "Which one?: " res 
         fi
         
-        if ! test -z $res; then
+        if test -n $res; then
             reade -Q 'GREEN' -i "$HOME/Downloads" -p "Download Folder?: " -e dir
             wget -P $dir "$link$res"
         fi
