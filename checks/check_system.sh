@@ -105,6 +105,21 @@ else
     #exit 1
 fi
 
+[[ $machine == 'Mac' ]] && type brew &> /dev/null &&
+    pac="brew"
+    pac_up="brew update"
+    pac_upg="brew update"
+    pac_ins="brew install"
+    pac_search="brew search"
+    pac_rm="brew uninstall"
+    pac_rm_orph="brew autoremove"
+    pac_clean="brew cleanup"
+    pac_clean_cache="brew cleanup --scrub"
+    pac_ls_ins="brew list"
+    #pac_rm_casc="sudo pacman -Rc"
+        
+
+
 # https://unix.stackexchange.com/questions/202891/how-to-know-whether-wayland-or-x11-is-being-used
 [[ $machine == 'Linux' ]] &&
     export X11_WAY="$(loginctl show-session $(loginctl | grep $(whoami) | awk 'NR=1{print $1}') -p Type | awk -F= 'NR==1{print $2}')"
@@ -426,7 +441,11 @@ if ! test -f ~/.profile; then
 fi
 
 if test -f ~/.bash_profile; then
-    export PROFILE=~/.bash_profile
+    if [[ $machine == 'Mac' ]]; then
+        export PROFILE=~/.zprofile
+    else 
+        export PROFILE=~/.bash_profile
+    fi
 fi
 
 export ENVVAR=~/.bashrc

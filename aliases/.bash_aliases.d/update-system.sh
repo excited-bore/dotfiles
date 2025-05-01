@@ -121,9 +121,15 @@ function update-system() {
         readyn -y 'CYAN' -p 'Install brew?' brew
         if [[ $brew == 'y' ]]; then
             if ! test -f install_brew.sh; then
-                 eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_brew.sh)" 
+                 source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_brew.sh)
             else
-                ./install_brew.sh
+                . ./install_brew.sh
+            fi
+        fi
+        if ! type wget &> /dev/null; then
+            readyn -p "Wget is a commandline tool that's used to download files from the internet and is used throughout these scripts. Install?" wget_brw
+            if [[ $wget_brw == 'y' ]]; then
+                brew install wget 
             fi
         fi
     elif [[ $machine == 'Windows' ]] && [[ $win_bash_shell == 'Git' ]] && ! test -d "/c/cygwin$ARCH_WIN" && ! test -d '/c/git-sdk-32' && ! type wsl &> /dev/null; then
@@ -131,7 +137,7 @@ function update-system() {
         reade -Q 'CYAN' -i 'wsl sdk cyg n' -p 'Install WSL, git SDK, Cygwin? [Wsl/sdk/cyg/n]: ' cyg
         if [[ "$cyg" == 'cyg' ]]; then
             if ! test -f install_cygwin.sh; then
-                 eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cygwin.sh)" 
+                 source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cygwin.sh) 
             else
                 ./install_cygwin.sh
             fi

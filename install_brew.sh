@@ -14,10 +14,12 @@ fi
 SCRIPT_DIR=$(get-script-dir)
 
 if ! type brew &> /dev/null; then
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" 
 fi
 
-local ins_appl unblock_hb
+if [[ $machine == 'Mac' ]] && ! grep -q 'eval "$(brew shellenv)"' ~/.zprofile; then
+    printf '\neval "$(brew shellenv)"\n' >> ~/.zprofile 
+fi
 
 if type brew &> /dev/null; then
     if [[ $machine == 'Mac' ]]; then
@@ -30,17 +32,18 @@ if type brew &> /dev/null; then
         readyn -p "Unblock Homebrew apps from Gatekeeper (No more popups each time when you install from homebrew) by setting HOMEBREW_CASK_OPTS=\"--no-quarantine\" in $ENVVAR?" unblock_hb
         if [[ $unblock_hb == 'y' ]]; then
            if [[ $ENVVAR =~ '.environment.env' ]]; then
-                sed -i='s/^#export HOMEBREW_CASK_OPTS/export HOMEBREW_CASK_OPTS/g' $ENVVAR
+                sed -i 's/^#export HOMEBREW_CASK_OPTS/export HOMEBREW_CASK_OPTS/g' $ENVVAR
            else
                 echo 'export HOMEBREW_CASK_OPTS=" --no-quarantine"' >> $ENVVAR
            fi
            source $ENVVAR
         fi
     fi
-    if test -z "$(brew list applite)"; then
+    if test -z "$(brew list applite)" &> /dev/null; then
         readyn -p 'Install Applite? (Opensource brew store GUI)' ins_appl
         if [[ "$ins_appl" == 'y' ]]; then
             brew install applite
         fi
     fi
 fi
+unset ins_appl unblock_hb

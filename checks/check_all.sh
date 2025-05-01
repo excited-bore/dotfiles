@@ -6,6 +6,9 @@
 # type sudo &>/dev/null &&
 #    alias sudo='sudo '
 
+#! type wget &> /dev/null && command -v brew &> /dev/null &&
+#    brew install wget 
+
 # Wget only uses https - encrypted http
 type wget &>/dev/null &&
     alias wget='wget --https-only '
@@ -106,6 +109,8 @@ else
     . ./checks/check_system.sh
 fi
 
+# printf "${green} Will now start with updating system ${normal}\n"
+
 if ! type update-system &>/dev/null; then
     if ! test -f aliases/.bash_aliases.d/update-system.sh; then
         eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)"
@@ -114,7 +119,6 @@ if ! type update-system &>/dev/null; then
     fi
 fi
 
-# printf "${green} Will now start with updating system ${normal}\n"
 
 if test -z $SYSTEM_UPDATED; then
     readyn -Y "CYAN" -p "Update system?" updatesysm

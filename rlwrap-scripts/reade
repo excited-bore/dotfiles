@@ -319,7 +319,9 @@ function reade() {
             history -r $oldhist
 
         test -n "$ZSH_VERSION" &&
-	    fc -IR $oldhist
+	    fc -IR $oldhist &&
+            fc -IR
+             
 
         if test -n "$oldtrps"; then
             eval "$oldtrps"
@@ -336,7 +338,7 @@ function reade() {
         export READE_VALUE="$vvvvvvvvvv"
         export REPLY="$vvvvvvvvvv"
 
-        if ! test -z "$@"; then
+        if test -n "$@"; then
             eval "${@:$#:1}='$vvvvvvvvvv'"
         fi
 	
