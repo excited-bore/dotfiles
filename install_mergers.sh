@@ -13,7 +13,7 @@ fi
 
 SCRIPT_DIR=$(get-script-dir)
 
-reade -Q "GREEN" -i "vscode mergiraf fac meld kompare kdiff3 p4merge sublime nvim" -p "Which to install? [Vscode/mergiraf/fac(fixallconflicts)/meld/kdiff3/kompare/p4merge/sublime(sublime merge)/nvim]: " merger
+reade -Q "GREEN" -i "vscode mergiraf fac meld diffmerge kompare kdiff3 p4merge sublime nvim" -p "Which to install? [Vscode/mergiraf/fac(fixallconflicts)/meld/diffmerge/kdiff3/kompare/p4merge/sublime(sublime merge)/nvim]: " merger
 
 if [[ $merger == 'nvim' ]] ;then
    if ! type nvim &> /dev/null; then
@@ -42,6 +42,7 @@ elif [[ $merger == 'vscode' ]] ;then
             . ./install_visual_studio_code.sh
         fi 
    fi
+
 elif [[ $merger == 'fac' ]] ;then
     if ! type go &> /dev/null; then
         if ! test -f install_go.sh; then
@@ -58,7 +59,6 @@ elif [[ $merger == 'fac' ]] ;then
     go install github.com/mkchoi212/fac@latest 
 
 elif [[ $merger == 'mergiraf' ]] ;then
-    
     if ! type cargo &> /dev/null; then
         if ! test -f install_cargo.sh; then
             if type curl &>/dev/null; then
@@ -131,11 +131,32 @@ elif [[ $merger == 'kdiff3' ]] ;then
             flatpak install kdiff3 
         fi 
     fi
+elif [[ $merger == 'diffmerge' ]] ;then
+   if ! command -v diffmerge  &> /dev/null; then
+        if [[ $distro_base == 'Arch' ]]; then
+            if ! test -f checks/check_AUR.sh; then
+                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_AUR.sh)
+            else
+                . ./checks/check_AUR.sh
+            fi
+            eval "$AUR_ins diffmerge" 
+        elif [[ $distro_base == 'Debian' ]]; then
+            if ! command -v wget &> /dev/null || ! command -v jq &> /dev/null; then
+                echo "Next $(tput setaf 1)sudo$(tput sgr0) will install 'wget' and 'jq'"
+                sudo apt install -y jq wget 
+            fi
+
+            if ! test -f aliases/.bash_aliases.d/git.sh; then
+                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/git.sh)
+            else
+                . ./aliases/.bash_aliases.d/git.sh
+            fi
+            #get-latest-releases-github 'https://github.com/sourcegear/diffmerge'  
+        fi
+   fi
 
 elif [[ $merger == 'kompare' ]] ;then
-    
     if ! type kdiff3 &> /dev/null; then
-        
         if [[ $distro_base == 'Debian' ]]; then
             sudo apt install kompare
         elif [[ $distro_base == 'Arch' ]]; then

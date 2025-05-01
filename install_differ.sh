@@ -13,6 +13,10 @@ fi
 
 SCRIPT_DIR=$(get-script-dir)
 
+wrapprs='delta diff-so-fancy riff ydiff diffr colordiff'
+cmds='difftastic nvim'
+guis='kdiff3 p4merge vscode'
+
 reade -Q "GREEN" -i "delta difftastic diff-so-fancy riff ydiff diffr colordiff" -p "Which to install? [Delta/difftastic/diff-so-fancy/riff/ydiff/diffr/colordiff]: " pager
 
 if [[ $pager == "bat" ]]; then
