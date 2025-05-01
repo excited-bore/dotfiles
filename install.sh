@@ -90,7 +90,7 @@ if test -z "$(eval "$pac_ls_ins groff 2> /dev/null")"; then
     unset groff_ins
 fi
 
-if test -z "$(eval "$pac_ls_ins zip 2> /dev/null")" || test -z "$(eval "$pac_ls_ins unzip 2> /dev/null")"; then
+if ! command -v zip &> /dev/null || ! command -v unzip &> /dev/null; then
     printf "${CYAN}zip${normal} and/or ${CYAN}unzip${normal} are not installed \n"
     readyn -p "Install zip and unzip?" nzp_ins
     if [[ $nzp_ins == 'y' ]]; then
