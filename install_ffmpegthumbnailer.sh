@@ -12,7 +12,7 @@ else
 fi
 
 if ! type ffmpegthumbnailer &> /dev/null; then
-    if test -n $pac_ins; then
+    if test -n "$pac_ins"; then
         eval "$pac_ins ffmpegthumbnailer"
     fi
 fi
