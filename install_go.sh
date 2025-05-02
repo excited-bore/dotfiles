@@ -31,17 +31,17 @@ if ! type go &> /dev/null; then
             sum=$(sha256sum $file | awk '{print $1;}')
             echo "Checksum golang website: $checksum"
             echo "Checksum file: $sum"
-            if [[ "$sum" == "$checksum" ]]; then
+            if ! [[ "$sum" == "$checksum" ]]; then
                 echo "Checksums are different; Aborting"
-                exit
+            else 
+                if ! type tar &> /dev/null; then
+                    eval "$pac_ins tar" 
+                fi
+                sudo tar -C /usr/local -xzf $file
+                export PATH=$PATH:/usr/local/go/bin 
+                sed -i 's|.export PATH=$PATH:/usr/local/go/bin|export PATH=$PATH:/usr/local/go/bin|g' $ENVVAR
+                command rm $file
             fi
-            if ! type tar &> /dev/null; then
-                eval "$pac_ins tar" 
-            fi
-            sudo tar -C /usr/local -xzf $file
-            export PATH=$PATH:/usr/local/go/bin 
-            sed -i 's|.export PATH=$PATH:/usr/local/go/bin|export PATH=$PATH:/usr/local/go/bin|g' $ENVVAR
-            rm $file
             #if grep -q "GOROOT" $ENVVAR; then
             #    sed -i "s|.export GOROOT=|export GOROOT=|g" $ENVVAR
             #    sed -i "s|export GOROOT=.*|export GOROOT=$goroot|g" $ENVVAR
@@ -55,7 +55,7 @@ if ! type go &> /dev/null; then
     fi
 fi
 
-if echo $(go env) | grep -q "GOPATH=$HOME/go"; then
+if command -v go &> /dev/null && echo $(go env) | grep -q "GOPATH=$HOME/go"; then
     readyn -p "Source installed go outside of $HOME/go? (Set GOPATH):" gopth
     if [[ "y" == "$gopth" ]]; then
         reade -Q "CYAN" -i "$HOME/.local" -p "GOPATH: " -e gopth
