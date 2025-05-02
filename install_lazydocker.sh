@@ -24,7 +24,10 @@ if ! type lazydocker &>/dev/null; then
     if [[ $distro_base == "Arch" ]] && test -n "$AUR_ins"; then
         eval "${AUR_ins}" lazydocker
     else
-        if ! type go &>/dev/null || ([ $(go version | awk '{print $3}' | cut -c 3-) -lt 1.19 ]); then
+        minver=1.19
+        gover=0
+        command -v go &> /dev/null && gover=$(go version | awk '{print $3}' | cut -c 3-)
+        if ! type go &>/dev/null || (type go &>/dev/null && awk "BEGIN {exit !($num1 < $num2)}" ); then
             if ! test -f $DIR/install_go.sh; then
                 source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_go.sh)
             else
