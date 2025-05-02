@@ -19,9 +19,9 @@ else
     . ./checks/check_aliases_dir.sh
 fi
 
-[[ "$(type sudo)" =~ 'aliased' ]] && unalias sudo
-[[ "$(type cp)" =~ 'aliased' ]] &&
-    unalias cp && alias cp='cp -fv'
+#[[ "$(type sudo)" =~ 'aliased' ]] && unalias sudo
+#[[ "$(type cp)" =~ 'aliased' ]] &&
+#    unalias cp && alias cp='cp -fv'
 
 
 SCRIPT_DIR=$(get-script-dir)
