@@ -31,7 +31,7 @@ elif [[ $distro_base == "Debian" ]]; then
         printf "export GEM_PATH=$paths\n" >> $ENVVAR
         printf "export PATH=\$PATH:\$GEM_PATH:\$GEM_HOME/bin\n" >> $ENVVAR
     fi
-
+    source $ENVVAR
 else
     eval "${pac_ins} ruby rbenv"
 fi
@@ -45,6 +45,7 @@ if test -f ~/.zshrc && ! grep -q 'eval "$(rbenv init -' ~/.zshrc; then
 fi
 
 unset latest vers all
+
 
 test -n "$BASH_VERSION" && source ~/.bashrc
 test -n "$ZSH_VERSION" && source ~/.zshrc
@@ -82,4 +83,3 @@ rbenv --version
 #fi
 
 #
-#source $ENVVAR
