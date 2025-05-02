@@ -10,7 +10,7 @@ if ! test -f checks/check_all.sh; then
      . ./checks/check_all.sh
  fi
 
-if ! type yay &> /dev/null; then
+if [[ $distro_base == 'Arch' ]] && test -z "$AUR_ins" &> /dev/null; then
     printf "An AUR installer / pacman wrapper is needed. ${CYAN}yay${normal} is recommended for this\n"
     readyn -p "Install yay?" insyay
     if [[ "y" == "$insyay" ]]; then

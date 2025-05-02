@@ -142,11 +142,11 @@ if [[ $distro_base == 'Debian' ]]; then
     fi
 
     if type add-apt-repository &>/dev/null; then
-        if ! test -f $SCRIPT_DIR/install_list-ppa.sh; then
-            source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_list-ppa.sh)
-        else
-            . $SCRIPT_DIR/install_list-ppa.sh
-        fi
+        #if ! test -f $SCRIPT_DIR/install_list-ppa.sh; then
+        #    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_list-ppa.sh)
+        #else
+        #    . $SCRIPT_DIR/install_list-ppa.sh
+        #fi
 
         if ! type ppa-purge &>/dev/null && ! test -z "$(apt search ppa-purge 2>/dev/null | awk 'NR>2{print;}')"; then
             printf "${CYAN}ppa-purge${normal} is not installed (cmd tool for disabling installed PPA's)\n"

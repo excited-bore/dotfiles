@@ -1282,7 +1282,8 @@ gitt() {
 
     readyn -Y "CYAN" -p "Set merge conflictsstyle?" -c "test -z $(git config $global --list | grep 'merge.conflictsstyle' | awk 'BEGIN { FS = "=" } ;{print $2;}')" conflict
     if [[ $conflict == "y" ]]; then
-        reade -Q "GREEN" -i "diff3 diff diff1 diff2" -p "Conflictsstyle: " cstyle
+        printf "${GREEN}Options:\n${CYAN}\t- " 
+        reade -Q "GREEN" -i "diff3 zdiff3 merge" -p "Conflictsstyle: " cstyle
         if ! test -z "$cstyle"; then
             git config "$global" merge.conflictsstyle "$cstyle"
         fi
