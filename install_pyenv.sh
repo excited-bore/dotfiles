@@ -16,6 +16,7 @@ if ! type pyenv &> /dev/null; then
     elif [[ "$distro_base" == "Arch" ]]; then
         eval "${pac_ins} pyenv"
     elif [[ $distro_base == "Debian" ]]; then
+        eval "${pac_ins} python3-setuptools python3-tk"
         curl https://pyenv.run | bash    
     else
         curl https://pyenv.run | bash
