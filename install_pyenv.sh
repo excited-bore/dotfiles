@@ -13,9 +13,9 @@ fi
 if [[ $machine == 'Mac' ]] && command -v brew &> /dev/null; then
     brew install pyenv 
 elif [[ "$distro_base" == "Arch" ]]; then
-    eval "${pac_ins} pyenv"
+    eval "${pac_ins} base-devel openssl zlib xz tk pyenv"
 elif [[ $distro_base == "Debian" ]]; then
-    eval "${pac_ins} python3-setuptools python3-tk"
+    eval "${pac_ins} build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev curl git libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev"
     curl https://pyenv.run | bash    
 else
     curl https://pyenv.run | bash
@@ -24,7 +24,7 @@ fi
 readyn -p 'Enable pyenv shell integration for current shell?' shell_init
 if [[ "$shell_init" == 'y' ]]; then
     export PYENV_ROOT="$HOME/.pyenv"
-    [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+    [[ -d $PYENV_ROOT/bin ]] && export PATH="$PATH:$PYENV_ROOT/bin"
     eval "$(pyenv init -)" 
 fi
 
