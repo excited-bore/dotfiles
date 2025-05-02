@@ -17,7 +17,7 @@ if ! type thefuck &>/dev/null; then
     if [[ $machine == 'Mac' ]] && type brew &>/dev/null; then
         brew install thefuck
     elif [[ $distro_base == 'Arch' ]]; then
-        sudo pacman -S thefuck
+        eval "${pac_ins} thefuck"
     elif type pkg &>/dev/null; then
         pkg install thefuck
     elif type crew &>/dev/null; then
@@ -25,15 +25,15 @@ if ! type thefuck &>/dev/null; then
     else
         if ! type pipx &>/dev/null; then
             if ! test -f install_pipx.sh; then
-                /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)"
+                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)
             else
                 . ./install_pipx.sh
             fi
-            if test -f $HOME/.local/bin/pipx && ! type pipx &>/dev/null; then
-                $HOME/.local/bin/pipx install --upgrade thefuck
-            elif type pipx &>/dev/null; then
-                pipx install --upgrade thefuck
-            fi
+        fi
+        if test -f $HOME/.local/bin/pipx && ! type pipx &>/dev/null; then
+            $HOME/.local/bin/pipx install --upgrade thefuck
+        elif type pipx &>/dev/null; then
+            pipx install --upgrade thefuck
         fi
     fi
 fi

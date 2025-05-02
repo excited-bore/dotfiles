@@ -19,7 +19,6 @@ if ! type autojump &>/dev/null; then
                 . ./checks/check_AUR.sh
             fi
             eval "${AUR_ins}" autojump
-        fi
     elif [[ $distro_base == "Debian" ]]; then
         eval "${pac_ins}" autojump
     fi
