@@ -38,8 +38,6 @@ if ! type go &> /dev/null; then
                     eval "$pac_ins tar" 
                 fi
                 sudo tar -C /usr/local -xzf $file
-                export PATH=$PATH:/usr/local/go/bin 
-                sed -i 's|.export PATH=$PATH:/usr/local/go/bin|export PATH=$PATH:/usr/local/go/bin|g' $ENVVAR
                 command rm $file
             fi
             #if grep -q "GOROOT" $ENVVAR; then
@@ -55,22 +53,46 @@ if ! type go &> /dev/null; then
     fi
 fi
 
-if command -v go &> /dev/null && echo $(go env) | grep -q "GOPATH=$HOME/go"; then
-    readyn -p "Source installed go outside of $HOME/go? (Set GOPATH):" gopth
-    if [[ "y" == "$gopth" ]]; then
-        reade -Q "CYAN" -i "$HOME/.local" -p "GOPATH: " -e gopth
-        #echo "${CYAN}Only GOPATH is necessary. Setting GOROOT is usually for development reasons${normal}"
-        #reade -Q "CYAN" -p "Set custom GOROOT? (Go tools, empty means leave default): " -e goroot
 
-        go env -w GO111MODULE=auto
-        go env -w GOPATH=$gopth
-         #if grep -q "GOPATH" $ENVVAR; then
-         #   sed -i "s|.export GOPATH=|export GOPATH=|g" $ENVVAR
-         #   sed -i "s|export GOPATH=.*|export GOPATH=$gopth|g" $ENVVAR
-         #   sed -i "s|.export PATH=\$PATH:\$GOPATH|export PATH=\$PATH:\$GOPATH|g" $ENVVAR
-         #else
-         #   echo "export GOPATH=$gopth" >> $ENVVAR
-         #   echo "export PATH=\$PATH:\$GOPATH" >> $ENVVAR
-         #fi
+command -v go &> /dev/null && gopath=$(go env | grep --color=never GOPATH | cut -d= -f2 | sed "s/'//g") 
+if command -v go &> /dev/null && ! [[ $PATH =~ $gopath ]]; then   
+     if grep -q 'go/bin' $ENVVAR; then
+         sed -i 's|.export PATH=$PATH:.*go/bin|export PATH=$PATH:'$gopath'/bin|g' $ENVVAR
+         sed -i 's|export PATH=$PATH:.*go/bin|export PATH=$PATH:'$gopath'/bin|g' $ENVVAR
+     else
+         printf "# GO\nexport PATH=\$PATH:$gopath/bin\n" >> $ENVVAR 
+     fi 
+fi
+
+echo "This next $(tput setaf 1)sudo$(tput sgr0) will check if something along the lines of 'Defaults secure_path=\".*/$gopath/bin\"' is being kept in /etc/sudoers";
+
+if test -f /etc/sudoers && ! sudo grep -q "/bin:$gopath/bin" /etc/sudoers; then
+    readyn -p "Add ${RED}$gopath/bin${GREEN} to /etc/sudoers? (so go applications installed with 'go install' can be executed using sudo)?" ansr
+    if [[ "$ansr" == 'y' ]]; then
+        sudo sed -i 's,Defaults secure_path="\(.*\)",Defaults secure_path="\1:'"$gopath"'/bin/",g' /etc/sudoers
+        echo "Added ${GREEN}'$gopath/bin'${normal} to ${RED}secure_path${normal} in /etc/sudoers!"
     fi
 fi
+
+export PATH="$PATH:$gopath/bin" 
+
+
+#if command -v go &> /dev/null && echo $(go env) | grep -q "GOPATH=$HOME/go"; then
+#    readyn -p "Source installed go outside of $HOME/go? (Set GOPATH):" gopth
+#    if [[ "y" == "$gopth" ]]; then
+#        reade -Q "CYAN" -i "$HOME/.local" -p "GOPATH: " -e gopth
+#        #echo "${CYAN}Only GOPATH is necessary. Setting GOROOT is usually for development reasons${normal}"
+#        #reade -Q "CYAN" -p "Set custom GOROOT? (Go tools, empty means leave default): " -e goroot
+#
+#        go env -w GO111MODULE=auto
+#        go env -w GOPATH=$gopth
+#         #if grep -q "GOPATH" $ENVVAR; then
+#         #   sed -i "s|.export GOPATH=|export GOPATH=|g" $ENVVAR
+#         #   sed -i "s|export GOPATH=.*|export GOPATH=$gopth|g" $ENVVAR
+#         #   sed -i "s|.export PATH=\$PATH:\$GOPATH|export PATH=\$PATH:\$GOPATH|g" $ENVVAR
+#         #else
+#         #   echo "export GOPATH=$gopth" >> $ENVVAR
+#         #   echo "export PATH=\$PATH:\$GOPATH" >> $ENVVAR
+#         #fi
+#    fi
+#fi

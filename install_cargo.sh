@@ -51,7 +51,7 @@ fi
 echo "This next $(tput setaf 1)sudo$(tput sgr0) will check if something along the lines of 'Defaults secure_path=\".*/\.cargo/bin\"' is being kept in /etc/sudoers";
 
 if test -f /etc/sudoers && ! sudo grep -q "/bin:$HOME/.cargo/bin" /etc/sudoers; then
-    readyn -Y 'GREEN' -p "Add ${RED}$HOME/.cargo/bin${GREEN} to /etc/sudoers? (so rust applications installed with cargo can be executed using sudo)?" ansr
+    readyn -p "Add ${RED}$HOME/.cargo/bin${GREEN} to /etc/sudoers? (so rust applications installed with cargo can be executed using sudo)?" ansr
     if [[ "$ansr" == 'y' ]]; then
         sudo sed -i 's,Defaults secure_path="\(.*\)",Defaults secure_path="\1:'"$HOME"'/.cargo/bin/",g' /etc/sudoers
         echo "Added ${GREEN}'/home/$USER/.cargo/bin'${normal} to ${RED}secure_path${normal} in /etc/sudoers!"
