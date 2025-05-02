@@ -22,13 +22,17 @@ fi
 #. $DIR/setup_git_build_from_source.sh "y" "neovim" "https://github.com" "neovim/neovim" "stable" "sudo apt update; eval "$pac_ins ninja-build gettext libtool libtool-bin cmake g++ pkg-config unzip curl doxygen" "make CMAKE_BUILD_TYPE=RelWithDebInfo; sudo make install" "sudo make uninstall" "make distclean; make deps" "y""
 
 vrs=10
+lazi=8
+#ruby=0.10.0
+
 if [[ "$distro_base" == "Debian" ]]; then
-    vrs=$(apt search neovim 2>/dev/null | awk 'NR>2 {print;}' | grep '^neovim/' | awk '{print $2}' | sed 's/~.*//g' | sed 's|\(.*\..*\)\..*|\1|g')
+    vrs=$(apt search neovim 2>/dev/null | awk 'NR>2 {print;}' | grep '^neovim/' | awk '{print $2}' | sed 's/~.*//g' | sed 's|\(.*\..*\)\..*|\1|g' | cut -d. -f2)
     #Minimum version for Lazy plugin manager
 fi
 
-if [[ "$distro_base" == "Debian" ]] && [[ $vrs < 0.8 ]]; then
-    echo "Neovim apt version is below 0.8, wich too low to run Lazy.nvim (nvim plugin manager)"
+if [[ "$distro_base" == "Debian" ]] && [ $vrs -lt $lazi ]; then
+    [[ $vrs < $lazi ]] && echo "Neovim apt version ($vrs) is below $lazi wich is too low to run Lazy.nvim (nvim plugin manager)"
+    #[[ $vrs < $ruby ]] && echo "Neovim apt version is below $ruby wich is too low to install ruby dependencies for nvim"
     if ! test -z "$(sudo apt list --installed 2>/dev/null | grep neovim)"; then
         readyn -p "Uninstall apt version of neovim?" nvmapt
         if [[ "y" == "$nvmapt" ]]; then
@@ -66,7 +70,7 @@ if [[ "$distro_base" == "Debian" ]] && [[ $vrs < 0.8 ]]; then
                     fi
                 fi
                 reade -Q "GREEN" -i "$pre $choices" -p "$prompt" nvmappmg
-                if [[ "$nfvmappmg" == 'ppa-unstable' ]]; then
+                if [[ "$nvmappmg" == 'ppa-unstable' ]]; then
                     sudo add-apt-repository ppa:neovim-ppa/unstable
                     sudo apt update
                     eval "${pac_ins} neovim"
@@ -262,8 +266,8 @@ if [[ "$langs" == 'y' ]]; then
                     if ! type cpanm &>/dev/null; then
                         eval "${pac_ins}" cpanminus
                     fi
-                    /usr/bin/vendor_perl/cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
-                    sudo /usr/bin/vendor_perl/cpanm --sudo -n Neovim::Ext
+                    cpanm --local-lib=~/perl5 local::lib && eval "$(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)"
+                    sudo cpanm --sudo -n Neovim::Ext
                 fi
             fi
         fi
