@@ -10,15 +10,15 @@ else
     . ./checks/check_all.sh
 fi
 
-local latest vers all
 
 if ! type ruby &>/dev/null || ! type gem &> /dev/null || ! type rbenv &> /dev/null; then
     if [[ "$distro_base" == "Arch" ]]; then
         eval "${pac_ins} ruby ruby-build rbenv"
     elif [[ $distro_base == "Debian" ]]; then
-        eval "${pac_ins} git-core curl zlib1g-dev build-essential libssl-dev libreadline-dev libyaml-dev libxml2-dev libxslt1-dev libcurl4-openssl-dev libffi-dev"
+        eval "${pac_rm} ruby"       
+        eval "${pac_ins} ruby-build rbenv"
     else
-        eval "${pac_ins}" ruby rbenv
+        eval "${pac_ins} ruby rbenv"
     fi
 
     if test -f ~/.bashrc && ! grep -q 'eval "$(rbenv init -)' ~/.bashrc; then
@@ -30,6 +30,7 @@ if ! type ruby &>/dev/null || ! type gem &> /dev/null || ! type rbenv &> /dev/nu
     fi
 
 fi
+unset latest vers all
 
 test -n "$BASH_VERSION" && source ~/.bashrc
 test -n "$ZSH_VERSION" && source ~/.zshrc
