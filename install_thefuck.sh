@@ -37,7 +37,7 @@ if ! type thefuck &>/dev/null; then
         if test -f $HOME/.local/bin/pipx && ! type pipx &>/dev/null; then
             $HOME/.local/bin/pipx install --upgrade thefuck
         elif type pipx &>/dev/null; then
-            pipx install thefuck
+            pipx install git+https://github.com/nvbn/thefuck
         fi
     fi
 fi
