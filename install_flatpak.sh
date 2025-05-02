@@ -69,7 +69,7 @@ if ! test -f ~/.bash_aliases.d/flatpacks.sh; then
         fi
          
         if ! test -f ~/.bash_aliases.d/flatpacks.sh; then
-            cp -fv --backup auto $file ~/.bash_aliases.d/ 
+            cp --backup numbered $file ~/.bash_aliases.d/ 
             test -n "$BASH_VERSION" && source ~/.bash_aliases.d/flatpacks.sh 
         fi
     fi    
