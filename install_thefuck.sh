@@ -23,6 +23,10 @@ if ! type thefuck &>/dev/null; then
     elif type crew &>/dev/null; then
         crew install thefuck
     else
+         
+        [[ $distro_base == 'Debian' ]] &&
+            eval "${pac_ins} python3-dev python3-pip python3-setuptools"
+        
         if ! type pipx &>/dev/null; then
             if ! test -f install_pipx.sh; then
                 source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)
