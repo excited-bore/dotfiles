@@ -16,7 +16,8 @@ DIR=$(get-script-dir)
 #    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 #fi
 
-if ! type cargo &>/dev/null; then
+if ! type cargo &>/dev/null || [[ $(rustc -V | awk '{print $2}') < 1.81.0 ]]; then
+    eval "${pac_rm} cargo rustc"
     if [[ "$distro_base" == "Debian" ]]; then
         eval "${pac_ins} curl build-essential gcc make"
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
@@ -24,6 +25,7 @@ if ! type cargo &>/dev/null; then
             printf "# CARGO\n[ -f ~/.cargo/env ] && source ~/.cargo/env\n" >> $ENVVAR ||
             sed -i 's,#source ~/.cargo/env,source ~/.cargo/env,g' $ENNVAR &&
             sed -i 's,#[ -f ~/.cargo/env ] && source ~/.cargo/env,[ -f ~/.cargo/env ] && source ~/.cargo/env,g' $ENVVAR
+        source $ENVVAR 
         rustc -V
     elif [[ "$distro_base" == "Arch" ]]; then
         eval "${pac_ins}" rust
