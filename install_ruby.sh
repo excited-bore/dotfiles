@@ -16,16 +16,16 @@ if ! type ruby &>/dev/null || ! type gem &> /dev/null || ! type rbenv &> /dev/nu
     if [[ "$distro_base" == "Arch" ]]; then
         eval "${pac_ins} ruby ruby-build rbenv"
     elif [[ $distro_base == "Debian" ]]; then
-        eval "${pac_ins} ruby ruby-dev rbenv"
+        eval "${pac_ins} git-core curl zlib1g-dev build-essential libssl-dev libreadline-dev libyaml-dev libxml2-dev libxslt1-dev libcurl4-openssl-dev libffi-dev"
     else
         eval "${pac_ins}" ruby rbenv
     fi
 
-    if ! grep -q 'eval "$(rbenv init -)' ~/.bashrc; then
+    if test -f ~/.bashrc && ! grep -q 'eval "$(rbenv init -)' ~/.bashrc; then
         printf "eval \"\$(rbenv init -)\"\n" >>~/.bashrc
     fi
 
-    if ! grep -q 'eval "$(rbenv init -' ~/.zshrc; then
+    if test -f ~/.zshrc && ! grep -q 'eval "$(rbenv init -' ~/.zshrc; then
         printf "eval \"\$(rbenv init - --no-rehash zsh)\"\n" >>~/.zshrc
     fi
 
