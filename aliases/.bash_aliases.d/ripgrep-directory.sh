@@ -11,7 +11,7 @@
 ripgrep-dir() {
     test -z $EDITOR && 
         (command -v nano && export EDITOR=/usr/bin/nano || export EDITOR=/usr/bin/vi) 
-    RG_PREFIX="rg --fixed-strings --follow --column --line-number --no-heading --color=always --smart-case" 
+    RG_PREFIX="rg --fixed-strings --follow --column --line-number --no-heading --color=always --smart-case --glob='!.git*'" 
     INITIAL_QUERY="${*:-}"
     DEFAULT_PROMPT="Dir > "
     local files="$(fzf \

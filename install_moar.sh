@@ -54,8 +54,8 @@ if ! command -v moar &> /dev/null; then
             tmpd=$(mktemp -d)
             tag=$(echo $moar | sed "s/moar-\(.*\)-linux.*/\1/g") 
             wget -P $tmpd https://github.com/walles/moar/releases/download/$tag/$moar
-            chmod u+x $tmpd/moar-*
-            sudo mv $tmpd/moar-* /usr/bin/moar
+            chmod u+x $tmpd/moar*
+            sudo mv $tmpd/moar* /usr/bin/moar
             echo "Done!"
         fi
     fi
