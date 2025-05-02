@@ -159,9 +159,13 @@ function update-system() {
     #echo "This next $(tput setaf 1)sudo$(tput sgr0) will try to update the packages for your system using the package managers it knows";
 
     if [[ $machine == 'Mac' ]]; then
+        
         echo "This next $(tput setaf 1)sudo$(tput sgr0) will try to update the packages for your system using the package managers it knows";
+       
         pac=softwareupdate
+        
         sudo softwareupdate -i -a
+       
         if type brew &> /dev/null; then
             pac=brew       
             if type yes &> /dev/null && ! test -z "$YES" ;then
@@ -172,7 +176,9 @@ function update-system() {
                 brew upgrade
             fi
         fi
+    
     elif [[ "$pac" == "apt" ]] || [[ "$pac" == "nala" ]]; then
+        
         if ! test -z "$YES"; then
             if [[ "$pac" == "apt" ]]; then
                 eval ${pac_up} -y
@@ -182,6 +188,7 @@ function update-system() {
         else
             eval "${pac_up}"
         fi
+       
         hdrs="linux-headers-$(uname -r)"
         if test -z "$(apt list --installed 2> /dev/null | grep $hdrs)"; then
             
@@ -192,15 +199,15 @@ function update-system() {
                 eval "${pac_ins} $hdrs"
             fi
         fi
+
         echo "This next $(tput setaf 1)sudo$(tput sgr0) will try to update the packages for your system using the package managers it knows";
         
         ! test -z "$YES" && flag='--auto' || flag=''
         
         readyn $flag -p "Upgrade system?" upgrd
-        if [[ $upgrd == 'y' ]];then
 
+        if [[ $upgrd == 'y' ]];then
             if ! test -z "$YES"; then 
-                
                 if [[ "$pac" == "apt" ]]; then
                     eval "sudo ${pac} upgrade -y"
                 else
@@ -210,6 +217,9 @@ function update-system() {
             else            
                 eval "sudo ${pac} upgrade" 
             fi
+            
+            eval "${pac_up} -y"            
+        
         fi
  
         if apt --dry-run autoremove 2> /dev/null | grep -Po '^Remv \K[^ ]+'; then
@@ -217,6 +227,7 @@ function update-system() {
             ! test -z "$YES" && flag='--auto' || flag=''
             
             readyn $flag -p 'Autoremove unneccesary packages?' remove
+       
             if [[ "$remove" == 'y' ]]; then
                 if ! test -z "$YES"; then
                     if [[ "$pac" == "apt" ]]; then
@@ -229,10 +240,13 @@ function update-system() {
                 fi
             fi
         fi
+    
     elif [[ "$pac" == "apk" ]]; then
+       
         apk update
 
     elif [[ "$pac" == "pacman" ]]; then
+   
         if ! test -z "$AUR_up"; then
             if ! test -z "$YES"; then 
                 if [[ "$AUR_up" == "pamac update" ]]; then
