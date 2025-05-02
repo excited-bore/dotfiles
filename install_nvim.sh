@@ -277,7 +277,11 @@ fi
 if ! type ctags &>/dev/null; then
     readyn -p "Install ctags? (helps with generating tags for quick lookup of f.ex. functions - best supported for in C development)" ctags
     if [[ "y" == $ctags ]]; then
-        eval "${pac_ins}" ctags
+        if [[ $distro_base == 'Arch' ]]; then
+            eval "${pac_ins}" ctags
+        elif [[ $distro_base == 'Debian' ]]; then
+             eval "${pac_ins} universal-ctags"       
+        fi
     fi
 fi
 
@@ -327,7 +331,7 @@ function instvim_r() {
     if ! sudo test -d /root/.config/nvim/; then
         sudo mkdir -p /root/.config/nvim/
     fi
-    sudo cp -fv --backup auto $dir/* /root/.config/nvim/
+    sudo cp -fv --backup numbered $dir/* /root/.config/nvim/
     if sudo test -n "$(ls /root/.config/nvim/*~ &>/dev/null)"; then
         sudo bash -c 'gio trash /root/.config/nvim/*~'
     fi
@@ -378,7 +382,7 @@ function instvim() {
         mkdir ~/.config/nvim/
     fi
 
-    cp -fv --backup auto $dir/* ~/.config/nvim/
+    cp -fv --backup numbered $dir/* ~/.config/nvim/
 
     if test -n "$(ls ~/.config/nvim/*~ &>/dev/null)"; then
         gio trash ~/.config/nvim/*~
