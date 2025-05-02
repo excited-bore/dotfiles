@@ -96,7 +96,7 @@ fi
 
 # TREE
 if ! type tree &>/dev/null; then
-    readyn -p "Install tree? (Builtin cd shortcut gets a nice directory tree preview ) " tree
+    readyn -p "Install tree? (Builtin cd shortcut gets a nice directory tree preview )" tree
     if [[ "$tree" == "y" ]]; then
         if ! test -f install_tree.sh; then
             source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_tree.sh)
@@ -124,7 +124,7 @@ fi
 # TODO: Check export for ripgrep
 # TODO: Do more with ripgrep
 if ! type rg &>/dev/null; then
-    readyn -p "Install ripgrep? (Recursive grep, opens possibility for line by line fzf )" rpgrp
+    readyn -y -p "Install ripgrep? (Recursive grep, opens possibility for line by line fzf )" rpgrp
     if [[ "$rpgrp" == "y" ]]; then
         if ! test -f install_ripgrep.sh; then
             source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ripgrep.sh)
