@@ -481,16 +481,19 @@ shell-keybinds_r() {
     sudo cp -f $binds1 /root/.keybinds.d/
     sudo cp -f $binds2 /root/.keybinds
     sudo cp -f $binds /root/
+    echo "Next $(tput setaf 1)sudo$(tput sgr0) will check whether '~/.keybinds' is sourced in /root/.bashrc"
     if test -f /root/.bashrc && ! grep -q '[ -f /root/.keybinds ]' /root/.bashrc; then
-        if grep -q '[ -f /root/.bash_aliases ]' /root/.bashrc; then
-            sed -i 's|\(\[ -f \/root/.bash_aliases \] \&\& source \/root/.bash_aliases\)|\1\n\[ -f \/root/.keybinds \] \&\& source \/root/.keybinds\n|g' /root/.bashrc
+        if sudo grep -q '[ -f /root/.bash_aliases ]' /root/.bashrc; then
+            sudo sed -i 's|\(\[ -f \/root/.bash_aliases \] \&\& source \/root/.bash_aliases\)|\1\n\[ -f \/root/.keybinds \] \&\& source \/root/.keybinds\n|g' /root/.bashrc
         else
             printf '[ -f ~/.keybinds ] && source ~/.keybinds' | sudo tee -a /root/.bashrc &>/dev/null
         fi
     fi
+    
     # X based settings is generally not for root and will throw errors
-    if grep -q '^setxkbmap' /root/.keybinds.d/keybinds.bash; then
-        sudo sed -i 's|setxkbmap|#setxkbmap|g' /root/.keybinds.d/keybinds.bash
+    echo "Next $(tput setaf 1)sudo$(tput sgr0) will check whether 'setxkbmap *' is part of /root/.keybinds.d/keybinds.bash and comment this line out to prevent errors"
+    if sudo grep -q '^setxkbmap' /root/.keybinds.d/keybinds.bash; then
+        sudo sed -i 's|^setxkbmap|#setxkbmap|g' /root/.keybinds.d/keybinds.bash
     fi
 }
 

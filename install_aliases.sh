@@ -258,8 +258,8 @@ othr='exit intr n'
 color='GREEN'
 prmpt='[Both/exit/intr/n]: '
 
-# echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for terminate background processes /root/.bashrc' "
-if grep -q "trap '! \[ -z \"\$(jobs -p)\" ] && kill -9 \$(jobs -p.*" ~/.bashrc || grep -q "trap '! [ -z \"\$(jobs -p)\" ] && kill -9 \$(jobs -p.*" /root/.bashrc; then
+echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for interrupt traps to terminate background processes in /root/.bashrc'"
+if grep -q "trap '! \[ -z \"\$(jobs -p)\" ] && kill -9 \$(jobs -p.*" ~/.bashrc || sudo grep -q "trap '! [ -z \"\$(jobs -p)\" ] && kill -9 \$(jobs -p.*" /root/.bashrc; then
     pre='n'
     othr='both exit intr'
     color='YELLOW'
