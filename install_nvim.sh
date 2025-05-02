@@ -266,8 +266,8 @@ if [[ "$langs" == 'y' ]]; then
                     if ! type cpanm &>/dev/null; then
                         eval "${pac_ins}" cpanminus
                     fi
-                    /usr/bin/vendor_perl/cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
-                    sudo /usr/bin/vendor_perl/cpanm --sudo -n Neovim::Ext
+                    cpanm --local-lib=~/perl5 local::lib && eval "$(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)"
+                    sudo cpanm --sudo -n Neovim::Ext
                 fi
             fi
         fi
