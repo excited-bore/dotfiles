@@ -306,7 +306,7 @@ function git_hl() {
                 fi
 
 
-                readyn -n -N 'BLUE' -p "Disable carriage return - '\\\n\\\r' - stripping when diffing files in windows?" diffr6
+                readyn -n -N 'BLUE' -p 'Disable carriage return - "\n\r" - stripping when diffing files in windows?' diffr6
                 if [[ $diffr6 == 'y' ]]; then
                     opts="$opts --strip-cr=off" 
                 fi
@@ -1373,7 +1373,7 @@ gitt() {
         fi
     fi
 
-    unset gitdiff diff gitmerge merge amt rslt gitcnf gitign
+    unset global gitdiff diff gitmerge merge amt rslt gitcnf gitign
 }
 
 test -n "$1" && gitt "$1"

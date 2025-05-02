@@ -766,8 +766,9 @@ fi
 unset tojump
 
 # Autojump
+# -c "! type autojump &> /dev/null"
 
-readyn -p "Install autojump? (jump to folders using 'bookmarks' - j_ )" -c "! type autojump &> /dev/null" tojump
+readyn -n -p "Install autojump? (jump to folders using 'bookmarks' - j_ )" tojump
 if [[ "$tojump" == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_autojump.sh; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_autojump.sh)
