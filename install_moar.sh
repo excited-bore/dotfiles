@@ -50,10 +50,11 @@ if ! command -v moar &> /dev/null; then
                 arch="386"
             fi
             latest=$(curl -sL "https://api.github.com/repos/walles/moar/releases" | jq '.[0]' -r | jq -r '.assets' | grep --color=never "name" | sed 's/"name"://g' | tr '"' ' ' | tr ',' ' ' | sed 's/[[:space:]]//g')                          
-            tmpd=$(mktemp -d)
             moar=$(echo "$latest" | grep --color=never $arch)
-            wget -P $tmpd https://github.com/walles/moar/releases/download/$moar
-            chmod a+x $tmpd/moar-*
+            tmpd=$(mktemp -d)
+            tag=$(echo $moar | sed "s/moar-\(.*\)-linux.*/\1/g") 
+            wget -P $tmpd https://github.com/walles/moar/releases/download/$tag/$moar
+            chmod u+x $tmpd/moar-*
             sudo mv $tmpd/moar-* /usr/bin/moar
             echo "Done!"
         fi
