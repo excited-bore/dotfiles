@@ -71,7 +71,7 @@ if [[ "$distro_base" == "Debian" ]] && ( [[ $vrs < $lazi ]] || [[ $vrs < $ruby ]
                     fi
                 fi
                 reade -Q "GREEN" -i "$pre $choices" -p "$prompt" nvmappmg
-                if [[ "$nfvmappmg" == 'ppa-unstable' ]]; then
+                if [[ "$nvmappmg" == 'ppa-unstable' ]]; then
                     sudo add-apt-repository ppa:neovim-ppa/unstable
                     sudo apt update
                     eval "${pac_ins} neovim"
