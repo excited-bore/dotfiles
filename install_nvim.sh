@@ -26,7 +26,7 @@ lazi=8
 #ruby=0.10.0
 
 if [[ "$distro_base" == "Debian" ]]; then
-    vrs=$(apt search neovim 2>/dev/null | awk 'NR>2 {print;}' | grep '^neovim/' | awk '{print $2}' | sed 's/~.*//g' | sed 's|\(.*\..*\)\..*|\1|g' | cut -d. -f-2)
+    vrs=$(apt search neovim 2>/dev/null | awk 'NR>2 {print;}' | grep '^neovim/' | awk '{print $2}' | sed 's/~.*//g' | sed 's|\(.*\..*\)\..*|\1|g' | cut -d. -f2)
     #Minimum version for Lazy plugin manager
 fi
 
