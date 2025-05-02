@@ -1,21 +1,25 @@
 [[ "$1" == 'n' ]] && SYSTEM_UPDATED='TRUE'
 
-# Allow sudo aliases
-# https://unix.stackexchange.com/questions/139231/keep-aliases-when-i-use-sudo-bash
+# Make sure cp copies forceably (without asking confirmation when overwriting) and verbosely
+unalias cp && alias cp='cp -fv'
 
-# type sudo &>/dev/null &&
-#    alias sudo='sudo '
+# Make sure mv moves forceably (without asking confirmation when overwriting) and verbosely
+unalias mv && alias mv='mv -fv'
+
+# Make sure rm removes forceably, recursively and verbosely 
+unalias rm && alias rm='rm -rfv'
+
+# Make sure sudo isn't aliased to something weird
+command -v sudo &>/dev/null &&
+    unalias sudo
+
+# Wget only uses https - encrypted http
+command -v wget &>/dev/null &&
+    unalias wget && alias wget='wget --https-only '
 
 #! type wget &> /dev/null && command -v brew &> /dev/null &&
 #    brew install wget 
 
-# Wget only uses https - encrypted http
-type wget &>/dev/null &&
-    alias wget='wget --https-only '
-
-# Make sure cp copies forceably (without asking conforirmation when overwriting) and verbosely
-! (alias | grep -q "alias cp='cp -*f*v*" || alias | grep -q "alias cp='cp -*v*f*" ) &&
-    alias cp='cp -fv'
 
 # https://stackoverflow.com/questions/5412761/using-colors-with-printf
 # Execute (during printf) for colored prompt
