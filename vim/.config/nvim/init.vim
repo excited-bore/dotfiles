@@ -429,6 +429,9 @@ Plugin 'preservim/nerdcommenter'
 
 " Gutentags - Automatic Ctags
 Plugin 'ludovicchabant/vim-gutentags'
+if !executable('ctags')
+    let g:gutentags_dont_load = 1
+endif
 
 
 " Minimap to keep track of where in file

@@ -64,7 +64,7 @@ if command -v go &> /dev/null && ! [[ $PATH =~ $gopath ]]; then
      fi 
 fi
 
-echo "This next $(tput setaf 1)sudo$(tput sgr0) will check if something along the lines of 'Defaults secure_path=\".*/$gopath/bin\"' is being kept in /etc/sudoers";
+echo "This next $(tput setaf 1)sudo$(tput sgr0) will check if something along the lines of '/bin:$gopath/bin' is being kept in /etc/sudoers";
 
 if test -f /etc/sudoers && ! sudo grep -q "/bin:$gopath/bin" /etc/sudoers; then
     readyn -p "Add ${RED}$gopath/bin${GREEN} to /etc/sudoers? (so go applications installed with 'go install' can be executed using sudo)?" ansr
