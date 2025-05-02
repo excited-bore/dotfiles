@@ -21,7 +21,7 @@ fi
 
 #. $DIR/setup_git_build_from_source.sh "y" "neovim" "https://github.com" "neovim/neovim" "stable" "sudo apt update; eval "$pac_ins ninja-build gettext libtool libtool-bin cmake g++ pkg-config unzip curl doxygen" "make CMAKE_BUILD_TYPE=RelWithDebInfo; sudo make install" "sudo make uninstall" "make distclean; make deps" "y""
 
-vrs=0
+vrs=10
 lazi=0.8
 #ruby=0.10.0
 
@@ -31,8 +31,7 @@ if [[ "$distro_base" == "Debian" ]]; then
 fi
 
 if [[ "$distro_base" == "Debian" ]] && [[ $vrs < $lazi ]]; then
-    
-    [[ $vrs < $lazi ]] && echo "Neovim apt version is below $lazi wich is too low to run Lazy.nvim (nvim plugin manager)"
+    [[ $vrs < $lazi ]] && echo "Neovim apt version ($vrs) is below $lazi wich is too low to run Lazy.nvim (nvim plugin manager)"
     #[[ $vrs < $ruby ]] && echo "Neovim apt version is below $ruby wich is too low to install ruby dependencies for nvim"
     if ! test -z "$(sudo apt list --installed 2>/dev/null | grep neovim)"; then
         readyn -p "Uninstall apt version of neovim?" nvmapt
