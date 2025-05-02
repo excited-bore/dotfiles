@@ -18,7 +18,13 @@ DIR=$(get-script-dir)
 
 if ! type cargo &>/dev/null; then
     if [[ "$distro_base" == "Debian" ]]; then
-        eval "${pac_ins}" rust
+        eval "${pac_ins} curl build-essential gcc make"
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+        ! grep -q 'source ~/.cargo/env' $ENVVAR &&
+            printf "# CARGO\n[ -f ~/.cargo/env ] && source ~/.cargo/env\n" >> $ENVVAR ||
+            sed -i 's,#source ~/.cargo/env,source ~/.cargo/env,g' $ENNVAR &&
+            sed -i 's,#[ -f ~/.cargo/env ] && source ~/.cargo/env,[ -f ~/.cargo/env ] && source ~/.cargo/env,g' $ENVVAR
+        rustc -V
     elif [[ "$distro_base" == "Arch" ]]; then
         eval "${pac_ins}" rust
     elif [[ "$distro" == 'Fedora' ]]; then

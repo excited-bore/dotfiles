@@ -80,15 +80,6 @@ if ! test -f $HOME/.environment.env; then
     fi
 fi
 
-if test -z "$(eval "$pac_ls_ins groff 2> /dev/null")"; then
-    printf "${CYAN}groff${normal} is not installed (Necessary for 'man' (manual) command)\n"
-    readyn -p "Install groff?" groff_ins
-    if [[ $groff_ins == 'y' ]]; then
-        eval "${pac_ins}" groff
-        printf "Logout and login (or reboot) to take effect\n"
-    fi
-    unset groff_ins
-fi
 
 if ! command -v zip &> /dev/null || ! command -v unzip &> /dev/null; then
     printf "${CYAN}zip${normal} and/or ${CYAN}unzip${normal} are not installed \n"
@@ -108,6 +99,16 @@ if [[ $machine == 'Linux' ]]; then
         fi
         unset nzp_ins
     fi
+fi
+
+if test -z "$(eval "$pac_ls_ins groff 2> /dev/null")"; then
+    printf "${CYAN}groff${normal} is not installed (Necessary for 'man' (manual) command)\n"
+    readyn -p "Install groff?" groff_ins
+    if [[ $groff_ins == 'y' ]]; then
+        eval "${pac_ins}" groff
+        printf "Logout and login (or reboot) to take effect\n"
+    fi
+    unset groff_ins
 fi
 
 if [[ $distro_base == 'Debian' ]]; then
