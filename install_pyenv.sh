@@ -10,17 +10,16 @@ else
     . ./checks/check_all.sh
 fi
 
-if ! type pyenv &> /dev/null; then
-    if [[ $machine == 'Mac' ]] && command -v brew &> /dev/null; then
-        brew install pyenv 
-    elif [[ "$distro_base" == "Arch" ]]; then
-        eval "${pac_ins} pyenv"
-    elif [[ $distro_base == "Debian" ]]; then
-        curl https://pyenv.run | bash    
-    else
-        curl https://pyenv.run | bash
-    fi 
-fi
+if [[ $machine == 'Mac' ]] && command -v brew &> /dev/null; then
+    brew install pyenv 
+elif [[ "$distro_base" == "Arch" ]]; then
+    eval "${pac_ins} pyenv"
+elif [[ $distro_base == "Debian" ]]; then
+    eval "${pac_ins} python3-setuptools python3-tk"
+    curl https://pyenv.run | bash    
+else
+    curl https://pyenv.run | bash
+fi 
 
 readyn -p 'Enable pyenv shell integration for current shell?' shell_init
 if [[ "$shell_init" == 'y' ]]; then

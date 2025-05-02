@@ -548,7 +548,7 @@ function rm-prompt(){
     if [[ $files > 0 ]] || [[ $symlinks > 0 ]] || [[ $dirss > 0 ]]; then
         reade -Q 'YELLOW' -i 'y n' -p "Remove all $symlinks symlink(s), $files file(s) and all $dirss directory(s)? [Y/n]: " rm_stff
         if [[ "$rm_stff" == 'y' ]]; then
-            command rm -f $RMPROMPT_RM_OPT -- $itms 
+            command rm -f $RMPROMPT_RM_OPT -- $@ 
         fi
     fi
     unset rm_stff dirss files i itm
