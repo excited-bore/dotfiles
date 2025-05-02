@@ -1071,6 +1071,15 @@ gitt() {
     readyn -p "Configure diff-wrapper/diff-pager for ${CYAN}pager.diff${GREEN}, ${CYAN}pager.show${GREEN} and ${CYAN}interactive.difffilter${GREEN}?" wdiff
    if [[ $wdiff == 'y' ]]; then
 
+        readyn -p "Install custom diff syntax highlighter?" -c "test -z '$diffs'" gitpgr
+        if [[ "$gitpgr" == "y" ]]; then
+            if ! test -f install_differ.sh; then
+                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_differ.sh)
+            else
+                . ./install_differ.sh
+            fi
+        fi
+ 
         local diffs diffsf
         if type delta &>/dev/null; then
             diffs=$diffs" delta"
