@@ -11,14 +11,15 @@ else
     . ./checks/check_all.sh
 fi
 
+if ! test -f checks/check_AUR.sh; then
+    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_AUR.sh)
+else
+    . ./checks/check_AUR.sh
+fi
+
 if ! type autojump &>/dev/null; then
     if [[ "$distro_base" == "Arch" ]]; then
-            if ! test -f checks/check_AUR.sh; then
-                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_AUR.sh)
-            else
-                . ./checks/check_AUR.sh
-            fi
-            eval "${AUR_ins}" autojump
+        eval "${AUR_ins}" autojump
     elif [[ $distro_base == "Debian" ]]; then
         eval "${pac_ins}" autojump
     fi

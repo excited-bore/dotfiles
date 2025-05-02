@@ -11,19 +11,24 @@ else
     . ./checks/check_all.sh
 fi
 
-SCRIPT_DIR=$(get-script-dir)
+DIR=$(get-script-dir)
+
+if ! test -f $DIR/checks/check_AUR.sh; then
+    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_AUR.sh)
+else
+    . $DIR/checks/check_AUR.sh
+fi
 
 
 if ! type lazydocker &>/dev/null; then
     if [[ $distro_base == "Arch" ]] && test -n "$AUR_ins"; then
         eval "${AUR_ins}" lazydocker
     else
-        if ! type go &>/dev/null || $(type go &>/dev/null && [[ $(go version | awk '{print $3}' | cut -c 3-) < 1.19 ]]); then
-            if ! test -f install_go.sh; then
-                tmp=$(mktemp) && wget -O $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_go.sh
-                ./$tmp
+        if ! type go &>/dev/null || $(type go &>/dev/null && [ $(go version | awk '{print $3}' | cut -c 3-) -lt 1.19 ]); then
+            if ! test -f $DIR/install_go.sh; then
+                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_go.sh)
             else
-                . ./install_go.sh
+                . $DIR/install_go.sh
             fi
             go install github.com/jesseduffield/lazydocker@latest
         fi
