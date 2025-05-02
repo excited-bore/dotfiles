@@ -1,21 +1,24 @@
 [[ "$1" == 'n' ]] && SYSTEM_UPDATED='TRUE'
 
 # Make sure cp copies forceably (without asking confirmation when overwriting) and verbosely
-unalias cp && alias cp='cp -fv'
+alias | grep -q 'alias cp' &&
+    unalias cp && alias cp='cp -fv'
 
 # Make sure mv moves forceably (without asking confirmation when overwriting) and verbosely
-unalias mv && alias mv='mv -fv'
+alias | grep -q 'alias mv' &&
+    unalias mv && alias mv='mv -fv'
 
 # Make sure rm removes forceably, recursively and verbosely 
-unalias rm && alias rm='rm -rfv'
+alias | grep -q 'alias rm' &&
+    unalias rm && alias rm='rm -rfv'
 
 # Make sure sudo isn't aliased to something weird
-command -v sudo &>/dev/null &&
+command -v sudo &>/dev/null && alias | grep -q 'alias sudo' &&
     unalias sudo
 
 # Wget only uses https - encrypted http
-command -v wget &>/dev/null &&
-    unalias wget && alias wget='wget --https-only '
+command -v wget &>/dev/null && alias | grep -q 'alias wget' &&
+    unalias wget && alias wget='wget --https-only'
 
 #! type wget &> /dev/null && command -v brew &> /dev/null &&
 #    brew install wget 
