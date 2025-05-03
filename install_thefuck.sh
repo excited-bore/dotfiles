@@ -35,10 +35,19 @@ if ! type thefuck &>/dev/null; then
             fi
         fi
         if test -f $HOME/.local/bin/pipx && ! type pipx &>/dev/null; then
-            $HOME/.local/bin/pipx install git+https://github.com/nvbn/thefuck
+            $HOME/.local/bin/pipx install thefuck
         elif type pipx &>/dev/null; then
-            pipx install git+https://github.com/nvbn/thefuck
+            pipx install thefuck
         fi
+        (cd $HOME/.local/share/pipx/venvs/thefuck
+         ./python3 -m pip install setuptools
+        )
+        sed -i 's/from imp import load_source/import importlib.machinery/' $HOME/.local/share/python3.12/site-packages/thefuck/conf.py
+        sed -i 's/settings = load_source(/settings = importlib.machinery.SourceFileLoader("settings", text_type(self.user_dir.joinpath("settings.py"))).load_module()/' $HOME/.local/share/python3.12/site-packages/thefuck/conf.py
+        sed -i "/'settings', text_type(self.user_dir.joinpath('settings.py')))/d" $HOME/.local/share/python3.12/site-packages/thefuck/conf.py
+        
+        sed -i 's/from imp import load_source/import importlib.machinery/' $HOME/.local/share/pipx/venvs/thefuck/lib/python3.12/site-packages/thefuck//types.py
+        sed -i 's/rule_module = load_source(name, str(path))/rule_module = importlib.machinery.SourceFileLoader(name, str(path)).load_module()/' $HOME/.local/share/pipx/venvs/thefuck/lib/python3.12/site-packages/thefuck//types.py
     fi
 fi
 
