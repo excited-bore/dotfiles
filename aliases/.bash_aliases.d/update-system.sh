@@ -359,7 +359,7 @@ function update-system() {
         fi
     fi
 
-    if ! test -z "$YES"; then
+    if test -n "$YES"; then
         YES="--auto" 
     fi
 
