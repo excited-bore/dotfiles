@@ -36,7 +36,7 @@ if [[ $machine == 'Windows' ]]; then
     else
         export ARCH_WIN='32'
     fi
-    if ! type winget &>/dev/null; then
+    if ! hash winget &>/dev/null; then
         #win_ver=$(cmd /c ver)
         printf "${RED}Winget (official window package manager) not installed - can't run scripts without install programs through it${normal}\n"
         readyn -p "(Attempt to) Install winget? ${CYAN}(Windows 10 - version 1809 required at mimimum for winget)${GREEN}" wngt
@@ -49,7 +49,7 @@ if [[ $machine == 'Windows' ]]; then
             #exit 1
         fi
     fi
-    if ! type sudo &>/dev/null; then
+    if ! hash sudo &>/dev/null; then
         printf "${RED}Sudo (Commandline tool to install/modify files at higher privilige, as root/admin) not installed - most of the script won't run without without${normal}\n"
         reade -Q 'GREEN' -i 'y' -p 'Install (g)sudo (unofficial sudo)? [Y/n]: ' 'n' gsdn
         if [[ "$gsdn" == 'y' ]]; then
@@ -58,7 +58,7 @@ if [[ $machine == 'Windows' ]]; then
             #exit 1
         fi
     fi
-    if ! type jq &>/dev/null; then
+    if ! hash jq &>/dev/null; then
         reade -Q 'GREEN' -i 'y' -p 'Install jq? (Json parser - used in scripts to get latest releases from github) [Y/n]: ' 'n' jqin
         if [[ $jqin == 'y' ]]; then
             winget install jqlang.jq
@@ -82,21 +82,21 @@ else
     SSHELL=sh
 fi
 
-if test -z $EDITOR; then
-    if type nano &>/dev/null; then
+if test -z "$EDITOR"; then
+    if hash nano &>/dev/null; then
         EDITOR=nano
-    elif type vi &>/dev/null; then
+    elif hash vi &>/dev/null; then
         EDITOR=vi
     else
         EDITOR=edit
     fi
 fi
 
-if type whereis &>/dev/null; then
+if hash whereis &>/dev/null; then
     function where_cmd() {
         eval "whereis $1 $pthdos2unix" | awk '{print $2;}'
     }
-elif type where &>/dev/null; then
+elif hash where &>/dev/null; then
     function where_cmd() {
         eval "where $1 $pthdos2unix"
     }
@@ -105,7 +105,7 @@ else
     #exit 1
 fi
 
-[[ $machine == 'Mac' ]] && type brew &> /dev/null &&
+if [[ $machine == 'Mac' ]] && hash brew &> /dev/null; then
     pac="brew"
     pac_up="brew update"
     pac_upg="brew update"
@@ -117,7 +117,7 @@ fi
     pac_clean_cache="brew cleanup --scrub"
     pac_ls_ins="brew list"
     #pac_rm_casc="sudo pacman -Rc"
-        
+fi
 
 
 # https://unix.stackexchange.com/questions/202891/how-to-know-whether-wayland-or-x11-is-being-used
