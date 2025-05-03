@@ -45,12 +45,12 @@ if [[ $ansr == 'pay-respects' ]]; then
 fi
 if test -n $ansr; then
     if test -f ~/.bashrc; then
-        sed -i '/eval \"\$(pay-respects --alias/d' ~/.bashrc 
-        printf "eval \"\$(pay-respects --alias $ansr)\"\n" >>~/.bashrc
+        sed -i '/eval \"\$(pay-respects bash --alias/d' ~/.bashrc 
+        printf "eval \"\$(pay-respects bash --alias $ansr)\"\n" >>~/.bashrc
     fi
     if test -f ~/.zshrc; then
-        sed -i '/eval \"\$(pay-respects --alias/d' ~/.zshrc
-        printf "eval \"\$(pay-respects --alias $ansr)\"\n" >>~/.zshrc
+        sed -i '/eval \"\$(pay-respects zsh --alias/d' ~/.zshrc
+        printf "eval \"\$(pay-respects zsh --alias $ansr)\"\n" >>~/.zshrc
     fi
 
     unset ansr
