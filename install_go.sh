@@ -21,7 +21,7 @@ if ! hash go &> /dev/null; then
         elif [[ "$arch" == "amd64" ]]; then
            arch="amd64"
         fi
-        sudo command rm -rf /usr/local/go 
+        sudo rm -rf /usr/local/go 
         latest=$(curl -sL "https://github.com/golang/go/tags" | grep --color=never "/golang/go/releases/tag" | perl -pe 's|.*/golang/go/releases/tag/(.*?)".*|\1|' | uniq | awk 'NR==1{max=$1;print $0; exit;}')
         file="$latest.linux-$arch.tar.gz"
         checksum=$(curl -sL "https://golang.google.cn/dl/" | awk 'BEGIN{FS="\n"; RS=""} $0 ~ /'$file'/ &&  $0 ~ /<\/tt>/ {print $0;}' | grep --color=never "<tt>" | sed "s,.*<tt>\(.*\)</tt>.*,\1,g")
@@ -39,7 +39,7 @@ if ! hash go &> /dev/null; then
                     eval "$pac_ins tar" 
                 fi
                 sudo tar -C /usr/local -xzf $file
-                command rm -rf $file
+                rm -rf $file
             fi
             #if grep -q "GOROOT" $ENVVAR; then
             #    sed -i "s|.export GOROOT=|export GOROOT=|g" $ENVVAR
@@ -54,31 +54,28 @@ if ! hash go &> /dev/null; then
     fi
 fi
 
-gopath="$HOME/go"
-hash go &> /dev/null && 
-    gopath=$(go env | grep --color=never GOPATH | cut -d= -f2 | sed "s/'//g") 
 
-if hash go &> /dev/null && ! [[ $PATH =~ $gopath ]]; then   
-     if grep -q 'go/bin' $ENVVAR; then
-         sed -i 's|.export PATH=$PATH:.*go/bin|export PATH=$PATH:'$gopath'/bin|g' $ENVVAR
-         sed -i 's|export PATH=$PATH:.*go/bin|export PATH=$PATH:'$gopath'/bin|g' $ENVVAR
-     else
-         printf "# GO\nexport PATH=\$PATH:$gopath/bin\n" >> $ENVVAR 
-     fi 
+if ! [[ $PATH =~ /usr/local/go/bin ]]; then
+    if grep -q '$GOPATH' $ENVVAR; then
+        sed -i 's|.export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin|export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin|g' $ENVVAR
+    else
+        printf "# GO\nexport PATH=\$PATH:/usr/local/go/bin:\$GOPATH/bin\n" >> $ENVVAR 
+    fi 
 fi
 
-echo "This next $(tput setaf 1)sudo$(tput sgr0) will check if something along the lines of '/bin:$gopath/bin' is being kept in /etc/sudoers";
+source $ENVVAR
 
-if test -f /etc/sudoers && ! sudo grep -q "/bin:$gopath/bin" /etc/sudoers; then
+go --version
+
+echo "This next $(tput setaf 1)sudo$(tput sgr0) will check if something along the lines of '/bin:$GOPATH/bin' is being kept in /etc/sudoers";
+
+if test -f /etc/sudoers && ! sudo grep -q "/bin:$GOPATH/bin" /etc/sudoers; then
     readyn -p "Add ${RED}$gopath/bin${GREEN} to /etc/sudoers? (so go applications installed with 'go install' can be executed using sudo)?" ansr
     if [[ "$ansr" == 'y' ]]; then
         sudo sed -i 's,Defaults secure_path="\(.*\)",Defaults secure_path="\1:'"$gopath"'/bin/",g' /etc/sudoers
         echo "Added ${GREEN}'$gopath/bin'${normal} to ${RED}secure_path${normal} in /etc/sudoers!"
     fi
 fi
-
-export PATH="$PATH:$gopath/bin" 
-
 
 #if command -v go &> /dev/null && echo $(go env) | grep -q "GOPATH=$HOME/go"; then
 #    readyn -p "Source installed go outside of $HOME/go? (Set GOPATH):" gopth
