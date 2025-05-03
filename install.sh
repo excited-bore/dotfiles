@@ -803,13 +803,14 @@ fi
 unset strshp
 
 # Thefuck
+# i mean pay-respects 
 
-readyn -p "Install 'thefuck'? (Correct last command that ended with an error)" -c "! hash thefuck &> /dev/null" tf
+readyn -p "Install 'pay-respects'? (Correct last command that ended with an error - 'thefuck' successor)" -c "! hash pay-respects &> /dev/null" tf
 if [[ "$tf" == "y" ]]; then
-    if ! test -f $SCRIPT_DIR/install_thefuck.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_thefuck.sh)
+    if ! test -f $SCRIPT_DIR/install_f.sh; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_f.sh)
     else
-        . $SCRIPT_DIR/install_thefuck.sh
+        . $SCRIPT_DIR/install_f.sh
     fi
 fi
 unset tf
