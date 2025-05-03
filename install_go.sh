@@ -41,31 +41,39 @@ if ! hash go &> /dev/null; then
                 sudo tar -C /usr/local -xzf $file
                 rm -rf $file
             fi
-            #if grep -q "GOROOT" $ENVVAR; then
-            #    sed -i "s|.export GOROOT=|export GOROOT=|g" $ENVVAR
-            #    sed -i "s|export GOROOT=.*|export GOROOT=$goroot|g" $ENVVAR
-            #    sed -i "s|.export PATH=\$PATH:\$GOROOT|export PATH=\$PATH:\$GOROOT|g" $ENVVAR
-            #    
-            #else
-            #    echo "export GOROOT=$goroot" >> $ENVVAR
-            #    echo "export PATH=\$PATH:\$GOROOT" >> $ENVVAR
-            #fi
+            
+            if ! [[ $PATH =~ /usr/local/go/bin ]]; then
+                if grep -q 'GOPATH' $ENVVAR; then
+                    sed -i 's|.export PATH=$PATH:/usr/local/go/bin|export PATH=$PATH:/usr/local/go/bin|g' $ENVVAR
+                    sed -i 's|.export PATH=$PATH:$(go env GOPATH)/bin|export PATH=$PATH:$(go env GOPATH)/bin|g' $ENVVAR
+                else
+                    printf "# GO\nexport PATH=\$PATH:/usr/local/go/bin\n" >> $ENVVAR 
+                    printf "export PATH=\$PATH:\$(go env GOPATH)/bin\n" >> $ENVVAR        
+                fi 
+                
+                source $ENVVAR
+            fi
         fi
     fi
 fi
 
+go --version
 
-if ! [[ $PATH =~ /usr/local/go/bin ]]; then
-    if grep -q '$GOPATH' $ENVVAR; then
-        sed -i 's|.export PATH=$PATH:/usr/local/go/bin:$(go env GOPATH)/bin|export PATH=$PATH:/usr/local/go/bin:$(go env GOPATH)/bin|g' $ENVVAR
+if ! [[ $PATH =~ "$(go env GOPATH)/bin" ]]; then
+    if grep -q 'GOPATH' $ENVVAR; then
+        sed -i 's|.export PATH=$PATH:$(go env GOPATH)/bin|export PATH=$PATH:$(go env GOPATH)/bin|g' $ENVVAR
     else
-        printf "# GO\nexport PATH=\$PATH:/usr/local/go/bin:\$(go env GOPATH)/bin\n" >> $ENVVAR 
+        if grep -q '# GO' $ENVVAR; then
+            printf "export PATH=\$PATH:\$(go env GOPATH)/bin\n" >> $ENVVAR        
+        else 
+            printf "# GO\nexport PATH=\$PATH:\$(go env GOPATH)/bin\n" >> $ENVVAR 
+        fi
     fi 
+    
+    source $ENVVAR
+
 fi
 
-source $ENVVAR
-
-go --version
 
 hash go && gopath=$(go env | grep --color=never GOPATH | cut -d= -f2 | sed "s/'//g")
 
