@@ -113,7 +113,7 @@ if ! type reade &> /dev/null ; then
     elif test -f $SCRIPT_DIR/01-reade.sh; then
 	. $SCRIPT_DIR/01-reade.sh 1> /dev/null
     else
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade)" &> /dev/null 
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade) &> /dev/null 
     fi
 fi
 
@@ -123,8 +123,8 @@ if ! type readyn &> /dev/null; then
     elif test -f $SCRIPT_DIR/02-readyn.sh; then
         . $SCRIPT_DIR/02-readyn.sh 1> /dev/null
     else
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/readyn)" &> /dev/null 
-    fi
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/readyn) &> /dev/null
+     fi
 fi
 
 if ! type yes-edit-no &> /dev/null; then
@@ -133,8 +133,16 @@ if ! type yes-edit-no &> /dev/null; then
     elif test -f $SCRIPT_DIR/03-yes-edit-no.sh; then
         . $SCRIPT_DIR/03-yes-edit-no.sh 1> /dev/null
     else
-        eval "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/yes-edit-no)" &> /dev/null 
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/yes-edit-no) &> /dev/null 
     fi
 fi
 
-
+if test -z "$pac"; then
+    if test -f $SCRIPT_DIR/checks/check_system.sh; then
+        . $SCRIPT_DIR/checks/check_system.sh 1> /dev/null
+    elif test -f $SCRIPT_DIR/04-check_system.sh; then
+        . $SCRIPT_DIR/04-check_system.sh 1> /dev/null
+    else
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh) &> /dev/null 
+    fi
+fi
