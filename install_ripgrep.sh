@@ -30,13 +30,13 @@ if ! test -f ~/.ripgreprc; then
             echo 'export RIPGREP_CONFIG_PATH=$HOME/.ripgreprc' >> $ENVVAR &> /dev/null
         fi
     } 
-    yes-edit-no -f ripgrep_conf -g "$file" -p "Install .ripgreprc at $HOME?" -c "test -f ~/.ripgreprc && test -z "$(diff $file ~/.ripgreprc)" || ! test -f ~/.ripgreprc" 
+    yes-edit-no -f ripgrep_conf -g "$file" -p "Install .ripgreprc at $HOME?" -c "test -f ~/.ripgreprc || test -n \"$(test -f ~/.ripgreprc && diff $file ~/.ripgreprc)\"" 
 fi
 
 echo "Next $(tput setaf 1)sudo$(tput sgr0) will check whether root dir exists and whether it contains a .ripgreprc config file"
 if sudo test -d /root && ! sudo test -f /root/.ripgreprc; then 
     function ripgrep_conf_r(){
-        sudo cp -fv --backup numbered $file /root 
+        sudo cp -fv --backup=numbered $file /root 
         if sudo grep -q 'export RIPGREP_CONFIG_PATH' $ENVVAR_R; then
             sudo sed -i 's|#export RIPGREP_CONFIG_PATH=|export RIPGREP_CONFIG_PATH=|g' $ENVVAR_R
             sudo sed -i 's|export RIPGREP_CONFIG_PATH=.*|export RIPGREP_CONFIG_PATH=$HOME/.ripgreprc|g' $ENVVAR_R
