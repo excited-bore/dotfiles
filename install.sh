@@ -3,7 +3,7 @@
 export INSTALL=1
 
 if ! test -f checks/check_all.sh; then
-    if type curl &>/dev/null; then
+    if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
@@ -15,7 +15,7 @@ fi
 
 SCRIPT_DIR=$(get-script-dir)
 
-if ! type rlwrap &>/dev/null; then
+if ! hash rlwrap &>/dev/null; then
     if ! test -f $SCRIPT_DIR/checks/check_rlwrap.sh; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_rlwrap.sh)
     else
@@ -23,18 +23,18 @@ if ! type rlwrap &>/dev/null; then
     fi
 fi
 
-if ! type curl &>/dev/null && ! test -z "$pac_ins"; then
+if ! hash curl &>/dev/null && ! test -z "$pac_ins"; then
     printf "${GREEN}Installing curl\n${normal}"
     eval ${pac_ins} curl
 fi
 
-if ! type jq &>/dev/null && ! test -z "$pac_ins"; then
+if ! hash jq &>/dev/null && ! test -z "$pac_ins"; then
     printf "${GREEN}Installing jq\n${normal}"
     eval ${pac_ins} jq
 fi
 
 printf "${green}If all necessary files are sourced correctly, this text looks green.\nIf not, something went wrong.\n"
-if type gio &>/dev/null; then
+if hash gio &>/dev/null; then
     printf "\n${green}Files that get overwritten get backed up and trashed (to prevent clutter).\nRecover using ${cyan}'gio trash --list'${green} and ${cyan}'gio trash --restore' ${normal}\n"
 fi
 
@@ -91,7 +91,7 @@ if ! command -v zip &> /dev/null || ! command -v unzip &> /dev/null; then
 fi
 
 if [[ $machine == 'Linux' ]]; then
-    if [[ "$X11_WAY" == 'x11' ]] && (! type xclip &>/dev/null || ! type xsel &>/dev/null); then
+    if [[ "$X11_WAY" == 'x11' ]] && (! hash xclip &>/dev/null || ! hash xsel &>/dev/null); then
         printf "${CYAN}xclip${normal} and/or ${CYAN}xsel${normal} are not installed (clipboard tools for X11 based systems)\n"
         readyn -p "Install xclip and xsel?" nzp_ins
         if [[ $nzp_ins == 'y' ]]; then
@@ -142,14 +142,14 @@ if [[ $distro_base == 'Debian' ]]; then
         fi
     fi
 
-    if type add-apt-repository &>/dev/null; then
+    if hash add-apt-repository &>/dev/null; then
         #if ! test -f $SCRIPT_DIR/install_list-ppa.sh; then
         #    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_list-ppa.sh)
         #else
         #    . $SCRIPT_DIR/install_list-ppa.sh
         #fi
 
-        if ! type ppa-purge &>/dev/null && ! test -z "$(apt search ppa-purge 2>/dev/null | awk 'NR>2{print;}')"; then
+        if ! hash ppa-purge &>/dev/null && ! test -z "$(apt search ppa-purge 2>/dev/null | awk 'NR>2{print;}')"; then
             printf "${CYAN}ppa-purge${normal} is not installed (cmd tool for disabling installed PPA's)\n"
             readyn -p "Install ppa-purge?" ppa_ins
             if [[ $ppa_ins == 'y' ]]; then
@@ -159,7 +159,7 @@ if [[ $distro_base == 'Debian' ]]; then
         fi
     fi
 
-    if ! type nala &>/dev/null && ! test -z "$(apt search nala 2>/dev/null | awk 'NR>2{print;}')"; then
+    if ! hash nala &>/dev/null && ! test -z "$(apt search nala 2>/dev/null | awk 'NR>2{print;}')"; then
         printf "${CYAN}nala${normal} is not installed (A TUI wrapper for apt install, update, upgrade, search, etc..)\n"
         readyn -p "Install nala?" nala_ins
         if [[ $nala_ins == 'y' ]]; then
@@ -172,7 +172,7 @@ if [[ $distro_base == 'Debian' ]]; then
     fi
 
     if [[ $distro == "Ubuntu" ]]; then
-        if ! type synaptic &>/dev/null; then
+        if ! hash synaptic &>/dev/null; then
             printf "${CYAN}synaptic${normal} is not installed (Better GUI for package management)\n"
             readyn -p "Install synaptic? " ins_curl
             if [[ $ins_curl == 'y' ]]; then
@@ -186,18 +186,18 @@ elif [[ $distro_base == 'Arch' ]]; then
 
     if test -z "$(pacman -Q pacman-contrib 2>/dev/null)"; then
         printf "${CYAN}pacman-contrib${normal} is not installed (Includes tools like pactree, pacsearch, pacdiff..)\n"
-        readyn -p 'Install pacman-contrib package?' -c '! type pactree &> /dev/null' pacmn_cntr
+        readyn -p 'Install pacman-contrib package?' -c '! hash pactree &> /dev/null' pacmn_cntr
         if [[ "$pacmn_cntr" == 'y' ]]; then
             sudo pacman -Su pacman-contrib
         fi
     fi
     unset pacmn_cntr
 
-    if ! type yay &>/dev/null; then
+    if ! hash yay &>/dev/null; then
         printf "${CYAN}yay${normal} is not installed (Pacman wrapper for installing AUR packages, needed for yay-fzf-install)\n"
         readyn -p "Install yay?" insyay
         if [[ "y" == "$insyay" ]]; then
-            if type curl &>/dev/null && ! test -f $SCRIPT_DIR/AUR_installers/install_yay.sh; then
+            if hash curl &>/dev/null && ! test -f $SCRIPT_DIR/AUR_installers/install_yay.sh; then
                 source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/AUR_installers/install_yay.sh)
             else
                 . $SCRIPT_DIR/AUR_installers/install_yay.sh
@@ -211,7 +211,7 @@ elif [[ $distro_base == 'Arch' ]]; then
         unset insyay
     fi
 
-    if type pamac &>/dev/null; then
+    if hash pamac &>/dev/null; then
         if ! test -f $SCRIPT_DIR/checks/check_pamac.sh; then
             source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pamac.sh)
         else
@@ -259,7 +259,7 @@ fi
 
 # Appimagelauncher
 
-if ! type AppImageLauncher &>/dev/null; then
+if ! hash AppImageLauncher &>/dev/null; then
     printf "${GREEN}If you want to install applications using appimages, there is a helper called 'appimagelauncher'\n"
     readyn -p "Check if appimage ready and install appimagelauncher?" appimage_install
     if [[ "$appimage_install" == 'y' ]]; then
@@ -273,7 +273,7 @@ fi
 
 # Flatpak
 
-#if ! type flatpak &> /dev/null; then
+#if ! hash flatpak &> /dev/null; then
 #printf "%s\n" "${blue}No flatpak detected. (Independent package manager from Red Hat)${normal}"
 readyn -p "Install (or just configure) Flatpak?" -c "test -z \"$FLATPAK\"" insflpk
 if [[ "y" == "$insflpk" ]]; then
@@ -285,7 +285,7 @@ if [[ "y" == "$insflpk" ]]; then
 fi
 unset insflpk
 
-if ! type snap &>/dev/null; then
+if ! hash snap &>/dev/null; then
     printf "%s\n" "${blue}No snap detected. (Independent package manager from Canonical)${normal}"
     readyn -Y "MAGENTA" -p "Install snap?" -n inssnap
     if [[ "y" == "$inssnap" ]]; then
@@ -300,7 +300,7 @@ unset inssnap
 
 # Ack prompt
 
-readyn -c "! type ack &> /dev/null" -p "Install ack? (A modern replacement for grep - finds lines in shell output)" ack
+readyn -c "! hash ack &> /dev/null" -p "Install ack? (A modern replacement for grep - finds lines in shell output)" ack
 
 if [[ "y" == "$ack" ]]; then
     if ! test -f $SCRIPT_DIR/install_ack.sh; then
@@ -313,9 +313,9 @@ unset ack
 
 # Hhighlighter (or just h)
 
-readyn -c "! type h &> /dev/null" -p "Install hhighlighter (or just h)? (A tiny utility to highlight multiple keywords with different colors in a textoutput)" h
+readyn -c "! hash h &> /dev/null" -p "Install hhighlighter (or just h)? (A tiny utility to highlight multiple keywords with different colors in a textoutput)" h
 if [[ "y" == "$h" ]]; then
-    if ! type ack &>/dev/null; then
+    if ! hash ack &>/dev/null; then
         printf "For ${CYAN}hhighlighter${normal} to work, ${CYAN}ack${normal} needs to be installed beforehand.\n"
         readyn -p "Install ack and then hhighlighter?" ansr
         if [[ "$ansr" == 'y' ]]; then
@@ -339,7 +339,7 @@ unset h
 
 # Eza prompt
 
-readyn -p "Install eza? (A modern replacement for ls)" -c "! type eza &> /dev/null" rmp
+readyn -p "Install eza? (A modern replacement for ls)" -c "! hash eza &> /dev/null" rmp
 
 if [[ "y" == "$rmp" ]]; then
     if ! test -f $SCRIPT_DIR/install_eza.sh; then
@@ -352,7 +352,7 @@ unset rmp
 
 # Xcp
 
-readyn -p "Install xcp? (cp but faster and with progress bar)" -c "! type xcp &> /dev/null" rmp
+readyn -p "Install xcp? (cp but faster and with progress bar)" -c "! hash xcp &> /dev/null" rmp
 
 if [[ "y" == "$rmp" ]]; then
     if ! test -f $SCRIPT_DIR/install_xcp.sh; then
@@ -365,7 +365,7 @@ unset rmp
 
 # Rm prompt
 
-readyn -p "Install rm-prompt? (Rm but lists files/directories before deletion)" -c "! type rm-prompt &> /dev/null" rmp
+readyn -p "Install rm-prompt? (Rm but lists files/directories before deletion)" -c "! hash rm-prompt &> /dev/null" rmp
 
 if [[ "y" == "$rmp" ]]; then
     if ! test -f $SCRIPT_DIR/install_rmprompt.sh; then
@@ -392,7 +392,7 @@ unset compl
 
 # Python completions
 
-readyn -p "Install python completions in ~/.bash_completion.d?" -c "! type activate-global-python-argcomplete &> /dev/null" pycomp
+readyn -p "Install python completions in ~/.bash_completion.d?" -c "! hash activate-global-python-argcomplete &> /dev/null" pycomp
 if [[ "y" == "$pycomp" ]]; then
     if ! test -f $SCRIPT_DIR/install_python_completions.sh; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_python_completions.sh)
@@ -567,7 +567,7 @@ unset bash_preexec
 
 # Pipewire (better sound)
 
-readyn -p "Install and configure pipewire? (sound system - pulseaudio replacement)" -c '! type wireplumber &> /dev/null || ! test -f ~/.config/pipewire/pipewire-pulse.conf.d/switch-on-connect.conf;' pipew
+readyn -p "Install and configure pipewire? (sound system - pulseaudio replacement)" -c '! hash wireplumber &> /dev/null || ! test -f ~/.config/pipewire/pipewire-pulse.conf.d/switch-on-connect.conf;' pipew
 if [[ "$pipew" == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_pipewire.sh; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipewire.sh)
@@ -579,7 +579,7 @@ unset pipew
 
 # Moar (Custom pager instead of less)
 
-readyn -p "Install moar? (Custom pager/less replacement - awesome default options)" -c '! type moar &> /dev/null;' moar
+readyn -p "Install moar? (Custom pager/less replacement - awesome default options)" -c '! hash moar &> /dev/null;' moar
 
 if [[ "$moar" == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_moar.sh; then
@@ -592,7 +592,7 @@ unset moar
 
 # Nano (Editor)
 
-readyn -p "Install nano + config? (Simple terminal editor)" -c "! type nano &> /dev/null || ! test -f ~/.nanorc &> /dev/null" nno
+readyn -p "Install nano + config? (Simple terminal editor)" -c "! hash nano &> /dev/null || ! test -f ~/.nanorc &> /dev/null" nno
 
 if [[ "y" == "$nno" ]]; then
     if ! test -f $SCRIPT_DIR/install_nano.sh; then
@@ -605,7 +605,7 @@ unset nno
 
 # Nvim (Editor)
 
-readyn -p "Install neovim + config? (Complex terminal editor)" -c "! type nvim &> /dev/null" nvm
+readyn -p "Install neovim + config? (Complex terminal editor)" -c "! hash nvim &> /dev/null" nvm
 
 if [[ "y" == "$nvm" ]]; then
     if ! test -f $SCRIPT_DIR/install_nvim.sh; then
@@ -618,7 +618,7 @@ unset nvm
 
 # Kitty (Terminal emulator)
 
-readyn -p "Install Kitty? (Terminal emulator)" -c "! type kitty &> /dev/null" kittn
+readyn -p "Install Kitty? (Terminal emulator)" -c "! hash kitty &> /dev/null" kittn
 
 if [[ "y" == "$kittn" ]]; then
     if ! test -f $SCRIPT_DIR/install_kitty.sh; then
@@ -631,7 +631,7 @@ unset kittn
 
 # Fzf (Fuzzy Finder)
 
-readyn -p "Install fzf? (Fuzzy file/folder finder - keybinding yes for upgraded Ctrl-R/reverse-search, fzf filenames on Ctrl+T and fzf-version of 'cd' on Alt-C + Custom script: Ctrl-f becomes system-wide file opener)" -c "! type fzf &> /dev/null" findr
+readyn -p "Install fzf? (Fuzzy file/folder finder - keybinding yes for upgraded Ctrl-R/reverse-search, fzf filenames on Ctrl+T and fzf-version of 'cd' on Alt-C + Custom script: Ctrl-f becomes system-wide file opener)" -c "! hash fzf &> /dev/null" findr
 
 if [[ "y" == "$findr" ]]; then
     if ! test -f $SCRIPT_DIR/install_fzf.sh; then
@@ -644,7 +644,7 @@ unset findr
 
 # Rg (ripgrep)
 
-readyn -p "Install ripgrep? (recursively searches the current directory for lines matching a regex pattern)" -c "! type rg &> /dev/null" rgrp
+readyn -p "Install ripgrep? (recursively searches the current directory for lines matching a regex pattern)" -c "! hash rg &> /dev/null" rgrp
 if [[ "y" == "$rgrp" ]]; then
     if ! test -f $SCRIPT_DIR/install_ripgrep.sh; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ripgrep.sh)
@@ -656,7 +656,7 @@ unset rgrp
 
 # Ast-grep (ast-grep)
 
-readyn -p "Install ast-grep? (Search and Rewrite code at large scale using precise AST pattern)" -c "! type ast-grep &> /dev/null" rgrp
+readyn -p "Install ast-grep? (Search and Rewrite code at large scale using precise AST pattern)" -c "! hash ast-grep &> /dev/null" rgrp
 if [[ "y" == "$rgrp" ]]; then
     if ! test -f $SCRIPT_DIR/install_ast-grep.sh; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ast-grep.sh)
@@ -668,7 +668,7 @@ unset rgrp
 
 # Git
 
-readyn -p "Install Git and configure? (Project managing tool)" -n -c "! type git &> /dev/null && test -f ~/.gitconfig" git_ins
+readyn -p "Install Git and configure? (Project managing tool)" -n -c "! hash git &> /dev/null && test -f ~/.gitconfig" git_ins
 
 if [[ "y" == "$git_ins" ]]; then
     if ! test -f $SCRIPT_DIR/install_git.sh; then
@@ -684,7 +684,7 @@ unset git_ins
 
 # Lazygit
 
-readyn -p "Install Lazygit?" -c "! type lazygit &> /dev/null" git_ins
+readyn -p "Install Lazygit?" -c "! hash lazygit &> /dev/null" git_ins
 if [[ "y" == "$git_ins" ]]; then
 
     if ! test -f $SCRIPT_DIR/install_lazygit.sh; then
@@ -705,7 +705,7 @@ unset git_ins
 
 # Ranger (File explorer)
 
-readyn -p "Install Ranger? (Terminal file explorer)" -c "! type ranger &> /dev/null" rngr
+readyn -p "Install Ranger? (Terminal file explorer)" -c "! hash ranger &> /dev/null" rngr
 if [[ "y" == "$rngr" ]]; then
     if ! test -f $SCRIPT_DIR/install_ranger.sh; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ranger.sh)
@@ -717,7 +717,7 @@ unset rngr
 
 # Tmux (File explorer)
 
-readyn -p "Install Tmux? (Terminal multiplexer)" -c "! type tmux &> /dev/null" tmx
+readyn -p "Install Tmux? (Terminal multiplexer)" -c "! hash tmux &> /dev/null" tmx
 if [[ "y" == "$tmx" ]]; then
     if ! test -f $SCRIPT_DIR/install_tmux.sh; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_tmux.sh)
@@ -729,7 +729,7 @@ unset tmx
 
 # Bat
 
-readyn -p "Install Bat? (Cat clone with syntax highlighting)" -c "! type bat &> /dev/null && ! type batcat &> /dev/null" bat
+readyn -p "Install Bat? (Cat clone with syntax highlighting)" -c "! hash bat &> /dev/null && ! hash batcat &> /dev/null" bat
 
 if [[ $bat == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_bat.sh; then
@@ -742,7 +742,7 @@ unset bat
 
 # Neofetch
 
-readyn -p "Install neofetch/fastfetch/screenFetch)? (Terminal taskmanager - system information tool)" -c "! type fastfetch &> /dev/null && ! type screenfetch &> /dev/null" tojump
+readyn -p "Install neofetch/fastfetch/screenFetch)? (Terminal taskmanager - system information tool)" -c "! hash fastfetch &> /dev/null && ! hash screenfetch &> /dev/null" tojump
 
 if [[ "$tojump" == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_neofetch_onefetch.sh; then
@@ -755,7 +755,7 @@ unset tojump
 
 # Btop
 
-readyn -p "Install Btop? (A processmanager with a fastly improved TUI relative to top/htop written in C++)" -c "! type btop &> /dev/null" tojump
+readyn -p "Install Btop? (A processmanager with a fastly improved TUI relative to top/htop written in C++)" -c "! hash btop &> /dev/null" tojump
 if [[ "$tojump" == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_btop.sh; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_btop.sh)
@@ -766,7 +766,7 @@ fi
 unset tojump
 
 # Autojump
-# -c "! type autojump &> /dev/null"
+# -c "! hash autojump &> /dev/null"
 
 readyn -n -p "Install autojump? (jump to folders using 'bookmarks' - j_ )" tojump
 if [[ "$tojump" == "y" ]]; then
@@ -780,7 +780,7 @@ unset tojump
 
 # Zoxide
 
-readyn -p "Install zoxide? (A cd that guesses the right path based on a history)" -c "! type zoxide &> /dev/null" zoxs
+readyn -p "Install zoxide? (A cd that guesses the right path based on a history)" -c "! hash zoxide &> /dev/null" zoxs
 if [[ "$zoxs" == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_zoxide.sh; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_zoxide.sh)
@@ -792,7 +792,7 @@ unset zoxs
 
 # Starship
 
-readyn -p "Install Starship? (Snazzy looking prompt)" -c "! type starship &> /dev/null" strshp
+readyn -p "Install Starship? (Snazzy looking prompt)" -c "! hash starship &> /dev/null" strshp
 if [[ "$strshp" == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_starship.sh; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_starship.sh)
@@ -804,7 +804,7 @@ unset strshp
 
 # Thefuck
 
-readyn -p "Install 'thefuck'? (Correct last command that ended with an error)" -c "! type thefuck &> /dev/null" tf
+readyn -p "Install 'thefuck'? (Correct last command that ended with an error)" -c "! hash thefuck &> /dev/null" tf
 if [[ "$tf" == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_thefuck.sh; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_thefuck.sh)
@@ -816,7 +816,7 @@ unset tf
 
 # Nmap
 
-readyn -p "Install nmap? (Network port scanning tool)" -c '! type nmap &> /dev/null' nmap
+readyn -p "Install nmap? (Network port scanning tool)" -c '! hash nmap &> /dev/null' nmap
 if [[ "$nmap" == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_nmap.sh; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nmap.sh)
@@ -828,7 +828,7 @@ unset nmap
 
 # Ufw / Gufw
 
-readyn -p "Install ufw? (Uncomplicated firewall - Iptables wrapper)" -c "! type ufw &> /dev/null" ins_ufw
+readyn -p "Install ufw? (Uncomplicated firewall - Iptables wrapper)" -c "! hash ufw &> /dev/null" ins_ufw
 if [[ $ins_ufw == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_ufw.sh; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ufw.sh)
@@ -843,7 +843,7 @@ unset ins_ufw
 #othr='n'
 #color='GREEN'
 #prmpt='[Y/n]: '
-#if type netstat &> /dev/null || type netstat-nat &> /dev/null; then
+#if hash netstat &> /dev/null || hash netstat-nat &> /dev/null; then
 #    pre='n'
 #    othr='y'
 #    color='YELLOW'
@@ -863,7 +863,7 @@ unset ins_ufw
 
 # Lazydocker
 
-readyn -p "Install lazydocker?" -c "! type lazydocker &> /dev/null" git_ins
+readyn -p "Install lazydocker?" -c "! hash lazydocker &> /dev/null" git_ins
 if [[ "y" == "$git_ins" ]]; then
     if ! test -f $SCRIPT_DIR/install_lazydocker.sh; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_lazydocker.sh)
@@ -875,7 +875,7 @@ unset git_ins
 
 # Exiftool (Metadata wiper)
 
-readyn -p "Install exiftool? (Metadata wiper for files)" -c "! type exiftool &> /dev/null" exif_t
+readyn -p "Install exiftool? (Metadata wiper for files)" -c "! hash exiftool &> /dev/null" exif_t
 if [[ "$exif_t" == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_exiftool.sh; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_exiftool.sh)
@@ -887,7 +887,7 @@ unset exif_t
 
 # Testdisk (File recovery tool)
 
-readyn -p "Install testdisk? (File recovery tool)" -c "! type testdisk &> /dev/null" kittn
+readyn -p "Install testdisk? (File recovery tool)" -c "! hash testdisk &> /dev/null" kittn
 if [[ "y" == "$kittn" ]]; then
     if ! test -f $SCRIPT_DIR/install_testdisk.sh; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_testdisk.sh)
@@ -899,7 +899,7 @@ unset kittn
 
 # Ffmpeg
 
-readyn -p "Install ffmpeg? (video/audio/image file converter)" -c "! type ffmpeg &> /dev/null" ffmpg
+readyn -p "Install ffmpeg? (video/audio/image file converter)" -c "! hash ffmpeg &> /dev/null" ffmpg
 if [[ "$ffmpg" == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_ffmpeg.sh; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ffmpeg.sh)
@@ -911,7 +911,7 @@ unset ffmpg
 
 # Yt-dlp
 
-readyn -p "Install yt-dlp? (youtube video downloader)" -c "! type yt-dlp &> /dev/null" yt_dlp
+readyn -p "Install yt-dlp? (youtube video downloader)" -c "! hash yt-dlp &> /dev/null" yt_dlp
 if [[ "$yt_dlp" == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_yt-dlp.sh; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_yt-dlp.sh)
@@ -949,7 +949,7 @@ fi
 # Check one last time if ~/.bash_preexec - for both $USER and root - is the last line in their ~/.bash_profile and ~/.bashrc
 
 #if ! test -f ./checks/check_bash_source_order.sh; then
-#    if type curl &>/dev/null; then
+#    if hash curl &>/dev/null; then
 #        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_bash_source_order.sh)
 #    else
 #        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"

@@ -114,7 +114,7 @@ environment-variables_r() {
             fi
         fi
     fi
-    if sudo test -f ~/.zshrc && ! sudo grep -q "/root/.environment.env" /root/.zshrc; then
+    if sudo test -f /root/.zshrc && ! sudo grep -q "/root/.environment.env" /root/.zshrc; then
         readyn -p "Source /root/.environment.env in /root/.zhrc?" zshrc
         if [[ $zshrc == 'y' ]]; then
             #if grep -q "[ -f ~/.bash_completion ]" ~/.bashrc; then
