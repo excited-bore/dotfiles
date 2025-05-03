@@ -116,7 +116,7 @@ function update-system() {
         fi
     fi
 
-    if [[ $machine == 'Mac' ]] && ! type brew &> /dev/null; then
+    if [[ $machine == 'Mac' ]] && ! hash brew &> /dev/null; then
         printf "${GREEN}Homebrew is a commandline package manager (like the Appstore) that works as an opensource alternative to the Appstore\nGui applications are available for it as well\n${normal}"
         readyn -y 'CYAN' -p 'Install brew?' brew
         if [[ $brew == 'y' ]]; then
@@ -126,7 +126,7 @@ function update-system() {
                 . ./install_brew.sh
             fi
         fi
-        if ! type wget &> /dev/null; then
+        if ! hash wget &> /dev/null; then
             readyn -p "Wget is a commandline tool that's used to download files from the internet and is used throughout these scripts. Install?" wget_brw
             if [[ $wget_brw == 'y' ]]; then
                 brew install wget 
@@ -166,9 +166,9 @@ function update-system() {
         
         sudo softwareupdate -i -a
        
-        if type brew &> /dev/null; then
+        if hash brew &> /dev/null; then
             pac=brew       
-            if type yes &> /dev/null && ! test -z "$YES" ;then
+            if hash yes &> /dev/null && test -n "$YES" ;then
                 yes | brew update  
                 yes | brew upgrade 
             else
@@ -278,11 +278,17 @@ function update-system() {
         fi
        
         ! test -z "$YES" && flag='--auto' || flag=''
-       	
+       
+        local cachcln 
+        
         readyn $flag -p "Clean / autoremove orphan packages - dependencies that aren't used by any package?" cachcln
+        
         if [[ $cachcln == 'y' ]]; then
-            if ! [[ -z "$AUR_clean" ]]; then
-                if ! test -z "$YES"; then 
+            
+            if [ -n "$AUR_clean" ]; then
+                
+                if test -n "$YES"; then 
+                    
                     if [[ "$AUR" == "pamac" ]]; then
                         pamac clean --no-confirm
                     else
@@ -291,16 +297,21 @@ function update-system() {
                 else
                     eval "$AUR_clean"
                 fi
-	   elif ! test -z $pac_clean; then
-            	if ! test -z "$YES"; then 
-		    eval "yes | $pac_clean"  
-            	else
+	   
+            elif test -n "$pac_clean"; then
+            	
+                if test -n "$YES"; then 
+                    if [[ "$pac" == "pacman" ]]; then
+                        eval "$pac_clean --noconfirm"  
+                    else
+                        eval "yes | $pac_clean"                   
+                    fi
+                else
                     eval "$pac_clean"
                 fi
 	    fi
         fi
-        unset cachcln 
-
+        
     elif [[ "$distro" == "Gentoo" ]]; then
         #TODO Add update cycle for Gentoo systems
         continue
@@ -316,14 +327,14 @@ function update-system() {
 
     elif [[ "$pac" == "zypper_tumble" ]]; then
         echo "This next $(tput setaf 1)sudo$(tput sgr0) will try to update the packages for your system using the package managers it knows";
-        if ! test -z "$YES"; then 
+        if test -n "$YES"; then 
             yes | sudo zypper dup
         else
             sudo zypper dup
         fi
 
     elif [[ "$pac" == "yum" ]]; then
-        if ! test -z "$YES"; then 
+        if test -n "$YES"; then 
             yes | yum update
         else
             yum update
@@ -333,7 +344,7 @@ function update-system() {
     unset hdrs hdrs_ins 
 
     if type flatpak &> /dev/null; then
-	if ! test -z "$YES"; then 
+	if test -n "$YES"; then 
             flatpak update -y
         else
             flatpak update
