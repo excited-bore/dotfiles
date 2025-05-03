@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if ! test -f checks/check_all.sh; then
-    if type curl &> /dev/null; then
+    if hash curl &> /dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         continue
@@ -10,7 +10,7 @@ else
     . ./checks/check_all.sh
 fi
 
-if ! type go &> /dev/null; then 
+if ! hash go &> /dev/null; then 
     if [[ $distro_base == "Arch" ]]; then
         eval "${pac_ins} go"
     elif [[ $distro_base == "Debian" ]]; then
@@ -21,11 +21,11 @@ if ! type go &> /dev/null; then
         elif [[ "$arch" == "amd64" ]]; then
            arch="amd64"
         fi
-        command rm -rf /usr/local/go 
+        sudo command rm -rf /usr/local/go 
         latest=$(curl -sL "https://github.com/golang/go/tags" | grep --color=never "/golang/go/releases/tag" | perl -pe 's|.*/golang/go/releases/tag/(.*?)".*|\1|' | uniq | awk 'NR==1{max=$1;print $0; exit;}')
         file="$latest.linux-$arch.tar.gz"
         checksum=$(curl -sL "https://golang.google.cn/dl/" | awk 'BEGIN{FS="\n"; RS=""} $0 ~ /'$file'/ &&  $0 ~ /<\/tt>/ {print $0;}' | grep --color=never "<tt>" | sed "s,.*<tt>\(.*\)</tt>.*,\1,g")
-        if ! type go &> /dev/null || ! [[ "$(go version)" =~ $latest ]]; then
+        if ! hash go &> /dev/null || ! [[ "$(go version)" =~ $latest ]]; then
             test -z $TMPDIR && TMPDIR=$(mktemp -d) 
             wget -P $TMPDIR https://golang.google.cn/dl/$file
             file=$TMPDIR/$file
@@ -35,12 +35,11 @@ if ! type go &> /dev/null; then
             if ! [[ "$sum" == "$checksum" ]]; then
                 echo "Checksums are different; Aborting"
             else 
-                if ! type tar &> /dev/null; then
+                if ! hash tar &> /dev/null; then
                     eval "$pac_ins tar" 
                 fi
-                tar xf $file $TMPDIR/go
-                sudo install $TMPDIR/go -D -t /usr/local                
-                command rm $file
+                sudo tar -C /usr/local -xzf $file
+                command rm -rf $file
             fi
             #if grep -q "GOROOT" $ENVVAR; then
             #    sed -i "s|.export GOROOT=|export GOROOT=|g" $ENVVAR
