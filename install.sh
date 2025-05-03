@@ -38,21 +38,21 @@ if hash gio &>/dev/null; then
     printf "\n${green}Files that get overwritten get backed up and trashed (to prevent clutter).\nRecover using ${cyan}'gio trash --list'${green} and ${cyan}'gio trash --restore' ${normal}\n"
 fi
 
-if [[ ! -e ~/config ]] && test -d ~/.config; then
+if ! test -e ~/config && test -d ~/.config; then
     readyn -Y "BLUE" -p "Create ~/.config to ~/config symlink? " sym1
     if [[ "y" == $sym1 ]]; then
         ln -s ~/.config ~/config
     fi
 fi
 
-if [[ ! -e ~/lib_systemd ]] && test -d ~/lib/systemd/system; then
+if ! test -e ~/lib_systemd && test -d ~/lib/systemd/system; then
     readyn -Y "BLUE" -p "Create /lib/systemd/system/ to user directory symlink?" sym2
     if [[ "y" == $sym2 ]]; then
         ln -s /lib/systemd/system/ ~/lib_systemd
     fi
 fi
 
-if [[ ! -e ~/etc_systemd ]] && test -d ~/etc/systemd/system; then
+if ! test -e ~/etc_systemd && test -d ~/etc/systemd/system; then
     readyn -Y "BLUE" -p "Create /etc/systemd/system/ to user directory symlink?" sym3
     if [[ "y" == $sym3 ]]; then
         ln -s /etc/systemd/system/ ~/etc_systemd
@@ -149,7 +149,16 @@ if [[ $distro_base == 'Debian' ]]; then
         #    . $SCRIPT_DIR/install_list-ppa.sh
         #fi
 
-        if ! hash ppa-purge &>/dev/null && ! test -z "$(apt search ppa-purge 2>/dev/null | awk 'NR>2{print;}')"; then
+        if ! hash xmllint &>/dev/null && test -n "$(apt search libxml2-utils 2>/dev/null | awk 'NR>2{print;}')"; then
+            printf "${CYAN}xmllint${normal} is not installed (cmd tool for lint xml/html - used in helper script for installing PPA's)\n"
+            readyn -p "Install xmllint?" xml_ins
+            if [[ $xml_ins == 'y' ]]; then
+                eval "yes | ${pac_ins} libxml2-utils"
+            fi
+            unset xml_ins
+        fi
+
+        if ! hash ppa-purge &>/dev/null && test -n "$(apt search ppa-purge 2>/dev/null | awk 'NR>2{print;}')"; then
             printf "${CYAN}ppa-purge${normal} is not installed (cmd tool for disabling installed PPA's)\n"
             readyn -p "Install ppa-purge?" ppa_ins
             if [[ $ppa_ins == 'y' ]]; then
@@ -159,7 +168,7 @@ if [[ $distro_base == 'Debian' ]]; then
         fi
     fi
 
-    if ! hash nala &>/dev/null && ! test -z "$(apt search nala 2>/dev/null | awk 'NR>2{print;}')"; then
+    if ! hash nala &>/dev/null && test -n "$(apt search nala 2>/dev/null | awk 'NR>2{print;}')"; then
         printf "${CYAN}nala${normal} is not installed (A TUI wrapper for apt install, update, upgrade, search, etc..)\n"
         readyn -p "Install nala?" nala_ins
         if [[ $nala_ins == 'y' ]]; then
