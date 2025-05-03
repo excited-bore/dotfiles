@@ -94,6 +94,7 @@ if type apt &> /dev/null; then
                 case $? in
                   0) # Success
                     echo "'$ppa' is ${GREEN}OK${normal} for $RELEASE"
+                    return 0
                     ;;
                   8) # HTTP 404 (Not Found) would result in wget returning 8
                     echo "'$ppa' is ${RED}UNAVAILABLE${normal} for $RELEASE"
@@ -129,78 +130,28 @@ if type apt &> /dev/null; then
 
         complete -W "-h --help" check-ppa
          
-     fi
-    
-     if type list-ppa &> /dev/null && type fzf &> /dev/null; then
-        
-        #function list-and-check-ppa-fzf(){
-        #    pre=''
-        #    if ! test -z $@; then
-        #        pre="--query $@"
-        #    fi
-        #    
-        #    if test -f ~/.config/list-ppa; then 
-        #        ppa="$(cat ~/.config/list-ppa | fzf --reverse)"
-        #    else
-        #        ppa="$(list-ppa 2> /dev/null | fzf --reverse)"
-        #    fi
-
-        #    if ! test -z $ppa; then
-        #        check-ppa $ppa
-        #    fi
-        #    unset ppa
-        #}
-        
-        function apt-add-ppa-fzf-install(){
-            pre=''
-            if ! test -z $@; then
-                pre="--query $@"
-            fi
+     
+        if type readyn &>/dev/null && hash curl &>/dev/null && hash xmllint &>/dev/null && hash fzf &>/dev/null; then
             
-            if test -f ~/.config/ppas; then 
-                ppa="$(cat ~/.config/ppas | fzf --reverse)"
-            else
-                printf "${cyan}No 'ppa-list' file found${normal}\n" 
-                readyn -Y 'GREEN' -p 'Generate list of known ppas (faster then constantly pining launchpad.net)?' res
-                if test $res == 'y'; then
-                   list-ppa --file ~/.config/ppas 
-                else 
-                    ppa="$(list-ppa 2> /dev/null | fzf --reverse)"
+            function apt-search-and-add-ppa() {
+                local packg ansr instll url="https://launchpad.net/ubuntu/+ppas?batch=300&start=0&name_filter="
+                test -n "$1" &&
+                    packg="$1" ||
+                    reade -Q 'GREEN' -i '""' -p "Name package?: " packg
+                ansr=$(curl -sSL "$url$packg" | xmllint --html --format --xpath '//a' - | grep --color=never '/~' | sed 's/.*href=\(.*\)/\1/g' | sed 's,</a>,,g' | sed 's,/~,,g' | sed 's,/+archive/ubuntu,,g' | sed 's,>,\t,g' | fzf --ansi --multi --select-1 --reverse --sync --delimiter '\t' --with-nth 1 --height 33% --preview='echo {2}' --preview-window='down,10%,follow' | awk '{print $1}' | tr -d \")
+                if test -n "$ansr"; then
+                    if check-ppa ppa:$ansr; then
+                        readyn -p "Install $ansr?" instll
+                        if [[ $instll == 'y' ]]; then
+                            sudo add-apt-repository ppa:$ansr
+                        fi
+                    fi
                 fi
-                 
-            fi 
-            
-            if ! test -z $ppa; then
-                check-ppa $ppa
-                if [[ $(check-ppa $ppa) =~ 'OK' ]]; then
-                    if [[ $(apt-list-ppa-installed) =~ "$ppa" ]]; then 
-                        printf "${cyan}$ppa${normal} is already added to the repos list\n" 
-                        return 2 
-                    else     
-                        sudo add-apt-repository ppa:$ppa
-                        sudo apt update         
-                    fi 
-                else
-                    return 2
-                fi
-            elif test -z $ppa && test -f ~/.config/ppas; then
-                printf "${cyan}No package selected. Maybe list is incomplete?${normal}\n" 
-                readyn -p 'Regenerate list of known ppas?' res
-                if test $res == 'y'; then
-                   list-ppa --file ~/.config/ppas 
-                fi
-            fi
-            unset ppa
-        }
-     fi
-
-     alias add-apt-fzf-install-ppa="apt-add-ppa-fzf-install"  
+            }
+            alias add-apt-search-ppa="apt-search-and-add-ppa"
+        fi
+    fi
     
-     if test -f ~/.config/ppas; then
-         complete -W "$(cat ~/.config/ppas | tr '\n' ' ' )" apt-add-repository 
-         complete -W "$(cat ~/.config/ppas | tr '\n' ' ' )" add-apt-repository 
-         complete -W "$(cat ~/.config/ppas | tr '\n' ' ' )" apt-add-ppa-fzf-install 
-     fi
 
      if type fzf &> /dev/null; then
 
