@@ -17,8 +17,9 @@ if [[ "$distro_base" == "Arch" ]]; then
     eval "${pac_ins} ruby ruby-build rbenv"
 elif [[ $distro_base == "Debian" ]]; then
     eval "${pac_up}"
-    eval "${pac_ins} ruby-build ruby-dev rbenv"
     eval "${pac_rm} ruby"       
+    eval "${pac_ins} ruby-build ruby-dev rbenv"
+    eval "${pac_up}"
 else
     eval "${pac_ins} ruby rbenv"
 fi
