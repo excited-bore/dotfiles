@@ -25,8 +25,8 @@ if ! type lazygit &>/dev/null; then
             fi
             LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po --color=never '"tag_name": "v\K[^"]*')
             wget -O $TMPDIR/lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
-            (cd $TMPDIR && tar xf $TMPDIR/lazygit.tar.gz)
-            sudo install $TMPDIR/lazygit /usr/local/bin
+            (cd $TMPDIR && tar xf lazygit.tar.gz lazygit)
+            sudo install $TMPDIR/lazygit -D -t /usr/local/bin
         fi
     fi
     unset nstll
@@ -41,7 +41,7 @@ fi
 readyn -p 'Configure lazygit?' conflazy
 if [[ 'y' == $conflazy ]]; then
     function cp_lazy_conf(){ mkdir -p ~/.config/lazygit/; cp -f $file ~/.config/lazygit/config.yml.example; }
-    yes-edit-no -g "$file" -p 'Copy an example lazygit yaml config file into ~/.config/lazygit/?' -f cp_lazy_conf -c "! test -f ~/.config/lazygit/config.yml.example || test -f ~/.config/lazygit/config.yml.example && ! test -z $(diff ~/.config/lazygit/config.yml.example $file) &> /dev/null" 
+    yes-edit-no -g "$file" -p 'Copy an example lazygit yaml config file into ~/.config/lazygit/?' -f cp_lazy_conf -c "! test -f ~/.config/lazygit/config.yml.example || (test -f ~/.config/lazygit/config.yml.example && test -n $(diff ~/.config/lazygit/config.yml.example $file 2> /dev/null)) &> /dev/null" 
     if ! test -f install_differ_pager.sh; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_git.sh)
     else

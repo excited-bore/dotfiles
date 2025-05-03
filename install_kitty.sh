@@ -198,7 +198,7 @@ if [[ $ktty_cnf == 'y' ]]; then
                 fi
                 readyn -p "Add shortcut for new window pos on ctrl+shift+alt+enter?" ktty_splt2
                 if [[ $ktty_splt2 == 'y' ]]; then
-                    reade -Q "GREEN" -i "hsplit vsplit before after" -p "Position new window: [Hsplit/vsplit/before/after]: " ktty_pos
+                    reade -Q "GREEN" -i "vsplit hsplit before after" -p "Position new window: [Vsplit/hsplit/before/after]: " ktty_pos
                     sed -i "s|map kitty_mod+alt+enter.*|map kitty_mod+alt+enter launch --location=$ktty_pos|g" $dir/kitty.conf
                 fi
 

@@ -26,6 +26,7 @@ if ! type go &> /dev/null; then
         file="$latest.linux-$arch.tar.gz"
         checksum=$(curl -sL "https://golang.google.cn/dl/" | awk 'BEGIN{FS="\n"; RS=""} $0 ~ /'$file'/ &&  $0 ~ /<\/tt>/ {print $0;}' | grep --color=never "<tt>" | sed "s,.*<tt>\(.*\)</tt>.*,\1,g")
         if ! type go &> /dev/null || ! [[ "$(go version)" =~ $latest ]]; then
+            test -z $TMPDIR && TMPDIR=$(mktemp -d) 
             wget -P $TMPDIR https://golang.google.cn/dl/$file
             file=$TMPDIR/$file
             sum=$(sha256sum $file | awk '{print $1;}')
@@ -37,7 +38,8 @@ if ! type go &> /dev/null; then
                 if ! type tar &> /dev/null; then
                     eval "$pac_ins tar" 
                 fi
-                sudo tar -C /usr/local -xzf $file
+                tar xf $file $TMPDIR/go
+                sudo install $TMPDIR/go -D -t /usr/local                
                 command rm $file
             fi
             #if grep -q "GOROOT" $ENVVAR; then
@@ -53,9 +55,11 @@ if ! type go &> /dev/null; then
     fi
 fi
 
+gopath="$HOME/go"
+hash go &> /dev/null && 
+    gopath=$(go env | grep --color=never GOPATH | cut -d= -f2 | sed "s/'//g") 
 
-command -v go &> /dev/null && gopath=$(go env | grep --color=never GOPATH | cut -d= -f2 | sed "s/'//g") 
-if command -v go &> /dev/null && ! [[ $PATH =~ $gopath ]]; then   
+if hash go &> /dev/null && ! [[ $PATH =~ $gopath ]]; then   
      if grep -q 'go/bin' $ENVVAR; then
          sed -i 's|.export PATH=$PATH:.*go/bin|export PATH=$PATH:'$gopath'/bin|g' $ENVVAR
          sed -i 's|export PATH=$PATH:.*go/bin|export PATH=$PATH:'$gopath'/bin|g' $ENVVAR

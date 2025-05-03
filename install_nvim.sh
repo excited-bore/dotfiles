@@ -331,7 +331,7 @@ function instvim_r() {
     if ! sudo test -d /root/.config/nvim/; then
         sudo mkdir -p /root/.config/nvim/
     fi
-    sudo cp -fv --backup numbered $dir/* /root/.config/nvim/
+    sudo cp -fv --backup=numbered $dir/* /root/.config/nvim/
     if sudo test -n "$(ls /root/.config/nvim/*~ &>/dev/null)"; then
         sudo bash -c 'gio trash /root/.config/nvim/*~'
     fi
@@ -382,7 +382,7 @@ function instvim() {
         mkdir ~/.config/nvim/
     fi
 
-    cp -fv --backup numbered $dir/* ~/.config/nvim/
+    cp -fv --backup=numbered $dir/* ~/.config/nvim/
 
     if test -n "$(ls ~/.config/nvim/*~ &>/dev/null)"; then
         gio trash ~/.config/nvim/*~
