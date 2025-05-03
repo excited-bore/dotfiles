@@ -33,8 +33,8 @@ if ! hash lazydocker &>/dev/null; then
             else
                 . $DIR/install_go.sh
             fi
-            go install github.com/jesseduffield/lazydocker@latest
         fi
+        go install github.com/jesseduffield/lazydocker@latest
         #if ! type curl &> /dev/null; then
         #    if test $distro_base == 'Debian'; then
         #        eval "$pac_ins curl"
