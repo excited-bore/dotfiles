@@ -20,21 +20,21 @@ else
 fi
 
 
-if ! type lazydocker &>/dev/null; then
+if ! hash lazydocker &>/dev/null; then
     if [[ $distro_base == "Arch" ]] && test -n "$AUR_ins"; then
         eval "${AUR_ins}" lazydocker
     else
         minver=1.19
         gover=0
-        command -v go &> /dev/null && gover=$(go version | awk '{print $3}' | cut -c 3-)
-        if ! type go &>/dev/null || (type go &>/dev/null && awk "BEGIN {exit !($num1 < $num2)}" ); then
+        hash go &> /dev/null && gover=$(go version | awk '{print $3}' | cut -c 3-)
+        if ! hash go &>/dev/null || (hash go &>/dev/null && awk "BEGIN {exit !($gover < $minver)}" ); then
             if ! test -f $DIR/install_go.sh; then
                 source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_go.sh)
             else
                 . $DIR/install_go.sh
             fi
-            go install github.com/jesseduffield/lazydocker@latest
         fi
+        go install github.com/jesseduffield/lazydocker@latest
         #if ! type curl &> /dev/null; then
         #    if test $distro_base == 'Debian'; then
         #        eval "$pac_ins curl"
@@ -45,7 +45,7 @@ if ! type lazydocker &>/dev/null; then
         #curl https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh | bash
     fi
 
-    if type lazydocker &>/dev/null; then
+    if hash lazydocker &>/dev/null; then
         lazydocker --version
     fi
 

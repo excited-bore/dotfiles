@@ -57,9 +57,9 @@ fi
 
 if ! [[ $PATH =~ /usr/local/go/bin ]]; then
     if grep -q '$GOPATH' $ENVVAR; then
-        sed -i 's|.export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin|export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin|g' $ENVVAR
+        sed -i 's|.export PATH=$PATH:/usr/local/go/bin:$(go env GOPATH)/bin|export PATH=$PATH:/usr/local/go/bin:$(go env GOPATH)/bin|g' $ENVVAR
     else
-        printf "# GO\nexport PATH=\$PATH:/usr/local/go/bin:\$GOPATH/bin\n" >> $ENVVAR 
+        printf "# GO\nexport PATH=\$PATH:/usr/local/go/bin:\$(go env GOPATH)/bin\n" >> $ENVVAR 
     fi 
 fi
 
@@ -67,9 +67,11 @@ source $ENVVAR
 
 go --version
 
+hash go && gopath=$(go env | grep --color=never GOPATH | cut -d= -f2 | sed "s/'//g")
+
 echo "This next $(tput setaf 1)sudo$(tput sgr0) will check if something along the lines of '/bin:$GOPATH/bin' is being kept in /etc/sudoers";
 
-if test -f /etc/sudoers && ! sudo grep -q "/bin:$GOPATH/bin" /etc/sudoers; then
+if test -f /etc/sudoers && hash go && ! sudo grep -q "/bin:$gopath/bin" /etc/sudoers; then
     readyn -p "Add ${RED}$gopath/bin${GREEN} to /etc/sudoers? (so go applications installed with 'go install' can be executed using sudo)?" ansr
     if [[ "$ansr" == 'y' ]]; then
         sudo sed -i 's,Defaults secure_path="\(.*\)",Defaults secure_path="\1:'"$gopath"'/bin/",g' /etc/sudoers
