@@ -57,9 +57,9 @@ fi
 
 if ! [[ $PATH =~ /usr/local/go/bin ]]; then
     if grep -q '$GOPATH' $ENVVAR; then
-        sed -i 's|.export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin|export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin|g' $ENVVAR
+        sed -i 's|.export PATH=$PATH:/usr/local/go/bin:$(go env GOPATH)/bin|export PATH=$PATH:/usr/local/go/bin:$(go env GOPATH)/bin|g' $ENVVAR
     else
-        printf "# GO\nexport PATH=\$PATH:/usr/local/go/bin:\$GOPATH/bin\n" >> $ENVVAR 
+        printf "# GO\nexport PATH=\$PATH:/usr/local/go/bin:\$(go env GOPATH)/bin\n" >> $ENVVAR 
     fi 
 fi
 
