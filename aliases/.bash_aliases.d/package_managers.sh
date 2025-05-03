@@ -30,8 +30,8 @@ if type apt &> /dev/null; then
                 second=\*.list
             fi
             for APT in `find $first -name $second`; do
-                ppa=$(grep "URIs" $APT | grep 'ppa' | awk '{print $2;}' | sed 's|https://ppa.launchpadcontent\.net/|ppa:|g' | sed 's|/ubuntu/||g')
-                if ! test -z $ppa; then 
+                ppa=$(grep "URIs" $APT | grep --color=never 'ppa' | awk '{print $2;}' | sed 's|https://ppa.launchpadcontent\.net/|ppa:|g' | sed 's|/ubuntu/||g')
+                if test -n "$ppa"; then 
                     printf "$ppa\n" 
                 fi
             done
@@ -47,10 +47,12 @@ if type apt &> /dev/null; then
             return 0
         } 
        
-        if type ppa-purge &> /dev/null; then
+        if hash ppa-purge &> /dev/null; then
             complete -F _ppa_purge ppa-purge 
+            alias remove-apt-ppa='ppa-purge'
+            alias apt-remove-ppa='ppa-purge'
         fi
-         
+        
 
         # Stolen from:
         # https://codereview.stackexchange.com/questions/45445/script-for-handling-ppas-on-ubuntu
@@ -93,11 +95,11 @@ if type apt &> /dev/null; then
                 ######################################################################
                 case $? in
                   0) # Success
-                    echo "'$ppa' is ${GREEN}OK${normal} for $RELEASE"
+                    echo "'$ppa' is ${GREEN}OK${normal} for $RELEASE - codename: $codename"
                     return 0
                     ;;
                   8) # HTTP 404 (Not Found) would result in wget returning 8
-                    echo "'$ppa' is ${RED}UNAVAILABLE${normal} for $RELEASE"
+                    echo "'$ppa' is ${RED}UNAVAILABLE${normal} for $RELEASE - codename: $codename"
                     return 1
                     ;;
                   *)
@@ -133,7 +135,7 @@ if type apt &> /dev/null; then
      
         if type readyn &>/dev/null && hash curl &>/dev/null && hash xmllint &>/dev/null && hash fzf &>/dev/null; then
             
-            function apt-search-and-add-ppa() {
+            function apt-search-ppa() {
                 local packg ansr instll url="https://launchpad.net/ubuntu/+ppas?batch=300&start=0&name_filter="
                 test -n "$1" &&
                     packg="$1" ||
@@ -141,14 +143,17 @@ if type apt &> /dev/null; then
                 ansr=$(curl -sSL "$url$packg" | xmllint --html --format --xpath '//a' - | grep --color=never '/~' | sed 's/.*href=\(.*\)/\1/g' | sed 's,</a>,,g' | sed 's,/~,,g' | sed 's,/+archive/ubuntu,,g' | sed 's,>,\t,g' | fzf --ansi --multi --select-1 --reverse --sync --delimiter '\t' --with-nth 1 --height 33% --preview='echo {2}' --preview-window='down,10%,follow' | awk '{print $1}' | tr -d \")
                 if test -n "$ansr"; then
                     if check-ppa ppa:$ansr; then
-                        readyn -p "Install $ansr?" instll
+                        readyn -p "Add to $ansr to /etc/apt/sources.list.d/?" instll
                         if [[ $instll == 'y' ]]; then
                             sudo add-apt-repository ppa:$ansr
                         fi
+                    else
+                        ansr=$(echo $ansr | sed 's,/,/+archive/ubuntu/,') 
+                        printf "Check for yourself at: https://launchpad.net/~$ansr"
                     fi
                 fi
             }
-            alias add-apt-search-ppa="apt-search-and-add-ppa"
+            alias add-apt-search-ppa="apt-search-ppa"
         fi
     fi
     
@@ -157,11 +162,11 @@ if type apt &> /dev/null; then
 
         function apt-fzf-install(){ 
             nstall='' 
-            if ! test -z "$@"; then
+            if test -n "$@"; then
                 nstall="$@"
             fi
             nstall="$(apt list --verbose $nstall 2> /dev/null | awk 'NF > 0' | sed '/Listing.../d' | paste -d "\t"  - - | fzf --ansi --select-1 --multi --reverse --sync --delimiter '\t' --with-nth 1 --height 33% --preview='echo {2}' --preview-window='down,10%,follow' | awk '{print $1}' | sed 's/,.*//')" 
-            if ! test -z "$nstall"; then
+            if test -n "$nstall"; then
                 sudo apt install $nstall 
             fi
             unset nstall
@@ -169,11 +174,11 @@ if type apt &> /dev/null; then
 
         function apt-fzf-remove(){
             pre=""
-            if ! test -z "$@"; then
+            if test -n "$@"; then
                 pre="$@"
             fi
             nstall="$(apt list --installed --verbose $pre 2>/dev/null | awk 'NF > 0' | sed '/Listing.../d' | paste -d "\t"  - - | fzf --ansi --select-1 --reverse --sync --delimiter '\t' --with-nth 1 --height 33% --preview='echo {2}' --preview-window='down,10%,follow' | awk '{print $1}' | sed 's/,.*//')" 
-            if ! test -z "$nstall"; then
+            if test -n "$nstall"; then
                 sudo apt remove $nstall 
             fi 
             unset nstall
