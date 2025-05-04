@@ -23,7 +23,7 @@ export TMPDIR=/tmp
 
 # LS_COLORS
 #https://unix.stackexchange.com/questions/498482/bash-tab-completion-colors-differ-from-ls-colors
-export LS_COLORS='no=00:fi=00:di=00;34:ln=01;36:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.gz=01;31:*.bz2=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.avi=01;35:*.fli=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.ogg=01;35:*.mp3=01;35:*.wav=01;35:*.xml=00;31:'
+#export LS_COLORS='no=00:fi=00:di=00;34:ln=01;36:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.gz=01;31:*.bz2=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.avi=01;35:*.fli=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.ogg=01;35:*.mp3=01;35:*.wav=01;35:*.xml=00;31:'
 
 # CLI_COLORS
 #export CLICOLOR_FORCE='true'
@@ -32,7 +32,7 @@ export LS_COLORS='no=00:fi=00:di=00;34:ln=01;36:pi=40;33:so=01;35:do=01;35:bd=40
 #export LC_ALL="en_US.UTF-8"
 
 # READE
-export READE_NOSTYLE='comp-only'
+export READE_NOSTYLE='filecomp-only'
 
 # RMPROMPT
 hash eza &> /dev/null && export RMPROMPT_LS_CMD="eza --long --tree --color=always --header --icons=always"
@@ -45,18 +45,18 @@ hash eza &> /dev/null && export RMPROMPT_LS_CMD="eza --long --tree --color=alway
 
 # MAN
 #export MANOPT='-a'
-export MANPAGER='nvim +Man!'
+#export MANPAGER='nvim +Man!'
 
 # PAGER
-export PAGER=/usr/bin/moar
+#export PAGER=/usr/bin/moar
 
 # LESS
 # Instead of less=more, try LESS='less --redraw-on-quit' or smth
-export LESS="  --quit-on-intr --redraw-on-quit --LINE-NUMBERS --line-num-width=2 --window=10 --use-color --color=Pkg$ --IGNORE-CASE --LONG-PROMPT --chop-long-lines --raw-control-chars --underline-special --mouse --QUIET --status-line --no-vbell --follow-name --exit-follow-on-close --quit-if-one-screen --squeeze-blank-lines"
+#export LESS="  --quit-on-intr --redraw-on-quit --LINE-NUMBERS --line-num-width=2 --window=10 --use-color --color=Pkg$ --IGNORE-CASE --LONG-PROMPT --chop-long-lines --raw-control-chars --underline-special --mouse --QUIET --status-line --no-vbell --follow-name --exit-follow-on-close --quit-if-one-screen --squeeze-blank-lines"
 #export LESSEDIT=$EDITOR
 
 # MOAR
-export MOAR='--statusbar=bold --colors=auto --render-unprintable=highlight --wrap --quit-if-one-screen'
+#export MOAR='--statusbar=bold --colors=auto --render-unprintable=highlight --wrap --quit-if-one-screen'
 
 # BAT
 [[ "$PAGER" =~ 'less' ]] && export BAT_PAGER="less $LESS --line-numbers"
@@ -73,10 +73,10 @@ export MOAR='--statusbar=bold --colors=auto --render-unprintable=highlight --wra
 #export DELTA_PAGER=$PAGER
 
 # EDITORS
-export EDITOR=/usr/bin/nvim
-export VISUAL=/usr/bin/code
-export SUDO_EDITOR=$EDITOR
-export SUDO_VISUAL=$EDITOR
+#export EDITOR=/usr/bin/nvim
+#export VISUAL=/usr/bin/code
+#export SUDO_EDITOR=$EDITOR
+#export SUDO_VISUAL=$EDITOR
 
 # READLINE
 #export INPUTRC=~/.inputrc
@@ -88,8 +88,8 @@ export SUDO_VISUAL=$EDITOR
 #export DISPLAY=":0.0"
 
 # VIM
-export MYVIMRC=~/.config/nvim/init.vim
-export MYGVIMRC=~/.config/nvim/init.vim
+#export MYVIMRC=~/.config/nvim/init.vim
+#export MYGVIMRC=~/.config/nvim/init.vim
 
 # VIMPAGER
 #export VIMPAGER_RC=~/.vimrc
@@ -103,57 +103,57 @@ hash gpg2 &> /dev/null && export GPG='gpg2' || export GPG='gpg'
 hash brew &> /dev/null && export HOMEBREW_CASK_OPTS="--no-quarantine"
 
 # SNAP
-export PATH=/bin/snap:/var/lib/snapd/snap/bin:$PATH
+#export PATH=/bin/snap:/var/lib/snapd/snap/bin:$PATH
 
 # FLATPAK
-export FLATPAK=$HOME/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share
-export FLATPAK_ENABLE_SDK_EXT=*
-export PATH=$PATH:$HOME/.local/bin/flatpak
+#export FLATPAK=$HOME/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share
+#export FLATPAK_ENABLE_SDK_EXT=*
+#export PATH=$PATH:$HOME/.local/bin/flatpak
 
 # XDG
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
 # $XDG_CACHE_HOME defines the base directory relative to which user-specific non-essential data files should be stored. If $XDG_CACHE_HOME is either not set or empty, a default equal to $HOME/.cache should be used. 
-export XDG_CACHE_HOME=$HOME/.cache
+#export XDG_CACHE_HOME=$HOME/.cache
 # $XDG_CONFIG_HOME defines the base directory relative to which user-specific configuration files should be stored. If $XDG_CONFIG_HOME is either not set or empty, a default equal to $HOME/.config should be used.
-export XDG_CONFIG_HOME=$HOME/.config
+#export XDG_CONFIG_HOME=$HOME/.config
 #  $XDG_CONFIG_DIRS defines the preference-ordered set of base directories to search for configuration files in addition to the $XDG_CONFIG_HOME base directory. The directories in $XDG_CONFIG_DIRS should be seperated with a colon ':'.
 #If $XDG_CONFIG_DIRS is either not set or empty, a value equal to /etc/xdg should be used. 
-export XDG_CONFIG_DIRS=/etc/xdg
+#export XDG_CONFIG_DIRS=/etc/xdg
 # $XDG_DATA_HOME defines the base directory relative to which user-specific data files should be stored. If $XDG_DATA_HOME is either not set or empty, a default equal to $HOME/.local/share should be used. 
-export XDG_DATA_HOME=$HOME/.local/share
+#export XDG_DATA_HOME=$HOME/.local/share
 # $XDG_DATA_DIRS defines the preference-ordered set of base directories to search for data files in addition to the $XDG_DATA_HOME base directory. The directories in $XDG_DATA_DIRS should be seperated with a colon ':'. 
 # If $XDG_DATA_DIRS is either not set or empty, a value equal to /usr/local/share/:/usr/share/ should be used. 
-export XDG_DATA_DIRS=/usr/local/share/:/usr/share:$FLATPAK
+#export XDG_DATA_DIRS=/usr/local/share/:/usr/share:$FLATPAK
 # $XDG_STATE_HOME defines the base directory relative to which user-specific state files should be stored. If $XDG_STATE_HOME is either not set or empty, a default equal to $HOME/.local/state should be used. 
-export XDG_STATE_HOME=$HOME/.local/state
+#export XDG_STATE_HOME=$HOME/.local/state
 # $XDG_RUNTIME_DIR defines the base directory relative to which user-specific non-essential runtime files and other file objects (such as sockets, named pipes, ...) should be stored. The directory MUST be owned by the user, and he MUST be the only one having read and write access to it. Its Unix access mode MUST be 0700. 
-export XDG_RUNTIME_DIR=/run/user/1000
+#export XDG_RUNTIME_DIR=/run/user/1000
 
 # SYSTEMD
 # https://systemd.io/ENVIRONMENT/
 # Pager stuff
-export SYSTEMD_PAGER="$PAGER"
-export SYSTEMD_PAGERSECURE=1
-export SYSTEMD_COLORS=256
-export SYSTEMD_LESS="FRXMK $LESS --line-num-width=5"
+#export SYSTEMD_PAGER="$PAGER"
+#export SYSTEMD_PAGERSECURE=1
+#export SYSTEMD_COLORS=256
+#export SYSTEMD_LESS="FRXMK $LESS --line-num-width=5"
 
 # Either one of (in order of decreasing importance) emerg, alert, crit, err, warning, notice, info, debug, or an integer in the range 0…7
 # This can be overridden with --log-level=.
-export SYSTEMD_LOG_LEVEL="warning"
+#export SYSTEMD_LOG_LEVEL="warning"
 # A boolean. If true, messages written to the tty will be colored according to priority.
 # This can be overridden with --log-color=.
 #export SYSTEMD_LOG_COLOR="true"
 # A boolean. If true, console log messages will be prefixed with a timestamp.
 # This can be overridden with --log-time=.
-export SYSTEMD_LOG_TIME="true"
+#export SYSTEMD_LOG_TIME="true"
 # A boolean. If true, messages will be prefixed with a filename and line number in the source code where the message originates.
 # This can be overridden with --log-location=.
-export SYSTEMD_LOG_LOCATION="true"
+#export SYSTEMD_LOG_LOCATION="true"
 # A boolean. If true, messages will be prefixed with the current numerical thread ID (TID).
-export SYSTEMD_LOG_TID="true"
+#export SYSTEMD_LOG_TID="true"
 # The destination for log messages. One of console (log to the attached tty), console-prefixed (log to the attached tty but with prefixes encoding the log level and "facility", see syslog(3), kmsg (log to the kernel circular log buffer), journal (log to the journal), journal-or-kmsg (log to the journal if available, and to kmsg otherwise), auto (determine the appropriate log target automatically, the default), null (disable log output).
 # This can be overridden with --log-target=
-export SYSTEMD_LOG_TARGET="auto"
+#export SYSTEMD_LOG_TARGET="auto"
 
 # Firefox hardware acceleration driver
 #export LIBVA_DRIVER_NAME="mesa"
@@ -185,7 +185,7 @@ hash activate-global-python-argcomplete &> /dev/null && export PYTHON_ARGCOMPLET
 #export LUA_PATH=""
 
 # GO
-export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
+#export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
 
 # RANGER
 #export RANGER_LOAD_DEFAULT_RC="FALSE"
@@ -195,7 +195,7 @@ export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
 #export INITIAL_QUERY="${*:-}"
 
 # FZF
-export PATH=$PATH:$HOME/.fzf/bin
+#export PATH=$PATH:$HOME/.fzf/bin
 #export FZF_PREVIEW_COLUMNS=0
 #export FZF_PREVIEW_LINES=0
 

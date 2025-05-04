@@ -23,6 +23,10 @@ if ! hash rlwrap &>/dev/null; then
     fi
 fi
 
+#if ! hash rlwrap &> /dev/null; then
+#   read 
+#fi
+
 if ! hash curl &>/dev/null && ! test -z "$pac_ins"; then
     printf "${GREEN}Installing curl\n${normal}"
     eval ${pac_ins} curl

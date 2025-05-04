@@ -78,9 +78,25 @@ function yes-edit-no() {
     local underline=$(tput ul)
     local italic=$(tput it)
 
-    local VERSION='1.0'
+    local VERSION='2.0'
+   
+    # [ -o/--other COMMAND, PROMPTDESCRIPTION [, REPLACEEDIT (${bold}1${normal}/0)]]
+    #
+    #        
+    #    -o, --other COMMAND, PROMPTDESCRIPTION [, REPLACEEDIT (${bold}1${normal}/0)], [[ FIRST (${bold}0${normal}/1)]]
+    #        Supply another kind of command other then 'edit' to perform together with the description of what's supposed to be done in string format as to be added to the prompt as long as -d/--dont-add-prompt is not supplied. There's a last option not to replace edit with this new command
+    #        Precedes every other option if the 4th option is 'y'
 
-    local hlpstr="${bold}YES-EDIT-NO${normal} [ -h/--help ] [ -v/--version] [ -d/--dont-askagain ] [ -y/--yes [ PREFILL [, PREFILLPROMPT ]] [ -Y/--yes-colour [ COLOUR ]] [ -n/--no [ PREFILL [, PREFILLPROMPT ]] [ -N/--no-colour [ COLOUR ]] [ -e/--edit [ PREFILL [, PREFILLPROMPT ]] [ -E/--editor EDITOR ] [ -Q/--edit-colour [ COLOUR ]] [ -o/--other COMMAND, PROMPTDESCRIPTION [, REPLACEEDIT (Y/n)]] [ -n/--no-askagain [ Y(Default)/N ] ] [ -e/--editor EDITOR ]  [ -g/--files-to-edit SPACESEPERATED-FILESTRING ] [ -p/--prompt PROMPTSTRING ] [ -Q/--colour COLOURSTRING ] [ -b/--break-chars BREAKCHARS-STRING ] [ -f/--function FUNCTION ] [ -c/--condition CONDITION ]  [ ${bold}SPACESEPARATED FILE(S)STRING${normal} ] [ ${bold}RETURNVAR${normal} ] 
+    #        For example: 'yes-edit-no --other=less,\"pager\",n' would add '[${bold}Y(es)${normal}/n(o)/e(dit)/p(ager)]: ' to the prompt and use less if 'p' was given'
+
+    #    -O, --other-colour [ ${underline_on}COLOUR${underline_off} ] 
+
+    #        Default: ${YELLOW}YELLOW${normal}
+
+
+    local hlpstr="${bold}YES-EDIT-NO${normal} [ -h/--help ] [ -v/--version] [ -d/--dont-askagain (${bold}1${normal}/0) ] [ -y/--yes [ PREFILL [, PREFILLPROMPT ]] [ -Y/--yes-colour [ COLOUR ]] [ -n/--no [ PREFILL [, PREFILLPROMPT ]] [ -N/--no-colour [ COLOUR ]] [ -e/--edit [ PREFILL [, PREFILLPROMPT ]] [ -E/--editor EDITOR ] [ -e/--editor EDITOR ] [ -Q/--edit-colour COLOURSTRING ] [ -p/--prompt PROMPTSTRING ] [ -d/--dont-askagain YES/NOPROMPT (${bold}1${normal}/0) ]  [ -f/--function FUNCTION ] [ -c/--condition CONDITION ] [ -r / --read-no-style [ NOCOMP (${bold}0${normal}/1) ] [ -b/--break-chars BREAKCHARS-STRING ] [ -g/--files-to-edit SPACESEPERATED-FILESTRING ] ${bold}SPACESEPARATED FILE(S)STRING${normal} ${bold}RETURNVAR${normal}
+
+        yes-edit-no version $VERSION
 
         Simplifies prompt for ${bold}read/rlwrap${normal} specifically for when file(s) need to be reviewed before installation 
         - repeats prompt as long neither 'yes' nor 'no' is chosen 
@@ -88,7 +104,7 @@ function yes-edit-no() {
 
         Needs at least 2 parameters.
         1) File(s) to edit/use commands on (if -g/--files-to-edit is not used yet)
-        2) Returnvar (only necessary if -f/--function is not used), will contain at default (if -o/--other is not supplied) 'yes' or 'no' ('edit' also if -n/--no-askagain is supplied) 
+        2) Returnvar (only necessary if -f/--function is not used), will contain at default 'yes' or 'no' ('edit' also except if -d/--dont-askagain is supplied) 
         
         Adding prompt using -p/--prompt is heavily recommended. Adds '[Y(es)/n(o)/e(dit)[/o(ther)]]: ' afterward) 
        
@@ -100,11 +116,11 @@ function yes-edit-no() {
             
             Print version and exit
 
-        -d, --dont-askagain [ Y/N STRING ] 
+        -d, --dont-askagain (${bold}1${normal}/0) 
 
-            Normally after prompted once and edit/other is chosen, it will repeat the prompt (while showing the diffs if edited). With -n, --noaskagain it will ask one last yes/no question and then quit (and if -f/--function is not empty, it will execute said function if yes is answered)
-            It takes the optional string argument of what is pregiven with this second question: (y)es (default) or (n)o.
-            f.ex. yes-edit-no --no-askagain='n'
+            Normally after prompted once and edit is chosen, it will repeat the prompt (while showing the diffs if edited). With -d, --dont-askagain it will ask one last yes/no question and then quit (and if -f/--function is not empty, it will execute said function if yes is answered)
+            It takes the optional string argument of what is pregiven with this second question: '1' (Default) - 'yes' or '0' - 'no'.
+            f.ex. yes-edit-no --dont-askagain 0
 
         -y, --yes [ ${underline_on}prefill${underline_off} ], [[ ${underline_on}prefill-prompt${underline_off} ]] 
            
@@ -138,22 +154,12 @@ function yes-edit-no() {
             
         -E, --editor EDITOR  
          
-            What editor to use. Looks at \$EDITOR if not given, otherwise will look whether nvim, vim, nano or vi exists. Not applicable if 'edit' option is replaced by another command with -o/--other.
+            What editor to use. Looks at \$EDITOR if not given, otherwise will look whether nvim, vim, nano or vi exists. 
 
         -Q, --edit-colour [ ${underline_on}COLOUR${underline_off} ] 
 
             Default: ${YELLOW}YELLOW${normal} 
 
-        -o, --other COMMAND, PROMPTDESCRIPTION [, REPLACEEDIT (Y/n)], [[ FIRST (y/N)]]
-            
-            Supply another kind of command other then 'edit' to perform together with the description of what's supposed to be done in string format as to be added to the prompt as long as -d/--dont-add-prompt is not supplied. There's a last option not to replace edit with this new command
-            Precedes every other option if the 4th option is 'y'
-
-            For example: 'yes-edit-no --other=less,\"pager\",n' would add '[${bold}Y(es)${normal}/n(o)/e(dit)/p(ager)]: ' to the prompt and use less if 'p' was given'
-
-        -O, --other-colour [ ${underline_on}COLOUR${underline_off} ] 
-
-            Default: ${YELLOW}YELLOW${normal} 
         
         -c, --condition ${underline_on}CONDITION${underline_off} 
 
@@ -177,9 +183,30 @@ function yes-edit-no() {
 
             At default something along the lines of '[${bold}Y(es)${normal}/n(o)/e(dit)]: ' will be added at the end of the prompt. With this option, that won't be the case.
 
+        -r, --read-no-style [ NOCOMP - ${bold}'0'${normal}/'1' ] 
+
+            This will stop read from using ${GREEN}colors${normal}/${bold}${underline_on}styles${normal} when applied.
+        
+            As read is pretty archaic and has been broken for a while, having a colorized 'read -p' prompt that uses prefixes/autocomp while obtaining bashhistory from readline using the '-e' flag can be problematic because cycling enough times through the given options will cause part of the option to 'stick' to the prompt - essentially breaking the prompt.
+            This is why most reade/yes-edit-no colorized prompts have their autocompletion underneath the prompt when rlwrap is not installed - - it uses 'printf PROMPT' instead of using 'read -p PROMPT' 
+            (!! ${bold}even when no color is supplied, since color/style can still supplied as a part of a given prompt so this is suspected${normal} !!). 
+            
+            This flag ${bold}${underline_on}mitigates that${normal}, which will remove all applied colors/styles and thus mitigate the need to avoid using 'read -p' 
+            (with an extra style removing check on the supplied prompt to make sure no style is passed).
+            
+            No option will set never set a style
+            Nocomp (optional) can be one '0' (Default) or '1'. 
+            If set it will ${bold}not${normal} remove colors/styles but will instead read will opt to never use multiple autocompletion (to avoid moving arrowkeys up and down breaking prompts) ${bold}apart from the first pregiven/prefix ${underline_on}which will be returned if flag is supplied and answer is empty${normal} 
+
+            There's also a environment variable READE_NOSTYLE that can be set beforehand with options: 'true', 'false', 'nocomp', 'filecomp-only'
+            This flag will preceed the option set with READE_NOSTYLE.
+            Yes-edit-no will ignore READE_NOSTYLE when set to 'filecomp-only'
+
         -b ${underline_on}LIST_OF_CHARACTERS${underline_off} 
 
-           (From rlwrap manual) Consider  the specified characters word-breaking (whitespace is always word-breaking). This determines what is considered a \"word\", both when completing and when building a completion word list from files specified by -f options following (not preceding!) it.\n Default list (){}[],'+-=&^%%\$#@\";|\ \n Unless -c is specified, / and . (period) are included in the default list\n\n"
+           (From rlwrap manual) Consider  the specified characters word-breaking (whitespace is always word-breaking). This determines what is considered a \"word\", both when completing and when building a completion word list from files specified by -f options following (not preceding!) it.\n Default list (){}[],'+-=&^%%\$#@\";|\ \n Unless -c is specified, / and . (period) are included in the default list
+
+            ${bold}( This option is kind of broken )${bold}\n\n"
 
     while :; do
         case $1 in
@@ -200,10 +227,11 @@ function yes-edit-no() {
 
     #https://stackoverflow.com/questions/12022592/how-can-i-use-long-options-with-the-bash-getopts-builtin
 
+        #'--other')              set -- "$@" '-o' ;;
+        #'--other-colour')       set -- "$@" '-O' ;;
     for arg in "$@"; do
         shift
         case "$arg" in
-        '--break-chars')        set -- "$@" '-b' ;;
         '--condition')          set -- "$@" '-c' ;;
         '--dont-askagain')      set -- "$@" '-d' ;;
         '--yes')                set -- "$@" '-y' ;;
@@ -213,12 +241,12 @@ function yes-edit-no() {
         '--edit')               set -- "$@" '-e' ;;
         '--editor')             set -- "$@" '-E' ;;
         '--edit-colour')        set -- "$@" '-Q' ;;
-        '--other')              set -- "$@" '-o' ;;
-        '--other-colour')       set -- "$@" '-O' ;;
         '--function')           set -- "$@" '-f' ;;
         '--files-to-edit')      set -- "$@" '-g' ;;
         '--prompt')             set -- "$@" '-p' ;;
         '--dont-add-prompt')    set -- "$@" '-P' ;;
+        '--read-no-style')      set -- "$@" '-r' ;; 
+        '--break-chars')        set -- "$@" '-b' ;;
         *)                      set -- "$@" "$arg" ;;
         esac
     done
@@ -242,19 +270,20 @@ function yes-edit-no() {
         local ofirst=''
         local YES_NO_EDITOR="$EDITOR"
         local editreplaced='n'
-        local othercmd=''
-        local other=''
         local ycolor="GREEN" 
         local ncolor="ORANGE" 
         local ecolor="YELLOW" 
-        local ocolor="YELLOW"
         local first=''
+        #local othercmd=''
+        #local other=''
+        #local ocolor="YELLOW"
         local noprompt=''
+        local nostyle=0
         local norepeat=''
         local functn=""
         local files=""
 
-        while getopts 'Pyneob:c:d:y:Y:n:N:e:E:Q:o:O:g:f:p:' flag; do
+        while getopts 'Pynerb:c:d:y:Y:n:N:e:E:Q:g:f:p:r:' flag; do
             case "${flag}" in
             b) ;;
             c)  
@@ -266,8 +295,8 @@ function yes-edit-no() {
                 fi 
                 ;; 
             d)
-                if ! test -z ${OPTARG} && [[ ${OPTARG} == 'n' || ${OPTARG} == 'y' ]]; then
-                    norepeat=${OPTARG}
+                if ! [[ ${OPTARG} ]]; then
+                    norepeat='n'
                 else
                     norepeat='y'
                 fi
@@ -370,43 +399,45 @@ function yes-edit-no() {
                     fi
                 fi
                 ;;
-            o)
-                local j=0
-                oflag='o'
-                for i in $(echo ${OPTARG} | sed "s/,/ /g"); do
-                    if [[ $j == 0 ]]; then
-                        othercmd="$i"
-                    elif [[ $j == 1 ]] && test -z "$noprompt"; then
-                        test -z "$i" &&
-                            printf "'-o/--other' takes 2 positional arguments: 
-                                        1) the name of the command
-                                        2) the action performed to portray in the prompt (like 'pager')\n" &&
-                            return 0
-                        other="$i"
-                        first=$(echo $other | cut -c1-1)
-                        
-                        oflag="$first"
-                        choices+=("$first")
-                        # Bless this post, how did I not know about `` in bash beforehand ???
-                        # https://stackoverflow.com/questions/27791251/get-first-character-of-a-string-shell
-                        choicesp+=("$first("$(cut -d "$first" -f2- <<<$other)")")
-                    elif [[ $j == 2 ]] && ! test -z "$i"; then
-                        YES_NO_EDITOR="$othercmd"
-                        editreplaced='y'
-                        [[ " ${choices[*]} " =~ " e " ]] && 
-                            test -n "$BASH_VERSION" && unset ${choices[2]} ||
-                            test -n "$ZSH_VERSION" && unset ${choices[3]}
-                        [[ " ${choicesp[*]} " =~ " e(dit) " ]] &&
-                            test -n "$BASH_VERSION" && unset ${choices[2]} ||
-                            test -n "$ZSH_VERSION" && unset ${choices[3]}
-                    elif [[ $j == 4 ]] && ! test -z "$i"; then
-                        ofirst='y' 
-                    fi
-                    j=$((j + 1))
-                done
-                unset j i
-                [[ ${OPTARG} =~ ^-.* ]] && OPTIND=$(($OPTIND - 1))
-                ;;
+     #       o)
+     #           local j=0
+     #           oflag='o'
+     #           for i in $(echo ${OPTARG} | sed "s/,/ /g"); do
+     #               if [[ $j == 0 ]]; then
+     #                   othercmd="$i"
+     #               elif [[ $j == 1 ]] && test -z "$noprompt"; then
+     #                   if test -z "$i"; then
+     #                       printf "'-o/--other' takes 2 positional arguments: 
+     #                                   1) the name of the command
+     #                                   2) the action performed to portray in the prompt (like 'pager')\n"
+     #                       return 0
+     #                   fi
+     #                   other="$i"
+     #                   first=$(echo $other | cut -c1-1)
+     #                   oflag="$first"
+     #                   choices+=("$first")
+     #                   # Bless this post, how did I not know about `` in bash beforehand ???
+     #                   # https://stackoverflow.com/questions/27791251/get-first-character-of-a-string-shell
+     #                   choicesp+=("$first("$(cut -d "$first" -f2- <<<$other)")")
+     #               #elif [[ $j == 2 ]] && [[ "$i" == '1' ]]; then
+     #               #    YES_NO_EDITOR="$othercmd"
+     #               #    editreplaced='y'
+     #               #    if [[ "${choices[*]}" =~ "e" ]]; then
+     #               #        test -n "$BASH_VERSION" && unset ${choices[2]} 
+     #               #        test -n "$ZSH_VERSION" && unset ${choices[3]}
+     #               #    fi
+     #               #    if [[ "${choicesp[*]}" =~ "e(dit)" ]]; then
+     #               #        test -n "$BASH_VERSION" && unset ${choices[2]}
+     #               #        test -n "$ZSH_VERSION" && unset ${choices[3]}
+     #               #    fi
+     #               elif [[ $j == 3 ]] && test -n "$i"; then
+     #                   ofirst='y' 
+     #               fi
+     #               echo $i $j && j=$(($j+1)) 
+     #           done
+     #           unset j i
+     #           [[ ${OPTARG} =~ ^-.* ]] && OPTIND=$(($OPTIND - 1))
+     #           ;;
                 
              Y) if [ -n "${OPTARG}" ] && ! [[ "${OPTARG}" == '--' ]] && ! [[ ${OPTARG} =~ ^-.* ]]; then 
                     ycolor="${OPTARG}";
@@ -453,6 +484,11 @@ function yes-edit-no() {
             P) 
                 noprompt='y'
                 ;;
+            r) nostyle='-r'  
+               if [[ ${OPTARG} ]]; then
+                  nostyle="-r 'nocomp'"
+               fi
+                ;;
             g)
                 test -z "${OPTARG}" &&
                     printf "This flag requires a string with files to edit/review\n" &&
@@ -492,8 +528,8 @@ function yes-edit-no() {
             
                 # Bash variant - list arrays
                 local i=0
-                local o op 
-                ! [ -z "$oflag" ] && o="${choices[3]}" && op="${choicesp[3]}"
+                #local o op 
+                #[ -n "$oflag" ] && o="${choices[3]}" && op="${choicesp[3]}"
                 if [ -n "$yflag" ]; then
                     i=0 
                     color="$ycolor"
@@ -516,10 +552,10 @@ function yes-edit-no() {
                     #    choicesp=(${choicesp[1]} "${choicesp[0]}" "${choicesp[2]}")
                     #fi
                 fi 
-                if [ -n "$oflag" ] && [[ $editreplaced == 'n' ]]; then 
-                    i=3 
-                    color=$ocolor
-                fi 
+                #if [ -n "$oflag" ] && [[ $editreplaced == 'n' ]]; then 
+                #    i=3 
+                #    color=$ocolor
+                #fi 
 
                 prmpt1=" [${bold}${choicesp[$i]^}"  
                 unset choicesp[$i] 
@@ -535,13 +571,13 @@ function yes-edit-no() {
         #    # (capitalize the first letter in a string)
             if test -n "$ZSH_VERSION"; then 
                 local i=1 
-                local o op 
-                ! [ -z "$oflag" ] && o="${choices[4]}" && op="${choicesp[4]}" 
-                
-                if [ -n "$yflag" ]; then
-                    i=1 
-                    color="$ycolor"
-                fi 
+                #local o op 
+                #! [ -z "$oflag" ] && o="${choices[4]}" && op="${choicesp[4]}" 
+                #
+                #if [ -n "$yflag" ]; then
+                #    i=1 
+                #    color="$ycolor"
+                #fi 
                 if [ -n "$nflag" ] || (test -n "$condition" && ! eval "$condition"); then 
                     nflag='n'
                     color="$ncolor"
@@ -560,10 +596,10 @@ function yes-edit-no() {
                     #    choicesp=(${choicesp[2]} "${choicesp[3]}" "${choicesp[1]}")
                     #fi
                 fi 
-                if [ -n "$oflag" ] && [[ $editreplaced == 'n' ]]; then 
-                    i=4 
-                    color="$ocolor"
-                fi 
+               # if [ -n "$oflag" ] && [[ $editreplaced == 'n' ]]; then 
+               #     i=4 
+               #     color="$ocolor"
+               # fi 
                    
                 local fst="$(sed 's/\([[:alpha:]](\)/\U\1/' <<<${choicesp[$i]})" 
                 prmpt1=" [${bold}$fst" 
@@ -584,25 +620,25 @@ function yes-edit-no() {
         [[ $color == 'ORANGE' ]] && color='YELLOW' 
 
         test -z $color && reade -i "${choices[*]}" -p "$prmpt2" vvvvvvvvvv ||
-            reade -Q $color -i "${choices[*]}" -p "$prmpt2" vvvvvvvvvv
+            reade $nostyle -Q $color -i "${choices[*]}" -p "$prmpt2" vvvvvvvvvv
 
         #Undercase only
         vvvvvvvvvv=$(echo "$vvvvvvvvvv" | tr '[:upper:]' '[:lower:]')
 
         if [[ "$vvvvvvvvvv" == 'e' ]]; then
             eval "${YES_NO_EDITOR} ${files[*]}"
-        elif ! test -z "$first" && [[ "$vvvvvvvvvv" == "$first" ]]; then
-            ${othercmd} ${files[*]}
+        #elif ! test -z "$first" && [[ "$vvvvvvvvvv" == "$first" ]]; then
+        #    ${othercmd} ${files[*]}
         fi
 
-        if ! test -z "$norepeat"; then
+        if test -n "$norepeat"; then
             if ! [[ "$vvvvvvvvvv" == 'n' ]] && ! [[ "$vvvvvvvvvv" == 'y' ]]; then
                 if [[ "$norepeat" == 'n' ]]; then
                     test -z $color && readyn --no "$prmpt" vvvvvvvvvv ||
-                        readyn --no -N $color -p "$prmpt" vvvvvvvvvv
+                        readyn $nostyle --no -N $color -p "$prmpt" vvvvvvvvvv
                 else
                     test -z $color && readyn "$prmpt" vvvvvvvvvv ||
-                        readyn -Y $color -p "$prmpt" vvvvvvvvvv
+                        readyn $nostyle -Y $color -p "$prmpt" vvvvvvvvvv
                 fi
             fi
         else
@@ -610,9 +646,9 @@ function yes-edit-no() {
                 [[ "$vvvvvvvvvv" == 'y' ]] || [[ "$vvvvvvvvvv" == 'n' ]] && break
 
                 if test -z $color; then 
-                    reade -i "${choices[*]}" -p "$prmpt2" vvvvvvvvvv || break
+                    reade $nostyle -i "${choices[*]}" -p "$prmpt2" vvvvvvvvvv || break
                 else
-                    reade -Q "$color" -i "${choices[*]}" -p "$prmpt2" vvvvvvvvvv || break
+                    reade $nostyle -Q "$color" -i "${choices[*]}" -p "$prmpt2" vvvvvvvvvv || break
                 fi
                 
                 # For whatever reason,  ' || break' doesnt work so this check here is being put here if something like an interrupt occured
@@ -626,8 +662,8 @@ function yes-edit-no() {
                 if [[ "$vvvvvvvvvv" == 'e' ]]; then
                     #echo ${files[*]}
                     eval "${YES_NO_EDITOR} ${files[*]}"
-                elif test -n "$first" && [[ "$vvvvvvvvvv" == "$first" ]]; then
-                    ${othercmd} ${files[*]}
+                #elif test -n "$first" && [[ "$vvvvvvvvvv" == "$first" ]]; then
+                #    ${othercmd} ${files[*]}
                 fi
             done
         fi
