@@ -1,4 +1,5 @@
 #!/bin/bash
+
 # Tip: Search binaries with 'whereis'
 # And check with 'printenv'
 
@@ -30,11 +31,14 @@ export LS_COLORS='no=00:fi=00:di=00;34:ln=01;36:pi=40;33:so=01;35:do=01;35:bd=40
 # LC_ALL
 #export LC_ALL="en_US.UTF-8"
 
-# TRASH
-#export TRASHBIN_LIMIT=1000
+# READE
+export READE_NOSTYLE='comp-only'
 
 # RMPROMPT
-type eza &> /dev/null && export RMPROMPT_LS_CMD="eza --long --tree --color=always --header --icons=always"
+hash eza &> /dev/null && export RMPROMPT_LS_CMD="eza --long --tree --color=always --header --icons=always"
+
+# TRASH
+#export TRASHBIN_LIMIT=1000
 
 # SUDO
 #export SUDO_ASKPASS=/usr/lib/ssh/x11-ssh-askpass
@@ -92,11 +96,11 @@ export MYGVIMRC=~/.config/nvim/init.vim
 
 # GPG
 # First one is custom
-type gpg2 &> /dev/null && export GPG='gpg2' || export GPG='gpg'
+hash gpg2 &> /dev/null && export GPG='gpg2' || export GPG='gpg'
 #export GNUPGHOME=~/.thunderbird/e0ecivas.default-release/ 
 
 # BREW
-type brew &> /dev/null && export HOMEBREW_CASK_OPTS="--no-quarantine"
+hash brew &> /dev/null && export HOMEBREW_CASK_OPTS="--no-quarantine"
 
 # SNAP
 export PATH=/bin/snap:/var/lib/snapd/snap/bin:$PATH
@@ -155,17 +159,17 @@ export SYSTEMD_LOG_TARGET="auto"
 #export LIBVA_DRIVER_NAME="mesa"
 
 # RUST
-type cargo &> /dev/null && export PATH=$PATH:~/.cargo/bin
+hash cargo &> /dev/null && export PATH=$PATH:~/.cargo/bin
 
 # PYTHON
 #export PYTHONPATH="/usr/bin/python:/usr/bin/python3:/usr/bin/python3.10"
 #export PATH="$PATH:$PYTHONPATH"
-type activate-global-python-argcomplete &> /dev/null && export PYTHON_ARGCOMPLETE_OK="TRUE"
+hash activate-global-python-argcomplete &> /dev/null && export PYTHON_ARGCOMPLETE_OK="TRUE"
 
 # PYENV
-#(type pyenv &> /dev/null && ! [[ "$(whereis pyenv)" =~ 'pyenv-win' ]]) && export PYENV_ROOT="$HOME/.pyenv"
-#(type pyenv &> /dev/null && ! [[ "$(whereis pyenv)" =~ 'pyenv-win' ]]) && [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-(type pyenv &> /dev/null && ! [[ "$(whereis pyenv)" =~ 'pyenv-win' ]]) && eval "$(pyenv init -)"
+#(hash pyenv &> /dev/null && ! [[ "$(whereis pyenv)" =~ 'pyenv-win' ]]) && export PYENV_ROOT="$HOME/.pyenv"
+#(hash pyenv &> /dev/null && ! [[ "$(whereis pyenv)" =~ 'pyenv-win' ]]) && [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+(hash pyenv &> /dev/null && ! [[ "$(whereis pyenv)" =~ 'pyenv-win' ]]) && eval "$(pyenv init -)"
 
 # RUBY
 #export GEM_HOME=/root/.gem/ruby/.0
@@ -196,7 +200,7 @@ export PATH=$PATH:$HOME/.fzf/bin
 #export FZF_PREVIEW_LINES=0
 
 #export FZF_DEFAULT_COMMAND="find / -type f"
-type fd &> /dev/null && export FZF_DEFAULT_COMMAND="fd --search-path / --type f --hidden"
+hash fd &> /dev/null && export FZF_DEFAULT_COMMAND="fd --search-path / --type f --hidden"
 
 #export FZF_DEFAULT_OPTS='--height=66% --layout=reverse-list --hscroll-off=50 --filepath-word --cycle --prompt="$>" --color=dark,fg:cyan'
 #label=$(curl -s http://metaphorpsum.com/sentences/1)
@@ -222,7 +226,7 @@ type fd &> /dev/null && export FZF_DEFAULT_COMMAND="fd --search-path / --type f 
 [ -s /etc/profile.d/autojump.sh ] && source /etc/profile.d/autojump.sh
 
 # THEFUCK
-type thefuck &> /dev/null && eval $(thefuck --alias f)
+## hash thefuck &> /dev/null && eval $(thefuck --alias f)
 
 # EMACS
 #export PATH="~/.emacs.d/bin/:$PATH"

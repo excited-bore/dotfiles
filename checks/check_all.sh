@@ -1,5 +1,7 @@
 [[ "$1" == 'n' ]] && SYSTEM_UPDATED='TRUE'
 
+READE_NOSTYLE='comp-only'
+
 # Make sure cp copies forceably (without asking confirmation when overwriting) and verbosely
 [[ "$(type cp)" =~ 'aliased' ]] &&
     unalias cp 

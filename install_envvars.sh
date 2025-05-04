@@ -3,7 +3,7 @@
 SYSTEM_UPDATED="TRUE"
 
 if ! test -f checks/check_all.sh; then
-    if ! type curl &>/dev/null; then
+    if ! hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
@@ -284,19 +284,22 @@ if [[ "$envvars" == "y" ]] && [[ "$1" == 'n' ]]; then
     sed -i 's/^#\[\[/\[\[/' $pathvr
     sed -i 's/^#(\[/(\[/' $pathvr
     sed -i 's/^#type/type/' $pathvr
+    sed -i 's/^#hash/hash/' $pathvr
 
     # Comment out FZF stuff
     sed -i 's/  --bind/ #--bind/' $pathvr
     sed -i 's/  --preview-window/ #--preview-window/' $pathvr
     sed -i 's/  --color/ #--color/' $pathvr
 
-    # Set tmpdir
-    sed 's|#export TMPDIR|export TMPDIR|' -i $pathvr
+    # Set TMPDIR
+    sed -i 's|#export TMPDIR|export TMPDIR|' $pathvr
+
+    # Set READE_NOSTYLE
+    sed -i 's|#export READE_NOSTYLE|export READE_NOSTYLE|' $pathvr
 
     #if ! grep -q '.environment' ~/.bashrc && ! grep -q '.environment' $PROFILE; then
     yes-edit-no -f environment-variables -g "$pathvr" -p "Install .environment in $HOME?" -e 
     printf "It's recommended to logout and login again to notice a change for ${MAGENTA}.profile${normal} and any ${CYAN}.*shell*_profiles\n${normal}"
-    #fi
 
 elif [[ "$envvars" == "y" ]]; then
 
