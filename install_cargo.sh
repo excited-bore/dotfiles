@@ -20,11 +20,11 @@ eval "${pac_rm} cargo rustc"
 if [[ "$distro_base" == "Debian" ]]; then
     eval "${pac_ins} curl build-essential gcc make"
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-    ! grep -q 'source ~/.cargo/env' $ENVVAR &&
-        printf "# CARGO\n[ -f ~/.cargo/env ] && source ~/.cargo/env\n" >> $ENVVAR ||
+    ! grep -q 'source ~/.cargo/env' $ENV &&
+        printf "# CARGO\n[ -f ~/.cargo/env ] && source ~/.cargo/env\n" >> $ENV ||
         sed -i 's,#source ~/.cargo/env,source ~/.cargo/env,g' $ENNVAR &&
-        sed -i 's,#[ -f ~/.cargo/env ] && source ~/.cargo/env,[ -f ~/.cargo/env ] && source ~/.cargo/env,g' $ENVVAR
-    source $ENVVAR 
+        sed -i 's,#[ -f ~/.cargo/env ] && source ~/.cargo/env,[ -f ~/.cargo/env ] && source ~/.cargo/env,g' $ENV
+    source $ENV 
     rustc -V
 elif [[ "$distro_base" == "Arch" ]]; then
     eval "${pac_ins}" rust
@@ -32,20 +32,20 @@ elif [[ "$distro" == 'Fedora' ]]; then
     eval "${pac_ins}" rust
 fi
 
-if ! grep -q "# RUST" "$ENVVAR"; then
-    printf "# RUST\ntest -d ~/.cargo/bin && export CARGO_INSTALL_ROOT=\$HOME/.cargo &&\nexport PATH=\$PATH:\$HOME/.cargo/bin\n" >>"$ENVVAR"
+if ! grep -q "# RUST" "$ENV"; then
+    printf "# RUST\ntest -d ~/.cargo/bin && export CARGO_INSTALL_ROOT=\$HOME/.cargo &&\nexport PATH=\$PATH:\$HOME/.cargo/bin\n" >>"$ENV"
 else
-    sed -i 's,#export CARGO_INSTALL_ROOT,export CARGO_INSTALL_ROOT,g' $ENVVAR
-    sed -i 's,#export PATH=\$PATH:\$HOME/.cargo,export PATH=\$PATH:\$HOME/.cargo,g' $ENVVAR
+    sed -i 's,#export CARGO_INSTALL_ROOT,export CARGO_INSTALL_ROOT,g' $ENV
+    sed -i 's,#export PATH=\$PATH:\$HOME/.cargo,export PATH=\$PATH:\$HOME/.cargo,g' $ENV
 fi
 
-echo "This next $(tput setaf 1)sudo$(tput sgr0) will set envvar for cargo in $ENVVAR_R"
+echo "This next $(tput setaf 1)sudo$(tput sgr0) will set envvar for cargo in $ENV_R"
 
-if ! sudo grep -q "# RUST" "$ENVVAR_R"; then
-    printf "# RUST\ntest -d \$HOME/.cargo/bin && export CARGO_INSTALL_ROOT=\$HOME/.cargo &&\nexport PATH=\$PATH:\$HOME/.cargo/bin\n" | sudo tee -a "$ENVVAR_R" &>/dev/null
+if ! sudo grep -q "# RUST" "$ENV_R"; then
+    printf "# RUST\ntest -d \$HOME/.cargo/bin && export CARGO_INSTALL_ROOT=\$HOME/.cargo &&\nexport PATH=\$PATH:\$HOME/.cargo/bin\n" | sudo tee -a "$ENV_R" &>/dev/null
 else
-    sudo sed -i 's,#export CARGO_INSTALL_ROOT,export CARGO_INSTALL_ROOT,g' $ENVVAR_R
-    sudo sed -i 's,#export PATH=\$PATH:\$HOME/.cargo,export PATH=\$PATH:\$HOME/.cargo,g' $ENVVAR_R
+    sudo sed -i 's,#export CARGO_INSTALL_ROOT,export CARGO_INSTALL_ROOT,g' $ENV_R
+    sudo sed -i 's,#export PATH=\$PATH:\$HOME/.cargo,export PATH=\$PATH:\$HOME/.cargo,g' $ENV_R
 fi
     
 echo "This next $(tput setaf 1)sudo$(tput sgr0) will check if something along the lines of 'Defaults secure_path=\".*/\.cargo/bin\"' is being kept in /etc/sudoers";

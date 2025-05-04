@@ -322,7 +322,7 @@ function instvim_r() {
     if ! sudo test -d /root/.config/nvim/; then
         sudo mkdir -p /root/.config/nvim/
     fi
-    sudo cp -fv --backup=numbered $dir/* /root/.config/nvim/
+    sudo cp -bfv $dir/* /root/.config/nvim/
     if sudo test -n "$(ls /root/.config/nvim/*~ &>/dev/null)"; then
         sudo bash -c 'gio trash /root/.config/nvim/*~'
     fi
@@ -332,30 +332,30 @@ function instvim_r() {
         sudo ln -s /root/.config/nvim/* /root/.var/app/io.neovim.nvim/config/nvim/
     fi
 
-    if sudo grep -q "MYVIMRC" $ENVVAR_R; then
-        sudo sed -i 's|.export MYVIMRC="|export MYVIMRC=~/.config/nvim/init.vim "|g' $ENVVAR_R
-        sudo sed -i 's|.export MYGVIMRC="|export MYGVIMRC=~/.config/nvim/init.vim "|g' $ENVVAR_R
+    if sudo grep -q "MYVIMRC" $ENV_R; then
+        sudo sed -i 's|.export MYVIMRC="|export MYVIMRC=~/.config/nvim/init.vim "|g' $ENV_R
+        sudo sed -i 's|.export MYGVIMRC="|export MYGVIMRC=~/.config/nvim/init.vim "|g' $ENV_R
     else
-        printf "export MYVIMRC=~/.config/nvim/init.vim\n" | sudo tee -a $ENVVAR_R &>/dev/null
-        printf "export MYGVIMRC=~/.config/nvim/init.vim\n" | sudo tee -a $ENVVAR_R &>/dev/null
+        printf "export MYVIMRC=~/.config/nvim/init.vim\n" | sudo tee -a $ENV_R &>/dev/null
+        printf "export MYGVIMRC=~/.config/nvim/init.vim\n" | sudo tee -a $ENV_R &>/dev/null
     fi
 
     readyn -p "Set nvim as default for root EDITOR? " vimrc
     if [[ "$vimrc" == "y" ]]; then
-        if sudo grep -q "EDITOR" $ENVVAR_R; then
-            sudo sed -i "s|.export EDITOR=.*|export EDITOR=$(where_cmd nvim)|g" $ENVVAR_R
+        if sudo grep -q "EDITOR" $ENV_R; then
+            sudo sed -i "s|.export EDITOR=.*|export EDITOR=$(where_cmd nvim)|g" $ENV_R
         else
-            printf "export EDITOR=$(where_cmd nvim)\n" | sudo tee -a $ENVVAR_R &>/dev/null
+            printf "export EDITOR=$(where_cmd nvim)\n" | sudo tee -a $ENV_R &>/dev/null
         fi
     fi
     unset vimrc
 
     readyn -p "Set nvim as default for root VISUAL? " vimrc
     if [[ "$vimrc" == "y" ]]; then
-        if sudo grep -q "VISUAL" $ENVVAR_R; then
-            sudo sed -i "s|.export VISUAL=*|export VISUAL=$(where_cmd nvim)|g" $ENVVAR_R
+        if sudo grep -q "VISUAL" $ENV_R; then
+            sudo sed -i "s|.export VISUAL=*|export VISUAL=$(where_cmd nvim)|g" $ENV_R
         else
-            printf "export VISUAL=$(where_cmd nvim)\n" | sudo tee -a $ENVVAR_R &>/dev/null
+            printf "export VISUAL=$(where_cmd nvim)\n" | sudo tee -a $ENV_R &>/dev/null
         fi
     fi
     unset vimrc
@@ -373,7 +373,7 @@ function instvim() {
         mkdir ~/.config/nvim/
     fi
 
-    cp -fv --backup=numbered $dir/* ~/.config/nvim/
+    cp -bfv $dir/* ~/.config/nvim/
 
     if test -n "$(ls ~/.config/nvim/*~ &>/dev/null)"; then
         gio trash ~/.config/nvim/*~
@@ -385,35 +385,35 @@ function instvim() {
         ln -s ~/.config/nvim/* ~/.var/app/io.neovim.nvim/config/nvim/
     fi
 
-    if grep -q "MYVIMRC" $ENVVAR; then
-        sed -i "s|.export MYVIMRC=.*|export MYVIMRC=~/.config/nvim/init.vim|g" $ENVVAR
-        sed -i "s|.export MYGVIMRC=*|export MYGVIMRC=~/.config/nvim/init.vim|g" $ENVVAR
+    if grep -q "MYVIMRC" $ENV; then
+        sed -i "s|.export MYVIMRC=.*|export MYVIMRC=~/.config/nvim/init.vim|g" $ENV
+        sed -i "s|.export MYGVIMRC=*|export MYGVIMRC=~/.config/nvim/init.vim|g" $ENV
     else
-        printf "export MYVIMRC=~/.config/nvim/init.vim\n" >>$ENVVAR
-        printf "export MYGVIMRC=~/.config/nvim/init.vim\n" >>$ENVVAR
+        printf "export MYVIMRC=~/.config/nvim/init.vim\n" >>$ENV
+        printf "export MYGVIMRC=~/.config/nvim/init.vim\n" >>$ENV
     fi
 
     readyn -p "Set Neovim as MANPAGER? " manvim
     if [[ "$manvim" == "y" ]]; then
-        sed -i 's|.export MANPAGER=.*|export MANPAGER='\''nvim +Man!'\''|g' $ENVVAR
+        sed -i 's|.export MANPAGER=.*|export MANPAGER='\''nvim +Man!'\''|g' $ENV
     fi
 
     readyn -p "Set Neovim as default for user EDITOR? " vimrc
     if [[ "$vimrc" == "y" ]]; then
-        if grep -q "EDITOR" $ENVVAR; then
-            sed -i "s|.export EDITOR=.*|export EDITOR=$(where_cmd nvim)|g" $ENVVAR
+        if grep -q "EDITOR" $ENV; then
+            sed -i "s|.export EDITOR=.*|export EDITOR=$(where_cmd nvim)|g" $ENV
         else
-            printf "export EDITOR=$(where_cmd nvim)\n" >>$ENVVAR
+            printf "export EDITOR=$(where_cmd nvim)\n" >>$ENV
         fi
     fi
     unset vimrc
 
     readyn -p "Set Neovim as default for user VISUAL? " vimrc
     if [[ "$vimrc" == "y" ]]; then
-        if grep -q "VISUAL" $ENVVAR; then
-            sed -i "s|.export VISUAL=*|export VISUAL=$(where_cmd nvim)|g" $ENVVAR
+        if grep -q "VISUAL" $ENV; then
+            sed -i "s|.export VISUAL=*|export VISUAL=$(where_cmd nvim)|g" $ENV
         else
-            printf "export VISUAL=$(where_cmd nvim)\n" >>$ENVVAR
+            printf "export VISUAL=$(where_cmd nvim)\n" >>$ENV
         fi
     fi
     unset vimrc

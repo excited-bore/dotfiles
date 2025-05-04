@@ -44,20 +44,20 @@ fi
 
 readyn -p "Set nvimpager as default pager for $USER?" moar_usr
 if [[ "y" == "$moar_usr" ]]; then
-    if grep -q "PAGER" $ENVVAR; then 
-        sed -i "s|.export PAGER=|export PAGER=|g" $ENVVAR
-        sed -i "s|export PAGER=.*|export PAGER=$(whereis nvimpager | awk '{print $2;}')|g" $ENVVAR
+    if grep -q "PAGER" $ENV; then 
+        sed -i "s|.export PAGER=|export PAGER=|g" $ENV
+        sed -i "s|export PAGER=.*|export PAGER=$(whereis nvimpager | awk '{print $2;}')|g" $ENV
     else
-        printf "export PAGER=$(whereis nvimpager | awk '{print $2;}')\n" >> $ENVVAR
+        printf "export PAGER=$(whereis nvimpager | awk '{print $2;}')\n" >> $ENV
     fi
 fi
 
 readyn -Y 'YELLOW' -p "Set nvimpager default pager for root?" moar_root
 if [[ "y" == "$moar_root" ]]; then
-    if sudo grep -q "PAGER" $ENVVAR_R; then
-        sudo sed -i "s|.export PAGER=|export PAGER=|g" $ENVVAR_R
-        sudo sed -i "s|export PAGER=.*|export PAGER=$(whereis nvimpager | awk '{print $2;}')|g" $ENVVAR_R
+    if sudo grep -q "PAGER" $ENV_R; then
+        sudo sed -i "s|.export PAGER=|export PAGER=|g" $ENV_R
+        sudo sed -i "s|export PAGER=.*|export PAGER=$(whereis nvimpager | awk '{print $2;}')|g" $ENV_R
     else
-        printf "export PAGER=$(whereis nvimpager | awk '{print $2;}')\n" | sudo tee -a $ENVVAR_R
+        printf "export PAGER=$(whereis nvimpager | awk '{print $2;}')\n" | sudo tee -a $ENV_R
     fi
 fi

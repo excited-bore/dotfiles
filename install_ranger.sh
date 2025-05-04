@@ -44,13 +44,14 @@ fi
 
 #ranger --copy-config=all
 ranger --confdir=/home/$USER/.config/ranger --copy-config=all
-if [[ $ENVVAR == ~/.environment.env ]]; then
-    sed -i 's|#export RANGER_LOAD_DEFAULT_RC=|export RANGER_LOAD_DEFAULT_RC=|g' $ENVVAR
-    sudo sed -i 's|#export RANGER_LOAD_DEFAULT_RC=|export RANGER_LOAD_DEFAULT_RC=|g' $ENVVAR_R
+if [[ $ENV == ~/.environment ]]; then
+    sed -i 's|#export RANGER_LOAD_DEFAULT_RC=|export RANGER_LOAD_DEFAULT_RC=|g' $ENV
+    sudo sed -i 's|#export RANGER_LOAD_DEFAULT_RC=|export RANGER_LOAD_DEFAULT_RC=|g' $ENV_R
 else
-    echo "export RANGER_LOAD_DEFAULT_RC=FALSE" >>$ENVVAR
-    printf "export RANGER_LOAD_DEFAULT_RC=FALSE\n" | sudo tee -a $ENVVAR_R
+    echo "export RANGER_LOAD_DEFAULT_RC=FALSE" >>$ENV
+    printf "export RANGER_LOAD_DEFAULT_RC=FALSE\n" | sudo tee -a $ENV_R
 fi
+
 if [ -d ~/.bash_aliases.d/ ]; then
     if test -f ranger/.bash_aliases.d/ranger.sh; then
         cp -bfv ranger/.bash_aliases.d/ranger.sh ~/.bash_aliases.d/ranger.sh

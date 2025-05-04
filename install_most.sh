@@ -28,29 +28,29 @@ fi
 most=$(whereis most)
 readyn -p "Set most default pager for $USER?" most_usr
 if [[ "y" == "$most_usr" ]]; then
-    if grep -q "MOST" $ENVVAR; then 
-        sed -i "s|.export MOST_SWITCHES=|export MOST_SWITCHES=|g" $ENVVAR 
-        sed -i "s|.export PAGER=|export PAGER=|g" $ENVVAR
-        sed -i "s|export PAGER=.*|export PAGER=$most|g" $ENVVAR
-        sed -i "s|.export SYSTEMD_PAGER=.*|export SYSTEMD_PAGER=\$PAGER|g" $ENVVAR
-        sed -i "s|.export SYSTEMD_PAGERSECURE=.*|export SYSTEMD_PAGERSECURE=1|g" $ENVVAR
+    if grep -q "MOST" $ENV; then 
+        sed -i "s|.export MOST_SWITCHES=|export MOST_SWITCHES=|g" $ENV 
+        sed -i "s|.export PAGER=|export PAGER=|g" $ENV
+        sed -i "s|export PAGER=.*|export PAGER=$most|g" $ENV
+        sed -i "s|.export SYSTEMD_PAGER=.*|export SYSTEMD_PAGER=\$PAGER|g" $ENV
+        sed -i "s|.export SYSTEMD_PAGERSECURE=.*|export SYSTEMD_PAGERSECURE=1|g" $ENV
     else
-        printf "export PAGER=$most\n" >> $ENVVAR
-        printf "export SYSTEMD_PAGER=\$PAGER" >> $ENVVAR
-        printf "export SYSTEMD_PAGERSECURE=1" >> $ENVVAR
+        printf "export PAGER=$most\n" >> $ENV
+        printf "export SYSTEMD_PAGER=\$PAGER" >> $ENV
+        printf "export SYSTEMD_PAGERSECURE=1" >> $ENV
     fi
 fi
     
 readyn -Y 'YELLOW' -p "Set most default pager for root?" most_root
 if [[ "y" == "$most_root" ]]; then
-    if sudo grep -q "MOST" $ENVVAR_R; then
-        sudo sed -i "s|.export MOST_SWITCHES=.*|export MOST_SWITCHES=.*|g" $ENVVAR_R 
-        sudo sed -i "s|.export PAGER=.*|export PAGER=$most|g" $ENVVAR_R
-        sudo sed -i "s|.export SYSTEMD_PAGER=.*|export SYSTEMD_PAGER=$PAGER|g" $ENVVAR_R
-        sudo sed -i "s|.export SYSTEMD_PAGERSECURE=.*|export SYSTEMD_PAGERSECURE=1|g" $ENVVAR_R
+    if sudo grep -q "MOST" $ENV_R; then
+        sudo sed -i "s|.export MOST_SWITCHES=.*|export MOST_SWITCHES=.*|g" $ENV_R 
+        sudo sed -i "s|.export PAGER=.*|export PAGER=$most|g" $ENV_R
+        sudo sed -i "s|.export SYSTEMD_PAGER=.*|export SYSTEMD_PAGER=$PAGER|g" $ENV_R
+        sudo sed -i "s|.export SYSTEMD_PAGERSECURE=.*|export SYSTEMD_PAGERSECURE=1|g" $ENV_R
     else
-        printf "export PAGER=$most\n" | sudo tee -a $ENVVAR_R
-        printf "export SYSTEMD_PAGER=\$PAGER\n" | sudo tee -a $ENVVAR_R
-        printf "export SYSTEMD_PAGERSECURE=1\n" | sudo tee -a $ENVVAR_R
+        printf "export PAGER=$most\n" | sudo tee -a $ENV_R
+        printf "export SYSTEMD_PAGER=\$PAGER\n" | sudo tee -a $ENV_R
+        printf "export SYSTEMD_PAGERSECURE=1\n" | sudo tee -a $ENV_R
     fi
 fi

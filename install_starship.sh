@@ -39,7 +39,7 @@ if [[ "y" == "$strship" ]]; then
     #fi
     if [ -d ~/.bash_aliases.d/ ]; then
         if test -f aliases/.bash_aliases.d/starship.sh; then
-            cp -fv --backup=numbered aliases/.bash_aliases.d/starship.sh ~/.bash_aliases.d/
+            cp -bfv aliases/.bash_aliases.d/starship.sh ~/.bash_aliases.d/
         else
             curl -o ~/.bash_aliases.d/starship.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/starship.sh
         fi
@@ -71,7 +71,7 @@ if [[ "y" == "$strship" ]]; then
     starship completions bash | sudo tee -a /root/.bash_completion.d/starship &>/dev/null
     if [ -d /root/.bash_aliases.d/ ]; then
         if test -f aliases/.bash_aliases.d/starship.sh; then
-            sudo cp -fv --backup=numbered aliases/.bash_aliases.d/starship.sh /root/.bash_aliases.d/
+            sudo cp -fbv  aliases/.bash_aliases.d/starship.sh /root/.bash_aliases.d/
         else
             sudo curl -o /root/.bash_aliases.d/starship.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/starship.sh
         fi

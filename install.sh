@@ -71,7 +71,7 @@ SCRIPT_DIR=$(get-script-dir)
 
 # Environment variables
 
-if ! test -f $HOME/.environment.env; then
+if ! test -f $HOME/.environment; then
     if ! test -f $SCRIPT_DIR/install_envvars.sh; then
         tmp=$(mktemp) && wget -O $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_envvars.sh
         . ./$tmp 'n'
@@ -495,8 +495,8 @@ if ! test -f /etc/inputrc; then
 fi
 
 shell-keybinds_r() {
-    if test -f /root/.environment.env; then
-        sudo sed -i 's|#export INPUTRC.*|export INPUTRC=~/.inputrc|g' /root/.environment.env
+    if test -f /root/.environment; then
+        sudo sed -i 's|#export INPUTRC.*|export INPUTRC=~/.inputrc|g' /root/.environment
     fi
     sudo cp -f $binds1 /root/.keybinds.d/
     sudo cp -f $binds2 /root/.keybinds
@@ -562,8 +562,8 @@ shell-keybinds() {
         fi
     fi
 
-    if [ -f ~/.environment.env ]; then
-        sed -i 's|#export INPUTRC.*|export INPUTRC=~/.inputrc|g' ~/.environment.env
+    if [ -f ~/.environment ]; then
+        sed -i 's|#export INPUTRC.*|export INPUTRC=~/.inputrc|g' ~/.environment
     fi
     unset vimde vivisual xterm
     yes-edit-no -Y "YELLOW" -f shell-keybinds_r -g "$binds $binds2 $binds1" -p "Install .inputrc and keybinds.bash at /root/ and /root/.keybinds.d/?"
@@ -948,20 +948,18 @@ unset yt_dlp
 #othr='n'
 #color='GREEN'
 #prmpt='[Y/n]: '
-#echo "Next $(tput setaf 1)sudo$(tput sgr0) check for /root/.environment.env' "
-#if test -f ~/.environment.env && sudo test -f /root/.environment.env; then
+#echo "Next $(tput setaf 1)sudo$(tput sgr0) check for /root/.environment' "
+#if test -f ~/.environment && sudo test -f /root/.environment; then
 #    pre='n'
 #    othr='y'
 #    color='YELLOW'
 #    prmpt='[N/y]: '
 #fi
 
-#reade -Q "$color" -i "$pre" -p "Check existence/create .environment.env and link it to .bashrc in $HOME/ and /root/? $prmpt" "$othr" envvars
+#reade -Q "$color" -i "$pre" -p "Check existence/create .environment and link it to .bashrc in $HOME/ and /root/? $prmpt" "$othr" envvars
 #if [[ "$envvars" == "y" ]] || [[ -z "$envvars" ]]  then
 if ! test -f $SCRIPT_DIR/install_envvars.sh; then
-    tmp=$(mktemp)
-    wget -O $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_envvars.sh
-    ./$tmp
+    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_envvars.sh)
 else
     . $SCRIPT_DIR/install_envvars.sh
 fi

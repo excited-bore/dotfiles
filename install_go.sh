@@ -44,15 +44,15 @@ if ! hash go &> /dev/null; then
             fi
             
             if ! [[ $PATH =~ /usr/local/go/bin ]]; then
-                if grep -q 'GOPATH' $ENVVAR; then
-                    sed -i 's|.export PATH=$PATH:/usr/local/go/bin|export PATH=$PATH:/usr/local/go/bin|g' $ENVVAR
-                    sed -i 's|.export PATH=$PATH:$(go env GOPATH)/bin|export PATH=$PATH:$(go env GOPATH)/bin|g' $ENVVAR
+                if grep -q 'GOPATH' $ENV; then
+                    sed -i 's|.export PATH=$PATH:/usr/local/go/bin|export PATH=$PATH:/usr/local/go/bin|g' $ENV
+                    sed -i 's|.export PATH=$PATH:$(go env GOPATH)/bin|export PATH=$PATH:$(go env GOPATH)/bin|g' $ENV
                 else
-                    printf "# GO\nexport PATH=\$PATH:/usr/local/go/bin\n" >> $ENVVAR 
-                    printf "export PATH=\$PATH:\$(go env GOPATH)/bin\n" >> $ENVVAR        
+                    printf "# GO\nexport PATH=\$PATH:/usr/local/go/bin\n" >> $ENV 
+                    printf "export PATH=\$PATH:\$(go env GOPATH)/bin\n" >> $ENV        
                 fi 
                 
-                source $ENVVAR
+                source $ENV
             fi
         fi
     fi
@@ -61,17 +61,17 @@ fi
 go help | $PAGER
 
 if ! [[ $PATH =~ "\$(go env GOPATH)/bin" ]]; then
-    if grep -q 'GOPATH' $ENVVAR; then
-        sed -i 's|.export PATH=$PATH:$(go env GOPATH)/bin|export PATH=$PATH:$(go env GOPATH)/bin|g' $ENVVAR
+    if grep -q 'GOPATH' $ENV; then
+        sed -i 's|.export PATH=$PATH:$(go env GOPATH)/bin|export PATH=$PATH:$(go env GOPATH)/bin|g' $ENV
     else
-        if grep -q '# GO' $ENVVAR; then
-            printf "export PATH=\$PATH:\$(go env GOPATH)/bin\n" >> $ENVVAR        
+        if grep -q '# GO' $ENV; then
+            printf "export PATH=\$PATH:\$(go env GOPATH)/bin\n" >> $ENV        
         else 
-            printf "# GO\nexport PATH=\$PATH:\$(go env GOPATH)/bin\n" >> $ENVVAR 
+            printf "# GO\nexport PATH=\$PATH:\$(go env GOPATH)/bin\n" >> $ENV 
         fi
     fi 
     
-    source $ENVVAR
+    source $ENV
 
 fi
 
@@ -97,13 +97,13 @@ fi
 #
 #        go env -w GO111MODULE=auto
 #        go env -w GOPATH=$gopth
-#         #if grep -q "GOPATH" $ENVVAR; then
-#         #   sed -i "s|.export GOPATH=|export GOPATH=|g" $ENVVAR
-#         #   sed -i "s|export GOPATH=.*|export GOPATH=$gopth|g" $ENVVAR
-#         #   sed -i "s|.export PATH=\$PATH:\$GOPATH|export PATH=\$PATH:\$GOPATH|g" $ENVVAR
+#         #if grep -q "GOPATH" $ENV; then
+#         #   sed -i "s|.export GOPATH=|export GOPATH=|g" $ENV
+#         #   sed -i "s|export GOPATH=.*|export GOPATH=$gopth|g" $ENV
+#         #   sed -i "s|.export PATH=\$PATH:\$GOPATH|export PATH=\$PATH:\$GOPATH|g" $ENV
 #         #else
-#         #   echo "export GOPATH=$gopth" >> $ENVVAR
-#         #   echo "export PATH=\$PATH:\$GOPATH" >> $ENVVAR
+#         #   echo "export GOPATH=$gopth" >> $ENV
+#         #   echo "export PATH=\$PATH:\$GOPATH" >> $ENV
 #         #fi
 #    fi
 #fi

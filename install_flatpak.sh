@@ -36,16 +36,16 @@ fi
 if type flatpak &> /dev/null && test -z "$FLATPAK"; then
     readyn -p "Add flatpak dirs to path? (XDG_DATA_DIRS)" flpkvrs 
     if [[ "$flpkvrs" == "y" ]]; then
-        if grep -q "FLATPAK" $ENVVAR; then
-            sed -i 's|.export PATH=$PATH:$HOME/.local/bin/flatpak|export PATH=$PATH:$HOME/.local/bin/flatpak|g' $ENVVAR
-            sed -i 's|.export FLATPAK=|export FLATPAK=$HOME/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share|'  $ENVVAR 
-            sed -i 's|.export FLATPAK_ENABLE_SDK_EXT=|export FLATPAK_ENABLE_SDK_EXT=*|' $ENVVAR
-            if ! grep -q 'XDG_DATA_DIRS*.*:$FLATPAK' $ENVVAR; then
-                sed -i 's|.export XDG_DATA_DIRS=\(.*\) |export XDG_DATA_DIRS=\1:$FLATPAK|' $ENVVAR
+        if grep -q "FLATPAK" $ENV; then
+            sed -i 's|.export PATH=$PATH:$HOME/.local/bin/flatpak|export PATH=$PATH:$HOME/.local/bin/flatpak|g' $ENV
+            sed -i 's|.export FLATPAK=|export FLATPAK=$HOME/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share|'  $ENV 
+            sed -i 's|.export FLATPAK_ENABLE_SDK_EXT=|export FLATPAK_ENABLE_SDK_EXT=*|' $ENV
+            if ! grep -q 'XDG_DATA_DIRS*.*:$FLATPAK' $ENV; then
+                sed -i 's|.export XDG_DATA_DIRS=\(.*\) |export XDG_DATA_DIRS=\1:$FLATPAK|' $ENV
             fi
         else
-            echo 'export PATH=$PATH:$HOME/.local/bin/flatpak' >> $ENVVAR
-            echo 'export XDG_DATA_DIRS=$XDG_DATA_DIRS:$HOME/.local/bin/flatpak:$HOME/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share' >> $ENVVAR
+            echo 'export PATH=$PATH:$HOME/.local/bin/flatpak' >> $ENV
+            echo 'export XDG_DATA_DIRS=$XDG_DATA_DIRS:$HOME/.local/bin/flatpak:$HOME/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share' >> $ENV
         fi
     fi
 fi
@@ -69,7 +69,7 @@ if ! test -f ~/.bash_aliases.d/flatpacks.sh; then
         fi
          
         if ! test -f ~/.bash_aliases.d/flatpacks.sh; then
-            cp --backup numbered $file ~/.bash_aliases.d/ 
+            cp -fv $file ~/.bash_aliases.d/ 
             test -n "$BASH_VERSION" && source ~/.bash_aliases.d/flatpacks.sh 
         fi
     fi    

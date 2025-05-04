@@ -75,8 +75,8 @@ fi
 readyn -p "Install general.sh at ~/? (aliases related to general actions - cd/mv/cp/rm + completion script replacement for 'read -e')" ansr
 
 if [[ $ansr == "y" ]]; then
-    if test -f ~/.environment.env; then
-        sed -i 's|^export TRASH_BIN_LIMIT=|export TRASH_BIN_LIMIT=|g' ~/.environment.env
+    if test -f ~/.environment; then
+        sed -i 's|^export TRASH_BIN_LIMIT=|export TRASH_BIN_LIMIT=|g' ~/.environment
     fi
 
     #if type gio &> /dev/null; then
@@ -226,18 +226,18 @@ if [[ $ansr == "y" ]]; then
 
         type gem &>/dev/null &&
             paths=$(gem environment | awk '/- GEM PATH/{flag=1;next}/- GEM CONFIGURATION/{flag=0}flag' | sed 's|     - ||g' | paste -s -d ':')
-        if grep -q "GEM" $ENVVAR; then
-            sed -i "s|.export GEM_|export GEM_|g" $ENVVAR
-            sed -i "s|export GEM_HOME=.*|export GEM_HOME=$HOME/.gem/ruby/$rver|g" $ENVVAR
+        if grep -q "GEM" $ENV; then
+            sed -i "s|.export GEM_|export GEM_|g" $ENV
+            sed -i "s|export GEM_HOME=.*|export GEM_HOME=$HOME/.gem/ruby/$rver|g" $ENV
             type gem &>/dev/null &&
-                sed -i "s|export GEM_PATH=.*|export GEM_PATH=$paths|g" $ENVVAR
-            sed -i "s|.export PATH=\$PATH:\$GEM_PATH|export PATH=\$PATH:\$GEM_PATH|g" $ENVVAR
-            sed -i 's|export PATH=$PATH:$GEM_PATH.*|export PATH=$PATH:$GEM_PATH:$GEM_HOME/bin|g' $ENVVAR
+                sed -i "s|export GEM_PATH=.*|export GEM_PATH=$paths|g" $ENV
+            sed -i "s|.export PATH=\$PATH:\$GEM_PATH|export PATH=\$PATH:\$GEM_PATH|g" $ENV
+            sed -i 's|export PATH=$PATH:$GEM_PATH.*|export PATH=$PATH:$GEM_PATH:$GEM_HOME/bin|g' $ENV
         else
-            printf "export GEM_HOME=$HOME/.gem/ruby/$rver\n" >>$ENVVAR
+            printf "export GEM_HOME=$HOME/.gem/ruby/$rver\n" >>$ENV
             type gem &>/dev/null &&
-                printf "export GEM_PATH=$paths\n" >>$ENVVAR
-            printf "export PATH=\$PATH:\$GEM_PATH:\$GEM_HOME/bin\n" >>$ENVVAR
+                printf "export GEM_PATH=$paths\n" >>$ENV
+            printf "export PATH=\$PATH:\$GEM_PATH:\$GEM_HOME/bin\n" >>$ENV
         fi
     fi
 

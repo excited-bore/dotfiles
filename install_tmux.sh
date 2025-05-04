@@ -67,7 +67,7 @@ sed -i 's|^set -g @continuum-restore '\''on'\''|#set -g @continuum-restore '\''o
 
 yes-edit-no -p "Install tmux.conf? (tmux conf at ~/.tmux.conf)" -g '$file' tmuxc
 if [[ "$tmuxc" == "y" ]]; then
-    cp -fv --backup=numbered $file ~/
+    cp -bfv $file ~/
     if test -f $file~ && type gio &>/dev/null; then
         gio trash $file~
     fi
@@ -210,7 +210,7 @@ unset tmuux
 readyn -p "Install tmux.sh at ~/.bash_aliases.d/? (tmux aliases)" tmuxx
 if [[ "$tmuxx" == "y" ]]; then
     if test -f tmux/.bash_aliases.d/tmux.sh; then
-        cp -fv --backup=numbered tmux/.bash_aliases.d/tmux.sh ~/.bash_aliases.d/
+        cp -bfv tmux/.bash_aliases.d/tmux.sh ~/.bash_aliases.d/
     else
         curl -s -o ~/.bash_aliases.d/tmux.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/tmux/.bash_aliases.d/tmux.sh
     fi

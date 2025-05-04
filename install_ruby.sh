@@ -57,16 +57,16 @@ ruby --version
 
 #rver=$(echo $(ruby --version) | awk '{print $2}' | cut -d. -f-2)'.0'
 #paths=$(gem environment | awk '/- GEM PATH/{flag=1;next}/- GEM CONFIGURATION/{flag=0}flag' | sed 's|     - ||g' | paste -s -d ':')
-#if grep -q "GEM" $ENVVAR; then
-#    sed -i "s|.export GEM_|export GEM_|g" $ENVVAR
-#    sed -i 's|.export PATH=$PATH:$GEM_PATH|export PATH=$PATH:$GEM_PATH|g' $ENVVAR
-#    sed -i "s|export GEM_HOME=.*|export GEM_HOME=$HOME/.gem/ruby/$rver|g" $ENVVAR
-#    sed -i "s|export GEM_PATH=.*|export GEM_PATH=$paths|g" $ENVVAR
-#    sed -i 's|export PATH=$PATH:$GEM_PATH.*|export PATH=$PATH:$GEM_PATH:$GEM_HOME/bin|g' $ENVVAR
+#if grep -q "GEM" $ENV; then
+#    sed -i "s|.export GEM_|export GEM_|g" $ENV
+#    sed -i 's|.export PATH=$PATH:$GEM_PATH|export PATH=$PATH:$GEM_PATH|g' $ENV
+#    sed -i "s|export GEM_HOME=.*|export GEM_HOME=$HOME/.gem/ruby/$rver|g" $ENV
+#    sed -i "s|export GEM_PATH=.*|export GEM_PATH=$paths|g" $ENV
+#    sed -i 's|export PATH=$PATH:$GEM_PATH.*|export PATH=$PATH:$GEM_PATH:$GEM_HOME/bin|g' $ENV
 #else
-#    printf "export GEM_HOME=$HOME/.gem/ruby/$rver\n" >> $ENVVAR
-#    printf "export GEM_PATH=$paths\n" >> $ENVVAR
-#    printf "export PATH=\$PATH:\$GEM_PATH:\$GEM_HOME/bin\n" >> $ENVVAR
+#    printf "export GEM_HOME=$HOME/.gem/ruby/$rver\n" >> $ENV
+#    printf "export GEM_PATH=$paths\n" >> $ENV
+#    printf "export PATH=\$PATH:\$GEM_PATH:\$GEM_HOME/bin\n" >> $ENV
 #fi
 
 #

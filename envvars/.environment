@@ -229,7 +229,7 @@ type thefuck &> /dev/null && eval $(thefuck --alias f)
 
 # KITTY
 #export KITTY_PATH=~/.local/bin/:~/.local/kitty.app/bin/
-#export PATH=$KITTY_PATH:$PATH
+#export PATH=$PATH:$KITTY_PATH
 
 # NINJA
 #export PATH=$PATH:/usr/bin/ninja

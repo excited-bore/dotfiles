@@ -243,7 +243,7 @@ if [[ $ktty_cnf == 'y' ]]; then
     function kitty_conf() {
         mkdir -p ~/.config/kitty
         cp -bvf $dir/kitty.conf ~/.config/kitty/kitty.conf
-        cp -vbf $dir/ssh.conf ~/.config/kitty/ssh.conf
+        cp -bvf $dir/ssh.conf ~/.config/kitty/ssh.conf
         if type gio &>/dev/null && [ -f ~/.config/kitty/kitty.conf~ ]; then
             gio trash ~/.config/kitty/kitty.conf~
         fi
@@ -270,12 +270,14 @@ fi
 unset kittn
 
 # TODO: Get sed warnings gone
-if [ -f ~/.environment.env ]; then
-    sed -i 's|^.\(export KITTY_PATH=~/.local/bin/:~/.local/kitty.app/bin/\)|\1|g' ~/.environment.env
-    sed -i 's|^.\(export PATH=$KITTY_PATH:$PATH\)|\1|g' ~/.environment.env
-    #sed -i 's|^.\(if \[\[ \$SSH_TTY \]\] .*\)|\1|g' $ENVVAR
-    #sed -i 's|^.\(export KITTY_PORT=.*\)|\1|g' $ENVVAR
-    #sed -i 's|^.\(fi\)|\1|g' $ENVVAR
+if grep -q '# KITTY' $ENV; then
+    sed -i 's|^.\(export KITTY_PATH=~/.local/bin/:~/.local/kitty.app/bin/\)|\1|g' $ENV
+    sed -i 's|^.\(export PATH=$PATH:$KITTY_PATH\)|\1|g' $ENV
+    #sed -i 's|^.\(if \[\[ \$SSH_TTY \]\] .*\)|\1|g' $ENV
+    #sed -i 's|^.\(export KITTY_PORT=.*\)|\1|g' $ENV
+    #sed -i 's|^.\(fi\)|\1|g' $ENV
+else
+    printf "# KITTY\nexport KITTY_PATH=~/.local/bin/:~/.local/kitty.app/bin\nexport PATH=\$PATH:\$KITTY_PATH\n" $ENV
 fi
 
 #if [ -x "$(command -v xdg-open)" ]; then

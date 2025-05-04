@@ -28,15 +28,15 @@ if type brew &> /dev/null; then
         sudo mkdir -p /Library/Caches/Homebrew
         sudo chown -R "$USER":admin /Library/Caches/Homebrew
     fi
-    if ! grep -q -- '--no-quarantine' $ENVVAR || grep -q '#export HOMEBREW_CASK_OPTS="--no-quarantine"' $ENVVAR; then
-        readyn -p "Unblock Homebrew apps from Gatekeeper (No more popups each time when you install from homebrew) by setting HOMEBREW_CASK_OPTS=\"--no-quarantine\" in $ENVVAR?" unblock_hb
+    if ! grep -q -- '--no-quarantine' $ENV || grep -q '#export HOMEBREW_CASK_OPTS="--no-quarantine"' $ENV; then
+        readyn -p "Unblock Homebrew apps from Gatekeeper (No more popups each time when you install from homebrew) by setting HOMEBREW_CASK_OPTS=\"--no-quarantine\" in $ENV?" unblock_hb
         if [[ $unblock_hb == 'y' ]]; then
-           if [[ $ENVVAR =~ '.environment.env' ]]; then
-                sed -i 's/^#export HOMEBREW_CASK_OPTS/export HOMEBREW_CASK_OPTS/g' $ENVVAR
+           if [[ $ENV =~ '.environment' ]]; then
+                sed -i 's/^#export HOMEBREW_CASK_OPTS/export HOMEBREW_CASK_OPTS/g' $ENV
            else
-                echo 'export HOMEBREW_CASK_OPTS=" --no-quarantine"' >> $ENVVAR
+                echo 'export HOMEBREW_CASK_OPTS=" --no-quarantine"' >> $ENV
            fi
-           source $ENVVAR
+           source $ENV
         fi
     fi
     if test -z "$(brew list applite)" &> /dev/null; then

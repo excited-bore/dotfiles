@@ -879,15 +879,15 @@ ${CYAN}\t4)${normal}${green} Disable pager/just highlight\n${normal}"
                 if [[ "$choice" == '1' ]] || [[ "$choice" == '2' ]] || [[ "$choice" == '3' ]] ; then  
                     if [[ "$pager" == "bat" ]]; then
 
-                        printf "${CYAN}$pager${GREEN} can:${normal}${green}\n\t - Can be configured using the environment variable \\\$BAT_PAGER by setting it to '$pgr $ln' in $ENVVAR(\\\$BAT_PAGER: $BAT_PAGER)\n\t - Uses the option '--pager' for setting a pager - '--pager='$pgr $ln'' in gitconfig\n${normal}\n" 
+                        printf "${CYAN}$pager${GREEN} can:${normal}${green}\n\t - Can be configured using the environment variable \\\$BAT_PAGER by setting it to '$pgr $ln' in $ENV(\\\$BAT_PAGER: $BAT_PAGER)\n\t - Uses the option '--pager' for setting a pager - '--pager='$pgr $ln'' in gitconfig\n${normal}\n" 
 
                         reade -Q "GREEN" -i 'batpager gitconfig' -p "Which? [Batpager/gitconfig]: " pager1
                         if [[ $pager1 == 'batpager' ]]; then
-                            if grep -q 'BAT_PAGER' $ENVVAR; then
-                                sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $ENVVAR
-                                sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='$pgr $ln'|g" $ENVVAR
+                            if grep -q 'BAT_PAGER' $ENV; then
+                                sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $ENV
+                                sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='$pgr $ln'|g" $ENV
                             else
-                                printf "# BAT\nexport BAT_PAGER='$pgr $ln'\n" >>$ENVVAR
+                                printf "# BAT\nexport BAT_PAGER='$pgr $ln'\n" >>$ENV
                             fi
                             git config $global "$cpager" "$pager$opts"
                         elif [[ $pager1 == 'gitconfig' ]]; then   
@@ -896,24 +896,24 @@ ${CYAN}\t4)${normal}${green} Disable pager/just highlight\n${normal}"
 
                     elif [[ "$pager" == "delta" ]]; then
 
-                        printf "${CYAN}$pager${GREEN} can:${normal}${green}\n\t - Can be configured using the environment variable \\\$DELTA_PAGER by setting it to '$pgr $ln' in $ENVVAR(\\\$BAT_PAGER: $BAT_PAGER)\n\t - Can be also be configured using the environment variable \\\$BAT_PAGER when \\\$DELTA_PAGER is empty - (\\\$DELTA_PAGER: $DELTA_PAGER)\n - Uses the option '--pager' for setting a pager - '--pager='$pgr $ln'' in gitconfig\n${normal}\n" 
+                        printf "${CYAN}$pager${GREEN} can:${normal}${green}\n\t - Can be configured using the environment variable \\\$DELTA_PAGER by setting it to '$pgr $ln' in $ENV(\\\$BAT_PAGER: $BAT_PAGER)\n\t - Can be also be configured using the environment variable \\\$BAT_PAGER when \\\$DELTA_PAGER is empty - (\\\$DELTA_PAGER: $DELTA_PAGER)\n - Uses the option '--pager' for setting a pager - '--pager='$pgr $ln'' in gitconfig\n${normal}\n" 
 
                         reade -Q "GREEN" -i 'deltapager batpager gitconfig' -p "Which? [Deltapager/batpager/gitconfig]: " pager1
                         if [[ $pager1 == 'deltapager' ]]; then
-                            if grep -q 'DELTA_PAGER' $ENVVAR; then
-                                sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $ENVVAR
-                                sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='$pgr $ln'|g" $ENVVAR
+                            if grep -q 'DELTA_PAGER' $ENV; then
+                                sed -i 's|.export DELTA_PAGER=|export DELTA_PAGER=|g' $ENV
+                                sed -i "s|export DELTA_PAGER=.*|export DELTA_PAGER='$pgr $ln'|g" $ENV
                             else
-                                printf "# DELTA\nexport DELTA_PAGER='$pgr $ln'\n" >>$ENVVAR
+                                printf "# DELTA\nexport DELTA_PAGER='$pgr $ln'\n" >>$ENV
                             fi
                             git config $global "$cpager" "delta"
 
                         elif [[ $pager1 == 'batpager' ]]; then
-                            if grep -q 'BAT_PAGER' $ENVVAR; then
-                                sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $ENVVAR
-                                sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='$pgr $ln'|g" $ENVVAR
+                            if grep -q 'BAT_PAGER' $ENV; then
+                                sed -i 's|.export BAT_PAGER=|export BAT_PAGER=|g' $ENV
+                                sed -i "s|export BAT_PAGER=.*|export BAT_PAGER='$pgr $ln'|g" $ENV
                             else
-                                printf "# BAT\nexport BAT_PAGER='$pgr $ln'\n" >>$ENVVAR
+                                printf "# BAT\nexport BAT_PAGER='$pgr $ln'\n" >>$ENV
                             fi
                             git config $global "$cpager" "delta" 
                         else

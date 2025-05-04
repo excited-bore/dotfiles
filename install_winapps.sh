@@ -24,8 +24,8 @@ sudo systemctl start --user libvirtd.service
 sudo usermod -aG libvirt $(whoami)
 sudo usermod -aG kvm $(whoami)
 
-if ! grep -q "LIBVIRT" $ENVVAR; then
-    printf "\n#LIBVIRT\nexport LIBVIRT_DEFAULT_URI=qemu:///system\n" >> $ENVVAR
+if ! grep -q "LIBVIRT" $ENV; then
+    printf "\n#LIBVIRT\nexport LIBVIRT_DEFAULT_URI=qemu:///system\n" >> $ENV
 else
-    sed -i "s|.export LIBVIRT_DEFAULT_URI=.*|export LIBVIRT_DEFAULT_URI=qemu:///system|g" $ENVVAR
+    sed -i "s|.export LIBVIRT_DEFAULT_URI=.*|export LIBVIRT_DEFAULT_URI=qemu:///system|g" $ENV
 fi

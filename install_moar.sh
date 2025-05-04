@@ -68,34 +68,34 @@ if type moar &> /dev/null; then
     readyn -p "Set moar as default pager for $USER?" moar_usr
     if [[ "y" == "$moar_usr" ]]; then
         
-        if grep -q "MOAR" $ENVVAR; then 
-            sed -i "s|.export MOAR=| MOAR=|g" $ENVVAR 
+        if grep -q "MOAR" $ENV; then 
+            sed -i "s|.export MOAR=| MOAR=|g" $ENV 
             
-            sed -i "s|export MOAR=.*|export MOAR='--statusbar=bold --colors=auto --render-unprintable=highlight --quit-if-one-screen'|g" $ENVVAR 
-            sed -i "s|.export PAGER=|export PAGER=|g" $ENVVAR
-            sed -i "s|export PAGER=.*|export PAGER=/usr/bin/moar|g" $ENVVAR
-            sed -i "s|.export SYSTEMD_PAGER=.*|export SYSTEMD_PAGER=\$PAGER|g" $ENVVAR
-            sed -i "s|.export SYSTEMD_PAGERSECURE=.*|export SYSTEMD_PAGERSECURE=1|g" $ENVVAR
+            sed -i "s|export MOAR=.*|export MOAR='--statusbar=bold --colors=auto --render-unprintable=highlight --quit-if-one-screen'|g" $ENV 
+            sed -i "s|.export PAGER=|export PAGER=|g" $ENV
+            sed -i "s|export PAGER=.*|export PAGER=/usr/bin/moar|g" $ENV
+            sed -i "s|.export SYSTEMD_PAGER=.*|export SYSTEMD_PAGER=\$PAGER|g" $ENV
+            sed -i "s|.export SYSTEMD_PAGERSECURE=.*|export SYSTEMD_PAGERSECURE=1|g" $ENV
         else
-            printf "export MOAR='--statusbar=bold --colors=auto --render-unprintable=highlight --quit-if-one-screen'\n" >> $ENVVAR 1> /dev/null
-            printf "export PAGER=/usr/bin/moar\n" >> $ENVVAR 1> /dev/null
-            printf "export SYSTEMD_PAGER=\$PAGER" >> $ENVVAR 1> /dev/null
-            printf "export SYSTEMD_PAGERSECURE=1" >> $ENVVAR 1> /dev/null
+            printf "export MOAR='--statusbar=bold --colors=auto --render-unprintable=highlight --quit-if-one-screen'\n" >> $ENV 1> /dev/null
+            printf "export PAGER=/usr/bin/moar\n" >> $ENV 1> /dev/null
+            printf "export SYSTEMD_PAGER=\$PAGER" >> $ENV 1> /dev/null
+            printf "export SYSTEMD_PAGERSECURE=1" >> $ENV 1> /dev/null
         fi
     fi
         
     readyn -p "Set moar as default pager for root?" moar_root
     if [[ "y" == "$moar_root" ]]; then
-        if sudo grep -q "MOAR" $ENVVAR_R; then
-            sudo sed -i "s|.export MOAR=.*|export MOAR='--statusbar=bold --colors=auto --render-unprintable=highlight --quit-if-one-screen'|g" $ENVVAR_R 
-            sudo sed -i "s|.export PAGER=.*|export PAGER=/usr/bin/moar|g" $ENVVAR_R
-            sudo sed -i "s|.export SYSTEMD_PAGER=.*|export SYSTEMD_PAGER=$PAGER|g" $ENVVAR_R
-            sudo sed -i "s|.export SYSTEMD_PAGERSECURE=.*|export SYSTEMD_PAGERSECURE=1|g" $ENVVAR_R
+        if sudo grep -q "MOAR" $ENV_R; then
+            sudo sed -i "s|.export MOAR=.*|export MOAR='--statusbar=bold --colors=auto --render-unprintable=highlight --quit-if-one-screen'|g" $ENV_R 
+            sudo sed -i "s|.export PAGER=.*|export PAGER=/usr/bin/moar|g" $ENV_R
+            sudo sed -i "s|.export SYSTEMD_PAGER=.*|export SYSTEMD_PAGER=$PAGER|g" $ENV_R
+            sudo sed -i "s|.export SYSTEMD_PAGERSECURE=.*|export SYSTEMD_PAGERSECURE=1|g" $ENV_R
         else
-            printf "export MOAR='--statusbar=bold --colors=auto --render-unprintable=highlight --quit-if-one-screen'\n" | sudo tee -a $ENVVAR_R 1> /dev/null
-            printf "export PAGER=/usr/bin/moar\n" | sudo tee -a $ENVVAR_R 1> /dev/null
-            printf "export SYSTEMD_PAGER=\$PAGER\n" | sudo tee -a $ENVVAR_R 1> /dev/null
-            printf "export SYSTEMD_PAGERSECURE=1\n" | sudo tee -a $ENVVAR_R 1> /dev/null
+            printf "export MOAR='--statusbar=bold --colors=auto --render-unprintable=highlight --quit-if-one-screen'\n" | sudo tee -a $ENV_R 1> /dev/null
+            printf "export PAGER=/usr/bin/moar\n" | sudo tee -a $ENV_R 1> /dev/null
+            printf "export SYSTEMD_PAGER=\$PAGER\n" | sudo tee -a $ENV_R 1> /dev/null
+            printf "export SYSTEMD_PAGERSECURE=1\n" | sudo tee -a $ENV_R 1> /dev/null
         fi
     fi
 fi
