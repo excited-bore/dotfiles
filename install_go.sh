@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 if ! test -f checks/check_all.sh; then
@@ -57,7 +58,7 @@ if ! hash go &> /dev/null; then
     fi
 fi
 
-go --version | $PAGER
+go help | $PAGER
 
 if ! [[ $PATH =~ "\$(go env GOPATH)/bin" ]]; then
     if grep -q 'GOPATH' $ENVVAR; then
