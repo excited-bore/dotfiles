@@ -13,15 +13,15 @@ else
     . ./checks/check_all.sh
 fi
 
-printf "Output ${GREEN}'locale'${normal}:\n"
-locale
+printf "Output ${GREEN}'localectl'${normal}:\n"
+localectl
 echo
 
-readyn -p 'Switch LANG (and possibly LANGUAGE) locale?' swtch
+readyn -p 'Switch keyboard language(+variant)?' swtch
 if [[ "$swtch" == 'y' ]]; then
-    all=$(locale -a)
+    all=$(localectl list-keymaps --no-pager)
     if type fzf &> /dev/null; then
-        lcle=$(echo "$all" | fzf --reverse --query 'utf8' --height 50%)
+        lcle=$(echo "$all" | fzf --reverse --query 'us' --height 50%)
     else
         readyn -p 'Only look for UTF8 based locale?' swtch
         if [[ "$swtch" == 'y' ]]; then
@@ -38,6 +38,7 @@ if [[ "$swtch" == 'y' ]]; then
             else 
                 sudo localectl set-locale LANG=$lcle 
             fi
+            GTK_THEME=Adwaita:dark gkbd-keyboard-display -g 1 
             echo "Language will change on reboot."
         fi
     else
@@ -45,6 +46,6 @@ if [[ "$swtch" == 'y' ]]; then
     fi
 fi
 
-printf "Output ${GREEN}'locale'${normal}:\n"
+printf "Output ${GREEN}'localectl'${normal}:\n"
 locale
 echo
