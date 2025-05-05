@@ -230,7 +230,7 @@ function yes-edit-no() {
         #'--other')              set -- "$@" '-o' ;;
         #'--other-colour')       set -- "$@" '-O' ;;
     for arg in "$@"; do
-        shift
+        shift 
         case "$arg" in
         '--condition')          set -- "$@" '-c' ;;
         '--dont-askagain')      set -- "$@" '-d' ;;
@@ -249,7 +249,7 @@ function yes-edit-no() {
         '--break-chars')        set -- "$@" '-b' ;;
         *)                      set -- "$@" "$arg" ;;
         esac
-    done
+    done && OPTIND=1
 
     if [[ -z "$1" ]] || [[ -z "$2" ]]; then
         printf "yes-edit-no needs at least 2 parameters.
@@ -278,7 +278,7 @@ function yes-edit-no() {
         #local other=''
         #local ocolor="YELLOW"
         local noprompt=''
-        local nostyle=0
+        local nostyle=""
         local norepeat=''
         local functn=""
         local files=""
@@ -484,11 +484,12 @@ function yes-edit-no() {
             P) 
                 noprompt='y'
                 ;;
-            r) nostyle='-r'  
+                  
+            r) nostyle='-r' 
                if [[ ${OPTARG} ]]; then
-                  nostyle="-r 'nocomp'"
+                   nostyle="-r 'nocomp'"
                fi
-                ;;
+               ;;
             g)
                 test -z "${OPTARG}" &&
                     printf "This flag requires a string with files to edit/review\n" &&
@@ -619,7 +620,8 @@ function yes-edit-no() {
         [[ $color == 'orange' ]] && color='yellow' 
         [[ $color == 'ORANGE' ]] && color='YELLOW' 
 
-        test -z $color && reade -i "${choices[*]}" -p "$prmpt2" vvvvvvvvvv ||
+        test -z "$color" && 
+            reade $nostyle -i "${choices[*]}" -p "$prmpt2" vvvvvvvvvv ||
             reade $nostyle -Q $color -i "${choices[*]}" -p "$prmpt2" vvvvvvvvvv
 
         #Undercase only
@@ -634,17 +636,19 @@ function yes-edit-no() {
         if test -n "$norepeat"; then
             if ! [[ "$vvvvvvvvvv" == 'n' ]] && ! [[ "$vvvvvvvvvv" == 'y' ]]; then
                 if [[ "$norepeat" == 'n' ]]; then
-                    test -z $color && readyn --no "$prmpt" vvvvvvvvvv ||
+                    test -z "$color" && 
+                        readyn $nostyle --no -p "$prmpt" vvvvvvvvvv ||
                         readyn $nostyle --no -N $color -p "$prmpt" vvvvvvvvvv
                 else
-                    test -z $color && readyn "$prmpt" vvvvvvvvvv ||
+                    test -z "$color" && 
+                        readyn $nostyle -p "$prmpt" vvvvvvvvvv ||
                         readyn $nostyle -Y $color -p "$prmpt" vvvvvvvvvv
                 fi
             fi
         else
             while :; do
                 [[ "$vvvvvvvvvv" == 'y' ]] || [[ "$vvvvvvvvvv" == 'n' ]] && break
-
+                 
                 if test -z $color; then 
                     reade $nostyle -i "${choices[*]}" -p "$prmpt2" vvvvvvvvvv || break
                 else

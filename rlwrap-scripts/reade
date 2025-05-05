@@ -250,8 +250,7 @@ function reade() {
                 fi
                 pre="$arg"
 
-                if test -n "$args" && ! [[ $nostyle == 'c' ]]; then
-		    echo 'bluh'
+                if test -n "$args" && ! [[ "$nostyle" == 'c' ]]; then
                     args=$(echo "$args" | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }')
                     args=$(echo "$args" | tr ' ' '\n')
 
@@ -274,7 +273,7 @@ function reade() {
 
                     #if ! test -e "$HISTFILE"; then
                     oldhist=$(mktemp)
-                    printf "$(history | awk '{$1=""; print;}')" > $oldhist
+                    echo -e "$(history | awk '{$1=""; print;}')" > $oldhist
                     #fi
 
                     if test -n "$BASH_VERSION"; then
@@ -333,9 +332,7 @@ function reade() {
                         
                         local pre="$(echo shopt | grep 'extglob' | awk '{print $2;}')"
                         shopt -s extglob
-                        
                         OPTARG="${OPTARG//$'\e'[\[(]*([0-9;])[@-n]/}"
-                        
                         readstr=$(echo "$readstr" | sed 's|read |read -p "'"${OPTARG}"'" |g')
                         
                         [[ "$pre" == 'off' ]] && 
@@ -370,7 +367,7 @@ function reade() {
             esac
         done
 
-        shift $((OPTIND - 2))
+        shift $((OPTIND - 1))
 
         local oldtrps="$(trap)"
 
@@ -443,7 +440,7 @@ function reade() {
                 frst="$(echo ${OPTARG} | awk '{print $1}')"
                 rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-P \"$frst\" |g")
                 args=$(echo ${OPTARG} | sed "s|\<$frst\> ||g")
-                ! test -z "$args" &&
+                test -n "$args" &&
                     args=$(echo $args | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }') &&
                     args=$(echo $args | tr ' ' '\n') &&
                     tmpf=$(mktemp) &&

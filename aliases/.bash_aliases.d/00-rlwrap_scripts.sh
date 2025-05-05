@@ -136,13 +136,3 @@ if ! type yes-edit-no &> /dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/yes-edit-no) &> /dev/null 
     fi
 fi
-
-if test -z "$pac"; then
-    if test -f $SCRIPT_DIR/checks/check_system.sh; then
-        . $SCRIPT_DIR/checks/check_system.sh 1> /dev/null
-    elif test -f $SCRIPT_DIR/04-check_system.sh; then
-        . $SCRIPT_DIR/04-check_system.sh 1> /dev/null
-    else
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh) &> /dev/null 
-    fi
-fi

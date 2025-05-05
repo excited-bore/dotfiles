@@ -276,7 +276,7 @@ function readyn(){
                 fi
                 ;; 
              r) nostyle='-r' 
-                if [[ "${OPTARG}" ]] && ! [[ "${OPTARG}" == '--' ]] && ! [[ ${OPTARG} =~ ^-.* ]]; then 
+                if [[ "${OPTARG}" == 1 ]] && ! [[ "${OPTARG}" == '--' ]] && ! [[ ${OPTARG} =~ ^-.* ]]; then 
                     nostyle='-r "nocomp"';
                 fi 
                 if [[ ${OPTARG} =~ ^-.* ]]; then
@@ -327,12 +327,15 @@ function readyn(){
 
     if ! test -z "$auto"; then
         if test -z "$prmpt"; then
-            test -z $ZSH_VERSION &&
-                printf "${!color}$prmpt1$pre${normal}\n" ||
+            test -n "$BASH_VERSION" &&
+                printf "${!color}$prmpt1$pre${normal}\n"; 
+            test -n "$ZSH_VERSION" &&
                 printf "${(P)color}$prmpt1$pre${normal}\n";   
         else
-            test -z $ZSH_VERSION &&
-                printf "${!color}$prmpt$prmpt1$pre${normal}\n" || 
+
+            test -n "$BASH_VERSION" &&
+                printf "${!color}$prmpt$prmpt1$pre${normal}\n"; 
+            test -n "$ZSH_VERSION" &&
                 printf "${(P)color}$prmpt$prmpt1$pre${normal}\n";   
 
         fi

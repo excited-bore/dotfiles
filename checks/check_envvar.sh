@@ -25,7 +25,7 @@ fi
 if test -f ~/.zshenv; then
     export ZSH_ENV=~/.zshenv
 elif test -f ~/.environment; then
-    export ZSH_ENV= ~/.environment
+    export ZSH_ENV=~/.environment
 elif test -f ~/.zprofile; then
     export ZSH_ENV=~/.zprofile
 fi
@@ -89,7 +89,7 @@ fi
 if sudo test -f /root/.zshenv; then
     export ZSH_ENV_R=/root/.zshenv
 elif sudo test -f /root/.environment; then
-    export ZSH_ENV_R= /root/.environment
+    export ZSH_ENV_R=/root/.environment
 elif sudo test -f /root/.zprofile; then
     export ZSH_ENV_R=/root/.zprofile
 fi

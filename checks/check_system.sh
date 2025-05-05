@@ -1,8 +1,8 @@
 #!/bin/bash
 
 if ! type reade &>/dev/null; then
+    test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh && source aliases/.bash_aliases.d/00-rlwrap_scripts.sh ||
     test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh && source ~/.bash_aliases.d/00-rlwrap_scripts.sh
-    test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh && source aliases/.bash_aliases.d/00-rlwrap_scripts.sh
 fi
 
 unameOut="$(uname -s)"
@@ -51,7 +51,7 @@ if [[ $machine == 'Windows' ]]; then
     fi
     if ! hash sudo &>/dev/null; then
         printf "${RED}Sudo (Commandline tool to install/modify files at higher privilige, as root/admin) not installed - most of the script won't run without without${normal}\n"
-        reade -Q 'GREEN' -i 'y' -p 'Install (g)sudo (unofficial sudo)? [Y/n]: ' 'n' gsdn
+        reade -Q 'GREEN' -i 'y n' -p 'Install (g)sudo (unofficial sudo)? [Y/n]: ' gsdn
         if [[ "$gsdn" == 'y' ]]; then
             ./../install_gsudo.sh
             #else
@@ -59,7 +59,7 @@ if [[ $machine == 'Windows' ]]; then
         fi
     fi
     if ! hash jq &>/dev/null; then
-        reade -Q 'GREEN' -i 'y' -p 'Install jq? (Json parser - used in scripts to get latest releases from github) [Y/n]: ' 'n' jqin
+        reade -Q 'GREEN' -i 'y n' -p 'Install jq? (Json parser - used in scripts to get latest releases from github) [Y/n]: ' jqin
         if [[ $jqin == 'y' ]]; then
             winget install jqlang.jq
         fi
@@ -459,7 +459,7 @@ fi
 if test -f ~/.zshenv; then
     export ZSH_ENV=~/.zshenv
 elif test -f ~/.environment; then
-    export ZSH_ENV= ~/.environment
+    export ZSH_ENV=~/.environment
 elif test -f ~/.zprofile; then
     export ZSH_ENV=~/.zprofile
 fi
@@ -494,7 +494,7 @@ if test -d ~/.keybinds.d/; then
     export BASH_KEYBIND_FILEDIR=~/.keybinds.d/
 fi
 
-echo "These next $(tput setaf 1)sudo's$(tput sgr0) checks for the profile, environment, bash_alias, bash_completion and keybind files and dirs in '/root/' to generate global variables.";
+#echo "These next $(tput setaf 1)sudo's$(tput sgr0) checks for the profile, environment, bash_alias, bash_completion and keybind files and dirs in '/root/' to generate global variables.";
 
 export ENV_R=/root/.profile
 export BASH_ENV_R=/root/.profile
@@ -502,52 +502,50 @@ export BASH_ALIAS_R=/root/.bashrc
 export BASH_COMPLETION_R=/root/.bashrc
 export BASH_KEYBIND_R=/root/.bashrc
 
-if ! sudo test -f /root/.profile; then
-    sudo touch /root/.profile
-fi
 
-if sudo test -f /root/.environment; then
+
+if test -f /root/.environment; then
     export ENV_R=/root/.environment  
-else
+elif test -f /root/.profile; then
     export ENV_R=/root/.profile
 fi
 
-if sudo test -f /root/.environment; then
+if test -f /root/.environment; then
     export BASH_ENV_R=/root/.environment
-elif sudo test -f /root/.bash_profile; then
+elif test -f /root/.bash_profile; then
     export BASH_ENV_R=/root/.bash_profile
 else
     export BASH_ENV_R=/root/.profile
 fi
 
-if sudo test -f /root/.zshenv; then
+if test -f /root/.zshenv; then
     export ZSH_ENV_R=/root/.zshenv
-elif sudo test -f /root/.environment; then
-    export ZSH_ENV_R= /root/.environment
-elif sudo test -f /root/.zprofile; then
+elif test -f /root/.environment; then
+    export ZSH_ENV_R=/root/.environment
+elif test -f /root/.zprofile; then
     export ZSH_ENV_R=/root/.zprofile
 fi
 
-if sudo test -f /root/.bash_aliases; then
+if test -f /root/.bash_aliases; then
     export BASH_ALIAS_R=/root/.bash_aliases
 fi
 
-if sudo test -d /root/.bash_aliases.d/; then
+if test -d /root/.bash_aliases.d/; then
     export BASH_ALIAS_FILEDIR_R=/root/.bash_aliases.d/
 fi
 
-if sudo test -f /root/.bash_completion; then
+if test -f /root/.bash_completion; then
     export BASH_COMPLETION_R=/root/.bash_completion
 fi
 
-if sudo test -d /root/.bash_completion.d/; then
+if test -d /root/.bash_completion.d/; then
     export BASH_COMPLETION_FILEDIR_R=/root/.bash_completion.d/
 fi
 
-if sudo test -f /root/.keybinds; then
+if test -f /root/.keybinds; then
     export BASH_KEYBIND_R=/root/.keybinds
 fi
 
-if sudo test -d /root/.keybinds.d/; then
+if test -d /root/.keybinds.d/; then
     export BASH_KEYBIND_FILEDIR_R=/root/.keybindsd.d/
 fi
