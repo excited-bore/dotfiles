@@ -29,8 +29,8 @@ set omnifunc=syntaxcomplete#Complete
 
 " Better command-line completion
 set wildmenu
-set wildmode=longest,full
-set wildoptions=fuzzy
+set wildmode=longest:full,full
+"set wildoptions=fuzzy
 
 "Enable relative number lines
 set relativenumber
@@ -42,7 +42,6 @@ set relativenumber
 " Set shell and shell cmd flags (-l/--login, -i/--interactive - WARNING: Might break config)
 "set shell=/bin/bash    
 "set shellcmdflag=-i
-
 
 
 "------------------------------------------------------------
