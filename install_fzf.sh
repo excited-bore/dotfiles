@@ -27,18 +27,6 @@ fi
 if ! test -d ~/.fzf || test -f ~/.fzf.bash; then
     git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
     ~/.fzf/install
-    if [[ $ENV =~ '.environment' ]]; then
-        sed -i 's|.export PATH=$PATH:$HOME/.fzf/bin|export PATH=$PATH:$HOME/.fzf/bin|g' $ENV
-    elif ! grep -q '.fzf/bin' $ENV; then
-        if grep -q '~/.environment' $ENV; then
-            sed -i 's|\(\[ -f ~/.environment\] \&\& source \~/.environment\)|\export PATH=$PATH:$HOME/.fzf/bin\n\n\1\n|g' ~/.bashrc
-        elif grep -q '~/.bash_aliases' $ENV; then
-            sed -i 's|\(\[ -f ~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\export PATH=$PATH:$HOME/.fzf/bin\n\n\1\n|g' ~/.bashrc
-            sed -i 's|\(if \[ -f ~/.bash_aliases \]; then\)|export PATH=$PATH:$HOME/.fzf/bin\n\n\1\n|g' ~/.bashrc
-        else
-            echo 'export PATH="$PATH:$HOME/.fzf/bin"' >>$ENV
-        fi
-    fi
     command rm -v ~/.fzf.bash
     sed -i '/\[ -f \~\/.fzf.bash \] \&\& source \~\/.fzf.bash/d' ~/.bashrc
     ! [ -f ~/.bash_completion.d/fzf-completion.bash ] &&
@@ -51,6 +39,20 @@ if ! test -d ~/.fzf || test -f ~/.fzf.bash; then
         ln -s ~/.fzf/shell/key-bindings.bash ~/.keybinds.d/fzf-bindings.bash
     fi
 fi
+
+if [[ $ENV =~ '.environment' ]]; then
+    sed -i 's|.export PATH=$PATH:$HOME/.fzf/bin|export PATH=$PATH:$HOME/.fzf/bin|g' $ENV
+elif ! grep -q '.fzf/bin' $ENV; then
+    if grep -q '~/.environment' $ENV; then
+        sed -i 's|\(\[ -f ~/.environment\] \&\& source \~/.environment\)|\export PATH=$PATH:$HOME/.fzf/bin\n\n\1\n|g' ~/.bashrc
+    elif grep -q '~/.bash_aliases' $ENV; then
+        sed -i 's|\(\[ -f ~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\export PATH=$PATH:$HOME/.fzf/bin\n\n\1\n|g' ~/.bashrc
+        sed -i 's|\(if \[ -f ~/.bash_aliases \]; then\)|export PATH=$PATH:$HOME/.fzf/bin\n\n\1\n|g' ~/.bashrc
+    else
+        echo 'export PATH="$PATH:$HOME/.fzf/bin"' >>$ENV
+    fi
+fi
+
 
 if test -f ~/.keybinds.d/keybinds.bash && grep -q '^bind -m emacs-standard  '\''"\\C-z": vi-undo'\''' ~/.keybinds.d/keybinds.bash; then
     sed -i 's|\\\C-z|\\\C-o|g' ~/.fzf/shell/key-bindings.bash
@@ -66,7 +68,7 @@ fi
 fnd="find"
 
 # TODO: Make better check: https://github.com/sharkdp/fd
-if ! type fd-find &>/dev/null && ! type fd &>/dev/null; then
+if ! hash fd-find &>/dev/null && ! hash fd &>/dev/null; then
     readyn -p "Install fd and use for fzf? (Faster find)" fdr
     if [[ "$fdr" == "y" ]]; then
         if ! test -f install_fd.sh; then
@@ -77,7 +79,7 @@ if ! type fd-find &>/dev/null && ! type fd &>/dev/null; then
     fi
 fi
 
-if type fd-find &>/dev/null || type fd &>/dev/null; then
+if hash fd-find &>/dev/null || type hash &>/dev/null; then
     fnd="fd"
 fi
 
@@ -203,13 +205,13 @@ if [[ $ENV == ~/.environment ]]; then
         sed -i 's|#export FZF_ALT_C_OPTS=|export FZF_ALT_C_OPTS=|g' $ENV
     fi
 elif ! grep -q "export FZF_DEFAULT_COMMAND" $ENV; then
-    printf "\n# FZF\nexport FZF_DEFAULT_COMMAND=\"$fnd\"\nexport FZF_CTRL_T_COMMAND='$FZF_DEFAULT_COMMAND'\n" >>$ENV &> /dev/null
+    printf "\n# FZF\nexport FZF_DEFAULT_COMMAND=\"$fnd\"\nexport FZF_CTRL_T_COMMAND='$FZF_DEFAULT_COMMAND'\n" >>$ENV &>/dev/null
     if type tree &>/dev/null; then
-        printf "export FZF_ALT_C_OPTS=\"--preview 'tree -C {}\"\n" >>$ENV &> /dev/null
+        printf "export FZF_ALT_C_OPTS=\"--preview 'tree -C {}\"\n" >>$ENV &>/dev/null
     fi
 fi
 
-echo "Next $(tput setaf 1)sudo$(tput sgr0) will update FZF environment variables in /root/.environment' "
+echo "Next $(tput setaf 1)sudo$(tput sgr0) will update FZF environment variables in $ENV_R'"
 if [[ $ENV_R == /root/.environment ]]; then
     sudo sed -i 's|#export FZF_DEFAULT_COMMAND|export FZF_DEFAULT_COMMAND |g' $ENV_R
     sudo sed -i 's|#export FZF_CTRL_T_COMMAND|export FZF_CTRL_T_COMMAND|g' $ENV_R
@@ -219,13 +221,13 @@ if [[ $ENV_R == /root/.environment ]]; then
     sudo sed -i 's/--bind/#--bind/' $ENV_R
     sudo sed -i 's/--preview-window/#--preview-window/' $ENV_R
     sudo sed -i 's/--color/#--color/' $ENV_R
-    if type tree &>/dev/null; then
+    if hash tree &>/dev/null; then
         sudo sed -i 's|#export FZF_ALT_C_OPTS=|export FZF_ALT_C_OPTS=|g' $ENV_R
     fi
 elif ! sudo grep -q "export FZF_DEFAULT_COMMAND" $ENV_R; then
-    printf "\n# FZF\nexport FZF_DEFAULT_COMMAND=\"$fnd\"\nexport FZF_CTRL_T_COMMAND='$FZF_DEFAULT_COMMAND'" | sudo tee -a $ENV_R &> /dev/null
-    if type tree &>/dev/null; then
-        printf "\nexport FZF_ALT_C_OPTS=\"--preview 'tree -C {}\"\n" | sudo tee -a $ENV_R &> /dev/null
+    printf "\n# FZF\nexport FZF_DEFAULT_COMMAND=\"$fnd\"\nexport FZF_CTRL_T_COMMAND='$FZF_DEFAULT_COMMAND'" | sudo tee -a $ENV_R &>/dev/null
+    if hash tree &>/dev/null; then
+        printf "\nexport FZF_ALT_C_OPTS=\"--preview 'tree -C {}\"\n" | sudo tee -a $ENV_R &>/dev/null
     fi
 fi
 

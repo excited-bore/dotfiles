@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if ! type ack &> /dev/null; then
+if ! hash ack &> /dev/null; then
     if ! test -f install_ack.sh; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ack.sh)
     else
@@ -8,9 +8,16 @@ if ! type ack &> /dev/null; then
     fi 
 fi
 
+if ! test -f checks/check_aliases_dir.sh; then
+    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)
+else
+    . ./checks/check_aliases_dir.sh
+fi 
+
 if ! type h &> /dev/null; then
-    sudo wget --https-only -O /usr/bin/h https://raw.githubusercontent.com/paoloantinori/hhighlighter/refs/heads/master/h.sh
-    printf '\nh "$@\n\"' | sudo tee -a /usr/bin/h &> /dev/null 
-    sudo chmod 0755 /usr/bin/h 
+    sudo wget --https-only -P ~/.bash_aliases.d/ https://raw.githubusercontent.com/paoloantinori/hhighlighter/refs/heads/master/h.sh
+    #printf '\nh "$@\n\"' | sudo tee -a /usr/bin/h &> /dev/null 
+    #sudo chmod 0755 /usr/bin/h 
 fi
+source ~/.bash_aliases.d/h.sh
 h --help 

@@ -15,7 +15,6 @@ fi
 
 SCRIPT_DIR=$(get-script-dir)
 
-
 if ! test -f checks/check_envvar.sh; then
     source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)
 else
@@ -40,7 +39,7 @@ Vestibulum sed arcu non odio euismod lacinia. Cursus in hac habitasse platea dic
 
 Tortor aliquam nulla facilisi cras fermentum. A arcu cursus vitae congue mauris rhoncus. Ac orci phasellus egestas tellus rutrum tellus. Eget sit amet tellus cras. Ornare lectus sit amet est placerat in egestas erat. Dis parturient montes nascetur ridiculus. Ut eu sem integer vitae. Viverra orci sagittis eu volutpat odio facilisis mauris sit amet. Enim eu turpis egestas pretium aenean pharetra magna ac. Molestie nunc non blandit massa enim. Felis imperdiet proin fermentum leo vel orci porta non. Nibh mauris cursus mattis molestie a iaculis at erat. Elementum nibh tellus molestie nunc non blandit massa enim nec. Fringilla est ullamcorper eget nulla facilisi etiam dignissim diam quis. Lectus magna fringilla urna porttitor. Dictum fusce ut placerat orci nulla pellentesque dignissim enim. Sed id semper risus in. Nascetur ridiculus mus mauris vitae ultricies.
 
-Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placerat in egestas erat imperdiet sed euismod nisi porta. Nulla aliquet porttitor lacus luctus accumsan. Consequat semper viverra nam libero justo laoreet. Ut diam quam nulla porttitor massa id neque aliquam vestibulum. Cursus metus aliquam eleifend mi. Viverra nam libero justo laoreet sit amet. Malesuada fames ac turpis egestas maecenas pharetra convallis posuere morbi. Orci ac auctor augue mauris augue neque gravida. Sed libero enim sed faucibus turpis in eu mi bibendum. Tellus pellentesque eu tincidunt tortor aliquam nulla facilisi cras fermentum. Scelerisque purus semper eget duis at tellus at urna. Pellentesque habitant morbi tristique senectus. In metus vulputate eu scelerisque felis imperdiet proin fermentum leo. Vulputate mi sit amet mauris commodo quis imperdiet massa tincidunt." > $TMPDIR/test1
+Vitae suscipit tellus mauris a. Sed elementum tempus egestas sed sed. Est placerat in egestas erat imperdiet sed euismod nisi porta. Nulla aliquet porttitor lacus luctus accumsan. Consequat semper viverra nam libero justo laoreet. Ut diam quam nulla porttitor massa id neque aliquam vestibulum. Cursus metus aliquam eleifend mi. Viverra nam libero justo laoreet sit amet. Malesuada fames ac turpis egestas maecenas pharetra convallis posuere morbi. Orci ac auctor augue mauris augue neque gravida. Sed libero enim sed faucibus turpis in eu mi bibendum. Tellus pellentesque eu tincidunt tortor aliquam nulla facilisi cras fermentum. Scelerisque purus semper eget duis at tellus at urna. Pellentesque habitant morbi tristique senectus. In metus vulputate eu scelerisque felis imperdiet proin fermentum leo. Vulputate mi sit amet mauris commodo quis imperdiet massa tincidunt." >$TMPDIR/test1
 
 echo "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce gravida, neque id eleifend hendrerit, ex arcu tincidunt nunc, at ullamcorper turpis arcu at erat. Maecenas dapibus nisi nibh, nec semper lacus luctus ut. Pellentesque nisi sem, malesuada hendrerit fermentum non, fermentum vitae eros. Pellentesque sodales felis massa, sit amet lobortis tellus ultrices in. Curabitur ornare est vel dui maximus fringilla. Vestibulum mattis elit mauris, ac scelerisque velit tincidunt sed. Quisque non ligula quis purus feugiat tempor vitae in risus. Vestibulum fermentum dolor lacus, non porta enim rhoncus feugiat. Fusce et ullamcorper tellus. Duis volutpat, turpis sit amet blandit sollicitudin, erat augue iaculis nisl, at porta nibh mauris eu ex. In ac sem id augue feugiat imperdiet at sit amet magna. Vestibulum fringilla, ante in posuere blandit, mauris quam blandit dui, ut tristique metus ex et nulla. Fusce a mattis est. Vestibulum facilisis nec lacus ornare faucibus. Nunc rhoncus tempor nibh sit amet porta. In hac habitasse platea dictumst.
 
@@ -48,7 +47,7 @@ Ut sollicitudin nulla fringilla libero vulputate, in facilisis risus posuere. Pr
 
 Donec pharetra vitae nibh ac suscipit. Donec vel lorem augue. Ut vitae leo risus. Suspendisse potenti. Ut eget diam sit amet lacus molestie blandit ut sodales justo. Donec vehicula hendrerit eros. Maecenas a cursus est, quis dictum augue. Proin malesuada lacus in scelerisque convallis. Phasellus non ornare augue, sit amet mollis ex. Etiam eu eros felis. Donec porttitor nulla velit, et egestas odio vehicula et. Sed interdum imperdiet urna, et lobortis sapien finibus ac. Curabitur vitae ipsum vitae nulla imperdiet venenatis. Donec maximus laoreet commodo. Nunc efficitur, eros eu lacinia porta, odio tortor mollis diam, at volutpat ligula augue eu nulla.
 
-Nullam aliquam, lorem eget vehicula congue, lorem tellus commodo justo, vitae vehicula diam sapien in est. Nullam sit amet ligula tempus, pulvinar diam eget, blandit dui. Sed nec euismod tellus, ac laoreet magna. Praesent facilisis dapibus massa sit amet aliquam. Aliquam luctus id erat a convallis. Donec vel quam cursus sem auctor tempus vitae vitae est. Praesent blandit semper lectus, in condimentum eros varius nec. Maecenas scelerisque non magna et commodo. Quisque congue venenatis est. Duis porttitor ornare aliquam. Integer vel auctor tortor. Donec purus quam, molestie et fringilla eu, volutpat sit amet tortor. Nam faucibus, risus vitae dapibus iaculis, nulla leo sollicitudin sem, nec aliquam diam mauris at turpis. Duis iaculis ac turpis et maximus. Sed at quam mauris. " > $TMPDIR/test2
+Nullam aliquam, lorem eget vehicula congue, lorem tellus commodo justo, vitae vehicula diam sapien in est. Nullam sit amet ligula tempus, pulvinar diam eget, blandit dui. Sed nec euismod tellus, ac laoreet magna. Praesent facilisis dapibus massa sit amet aliquam. Aliquam luctus id erat a convallis. Donec vel quam cursus sem auctor tempus vitae vitae est. Praesent blandit semper lectus, in condimentum eros varius nec. Maecenas scelerisque non magna et commodo. Quisque congue venenatis est. Duis porttitor ornare aliquam. Integer vel auctor tortor. Donec purus quam, molestie et fringilla eu, volutpat sit amet tortor. Nam faucibus, risus vitae dapibus iaculis, nulla leo sollicitudin sem, nec aliquam diam mauris at turpis. Duis iaculis ac turpis et maximus. Sed at quam mauris. " >$TMPDIR/test2
 
 loremIpsum1=$TMPDIR/test1
 loremIpsum2=$TMPDIR/test2
@@ -82,9 +81,9 @@ function git_hl() {
         diffs=$diffs" batdiff"
     fi
 
-    diffp="$(echo $diffs | sed 's/ /\n\t- /g')"  
+    diffp="$(echo $diffs | sed 's/ /\n\t- /g')"
 
-    printf "${GREEN}Diff highlighting tools:${CYAN}\n\t- $diffp${normal}\n" 
+    printf "${GREEN}Diff highlighting tools:${CYAN}\n\t- $diffp${normal}\n"
 
     reade -Q "GREEN" -i "$diffs" -p "Diff filter: " diff
     if test -n "$diff"; then
@@ -96,9 +95,9 @@ function git_hl() {
             opts=' --paging=never'
             readyn -Y "CYAN" -p "You selected $diff. Configure?" conf
             if [[ "y" == "$conf" ]]; then
-                local opt1s='' 
+                local opt1s=''
                 while test -z "$opt1s"; do
-                    side='n' 
+                    side='n'
                     readyn -Y "CYAN" -p "Set syntax theme for delta?" delta1
                     if [[ "$delta1" == 'y' ]]; then
                         theme=$(printf "$(delta --list-syntax-themes | tail -n +1 | awk '{$1="";print;}' | sed 's/ //')" | fzf --reverse --border --border-label="Syntax theme" --preview="delta --syntax-theme={} $TMPDIR/test1 $TMPDIR/test2")
@@ -108,7 +107,7 @@ function git_hl() {
                     readyn -Y "CYAN" -p "Set linenumbers?" delta3
                     if [[ "y" == $delta3 ]]; then
                         git config $global delta.linenumbers true
-                        opt1s="$opt1s --line-numbers" 
+                        opt1s="$opt1s --line-numbers"
                     elif [[ "n" == $delta3 ]]; then
                         git config $global delta.linenumbers false
                     fi
@@ -116,7 +115,7 @@ function git_hl() {
                     readyn -Y "CYAN" -p "Set to dark?" delta2
                     if [[ "y" == $delta2 ]]; then
                         git config $global delta.dark true
-                        opt1s="$opt1s --dark" 
+                        opt1s="$opt1s --dark"
                     elif [[ "n" == $delta2 ]]; then
                         git config $global delta.dark false
                     fi
@@ -124,13 +123,13 @@ function git_hl() {
                     readyn -n -N 'BLUE' -p "Side-by-side view?" delta3
                     if [[ "y" == $delta3 ]]; then
                         git config $global delta.side-by-side true
-                        opt1s="$opt1s --side-by-side" 
-                        side='y' 
+                        opt1s="$opt1s --side-by-side"
+                        side='y'
                     elif [[ "n" == $delta3 ]]; then
                         git config $global delta.side-by-side false
                     fi
 
-                    if ! [[ "$cmd" =~ 'lazygit' ]]; then 
+                    if ! [[ "$cmd" =~ 'lazygit' ]]; then
                         readyn -Y "CYAN" -p "Set to navigate? (Move between diff sections using n and N)" delta1
                         if [[ "y" == $delta1 ]]; then
                             git config $global delta.navigate true
@@ -142,7 +141,7 @@ function git_hl() {
                     readyn -Y "CYAN" -p "Set hyperlinks?" delta1
                     if [[ "y" == $delta1 ]]; then
                         git config $global delta.hyperlinks true
-                        opt1s="$opt1s --hyperlinks" 
+                        opt1s="$opt1s --hyperlinks"
                     elif [[ "y" == $delta1 ]]; then
                         git config $global delta.hyperlinks false
                     fi
@@ -152,12 +151,12 @@ function git_hl() {
                         opt1s=''
                     fi
                 done
-                opts="$opts$opt1s" 
-                [[ $cmd =~ 'difffilter' ]] && opts=' --paging=never' 
+                opts="$opts$opt1s"
+                [[ $cmd =~ 'difffilter' ]] && opts=' --paging=never'
                 git config $global --replace-all delta.syntax-theme "$theme"
             fi
         elif [[ "$diff" == "diff-so-fancy" ]]; then
-           
+
             if [[ "$cmd" =~ 'difffilter' ]]; then
                 opts=' --patch'
 
@@ -191,18 +190,18 @@ function git_hl() {
                     reade -Q "CYAN" -i "47 $(seq 1 100)" -p "By default, the separator for the file header spans the full width of the terminal. Use this setting to set the width of the file header manually. (Default: 47): " diffancy
                     # git log's commit header width
                     re='^[0-9]+$'
-                    if [[ $diffancy =~ $re ]] ; then
+                    if [[ $diffancy =~ $re ]]; then
                         git config --global diff-so-fancy.rulerWidth $diffancy
                     fi
                 fi
             fi
         elif [[ "$diff" == "riff" ]]; then
-            
-            opts=' --no-pager --color=on' 
+
+            opts=' --no-pager --color=on'
             reade -Q 'CYAN' -i 'n m a' -p "Ignore changes in amount of whitespace / ignore all whitespace? (Default: none) [N(o)/(a)m(ount)/a(ll)]: " riff1
             if [[ "$riff1" == 'm' ]]; then
                 opts=$opts" --ignore-space-change"
-            elif [[ "$riff1" == 'a' ]]; then 
+            elif [[ "$riff1" == 'a' ]]; then
                 opts=$opts" --ignore-all-space"
             fi
 
@@ -215,14 +214,14 @@ function git_hl() {
 
         elif [[ "$diff" == "ydiff" ]]; then
             opts=' --color=auto -p cat'
-            colorArg='never' 
-            [[ "$cmd" =~ 'lazygit' ]] && opts=$opts" --width={{columnWidth}}"  
+            colorArg='never'
+            [[ "$cmd" =~ 'lazygit' ]] && opts=$opts" --width={{columnWidth}}"
             readyn -Y 'CYAN' -p "You selected $diff. Configure?" conf
             if [[ "y" == "$conf" ]]; then
                 readyn -Y 'CYAN' -p "Enable side-by-side mode?" diffr1
                 if [[ "$diffr1" == 'y' ]]; then
                     opts=$opts" --side-by-side"
-                    side='y' 
+                    side='y'
                     readyn -Y "CYAN" -p "Wrap long lines in side-by-side view?" diffr1
                     if [[ "$diffr1" == 'y' ]]; then
                         opts=$opts" --wrap"
@@ -240,13 +239,13 @@ function git_hl() {
 
                     printf "${green}Style is optional.[Default]
 \t - ${CYAN}Compact:${green} Take as little width as possible.
-\t - ${CYAN}Aligned:${green} Align to tab stops (useful if tab is used for indentation).${normal}\n" 
+\t - ${CYAN}Aligned:${green} Align to tab stops (useful if tab is used for indentation).${normal}\n"
 
                     reade -Q "CYAN" -i 'c a n' -p "Set linenumber style? [C(ompact)/a(ligned)/n(o)]: " diffr1
                     if [[ "$diffr1" == 'c' ]] || [[ "$diffr1" == 'a' ]]; then
 
-                       [[ "$diffr1" == 'c' ]] && diffr1='compact'  
-                       [[ "$diffr1" == 'a' ]] && diffr1='aligned'  
+                        [[ "$diffr1" == 'c' ]] && diffr1='compact'
+                        [[ "$diffr1" == 'a' ]] && diffr1='aligned'
                         opts=" --line-numbers $diffr1"
 
                     else
@@ -255,8 +254,8 @@ function git_hl() {
                 fi
             fi
         elif [[ "$diff" == "difftastic" ]]; then
-            diff='difft' 
-            extrn='y' 
+            diff='difft'
+            extrn='y'
             opts=' --color=always'
             readyn -Y "CYAN" -p "You selected difftastic. Configure?" conf
             if [[ "y" == "$conf" ]]; then
@@ -268,12 +267,12 @@ function git_hl() {
                     reade -Q 'GREEN' -i 's b i' -p 'Display [S(ide-by-side)/(side-by-side-)b(oth)/i(nline)]: ' disp
                     if [[ $disp == 's' ]]; then
                         opts=$opts" --display=side-by-side"
-                        side='y' 
+                        side='y'
                     elif [[ $disp == 'b' ]]; then
-                        opts=$opts" --display=side-by-side-show-both" 
-                        side='y' 
+                        opts=$opts" --display=side-by-side-show-both"
+                        side='y'
                     elif [[ $disp == 'i' ]]; then
-                        opts=$opts" --display=inline" 
+                        opts=$opts" --display=inline"
                     fi
                 fi
                 readyn -Y 'CYAN' -p "Set context? (Lines before and after changed lines - Default: 3)" diffr1
@@ -281,7 +280,7 @@ function git_hl() {
                     reade -Q 'GREEN' -i '3 2 1 4 5 6 7 8' -p 'Context: ' cntxt
                     re='^[0-9]+$'
                     if [[ $cntxt =~ $re ]]; then
-                        opts="$opts --context=$cntxt" 
+                        opts="$opts --context=$cntxt"
                     fi
                 fi
 
@@ -290,30 +289,29 @@ function git_hl() {
                     reade -Q 'GREEN' -i 'd l' -p 'Background [D(ark)/l(ight)]: ' bac
                     if [[ $bac == 'd' ]]; then
                         opts="$opts --background=dark"
-                    elif [[ $bac == 'l' ]]; then 
+                    elif [[ $bac == 'l' ]]; then
                         opts="$opts --background=light"
                     fi
                 fi
-                
+
                 readyn -n -N 'BLUE' -p "Ignore changed comments when diffing?" diffr2
                 if [[ $diffr2 == 'y' ]]; then
-                    opts="$opts --ignore-comments" 
-                fi
-                
-                readyn -n -N 'BLUE' -p "Skip unchanged files when diffing? (!! This includes things like adding/removing executable flag !!)" diffr3
-                if [[ $diffr3 == 'y' ]]; then
-                    opts="$opts --skip-unchanged" 
+                    opts="$opts --ignore-comments"
                 fi
 
+                readyn -n -N 'BLUE' -p "Skip unchanged files when diffing? (!! This includes things like adding/removing executable flag !!)" diffr3
+                if [[ $diffr3 == 'y' ]]; then
+                    opts="$opts --skip-unchanged"
+                fi
 
                 readyn -n -N 'BLUE' -p 'Disable carriage return - "\n\r" - stripping when diffing files in windows?' diffr6
                 if [[ $diffr6 == 'y' ]]; then
-                    opts="$opts --strip-cr=off" 
+                    opts="$opts --strip-cr=off"
                 fi
 
                 readyn -n -N 'BLUE' -p "Disable syntax highlighting?" diffr5
                 if [[ $diffr5 == 'y' ]]; then
-                    opts="$opts --syntax-highlight=off" 
+                    opts="$opts --syntax-highlight=off"
                 fi
 
             fi
@@ -323,10 +321,10 @@ function git_hl() {
             if [[ "y" == "$conf" ]]; then
                 readyn -n -N "BLUE" -p "Set amount of extra lines above and under changes in codeblocks (Default: 2)?" batdiff1
                 if [[ "$batdiff1" == 'y' ]]; then
-                    reade -Q 'GREEN' -i "$(seq 2 10)" -p 'Context: ' cntxt 
+                    reade -Q 'GREEN' -i "$(seq 2 10)" -p 'Context: ' cntxt
                     re='^[0-9]+$'
                     if [[ $cntxt =~ $re ]]; then
-                        opts=$opts" --diff-context $cntxt" 
+                        opts=$opts" --diff-context $cntxt"
                     fi
                 fi
                 readyn -Y "BLUE" -p "Use ${GREEN}delta${BLUE} config?" diffr1
@@ -337,33 +335,33 @@ function git_hl() {
         fi
     fi
 
-    local sidepanelw='0.333' 
+    local sidepanelw='0.333'
     if [[ $cmd =~ 'lazygit' ]] && [[ "$side" == 'y' ]]; then
-        printf "${GREEN}Side-by-side selected. This might take up a bit more space in the diff panel for lazygit.\n${normal}" 
+        printf "${GREEN}Side-by-side selected. This might take up a bit more space in the diff panel for lazygit.\n${normal}"
         readyn -p "Set side panel width (left side panels - Default 0.333)" sidepn
         if [[ $sidepn == 'y' ]]; then
-            reade -Q 'GREEN' -i "$(echo "$(seq .01 .01 .33)" | tac)" -p 'Side pane width: ' sidepnw 
-            # Seq why no keep float symbol :C 
-            sidepnw=$(echo $sidepnw | sed 's/,/./g') 
+            reade -Q 'GREEN' -i "$(echo "$(seq .01 .01 .33)" | tac)" -p 'Side pane width: ' sidepnw
+            # Seq why no keep float symbol :C
+            sidepnw=$(echo $sidepnw | sed 's/,/./g')
             re='^[+-]?[0-9]*\.?[0-9]+$'
-            if [[ $sidepnw =~ $re ]] ; then
+            if [[ $sidepnw =~ $re ]]; then
                 sidepanelw=$sidepnw
-            fi 
+            fi
         fi
-    
+
     fi
 
     if ! test -z "$cmd"; then
         if [[ "$cmd" =~ 'difffilter' ]]; then
-            diff="$(echo $diff | awk '{print $1;}')" 
+            diff="$(echo $diff | awk '{print $1;}')"
             eval "$cmd $diff$opts"
         elif [[ "$cmd" =~ 'lazygit' ]]; then
             if ! test -f ~/.config/lazygit/config.yml; then
-                touch ~/.config/lazygit/config.yml 
+                touch ~/.config/lazygit/config.yml
             fi
             if test -n "$sidepanelw"; then
-                if ! grep -q 'sidePanelWidth:'  ~/.config/lazygit/config.yml; then
-                    printf "gui:\n sidePanelWidth: $sidepanelw\n" >> ~/.config/lazygit/config.yml 
+                if ! grep -q 'sidePanelWidth:' ~/.config/lazygit/config.yml; then
+                    printf "gui:\n sidePanelWidth: $sidepanelw\n" >>~/.config/lazygit/config.yml
                 else
                     sed -i 's/^[ \t]*sidePanelWidth:*.*/ sidePanelWidth: '"$sidepanelw"'/g' ~/.config/lazygit/config.yml
                 fi
@@ -371,9 +369,9 @@ function git_hl() {
 
             if ! grep -q 'git:' ~/.config/lazygit/config.yml; then
                 if [[ "$extrn" == 'n' ]]; then
-                    printf "git:\n paging:\n   useConfig: false\n   colorArg: $colorArg\n   pager: $diff$opts\n" >> ~/.config/lazygit/config.yml 
-                else 
-                    printf "git:\n paging:\n   externalDiffCommand: $diff$opts\n" >> ~/.config/lazygit/config.yml 
+                    printf "git:\n paging:\n   useConfig: false\n   colorArg: $colorArg\n   pager: $diff$opts\n" >>~/.config/lazygit/config.yml
+                else
+                    printf "git:\n paging:\n   externalDiffCommand: $diff$opts\n" >>~/.config/lazygit/config.yml
                 fi
             elif ! grep -q 'paging:' ~/.config/lazygit/config.yml; then
                 if [[ "$extrn" == 'n' ]]; then
@@ -387,12 +385,12 @@ function git_hl() {
                     sed -i '/externalDiffCommand:.*/d' ~/.config/lazygit/config.yml
                     if ! grep -q 'pager:' ~/.config/lazygit/config.yml; then
                         sed -i 's/\(paging:\)/\1\n   useConfig: false\n   colorArg: '$colorArg'\n   pager: '"$diff$opts"'\n /g' ~/.config/lazygit/config.yml
-                    else 
+                    else
                         sed -i 's/^[ \t]*colorArg:*.*/   colorArg: '"$colorArg"'/g' ~/.config/lazygit/config.yml
                         sed -i 's/^[ \t]*pager:*.*/   pager: '"$diff$opts"'/g' ~/.config/lazygit/config.yml
                     fi
                 elif [[ "$extrn" == 'y' ]]; then
-                    if ! grep -q 'externalDiffCommand:'  ~/.config/lazygit/config.yml; then
+                    if ! grep -q 'externalDiffCommand:' ~/.config/lazygit/config.yml; then
                         sed -i 's/\(paging:\)/\1\n   externalDiffCommand: '"$diff$opts"'\n/g' ~/.config/lazygit/config.yml
                     else
                         sed -i 's/^[ \t]*externalDiffCommand:*.*/   externalDiffCommand: '"$diff$opts"'\n/g' ~/.config/lazygit/config.yml
@@ -401,14 +399,14 @@ function git_hl() {
             fi
 
             # Cleanup - remove empty lines
-            sed -i '/^[[:space:]]*$/d' ~/.config/lazygit/config.yml 
+            sed -i '/^[[:space:]]*$/d' ~/.config/lazygit/config.yml
 
             # Then show changes
-            printf "${GREEN}'$HOME/.config/lazygit/config.yml'${normal}\n" 
-            cat -b ~/.config/lazygit/config.yml | $PAGER 
+            printf "${GREEN}'$HOME/.config/lazygit/config.yml'${normal}\n"
+            cat -b ~/.config/lazygit/config.yml | $PAGER
         fi
     fi
-    
+
 }
 
 git_pager() {
@@ -421,12 +419,11 @@ git_pager() {
         global="--global"
     fi
 
-
-    local pagers pagersf pager diffs diffsf 
+    local pagers pagersf pager diffs diffsf
 
     if [[ "$cpager" == 'pager.diff' ]] || [[ "$cpager" == 'pager.show' ]]; then
-        diffs=''  
-        diffsf='' 
+        diffs=''
+        diffsf=''
         if type delta &>/dev/null; then
             diffs=$diffs" delta"
             diffsf=$diffsf"\t - delta\n"
@@ -455,7 +452,7 @@ git_pager() {
         printf "${GREEN}Installed diff-wrappers / diff-pagers${normal}:\n"
         printf "${CYAN}$diffsf${normal}"
 
-    fi 
+    fi
 
     if type vimpager &>/dev/null; then
         pagers=$pagers" vimpager"
@@ -477,13 +474,13 @@ git_pager() {
         pagers=$pagers" moar"
         pagersf=$pagersf"\t - moar\n"
     fi
-    
+
     pagers=$pagers" less more cat"
     pagersf=$pagersf"\t - less\n\t - more\n\t - cat (disable pager)\n"
 
     printf "${GREEN}Installed pagers${normal}:\n"
     printf "${CYAN}$pagersf${normal}"
-    
+
     reade -Q "green" -i "$diffs $pagers" -p "Which one used for ${GREEN}$cpager?:${normal} " pager
     if [[ $pager == 'cat' ]]; then
         git config $global "$cpager" false
@@ -500,7 +497,7 @@ git_pager() {
         else
             ln=$ln" -N"
         fi
-    
+
         readyn -p "Keep less from making sound?" lne
         if [[ "$lne" == 'y' ]]; then
             ln=$ln" --QUIET"
@@ -511,7 +508,7 @@ git_pager() {
         readyn -Y 'CYAN' -p "You chose $pager. Configure?" moar_cnf
         if [[ $moar_cnf == 'y' ]]; then
 
-            while : ; do
+            while :; do
 
                 readyn -Y "CYAN" -p "Quit if on one screen?" pager1
                 if [[ $pager1 == 'y' ]]; then
@@ -523,7 +520,7 @@ git_pager() {
 
                     # Showing style changes using fzf's --preview doesn't work with moar,
                     # so it's this mess
-                    local style 
+                    local style
                     local thme='n'
                     local styles="abap\nalgol\nalgol_nu\napi\narduino\nautumn\naverage\nbase16-snazzy\nborland\nbw\ncatppuccin-frappe\ncatppuccin-latte\ncatppuccin-macchiato\ncatppuccin-mocha\ncolorful\ncompat\ndoom-one\ndoom-one2\ndracula\nemacs\nfriendly\nfruity\ngithub-dark\ngithub\ngruvbox-light\ngruvbox\nhr_high_contrast\nhrdark\nigor\nlovelace\nmanni\nmodus-operandi\nmodus-vivendi\nmonokai\nmonokailight\nmurphy\nnative\nnord\nonedark\nonesenterprise\nparaiso-dark\nparaiso-light\npastie\nperldoc\npygments\nrainbow_dash\nrose-pine-dawn\nrose-pine-moon\nrose-pine\nrrt\nsolarized-dark\nsolarized-dark256\nsolarized-light\nswapoff\ntango\ntrac\nvim\nvs\nvulcan\nwitchhazel\nxcode-dark\nxcode"
                     while [[ $thme == 'n' ]]; do
@@ -532,7 +529,7 @@ git_pager() {
                         readyn -n -N "MAGENTA" -p "Set as style? (Will retry if no)" thme
                     done
                     pager=$pager" --style=$style"
-                    style='' 
+                    style=''
                 fi
 
                 readyn -Y "CYAN" -p "Show linenumber?" pager1
@@ -544,14 +541,14 @@ git_pager() {
                 if [[ $pager1 == 'y' ]]; then
                     pager=$pager' --wrap'
                 fi
-                
-                $pager $TMPDIR/test1 
-    
+
+                $pager $TMPDIR/test1
+
                 readyn -Y "MAGENTA" -p "Is this ok? (Will retry if no)" moar_ok
 
                 [[ $moar_ok == 'y' ]] && break
 
-            done 
+            done
 
         fi
 
@@ -582,7 +579,7 @@ git_pager() {
 
                 readyn -Y "CYAN" -p "Set styles? (features like line numbers/grid spacing)" delta2
                 if [[ "y" == "$delta2" ]]; then
-                    local style 
+                    local style
                     printf "\t* default: enables recommended style components (default).
 \t* full: enables all available components.
 \t* auto: same as 'default', unless the output is piped.
@@ -595,8 +592,8 @@ git_pager() {
 \t        and the header from the content.
 \t* rule: horizontal lines to delimit files.
 \t* numbers: show line numbers in the side bar.
-\t* snip: draw separation lines between distinct line ranges.\n" 
-reade -Q 'GREEN' -i 'default full auto plain changes header header-filename header-filesize grid rule numbers snip' -p 'Style (multiple comma separated - numbers,changes): ' style 
+\t* snip: draw separation lines between distinct line ranges.\n"
+                    reade -Q 'GREEN' -i 'default full auto plain changes header header-filename header-filesize grid rule numbers snip' -p 'Style (multiple comma separated - numbers,changes): ' style
                     opts=$opts" --style='$style'"
                 fi
 
@@ -630,11 +627,11 @@ reade -Q 'GREEN' -i 'default full auto plain changes header header-filename head
 
             elif [[ "$pager" == "riff" ]]; then
 
-                opts=' --color=on' 
+                opts=' --color=on'
                 reade -Q 'CYAN' -i 'n m a' -p "Ignore changes in amount of whitespace / ignore all whitespace? (Default: none) [N(o)/(a)m(ount)/a(ll)]: " riff1
                 if [[ "$riff1" == 'm' ]]; then
                     opts=$opts" --ignore-space-change"
-                elif [[ "$riff1" == 'a' ]]; then 
+                elif [[ "$riff1" == 'a' ]]; then
                     opts=$opts" --ignore-all-space"
                 fi
 
@@ -647,7 +644,7 @@ reade -Q 'GREEN' -i 'default full auto plain changes header header-filename head
 
             elif [[ "$pager" == "delta" ]]; then
 
-                local opt1s='' 
+                local opt1s=''
                 while test -z "$opt1s"; do
 
                     readyn -Y "CYAN" -p "Set syntax theme for delta?" delta1
@@ -659,7 +656,7 @@ reade -Q 'GREEN' -i 'default full auto plain changes header header-filename head
                     readyn -Y "CYAN" -p "Set linenumbers?" delta3
                     if [[ "y" == $delta3 ]]; then
                         git config $global delta.linenumbers true
-                        opt1s="$opt1s --line-numbers" 
+                        opt1s="$opt1s --line-numbers"
                     elif [[ "n" == $delta3 ]]; then
                         git config $global delta.linenumbers false
                     fi
@@ -667,7 +664,7 @@ reade -Q 'GREEN' -i 'default full auto plain changes header header-filename head
                     readyn -Y "CYAN" -p "Set to dark?" delta2
                     if [[ "y" == $delta2 ]]; then
                         git config $global delta.dark true
-                        opt1s="$opt1s --dark" 
+                        opt1s="$opt1s --dark"
                     elif [[ "n" == $delta2 ]]; then
                         git config $global delta.dark false
                     fi
@@ -675,12 +672,12 @@ reade -Q 'GREEN' -i 'default full auto plain changes header header-filename head
                     readyn -n -N 'BLUE' -p "Side-by-side view?" delta3
                     if [[ "y" == $delta3 ]]; then
                         git config $global delta.side-by-side true
-                        opt1s="$opt1s --side-by-side" 
+                        opt1s="$opt1s --side-by-side"
                     elif [[ "n" == $delta3 ]]; then
                         git config $global delta.side-by-side false
                     fi
 
-                    if ! [[ "$cmd" =~ 'lazygit' ]]; then 
+                    if ! [[ "$cmd" =~ 'lazygit' ]]; then
                         readyn -Y "CYAN" -p "Set to navigate? (Move between diff sections using n and N)" delta1
                         if [[ "y" == $delta1 ]]; then
                             git config $global delta.navigate true
@@ -692,12 +689,12 @@ reade -Q 'GREEN' -i 'default full auto plain changes header header-filename head
                     readyn -Y "CYAN" -p "Set hyperlinks?" delta1
                     if [[ "y" == $delta1 ]]; then
                         git config $global delta.hyperlinks true
-                        opt1s="$opt1s --hyperlinks" 
+                        opt1s="$opt1s --hyperlinks"
                     elif [[ "y" == $delta1 ]]; then
                         git config $global delta.hyperlinks false
                     fi
 
-                    eval "delta $opt1s -- $TMPDIR/test1 $TMPDIR/test2"
+                    eval "delta --pager='less -R' $opt1s -- $TMPDIR/test1 $TMPDIR/test2"
                     readyn -N "MAGENTA" -n -p "Is this ok? (will retry if no)" dltthme
                     if [[ "$dltthme" == "n" ]]; then
                         opt1s=''
@@ -759,12 +756,12 @@ reade -Q 'GREEN' -i 'default full auto plain changes header header-filename head
                     readyn -Y "CYAN" -p "Set linenumber?" diffr1
                     if [[ "$diffr1" == 'y' ]]; then
 
-                        printf "${green}Style is optional.[Default]\n\t - ${CYAN}Compact:${green} Take as little width as possible.\n\t - ${CYAN}Aligned:${green} Align to tab stops (useful if tab is used for indentation).${normal}\n" 
+                        printf "${green}Style is optional.[Default]\n\t - ${CYAN}Compact:${green} Take as little width as possible.\n\t - ${CYAN}Aligned:${green} Align to tab stops (useful if tab is used for indentation).${normal}\n"
 
                         reade -Q "CYAN" -i 'c a n' -p "Set linenumber style? [C(ompact)/a(ligned)/n(o)]: " diffr1
                         if [[ "$diffr1" == 'c' ]] || [[ "$diffr1" == 'a' ]]; then
-                           [[ "$diffr1" == 'c' ]] && diffr1='compact'  
-                           [[ "$diffr1" == 'a' ]] && diffr1='aligned'  
+                            [[ "$diffr1" == 'c' ]] && diffr1='compact'
+                            [[ "$diffr1" == 'a' ]] && diffr1='aligned'
                             opts=" --line-numbers $diffr1"
                         else
                             opts=" --line-numbers"
@@ -783,33 +780,33 @@ ${CYAN}\t4)${normal}${green} Disable pager/just highlight\n${normal}"
             reade -Q "GREEN" -i '1 2 3 4' -p "What to do? [1/2/3/4]: " choice
 
             if ! [[ "$choice" == '4' ]]; then
-                pgr=$(git config $global --list | grep 'core.pager' | awk 'BEGIN { FS = "=" }; {print $2;}') 
-                if test -z "$pgr" || ! type $pgr &> /dev/null; then
-                    if test -n "$PAGER" && type $(echo $PAGER | awk '{print $1;}') &> /dev/null; then
+                pgr=$(git config $global --list | grep 'core.pager' | awk 'BEGIN { FS = "=" }; {print $2;}')
+                if test -z "$pgr" || ! type $pgr &>/dev/null; then
+                    if test -n "$PAGER" && type $(echo $PAGER | awk '{print $1;}') &>/dev/null; then
                         pgr=$(echo $PAGER | awk '{print $1;}')
-                    else 
+                    else
                         pgr='less'
                     fi
                 fi
 
                 if [[ "$choice" == '1' ]]; then
-                    if [[ $pgr =~ "less" ]]; then 
+                    if [[ $pgr =~ "less" ]]; then
                         pgr='less'
-                        ln=' -nRQ' 
-                    elif [[ $pgr =~ "moar" ]]; then 
+                        ln=' -nRQ'
+                    elif [[ $pgr =~ "moar" ]]; then
                         pgr='moar'
-                        ln=' --no-linenumbers --colors=auto' 
+                        ln=' --no-linenumbers --colors=auto'
                     elif [[ "$pgr" =~ "nvimpager" ]] || [[ "$pgr" =~ "vimpager" ]]; then
-                        [[ "$pgr" =~ "nvimpager" ]] && pgr='nvimpager' 
-                        [[ "$pgr" =~ "vimpager" ]] && pgr='vimpager' 
+                        [[ "$pgr" =~ "nvimpager" ]] && pgr='nvimpager'
+                        [[ "$pgr" =~ "vimpager" ]] && pgr='vimpager'
                         ln=""
-                    fi 
+                    fi
 
-                else 
+                else
 
                     if [[ $choice == '2' ]]; then
-                        pagersp=$(echo "$pagersf" | sed 's,\\t - bat\\n,,g') 
-                        pagers=$(echo "$pagers" | sed 's, bat,,g') 
+                        pagersp=$(echo "$pagersf" | sed 's,\\t - bat\\n,,g')
+                        pagers=$(echo "$pagers" | sed 's, bat,,g')
                         printf "${GREEN}Installed tools that could serve as pagers${normal}:\n"
                         printf "${CYAN}$pagersp${normal}\n"
 
@@ -836,11 +833,11 @@ ${CYAN}\t4)${normal}${green} Disable pager/just highlight\n${normal}"
                         readyn -p "Keep less from making sound?" lne
                         if [[ "$lne" == 'y' ]]; then
                             ln=$ln" --QUIET"
-                        fi 
+                        fi
 
                     elif [[ $pgr =~ "moar" ]]; then
 
-                        pgr='moar' 
+                        pgr='moar'
                         printf "${CYAN}You selected ${GREEN}moar${normal}\n"
 
                         readyn -n -N 'BLUE' -p "Show linenumber?" pager1
@@ -859,8 +856,8 @@ ${CYAN}\t4)${normal}${green} Disable pager/just highlight\n${normal}"
                         fi
 
                     elif [[ "$pgr" =~ "nvimpager" ]] || [[ "$pgr" =~ "vimpager" ]]; then
-                        [[ "$pgr" =~ "nvimpager" ]] && pgr='nvimpager' 
-                        [[ "$pgr" =~ "vimpager" ]] && pgr='vimpager' 
+                        [[ "$pgr" =~ "nvimpager" ]] && pgr='nvimpager'
+                        [[ "$pgr" =~ "vimpager" ]] && pgr='vimpager'
                         ln=""
 
                         colors="blue darkblue default delek desert elflord evening gruvbox habamax industry koehler lunaperch morning murphy pablo peachpuff quiet ron shine slate torte zellner"
@@ -872,14 +869,14 @@ ${CYAN}\t4)${normal}${green} Disable pager/just highlight\n${normal}"
                         if [[ "$pager1" == "y" ]]; then
                             reade -Q "CYAN" -i "default $colors" -p "Colorscheme: " color
                             ln="$ln +'colorscheme $color'"
-                        fi 
-                    fi 
+                        fi
+                    fi
                 fi
 
-                if [[ "$choice" == '1' ]] || [[ "$choice" == '2' ]] || [[ "$choice" == '3' ]] ; then  
+                if [[ "$choice" == '1' ]] || [[ "$choice" == '2' ]] || [[ "$choice" == '3' ]]; then
                     if [[ "$pager" == "bat" ]]; then
 
-                        printf "${CYAN}$pager${GREEN} can:${normal}${green}\n\t - Can be configured using the environment variable \\\$BAT_PAGER by setting it to '$pgr $ln' in $ENV(\\\$BAT_PAGER: $BAT_PAGER)\n\t - Uses the option '--pager' for setting a pager - '--pager='$pgr $ln'' in gitconfig\n${normal}\n" 
+                        printf "${CYAN}$pager${GREEN} can:${normal}${green}\n\t - Can be configured using the environment variable \\\$BAT_PAGER by setting it to '$pgr $ln' in $ENV(\\\$BAT_PAGER: $BAT_PAGER)\n\t - Uses the option '--pager' for setting a pager - '--pager='$pgr $ln'' in gitconfig\n${normal}\n"
 
                         reade -Q "GREEN" -i 'batpager gitconfig' -p "Which? [Batpager/gitconfig]: " pager1
                         if [[ $pager1 == 'batpager' ]]; then
@@ -890,13 +887,13 @@ ${CYAN}\t4)${normal}${green} Disable pager/just highlight\n${normal}"
                                 printf "# BAT\nexport BAT_PAGER='$pgr $ln'\n" >>$ENV
                             fi
                             git config $global "$cpager" "$pager$opts"
-                        elif [[ $pager1 == 'gitconfig' ]]; then   
+                        elif [[ $pager1 == 'gitconfig' ]]; then
                             git config $global "$cpager" "$pager --pager='$pgr $ln'"
                         fi
 
                     elif [[ "$pager" == "delta" ]]; then
 
-                        printf "${CYAN}$pager${GREEN} can:${normal}${green}\n\t - Can be configured using the environment variable \\\$DELTA_PAGER by setting it to '$pgr $ln' in $ENV(\\\$BAT_PAGER: $BAT_PAGER)\n\t - Can be also be configured using the environment variable \\\$BAT_PAGER when \\\$DELTA_PAGER is empty - (\\\$DELTA_PAGER: $DELTA_PAGER)\n - Uses the option '--pager' for setting a pager - '--pager='$pgr $ln'' in gitconfig\n${normal}\n" 
+                        printf "${CYAN}$pager${GREEN} can:${normal}${green}\n\t - Can be configured using the environment variable \\\$DELTA_PAGER by setting it to '$pgr $ln' in $ENV(\\\$BAT_PAGER: $BAT_PAGER)\n\t - Can be also be configured using the environment variable \\\$BAT_PAGER when \\\$DELTA_PAGER is empty - (\\\$DELTA_PAGER: $DELTA_PAGER)\n - Uses the option '--pager' for setting a pager - '--pager='$pgr $ln'' in gitconfig\n${normal}\n"
 
                         reade -Q "GREEN" -i 'deltapager batpager gitconfig' -p "Which? [Deltapager/batpager/gitconfig]: " pager1
                         if [[ $pager1 == 'deltapager' ]]; then
@@ -915,7 +912,7 @@ ${CYAN}\t4)${normal}${green} Disable pager/just highlight\n${normal}"
                             else
                                 printf "# BAT\nexport BAT_PAGER='$pgr $ln'\n" >>$ENV
                             fi
-                            git config $global "$cpager" "delta" 
+                            git config $global "$cpager" "delta"
                         else
                             git config $global "$cpager" "delta --pager='$pgr $ln'"
                         fi
@@ -927,7 +924,7 @@ ${CYAN}\t4)${normal}${green} Disable pager/just highlight\n${normal}"
                         git config $global "$cpager" "PAGER='$pgr $ln' $pager $opts"
 
                     elif [[ $pager == 'diff-so-fancy' ]] || [[ $pager == 'diffr' ]] || [[ $pager == 'colordiff' ]]; then
-                        [[ $pgr == 'less' ]] && ln="$ln -F" 
+                        [[ $pgr == 'less' ]] && ln="$ln -F"
                         git config $global "$cpager" "$pager | $pgr $ln"
                     fi
                 else
@@ -935,17 +932,17 @@ ${CYAN}\t4)${normal}${green} Disable pager/just highlight\n${normal}"
                     if [[ "$pager" == "delta" ]] || [[ "$pager" == "bat" ]]; then
                         git config $global "$cpager" "$pager $opts --paging=never"
 
-                    elif [[ "$pager" == "ydiff" ]]; then  
+                    elif [[ "$pager" == "ydiff" ]]; then
                         git config $global "$cpager" "ydiff $opts --pager=cat"
 
                     elif [[ "$pager" == "riff" ]]; then
-                        git config $global "$cpager" "$pager $opts --no-pager" 
+                        git config $global "$cpager" "$pager $opts --no-pager"
 
                     elif [[ $pager == 'diff-so-fancy' ]] || [[ $pager == 'diffr' ]] || [[ $pager == 'colordiff' ]]; then
                         git config $global "$cpager" "$pager"
 
                     fi
-                fi 
+                fi
             fi
         fi
     fi
@@ -1007,16 +1004,14 @@ gitt() {
     fi
     unset colrs
 
-
     readyn -p 'Configure git to look for ssh:// instead of https:// when f.ex. cloning/pulling/pushing?' -c "! [[ $global =~ 'global' ]] && test -z $(git config $global --list | grep 'url.ssh://git@github.com/.insteadof=' | awk 'BEGIN { FS = "=" }; {print $2;}')" githttpee
     if [[ "y" == $githttpee ]]; then
         git config $global url.ssh://git@github.com/.insteadOf https://github.com/
     fi
-    
+
     unset gihttpee gitrerere mail name
 
-
-    local pagersf pager 
+    local pagersf pager
 
     if type vimpager &>/dev/null; then
         pagers=$pagers" vimpager"
@@ -1038,10 +1033,9 @@ gitt() {
         pagers=$pagers" moar"
         pagersf=$pagersf"\t - moar\n"
     fi
-    
+
     pagers=$pagers" less more"
     pagersf=$pagersf"\t - less\n\t - more\n"
-
 
     local gitpgr pager wpager
 
@@ -1059,7 +1053,6 @@ gitt() {
             fi
         fi
 
-
         readyn -p "Configure core.pager (default pager for most interactions)?" -c "test -z \"$(git config $global --list | grep 'core.pager' | awk 'BEGIN { FS = "=" }; {print $2;}')\"" pager
         if [[ $pager == 'y' ]]; then
             git_pager "core.pager" "$global"
@@ -1069,7 +1062,7 @@ gitt() {
     local wdiff
 
     readyn -p "Configure diff-wrapper/diff-pager for ${CYAN}pager.diff${GREEN}, ${CYAN}pager.show${GREEN} and ${CYAN}interactive.difffilter${GREEN}?" wdiff
-   if [[ $wdiff == 'y' ]]; then
+    if [[ $wdiff == 'y' ]]; then
 
         readyn -p "Install custom diff syntax highlighter?" -c "test -z '$diffs'" gitpgr
         if [[ "$gitpgr" == "y" ]]; then
@@ -1079,7 +1072,7 @@ gitt() {
                 . ./install_differ.sh
             fi
         fi
- 
+
         local diffs diffsf
         if type delta &>/dev/null; then
             diffs=$diffs" delta"
@@ -1107,8 +1100,8 @@ gitt() {
         fi
 
         printf "${GREEN}Installed tools that could serve as diff highlighters${normal}:\n"
-        printf "${CYAN}$diffsf${normal}" 
-        
+        printf "${CYAN}$diffsf${normal}"
+
         #readyn -p "Set a different diff command (Set default diff command)?" -c "test -z \"$(git config $global --list | grep 'diff.external' | awk 'BEGIN { FS = "=" }; {print $2;}')\"" pager
         #if [[ $pager == 'y' ]]; then
         #    git_pager "diff.external" "$global" 'y'
@@ -1128,7 +1121,6 @@ gitt() {
         if [[ $pager == 'y' ]]; then
             git_pager "pager.log" "$global"
         fi
-    
 
         readyn -p "Configure custom interactive diff filter? (When f.ex. git add --patch shows a colorized diff, the diff will be piped into this command)" -c "test -z \"$(git config $global --list | grep 'interactive.difffilter' | awk 'BEGIN { FS = "=" }; {print $2;}')\"" gitdiff1
         if [[ "y" == "$gitdiff1" ]]; then
@@ -1235,7 +1227,7 @@ gitt() {
         fi
     fi
 
-    readyn -n -N "BLUE" -p "Allow difftool prompt?" conflict    
+    readyn -n -N "BLUE" -p "Allow difftool prompt?" conflict
     if [[ $conflict == "y" ]]; then
         git config $global difftool.prompt "true"
     else
@@ -1282,7 +1274,7 @@ gitt() {
         fi
     fi
 
-    readyn -n -N "BLUE" -p "Allow mergetool prompt?" conflict    
+    readyn -n -N "BLUE" -p "Allow mergetool prompt?" conflict
     if [[ $conflict == "y" ]]; then
         git config $global mergetool.prompt "true"
     else
@@ -1291,7 +1283,7 @@ gitt() {
 
     readyn -Y "CYAN" -p "Set merge conflictsstyle?" -c "test -z $(git config $global --list | grep 'merge.conflictsstyle' | awk 'BEGIN { FS = "=" } ;{print $2;}')" conflict
     if [[ $conflict == "y" ]]; then
-        printf "${GREEN}Options:\n${CYAN}\t- " 
+        printf "${GREEN}Options:\n${CYAN}\t- "
         reade -Q "GREEN" -i "diff3 zdiff3 merge" -p "Conflictsstyle: " cstyle
         if ! test -z "$cstyle"; then
             git config "$global" merge.conflictsstyle "$cstyle"
@@ -1320,7 +1312,7 @@ gitt() {
             else
                 . ./install_lazygit.sh
             fi
-        fi 
+        fi
     fi
 
     #local diffpre="n"
@@ -1339,7 +1331,7 @@ gitt() {
     #                . ./install_differ_pager.sh
     #            fi
     #        fi
-    #         
+    #
     #        git_hl "lazygit"
     #    fi
     #fi

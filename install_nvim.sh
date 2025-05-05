@@ -21,18 +21,17 @@ fi
 
 #. $DIR/setup_git_build_from_source.sh "y" "neovim" "https://github.com" "neovim/neovim" "stable" "sudo apt update; eval "$pac_ins ninja-build gettext libtool libtool-bin cmake g++ pkg-config unzip curl doxygen" "make CMAKE_BUILD_TYPE=RelWithDebInfo; sudo make install" "sudo make uninstall" "make distclean; make deps" "y""
 
-
 if [[ "$distro_base" == "Debian" ]]; then
-    
+
     vrs=10
     lazi=8
     #ruby=0.10.0
-    
+
     #Minimum version for Lazy plugin manager
     vrs=$(apt search neovim 2>/dev/null | awk 'NR>2 {print;}' | grep '^neovim/' | awk '{print $2}' | sed 's/~.*//g' | sed 's|\(.*\..*\)\..*|\1|g' | cut -d. -f2)
-    
+
     [[ $vrs < $lazi ]] && echo "Neovim apt version ($(apt search neovim 2>/dev/null | awk 'NR>2 {print;}' | grep '^neovim/' | awk '{print $2}') is below 0.$lazi wich is too low to run Lazy.nvim (nvim plugin manager)"
-    
+
     #[[ $vrs < $ruby ]] && echo "Neovim apt version is below $ruby wich is too low to install ruby dependencies for nvim"
     if test -n "$(sudo apt list --installed 2>/dev/null | grep neovim)"; then
         readyn -p "Uninstall apt version of neovim?" nvmapt
@@ -190,7 +189,7 @@ if [[ "$langs" == 'y' ]]; then
     if ! type pylint &>/dev/null; then
         readyn -p "Install nvim-python?" pyscripts
         if [[ "y" == "$pyscripts" ]]; then
-            if ! type pyenv &>/dev/null; then
+            if ! hash pyenv &>/dev/null; then
                 if ! test -f $DIR/install_pyenv.sh; then
                     source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pyenv.sh)
                 else
@@ -271,7 +270,7 @@ if ! type ctags &>/dev/null; then
         if [[ $distro_base == 'Arch' ]]; then
             eval "${pac_ins}" ctags
         elif [[ $distro_base == 'Debian' ]]; then
-             eval "${pac_ins} universal-ctags"       
+            eval "${pac_ins} universal-ctags"
         fi
     fi
 fi
@@ -450,7 +449,7 @@ vimsh_r() {
 vimsh() {
     cp -fv $file ~/.bash_aliases.d/
     cp -fv $file1 ~/.bash_completion.d/
-    yes-edit-no -f vimsh_r -g "$file $file1" -p "Install vim aliases at /root/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)?" 
+    yes-edit-no -f vimsh_r -g "$file $file1" -p "Install vim aliases at /root/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)?"
 }
 yes-edit-no -f vimsh -g "$file $file1" -p "Install vim aliases at ~/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)?"
 

@@ -24,7 +24,7 @@ if ! hash rlwrap &>/dev/null; then
 fi
 
 #if ! hash rlwrap &> /dev/null; then
-#   read 
+#   read
 #fi
 
 if ! hash curl &>/dev/null && ! test -z "$pac_ins"; then
@@ -84,8 +84,7 @@ if ! test -f $HOME/.environment; then
     fi
 fi
 
-
-if ! command -v zip &> /dev/null || ! command -v unzip &> /dev/null; then
+if ! hash zip &>/dev/null || ! hash unzip &>/dev/null; then
     printf "${CYAN}zip${normal} and/or ${CYAN}unzip${normal} are not installed \n"
     readyn -p "Install zip and unzip?" nzp_ins
     if [[ $nzp_ins == 'y' ]]; then
@@ -215,11 +214,13 @@ elif [[ $distro_base == 'Arch' ]]; then
             else
                 . $SCRIPT_DIR/AUR_installers/install_yay.sh
             fi
-            AUR_pac="yay"
-            AUR_up="yay -Syu"
-            AUR_ins="yay -S"
-            AUR_search="yay -Ss"
-            AUR_ls_ins="yay -Q"
+            if hash yay &>/dev/null; then
+                AUR_pac="yay"
+                AUR_up="yay -Syu"
+                AUR_ins="yay -S"
+                AUR_search="yay -Ss"
+                AUR_ls_ins="yay -Q"
+            fi
         fi
         unset insyay
     fi
@@ -323,32 +324,6 @@ if [[ "y" == "$ack" ]]; then
     fi
 fi
 unset ack
-
-# Hhighlighter (or just h)
-
-readyn -c "! hash h &> /dev/null" -p "Install hhighlighter (or just h)? (A tiny utility to highlight multiple keywords with different colors in a textoutput)" h
-if [[ "y" == "$h" ]]; then
-    if ! hash ack &>/dev/null; then
-        printf "For ${CYAN}hhighlighter${normal} to work, ${CYAN}ack${normal} needs to be installed beforehand.\n"
-        readyn -p "Install ack and then hhighlighter?" ansr
-        if [[ "$ansr" == 'y' ]]; then
-            if ! test -f $SCRIPT_DIR/install_ack.sh; then
-                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ack.sh)
-            else
-                . $SCRIPT_DIR/install_ack.sh
-            fi
-        else
-            break
-        fi
-        unset ansr
-    fi
-    if ! test -f $SCRIPT_DIR/install_hhighlighter.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_hhighlighter.sh)
-    else
-        . $SCRIPT_DIR/install_hhighlighter.sh
-    fi
-fi
-unset h
 
 # Eza prompt
 
@@ -464,6 +439,32 @@ if [[ "y" == "$scripts" ]]; then
     fi
 fi
 
+# Hhighlighter (or just h)
+
+readyn -c "! hash h &> /dev/null" -p "Install hhighlighter (or just h)? (A tiny utility to highlight multiple keywords with different colors in a textoutput)" h
+if [[ "y" == "$h" ]]; then
+    if ! hash ack &>/dev/null; then
+        printf "For ${CYAN}hhighlighter${normal} to work, ${CYAN}ack${normal} needs to be installed beforehand.\n"
+        readyn -p "Install ack and then hhighlighter?" ansr
+        if [[ "$ansr" == 'y' ]]; then
+            if ! test -f $SCRIPT_DIR/install_ack.sh; then
+                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ack.sh)
+            else
+                . $SCRIPT_DIR/install_ack.sh
+            fi
+        else
+            break
+        fi
+        unset ansr
+    fi
+    if ! test -f $SCRIPT_DIR/install_hhighlighter.sh; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_hhighlighter.sh)
+    else
+        . $SCRIPT_DIR/install_hhighlighter.sh
+    fi
+fi
+unset h
+
 test -n "$BASH_VERSION" && source ~/.bashrc &>/dev/null
 test -n "$ZSH_VERSION" && source ~/.zshrc &>/dev/null
 
@@ -513,7 +514,7 @@ shell-keybinds_r() {
             printf '[ -f ~/.keybinds ] && source ~/.keybinds' | sudo tee -a /root/.bashrc &>/dev/null
         fi
     fi
-    
+
     # X based settings is generally not for root and will throw errors
     echo "Next $(tput setaf 1)sudo$(tput sgr0) will check whether 'setxkbmap *' is part of /root/.keybinds.d/keybinds.bash and comment this line out to prevent errors"
     if sudo grep -q '^setxkbmap' /root/.keybinds.d/keybinds.bash; then
@@ -827,7 +828,7 @@ fi
 unset strshp
 
 # Thefuck
-# i mean pay-respects 
+# i mean pay-respects
 
 readyn -p "Install 'pay-respects'? (Correct last command that ended with an error - 'thefuck' successor)" -c "! hash pay-respects &> /dev/null" tf
 if [[ "$tf" == "y" ]]; then

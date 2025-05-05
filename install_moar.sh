@@ -25,12 +25,12 @@ if ! command -v moar &> /dev/null; then
     
     if [[ "$distro_base" == "Arch" ]]; then 
         
-        local answer
+        #local answer
         readyn -p "Install moar?"  answer
         if [[ "$answer" == "y" ]]; then
             eval "${AUR_ins} moar-git";
         fi
-    
+    	unset answer
     else
         
         printf "Package manager unknown or PM doesn't offer moar (f.ex. apt).\n"; 
@@ -61,9 +61,9 @@ if ! command -v moar &> /dev/null; then
     fi
 fi
 
-if type moar &> /dev/null; then
+if hash moar &> /dev/null; then
     
-    moar --help | $PAGER
+    moar --help | less -R
     
     readyn -p "Set moar as default pager for $USER?" moar_usr
     if [[ "y" == "$moar_usr" ]]; then

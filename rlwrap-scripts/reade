@@ -409,9 +409,9 @@ function reade() {
         export READE_VALUE="$vvvvvvvvvv"
         export REPLY="$vvvvvvvvvv"
 
-        #if test -n "$@"; then
-        #    eval "${@:$#:1}='$vvvvvvvvvv'"
-        #fi
+        if test -n "$@"; then
+            eval "${@:$#:1}='$vvvvvvvvvv'"
+        fi
 	
     else
         if [[ $# < 1 ]]; then

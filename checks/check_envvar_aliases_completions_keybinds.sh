@@ -198,7 +198,7 @@ fi
 if test -f ~/.zshenv; then
     export ZSH_ENV=~/.zshenv
 elif test -f ~/.environment; then
-    export ZSH_ENV= ~/.environment
+    export ZSH_ENV=~/.environment
 elif test -f ~/.zprofile; then
     export ZSH_ENV=~/.zprofile
 fi

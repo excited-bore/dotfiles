@@ -20,7 +20,7 @@ if ! test -f $file; then
 fi
 
 echo "Next $(tput setaf 1)sudo$(tput sgr0) will install $(tput setaf 2)rm-prompt$(tput sgr0) inside $(tput bold)/usr/bin/$(tput sgr0)"
-yes-edit-no -g "$file" -p 'Install rm-prompt?' -c '! command -v rm-prompt &> /dev/null' nstll
+yes-edit-no -g "$file" -p 'Install rm-prompt?' -c '! hash rm-prompt &> /dev/null' nstll
 if [[ $nstll == 'y' ]]; then
     sudo install -Dm777 $file -t "/usr/bin/" 
     rm-prompt --help 

@@ -13,7 +13,7 @@ fi
 
 DIR=$(get-script-dir) 
 
-if ! type cargo &> /dev/null || ! [[ $PATH =~ '/.cargo/bin' ]] || [[ $(rustc -V | awk '{print $2}') < 1.81.0 ]]; then
+if ! hash cargo &> /dev/null || ! [[ $PATH =~ '/.cargo/bin' ]] || (hash rustc &> /dev/null && [[ $(rustc -V | awk '{print $2}') < 1.81.0 ]]); then
     if ! test -f $DIR/install_cargo.sh; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)
     else
