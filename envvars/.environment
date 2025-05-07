@@ -1,5 +1,3 @@
-#!/bin/bash
-
 # Tip: Search binaries with 'whereis'
 # And check with 'printenv'
 
@@ -9,7 +7,7 @@
 #export TERM=vt100
 
 # BASH
-#export BASH_ENV=~/.bashrc
+#export BASH_ENV=~/.environment
 
 # TMPDIR
 export TMPDIR=/tmp
