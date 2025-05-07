@@ -59,7 +59,7 @@ csysm_r() {
 }
 csysm() {
     cp $csysm ~/.bash_aliases.d/04-check_system.sh
-    yes-edit-no -y -Q "YELLOW" -f csysm_r -g "$csysm" -p "Install check_system.sh at /root/?" 
+    yes-edit-no -y -Y "YELLOW" -f csysm_r -g "$csysm" -p "Install check_system.sh at /root/?" 
 }
 yes-edit-no -y -f csysm -g "$csysm" -p "Install check_system.sh at ~/.bash_aliases.d/ (do a checkup on what kind of system this is - used for later scripts)?" 
 

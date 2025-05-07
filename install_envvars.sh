@@ -39,7 +39,7 @@ environment-variables_r() {
     if sudo test -f /root/.zshrc; then
         shell_rcs="$shell_rcs${GREEN}\t- /root/.zshrc\n"
     fi
-    prmpt="File(s):\n$shell_profiles${normal}${GREEN}should${normal} get sourced at login...\nHowever, if a ${CYAN}*shell*_profile${normal} (f.ex. .bash_profile) file exists, ${MAGENTA}.profile${RED} won't get sourced at login${normal}\nFile(s):\n${CYAN}$shell_rcs${normal}get sourced when starting a new *shell* shell (f.ex. ${CYAN}bash${normal} shell)\n"
+    prmpt="File(s):\n$shell_profiles${normal}${GREEN}should${normal} get sourced at login...\nHowever, if a ${CYAN}*shell*_profile${normal} (f.ex. .bash_profile) file exists, ${MAGENTA}.profile${RED} won't get sourced at login${normal}\nFile(s):\n${CYAN}$shell_rcs${normal}get sourced when starting a new *interactive* shell (f.ex. ${CYAN}bash${normal} shell)\n"
 #Certain programs check the correct ${CYAN}*shell*_profile${normal}, others (by accident) only check ${MAGENTA}.profile${normal}..\n"
     printf "$prmpt"
 
@@ -152,7 +152,7 @@ environment-variables() {
     if sudo test -f ~/.zshrc; then
         shell_rcs="$shell_rcs${GREEN}\t- $HOME/.zshrc\n"
     fi
-    prmpt="File(s):\n$shell_profiles${normal}${GREEN}should${normal} get sourced at login...\nHowever, if a ${CYAN}*shell*_profile${normal} (f.ex. .bash_profile) file exists, ${MAGENTA}.profile${RED} won't get sourced at login${normal}\nFile(s):\n${CYAN}$shell_rcs${normal}get sourced when starting a new *shell* shell (f.ex. ${CYAN}bash${normal} shell)\n"
+    prmpt="File(s):\n$shell_profiles${normal}${GREEN}should${normal} get sourced at login...\nHowever, if a ${CYAN}*shell*_profile${normal} (f.ex. .bash_profile) file exists, ${MAGENTA}.profile${RED} won't get sourced at login${normal}\nFile(s):\n${CYAN}$shell_rcs${normal}get sourced when starting a new *interactive* shell (f.ex. ${CYAN}bash${normal} shell)\n"
 #Certain programs check the correct ${CYAN}*shell*_profile${normal}, others (by accident) only check ${MAGENTA}.profile${normal}..\n"
     printf "$prmpt"
 
