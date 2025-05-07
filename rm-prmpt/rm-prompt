@@ -492,16 +492,20 @@ function rm-prompt(){
     if test -z $RMPROMPT_RM_OPT; then
         RMPROMPT_RM_OPT='-rv' 
     fi
+    
     if test -z "$RMPROMPT_LS_CMD"; then
         RMPROMPT_LS_CMD='ls -ARh --color=always' 
     fi
     if test -z "$RMPROMPT_LS_DIR_CMD"; then
         RMPROMPT_LS_DIR_CMD="$RMPROMPT_LS_CMD" 
     fi
-    if test -z $RMPROMPT_PAGER; then
+    
+    if test -z "$RMPROMPT_PAGER" && test -n "$PAGER"; then
         RMPROMPT_PAGER=$PAGER 
+    elif test -z "$PAGER"; then
+        RMPROMPT_PAGER="less -R -Q --no-vbell --LINE-NUMBERS --use-color --quit-if-one-screen" 
     fi
-    if [[ "$RMPROMPT_NOPAGER" == "1" ]]; then  
+    if [[ "$RMPROMPT_NOPAGER" ]]; then  
         RMPROMPT_PAGER="cat" 
     fi
     
@@ -512,19 +516,20 @@ function rm-prompt(){
     local itm 
     local ffiles ssymlinks ddirss
     
-    for itm in "$@"; do
-        if test -e "$itm"; then
-           if test -d "$itm"; then
-               eval "$RMPROMPT_LS_DIR_CMD -- \"$itm\"" 
-           else
-               eval "$RMPROMPT_LS_CMD -- \"$itm\"" 
-           fi
-        else
-            printf "$itm doesn't exist. Exiting..\n"
-            return 1
-        fi
-    done | $RMPROMPT_PAGER 
-
+    #for itm in "$@"; do
+    #    if test -e "$itm"; then
+    #       if test -d "$itm"; then
+    #           eval "$RMPROMPT_LS_DIR_CMD -- \"$itm\"" 
+    #       else
+    #           eval "$RMPROMPT_LS_CMD -- \"$itm\"" 
+    #       fi
+    #    else
+    #        printf "$itm doesn't exist. Exiting..\n"
+    #        return 1
+    #    fi
+    #done | $RMPROMPT_PAGER 
+    
+    eval "$RMPROMPT_LS_DIR_CMD "$@" | $RMPROMPT_PAGER"
 
     files=$(($files + $(find "$@" -type f 2> /dev/null | wc -l ))) 
     symlinks=$(($symlinks + $(find "$@" -type l 2> /dev/null | wc -l)))  
@@ -548,9 +553,15 @@ function rm-prompt(){
     #    itms="$itms $itm"  
     #done 
     
-    [ $files -gt 0 ] && ffiles="${RED}$ffiles${YELLOW}" || ffiles="${CYAN}$ffiles${YELLOW}" 
-    [ $symlinks -gt 0 ] && ssymlinks="${RED}$ssymlinks${YELLOW}" || ssymlinks="${CYAN}$ssymlinks${YELLOW}"
-    [ $dirss -gt 0 ] && ddirss="${RED}$ddirss${YELLOW}" || ddirss="${CYAN}$ddirss${YELLOW}" 
+    [ $files -gt 0 ] && 
+        ffiles="${RED}$files${YELLOW}" || 
+        ffiles="${CYAN}$files${YELLOW}" 
+    [ $symlinks -gt 0 ] && 
+        ssymlinks="${RED}$symlinks${YELLOW}" || 
+        ssymlinks="${CYAN}$symlinks${YELLOW}"
+    [ $dirss -gt 0 ] && 
+        ddirss="${RED}$dirss${YELLOW}" || 
+        ddirss="${CYAN}$dirss${YELLOW}" 
    
     if [ $files -gt 0 ] || [ $symlinks -gt 0 ] || [ $dirss -gt 0 ]; then
         reade -Q 'YELLOW' -i 'y n' -p "Remove all $ssymlinks symlink(s), $ffiles file(s) and all $ddirss directory(s)? [Y/n]: " rm_stff

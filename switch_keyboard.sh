@@ -35,7 +35,9 @@ if [[ "$swtch" == 'y' ]]; then
         command rm -rf $tmpd
     else
         (cd ./calamares
-        sudo calamares -d 1> /dev/null) 
+        cp settings-keyboard.conf settings.conf  
+        sudo calamares -d &> /dev/null
+        rm settings.conf) 
     fi
     #all=$(localectl list-keymaps --no-pager)
     #if type fzf &> /dev/null; then
