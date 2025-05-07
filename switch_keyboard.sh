@@ -24,18 +24,18 @@ if [[ "$swtch" == 'y' ]]; then
     
     if ! hash calamares &> /dev/null; then
         echo "Installing calamares to use for keyboard configuration."
-        eval "${pac_ins} calamares qt6" 
+        eval "${pac_ins} calamares" 
     fi
 
     if ! test -d calamares || ! test -f calamares/settings.conf; then
         tmpd=$(mktemp -d)
         wget -P $tmpd https://raw.githubusercontent.com/excited-bore/dotfiles/main/calamares/settings.conf
         (cd $tmpd
-        sudo calamares -d &> /dev/null)
+        sudo calamares -d 1> /dev/null)
         command rm -rf $tmpd
     else
         (cd ./calamares
-        sudo calamares -d &> /dev/null) 
+        sudo calamares -d 1> /dev/null) 
     fi
     #all=$(localectl list-keymaps --no-pager)
     #if type fzf &> /dev/null; then
