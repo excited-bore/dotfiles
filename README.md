@@ -75,6 +75,15 @@ Then it helps with installing/configuring:
 Also helps configuring global gitconfig and global gitignore, and gives the option to install all kinds of bash-aliases/.bash_aliases.d/functions
 
 
+## switch_keyboard.sh
+Script to automate setting up your keyboard in linux.  
+For trying out this script try:
+
+```
+source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/switch_keyboard.sh)'
+```
+
+
 ## Install_git.sh
 Script to automate setting up pagers, syntax highlighters and a variety of git options. Adds aliases like 'git-https-to-ssh' and 'git-add-ssh-key'.  
 For trying out this script while setting global git options, try:
