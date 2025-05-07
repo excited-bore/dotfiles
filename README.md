@@ -77,7 +77,8 @@ Also helps configuring global gitconfig and global gitignore, and gives the opti
 
 ## switch_keyboard.sh
 Script to automate setting up your keyboard in linux.  
-For trying out this script try:
+Launches calamares (GUI) in debug mode. Tested and works over ssh.  
+For trying out only this script, try:
 
 ```
 source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/switch_keyboard.sh)'
