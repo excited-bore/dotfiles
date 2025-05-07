@@ -84,7 +84,7 @@ if hash moar &> /dev/null; then
         fi
     fi
         
-    readyn -p "Set moar as default pager for root?" moar_root
+    readyn -Y 'YELLOW' -p "Set moar as default pager for root?" moar_root
     if [[ "y" == "$moar_root" ]]; then
         if sudo grep -q "MOAR" $ENV_R; then
             sudo sed -i "s|.export MOAR=.*|export MOAR='--statusbar=bold --colors=auto --render-unprintable=highlight --quit-if-one-screen'|g" $ENV_R 
