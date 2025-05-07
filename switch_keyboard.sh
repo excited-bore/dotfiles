@@ -31,11 +31,11 @@ if [[ "$swtch" == 'y' ]]; then
         tmpd=$(mktemp -d)
         wget -P $tmpd https://raw.githubusercontent.com/excited-bore/dotfiles/main/calamares/settings.conf
         (cd $tmpd
-        sudo calamares -d &> /dev/null)
+        sudo calamares -d 1> /dev/null)
         command rm -rf $tmpd
     else
-        (cd $DIR/calamares
-        sudo calamares -d &> /dev/null) 
+        (cd ./calamares
+        sudo calamares -d 1> /dev/null) 
     fi
     #all=$(localectl list-keymaps --no-pager)
     #if type fzf &> /dev/null; then
