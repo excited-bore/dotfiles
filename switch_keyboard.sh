@@ -24,7 +24,7 @@ if [[ "$swtch" == 'y' ]]; then
     
     if ! hash calamares &> /dev/null; then
         echo "Installing calamares to use for keyboard configuration."
-        eval "${pac_ins} calamares" 
+        eval "${pac_ins} calamares qt6" 
     fi
 
     if ! test -d calamares || ! test -f calamares/settings.conf; then
@@ -34,7 +34,7 @@ if [[ "$swtch" == 'y' ]]; then
         sudo calamares -d &> /dev/null)
         command rm -rf $tmpd
     else
-        (cd $DIR/calamares
+        (cd ./calamares
         sudo calamares -d &> /dev/null) 
     fi
     #all=$(localectl list-keymaps --no-pager)
