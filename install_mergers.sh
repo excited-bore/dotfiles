@@ -201,7 +201,7 @@ elif [[ $merger == 'sublime' ]] ;then
 
     if ! test -f /opt/sublime_merge/sublime_merge; then
         if [[ $distro_base == 'Debian' ]]; then
-            wget -qO https://download.sublimetext.com/sublimehq-pub.gpg | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/sublimehq-archive.gpg > /dev/null
+            curl https://download.sublimetext.com/sublimehq-pub.gpg | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/sublimehq-archive.gpg > /dev/null
             if test -z $(apt list --installed apt-transport-https 2> /dev/null); then
                 eval "$pac_ins apt-transport-https "
             fi

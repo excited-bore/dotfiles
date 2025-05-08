@@ -31,7 +31,7 @@ if ! type code &> /dev/null; then
         if test -z $(apt list --installed apt-transport-https 2> /dev/null); then
             eval "$pac_ins apt-transport-https "
         fi
-        wget -q https://packages.microsoft.com/keys/microsoft.asc -O- | sudo apt-key add - 
+        curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add - 
         sudo add-apt-repository "deb [arch=$arch] https://packages.microsoft.com/repos/vscode stable main" 
         sudo apt update 
         eval "$pac_ins code"

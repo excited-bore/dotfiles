@@ -24,8 +24,8 @@ fi
 readyn -p "Add cronjob to wipe all metadata recursively every 5 min in $HOME/Pictures?" wipe
 if [[ $wipe == 'y' ]]; then
     (
-        crontab -l
         echo '0,5,10,15,25,30,35,40,45,5,55 * * * * exiftool -r -overwrite_original_in_place -all= $HOME/Pictures'
     ) | sort -u | crontab -
+    crontab -l
 fi
 unset wipe

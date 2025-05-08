@@ -29,7 +29,7 @@ if [[ "$swtch" == 'y' ]]; then
 
     if ! test -d calamares || ! test -f calamares/settings.conf; then
         tmpd=$(mktemp -d)
-        wget -P $tmpd https://raw.githubusercontent.com/excited-bore/dotfiles/main/calamares/settings.conf
+        wget-dir $tmpd https://raw.githubusercontent.com/excited-bore/dotfiles/main/calamares/settings.conf
         (cd $tmpd
         sudo calamares -d 1> /dev/null)
         command rm -rf $tmpd

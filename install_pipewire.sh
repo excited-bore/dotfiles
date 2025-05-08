@@ -221,8 +221,8 @@ file=$SCRIPT_DIR/pipewire/.bash_aliases.d/pipewire.sh
 file1=$SCRIPT_DIR/pipewire/.bash_completion.d/pipewire
 if ! test -f $file || ! test -f $file1; then
     tmpd=$(mktemp -d)
-    wget -P $tmpd https://raw.githubusercontent.com/excited-bore/dotfiles/main/pipewire/.bash_aliases.d/pipewire.sh
-    wget -P $tmpd https://raw.githubusercontent.com/excited-bore/dotfiles/main/pipewire/.bash_completions.d/pipewire
+    wget-dir $tmpd https://raw.githubusercontent.com/excited-bore/dotfiles/main/pipewire/.bash_aliases.d/pipewire.sh
+    wget-dir $tmpd https://raw.githubusercontent.com/excited-bore/dotfiles/main/pipewire/.bash_completions.d/pipewire
     file=$tmpd/pipewire.sh
     file1=$tmpd/pipewire
 fi

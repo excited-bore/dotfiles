@@ -42,7 +42,7 @@ if [[ $machine == 'Windows' ]]; then
         readyn -p "(Attempt to) Install winget? ${CYAN}(Windows 10 - version 1809 required at mimimum for winget)${GREEN}" wngt
         if [[ "$wngt" == 'y' ]]; then
             tmpd=$(mktemp -d)
-            wget -P $tmpd https://raw.githubusercontent.com/asheroto/winget-install/master/winget-install.ps1
+            wget-dir $tmpd https://raw.githubusercontent.com/asheroto/winget-install/master/winget-install.ps1
             sudo pwsh $tmpd/winget-install.ps1
         else
             printf "${RED}Can't install scripts without winget${normal}\n"

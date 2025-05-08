@@ -25,9 +25,19 @@ command -v sudo &>/dev/null && [[ "$(type sudo)" =~ 'aliased' ]] &&
 command -v wget &>/dev/null && [[ "$(type wget)" =~ 'aliased' ]] &&
     unalias wget 
 alias wget='wget --https-only'
+alias wget-quiet='wget -q'
+alias wget-dir='wget -P'
+alias wget-name='wget -O'
 
-# Less does raw control chars
-alias less='less -R'
+if hash aria2c &> /dev/null; then
+    alias wget='aria2c'
+    alias wget-quiet='aria2c -q'
+    alias wget-dir='aria2c -d'
+    alias wget-name='aria2c -o'
+fi
+
+# Less does raw control chars, use color and linenumbers, no sounds/bell and doesn't give you epilepsy
+alias less='less -R --use-color --LINE-NUMBERS --quit-if-one-screen -Q --no-vbell'
 
 #! type wget &> /dev/null && command -v brew &> /dev/null &&
 #    brew install wget 

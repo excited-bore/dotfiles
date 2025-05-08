@@ -30,9 +30,10 @@ fi
 
 fonts=$(mktemp -d)
 get-latest-releases-github https://github.com/ryanoasis/nerd-fonts $fonts/
-#wget -P "$fonts" https://github.com/vorillaz/devicons/archive/master.zip
+#wget-dir "$fonts" https://github.com/vorillaz/devicons/archive/master.zip
 
 if [[ "$(ls $fonts/*)" ]]; then
+
     [[ "$(ls $fonts/*.zip 2> /dev/null)" ]] &&
         unzip $fonts/*.zip -d $fonts &&
         rm $fonts/*.zip
@@ -46,5 +47,5 @@ if [[ "$(ls $fonts/*)" ]]; then
 fi
 
 #ltstv=$(curl -sL "https://api.github.com/repos/ryanoasis/nerd-fonts/releases/latest" | jq -r ".tag_name")
-#wget -P "$fonts" https://github.com/ryanoasis/nerd-fonts/releases/download/$ltstv/Hermit.zip
+#wget-dir "$fonts" https://github.com/ryanoasis/nerd-fonts/releases/download/$ltstv/Hermit.zip
 #unzip $fonts/Hermit.zip -d $fonts

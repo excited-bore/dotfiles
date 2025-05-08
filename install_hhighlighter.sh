@@ -15,7 +15,7 @@ else
 fi 
 
 if ! type h &> /dev/null; then
-    sudo wget --https-only -P ~/.bash_aliases.d/ https://raw.githubusercontent.com/paoloantinori/hhighlighter/refs/heads/master/h.sh
+    sudo -E wget-dir ~/.bash_aliases.d/ https://raw.githubusercontent.com/paoloantinori/hhighlighter/refs/heads/master/h.sh
     #printf '\nh "$@\n\"' | sudo tee -a /usr/bin/h &> /dev/null 
     #sudo chmod 0755 /usr/bin/h 
 fi

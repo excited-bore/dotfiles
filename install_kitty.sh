@@ -38,7 +38,7 @@ if ! test -d kitty/.config/kitty; then
     curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/download_git_directory.sh | tee "$tmpfile" &>/dev/null
     chmod u+x "$tmpfile"
     eval $tmpfile https://github.com/excited-bore/dotfiles/tree/main/kitty/.config/kitty $tmpdir
-    wget -P $tmpdir https://raw.githubusercontent.com/excited-bore/dotfiles/main/kitty/.bash_aliases.d/kitty.sh
+    wget-dir $tmpdir https://raw.githubusercontent.com/excited-bore/dotfiles/main/kitty/.bash_aliases.d/kitty.sh
     dir=$tmpdir/kitty/.config/kitty
     file=$tmpdir/kitty.sh
 else
@@ -193,12 +193,24 @@ if [[ $ktty_cnf == 'y' ]]; then
                 readyn -p "Set position new window?" ktty_splt1
 
                 if [[ $ktty_splt1 == 'y' ]]; then
-                    reade -Q "GREEN" -i "hsplit vsplit default before after" -p "Position new window: [Hsplit/vsplit/default/before/after]: " ktty_pos
+                    reade -Q "GREEN" -i "vsplit hsplit default before after" -p "Position new window: [Hsplit/vsplit/default/before/after]: " ktty_pos
                     sed -i "s|map kitty_mod+enter[^+].*|map kitty_mod+enter launch --location=$ktty_pos|g" $dir/kitty.conf
                 fi
                 readyn -p "Add shortcut for new window pos on ctrl+shift+alt+enter?" ktty_splt2
                 if [[ $ktty_splt2 == 'y' ]]; then
-                    reade -Q "GREEN" -i "vsplit hsplit before after" -p "Position new window: [Vsplit/hsplit/before/after]: " ktty_pos
+                    
+                    all="hsplit vsplit before after"
+                    prmpt="[Hsplit/vsplit/before/after]"
+                    if [[ $ktty_pos == 'hsplit' ]]; then
+                        all="vsplit before after"
+                        prmpt="[Vsplit/before/after]"
+                    fi
+                    if [[ $ktty_pos == 'vsplit' ]]; then
+                        all="hsplit before after"
+                        prmpt="[Hsplit/before/after]"
+                    fi
+                    reade -Q "GREEN" -i "$all" -p "Position new window: $prmpt: " ktty_pos
+                    
                     sed -i "s|map kitty_mod+alt+enter.*|map kitty_mod+alt+enter launch --location=$ktty_pos|g" $dir/kitty.conf
                 fi
 

@@ -253,7 +253,7 @@ if ! test -f /usr/bin/rifle || ! test -f ~/.bash_aliases.d/fzf-rifle.sh && grep 
                     eval "${pac_ins}" python
                 fi
             fi
-            sudo wget -P /usr/bin/ https://raw.githubusercontent.com/ranger/ranger/master/ranger/ext/rifle.py
+            sudo wget-dir /usr/bin/ https://raw.githubusercontent.com/ranger/ranger/master/ranger/ext/rifle.py
             sudo mv -v /usr/bin/rifle.py /usr/bin/rifle
             sudo chmod +x /usr/bin/rifle
         fi

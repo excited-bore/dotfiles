@@ -1,9 +1,12 @@
-#/bin/bash
-
-if ! type reade &> /dev/null; then
-    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)
+if ! test -f checks/check_all.sh; then
+    if hash curl &>/dev/null; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
+    else
+        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
+        return 1 || exit 1
+    fi
 else
-    . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
+    . ./checks/check_all.sh
 fi
 
 if test -z $1; then
@@ -76,7 +79,7 @@ while ! test -z "$file_array"; do
         cat $i
         for j in $(cat "$i" | grep 'download_url' | awk '{print $2}' | cut -d, -f-1 | sed 's,"\(.*\)",\1,g'); do
             if ! test "$j" == "null"; then
-                wget -P "$current_dir" -- "$j" 
+                wget-dir "$current_dir" -- "$j" 
             fi
         done
         dir_array=($(pop_element "${dir_array[@]}" "$main_dir"))

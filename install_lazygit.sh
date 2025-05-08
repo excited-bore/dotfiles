@@ -24,7 +24,7 @@ if ! type lazygit &>/dev/null; then
                 eval "${pac_ins} curl"
             fi
             LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po --color=never '"tag_name": "v\K[^"]*')
-            wget -O $TMPDIR/lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
+            wget-name $TMPDIR/lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
             (cd $TMPDIR && tar xf lazygit.tar.gz lazygit)
             sudo install $TMPDIR/lazygit -D -t /usr/local/bin
         fi

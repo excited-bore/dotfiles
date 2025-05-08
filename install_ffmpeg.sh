@@ -34,7 +34,7 @@ if type ffmpeg &>/dev/null; then
     ffmpgsh=$(pwd)/aliases/.bash_aliases.d/ffmpeg.sh
 
     if ! test -f $ffmpgsh; then
-        wget -P $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/ffmpeg.sh
+        wget-dir $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/ffmpeg.sh
         ffmpgsh=$TMPDIR/ffmpeg.sh
     fi
 
