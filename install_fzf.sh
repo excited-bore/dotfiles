@@ -1,5 +1,3 @@
-#!/bin/bash
-
 if ! test -f checks/check_all.sh; then
     if type curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
@@ -35,21 +33,22 @@ if ! test -d ~/.fzf || test -f ~/.fzf.bash; then
     printf "${cyan}Fzf${normal} keybinds:\n\t - Fzf history on Ctrl-R (replaces reverse-search-history)\n\t - Filepath retriever on Ctrl-T\n\t - Directory navigator on Alt-C\n\t - **<TAB> for fzf completion on some commands\n"
     readyn -p "Use fzf keybinds?" -c "! test -f ~/.keybinds.d/fzf-bindings.bash" fzf_key
     if [[ "$fzf_key" == 'y' ]]; then
-        test -f ~/.keybinds.d/fzf-bindings.bash && command rm ~/.keybinds.d/fzf-bindings.bash
+        test -f ~/.keybinds.d/fzf-bindings.bash && 
+            command rm ~/.keybinds.d/fzf-bindings.bash
         ln -s ~/.fzf/shell/key-bindings.bash ~/.keybinds.d/fzf-bindings.bash
     fi
 fi
 
 if [[ $ENV =~ '.environment' ]]; then
-    sed -i 's|.export PATH=$PATH:$HOME/.fzf/bin|export PATH=$PATH:$HOME/.fzf/bin|g' $ENV
-elif ! grep -q '.fzf/bin' $ENV; then
+    sed -i 's|.export PATH=$PATH:$HOME/.fzf/bin|export PATH=$PATH:$HOME/.fzf/bin/fzf|g' $ENV
+elif ! grep -q '.fzf/bin/fzf' $ENV; then
     if grep -q '~/.environment' $ENV; then
-        sed -i 's|\(\[ -f ~/.environment\] \&\& source \~/.environment\)|\export PATH=$PATH:$HOME/.fzf/bin\n\n\1\n|g' ~/.bashrc
+        sed -i 's|\(\[ -f ~/.environment\] \&\& source \~/.environment\)|\export PATH=$PATH:$HOME/.fzf/bin/fzf\n\n\1\n|g' $ENV
     elif grep -q '~/.bash_aliases' $ENV; then
-        sed -i 's|\(\[ -f ~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\export PATH=$PATH:$HOME/.fzf/bin\n\n\1\n|g' ~/.bashrc
-        sed -i 's|\(if \[ -f ~/.bash_aliases \]; then\)|export PATH=$PATH:$HOME/.fzf/bin\n\n\1\n|g' ~/.bashrc
+        sed -i 's|\(\[ -f ~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\export PATH=$PATH:$HOME/.fzf/bin/fzf\n\n\1\n|g' $ENV
+        sed -i 's|\(if \[ -f ~/.bash_aliases \]; then\)|export PATH=$PATH:$HOME/.fzf/bin/fzf\n\n\1\n|g' $ENV
     else
-        echo 'export PATH="$PATH:$HOME/.fzf/bin"' >>$ENV
+        echo 'export PATH="$PATH:$HOME/.fzf/bin/fzf"' >>$ENV
     fi
 fi
 
