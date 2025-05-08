@@ -32,16 +32,18 @@ fonts=$(mktemp -d)
 get-latest-releases-github https://github.com/ryanoasis/nerd-fonts $fonts/
 #wget -P "$fonts" https://github.com/vorillaz/devicons/archive/master.zip
 
-[[ "$(ls $fonts/*.zip 2> /dev/null)" ]] &&
-    unzip $fonts/*.zip -d $fonts &&
-    rm $fonts/*.zip
+if [[ "$(ls $fonts/*)" ]]; then
+    [[ "$(ls $fonts/*.zip 2> /dev/null)" ]] &&
+        unzip $fonts/*.zip -d $fonts &&
+        rm $fonts/*.zip
 
-[[ "$(ls $fonts/*.tar.xz 2> /dev/null)" ]] &&
-    tar -xf $fonts/*.tar.xz -C $fonts &&
-    rm $fonts/*.tar.xz
+    [[ "$(ls $fonts/*.tar.xz 2> /dev/null)" ]] &&
+        tar -xf $fonts/*.tar.xz -C $fonts &&
+        rm $fonts/*.tar.xz
 
-mv $fonts/* ~/.local/share/fonts
-sudo fc-cache -fv
+    mv $fonts/* ~/.local/share/fonts
+    sudo fc-cache -fv
+fi
 
 #ltstv=$(curl -sL "https://api.github.com/repos/ryanoasis/nerd-fonts/releases/latest" | jq -r ".tag_name")
 #wget -P "$fonts" https://github.com/ryanoasis/nerd-fonts/releases/download/$ltstv/Hermit.zip
