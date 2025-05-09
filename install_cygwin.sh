@@ -1,3 +1,5 @@
+DLSCRIPT=1
+
 if ! test -f checks/check_all.sh; then
     if type curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
@@ -24,7 +26,7 @@ if test $machine == 'Windows'; then
     # Install Cygwin
     if ! type winget &> /dev/null; then
         tmpd=$(mktemp -d)
-        wget-dir $tmpd https://raw.githubusercontent.com/asheroto/winget-install/master/winget-install.ps1  
+        wget-aria-dir $tmpd https://raw.githubusercontent.com/asheroto/winget-install/master/winget-install.ps1  
         sudo pwsh $tmpd/winget-install.ps1
     fi
     if ! test $win_bash_shell == 'Cygwin' && ! test -d /c/cygwin$ARCH_WIN; then

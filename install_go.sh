@@ -27,7 +27,7 @@ if ! hash go &> /dev/null; then
         checksum=$(curl -sL "https://golang.google.cn/dl/" | awk 'BEGIN{FS="\n"; RS=""} $0 ~ /'$file'/ &&  $0 ~ /<\/tt>/ {print $0;}' | grep --color=never "<tt>" | sed "s,.*<tt>\(.*\)</tt>.*,\1,g")
         if ! hash go &> /dev/null || ! [[ "$(go version)" =~ $latest ]]; then
             test -z $TMPDIR && TMPDIR=$(mktemp -d) 
-            wget-dir $TMPDIR https://golang.google.cn/dl/$file
+            wget-aria-dir $TMPDIR https://golang.google.cn/dl/$file
             file=$TMPDIR/$file
             sum=$(sha256sum $file | awk '{print $1;}')
             echo "Checksum golang website: $checksum"

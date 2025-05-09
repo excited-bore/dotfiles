@@ -45,7 +45,7 @@ fi
 
 ytbe=aliases/.bash_aliases.d/youtube.sh
 if ! test -d aliases/.bash_aliases.d/; then
-    wget-dir $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/youtube.sh
+    wget-aria-dir $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/youtube.sh
     ytbe=$TMPDIR/youtube.sh
 fi
 

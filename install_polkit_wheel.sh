@@ -16,7 +16,7 @@ if sudo test -d /etc/polkit-1/localauthority/50-local.d/ && ! sudo test -f /etc/
     file=polkit/49-nopasswd_global.pkla 
     if ! test -f polkit/49-nopasswd_global.pkla; then
         mktemp=$(mktemp -d) 
-        wget-name $tmp/49-nopasswd_global.pkla https://raw.githubusercontent.com/excited-bore/dotfiles/main/polkit/49-nopasswd_global.pkla
+        wget-aria-name $tmp/49-nopasswd_global.pkla https://raw.githubusercontent.com/excited-bore/dotfiles/main/polkit/49-nopasswd_global.pkla
         file=$tmp/49-nopasswd_global.pkla 
     fi
     function localauth_conf(){
@@ -30,7 +30,7 @@ if sudo test -d /etc/polkit-1/localauthority.conf.d/ && ! sudo test -f /etc/polk
     file=polkit/49-nopasswd_global.conf 
     if ! test -f polkit/49-nopasswd_global.conf; then
         mktemp=$(mktemp -d) 
-        wget-name $tmp/49-nopasswd_global.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/polkit/49-nopasswd_global.conf
+        wget-aria-name $tmp/49-nopasswd_global.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/polkit/49-nopasswd_global.conf
         file=$tmp/49-nopasswd_global.conf 
     fi 
     function localauth_conf_d(){
@@ -44,7 +44,7 @@ if sudo test -d /etc/polkit-1/rules.d/ && ! sudo test -f /etc/polkit-1/rules.d/9
     file=polkit/49-nopasswd_global.rules 
     if ! test -f polkit/49-nopasswd_global.rules; then
         mktemp=$(mktemp -d) 
-        wget-name $tmp/49-nopasswd_global.rules https://raw.githubusercontent.com/excited-bore/dotfiles/main/polkit/49-nopasswd_global.rules
+        wget-aria-name $tmp/49-nopasswd_global.rules https://raw.githubusercontent.com/excited-bore/dotfiles/main/polkit/49-nopasswd_global.rules
         file=$tmp/49-nopasswd_global.rules
     fi 
     function rules_conf(){

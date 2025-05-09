@@ -24,7 +24,7 @@ if ! type lazygit &>/dev/null; then
                 eval "${pac_ins} curl"
             fi
             LAZYGIT_VERSION=$(curl "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po --color=never '"tag_name": "v\K[^"]*')
-            wget-name $TMPDIR/lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
+            wget-aria-name $TMPDIR/lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
             (cd $TMPDIR && tar xf lazygit.tar.gz lazygit)
             sudo install $TMPDIR/lazygit -D -t /usr/local/bin
         fi
@@ -35,7 +35,7 @@ lazygit --help | $PAGER
 
 file=lazygit/.config/lazygit/config.yml.example
 if ! test -f $file; then
-    file=$(wget-name ~/.config/lazygit/config.yml.example https://raw.githubusercontent.com/excited-bore/dotfiles/main/lazygit/.config/lazygit/config.yml.example)
+    file=$(wget-aria-name ~/.config/lazygit/config.yml.example https://raw.githubusercontent.com/excited-bore/dotfiles/main/lazygit/.config/lazygit/config.yml.example)
 fi
 
 readyn -p 'Configure lazygit?' conflazy

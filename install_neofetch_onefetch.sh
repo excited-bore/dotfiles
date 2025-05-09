@@ -54,7 +54,7 @@ if ! type neofetch &>/dev/null && ! type fastfetch &>/dev/null && ! type screenF
             os="linux"
             ltstv=$(curl -sL https://api.github.com/repos/fastfetch-cli/fastfetch/releases/latest | jq -r ".tag_name")
             tmp=$(mktemp -d)
-            wget-dir $tmp https://github.com/fastfetch-cli/fastfetch/releases/download/$ltstv/fastfetch-$os-$fetch_arch.deb
+            wget-aria-dir $tmp https://github.com/fastfetch-cli/fastfetch/releases/download/$ltstv/fastfetch-$os-$fetch_arch.deb
             sudo dpkg -i $tmp/fastfetch-$os-$fetch_arch.deb
         elif [[ $distro_base == "Arch" ]]; then
             eval "${pac_ins}" fastfetch

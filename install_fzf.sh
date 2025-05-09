@@ -42,15 +42,15 @@ if ! test -d ~/.fzf || test -f ~/.fzf.bash; then
 fi
 
 if [[ $ENV =~ '.environment' ]]; then
-    sed -i 's|.export PATH=$PATH:$HOME/.fzf/bin|export PATH=$PATH:$HOME/.fzf/bin/fzf|g' $ENV
-elif ! grep -q '.fzf/bin/fzf' $ENV; then
+    sed -i 's|.export PATH=$PATH:$HOME/.fzf/bin|export PATH=$PATH:$HOME/.fzf/bin|g' $ENV
+elif ! grep -q '.fzf/bin' $ENV; then
     if grep -q '~/.environment' $ENV; then
-        sed -i 's|\(\[ -f ~/.environment\] \&\& source \~/.environment\)|\export PATH=$PATH:$HOME/.fzf/bin/fzf\n\n\1\n|g' $ENV
+        sed -i 's|\(\[ -f ~/.environment\] \&\& source \~/.environment\)|\export PATH=$PATH:$HOME/.fzf/bin\n\n\1\n|g' $ENV
     elif grep -q '~/.bash_aliases' $ENV; then
-        sed -i 's|\(\[ -f ~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\export PATH=$PATH:$HOME/.fzf/bin/fzf\n\n\1\n|g' $ENV
-        sed -i 's|\(if \[ -f ~/.bash_aliases \]; then\)|export PATH=$PATH:$HOME/.fzf/bin/fzf\n\n\1\n|g' $ENV
+        sed -i 's|\(\[ -f ~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\export PATH=$PATH:$HOME/.fzf/bin/\n\n\1\n|g' $ENV
+        sed -i 's|\(if \[ -f ~/.bash_aliases \]; then\)|export PATH=$PATH:$HOME/.fzf/bin\n\n\1\n|g' $ENV
     else
-        echo 'export PATH="$PATH:$HOME/.fzf/bin/fzf"' >>$ENV
+        echo 'export PATH="$PATH:$HOME/.fzf/bin"' >>$ENV
     fi
 fi
 
@@ -150,7 +150,7 @@ if ! type rg &>/dev/null; then
             if test -f fzf/.bash_aliases.d/ripgrep-directory.sh; then
                 cp -fv fzf/.bash_aliases.d/ripgrep-directory.sh ~/.bash_aliases.d/
             else
-                wget-name ~/.bash_aliases.d/ripgrep-directory.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/.bash_aliases.d/ripgrep-directory.sh
+                wget-aria-name ~/.bash_aliases.d/ripgrep-directory.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/.bash_aliases.d/ripgrep-directory.sh
             fi
         fi
     fi
@@ -254,13 +254,13 @@ if ! test -f /usr/bin/rifle || ! test -f ~/.bash_aliases.d/fzf-rifle.sh && grep 
                     eval "${pac_ins}" python
                 fi
             fi
-            sudo wget-dir /usr/bin/ https://raw.githubusercontent.com/ranger/ranger/master/ranger/ext/rifle.py
+            sudo wget-aria-dir /usr/bin/ https://raw.githubusercontent.com/ranger/ranger/master/ranger/ext/rifle.py
             sudo mv -v /usr/bin/rifle.py /usr/bin/rifle
             sudo chmod +x /usr/bin/rifle
         fi
         if ! test -f ranger/.config/ranger/rifle.conf; then
-            wget-name ~/.config/ranger/rifle.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/.config/ranger/rifle.conf
-            wget-name ~/.bash_aliases.d/fzf-rifle.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/.bash_aliases.d/fzf-rifle.sh
+            wget-aria-name ~/.config/ranger/rifle.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/.config/ranger/rifle.conf
+            wget-aria-name ~/.bash_aliases.d/fzf-rifle.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/.bash_aliases.d/fzf-rifle.sh
         else
             mkdir -p ~/.config/ranger
             cp -fv ranger/.config/ranger/rifle.conf ~/.config/ranger/
@@ -302,7 +302,7 @@ if ! test -f ~/.bash_aliases.d/docker-fzf.sh; then
         else
             . ./checks/check_aliases_dir.sh
         fi
-        wget-name ~/.bash_aliases.d/docker-fzf.sh https://raw.githubusercontent.com/MartinRamm/fzf-docker/master/docker-fzf
+        wget-aria-name ~/.bash_aliases.d/docker-fzf.sh https://raw.githubusercontent.com/MartinRamm/fzf-docker/master/docker-fzf
     fi
 fi
 unset fzf_t

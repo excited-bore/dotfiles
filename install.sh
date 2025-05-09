@@ -57,10 +57,10 @@ if hash aria2c &>/dev/null && test -z "$WGET_ARIA"; then
     readyn -p "Always use 'aria2c' in favour of 'wget' for faster downloads?" wget_ar
     if [[ $wget_ar == 'y' ]]; then
         WGET_ARIA=1
-        alias wget='aria2c'
-        alias wget-quiet='aria2c -q'
-        alias wget-dir='aria2c -d'
-        alias wget-name='aria2c -o'
+        alias wget-aria='aria2c'
+        alias wget-aria-quiet='aria2c -q'
+        alias wget-aria-dir='aria2c -d'
+        alias wget-aria-name='aria2c -o'
     fi
     unset wget_ar
 fi
@@ -120,7 +120,7 @@ SCRIPT_DIR=$(get-script-dir)
 if ! test -f $HOME/.environment; then
     if ! test -f $SCRIPT_DIR/install_envvars.sh; then
         tmp=$(mktemp) && 
-            wget-name $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_envvars.sh
+            wget-aria-name $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_envvars.sh
         . ./$tmp 'n'
     else
         . $SCRIPT_DIR/install_envvars.sh 'n'

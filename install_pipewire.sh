@@ -32,7 +32,7 @@ if ! test -f ~/.bash_completion.d/pipewire; then
          
         pipewire_cmp=pipewire/.bash_completion.d/pipewire
         if ! test -f pipewire/.bash_completion.d/pipewire; then
-            wget-dir $TMPDIR https://raw.githubusercontent.com/excited-bore/dotfiles/main/pipewire/.bash_completion.d/pipewire 
+            wget-aria-dir $TMPDIR https://raw.githubusercontent.com/excited-bore/dotfiles/main/pipewire/.bash_completion.d/pipewire 
             pipewire_cmp=$TMPDIR/pipewire
         fi
         cp -f $pipewire_cmp ~/.bash_completion.d/ 
@@ -221,8 +221,8 @@ file=$SCRIPT_DIR/pipewire/.bash_aliases.d/pipewire.sh
 file1=$SCRIPT_DIR/pipewire/.bash_completion.d/pipewire
 if ! test -f $file || ! test -f $file1; then
     tmpd=$(mktemp -d)
-    wget-dir $tmpd https://raw.githubusercontent.com/excited-bore/dotfiles/main/pipewire/.bash_aliases.d/pipewire.sh
-    wget-dir $tmpd https://raw.githubusercontent.com/excited-bore/dotfiles/main/pipewire/.bash_completions.d/pipewire
+    wget-aria-dir $tmpd https://raw.githubusercontent.com/excited-bore/dotfiles/main/pipewire/.bash_aliases.d/pipewire.sh
+    wget-aria-dir $tmpd https://raw.githubusercontent.com/excited-bore/dotfiles/main/pipewire/.bash_completions.d/pipewire
     file=$tmpd/pipewire.sh
     file1=$tmpd/pipewire
 fi

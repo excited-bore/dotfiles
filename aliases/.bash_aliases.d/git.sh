@@ -65,13 +65,13 @@ if type wget &>/dev/null && type jq &>/dev/null; then
             fi
             if test -d "$dir"; then
                 
-                ! [[ "$(type wget)" =~ 'aria2c' ]] &&
-                    wget -P $dir "$link$res" ||
-                    wget-dir $dir "$link$res"
+                type wget-aria &> /dev/null &&
+                    wget-aria-dir $dir "$link$res" ||
+                    wget -P $dir "$link$res" 
             else
-               ! [[ "$(type wget)" =~ 'aria2c' ]] &&
-                    wget -O $dir "$link$res" ||
-                    wget-name $dir "$link$res"
+                type wget-aria &> /dev/null &&
+                    wget-aria-name $dir "$link$res" ||
+                    wget -O $dir "$link$res" 
             fi
         fi
     }

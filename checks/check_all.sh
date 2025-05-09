@@ -146,7 +146,14 @@ alias wget='wget --https-only'
 alias wget-quiet='wget -q'
 alias wget-dir='wget -P'
 alias wget-name='wget -O'
-alias wget-curl='wget -qO-'
+
+alias curl="curl -fsSL"
+
+if ! hash curl &> /dev/null; then
+    alias wget-curl='wget -qO-'
+else
+    alias wget-curl='curl'
+fi
 
 if [[ $DLSCRIPT ]]; then
     if hash aria2c &>/dev/null && test -z "$WGET_ARIA"; then
@@ -158,16 +165,15 @@ if [[ $DLSCRIPT ]]; then
     fi
 
     if [[ $WGET_ARIA ]]; then
-        alias wget='aria2c'
-        alias wget-quiet='aria2c -q'
-        alias wget-dir='aria2c -d'
-        alias wget-name='aria2c -o'
+        alias wget-aria='aria2c'
+        alias wget-aria-quiet='aria2c -q'
+        alias wget-aria-dir='aria2c -d'
+        alias wget-aria-name='aria2c -o'
     fi
 fi
 
-alias curl="curl -fsSL"
 
-# Less does raw control chars, use color and linenumbers, no sounds/bell and doesn't give you epilepsy
+# Less does raw control chars, use color and linenumbers, no sounds/bell and doesn't trigger your epilepsy
 alias less='less -R --use-color --LINE-NUMBERS --quit-if-one-screen -Q --no-vbell'
 
 

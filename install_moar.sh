@@ -36,7 +36,7 @@ if ! command -v moar &> /dev/null; then
         printf "Package manager unknown or PM doesn't offer moar (f.ex. apt).\n"; 
         readyn -Y "YELLOW" -p "Install moar from github binary or not?" answer
         if [[ "y" == "$answer" ]]; then
-            if ! command -v wget &> /dev/null || ! command -v jq &> /dev/null; then
+            if ! hash wget &> /dev/null || ! hash jq &> /dev/null; then
                 readyn -p "Need wget and jq for this to work (tool to fetch file from the internet and tool to query JSON format). Install wget and jq?"  ins_wget
                 if [[ $ins_wget == 'y' ]]; then
                     eval "${pac_ins} wget jq"
@@ -53,7 +53,7 @@ if ! command -v moar &> /dev/null; then
             moar=$(echo "$latest" | grep --color=never $arch)
             tmpd=$(mktemp -d)
             tag=$(echo $moar | sed "s/moar-\(.*\)-linux.*/\1/g") 
-            wget-dir $tmpd https://github.com/walles/moar/releases/download/$tag/$moar
+            wget-aria-dir $tmpd https://github.com/walles/moar/releases/download/$tag/$moar
             chmod u+x $tmpd/moar*
             sudo mv $tmpd/moar* /usr/bin/moar
             echo "Done!"

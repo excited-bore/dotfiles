@@ -24,7 +24,7 @@ fi
         exit 1 
     fi
     tmpd=$(mktemp -d)     
-    wget-dir $tmpd "$link"
+    wget-aria-dir $tmpd "$link"
     mv $tmpd/QtTinySA.bin $tmpd/QtTinySA  
     if ! groups $USER | grep -qw 'dialout'; then
         echo "$(tput bold && tput setaf 1)User '$USER' is not added to the group 'dialout'$(tput sgr0) which is needed to gain access to serial ports"

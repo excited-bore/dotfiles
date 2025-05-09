@@ -81,7 +81,7 @@ while ! test -z "$file_array"; do
         cat $i
         for j in $(cat "$i" | grep 'download_url' | awk '{print $2}' | cut -d, -f-1 | sed 's,"\(.*\)",\1,g'); do
             if ! test "$j" == "null"; then
-                wget-dir "$current_dir" -- "$j" 
+                wget-aria-dir "$current_dir" -- "$j" 
             fi
         done
         dir_array=($(pop_element "${dir_array[@]}" "$main_dir"))

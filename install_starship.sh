@@ -41,7 +41,7 @@ if [[ "y" == "$strship" ]]; then
         if test -f aliases/.bash_aliases.d/starship.sh; then
             cp -bfv aliases/.bash_aliases.d/starship.sh ~/.bash_aliases.d/
         else
-            wget-name ~/.bash_aliases.d/starship.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/starship.sh
+            wget-aria-name ~/.bash_aliases.d/starship.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/starship.sh
         fi
 
         if type gio &>/dev/null && test -f ~/.bash_aliases.d/starship.sh~; then
@@ -73,7 +73,7 @@ if [[ "y" == "$strship" ]]; then
         if test -f aliases/.bash_aliases.d/starship.sh; then
             sudo cp -fbv  aliases/.bash_aliases.d/starship.sh /root/.bash_aliases.d/
         else
-            sudo -E wget-name /root/.bash_aliases.d/starship.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/starship.sh
+            sudo -E wget-aria-name /root/.bash_aliases.d/starship.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/starship.sh
         fi
         if type gio &>/dev/null && test -f /root/.bash_aliases.d/starship.sh~; then
             sudo gio trash /root/.bash_aliases.d/starship.sh~*

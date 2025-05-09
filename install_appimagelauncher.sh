@@ -57,7 +57,7 @@ if ! type AppImageLauncher &>/dev/null; then
             fi
             file=$(echo "$ltstv" | grep --color=never $code_name"_"$arch)
 
-            wget-dir $tmpd https://github.com/TheAssassin/AppImageLauncher/releases/download/$tag/$file
+            wget-aria-dir $tmpd https://github.com/TheAssassin/AppImageLauncher/releases/download/$tag/$file
             sudo dpkg -i $tmpd/$file
             sudo apt --fix-broken install -y
             sudo systemctl restart systemd-binfmt
