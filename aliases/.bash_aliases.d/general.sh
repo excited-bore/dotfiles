@@ -24,9 +24,13 @@ if type wget &> /dev/null; then
     alias wget='wget --https-only '
 fi
 
+#alias wget='aria2c'
+
 if type curl &> /dev/null; then
    alias curl="curl --proto '=https' --tlsv1.2" 
 fi
+
+alias r="stty sane && source ~/.bashrc"
 
 alias my-folder="sudo chown -R $USER:$USER ./"
 
@@ -45,7 +49,6 @@ alias my-folder="sudo chown -R $USER:$USER ./"
 #elif ! test -z $PROFILE; then
 #    alias r="stty sane && source $PROFILE && source ~/.bashrc"
 #else
-    alias r="stty sane && source ~/.bashrc"
 #fi
 
 #if test -z $PAGER; then

@@ -219,6 +219,17 @@ if [[ $ansr == "y" ]]; then
         fi
     fi
     unset ack_gr
+    
+    if type aria2c &>/dev/null; then
+        readyn -n -p "Set 'aria2c' as alias for 'wget'?" aria_wgt
+        if [[ "$aria_wgt" == "y" ]]; then
+            sed -i 's|.*alias wget="aria2c"|alias wget="aria2c"|g' $genr
+        else
+            sed -i 's|^alias wget="aria2c"|alias wget="wget --https-only"|g' $genr
+        fi
+    fi
+    unset aria_wgt
+
 
     if type ruby &>/dev/null; then
 

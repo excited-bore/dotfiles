@@ -16,7 +16,7 @@ fi
 
 SCRIPT_DIR=$(get-script-dir)
 
-if (! hash zip &>/dev/null || ! hash unzip &>/dev/null) && test -n "$pac_ins"; then
+if ! ( hash zip &>/dev/null || hash unzip &>/dev/null) && test -n "$pac_ins"; then
     printf "${CYAN}zip${normal} and/or ${CYAN}unzip${normal} are not installed \n"
     readyn -p "Install zip and unzip?" nzp_ins
     if [[ $nzp_ins == 'y' ]]; then
@@ -333,7 +333,7 @@ if [[ "y" == "$insflpk" ]]; then
 fi
 unset insflpk
 
-if ! hash snap &>/dev/null; thenhttps://www.youtube.com/watch?v=mzE1ofYjq1s
+if ! hash snap &>/dev/null; then
     printf "%s\n" "${blue}No snap detected. (Independent package manager from Canonical)${normal}"
     readyn -Y "MAGENTA" -p "Install snap?" -n inssnap
     if [[ "y" == "$inssnap" ]]; then

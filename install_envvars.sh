@@ -420,17 +420,19 @@ elif [[ "$envvars" == "y" ]]; then
 
     readyn -p "Set EDITOR and VISUAL?" edtvsl
     if [[ "$edtvsl" == "y" ]]; then
+        editors="" 
+        prmpt="${green}" 
         if type vi &>/dev/null; then
             editors="vi $editors"
             prmpt="$prmpt \tvi = Archaic and non-userfriendly editor\n"
         fi
         if type nano &>/dev/null; then
-            editors="nano"
-            prmpt="${green}\tnano = Default editor - Basic, but userfriendly\n"
+            editors="nano $editors"
+            prmpt="$prmpt \tnano = Default editor - Basic, but userfriendly\n"
         fi
         if type edit &>/dev/null; then
             editors="edit $editors"
-            prmpt="$prmpt \tOne of unix default editors = Archaic editor - not recommended\n"
+            prmpt="$prmpt \tEdit = One of unix default editors = Archaic editor - not recommended\n"
         fi
         if type micro &>/dev/null; then
             editors="micro $editors"
