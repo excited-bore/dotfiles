@@ -49,8 +49,8 @@ if ! type AppImageLauncher &>/dev/null; then
                 eval "$pac_ins jq -y "
             fi
             tmpd=$(mktemp -d)
-            tag=$(curl -sL https://api.github.com/repos/TheAssassin/AppImageLauncher/releases/latest | jq -r ".tag_name")
-            ltstv=$(curl -sL https://api.github.com/repos/TheAssassin/AppImageLauncher/releases/latest | jq -r ".assets" | grep --color=never "name" | sed 's/"name"://g' | tr '"' ' ' | tr ',' ' ' | sed 's/[[:space:]]//g')
+            tag=$(curl https://api.github.com/repos/TheAssassin/AppImageLauncher/releases/latest | jq -r ".tag_name")
+            ltstv=$(curl https://api.github.com/repos/TheAssassin/AppImageLauncher/releases/latest | jq -r ".assets" | grep --color=never "name" | sed 's/"name"://g' | tr '"' ' ' | tr ',' ' ' | sed 's/[[:space:]]//g')
             code_name='bionic'
             if ! test -z && [[ $release < 16.04 ]] || [[ $release == 16.04 ]]; then
                 code_name='xenial'

@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 if ! test -f checks/check_all.sh; then
     if type curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
@@ -14,7 +12,7 @@ fi
 SCRIPT_DIR=$(get-script-dir)
 
 # https://github.com/ajeetdsouza/zoxide?tab=readme-ov-file#installation
-if ! type zoxide &>/dev/null; then
+if ! hash zoxide &>/dev/null; then
     if [[ $machine == 'Mac' ]] && type brew &>/dev/null; then
         brew install zoxide
     elif [[ $distro_base == 'Arch' ]]; then
@@ -32,9 +30,9 @@ if ! type zoxide &>/dev/null; then
     elif type nix-env &>/dev/null; then
         nix-env -iA nixpkgs.zoxide
     else
-        if ! type cargo &>/dev/null; then
+        if ! hash cargo &>/dev/null; then
             if ! test -f install_cargo.sh; then
-                /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)"
+                source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)
             else
                 . ./install_cargo.sh
             fi
