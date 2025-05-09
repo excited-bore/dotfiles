@@ -119,9 +119,9 @@ SCRIPT_DIR=$(get-script-dir)
 
 if ! test -f $HOME/.environment; then
     if ! test -f $SCRIPT_DIR/install_envvars.sh; then
-        tmp=$(mktemp) && 
-            wget-aria-name $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_envvars.sh
-        . ./$tmp 'n'
+        tmp=$(mktemp -d) && 
+            wget-aria-dir $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_envvars.sh
+            . ./$tmp/install_envvars.sh 'n'
     else
         . $SCRIPT_DIR/install_envvars.sh 'n'
     fi
@@ -346,32 +346,18 @@ if ! hash snap &>/dev/null; then
 fi
 unset inssnap
 
-# Nerdfonts
+# Fzf (Fuzzy Finder)
 
-readyn -p "Install a Nerdfont? (Type of font with icons to distinguish filetypes in the terminal + other types of icons)" nstll_nerdfont
+readyn -p "Install fzf? (Fuzzy file/folder finder - keybinding yes for upgraded Ctrl-R/reverse-search, fzf filenames on Ctrl+T and fzf-version of 'cd' on Alt-C + Custom script: Ctrl-f becomes system-wide file opener)" -c "! hash fzf &> /dev/null" findr
 
-if [[ "y" == "$nstll_nerdfont" ]]; then
-    if ! test -f $SCRIPT_DIR/install_nerdfonts.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nerdfonts.sh)
+if [[ "y" == "$findr" ]]; then
+    if ! test -f $SCRIPT_DIR/install_fzf.sh; then
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fzf.sh)
     else
-        . $SCRIPT_DIR/install_nerdfonts.sh
+        . $SCRIPT_DIR/install_fzf.sh
     fi
 fi
-unset nstll_nerdfont
-
-
-# Ack prompt
-
-readyn -c "! hash ack &> /dev/null" -p "Install ack? (A modern replacement for grep - finds lines in shell output)" ack
-
-if [[ "y" == "$ack" ]]; then
-    if ! test -f $SCRIPT_DIR/install_ack.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ack.sh)
-    else
-        . $SCRIPT_DIR/install_ack.sh
-    fi
-fi
-unset ack
+unset findr
 
 # Eza prompt
 
@@ -413,8 +399,21 @@ fi
 
 unset rmp
 
+# Ack prompt
+
+readyn -c "! hash ack &> /dev/null" -p "Install ack? (A modern replacement for grep - finds lines in shell output)" ack
+
+if [[ "y" == "$ack" ]]; then
+    if ! test -f $SCRIPT_DIR/install_ack.sh; then
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ack.sh)
+    else
+        . $SCRIPT_DIR/install_ack.sh
+    fi
+fi
+unset ack
+
+
 # Bash alias completions
-# v
 
 readyn -p "Install bash completions for aliases in ~/.bash_completion.d?" -c "! test -f ~/.bash_completion.d/complete_alias" compl
 if [[ "y" == "$compl" ]]; then
@@ -601,6 +600,19 @@ if [[ "y" == "$nvm" ]]; then
 fi
 unset nvm
 
+# Nerdfonts
+
+readyn -p "Install a Nerdfont? (Type of font with icons to distinguish filetypes in the terminal + other types of icons)" nstll_nerdfont
+
+if [[ "y" == "$nstll_nerdfont" ]]; then
+    if ! test -f $SCRIPT_DIR/install_nerdfonts.sh; then
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nerdfonts.sh)
+    else
+        . $SCRIPT_DIR/install_nerdfonts.sh
+    fi
+fi
+unset nstll_nerdfont
+
 # Kitty (Terminal emulator)
 
 readyn -p "Install Kitty? (Terminal emulator)" -c "! hash kitty &> /dev/null" kittn
@@ -613,19 +625,6 @@ if [[ "y" == "$kittn" ]]; then
     fi
 fi
 unset kittn
-
-# Fzf (Fuzzy Finder)
-
-readyn -p "Install fzf? (Fuzzy file/folder finder - keybinding yes for upgraded Ctrl-R/reverse-search, fzf filenames on Ctrl+T and fzf-version of 'cd' on Alt-C + Custom script: Ctrl-f becomes system-wide file opener)" -c "! hash fzf &> /dev/null" findr
-
-if [[ "y" == "$findr" ]]; then
-    if ! test -f $SCRIPT_DIR/install_fzf.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fzf.sh)
-    else
-        . $SCRIPT_DIR/install_fzf.sh
-    fi
-fi
-unset findr
 
 # Rg (ripgrep)
 

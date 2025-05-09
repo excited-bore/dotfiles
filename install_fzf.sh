@@ -24,43 +24,51 @@ fi
 # Bash completion issue with fzf fix
 # https://github.com/cykerway/complete-alias/issues/46
 
-if ! test -d ~/.fzf || test -f ~/.fzf.bash; then
-    git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-    ~/.fzf/install
-    command rm -v ~/.fzf.bash
-    sed -i '/\[ -f \~\/.fzf.bash \] \&\& source \~\/.fzf.bash/d' ~/.bashrc
-    ! [ -f ~/.bash_completion.d/fzf-completion.bash ] &&
-        ln -s ~/.fzf/shell/completion.bash ~/.bash_completion.d/fzf-completion.bash
-
-    printf "${cyan}Fzf${normal} keybinds:\n\t - Fzf history on Ctrl-R (replaces reverse-search-history)\n\t - Filepath retriever on Ctrl-T\n\t - Directory navigator on Alt-C\n\t - **<TAB> for fzf completion on some commands\n"
-    readyn -p "Use fzf keybinds?" -c "! test -f ~/.keybinds.d/fzf-bindings.bash" fzf_key
-    if [[ "$fzf_key" == 'y' ]]; then
-        test -f ~/.keybinds.d/fzf-bindings.bash && 
-            command rm ~/.keybinds.d/fzf-bindings.bash
-        ln -s ~/.fzf/shell/key-bindings.bash ~/.keybinds.d/fzf-bindings.bash
-    fi
+if ! hash fzf &> /dev/null; then
+    eval "${pac_ins} fzf" 
 fi
 
-if [[ $ENV =~ '.environment' ]]; then
-    sed -i 's|.export PATH=$PATH:$HOME/.fzf/bin|export PATH=$PATH:$HOME/.fzf/bin|g' $ENV
-elif ! grep -q '.fzf/bin' $ENV; then
-    if grep -q '~/.environment' $ENV; then
-        sed -i 's|\(\[ -f ~/.environment\] \&\& source \~/.environment\)|\export PATH=$PATH:$HOME/.fzf/bin\n\n\1\n|g' $ENV
-    elif grep -q '~/.bash_aliases' $ENV; then
-        sed -i 's|\(\[ -f ~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\export PATH=$PATH:$HOME/.fzf/bin/\n\n\1\n|g' $ENV
-        sed -i 's|\(if \[ -f ~/.bash_aliases \]; then\)|export PATH=$PATH:$HOME/.fzf/bin\n\n\1\n|g' $ENV
-    else
-        echo 'export PATH="$PATH:$HOME/.fzf/bin"' >>$ENV
-    fi
-fi
+! [ -f ~/.bash_completion.d/fzf-completion.bash ] &&
+    (cd ~/.bash_completion.d/
+    wget-aria-name fzf-completion.bash https://raw.githubusercontent.com/junegunn/fzf/refs/heads/master/shell/completion.bash)
 
+#if ! test -d ~/.fzf || test -f ~/.fzf.bash; then
+    #git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+    #~/.fzf/install
+    #command rm -v ~/.fzf.bash
+    #sed -i '/\[ -f \~\/.fzf.bash \] \&\& source \~\/.fzf.bash/d' ~/.bashrc
+
+#fi
+
+printf "${cyan}Fzf${normal} keybinds:\n\t - Fzf history on Ctrl-R (replaces reverse-search-history)\n\t - Filepath retriever on Ctrl-T\n\t - Directory navigator on Alt-C\n\t - **<TAB> for fzf completion on some commands\n"
+readyn -p "Use fzf keybinds?" -c "test -f ~/.keybinds.d/fzf-bindings.bash" fzf_key
+if [[ "$fzf_key" == 'y' ]]; then
+    test -f ~/.keybinds.d/fzf-bindings.bash && 
+        rm ~/.keybinds.d/fzf-bindings.bash
+        wget-aria-dir $HOME/.keybinds.d/ https://raw.githubusercontent.com/junegunn/fzf/refs/heads/master/shell/key-bindings.bash
+fi
 
 if test -f ~/.keybinds.d/keybinds.bash && grep -q '^bind -m emacs-standard  '\''"\\C-z": vi-undo'\''' ~/.keybinds.d/keybinds.bash; then
     sed -i 's|\\\C-z|\\\C-o|g' ~/.fzf/shell/key-bindings.bash
 fi
-
 unset fzf_key
-export PATH="$PATH:$HOME/.fzf/bin"
+
+#if [[ $ENV =~ '.environment' ]]; then
+#    sed -i 's|.export PATH=$PATH:$HOME/.fzf/bin|export PATH=$PATH:$HOME/.fzf/bin|g' $ENV
+#elif ! grep -q '.fzf/bin' $ENV; then
+#    if grep -q '~/.environment' $ENV; then
+#        sed -i 's|\(\[ -f ~/.environment\] \&\& source \~/.environment\)|\export PATH=$PATH:$HOME/.fzf/bin\n\n\1\n|g' $ENV
+#    elif grep -q '~/.bash_aliases' $ENV; then
+#        sed -i 's|\(\[ -f ~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\export PATH=$PATH:$HOME/.fzf/bin/\n\n\1\n|g' $ENV
+#        sed -i 's|\(if \[ -f ~/.bash_aliases \]; then\)|export PATH=$PATH:$HOME/.fzf/bin\n\n\1\n|g' $ENV
+#    else
+#        echo 'export PATH="$PATH:$HOME/.fzf/bin"' >>$ENV
+#    fi
+#fi
+
+
+
+#export PATH="$PATH:$HOME/.fzf/bin"
 
 if ! [ -f ~/.fzf_history ]; then
     touch ~/.fzf_history
@@ -150,7 +158,7 @@ if ! type rg &>/dev/null; then
             if test -f fzf/.bash_aliases.d/ripgrep-directory.sh; then
                 cp -fv fzf/.bash_aliases.d/ripgrep-directory.sh ~/.bash_aliases.d/
             else
-                wget-aria-name ~/.bash_aliases.d/ripgrep-directory.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/.bash_aliases.d/ripgrep-directory.sh
+                wget-aria-dir ~/.bash_aliases.d/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/.bash_aliases.d/ripgrep-directory.sh
             fi
         fi
     fi
@@ -243,7 +251,7 @@ fi
 #fi
 #unset comp_key
 
-if ! test -f /usr/bin/rifle || ! test -f ~/.bash_aliases.d/fzf-rifle.sh && grep -q "fzf_rifle" $KEYBIND; then
+if ! test -f /usr/bin/rifle || ! test -f ~/.bash_aliases.d/fzf-rifle.sh && grep -q "fzf_rifle" ~/.keybinds.d/keybinds.bash; then
     readyn -p "Use rifle (file opener from 'ranger') to open found files and dirs with a custom Ctrl-F filesearch shortcut?" fzf_f
     if [[ "$fzf_f" == "y" ]]; then
         if ! type rifle &>/dev/null; then
@@ -259,8 +267,8 @@ if ! test -f /usr/bin/rifle || ! test -f ~/.bash_aliases.d/fzf-rifle.sh && grep 
             sudo chmod +x /usr/bin/rifle
         fi
         if ! test -f ranger/.config/ranger/rifle.conf; then
-            wget-aria-name ~/.config/ranger/rifle.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/.config/ranger/rifle.conf
-            wget-aria-name ~/.bash_aliases.d/fzf-rifle.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/.bash_aliases.d/fzf-rifle.sh
+            wget-aria-dir ~/.config/ranger/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/.config/ranger/rifle.conf
+            wget-aria-dir ~/.bash_aliases.d/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/.bash_aliases.d/fzf-rifle.sh
         else
             mkdir -p ~/.config/ranger
             cp -fv ranger/.config/ranger/rifle.conf ~/.config/ranger/
@@ -302,7 +310,7 @@ if ! test -f ~/.bash_aliases.d/docker-fzf.sh; then
         else
             . ./checks/check_aliases_dir.sh
         fi
-        wget-aria-name ~/.bash_aliases.d/docker-fzf.sh https://raw.githubusercontent.com/MartinRamm/fzf-docker/master/docker-fzf
+        wget-aria-dir ~/.bash_aliases.d/ https://raw.githubusercontent.com/MartinRamm/fzf-docker/master/docker-fzf
     fi
 fi
 unset fzf_t
