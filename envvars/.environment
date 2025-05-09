@@ -101,12 +101,12 @@ export MYGVIMRC=~/.config/nvim/init.vim
 #hash brew &>/dev/null && export HOMEBREW_CASK_OPTS="--no-quarantine"
 
 # SNAP
-export PATH=/bin/snap:/var/lib/snapd/snap/bin:$PATH
+export PATH=$PATH:/bin/snap:/var/lib/snapd/snap/bin
 
 # FLATPAK
 export FLATPAK=$HOME/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share
 export FLATPAK_ENABLE_SDK_EXT=*
-export PATH=$PATH:$HOME/.local/bin/flatpak
+export PATH=$PATH:$HOME/.local/bin
 
 # XDG
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
@@ -193,7 +193,7 @@ export SYSTEMD_LOG_TARGET="auto"
 #export INITIAL_QUERY="${*:-}"
 
 # FZF
-export PATH=$PATH:$HOME/.fzf/bin
+#export PATH=$PATH:$HOME/.fzf/bin
 #export FZF_PREVIEW_COLUMNS=0
 #export FZF_PREVIEW_LINES=0
 

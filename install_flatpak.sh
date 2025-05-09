@@ -37,14 +37,14 @@ if type flatpak &> /dev/null && test -z "$FLATPAK"; then
     readyn -p "Add flatpak dirs to path? (XDG_DATA_DIRS)" flpkvrs 
     if [[ "$flpkvrs" == "y" ]]; then
         if grep -q "FLATPAK" $ENV; then
-            sed -i 's|.export PATH=$PATH:$HOME/.local/bin/flatpak|export PATH=$PATH:$HOME/.local/bin/flatpak|g' $ENV
+            sed -i 's|.export PATH=$PATH:$HOME/.local/bin|export PATH=$PATH:$HOME/.local/bin|g' $ENV
             sed -i 's|.export FLATPAK=|export FLATPAK=$HOME/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share|'  $ENV 
             sed -i 's|.export FLATPAK_ENABLE_SDK_EXT=|export FLATPAK_ENABLE_SDK_EXT=*|' $ENV
             if ! grep -q 'XDG_DATA_DIRS*.*:$FLATPAK' $ENV; then
                 sed -i 's|.export XDG_DATA_DIRS=\(.*\) |export XDG_DATA_DIRS=\1:$FLATPAK|' $ENV
             fi
         else
-            echo 'export PATH=$PATH:$HOME/.local/bin/flatpak' >> $ENV
+            echo 'export PATH=$PATH:$HOME/.local/bin' >> $ENV
             echo 'export XDG_DATA_DIRS=$XDG_DATA_DIRS:$HOME/.local/bin/flatpak:$HOME/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share' >> $ENV
         fi
     fi

@@ -17,9 +17,9 @@ if test -n $pac_ins; then
 fi
 
 if grep -q "SNAP" $ENV; then
-    sed -i 's|#export PATH=\(/bin/snap.*\)|export PATH=\1|g' "$ENV"
+    sed -i 's|#export PATH=$PATH:/bin/snap|export PATH=$PATH:/bin/snap|g' "$ENV"
 else
-    echo "export PATH=/bin/snap:/var/lib/snapd/snap/bin:$PATH" >> "$ENV"
+    echo "export PATH=:\$PATH/bin/snap:/var/lib/snapd/snap/bin" >> "$ENV"
 fi
 
 sudo systemctl daemon-reload
