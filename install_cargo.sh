@@ -16,8 +16,8 @@ DIR=$(get-script-dir)
 #    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 #fi
 
-eval "${pac_rm} cargo rustc"
 if [[ "$distro_base" == "Debian" ]]; then
+    eval "${pac_rm} cargo rustc"
     eval "${pac_ins} curl build-essential gcc make"
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
     ! grep -q 'source ~/.cargo/env' $ENV &&
@@ -27,9 +27,9 @@ if [[ "$distro_base" == "Debian" ]]; then
     source $ENV 
     rustc -V
 elif [[ "$distro_base" == "Arch" ]]; then
-    eval "${pac_ins}" rust
+    eval "${pac_ins} rust"
 elif [[ "$distro" == 'Fedora' ]]; then
-    eval "${pac_ins}" rust
+    eval "${pac_ins} rust"
 fi
 
 if ! grep -q "# RUST" "$ENV"; then

@@ -42,14 +42,28 @@ if hash pay-respects &> /dev/null; then
         printf "Using 'f' as alias\n"
         ansr='f'
     fi
-    if test -n $ansr; then
+    if test -n "$ansr"; then
         if test -f ~/.bashrc; then
-            sed -i '/eval \"\$(pay-respects bash --alias/d' ~/.bashrc 
-            printf "eval \"\$(pay-respects bash --alias $ansr)\"\n" >>~/.bashrc
+            sed -i '/eval \"\$(pay-respects bash/d' ~/.bashrc 
+            if [[ "$ansr" == 'f' ]]; then
+                printf "eval \"\$(pay-respects bash)\"\n" >>~/.bashrc
+            else
+                printf "eval \"\$(pay-respects bash --alias $ansr)\"\n" >>~/.bashrc
+            fi
         fi
+        
+        # Bug in default manjaro bashrc 
+        if grep -qE "^xhost" ~/.bashrc; then
+            sed -i 's/xhost/hash xhost \&> \/dev\/null \&\& xhost/g' ~/.bashrc
+        fi
+        
         if test -f ~/.zshrc; then
-            sed -i '/eval \"\$(pay-respects zsh --alias/d' ~/.zshrc
-            printf "eval \"\$(pay-respects zsh --alias $ansr)\"\n" >>~/.zshrc
+            sed -i '/eval \"\$(pay-respects zsh/d' ~/.zshrc
+            if [[ "$ansr" == 'f' ]]; then
+                printf "eval \"\$(pay-respects zsh)\"\n" >>~/.bashrc
+            else
+                printf "eval \"\$(pay-respects zsh --alias $ansr)\"\n" >>~/.zshrc
+            fi
         fi
 
         unset ansr
