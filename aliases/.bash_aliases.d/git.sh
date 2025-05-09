@@ -64,9 +64,14 @@ if type wget &>/dev/null && type jq &>/dev/null; then
                 reade -Q 'GREEN' -i "$HOME/Downloads" -p "Download Folder?: " -e dir
             fi
             if test -d "$dir"; then
-                wget -P $dir "$link$res"
+                
+                ! [[ "$(type wget)" =~ 'aria2c' ]] &&
+                    wget -P $dir "$link$res" ||
+                    wget-dir $dir "$link$res"
             else
-                wget -O $dir "$link$res"
+               ! [[ "$(type wget)" =~ 'aria2c' ]] &&
+                    wget -O $dir "$link$res" ||
+                    wget-name $dir "$link$res"
             fi
         fi
     }
