@@ -1,4 +1,5 @@
 DLSCRIPT=1
+SYSTEM_UPDATED='TRUE'
 
 if ! hash ack &> /dev/null; then
     if ! test -f install_ack.sh; then
@@ -15,7 +16,7 @@ else
 fi 
 
 if ! type h &> /dev/null; then
-    sudo -E wget-aria-dir ~/.bash_aliases.d/ https://raw.githubusercontent.com/paoloantinori/hhighlighter/refs/heads/master/h.sh
+    sudo wget-aria-dir ~/.bash_aliases.d/ https://raw.githubusercontent.com/paoloantinori/hhighlighter/refs/heads/master/h.sh
     #printf '\nh "$@\n\"' | sudo tee -a /usr/bin/h &> /dev/null 
     #sudo chmod 0755 /usr/bin/h 
 fi

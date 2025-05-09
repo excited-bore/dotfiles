@@ -74,7 +74,7 @@ function readyn(){
     while :; do
         case $1 in
             -h|-\?|--help|'')
-                printf "${bold}READYN${normal} [ -h/--help ] [ -v/--version ]  [ -y/--yes [ PREFILL ] ]  [ -n/--no [ CONDITION ] ]  [ -p/--prompt PROMPTSTRING ] [ -Q/--colour COLOURSTRING ] [ -r / --read-no-style [ NOCOMP ] ]  [ -b/--break-chars BREAK-CHARS ]  returnvar\n
+                printf "${bold}READYN${normal} [ -h/--help ] [ -v/--version ]  [ -y/--yes [ PREFILL ] ]  [ -n/--no [ CONDITION ] ]  [ -p/--prompt PROMPTSTRING ] [ -Q/--colour COLOURSTRING ] [ -r / --read-no-style [ NOCOMP ] ]  [ -b/--break-chars BREAK-CHARS ]  returnvar
         
          readyn version $VERSION
                

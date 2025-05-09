@@ -960,4 +960,12 @@ if [[ "$allis" == 'y' ]]; then
     [ -n "$ZSH_VERSION" ] && set -o posixaliases
     alias | $PAGER
 fi
-unset allis
+
+readyn -p 'List all functions?' fncts
+if [[ "$fncts" == 'y' ]]; then
+    [ -n "$BASH_VERSION" ] && set -o posix
+    [ -n "$ZSH_VERSION" ] && set -o posixaliases
+    declare -f | $PAGER
+fi
+
+unset fncts allis

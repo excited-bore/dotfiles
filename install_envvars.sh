@@ -432,7 +432,7 @@ elif [[ "$envvars" == "y" ]]; then
         fi
         if type edit &>/dev/null; then
             editors="edit $editors"
-            prmpt="$prmpt \tEdit = One of unix default editors = Archaic editor - not recommended\n"
+            prmpt="$prmpt \tedit = One of unix default editors = Archaic editor - not recommended\n"
         fi
         if type micro &>/dev/null; then
             editors="micro $editors"
