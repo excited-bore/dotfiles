@@ -201,7 +201,7 @@ if [[ $ansr == "y" ]]; then
     fi
 
     if type bat &>/dev/null; then
-        readyn -n -p "Set 'cat' as alias for 'bat'?" cat
+        readyn -n -p "Set 'bat' as alias for 'cat'?" cat
         if [[ "$cat" == "y" ]]; then
             sed -i 's|.*alias cat="bat"|alias cat="bat"|g' $genr
         else

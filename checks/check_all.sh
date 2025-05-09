@@ -124,10 +124,10 @@ alias get-script-dir='cd "$( dirname "$-1" )" && pwd'
 [[ "$(type cp)" =~ 'aliased' ]] &&
     unalias cp 
 alias cp='cp -fv'
-if hash xcp &> /dev/null; then
+if hash xcp &> /dev/null && ! [[ "$(type cp)" =~ 'xcp -v' ]]; then
     echo "Since you have xcp installed, this next $(tput setaf 1)sudo$(tput sgr0) will check whether it can be used for the script (if it's sudo executable, it is)"
     sudo bash -c "hash xcp" &&
-        alias cp='xcp -v'
+        alias cp='xcp'
 fi
 
 # Make sure mv moves forceably (without asking confirmation when overwriting) and verbosely
@@ -143,14 +143,18 @@ alias rm='rm -rfv'
 # Make sure sudo isn't aliased to something weird
 command -v sudo &>/dev/null && [[ "$(type sudo)" =~ 'aliased' ]] &&
     unalias sudo
+# Keep aliases when using sudo
+alias sudo="sudo "
 
 # Wget only uses https - encrypted http
 command -v wget &>/dev/null && [[ "$(type wget)" =~ 'aliased' ]] &&
     unalias wget 
 alias wget='wget --https-only'
-alias wget-quiet='wget -q'
-alias wget-dir='wget -P'
-alias wget-name='wget -O'
+
+alias wget-aria='wget'
+alias wget-aria-quiet='wget -q'
+alias wget-aria-dir='wget -P'
+alias wget-aria-name='wget -O'
 
 alias curl="curl -fsSL --proto '=https' --tlsv1.2"
 

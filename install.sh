@@ -48,7 +48,7 @@ if ! hash aria2c &>/dev/null && test -n "$pac_ins"; then
     printf "${CYAN}aria2c${normal} is not installed \n"
     readyn -p "Install aria2c (for fetching files from internet - multithreaded versus singlethreaded wget -> faster downloads)?" ins_ar
     if [[ $ins_ar == 'y' ]]; then
-        eval "${pac_ins} aria2c" 
+        eval "${pac_ins} aria2" 
     fi
     unset ins_aria2c
 fi
@@ -348,7 +348,7 @@ unset inssnap
 
 # Fzf (Fuzzy Finder)
 
-readyn -p "Install fzf? (Fuzzy file/folder finder - keybinding yes for upgraded Ctrl-R/reverse-search, fzf filenames on Ctrl+T and fzf-version of 'cd' on Alt-C + Custom script: Ctrl-f becomes system-wide file opener)" -c "! hash fzf &> /dev/null" findr
+readyn -p "Install fzf? (Fuzzy file/folder finder - replaces Ctrl-R/reverse-search, binds fzf search files on Ctrl+T and fuzzy search directories on Alt-C + Custom script: Ctrl-f becomes system-wide file opener)" -c "! hash fzf &> /dev/null" findr
 
 if [[ "y" == "$findr" ]]; then
     if ! test -f $SCRIPT_DIR/install_fzf.sh; then
