@@ -148,19 +148,21 @@ alias wget-dir='wget -P'
 alias wget-name='wget -O'
 alias wget-curl='wget -qO-'
 
-if hash aria2c &>/dev/null && test -z "$WGET_ARIA"; then
-    readyn -p "Always use 'aria2c' in favour of 'wget' for faster downloads?" wget_ar
-    if [[ $wget_ar == 'y' ]]; then
-        WGET_ARIA=1 
+if [[ $DLSCRIPT ]]; then
+    if hash aria2c &>/dev/null && test -z "$WGET_ARIA"; then
+        readyn -p "Always use 'aria2c' in favour of 'wget' for faster downloads?" wget_ar
+        if [[ $wget_ar == 'y' ]]; then
+            WGET_ARIA=1 
+        fi
+        unset wget_ar
     fi
-    unset wget_ar
-fi
 
-if [[ $WGET_ARIA ]]; then
-    alias wget='aria2c'
-    alias wget-quiet='aria2c -q'
-    alias wget-dir='aria2c -d'
-    alias wget-name='aria2c -o'
+    if [[ $WGET_ARIA ]]; then
+        alias wget='aria2c'
+        alias wget-quiet='aria2c -q'
+        alias wget-dir='aria2c -d'
+        alias wget-name='aria2c -o'
+    fi
 fi
 
 alias curl="curl -fsSL"

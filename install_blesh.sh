@@ -1,4 +1,4 @@
-#!/bin/bash
+DLSCRIPT=1
 
 if ! test -f ~/.local/share/blesh; then
     tmpd=$(mktemp -d) 

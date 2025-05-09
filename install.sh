@@ -1,6 +1,5 @@
-#!/bin/bash
-
-export INSTALL=1
+INSTALL=1
+DLSCRIPT=1
 
 unalias curl &> /dev/null
 unalias wget &> /dev/null

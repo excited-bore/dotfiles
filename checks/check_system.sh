@@ -1,5 +1,3 @@
-#!/bin/bash
-
 if ! type reade &>/dev/null; then
     test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh && source aliases/.bash_aliases.d/00-rlwrap_scripts.sh ||
     test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh && source ~/.bash_aliases.d/00-rlwrap_scripts.sh

@@ -1,5 +1,4 @@
-# !/bin/bash
-
+DLSCRIPT=1
 
 if ! test -f checks/check_all.sh; then
     if type curl &> /dev/null; then

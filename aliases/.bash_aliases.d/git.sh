@@ -6,7 +6,7 @@ fi
 if type wget &>/dev/null && type jq &>/dev/null; then
 
     function get-latest-releases-github() {
-
+        
         local gtb_link new_url ltstv versn link res dir quer
 
         if test -z "$1"; then

@@ -17,16 +17,16 @@ if ! type wihotspot &> /dev/null; then
         sudo add-apt-repository ppa:lakinduakash/lwh
         sudo apt update
         eval "$pac_ins linux-wifi-hotspot"
-    elif [[ $distro == "Arch" ]]; then
+    elif [[ $distro_base == "Arch" ]]; then
         if ! test -z "$AUR_ins"; then
             eval "$AUR_ins" linux-wifi-hotspot
         else
             echo "Install linux-wifi-hotspot from the AUR. If you have an AUR Helper that is not an AUR wrapper, try installing it manually"
         fi
-    elif [[ $distro == "Manjaro" ]]; then
-        pamac install linux-wifi-hotspot
+    if [[ $distro == "Manjaro" ]]; then
         sudo aa-complain -d /etc/apparmor.d/ dnsmasq
-    else
+    fi 
+    #else
     #    if test "$distro" == "Fedora" || test "$distro" == "CentOS" || test "$distro" == "RHEL"; then
     #    git clone https://github.com/lakinduakash/linux-wifi-hotspot
     #    cd linux-wifi-hotspot
@@ -34,7 +34,7 @@ if ! type wihotspot &> /dev/null; then
     #    make
 
     #    sudo make install
-    #fi
+    fi
 fi
 
 wihotspot

@@ -1,6 +1,6 @@
-#!/bin/bash
+DLSCRIPT=1
 
-hash jq &>/dev/null &&
+hash jq &>/dev/null && hash unzip &>/dev/null &&
     SYSTEM_UPDATED='TRUE'
 
 if ! test -f checks/check_all.sh; then

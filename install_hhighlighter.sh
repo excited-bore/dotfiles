@@ -1,4 +1,4 @@
-#!/bin/bash
+DLSCRIPT=1
 
 if ! hash ack &> /dev/null; then
     if ! test -f install_ack.sh; then

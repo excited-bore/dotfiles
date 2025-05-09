@@ -1,4 +1,4 @@
-#!/bin/bash
+DLSCRIPT=1
 
 #https://bbs.archlinux.org/viewtopic.php?id=271850
 if ! test -f checks/check_all.sh; then

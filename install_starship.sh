@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+DLSCRIPT=1
 
 if ! test -f checks/check_all.sh; then 
     if command -v curl &> /dev/null; then 
@@ -10,7 +10,7 @@ else
     . ./checks/check_all.sh 
 fi
 
-SCRIPT_DIR=$(pwd)
+SCRIPT_DIR=$(get-script-dir)
 
 # https://unix.stackexchange.com/questions/690233/piping-yes-when-running-scripts-from-curl
 
