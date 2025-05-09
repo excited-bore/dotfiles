@@ -152,7 +152,7 @@ alias wget-quiet='wget -q'
 alias wget-dir='wget -P'
 alias wget-name='wget -O'
 
-alias curl="curl -fsSL"
+alias curl="curl -fsSL --proto '=https' --tlsv1.2"
 
 if ! hash curl &> /dev/null; then
     alias wget-curl='wget -qO-'
