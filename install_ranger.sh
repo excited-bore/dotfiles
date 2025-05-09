@@ -54,7 +54,7 @@ fi
 
 if [ -d ~/.bash_aliases.d/ ]; then
     if test -f ranger/.bash_aliases.d/ranger.sh; then
-        cp -bfv ranger/.bash_aliases.d/ranger.sh ~/.bash_aliases.d/ranger.sh
+        cp ranger/.bash_aliases.d/ranger.sh ~/.bash_aliases.d/ranger.sh
     else
         curl -o ~/.bash_aliases.d/ranger.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/.bash_aliases.d/ranger.sh
     fi
@@ -79,7 +79,7 @@ rangr_cnf() {
         mkdir -p ~/.config/ranger/
     fi
 
-    cp -bfv -t ~/.config/ranger $dir/rc.conf $dir/rifle.conf $dir/scope.sh
+    cp -t ~/.config/ranger $dir/rc.conf $dir/rifle.conf $dir/scope.sh
     if type gio &>/dev/null; then
         if test -f ~/.config/ranger/rc.conf~; then
             gio trash ~/.config/ranger/rc.conf~
@@ -95,7 +95,7 @@ rangr_cnf() {
 yes-edit-no -f rangr_cnf -g "$dir/rc.conf $dir/rifle.conf $dir/scope.sh" -p "Install predefined configuration (rc.conf,rifle.conf and scope.sh at ~/.config/ranger/)? " -e
 
 readyn -p "F2 for Ranger?" rf2
-if [[ -z "$rf2" ]] || [[ "y" == "$rf2" ]]; then
+if [[ "y" == "$rf2" ]]; then
     binds=~/.bashrc
     if [ -f ~/.keybinds.d/keybinds.bash ]; then
         binds=~/.keybinds.d/keybinds.bash

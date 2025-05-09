@@ -34,7 +34,7 @@ if ! type neofetch &>/dev/null && ! type fastfetch &>/dev/null && ! type screenF
 
             function neofetch_conf() {
                 mkdir -p ~/.config/neofetch
-                cp -fbv $file ~/.config/neofetch/
+                cp $file ~/.config/neofetch/
             }
             yes-edit-no -f neofetch_conf -g "$file" -p "Install neofetch config.conf at $HOME/.config/neofetch/?"
             neofetch

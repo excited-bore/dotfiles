@@ -22,7 +22,7 @@ fi
 
 if ! test -f ~/.ripgreprc; then 
     function ripgrep_conf(){
-        cp -fbv $file $HOME 
+        cp $file $HOME 
         if grep -q 'export RIPGREP_CONFIG_PATH' $ENV; then
             sed -i 's|#export RIPGREP_CONFIG_PATH=|export RIPGREP_CONFIG_PATH=|g' $ENV
             sed -i 's|export RIPGREP_CONFIG_PATH=.*|export RIPGREP_CONFIG_PATH=$HOME/.ripgreprc|g' $ENV
@@ -36,7 +36,7 @@ fi
 echo "Next $(tput setaf 1)sudo$(tput sgr0) will check whether root dir exists and whether it contains a .ripgreprc config file"
 if sudo test -d /root && ! sudo test -f /root/.ripgreprc; then 
     function ripgrep_conf_r(){
-        sudo cp -bfv $file /root 
+        sudo cp $file /root 
         if sudo grep -q 'export RIPGREP_CONFIG_PATH' $ENV_R; then
             sudo sed -i 's|#export RIPGREP_CONFIG_PATH=|export RIPGREP_CONFIG_PATH=|g' $ENV_R
             sudo sed -i 's|export RIPGREP_CONFIG_PATH=.*|export RIPGREP_CONFIG_PATH=$HOME/.ripgreprc|g' $ENV_R

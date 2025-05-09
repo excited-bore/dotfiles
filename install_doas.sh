@@ -18,18 +18,18 @@ elif [[ $distro_base == "Debian" ]]; then
 fi
 
 sed -i "s/user/$USER/g" doas/doas.conf
-sudo cp -f doas/doas.conf /etc/doas.conf
+sudo cp doas/doas.conf /etc/doas.conf
 
 #./install_polkit_wheel.sh
 
 readyn -p "Install doas.sh? (~/.bash_aliases.d/doas.sh)" doas
-if [ -z $doas ]; then 
+if [[ $doas == 'y' ]]; then 
     if ! [ -d ~/.bash_aliases.d/ ]; then
         mkdir ~/.bash_aliases.d/
     fi
-    cp -f doas/doas.sh ~/.bash_aliases.d/doas.sh
+    cp doas/doas.sh ~/.bash_aliases.d/doas.sh
     readyn -p "Install doas.sh globally? (/root/.bash_aliases.d/doas.sh" gdoas
-    if [ -z $gdoas ]; then
+    if [[ $gdoas == 'y' ]]; then
         if ! sudo test -d ~/.bash_aliases.d/ ; then
             sudo mkdir /root/.bash_aliases.d/
         fi
@@ -37,7 +37,7 @@ if [ -z $doas ]; then
 
             printf "\nif [[ -d /root/.bash_aliases.d/ ]]; then\n  for alias in /root/.bash_aliases.d/*.sh; do\n      . \"\$alias\" \n  done\nfi" | sudo tee -a /root/.bashrc > /dev/null
         fi
-        sudo cp -f doas/doas.sh /root/.bash_aliases.d/doas.sh
+        sudo cp doas/doas.sh /root/.bash_aliases.d/doas.sh
     fi
 fi
 

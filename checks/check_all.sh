@@ -124,6 +124,11 @@ alias get-script-dir='cd "$( dirname "$-1" )" && pwd'
 [[ "$(type cp)" =~ 'aliased' ]] &&
     unalias cp 
 alias cp='cp -fv'
+if hash xcp &> /dev/null; then
+    echo "Since you have xcp installed, this next $(tput setaf 1)sudo$(tput sgr0) will check whether it can be used for the script (if it's sudo executable, it is)"
+    sudo bash -c "hash xcp" &&
+        alias cp='xcp -v'
+fi
 
 # Make sure mv moves forceably (without asking confirmation when overwriting) and verbosely
 [[ "$(type mv)" =~ 'aliased' ]] && 

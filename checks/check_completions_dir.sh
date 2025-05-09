@@ -8,7 +8,7 @@ if [ ! -f ~/.bash_completion ]; then
     if ! test -f completions/.bash_completion; then
         curl -o ~/.bash_completion https://raw.githubusercontent.com/excited-bore/dotfiles/main/completions/.bash_completion
     else
-        cp -fv completions/.bash_completion ~/
+        cp completions/.bash_completion ~/
     fi 
 fi
 
@@ -27,7 +27,7 @@ if ! sudo test -f /root/.bash_completion; then
         if ! test -f completions/.bash_completion; then
             sudo curl -o /root/.bash_completion https://raw.githubusercontent.com/excited-bore/dotfiles/main/completions/.bash_completion 
         else
-            sudo cp -fv completions/.bash_completion /root/
+            sudo cp completions/.bash_completion /root/
         fi 
     fi
     if ! sudo test -d /root/.bash_completion.d/; then

@@ -449,10 +449,10 @@ if ! test -f $xterm; then
 fi
 
 xresources_r() {
-    sudo cp -fv $xterm /root/.Xresources
+    sudo cp $xterm /root/.Xresources
 }
 xresources() {
-    cp -fv $xterm ~/.Xresources
+    cp $xterm ~/.Xresources
     yes-edit-no -f xresources_r -g "$xterm" -p "Install .Xresources at /root/?" -e -n -Q "RED"
 }
 yes-edit-no -f xresources -g "$xterm" -p "Install .Xresources at ~/? (Xterm configuration)" -e -Q "YELLOW"

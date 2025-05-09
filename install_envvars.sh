@@ -21,7 +21,7 @@ fi
 #fi
 
 environment-variables_r() {
-    sudo cp -fv $pathvr /root/.environment
+    sudo cp $pathvr /root/.environment
     if ! sudo test -f /root/.profile; then
         sudo touch /root/.profile
     fi
@@ -134,7 +134,7 @@ environment-variables_r() {
 }
 
 environment-variables() {
-    cp -fv $pathvr ~/.environment
+    cp $pathvr ~/.environment
     if ! test -f ~/.profile; then
         touch ~/.profile
     fi

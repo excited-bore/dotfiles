@@ -89,7 +89,7 @@ if test $machine == 'Windows'; then
                 install $tmpd/apt-cyg /bin
             elif test $win_bash_shell == 'Git'; then
                 #/c/cygwin$ARCH_WIN/bin/bash.exe "install $tmpd/apt-cyg /bin"
-                cp -v $tmp/apt-cyg $cyg_home 
+                cp $tmp/apt-cyg $cyg_home 
                 printf "Open up Cygwin terminal and type 'install apt-cyg /bin' to finish installing apt-cyg\n"
             else
                 printf "Dont know how to install using this shell\nFile downloaded at '$tmpd/apt-cyg' and should install using 'C:\cygwin64\bin\bash.exe install $tmpd/apt-cyg'\n"

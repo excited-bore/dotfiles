@@ -39,7 +39,7 @@ if [[ "y" == "$strship" ]]; then
     #fi
     if [ -d ~/.bash_aliases.d/ ]; then
         if test -f aliases/.bash_aliases.d/starship.sh; then
-            cp -bfv aliases/.bash_aliases.d/starship.sh ~/.bash_aliases.d/
+            cp aliases/.bash_aliases.d/starship.sh ~/.bash_aliases.d/
         else
             wget-aria-dir ~/.bash_aliases.d/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/starship.sh
         fi
@@ -71,7 +71,7 @@ if [[ "y" == "$strship" ]]; then
     starship completions bash | sudo tee -a /root/.bash_completion.d/starship &>/dev/null
     if [ -d /root/.bash_aliases.d/ ]; then
         if test -f aliases/.bash_aliases.d/starship.sh; then
-            sudo cp -fbv  aliases/.bash_aliases.d/starship.sh /root/.bash_aliases.d/
+            sudo cp aliases/.bash_aliases.d/starship.sh /root/.bash_aliases.d/
         else
             sudo -E wget-aria-dir /root/.bash_aliases.d/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/starship.sh
         fi

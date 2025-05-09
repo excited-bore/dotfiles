@@ -67,7 +67,7 @@ sed -i 's|^set -g @continuum-restore '\''on'\''|#set -g @continuum-restore '\''o
 
 yes-edit-no -p "Install tmux.conf? (tmux conf at ~/.tmux.conf)" -g '$file' tmuxc
 if [[ "$tmuxc" == "y" ]]; then
-    cp -bfv $file ~/
+    cp $file ~/
     if test -f $file~ && type gio &>/dev/null; then
         gio trash $file~
     fi
@@ -202,7 +202,7 @@ unset tmuxx
 readyn -Y 'YELLOW' -p "Install tmux completions at root?" tmuux
 if [[ "$tmuux" == "y" ]]; then
     if ! [ -e /root/.bash_completion.d/tmux ]; then
-        curl -s https://raw.githubusercontent.com/imomaliev/tmux-bash-completion/master/completions/tmux | sudo tee -a /root/.bash_completion.d/tmux &>/dev/null
+        curl https://raw.githubusercontent.com/imomaliev/tmux-bash-completion/master/completions/tmux | sudo tee -a /root/.bash_completion.d/tmux &>/dev/null
     fi
 fi
 unset tmuux
@@ -210,9 +210,9 @@ unset tmuux
 readyn -p "Install tmux.sh at ~/.bash_aliases.d/? (tmux aliases)" tmuxx
 if [[ "$tmuxx" == "y" ]]; then
     if test -f tmux/.bash_aliases.d/tmux.sh; then
-        cp -bfv tmux/.bash_aliases.d/tmux.sh ~/.bash_aliases.d/
+        cp tmux/.bash_aliases.d/tmux.sh ~/.bash_aliases.d/
     else
-        curl -s -o ~/.bash_aliases.d/tmux.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/tmux/.bash_aliases.d/tmux.sh
+        curl -o ~/.bash_aliases.d/tmux.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/tmux/.bash_aliases.d/tmux.sh
     fi
     if type gio &>/dev/null && test -f ~/.bash_aliases.d/tmux.sh~; then
         gio trash ~/.bash_aliases.d/tmux.sh~

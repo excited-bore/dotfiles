@@ -254,8 +254,8 @@ if [[ $ktty_cnf == 'y' ]]; then
 
     function kitty_conf() {
         mkdir -p ~/.config/kitty
-        cp -bvf $dir/kitty.conf ~/.config/kitty/kitty.conf
-        cp -bvf $dir/ssh.conf ~/.config/kitty/ssh.conf
+        cp $dir/kitty.conf ~/.config/kitty/kitty.conf
+        cp $dir/ssh.conf ~/.config/kitty/ssh.conf
         if type gio &>/dev/null && [ -f ~/.config/kitty/kitty.conf~ ]; then
             gio trash ~/.config/kitty/kitty.conf~
         fi
@@ -274,7 +274,7 @@ if [[ "y" == "$kittn" ]]; then
     else
         . ./checks/check_aliases_dir.sh
     fi
-    cp -bvf $file ~/.bash_aliases.d/kitty.sh
+    cp $file ~/.bash_aliases.d/kitty.sh
     if type gio &>/dev/null && [ -f ~/.bash_aliases.d/kitty.sh~ ]; then
         gio trash ~/.bash_aliases.d/kitty.sh~
     fi

@@ -43,7 +43,7 @@ readyn -p 'Configure lazygit?' conflazy
 if [[ 'y' == $conflazy ]]; then
     function cp_lazy_conf() {
         mkdir -p ~/.config/lazygit/
-        cp -f $file ~/.config/lazygit/config.yml.example
+        cp $file ~/.config/lazygit/config.yml.example
     }
     yes-edit-no -g "$file" -p 'Copy an example lazygit yaml config file into ~/.config/lazygit/?' -f cp_lazy_conf -c "test -f ~/.config/lazygit/config.yml.example || ! (test -f ~/.config/lazygit/config.yml.example && test -n $(diff ~/.config/lazygit/config.yml.example $file 2>/dev/null)) &> /dev/null"
     if ! test -f install_differ_pager.sh; then

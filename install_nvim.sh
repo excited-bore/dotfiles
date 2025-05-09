@@ -321,7 +321,7 @@ function instvim_r() {
     if ! sudo test -d /root/.config/nvim/; then
         sudo mkdir -p /root/.config/nvim/
     fi
-    sudo cp -bfv $dir/* /root/.config/nvim/
+    sudo cp $dir/* /root/.config/nvim/
     if sudo test -n "$(ls /root/.config/nvim/*~ &>/dev/null)"; then
         sudo bash -c 'gio trash /root/.config/nvim/*~'
     fi
@@ -372,7 +372,7 @@ function instvim() {
         mkdir ~/.config/nvim/
     fi
 
-    cp -bfv $dir/* ~/.config/nvim/
+    cp $dir/* ~/.config/nvim/
 
     if test -n "$(ls ~/.config/nvim/*~ &>/dev/null)"; then
         gio trash ~/.config/nvim/*~
@@ -442,13 +442,13 @@ if ! test -d vim/.bash_aliases.d/ || ! test -d vim/.bash_completion.d/; then
 fi
 
 vimsh_r() {
-    sudo cp -fv $file /root/.bash_aliases.d/
-    sudo cp -fv $file1 /root/.bash_completion.d/
+    sudo cp $file /root/.bash_aliases.d/
+    sudo cp $file1 /root/.bash_completion.d/
 }
 
 vimsh() {
-    cp -fv $file ~/.bash_aliases.d/
-    cp -fv $file1 ~/.bash_completion.d/
+    cp $file ~/.bash_aliases.d/
+    cp $file1 ~/.bash_completion.d/
     yes-edit-no -f vimsh_r -g "$file $file1" -p "Install vim aliases at /root/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)?"
 }
 yes-edit-no -f vimsh -g "$file $file1" -p "Install vim aliases at ~/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)?"

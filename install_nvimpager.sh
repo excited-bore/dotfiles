@@ -39,7 +39,7 @@ if [[ "$conf" == "y" ]]; then
     if ! test -d ~/.config/nvimpager; then
         mkdir ~/.config/nvimpager
     fi
-    cp -fv ~/.config/nvim/* ~/.config/nvimpager/
+    cp ~/.config/nvim/* ~/.config/nvimpager/
 fi
 
 readyn -p "Set nvimpager as default pager for $USER?" moar_usr

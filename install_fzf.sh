@@ -156,7 +156,7 @@ if ! type rg &>/dev/null; then
         readyn -p "Add shortcut for ripgrep files in dir? (Ctrl-g)" rpgrpdir
         if [[ "$rpgrpdir" == "y" ]]; then
             if test -f fzf/.bash_aliases.d/ripgrep-directory.sh; then
-                cp -fv fzf/.bash_aliases.d/ripgrep-directory.sh ~/.bash_aliases.d/
+                cp fzf/.bash_aliases.d/ripgrep-directory.sh ~/.bash_aliases.d/
             else
                 wget-aria-dir ~/.bash_aliases.d/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/.bash_aliases.d/ripgrep-directory.sh
             fi
@@ -271,8 +271,8 @@ if ! test -f /usr/bin/rifle || ! test -f ~/.bash_aliases.d/fzf-rifle.sh && grep 
             wget-aria-dir ~/.bash_aliases.d/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/.bash_aliases.d/fzf-rifle.sh
         else
             mkdir -p ~/.config/ranger
-            cp -fv ranger/.config/ranger/rifle.conf ~/.config/ranger/
-            cp -fv fzf/.bash_aliases.d/fzf-rifle.sh ~/.bash_aliases.d/
+            cp ranger/.config/ranger/rifle.conf ~/.config/ranger/
+            cp fzf/.bash_aliases.d/fzf-rifle.sh ~/.bash_aliases.d/
         fi
         sed -i 's/\\\C-f//g' ~/.fzf/shell/key-bindings.bash
         sed -i "s|\(bind -m vi-insert '\"\\\C-t\":.*\)|\1\n\n    # CTRL-F - Search with previews and other handy additions\n    bind -m emacs-standard '\"\\\C-f\": \"\\\C-t\"'\n    bind -m vi-command '\"\\\C-f\": \"\\\C-o\\\C-f\\\C-o\"'\n    bind -m vi-insert '\"\\\C-f\": \"\\\C-o\\\C-f\\\C-o\"'|g" ~/.fzf/shell/key-bindings.bash

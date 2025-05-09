@@ -35,7 +35,7 @@ if ! test -f ~/.bash_completion.d/pipewire; then
             wget-aria-dir $TMPDIR https://raw.githubusercontent.com/excited-bore/dotfiles/main/pipewire/.bash_completion.d/pipewire 
             pipewire_cmp=$TMPDIR/pipewire
         fi
-        cp -f $pipewire_cmp ~/.bash_completion.d/ 
+        cp $pipewire_cmp ~/.bash_completion.d/ 
     fi
 fi
 
@@ -92,7 +92,7 @@ if type systemctl &> /dev/null && ! test -f /etc/systemd/user/pipewire-load-swit
     #            sudo mkdir -p /etc/pipewire/pipewire-pulse.conf.d/
     #        fi
     #        echo "Next $(tput setaf 1)sudo$(tput sgr0) will move $conf to /etc/pipewire/pipewire-pulse.conf.d/"
-    #        sudo cp -vf $conf /etc/pipewire/pipewire-pulse.conf.d
+    #        sudo cp $conf /etc/pipewire/pipewire-pulse.conf.d
     #        printf "${GREEN}Added pipewire conf for all users at:\n${CYAN}/etc/pipewire/pipewire-pulse.conf.d\n${normal}" 
     #    fi
 
@@ -228,13 +228,13 @@ if ! test -f $file || ! test -f $file1; then
 fi
 
 pipewire_r(){ 
-    sudo cp -fv $file /root/.bash_aliases.d/; 
-    sudo cp -fv $file1 /root/.bash_completion.d/; 
+    sudo cp $file /root/.bash_aliases.d/; 
+    sudo cp $file1 /root/.bash_completion.d/; 
 }
 
 pipewiresh(){
-    cp -fv $file ~/.bash_aliases.d/;
-    cp -fv $file1 ~/.bash_completion.d/;
+    cp $file ~/.bash_aliases.d/;
+    cp $file1 ~/.bash_completion.d/;
     yes-edit-no -Y 'YELLOW' -f pipewire_r -g "$file $file1" -p "Install pipewire aliases at /root/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)?"
 }
 yes-edit-no -f pipewiresh -g "$file $file1" -p "Install pipewire aliases at ~/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)?"

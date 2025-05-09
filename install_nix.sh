@@ -35,11 +35,11 @@ if type nix &> /dev/null; then
     fi
 
     function ins_nix_r(){
-        sudo cp -vf $nixsh /root/.bash_aliases.d/
+        sudo cp $nixsh /root/.bash_aliases.d/
     }	
 
     function ins_nix(){
-        cp -vf $nixsh ~/.bash_aliases.d/nix.sh
+        cp $nixsh ~/.bash_aliases.d/nix.sh
         yes-edit-no -f ins_nix_r -g "$nixsh" -p "Install nix.sh to /root? (nix bash aliases)" 
     }	
     yes-edit-no -f ins_nix -g "$nixsh" -p "Install nix.sh to $HOME? (nix bash aliases)"

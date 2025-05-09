@@ -50,6 +50,6 @@ if ! test -d aliases/.bash_aliases.d/; then
 fi
 
 ytbe() {
-    cp -fv "$ytbe" ~/.bash_aliases.d/
+    cp "$ytbe" ~/.bash_aliases.d/
 }
 yes-edit-no -f ytbe -g "$ytbe" -p "Install yt-dlp (youtube cli download) and youtube.sh at ~/.bash_aliases.d/ (yt-dlp aliases)?"

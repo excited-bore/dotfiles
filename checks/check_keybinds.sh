@@ -4,7 +4,7 @@ if [ ! -f ~/.keybinds ]; then
     if ! test -f keybinds/.keybinds; then
         curl -o ~/.keybinds https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds  
     else
-        cp -fv keybinds/.keybinds ~/
+        cp keybinds/.keybinds ~/
     fi 
 fi 
 

@@ -1361,7 +1361,7 @@ gitt() {
         if ! test -f aliases/.bash_aliases.d/git.sh; then
             curl -o ~/.bash_aliases.d/git.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/git.sh
         else
-            cp -f aliases/.bash_aliases.d/git.sh ~/.bash_aliases.d/
+            cp aliases/.bash_aliases.d/git.sh ~/.bash_aliases.d/
         fi
     fi
 

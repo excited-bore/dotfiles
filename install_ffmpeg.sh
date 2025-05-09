@@ -39,11 +39,11 @@ if type ffmpeg &>/dev/null; then
     fi
 
     function ins_ffmpg_r() {
-        sudo cp -vf $ffmpgsh /root/.bash_aliases.d/
+        sudo cp $ffmpgsh /root/.bash_aliases.d/
     }
 
     function ins_ffmpg() {
-        cp -vf $ffmpgsh ~/.bash_aliases.d/nix.sh
+        cp $ffmpgsh ~/.bash_aliases.d/nix.sh
         yes-edit-no -Y 'YELLOW' -f ins_ffmpg_r -g "$ffmpgsh" -p "Install ffmpeg.sh to /root? (nix bash aliases)"
     }
 

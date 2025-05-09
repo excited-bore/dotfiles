@@ -14,7 +14,7 @@ fi
 if ! test -f ~/.exrc; then
     readyn -p "Install exrc (ex config) at $HOME?"  nsrc
     if [[ $nsrc == 'y' ]]; then
-        cp -fv ex/.exrc ~/.exrc
+        cp ex/.exrc ~/.exrc
     fi
 fi
 
@@ -22,6 +22,6 @@ echo "This next $(tput setaf 1)sudo$(tput sgr0) will check for /root/.nanorc";
 if ! sudo test -f /root/.nanorc; then
     readyn -p 'Install exrc (ex config) at /root?' nsrc
     if [[ $nsrc == 'y' ]]; then
-        sudo cp -fv ex/.exrc /root/.exrc
+        sudo cp ex/.exrc /root/.exrc
     fi
 fi

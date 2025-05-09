@@ -31,7 +31,7 @@ if ! test -f ~/.nanorc; then
         elif command ls -A /usr/local/share/nano &>/dev/null && ! grep -q '/usr/local/share/nano/' nano/.nanorc; then
             sed -i 's|include "/.*|include "/usr/local/share/nano/\*\.nanorc"|g' nano/.nanorc
         fi
-        cp -fv nano/.nanorc ~/.nanorc
+        cp nano/.nanorc ~/.nanorc
     fi
 fi
 
@@ -45,6 +45,6 @@ if ! sudo test -f /root/.nanorc; then
         elif command ls -A /usr/local/share/nano &>/dev/null && ! grep -q '/usr/local/share/nano/' nano/.nanorc; then
             sed -i 's|include "/.*|include "/usr/local/share/nano/\*\.nanorc"|g' nano/.nanorc
         fi
-        sudo cp -fv nano/.nanorc /root/.nanorc
+        sudo cp nano/.nanorc /root/.nanorc
     fi
 fi

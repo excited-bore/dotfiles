@@ -1,10 +1,18 @@
-#!/usr/bin/env bash
+if ! test -f checks/check_all.sh; then 
+    if hash curl &> /dev/null; then 
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)  
+    else  
+        continue  
+    fi 
+else 
+    . ./checks/check_all.sh 
+fi
 
 if ! [ -f ~/.bash_aliases ]; then
     if ! test -f aliases/.bash_aliases; then
         curl -o ~/.bash_aliases https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases  
     else
-        cp -fv aliases/.bash_aliases ~/
+        cp aliases/.bash_aliases ~/
     fi 
 fi
 
@@ -41,7 +49,7 @@ if ! [ -f /root/.bash_aliases ]; then
     if ! test -f aliases/.bash_aliases; then
         sudo curl -o /root/.bash_aliases https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases  
     else
-        sudo cp -fv aliases/.bash_aliases /root/
+        sudo cp aliases/.bash_aliases /root/
     fi 
 fi
 if ! sudo grep -q ".bash_aliases" /root/.bashrc; then
@@ -57,7 +65,7 @@ fi
 
 if ! test -f ./checks/check_bash_source_order.sh; then
     if type curl &>/dev/null; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_bash_source_order.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_bash_source_order.sh)
     else
         printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
         return 1 || exit 1

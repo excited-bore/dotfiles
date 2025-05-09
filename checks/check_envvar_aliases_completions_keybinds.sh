@@ -11,7 +11,7 @@ fi
 
 if ! test -f ~/.bash_aliases; then
     if test -f aliases/.bash_aliases; then
-        cp -fv aliases/.bash_aliases ~/
+        cp aliases/.bash_aliases ~/
     else
         curl -o ~/.bash_aliases https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases
     fi
@@ -23,7 +23,7 @@ fi
 
 if ! test -f ~/.bash_completion; then
     if test -f completions/.bash_completion; then
-        cp -fv completions/.bash_completion ~/
+        cp completions/.bash_completion ~/
     else
         curl -o ~/.bash_completion https://raw.githubusercontent.com/excited-bore/dotfiles/main/completions/.bash_completion
     fi
@@ -35,7 +35,7 @@ fi
 
 if ! test -f ~/.keybinds; then
     if test -f keybinds/.keybinds; then
-        cp -fv keybinds/.keybinds ~/
+        cp keybinds/.keybinds ~/
     else
         curl -o ~/.keybinds https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds
     fi
@@ -104,12 +104,12 @@ fi
 
 if ! sudo test -f /root/.bash_aliases; then
     echo "Next $(tput setaf 1)sudo$(tput sgr0) will install '.bash_aliases.d' in /root and source files in it with '/root/.bash_aliases' "
-    sudo cp -fv ~/.bash_aliases /root/
+    sudo cp ~/.bash_aliases /root/
     if ! sudo test -d /root/.bash_aliases.d/; then
         sudo mkdir /root/.bash_aliases.d/
-        #sudo cp -fv ~/.bash_aliases.d/check_system.sh /root/.bash_aliases.d/check_system.sh
-        #sudo cp -fv ~/.bash_aliases.d/bash.sh /root/.bash_aliases.d/bash.sh
-        #sudo cp -fv ~/.bash_aliases.d/00-rlwrap_scripts.sh /root/.bash_aliases.d/00-rlwrap_scripts.sh
+        #sudo cp ~/.bash_aliases.d/check_system.sh /root/.bash_aliases.d/check_system.sh
+        #sudo cp ~/.bash_aliases.d/bash.sh /root/.bash_aliases.d/bash.sh
+        #sudo cp ~/.bash_aliases.d/00-rlwrap_scripts.sh /root/.bash_aliases.d/00-rlwrap_scripts.sh
     fi
     if ! sudo grep -q "~/.bash_aliases" ~/.bashrc; then
         printf "\n[ -f ~/.bash_aliases ] && source ~/.bash_aliases\n\n" | sudo tee -a /root/.bashrc &>/dev/null
@@ -125,7 +125,7 @@ if ! sudo test -f /root/.bash_completion; then
         if ! test -f completions/.bash_completion; then
             sudo curl -o /root/.bash_aliases https://raw.githubusercontent.com/excited-bore/dotfiles/main/completions/.bash_completion
         else
-            sudo cp -fv completions/.bash_completion /root/
+            sudo cp completions/.bash_completion /root/
         fi
     fi
     if ! sudo test -d /root/.bash_completion.d/; then
@@ -147,7 +147,7 @@ if ! sudo test -f /root/.keybinds; then
         if ! test -f keybinds/.keybinds; then
             sudo curl -o /root/.bash_aliases https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds
         else
-            sudo cp -fv keybinds/.keybinds /root/
+            sudo cp keybinds/.keybinds /root/
         fi
     fi
     if ! sudo test -d /root/.keybinds.d/; then
@@ -162,7 +162,7 @@ fi
 
 if ! test -f ./checks/check_bash_source_order.sh; then
     if type curl &>/dev/null; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_bash_source_order.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_bash_source_order.sh)
     else
         printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
         return 1 || exit 1

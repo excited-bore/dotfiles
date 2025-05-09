@@ -33,9 +33,9 @@ shell-keybinds_r() {
     if test -f /root/.environment; then
         sudo sed -i 's|#export INPUTRC.*|export INPUTRC=~/.inputrc|g' /root/.environment
     fi
-    sudo cp -f $binds1 /root/.keybinds.d/
-    sudo cp -f $binds2 /root/.keybinds
-    sudo cp -f $binds /root/
+    sudo cp $binds1 /root/.keybinds.d/
+    sudo cp $binds2 /root/.keybinds
+    sudo cp $binds /root/
     echo "Next $(tput setaf 1)sudo$(tput sgr0) will check whether '~/.keybinds' is sourced in /root/.bashrc"
     if test -f /root/.bashrc && ! grep -q '[ -f /root/.keybinds ]' /root/.bashrc; then
         if sudo grep -q '[ -f /root/.bash_aliases ]' /root/.bashrc; then
@@ -85,9 +85,9 @@ shell-keybinds() {
         fi
     fi
 
-    cp -f $binds1 ~/.keybinds.d/
-    cp -f $binds2 ~/.keybinds
-    cp -f $binds ~/
+    cp $binds1 ~/.keybinds.d/
+    cp $binds2 ~/.keybinds
+    cp $binds ~/
 
     if test -f ~/.bashrc && ! grep -q '~/.keybinds' ~/.bashrc; then
         if grep -q '\[ -f ~/.bash_aliases \]' ~/.bashrc; then
