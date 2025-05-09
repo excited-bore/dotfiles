@@ -14,7 +14,7 @@ fi
 
 if ! type nvim > /dev/null ; then
    if ! test -f ./install_nvim.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/install_fzf.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/install_fzf.sh)
     else
         . ./install_nvim.sh
     fi

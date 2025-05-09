@@ -19,7 +19,7 @@ if [[ $merger == 'nvim' ]] ;then
    if ! type nvim &> /dev/null; then
         if ! test -f install_neovim.sh; then
             if type curl &>/dev/null; then
-                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_neovim.sh)
+                source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_neovim.sh)
             else
                 printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
                 return 1 || exit 1
@@ -33,7 +33,7 @@ elif [[ $merger == 'vscode' ]] ;then
    if ! type code &> /dev/null; then
         if ! test -f install_visual_studio_code.sh; then
             if type curl &>/dev/null; then
-                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_visual_studio_code.sh)
+                source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_visual_studio_code.sh)
             else
                 printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
                 return 1 || exit 1
@@ -47,7 +47,7 @@ elif [[ $merger == 'fac' ]] ;then
     if ! type go &> /dev/null; then
         if ! test -f install_go.sh; then
             if type curl &>/dev/null; then
-                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_go.sh)
+                source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_go.sh)
             else
                 printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
                 return 1 || exit 1
@@ -62,7 +62,7 @@ elif [[ $merger == 'mergiraf' ]] ;then
     if ! type cargo &> /dev/null; then
         if ! test -f install_cargo.sh; then
             if type curl &>/dev/null; then
-                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)
+                source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)
             else
                 printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
                 return 1 || exit 1
@@ -78,7 +78,7 @@ elif [[ $merger == 'meld' ]] ;then
         if ! type brew &> /dev/null; then
             if ! test -f install_brew.sh; then
                 if type curl &>/dev/null; then
-                    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_brew.sh)
+                    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_brew.sh)
                 else
                     printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
                     return 1 || exit 1
@@ -98,7 +98,7 @@ elif [[ $merger == 'meld' ]] ;then
         if ! type pipx &> /dev/null; then
             if ! test -f install_pipx.sh; then
                 if type curl &>/dev/null; then
-                    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)
+                    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)
                 else
                     printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
                     return 1 || exit 1
@@ -120,7 +120,7 @@ elif [[ $merger == 'kdiff3' ]] ;then
         elif [[ $machine == 'Linux' ]]; then
             if ! test -f install_flatpak.sh; then
                 if type curl &>/dev/null; then
-                    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_flatpak.sh)
+                    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_flatpak.sh)
                 else
                     printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
                     return 1 || exit 1
@@ -135,7 +135,7 @@ elif [[ $merger == 'diffmerge' ]] ;then
    if ! command -v diffmerge  &> /dev/null; then
         if [[ $distro_base == 'Arch' ]]; then
             if ! test -f checks/check_AUR.sh; then
-                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_AUR.sh)
+                source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_AUR.sh)
             else
                 . ./checks/check_AUR.sh
             fi
@@ -147,7 +147,7 @@ elif [[ $merger == 'diffmerge' ]] ;then
             fi
 
             if ! test -f aliases/.bash_aliases.d/git.sh; then
-                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/git.sh)
+                source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/git.sh)
             else
                 . ./aliases/.bash_aliases.d/git.sh
             fi
@@ -164,7 +164,7 @@ elif [[ $merger == 'kompare' ]] ;then
         elif [[ $machine == 'Linux' ]]; then
             if ! test -f install_flatpak.sh; then
                 if type curl &>/dev/null; then
-                    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_flatpak.sh)
+                    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_flatpak.sh)
                 else
                     printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
                     return 1 || exit 1
@@ -181,7 +181,7 @@ elif [[ $merger == 'p4merge' ]] ;then
     if ! type kdiff3 &> /dev/null; then
         if [[ $distro_base == 'Arch' ]]; then
             if ! test -f checks/check_AUR.sh; then
-                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_AUR.sh)
+                source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_AUR.sh)
             else 
                 . ./checks/check_AUR.sh
             fi

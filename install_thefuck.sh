@@ -29,7 +29,7 @@ if ! type thefuck &>/dev/null; then
         
         if ! type pipx &>/dev/null; then
             if ! test -f install_pipx.sh; then
-                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)
+                source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)
             else
                 . ./install_pipx.sh
             fi

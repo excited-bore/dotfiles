@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 if ! test -f checks/check_all.sh; then
     if type curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
@@ -12,7 +10,7 @@ else
 fi
 
 if ! test -f checks/check_AUR.sh; then
-    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_AUR.sh)
+    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_AUR.sh)
 else
     . ./checks/check_AUR.sh
 fi
@@ -27,7 +25,7 @@ if ! hash pay-respects &>/dev/null; then
         eval "${AUR_ins} pay-respects"
     else
         if ! test -f install_cargo.sh; then
-            source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)
+            source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)
         else
             . ./install_cargo.sh
         fi

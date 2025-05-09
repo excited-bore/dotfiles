@@ -2,43 +2,6 @@
 
 READE_NOSTYLE='filecomp-only'
 
-# Make sure cp copies forceably (without asking confirmation when overwriting) and verbosely
-[[ "$(type cp)" =~ 'aliased' ]] &&
-    unalias cp 
-alias cp='cp -fv'
-
-# Make sure mv moves forceably (without asking confirmation when overwriting) and verbosely
-[[ "$(type mv)" =~ 'aliased' ]] && 
-    unalias mv 
-alias mv='mv -fv'
-
-# Make sure rm removes forceably, recursively and verbosely 
-[[ "$(type rm)" =~ 'aliased' ]] &&
-    unalias rm 
-alias rm='rm -rfv'
-
-# Make sure sudo isn't aliased to something weird
-command -v sudo &>/dev/null && [[ "$(type sudo)" =~ 'aliased' ]] &&
-    unalias sudo
-
-# Wget only uses https - encrypted http
-command -v wget &>/dev/null && [[ "$(type wget)" =~ 'aliased' ]] &&
-    unalias wget 
-alias wget='wget --https-only'
-alias wget-quiet='wget -q'
-alias wget-dir='wget -P'
-alias wget-name='wget -O'
-
-if hash aria2c &> /dev/null; then
-    alias wget='aria2c'
-    alias wget-quiet='aria2c -q'
-    alias wget-dir='aria2c -d'
-    alias wget-name='aria2c -o'
-fi
-
-# Less does raw control chars, use color and linenumbers, no sounds/bell and doesn't give you epilepsy
-alias less='less -R --use-color --LINE-NUMBERS --quit-if-one-screen -Q --no-vbell'
-
 #! type wget &> /dev/null && command -v brew &> /dev/null &&
 #    brew install wget 
 
@@ -156,6 +119,55 @@ fi
 
 
 alias get-script-dir='cd "$( dirname "$-1" )" && pwd'
+
+# Make sure cp copies forceably (without asking confirmation when overwriting) and verbosely
+[[ "$(type cp)" =~ 'aliased' ]] &&
+    unalias cp 
+alias cp='cp -fv'
+
+# Make sure mv moves forceably (without asking confirmation when overwriting) and verbosely
+[[ "$(type mv)" =~ 'aliased' ]] && 
+    unalias mv 
+alias mv='mv -fv'
+
+# Make sure rm removes forceably, recursively and verbosely 
+[[ "$(type rm)" =~ 'aliased' ]] &&
+    unalias rm 
+alias rm='rm -rfv'
+
+# Make sure sudo isn't aliased to something weird
+command -v sudo &>/dev/null && [[ "$(type sudo)" =~ 'aliased' ]] &&
+    unalias sudo
+
+# Wget only uses https - encrypted http
+command -v wget &>/dev/null && [[ "$(type wget)" =~ 'aliased' ]] &&
+    unalias wget 
+alias wget='wget --https-only'
+alias wget-quiet='wget -q'
+alias wget-dir='wget -P'
+alias wget-name='wget -O'
+alias wget-curl='wget -qO-'
+
+if hash aria2c &>/dev/null && test -z "$WGET_ARIA"; then
+    readyn -p "Always use 'aria2c' in favour of 'wget' for faster downloads?" wget_ar
+    if [[ $wget_ar == 'y' ]]; then
+        WGET_ARIA=1 
+    fi
+    unset wget_ar
+fi
+
+if [[ $WGET_ARIA ]]; then
+    alias wget='aria2c'
+    alias wget-quiet='aria2c -q'
+    alias wget-dir='aria2c -d'
+    alias wget-name='aria2c -o'
+fi
+
+alias curl="curl -fsSL"
+
+# Less does raw control chars, use color and linenumbers, no sounds/bell and doesn't give you epilepsy
+alias less='less -R --use-color --LINE-NUMBERS --quit-if-one-screen -Q --no-vbell'
+
 
 #function get-script-dir() {
 #    SOURCE=$0

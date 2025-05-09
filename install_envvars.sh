@@ -688,7 +688,7 @@ fi
 
 if ! test -f ./checks/check_bash_source_order.sh; then
     if type curl &>/dev/null; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_bash_source_order.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_bash_source_order.sh)
     else
         printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
         return 1 || exit 1

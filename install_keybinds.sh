@@ -54,7 +54,7 @@ shell-keybinds_r() {
 
 shell-keybinds() {
     if ! test -f $SCRIPT_DIR/checks/check_keybinds.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_keybinds.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_keybinds.sh)
     else
         . $SCRIPT_DIR/checks/check_keybinds.sh
     fi

@@ -25,15 +25,15 @@ if ! test -f ~/.bash_completion.d/pipewire; then
     if [[ $comps == 'y' ]]; then
 
         if ! test -f checks/check_completions_dir.sh; then
-             source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh) 
+             source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh) 
         else
             . ./checks/check_completions_dir.sh
         fi
          
         pipewire_cmp=pipewire/.bash_completion.d/pipewire
         if ! test -f pipewire/.bash_completion.d/pipewire; then
-            tmp1=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/pipewire/.bash_completion.d/pipewire 
-            pipewire_cmp=$tmp1
+            wget-dir $TMPDIR https://raw.githubusercontent.com/excited-bore/dotfiles/main/pipewire/.bash_completion.d/pipewire 
+            pipewire_cmp=$TMPDIR/pipewire
         fi
         cp -f $pipewire_cmp ~/.bash_completion.d/ 
     fi

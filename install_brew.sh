@@ -14,11 +14,11 @@ fi
 SCRIPT_DIR=$(get-script-dir)
 
 if ! type brew &> /dev/null; then
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" 
+    source <(curl https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)
 fi
 
-if [[ $machine == 'Mac' ]] && ! grep -q 'eval "$(brew shellenv)"' ~/.zprofile; then
-    printf '\neval "$(brew shellenv)"\n' >> ~/.zprofile 
+if [[ $machine == 'Mac' ]] && ! grep -q 'eval "$(brew shellenv)"' $ZSH_ENV; then
+    printf '\neval "$(brew shellenv)"\n' >> $ZSH_ENV 
 fi
 
 if type brew &> /dev/null; then

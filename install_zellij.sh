@@ -13,9 +13,9 @@ fi
 
 SCRIPT_DIR=$(get-script-dir)
 
-if ! command -v cargo &> /dev/null; then
+if ! hash cargo &> /dev/null; then
     if ! test -f $SCRIPT_DIR/install_cargo.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)
     else
        . ./install_cargo.sh
     fi

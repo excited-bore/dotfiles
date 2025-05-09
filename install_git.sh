@@ -16,14 +16,14 @@ fi
 SCRIPT_DIR=$(get-script-dir)
 
 if ! test -f checks/check_envvar.sh; then
-    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)
+    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)
 else
     . ./checks/check_envvar.sh
 fi
 
 #if ! type fzf &> /dev/null ; then
 #   if ! test -f ./install_fzf.sh; then
-#        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/install_fzf.sh)
+#        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/install_fzf.sh)
 #    else
 #        ./install_fzf.sh
 #    fi
@@ -1047,7 +1047,7 @@ gitt() {
         readyn -n -p "Install custom pager?" gitpgr
         if [[ "$gitpgr" == "y" ]]; then
             if ! test -f install_pager.sh; then
-                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pager.sh)
+                source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pager.sh)
             else
                 . ./install_pager.sh
             fi
@@ -1067,7 +1067,7 @@ gitt() {
         readyn -p "Install custom diff syntax highlighter?" -c "test -z '$diffs'" gitpgr
         if [[ "$gitpgr" == "y" ]]; then
             if ! test -f install_differ.sh; then
-                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_differ.sh)
+                source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_differ.sh)
             else
                 . ./install_differ.sh
             fi
@@ -1127,7 +1127,7 @@ gitt() {
             readyn -p "Install custom diff syntax highlighter?" -c "test -z '$diffs'" gitpgr
             if [[ "$gitpgr" == "y" ]]; then
                 if ! test -f install_differ.sh; then
-                    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_differ.sh)
+                    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_differ.sh)
                 else
                     . ./install_differ.sh
                 fi
@@ -1298,7 +1298,7 @@ gitt() {
     readyn -p "Check and create global gitignore? (~/.config/git/ignore)" gitign
     if [[ "y" == "$gitign" ]]; then
         if ! test -f install_gitignore.sh; then
-            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_gitignore.sh)"
+            /bin/bash -c "$(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_gitignore.sh)"
         else
             . ./install_gitignore.sh
         fi
@@ -1308,7 +1308,7 @@ gitt() {
         readyn -p "Install lazygit? (git TUI - terminal user interface)" gitlaz
         if [[ "y" == "$gitlaz" ]]; then
             if ! test -f install_lazygit.sh; then
-                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_lazygit.sh)
+                source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_lazygit.sh)
             else
                 . ./install_lazygit.sh
             fi
@@ -1326,7 +1326,7 @@ gitt() {
     #        readyn -n -p "Install custom diff syntax highlighter?" gitpgr
     #        if [[ "$gitpgr" == "y" ]]; then
     #            if ! test -f install_differ_pager.sh; then
-    #                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_differ_pager.sh)
+    #                source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_differ_pager.sh)
     #            else
     #                . ./install_differ_pager.sh
     #            fi
@@ -1342,7 +1342,7 @@ gitt() {
     #    readyn -p "Install fzf-git? (Extra fzf stuff on leader-key C-g): "" gitfzf
     #    if [ "$fzfgit" == "y" ]; then
     #        if ! test -f checks/check_aliases_dir.sh; then
-    #            source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)
+    #            source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)
     #        else
     #           . ./checks/check_aliases_dir.sh
     #        fi
@@ -1354,7 +1354,7 @@ gitt() {
     readyn -p "Install git.sh? (Git aliases)" gitals
     if [[ "$gitals" == "y" ]]; then
         if ! test -f checks/check_aliases_dir.sh; then
-            source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)
+            source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)
         else
             . ./checks/check_aliases_dir.sh
         fi

@@ -122,7 +122,7 @@ if ! test -d ~/.config/ranger/plugins/devicons2; then
             readyn -p "Install Nerdfonts from binary - no apt? (Special FontIcons)" nrdfnts
             if [[ $nrdfnts == "y" ]]; then
                 if ! test -f ./install_nerdfonts.sh; then
-                    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nerdfonts.sh)
+                    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nerdfonts.sh)
                 else
                     . ./install_nerdfonts.sh
                 fi

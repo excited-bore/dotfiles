@@ -15,7 +15,7 @@ if [[ $distro_base == 'Arch' ]] && test -z "$AUR_ins" &> /dev/null; then
     readyn -p "Install yay?" insyay
     if [[ "y" == "$insyay" ]]; then
         if type curl &>/dev/null && ! test -f $SCRIPT_DIR/AUR_installers/install_yay.sh; then
-            source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/AUR_installers/install_yay.sh)
+            source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/AUR_installers/install_yay.sh)
         else
             . $SCRIPT_DIR/AUR_installers/install_yay.sh
         fi

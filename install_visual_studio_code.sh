@@ -14,7 +14,7 @@ fi
 if ! type code &> /dev/null; then
     if [[ "$distro_base" == "Arch" ]]; then
         if ! test -f checks/check_AUR.sh; then
-            source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_AUR.sh)
+            source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_AUR.sh)
         else 
             . ./checks/check_AUR.sh
         fi
@@ -31,7 +31,7 @@ if ! type code &> /dev/null; then
         if test -z $(apt list --installed apt-transport-https 2> /dev/null); then
             eval "$pac_ins apt-transport-https "
         fi
-        curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add - 
+        curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add - 
         sudo add-apt-repository "deb [arch=$arch] https://packages.microsoft.com/repos/vscode stable main" 
         sudo apt update 
         eval "$pac_ins code"

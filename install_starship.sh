@@ -14,7 +14,7 @@ SCRIPT_DIR=$(pwd)
 
 # https://unix.stackexchange.com/questions/690233/piping-yes-when-running-scripts-from-curl
 
-sh -c "$(curl -fsSL https://starship.rs/install.sh)" -y -f
+sh -c "$(curl https://starship.rs/install.sh)" -y -f
 
 readyn -p "Install starship for user?" strship
 if [[ "y" == "$strship" ]]; then
@@ -28,7 +28,7 @@ if [[ "y" == "$strship" ]]; then
         printf "\neval \"\$(starship init zsh)\"\n" >>~/.zshrc
     fi
     if ! test -f checks/check_completions_dir.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)
     else
         . ./checks/check_completions_dir.sh
     fi
@@ -41,7 +41,7 @@ if [[ "y" == "$strship" ]]; then
         if test -f aliases/.bash_aliases.d/starship.sh; then
             cp -bfv aliases/.bash_aliases.d/starship.sh ~/.bash_aliases.d/
         else
-            curl -o ~/.bash_aliases.d/starship.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/starship.sh
+            wget-name ~/.bash_aliases.d/starship.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/starship.sh
         fi
 
         if type gio &>/dev/null && test -f ~/.bash_aliases.d/starship.sh~; then
@@ -63,7 +63,7 @@ if [[ "y" == "$strship" ]]; then
     fi
 
     if ! test -f checks/check_completions_dir.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)
     else
         . ./checks/check_completions_dir.sh
     fi
@@ -73,7 +73,7 @@ if [[ "y" == "$strship" ]]; then
         if test -f aliases/.bash_aliases.d/starship.sh; then
             sudo cp -fbv  aliases/.bash_aliases.d/starship.sh /root/.bash_aliases.d/
         else
-            sudo curl -o /root/.bash_aliases.d/starship.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/starship.sh
+            sudo -E wget-name /root/.bash_aliases.d/starship.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/starship.sh
         fi
         if type gio &>/dev/null && test -f /root/.bash_aliases.d/starship.sh~; then
             sudo gio trash /root/.bash_aliases.d/starship.sh~*
@@ -84,7 +84,7 @@ unset strship
 
 if ! test -f ./checks/check_bash_source_order.sh; then
     if type curl &>/dev/null; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_bash_source_order.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_bash_source_order.sh)
     else
         printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
         return 1 || exit 1
@@ -97,7 +97,7 @@ test -n "$BASH_VERSION" && eval "$(starship init bash)"
 test -n "$ZSH_VERSION" && eval "$(starship init zsh)"
 
 if ! test -f aliases/.bash_aliases.d/starship.sh; then
-    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/starship.sh)
+    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/starship.sh)
 else
     . ./aliases/.bash_aliases.d/starship.sh
 fi

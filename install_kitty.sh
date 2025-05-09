@@ -35,7 +35,7 @@ fi
 if ! test -d kitty/.config/kitty; then
     tmpdir=$(mktemp -d -t kitty-XXXXXXXXXX)
     tmpfile=$(mktemp)
-    curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/download_git_directory.sh | tee "$tmpfile" &>/dev/null
+    curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/download_git_directory.sh | tee "$tmpfile" &>/dev/null
     chmod u+x "$tmpfile"
     eval $tmpfile https://github.com/excited-bore/dotfiles/tree/main/kitty/.config/kitty $tmpdir
     wget-dir $tmpdir https://raw.githubusercontent.com/excited-bore/dotfiles/main/kitty/.bash_aliases.d/kitty.sh
@@ -270,7 +270,7 @@ unset ktty_conf
 readyn -p "Install kitty aliases? (at ~/.bash_aliases.d/kitty.sh)" kittn
 if [[ "y" == "$kittn" ]]; then
     if ! test -f checks/check_aliases_dir.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)
     else
         . ./checks/check_aliases_dir.sh
     fi

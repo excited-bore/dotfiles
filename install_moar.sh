@@ -14,7 +14,7 @@ else
 fi
 
 if ! test -f checks/check_AUR.sh; then
-    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_AUR.sh)
+    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_AUR.sh)
 else
     . ./checks/check_AUR.sh
 fi

@@ -17,7 +17,7 @@ if ! type list-ppa &> /dev/null || [[ $(pipx list 2> /dev/null | grep list-ppa |
     if [[ $ppa_ins == 'y' ]]; then
         if ! type pipx &> /dev/null; then
             if ! test -f install_pipx.sh; then
-                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh) 
+                source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh) 
             else
                 . ./install_pipx.sh
             fi  

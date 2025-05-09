@@ -12,7 +12,7 @@ else
 fi
 
 if ! test -f checks/check_envvar_aliases_completions_keybinds.sh; then
-     source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar_aliases_completions_keybinds.sh) 
+     source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar_aliases_completions_keybinds.sh) 
 else
     . ./checks/check_envvar_aliases_completions_keybinds.sh
 fi
@@ -55,7 +55,7 @@ if ! test -f ~/.bash_aliases.d/flatpacks.sh; then
     readyn -p "Install flatpackwrapper? (For one-word flatpak aliases in terminal)" pam
     if [[ "y" == $pam ]]; then
         if ! test -f install_bashalias_completions.sh; then
-             source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bashalias_completions.sh) 
+             source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bashalias_completions.sh) 
         else
              . ./install_bashalias_completions.sh
         fi
@@ -88,7 +88,7 @@ if ! sudo test -f /etc/polkit/49-nopasswd_global.pkla && ! sudo test -f /etc/pol
     readyn -p "Run installer for no password with pam / polkit?" pam
     if [[ "y" == "$pam" ]]; then
         if ! test -f install_polkit_wheel.sh; then
-             source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_polkit_wheel.sh) 
+             source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_polkit_wheel.sh) 
         else
             . ./install_polkit_wheel.sh
         fi

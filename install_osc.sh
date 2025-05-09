@@ -11,11 +11,11 @@ else
     . ./checks/check_all.sh
 fi
 
-if ! command -v go &> /dev/null; then
+if ! hash go &> /dev/null; then
     readyn -p "Installer uses go. Install?" go
     if [[ "y" == "$go" ]]; then
         if ! test -f install_go.sh; then
-             source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_go.sh) 
+             source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_go.sh) 
         else
             . ./install_go.sh
         fi
@@ -26,7 +26,7 @@ fi
 go install -v github.com/theimpostor/osc@latest
 
 if ! test -f checks/check_completions_dir.sh; then
-     source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh) 
+     source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh) 
 else
     . ./checks/check_completions_dir.sh
 fi

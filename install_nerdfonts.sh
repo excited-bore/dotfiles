@@ -15,7 +15,7 @@ else
 fi
 
 if ! test -f aliases/.bash_aliases.d/git.sh; then
-    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/git.sh)
+    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/git.sh)
 else
     . ./aliases/.bash_aliases.d/git.sh
 fi
@@ -24,9 +24,14 @@ if ! [ -d ~/.local/share/fonts ]; then
     mkdir ~/.local/share/fonts
 fi
 
+if ! type unzip &>/dev/null; then
+    eval "$pac_ins unzip"
+fi
+
 if ! type jq &>/dev/null; then
     eval "$pac_ins jq"
 fi
+
 
 fonts=$(mktemp -d)
 get-latest-releases-github https://github.com/ryanoasis/nerd-fonts $fonts/

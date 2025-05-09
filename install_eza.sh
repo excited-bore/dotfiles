@@ -15,7 +15,7 @@ DIR=$(get-script-dir)
 
 if ! hash cargo &> /dev/null || ! [[ $PATH =~ '/.cargo/bin' ]] || (hash rustc &> /dev/null && [[ $(rustc -V | awk '{print $2}') < 1.81.0 ]]); then
     if ! test -f $DIR/install_cargo.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)
     else
        . $DIR/install_cargo.sh
     fi
@@ -67,7 +67,7 @@ if ! test -f ~/.bash_completion.d/eza; then
    readyn -p 'Install bash completions for eza?' bash_cm  
    if [[ $bash_cm == 'y' ]]; then
         if ! test -f checks/check_completions_dir.sh; then
-             source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh) 
+             source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh) 
         else
             . ./checks/check_completions_dir.sh
         fi

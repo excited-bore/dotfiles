@@ -14,7 +14,7 @@ fi
 DIR=$(get-script-dir)
 
 if ! test -f checks/check_envvar_aliases_completions_keybinds.sh; then
-    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar_aliases_completions_keybinds.sh)
+    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar_aliases_completions_keybinds.sh)
 else
     . ./checks/check_envvar_aliases_completions_keybinds.sh
 fi
@@ -69,7 +69,7 @@ if [[ "$distro_base" == "Debian" ]]; then
         eval "${pac_ins} neovim"
     elif [[ "appimage" == "$nvmappmg" ]]; then
         if ! test -f checks/check_appimage_ready.sh; then
-            source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_appimage_ready.sh)
+            source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_appimage_ready.sh)
         else
             . ./checks/check_appimage_ready.sh
         fi
@@ -99,7 +99,7 @@ if [[ "$distro_base" == "Debian" ]]; then
                 readyn -p "Install flatpak?" insflpk
                 if [[ "y" == "$insflpk" ]]; then
                     if ! test -f install_flatpak.sh; then
-                        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_flatpak.sh)
+                        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_flatpak.sh)
                     else
                         . ./install_flatpak.sh
                     fi
@@ -129,7 +129,7 @@ if [[ "$distro_base" == "Debian" ]]; then
         readyn -p "Install flatpak? " insflpk
         if [[ "y" == "$insflpk" ]]; then
             if ! test -f install_flatpak.sh; then
-                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_flatpak.sh)
+                source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_flatpak.sh)
             else
                 . ./install_flatpak.sh
             fi
@@ -191,7 +191,7 @@ if [[ "$langs" == 'y' ]]; then
         if [[ "y" == "$pyscripts" ]]; then
             if ! hash pyenv &>/dev/null; then
                 if ! test -f $DIR/install_pyenv.sh; then
-                    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pyenv.sh)
+                    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pyenv.sh)
                 else
                     . $DIR/install_pyenv.sh
                 fi
@@ -199,7 +199,7 @@ if [[ "$langs" == 'y' ]]; then
 
             if ! type pipx &>/dev/null && ! test -f $HOME/.local/bin/pipx; then
                 if ! test -f $DIR/install_pipx.sh; then
-                    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)
+                    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)
                 else
                     . $DIR/install_pipx.sh
                 fi
@@ -227,7 +227,7 @@ if [[ "$langs" == 'y' ]]; then
         readyn -p "Install nvim-ruby? " rubyscripts
         if [[ "y" == $rubyscripts ]]; then
             if ! test -f install_ruby.sh; then
-                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ruby.sh)
+                source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ruby.sh)
             else
                 . ./install_ruby.sh
             fi
@@ -281,7 +281,7 @@ if ! type rg &>/dev/null; then
     readyn -p "Install ripgrep (recursive grep)?" rg_ins
     if [[ "y" == "$rg_ins" ]]; then
         if ! test -f install_ripgrep.sh; then
-            source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ripgrep.sh)
+            source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ripgrep.sh)
         else
             . ./install_ripgrep.sh
         fi
@@ -294,7 +294,7 @@ if ! type ast-grep &>/dev/null; then
     readyn -p "Install ast-grep (search and rewrite code at large scale using precise AST pattern)?" ast_ins
     if [[ "y" == "$ast_ins" ]]; then
         if ! test -f install_ast-grep.sh; then
-            source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ast-grep.sh)
+            source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ast-grep.sh)
         else
             . ./install_ast-grep.sh
         fi
@@ -307,7 +307,7 @@ dir=vim/.config/nvim
 if ! test -d vim/; then
     tmpdir=$(mktemp -d -t nvim-XXXXXXXXXX)
     tmpfile=$(mktemp)
-    curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/download_git_directory.sh | tee "$tmpfile" &>/dev/null
+    curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/download_git_directory.sh | tee "$tmpfile" &>/dev/null
     chmod u+x "$tmpfile"
     eval $tmpfile https://github.com/excited-bore/dotfiles/tree/main/vim/.config/nvim $tmpdir
     dir=$tmpdir/vim/.config/nvim
@@ -457,7 +457,7 @@ if ! type nvimpager &>/dev/null; then
     readyn -n -p "Install nvimpager?" vimrc
     if [[ "$vimrc" == "y" ]]; then
         if ! test -f install_nvimpager.sh; then
-            source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nvimpager.sh)
+            source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nvimpager.sh)
         else
             . ./install_nvimpager.sh
         fi

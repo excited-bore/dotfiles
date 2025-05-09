@@ -9,7 +9,7 @@ if ! hash ack &> /dev/null; then
 fi
 
 if ! test -f checks/check_aliases_dir.sh; then
-    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)
+    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)
 else
     . ./checks/check_aliases_dir.sh
 fi 

@@ -2,6 +2,9 @@
 
 export INSTALL=1
 
+unalias curl &> /dev/null
+unalias wget &> /dev/null
+
 if ! test -f checks/check_all.sh; then
     if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
@@ -14,9 +17,59 @@ fi
 
 SCRIPT_DIR=$(get-script-dir)
 
+if (! hash zip &>/dev/null || ! hash unzip &>/dev/null) && test -n "$pac_ins"; then
+    printf "${CYAN}zip${normal} and/or ${CYAN}unzip${normal} are not installed \n"
+    readyn -p "Install zip and unzip?" nzp_ins
+    if [[ $nzp_ins == 'y' ]]; then
+        eval "${pac_ins} zip unzip"
+    fi
+    unset nzp_ins
+fi
+
+if ! hash curl &>/dev/null && test -n "$pac_ins"; then
+    printf "${CYAN}curl${normal} is not installed \n"
+    readyn -p "Install curl (for command related to URLS)?" ins_curl
+    if [[ $ins_curl == 'y' ]]; then
+        eval "${pac_ins} curl"
+    fi
+    unset ins_curl
+fi
+
+
+if ! hash jq &>/dev/null && test -n "$pac_ins"; then
+    printf "${CYAN}jq${normal} is not installed \n"
+    readyn -p "Install jq (for querying javascript - used to get latest release(s) from github)?" ins_jq
+    if [[ $ins_jq == 'y' ]]; then
+        eval "${pac_ins} jq"
+    fi
+    unset ins_jq
+fi
+
+if ! hash aria2c &>/dev/null && test -n "$pac_ins"; then
+    printf "${CYAN}aria2c${normal} is not installed \n"
+    readyn -p "Install aria2c (for fetching files from internet - multithreaded versus singlethreaded wget -> faster downloads)?" ins_ar
+    if [[ $ins_ar == 'y' ]]; then
+        eval "${pac_ins} aria2c" 
+    fi
+    unset ins_aria2c
+fi
+
+if hash aria2c &>/dev/null && test -z "$WGET_ARIA"; then
+    readyn -p "Always use 'aria2c' in favour of 'wget' for faster downloads?" wget_ar
+    if [[ $wget_ar == 'y' ]]; then
+        WGET_ARIA=1
+        alias wget='aria2c'
+        alias wget-quiet='aria2c -q'
+        alias wget-dir='aria2c -d'
+        alias wget-name='aria2c -o'
+    fi
+    unset wget_ar
+fi
+
+
 if ! hash rlwrap &>/dev/null; then
     if ! test -f $SCRIPT_DIR/checks/check_rlwrap.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_rlwrap.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_rlwrap.sh)
     else
         . $SCRIPT_DIR/checks/check_rlwrap.sh
     fi
@@ -26,15 +79,6 @@ fi
 #   read
 #fi
 
-if ! hash curl &>/dev/null && ! test -z "$pac_ins"; then
-    printf "${GREEN}Installing curl\n${normal}"
-    eval ${pac_ins} curl
-fi
-
-if ! hash jq &>/dev/null && ! test -z "$pac_ins"; then
-    printf "${GREEN}Installing jq\n${normal}"
-    eval ${pac_ins} jq
-fi
 
 printf "${green}If all necessary files are sourced correctly, this text looks green.\nIf not, something went wrong.\n"
 if hash gio &>/dev/null; then
@@ -82,15 +126,6 @@ if ! test -f $HOME/.environment; then
     else
         . $SCRIPT_DIR/install_envvars.sh 'n'
     fi
-fi
-
-if ! hash zip &>/dev/null || ! hash unzip &>/dev/null; then
-    printf "${CYAN}zip${normal} and/or ${CYAN}unzip${normal} are not installed \n"
-    readyn -p "Install zip and unzip?" nzp_ins
-    if [[ $nzp_ins == 'y' ]]; then
-        eval "${pac_ins}" zip unzip
-    fi
-    unset nzp_ins
 fi
 
 if [[ $machine == 'Linux' ]]; then
@@ -147,7 +182,7 @@ if [[ $distro_base == 'Debian' ]]; then
 
     if hash add-apt-repository &>/dev/null; then
         #if ! test -f $SCRIPT_DIR/install_list-ppa.sh; then
-        #    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_list-ppa.sh)
+        #    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_list-ppa.sh)
         #else
         #    . $SCRIPT_DIR/install_list-ppa.sh
         #fi
@@ -210,7 +245,7 @@ elif [[ $distro_base == 'Arch' ]]; then
         readyn -p "Install yay?" insyay
         if [[ "y" == "$insyay" ]]; then
             if hash curl &>/dev/null && ! test -f $SCRIPT_DIR/AUR_installers/install_yay.sh; then
-                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/AUR_installers/install_yay.sh)
+                source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/AUR_installers/install_yay.sh)
             else
                 . $SCRIPT_DIR/AUR_installers/install_yay.sh
             fi
@@ -227,7 +262,7 @@ elif [[ $distro_base == 'Arch' ]]; then
 
     if hash pamac &>/dev/null; then
         if ! test -f $SCRIPT_DIR/checks/check_pamac.sh; then
-            source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pamac.sh)
+            source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pamac.sh)
         else
             . $SCRIPT_DIR/checks/check_pamac.sh
         fi
@@ -249,7 +284,7 @@ if ! sudo test -f /etc/polkit/49-nopasswd_global.pkla && ! sudo test -f /etc/pol
     readyn -Y "YELLOW" -p "Install polkit files for automatic authentication for passwords? " plkit
     if [[ "y" == "$plkit" ]]; then
         if ! test -f $SCRIPT_DIR/install_polkit_wheel.sh; then
-            source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_polkit_wheel.sh)
+            source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_polkit_wheel.sh)
         else
             . $SCRIPT_DIR/install_polkit_wheel.sh
         fi
@@ -260,13 +295,13 @@ fi
 SCRIPT_DIR=$(get-script-dir)
 
 if ! test -f $SCRIPT_DIR/checks/check_envvar.sh; then
-    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)
+    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)
 else
     . $SCRIPT_DIR/checks/check_envvar.sh
 fi
 
 if ! test -f $SCRIPT_DIR/checks/checkn_completions_dir.sh; then
-    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)
+    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)
 else
     . $SCRIPT_DIR/checks/check_completions_dir.sh
 fi
@@ -278,7 +313,7 @@ if ! hash AppImageLauncher &>/dev/null; then
     readyn -p "Check if appimage ready and install appimagelauncher?" appimage_install
     if [[ "$appimage_install" == 'y' ]]; then
         if ! test -f $SCRIPT_DIR/install_appimagelauncher.sh; then
-            source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_appimagelauncher.sh)
+            source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_appimagelauncher.sh)
         else
             . $SCRIPT_DIR/install_appimagelauncher.sh
         fi
@@ -292,7 +327,7 @@ fi
 readyn -p "Install (or just configure) Flatpak?" -c "test -z \"$FLATPAK\"" insflpk
 if [[ "y" == "$insflpk" ]]; then
     if ! test -f $SCRIPT_DIR/install_flatpak.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_flatpak.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_flatpak.sh)
     else
         . $SCRIPT_DIR/install_flatpak.sh
     fi
@@ -304,7 +339,7 @@ if ! hash snap &>/dev/null; thenhttps://www.youtube.com/watch?v=mzE1ofYjq1s
     readyn -Y "MAGENTA" -p "Install snap?" -n inssnap
     if [[ "y" == "$inssnap" ]]; then
         if ! test -f $SCRIPT_DIR/install_snapd.sh; then
-            source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_snapd.sh)
+            source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_snapd.sh)
         else
             . $SCRIPT_DIR/install_snapd.sh
         fi
@@ -318,7 +353,7 @@ readyn -p "Install a Nerdfont? (Type of font with icons to distinguish filetypes
 
 if [[ "y" == "$nstll_nerdfont" ]]; then
     if ! test -f $SCRIPT_DIR/install_nerdfonts.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nerdfonts.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nerdfonts.sh)
     else
         . $SCRIPT_DIR/install_nerdfonts.sh
     fi
@@ -332,7 +367,7 @@ readyn -c "! hash ack &> /dev/null" -p "Install ack? (A modern replacement for g
 
 if [[ "y" == "$ack" ]]; then
     if ! test -f $SCRIPT_DIR/install_ack.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ack.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ack.sh)
     else
         . $SCRIPT_DIR/install_ack.sh
     fi
@@ -345,7 +380,7 @@ readyn -p "Install eza? (A modern replacement for ls)" -c "! hash eza &> /dev/nu
 
 if [[ "y" == "$rmp" ]]; then
     if ! test -f $SCRIPT_DIR/install_eza.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_eza.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_eza.sh)
     else
         . $SCRIPT_DIR/install_eza.sh
     fi
@@ -358,7 +393,7 @@ readyn -p "Install xcp? (cp but faster and with progress bar)" -c "! hash xcp &>
 
 if [[ "y" == "$rmp" ]]; then
     if ! test -f $SCRIPT_DIR/install_xcp.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_xcp.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_xcp.sh)
     else
         . $SCRIPT_DIR/install_xcp.sh
     fi
@@ -371,7 +406,7 @@ readyn -p "Install rm-prompt? (Rm but lists files/directories before deletion)" 
 
 if [[ "y" == "$rmp" ]]; then
     if ! test -f $SCRIPT_DIR/install_rmprompt.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_rmprompt.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_rmprompt.sh)
     else
         $SCRIPT_DIR/install_rmprompt.sh
     fi
@@ -385,7 +420,7 @@ unset rmp
 readyn -p "Install bash completions for aliases in ~/.bash_completion.d?" -c "! test -f ~/.bash_completion.d/complete_alias" compl
 if [[ "y" == "$compl" ]]; then
     if ! test -f $SCRIPT_DIR/install_bashalias_completions.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bashalias_completions.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bashalias_completions.sh)
     else
         . $SCRIPT_DIR/install_bashalias_completions.sh
     fi
@@ -397,7 +432,7 @@ unset compl
 readyn -p "Install python completions in ~/.bash_completion.d?" -c "! hash activate-global-python-argcomplete &> /dev/null" pycomp
 if [[ "y" == "$pycomp" ]]; then
     if ! test -f $SCRIPT_DIR/install_python_completions.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_python_completions.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_python_completions.sh)
     else
         . $SCRIPT_DIR/install_python_completions.sh
     fi
@@ -429,7 +464,7 @@ yes-edit-no -f xresources -g "$xterm" -p "Install .Xresources at ~/? (Xterm conf
 #readyn -p "Install reade, readyn and yes-edit-no?" -c 'test -f ~/.bash_aliases.d/reade' insrde
 #if test "$insrde" == 'y'; then
 #    if ! test -f install_reade_readyn.sh; then
-#         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_reade_readyn.sh)
+#         source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_reade_readyn.sh)
 #    else
 #        ./install_reade_readyn.sh
 #    fi
@@ -442,12 +477,12 @@ readyn -p "Install bash aliases and other config?" scripts
 if [[ "y" == "$scripts" ]]; then
 
     if ! test -f $SCRIPT_DIR/checks/check_aliases_dir.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)
     else
         . $SCRIPT_DIR/checks/check_aliases_dir.sh
     fi
     if ! test -f $SCRIPT_DIR/install_aliases.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/install_aliases.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/install_aliases.sh)
     else
         . $SCRIPT_DIR/install_aliases.sh
     fi
@@ -462,7 +497,7 @@ if [[ "y" == "$h" ]]; then
         readyn -p "Install ack and then hhighlighter?" ansr
         if [[ "$ansr" == 'y' ]]; then
             if ! test -f $SCRIPT_DIR/install_ack.sh; then
-                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ack.sh)
+                source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ack.sh)
             else
                 . $SCRIPT_DIR/install_ack.sh
             fi
@@ -472,7 +507,7 @@ if [[ "y" == "$h" ]]; then
         unset ansr
     fi
     if ! test -f $SCRIPT_DIR/install_hhighlighter.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_hhighlighter.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_hhighlighter.sh)
     else
         . $SCRIPT_DIR/install_hhighlighter.sh
     fi
@@ -484,7 +519,7 @@ test -n "$ZSH_VERSION" && source ~/.zshrc &>/dev/null
 
 
 if ! test -f install_keybinds.sh; then
-    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_keybinds.sh)
+    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_keybinds.sh)
 else
     . ./install_keybinds.sh
 fi
@@ -492,7 +527,7 @@ fi
 
 if ! test -f checks/check_all.sh; then
     if hash curl &>/dev/null; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
         return 1 || exit 1
@@ -509,7 +544,7 @@ SCRIPT_DIR=$(get-script-dir)
 readyn -p "Install pre-execution hooks for bash in ~/.bash_preexec?" -c "! test -f ~/.bash_preexec.sh || ! test -f /root/.bash_preexec.sh" bash_preexec
 if [[ "y" == "$bash_preexec" ]]; then
     if ! test -f $SCRIPT_DIR/install_bash_preexec.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bash_preexec.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bash_preexec.sh)
     else
         . $SCRIPT_DIR/install_bash_preexec.sh
     fi
@@ -521,7 +556,7 @@ unset bash_preexec
 readyn -p "Install and configure pipewire? (sound system - pulseaudio replacement)" -c '! hash wireplumber &> /dev/null || ! test -f ~/.config/pipewire/pipewire-pulse.conf.d/switch-on-connect.conf;' pipew
 if [[ "$pipew" == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_pipewire.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipewire.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipewire.sh)
     else
         . $SCRIPT_DIR/install_pipewire.sh
     fi
@@ -534,7 +569,7 @@ readyn -p "Install moar? (Custom pager/less replacement - awesome default option
 
 if [[ "$moar" == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_moar.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_moar.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_moar.sh)
     else
         . $SCRIPT_DIR/install_moar.sh
     fi
@@ -547,7 +582,7 @@ readyn -p "Install nano + config? (Simple terminal editor)" -c "! hash nano &> /
 
 if [[ "y" == "$nno" ]]; then
     if ! test -f $SCRIPT_DIR/install_nano.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nano.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nano.sh)
     else
         . $SCRIPT_DIR/install_nano.sh
     fi
@@ -560,7 +595,7 @@ readyn -p "Install neovim + config? (Complex terminal editor)" -c "! hash nvim &
 
 if [[ "y" == "$nvm" ]]; then
     if ! test -f $SCRIPT_DIR/install_nvim.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nvim.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nvim.sh)
     else
         . $SCRIPT_DIR/install_nvim.sh
     fi
@@ -573,7 +608,7 @@ readyn -p "Install Kitty? (Terminal emulator)" -c "! hash kitty &> /dev/null" ki
 
 if [[ "y" == "$kittn" ]]; then
     if ! test -f $SCRIPT_DIR/install_kitty.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_kitty.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_kitty.sh)
     else
         . $SCRIPT_DIR/install_kitty.sh
     fi
@@ -586,7 +621,7 @@ readyn -p "Install fzf? (Fuzzy file/folder finder - keybinding yes for upgraded 
 
 if [[ "y" == "$findr" ]]; then
     if ! test -f $SCRIPT_DIR/install_fzf.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fzf.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fzf.sh)
     else
         . $SCRIPT_DIR/install_fzf.sh
     fi
@@ -598,7 +633,7 @@ unset findr
 readyn -p "Install ripgrep? (recursively searches the current directory for lines matching a regex pattern)" -c "! hash rg &> /dev/null" rgrp
 if [[ "y" == "$rgrp" ]]; then
     if ! test -f $SCRIPT_DIR/install_ripgrep.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ripgrep.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ripgrep.sh)
     else
         . $SCRIPT_DIR/install_ripgrep.sh
     fi
@@ -610,7 +645,7 @@ unset rgrp
 readyn -p "Install ast-grep? (Search and Rewrite code at large scale using precise AST pattern)" -c "! hash ast-grep &> /dev/null" rgrp
 if [[ "y" == "$rgrp" ]]; then
     if ! test -f $SCRIPT_DIR/install_ast-grep.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ast-grep.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ast-grep.sh)
     else
         . $SCRIPT_DIR/install_ast-grep.sh
     fi
@@ -639,7 +674,7 @@ readyn -p "Install Lazygit?" -c "! hash lazygit &> /dev/null" git_ins
 if [[ "y" == "$git_ins" ]]; then
 
     if ! test -f $SCRIPT_DIR/install_lazygit.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_lazygit.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_lazygit.sh)
     else
         . $SCRIPT_DIR/install_lazygit.sh
     fi
@@ -659,7 +694,7 @@ unset git_ins
 readyn -p "Install Ranger? (Terminal file explorer)" -c "! hash ranger &> /dev/null" rngr
 if [[ "y" == "$rngr" ]]; then
     if ! test -f $SCRIPT_DIR/install_ranger.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ranger.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ranger.sh)
     else
         . $SCRIPT_DIR/install_ranger.sh
     fi
@@ -671,7 +706,7 @@ unset rngr
 readyn -p "Install Tmux? (Terminal multiplexer)" -c "! hash tmux &> /dev/null" tmx
 if [[ "y" == "$tmx" ]]; then
     if ! test -f $SCRIPT_DIR/install_tmux.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_tmux.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_tmux.sh)
     else
         . $SCRIPT_DIR/install_tmux.sh
     fi
@@ -684,7 +719,7 @@ readyn -p "Install Bat? (Cat clone with syntax highlighting)" -c "! hash bat &> 
 
 if [[ $bat == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_bat.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bat.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bat.sh)
     else
         . $SCRIPT_DIR/install_bat.sh
     fi
@@ -697,7 +732,7 @@ readyn -p "Install neofetch/fastfetch/screenFetch)? (Terminal taskmanager - syst
 
 if [[ "$tojump" == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_neofetch_onefetch.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_neofetch_onefetch.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_neofetch_onefetch.sh)
     else
         . $SCRIPT_DIR/install_neofetch_onefetch.sh
     fi
@@ -709,7 +744,7 @@ unset tojump
 readyn -p "Install Btop? (A processmanager with a fastly improved TUI relative to top/htop written in C++)" -c "! hash btop &> /dev/null" tojump
 if [[ "$tojump" == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_btop.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_btop.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_btop.sh)
     else
         . $SCRIPT_DIR/install_btop.sh
     fi
@@ -722,7 +757,7 @@ unset tojump
 readyn -n -p "Install autojump? (jump to folders using 'bookmarks' - j_ )" tojump
 if [[ "$tojump" == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_autojump.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_autojump.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_autojump.sh)
     else
         . $SCRIPT_DIR/install_autojump.sh
     fi
@@ -734,7 +769,7 @@ unset tojump
 readyn -p "Install zoxide? (A cd that guesses the right path based on a history)" -c "! hash zoxide &> /dev/null" zoxs
 if [[ "$zoxs" == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_zoxide.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_zoxide.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_zoxide.sh)
     else
         . $SCRIPT_DIR/install_zoxide.sh
     fi
@@ -746,7 +781,7 @@ unset zoxs
 readyn -p "Install Starship? (Snazzy looking prompt)" -c "! hash starship &> /dev/null" strshp
 if [[ "$strshp" == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_starship.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_starship.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_starship.sh)
     else
         . $SCRIPT_DIR/install_starship.sh
     fi
@@ -759,7 +794,7 @@ unset strshp
 readyn -p "Install 'pay-respects'? (Correct last command that ended with an error - 'thefuck' successor)" -c "! hash pay-respects &> /dev/null" tf
 if [[ "$tf" == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_f.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_f.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_f.sh)
     else
         . $SCRIPT_DIR/install_f.sh
     fi
@@ -771,7 +806,7 @@ unset tf
 readyn -p "Install nmap? (Network port scanning tool)" -c '! hash nmap &> /dev/null' nmap
 if [[ "$nmap" == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_nmap.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nmap.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nmap.sh)
     else
         . $SCRIPT_DIR/install_nmap.sh
     fi
@@ -783,7 +818,7 @@ unset nmap
 readyn -p "Install ufw? (Uncomplicated firewall - Iptables wrapper)" -c "! hash ufw &> /dev/null" ins_ufw
 if [[ $ins_ufw == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_ufw.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ufw.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ufw.sh)
     else
         . $SCRIPT_DIR/install_ufw.sh
     fi
@@ -805,7 +840,7 @@ unset ins_ufw
 #reade -Q "$color" -i "$pre" -p "Install netstat? (Also port scanning tool) $prmpt" "$othr" tojump
 #if [[ "$tojump" == "y" ]]; then
 #    if ! test -f install_netstat.sh; then
-#        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_netstat.sh)
+#        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_netstat.sh)
 #    else
 #        ./install_netstat.sh
 #    fi
@@ -818,7 +853,7 @@ unset ins_ufw
 readyn -p "Install lazydocker?" -c "! hash lazydocker &> /dev/null" git_ins
 if [[ "y" == "$git_ins" ]]; then
     if ! test -f $SCRIPT_DIR/install_lazydocker.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_lazydocker.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_lazydocker.sh)
     else
         . $SCRIPT_DIR/install_lazydocker.sh
     fi
@@ -830,7 +865,7 @@ unset git_ins
 readyn -p "Install exiftool? (Metadata wiper for files)" -c "! hash exiftool &> /dev/null" exif_t
 if [[ "$exif_t" == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_exiftool.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_exiftool.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_exiftool.sh)
     else
         . $SCRIPT_DIR/install_exiftool.sh
     fi
@@ -842,7 +877,7 @@ unset exif_t
 readyn -p "Install testdisk? (File recovery tool)" -c "! hash testdisk &> /dev/null" kittn
 if [[ "y" == "$kittn" ]]; then
     if ! test -f $SCRIPT_DIR/install_testdisk.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_testdisk.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_testdisk.sh)
     else
         . $SCRIPT_DIR/install_testdisk.sh
     fi
@@ -854,7 +889,7 @@ unset kittn
 readyn -p "Install ffmpeg? (video/audio/image file converter)" -c "! hash ffmpeg &> /dev/null" ffmpg
 if [[ "$ffmpg" == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_ffmpeg.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ffmpeg.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ffmpeg.sh)
     else
         . $SCRIPT_DIR/install_ffmpeg.sh
     fi
@@ -866,7 +901,7 @@ unset ffmpg
 readyn -p "Install yt-dlp? (youtube video downloader)" -c "! hash yt-dlp &> /dev/null" yt_dlp
 if [[ "$yt_dlp" == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_yt-dlp.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_yt-dlp.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_yt-dlp.sh)
     else
         . $SCRIPT_DIR/install_yt-dlp.sh
     fi
@@ -890,7 +925,7 @@ unset yt_dlp
 #reade -Q "$color" -i "$pre" -p "Check existence/create .environment and link it to .bashrc in $HOME/ and /root/? $prmpt" "$othr" envvars
 #if [[ "$envvars" == "y" ]] || [[ -z "$envvars" ]]  then
 if ! test -f $SCRIPT_DIR/install_envvars.sh; then
-    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_envvars.sh)
+    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_envvars.sh)
 else
     . $SCRIPT_DIR/install_envvars.sh
 fi
@@ -900,7 +935,7 @@ fi
 
 #if ! test -f ./checks/check_bash_source_order.sh; then
 #    if hash curl &>/dev/null; then
-#        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_bash_source_order.sh)
+#        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_bash_source_order.sh)
 #    else
 #        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
 #        return 1 || exit 1

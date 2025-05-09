@@ -185,7 +185,7 @@ readyn -p "Install tmux completions?" tmuxx
 if [[ "$tmuxx" == "y" ]]; then
 
     if ! test -f checks/check_completions_dir.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)
     else
         . ./checks/check_completions_dir.sh
     fi

@@ -16,7 +16,7 @@ fi
 if ! type go &> /dev/null; then
     echo "Go is not installed. Installing Go..."
     if ! test -f install_go.sh; then
-         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh) 
+         source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh) 
     else
         . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
     fi

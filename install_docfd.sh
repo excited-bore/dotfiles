@@ -26,9 +26,9 @@ if ! command -v fzf &> /dev/null; then
     readyn -p "Install fzf? (Fuzzy file/folder finder - keybinding yes for upgraded Ctrl-R/reverse-search, fzf filenames on Ctrl+T and fzf-version of 'cd' on Alt-C + Custom script: Ctrl-f becomes system-wide file opener)" findr
     if [[ "y" == "$findr" ]]; then
         if ! test -f install_fzf.sh; then
-            source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fzf.sh) 
+            source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fzf.sh) 
         else
-            ./install_fzf.sh
+            . ./install_fzf.sh
         fi
     fi
 fi

@@ -12,25 +12,25 @@ else
 fi
 
 if ! test -f checks/check_completions_dir.sh; then
-     source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh) 
+     source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh) 
 else
     . ./checks/check_completions_dir.sh
 fi
 
 if ! test -f checks/check_AUR.sh; then
-     source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_AUR.sh)
+     source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_AUR.sh)
 else
     . ./checks/check_AUR.sh
 fi
 
 if ! test -f install_go.sh; then
-     source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_go.sh)
+     source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_go.sh)
 else
     . ./install_go.sh
 fi
 
 if ! test -f install_docker.sh; then
-     source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_docker.sh)
+     source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_docker.sh)
 else
     . ./install_docker.sh
 fi
@@ -49,7 +49,7 @@ elif [[ $distro_base == "Debian" ]]; then
     sudo install -Dm644 "$TMPDIR/apx/config/config.json" "/etc/apx/config.json"
     sudo sed -i "s,\(\"distroboxpath\": \"\).*,\1/home/$USER/.local/bin/distrobox\",g" /etc/apx/config.json
     if ! test -f install_distrobox.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_distrobox.sh) 
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_distrobox.sh) 
      else
         . ./install_distrobox.sh
     fi

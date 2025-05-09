@@ -9,7 +9,7 @@ if type curl &> /dev/null && ! type pipx &> /dev/null; then
 fi
 
 if ! test -f checks/check_completions_dir.sh; then
-     source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)
+     source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)
 else
     . ./checks/check_completions_dir.sh
 fi

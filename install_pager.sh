@@ -17,26 +17,26 @@ SCRIPT_DIR=$(get-script-dir)
 reade -Q "GREEN" -i "moar bat most nvimpager" -p "Which to install? [Bat/moar/most/nvimpager]: " pager
 if [[ $pager == "bat" ]]; then
     if ! test -f install_bat.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bat.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bat.sh)
     else
         . ./install_bat.sh
     fi
 
 elif [[ $pager == "moar" ]]; then
     if ! test -f install_moar.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_moar.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_moar.sh)
     else
         . ./install_moar.sh
     fi
 elif [[ $pager == "most" ]]; then
     if ! test -f install_most.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_most.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_most.sh)
     else
         . ./install_most.sh
     fi
 elif [[ $pager == "nvimpager" ]]; then
     if ! test -f install_nvimpager.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nvimpager.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nvimpager.sh)
     else
         . ./install_nvimpager.sh
     fi

@@ -14,7 +14,7 @@ fi
 SCRIPT_DIR=$(get-script-dir)
 
 if ! test -f checks/check_envvar.sh; then
-     source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh) 
+     source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh) 
 else
     . ./checks/check_envvar.sh
 fi

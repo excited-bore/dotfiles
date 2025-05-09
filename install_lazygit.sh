@@ -23,7 +23,7 @@ if ! type lazygit &>/dev/null; then
             if ! type curl &>/dev/null; then
                 eval "${pac_ins} curl"
             fi
-            LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po --color=never '"tag_name": "v\K[^"]*')
+            LAZYGIT_VERSION=$(curl "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po --color=never '"tag_name": "v\K[^"]*')
             wget-name $TMPDIR/lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
             (cd $TMPDIR && tar xf lazygit.tar.gz lazygit)
             sudo install $TMPDIR/lazygit -D -t /usr/local/bin
@@ -35,7 +35,7 @@ lazygit --help | $PAGER
 
 file=lazygit/.config/lazygit/config.yml.example
 if ! test -f $file; then
-    file=$(curl -fsSL -o ~/.config/lazygit/config.yml.example https://raw.githubusercontent.com/excited-bore/dotfiles/main/lazygit/.config/lazygit/)
+    file=$(wget-name ~/.config/lazygit/config.yml.example https://raw.githubusercontent.com/excited-bore/dotfiles/main/lazygit/.config/lazygit/config.yml.example)
 fi
 
 readyn -p 'Configure lazygit?' conflazy
@@ -46,7 +46,7 @@ if [[ 'y' == $conflazy ]]; then
     }
     yes-edit-no -g "$file" -p 'Copy an example lazygit yaml config file into ~/.config/lazygit/?' -f cp_lazy_conf -c "test -f ~/.config/lazygit/config.yml.example || ! (test -f ~/.config/lazygit/config.yml.example && test -n $(diff ~/.config/lazygit/config.yml.example $file 2>/dev/null)) &> /dev/null"
     if ! test -f install_differ_pager.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_git.sh)
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_git.sh)
     else
         . ./install_git.sh
     fi
@@ -56,7 +56,7 @@ if [[ 'y' == $conflazy ]]; then
         readyn -n -p "Install custom diff syntax highlighter?" gitpgr
         if [[ "$gitpgr" == "y" ]]; then
             if ! test -f install_differ.sh; then
-                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_differ.sh)
+                source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_differ.sh)
             else
                 . ./install_differ.sh
             fi
@@ -69,7 +69,7 @@ fi
 #    readyn -p "Install copy-to?" cpcnf
 #    if [[ "y" == "$cpcnf" ]] || [ -z "$cpcnf" ]; then
 #        if ! test -f install_copy-to.sh; then
-#            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_copy-to.sh)"
+#            /bin/bash -c "$(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_copy-to.sh)"
 #        else
 #            . ./install_copy-to.sh
 #        fi
@@ -81,7 +81,7 @@ fi
 #        readyn -p "Set up an alias so copy-to does a 'run all' when starting up lazygit?" nstll
 #        if [[ "$nstll" == "y" ]]; then
 #            if ! test -f checks/check_aliases_dir.sh; then
-#                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)
+#                source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)
 #            else
 #                . ./checks/check_aliases_dir.sh
 #            fi
