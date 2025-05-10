@@ -361,8 +361,8 @@ if type lazygit &>/dev/null; then
 fi
 
 # F5, Ctrl-r - Reload .bashrc
-bind '"\205": re-read-init-file'
-bind -x '"\206": source ~/.profile && source ~/.bashrc'
+bind '"\205": re-read-init-file;'
+bind -x '"\206": source ~/.bashrc'
 bind -m emacs-standard '"\e[15~": "\205\206"'
 bind -m vi-command '"\e[15~": "\205\206"'
 bind -m vi-insert '"\e[15~": "\205\206"'

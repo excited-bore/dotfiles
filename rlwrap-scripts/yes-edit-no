@@ -1,10 +1,7 @@
-#!/bin/bash
-
 # Get script dir when sourced
 
 if test -z $ZSH_VERSION; then
-    #[[ $0 != $BASH_SOURCE ]] && SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")" || SCRIPT_DIR="$(cd "$(dirname "$-1")" && pwd)"
-    SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+    SCRIPT_DIR=$( builtin cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 else
     SCRIPT_DIR="${0:A:h}"
 fi

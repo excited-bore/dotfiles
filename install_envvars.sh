@@ -297,10 +297,6 @@ if [[ "$envvars" == "y" ]] && [[ "$1" == 'n' ]]; then
     # Set READE_NOSTYLE
     sed -i 's|#export READE_NOSTYLE|export READE_NOSTYLE|' $pathvr
 
-    # Check and set cargo
-    #[ -d ~/.cargo/bin ] && 
-    #    sed -i 's|#export PATH=$PATH:$HOME/.cargo/bin|export READE_NOSTYLE|' $pathvr
-
     #if ! grep -q '.environment' ~/.bashrc && ! grep -q '.environment' $PROFILE; then
     yes-edit-no -f environment-variables -g "$pathvr" -p "Install .environment in $HOME?" -e 
     printf "It's recommended to logout and login again to notice a change for ${MAGENTA}.profile${normal} and any ${CYAN}.*shell*_profiles\n${normal}"
@@ -321,8 +317,11 @@ elif [[ "$envvars" == "y" ]]; then
     sed -i 's/  --preview-window/ #--preview-window/' $pathvr
     sed -i 's/  --color/ #--color/' $pathvr
 
-    # Set tmpdir
+    # Set TMPDIR
     sed 's|#export TMPDIR|export TMPDIR|' -i $pathvr
+    
+    # Set READE_NOSTYLE
+    sed -i 's|#export READE_NOSTYLE|export READE_NOSTYLE|' $pathvr
 
     if ! grep -q '.environment' ~/.bashrc && ! grep -q '.environment' $PROFILE; then
         yes-edit-no -f environment-variables -g "$pathvr" -p "Install .environment in $HOME?" -e

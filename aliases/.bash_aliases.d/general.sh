@@ -13,7 +13,7 @@ if [ -z $TRASHBIN_LIMIT ]; then
 fi
 
 if [[ $machine == 'Windows' ]] && [[ $win_bash_shell == 'Cygwin' ]]; then
-    alias cd-home-="cd /cygdrive/c/Users/$USER"
+    alias cd-home="cd /cygdrive/c/Users/$USER"
 fi
 
 if type sudo &> /dev/null; then
@@ -70,9 +70,12 @@ alias disable-glob="set -f"
 
 # Cd wrapper
 function cd-w() {
-    ! test -d $@ && 
-        builtin cd -- $@ && 
+    
+    if ! test -d $@; then 
+        builtin cd -- "$@" 
         return 1 
+    fi
+    
     local push=1
     local j=0
     if [[ "$1" == "--" ]]; then
@@ -98,6 +101,7 @@ function cd-w() {
 }
 
 complete -F _cd cd-w
+
 if type _fzf_dir_completion &> /dev/null; then
     complete -F _fzf_dir_completion cd
 fi
@@ -110,7 +114,7 @@ alias cp-old="cp -ruv"
 alias copy="cp"
 
 # scp - copy over ssh 
-alias scp="scp -r "
+alias scp="scp -r"
 
 
 function cp-all-to(){
@@ -139,34 +143,23 @@ alias cpf-bckup="cp -f -b"
 #    local sorce=()
 #    local target=0
 #    local args=$@
-#    #VALID_ARGS=$(getopt -o abdfiHlPpRrsStTuvxZ --long \
-#    #archive, \
-#    #attributes-only, \
-#    #backup:, \
-#    #copy-contents, \
-#    #debug, \
-#    #force, \
-#    #interactive, \
-#    #link, \
-#    #no-dereference, \
-#    #preserve:, \
-#    #no-preserve:, \
-#    #parents¸ \
-#    #recursive, \
-#    #reflink:, \
-#    #remove-destination, \
-#    #sparse:, \
-#    #strip-trailing-slashes, \
-#    #symbolic-link, \
-#    #suffix:, \
-#    #target-directory:, \
-#    #no-target-directory, \
-#    #update:, \
-#    #verbose, \
-#    #one-file-system, \
-#    #context:, \
-#    #help, \
-#    #version -- "$@")
+    #TEMP=$(getopt -o abdfiHlLnPpRrsStTuvxZh: --long archive,attributes-only,backup:,copy-contents,debug,force,interactive,link,dereference,no-clobber,no-dereference,preserve:,no-preserve:,parents,recursive,reflink:,remove-destination,sparse:,strip-trailing-slashes,symbolic-link,suffix:,target-directory:,no-target-directory,update:,verbose,keep-directory-symlink,one-file-system,context:,help,version \
+             # -n 'cp' -- "$@") 
+    
+    # Note the quotes around '$TEMP': they are essential!
+    #eval set -- "$TEMP" 
+
+    #while true; do
+    #    case "$1" in
+    #    -a | -b | --archive | --attributes-only | --copy-contents | -d | --debug | -f | --force | -i | --interactive | -H | -l | --link | -L | --dereference | -n | --no-clobber | -P | --no-dererence | -p | --preserve | --no-preserve | --parents | -R | -r | --recursive | --reflink | --remove-destination | --sparse | --strip-trailing-slashes | -s | --symbolic-link | -T | --no-target-directory | --update | -u | -v | --verbose | --keep-directory-symlink | -x | --one-file-system | -Z | --context | --help | --version) shift  ;;
+    #    --backup) echo $2; bcp="$2"; shift 2 ;;
+    #    -t | --target-directory) target="$2"; shift 2 ;; 
+    #    -S | --suffix) suff="$2"; shift 2 ;; 
+    #    -- ) shift; break; ;; 
+    #    * ) break ;;
+    #  esac
+    #done 
+#    
 #    #
 #    #eval set -- "$VALID_ARGS"
 #    
@@ -232,48 +225,113 @@ alias cpf-bckup="cp -f -b"
 
 
 function cp-trash(){
-    local dest="${@: -1:1}"
-    local sorce=()
-    local target=0
-    local suff="~"
+    
+    # Make zsh have 0-indexed arrays
+    test -n "$ZSH_VERSION" &&
+        setopt KSH_ARRAYS       
+    
+    local target
+    local suff
+    local bcp
+    
+    local args="$@" 
+    local othrargs="" 
     local i=0
-    local bcp=0
-    local frc=0
-    for arg in $@ ; do
-        i=$((i+1))
+    
+    for arg in "$@"; do
+        i=$(($i+1)) 
         case "$arg" in
-            -b | --backup)  bcp=1 ;;
-            -S | --suffix)
-                suff=dest="${@: $i+1:1}";;
-            -t | --target-directory)  
-                target=1
-                dest="${@: $i+1:1}" ;;
+            -a | --archive | --attributes-only | --copy-contents | -d | --debug | -f | --force | -i | --interactive | -H | -l | --link | -L | --dereference | -n | --no-clobber | -P | --no-dererence | -p | --preserve | --preserve=* | --no-preserve=* | --parents | -R | -r | --recursive | --reflink | --reflink=* | --remove-destination | --sparse=* | --strip-trailing-slashes | -s | --symbolic-link | -T | --no-target-directory | --update | --update=* | -u | -v | --verbose | --keep-directory-symlink | -x | --one-file-system | -Z | --context | --context=* | --help | --version) 
+               othrargs="$othrarg $arg"; shift ;; 
+            -b | --backup | --backup=*) 
+                if [[ "$arg" =~ "--backup=" ]]; then
+                    bcp="${arg#--backup=}" ;
+                else
+                    bcp="simple" ;
+                fi; 
+                othrargs="$othrarg $arg"; shift ;;
+            -t) target="${@:$(($i+1)):1}"; shift 2 ;;
+            --target-directory=*) target="${arg#--target-directory=}"; shift ;;
+            -S) suff="${@:$(($i+1)):1}"; 
+               othrargs="$othrarg $arg $suff"; shift 2 ;; 
+            --suffix=*) suff="${arg#--suffix=}"; 
+               othrargs="$othrarg $arg"; shift ;;
+            -* | --*) echo "cp-trash: unrecognized option '"$arg"'"; return 1 ;; 
+            --) break ;; 
         esac
     done
-    
-    if [[ $bcp == 1 ]]; then
-        cp "$@"
-    else
-        cp -b "$@"
+   
+    if test -n "$target" && ! [ -d "$target" ]; then
+        printf "cp: target directory '"$target"': Not a directory\n"
+        return 1
+    fi
+ 
+    local sorce=("$@")
+   
+    if test -z "$target"; then
+        target="${sorce[-1]}" 
+        unset "sorce[${#sorce[@]}-1]"
     fi
     
-    if [ -d "$dest" ]; then
-        target=1
+    local tdir="$(dirname $(readlink -f "$target"))" 
+    if [ -d "$target" ]; then
+        tdir="$target"
     fi
-    
-    if [[ $target == 1 ]] ; then
-        for s in "${sorce[@]}"; do
-            if [ -a "$dest/$s$suff" ]; then 
-                trash "$dest/$(basename $s$suff)" 
-                echo "Backup for $dest/$(basename $s$suff)  put in trash."
-            fi 
-        done
-    else
-        if test -a "$dest$suff"; then
-            trash "$dest$suff"
-            echo "Backup(s) put in trash. Use 'gio trash --list' to list / 'gio trash --restore' to restore"
+
+    for s in "${sorce[@]}"; do
+        local src="$tdir/$(basename $s)" 
+        if [ -a "$src" ]; then 
+            
+            local opts="overwrite diff trash"
+            local prmpt="[Overwrite/diff/trash]" 
+            if ! ([[ "$othrargs" =~ '-b' ]] || [[ "$othrargs" =~ '--backup' ]]); then
+                opts="overwrite diff backup trash"
+                prmpt="[Overwrite/diff/backup/trash]" 
+            fi
+            echo "About to overwrite ${CYAN}'$src'${YELLOW}" 
+            reade -Q 'YELLOW' -i "$opts" -p "What to do? $prmpt: " descn
+            if [[ "$descn" == 'overwrite' ]]; then
+                if ([[ "$othrargs" =~ "-f" ]] || [[ "$othrargs" =~ '--force' ]]); then
+                    command cp $othrargs "$s" "$target"
+                else
+                    command cp -f $othrargs "$s" "$target"
+                fi
+            elif [[ "$descn" == 'backup' ]]; then 
+                command cp -b $othrargs "$s" "$target"  
+            elif [[ "$descn" == 'diff' ]]; then 
+                diff "$s" "$src" | $PAGER  
+                opts="overwrite trash"
+                prmpt="[Overwrite/trash]" 
+                if ! ([[ "$othrargs" =~ '-b' ]] || [[ "$othrargs" =~ '--backup' ]]); then
+                    opts="overwrite backup trash"
+                    prmpt="[Overwrite/backup/trash]" 
+                fi
+                echo "About to overwrite ${CYAN}'$src'${YELLOW}" 
+                reade -Q 'YELLOW' -i "$opts" -p "What to do? $prmpt: " descn1
+                if [[ "$descn1" == 'overwrite' ]]; then
+                    if ([[ "$othrargs" =~ "-f" ]] || [[ "$othrargs" =~ '--force' ]]); then
+                        command cp $othrargs "$s" "$target"
+                    else
+                        command cp -f $othrargs "$s" "$target"
+                    fi 
+                elif [[ "$descn1" == 'backup' ]]; then 
+                    command cp -b $othrargs "$s" "$target"
+                elif [[ "$descn1" == 'trash' ]]; then
+                    trash "$src" 
+                    echo "$src trashed before copying"
+                    command cp $args
+                fi
+            elif [[ "$descn" == 'trash' ]]; then
+                trash "$src" 
+                echo "$src trashed before copying"
+                command cp $args
+                 
+            fi
         fi  
-    fi
+    done
+   
+    unset descn descn1 
+    #echo "Backup(s) put in trash. Use 'gio trash --list' to list / 'gio trash --restore' to restore"
 }
 
 # Cp recursively and verbose
@@ -702,19 +760,19 @@ alias hardlink="ln-hard"
 #complete -F _filedir ln-hard
 
 function trash(){
-    for arg in $@ ; do
+    for arg in "$@" ; do
         if [ -f "$arg" ] || [ -d "$arg" ]; then
-            gio trash $arg;
+            gio trash "$arg";
             if [ $(gio trash --list | wc -l) -gt "$TRASHBIN_LIMIT" ]; then
                 local ansr
                 echo "${red1}Trashbin has more then $TRASHBIN_LIMIT items"
-                reade -Q "YELLOW" -i "y" -p "Empty? ('trash-restore' to restore) [Y/n]: " "n"  ansr
-                if [ $ansr == "y" ]; then
+                readyn -Y 'YELLOW' -p "Empty? ('trash-restore' to restore)"  ansr
+                if [[ $ansr == "y" ]]; then
                     trash-empty
                 fi
             fi
         elif [ -L "$arg" ]; then
-            rm $arg;
+            command rm $arg;
         else
             echo "Trash one or more files / directories. Nothing passed as argument";
         fi
