@@ -159,6 +159,7 @@ else
     eval "${pac_ins}" neovim
 fi
 
+nvim --version
 nvim --help | $PAGER
 
 if [[ $machine == 'Linux' ]]; then
@@ -244,7 +245,7 @@ if [[ "$langs" == 'y' ]]; then
         fi
     fi
 
-    if type cpan &>/dev/null; then
+    if hash cpan &>/dev/null; then
         printf "${CYAN}Perl uses cpan for the installation of modules and initializing perl modules for the first time can take a while.\n${normal}"
         readyn -p "Run it now and check whether neovim module is installed?" cpn
         if [[ "y" == $cpn ]]; then
@@ -381,7 +382,9 @@ function instvim() {
     # Symlink configs to flatpak dirs for possible flatpak nvim use
     if type flatpak &>/dev/null && echo "$(flatpak list)" | grep -q "neovim"; then
         mkdir -p ~/.var/app/io.neovim.nvim/config/nvim/
-        ln -s ~/.config/nvim/* ~/.var/app/io.neovim.nvim/config/nvim/
+        if ! test -L $(ls ~/.config/nvim/); then
+            ln -s ~/.config/nvim/* ~/.var/app/io.neovim.nvim/config/nvim/
+        fi
     fi
 
     if grep -q "MYVIMRC" $ENV; then
@@ -419,7 +422,9 @@ function instvim() {
 
     readyn -Y 'YELLOW' -p "Make symlink for init.vim at ~/.vimrc for user? (Might conflict with nvim +checkhealth)" -c "! test -f ~/.vimrc" vimrc
     if [[ $vimrc == 'y' ]]; then
-        ln -s ~/.config/nvim/init.vim ~/.vimrc
+        if ! test -L ~/.config/nvim/init.vim; then
+            ln -s ~/.config/nvim/init.vim ~/.vimrc
+        fi
     fi
     yes-edit-no -f instvim_r -g "$dir/init.vim $dir/init.lua.vim $dir/plug_lazy_adapter.vim" -p "Install (neo)vim readconfigs at /root/.config/nvim/ ? (init.vim, init.lua, etc..)" -e -Q "YELLOW"
 }

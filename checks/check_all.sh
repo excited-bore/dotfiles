@@ -121,7 +121,7 @@ fi
 alias get-script-dir='cd "$( dirname "$-1" )" && pwd'
 
 # Make sure cp copies forceably (without asking confirmation when overwriting) and verbosely
-if hash xcp &> /dev/null && ! [[ "$(type cp)" =~ 'xcp -v' ]]; then
+if hash xcp &> /dev/null && ! [[ "$(type cp)" =~ 'xcp' ]]; then
     echo "Since you have xcp installed, this next $(tput setaf 1)sudo$(tput sgr0) will check whether it can be used for the script (if it's sudo executable, it is)"
     sudo bash -c "hash xcp" &&
         alias cp='xcp' ||
