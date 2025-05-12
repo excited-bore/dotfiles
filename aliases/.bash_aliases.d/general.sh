@@ -272,15 +272,15 @@ function cp-trash(){
         target="${sorce[-1]}" 
         unset "sorce[${#sorce[@]}-1]"
     fi
-    
-    local tdir="$(dirname $(readlink -f "$target"))" 
-    if [ -d "$target" ]; then
-        tdir="$target"
-    fi
 
     for s in "${sorce[@]}"; do
-        local src="$tdir/$(basename $s)" 
-        if [ -a "$src" ]; then 
+        local trgt 
+        if test -f $target; then
+            trgt=$target 
+        else
+            trgt="$target/$(basename $s)" 
+        fi
+        if [ -a "$trgt" ]; then 
             
             local opts="overwrite diff trash"
             local prmpt="[Overwrite/diff/trash]" 
@@ -288,7 +288,7 @@ function cp-trash(){
                 opts="overwrite diff backup trash"
                 prmpt="[Overwrite/diff/backup/trash]" 
             fi
-            echo "About to overwrite ${CYAN}'$src'${YELLOW}" 
+            echo "About to overwrite ${CYAN}'$trgt'${YELLOW}" 
             reade -Q 'YELLOW' -i "$opts" -p "What to do? $prmpt: " descn
             if [[ "$descn" == 'overwrite' ]]; then
                 if ([[ "$othrargs" =~ "-f" ]] || [[ "$othrargs" =~ '--force' ]]); then
@@ -299,14 +299,14 @@ function cp-trash(){
             elif [[ "$descn" == 'backup' ]]; then 
                 command cp -b $othrargs "$s" "$target"  
             elif [[ "$descn" == 'diff' ]]; then 
-                diff "$s" "$src" | $PAGER  
+                diff "$s" "$trgt" | $PAGER  
                 opts="overwrite trash"
                 prmpt="[Overwrite/trash]" 
                 if ! ([[ "$othrargs" =~ '-b' ]] || [[ "$othrargs" =~ '--backup' ]]); then
                     opts="overwrite backup trash"
                     prmpt="[Overwrite/backup/trash]" 
                 fi
-                echo "About to overwrite ${CYAN}'$src'${YELLOW}" 
+                echo "About to overwrite ${CYAN}'$trgt'${YELLOW}" 
                 reade -Q 'YELLOW' -i "$opts" -p "What to do? $prmpt: " descn1
                 if [[ "$descn1" == 'overwrite' ]]; then
                     if ([[ "$othrargs" =~ "-f" ]] || [[ "$othrargs" =~ '--force' ]]); then
@@ -317,13 +317,13 @@ function cp-trash(){
                 elif [[ "$descn1" == 'backup' ]]; then 
                     command cp -b $othrargs "$s" "$target"
                 elif [[ "$descn1" == 'trash' ]]; then
-                    trash "$src" 
-                    echo "$src trashed before copying"
+                    trash "$trgt" 
+                    echo "$trgt trashed before copying"
                     command cp $args
                 fi
             elif [[ "$descn" == 'trash' ]]; then
-                trash "$src" 
-                echo "$src trashed before copying"
+                trash "$trgt" 
+                echo "$trgt trashed before copying"
                 command cp $args
                  
             fi
