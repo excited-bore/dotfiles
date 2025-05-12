@@ -39,18 +39,44 @@ get-latest-releases-github https://github.com/ryanoasis/nerd-fonts $fonts/
 
 if [[ "$(ls $fonts/*)" ]]; then
 
-    [[ "$(ls $fonts/*.zip 2> /dev/null)" ]] &&
-        unzip $fonts/*.zip -d $fonts &&
+    if [[ "$(ls $fonts/*.zip &> /dev/null)" ]]; then
+        name=$(basename $(command ls $fonts/) .zip)
+        unzip $fonts/*.zip -d $fonts 
         rm $fonts/*.zip
+    fi
 
-    [[ "$(ls $fonts/*.tar.xz 2> /dev/null)" ]] &&
-        tar -xf $fonts/*.tar.xz -C $fonts &&
+    if [[ "$(ls $fonts/*.tar.xz 2> /dev/null)" ]]; then
+        name=$(basename $(command ls $fonts/) .tar.xz) 
+        tar -xf $fonts/*.tar.xz -C $fonts
         rm $fonts/*.tar.xz
+    fi
+    echo "$name" 
 
     mv $fonts/* ~/.local/share/fonts
     sudo fc-cache -fv
 fi
 
-#ltstv=$(curl -sL "https://api.github.com/repos/ryanoasis/nerd-fonts/releases/latest" | jq -r ".tag_name")
-#wget-aria-dir "$fonts" https://github.com/ryanoasis/nerd-fonts/releases/download/$ltstv/Hermit.zip
-#unzip $fonts/Hermit.zip -d $fonts
+if test -n "$name"; then
+
+    if ! hash display &> /dev/null; then
+        readyn -p "Install 'ImageMagick' to preview/show fonts?" yhno
+        if [[ "$yhno" == 'y' ]]; then
+            eval "$pac_ins ImageMagick"
+        fi
+    fi
+
+    if hash display &> /dev/null; then
+        files="$(find $HOME/.local/share/fonts -name "$name*NerdFont*")" 
+        for i in $files; do 
+            echo $i; 
+            display $(echo "$i" | sed 's/.*[[:space:]]//g'); 
+        done
+    fi
+fi
+
+#if hash xfconf-query &> /dev/null; then 
+    #family="$(fc-list --format="%{fullname}\t%{file}\n" | fzf --ansi --select-1 --multi --reverse --sync --delimiter '\t' --with-nth 1 --height 33% --preview='echo {2}' --preview-window='down,10%,follow')" 
+    #xfconf-query -c xsettings -p /Gtk/FontName -s "$name 10"
+#fi
+
+unset fonts name files i yhno
