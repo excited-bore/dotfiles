@@ -29,24 +29,12 @@ export LS_COLORS='no=00:fi=00:di=00;34:ln=01;36:pi=40;33:so=01;35:do=01;35:bd=40
 # LC_ALL
 #export LC_ALL="en_US.UTF-8"
 
-# READE
-#export READE_NOSTYLE='filecomp-only'
-
-# RMPROMPT
-#hash eza &>/dev/null && export RMPROMPT_LS_CMD="eza --long --tree --color=always --header --icons=always"
-
-# TRASH
-#export TRASHBIN_LIMIT=1000
-
-# SUDO
-#export SUDO_ASKPASS=/usr/lib/ssh/x11-ssh-askpass
+# PAGER
+export PAGER=/usr/bin/moar
 
 # MAN
 #export MANOPT='-a'
 export MANPAGER='nvim +Man!'
-
-# PAGER
-export PAGER=/usr/bin/moar
 
 # LESS
 # Instead of less=more, try LESS='less --redraw-on-quit' or smth
@@ -61,14 +49,30 @@ export MOAR='--statusbar=bold --colors=auto --render-unprintable=highlight --wra
 [[ "$PAGER" =~ 'moar' ]] && export BAT_PAGER="moar $MOAR --no-linenumbers"
 #export BAT_PAGER="/usr/bin/moar $MOAR --no-linenumbers"
 
-# DIFFPROG
-#export DIFFPROG="nvim -d"
-
 # DELTA
 [[ "$PAGER" =~ 'less' ]] && export DELTA_PAGER='less '"$LESS"' --line-numbers'
 [[ "$PAGER" =~ 'moar' ]] && export DELTA_PAGER='moar '"$MOAR"' --no-linenumbers'
 #! [[ "$BAT_PAGER" == '' ]] && export DELTA_PAGER="$BAT_PAGER"
 #export DELTA_PAGER=$PAGER
+
+# READE
+export READE_NOSTYLE='filecomp-only'
+
+# RMPROMPT
+hash eza &>/dev/null && export RMPROMPT_LS_CMD="eza --long --tree --color=always --header --icons=always"
+
+# TRASH
+#export TRASHBIN_LIMIT=1000
+
+# DIFFPROG
+#export DIFFPROG="nvim -d"
+
+# CPTRASH
+test -n "$DIFFPROG" && export CPTRASHDIFF="$DIFFPROG" || export CPTRASHDIFF="diff --color=always"
+test -n "$DIFFPROG" && [[ "$DIFFPROG" =~ 'vim' ]] && export CPTRASHPAGER='command cat' || export CPTRASHPAGER="$PAGER"
+
+# SUDO
+#export SUDO_ASKPASS=/usr/lib/ssh/x11-ssh-askpass
 
 # EDITORS
 export EDITOR=/usr/bin/nvim
@@ -157,7 +161,7 @@ export SYSTEMD_LOG_TARGET="auto"
 #export LIBVA_DRIVER_NAME="mesa"
 
 # RUST
-#hash cargo &>/dev/null && export PATH=$PATH:~/.cargo/bin
+hash cargo &>/dev/null && export PATH=$PATH:~/.cargo/bin
 
 # PYTHON
 #export PYTHONPATH="/usr/bin/python:/usr/bin/python3:/usr/bin/python3.10"

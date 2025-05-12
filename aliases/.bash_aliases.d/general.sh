@@ -234,17 +234,17 @@ function cp-trash(){
     local suff
     local bcp
    
-     
-    if test -n "$DIFFPROG"; then
-        CPTRASHDIFF="$DIFFPROG" 
-    elif test -z "$CPTRASHDIFF"; then
-        CPTRASHDIFF='diff --side-by-side' 
+    if test -z "$CPTRASHDIFF"; then
+        if test -n "$DIFFPROG"; then
+            CPTRASHDIFF="$DIFFPROG" 
+        else 
+            CPTRASHDIFF='diff --color=always' 
+        fi 
     fi
    
     if test -z "$CPTRASHPAGER"; then
         CPTRASHPAGER='less -R --use-color --LINE-NUMBERS --quit-if-one-screen -Q --no-vbell'
     fi 
-
 
     local args="$@" 
     local othrargs="" 
@@ -312,7 +312,7 @@ function cp-trash(){
                 elif [[ "$descn" == 'backup' ]]; then 
                     command cp -b $othrargs "$s" "$target"  
                 elif [[ "$descn" == 'diff' ]]; then 
-                    eval ${DIFFPROG} "$s" "$trgt" 
+                    eval "${CPTRASHDIFF} $s $trgt" 
                     opts="overwrite trash"
                     prmpt="[Overwrite/trash]" 
                     if ! ([[ "$othrargs" =~ '-b' ]] || [[ "$othrargs" =~ '--backup' ]]); then
@@ -349,7 +349,6 @@ function cp-trash(){
     fi
    
     unset descn descn1 
-    #echo "Backup(s) put in trash. Use 'gio trash --list' to list / 'gio trash --restore' to restore"
 }
 
 # Cp recursively and verbose
