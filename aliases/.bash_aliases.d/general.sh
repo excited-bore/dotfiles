@@ -233,7 +233,19 @@ function cp-trash(){
     local target
     local suff
     local bcp
-    
+   
+     
+    if test -n "$DIFFPROG"; then
+        CPTRASHDIFF="$DIFFPROG" 
+    elif test -z "$CPTRASHDIFF"; then
+        CPTRASHDIFF='diff --side-by-side' 
+    fi
+   
+    if test -z "$CPTRASHPAGER"; then
+        CPTRASHPAGER='less -R --use-color --LINE-NUMBERS --quit-if-one-screen -Q --no-vbell'
+    fi 
+
+
     local args="$@" 
     local othrargs="" 
     local i=0
@@ -273,62 +285,68 @@ function cp-trash(){
         unset "sorce[${#sorce[@]}-1]"
     fi
 
-    for s in "${sorce[@]}"; do
-        local trgt 
-        if test -f $target; then
-            trgt=$target 
-        else
-            trgt="$target/$(basename $s)" 
-        fi
-        if [ -a "$trgt" ]; then 
-            
-            local opts="overwrite diff trash"
-            local prmpt="[Overwrite/diff/trash]" 
-            if ! ([[ "$othrargs" =~ '-b' ]] || [[ "$othrargs" =~ '--backup' ]]); then
-                opts="overwrite diff backup trash"
-                prmpt="[Overwrite/diff/backup/trash]" 
+    if test -n "$sorce"; then
+        for s in "${sorce[@]}"; do
+            local trgt 
+            if test -f $target; then
+                trgt=$target 
+            else
+                trgt="$target/$(basename $s)" 
             fi
-            echo "About to overwrite ${CYAN}'$trgt'${YELLOW}" 
-            reade -Q 'YELLOW' -i "$opts" -p "What to do? $prmpt: " descn
-            if [[ "$descn" == 'overwrite' ]]; then
-                if ([[ "$othrargs" =~ "-f" ]] || [[ "$othrargs" =~ '--force' ]]); then
-                    command cp $othrargs "$s" "$target"
-                else
-                    command cp -f $othrargs "$s" "$target"
-                fi
-            elif [[ "$descn" == 'backup' ]]; then 
-                command cp -b $othrargs "$s" "$target"  
-            elif [[ "$descn" == 'diff' ]]; then 
-                diff "$s" "$trgt" | $PAGER  
-                opts="overwrite trash"
-                prmpt="[Overwrite/trash]" 
+            if [ -a "$trgt" ]; then 
+                
+                local opts="overwrite diff trash"
+                local prmpt="[Overwrite/diff/trash]" 
                 if ! ([[ "$othrargs" =~ '-b' ]] || [[ "$othrargs" =~ '--backup' ]]); then
-                    opts="overwrite backup trash"
-                    prmpt="[Overwrite/backup/trash]" 
+                    opts="overwrite diff backup trash"
+                    prmpt="[Overwrite/diff/backup/trash]" 
                 fi
                 echo "About to overwrite ${CYAN}'$trgt'${YELLOW}" 
-                reade -Q 'YELLOW' -i "$opts" -p "What to do? $prmpt: " descn1
-                if [[ "$descn1" == 'overwrite' ]]; then
+                reade -Q 'YELLOW' -i "$opts" -p "What to do? $prmpt: " descn
+                if [[ "$descn" == 'overwrite' ]]; then
                     if ([[ "$othrargs" =~ "-f" ]] || [[ "$othrargs" =~ '--force' ]]); then
                         command cp $othrargs "$s" "$target"
                     else
                         command cp -f $othrargs "$s" "$target"
-                    fi 
-                elif [[ "$descn1" == 'backup' ]]; then 
-                    command cp -b $othrargs "$s" "$target"
-                elif [[ "$descn1" == 'trash' ]]; then
+                    fi
+                elif [[ "$descn" == 'backup' ]]; then 
+                    command cp -b $othrargs "$s" "$target"  
+                elif [[ "$descn" == 'diff' ]]; then 
+                    eval ${DIFFPROG} "$s" "$trgt" 
+                    opts="overwrite trash"
+                    prmpt="[Overwrite/trash]" 
+                    if ! ([[ "$othrargs" =~ '-b' ]] || [[ "$othrargs" =~ '--backup' ]]); then
+                        opts="overwrite backup trash"
+                        prmpt="[Overwrite/backup/trash]" 
+                    fi
+                    echo "About to overwrite ${CYAN}'$trgt'${YELLOW}" 
+                    reade -Q 'YELLOW' -i "$opts" -p "What to do? $prmpt: " descn1
+                    if [[ "$descn1" == 'overwrite' ]]; then
+                        if ([[ "$othrargs" =~ "-f" ]] || [[ "$othrargs" =~ '--force' ]]); then
+                            command cp $othrargs "$s" "$target"
+                        else
+                            command cp -f $othrargs "$s" "$target"
+                        fi 
+                    elif [[ "$descn1" == 'backup' ]]; then 
+                        command cp -b $othrargs "$s" "$target"
+                    elif [[ "$descn1" == 'trash' ]]; then
+                        trash "$trgt" 
+                        echo "${CYAN}$trgt${normal} trashed before copying"
+                        echo "${GREEN}Backup(s) put in trash. Use ${CYAN}'gio trash --list'${GREEN} to list / ${CYAN}'gio trash --restore'${GREEN} to restore${normal}" 
+                        command cp $args
+                    fi
+                elif [[ "$descn" == 'trash' ]]; then
                     trash "$trgt" 
-                    echo "$trgt trashed before copying"
+                    echo "${CYAN}$trgt${normal} trashed before copying"
+                    echo "${GREEN}Backup(s) put in trash. Use ${CYAN}'gio trash --list'${GREEN} to list / ${CYAN}'gio trash --restore'${GREEN} to restore${normal}" 
                     command cp $args
+                     
                 fi
-            elif [[ "$descn" == 'trash' ]]; then
-                trash "$trgt" 
-                echo "$trgt trashed before copying"
-                command cp $args
-                 
-            fi
-        fi  
-    done
+            fi  
+        done
+    else
+        command cp $args
+    fi
    
     unset descn descn1 
     #echo "Backup(s) put in trash. Use 'gio trash --list' to list / 'gio trash --restore' to restore"
