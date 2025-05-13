@@ -82,27 +82,104 @@ if test -n "$name"; then
         done
     fi
 
-    if hash xfconf-query &> /dev/null; then 
-        unset yhno 
-        readyn -p 'Set one as default font for the entire system?' yhno
-        if [[ "$yhno" == 'y' ]]; then
-           
-            quer="--query=Regular" 
-            if [[ $(echo "$files" | wc -w) == 1 ]]; then
-                quer="--query=$files" 
+    if ( hash xfconf-query &> /dev/null || hash gsettings &> /dev/null || test -f $XDG_CONFIG_HOME/kitty/kitty.conf) ; then 
+        if hash xfconf-query &> /dev/null; then 
+            readyn -p "Set one installed font as the default for the entire system - for ${CYAN}xfce${GREEN}?" yhno
+            if [[ "$yhno" == 'y' ]]; then
+               
+                quer="--query=Regular" 
+                if [[ $(echo "$files" | wc -w) == 1 ]]; then
+                    quer="--query=$files" 
+                fi
+                file=$(printf "$name" | sort  -t '-'  -k1,1 | uniq | fzf --header="Which font?" $quer --reverse --height 50%) 
+                style=$(echo $file | cut -d. -f-1 | cut -d- -f2) 
+                familystyle=$(fc-query "$HOME/.local/share/fonts/$file" --format "%{family} %{style}\n" | uniq) 
+                reade -Q 'GREEN' -i "10 $(seq 1 48)" -p "Default fontsize (Default 10): " size 
+                re='^[0-9]+$'
+                if ! [[ $size =~ $re ]] ; then
+                    echo "${RED}$size${normal} is not a number!" 
+                else
+                    xfconf-query -c xsettings -p /Gtk/FontName -s "$familystyle $size"
+                fi
             fi
-            file=$(printf "$name" | sort  -t '-'  -k1,1 | uniq | fzf --header="Which font?" $quer --reverse --height 50%) 
-            style=$(echo $file | cut -d. -f-1 | cut -d- -f2) 
-            name=$(fc-query "$HOME/.local/share/fonts/$file" --format "%{family} %{style}\n" | uniq) 
-            reade -Q 'GREEN' -i "10 $(seq 1 48)" -p "Default fontsize (Default 10): " size 
-            re='^[0-9]+$'
-            if ! [[ $size =~ $re ]] ; then
-                echo "${RED}$size${normal} is not a number!" 
-            else
-                xfconf-query -c xsettings -p /Gtk/FontName -s "$name $size"
+        fi
+        
+        if hash gsettings &> /dev/null; then 
+            readyn -p "Set one installed font as the default for the entire system - for ${CYAN}GNOME${GREEN}?" yhno
+            if [[ "$yhno" == 'y' ]]; then
+               
+                quer="--query=Regular" 
+                if [[ $(echo "$files" | wc -w) == 1 ]]; then
+                    quer="--query=$files" 
+                fi
+                file=$(printf "$name" | sort  -t '-'  -k1,1 | uniq | fzf --header="Which font?" $quer --reverse --height 50%) 
+                style=$(echo $file | cut -d. -f-1 | cut -d- -f2) 
+                familystyle=$(fc-query "$HOME/.local/share/fonts/$file" --format "%{family} %{style}\n" | uniq) 
+                reade -Q 'GREEN' -i "10 $(seq 1 48)" -p "Default fontsize (Default 10): " size 
+                re='^[0-9]+$'
+                if ! [[ $size =~ $re ]] ; then
+                    echo "${RED}$size${normal} is not a number!" 
+                else
+                    gsettings set org.gnome.desktop.interface font-name "$familystyle $size" 
+                    gsettings set org.gnome.desktop.wm.preferences titlebar-font "$familystyle $size"
+                    readyn -p "Set as default font when using document editors (for example librewriter)" yhno
+                    if [[ "$yhno" == 'y' ]]; then
+                        gsettings set org.gnome.desktop.interface document-font-name "$familystyle $size" 
+                    fi 
+                    if ! [[ "$familystyle" =~ 'Mono' ]]; then
+                        printf "Font is ${RED}not${normal} from family ${CYAN}'Mono/Monospace'${cyan} (type of font where each character occupies the same amount of horizontal space)${normal}\nIf set as the default for terminals text might look ugly / out of place\n"
+                        readyn -p "Set as default font for terminals anyway?" yhno 
+                        if [[ "$yhno" == 'y' ]]; then
+                            gsettings set org.gnome.desktop.interface monospace-font-name "$familystyle $size"
+                        elif [[ "$yhno" == 'n' ]] && [[ "$name" =~ "Mono" ]]; then
+                            readyn -p "Rechose a font from the family 'Mono/Monospace'?" yhno
+                            if [[ "$yhno" == 'y' ]]; then 
+                                quer="--query=Mono" 
+                                file=$(printf "$name" | sort  -t '-'  -k1,1 | uniq | fzf --header="Which font?" $quer --reverse --height 50%) 
+                                if ! [[ "$file" =~ "Mono" ]]; then
+                                    echo "Chosen family of fonts not 'Mono/Monospace'. Moving on.." 
+                                else
+                                    style=$(echo $file | cut -d. -f-1 | cut -d- -f2) 
+                                    familystyle=$(fc-query "$HOME/.local/share/fonts/$file" --format "%{family} %{style}\n" | uniq) 
+                                    reade -Q 'GREEN' -i "10 $(seq 1 48)" -p "Default fontsize (Default 10): " size 
+                                    re='^[0-9]+$'
+                                    if ! [[ $size =~ $re ]] ; then
+                                        echo "${RED}$size${normal} is not a number!" 
+                                    else
+                                        gsettings set org.gnome.desktop.interface monospace-font-name "$familystyle $size"
+                                    fi
+                                fi
+                            fi 
+                        fi
+                    fi
+                fi
             fi
+        fi 
+
+
+        if test -f $XDG_CONFIG_HOME/kitty/kitty.conf; then
+            readyn -p "Set one installed font as the default for the ${CYAN}kitty terminal emulator${GREEN}?" yhno
+            if [[ "$yhno" == 'y' ]]; then
+                quer="--query=Regular" 
+                if [[ "$file" ]]; then 
+                    quer="--query=$file" 
+                elif [[ $(echo "$files" | wc -w) == 1 ]]; then
+                    quer="--query=$files" 
+                fi
+                file=$(printf "$name" | sort  -t '-'  -k1,1 | uniq | fzf --header="Which font?" $quer --reverse --height 50%) 
+                style=$(echo $file | cut -d. -f-1 | cut -d- -f2) 
+                familystyle=$(fc-query "$HOME/.local/share/fonts/$file" --format "%{family} %{style}\n" | uniq) 
+                reade -Q 'GREEN' -i "10 $(seq 1 48)" -p "Default fontsize (Default 10): " size 
+                re='^[0-9]+$'
+                if ! [[ $size =~ $re ]] ; then
+                    echo "${RED}$size${normal} is not a number!" 
+                else
+                    sed -i "s/font_family.*/font_family\t$familystyle/g" $XDG_CONFIG_HOME/kitty/kitty.conf
+                    sed -i "s/font_size.*/font_size\t$size/g" $XDG_CONFIG_HOME/kitty/kitty.conf
+                fi
+            fi 
         fi
     fi
 fi
 
-unset fonts style name file files i yhno size tar_zip quer
+unset fonts style name file files i yhno size tar_zip quer familystyle

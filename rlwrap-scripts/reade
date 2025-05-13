@@ -469,7 +469,7 @@ function reade() {
 
         shift $((OPTIND - 1))
 
-        # Cant unset of localize this 'vvvvvvvv' variable
+        unset vvvvvvvvvv ${@:$#:1} 
 
         vvvvvvvv="$(eval $rlwstring)"
 
