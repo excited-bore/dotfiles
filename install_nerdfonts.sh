@@ -92,8 +92,8 @@ if test -n "$name"; then
                 quer="--query=$files" 
             fi
             file=$(printf "$name" | sort  -t '-'  -k1,1 | uniq | fzf --header="Which font?" $quer --reverse --height 50%) 
-            style=$(basename $file .ttf | cut -d- -f2) 
-            name=$(fc-list $file:style=$style --format "%{family} %{style}") 
+            style=$(echo $file | cut -d. -f-1 | cut -d- -f2) 
+            name=$(fc-query "$HOME/.local/share/fonts/$file" --format "%{family} %{style}\n" | uniq) 
             reade -Q 'GREEN' -i "10 $(seq 1 48)" -p "Default fontsize (Default 10): " size 
             re='^[0-9]+$'
             if ! [[ $size =~ $re ]] ; then
