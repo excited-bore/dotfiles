@@ -7,7 +7,7 @@ if type wget &>/dev/null && type jq &>/dev/null; then
 
     function get-latest-releases-github() {
         
-        local gtb_link new_url ltstv versn link res dir quer
+        local gtb_link new_url releases nwreleases versn link res dir filtr quer i
 
         if test -z "$1"; then
             reade -Q 'GREEN' -i "https://github.com/" -p 'Github link: ' gtb_link
@@ -24,7 +24,11 @@ if type wget &>/dev/null && type jq &>/dev/null; then
         fi
 
         if test -n "$3"; then
-            quer="$3"
+            filtr="$3"
+        fi
+
+        if test -n "$4"; then
+            quer="$4"
         fi
 
         new_url="$(echo "$gtb_link" | sed 's|https://github.com|https://api.github.com/repos|g')"
@@ -34,7 +38,7 @@ if type wget &>/dev/null && type jq &>/dev/null; then
 
         printf "Analyzing ${CYAN}'$new_url'.${normal}\nDepending on how many releases are available this might take a while..\n"
 
-        ltstv=$(curl -sL "$new_url" | jq '.[0]' -r | jq -r '.assets' | grep --color=never "name" | sed 's/"name"://g' | tr '"' ' ' | tr ',' ' ' | sed 's/[[:space:]]//g')
+        releases=$(curl -sL "$new_url" | jq '.[0]' -r | jq -r '.assets' | grep --color=never "name" | sed 's/"name"://g' | tr '"' ' ' | tr ',' ' ' | sed 's/[[:space:]]//g')
         versn=$(curl -sL "$new_url" | jq '.[0]' -r | jq -r '.tag_name')
 
         if [[ $gtb_link =~ '/releases' ]]; then
@@ -43,36 +47,50 @@ if type wget &>/dev/null && type jq &>/dev/null; then
             link="$gtb_link/releases/download/$versn/"
         fi
 
-        if test -z "$ltstv"; then
+        if test -z "$releases"; then
             printf "${red}No releases found when analyzing ${CYAN}'$new_url'.${normal}\n"
             return 1
+        fi
+
+        if test -n "$filtr"; then
+            for i in $releases; do
+                if [[ "$i" =~ "$filtr" ]]; then
+                    nwreleases="$nwreleases$i\n" 
+                fi
+            done
+            releases="$nwreleases"
         fi
 
         if command -v fzf &>/dev/null; then
             test -n "$quer" &&
                 quer="--query $quer"
-            res="$(echo "$ltstv" | fzf $quer --multi --reverse --height 50%)"
+            res="$(printf "$releases" | fzf $quer --multi --reverse --height 50%)"
         else
-            printf "Files: \n${cyan}$ltstv${normal}\n"
-            #frst="$(echo $ltstv | awk '{print $1}')"
-            #ltstv="$(echo $ltstv | sed "s/\<$frst\> //g")"
-            reade -Q 'CYAN' -i "$quer $ltstv" -p "Which one?: " res
+            printf "Files: \n${cyan}$releases${normal}\n"
+            reade -Q 'CYAN' -i "$quer $releases" -p "Which one?: " res
         fi
 
         if test -n "$res"; then
             if test -z "$2"; then
                 reade -Q 'GREEN' -i "$HOME/Downloads" -p "Download Folder?: " -e dir
             fi
-            if test -d "$dir"; then
-                
-                type wget-aria &> /dev/null &&
-                    wget-aria-dir $dir "$link$res" ||
-                    wget -P $dir "$link$res" 
-            else
-                type wget-aria &> /dev/null &&
-                    wget-aria-name $dir "$link$res" ||
-                    wget -O $dir "$link$res" 
-            fi
+           
+            for i in $res; do 
+                if test -d "$dir"; then
+                    
+                    # Remove stray '/' when it's a dir
+                    [[ "${dir: -1}" == '/' ]] &&
+                        dir="${dir%?}"
+                   
+                    type wget-aria &> /dev/null &&
+                        wget-aria-dir $dir "$link$i" ||
+                        wget -P $dir "$link$i" 
+                else
+                    type wget-aria &> /dev/null &&
+                        wget-aria-name $dir "$link$i" ||
+                        wget -O $dir "$link$i" 
+                fi
+            done 
         fi
     }
 fi
