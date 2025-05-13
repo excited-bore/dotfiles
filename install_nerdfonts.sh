@@ -128,7 +128,7 @@ if test -n "$name"; then
                     fi 
                     if ! [[ "$familystyle" =~ 'Mono' ]]; then
                         printf "Font is ${RED}not${normal} from family ${CYAN}'Mono/Monospace'${cyan} (type of font where each character occupies the same amount of horizontal space)${normal}\nIf set as the default for terminals text might look ugly / out of place\n"
-                        readyn -p "Set as default font for terminals anyway?" yhno 
+                        readyn -n -p "Set as default font for terminals anyway?" yhno 
                         if [[ "$yhno" == 'y' ]]; then
                             gsettings set org.gnome.desktop.interface monospace-font-name "$familystyle $size"
                         elif [[ "$yhno" == 'n' ]] && [[ "$name" =~ "Mono" ]]; then
@@ -151,6 +151,8 @@ if test -n "$name"; then
                                 fi
                             fi 
                         fi
+                    else
+                        gsettings set org.gnome.desktop.interface monospace-font-name "$familystyle $size"
                     fi
                 fi
             fi
