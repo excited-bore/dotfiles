@@ -1,5 +1,3 @@
-#!/bin/bash
-
 if ! test -f checks/check_all.sh; then
      source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh) 
 else
@@ -17,7 +15,7 @@ if ! type ack &> /dev/null; then
     if test -n "$AUR_ins"; then
         eval "${AUR_ins}" ack 
     elif test -n "$pac_ins"; then
-        printf "Gonna try to install ack through the regular packagemanager\n"
+        printf "Going try to install ack through the regular packagemanager\n"
         eval "${pac_ins}" ack
     fi
     if ! [[ $? == 0 ]] || test -z "$pac_ins"; then
@@ -28,5 +26,5 @@ if ! type ack &> /dev/null; then
         unset b 
     fi
 fi
-test -z "$PAGER" && PAGER=less
-type ack &> /dev/null && ack --help | $PAGER
+test -z "$PAGER" && PAGER="less -Q --no-vbell --quit-if-one-screen -N --use-color"
+hash ack &> /dev/null && ack --help | $PAGER

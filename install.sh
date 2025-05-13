@@ -331,7 +331,6 @@ if [[ "y" == "$insflpk" ]]; then
         . $SCRIPT_DIR/install_flatpak.sh
     fi
 fi
-unset insflpk
 
 if ! hash snap &>/dev/null; then
     printf "%s\n" "${blue}No snap detected. (Independent package manager from Canonical)${normal}"
@@ -344,7 +343,6 @@ if ! hash snap &>/dev/null; then
         fi
     fi
 fi
-unset inssnap
 
 # Fzf (Fuzzy Finder)
 
@@ -357,7 +355,6 @@ if [[ "y" == "$findr" ]]; then
         . $SCRIPT_DIR/install_fzf.sh
     fi
 fi
-unset findr
 
 # Eza prompt
 
@@ -370,7 +367,6 @@ if [[ "y" == "$rmp" ]]; then
         . $SCRIPT_DIR/install_eza.sh
     fi
 fi
-unset rmp
 
 # Xcp
 
@@ -383,7 +379,6 @@ if [[ "y" == "$rmp" ]]; then
         . $SCRIPT_DIR/install_xcp.sh
     fi
 fi
-unset rmp
 
 # Rm prompt
 
@@ -397,7 +392,6 @@ if [[ "y" == "$rmp" ]]; then
     fi
 fi
 
-unset rmp
 
 # Ack prompt
 
@@ -410,7 +404,19 @@ if [[ "y" == "$ack" ]]; then
         . $SCRIPT_DIR/install_ack.sh
     fi
 fi
-unset ack
+
+
+# Ack prompt
+
+readyn -c "! hash dysk &> /dev/null" -p "Install dysk? (A modern replacement for df - list disk space for maps / directories)" dysk
+
+if [[ "y" == "$dysk" ]]; then
+    if ! test -f $SCRIPT_DIR/install_dysk.sh; then
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_dysk.sh)
+    else
+        . $SCRIPT_DIR/install_dysk.sh
+    fi
+fi
 
 
 # Bash alias completions
@@ -423,7 +429,6 @@ if [[ "y" == "$compl" ]]; then
         . $SCRIPT_DIR/install_bashalias_completions.sh
     fi
 fi
-unset compl
 
 # Python completions
 
@@ -435,7 +440,6 @@ if [[ "y" == "$pycomp" ]]; then
         . $SCRIPT_DIR/install_python_completions.sh
     fi
 fi
-unset pycomp
 
 SCRIPT_DIR=$(get-script-dir)
 

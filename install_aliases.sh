@@ -219,7 +219,18 @@ if [[ $ansr == "y" ]]; then
         fi
     fi
     unset ack_gr
-    
+
+    if type dysk &>/dev/null; then
+        readyn -n -p "Set 'dysk' as alias for 'df'?" dysk_df
+        if [[ "$dysk_df" == "y" ]]; then
+            sed -i 's|.alias df="dysk"|alias df="dysk"|g' $genr
+        else
+            sed -i 's|^alias df="dysk"|#alias df="dysk"|g' $genr
+        fi
+    fi
+    unset dysk_df
+
+
     if type aria2c &>/dev/null; then
         readyn -n -p "Set 'aria2c' as alias for 'wget'?" aria_wgt
         if [[ "$aria_wgt" == "y" ]]; then
