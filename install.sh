@@ -343,6 +343,8 @@ if ! hash snap &>/dev/null; then
         fi
     fi
 fi
+unset inssnap
+
 
 # Fzf (Fuzzy Finder)
 
@@ -355,6 +357,7 @@ if [[ "y" == "$findr" ]]; then
         . $SCRIPT_DIR/install_fzf.sh
     fi
 fi
+unset findr
 
 # Eza prompt
 
@@ -367,6 +370,8 @@ if [[ "y" == "$rmp" ]]; then
         . $SCRIPT_DIR/install_eza.sh
     fi
 fi
+unset rmp
+
 
 # Xcp
 
@@ -379,6 +384,8 @@ if [[ "y" == "$rmp" ]]; then
         . $SCRIPT_DIR/install_xcp.sh
     fi
 fi
+unset rmp
+
 
 # Rm prompt
 
@@ -391,6 +398,7 @@ if [[ "y" == "$rmp" ]]; then
         $SCRIPT_DIR/install_rmprompt.sh
     fi
 fi
+unset rmp
 
 
 # Ack prompt
@@ -404,11 +412,38 @@ if [[ "y" == "$ack" ]]; then
         . $SCRIPT_DIR/install_ack.sh
     fi
 fi
+unset ack
+
+# Dust - Du replacement
+ 
+readyn -c "! hash dust &> /dev/null" -p "Install dust? (A modern replacement for du - list disk space for maps / directories is free)" dust
+
+if [[ "y" == "$dust" ]]; then
+    if ! test -f $SCRIPT_DIR/install_dust.sh; then
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_dust.sh)
+    else
+        . $SCRIPT_DIR/install_dust.sh
+    fi
+fi
+unset dust
 
 
-# Ack prompt
+# Dua - TUI du replacement / file browser
+ 
+readyn -c "! hash dua &> /dev/null" -p "Install dua? (Du replacement like dust but also a TUI file browser)" dua
 
-readyn -c "! hash dysk &> /dev/null" -p "Install dysk? (A modern replacement for df - list disk space for maps / directories)" dysk
+if [[ "y" == "$dua" ]]; then
+    if ! test -f $SCRIPT_DIR/install_dua.sh; then
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_dua.sh)
+    else
+        . $SCRIPT_DIR/install_dua.sh
+    fi
+fi
+unset dua
+
+# Dysk - Df replacement
+ 
+readyn -c "! hash dysk &> /dev/null" -p "Install dysk? (A modern replacement for df - list device disk space)" dysk
 
 if [[ "y" == "$dysk" ]]; then
     if ! test -f $SCRIPT_DIR/install_dysk.sh; then
@@ -417,7 +452,7 @@ if [[ "y" == "$dysk" ]]; then
         . $SCRIPT_DIR/install_dysk.sh
     fi
 fi
-
+unset dysk
 
 # Bash alias completions
 
@@ -429,6 +464,7 @@ if [[ "y" == "$compl" ]]; then
         . $SCRIPT_DIR/install_bashalias_completions.sh
     fi
 fi
+unset compl
 
 # Python completions
 
@@ -440,6 +476,7 @@ if [[ "y" == "$pycomp" ]]; then
         . $SCRIPT_DIR/install_python_completions.sh
     fi
 fi
+unset pycomp
 
 SCRIPT_DIR=$(get-script-dir)
 

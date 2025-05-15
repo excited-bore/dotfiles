@@ -21,15 +21,15 @@ if ! hash cargo &> /dev/null || ! [[ $PATH =~ '/.cargo/bin' ]] || (hash rustc &>
     fi
 fi
 
-hash eza &> /dev/null && ezv="$(eza -v | awk 'NR==2{print $1;}' | tr 'v' ' ')"
-carv="$(cargo search 'eza =' 2> /dev/null | awk 'NR==1{print $3;}' | tr '"' ' ')"
-if ! hash eza &> /dev/null || test -n "$ezv" && version-higher $carv $ezv; then
-    if hash eza &> /dev/null && version-higher $carv $ezv && test -n "$pac_rm"; then
-        yes | eval "${pac_rm}" eza   
+hash dust &> /dev/null && duav=$(dust -V | awk 'NR==2{print $1;}' | tr 'v' ' ')
+carv=$(cargo search 'dust =' 2> /dev/null | awk 'NR==1{print $3;}' | tr '"' ' ')
+if ! hash dust &> /dev/null || test -n "$ezv" && version-higher "$carv" "$ezv"; then
+    if hash dust &> /dev/null && test -n "$pac_rm"; then
+        yes | eval "${pac_rm}" dust   
     else
         printf "Installing cargo version for eza (latest) but unable to remove current version for eza.\n Package manager probably unkown, try uninstalling manually.\n"
     fi
-    cargo install --locked eza  
+    cargo install --locked dust 
     #if test $distro_base == 'Arch'; then
     #    eval "$pac_ins eza"
     #elif test $distro_base == 'Debian'; then
@@ -61,7 +61,7 @@ if ! hash eza &> /dev/null || test -n "$ezv" && version-higher $carv $ezv; then
     #fi
 fi
 unset ezv carv
-eza --help | $PAGER 
+dust --help | $PAGER 
 
 if ! test -f ~/.bash_completion.d/eza; then
    readyn -p 'Install bash completions for eza?' bash_cm  
@@ -75,3 +75,5 @@ if ! test -f ~/.bash_completion.d/eza; then
    fi
 fi
 unset bash_cm
+
+
