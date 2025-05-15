@@ -29,7 +29,7 @@ if ! hash dust &> /dev/null || test -n "$ezv" && version-higher "$carv" "$ezv"; 
     else
         printf "Installing cargo version for eza (latest) but unable to remove current version for eza.\n Package manager probably unkown, try uninstalling manually.\n"
     fi
-    cargo install --locked dust 
+    cargo install --locked du-dust 
     #if test $distro_base == 'Arch'; then
     #    eval "$pac_ins eza"
     #elif test $distro_base == 'Debian'; then

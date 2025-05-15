@@ -85,20 +85,23 @@ environment-variables_r() {
         fi
     fi
 
-    if test -f /root/.bash_profile && ! sudo grep -q "/root/.bash_profile" /root/.profile; then
-        readyn -n -p "Link /root/.bash_profile in /root/.profile?" bprofr
-        if [[ "$bprofr" == 'y' ]]; then
-            printf "\n[ -f /root/.bash_profile ] && source /root/.bash_profile\n\n" | sudo tee -a /root/.profile 1> /dev/null
-        fi
-        unset bprofr
-    fi
-    if test -f /root/.zsh_profile && ! grep -q "/root/.zsh_profile" ~/.profile; then
-        readyn -p "Link /root/.zsh_profile in /root/.profile?" zprofr
-        if [[ "$zprofr" == 'y' ]]; then
-            printf "\n[ -f /root/.zsh_profile ] && source /root/.zsh_profile\n\n" | sudo tee -a /root/.profile 1> /dev/null
-        fi
-        unset zprofr
-    fi
+    # This always breaks !  
+
+    #if test -f /root/.bash_profile && ! sudo grep -q "/root/.bash_profile" /root/.profile; then
+    #    readyn -n -p "Link /root/.bash_profile in /root/.profile?" bprofr
+    #    if [[ "$bprofr" == 'y' ]]; then
+    #        printf "\n[ -f /root/.bash_profile ] && source /root/.bash_profile\n\n" | sudo tee -a /root/.profile 1> /dev/null
+    #    fi
+    #    unset bprofr
+    #fi
+    #if test -f /root/.zsh_profile && ! grep -q "/root/.zsh_profile" ~/.profile; then
+    #    readyn -p "Link /root/.zsh_profile in /root/.profile?" zprofr
+    #    if [[ "$zprofr" == 'y' ]]; then
+    #        printf "\n[ -f /root/.zsh_profile ] && source /root/.zsh_profile\n\n" | sudo tee -a /root/.profile 1> /dev/null
+    #    fi
+    #    unset zprofr
+    #fi
+    
     if sudo test -f /root/.bashrc && ! sudo grep -q "~/.environment" /root/.bashrc; then
         readyn -Y 'GREEN' -p "Source /root/.environment in /root/.bashrc?" bashrc
         if [[ $bashrc == 'y' ]]; then
@@ -200,20 +203,22 @@ environment-variables() {
          
     fi
 
-    if test -f ~/.bash_profile && ! grep -q "~/.bash_profile" ~/.profile; then
-        readyn -n -p "Link ~/.bash_profile in ~/.profile?" bprof
-        if [[ "$bprof" == 'y' ]]; then
-            printf "\n[ -f ~/.bash_profile ] && source ~/.bash_profile\n\n" >>~/.profile 
-        fi
-        unset bprof
-    fi
-    if test -f ~/.zsh_profile && ! grep -q "~/.zsh_profile" ~/.profile; then
-        readyn -p "Link ~/.zsh_profile in ~/.profile?" zprof
-        if [[ "$zprof" == 'y' ]]; then
-            printf "\n[ -f ~/.zsh_profile ] && source ~/.zsh_profile\n\n" >>~/.profile
-        fi
-        unset bprof
-    fi
+    # This always breaks !  
+    
+    #if test -f ~/.bash_profile && ! grep -q "~/.bash_profile" ~/.profile; then
+    #    readyn -n -p "Link ~/.bash_profile in ~/.profile?" bprof
+    #    if [[ "$bprof" == 'y' ]]; then
+    #        printf "\n[ -f ~/.bash_profile ] && source ~/.bash_profile\n\n" >>~/.profile 
+    #    fi
+    #    unset bprof
+    #fi
+    #if test -f ~/.zsh_profile && ! grep -q "~/.zsh_profile" ~/.profile; then
+    #    readyn -p "Link ~/.zsh_profile in ~/.profile?" zprof
+    #    if [[ "$zprof" == 'y' ]]; then
+    #        printf "\n[ -f ~/.zsh_profile ] && source ~/.zsh_profile\n\n" >>~/.profile
+    #    fi
+    #    unset bprof
+    #fi
         
     if test -f ~/.bashrc && ! grep -q "~/.environment" ~/.bashrc; then
         readyn -p "Source $HOME/.environment in $HOME/.bashrc?" bashrc
