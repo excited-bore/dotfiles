@@ -438,7 +438,7 @@ alias rm-all-hidden="rm -rv .[!.]* *";
 # Ls and Eza
 
 #Always output colours for ls, grep and variants
-type eza &> /dev/null && alias ls="eza --header --color=always --icons=always"
+hash eza &> /dev/null && alias ls="eza --header --color=always --icons=always"
 
 # List directories first
 alias ls-dirtop="ls --group-directories-first"
@@ -462,7 +462,7 @@ if type eza &> /dev/null; then
     alias eza-files="eza -A --only-files"
     alias eza-git="eza --long --git-repos --header --git" 
 
-type eza &> /dev/null && alias ls="eza --header --color=always --icons=always"
+hash eza &> /dev/null && alias ls="eza --header --color=always --icons=always"
     alias ls-all="eza-all"
     alias llnh="eza -A --long --color=always --icons=always --smart-group --octal-permissions"
     alias ls-dirtop="eza-dirtop"
@@ -1036,16 +1036,19 @@ function iommu-groups(){
 
 # disk free and free
 alias free='free -h'
-alias free-kilo='command free --kilo'
-alias free-mega='command free --mega'
-alias free-giga='command free --giga'
-alias df='df -h -T --total'
-#alias df='dysk'
-alias lfs='dysk'
+alias free-kilob='command free --kilo'
+alias free-megab='command free --mega'
+alias free-gigab='command free --giga'
+
 alias du="du -hs | awk '{print \$1}'"
+#alias du="dust"
 alias folder-size="du"
 alias dir-size="du"
 alias dirsize="du"
+
+alias df='df -h -T --total'
+#alias df='dysk'
+alias lfs='dysk'
 
 
 alias regenerate-initrams-all-kernels="sudo mkinitcpio -P"
