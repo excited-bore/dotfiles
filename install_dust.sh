@@ -21,13 +21,13 @@ if ! hash cargo &> /dev/null || ! [[ $PATH =~ '/.cargo/bin' ]] || (hash rustc &>
     fi
 fi
 
-hash dust &> /dev/null && duav=$(dust -V | awk 'NR==2{print $1;}' | tr 'v' ' ')
-carv=$(cargo search 'dust =' 2> /dev/null | awk 'NR==1{print $3;}' | tr '"' ' ')
-if ! hash dust &> /dev/null || test -n "$ezv" && version-higher "$carv" "$ezv"; then
+hash dust &> /dev/null && dust=$(dust -V | awk '{print $2;}')
+carv=$(cargo search 'dust =' 2> /dev/null | awk 'NR==1{print $3;}' | tr '"' ' ' | sed 's/ //g')
+if ! hash dust &> /dev/null || (test -n "$dust" && version-higher "$carv" "$dust"); then
     if hash dust &> /dev/null && test -n "$pac_rm"; then
-        yes | eval "${pac_rm}" dust   
+        yes | eval "${pac_rm}" dust
     else
-        printf "Installing cargo version for eza (latest) but unable to remove current version for eza.\n Package manager probably unkown, try uninstalling manually.\n"
+        printf "Installing cargo version for dust (latest) but unable to remove current version for dua.\n Package manager probably unkown, try uninstalling manually.\n"
     fi
     cargo install --locked du-dust 
     #if test $distro_base == 'Arch'; then
