@@ -22,7 +22,7 @@ if ! hash cargo &> /dev/null || ! [[ $PATH =~ '/.cargo/bin' ]] || (hash rustc &>
 fi
 
 hash dua &> /dev/null && duav=$(dua -V | awk '{print $2;}')
-carv=$(cargo search 'dua-cli =' 2> /dev/null | awk 'NR==1{print $3;}' | tr '"' ' ')
+carv=$(cargo search 'dua-cli =' 2> /dev/null | awk 'NR==1{print $3;}' | sed 's/"//g')
 if ! hash dua &> /dev/null || (test -n "$duav" && version-higher "$carv" "$duav"); then
     if hash dua &> /dev/null && test -n "$pac_rm"; then
         yes | eval "${pac_rm}" dua-cli   
@@ -60,19 +60,5 @@ if ! hash dua &> /dev/null || (test -n "$duav" && version-higher "$carv" "$duav"
     #    cargo install eza 
     #fi
 fi
-unset ezv carv
+unset duav carv
 dua --help | $PAGER 
-
-if ! test -f ~/.bash_completion.d/eza; then
-   readyn -p 'Install bash completions for eza?' bash_cm  
-   if [[ $bash_cm == 'y' ]]; then
-        if ! test -f checks/check_completions_dir.sh; then
-             source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh) 
-        else
-            . ./checks/check_completions_dir.sh
-        fi
-        echo $(curl  https://raw.githubusercontent.com/eza-community/eza/refs/heads/main/completions/bash/eza) > ~/.bash_completion.d/eza
-   fi
-fi
-unset bash_cm
-

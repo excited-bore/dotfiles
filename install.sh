@@ -433,10 +433,10 @@ unset dust
 readyn -c "! hash dua &> /dev/null" -p "Install dua? (Du replacement like dust but also a TUI file browser)" dua
 
 if [[ "y" == "$dua" ]]; then
-    if ! test -f $SCRIPT_DIR/install_dua.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_dua.sh)
+    if ! test -f $SCRIPT_DIR/install_dua_cli.sh; then
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_dua_cli.sh)
     else
-        . $SCRIPT_DIR/install_dua.sh
+        . $SCRIPT_DIR/install_dua_cli.sh
     fi
 fi
 unset dua
