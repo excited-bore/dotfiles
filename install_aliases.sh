@@ -118,36 +118,78 @@ if [[ $ansr == "y" ]]; then
         fi
     fi
 
-    readyn -p "Set cp alias?" cp_all
- 
+    readyn -p "Set ${CYAN}cp${GREEN} alias?" cp_all
 
     if [[ $cp_all == 'y' ]]; then
         cp_xcp="cp"
+        cp_prgs=''
         cp_r=''
         cp_vr=''
         cp_ov=''
         cp_der=''
-        if hash xcp &>/dev/null; then
-            readyn -p "${CYAN}xcp${GREEN} installed. Use xcp instead of cp (might conflict with sudo cp if cargo not available is sudo path / secure_path in /etc/sudoers)?" cp_xcpq
-            if [[ $cp_xcpq == 'y' ]]; then
-                cp_xcp='xcp --glob'
+        if hash cpg &> /dev/null || hash xcp &> /dev/null; then
+            if hash cpg &> /dev/null && hash xcp &> /dev/null; then
+                readyn -p "Both '${CYAN}cpg${GREEN}' and '${CYAN}xcp${GREEN}' are installed. Use either instead of regular 'cp'?" cp_xcpq
+                if [[ "$cp_xcpq" == 'y' ]]; then
+                    reade -Q 'GREEN' -i 'cpg xcp' -p 'Which one? [Cpg/xcp]: ' cp_xcp
+                    if [[ "$cp_xcpq" == 'xcp' ]]; then
+                        cp_xcp='xcp --glob'
+                    fi
+                fi
+            else
+                if hash cpg &>/dev/null; then
+                    readyn -p "${CYAN}cpg${GREEN} installed. Use cpg instead of cp?" cp_xcpq
+                    if [[ "$cp_xcpq" == 'y' ]]; then
+                        cp_xcp='cpg'
+                    fi
+                fi
+
+                if hash xcp &>/dev/null; then
+                    readyn -p "${CYAN}xcp${GREEN} installed. Use xcp instead of cp (might conflict with sudo cp if cargo not available is sudo path / secure_path in /etc/sudoers)?" cp_xcpq
+                    if [[ "$cp_xcpq" == 'y' ]]; then
+                        cp_xcp='xcp --glob'
+                    fi
+                fi
             fi
+
+            if [[ "$cp_xcp" == 'xcp --glob' ]] || [[ "$cp_xcp" == 'cpg' ]]; then
+                readyn -p "Set progress bar?" cp_prgsq
+                if [[ "$cp_prgsq" == 'y' ]]; then
+                    [[ "$cp_xcp" == 'cpg' ]] && cp_prgs='--progress-bar'
+                else
+                    [[ "$cp_xcp" == 'xcp --glob' ]] && cp_prgs='--no-progress'
+                fi
+            fi
+             
         fi
         readyn -p "Be recursive? (Recursive means copy everything inside directories without aborting)" cp_rq
         if [[ "$cp_rq" == 'y' ]]; then
             cp_r='--recursive'
             #xcp_r="--recursive"
         fi
+       
+        cp_ov_opts="always default skip prompt" 
+        cp_ov_prmpt="[Always/default/skip/prompt]: " 
+
+        if [[ $cp_xcp == 'xcp --glob' ]]; then
+            cp_ov_opts="always default skip" 
+            cp_ov_prmpt="[Always/default/skip]: " 
+        fi
+        
+        reade -Q 'GREEN' -i "$cp_ov_opts" -p "Always overwrite already present files, silently skip, prompt for each or never overwrite? $cp_ov_prmpt" cp_ovq
+        if [[ $cp_ovq == 'always' ]]; then
+            cp_ov='--force'
+        elif [[ $cp_ovq == 'skip' ]]; then
+            cp_ov='--no-clobber'
+            #xcp_ov="--no-clobber"
+        elif [[ $cp_ovq == 'prompt' ]]; then
+            cp_ov='--interactive'
+        fi
+        
         readyn -p "Be verbose? (All info about copying process)" cp_vq
         if [[ "$cp_vq" == 'y' ]]; then
             cp_v='--verbose'
             #xcp_v="--verbose"
-        fi
-
-        readyn -n -p "Never overwrite already present files?" cp_ovq
-        if [[ $cp_ovq == 'y' ]]; then
-            cp_ov='--no-clobber'
-            #xcp_ov="--no-clobber"
         fi
 
         readyn -p "Lookup files/directories of symlinks?" cp_derq
@@ -160,12 +202,56 @@ if [[ $ansr == "y" ]]; then
         #if hash xcp &> /dev/null && [[ $cp_xcpq == 'y' ]]; then
             #sed -i 's|^alias cp=".*|alias cp="'"$cp_xcp $xcp_r $xcp_v $xcp_ov $xcp_der"' --"|g' $genr 
         #else 
-            sed -i 's|^alias cp=".*|alias cp="'"$cp_xcp $cp_r $cp_v $cp_ov $cp_der"'"|g' $genr
+            sed -i 's|^alias cp=".*|alias cp="'"$cp_xcp $cp_prgs $cp_r $cp_v $cp_ov $cp_der"'"|g' $genr
         #fi
         #[[ "$cp_xcp" =~ 'xcp --glob' ]] && sed -i 's|^alias cp=".*|hash xcp \&> /dev/null && alias cp="'"$cp_xcp $cp_r $cp_v $cp_ov $cp_der"' --" \|\| alias cp="cp "'"$cp_r $cp_v $cp_ov $cp_der"' --"|g' $genr || sed -i 's|^alias cp=".*|hash xcp \&> /dev/null && alias cp="'"$cp_xcp $cp_r $cp_v $cp_ov $cp_der"' --"|g'
     fi
 
-    unset cp_all cp_xcp cp_v cp_ov cp_xcpq
+    unset cp_all cp_r cp_rq cp_prgsq cp_prgs cp_xcpq cp_xcp cp_v cp_ov cp_xcpq cp_ovq cp_ov_prmpt cp_ov_opts cp_derq cp_der
+
+
+    readyn -p "Set ${CYAN}mv${GREEN} alias?" mv_all
+    if [[ $mv_all == 'y' ]]; then
+        mv_mvg="mv"
+        mv_prgs=''
+        mv_ov='' 
+        mv_v=''
+        if hash mvg &> /dev/null; then
+            readyn -p "'${CYAN}mvg${GREEN}' installed. Use instead of regular 'mv'?" mv_mvgq
+            if [[ "$mv_mvgq" == 'y' ]]; then
+                mv_mvg='mvg'
+                
+                readyn -p "Set progress bar?" mv_prgsq
+                if [[ "$mv_prgsq" == 'y' ]]; then
+                    mv_prgs='--progress-bar'
+                fi
+            fi
+        fi
+       
+        mv_ov_opts="always default skip prompt" 
+        mv_ov_prmpt="[Always/default/skip/prompt]: " 
+        
+        reade -Q 'GREEN' -i "$mv_ov_opts" -p "Always overwrite already present files, silently skip, prompt for each or never overwrite? $cp_ov_prmpt" mv_ovq
+        if [[ $mv_ovq == 'always' ]]; then
+            mv_ov='--force'
+        elif [[ $mv_ovq == 'skip' ]]; then
+            mv_ov='--no-clobber'
+            #xcp_ov="--no-clobber"
+        elif [[ $mv_ovq == 'prompt' ]]; then
+            mv_ov='--interactive'
+        fi 
+
+        readyn -p "Be verbose? (All info about copying process)" cp_vq
+        if [[ "$cp_vq" == 'y' ]]; then
+            mv_v='--verbose'
+            #xcp_v="--verbose"
+        fi 
+    
+        sed -i 's|^alias mv=".*|alias mv="'"$mv_mvg $mv_prgs $mv_ov $mv_v"'"|g' $genr
+    fi 
+
+    unset mv_all mv_prgsq mv_prgs mv_mvgq mv_mvg mv_v mv_ov mv_vq mv_ovq mv_ov_prmpt mv_ov_opts
+
 
     prompt="${green}    - Force remove, recursively delete given directories (enable deletion of direction without deleting every file in directory first) and ${bold}always give at least one prompt before removing?${normal}${green}
     - Force remove, ${YELLOW}don't${normal}${green} recursively look for files and give a prompt not always, but if removing 3 or more files/folder?

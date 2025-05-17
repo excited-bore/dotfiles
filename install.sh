@@ -345,20 +345,6 @@ if ! hash snap &>/dev/null; then
 fi
 unset inssnap
 
-
-# Fzf (Fuzzy Finder)
-
-readyn -p "Install fzf? (Fuzzy file/folder finder - replaces Ctrl-R/reverse-search, binds fzf search files on Ctrl+T and fuzzy search directories on Alt-C + Custom script: Ctrl-f becomes system-wide file opener)" -c "! hash fzf &> /dev/null" findr
-
-if [[ "y" == "$findr" ]]; then
-    if ! test -f $SCRIPT_DIR/install_fzf.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fzf.sh)
-    else
-        . $SCRIPT_DIR/install_fzf.sh
-    fi
-fi
-unset findr
-
 # Eza prompt
 
 readyn -p "Install eza? (A modern replacement for ls)" -c "! hash eza &> /dev/null" rmp
@@ -374,17 +360,42 @@ unset rmp
 
 
 # Xcp
+printf "${CYAN}cpg/mvg${GREEN} are patches for the default coreutils 'cp (copy) / mv (move)' which gives an added flag to both for a progress bar with '-g/--progress-bar'
+${CYAN}xcp${GREEN} is an 'extended', rust-written cp that copies faster and also comes with a progress bar${normal}\n"
 
-readyn -p "Install xcp? (cp but faster and with progress bar)" -c "! hash xcp &> /dev/null" rmp
-
-if [[ "y" == "$rmp" ]]; then
+color="GREEN"
+cpgi="all advcpmv xcp none"
+cpgp="[All/advcpmv/xcp/none]: "
+if hash cpg &> /dev/null && hash xcp &> /dev/null; then
+    cpgi="none all advcpmv xcp"
+    cpgp="[None/all/advcpmv/xcp]: "
+    color="YELLOW"
+else
+    if hash xcp &> /dev/null; then
+        cpgi="xcp advcpmv all none"
+        cpgp="[Xcp/advcpmv/all/none]: "
+    fi 
+    if hash cpg &> /dev/null; then
+        cpgi="advcpmv xcp all none"
+        cpgp="[Advcpmv/xcp/all/none]: "
+    fi
+fi
+reade -Q "$color" -i "$cpgi" -p "Install advcpmv, xcp, all or none? $cpgp" cpg
+if [[ "all" == "$cpg" ]] || [[ "advcpmv" == "$cpg" ]]; then
+    if ! test -f $SCRIPT_DIR/install_advcpmv.sh; then
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_advcpmv.sh)
+    else
+        . $SCRIPT_DIR/install_advcpmv.sh
+    fi
+fi
+if [[ "all" == "$cpg" ]] || [[ "xcp" == "$cpg" ]]; then
     if ! test -f $SCRIPT_DIR/install_xcp.sh; then
         source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_xcp.sh)
     else
         . $SCRIPT_DIR/install_xcp.sh
     fi
 fi
-unset rmp
+unset cpg cpgi cpgp color
 
 
 # Rm prompt
@@ -399,6 +410,20 @@ if [[ "y" == "$rmp" ]]; then
     fi
 fi
 unset rmp
+
+# Fzf (Fuzzy Finder)
+
+readyn -p "Install fzf? (Fuzzy file/folder finder - replaces Ctrl-R/reverse-search, binds fzf search files on Ctrl+T and fuzzy search directories on Alt-C + Custom script: Ctrl-f becomes system-wide file opener)" -c "! hash fzf &> /dev/null" findr
+
+if [[ "y" == "$findr" ]]; then
+    if ! test -f $SCRIPT_DIR/install_fzf.sh; then
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fzf.sh)
+    else
+        . $SCRIPT_DIR/install_fzf.sh
+    fi
+fi
+unset findr
+
 
 
 # Ack prompt
