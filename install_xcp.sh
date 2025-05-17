@@ -17,5 +17,5 @@ if ! hash xcp &> /dev/null; then
         fi
     fi
     cargo install xcp
-    xcp --help | $PAGER 
 fi
+xcp --help | $PAGER 

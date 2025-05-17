@@ -1,5 +1,3 @@
-DLSCRIPT=1
-
 if ! test -f checks/check_all.sh; then
     if type curl &> /dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh) 
@@ -60,20 +58,7 @@ if ! hash dust &> /dev/null || (test -n "$dust" && version-higher "$carv" "$dust
     #    cargo install eza 
     #fi
 fi
+
 unset ezv carv
+
 dust --help | $PAGER 
-
-if ! test -f ~/.bash_completion.d/eza; then
-   readyn -p 'Install bash completions for eza?' bash_cm  
-   if [[ $bash_cm == 'y' ]]; then
-        if ! test -f checks/check_completions_dir.sh; then
-             source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh) 
-        else
-            . ./checks/check_completions_dir.sh
-        fi
-        echo $(curl  https://raw.githubusercontent.com/eza-community/eza/refs/heads/main/completions/bash/eza) > ~/.bash_completion.d/eza
-   fi
-fi
-unset bash_cm
-
-

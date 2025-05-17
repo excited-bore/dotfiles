@@ -556,27 +556,23 @@ unset h
 test -n "$BASH_VERSION" && source ~/.bashrc &>/dev/null
 test -n "$ZSH_VERSION" && source ~/.zshrc &>/dev/null
 
+if ! test -f checks/check_all.sh; then
+    if hash curl &>/dev/null; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
+    else
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
+    fi
+else
+    . ./checks/check_all.sh
+fi
+
+SCRIPT_DIR=$(get-script-dir)
 
 if ! test -f install_keybinds.sh; then
     source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_keybinds.sh)
 else
     . ./install_keybinds.sh
 fi
-
-
-if ! test -f checks/check_all.sh; then
-    if hash curl &>/dev/null; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
-    else
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-        return 1 || exit 1
-    fi
-else
-    . ./checks/check_all.sh
-fi
-
-
-SCRIPT_DIR=$(get-script-dir)
 
 # Bash Preexec
 

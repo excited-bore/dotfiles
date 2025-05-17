@@ -120,13 +120,22 @@ fi
 
 alias get-script-dir='cd "$( dirname "$-1" )" && pwd'
 
+
 # Make sure cp copies forceably (without asking confirmation when overwriting) and verbosely
-if hash xcp &> /dev/null && ! [[ "$(type cp)" =~ 'xcp' ]]; then
-    echo "Since you have xcp installed, this next $(tput setaf 1)sudo$(tput sgr0) will check whether it can be used for the script (if it's sudo executable, it is)"
-    sudo bash -c "hash xcp" &&
-        alias cp='xcp' ||
-        alias cp='cp -fv'
-else
+
+if (hash xcp &> /dev/null || hash cpg &> /dev/null) && ! ([[ "$(type cp)" =~ "'cpg -fgv'" ]] || [[ "$(type cp)" =~ "'xcp'" ]]); then
+    if hash cpg &> /dev/null; then
+        echo "Since you have cpg installed, this next $(tput setaf 1)sudo$(tput sgr0) will check whether it can be used for the script (if it's sudo executable, it is)"
+        sudo bash -c "hash cpg" &&
+            alias cp='cpg -fgv' ||
+            alias cp='cp -fv'
+    elif hash xcp &> /dev/null; then
+        echo "Since you have xcp installed, this next $(tput setaf 1)sudo$(tput sgr0) will check whether it can be used for the script (if it's sudo executable, it is)"
+        sudo bash -c "hash xcp" &&
+            alias cp='xcp' ||
+            alias cp='cp -fv'
+    fi
+elif ! (hash xcp &> /dev/null || hash cpg &> /dev/null); then
     alias cp='cp -fv'
 fi
 
@@ -211,7 +220,7 @@ alias less='less -R --use-color --LINE-NUMBERS --quit-if-one-screen -Q --no-vbel
 
 function version-higher() {
     if [[ $1 == $2 ]]; then
-        return 0
+        return 1
     fi
     local IFS=.
     local i ver1=($1) ver2=($2)
