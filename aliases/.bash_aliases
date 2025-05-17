@@ -9,4 +9,8 @@ if [ -d ~/.bash_aliases.d/ ] && [ "$(ls -A ~/.bash_aliases.d/)" ]; then
   done
 fi
 
-#complete -F _complete_alias "${!BASH_ALIASES[@]}"
+function unalias(){
+    command unalias $@
+    complete -F _complete_alias "${!BASH_ALIASES[@]}"
+}
+complete -F _complete_alias "${!BASH_ALIASES[@]}"
