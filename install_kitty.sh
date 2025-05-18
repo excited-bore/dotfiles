@@ -193,7 +193,7 @@ if [[ $ktty_cnf == 'y' ]]; then
                 readyn -p "Set position new window?" ktty_splt1
 
                 if [[ $ktty_splt1 == 'y' ]]; then
-                    reade -Q "GREEN" -i "vsplit hsplit default before after" -p "Position new window: [Hsplit/vsplit/default/before/after]: " ktty_pos
+                    reade -Q "GREEN" -i "vsplit hsplit default before after" -p "Position new window: [Vsplit/hsplit/default/before/after]: " ktty_pos
                     sed -i "s|map kitty_mod+enter[^+].*|map kitty_mod+enter launch --location=$ktty_pos|g" $dir/kitty.conf
                 fi
                 readyn -p "Add shortcut for new window pos on ctrl+shift+alt+enter?" ktty_splt2
