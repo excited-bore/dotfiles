@@ -75,15 +75,22 @@ if test -n "$name"; then
         fi
     fi
 
-    if hash display &> /dev/null; then
-        files=$(printf "$name" | sort  -t '-'  -k1,1 | uniq | fzf --header="Which fonts to preview?" --query='Regular' --multi --reverse --height 50%) 
-        for i in $files; do 
-            display $(echo "$HOME/.local/share/fonts/$i" | sed 's/.*[[:space:]]//g'); 
-        done
-    fi
+    while : ; do 
+        if hash display &> /dev/null; then
+            files=$(printf "$name" | sort  -t '-'  -k1,1 | uniq | fzf --header="Which fonts to preview?" --query='Regular' --multi --reverse --height 50%) 
+            for i in $files; do 
+                display $(echo "$HOME/.local/share/fonts/$i" | sed 's/.*[[:space:]]//g'); 
+            done
+        fi
+        readyn -p "Preview more fonts?" prvwmore
+        if [[ "$prvwmore" == 'n' ]]; then
+             break;
+        fi
+    done
+    unset prvwmore
 
     if ( hash xfconf-query &> /dev/null || hash gsettings &> /dev/null || test -f $XDG_CONFIG_HOME/kitty/kitty.conf) ; then 
-        if hash xfconf-query &> /dev/null; then 
+        if [[ "$DESKTOP_SESSION" == 'xfce' ]]; then 
             readyn -p "Set one installed font as the default for the entire system - for ${CYAN}xfce${GREEN}?" yhno
             if [[ "$yhno" == 'y' ]]; then
                
@@ -104,7 +111,7 @@ if test -n "$name"; then
             fi
         fi
         
-        if hash gsettings &> /dev/null; then 
+        if [[ "$DESKTOP_SESSION" == 'gnome' ]]; then 
             readyn -p "Set one installed font as the default for the entire system - for ${CYAN}GNOME${GREEN}?" yhno
             if [[ "$yhno" == 'y' ]]; then
                
