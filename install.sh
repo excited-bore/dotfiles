@@ -372,12 +372,12 @@ if hash cpg &> /dev/null && hash xcp &> /dev/null; then
     color="YELLOW"
 else
     if hash xcp &> /dev/null; then
-        cpgi="xcp advcpmv all none"
-        cpgp="[Xcp/advcpmv/all/none]: "
+        cpgi="advcpmv xcp  all none"
+        cpgp="[Advcpmv/xcp/all/none]: "
     fi 
     if hash cpg &> /dev/null; then
-        cpgi="advcpmv xcp all none"
-        cpgp="[Advcpmv/xcp/all/none]: "
+        cpgi="xcp advcpmv all none"
+        cpgp="[Xcp/advcpmv/all/none]: "
     fi
 fi
 reade -Q "$color" -i "$cpgi" -p "Install advcpmv, xcp, all or none? $cpgp" cpg
