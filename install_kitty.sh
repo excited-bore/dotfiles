@@ -292,9 +292,18 @@ else
     printf "# KITTY\nexport KITTY_PATH=~/.local/bin/:~/.local/kitty.app/bin\nexport PATH=\$PATH:\$KITTY_PATH\n" $ENV
 fi
 
-#if [ -x "$(command -v xdg-open)" ]; then
-#    reade -Q "GREEN" -p -i "y" "Set kitty as default terminal? "" kittn
-#    if [ "y" == "$kittn" ]; then
-#
-#    fi
-#fi
+
+readyn -p "Set kitty as default terminal?" kittn
+if [[ "y" == "$kittn" ]]; then
+    if [[ "$DESKTOP_SESSION" == 'xfce' ]]; then
+        if ! test -f $XDG_CONFIG_HOME/xfce4/helpers.rc; then
+             touch $XDG_CONFIG_HOME/xfce4/helpers.rc 
+        fi
+        if ! grep -q "TerminalEmulator" $XDG_CONFIG_HOME/xfce4/helpers.rc; then
+            echo "TerminalEmulator=kitty" >> $XDG_CONFIG_HOME/xfce4/helpers.rc 
+        else
+            sed -i 's/TerminalEmulator=.*/TerminalEmulator=kitty/g' $XDG_CONFIG_HOME/xfce4/helpers.rc
+        fi
+    fi
+fi
+unset kittn
