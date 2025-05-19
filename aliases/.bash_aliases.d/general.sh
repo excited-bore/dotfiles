@@ -109,8 +109,8 @@ fi
 alias cd='cd-w'
 
 # cp recursively, verbose ()
-# cpOld same but no files older are overwritten
-alias cp-old="cp -ruv"
+# cp-skip-existing same but no files older are overwritten
+alias cp-skip-existing="cp -ruv"
 alias copy="cp"
 
 # scp - copy over ssh 
@@ -353,13 +353,16 @@ function cp-trash(){
 
 # Cp recursively and verbose
 alias cp="cpg --progress-bar --recursive --verbose --force --dereference"
-alias cp-retrace-symlinks="cp --dereference --driver parblock"
+alias cp-lookup-symlinks="cp --dereference --driver parblock"
 
 # mv (recursively native) verbose and only ask for interaction when overwriting newer files
 
 alias mv="mvg --progress-bar --force --verbose"
-alias mvOld="mv -nv"
+alias mv-skip-existing="mv -nv"
 alias move="mv"
+alias switch-destination="mv --exchange"
+alias mv-exchange="mv --exchange"
+
 function mv-dir-to(){
     local dest
     reade -Q "GREEN" -i "~/" -p "This will copy the entire directory to: " -e dest

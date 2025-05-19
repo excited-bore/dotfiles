@@ -134,7 +134,24 @@ if type apt &> /dev/null; then
          
      
         if type readyn &>/dev/null && hash curl &>/dev/null && hash xmllint &>/dev/null && hash fzf &>/dev/null; then
-            
+            function urlencode() {
+                # Usage: urlencode "string"
+                local LC_ALL=C
+                for (( i = 0; i < ${#1}; i++ )); do
+                    : "${1:i:1}"
+                    case "$_" in
+                        [a-zA-Z0-9.~_-])
+                            printf '%s' "$_"
+                        ;;
+
+                        *)
+                            printf '%%%02X' "'$_"
+                        ;;
+                    esac
+                done
+                printf '\n'
+            } 
+
             function apt-search-ppa() {
                 local packg ansr instll url="https://launchpad.net/ubuntu/+ppas?batch=300&start=0&name_filter="
                 test -n "$1" &&
