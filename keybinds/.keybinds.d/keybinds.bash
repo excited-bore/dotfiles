@@ -91,13 +91,13 @@ bind -m vi-command '"\e[B": history-search-forward'
 bind -m vi-insert '"\e[B": history-search-forward'
 
 # Control left/right to jump from bigwords (ignore spaces when jumping) instead of chars
-bind -m emacs-standard '"\e[1;5D": vi-backward-bigword'
-bind -m vi-command '"\e[1;5D": vi-backward-bigword'
-bind -m vi-insert '"\e[1;5D": vi-backward-bigword'
+bind -m emacs-standard '"\e[1;5D": vi-backward-word'
+bind -m vi-command '"\e[1;5D": vi-backward-word'
+bind -m vi-insert '"\e[1;5D": vi-backward-word'
 
-bind -m emacs-standard '"\e[1;5C": vi-forward-bigword'
-bind -m vi-command '"\e[1;5C": vi-forward-bigword'
-bind -m vi-insert '"\e[1;5C": vi-forward-bigword'
+bind -m emacs-standard '"\e[1;5C": vi-forward-word'
+bind -m vi-command '"\e[1;5C": vi-forward-word'
+bind -m vi-insert '"\e[1;5C": vi-forward-word'
 
 # Full path dirs
 alias dirs="dirs -l"
@@ -137,13 +137,48 @@ bind -m vi-insert '"\e[1;5B": "\eddi\e266 _.\C-m"'
 #bind -m vi-insert      '"\e[1;5B": "\eddi\e266 _.\C-m"'
 
 # Shift left/right to jump from words instead of chars
-bind -m emacs-standard '"\e[1;2D": backward-word'
-bind -m vi-command '"\e[1;2D": backward-word'
-bind -m vi-insert '"\e[1;2D": backward-word'
 
-bind -m emacs-standard '"\e[1;2C": forward-word'
-bind -m vi-command '"\e[1;2C": forward-word'
-bind -m vi-insert '"\e[1;2C": forward-word'
+# EEEEEUUUUUUH BASH REGEX?????
+# https://unix.stackexchange.com/questions/421460/bash-regex-and-https-regex101-com
+
+transpose_whitespace_words () {
+  shopt -s extglob 
+  local prefix=${READLINE_LINE:0:$READLINE_POINT} suffix=${READLINE_LINE:$READLINE_POINT}
+  if [[ $suffix =~ ^[^[:space:]] ]] && [[ $prefix =~ [^[:space:]]+$ ]]; then
+    prefix=${prefix%${BASH_REMATCH[0]}}
+    suffix=${BASH_REMATCH[0]}${suffix}
+  fi
+  if [[ $suffix =~ ^[[:space:]]+ ]]; then
+        prefix=${prefix}${BASH_REMATCH[0]}
+        suffix=${suffix#${BASH_REMATCH[0]}}
+  fi
+  if [[ $suffix =~ [^[:space:]^_^-]+ ]]; then
+        echo ${READLINE_LINE:0:$READLINE_POINT}
+        echo ${BASH_REMATCH[0]} 
+        echo ${BASH_REMATCH[1]} 
+        prefix=${prefix}${BASH_REMATCH[0]}
+        suffix=${suffix#${BASH_REMATCH[0]}}
+  fi
+
+  if [[ $prefix =~ ([^[:space:]]+)([[:space:]]+)$ ]]; then
+    local word1=${BASH_REMATCH[1]} space=${BASH_REMATCH[2]}
+    prefix=${prefix%${BASH_REMATCH[0]}}
+    if [[ $suffix =~ [^[:space:]]+ ]]; then
+      suffix=${suffix#${BASH_REMATCH[0]}}
+      READLINE_LINE=${prefix}${BASH_REMATCH[0]}$space$word1$suffix
+      READLINE_POINT=$((${#READLINE_LINE} - ${#suffix}))
+      echo $READLINE_POINT 
+    fi
+  fi
+}
+
+bind -m emacs-standard '"\e[1;2D": transpose-words'
+bind -m vi-command '"\e[1;2D": transpose-words'
+bind -m vi-insert '"\e[1;2D": transpose-words'
+
+bind -m emacs-standard '"\e[1;2C": transpose-words'
+bind -m vi-command '"\e[1;2C": transpose-words'
+bind -m vi-insert '"\e[1;2C": transpose-words'
 
 alias __='clear && tput cup $(($LINE_TPUT+1)) $TPUT_COL && tput sc && tput cuu1 && echo "${PS1@P}" && tput cuu1'
 
@@ -247,7 +282,7 @@ bind -m vi-command -x '"'\''":_quote_all'
 _edit_wo_executing() {
     local editor="${EDITOR:-nano}"
     tmpf="$(mktemp).sh"
-    printf "#!$SHELL"'\n%s\n' "$READLINE_LINE" >"$tmpf"
+    printf "$READLINE_LINE" >"$tmpf"
     $EDITOR "$tmpf"
     # https://stackoverflow.com/questions/6675492/how-can-i-remove-all-newlines-n-using-sed
     #[ "$(sed -n '/^#!\/bin\/bash/p;q' "$tmpf")" ] && sed -i 1d "$tmpf"
