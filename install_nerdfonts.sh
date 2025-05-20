@@ -70,9 +70,9 @@ fi
 if test -n "$name"; then
 
     if ! hash display &> /dev/null || ! hash ueberzug &> /dev/null; then
-        readyn -p "Install 'ImageMagick' and 'ueberzug' to preview/show fonts?" yhno
+        readyn -p "Install 'imagemagick' and 'ueberzug' to preview/show fonts?" yhno
         if [[ "$yhno" == 'y' ]]; then
-            eval "$pac_ins ImageMagick ueberzug"
+            eval "$pac_ins imagemagick ueberzug"
         fi
     fi
     
