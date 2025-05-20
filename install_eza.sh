@@ -71,7 +71,7 @@ if ! test -f ~/.bash_completion.d/eza; then
         else
             . ./checks/check_completions_dir.sh
         fi
-        echo $(curl  https://raw.githubusercontent.com/eza-community/eza/refs/heads/main/completions/bash/eza) > ~/.bash_completion.d/eza
+        curl https://raw.githubusercontent.com/eza-community/eza/refs/heads/main/completions/bash/eza > ~/.bash_completion.d/eza
    fi
 fi
 unset bash_cm
