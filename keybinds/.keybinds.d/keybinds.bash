@@ -141,40 +141,66 @@ bind -m vi-insert '"\e[1;5B": "\eddi\e266 _.\C-m"'
 # EEEEEUUUUUUH BASH REGEX?????
 # https://unix.stackexchange.com/questions/421460/bash-regex-and-https-regex101-com
 
-transpose_whitespace_words () {
-  shopt -s extglob 
-  local prefix=${READLINE_LINE:0:$READLINE_POINT} suffix=${READLINE_LINE:$READLINE_POINT}
-  if [[ $suffix =~ ^[^[:space:]] ]] && [[ $prefix =~ [^[:space:]]+$ ]]; then
-    prefix=${prefix%${BASH_REMATCH[0]}}
-    suffix=${BASH_REMATCH[0]}${suffix}
-  fi
-  if [[ $suffix =~ ^[[:space:]]+ ]]; then
-        prefix=${prefix}${BASH_REMATCH[0]}
-        suffix=${suffix#${BASH_REMATCH[0]}}
-  fi
-  if [[ $suffix =~ [^[:space:]^_^-]+ ]]; then
-        echo ${READLINE_LINE:0:$READLINE_POINT}
-        echo ${BASH_REMATCH[0]} 
-        echo ${BASH_REMATCH[1]} 
-        prefix=${prefix}${BASH_REMATCH[0]}
-        suffix=${suffix#${BASH_REMATCH[0]}}
-  fi
+# This explains a ton
+# https://unix.stackexchange.com/questions/251013/bash-regex-capture-group
 
-  if [[ $prefix =~ ([^[:space:]]+)([[:space:]]+)$ ]]; then
-    local word1=${BASH_REMATCH[1]} space=${BASH_REMATCH[2]}
-    prefix=${prefix%${BASH_REMATCH[0]}}
-    if [[ $suffix =~ [^[:space:]]+ ]]; then
-      suffix=${suffix#${BASH_REMATCH[0]}}
-      READLINE_LINE=${prefix}${BASH_REMATCH[0]}$space$word1$suffix
-      READLINE_POINT=$((${#READLINE_LINE} - ${#suffix}))
-      echo $READLINE_POINT 
-    fi
-  fi
+
+global_rematch() { 
+    local s=$1 regex=$2 
+
+    # https://stackoverflow.com/questions/10582763/how-to-return-an-array-in-bash-without-using-globals
+    local -n array=$3
+    array=()
+    
+    while [[ $s =~ $regex ]]; do 
+        array+=("${BASH_REMATCH[0]}")
+        s=${s#*"${BASH_REMATCH[0]}"}
+    done
 }
 
-bind -m emacs-standard '"\e[1;2D": transpose-words'
-bind -m vi-command '"\e[1;2D": transpose-words'
-bind -m vi-insert '"\e[1;2D": transpose-words'
+transpose_words() {
+    local prefix=${READLINE_LINE:0:$READLINE_POINT} suffix=${READLINE_LINE:$READLINE_POINT}
+    local arr arrr chars start end
+    global_rematch "${READLINE_LINE}" '[[:alnum:]][^[:space:]^\W]+' arr
+    if [[ ${#arr[@]} -gt 1 ]]; then 
+        echo "${arr[*]}"
+        global_rematch "${READLINE_LINE:0}" '\W' arrr
+        global_rematch "${READLINE_LINE:0}" '.' chars
+        #echo ${#chars[*]} 
+        #echo $READLINE_POINT 
+        echo "${arrr[*]}"
+    fi
+    #if [[ $suffix =~ ^[^[:space:]] ]] && [[ $prefix =~ [^[:space:]]+$ ]]; then
+    #  prefix=${prefix%${BASH_REMATCH[0]}}
+    #  suffix=${BASH_REMATCH[0]}${suffix}
+    #fi
+    #if [[ $suffix =~ ^[[:space:]]+ ]]; then
+    #      prefix=${prefix}${BASH_REMATCH[0]}
+    #      suffix=${suffix#${BASH_REMATCH[0]}}
+    #fi
+    #if ; then
+    #      echo ${READLINE_LINE:0:$READLINE_POINT}
+    #      echo ${BASH_REMATCH[0]} 
+    #      echo ${BASH_REMATCH[1]} 
+    #      prefix=${prefix}${BASH_REMATCH[0]}
+    #      suffix=${suffix#${BASH_REMATCH[0]}}
+    #fi
+
+    #if [[ $prefix =~ ([^[:space:]]+)([[:space:]]+)$ ]]; then
+    #  local word1=${BASH_REMATCH[1]} space=${BASH_REMATCH[2]}
+    #  prefix=${prefix%${BASH_REMATCH[0]}}
+    #  if [[ $suffix =~ [^[:space:]]+ ]]; then
+    #    suffix=${suffix#${BASH_REMATCH[0]}}
+    #    READLINE_LINE=${prefix}${BASH_REMATCH[0]}$space$word1$suffix
+    #    READLINE_POINT=$((${#READLINE_LINE} - ${#suffix}))
+    #    echo $READLINE_POINT 
+    #  fi
+    #fi
+}
+
+bind -m emacs-standard -x '"\e[1;2D": transpose_words'
+bind -m vi-command -x '"\e[1;2D": transpose_words'
+bind -m vi-insert -x '"\e[1;2D": transpose_words'
 
 bind -m emacs-standard '"\e[1;2C": transpose-words'
 bind -m vi-command '"\e[1;2C": transpose-words'
