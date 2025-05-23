@@ -187,13 +187,21 @@ transpose_words() {
     if [[ "${READLINE_LINE: -1}" == ' ' ]]; then
         READLINE_LINE="${READLINE_LINE::-1}" 
     fi
-    
-    global_rematch "${READLINE_LINE}" '[A-Za-z0-9]+' arr
+   
+    local include_only_alphanums='[A-Za-z0-9]+' 
+    local only_exclude_spaces='[^[:space:]]+'
+
+    global_rematch "${READLINE_LINE}" $only_exclude_spaces arr
+
     local args=${#arr[@]} 
     if [[ $args -gt 1 ]]; then 
-        global_rematch "${READLINE_LINE:0}" '[^A-Za-z0-9]+' arrr
-        global_rematch "${READLINE_LINE:0}" '.' chars
+
+        local exclude_only_aphanums='[^A-Za-z0-9]+' 
+        local only_include_spaces='[[:space:]]+'  
+
+        global_rematch "${READLINE_LINE:0}" $only_include_spaces arrr
         
+        #global_rematch "${READLINE_LINE:0}" '.' chars
         #echo ${arr[@]}
         #echo ${arrr[@]}
 
@@ -206,13 +214,25 @@ transpose_words() {
             
             # Get the firstword count and the count of the string up to the last alphanumerical 
             local firstword lasttword cntuptolastword
-            if [[ $READLINE_LINE =~ ^([A-Za-z0-9]+) ]]; then
+
+            local firstalphanumericword='^([A-Za-z0-9]+)' 
+            local firstnonspaceword='^[[:space:]]*([^[:space:]]+)'
+
+            if [[ $READLINE_LINE =~ $firstnonspaceword ]]; then
                 firstword=$(($(echo "${BASH_REMATCH[0]}" | wc --chars) - 1)) 
             fi
-            if [[ $READLINE_LINE =~ ([A-Za-z0-9]+)[^A-Za-z0-9_]*$ ]]; then
+
+            local lastalphanumericword='([A-Za-z0-9]+)[^A-Za-z0-9_]*$' 
+            local lasttnonspaceword='([^[:space:]]+)[[:space:]]*$'
+
+            if [[ $READLINE_LINE =~ $lasttnonspaceword ]]; then
                 lasttword=$(($(echo "${BASH_REMATCH[1]}" | wc --chars) - 1)) 
             fi
-            if [[ $READLINE_LINE =~ ^.*[A-Za-z0-9] ]]; then
+
+            local tolastalphanumericword='^.*[A-Za-z0-9]' 
+            local tolasttnonspaceword='^.*[[:space:]]'
+
+            if [[ $READLINE_LINE =~ $tolasttnonspaceword ]]; then
                 cntuptolastword=$(($(echo "${BASH_REMATCH[0]}" | wc --chars) - $lasttword - 1)) 
             fi
 
@@ -414,6 +434,15 @@ bind -m emacs-standard '"\e[Z": menu-complete-backward'
 bind -m vi-command '"\e[Z": menu-complete-backward'
 bind -m vi-insert '"\e[Z": menu-complete-backward'
 
+if [[ "$TERM" == 'xterm-kitty' ]]; then
+    # (Kitty only) Ctrl-tab for variable autocompletion
+    bind -m emacs-standard '"\e[9;5u": possible-variable-completions'
+    bind -m vi-command '"\e[9;5u": possible-variable-completions'
+    bind -m vi-insert '"\e[9;5u": possible-variable-completions'
+
+fi
+
+
 # Ctrl-q quits terminal
 bind -m emacs-standard -x '"\C-q": exit'
 bind -m vi-command -x '"\C-q": exit'
@@ -532,10 +561,13 @@ if type autojump &>/dev/null; then
 fi
 
 if type fzf &>/dev/null; then
-    # (Kitty only) Ctrl-tab for fzf autocompletion
-    bind -m emacs-standard '"\e[9;5u": " **\t"'
-    bind -m vi-command '"\e[9;5u": " **\t"'
-    bind -m vi-insert '"\e[9;5u": " **\t"'
+    
+    #if [[ "$TERM" == 'xterm-kitty' ]]; then
+    #    # (Kitty only) Ctrl-tab for fzf autocompletion
+    #    bind -m emacs-standard '"\e[9;5u": " **\t"'
+    #    bind -m vi-command '"\e[9;5u": " **\t"'
+    #    bind -m vi-insert '"\e[9;5u": " **\t"'
+    #fi
 
     if type ripgrep-dir &>/dev/null; then
         # Alt-g: Ripgrep function overview
