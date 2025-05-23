@@ -178,7 +178,7 @@ unset_array(){
 
 transpose_words() {
     local directn='left'
-    if test -n "$1"; then
+    if test -n "$1" && ! [[ "$1" == 'left' ]]; then
         directn='right' 
     fi
     local arr arrr chars start end
@@ -223,14 +223,14 @@ transpose_words() {
             fi
 
             local lastalphanumericword='([A-Za-z0-9]+)[^A-Za-z0-9_]*$' 
-            local lasttnonspaceword='([^[:space:]]+)[[:space:]]*$'
+            local lasttnonspaceword='([^[:space:]]+)*$'
 
             if [[ $READLINE_LINE =~ $lasttnonspaceword ]]; then
-                lasttword=$(($(echo "${BASH_REMATCH[1]}" | wc --chars) - 1)) 
+                lasttword=$(($(echo "${BASH_REMATCH[-1]}" | wc --chars) - 1)) 
             fi
 
             local tolastalphanumericword='^.*[A-Za-z0-9]' 
-            local tolasttnonspaceword='^.*[[:space:]]'
+            local tolasttnonspaceword='^.*[^[:space:]]'
 
             if [[ $READLINE_LINE =~ $tolasttnonspaceword ]]; then
                 cntuptolastword=$(($(echo "${BASH_REMATCH[0]}" | wc --chars) - $lasttword - 1)) 
@@ -249,7 +249,7 @@ transpose_words() {
                                 local lntcnt=$(($(echo "$oldprefix$lastword" | wc --chars) - 1))
                                 local suffix=${READLINE_LINE:$lntcnt}
                                 line="$olderprefix$lastword$olderspcl$olderword$suffix" 
-                            elif [[ $READLINE_POINT -lt $cntuptolastword ]]; then 
+                            elif [[ $READLINE_POINT -lt $cntuptolastword ]]; then
                                 oldprfxcnt=$(($(echo "$oldprefix$newword$lastspcl" | wc --chars) - 1)) 
                                 local lntcnt=$(($(echo "$oldprefix$lastword$lastspcl$newword" | wc --chars) - 1))
                                 local suffix=${READLINE_LINE:$lntcnt}
@@ -307,11 +307,11 @@ transpose_words() {
                     local oldprfxcnt line prfxcnt=0
                     if test -n "$olderprefix"; then
                         prfxcnt=$(($(echo "$olderprefix" | wc --chars) - 1))
-                        if ! [[ "$directn" == 'right' ]] && ([[ "${#arr[@]}" == 1 ]] || [[ $READLINE_POINT == ${#READLINE_LINE} ]]); then
-                            if [[ ${READLINE_LINE: -1} =~ [^A-Za-z0-9]+ ]]; then
-                                line="$olderprefix$newword$olderspcl$olderword$lastspcl" 
+                        if ! [[ "$directn" == 'right' ]] && ([[ "${#arr[@]}" == 1 ]] || [[ $READLINE_POINT == ${#READLINE_LINE} ]] || [[ $READLINE_POINT == ${arrr[-1]} ]]); then
+                            if [[ ${READLINE_LINE: -1} =~ $only_include_spaces ]]; then
+                                line="$olderprefix$newword$olderspcl$olderword" 
                             else
-                                line="$olderprefix$newword$olderspcl$olderword$lastspcl$lastword" 
+                                line="$olderprefix$newword$olderspcl$olderword" 
                             fi
                         else 
                             if [[ "$directn" == 'left' ]]; then
@@ -323,7 +323,7 @@ transpose_words() {
                                 prfxcnt=$(($(echo "$oldprefix$olderword$lastspcl$newword${arrr[1]}" | wc --chars) - 1)) 
                                 local wordcnt=$(($(echo "$oldprefix$olderword$lastspcl$newword${arrr[1]}$lastword" | wc --chars) - 1)) 
                                 local suffix=${READLINE_LINE:$wordcnt}
-                                line="$oldprefix$olderword$lastspcl$newword${arrr[1]}$lastword" 
+                                line="$oldprefix$olderword$lastspcl$newword${arrr[1]}$lastword$suffix" 
                             else
                                 break
                             fi
@@ -370,9 +370,9 @@ transpose_words() {
     unset arr arrr
 }
 
-bind -m emacs-standard -x '"\e[1;2D": transpose_words'
-bind -m vi-command -x '"\e[1;2D": transpose_words'
-bind -m vi-insert -x '"\e[1;2D": transpose_words'
+bind -m emacs-standard -x '"\e[1;2D": transpose_words left'
+bind -m vi-command -x '"\e[1;2D": transpose_words left'
+bind -m vi-insert -x '"\e[1;2D": transpose_words left'
 
 bind -m emacs-standard -x '"\e[1;2C": transpose_words right'
 bind -m vi-command -x '"\e[1;2C": transpose_words right'
