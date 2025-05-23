@@ -182,11 +182,21 @@ transpose_words() {
         directn='right' 
     fi
     local arr arrr chars start end
+    
+    # Remove trailing whitespace
+    if [[ "${READLINE_LINE: -1}" == ' ' ]]; then
+        READLINE_LINE="${READLINE_LINE::-1}" 
+    fi
+    
     global_rematch "${READLINE_LINE}" '[A-Za-z0-9]+' arr
     local args=${#arr[@]} 
     if [[ $args -gt 1 ]]; then 
-        global_rematch "${READLINE_LINE:0}" '\W+' arrr
+        global_rematch "${READLINE_LINE:0}" '[^A-Za-z0-9]+' arrr
         global_rematch "${READLINE_LINE:0}" '.' chars
+        
+        #echo ${arr[@]}
+        #echo ${arrr[@]}
+
         local index=0
         local olderprefix='' oldprefix='' prefix='' olderword='' olderspcl='' lastword=${arr[0]} lastspcl=${arrr[0]} newword=${arr[1]}  
         while ([[ ${#arr[@]} -ge 1 ]] || [[ ${#arrr[@]} -ge 1 ]]); do 
@@ -199,7 +209,7 @@ transpose_words() {
             if [[ $READLINE_LINE =~ ^([A-Za-z0-9]+) ]]; then
                 firstword=$(($(echo "${BASH_REMATCH[0]}" | wc --chars) - 1)) 
             fi
-            if [[ $READLINE_LINE =~ ([A-Za-z0-9]+)[^A-Za-z0-9^\W]*$ ]]; then
+            if [[ $READLINE_LINE =~ ([A-Za-z0-9]+)[^A-Za-z0-9_]*$ ]]; then
                 lasttword=$(($(echo "${BASH_REMATCH[1]}" | wc --chars) - 1)) 
             fi
             if [[ $READLINE_LINE =~ ^.*[A-Za-z0-9] ]]; then
@@ -215,17 +225,14 @@ transpose_words() {
                         if [[ "${#arr[@]}" == 1 ]] && ! [[ "$directn" == 'right' ]]; then
                             line="$olderprefix$newword$olderspcl$lastword" 
                         else 
-                            [[ "$directn" == 'right' ]] && 
-                                oldprfxcnt=$(($(echo "$oldprefix$newword$lastspcl" | wc --chars) - 1)) 
                             if [[ "$directn" == 'left' ]]; then
-                                local lntcnt=$(($(echo "$oldprefix" | wc --chars) - 1))
-                                local wordcnt=$(($(echo "$lastword" | wc --chars) - 1)) 
-                                local suffix=${READLINE_LINE:$(($lntcnt+$wordcnt))}
+                                local lntcnt=$(($(echo "$oldprefix$lastword" | wc --chars) - 1))
+                                local suffix=${READLINE_LINE:$lntcnt}
                                 line="$olderprefix$lastword$olderspcl$olderword$suffix" 
                             elif [[ $READLINE_POINT -lt $cntuptolastword ]]; then 
-                                local lntcnt=$(($(echo "$oldprefix" | wc --chars) - 1))
-                                local wordcnt=$(($(echo "$lastword$lastspcl$newword" | wc --chars) - 1)) 
-                                local suffix=${READLINE_LINE:$(($lntcnt+$wordcnt))}
+                                oldprfxcnt=$(($(echo "$oldprefix$newword$lastspcl" | wc --chars) - 1)) 
+                                local lntcnt=$(($(echo "$oldprefix$lastword$lastspcl$newword" | wc --chars) - 1))
+                                local suffix=${READLINE_LINE:$lntcnt}
                                 line="$oldprefix$newword$lastspcl$lastword$suffix" 
                             else
                                 break
@@ -234,23 +241,23 @@ transpose_words() {
                     else
                         oldprfxcnt=0
                         if test -n "$oldprefix"; then
-                            [[ "$directn" == 'right' ]] && 
-                                oldprfxcnt=$(($(echo "$olderword$olderspcl$lastword$lastspcl" | wc --chars) - 1)) &&
-                                prfxcnt=$(($(echo "$prefix$lastspcl" | wc --chars) - 1))
-                            test -z "$olderspcl" && olderspcl="$lastspcl"
+                            test -z "$olderspcl" && olderspcl="$lastspcl" && lastspcl=${arrr[1]}
                             if [[ "$directn" == 'left' ]]; then
-                                local lntcnt=$(($(echo "$olderword$olderspcl$lastword" | wc --chars) - 1))
+                                local lntcnt=$(($(echo "$lastword$olderspcl$olderword" | wc --chars) - 1))
                                 local suffix=${READLINE_LINE:$lntcnt}
                                 line="$lastword$olderspcl$olderword$suffix" 
                             else
+                                test -z "$prefix" && 
+                                    prfxcnt=$(($(echo "${arr[0]}" | wc --chars) - 1))
+                                oldprfxcnt=$(($(echo "$olderword$olderspcl$newword$lastspcl" | wc --chars) - 1))
                                 local lntcnt=$(($(echo "$olderword$olderspcl$newword$lastspcl$lastword" | wc --chars) - 1))
                                 local suffix=${READLINE_LINE:$lntcnt}
                                 line="$olderword$olderspcl$newword$lastspcl$lastword$suffix" 
                             fi
                         elif ([[ "$directn" == 'left' ]] && [[ $READLINE_POINT -gt $firstword ]]) || [[ "$directn" == 'right' ]]; then
                             [[ "$directn" == 'right' ]] && 
-                                oldprfxcnt=$(($(echo "$lastword" | wc --chars) - 1)) &&
-                                prfxcnt=$(($(echo "$prefix$lastspcl" | wc --chars) - 1))
+                                oldprfxcnt=$(($(echo "$lastword$lastspcl$newword" | wc --chars) - 1)) 
+                            test -z "$prefix" && prfxcnt=$(($(echo "${arr[0]}" | wc --chars) - 1))
                             local wordcnt=$(($(echo "$lastword$lastspcl$newword" | wc --chars) - 1)) 
                             local suffix=${READLINE_LINE:$(($wordcnt))}
                             line="$newword$lastspcl$lastword$suffix" 
@@ -277,44 +284,57 @@ transpose_words() {
             index=$(($index + $charcount))
             if [[ "$lastspcl" =~ "$linechar" ]]; then
                 if [[ $index -ge $READLINE_POINT ]]; then
-                    local prfxcnt=$(($(echo "$prefix" | wc --chars) - 1))
-                    local oldprfxcnt line
+                    local oldprfxcnt line prfxcnt=0
                     if test -n "$olderprefix"; then
-                        oldprfxcnt=$(($(echo "$olderprefix" | wc --chars) - 1))
-                        if [[ ${#arr[@]} == 1 ]]; then
-                            line="$olderprefix$newword$lastspcl$lastword" 
-                        else 
-                            local lntcnt=$(($(echo "$oldprefix" | wc --chars) - 1))
-                            local wordcnt=$(($(echo "$olderspcl$lastword" | wc --chars) - 1)) 
-                            local suffix=${READLINE_LINE:$(($lntcnt+$wordcnt))}
-                            if [[ "$directn" == 'left' ]]; then
-                                line="$olderprefix$lastword$olderspcl$olderword$suffix" 
+                        prfxcnt=$(($(echo "$olderprefix" | wc --chars) - 1))
+                        if ! [[ "$directn" == 'right' ]] && ([[ "${#arr[@]}" == 1 ]] || [[ $READLINE_POINT == ${#READLINE_LINE} ]]); then
+                            if [[ ${READLINE_LINE: -1} =~ [^A-Za-z0-9]+ ]]; then
+                                line="$olderprefix$newword$olderspcl$olderword$lastspcl" 
                             else
-                                line="$olderprefix$olderword$olderspcl$lastword$suffix" 
+                                line="$olderprefix$newword$olderspcl$olderword$lastspcl$lastword" 
+                            fi
+                        else 
+                            if [[ "$directn" == 'left' ]]; then
+
+                                local lntcnt=$(($(echo "$olderprefix$lastword$lastspcl$olderword" | wc --chars) - 1))
+                                local suffix=${READLINE_LINE:$lntcnt}
+                                line="$olderprefix$lastword$lastspcl$olderword$suffix" 
+                            elif [[ $READLINE_POINT -lt $cntuptolastword ]]; then 
+                                prfxcnt=$(($(echo "$oldprefix$olderword$lastspcl$newword${arrr[1]}" | wc --chars) - 1)) 
+                                local wordcnt=$(($(echo "$oldprefix$olderword$lastspcl$newword${arrr[1]}$lastword" | wc --chars) - 1)) 
+                                local suffix=${READLINE_LINE:$wordcnt}
+                                line="$oldprefix$olderword$lastspcl$newword${arrr[1]}$lastword" 
+                            else
+                                break
                             fi
                         fi
                     else
-                        oldprfxcnt=0
-
-                        if test -n "$oldprefix"; then
-                            test -z "$olderspcl" && olderspcl="$lastspcl"
-                            local lntcnt=$(($(echo "$olderword$olderspcl" | wc --chars) - 1))
-                            local wordcnt=$(($(echo "$lastword" | wc --chars) - 1)) 
-                            local suffix=${READLINE_LINE:$(($lntcnt+$wordcnt))}
+                       oldprfxcnt=0
+                       if test -n "$oldprefix"; then
+                            test -z "$olderspcl" && olderspcl="$lastspcl" && lastspcl="${arrr[1]}"
                             if [[ "$directn" == 'left' ]]; then
+                                local lntcnt=$(($(echo "$olderword$olderspcl$lastword" | wc --chars) - 1))
+                                local suffix=${READLINE_LINE:$lntcnt}
                                 line="$lastword$olderspcl$olderword$suffix" 
                             else
-                                line="$olderword$olderspcl$lastword$suffix" 
+                                prfxcnt=$(($(echo "$olderword$olderspcl$newword$lastspcl" | wc --chars) - 1))
+                                local lntcnt=$(($(echo "$olderword$olderspcl$newword$lastspcl$lastword" | wc --chars) - 1))
+                                local suffix=${READLINE_LINE:$lntcnt}
+             
+                                line="$olderword$olderspcl$newword$lastspcl$lastword$suffix" 
                             fi
-                        else
+                        elif [[ "$directn" == 'right' ]] || ([[ "$directn" == 'left' ]] && [[ $READLINE_POINT -gt $firstword ]]); then
+                            oldprfxcnt=$(($(echo "$lastword" | wc --chars) - 1)) &&
+                            prfxcnt=$(($(echo "$prefix$lastspcl" | wc --chars) - 1))
                             local wordcnt=$(($(echo "$lastword$lastspcl$newword" | wc --chars) - 1)) 
                             local suffix=${READLINE_LINE:$(($wordcnt))}
                             line="$newword$lastspcl$lastword$suffix" 
-                            echo $line 
+                        else
+                            break
                         fi
 
                     fi
-                    local relpoint=$(($READLINE_POINT - $prfxcnt + $oldprfxcnt))
+                    local relpoint=$(($prfxcnt))
                     READLINE_LINE=$line
                     READLINE_POINT=$relpoint
                     break
