@@ -202,12 +202,14 @@ transpose_words() {
         global_rematch "${READLINE_LINE:0}" $only_include_spaces arrr
         
         #global_rematch "${READLINE_LINE:0}" '.' chars
-        #echo ${arr[@]}
-        #echo ${arrr[@]}
 
         local index=0
         local olderprefix='' oldprefix='' prefix='' olderword='' olderspcl='' lastword=${arr[0]} lastspcl=${arrr[0]} newword=${arr[1]}  
         while ([[ ${#arr[@]} -ge 1 ]] || [[ ${#arrr[@]} -ge 1 ]]); do 
+            
+            #echo ${arr[@]}
+            #echo ${arrr[@]}
+            
             local linechar=${READLINE_LINE:$index:1}
             local charcount=$(($(echo "${arr[0]}" | wc --chars) - 1)) 
             index=$(($index + $charcount)) 
@@ -237,12 +239,17 @@ transpose_words() {
             fi
 
             if [[ "$lastword" =~ "$linechar" ]]; then
-                if [[ $index -ge $READLINE_POINT ]]; then
-                    local prfxcnt=$(($(echo "$prefix" | wc --chars) - 1))
-                    local oldprfxcnt line
-                    if test -n "$olderprefix"; then
+                local prfxcnt=$(($(echo "$prefix" | wc --chars) - 1))
+                local oldprfxcnt line
+                
+                if [[ $index -ge $READLINE_POINT ]] || ([[ $index -eq $(($READLINE_POINT - 1)) ]] && [[ "$directn" == 'right' ]]); then
+                    if ([[ $index -eq $(($READLINE_POINT - 1)) ]] && [[ $READLINE_POINT == $cntuptolastword ]] && [[ "$directn" == 'right' ]]); then 
+                        line="$oldprefix$newword$olderspcl$lastword" 
+                        oldprfxcnt=${#READLINE_LINE}
+
+                    elif test -n "$olderprefix"; then
                         oldprfxcnt=$(($(echo "$olderprefix" | wc --chars) - 1))
-                        if [[ "${#arr[@]}" == 1 ]] && ! [[ "$directn" == 'right' ]]; then
+                        if [[ "${#arr[@]}" == 1 ]] && [[ "$directn" == 'left' ]]; then
                             line="$olderprefix$newword$olderspcl$lastword" 
                         else 
                             if [[ "$directn" == 'left' ]]; then
@@ -255,6 +262,8 @@ transpose_words() {
                                 local suffix=${READLINE_LINE:$lntcnt}
                                 line="$oldprefix$newword$lastspcl$lastword$suffix" 
                             else
+                                [[ "$directn" == 'right' ]] && ! [[ $READLINE_POINT = ${#READLINE_LINE} ]] &&
+                                    READLINE_POINT=${#READLINE_LINE}
                                 break
                             fi
                         fi
@@ -277,11 +286,14 @@ transpose_words() {
                         elif ([[ "$directn" == 'left' ]] && [[ $READLINE_POINT -gt $firstword ]]) || [[ "$directn" == 'right' ]]; then
                             [[ "$directn" == 'right' ]] && 
                                 oldprfxcnt=$(($(echo "$lastword$lastspcl$newword" | wc --chars) - 1)) 
-                            test -z "$prefix" && prfxcnt=$(($(echo "${arr[0]}" | wc --chars) - 1))
+                            test -z "$prefix" && prfxcnt=$(($(echo "$lastword" | wc --chars) - 1))
                             local wordcnt=$(($(echo "$lastword$lastspcl$newword" | wc --chars) - 1)) 
                             local suffix=${READLINE_LINE:$(($wordcnt))}
+                            #    line="${READLINE_LINE $lastword$lastspcl$newword$suffix" ||
                             line="$newword$lastspcl$lastword$suffix" 
                         else
+                            [[ "$directn" == 'left' ]] && ! [[ $READLINE_POINT = 0 ]] &&
+                                READLINE_POINT=0
                             break
                         fi
                     fi
@@ -307,12 +319,9 @@ transpose_words() {
                     local oldprfxcnt line prfxcnt=0
                     if test -n "$olderprefix"; then
                         prfxcnt=$(($(echo "$olderprefix" | wc --chars) - 1))
-                        if ! [[ "$directn" == 'right' ]] && ([[ "${#arr[@]}" == 1 ]] || [[ $READLINE_POINT == ${#READLINE_LINE} ]] || [[ $READLINE_POINT == ${arrr[-1]} ]]); then
-                            if [[ ${READLINE_LINE: -1} =~ $only_include_spaces ]]; then
-                                line="$olderprefix$newword$olderspcl$olderword" 
-                            else
-                                line="$olderprefix$newword$olderspcl$olderword" 
-                            fi
+                        if ! [[ "$directn" == 'right' ]] && ([[ "${#arr[@]}" == 1 ]] || [[ $READLINE_POINT == ${#READLINE_LINE} ]] || [[ $READLINE_POINT == ${#arrr[-1]} ]]); then
+                            READLINE_POINT=${#READLINE_LINE} 
+                            line="$olderprefix$newword$olderspcl$olderword" 
                         else 
                             if [[ "$directn" == 'left' ]]; then
 
