@@ -177,10 +177,16 @@ unset_array(){
 }
 
 transpose_words() {
+    local wordsorspace='space' 
+    if test -n "$1" && ! [[ "$1" == 'space' ]]; then
+        wordsorspace='words' 
+    fi
+    
     local directn='left'
-    if test -n "$1" && ! [[ "$1" == 'left' ]]; then
+    if test -n "$2" && ! [[ "$2" == 'left' ]]; then
         directn='right' 
     fi
+
     local arr arrr chars start end
     
     # Remove trailing whitespace
@@ -190,16 +196,26 @@ transpose_words() {
    
     local include_only_alphanums='[A-Za-z0-9]+' 
     local only_exclude_spaces='[^[:space:]]+'
+   
+    local words 
+    [[ $wordsorspace == 'space' ]] && 
+        words=$only_exclude_spaces ||
+        words=$include_only_alphanums
 
-    global_rematch "${READLINE_LINE}" $only_exclude_spaces arr
+    global_rematch "${READLINE_LINE}" $words arr
 
     local args=${#arr[@]} 
     if [[ $args -gt 1 ]]; then 
 
         local exclude_only_aphanums='[^A-Za-z0-9]+' 
         local only_include_spaces='[[:space:]]+'  
+        
+        local non_words
+        [[ $wordsorspace == 'space' ]] && 
+            non_words=$only_include_spaces ||
+            non_words=$exclude_only_aphanums
 
-        global_rematch "${READLINE_LINE:0}" $only_include_spaces arrr
+        global_rematch "${READLINE_LINE:0}" $non_words arrr
         
         #global_rematch "${READLINE_LINE:0}" '.' chars
 
@@ -220,21 +236,36 @@ transpose_words() {
             local firstalphanumericword='^([A-Za-z0-9]+)' 
             local firstnonspaceword='^[[:space:]]*([^[:space:]]+)'
 
-            if [[ $READLINE_LINE =~ $firstnonspaceword ]]; then
+            local firstwordpattrn
+            [[ $wordsorspace == 'space' ]] && 
+                firstwordpattrn=$firstnonspaceword ||
+                firstwordpattrn=$firstalphanumericword
+
+            if [[ $READLINE_LINE =~ $firstwordpattrn ]]; then
                 firstword=$(($(echo "${BASH_REMATCH[0]}" | wc --chars) - 1)) 
             fi
 
             local lastalphanumericword='([A-Za-z0-9]+)[^A-Za-z0-9_]*$' 
-            local lasttnonspaceword='([^[:space:]]+)*$'
+            local lastnonspaceword='([^[:space:]]+)*$'
 
-            if [[ $READLINE_LINE =~ $lasttnonspaceword ]]; then
+            local lastwordpattrn
+            [[ $wordsorspace == 'space' ]] && 
+                lastwordpattrn=$lastnonspaceword ||
+                lastwordpattrn=$lastalphanumericword
+
+            if [[ $READLINE_LINE =~ $lastwordpattrn ]]; then
                 lasttword=$(($(echo "${BASH_REMATCH[-1]}" | wc --chars) - 1)) 
             fi
 
             local tolastalphanumericword='^.*[A-Za-z0-9]' 
-            local tolasttnonspaceword='^.*[^[:space:]]'
+            local tolastnonspaceword='^.*[^[:space:]]'
 
-            if [[ $READLINE_LINE =~ $tolasttnonspaceword ]]; then
+            local tolastwordpattrn
+            [[ $wordsorspace == 'space' ]] && 
+                tolastwordpattrn=$tolastnonspaceword ||
+                tolastwordpattrn=$tolastalphanumericword
+
+            if [[ $READLINE_LINE =~ $tolastwordpattrn ]]; then
                 cntuptolastword=$(($(echo "${BASH_REMATCH[0]}" | wc --chars) - $lasttword - 1)) 
             fi
 
@@ -379,13 +410,26 @@ transpose_words() {
     unset arr arrr
 }
 
-bind -m emacs-standard -x '"\e[1;2D": transpose_words left'
-bind -m vi-command -x '"\e[1;2D": transpose_words left'
-bind -m vi-insert -x '"\e[1;2D": transpose_words left'
+# Transpose space-separated words on Shift Left/Right
 
-bind -m emacs-standard -x '"\e[1;2C": transpose_words right'
-bind -m vi-command -x '"\e[1;2C": transpose_words right'
-bind -m vi-insert -x '"\e[1;2C": transpose_words right'
+bind -m emacs-standard -x '"\e[1;2D": transpose_words space left'
+bind -m vi-command -x '"\e[1;2D": transpose_words space left'
+bind -m vi-insert -x '"\e[1;2D": transpose_words space left'
+
+bind -m emacs-standard -x '"\e[1;2C": transpose_words space right'
+bind -m vi-command -x '"\e[1;2C": transpose_words space right'
+bind -m vi-insert -x '"\e[1;2C": transpose_words space right'
+
+# Transpose special character separated words on Alt+Shift Left/Right
+
+bind -m emacs-standard -x '"\e[1;4D": transpose_words words left'
+bind -m vi-command -x '"\e[1;4D": transpose_words words left'
+bind -m vi-insert -x '"\e[1;4D": transpose_words words left'
+
+bind -m emacs-standard -x '"\e[1;4C": transpose_words words right'
+bind -m vi-command -x '"\e[1;4C": transpose_words words right'
+bind -m vi-insert -x '"\e[1;4C": transpose_words words right'
+
 
 alias __='clear && tput cup $(($LINE_TPUT+1)) $TPUT_COL && tput sc && tput cuu1 && echo "${PS1@P}" && tput cuu1'
 
