@@ -176,6 +176,8 @@ unset_array(){
     unset new_array
 }
 
+#TRANSPOSE_QUOTED=1
+
 transpose_words() {
     local wordsorspace='space' 
     if test -n "$1" && ! [[ "$1" == 'space' ]]; then
@@ -187,97 +189,140 @@ transpose_words() {
         directn='right' 
     fi
 
+    local only_exclude_spaces='[^[:space:]]+'
+    local include_only_alphanums='[A-Za-z0-9]+' 
+
+    local quotedspace='(['\''"])(?:\\.|(?!\1).)+?\1|[[:space:]]+' 
+    local quotedalphanumeric='(['\''"])(?:\\.|(?!\1).)+?\1|[A-Za-z0-9]+' 
+   
+    local words 
+    if [[ "$wordsorspace" == 'space' ]]; then 
+        [[ $TRANSPOSE_QUOTED ]] && 
+            words=$quotedspace || 
+            words=$only_exclude_spaces
+    else
+        [[ $TRANSPOSE_QUOTED ]] && 
+            words=$quotedalphanumeric || 
+            words=$include_only_alphanums
+    fi
+
+    local only_include_spaces='[[:space:]]+'  
+    local exclude_only_aphanums='[^A-Za-z0-9]+' 
+   
+    local invertedquotedspace='^((['\''"])(?:\\.|(?!\1).)+?\1|^[[:space:]]+)' 
+    local invertedquotedalpha='^(['\''"])(?:\\.|(?!\1).)+?\1|[^A-Za-z0-9]+' 
+
+    local non_words
+    if [[ "$wordsorspace" == 'space' ]]; then
+        [[ $TRANSPOSE_QUOTED ]] && 
+            non_words=$invertedquotedspace || 
+            non_words=$only_include_spaces
+    else
+        [[ $TRANSPOSE_QUOTED ]] && 
+            non_words=$invertedquotedalpha || 
+            non_words=$exclude_only_aphanums   
+    fi 
+
+    local firstnonspaceword='^[[:space:]]*([^[:space:]]+)' 
+    local firstalphanumericword='^([A-Za-z0-9]+)' 
+
+    local quotedfirstalphanumericword='^((['\''"])(?:\\.|(?!\1).)+?\1|[A-Za-z0-9]+)' 
+    local quotedfirstnonspaceword='^((['\''"])(?:\\.|(?!\1).)+?\1|^[[:space:]]*([^[:space:]]+))' 
+
+    local firstwordpattrn
+    if [[ "$wordsorspace" == 'space' ]]; then
+        [[ $TRANSPOSE_QUOTED ]] && 
+            firstwordpattrn=$quotedfirstnonspaceword || 
+            firstwordpattrn=$firstnonspaceword
+    else
+        [[ $TRANSPOSE_QUOTED ]] && 
+            firstwordpattrn=$quotedfirstalphanumericword || 
+            firstwordpattrn=$firstalphanumericword   
+    fi
+
+    local lastnonspaceword='([^[:space:]]+)*$'
+    local lastalphanumericword='([A-Za-z0-9]+)[^A-Za-z0-9_]*$' 
+
+    local quotedlastnonspaceword='(['\''"])(?:\\.|(?!\1).)+?\1*$|([^[:space:]]+)*$'
+    local quotedlastalphanumericword='(['\''"])(?:\\.|(?!\1).)+?\1*$|([A-Za-z0-9]+)[^A-Za-z0-9]*$' 
+
+    local lastwordpattrn
+    if [[ "$wordsorspace" == 'space' ]]; then
+        [[ $TRANSPOSE_QUOTED ]] && 
+            lastwordpattrn=$quotedlastnonspaceword || 
+            lastwordpattrn=$lastnonspaceword
+    else
+        [[ $TRANSPOSE_QUOTED ]] && 
+            lastwordpattrn=$quotedlastalphanumericword || 
+            lastwordpattrn=$lastalphanumericword   
+    fi
+
+    local tolastnonspaceword='^.*[^[:space:]]'
+    local tolastalphanumericword='^.*[A-Za-z0-9]' 
+
+    local tolastquotedexcludednonspaceword='^.*(['\''"])(?:\\.|(?!\1).)+?\1|[^[:space:]]'
+    local tolastquotedalphanumericword='^.*(['\''"])(?:\\.|(?!\1).)+?\1|[A-Za-z0-9]' 
+
+    local tolastwordpattrn
+    if [[ "$wordsorspace" == 'space' ]]; then
+        [[ $TRANSPOSE_QUOTED ]] && 
+            tolastwordpattrn=$tolastquotedexcludednonspaceword ||
+            tolastwordpattrn=$tolastnonspaceword  
+    else
+        [[ $TRANSPOSE_QUOTED ]] && 
+            tolastwordpattrn=$tolastquotedalphanumericword || 
+            tolastwordpattrn=$tolastalphanumericword   
+    fi    
+    
     local arr arrr chars start end
     
     # Remove trailing whitespace
     if [[ "${READLINE_LINE: -1}" == ' ' ]]; then
         READLINE_LINE="${READLINE_LINE::-1}" 
     fi
-   
-    local include_only_alphanums='[A-Za-z0-9]+' 
-    local only_exclude_spaces='[^[:space:]]+'
-   
-    local words 
-    [[ $wordsorspace == 'space' ]] && 
-        words=$only_exclude_spaces ||
-        words=$include_only_alphanums
 
     global_rematch "${READLINE_LINE}" $words arr
-
+    
     local args=${#arr[@]} 
     if [[ $args -gt 1 ]]; then 
 
-        local exclude_only_aphanums='[^A-Za-z0-9]+' 
-        local only_include_spaces='[[:space:]]+'  
-        
-        local non_words
-        [[ $wordsorspace == 'space' ]] && 
-            non_words=$only_include_spaces ||
-            non_words=$exclude_only_aphanums
-
-        global_rematch "${READLINE_LINE:0}" $non_words arrr
-        
+        global_rematch "${READLINE_LINE}" $non_words arrr
+       
         #global_rematch "${READLINE_LINE:0}" '.' chars
 
         local index=0
         local olderprefix='' oldprefix='' prefix='' olderword='' olderspcl='' lastword=${arr[0]} lastspcl=${arrr[0]} newword=${arr[1]}  
         while ([[ ${#arr[@]} -ge 1 ]] || [[ ${#arrr[@]} -ge 1 ]]); do 
-            
-            #echo ${arr[@]}
-            #echo ${arrr[@]}
-            
+           
             local linechar=${READLINE_LINE:$index:1}
+
             local charcount=$(($(echo "${arr[0]}" | wc --chars) - 1)) 
             index=$(($index + $charcount)) 
             
-            # Get the firstword count and the count of the string up to the last alphanumerical 
+            # get the firstword count and the count of the string up to the last alphanumerical 
             local firstword lasttword cntuptolastword
-
-            local firstalphanumericword='^([A-Za-z0-9]+)' 
-            local firstnonspaceword='^[[:space:]]*([^[:space:]]+)'
-
-            local firstwordpattrn
-            [[ $wordsorspace == 'space' ]] && 
-                firstwordpattrn=$firstnonspaceword ||
-                firstwordpattrn=$firstalphanumericword
 
             if [[ $READLINE_LINE =~ $firstwordpattrn ]]; then
                 firstword=$(($(echo "${BASH_REMATCH[0]}" | wc --chars) - 1)) 
             fi
 
-            local lastalphanumericword='([A-Za-z0-9]+)[^A-Za-z0-9_]*$' 
-            local lastnonspaceword='([^[:space:]]+)*$'
-
-            local lastwordpattrn
-            [[ $wordsorspace == 'space' ]] && 
-                lastwordpattrn=$lastnonspaceword ||
-                lastwordpattrn=$lastalphanumericword
-
             if [[ $READLINE_LINE =~ $lastwordpattrn ]]; then
                 lasttword=$(($(echo "${BASH_REMATCH[-1]}" | wc --chars) - 1)) 
             fi
-
-            local tolastalphanumericword='^.*[A-Za-z0-9]' 
-            local tolastnonspaceword='^.*[^[:space:]]'
-
-            local tolastwordpattrn
-            [[ $wordsorspace == 'space' ]] && 
-                tolastwordpattrn=$tolastnonspaceword ||
-                tolastwordpattrn=$tolastalphanumericword
 
             if [[ $READLINE_LINE =~ $tolastwordpattrn ]]; then
                 cntuptolastword=$(($(echo "${BASH_REMATCH[0]}" | wc --chars) - $lasttword - 1)) 
             fi
 
             if [[ "$lastword" =~ "$linechar" ]]; then
+
                 local prfxcnt=$(($(echo "$prefix" | wc --chars) - 1))
                 local oldprfxcnt line
                 
                 if [[ $index -ge $READLINE_POINT ]] || ([[ $index -eq $(($READLINE_POINT - 1)) ]] && [[ "$directn" == 'right' ]]); then
                     if ([[ $index -eq $(($READLINE_POINT - 1)) ]] && [[ $READLINE_POINT == $cntuptolastword ]] && [[ "$directn" == 'right' ]]); then 
-                        line="$oldprefix$newword$olderspcl$lastword" 
+                        line="$READLINE_LINE"
                         oldprfxcnt=${#READLINE_LINE}
-
                     elif test -n "$olderprefix"; then
                         oldprfxcnt=$(($(echo "$olderprefix" | wc --chars) - 1))
                         if [[ "${#arr[@]}" == 1 ]] && [[ "$directn" == 'left' ]]; then
@@ -333,19 +378,27 @@ transpose_words() {
                     READLINE_POINT=$relpoint
                     break
                 fi
+
                 test -n "$oldprefix" && olderprefix=$oldprefix
                 oldprefix=$prefix
                 prefix="$prefix${arr[0]}"
                 test -z "$oldprefix" && oldprefix=$prefix 
                 unset_array arr 0; 
                 olderword=$lastword 
-                test -n "${arr[1]}" && lastword=$newword; 
-                test -n "${arr[1]}" && newword=${arr[1]} || newword=${arr[0]}
+                test -n "${arr[1]}" && 
+                    lastword=$newword && newword=${arr[1]} ||
+                    newword=${arr[0]}
             fi
+
+            
             local linechar=${READLINE_LINE:$index:1}
             local charcount=$(($(echo "${arrr[0]}" | wc --chars) - 1)) 
             index=$(($index + $charcount))
+
+
             if [[ "$lastspcl" =~ "$linechar" ]]; then
+
+
                 if [[ $index -ge $READLINE_POINT ]]; then
                     local oldprfxcnt line prfxcnt=0
                     if test -n "$olderprefix"; then
@@ -371,17 +424,27 @@ transpose_words() {
                     else
                        oldprfxcnt=0
                        if test -n "$oldprefix"; then
-                            test -z "$olderspcl" && olderspcl="$lastspcl" && lastspcl="${arrr[1]}"
-                            if [[ "$directn" == 'left' ]]; then
-                                local lntcnt=$(($(echo "$olderword$olderspcl$lastword" | wc --chars) - 1))
-                                local suffix=${READLINE_LINE:$lntcnt}
-                                line="$lastword$olderspcl$olderword$suffix" 
+                            #test -z "$olderword" && olderword="$lastword" && lastword="${arr[1]}"
+                            #test -z "$olderspcl" && olderspcl="$lastspcl" && lastspcl="${arrr[1]}"
+                            if [[ $READLINE_POINT -gt $cntuptolastword ]] && [[ "$directn" == 'right' ]]; then 
+                                line="$READLINE_LINE"
+                                READLINE_POINT=${#READLINE_LINE}
+                                prfxcnt=0
                             else
-                                prfxcnt=$(($(echo "$olderword$olderspcl$newword$lastspcl" | wc --chars) - 1))
-                                local lntcnt=$(($(echo "$olderword$olderspcl$newword$lastspcl$lastword" | wc --chars) - 1))
-                                local suffix=${READLINE_LINE:$lntcnt}
-             
-                                line="$olderword$olderspcl$newword$lastspcl$lastword$suffix" 
+                                if [[ "$directn" == 'left' ]]; then
+                                    #local lntcnt=$(($(echo "$olderword$olderspcl$lastword" | wc --chars) - 1))
+                                    #local suffix=${READLINE_LINE:$lntcnt}
+                                    #line="$lastword$olderspcl$olderword$suffix" 
+                                    local lntcnt=$(($(echo "$newword$lastspcl$oldprefix" | wc --chars) - 1))
+                                    local suffix=${READLINE_LINE:$lntcnt}
+                                    line="$newword$lastspcl$oldprefix$suffix" 
+                                else
+                                    prfxcnt=$(($(echo "$olderword$olderspcl$newword$lastspcl" | wc --chars) - 1))
+                                    local lntcnt=$(($(echo "$olderword$olderspcl$newword$lastspcl$lastword" | wc --chars) - 1))
+                                    local suffix=${READLINE_LINE:$lntcnt}
+                 
+                                    line="$olderword$olderspcl$newword$lastspcl$lastword$suffix" 
+                                fi
                             fi
                         elif [[ "$directn" == 'right' ]] || ([[ "$directn" == 'left' ]] && [[ $READLINE_POINT -gt $firstword ]]); then
                             oldprfxcnt=$(($(echo "$lastword" | wc --chars) - 1)) &&
@@ -394,7 +457,7 @@ transpose_words() {
                         fi
 
                     fi
-                    local relpoint=$(($prfxcnt))
+                    local relpoint=$(($READLINE_POINT - $prfxcnt))
                     READLINE_LINE=$line
                     READLINE_POINT=$relpoint
                     break
