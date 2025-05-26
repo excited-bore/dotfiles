@@ -424,13 +424,14 @@ transpose_words() {
                                 local suffix=${READLINE_LINE:$wordcnt}
                                 line="$oldprefix$olderword$lastspcl$newword${arrr[1]}$lastword$suffix" 
                             else
+                                [[ "$directn" == 'right' ]] && ! [[ $READLINE_POINT = ${#READLINE_LINE} ]] &&
+                                    READLINE_POINT=${#READLINE_LINE}
                                 break
                             fi
                         fi
                     else
                        oldprfxcnt=0
                        if test -n "$oldprefix"; then
-                            #test -z "$olderword" && olderword="$lastword" && lastword="${arr[1]}"
                             test -z "$olderspcl" && olderspcl="$lastspcl" && lastspcl="${arrr[1]}"
                             if [[ $READLINE_POINT -gt $cntuptolastword ]] && [[ "$directn" == 'right' ]]; then 
                                 line="$READLINE_LINE"
