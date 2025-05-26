@@ -488,14 +488,14 @@ alias lp="ls-all-pager"
 alias mkdir="mkdir -pv"
 
 
-alias grep='grep --colour=always'
-alias egrep='grep -e'
-alias fgrep='fgrep --colour=always'
-alias rg='rg --color=always'
+alias egrep='grep --extended-regexp --colour=always'
+alias fgrep='grep --fixed-strings --colour=always'
+alias grep='grep --extended-regexp --colour=always'
 
 alias grep-no-color='grep --color=never'
-alias grep-no-case-sensitivwe='grep -i'
+alias grep-no-case-sensitivwe='grep --ignore-case'
 
+alias rg='rg --color=always'
 
 # Refresh output command every 0.1s
 alias refresh="watch -n0 --color bash -ic"

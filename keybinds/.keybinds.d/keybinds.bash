@@ -176,7 +176,7 @@ unset_array(){
     unset new_array
 }
 
-#TRANSPOSE_QUOTED=1
+TRANSPOSE_QUOTED=1
 
 transpose_words() {
     local wordsorspace='space' 
@@ -192,8 +192,7 @@ transpose_words() {
     local only_exclude_spaces='[^[:space:]]+'
     local include_only_alphanums='[A-Za-z0-9]+' 
 
-    local quotedspace='(['\''"])(?:\\.|(?!\1).)+?\1|[[:space:]]+' 
-    local quotedalphanumeric='(['\''"])(?:\\.|(?!\1).)+?\1|[A-Za-z0-9]+' 
+    local quotedspace='"[^"]*"+|'\''[^'\'']*'\''+|[^[:space:]]+' 
    
     local words 
     if [[ "$wordsorspace" == 'space' ]]; then 
@@ -201,33 +200,23 @@ transpose_words() {
             words=$quotedspace || 
             words=$only_exclude_spaces
     else
-        [[ $TRANSPOSE_QUOTED ]] && 
-            words=$quotedalphanumeric || 
-            words=$include_only_alphanums
+        words=$include_only_alphanums
     fi
 
     local only_include_spaces='[[:space:]]+'  
     local exclude_only_aphanums='[^A-Za-z0-9]+' 
    
-    local invertedquotedspace='^((['\''"])(?:\\.|(?!\1).)+?\1|^[[:space:]]+)' 
-    local invertedquotedalpha='^(['\''"])(?:\\.|(?!\1).)+?\1|[^A-Za-z0-9]+' 
-
     local non_words
     if [[ "$wordsorspace" == 'space' ]]; then
-        [[ $TRANSPOSE_QUOTED ]] && 
-            non_words=$invertedquotedspace || 
-            non_words=$only_include_spaces
+        non_words=$only_include_spaces
     else
-        [[ $TRANSPOSE_QUOTED ]] && 
-            non_words=$invertedquotedalpha || 
-            non_words=$exclude_only_aphanums   
+        non_words=$exclude_only_aphanums   
     fi 
 
-    local firstnonspaceword='^[[:space:]]*([^[:space:]]+)' 
-    local firstalphanumericword='^([A-Za-z0-9]+)' 
+    local firstnonspaceword='^([^[:space:]]+)' 
+    local firstalphanumericword='^([A-Za-z0-9]+)'
 
-    local quotedfirstalphanumericword='^((['\''"])(?:\\.|(?!\1).)+?\1|[A-Za-z0-9]+)' 
-    local quotedfirstnonspaceword='^((['\''"])(?:\\.|(?!\1).)+?\1|^[[:space:]]*([^[:space:]]+))' 
+    local quotedfirstnonspaceword='^(("[^"]*"+|'\''[^'\'']*'\''+)*[^[:space:]]+)' 
 
     local firstwordpattrn
     if [[ "$wordsorspace" == 'space' ]]; then
@@ -235,16 +224,13 @@ transpose_words() {
             firstwordpattrn=$quotedfirstnonspaceword || 
             firstwordpattrn=$firstnonspaceword
     else
-        [[ $TRANSPOSE_QUOTED ]] && 
-            firstwordpattrn=$quotedfirstalphanumericword || 
-            firstwordpattrn=$firstalphanumericword   
+        firstwordpattrn=$firstalphanumericword   
     fi
 
     local lastnonspaceword='([^[:space:]]+)*$'
-    local lastalphanumericword='([A-Za-z0-9]+)[^A-Za-z0-9_]*$' 
+    local lastalphanumericword='([A-Za-z0-9]+)[^A-Za-z0-9]*$' 
 
-    local quotedlastnonspaceword='(['\''"])(?:\\.|(?!\1).)+?\1*$|([^[:space:]]+)*$'
-    local quotedlastalphanumericword='(['\''"])(?:\\.|(?!\1).)+?\1*$|([A-Za-z0-9]+)[^A-Za-z0-9]*$' 
+    local quotedlastnonspaceword='("[^"]*"+|'\''[^'\'']*'\''+)*$|([^[:space:]]+)*$'
 
     local lastwordpattrn
     if [[ "$wordsorspace" == 'space' ]]; then
@@ -252,29 +238,24 @@ transpose_words() {
             lastwordpattrn=$quotedlastnonspaceword || 
             lastwordpattrn=$lastnonspaceword
     else
-        [[ $TRANSPOSE_QUOTED ]] && 
-            lastwordpattrn=$quotedlastalphanumericword || 
-            lastwordpattrn=$lastalphanumericword   
+        lastwordpattrn=$lastalphanumericword   
     fi
 
-    local tolastnonspaceword='^.*[^[:space:]]'
+    local tolastnonspaceword='^.*"[^"]*"*[^[:space:]]|^.*'\''[^'\'']*'\''*[^[:space:]]|^.*[^[:space:]]'
     local tolastalphanumericword='^.*[A-Za-z0-9]' 
 
-    local tolastquotedexcludednonspaceword='^.*(['\''"])(?:\\.|(?!\1).)+?\1|[^[:space:]]'
-    local tolastquotedalphanumericword='^.*(['\''"])(?:\\.|(?!\1).)+?\1|[A-Za-z0-9]' 
+    local tolastwordincludedquoted='^.*("[^"]*"|+|[^[:space:]]'
 
     local tolastwordpattrn
     if [[ "$wordsorspace" == 'space' ]]; then
         [[ $TRANSPOSE_QUOTED ]] && 
-            tolastwordpattrn=$tolastquotedexcludednonspaceword ||
+            tolastwordpattrn=$tolastwordincludedquoted ||
             tolastwordpattrn=$tolastnonspaceword  
     else
-        [[ $TRANSPOSE_QUOTED ]] && 
-            tolastwordpattrn=$tolastquotedalphanumericword || 
-            tolastwordpattrn=$tolastalphanumericword   
+        tolastwordpattrn=$tolastalphanumericword   
     fi    
     
-    local arr arrr chars start end
+    local arr arrr line
     
     # Remove trailing whitespace
     if [[ "${READLINE_LINE: -1}" == ' ' ]]; then
@@ -286,10 +267,19 @@ transpose_words() {
     local args=${#arr[@]} 
     if [[ $args -gt 1 ]]; then 
 
-        global_rematch "${READLINE_LINE}" $non_words arrr
-       
-        #global_rematch "${READLINE_LINE:0}" '.' chars
+        # Chatgpt helped me with this one
+        # Use a rare control char as placeholder,
+        # then replace double-quoted and single-quoted strings with said placeholder
+        
+        if [[ "$wordsorspace" == 'space' ]] && [[ $TRANSPOSE_QUOTED ]]; then
+            placeholder=$'\x01'  
+            line=$(echo "${READLINE_LINE}" | sed -E 's/"[^"]*"|'\''[^'\'']*'\''/'"$placeholder"'/g') 
+        else
+            line="${READLINE_LINE}"
+        fi
 
+        global_rematch "${READLINE_LINE}" $non_words arrr
+      
         local index=0
         local olderprefix='' oldprefix='' prefix='' olderword='' olderspcl='' lastword=${arr[0]} lastspcl=${arrr[0]} newword=${arr[1]}  
         while ([[ ${#arr[@]} -ge 1 ]] || [[ ${#arrr[@]} -ge 1 ]]); do 
