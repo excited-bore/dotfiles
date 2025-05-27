@@ -192,12 +192,12 @@ transpose_words() {
     local only_exclude_spaces='[^[:space:]]+'
     local include_only_alphanums='[A-Za-z0-9]+' 
 
-    local quotedspace='"[^"]*"+|'\''[^'\'']*'\''+|[^[:space:]]+' 
+    local notquotedspace_exclude_space='"[^"]*"+|'\''[^'\'']*'\''+|[^[:space:]]+' 
    
     local words 
     if [[ "$wordsorspace" == 'space' ]]; then 
         [[ $TRANSPOSE_QUOTED ]] && 
-            words=$quotedspace || 
+            words=$notquotedspace_exclude_space || 
             words=$only_exclude_spaces
     else
         words=$include_only_alphanums
@@ -242,9 +242,10 @@ transpose_words() {
     fi
 
     local tolastnonspaceword='^.*"[^"]*"*[^[:space:]]|^.*'\''[^'\'']*'\''*[^[:space:]]|^.*[^[:space:]]'
+    #local tolastnonspaceword='^.*[^[:space:]]'
     local tolastalphanumericword='^.*[A-Za-z0-9]' 
 
-    local tolastwordincludedquoted='^.*("[^"]*"|+|[^[:space:]]'
+    local tolastwordincludedquoted='^.*("[^"]*"+|'\''[^'\'']*'\''+)*[^[:space:]]'
 
     local tolastwordpattrn
     if [[ "$wordsorspace" == 'space' ]]; then
@@ -256,10 +257,28 @@ transpose_words() {
     fi    
     
     local arr arrr line
-    
-    # Remove trailing whitespace
-    if [[ "${READLINE_LINE: -1}" == ' ' ]]; then
-        READLINE_LINE="${READLINE_LINE::-1}" 
+   
+    # Check for escaped spaced words and trailing spaces, then exit
+    local re='(^|[[:space:]])(([^[:space:]'\'']*\\ )+[^[:space:]'\'']*)'
+    if [[ "${READLINE_LINE}" =~ $re ]] || [[ "${READLINE_LINE: -1}" == ' ' ]]; then
+        
+        # Quoted escaped spaced words
+        while [[ "${READLINE_LINE}" =~ $re ]]; do
+            local i=${BASH_REMATCH[0]}
+            local j="'$(eval "echo $i")'"
+            local ree='.*'$(printf %q "$i")''
+            if [[ $READLINE_LINE =~ $ree ]]; then
+                local suffxcount=$(($(echo "${BASH_REMATCH[0]}" | wc --chars)))
+                local preffxcount=$(($suffxcount - $(echo $i | wc --chars)))
+                READLINE_LINE="${READLINE_LINE:0:$preffxcount}$j ${READLINE_LINE:$suffxcount}" 
+            fi
+        done
+        
+        # Remove trailing whitespace
+        if [[ "${READLINE_LINE: -1}" == ' ' ]]; then
+            READLINE_LINE="${READLINE_LINE::-1}" 
+        fi
+        return 0 
     fi
 
     global_rematch "${READLINE_LINE}" $words arr
@@ -272,7 +291,7 @@ transpose_words() {
         # then replace double-quoted and single-quoted strings with said placeholder
         
         if [[ "$wordsorspace" == 'space' ]] && [[ $TRANSPOSE_QUOTED ]]; then
-            placeholder=$'\x01'  
+            local placeholder=$'\x01'  
             line=$(echo "${READLINE_LINE}" | sed -E 's/"[^"]*"|'\''[^'\'']*'\''/'"$placeholder"'/g') 
         else
             line="${READLINE_LINE}"
@@ -318,6 +337,7 @@ transpose_words() {
                             line="$olderprefix$newword$olderspcl$lastword" 
                         else 
                             if [[ "$directn" == 'left' ]]; then
+
                                 local lntcnt=$(($(echo "$oldprefix$lastword" | wc --chars) - 1))
                                 local suffix=${READLINE_LINE:$lntcnt}
                                 line="$olderprefix$lastword$olderspcl$olderword$suffix" 
@@ -405,6 +425,7 @@ transpose_words() {
                             line="$olderprefix$newword$olderspcl$olderword" 
                         else 
                             if [[ "$directn" == 'left' ]]; then
+
                                 local lntcnt=$(($(echo "$olderprefix$lastword$lastspcl$olderword" | wc --chars) - 1))
                                 local suffix=${READLINE_LINE:$lntcnt}
                                 line="$olderprefix$lastword$lastspcl$olderword$suffix" 
@@ -423,6 +444,7 @@ transpose_words() {
                        oldprfxcnt=0
                        if test -n "$oldprefix"; then
                             test -z "$olderspcl" && olderspcl="$lastspcl" && lastspcl="${arrr[1]}"
+
                             if [[ $READLINE_POINT -gt $cntuptolastword ]] && [[ "$directn" == 'right' ]]; then 
                                 line="$READLINE_LINE"
                                 READLINE_POINT=${#READLINE_LINE}
