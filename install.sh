@@ -466,18 +466,37 @@ if [[ "y" == "$dua" ]]; then
 fi
 unset dua
 
-# Dysk - Df replacement
- 
-readyn -c "! hash dysk &> /dev/null" -p "Install dysk? (A modern replacement for df - list device disk space)" dysk
 
-if [[ "y" == "$dysk" ]]; then
+# Duf and Dysk - Df replacement
+
+color='GREEN'
+pre="duf dysk both none"
+prmpt=" [Duf/dysk/both/none]: "
+if ! hash dysk &> /dev/null && hash duf &> /dev/null; then
+    pre="dysk duf both none"
+    prmpt=" [Dysk/duf/both/none]: "
+elif hash dysk &> /dev/null && hash duf &> /dev/null; then  
+    color='YELLOW'
+    pre="none dysk duf both"
+    prmpt=" [None/duf/dysk/both]: "
+fi
+
+reade -Q "$color" -i "$pre" -p "Install duf, dysk or both? (Both are modern replacements for df - tools list hard drive disk space)$prmpt" duf_dysk
+if [[ "both" == "$duf_dysk" ]] || [[ "duf" == "$duf_dysk" ]]; then
+    if ! test -f $SCRIPT_DIR/install_duf.sh; then
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_duf.sh)
+    else
+        . $SCRIPT_DIR/install_duf.sh
+    fi
+fi 
+if [[ "both" == "$duf_dysk" ]] || [[ "dysk" == "$duf_dysk" ]]; then
     if ! test -f $SCRIPT_DIR/install_dysk.sh; then
         source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_dysk.sh)
     else
         . $SCRIPT_DIR/install_dysk.sh
     fi
 fi
-unset dysk
+unset duf_dysk color pre prmpt
 
 # Bash alias completions
 

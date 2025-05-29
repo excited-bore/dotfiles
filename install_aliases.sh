@@ -333,13 +333,34 @@ if [[ $ansr == "y" ]]; then
     fi
     unset du_dust_dua prmpt which dust_dua
 
-    if hash dysk &>/dev/null; then
+    if hash duf &> /dev/null && hash dysk &>/dev/null; then
+        printf "${GREEN}Both ${CYAN}duf${GREEN} and ${CYAN}dysk${GREEN} are installed${normal}\n"
+        readyn -p "Set one as alias for 'df'?" dysk_df
+        if [[ "$dysk_df" == "y" ]]; then
+            reade -Q 'GREEN' -i 'duf dysk' -p 'Which one?: ' duf_dysk 
+            sed -i "s|.alias df=|alias df=|g; s|alias df=.*|alias df='$duf_dysk'|g" $genr
+        else
+            sed -i 's|^alias df=|#alias df=|g' $genr
+        fi
+    
+    elif hash duf &> /dev/null; then
+        printf "${CYAN}Duf${GREEN} is installed${normal}\n"
+        readyn -p "Set 'duf' as alias for 'df'?" dysk_df
+        if [[ "$dysk_df" == "y" ]]; then
+            sed -i "s|.alias df=|alias df=|g; s|alias df=.*|alias df='duf'|g" $genr
+        else
+            sed -i 's|^alias df=|#alias df=|g' $genr
+        fi
+    
+    elif hash dysk &> /dev/null; then
+        printf "${CYAN}Dysk${GREEN} is installed${normal}\n"
         readyn -p "Set 'dysk' as alias for 'df'?" dysk_df
         if [[ "$dysk_df" == "y" ]]; then
-            sed -i 's|.alias df="dysk"|alias df="dysk"|g' $genr
+            sed -i "s|.alias df=|alias df=|g; s|alias df=.*|alias df='dysk'|g" $genr
         else
-            sed -i 's|^alias df="dysk"|#alias df="dysk"|g' $genr
+            sed -i 's|^alias df=|#alias df=|g' $genr
         fi
+         
     fi
     unset dysk_df
 
