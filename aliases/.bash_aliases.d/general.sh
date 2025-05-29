@@ -133,96 +133,6 @@ complete -F _files cp-all-to
 
 alias cpf-bckup="cp -f -b"
 
-#function cp-reverse(){
-#    getopt -T
-#    if [ "$?" != 4 ]; then
-#        echo 2>&1 "Wrong version of 'getopt' detected, exiting..."
-#        exit 1
-#    fi
-#    local dest="${@: -1:1}"
-#    local sorce=()
-#    local target=0
-#    local args=$@
-    #TEMP=$(getopt -o abdfiHlLnPpRrsStTuvxZh: --long archive,attributes-only,backup:,copy-contents,debug,force,interactive,link,dereference,no-clobber,no-dereference,preserve:,no-preserve:,parents,recursive,reflink:,remove-destination,sparse:,strip-trailing-slashes,symbolic-link,suffix:,target-directory:,no-target-directory,update:,verbose,keep-directory-symlink,one-file-system,context:,help,version \
-             # -n 'cp' -- "$@") 
-    
-    # Note the quotes around '$TEMP': they are essential!
-    #eval set -- "$TEMP" 
-
-    #while true; do
-    #    case "$1" in
-    #    -a | -b | --archive | --attributes-only | --copy-contents | -d | --debug | -f | --force | -i | --interactive | -H | -l | --link | -L | --dereference | -n | --no-clobber | -P | --no-dererence | -p | --preserve | --no-preserve | --parents | -R | -r | --recursive | --reflink | --remove-destination | --sparse | --strip-trailing-slashes | -s | --symbolic-link | -T | --no-target-directory | --update | -u | -v | --verbose | --keep-directory-symlink | -x | --one-file-system | -Z | --context | --help | --version) shift  ;;
-    #    --backup) echo $2; bcp="$2"; shift 2 ;;
-    #    -t | --target-directory) target="$2"; shift 2 ;; 
-    #    -S | --suffix) suff="$2"; shift 2 ;; 
-    #    -- ) shift; break; ;; 
-    #    * ) break ;;
-    #  esac
-    #done 
-#    
-#    #
-#    #eval set -- "$VALID_ARGS"
-#    
-#    while : ; do
-#        case "$1" in
-#            --backup | --preserve | --no-preserve | --sparse | -S | --suffix | -u | --update | --context)         
-#                if [ "$2" ] && ([ "$2" == "none" ] || [ "$2" == "off" ] || [ $2 == "numbered" ] || [ $2 == "t" ] || [ $2 == "existing" ] || [ $2 == "simple" ] || [ $2 == "never" ]); then 
-#                    shift 2
-#                else
-#                    shift
-#                fi
-#               ;;
-#             --target-directory | -!(-*)t)  
-#                target=1
-#                if test -d "$2"; then
-#                    dest="$2" 
-#                    shift 2 
-#                fi
-#                ;;
-#            -* | --*)  
-#                shift 
-#                ;;
-#            --) 
-#                shift
-#                break
-#                ;;
-#            *) 
-#                break
-#                ;;
-#        esac
-#    done
-#
-#    for arg in $@; do
-#        echo $arg
-#        for arg1 in ${args} ; do
-#            if [[ "$arg" == "$arg1" ]] ; then
-#                args=("${args[@]/$arg}")
-#            fi
-#        done
-#        if [[ "$arg" != "$dest" ]]; then
-#            sorce+=("$arg")
-#        fi
-#    done 
-#    
-#    if test -d "$dest"; then
-#        target=1
-#    fi
-#    if test "$target" == 1 ; then
-#        for s in "${sorce[@]}"; do
-#            if test -a "$dest/$(basename $s)"; then 
-#                echo ${args[@]}
-#                cp "${args[@]}" "$(dirname $dest)/$(basename $s)" "$s" 
-#            else
-#                echo "Files that were previously the destination have not been found"
-#            fi 
-#        done
-#    else
-#        if [[ "${#sorce[@]}" == 1 ]]; then
-#            cp  ${args[@]} "$dest" "${sorce[0]}" 
-#        fi  
-#    fi
-#}
-
 
 function cp-trash(){
     
@@ -488,9 +398,9 @@ alias lp="ls-all-pager"
 alias mkdir="mkdir -pv"
 
 
-alias egrep='grep --extended-regexp --colour=always'
-alias fgrep='grep --fixed-strings --colour=always'
-alias grep='grep --extended-regexp --colour=always'
+alias egrep='grep --colour=always --extended-regexp'
+alias fgrep='grep --colour=always --fixed-strings'
+alias grep='grep --colour=always'
 
 alias grep-no-color='grep --color=never'
 alias grep-no-case-sensitivwe='grep --ignore-case'
@@ -1043,13 +953,37 @@ alias free-kilob='command free --kilo'
 alias free-megab='command free --mega'
 alias free-gigab='command free --giga'
 
+# Du
+
 alias du="du -hs | awk '{print \$1}'"
-#alias du="dust"
+
+if hash ncdu &> /dev/null; then
+   alias ncdu='ncdu --color dark' 
+   alias du-tui='ncdu' 
+fi
+
+if hash ncdu &> /dev/null && ! hash dua &> /dev/null; then
+   alias dua-interactive='ncdu' 
+fi
+
+if hash dua &> /dev/null; then
+   alias dua-interactive='dua interactive' 
+   alias dua-aggregate='dua aggregate' 
+   alias du-tui='dua' 
+fi
+
+if ! hash ncdu &> /dev/null && hash dua &> /dev/null; then
+   alias ncdu='dua interactive' 
+fi
+
+#alias du='dust'
 alias folder-size="du"
 alias dir-size="du"
 alias dirsize="du"
 
+# Df
 alias df='df -h -T --total'
+
 #alias df='dysk'
 alias lfs='dysk'
 
