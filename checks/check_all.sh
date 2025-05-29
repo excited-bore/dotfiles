@@ -141,23 +141,23 @@ fi
 
 # Make sure mv moves forceably (without asking confirmation when overwriting) and verbosely
 [[ "$(type mv)" =~ 'aliased' ]] && 
-    unalias mv 
+    command unalias mv 
 alias mv='mv -fv'
 
 # Make sure rm removes forceably, recursively and verbosely 
 [[ "$(type rm)" =~ 'aliased' ]] &&
-    unalias rm 
+    command unalias rm 
 alias rm='rm -rfv'
 
 # Make sure sudo isn't aliased to something weird
 command -v sudo &>/dev/null && [[ "$(type sudo)" =~ 'aliased' ]] &&
-    unalias sudo
+    command unalias sudo
 # Keep aliases when using sudo
 alias sudo="sudo "
 
 # Wget only uses https - encrypted http
 command -v wget &>/dev/null && [[ "$(type wget)" =~ 'aliased' ]] &&
-    unalias wget 
+    command unalias wget 
 alias wget='wget --https-only'
 
 alias wget-aria='wget'
