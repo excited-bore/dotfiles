@@ -477,7 +477,7 @@ if ! hash dysk &> /dev/null && hash duf &> /dev/null; then
     prmpt=" [Dysk/duf/both/none]: "
 elif hash dysk &> /dev/null && hash duf &> /dev/null; then  
     color='YELLOW'
-    pre="none dysk duf both"
+    pre="none duf dysk both"
     prmpt=" [None/duf/dysk/both]: "
 fi
 
