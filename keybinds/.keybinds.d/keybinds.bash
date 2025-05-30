@@ -419,7 +419,6 @@ transpose_words() {
                     if test -n "$olderprefix"; then
                         prfxcnt=$(($(echo "$olderprefix" | wc --chars) - 1))
                         if [[ "$directn" == 'left' ]] && ([[ "${#arr[@]}" == 1 ]] || [[ $READLINE_POINT == ${#READLINE_LINE} ]] || [[ $READLINE_POINT == ${#arrr[-1]} ]]); then
-echo q
                             relpoint=$(($(echo "$olderprefix" | wc --chars) - 1)) 
                             local lntcnt=$(($(echo "$olderprefix$lastword$lastspcl$olderword" | wc --chars) - 1))
                             local suffix=${READLINE_LINE:$lntcnt}
@@ -435,7 +434,7 @@ echo q
                                 relpoint=$(($(echo "$oldprefix$olderword$lastspcl$newword${arrr[1]}" | wc --chars) - 1)) 
                                 local wordcnt=$(($(echo "$oldprefix$olderword$lastspcl$newword${arrr[1]}$lastword" | wc --chars) - 1)) 
                                 local suffix=${READLINE_LINE:$wordcnt}
-                                line="$oldprefix$olderword$lastspcl$newword${arrr[1]}$lastword$suffix" 
+                                line="$oldprefix$olderword$lastspcl$newword${arrr[1]}$suffix" 
                             else
                                 [[ "$directn" == 'right' ]] && ! [[ $READLINE_POINT = ${#READLINE_LINE} ]] &&
                                     READLINE_POINT=${#READLINE_LINE}
