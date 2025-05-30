@@ -242,25 +242,35 @@ transpose_words() {
     local arr arrr line
    
     # Check for escaped spaced words and trailing spaces, then exit
-    local re='(^|[[:space:]])(([^[:space:]'\'']*\\ )+[^[:space:]'\'']*)'
+    local re='(([^[:space:]'\'']*\\ )+[^[:space:]'\'']*)'
     if [[ "${READLINE_LINE}" =~ $re ]] || [[ "${READLINE_LINE: -1}" == ' ' ]]; then
-        
-        # Quoted escaped spaced words
-        while [[ "${READLINE_LINE}" =~ $re ]]; do
-            local i=${BASH_REMATCH[0]}
-            local j="'$(eval "echo $i")'"
-            local ree='.*'$(printf %q "$i")''
-            if [[ $READLINE_LINE =~ $ree ]]; then
-                local suffxcount=$(($(echo ${BASH_REMATCH[0]} | wc --chars)))
-                local preffxcount=$(($suffxcount - $(echo $i | wc --chars)))
-                READLINE_LINE="${READLINE_LINE:0:$preffxcount}$j${READLINE_LINE:$suffxcount}" 
+        while [[ "${READLINE_LINE}" =~ $re ]] || [[ "${READLINE_LINE: -1}" == ' ' ]]; do
+            
+            # Remove trailing whitespace
+            if [[ "${READLINE_LINE: -1}" == ' ' ]]; then
+                READLINE_LINE="${READLINE_LINE::-1}" 
             fi
-        done
-        
-        # Remove trailing whitespace
-        if [[ "${READLINE_LINE: -1}" == ' ' ]]; then
-            READLINE_LINE="${READLINE_LINE::-1}" 
-        fi
+            
+            # Quoted escaped spaced words
+            if [[ "${READLINE_LINE}" =~ $re ]]; then
+                local i=${BASH_REMATCH[0]}
+                #echo "'$i'" 
+                local j="'$(eval "echo $i")'"
+                local ree='.*'$(printf %q "$i")''
+                
+                if [[ $READLINE_LINE =~ $ree ]]; then
+                    local suffxcount=$(($(echo "${BASH_REMATCH[0]}" | wc --chars)))
+                    local preffxcount=$(($suffxcount - $(echo $i | wc --chars)))
+                    #echo "'${BASH_REMATCH[0]}'"
+                    #echo "Suffix: '${READLINE_LINE:$suffxcount}'" 
+                    #echo "Suffix - 1: '${READLINE_LINE:$((suffxcount - 1))}'" 
+                    #echo "Prefix: '${READLINE_LINE:0:$preffxcount}'" 
+                    READLINE_LINE="${READLINE_LINE:0:$preffxcount}$j${READLINE_LINE:$((suffxcount - 1))}" 
+                    #echo $READLINE_LINE 
+                fi
+            
+            fi
+        done 
         return 0 
     fi
 
@@ -431,14 +441,10 @@ transpose_words() {
                             else
                                 if [[ "$directn" == 'left' ]]; then
                                     READLINE_POINT=0 
-                                    local lntcnt=$(($(echo "$lastword$olderspcl$oldprefix$lastspcl$newword" | wc --chars) - 1))
+                                    local lntcnt=$(($(echo "$olderword$olderspcl$lastspcl$newword" | wc --chars) - 1))
                                     local suffix=${READLINE_LINE:$lntcnt}
     
-                                    if [[ "$oldprefix" == "$lastword" ]]; then
-                                        line="$lastword$olderspcl$newword$suffix" 
-                                    else
-                                        line="$lastword$olderspcl$oldprefix$lastspcl$newword$suffix" 
-                                    fi
+                                    line="$olderword$olderspcl$lastspcl$newword$suffix" 
                                 else
                                     relpoint=$(($(echo "$olderword$olderspcl$newword$lastspcl" | wc --chars) - 1))
                                     local lntcnt=$(($(echo "$olderword$olderspcl$newword$lastspcl$lastword" | wc --chars) - 1))
