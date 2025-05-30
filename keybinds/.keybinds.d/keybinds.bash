@@ -192,7 +192,7 @@ transpose_words() {
     local only_exclude_spaces='[^[:space:]]+'
     local include_only_alphanums='[A-Za-z0-9]+' 
 
-    local notquotedspace_exclude_space='"[^"]*"+|'\''[^'\'']*'\''+|[^[:space:]]+' 
+    local notquotedspace_exclude_space='("[^"]*")+|('\''[^'\'']*'\'')+|[^[:space:]]+' 
    
     local words 
     if [[ "$wordsorspace" == 'space' ]]; then 
@@ -241,11 +241,20 @@ transpose_words() {
     
     local arr arrr line
    
-    # Check for escaped spaced words and trailing spaces, then exit
+    # Checks leading and trailing spaces, for escaped spaced words which it quotes using '', then exit
     local re='(([^[:space:]'\'']*\\ )+[^[:space:]'\'']*)'
-    if [[ "${READLINE_LINE}" =~ $re ]] || [[ "${READLINE_LINE: -1}" == ' ' ]]; then
-        while [[ "${READLINE_LINE}" =~ $re ]] || [[ "${READLINE_LINE: -1}" == ' ' ]]; do
-            
+    if [[ "${READLINE_LINE}" =~ $re ]] || [[ "${READLINE_LINE: -1}" == ' ' ]] || [[ ${READLINE_LINE:0:1} == ' ' ]]; then
+         
+        local quoteds
+        global_rematch "${READLINE_LINE}" "$re" quoteds 
+
+        while [[ "${READLINE_LINE}" =~ $re ]] || [[ "${READLINE_LINE: -1}" == ' ' ]] || [[ ${READLINE_LINE:0:1} == ' ' ]]; do
+
+            # Remove leading whitespace
+            if [[ "${READLINE_LINE:0:1}" == ' ' ]]; then
+                READLINE_LINE="${READLINE_LINE:1}" 
+            fi
+
             # Remove trailing whitespace
             if [[ "${READLINE_LINE: -1}" == ' ' ]]; then
                 READLINE_LINE="${READLINE_LINE::-1}" 
@@ -265,7 +274,13 @@ transpose_words() {
                     #echo "Suffix: '${READLINE_LINE:$suffxcount}'" 
                     #echo "Suffix - 1: '${READLINE_LINE:$((suffxcount - 1))}'" 
                     #echo "Prefix: '${READLINE_LINE:0:$preffxcount}'" 
-                    READLINE_LINE="${READLINE_LINE:0:$preffxcount}$j${READLINE_LINE:$((suffxcount - 1))}" 
+                    
+                    # Idk but if it loops over multiple (similar??) words that need quoting, it miscounts and IDK ive gone over it multiple times im doing this terribleness  
+                    if [[ ${#quoteds} -gt 1 ]]; then
+                        READLINE_LINE="${READLINE_LINE:0:$preffxcount}$j${READLINE_LINE:$((suffxcount - 1))}" 
+                    else
+                        READLINE_LINE="${READLINE_LINE:0:$preffxcount}$j${READLINE_LINE:$suffxcount}" 
+                    fi
                     #echo $READLINE_LINE 
                 fi
             
@@ -274,8 +289,12 @@ transpose_words() {
         return 0 
     fi
 
-    global_rematch "${READLINE_LINE}" $words arr
+    global_rematch "${READLINE_LINE}" "$words" arr
     
+    #for i in "${arr[@]}"; do
+    #    echo "'$i'"
+    #done
+
     local args=${#arr[@]} 
     if [[ $args -gt 1 ]]; then 
 
@@ -290,8 +309,8 @@ transpose_words() {
             line="${READLINE_LINE}"
         fi
 
-        global_rematch "${READLINE_LINE}" $non_words arrr
-      
+        global_rematch "$line" $non_words arrr
+        
         local index=0
         local olderprefix='' oldprefix='' prefix='' olderword='' olderspcl='' lastword=${arr[0]} lastspcl=${arrr[0]} newword=${arr[1]}  
         while ([[ ${#arr[@]} -ge 1 ]] || [[ ${#arrr[@]} -ge 1 ]]); do 
@@ -436,21 +455,23 @@ transpose_words() {
 
                             if [[ $READLINE_POINT -ge $cntuptolastword ]] && [[ "$directn" == 'right' ]]; then 
                                 line="$READLINE_LINE"
-                                READLINE_POINT=${#READLINE_LINE}
-                                prfxcnt=0
+                                relpoint=${#READLINE_LINE}
                             else
                                 if [[ "$directn" == 'left' ]]; then
                                     READLINE_POINT=0 
-                                    local lntcnt=$(($(echo "$olderword$olderspcl$lastspcl$newword" | wc --chars) - 1))
-                                    local suffix=${READLINE_LINE:$lntcnt}
-    
-                                    line="$olderword$olderspcl$lastspcl$newword$suffix" 
+                                    if [[ "${#arr}" == '1' ]]; then
+                                        local lntcnt=$(($(echo "$olderword" | wc --chars) - 1))
+                                        local suffix=${READLINE_LINE:$lntcnt}
+                                        line="$lastword$suffix" 
+                                    else
+                                        local lntcnt=$(($(echo "$olderword$olderspcl$lastword" | wc --chars) - 1))
+                                        local suffix=${READLINE_LINE:$lntcnt}
+        
+                                        line="$olderword$olderspcl$lastword$suffix" 
+                                    fi
                                 else
-                                    relpoint=$(($(echo "$olderword$olderspcl$newword$lastspcl" | wc --chars) - 1))
-                                    local lntcnt=$(($(echo "$olderword$olderspcl$newword$lastspcl$lastword" | wc --chars) - 1))
-                                    local suffix=${READLINE_LINE:$lntcnt}
-                 
-                                    line="$olderword$olderspcl$newword$lastspcl$lastword$suffix" 
+                                    relpoint=${#READLINE_LINE}
+                                    line="$READLINE_LINE" 
                                 fi
                             fi
                         elif [[ "$directn" == 'right' ]] || ([[ "$directn" == 'left' ]] && [[ $READLINE_POINT -gt $firstword ]]); then

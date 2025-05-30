@@ -971,6 +971,10 @@ inoremap <C-r> <C-\><C-o>:redo<CR>
 vnoremap <C-r> <Esc>:redo<CR>gv 
 
 " Ctrl - Z is -> Undo instead of stop 
+
+" To make sure it's not bound to set as backgroundtask
+unmap <C-z>
+
 nnoremap <C-z> u
 inoremap <C-z> <C-\><C-o>:u<CR>
 vnoremap <C-z> u 
