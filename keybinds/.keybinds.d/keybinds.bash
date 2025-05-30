@@ -291,10 +291,6 @@ transpose_words() {
 
     global_rematch "${READLINE_LINE}" "$words" arr
     
-    #for i in "${arr[@]}"; do
-    #    echo "'$i'"
-    #done
-
     local args=${#arr[@]} 
     if [[ $args -gt 1 ]]; then 
 
@@ -459,7 +455,15 @@ transpose_words() {
                             else
                                 if [[ "$directn" == 'left' ]]; then
                                     READLINE_POINT=0 
-                                    if [[ "${#arr}" == '1' ]]; then
+                                    
+                                    # Don't trust bash's associative arrays when in a scenario like this i guess ??
+                                    # 'echo "${#arr}"' would sometimes count all the words inside a quoted word with spaces 
+                                    local i=0
+                                    for j in "${arr[@]}"; do
+                                        i=$((i+1))
+                                    done
+
+                                    if [[ $i == '1' ]]; then
                                         local lntcnt=$(($(echo "$olderword" | wc --chars) - 1))
                                         local suffix=${READLINE_LINE:$lntcnt}
                                         line="$lastword$suffix" 
