@@ -11,6 +11,31 @@ alias list-binds-readline="{ printf \"\nList commands bound to keys\n\n\n\" ; bi
 alias list-binds-xterm="xrdb -query -all"
 alias list-binds-kitty='kitty +kitten show_key -m kitty'
 
+if hash xfconf-query &> /dev/null; then
+    function list-binds-xfce4(){
+        local usedkeysp="$(xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/default -l -v | sed 's|/xfwm4/default/||g; s|<Primary>|<Control>|g; s|<Super>|<Windowkey>|g; s|><|-|g; s|<||g; s|>|-|g;' | sort -V)"
+        local usedkeysp1="$(xfconf-query -c xfce4-keyboard-shortcuts -p /commands/custom -l -v | sed 's|/commands/custom/||g; s|<Primary>|<Control>|g; s|<Super>|<Windowkey>|g; s|><|-|g; s|<||g; s|>|-|g;' | sort -V)" 
+        
+        (printf "${GREEN}Known ${CYAN}xfce4${GREEN} keybinds: \n${normal}"
+        for i in $(seq 2); do
+            local var1; 
+            if [[ $i == 1 ]]; then
+                var1=($(echo "$usedkeysp" | awk '{print $1}'))
+                printf "\n${GREEN}Window Manager shortcuts: \n\n${normal}"
+            else 
+                usedkeysp=$usedkeysp1 
+                var1=($(echo "$usedkeysp1" | awk '{print $1}'))
+                printf "\n${GREEN}Application Shortcuts: \n\n${normal}"
+            fi
+            for i in ${!var1[@]}; do
+                printf "%-35s %-35s\n" "${green}${var1[$i]}" "${cyan}$(awk 'NR=='$((i+1))'{$1="";print;}' <<< $usedkeysp | sed 's/^ //')${normal}"; 
+            done
+        done) | $PAGER
+    }
+fi
+
+
+
 # TTY
 
 # To see the complete character string sent by a key, you can use this command, and type the key within 2 seconds:

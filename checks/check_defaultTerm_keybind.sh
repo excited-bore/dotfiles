@@ -13,18 +13,24 @@ fi
 
 SCRIPT_DIR=$(get-script-dir)
 
-function xfce-listkeybinds(){
-    local usedkeysp=$(xfconf-query -c xfce4-keyboard-shortcuts -p /commands/custom -l -v | sed 's|/commands/custom/||g; s|<Primary>|<Control>|g; s|<Super>|<Windowkey>|g; s|><|-|g; s|<||g; s|>|-|g;' ) 
-#    usedkeysp="$usedkeysp
-#$(xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/default -l -v | sed 's|/xfwm4/default/||g; s|<Primary>|<Control>|g; s|<Super>|<Windowkey>|g; s|><|-|g; s|<||g; s|>|-|g;')"
+function list-binds-xfce4(){
+    local usedkeysp="$(xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/default -l -v | sed 's|/xfwm4/default/||g; s|<Primary>|<Control>|g; s|<Super>|<Windowkey>|g; s|><|-|g; s|<||g; s|>|-|g;' | sort -V)"
+    local usedkeysp1="$(xfconf-query -c xfce4-keyboard-shortcuts -p /commands/custom -l -v | sed 's|/commands/custom/||g; s|<Primary>|<Control>|g; s|<Super>|<Windowkey>|g; s|><|-|g; s|<||g; s|>|-|g;' | sort -V)" 
     
-    usedkeysp=$(echo "$usedkeysp" | sort -V)
-
-    local var1=($(echo "$usedkeysp" | awk '{print $1}')); 
-    
-    (printf "${GREEN}Known ${CYAN}xfce4${GREEN} keybinds: \n\n${normal}"
-    for i in ${!var1[@]}; do
-        printf "%-35s %-35s\n" "${green}${var1[$i]}" "${cyan}$(awk 'NR=='$((i+1))'{$1="";print;}' <<< $usedkeysp | sed 's/^ //')${normal}"; 
+    (printf "${GREEN}Known ${CYAN}xfce4${GREEN} keybinds: \n${normal}"
+    for i in $(seq 2); do
+        local var1; 
+        if [[ $i == 1 ]]; then
+            var1=($(echo "$usedkeysp" | awk '{print $1}'))
+            printf "\n${GREEN}Window Manager shortcuts: \n\n${normal}"
+        else 
+            usedkeysp=$usedkeysp1 
+            var1=($(echo "$usedkeysp1" | awk '{print $1}'))
+            printf "\n${GREEN}Application Shortcuts: \n\n${normal}"
+        fi
+        for i in ${!var1[@]}; do
+            printf "%-35s %-35s\n" "${green}${var1[$i]}" "${cyan}$(awk 'NR=='$((i+1))'{$1="";print;}' <<< $usedkeysp | sed 's/^ //')${normal}"; 
+        done
     done) | $PAGER
 }
 
@@ -202,7 +208,7 @@ if [[ "$DESKTOP_SESSION" == 'xfce' ]]; then
         if [[ "y" == "$setermemkeybind" ]]; then
             printf "Format: ${CYAN}[Control/Shift/Alt/Windowkey]-[Control/Shift/Alt/Windowkey]-[Control/Shift/Alt/Windowkey]${GREEN}-Key\n${normal}"
 
-            xfce-listkeybinds 
+            list-binds-xfce4
             reade -Q 'GREEN' -i 'Control-Alt-t Windowkey-t' -p 'What keybind?: ' keyb
                 
             while test -n "$keyb"; do 
@@ -225,7 +231,7 @@ if [[ "$DESKTOP_SESSION" == 'xfce' ]]; then
                             reade -Q 'GREEN' -i "$binds" -p 'What keybind?: ' keyb
                             unset binds
 
-                            xfce-listkeybinds 
+                            list-binds-xfce4
                             usedkeys=$(xfconf-query -c xfce4-keyboard-shortcuts -p /commands/custom -l -v | awk '{print $1;}' | sed 's|/commands/custom/||g; s|<Primary>|<Control>|g; s|<Super>|<Windowkey>|g; s|><|-|g; s|<||g; s|>|-|g;' )
                             for j in ${usedkeys[@]}; do
                                 if [[ $j == $keyb ]]; then
@@ -270,7 +276,7 @@ if [[ "$DESKTOP_SESSION" == 'xfce' ]]; then
                 #            reade -Q 'GREEN' -i "$binds" -p 'What keybind?: ' keyb
                 #            unset binds
 
-                #            xfce-listkeybinds 
+                #            list-binds-xfce4 
                 #            usedkeys=$(xfconf-query -c xfce4-keyboard-shortcuts -p /commands/custom -l -v | awk '{print $1;}' | sed 's|/commands/custom/||g; s|<Primary>|<Control>|g; s|<Super>|<Windowkey>|g; s|><|-|g; s|<||g;' )
                 #            for j in ${usedkeys[@]}; do
                 #                if [[ $j == $keyb ]]; then
