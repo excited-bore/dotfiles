@@ -1,5 +1,4 @@
 INSTALL=1
-DLSCRIPT=1
 
 unalias curl &> /dev/null
 unalias wget &> /dev/null
@@ -360,17 +359,19 @@ unset rmp
 
 
 # Xcp
-printf "${CYAN}cpg/mvg${GREEN} are patches for the default coreutils 'cp (copy) / mv (move)' which gives an added flag to both for a progress bar with '-g/--progress-bar'
-${CYAN}xcp${GREEN} is an 'extended', rust-written cp that copies faster and also comes with a progress bar${normal}\n"
 
-color="GREEN"
-cpgi="all advcpmv xcp none"
-cpgp="[All/advcpmv/xcp/none]: "
 if hash cpg &> /dev/null && hash xcp &> /dev/null; then
     cpgi="none all advcpmv xcp"
     cpgp="[None/all/advcpmv/xcp]: "
     color="YELLOW"
 else
+    
+    printf "${CYAN}cpg/mvg${GREEN} are patches for the default coreutils 'cp (copy) / mv (move)' which gives an added flag to both for a progress bar with '-g/--progress-bar'
+    ${CYAN}xcp${GREEN} is an 'extended', rust-written cp that copies faster and also comes with a progress bar${normal}\n"
+    
+    color="GREEN"
+    cpgi="all advcpmv xcp none"
+    cpgp="[All/advcpmv/xcp/none]: "
     if hash xcp &> /dev/null; then
         cpgi="advcpmv xcp  all none"
         cpgp="[Advcpmv/xcp/all/none]: "

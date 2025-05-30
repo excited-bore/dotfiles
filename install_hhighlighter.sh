@@ -1,4 +1,3 @@
-DLSCRIPT=1
 SYSTEM_UPDATED='TRUE'
 
 if ! hash ack &> /dev/null; then

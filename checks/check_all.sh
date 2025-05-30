@@ -173,16 +173,30 @@ else
     alias wget-curl='curl'
 fi
 
-if [[ $DLSCRIPT ]]; then
-    if hash aria2c &>/dev/null && test -z "$WGET_ARIA"; then
-        readyn -p "Always use 'aria2c' in favour of 'wget' for faster downloads?" wget_ar
-        if [[ $wget_ar == 'y' ]]; then
-            WGET_ARIA=1 
-        fi
-        unset wget_ar
-    fi
-
-    if [[ $WGET_ARIA ]]; then
+if hash aria2c &>/dev/null; then 
+    if test -z "$WGET_ARIA"; then
+        command unalias wget-aria 
+        function wget-aria(){
+            readyn -p "Use 'aria2c' in favour of 'wget' for faster downloads?" wget_ar
+            if [[ $wget_ar == 'y' ]]; then
+                export WGET_ARIA=1 
+                alias wget-aria='aria2c'
+                alias wget-aria-quiet='aria2c -q'
+                alias wget-aria-dir='aria2c -d'
+                alias wget-aria-name='aria2c -o'
+                local frst="$1"
+                [[ "$frst" == "-P" ]] && frst="-d"  
+                [[ "$frst" == "-O" ]] && frst="-o"  
+                aria2c $frst ${@:2}
+            else
+                wget $@ 
+            fi
+            unset wget_ar
+        } 
+        alias wget-aria-quiet="wget-aria -q" 
+        alias wget-aria-dir="wget-aria -P" 
+        alias wget-aria-name="wget-aria -O" 
+    else
         alias wget-aria='aria2c'
         alias wget-aria-quiet='aria2c -q'
         alias wget-aria-dir='aria2c -d'

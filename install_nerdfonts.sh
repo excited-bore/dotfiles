@@ -1,5 +1,3 @@
-DLSCRIPT=1
-
 hash jq &>/dev/null && hash unzip &>/dev/null && hash display &> /dev/null && hash ueberzug &> /dev/null &&
     SYSTEM_UPDATED='TRUE'
 

@@ -1,5 +1,3 @@
-DLSCRIPT=1
-
 if ! test -f ~/.local/share/blesh; then
     tmpd=$(mktemp -d) 
     wget-aria-dir $tmpd https://github.com/akinomyoga/ble.sh/releases/download/v0.4.0-devel3/ble-0.4.0-devel3.tar.xz 

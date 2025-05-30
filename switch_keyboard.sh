@@ -1,4 +1,3 @@
-DLSCRIPT=1
 SYSTEM_UPDATED='TRUE'
 
 if ! test -f checks/check_all.sh; then
