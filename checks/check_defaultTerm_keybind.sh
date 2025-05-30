@@ -311,6 +311,9 @@ if [[ "$DESKTOP_SESSION" == 'xfce' ]]; then
         unset keyb nobind kittn usedkeys i j
     fi
 
+     # Solution to 'accidently' resetting application shortcuts to default
+     # https://forum.xfce.org/viewtopic.php?pid=76178#p76178
+
     if [[ "$(xfconf-query -c xfce4-keyboard-shortcuts -p /commands/custom -l -v)" =~ /commands/custom/\<Alt\>F1.*xfce4-popup-applicationsmenu ]]; then
         echo "${CYAN}Altf-F1${normal}${green}, which translates to the same keycode as the ${CYAN}Windowskey/Commandkey${normal}${green}, is bound to the action that opens the right-click menu - ${MAGENTA}xfce4-popup-applicationsmenu${normal}"
         readyn -p "Would you like to change this to the menu that opens the popup 'whiskermenu' ${normal}${cyan}(the menu that opens from clicking the distro icon down left) ${CYAN}- xfce4-popup-whiskermenu${GREEN}" wiskermen
