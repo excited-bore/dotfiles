@@ -412,8 +412,6 @@ transpose_words() {
                                 relpoint=$(($(echo "$oldprefix$olderword$lastspcl$newword${arrr[1]}" | wc --chars) - 1)) 
                                 local wordcnt=$(($(echo "$oldprefix$olderword$lastspcl$newword${arrr[1]}$lastword" | wc --chars) - 1)) 
                                 local suffix=${READLINE_LINE:$wordcnt}
-                                echo $cntuptolastword 
-                                echo $READLINE_POINT
                                 line="$oldprefix$olderword$lastspcl$newword${arrr[1]}$lastword$suffix" 
                             else
                                 [[ "$directn" == 'right' ]] && ! [[ $READLINE_POINT = ${#READLINE_LINE} ]] &&
