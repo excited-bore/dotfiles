@@ -461,7 +461,7 @@ transpose_words() {
                                         local suffix=${READLINE_LINE:$lntcnt}
                                         line="$lastword$suffix" 
                                     else
-                                        relpoint=$(($(echo "$olderprefix" | wc --chars) - 1)) 
+                                        relpoint=$(($(echo "$oldprefix" | wc --chars) - 1)) 
                                         local lntcnt=$(($(echo "$olderword$olderspcl$lastword" | wc --chars) - 1))
                                         local suffix=${READLINE_LINE:$lntcnt}
                                         line="$olderword$olderspcl$lastword$suffix" 
