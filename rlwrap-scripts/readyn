@@ -295,6 +295,8 @@ function readyn(){
 
     shift $((OPTIND-1)) 
 
+    local prmpt1 color pre othr 
+    
     if test -z "$preff" || [[ "$preff" == 'y' ]]; then
         prmpt1=" [$prmpty/$prmptn]: "
         color="$ycolor"

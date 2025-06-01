@@ -433,11 +433,11 @@ unset ack
 if ! (hash dua &> /dev/null && hash dust &> /dev/null && hash ncdu &> /dev/null); then 
     printf "${CYAN}Dua${GREEN} and ${CYAN}dust${GREEN} are modern cli replacements of du\n${CYAN}Ncdu${GREEN} and ${CYAN}'dua interactive'${GREEN} are interactive TUI replacements that also help remove unnecessary files)${normal}\n"
     color='GREEN'
-    pre="dua dust ncdu both none"
+    pre="dua dust ncdu all none"
     prmpt=" [Dua/dust/ncdu/all/none]: "
     if ! hash dust &> /dev/null && hash dua &> /dev/null; then
         pre="dust dua ncdu all none"
-        prmpt=" [Dust/dua/ncdu/both/none]: "
+        prmpt=" [Dust/dua/ncdu/all/none]: "
     elif hash dua &> /dev/null && hash dust &> /dev/null && ! hash ncdu &> /dev/null; then  
         pre="ncdu dust dua all none"
         prmpt=" [Ncdu/dua/dust/all/none]: "
@@ -445,7 +445,7 @@ if ! (hash dua &> /dev/null && hash dust &> /dev/null && hash ncdu &> /dev/null)
 else
     color='YELLOW'
     pre="none dua dust ncdu all"
-    prmpt=" [None/dua/dust/ncdu/both]: "
+    prmpt=" [None/dua/dust/ncdu/all]: "
 fi
 reade -Q "$color" -i "$pre" -p "Install dua, dust, ncdu or all? $prmpt" dua_dust_ncdu
 if [[ "all" == "$dua_dust_ncdu" ]] || [[ "dua" == "$dua_dust_ncdu" ]]; then

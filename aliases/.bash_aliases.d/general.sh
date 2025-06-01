@@ -968,15 +968,17 @@ fi
 
 if hash dua &> /dev/null; then
    alias dua-interactive='dua interactive' 
+   alias du-tui='dua interactive' 
    alias dua-aggregate='dua aggregate' 
-   alias du-tui='dua' 
 fi
 
 if ! hash ncdu &> /dev/null && hash dua &> /dev/null; then
    alias ncdu='dua interactive' 
 fi
 
-#alias du='dust'
+alias du="dua""
+alias du="dua interactive"
+
 alias folder-size="du"
 alias dir-size="du"
 alias dirsize="du"
@@ -984,7 +986,7 @@ alias dirsize="du"
 # Df
 alias df='df -h -T --total'
 
-#alias df='dysk'
+alias df='duf'
 alias lfs='dysk'
 
 

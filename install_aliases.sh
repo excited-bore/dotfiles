@@ -306,59 +306,121 @@ if [[ $ansr == "y" ]]; then
     fi
     unset ack_gr
 
-    if hash dust &>/dev/null || hash dua &>/dev/null; then
-        hash dust &> /dev/null && prmpt="'dust'"
-        hash dua &> /dev/null && prmpt="'dua'" 
-        hash dust &> /dev/null && hash dua &> /dev/null && prmpt="or 'dust', or 'dua'" 
+    if hash dust &>/dev/null || hash dua &>/dev/null || hash ncdu &> /dev/null; then
+        if hash dust &> /dev/null || hash dua &> /dev/null || hash ncdu &> /dev/null; then
+            if ! hash dua &> /dev/null && ! hash dua &> /dev/null && hash ncdu &> /dev/null; then 
+                prmpt="${CYAN}'ncdu'${GREEN}"
+                prmpt1=$prmpt
+            elif ! hash dust &> /dev/null && hash dua &> /dev/null && ! hash ncdu &> /dev/null; then 
+                prmpt="${CYAN}'dua'${GREEN}" 
+                prmpt1=$prmpt
+            elif hash dust &> /dev/null && ! hash dua &> /dev/null && ! hash ncdu &> /dev/null; then 
+                prmpt="${CYAN}'dust'${GREEN}"
+            elif hash dust &> /dev/null && hash dua &> /dev/null && ! hash ncdu &> /dev/null; then
+                prmpt="or ${CYAN}'dua'${GREEN}, or ${CYAN}'dust'${GREEN}" 
+                prmpt1="${CYAN}'dua'${GREEN}" 
+                choices="dua dust" 
+                prmptp=" [Dua/dust]: " 
+            elif hash dust &> /dev/null && hash ncdu &> /dev/null && ! hash dua &> /dev/null; then 
+                prmpt="or ${CYAN}'dust'${GREEN}, or ${CYAN}'ncdu'${GREEN}" 
+                prmpt1="${CYAN}'ncdu'${GREEN}" 
+                choices="dust ncdu" 
+                prmptp=" [Dust/ncdu]: " 
+            elif hash dua &> /dev/null && hash ncdu &> /dev/null && ! hash dust &> /dev/null; then 
+                prmpt="or ${CYAN}'dua'${GREEN}, or ${CYAN}'ncdu'${GREEN}" 
+                prmpt1="or ${CYAN}'dua interactive'${GREEN}, or ${CYAN}'ncdu'${GREEN}"
+                choices="dua ncdu" 
+                prmptp=" [Dua/ncdu]: " 
+                choices1=$choices 
+                prmptp1=$prmptp 
+            elif hash dust &> /dev/null && hash dua &> /dev/null && hash ncdu &> /dev/null; then
+                prmpt="or ${CYAN}'dua'${GREEN}, or ${CYAN}'dust'${GREEN}, or ${CYAN}'ncdu'${GREEN}" 
+                prmpt1="or ${CYAN}'dua interactive'${GREEN}, or ${CYAN}'ncdu'${GREEN}"
+                choices="dua dust ncdu" 
+                prmptp=" [Dua/dust/ncdu]: " 
+                choices1="dua ncdu" 
+                prmptp1="  [Dua/ncdu]: " 
+            fi
+        fi
+
         readyn -p "Set $prmpt as alias for 'du'?" du_dust_dua
         if [[ "$du_dust_dua" == "y" ]]; then
-            which='dust' 
-            if hash dust &>/dev/null && hash dua &>/dev/null; then
-                reade -Q 'GREEN' -i 'dust dua' -p 'Which one? [Dust/dua]: ' dust_dua
+            if hash dust &>/dev/null && hash dua &>/dev/null && hash ncdu &> /dev/null; then
+                reade -Q 'GREEN' -i "$choices" -p "Which one?$prmptp" dust_dua
                 if [[ 'dust' == "$dust_dua" ]]; then
                     which="dust" 
                 elif [[ 'dua' == "$dust_dua" ]]; then
                     which='dua'
+                elif [[ 'ncdu' == "$dust_dua" ]]; then
+                    which='ncdu'
                 fi
             elif hash dust &>/dev/null; then 
                 which='dust' 
             elif hash dua &>/dev/null; then 
                 which='dua' 
+            elif hash ncdu &>/dev/null; then 
+                which='ncdu' 
             fi
-            sed -i "s|.alias du='.*|alias du='$which'|g" $genr
+            sed -E -i "s|.alias du=\"|alias du=\"|g; s/alias du=\"(dua|dust|ncdu)/alias du=\"$which/g" $genr
         else
-            sed -i 's|^alias du="dust"|#alias du="dust"|g' $genr
-            sed -i 's|^alias du="dua"|#alias du="dua"|g' $genr
+            sed -E -i 's|^alias du="\((dust|dua|ncdu)\)"|#alias du="\1"|g' $genr
+        fi
+        
+        unset du_dust_dua choices prmptp 
+        
+        if hash dua &> /dev/null || hash ncdu &> /dev/null; then
+            readyn -p "Set $prmpt1 as alias for 'du-tui'?" du_dust_dua
+            if [[ "$du_dust_dua" == "y" ]]; then
+                if hash dua &>/dev/null && hash ncdu &>/dev/null; then
+                    reade -Q 'GREEN' -i "$choices1" -p "Which one?$prmptp1" dust_dua
+                    if [[ 'ncdu' == "$dust_dua" ]]; then
+                        which="ncdu" 
+                    elif [[ 'dua' == "$dust_dua" ]]; then
+                        which='dua interactive'
+                    fi
+                elif hash ncdu &>/dev/null; then 
+                    which='ncdu' 
+                elif hash dua &>/dev/null; then 
+                    which='dua interactive' 
+                fi
+                if test -n "$which"; then
+                    sed -E -i "s|.alias du-tui=\"|alias du-tui=\"|g; s/alias du-tui=\".*/alias du=\"$which\"/g" $genr
+                fi
+            else
+                sed -i 's|^alias du-tui="dua interactive"|#alias du-tui="dua interactive"|g' $genr
+                sed -i 's|^alias du-tui="ncdu"|#alias du-tui="ncdu"|g' $genr
+            fi
         fi
     fi
     unset du_dust_dua prmpt which dust_dua
 
-    if hash duf &> /dev/null && hash dysk &>/dev/null; then
-        printf "${GREEN}Both ${CYAN}duf${GREEN} and ${CYAN}dysk${GREEN} are installed${normal}\n"
-        readyn -p "Set one as alias for 'df'?" dysk_df
-        if [[ "$dysk_df" == "y" ]]; then
-            reade -Q 'GREEN' -i 'duf dysk' -p 'Which one?: ' duf_dysk 
-            sed -i "s|.alias df=.*|alias df='$duf_dysk'|g" $genr
-        else
-            sed -i 's|^alias df="\(dysk|duf\)"|#alias df="\1"|g' $genr
+    if hash duf &> /dev/null || hash dysk &>/dev/null; then
+        if hash duf &> /dev/null && hash dysk &>/dev/null; then
+            readyn -p "Set or ${CYAN}duf${GREEN}, or ${CYAN}dysk${GREEN} as alias for 'df'?" dysk_df
+            if [[ "$dysk_df" == "y" ]]; then
+                reade -Q 'GREEN' -i 'duf dysk' -p 'Which one? [Duf/dysk]: ' duf_dysk 
+                if test -n "$duf_dysk"; then
+                    sed -E -i "s/.alias=df/alias=df/g; s/alias df='(dysk|duf)'/alias df='"$duf_dysk"'/g" $genr
+                fi
+            else
+                sed -i 's|^alias df="\(dysk|duf\)"|#alias df="\1"|g' $genr
+            fi
+        
         fi
-    
     elif hash duf &> /dev/null; then
-        printf "${CYAN}Duf${GREEN} is installed${normal}\n"
-        readyn -p "Set 'duf' as alias for 'df'?" dysk_df
+        readyn -p "Set ${CYAN}'duf'${GREEN} as alias for 'df'?" dysk_df
         if [[ "$dysk_df" == "y" ]]; then
             sed -i "s|.alias df=|alias df=|g; s|alias df=.*|alias df='duf'|g" $genr
         else
-            sed -i 's|^alias df=|#alias df=|g' $genr
+            sed -i 's|^alias df="\(dysk|duf\)"|#alias df=|g' $genr
         fi
     
     elif hash dysk &> /dev/null; then
-        printf "${CYAN}Dysk${GREEN} is installed${normal}\n"
-        readyn -p "Set 'dysk' as alias for 'df'?" dysk_df
+        readyn -p "Set ${CYAN}'dysk'${GREEN} as alias for 'df'?" dysk_df
         if [[ "$dysk_df" == "y" ]]; then
             sed -i "s|.alias df=|alias df=|g; s|alias df=.*|alias df='dysk'|g" $genr
         else
-            sed -i 's|^alias df=|#alias df=|g' $genr
+            sed -i 's|^alias df="\(dysk|duf\)"|#alias df=|g' $genr
         fi
          
     fi
