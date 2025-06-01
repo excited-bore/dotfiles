@@ -34,126 +34,159 @@ function list-binds-xfce4(){
     done) | $PAGER
 }
 
+if [[ $DESKTOP_SESSION == 'xfce' ]]; then
 
-function xfce-keybinds-handle-error(){
-    local err=$1
-    if [[ "$err" == 1 ]]; then 
-        printf "${GREEN}Opening graphical program ${CYAN}xfce4-keyboard-settings${normal}.${GREEN} Go to the second tab: '${MAGENTA}Applications Shortcuts${normal}'\n"
-        echo
-        sleep 1
-        printf "${GREEN}.."
-        sleep 2
-        printf ".\n${normal}"
-        xfce4-keyboard-settings 
-    elif [[ "$err" == 2 ]]; then
-        printf "${GREEN}Opening graphical program ${CYAN}xfwm4-settings${normal}.${GREEN} Go to the second tab: '${MAGENTA}Applications Shortcuts${normal}'\n"
-        echo
-        sleep 1
-        printf "${GREEN}.."
-        sleep 2
-        printf ".\n${normal}"
-        xfwm4-settings 
-    fi
-}
-
-function xfce-check-binds(){
-    local keyb=$1 
-    #local firstbatch=$2
-    local value=$2
-    local usedkeys
-
-    
-    #if [[ $firstbatch == 1 ]]; then
-        usedkeys=$(xfconf-query -c xfce4-keyboard-shortcuts -p /commands/custom -l -v | sed 's|/commands/custom/||g; s|<Primary>|<Control>|g; s|<Super>|<Windowkey>|g; s|><|-|g; s|<||g; s|>|-|g;;' )
-    #else
-    #    usedkeys=$(xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/default -l -v | sed 's|/xfwm4/default/||g; s|<Primary>|<Control>|g; s|<Super>|<Windowkey>|g; s|><|-|g; s|<||g; s|>|-|g;' )
-    #fi
-
-    local usedkey=$(echo "$usedkeys" | grep --color=never $keyb | awk '{$1=""; print;}' | xargs)
-
-    local whatdo 
-    printf "${GREEN}$keyb${normal}${green} is already bound to '${CYAN}$usedkey${GREEN}'${normal}\n"
-    reade -Q 'GREEN' -i "replace-existing-keybind remove-existing-keybind different-keybind nevermind" -p "What to do? [Replace-existing-keybind/remove-existing-keybind/different-keybind/nevermind]: " whatdo
-    if [[ $whatdo == 'replace-existing-keybind' ]] || [[ $whatdo == 'remove-existing-keybind' ]]; then
-        if [[ $whatdo == 'replace-existing-keybind' ]]; then
-            if [[ $usedkey == 'xfce4-terminal --drop-down' ]]; then
-                newkeys='F9' 
-            fi
-            local newk 
-            reade -Q 'GREEN' -i "$newkeys" -p "What to set ${CYAN}$usedkey${GREEN} to?: " newk
-            if test -n "$newk"; then
-                
-                usedkeys=$(xfconf-query -c xfce4-keyboard-shortcuts -p /commands/custom -l -v | awk '{print $1;}' | sed 's|/commands/custom/||g; s|<Primary>|<Control>|g; s|<Super>|<Windowkey>|g; s|><|-|g; s|<||g; s|>|-|g;' )
-                
-                for i in "${usedkeys[@]}"; do 
-                    if [[ $i == $newk ]]; then 
-                        local usedkey1=$(xfconf-query -c xfce4-keyboard-shortcuts -p /commands/custom -l -v | sed 's|/commands/custom/||g; s|<Primary>|<Control>|g; s|<Super>|<Windowkey>|g; s|><|-|g; s|<||g; s|>|-|g;' | grep --color=never "$newk" | awk '{$1=""; print}')
-                         
-                        printf "${YELLOW}$newk${normal}${green} is already used for ${CYAN}$usedkey1${normal}\n"
-                        return 1 
-
-                    fi
-                done
-                
-                usedkeys=$(xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/default -l -v | awk '{print $1;}' | sed 's|/xfwm4/default/||g; s|<Primary>|<Control>|g; s|<Super>|<Windowkey>|g; s|><|-|g; s|<||g; s|>|-|g;' )
-                 for i in "${usedkeys[@]}"; do 
-                    if [[ $i == $newk ]]; then 
-                        local usedkey1=$(xfconf-query -c xfce4-keyboard-shortcuts -p /commands/custom -l -v | sed 's|/commands/custom/||g; s|<Primary>|<Control>|g; s|<Super>|<Windowkey>|g; s|><|-|g; s|<||g; s|>|-|g;' | grep --color=never "$newk" | awk '{$1=""; print}')
-                         
-                        printf "${YELLOW}$newk${normal}${green} is already used for ${CYAN}$usedkey1${normal}\n"
-                        return 2 
-                    fi
-                done
-                
-                newk=$(echo "$newk" | sed 's|-||g; s|Control|<Primary>|g; s|Shift|<Shift>|g; s|Alt|<Alt>|g; s|Windowkey|<Super>|g;' )
-                #if [[ $firstbatch == 1 ]]; then
-                    if [[ "$usedkey1" == 'true' ]] || [[ "$usedkey1" == 'false' ]]; then
-                        xfconf-query -c xfce4-keyboard-shortcuts -n -p /commands/custom/$newk -t boolean -s "$usedkey" 
-                    else
-                        xfconf-query -c xfce4-keyboard-shortcuts -n -p /commands/custom/$newk -t string -s "$usedkey" 
-                    fi
-                    xfconf-query -c xfce4-keyboard-shortcuts -p /commands/custom/$newk -l -v 
-
-                #else
-                #    if [[ "$usedkey1" == 'true' ]] || [[ "$usedkey1" == 'false' ]]; then
-                #        xfconf-query -c xfce4-keyboard-shortcuts -n -p /xfwm4/default/$newk -t boolean -s "$usedkey" 
-                #    else
-                #        xfconf-query -c xfce4-keyboard-shortcuts -n -p /xfwm4/default/$newk -t string -s "$usedkey" 
-                #    fi
-                #    xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/default/$newk -l -v 
-                #fi
-            fi
-
-        elif [[ $whatdo == 'remove-existing-keybind' ]]; then
-            keyb=$(echo "$keyb" | sed 's|-||g; s|Control|<Primary>|g; s|Shift|<Shift>|g; s|Alt|<Alt>|g; s|Windowkey|<Super>|g;' )
-            #if [[ $firstbatch == 1 ]]; then
-                xfconf-query -c xfce4-keyboard-shortcuts -r -p /commands/custom/$keyb    
-            #else
-            #    xfconf-query -c xfce4-keyboard-shortcuts -r -p /xfwm4/default/$keyb    
-            #fi
+    function xfce-keybinds-handle-error(){
+        local err=$1
+        if [[ "$err" == 1 ]]; then 
+            printf "${GREEN}Opening graphical program ${CYAN}xfce4-keyboard-settings${normal}.${GREEN} Go to the second tab: '${MAGENTA}Applications Shortcuts${normal}'\n"
+            echo
+            sleep 1
+            printf "${GREEN}.."
+            sleep 2
+            printf ".\n${normal}"
+            xfce4-keyboard-settings 
+        elif [[ "$err" == 2 ]]; then
+            printf "${GREEN}Opening graphical program ${CYAN}xfwm4-settings${normal}.${GREEN} Go to the second tab: '${MAGENTA}Applications Shortcuts${normal}'\n"
+            echo
+            sleep 1
+            printf "${GREEN}.."
+            sleep 2
+            printf ".\n${normal}"
+            xfwm4-settings 
         fi
-    
-        keyb=$(echo "$keyb" | sed 's|-||g; s|Control|<Primary>|g; s|Shift|<Shift>|g; s|Alt|<Alt>|g; s|Windowkey|<Super>|g;' )
+    }
+
+
+    function xfce-check-binds(){
+        local keyb=$1 
+        #local firstbatch=$2
+        local value=$2
+        local usedkeys
+
         
         #if [[ $firstbatch == 1 ]]; then
-            if [[ "$usedkey" == 'true' ]] || [[ "$usedkey" == 'false' ]]; then
-                xfconf-query -c xfce4-keyboard-shortcuts -n -p /commands/custom/$keyb -t boolean -s "$value" 
-            else
-                xfconf-query -c xfce4-keyboard-shortcuts -n -p /commands/custom/$keyb -t string -s "$value" 
-            fi
-            xfconf-query -c xfce4-keyboard-shortcuts -p /commands/custom/$keyb -l -v 
+            usedkeys=$(xfconf-query -c xfce4-keyboard-shortcuts -p /commands/custom -l -v | sed 's|/commands/custom/||g; s|<Primary>|<Control>|g; s|<Super>|<Windowkey>|g; s|><|-|g; s|<||g; s|>|-|g;;' )
         #else
-        #    if [[ "$usedkey" == 'true' ]] || [[ "$usedkey" == 'false' ]]; then
-        #        xfconf-query -c xfce4-keyboard-shortcuts -n -p /xfwm4/default/$keyb -t boolean -s "kitty" 
-        #    else
-        #        xfconf-query -c xfce4-keyboard-shortcuts -n -p /xfwm4/default/$keyb -t string -s "kitty" 
-        #    fi
-        #    xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/default/$keyb -l -v 
+        #    usedkeys=$(xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/default -l -v | sed 's|/xfwm4/default/||g; s|<Primary>|<Control>|g; s|<Super>|<Windowkey>|g; s|><|-|g; s|<||g; s|>|-|g;' )
         #fi
 
-    elif [[ $whatdo == 'different-keybind' ]]; then
-        return 3 
-    fi
-    return 0
-}
+        local usedkey=$(echo "$usedkeys" | grep --color=never $keyb | awk '{$1=""; print;}' | xargs)
 
+        local whatdo 
+        printf "${GREEN}$keyb${normal}${green} is already bound to '${CYAN}$usedkey${GREEN}'${normal}\n"
+        reade -Q 'GREEN' -i "replace-existing-keybind remove-existing-keybind different-keybind nevermind" -p "What to do? [Replace-existing-keybind/remove-existing-keybind/different-keybind/nevermind]: " whatdo
+        if [[ $whatdo == 'replace-existing-keybind' ]] || [[ $whatdo == 'remove-existing-keybind' ]]; then
+            if [[ $whatdo == 'replace-existing-keybind' ]]; then
+                if [[ $usedkey == 'xfce4-terminal --drop-down' ]]; then
+                    newkeys='F9' 
+                fi
+                local newk 
+                reade -Q 'GREEN' -i "$newkeys" -p "What to set ${CYAN}$usedkey${GREEN} to?: " newk
+                if test -n "$newk"; then
+                    
+                    usedkeys=$(xfconf-query -c xfce4-keyboard-shortcuts -p /commands/custom -l -v | awk '{print $1;}' | sed 's|/commands/custom/||g; s|<Primary>|<Control>|g; s|<Super>|<Windowkey>|g; s|><|-|g; s|<||g; s|>|-|g;' )
+                    
+                    for i in "${usedkeys[@]}"; do 
+                        if [[ $i == $newk ]]; then 
+                            local usedkey1=$(xfconf-query -c xfce4-keyboard-shortcuts -p /commands/custom -l -v | sed 's|/commands/custom/||g; s|<Primary>|<Control>|g; s|<Super>|<Windowkey>|g; s|><|-|g; s|<||g; s|>|-|g;' | grep --color=never "$newk" | awk '{$1=""; print}')
+                             
+                            printf "${YELLOW}$newk${normal}${green} is already used for ${CYAN}$usedkey1${normal}\n"
+                            return 1 
+
+                        fi
+                    done
+                    
+                    usedkeys=$(xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/default -l -v | awk '{print $1;}' | sed 's|/xfwm4/default/||g; s|<Primary>|<Control>|g; s|<Super>|<Windowkey>|g; s|><|-|g; s|<||g; s|>|-|g;' )
+                     for i in "${usedkeys[@]}"; do 
+                        if [[ $i == $newk ]]; then 
+                            local usedkey1=$(xfconf-query -c xfce4-keyboard-shortcuts -p /commands/custom -l -v | sed 's|/commands/custom/||g; s|<Primary>|<Control>|g; s|<Super>|<Windowkey>|g; s|><|-|g; s|<||g; s|>|-|g;' | grep --color=never "$newk" | awk '{$1=""; print}')
+                             
+                            printf "${YELLOW}$newk${normal}${green} is already used for ${CYAN}$usedkey1${normal}\n"
+                            return 2 
+                        fi
+                    done
+                    
+                    newk=$(echo "$newk" | sed 's|-||g; s|Control|<Primary>|g; s|Shift|<Shift>|g; s|Alt|<Alt>|g; s|Windowkey|<Super>|g;' )
+                    #if [[ $firstbatch == 1 ]]; then
+                        if [[ "$usedkey1" == 'true' ]] || [[ "$usedkey1" == 'false' ]]; then
+                            xfconf-query -c xfce4-keyboard-shortcuts -n -p /commands/custom/$newk -t boolean -s "$usedkey" 
+                        else
+                            xfconf-query -c xfce4-keyboard-shortcuts -n -p /commands/custom/$newk -t string -s "$usedkey" 
+                        fi
+                        xfconf-query -c xfce4-keyboard-shortcuts -p /commands/custom/$newk -l -v 
+
+                    #else
+                    #    if [[ "$usedkey1" == 'true' ]] || [[ "$usedkey1" == 'false' ]]; then
+                    #        xfconf-query -c xfce4-keyboard-shortcuts -n -p /xfwm4/default/$newk -t boolean -s "$usedkey" 
+                    #    else
+                    #        xfconf-query -c xfce4-keyboard-shortcuts -n -p /xfwm4/default/$newk -t string -s "$usedkey" 
+                    #    fi
+                    #    xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/default/$newk -l -v 
+                    #fi
+                fi
+
+            elif [[ $whatdo == 'remove-existing-keybind' ]]; then
+                keyb=$(echo "$keyb" | sed 's|-||g; s|Control|<Primary>|g; s|Shift|<Shift>|g; s|Alt|<Alt>|g; s|Windowkey|<Super>|g;' )
+                #if [[ $firstbatch == 1 ]]; then
+                    xfconf-query -c xfce4-keyboard-shortcuts -r -p /commands/custom/$keyb    
+                #else
+                #    xfconf-query -c xfce4-keyboard-shortcuts -r -p /xfwm4/default/$keyb    
+                #fi
+            fi
+        
+            keyb=$(echo "$keyb" | sed 's|-||g; s|Control|<Primary>|g; s|Shift|<Shift>|g; s|Alt|<Alt>|g; s|Windowkey|<Super>|g;' )
+            
+            #if [[ $firstbatch == 1 ]]; then
+                if [[ "$usedkey" == 'true' ]] || [[ "$usedkey" == 'false' ]]; then
+                    xfconf-query -c xfce4-keyboard-shortcuts -n -p /commands/custom/$keyb -t boolean -s "$value" 
+                else
+                    xfconf-query -c xfce4-keyboard-shortcuts -n -p /commands/custom/$keyb -t string -s "$value" 
+                fi
+                xfconf-query -c xfce4-keyboard-shortcuts -p /commands/custom/$keyb -l -v 
+            #else
+            #    if [[ "$usedkey" == 'true' ]] || [[ "$usedkey" == 'false' ]]; then
+            #        xfconf-query -c xfce4-keyboard-shortcuts -n -p /xfwm4/default/$keyb -t boolean -s "kitty" 
+            #    else
+            #        xfconf-query -c xfce4-keyboard-shortcuts -n -p /xfwm4/default/$keyb -t string -s "kitty" 
+            #    fi
+            #    xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/default/$keyb -l -v 
+            #fi
+
+        elif [[ $whatdo == 'different-keybind' ]]; then
+            return 3 
+        fi
+        return 0
+    }
+
+    if [[ "$(xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/custom -l -v)" =~ /xfwm4/custom/\<Alt\>\<Control\> ]] || [[ "$(xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/custom -l -v)" =~ /xfwm4/custom/\<Shift\>\<Control\>\<Alt\> ]]; then
+        printf "${CYAN}Control-Alt${normal}${green} used for ${CYAN}xfce4's window management${normal}
+${ORANGE}This can conflict with different applications' (default) keybinds\n${normal}"
+        readyn -p "Set ${CYAN}Control-Alt${GREEN} to ${CYAN}Control-Windows/Commandkey${GREEN}?" ctrl_alt_super
+        if [[ $ctrl_alt_super == 'y' ]]; then
+            vars=$(xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/custom -l -v | grep --color=never '<Primary><Alt>' | awk '{print $1}') 
+            vars="$vars"$(xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/custom -l -v | grep --color=never '<Shift><Control><Alt>' | awk '{print $1}') 
+
+            for i in $vars; do
+                value="$(xfconf-query -c xfce4-keyboard-shortcuts -p $i -l -v | awk '{$1=""; print}')"
+                key=$(echo "$i" | sed 's/Alt/Super/g') 
+                xfconf-query -c xfce4-keyboard-shortcuts -p $i -r
+                xfconf-query -c xfce4-keyboard-shortcuts -n -p $key -t string -s $value
+            done 
+        fi
+        unset ctrl_alt_super vars i value key
+    fi   
+
+    # Solution to 'accidently' resetting application shortcuts to default
+    # https://forum.xfce.org/viewtopic.php?pid=76178#p76178
+
+    if [[ "$(xfconf-query -c xfce4-keyboard-shortcuts -p /commands/custom -l -v)" =~ /commands/custom/\<Alt\>F1.*xfce4-popup-applicationsmenu ]]; then
+        echo "${CYAN}Altf-F1${normal}${green}, which translates to the same keycode as the ${CYAN}Windowskey/Commandkey${normal}${green}, is bound to the action that opens the right-click menu - ${MAGENTA}xfce4-popup-applicationsmenu${normal}"
+        readyn -p "Would you like to change this to the menu that opens the popup 'whiskermenu' ${normal}${cyan}(the menu that opens from clicking the distro icon down left) ${CYAN}- xfce4-popup-whiskermenu${GREEN}" wiskermen
+        if [[ $wiskermen == 'y' ]]; then
+            xfconf-query -c xfce4-keyboard-shortcuts -p /commands/custom/\<Alt\>F1 -r 
+            xfconf-query -c xfce4-keyboard-shortcuts -n -p /commands/custom/\<Alt\>F1 -t string -s 'xfce4-popup-whiskermenu' 
+        fi
+    fi
+
+fi

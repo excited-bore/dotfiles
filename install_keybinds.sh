@@ -11,6 +11,13 @@ fi
 
 SCRIPT_DIR=$(get-script-dir)
 
+if ! test -f $SCRIPT_DIR/checks/check_defaultTerm_keybind.sh; then
+   source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_defaultTerm_keybind.sh)
+else
+   source $SCRIPT_DIR/checks/check_defaultTerm_keybind.sh 
+fi
+
+
 # Shell-keybinds
 
 binds=$SCRIPT_DIR/keybinds/.inputrc
@@ -105,12 +112,6 @@ shell-keybinds() {
 }
 
 yes-edit-no -f shell-keybinds -g "$binds $binds2 $binds1" -p "Install .inputrc and keybinds.bash at ~/ and ~/.keybinds.d/? (keybinds configuration)"
-
-if ! test -f checks/check_defaultTerm_keybind.sh; then
-   source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_defaultTerm_keybind.sh)
-else
-   source checks/check_defaultTerm_keybind.sh 
-fi
 
 
 if [[ "$DESKTOP_SESSION" == 'xfce' ]]; then
@@ -265,17 +266,4 @@ if [[ "$DESKTOP_SESSION" == 'xfce' ]]; then
         fi
         unset keyb nobind kittn usedkeys i j
     fi
-
-     # Solution to 'accidently' resetting application shortcuts to default
-     # https://forum.xfce.org/viewtopic.php?pid=76178#p76178
-
-    if [[ "$(xfconf-query -c xfce4-keyboard-shortcuts -p /commands/custom -l -v)" =~ /commands/custom/\<Alt\>F1.*xfce4-popup-applicationsmenu ]]; then
-        echo "${CYAN}Altf-F1${normal}${green}, which translates to the same keycode as the ${CYAN}Windowskey/Commandkey${normal}${green}, is bound to the action that opens the right-click menu - ${MAGENTA}xfce4-popup-applicationsmenu${normal}"
-        readyn -p "Would you like to change this to the menu that opens the popup 'whiskermenu' ${normal}${cyan}(the menu that opens from clicking the distro icon down left) ${CYAN}- xfce4-popup-whiskermenu${GREEN}" wiskermen
-        if [[ $wiskermen == 'y' ]]; then
-            xfconf-query -c xfce4-keyboard-shortcuts -p /commands/custom/\<Alt\>F1 -r 
-            xfconf-query -c xfce4-keyboard-shortcuts -n -p /commands/custom/\<Alt\>F1 -t string -s 'xfce4-popup-whiskermenu' 
-        fi
-    fi
-
 fi

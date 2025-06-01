@@ -29,9 +29,11 @@ if test -f $BASH_ALIAS; then
     else
         echo 'complete -F _complete_alias "${!BASH_ALIASES[@]}"' >> $BASH_ALIAS
     fi
-    readyn -p "Make an unalias wrapper so everytime you unalias a command using 'unalias', it also checks what commands still need autocompletion? (Helps avoiding errors when unaliasing a command, then using autocompletion)" unalias_w
-    if [[ $unalias_w == 'y' ]]; then
-        printf "\nfunction unalias(){\n\tcommand unalias \$@\n\twhile read -r line; do\n\t\tif [[ \$(echo \"\$line\" | awk '\$2 == \"-F\" { print \$3 }') =~ \"_complete_alias\" ]]; then\n\t\tlocal cmd=\$(echo \"\$line\" | awk '{print \$NF}')\n\t\tif ! [[ \$(type \$cmd 2> /dev/null) =~ \"alias\" ]]; then\n\t\t\tcomplete -r \$cmd\n\t\tfi\n\tfi\n\tdone < <(complete -p)\n}" >> $BASH_ALIAS 
+    if ! grep -q 'function unalias' $BASH_ALIAS; then
+        readyn -p "Make an unalias wrapper so everytime you unalias a command using 'unalias', it also checks what commands still need autocompletion? (Helps avoiding errors when unaliasing a command, then using autocompletion)" unalias_w
+        if [[ $unalias_w == 'y' ]]; then
+            printf "\nfunction unalias(){\n\tcommand unalias \$@\n\twhile read -r line; do\n\t\tif [[ \$(echo \"\$line\" | awk '\$2 == \"-F\" { print \$3 }') =~ \"_complete_alias\" ]]; then\n\t\tlocal cmd=\$(echo \"\$line\" | awk '{print \$NF}')\n\t\tif ! [[ \$(type \$cmd 2> /dev/null) =~ \"alias\" ]]; then\n\t\t\tcomplete -r \$cmd\n\t\tfi\n\tfi\n\tdone < <(complete -p)\n}" >> $BASH_ALIAS 
+        fi
     fi
     unset unalias_w 
 fi
@@ -54,9 +56,10 @@ if [[ "y" == $rcompl ]]; then
         sudo touch $BASH_ALIAS_R
         printf "complete -F _complete_alias \"\${!BASH_ALIASES[@]}\"\n" | sudo tee -a $BASH_ALIAS_R 1> /dev/null
     fi
-    readyn -Y 'YELLOW' -p "Make an unalias wrapper for root (as well) so everytime you unalias a command using 'unalias', it also checks what commands still need autocompletion? (Helps avoiding errors when unaliasing a command, then using autocompletion)" unalias_w
-    if [[ $unalias_w == 'y' ]]; then
-        printf "\nfunction unalias(){\n\tcommand unalias \$@\n\twhile read -r line; do\n\t\tif [[ \$(echo \"\$line\" | awk '\$2 == \"-F\" { print \$3 }') =~ \"_complete_alias\" ]]; then\n\t\tlocal cmd=\$(echo \"\$line\" | awk '{print \$NF}')\n\t\tif ! [[ \$(type \$cmd 2> /dev/null) =~ \"alias\" ]]; then\n\t\t\tcomplete -r \$cmd\n\t\tfi\n\tfi\n\tdone < <(complete -p)\n}" | sudo tee -a $BASH_ALIAS_R 1> /dev/null 
+    if sudo ! grep -q 'function unalias' $BASH_ALIAS_R; then
+        readyn -Y 'YELLOW' -p "Make an unalias wrapper for root (as well) so everytime you unalias a command using 'unalias', it also checks what commands still need autocompletion? (Helps avoiding errors when unaliasing a command, then using autocompletion)" unalias_w
+        if [[ $unalias_w == 'y' ]]; then
+            printf "\nfunction unalias(){\n\tcommand unalias \$@\n\twhile read -r line; do\n\t\tif [[ \$(echo \"\$line\" | awk '\$2 == \"-F\" { print \$3 }') =~ \"_complete_alias\" ]]; then\n\t\tlocal cmd=\$(echo \"\$line\" | awk '{print \$NF}')\n\t\tif ! [[ \$(type \$cmd 2> /dev/null) =~ \"alias\" ]]; then\n\t\t\tcomplete -r \$cmd\n\t\tfi\n\tfi\n\tdone < <(complete -p)\n}" | sudo tee -a $BASH_ALIAS_R 1> /dev/null 
+        fi
     fi
-    
 fi
