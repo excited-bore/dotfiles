@@ -489,6 +489,7 @@ elif [[ "$envvars" == "y" ]]; then
         #frst="$(echo $compedit | awk '{print $1}')"
         #compedit="$(echo $compedit | sed "s/\<$frst\> //g")"
         printf "$prmpt${normal}"
+        editors_p=$(echo $editorsp $editors1 | uniq) 
         reade -Q "GREEN" -i "$frst $editors_p" -p "EDITOR (Terminal - $frst default)=" edtor
         edtor="$(where_cmd $edtor)"
         if [[ "$edtor" =~ "emacs" ]]; then

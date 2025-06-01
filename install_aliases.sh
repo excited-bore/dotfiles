@@ -338,7 +338,7 @@ if [[ $ansr == "y" ]]; then
         readyn -p "Set one as alias for 'df'?" dysk_df
         if [[ "$dysk_df" == "y" ]]; then
             reade -Q 'GREEN' -i 'duf dysk' -p 'Which one?: ' duf_dysk 
-            sed -i "s|.alias df=.*||alias df='$duf_dysk'|g" $genr
+            sed -i "s|.alias df=.*|alias df='$duf_dysk'|g" $genr
         else
             sed -i 's|^alias df="\(dysk|duf\)"|#alias df="\1"|g' $genr
         fi
