@@ -199,7 +199,7 @@ if [[ "$DESKTOP_SESSION" == 'xfce' ]]; then
                                 fi
                             done
 
-                            #usedkeys=$(xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/default -l -v | awk '{print $1;}' | sed 's|/xfwm4/default/||g; s|<Primary>|<Control>|g; s|<Super>|<Windowkey>|g; s|><|-|g; s|<||g; s|>|-|g;' )
+                            #usedkeys=$(xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/custom -l -v | awk '{print $1;}' | sed 's|/xfwm4/custom/||g; s|<Primary>|<Control>|g; s|<Super>|<Windowkey>|g; s|><|-|g; s|<||g; s|>|-|g;' )
                             #for j in ${usedkeys[@]}; do
                             #    if [[ $j == $keyb ]]; then
                             #        xfce-check-binds "$keyb" "$value"
@@ -213,7 +213,7 @@ if [[ "$DESKTOP_SESSION" == 'xfce' ]]; then
                     fi
                 done
                 
-                #usedkeys=$(xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/default -l -v | awk '{print $1;}' | sed 's|/xfwm4/default/||g; s|<Primary>|<Control>|g; s|<Super>|<Windowkey>|g; s|><|-|g; s|<||g; s|>|-|g;' )
+                #usedkeys=$(xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/custom -l -v | awk '{print $1;}' | sed 's|/xfwm4/custom/||g; s|<Primary>|<Control>|g; s|<Super>|<Windowkey>|g; s|><|-|g; s|<||g; s|>|-|g;' )
 
                 #for i in ${usedkeys[@]}; do
                 #    if [[ $i == $keyb ]]; then
@@ -244,7 +244,7 @@ if [[ "$DESKTOP_SESSION" == 'xfce' ]]; then
                 #                fi
                 #            done
 
-                #            usedkeys=$(xfconf-query -c xfce4-keyboard-shortcuts -p /commands/custom -l -v | awk '{print $1;}' | sed 's|/xfwm4/default/||g; s|<Primary>|<Control>|g; s|<Super>|<Windowkey>|g; s|><|-|g; s|<||g; s|>|-|g;')
+                #            usedkeys=$(xfconf-query -c xfce4-keyboard-shortcuts -p /commands/custom -l -v | awk '{print $1;}' | sed 's|/xfwm4/custom/||g; s|<Primary>|<Control>|g; s|<Super>|<Windowkey>|g; s|><|-|g; s|<||g; s|>|-|g;')
                 #            for j in ${usedkeys[@]}; do
                 #                if [[ $j == $keyb ]]; then
                 #                    xfce-check-binds "$keyb" "$value"

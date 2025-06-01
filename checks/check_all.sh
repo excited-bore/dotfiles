@@ -49,7 +49,6 @@ underline_on=$(tput smul)
 underline_off=$(tput rmul)
 standout_on=$(tput smso)
 standout_off=$(tput rmso)
-hl
 
 half_bright=$(tput dim)
 reverse_color=$(tput rev)
