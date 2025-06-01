@@ -976,7 +976,7 @@ if ! hash ncdu &> /dev/null && hash dua &> /dev/null; then
    alias ncdu='dua interactive' 
 fi
 
-alias du="dua""
+alias du="dua"
 alias du="dua interactive"
 
 alias folder-size="du"

@@ -120,8 +120,7 @@ fi
 
 alias get-script-dir='cd "$( dirname "$-1" )" && pwd'
 
-
-([[ "$(type unalias)" =~ 'aliased' ]] [[ "$(type unalias)" =~ 'function' ]]) && 
+([[ "$(type unalias)" =~ 'aliased' ]] || [[ "$(type unalias)" =~ 'function' ]]) && 
     alias unalias="command unalias"
 
 # Make sure cp copies forceably (without asking confirmation when overwriting) and verbosely

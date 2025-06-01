@@ -367,7 +367,7 @@ if [[ $ansr == "y" ]]; then
             elif hash ncdu &>/dev/null; then 
                 which='ncdu' 
             fi
-            sed -E -i "s|.alias du=\"|alias du=\"|g; s/alias du=\"(dua|dust|ncdu)/alias du=\"$which/g" $genr
+            sed -E -i "s|.alias du=\"|alias du=\"|g; s/alias du=\"(dua|dust|ncdu)\"/alias du=\"$which\"/g" $genr
         else
             sed -E -i 's|^alias du="\((dust|dua|ncdu)\)"|#alias du="\1"|g' $genr
         fi
