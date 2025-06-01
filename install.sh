@@ -414,7 +414,6 @@ fi
 unset findr
 
 
-
 # Ack prompt
 
 readyn -c "! hash ack &> /dev/null" -p "Install ack? (A modern replacement for grep - finds lines in shell output)" ack
@@ -428,32 +427,51 @@ if [[ "y" == "$ack" ]]; then
 fi
 unset ack
 
-# Dust - Du replacement
- 
-readyn -c "! hash dust &> /dev/null" -p "Install dust? (A modern replacement for du - list disk space for maps / directories is free)" dust
 
-if [[ "y" == "$dust" ]]; then
+# Dust, dua and ncdu - Du replacement(s)
+
+if ! (hash dua &> /dev/null && hash dust &> /dev/null && hash ncdu &> /dev/null); then 
+    printf "${CYAN}Dua${GREEN} and ${CYAN}dust${GREEN} are modern cli replacements of du\n${CYAN}Ncdu${GREEN} and ${CYAN}'dua interactive'${GREEN} are interactive TUI replacements that also help remove unnecessary files)${normal}\n"
+    color='GREEN'
+    pre="dua dust ncdu both none"
+    prmpt=" [Dua/dust/ncdu/all/none]: "
+    if ! hash dust &> /dev/null && hash dua &> /dev/null; then
+        pre="dust dua ncdu all none"
+        prmpt=" [Dust/dua/ncdu/both/none]: "
+    elif hash dua &> /dev/null && hash dust &> /dev/null && ! hash ncdu &> /dev/null; then  
+        pre="ncdu dust dua all none"
+        prmpt=" [Ncdu/dua/dust/all/none]: "
+    fi
+else
+    color='YELLOW'
+    pre="none dua dust ncdu all"
+    prmpt=" [None/dua/dust/ncdu/both]: "
+fi
+reade -Q "$color" -i "$pre" -p "Install dua, dust, ncdu or all? $prmpt" dua_dust_ncdu
+if [[ "all" == "$dua_dust_ncdu" ]] || [[ "dua" == "$dua_dust_ncdu" ]]; then
+    if ! test -f $SCRIPT_DIR/install_dua_cli.sh; then
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_dua_cli.sh)
+    else
+        . $SCRIPT_DIR/install_dua_cli.sh
+    fi
+fi 
+if [[ "all" == "$dua_dust_ncdu" ]] || [[ "dust" == "$dua_dust_ncdu" ]]; then
     if ! test -f $SCRIPT_DIR/install_dust.sh; then
         source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_dust.sh)
     else
         . $SCRIPT_DIR/install_dust.sh
     fi
 fi
-unset dust
-
-
-# Dua - TUI du replacement / file browser
- 
-readyn -c "! hash dua &> /dev/null" -p "Install dua? (Du replacement like dust but also a TUI file browser)" dua
-
-if [[ "y" == "$dua" ]]; then
-    if ! test -f $SCRIPT_DIR/install_dua_cli.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_dua_cli.sh)
+if [[ "all" == "$dua_dust_ncdu" ]] || [[ "ncdu" == "$dua_dust_ncdu" ]]; then
+    if ! test -f $SCRIPT_DIR/install_ncdu.sh; then
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ncdu.sh)
     else
-        . $SCRIPT_DIR/install_dua_cli.sh
+        . $SCRIPT_DIR/install_ncdu.sh
     fi
 fi
-unset dua
+unset dua_dust_ncdu color pre prmpt
+
+
 
 
 # Duf and Dysk - Df replacement
