@@ -307,6 +307,12 @@ if [[ $ansr == "y" ]]; then
     unset ack_gr
 
     if hash dust &>/dev/null || hash dua &>/dev/null || hash ncdu &> /dev/null; then
+        if hash ncdu &> /dev/null; then
+            reade -Q 'GREEN' -i 'dark dark-bg none' -p "${CYAN}ncdu${GREEN} installed. What colorscheme? [Dark/dark-bg/none]: " ncdu_color
+            if test -n "$ncdu_color"; then
+                sed -i "s/alias ncdu=\"ncdu .*\"/alias ncdu=\"ncdu --color $ncdu_color\"/g" $genr 
+            fi
+        fi
         if hash dust &> /dev/null || hash dua &> /dev/null || hash ncdu &> /dev/null; then
             if ! hash dua &> /dev/null && ! hash dua &> /dev/null && hash ncdu &> /dev/null; then 
                 prmpt="${CYAN}'ncdu'${GREEN}"
