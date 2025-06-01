@@ -52,18 +52,6 @@ if ! hash aria2c &>/dev/null && test -n "$pac_ins"; then
     unset ins_aria2c
 fi
 
-if hash aria2c &>/dev/null && test -z "$WGET_ARIA"; then
-    readyn -p "Always use 'aria2c' in favour of 'wget' for faster downloads?" wget_ar
-    if [[ $wget_ar == 'y' ]]; then
-        WGET_ARIA=1
-        alias wget-aria='aria2c'
-        alias wget-aria-quiet='aria2c -q'
-        alias wget-aria-dir='aria2c -d'
-        alias wget-aria-name='aria2c -o'
-    fi
-    unset wget_ar
-fi
-
 
 if ! hash rlwrap &>/dev/null; then
     if ! test -f $SCRIPT_DIR/checks/check_rlwrap.sh; then
