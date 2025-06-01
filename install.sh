@@ -619,6 +619,34 @@ fi
 
 SCRIPT_DIR=$(get-script-dir)
 
+# Nerdfonts
+
+readyn -p "Install a Nerdfont? (Type of font with icons to distinguish filetypes in the terminal + other types of icons)" nstll_nerdfont
+
+if [[ "y" == "$nstll_nerdfont" ]]; then
+    if ! test -f $SCRIPT_DIR/install_nerdfonts.sh; then
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nerdfonts.sh)
+    else
+        . $SCRIPT_DIR/install_nerdfonts.sh
+    fi
+fi
+unset nstll_nerdfont
+
+# Kitty (Terminal emulator)
+
+readyn -p "Install Kitty? (Terminal emulator)" -c "! hash kitty &> /dev/null" kittn
+
+if [[ "y" == "$kittn" ]]; then
+    if ! test -f $SCRIPT_DIR/install_kitty.sh; then
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_kitty.sh)
+    else
+        . $SCRIPT_DIR/install_kitty.sh
+    fi
+fi
+unset kittn
+
+# Keybinds
+
 if ! test -f install_keybinds.sh; then
     source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_keybinds.sh)
 else
@@ -687,32 +715,6 @@ if [[ "y" == "$nvm" ]]; then
     fi
 fi
 unset nvm
-
-# Nerdfonts
-
-readyn -p "Install a Nerdfont? (Type of font with icons to distinguish filetypes in the terminal + other types of icons)" nstll_nerdfont
-
-if [[ "y" == "$nstll_nerdfont" ]]; then
-    if ! test -f $SCRIPT_DIR/install_nerdfonts.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nerdfonts.sh)
-    else
-        . $SCRIPT_DIR/install_nerdfonts.sh
-    fi
-fi
-unset nstll_nerdfont
-
-# Kitty (Terminal emulator)
-
-readyn -p "Install Kitty? (Terminal emulator)" -c "! hash kitty &> /dev/null" kittn
-
-if [[ "y" == "$kittn" ]]; then
-    if ! test -f $SCRIPT_DIR/install_kitty.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_kitty.sh)
-    else
-        . $SCRIPT_DIR/install_kitty.sh
-    fi
-fi
-unset kittn
 
 # Rg (ripgrep)
 

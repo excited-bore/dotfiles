@@ -290,10 +290,3 @@ if grep -q '# KITTY' $ENV; then
 else
     printf "# KITTY\nexport KITTY_PATH=~/.local/bin/:~/.local/kitty.app/bin\nexport PATH=\$PATH:\$KITTY_PATH\n" $ENV
 fi
-
-
-if ! test -f checks/check_defaultTerm_keybind.sh; then
-   source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_defaultTerm_keybind.sh)
-else
-   source checks/check_defaultTerm_keybind.sh 
-fi

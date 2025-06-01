@@ -121,6 +121,9 @@ fi
 alias get-script-dir='cd "$( dirname "$-1" )" && pwd'
 
 
+([[ "$(type unalias)" =~ 'aliased' ]] [[ "$(type unalias)" =~ 'function' ]]) && 
+    alias unalias="command unalias"
+
 # Make sure cp copies forceably (without asking confirmation when overwriting) and verbosely
 
 if (hash xcp &> /dev/null || hash cpg &> /dev/null) && ! ([[ "$(type cp)" =~ "'cpg -fgv'" ]] || [[ "$(type cp)" =~ "'xcp'" ]]); then
@@ -208,27 +211,6 @@ fi
 # Less does raw control chars, use color and linenumbers, no sounds/bell and doesn't trigger your epilepsy
 alias less='less -R --use-color --LINE-NUMBERS --quit-if-one-screen -Q --no-vbell'
 
-
-#function get-script-dir() {
-#    SOURCE=$0
-#    test -n "$1" && SOURCE=$1 
-#    if test -n "$BASH_VERSION"; then
-#        SOURCE=$(cd -- "$(dirname -- "$SOURCE")" &> /dev/null && pwd ) 
-#        #while [ -h "$SOURCE" ]; do # Resolve $SOURCE until the file is no longer a symlink
-#        #    DIR=$(command cd -P "$(dirname "$SOURCE")" && pwd)
-#        #    SOURCE=$(readlink "$SOURCE")
-#        #    [[ $SOURCE != /* ]] && SOURCE=$DIR/$SOURCE # If $SOURCE was a relative symlink, resolve it relative to the symlink base directory
-#        #done
-#        #DIR=$(command cd -P "$(dirname "$SOURCE")" && pwd)
-#    elif test -n "$ZSH_VERSION"; then
-#        SOURCE="${0:A:h}"
-#    fi
-#    if ! test -z $2; then
-#        eval "$2=$SOURCE"
-#    else
-#        eval "$1=$SOURCE"
-#    fi
-#}
 
 # https://stackoverflow.com/questions/4023830/how-to-compare-two-strings-in-dot-separated-version-format-in-bash
 
