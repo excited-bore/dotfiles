@@ -33,10 +33,34 @@ fi
 #    fi
 #fi
 
+function version-higher() {
+    if [[ $1 == $2 ]]; then
+        return 1
+    fi
+    local IFS=.
+    local i ver1=($1) ver2=($2)
+    # fill empty fields in ver1 with zeros
+    test -n "$BASH_VERSION" && local j=0 
+    test -n "$ZSH_VERSION" && local j=1 
+    for ((i = ${#ver1[@]}; i < ${#ver2[@]}; i++)); do
+        ver1[i]=$j
+    done
+    for ((i = $j; i < ${#ver1[@]}; i++)); do
+        if ((10#${ver1[i]:=$j} > 10#${ver2[i]:=$j})); then
+            return 0
+        fi
+        if ((10#${ver1[i]} < 10#${ver2[i]})); then
+            return 1
+        fi
+    done
+    return 0
+}
+
 # https://www.explainxkcd.com/wiki/index.php/1654:_Universal_Install_Script
+
 function update-system() {
-    test -e $YES && unset YES 
-    test -e $NOGUI && unset NOGUI
+    test -n $YES && unset YES 
+    test -n $NOGUI && unset NOGUI
     while [[ $# -gt 0 ]]; do
         case $1 in
         -h|-\?|--help)  
@@ -192,7 +216,7 @@ function update-system() {
         local latest_lts="$(curl -fsSL https://www.kernel.org | xmllint --html --xpath "(//td[text()='longterm:'])[1]/following-sibling::td[1]/strong/text()" - | cut -d. -f-2 )"
         local latest_lts1="linux-image-$latest_lts"
 
-        if ! [[ "$(uname -r)" =~ "$latest_lts" ]]; then
+        if ! [[ "$(uname -r)" =~ "$latest_lts" ]] && version-higher $latest_lts $(uname -r); then
             test -n "$YES" && flag='--auto' || flag=''
             readyn $flag -p "Lastest longterm support linux kernel not installed. Install ${CYAN}$latest_lts1${GREEN} and ${CYAN}$latest_lts1-headers${GREEN}?" latest_ins
             if [[ $latest_ins == 'y' ]]; then
@@ -282,7 +306,7 @@ function update-system() {
         local latest_lts="$(curl -fsSL https://www.kernel.org | xmllint --html --xpath "(//td[text()='longterm:'])[1]/following-sibling::td[1]/strong/text()" - | cut -d. -f-2 )"
         local latest_lts1="linux${latest_lts//"."}"
 
-        if ! [[ "$(uname -r)" =~ "$latest_lts" ]]; then
+        if ! [[ "$(uname -r)" =~ "$latest_lts" ]] && version-higher $latest_lts $(uname -r); then
             
             test -n "$YES" && flag='--auto' || flag=''
             
