@@ -254,8 +254,16 @@ function update-system() {
                 eval "sudo ${pac} upgrade" 
             fi
             
-            eval "${pac_up} -y"            
-        
+            if test -n "$YES"; then
+                if [[ "$pac" == "apt" ]]; then
+                    eval ${pac_up} -y
+                else
+                    eval "yes | ${pac_up}"
+                fi
+            else
+                eval "${pac_up}"
+            fi
+            
         fi
  
         if apt --dry-run autoremove 2> /dev/null | grep -Po '^Remv \K[^ ]+'; then

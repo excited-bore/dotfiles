@@ -134,7 +134,7 @@ if (hash xcp &> /dev/null || hash cpg &> /dev/null) && ! ([[ "$(type cp)" =~ "'c
             alias cp='cp -fv'
     elif hash xcp &> /dev/null; then
         echo "Since you have xcp installed, this next $(tput setaf 1)sudo$(tput sgr0) will check whether it can be used for the script (if it's sudo executable, it is)"
-        sudo bash -c "hash xcp" &&
+        sudo bash -c "hash xcp &> /dev/null" &&
             alias cp='xcp' ||
             alias cp='cp -fv'
     fi
