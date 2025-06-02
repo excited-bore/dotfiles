@@ -179,7 +179,7 @@ function update-system() {
     
     elif [[ "$pac" == "apt" ]] || [[ "$pac" == "nala" ]]; then
         
-        if ! test -z "$YES"; then
+        if test -n "$YES"; then
             if [[ "$pac" == "apt" ]]; then
                 eval ${pac_up} -y
             else
@@ -188,11 +188,23 @@ function update-system() {
         else
             eval "${pac_up}"
         fi
-       
+      
+        local latest_lts="$(curl -fsSL https://www.kernel.org | xmllint --html --xpath "(//td[text()='longterm:'])[1]/following-sibling::td[1]/strong/text()" - | cut -d. -f-2 )"
+        local latest_lts1="linux-image-$latest_lts"
+
+        if ! [[ "$(uname -r)" =~ "$latest_lts" ]]; then
+            test -n "$YES" && flag='--auto' || flag=''
+            readyn $flag -p "Lastest longterm support linux kernel not installed. Install ${CYAN}$latest_lts1${GREEN} and ${CYAN}$latest_lts1-headers${GREEN}?" latest_ins
+            if [[ $latest_ins == 'y' ]]; then
+                eval "${pac_ins} $latest_lts1 $latest_lts1-headers"
+            fi
+            unset latest_ins
+        fi
+
         hdrs="linux-headers-$(uname -r)"
         if test -z "$(apt list --installed 2> /dev/null | grep $hdrs)"; then
             
-            ! test -z "$YES" && flag='--auto' || flag=''
+            test -n "$YES" && flag='--auto' || flag=''
             
             readyn $flag -p "Right linux headers not installed. Install $hdrs?" hdrs_ins
             if [[ "$hdrs_ins" == "y" ]]; then
@@ -202,12 +214,12 @@ function update-system() {
 
         echo "This next $(tput setaf 1)sudo$(tput sgr0) will try to update the packages for your system using the package managers it knows";
         
-        ! test -z "$YES" && flag='--auto' || flag=''
+        test -n "$YES" && flag='--auto' || flag=''
         
         readyn $flag -p "Upgrade system?" upgrd
 
         if [[ $upgrd == 'y' ]];then
-            if ! test -z "$YES"; then 
+            if test -n "$YES"; then 
                 if [[ "$pac" == "apt" ]]; then
                     eval "sudo ${pac} upgrade -y"
                 else
@@ -224,7 +236,7 @@ function update-system() {
  
         if apt --dry-run autoremove 2> /dev/null | grep -Po '^Remv \K[^ ]+'; then
             
-            ! test -z "$YES" && flag='--auto' || flag=''
+            test -n "$YES" && flag='--auto' || flag=''
             
             readyn $flag -p 'Autoremove unneccesary packages?' remove
        
@@ -247,8 +259,10 @@ function update-system() {
 
     elif [[ "$pac" == "pacman" ]]; then
    
-        if ! test -z "$AUR_up"; then
-            if ! test -z "$YES"; then 
+        if test -n "$AUR_up"; then
+            
+            if test -n "$YES"; then 
+                
                 if [[ "$AUR_up" == "pamac update" ]]; then
                     pamac update --no-confirm
                 else
@@ -259,25 +273,48 @@ function update-system() {
             fi
         fi 
         
-        if ! test -z "$YES"; then 
+        if test -n "$YES"; then 
             eval "${pac_up} --noconfirm"
         else 
             eval "${pac_up}"
         fi
         
+        local latest_lts="$(curl -fsSL https://www.kernel.org | xmllint --html --xpath "(//td[text()='longterm:'])[1]/following-sibling::td[1]/strong/text()" - | cut -d. -f-2 )"
+        local latest_lts1="linux${latest_lts//"."}"
+
+        if ! [[ "$(uname -r)" =~ "$latest_lts" ]]; then
+            
+            test -n "$YES" && flag='--auto' || flag=''
+            
+            readyn $flag -p "Lastest longterm support linux kernel not installed. Install ${CYAN}$latest_lts1${GREEN} and ${CYAN}$latest_lts1-headers${GREEN}?" latest_ins
+            if [[ $latest_ins == 'y' ]]; then
+
+                test -n "$YES" && flag='--noconfirm' || flag=''
+
+                eval "${pac_ins} $flag $latest_lts1 $latest_lts1-headers"
+            fi
+            unset latest_ins
+        fi
+
         hdrs="$(echo $(uname -r) | cut -d. -f-2)"
         hdrs="linux${hdrs//"."}-headers"
+        
         if test -z "$(pacman -Q $hdrs 2> /dev/null)"; then
             
-            ! test -z "$YES" && flag='--auto' || flag=''
+            test -n "$YES" && flag='--auto' || flag=''
             
             readyn $flag -p "Right linux headers not installed. Install $hdrs?" hdrs_ins
             if [[ "$hdrs_ins" == "y" ]]; then
-                eval "${pac_ins} $hdrs"
+
+                test -n "$YES" && flag='--noconfirm' || flag=''
+               
+                eval "${pac_ins} $flag $hdrs"
             fi
+            unset hdrs_ins
         fi
+        unset hdrs
        
-        ! test -z "$YES" && flag='--auto' || flag=''
+        test -n "$YES" && flag='--auto' || flag=''
        
         local cachcln 
         
