@@ -262,12 +262,12 @@ function cp-trash(){
 }
 
 # Cp recursively and verbose
-alias cp="cpg --progress-bar --recursive --verbose --force --dereference"
+alias cp="xcp --glob  --recursive --verbose --force --dereference"
 alias cp-lookup-symlinks="cp --dereference --driver parblock"
 
 # mv (recursively native) verbose and only ask for interaction when overwriting newer files
 
-alias mv="mvg --progress-bar --force --verbose"
+alias mv="mv  --force --verbose"
 alias mv-skip-existing="mv -nv"
 alias move="mv"
 alias switch-destination="mv --exchange"
@@ -329,7 +329,7 @@ function mv-trash(){
 } 
 
 
-alias mv="mvg --progress-bar --force --verbose"
+alias mv="mv  --force --verbose"
 
 
 # Rm 

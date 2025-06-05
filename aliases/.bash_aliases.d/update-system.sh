@@ -212,17 +212,19 @@ function update-system() {
         else
             eval "${pac_up}"
         fi
-      
-        local latest_lts="$(curl -fsSL https://www.kernel.org | xmllint --html --xpath "(//td[text()='longterm:'])[1]/following-sibling::td[1]/strong/text()" - | cut -d. -f-2 )"
-        local latest_lts1="linux-image-$latest_lts"
+        
+        if hash mainline &> /dev/null; then
+            local latest_lts="$(curl -fsSL https://www.kernel.org | xmllint --html --xpath "(//td[text()='longterm:'])[1]/following-sibling::td[1]/strong/text()" - 2> /dev/null)"
+            #local latest_lts1="linux-image-$latest_lts"
 
-        if ! [[ "$(uname -r)" =~ "$latest_lts" ]] && version-higher $latest_lts $(uname -r); then
-            test -n "$YES" && flag='--auto' || flag=''
-            readyn $flag -p "Lastest longterm support linux kernel not installed. Install ${CYAN}$latest_lts1${GREEN} and ${CYAN}$latest_lts1-headers${GREEN}?" latest_ins
-            if [[ $latest_ins == 'y' ]]; then
-                eval "${pac_ins} $latest_lts1 $latest_lts1-headers"
+            if ! [[ "$(uname -r)" =~ "$latest_lts" ]] && version-higher $latest_lts $(uname -r); then
+                test -n "$YES" && flag='--auto' || flag=''
+                readyn $flag -p "Lastest longterm support linux kernel not installed. Install ${CYAN}$latest_lts${GREEN} (and ${CYAN}$latest_lts-headers${GREEN})?" latest_ins
+                if [[ $latest_ins == 'y' ]]; then
+                    mainline install $latest_lts
+                fi
+                unset latest_ins
             fi
-            unset latest_ins
         fi
 
         hdrs="linux-headers-$(uname -r)"
@@ -311,7 +313,7 @@ function update-system() {
             eval "${pac_up}"
         fi
         
-        local latest_lts="$(curl -fsSL https://www.kernel.org | xmllint --html --xpath "(//td[text()='longterm:'])[1]/following-sibling::td[1]/strong/text()" - | cut -d. -f-2 )"
+        local latest_lts="$(curl -fsSL https://www.kernel.org | xmllint --html --xpath "(//td[text()='longterm:'])[1]/following-sibling::td[1]/strong/text()" - 2> /dev/null | cut -d. -f-2 )"
         local latest_lts1="linux${latest_lts//"."}"
 
         if ! [[ "$(uname -r)" =~ "$latest_lts" ]] && version-higher $latest_lts $(uname -r); then

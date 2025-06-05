@@ -1,7 +1,7 @@
 INSTALL=1
 
-unalias curl &> /dev/null
-unalias wget &> /dev/null
+unalias curl &>/dev/null
+unalias wget &>/dev/null
 
 if ! test -f checks/check_all.sh; then
     if hash curl &>/dev/null; then
@@ -15,7 +15,7 @@ fi
 
 SCRIPT_DIR=$(get-script-dir)
 
-if ! ( hash zip &>/dev/null || hash unzip &>/dev/null) && test -n "$pac_ins"; then
+if ! (hash zip &>/dev/null || hash unzip &>/dev/null) && test -n "$pac_ins"; then
     printf "${CYAN}zip${normal} and/or ${CYAN}unzip${normal} are not installed \n"
     readyn -p "Install zip and unzip?" nzp_ins
     if [[ $nzp_ins == 'y' ]]; then
@@ -33,7 +33,6 @@ if ! hash curl &>/dev/null && test -n "$pac_ins"; then
     unset ins_curl
 fi
 
-
 if ! hash jq &>/dev/null && test -n "$pac_ins"; then
     printf "${CYAN}jq${normal} is not installed \n"
     readyn -p "Install jq (for querying javascript - used to get latest release(s) from github)?" ins_jq
@@ -47,11 +46,10 @@ if ! hash aria2c &>/dev/null && test -n "$pac_ins"; then
     printf "${CYAN}aria2c${normal} is not installed \n"
     readyn -p "Install aria2c (for fetching files from internet - multithreaded versus singlethreaded wget -> faster downloads)?" ins_ar
     if [[ $ins_ar == 'y' ]]; then
-        eval "${pac_ins} aria2" 
+        eval "${pac_ins} aria2"
     fi
     unset ins_aria2c
 fi
-
 
 if ! hash rlwrap &>/dev/null; then
     if ! test -f $SCRIPT_DIR/checks/check_rlwrap.sh; then
@@ -64,7 +62,6 @@ fi
 #if ! hash rlwrap &> /dev/null; then
 #   read
 #fi
-
 
 printf "${green}If all necessary files are sourced correctly, this text looks green.\nIf not, something went wrong.\n"
 if hash gio &>/dev/null; then
@@ -106,9 +103,9 @@ SCRIPT_DIR=$(get-script-dir)
 
 if ! test -f $HOME/.environment; then
     if ! test -f $SCRIPT_DIR/install_envvars.sh; then
-        tmp=$(mktemp -d) && 
+        tmp=$(mktemp -d) &&
             wget-aria-dir $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_envvars.sh
-            . ./$tmp/install_envvars.sh 'n'
+        . ./$tmp/install_envvars.sh 'n'
     else
         . $SCRIPT_DIR/install_envvars.sh 'n'
     fi
@@ -181,6 +178,17 @@ if [[ $distro_base == 'Debian' ]]; then
             fi
             unset xml_ins
         fi
+
+        if ! hash mainline &>/dev/null; then
+            printf "${CYAN}mainline${normal} is not installed (GUI and cmd tool for managing installation of (newer) kernel versions)\n"
+            readyn -p "Install mainline?" mainl_ins
+            if [[ $mainl_ins == 'y' ]]; then
+                sudo add-apt-repository ppa:cappelikan/ppa 
+                eval "${pac_up}" 
+                eval "yes | ${pac_ins} mainline"
+            fi
+            unset mainl_ins
+        fi 
 
         if ! hash ppa-purge &>/dev/null && test -n "$(apt search ppa-purge 2>/dev/null | awk 'NR>2{print;}')"; then
             printf "${CYAN}ppa-purge${normal} is not installed (cmd tool for disabling installed PPA's)\n"
@@ -345,26 +353,25 @@ if [[ "y" == "$rmp" ]]; then
 fi
 unset rmp
 
-
 # Xcp
 
-if hash cpg &> /dev/null && hash xcp &> /dev/null; then
+if hash cpg &>/dev/null && hash xcp &>/dev/null; then
     cpgi="none all advcpmv xcp"
     cpgp="[None/all/advcpmv/xcp]: "
     color="YELLOW"
 else
-    
+
     printf "${CYAN}cpg/mvg${GREEN} are patches for the default coreutils 'cp (copy) / mv (move)' which gives an added flag to both for a progress bar with '-g/--progress-bar'
     ${CYAN}xcp${GREEN} is an 'extended', rust-written cp that copies faster and also comes with a progress bar${normal}\n"
-    
+
     color="GREEN"
     cpgi="all advcpmv xcp none"
     cpgp="[All/advcpmv/xcp/none]: "
-    if hash xcp &> /dev/null; then
+    if hash xcp &>/dev/null; then
         cpgi="advcpmv xcp  all none"
         cpgp="[Advcpmv/xcp/all/none]: "
-    fi 
-    if hash cpg &> /dev/null; then
+    fi
+    if hash cpg &>/dev/null; then
         cpgi="xcp advcpmv all none"
         cpgp="[Xcp/advcpmv/all/none]: "
     fi
@@ -385,7 +392,6 @@ if [[ "all" == "$cpg" ]] || [[ "xcp" == "$cpg" ]]; then
     fi
 fi
 unset cpg cpgi cpgp color
-
 
 # Rm prompt
 
@@ -413,7 +419,6 @@ if [[ "y" == "$findr" ]]; then
 fi
 unset findr
 
-
 # Ack prompt
 
 readyn -c "! hash ack &> /dev/null" -p "Install ack? (A modern replacement for grep - finds lines in shell output)" ack
@@ -427,18 +432,17 @@ if [[ "y" == "$ack" ]]; then
 fi
 unset ack
 
-
 # Dust, dua and ncdu - Du replacement(s)
 
-if ! (hash dua &> /dev/null && hash dust &> /dev/null && hash ncdu &> /dev/null); then 
+if ! (hash dua &>/dev/null && hash dust &>/dev/null && hash ncdu &>/dev/null); then
     printf "${CYAN}Dua${GREEN} and ${CYAN}dust${GREEN} are modern cli replacements of du\n${CYAN}Ncdu${GREEN} and ${CYAN}'dua interactive'${GREEN} are interactive TUI replacements that also help remove unnecessary files)${normal}\n"
     color='GREEN'
     pre="dua dust ncdu all none"
     prmpt=" [Dua/dust/ncdu/all/none]: "
-    if ! hash dust &> /dev/null && hash dua &> /dev/null; then
+    if ! hash dust &>/dev/null && hash dua &>/dev/null; then
         pre="dust dua ncdu all none"
         prmpt=" [Dust/dua/ncdu/all/none]: "
-    elif hash dua &> /dev/null && hash dust &> /dev/null && ! hash ncdu &> /dev/null; then  
+    elif hash dua &>/dev/null && hash dust &>/dev/null && ! hash ncdu &>/dev/null; then
         pre="ncdu dust dua all none"
         prmpt=" [Ncdu/dua/dust/all/none]: "
     fi
@@ -454,7 +458,7 @@ if [[ "all" == "$dua_dust_ncdu" ]] || [[ "dua" == "$dua_dust_ncdu" ]]; then
     else
         . $SCRIPT_DIR/install_dua_cli.sh
     fi
-fi 
+fi
 if [[ "all" == "$dua_dust_ncdu" ]] || [[ "dust" == "$dua_dust_ncdu" ]]; then
     if ! test -f $SCRIPT_DIR/install_dust.sh; then
         source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_dust.sh)
@@ -471,18 +475,15 @@ if [[ "all" == "$dua_dust_ncdu" ]] || [[ "ncdu" == "$dua_dust_ncdu" ]]; then
 fi
 unset dua_dust_ncdu color pre prmpt
 
-
-
-
 # Duf and Dysk - Df replacement
 
 color='GREEN'
 pre="duf dysk both none"
 prmpt=" [Duf/dysk/both/none]: "
-if ! hash dysk &> /dev/null && hash duf &> /dev/null; then
+if ! hash dysk &>/dev/null && hash duf &>/dev/null; then
     pre="dysk duf both none"
     prmpt=" [Dysk/duf/both/none]: "
-elif hash dysk &> /dev/null && hash duf &> /dev/null; then  
+elif hash dysk &>/dev/null && hash duf &>/dev/null; then
     color='YELLOW'
     pre="none duf dysk both"
     prmpt=" [None/duf/dysk/both]: "
@@ -495,7 +496,7 @@ if [[ "both" == "$duf_dysk" ]] || [[ "duf" == "$duf_dysk" ]]; then
     else
         . $SCRIPT_DIR/install_duf.sh
     fi
-fi 
+fi
 if [[ "both" == "$duf_dysk" ]] || [[ "dysk" == "$duf_dysk" ]]; then
     if ! test -f $SCRIPT_DIR/install_dysk.sh; then
         source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_dysk.sh)

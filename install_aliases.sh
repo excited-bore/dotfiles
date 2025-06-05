@@ -324,7 +324,7 @@ if [[ $ansr == "y" ]]; then
                 prmpt="${CYAN}'dust'${GREEN}"
             elif hash dust &> /dev/null && hash dua &> /dev/null && ! hash ncdu &> /dev/null; then
                 prmpt="or ${CYAN}'dua'${GREEN}, or ${CYAN}'dust'${GREEN}" 
-                prmpt1="${CYAN}'dua'${GREEN}" 
+                prmpt1="${CYAN}'dua interactive'${GREEN}" 
                 choices="dua dust" 
                 prmptp=" [Dua/dust]: " 
             elif hash dust &> /dev/null && hash ncdu &> /dev/null && ! hash dua &> /dev/null; then 
@@ -373,7 +373,7 @@ if [[ $ansr == "y" ]]; then
         fi
         
         unset du_dust_dua choices prmptp 
-        
+       
         if hash dua &> /dev/null || hash ncdu &> /dev/null; then
             readyn -p "Set $prmpt1 as alias for 'du-tui'?" du_dust_dua
             if [[ "$du_dust_dua" == "y" ]]; then
@@ -577,6 +577,36 @@ update_sysm_r() {
 update_sysm() {
     cp  $update_sysm ~/.bash_aliases.d/
     sed -i '/SYSTEM_UPDATED="TRUE"/d' ~/.bash_aliases.d/update-system.sh
+    
+    if [[ $distro_base == 'Debian' ]]; then
+        
+        if ! hash mainline &>/dev/null; then
+            printf "${CYAN}mainline${normal} is not installed (GUI and cmd tool for managing installation of (newer) kernel versions)\n"
+            readyn -p "Install mainline?" mainl_ins
+            if [[ $mainl_ins == 'y' ]]; then
+                if test -z "$(apt list --installed software-properties-common 2>/dev/null | awk 'NR>1{print;}')"; then
+                    sudo apt install -y software-properties-common
+                fi 
+                sudo add-apt-repository ppa:cappelikan/ppa 
+                eval "${pac_up}" 
+                sudo apt install -y mainline
+            fi
+            unset mainl_ins
+        fi
+    fi
+    
+    if ! hash xmllint &>/dev/null; then
+        printf "${CYAN}xmllint${normal} is not installed (cmd tool for lint xml/html - used in helper script for checking on latest LTS kernel)\n"
+        readyn -p "Install xmllint?" xml_ins
+        if [[ $xml_ins == 'y' ]]; then
+            if [[ "$distro_base" == 'Debian' ]]; then
+                sudo apt install -y libxml2-utils
+            elif [[ "$distro_base" == 'Arch' ]]; then
+                sudo pacman -Su --noconfirm xmllint 
+            fi
+        fi
+        unset xml_ins
+    fi
     yes-edit-no -Y "YELLOW" -f update_sysm_r -g "$update_sysm" -p "Install update-system.sh at /root/.bash_aliases.d//?" 
 }
 yes-edit-no -f update_sysm -g "$update_sysm" -p "Install update-system.sh at ~/.bash_aliases.d/? (Global system update function)?"
