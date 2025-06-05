@@ -59,8 +59,7 @@ function version-higher() {
 # https://www.explainxkcd.com/wiki/index.php/1654:_Universal_Install_Script
 
 function update-system() {
-    test -n $YES && unset YES 
-    test -n $NOGUI && unset NOGUI
+    local YES NOGUI KERNEL='lts' SKIPKERNEL='n' 
     while [[ $# -gt 0 ]]; do
         case $1 in
         -h|-\?|--help)  
@@ -106,27 +105,58 @@ function update-system() {
           - npm
           - pipx
           - cargo
-          - gem\n\n
-    -h / --help : Show this help message and exit\n
-    -y / --yes  : Auto update without prompting. \n
-    -s / --skipgui : Skip asking to updating if it requires a GUI prompt (f.ex. snap)\n"
-            exit
-            ;;
+          - gem
+
+    -h / --help  
+
+            Show this help message and exit
+                
+    -y / --yes [ skipkernelcheck ${bold}1(default)${normal}/0 ] 
+               
+            Auto update without prompting. 
+            Optional : Skip newer kernel check if 1
+
+    -k / --kernel [ ${bold}lts(default)${normal}/version-number/stable/mainline ]   
+                           
+            Looks for the latest lts (long term support) tagged kernel version. 
+            Optional: Set tag specifically for specific version / the newest stable or mainline tagged version 
+
+    -s / --skip-gui : 
+             
+             Skip asking to updating if it requires a GUI prompt (f.ex. snap)\n"
+            
+                exit
+                ;;
             -y|--yes)
-              YES="-y"
-              shift # past value
-              ;;
-	    -s|--skipgui)
-	      NOGUI='y'
-	      shift
-	      ;;
+                YES="-y"
+                SKIPKERNEL='y' 
+                if [[ "$2" == '0' ]] || [[ "$2" == '1' ]]; then 
+                    [[ "$2" == '0' ]] && SKIPKERNEL='n' 
+                    shift 2 
+                else
+                    shift 
+                fi
+                ;;
+	    -s|--skip-gui)
+	        NOGUI='y'
+	        shift
+	        ;;
+            -k|--kernel)
+                if ! ([[ "$2" =~ -* ]] || [[ "$2" =~ --* ]]); then
+                    KERNEL="$2"
+                    shift 2
+                else
+                    KERNEL='lts'
+                    shift
+                fi
+                ;;
             -*|--*)
-              echo "Unknown option $1"
-              exit 1
-              ;;
+                echo "Unknown option '$1'"
+                exit 1
+                ;;
             *)
-              break
-              ;;
+                break
+                ;;
           esac
         done
     
@@ -213,13 +243,23 @@ function update-system() {
             eval "${pac_up}"
         fi
         
-        if hash mainline &> /dev/null; then
-            local latest_lts="$(curl -fsSL https://www.kernel.org | xmllint --html --xpath "(//td[text()='longterm:'])[1]/following-sibling::td[1]/strong/text()" - 2> /dev/null)"
+        if ! [[ "$SKIPKERNEL" == 'y' ]] && hash curl &> /dev/null && hash mainline &> /dev/null && hash xmllint &> /dev/null; then
+            local latest_lts prmpt
+            if [[ "$KERNEL" == 'lts' ]] || [[ "$KERNEL" == 'stable' ]] || [[ "$KERNEL" == 'mainline' ]]; then
+                prmpt="Lates $KERNEL linux kernel"
+                [[ "$KERNEL" == 'lts' ]] && prmpt='Latest longterm support linux kernel'
+                latest_lts="$(curl -fsSL https://www.kernel.org | xmllint --html --xpath "(//td[text()='$KERNEL:'])[1]/following-sibling::td[1]/strong/text()" - 2> /dev/null)"
+            else 
+                latest_lts="$KERNEL"
+                prmpt="Kernel version $KERNEL"
+            fi
             #local latest_lts1="linux-image-$latest_lts"
 
-            if ! [[ "$(uname -r)" =~ "$latest_lts" ]] && version-higher $latest_lts $(uname -r); then
+            if ! [[ "$(uname -r)" == "$latest_lts" ]] && ( [[ $latest_lts == $KERNEL ]] || version-higher $latest_lts $(uname -r) ); then
+
                 test -n "$YES" && flag='--auto' || flag=''
-                readyn $flag -p "Lastest longterm support linux kernel not installed. Install ${CYAN}$latest_lts${GREEN} (and ${CYAN}$latest_lts-headers${GREEN})?" latest_ins
+
+                readyn $flag -p "$prmpt not installed. Install ${CYAN}$latest_lts${GREEN} (and ${CYAN}$latest_lts-headers${GREEN})?" latest_ins
                 if [[ $latest_ins == 'y' ]]; then
                     mainline install $latest_lts
                 fi
@@ -313,22 +353,33 @@ function update-system() {
             eval "${pac_up}"
         fi
         
-        local latest_lts="$(curl -fsSL https://www.kernel.org | xmllint --html --xpath "(//td[text()='longterm:'])[1]/following-sibling::td[1]/strong/text()" - 2> /dev/null | cut -d. -f-2 )"
-        local latest_lts1="linux${latest_lts//"."}"
+        #if ! [[ "$SKIPKERNEL" == 'y' ]] && hash curl &> /dev/null && hash xmllint &> /dev/null; then
+        #    local latest_lts latest_lts1 prmpt
+        #    if [[ "$KERNEL" == 'lts' ]] || [[ "$KERNEL" == 'stable' ]] || [[ "$KERNEL" == 'mainline' ]]; then
+        #        prmpt="Latest $KERNEL linux kernel"
+        #        [[ "$KERNEL" == 'lts' ]] && prmpt='Latest longterm support linux kernel'
+        #        latest_lts="$(curl -fsSL https://www.kernel.org | xmllint --html --xpath "(//td[text()='$KERNEL:'])[1]/following-sibling::td[1]/strong/text()" - 2> /dev/null | cut -d. -f-2 )"
+        #        latest_lts1="linux${latest_lts//"."}"
+        #    else 
+        #        latest_lts="$KERNEL"
+        #        prmpt="Kernel version $KERNEL"
+        #    fi
+        #    #local latest_lts1="linux-image-$latest_lts"
 
-        if ! [[ "$(uname -r)" =~ "$latest_lts" ]] && version-higher $latest_lts $(uname -r); then
-            
-            test -n "$YES" && flag='--auto' || flag=''
-            
-            readyn $flag -p "Lastest longterm support linux kernel not installed. Install ${CYAN}$latest_lts1${GREEN} and ${CYAN}$latest_lts1-headers${GREEN}?" latest_ins
-            if [[ $latest_ins == 'y' ]]; then
+        #    if ! [[ "$(uname -r)" == "$latest_lts" ]] && ( [[ $latest_lts == $KERNEL ]] || version-higher $latest_lts $(uname -r) ); then
 
-                test -n "$YES" && flag='--noconfirm' || flag=''
+        #        test -n "$YES" && flag='--auto' || flag=''
 
-                eval "${pac_ins} $flag $latest_lts1 $latest_lts1-headers"
-            fi
-            unset latest_ins
-        fi
+        #        readyn $flag -p "$prmpt not installed. Install ${CYAN}$latest_lts${GREEN} (and ${CYAN}$latest_lts-headers${GREEN})?" latest_ins
+        #        if [[ $latest_ins == 'y' ]]; then
+
+        #            test -n "$YES" && flag='--noconfirm' || flag=''
+
+        #            eval "${pac_ins} $flag $latest_lts1 $latest_lts1-headers"
+        #        fi
+        #        unset latest_ins
+        #    fi
+        #fi
 
         hdrs="$(echo $(uname -r) | cut -d. -f-2)"
         hdrs="linux${hdrs//"."}-headers"

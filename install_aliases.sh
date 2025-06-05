@@ -602,7 +602,7 @@ update_sysm() {
             if [[ "$distro_base" == 'Debian' ]]; then
                 sudo apt install -y libxml2-utils
             elif [[ "$distro_base" == 'Arch' ]]; then
-                sudo pacman -Su --noconfirm xmllint 
+                sudo pacman -Su --noconfirm libxml2 
             fi
         fi
         unset xml_ins
