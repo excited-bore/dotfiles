@@ -9,7 +9,7 @@ fi
 
 ### APT ###
 
-if type apt &> /dev/null; then
+if hash apt &> /dev/null; then
     alias apt-update="sudo apt update" 
     alias apt-upgrade="sudo apt upgrade" 
     alias apt-install="sudo apt install" 
@@ -17,7 +17,7 @@ if type apt &> /dev/null; then
     alias apt-list-installed="sudo apt list --installed" 
     alias apt-full-upgrade="sudo apt update && sudo apt full-upgrade && sudo apt autoremove"
     
-    if type apt-add-repository &> /dev/null; then
+    if hash apt-add-repository &> /dev/null; then
         # https://askubuntu.com/questions/148932/how-can-i-get-a-list-of-all-repositories-and-ppas-from-the-command-line-into-an 
         # Script to get all the PPAs which are installed on a system
 	
@@ -175,7 +175,7 @@ if type apt &> /dev/null; then
     fi
     
 
-     if type fzf &> /dev/null; then
+     if hash fzf &> /dev/null; then
 
         function apt-fzf-install(){ 
             nstall='' 
@@ -205,7 +205,7 @@ fi
 
 ### PACMAN ###
 
-if type pacman &> /dev/null; then
+if hash pacman &> /dev/null; then
     alias pacman-update="sudo pacman -Su"
     alias pacman-install="sudo pacman -S"
     alias pacman-search="pacman -Ss"
@@ -215,12 +215,6 @@ if type pacman &> /dev/null; then
     alias pacman-list-installed-native="pacman -Qn" 
     alias pacman-refresh-update="sudo pacman -Syu"
     alias pacman-forcerefresh-update="sudo pacman -Syyu"
-    # pacman-mirrors -f:
-    #      -f, --fasttrack [NUMBER]
-    #          Generates a random mirrorlist for the users current selected branch, mirrors are randomly selected from the users current mirror pool, either a custom pool or the default pool, the randomly selected
-    #          mirrors are ranked by their current access time.  The higher number the higher possibility of a fast mirror.  If a number is given the resulting mirrorlist contains that number of servers.
-    alias pacman-create-default-mirrors-and-forcerefresh="sudo pacman-mirrors -f 5 && sudo pacman -Syy"
-    alias pacman-create-default-mirrors-and-refresh="sudo pacman-mirrors -f 5 && sudo pacman -Sy"
     alias pacman-list-files-package="pacman -Ql"
     alias pacman-list-AUR-installed="pacman -Qm"
     alias pacman-rm-lock="sudo rm /var/lib/pacman/db.lck"
@@ -229,7 +223,9 @@ if type pacman &> /dev/null; then
     alias pacman-clean-cache="sudo pacman -Sc" 
     
 
-    if type fzf &> /dev/null; then
+    if hash fzf &> /dev/null; then
+
+         
 
         function pacman-fzf-install(){ 
             if ! test -z "$@"; then
@@ -344,17 +340,42 @@ if type pacman &> /dev/null; then
     #fi
    #sed -n -e 's/^.*stalled: //p' 
 
-    ### PAMAC ###
 
     # For manjaro: consider pacui
     # https://forum.manjaro.org/t/pacui-bash-script-providing-advanced-pacman-and-yay-pikaur-aurman-pakku-trizen-pacaur-pamac-cli-functionality-in-a-simple-ui/561
     #(don't run pamac with sudo)
 
-    if type pamac &> /dev/null; then
+    ### PACMAN-MIRRORS ###
+     
+    if hash pacman-mirrors &> /dev/null; then
+        
+        # https://wiki.manjaro.org/index.php?title=Pacman-mirrors 
+
+        alias pacman-mirrors-list-available-countries="pacman-mirrors --country-list" 
+        alias pacman-mirrors-list-configured-countries="pacman-mirrors --country-config" 
+
+        alias pacman-mirrors-get-branch="pacman-mirrors --get-branch" 
+        
+        # pacman-mirrors -f:
+        #      -f, --fasttrack [NUMBER]
+        #          Generates a random mirrorlist for the users current selected branch, mirrors are randomly selected from the users current mirror pool, either a custom pool or the default pool, the randomly selected
+        #          mirrors are ranked by their current access time.  The higher number the higher possibility of a fast mirror.  If a number is given the resulting mirrorlist contains that number of servers. 
+        alias pacman-mirrors-gen-list-fastest-mirrors="sudo pacman-mirrors --fasttrack && sudo pacman -Syu"
+        
+        alias pacman-mirrors-gen-list-country-based-mirrors="sudo pacman-mirrors --geoip && sudo pacman -Syu" 
+        alias pacman-mirrors-gen-list-continent-based-mirrors="sudo pacman-mirrors --continent && sudo pacman -Syu"
+        alias pacman-mirrors-gen-list-GUI="sudo pacman-mirrors --interactive --default && sudo pacman -Syu"
+        
+        alias pacman-mirrors-full-reset-to-default="sudo pacman-mirrors --country all --api --protocol all -set-branch stable && sudo pacman -Syu" 
+    fi
+    
+    ### PAMAC ###
+
+    if hash pamac &> /dev/null; then
         alias pamac-update="pamac update"
-        alias pamac-update-yes="yes | pamac update"
+        alias pamac-update-yes="pamac update --no-confirm"
         alias pamac-upgrade="pamac upgrade"
-        alias pamac-upgrade-yes="yes | pamac upgrade"
+        alias pamac-upgrade-yes="pamac upgrade --no-confirm"
         alias pamac-list-installed="pamac list --installed" 
         alias pamac-list-installed-AUR="pamac list --foreign" 
         alias pamac-list-groups="pamac list --groups" 
@@ -474,10 +495,10 @@ if type pacman &> /dev/null; then
     ### YAY ###
 
 
-    if type yay &> /dev/null; then
+    if hash yay &> /dev/null; then
         alias yay-update="yay -Su"
         alias yay-install="yay -Su"
-        alias yay-update-yes="yes | yay -Su"
+        alias yay-update-yes="yay -Su --noconfirm"
         alias yay-remove="yay -R"
         alias yay-list-installed="yay -Q" 
         #alias yay-list-groups="yay -Ssq" 

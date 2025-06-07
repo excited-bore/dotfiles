@@ -1,5 +1,3 @@
-#!/bin/bash
-
 if ! type reade &> /dev/null && test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh; then
     . ~/.bash_aliases.d/00-rlwrap_scripts.sh
 fi 
@@ -246,7 +244,7 @@ function update-system() {
         if ! [[ "$SKIPKERNEL" == 'y' ]] && hash curl &> /dev/null && hash mainline &> /dev/null && hash xmllint &> /dev/null; then
             local latest_lts prmpt
             if [[ "$KERNEL" == 'lts' ]] || [[ "$KERNEL" == 'stable' ]] || [[ "$KERNEL" == 'mainline' ]]; then
-                prmpt="Lates $KERNEL linux kernel"
+                prmpt="Latest $KERNEL linux kernel"
                 [[ "$KERNEL" == 'lts' ]] && prmpt='Latest longterm support linux kernel'
                 latest_lts="$(curl -fsSL https://www.kernel.org | xmllint --html --xpath "(//td[text()='$KERNEL:'])[1]/following-sibling::td[1]/strong/text()" - 2> /dev/null)"
             else 
@@ -348,38 +346,40 @@ function update-system() {
         fi 
         
         if test -n "$YES"; then 
-            eval "${pac_up} --noconfirm"
+            sudo pacman -Su --noconfirm
         else 
-            eval "${pac_up}"
+            sudo pacman -Su
         fi
         
-        #if ! [[ "$SKIPKERNEL" == 'y' ]] && hash curl &> /dev/null && hash xmllint &> /dev/null; then
-        #    local latest_lts latest_lts1 prmpt
-        #    if [[ "$KERNEL" == 'lts' ]] || [[ "$KERNEL" == 'stable' ]] || [[ "$KERNEL" == 'mainline' ]]; then
-        #        prmpt="Latest $KERNEL linux kernel"
-        #        [[ "$KERNEL" == 'lts' ]] && prmpt='Latest longterm support linux kernel'
-        #        latest_lts="$(curl -fsSL https://www.kernel.org | xmllint --html --xpath "(//td[text()='$KERNEL:'])[1]/following-sibling::td[1]/strong/text()" - 2> /dev/null | cut -d. -f-2 )"
-        #        latest_lts1="linux${latest_lts//"."}"
-        #    else 
-        #        latest_lts="$KERNEL"
-        #        prmpt="Kernel version $KERNEL"
-        #    fi
-        #    #local latest_lts1="linux-image-$latest_lts"
+        if ! [[ "$SKIPKERNEL" == 'y' ]] && hash curl &> /dev/null && hash xmllint &> /dev/null; then 
+            local latest_lts latest_lts1 prmpt
+            if [[ "$KERNEL" == 'lts' ]] || [[ "$KERNEL" == 'stable' ]] || [[ "$KERNEL" == 'mainline' ]]; then
+                prmpt="Latest $KERNEL linux kernel"
+                [[ "$KERNEL" == 'lts' ]] && prmpt='Latest longterm support linux kernel'
+                # https://www.kernel.org/feeds/kdist.xml 
+                latest_lts="$(curl -fsSL https://www.kernel.org | xmllint --html --xpath "(//td[text()='$KERNEL:'])[1]/following-sibling::td[1]/strong/text()" - 2> /dev/null | cut -d. -f-2 )"
+                #latest_lts="$(curl -fsSL https://www.kernel.org/feeds/kdist.xml | xmllint --xpath '//title[contains(., "longterm")][1]/text()' - | awk 'NR==1{print $1;}' | cut -d: -f-1)"
+                latest_lts1="linux${latest_lts//"."}"
+            else 
+                latest_lts="$KERNEL"
+                prmpt="Kernel version $KERNEL"
+            fi
+            #local latest_lts1="linux-image-$latest_lts"
 
-        #    if ! [[ "$(uname -r)" == "$latest_lts" ]] && ( [[ $latest_lts == $KERNEL ]] || version-higher $latest_lts $(uname -r) ); then
+            if ! [[ "$(uname -r)" == "$latest_lts" ]] && ( [[ $latest_lts == $KERNEL ]] || version-higher $latest_lts $(uname -r) ); then
 
-        #        test -n "$YES" && flag='--auto' || flag=''
+                test -n "$YES" && flag='--auto' || flag=''
 
-        #        readyn $flag -p "$prmpt not installed. Install ${CYAN}$latest_lts${GREEN} (and ${CYAN}$latest_lts-headers${GREEN})?" latest_ins
-        #        if [[ $latest_ins == 'y' ]]; then
+                readyn $flag -p "$prmpt not installed. Install ${CYAN}$latest_lts${GREEN} (and ${CYAN}$latest_lts-headers${GREEN})?" latest_ins
+                if [[ $latest_ins == 'y' ]]; then
 
-        #            test -n "$YES" && flag='--noconfirm' || flag=''
+                    test -n "$YES" && flag='--noconfirm' || flag=''
 
-        #            eval "${pac_ins} $flag $latest_lts1 $latest_lts1-headers"
-        #        fi
-        #        unset latest_ins
-        #    fi
-        #fi
+                    eval "${pac_ins} $flag $latest_lts1 $latest_lts1-headers"
+                fi
+                unset latest_ins
+            fi
+        fi
 
         hdrs="$(echo $(uname -r) | cut -d. -f-2)"
         hdrs="linux${hdrs//"."}-headers"
