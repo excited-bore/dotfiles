@@ -194,6 +194,7 @@ function readyn(){
     local othr='n' 
     local prmpty="${underline_on}Y${underline_off}es"
     local prmptn="${underline_on}n${underline_off}o"
+    local prmpt1=''
     local ycolor='GREEN' 
     local ncolor='YELLOW' 
     local color="$ycolor" 
@@ -293,10 +294,8 @@ function readyn(){
         esac
     done 
 
-    shift $((OPTIND-1)) 
+    shift $((OPTIND-1))  
 
-    local prmpt1 color pre othr 
-    
     if test -z "$preff" || [[ "$preff" == 'y' ]]; then
         prmpt1=" [$prmpty/$prmptn]: "
         color="$ycolor"

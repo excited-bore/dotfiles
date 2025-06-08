@@ -29,4 +29,4 @@ if ! type ast-grep &>/dev/null; then
     fi
 fi
 
-ast-grep --help | $PAGER
+eval "ast-grep --help | $PAGER"

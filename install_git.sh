@@ -403,7 +403,7 @@ function git_hl() {
 
             # Then show changes
             printf "${GREEN}'$HOME/.config/lazygit/config.yml'${normal}\n"
-            cat -b ~/.config/lazygit/config.yml | $PAGER
+            eval "cat -b ~/.config/lazygit/config.yml | $PAGER"
         fi
     fi
 

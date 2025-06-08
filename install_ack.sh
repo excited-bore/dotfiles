@@ -26,5 +26,4 @@ if ! type ack &> /dev/null; then
         unset b 
     fi
 fi
-test -z "$PAGER" && PAGER="less -Q --no-vbell --quit-if-one-screen -N --use-color"
-hash ack &> /dev/null && ack --help | $PAGER
+hash ack &> /dev/null && eval "ack --help | $PAGER"

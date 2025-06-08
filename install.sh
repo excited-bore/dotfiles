@@ -1,5 +1,4 @@
 INSTALL=1
-
 unalias curl &>/dev/null
 unalias wget &>/dev/null
 
@@ -1049,14 +1048,14 @@ readyn -p 'List all aliases?' allis
 if [[ "$allis" == 'y' ]]; then
     [ -n "$BASH_VERSION" ] && set -o posix
     [ -n "$ZSH_VERSION" ] && set -o posixaliases
-    alias | $PAGER
+    eval "alias | $PAGER"
 fi
 
 readyn -p 'List all functions?' fncts
 if [[ "$fncts" == 'y' ]]; then
     [ -n "$BASH_VERSION" ] && set -o posix
     [ -n "$ZSH_VERSION" ] && set -o posixaliases
-    declare -f | $PAGER
+    eval "declare -f | $PAGER"
 fi
 
 unset fncts allis

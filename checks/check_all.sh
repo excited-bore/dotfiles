@@ -210,7 +210,7 @@ fi
 
 # Less does raw control chars, use color and linenumbers, no sounds/bell and doesn't trigger your epilepsy
 alias less='less -R --use-color --LINE-NUMBERS --quit-if-one-screen -Q --no-vbell'
-
+test -z "$PAGER" && PAGER="less"
 
 # https://stackoverflow.com/questions/4023830/how-to-compare-two-strings-in-dot-separated-version-format-in-bash
 

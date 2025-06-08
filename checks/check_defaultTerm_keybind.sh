@@ -18,20 +18,28 @@ function list-binds-xfce4(){
     local usedkeysp1="$(xfconf-query -c xfce4-keyboard-shortcuts -p /commands/custom -l -v | sed 's|/commands/custom/||g; s|<Primary>|<Control>|g; s|<Super>|<Windowkey>|g; s|><|-|g; s|<||g; s|>|-|g;' | sort -V)" 
     
     (printf "${GREEN}Known ${CYAN}xfce4${GREEN} keybinds: \n${normal}"
-    for i in $(seq 2); do
-        local var1; 
-        if [[ $i == 1 ]]; then
+    local var1; 
+    for j in $(seq 2); do
+        if [[ $j == 1 ]]; then
             var1=($(echo "$usedkeysp" | awk '{print $1}'))
             printf "\n${GREEN}Window Manager shortcuts: \n\n${normal}"
         else 
             usedkeysp=$usedkeysp1 
-            var1=($(echo "$usedkeysp1" | awk '{print $1}'))
+            var1=($(echo "$usedkeysp1" | awk '{print $1}' )) 
             printf "\n${GREEN}Application Shortcuts: \n\n${normal}"
         fi
-        for i in ${!var1[@]}; do
-            printf "%-35s %-35s\n" "${green}${var1[$i]}" "${cyan}$(awk 'NR=='$((i+1))'{$1="";print;}' <<< $usedkeysp | sed 's/^ //')${normal}"; 
-        done
-    done) | $PAGER
+        if test -n "$BASH_VERSION"; then
+            for i in ${!var1[@]}; do
+                printf "%-35s %-35s\n" "${green}${var1[$i]}" "${cyan}$(awk 'NR=='$((i+1))'{$1="";print;}' <<< $usedkeysp | sed 's/^ //')${normal}"; 
+            done
+        elif test -n "$ZSH_VERSION"; then
+            local i=0
+            for k in ${var1[@]}; do
+                printf "%-35s %-35s\n" "${green}${var1[$i]}" "${cyan}$(awk 'NR=='$((i+1))'{$1="";print;}' <<< $usedkeysp | sed 's/^ //')${normal}"; 
+                i=$((i+1))
+            done
+        fi
+    done) | eval "$PAGER"
 }
 
 if [[ $DESKTOP_SESSION == 'xfce' ]]; then

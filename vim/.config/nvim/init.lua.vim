@@ -325,7 +325,7 @@ require("lazy").setup({
                         "cssls",
                         "jsonls",
                         "pyright",
-                        "bashls",
+                       -- "bashls",
                        -- "tailwindcss",
                        -- "tsserver",
                        -- "eslint",

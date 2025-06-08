@@ -123,7 +123,7 @@ function update-system() {
              
              Skip asking to updating if it requires a GUI prompt (f.ex. snap)\n"
             
-                exit
+                exit 0 
                 ;;
             -y|--yes)
                 YES="-y"
