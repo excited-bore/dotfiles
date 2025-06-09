@@ -122,7 +122,7 @@ fi
 alias get-script-dir='cd "$( dirname "$-1" )" && pwd'
 
 ([[ "$(type unalias)" =~ 'aliased' ]] || [[ "$(type unalias)" =~ 'function' ]]) && 
-    alias unalias="command unalias"
+    alias unalias="builtin unalias"
 
 # Make sure cp copies forceably (without asking confirmation when overwriting) and verbosely
 
@@ -178,7 +178,7 @@ fi
 
 if hash aria2c &>/dev/null; then 
     if test -z "$WGET_ARIA"; then
-        command unalias wget-aria 
+        builtin unalias wget-aria 
         function wget-aria(){
             readyn -p "Use 'aria2c' in favour of 'wget' for faster downloads?" wget_ar
             if [[ $wget_ar == 'y' ]]; then

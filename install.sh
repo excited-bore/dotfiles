@@ -274,7 +274,7 @@ fi
 echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for polkit related files in '/etc/polkit', '/etc/polkit-1/rules.d/' and '/etc/polkit-1/localauthority.conf.d/'"
 
 if ! sudo test -f /etc/polkit/49-nopasswd_global.pkla && ! sudo test -f /etc/polkit-1/localauthority.conf.d/90-nopasswd_global.conf && ! sudo test -f /etc/polkit-1/rules.d/90-nopasswd_global.rules; then
-    readyn -Y "YELLOW" -p "Install polkit files for automatic authentication for passwords? " plkit
+    readyn -Y "YELLOW" -p "Install polkit files for automatic authentication for passwords?" plkit
     if [[ "y" == "$plkit" ]]; then
         if ! test -f $SCRIPT_DIR/install_polkit_wheel.sh; then
             source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_polkit_wheel.sh)

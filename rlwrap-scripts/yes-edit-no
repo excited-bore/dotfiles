@@ -270,6 +270,7 @@ function yes-edit-no() {
         local ycolor="GREEN" 
         local ncolor="ORANGE" 
         local ecolor="YELLOW" 
+        local color=''
         local first=''
         #local othercmd=''
         #local other=''
@@ -572,10 +573,10 @@ function yes-edit-no() {
                 #local o op 
                 #! [ -z "$oflag" ] && o="${choices[4]}" && op="${choicesp[4]}" 
                 #
-                #if [ -n "$yflag" ]; then
-                #    i=1 
-                #    color="$ycolor"
-                #fi 
+                if [ -n "$yflag" ]; then
+                    i=1 
+                    color="$ycolor"
+                fi 
                 if [ -n "$nflag" ] || (test -n "$condition" && ! eval "$condition"); then 
                     nflag='n'
                     color="$ncolor"

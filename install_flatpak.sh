@@ -33,7 +33,7 @@ if ! type flatpak &> /dev/null; then
     fi
 fi
 
-if type flatpak &> /dev/null && test -z "$FLATPAK"; then
+if hash flatpak &> /dev/null && test -z "$FLATPAK"; then
     readyn -p "Add flatpak dirs to path? (XDG_DATA_DIRS)" flpkvrs 
     if [[ "$flpkvrs" == "y" ]]; then
         if grep -q "FLATPAK" $ENV; then
@@ -63,8 +63,8 @@ if ! test -f ~/.bash_aliases.d/flatpacks.sh; then
         if test -f flatpak/.bash_aliases.d/flatpacks.sh; then
             file=flatpak/.bash_aliases.d/flatpacks.sh
         else
-            dir1="$(mktemp -d -t tmux-XXXXXXXXXX)"
-            curl -s -o $file1/flatpacks.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/flatpak/.bash_aliases.d/flatpacks.sh
+            dir1="$(mktemp -d -t flatpak-XXXXXXXXXX)"
+            curl -o $file1/flatpacks.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/flatpak/.bash_aliases.d/flatpacks.sh
             file=$dir1/flatpacks.sh
         fi
          
@@ -74,7 +74,7 @@ if ! test -f ~/.bash_aliases.d/flatpacks.sh; then
         fi
     fi    
 fi
-unset pam file
+unset pam file dir1
 
 if ! echo $(flatpak list --columns=name) | grep -q "Flatseal"; then
     readyn -p "Install GUI for configuring flatpak permissions - flatseal?" fltseal
