@@ -434,21 +434,21 @@ unset ack
 # Dust, dua and ncdu - Du replacement(s)
 
 if ! (hash dua &>/dev/null && hash dust &>/dev/null && hash ncdu &>/dev/null); then
-    printf "${CYAN}Dua${GREEN} and ${CYAN}dust${GREEN} are modern cli replacements of du\n${CYAN}Ncdu${GREEN} and ${CYAN}'dua interactive'${GREEN} are interactive TUI replacements that also help remove unnecessary files)${normal}\n"
+    printf "${CYAN}'Dua'${GREEN} and ${CYAN}'dust'${GREEN} are modern cli replacements of du\n${CYAN}'Ncdu'${GREEN} and ${CYAN}'dua interactive'${GREEN} are interactive TUI replacements that also help remove unnecessary files${normal}\n"
     color='GREEN'
     pre="dua dust ncdu all none"
-    prmpt=" [Dua/dust/ncdu/all/none]: "
+    prmpt="[Dua/dust/ncdu/all/none]: "
     if ! hash dust &>/dev/null && hash dua &>/dev/null; then
         pre="dust dua ncdu all none"
-        prmpt=" [Dust/dua/ncdu/all/none]: "
+        prmpt="[Dust/dua/ncdu/all/none]: "
     elif hash dua &>/dev/null && hash dust &>/dev/null && ! hash ncdu &>/dev/null; then
         pre="ncdu dust dua all none"
-        prmpt=" [Ncdu/dua/dust/all/none]: "
+        prmpt="[Ncdu/dua/dust/all/none]: "
     fi
 else
     color='YELLOW'
     pre="none dua dust ncdu all"
-    prmpt=" [None/dua/dust/ncdu/all]: "
+    prmpt="[None/dua/dust/ncdu/all]: "
 fi
 reade -Q "$color" -i "$pre" -p "Install dua, dust, ncdu or all? $prmpt" dua_dust_ncdu
 if [[ "all" == "$dua_dust_ncdu" ]] || [[ "dua" == "$dua_dust_ncdu" ]]; then
@@ -488,7 +488,7 @@ elif hash dysk &>/dev/null && hash duf &>/dev/null; then
     prmpt=" [None/duf/dysk/both]: "
 fi
 
-reade -Q "$color" -i "$pre" -p "Install duf, dysk or both? (Both are modern replacements for df - tools list hard drive disk space)$prmpt" duf_dysk
+reade -Q "$color" -i "$pre" -p "Install ${CYAN}duf${GREEN}, ${CYAN}dysk${GREEN} or both? (Both are modern replacements for df - tools list hard drive disk space)$prmpt" duf_dysk
 if [[ "both" == "$duf_dysk" ]] || [[ "duf" == "$duf_dysk" ]]; then
     if ! test -f $SCRIPT_DIR/install_duf.sh; then
         source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_duf.sh)

@@ -15,11 +15,6 @@ fi
 
 # Environment variables
 
-#if ! test -z $1; then
-#envvars=$"1
-#else
-#fi
-
 environment-variables_r() {
     sudo cp $pathvr /root/.environment
     if ! sudo test -f /root/.profile; then
@@ -72,7 +67,7 @@ environment-variables_r() {
         
         if test -f /root/.zsh_profile && ! sudo grep -q "/root/.environment" /root/.zsh_profile; then
             printf "${GREEN}Just source $HOME/.environment in $HOME/.zsh_profile\n${normal}" 
-            reade -Q GREEN -i 'source delete' -p "Or copy everything from $HOME/.zsh_profile into $HOME/.profile and also delete $HOME/.zsh_profile? [Source/delete]: " zprof_r
+            reade -Q "GREEN" -i 'source delete' -p "Or copy everything from $HOME/.zsh_profile into $HOME/.profile and also delete $HOME/.zsh_profile? [Source/delete]: " zprof_r
 
             if [[ $zprof_r == 'source' ]]; then
                 if ! sudo grep -q "/root/.environment" /root/.zsh_profile; then 
@@ -350,40 +345,50 @@ elif [[ "$envvars" == "y" ]]; then
         # Uncomment export PAGER=
         sed 's/^#export PAGER=/export PAGER=/' -i $pathvr
 
-        pagers="more"
-        prmpt="${green} \tless = Default pager - Basic, archaic but very customizable\n\tmore = Preinstalled other pager - leaves text by default, less customizable (ironically)\n"
-        if type pg &>/dev/null; then
-            pagers="$pagers pg"
-            prmpt="$prmpt \tpg = Archaic and unintuitive like vi\n"
+        prmpt=""
+        pagers=""
+        
+        if hash pg &>/dev/null; then
+            pagers="pg $pagers"
+            prmpt="\tpg = Archaic and unintuitive pager like vi is as an editor\n$prmpt"
+        fi
+        if hash more &>/dev/null; then
+            pagers="more $pagers"
+            prmpt="\tmore = Archaic pager - leaves text by default, less customizable (ironically)\n$prmpt"
         fi
         if type most &>/dev/null; then
-            pagers="$pagers most"
-            prmpt="$prmpt \tmost = Installed pager that is very customizable\n"
+            pagers="most $pagers"
+            prmpt="\tmost = Installed pager that is very customizable\n$prmpt"
         fi
         if type bat &>/dev/null; then
-            pagers="$pagers bat"
-            prmpt="$prmpt \tbat = Cat clone / pager wrapper with syntax highlighting\n"
-            sed -i 's/#export BAT=/export BAT=/' $pathvr
-        fi
-        if type moar &>/dev/null; then
-            pagers="$pagers moar"
-            prmpt="$prmpt \tmoar = Installed pager with an awesome default configuration\n"
-            sed -i 's/#export MOAR=/export MOAR=/' $pathvr
+            pagers="bat $pagers"
+            prmpt="\tbat = Cat clone / pager wrapper with syntax highlighting\n$prmpt"
         fi
         if type nvimpager &>/dev/null; then
-            pagers="$pagers nvimpager"
-            prmpt="$prmpt \tnvimpager = The pager that acts and feels like Neovim. Did you guess?\n"
+            pagers="nvimpager $pagers"
+            prmpt="\tnvimpager = The pager that acts and feels like Neovim. Did you guess?\n$prmpt"
         fi
-        printf "$prmpt${normal}"
+        if hash less &>/dev/null; then
+            pagers="less $pagers"
+            prmpt="\tless = Default pager - Basic, archaic but very customizable\n$prmpt"
+        fi
+        if type moar &>/dev/null; then
+            pagers="moar $pagers"
+            prmpt="\tmoar = Installed pager with an awesome default configuration\n$prmpt"
+        fi
+        printf "${green}$prmpt${normal}"
 
-        reade -Q "GREEN" -i "less $pagers" -p "PAGER(less default)=" pgr2
+        reade -Q "GREEN" -i "$pagers" -p "PAGER(less default)=" pgr2
+
 
         pgr2="$(where_cmd $pgr2)"
         sed -i 's|export PAGER=.*|export PAGER='"$pgr2"'|' $pathvr
+        
+        unset pgr2 
 
         # Set less options that system supports
         sed -i 's|#export LESS=|export LESS=|g' $pathvr
-        if type man &>/dev/null; then
+        if hash man &>/dev/null; then
             lss=$(cat $pathvr | grep 'export LESS="*"' | sed 's|export LESS="\(.*\)"|\1|g')
             lss_n=""
             for opt in ${lss}; do
@@ -398,20 +403,44 @@ elif [[ "$envvars" == "y" ]]; then
         #sed -i 's/#export LESSEDIT=/export LESSEDIT=/' .environment
 
         # Set moar options
-        sed -i 's/#export MOAR=/export MOAR=/' $pathvr
-        if [[ "$(basename ""$pgr2"")" == "bat" ]] && type moar &>/dev/null || [[ "$(basename ""$pgr2"")" == "bat" ]] && type nvimpager &>/dev/null; then
+        hash moar &> /dev/null && 
+            sed -i 's/#export MOAR=/export MOAR=/' $pathvr
+      
+        # Set bat options
+        hash bat &> /dev/null && 
+            sed -i 's/#export BAT=/export BAT=/' $pathvr
+    
+        if [[ "$(basename ""$pgr2"")" == "bat" ]] && hash moar &>/dev/null || [[ "$(basename ""$pgr2"")" == "bat" ]] && hash nvimpager &>/dev/null; then
+            prmpt=""
             pagers=""
-            prmpt="${cyan}Bat is a pager wrapper that defaults to less except if BAT_PAGER is set\n\t${green}less = Default pager - Basic, archaic but very customizable\n"
-            if type moar &>/dev/null; then
-                pagers="$pagers moar"
-                prmpt="$prmpt \tmoar = Custom pager with an awesome default configuration\n"
+            
+            if hash pg &>/dev/null; then
+                pagers="pg $pagers"
+                prmpt="\tpg = Archaic and unintuitive pager like vi is as an editor\n$prmpt"
+            fi
+            if hash more &>/dev/null; then
+                pagers="more $pagers"
+                prmpt="\tmore = Archaic pager - leaves text by default, less customizable (ironically)\n$prmpt"
+            fi
+            if type most &>/dev/null; then
+                pagers="most $pagers"
+                prmpt="\tmost = Installed pager that is very customizable\n$prmpt"
             fi
             if type nvimpager &>/dev/null; then
-                pagers="$pagers nvimpager"
-                prmpt="$prmpt \tnvimpager = The pager that acts and feels like Neovim. Did you guess?\n"
+                pagers="nvimpager $pagers"
+                prmpt="\tnvimpager = The pager that acts and feels like Neovim. Did you guess?\n$prmpt"
             fi
-            printf "$prmpt${normal}"
-            reade -Q "GREEN" -i "less $pagers" -p "BAT_PAGER(less default)=" pgr2
+            if hash less &>/dev/null; then
+                pagers="less $pagers"
+                prmpt="\tless = Default pager - Basic, archaic but very customizable\n$prmpt"
+            fi
+            if type moar &>/dev/null; then
+                pagers="moar $pagers"
+                prmpt="\tmoar = Installed pager with an awesome default configuration\n$prmpt"
+            fi
+            printf "${green}$prmpt${normal}"
+            
+            reade -Q "GREEN" -i "$pagers" -p "BAT_PAGER(less default)=" pgr2
             pgr2="$(where_cmd $pgr2)"
             [[ "$pgr2" =~ "less" ]] && pgr2="$pgr2 \$LESS --line-numbers"
             [[ "$pgr2" =~ "moar" ]] && pgr2="$pgr2 \$MOAR --no-linenumbers"
@@ -419,7 +448,8 @@ elif [[ "$envvars" == "y" ]]; then
             sed -i "s|^export BAT_PAGER=.*|export BAT_PAGER=\"$pgr2\"|" $pathvr
         fi
     fi
-    unset prmpt
+    
+    unset pagers prmpt
 
     if type nvim &>/dev/null; then
         readyn -p "Set Neovim as MANPAGER?" manvim
@@ -432,65 +462,67 @@ elif [[ "$envvars" == "y" ]]; then
     if [[ "$edtvsl" == "y" ]]; then
         editors="" 
         prmpt="${green}" 
-        if type vi &>/dev/null; then
+        if hash vi &>/dev/null; then
             editors="vi $editors"
             prmpt="$prmpt \tvi = Archaic and non-userfriendly editor\n"
         fi
-        if type nano &>/dev/null; then
+        if hash nano &>/dev/null; then
             editors="nano $editors"
             prmpt="$prmpt \tnano = Default editor - Basic, but userfriendly\n"
         fi
-        if type edit &>/dev/null; then
+        if hash edit &>/dev/null; then
             editors="edit $editors"
             prmpt="$prmpt \tedit = One of unix default editors = Archaic editor - not recommended\n"
         fi
-        if type micro &>/dev/null; then
+        if hash micro &>/dev/null; then
             editors="micro $editors"
             prmpt="$prmpt \tMicro = Relatively good out-of-the-box editor - Decent keybindings, yet no customizations\n"
         fi
-        if type ne &>/dev/null; then
+        if hash ne &>/dev/null; then
             editors="ne $editors"
             prmpt="$prmpt \tNice editor = Relatively good out-of-the-box editor - Decent keybindings, yet no customizations\n"
         fi
 
-        if type vim &>/dev/null; then
+        if hash vim &>/dev/null; then
             editors="vim $editors"
             prmpt="$prmpt \tvim = The one and only true modal editor - Not userfriendly, but many features (maybe even too many) and greatly customizable\n"
-            sed -i "s|#export MYVIMRC=|export MYVIMRC=|g" $pathvr
-            sed -i "s|#export MYGVIMRC=|export MYGVIMRC=|g" $pathvr
+            #sed -i "s|#export MYVIMRC=|export MYVIMRC=|g" $pathvr
+            #sed -i "s|#export MYGVIMRC=|export MYGVIMRC=|g" $pathvr
         fi
-        if type nvim &>/dev/null; then
+        if hash nvim &>/dev/null; then
             editors="nvim $editors"
             prmpt="$prmpt \tnvim (neovim) = A better vim? - Faster and less buggy then regular vim, even a little userfriendlier\n"
-            sed -i "s|#export MYVIMRC=|export MYVIMRC=|g" $pathvr
-            sed -i "s|#export MYGVIMRC=|export MYGVIMRC=|g" $pathvr
+            #sed -i "s|#export MYVIMRC=|export MYVIMRC=|g" $pathvr
+            #sed -i "s|#export MYGVIMRC=|export MYGVIMRC=|g" $pathvr
         fi
-        if type emacs &>/dev/null; then
+        if hash emacs &>/dev/null; then
             editors="emacs $editors"
             prmpt="$prmpt \tEmacs = One of the oldest and versatile editors - Modal and featurerich, but overwhelming as well\n"
         fi
-        if type code &>/dev/null; then
+        if hash code &>/dev/null; then
             editors="$editors code"
             prmpt="$prmpt \tCode = Visual Studio Code - Modern standard for most when it comes to text editors (Warning: does not work well when paired with sudo)\n"
         fi
+       
         printf "$prmpt${normal}"
+        
         touch $TMPDIR/editor-outpt
         # Redirect output to file in subshell (mimeopen gives output but also starts read. This cancels read). In tmp because that gets cleaned up
         (echo "" | mimeopen -a editor-check.sh &>$TMPDIR/editor-outpt)
-        editors1="$(cat $TMPDIR/editor-outpt | awk 'NR > 2' | awk '{if (prev_1_line) print prev_1_line; prev_1_line=prev_line} {prev_line=$NF}' | sed 's|[()]||g' | uniq) $editors"
-        editors1="$(echo $editors1 | tr ' ' '\n' | sort -u)"
+        editors1="$(cat $TMPDIR/editor-outpt | awk 'NR > 2' | awk '{if (prev_1_line) print prev_1_line; prev_1_line=prev_line} {prev_line=$NF}' | sed 's|[()]||g' | tr '\n' ' ' | uniq)$editors"
+        editors1="$(echo $editors1 | tr ' ' '\n' | sort -u | xargs | tr ' ' '\n')"
         prmpt="Found editors using ${CYAN}mimeopen${normal} (non definitive list): ${GREEN}\n"
         while IFS= read -r i; do            
             prmpt="$prmpt\t - $i\n"
         done <<< $editors1
-        
+        printf "$prmpt${normal}"
+       
+        editors="$(echo $editors1 | tr '\n' ' ')"
         frst="$(echo $editors | awk '{print $1}')"
         editors_p="$(echo $editors | sed "s/\<$frst\> //g")"
-        #frst="$(echo $compedit | awk '{print $1}')"
-        #compedit="$(echo $compedit | sed "s/\<$frst\> //g")"
-        printf "$prmpt${normal}"
-        editors_p=$(echo $editorsp $editors1 | uniq) 
+        
         reade -Q "GREEN" -i "$frst $editors_p" -p "EDITOR (Terminal - $frst default)=" edtor
+        
         edtor="$(where_cmd $edtor)"
         if [[ "$edtor" =~ "emacs" ]]; then
             edtor="$edtor -nw"

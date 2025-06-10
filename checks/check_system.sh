@@ -432,6 +432,19 @@ fi
 
 # VARS
 
+if test -z "$XDG_CONFIG_HOME"; then
+    if [[ "$machine" == 'Linux' ]]; then
+        export XDG_CONFIG_HOME=$HOME/.config
+    fi
+fi
+
+if test -z "$XDG_DATA_HOME"; then
+    if [[ "$machine" == 'Linux' ]]; then
+        export XDG_DATA_HOME=$HOME/.local/share
+    fi
+fi
+
+
 if ! test -f ~/.profile; then
     touch ~/.profile
 fi
@@ -469,7 +482,7 @@ if test -f ~/.bash_aliases; then
 fi
 
 if test -d ~/.bash_aliases.d/; then
-    export BASH_ALIAS_FILEDIR=~/.bash_aliases.d/
+    export BASH_ALIAS_FILEDIR=~/.bash_aliases.d
 fi
 
 export BASH_COMPLETION=~/.bashrc
@@ -479,7 +492,7 @@ if test -f ~/.bash_completion; then
 fi
 
 if test -d ~/.bash_completion.d/; then
-    export BASH_COMPLETION_FILEDIR=~/.bash_completion.d/
+    export BASH_COMPLETION_FILEDIR=~/.bash_completion.d
 fi
 
 export BASH_KEYBIND=~/.bashrc
@@ -489,7 +502,7 @@ if test -f ~/.keybinds; then
 fi
 
 if test -d ~/.keybinds.d/; then
-    export BASH_KEYBIND_FILEDIR=~/.keybinds.d/
+    export BASH_KEYBIND_FILEDIR=~/.keybinds.d
 fi
 
 #echo "These next $(tput setaf 1)sudo's$(tput sgr0) checks for the profile, environment, bash_alias, bash_completion and keybind files and dirs in '/root/' to generate global variables.";
@@ -529,7 +542,7 @@ if test -f /root/.bash_aliases; then
 fi
 
 if test -d /root/.bash_aliases.d/; then
-    export BASH_ALIAS_FILEDIR_R=/root/.bash_aliases.d/
+    export BASH_ALIAS_FILEDIR_R=/root/.bash_aliases.d
 fi
 
 if test -f /root/.bash_completion; then
@@ -537,7 +550,7 @@ if test -f /root/.bash_completion; then
 fi
 
 if test -d /root/.bash_completion.d/; then
-    export BASH_COMPLETION_FILEDIR_R=/root/.bash_completion.d/
+    export BASH_COMPLETION_FILEDIR_R=/root/.bash_completion.d
 fi
 
 if test -f /root/.keybinds; then
@@ -545,5 +558,5 @@ if test -f /root/.keybinds; then
 fi
 
 if test -d /root/.keybinds.d/; then
-    export BASH_KEYBIND_FILEDIR_R=/root/.keybindsd.d/
+    export BASH_KEYBIND_FILEDIR_R=/root/.keybindsd.d
 fi

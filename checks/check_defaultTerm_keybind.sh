@@ -187,13 +187,13 @@ ${ORANGE}This can conflict with different applications' (custom) keybinds\n${nor
         readyn -p "Set ${CYAN}Control-Alt${GREEN} to ${CYAN}Control-Windows/Commandkey${GREEN}?" ctrl_alt_super
         if [[ $ctrl_alt_super == 'y' ]]; then
             vars=$(xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/custom -l -v | grep --color=never '<Primary><Alt>' | awk '{print $1}') 
-            vars="$vars"$(xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/custom -l -v | grep --color=never '<Shift><Control><Alt>' | awk '{print $1}') 
+            vars="$vars\n$(xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/custom -l -v | grep --color=never '<Shift><Control><Alt>' | awk '{print $1}')"
 
-            for i in $vars; do
+            for i in $(echo "$vars"); do
                 value="$(xfconf-query -c xfce4-keyboard-shortcuts -p $i -l -v | awk '{$1=""; print}')"
                 key=$(echo "$i" | sed 's/Alt/Super/g') 
                 xfconf-query -c xfce4-keyboard-shortcuts -p $i -r
-                xfconf-query -c xfce4-keyboard-shortcuts -n -p $key -t string -s $value
+                xfconf-query -c xfce4-keyboard-shortcuts -n -p $key -t string -s "$value"
             done 
         fi
         unset ctrl_alt_super vars i value key

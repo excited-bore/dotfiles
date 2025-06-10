@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if ! test -f checks/check_all.sh; then
-    if type curl &>/dev/null; then
+    if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
@@ -13,13 +13,13 @@ fi
 
 SCRIPT_DIR=$(get-script-dir)
 
-if ! type tmux &>/dev/null; then
+if ! hash tmux &>/dev/null; then
     if [[ "$distro_base" == "Arch" ]] || [[ "$distro_base" == "Debian" ]]; then
         eval "${pac_ins}" tmux
     fi
 fi
 
-tmux --help | $PAGER
+tmux --help
 
 #if [ ! -d ~/.bash_aliases.d/ ]; then
 #   mkdir ~/.bash_aliases.d/
@@ -53,7 +53,7 @@ if test -f tmux/.tmux.conf; then
     file=tmux/.tmux.conf
 else
     dir1="$(mktemp -d -t tmux-XXXXXXXXXX)"
-    curl -s -o $dir1/.tmux.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/tmux/.tmux.conf
+    curl -o $dir1/.tmux.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/tmux/.tmux.conf
     file=$dir1/.tmux.conf
 fi
 
@@ -65,16 +65,16 @@ sed -i 's|^set -g @plugin|#set -g @plugin|g' $file
 sed -i 's|^run '\''~/.tmux/plugins/tpm/tpm'\''|#run '\''~/.tmux/plugins/tpm/tpm'\''|g' $file
 sed -i 's|^set -g @continuum-restore '\''on'\''|#set -g @continuum-restore '\''on'\''|g' $file
 
-yes-edit-no -p "Install tmux.conf? (tmux conf at ~/.tmux.conf)" -g '$file' tmuxc
+yes-edit-no -p "Install tmux.conf? (tmux conf at ~/.tmux.conf)" -g "$file" tmuxc
 if [[ "$tmuxc" == "y" ]]; then
     cp $file ~/
-    if test -f $file~ && type gio &>/dev/null; then
+    if test -f $file~ && hash gio &>/dev/null; then
         gio trash $file~
     fi
 fi
 unset tmuxc
 
-readyn -p "Install tmux plugin manager? (tpm)" tmuxx
+readyn -p "Install tmux plugin manager? (tpm)" -c "! test -d $HOME/.tmux/plugins/tpm || ! grep -q \"set -g @plugin 'tmux-plugins/tpm'\" ~/.tmux.conf" tmuxx
 if [[ "$tmuxx" == "y" ]]; then
     if ! [ -d ~/.tmux/plugins/tpm ]; then
         git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
@@ -91,7 +91,7 @@ unset tmuxx
 
 readyn -p "Install tmux clipboard plugin? (tmux-yank)" tmuxx
 if [[ "$tmuxx" == "y" ]]; then
-    if ! type xclip &>/dev/null || ! type xsel &>/dev/null; then
+    if ! hash xclip &>/dev/null || ! hash xsel &>/dev/null; then
         if [[ "$distro_base" == "Arch" ]] || [[ $distro_base == "Debian" ]]; then
             eval "${pac_ins}" xclip xsel
         fi
@@ -230,7 +230,7 @@ fi
 unset tmuxxx
 
 tmux source-file ~/.tmux.conf
-. ~/.tmux/plugins/tpm/bin/install_plugins
-. ~/.tmux/plugins/tpm/bin/update_plugins all
+~/.tmux/plugins/tpm/bin/install_plugins
+~/.tmux/plugins/tpm/bin/update_plugins all
 
 echo "${green}Install plugins in tmux with 'C-b + I' / Update with 'C-b + U'${normal}"

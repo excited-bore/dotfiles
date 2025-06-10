@@ -21,7 +21,7 @@ if ! type kitty &>/dev/null; then
     fi
 fi
 
-kitty --help | $PAGER
+eval "kitty --help | $PAGER"
 
 if [[ "$distro_base" == 'Arch' ]] && ! ls /usr/share/fonts/noto | grep -i -q emoji; then
     readyn -p 'Install noto-emoji font for kitty?' emoji
@@ -126,7 +126,7 @@ grid_lay="\t  ${bold}Grid${normal}
 │         │          │         │
 └─────────┴──────────┴─────────┘\n"
 
-lays="splits horizontal vertical tall fat grid"
+lays=("splits" "horizontal" "vertical" "tall" "fat" "grid")
 
 readyn -p "Install kitty.conf and ssh.conf at ~/.config/kitty/ (kitty config)?" ktty_cnf
 
@@ -177,7 +177,7 @@ if [[ $ktty_cnf == 'y' ]]; then
             layouts1=$(echo "$lays" | sed "s/\<"$frst"\> //g")
             layout_p=$(echo "$lays" | tr ' ' '/')
 
-            test -z "$ZSH_VERSION" &&
+            test -n "$BASH_VERSION" &&
 
                 # Bash variant
                 layout_p="${layout_p^}" ||
@@ -230,7 +230,7 @@ if [[ $ktty_cnf == 'y' ]]; then
                 lays=$(echo "$lays" | sed "s/grid //g")
             fi
         done
-        enbld=$(echo $enbld | tr ' ' ',')
+        enbld=$(echo $enbld | xargs | tr ' ' ',')
         sed -i "s|enabled_layouts.*|enabled_layouts $enbld|g" $dir/kitty.conf
     fi
 

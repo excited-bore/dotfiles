@@ -148,7 +148,7 @@ if ! test -f $HOME/.config/wireplumber/wireplumber.conf.d/51-disable-suspension.
     printf "${yellow}Noticeable audio delay or audible pop/crack when starting playback can be caused by ${YELLOW}'node suspension when inactive'\n${normal}"
     printf "${RED}This might also break more then it helps\n${normal}"
     readyn -n -p "Disable node suspension when inactive?" dis_node
-    if test $dis_node == 'y'; then
+    if [[ "$dis_node" == 'y' ]]; then
         dis_node_f="$HOME/.config/wireplumber/wireplumber.conf.d/51-disable-suspension.conf"  
         touch dis_node_f 
         printf "monitor.alsa.rules = [

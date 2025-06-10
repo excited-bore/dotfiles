@@ -1,4 +1,3 @@
-
 if ! test -f checks/check_all.sh; then
     if type curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
@@ -42,13 +41,14 @@ fi
 printf "${cyan}Fzf${normal} keybinds:\n\t - Fzf history on Ctrl-R (replaces reverse-search-history)\n\t - Filepath retriever on Ctrl-T\n\t - Directory navigator on Alt-C\n\t - **<TAB> for fzf completion on some commands\n"
 readyn -p "Use fzf keybinds?" -c "test -f ~/.keybinds.d/fzf-bindings.bash" fzf_key
 if [[ "$fzf_key" == 'y' ]]; then
-    test -f ~/.keybinds.d/fzf-bindings.bash && 
-        rm ~/.keybinds.d/fzf-bindings.bash
+    test -f $BASH_KEYBIND_FILEDIR/fzf-bindings.bash && 
+        rm $BASH_KEYBIND_FILEDIR/fzf-bindings.bash
         wget-aria-dir $HOME/.keybinds.d/ https://raw.githubusercontent.com/junegunn/fzf/refs/heads/master/shell/key-bindings.bash
 fi
 
-if test -f ~/.keybinds.d/keybinds.bash && grep -q '^bind -m emacs-standard  '\''"\\C-z": vi-undo'\''' ~/.keybinds.d/keybinds.bash; then
-    sed -i 's|\\\C-z|\\\C-o|g' ~/.fzf/shell/key-bindings.bash
+if test -f $BASH_KEYBIND_FILEDIR/keybinds.bash; then
+    grep -q '^bind -m emacs-standard  '\''"\\C-z": vi-undo'\''' $BASH_KEYBIND_FILEDIR/keybinds.bash &&
+        sed -i 's|\\\C-z|\\\C-o|g' ~/.fzf/shell/key-bindings.bash
 fi
 unset fzf_key
 
