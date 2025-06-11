@@ -358,23 +358,23 @@ if hash cpg &>/dev/null && hash xcp &>/dev/null; then
     cpgi="none all advcpmv xcp"
     cpgp="[None/all/advcpmv/xcp]: "
     color="YELLOW"
-else
-
-    printf "${CYAN}cpg/mvg${GREEN} are patches for the default coreutils 'cp (copy) / mv (move)' which gives an added flag to both for a progress bar with '-g/--progress-bar'
-    ${CYAN}xcp${GREEN} is an 'extended', rust-written cp that copies faster and also comes with a progress bar${normal}\n"
-
+elif hash xcp &>/dev/null; then
+    printf "${CYAN}cpg/mvg${GREEN} are patches for the default coreutils 'cp (copy) / mv (move)' which gives an added flag to both for a progress bar with '-g/--progress-bar'\n" 
+    cpgi="advcpmv xcp all none"
+    cpgp="[Advcpmv/xcp/all/none]: "
     color="GREEN"
+elif hash cpg &>/dev/null; then 
+    printf "${CYAN}xcp${GREEN} is an 'extended', rust-written cp that copies faster and also comes with a progress bar${normal}\n"
+    cpgi="xcp advcpmv all none"
+    cpgp="[Xcp/advcpmv/all/none]: "
+    color="GREEN"
+else
+    printf "${CYAN}cpg/mvg${GREEN} are patches for the default coreutils 'cp (copy) / mv (move)' which gives an added flag to both for a progress bar with '-g/--progress-bar'\n${CYAN}xcp${GREEN} is an 'extended', rust-written cp that copies faster and also comes with a progress bar${normal}\n"
     cpgi="all advcpmv xcp none"
     cpgp="[All/advcpmv/xcp/none]: "
-    if hash xcp &>/dev/null; then
-        cpgi="advcpmv xcp  all none"
-        cpgp="[Advcpmv/xcp/all/none]: "
-    fi
-    if hash cpg &>/dev/null; then
-        cpgi="xcp advcpmv all none"
-        cpgp="[Xcp/advcpmv/all/none]: "
-    fi
+    color="GREEN"
 fi
+
 reade -Q "$color" -i "$cpgi" -p "Install advcpmv, xcp, all or none? $cpgp" cpg
 if [[ "all" == "$cpg" ]] || [[ "advcpmv" == "$cpg" ]]; then
     if ! test -f $SCRIPT_DIR/install_advcpmv.sh; then
@@ -434,22 +434,28 @@ unset ack
 # Dust, dua and ncdu - Du replacement(s)
 
 if ! (hash dua &>/dev/null && hash dust &>/dev/null && hash ncdu &>/dev/null); then
-    printf "${CYAN}'Dua'${GREEN} and ${CYAN}'dust'${GREEN} are modern cli replacements of du\n${CYAN}'Ncdu'${GREEN} and ${CYAN}'dua interactive'${GREEN} are interactive TUI replacements that also help remove unnecessary files${normal}\n"
-    color='GREEN'
-    pre="dua dust ncdu all none"
-    prmpt="[Dua/dust/ncdu/all/none]: "
-    if ! hash dust &>/dev/null && hash dua &>/dev/null; then
+    if ! (hash dua &>/dev/null || hash dust &>/dev/null || hash ncdu &>/dev/null); then 
+        printf "${CYAN}'Dua'${GREEN} and ${CYAN}'dust'${GREEN} are modern cli replacements of du\n${CYAN}'Dua interactive'${GREEN} and ${CYAN}'ncdu'${GREEN} are interactive TUI replacements that also help remove unnecessary files${normal}\n"
+        color='GREEN'
+        pre="dua dust ncdu all none"
+        prmpt="[Dua/dust/ncdu/all/none]: "
+    elif ! hash dust &>/dev/null && hash dua &>/dev/null; then
+        printf "${CYAN}'Dust'${GREEN} is a modern cli replacements of du\n${CYAN}'Ncdu'${GREEN} is an interactive TUI replacements that also help remove unnecessary files${normal}\n"
+        color='GREEN'
         pre="dust dua ncdu all none"
         prmpt="[Dust/dua/ncdu/all/none]: "
     elif hash dua &>/dev/null && hash dust &>/dev/null && ! hash ncdu &>/dev/null; then
-        pre="ncdu dust dua all none"
-        prmpt="[Ncdu/dua/dust/all/none]: "
+        printf "${CYAN}'Ncdu'${GREEN} is an interactive TUI replacements that also help remove unnecessary files${normal}\n"
+        color='GREEN'
+        pre="ncdu dust dua none"
+        prmpt="[Ncdu/dust/dua/none]: "
     fi
 else
     color='YELLOW'
     pre="none dua dust ncdu all"
     prmpt="[None/dua/dust/ncdu/all]: "
 fi
+
 reade -Q "$color" -i "$pre" -p "Install dua, dust, ncdu or all? $prmpt" dua_dust_ncdu
 if [[ "all" == "$dua_dust_ncdu" ]] || [[ "dua" == "$dua_dust_ncdu" ]]; then
     if ! test -f $SCRIPT_DIR/install_dua_cli.sh; then
