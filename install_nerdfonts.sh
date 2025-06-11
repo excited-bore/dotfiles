@@ -114,7 +114,7 @@ if test -n "$name"; then
                     file=$(FONTPREVIEW_FILES="$name" $TMPDIR/fontpreview.sh) 
                 style=$(echo $file | cut -d. -f-1 | cut -d- -f2) 
                 familystyle=$(fc-query "$XDG_DATA_HOME/fonts/$file" --format "%{family} %{style}\n" | uniq) 
-                reade -Q 'GREEN' -i "10 $(seq 1 48)" -p "Default fontsize (Default 10): " size 
+                reade -Q 'GREEN' -i "10 $(seq 1 48 | tr '\n' ' ')" -p "Default fontsize (Default 10): " size 
                 re='^[0-9]+$'
                 if ! [[ $size =~ $re ]] ; then
                     echo "${RED}$size${normal} is not a number!" 
@@ -135,7 +135,7 @@ if test -n "$name"; then
                     file=$(FONTPREVIEW_FILES="$name" $TMPDIR/fontpreview.sh) 
                 style=$(echo $file | cut -d. -f-1 | cut -d- -f2) 
                 familystyle=$(fc-query "$XDG_DATA_HOME/fonts/$file" --format "%{family} %{style}\n" | uniq) 
-                reade -Q 'GREEN' -i "10 $(seq 1 48)" -p "Default fontsize (Default 10): " size 
+                reade -Q 'GREEN' -i "10 $(seq 1 48 | tr '\n' ' ')" -p "Default fontsize (Default 10): " size 
                 re='^[0-9]+$'
                 if ! [[ $size =~ $re ]] ; then
                     echo "${RED}$size${normal} is not a number!" 
@@ -161,7 +161,7 @@ if test -n "$name"; then
                                 else
                                     style=$(echo $file | cut -d. -f-1 | cut -d- -f2) 
                                     familystyle=$(fc-query "$XDG_DATA_HOME/fonts/$file" --format "%{family} %{style}\n" | uniq) 
-                                    reade -Q 'GREEN' -i "10 $(seq 1 48)" -p "Default fontsize (Default 10): " size 
+                                    reade -Q 'GREEN' -i "10 $(seq 1 48 | tr '\n' ' ')" -p "Default fontsize (Default 10): " size 
                                     re='^[0-9]+$'
                                     if ! [[ $size =~ $re ]] ; then
                                         echo "${RED}$size${normal} is not a number!" 
@@ -182,7 +182,7 @@ if test -n "$name"; then
         if test -f $XDG_CONFIG_HOME/kitty/kitty.conf; then
             readyn -p "Set one installed font as the default for the ${CYAN}kitty terminal emulator${GREEN}?" yhno
             if [[ "$yhno" == 'y' ]]; then
-                if [[ -n "$file" ]]; then 
+                if [ -n "$file" ]; then 
                     quer="--query=$file" 
                 #elif [[ $(echo "$files" | wc -w) == 1 ]]; then
                 #    quer="--query=$files" 
@@ -192,7 +192,7 @@ if test -n "$name"; then
                     file=$(FONTPREVIEW_QUERY="$file" FONTPREVIEW_FILES="$name" $TMPDIR/fontpreview.sh) 
                 style=$(echo $file | cut -d. -f-1 | cut -d- -f2) 
                 familystyle=$(fc-query "$XDG_DATA_HOME/fonts/$file" --format "%{family} %{style}\n" | uniq) 
-                reade -Q 'GREEN' -i "10 $(seq 1 48)" -p "Default fontsize (Default 10): " size 
+                reade -Q 'GREEN' -i "10 $(seq 1 48 | tr '\n' ' ')" -p "Default fontsize (Default 10): " size 
                 re='^[0-9]+$'
                 if ! [[ $size =~ $re ]] ; then
                     echo "${RED}$size${normal} is not a number!" 

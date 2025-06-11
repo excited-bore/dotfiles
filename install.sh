@@ -354,7 +354,7 @@ unset rmp
 
 # Xcp
 
-if hash cpg &>/dev/null && hash xcp &>/dev/null; then
+if (hash cpg &>/dev/null || cp --help | grep -qF -- '-g') && hash xcp &>/dev/null; then
     cpgi="none all advcpmv xcp"
     cpgp="[None/all/advcpmv/xcp]: "
     color="YELLOW"
@@ -363,7 +363,7 @@ elif hash xcp &>/dev/null; then
     cpgi="advcpmv xcp all none"
     cpgp="[Advcpmv/xcp/all/none]: "
     color="GREEN"
-elif hash cpg &>/dev/null; then 
+elif (hash cpg &>/dev/null || cp --help | grep -qF -- '-g'); then 
     printf "${CYAN}xcp${GREEN} is an 'extended', rust-written cp that copies faster and also comes with a progress bar${normal}\n"
     cpgi="xcp advcpmv all none"
     cpgp="[Xcp/advcpmv/all/none]: "
