@@ -43,14 +43,13 @@ get-latest-releases-github https://github.com/ryanoasis/nerd-fonts $fonts/ "$tar
 
 if [[ "$(ls $fonts/* 2> /dev/null)" ]]; then
 
-    if [[ "$(ls $fonts/*.zip 2> /dev/null)" ]]; then
+    if [[ "$tar_zip" == 'zip' ]]; then
         for i in $(command ls $fonts/*.zip); do
             unzip $i -d $fonts 
         done
         rm $fonts/*.zip
-    fi
-
-    if [[ "$(ls $fonts/*.tar.xz 2> /dev/null)" ]]; then
+    
+    elif [[ "$tar_zip" == '.tar.xz' ]]; then
         for i in $(command ls $fonts/*.tar.xz); do
             tar -xf $i -C $fonts
         done
