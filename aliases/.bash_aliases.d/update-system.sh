@@ -57,7 +57,7 @@ function version-higher() {
 # https://www.explainxkcd.com/wiki/index.php/1654:_Universal_Install_Script
 
 function update-system() {
-    local YES NOGUI KERNEL='lts' SKIPKERNEL='n' 
+    local YES flag NOGUI KERNEL='lts' SKIPKERNEL='n' 
     while [[ $# -gt 0 ]]; do
         case $1 in
         -h|-\?|--help)  
@@ -158,7 +158,7 @@ function update-system() {
           esac
         done
     
-    local flag hdrs
+    local hdrs
 
     if type timedatectl &> /dev/null && ! [[ "$(timedatectl show | grep '^NTP' | head -n 1 | awk 'BEGIN { FS = "=" } ; {print $2}')" == "yes" ]]; then 
         readyn -p "Timedate NTP not set (Automatic timesync). This can cause issues with syncing to repositories. Activate it?" set_ntp
@@ -331,6 +331,25 @@ function update-system() {
 
     elif [[ "$pac" == "pacman" ]]; then
    
+        if test -f /var/lib/pacman/db.lck; then
+            printf "${yellow}There's a lockfile ${ORANGE}/var/lib/pacman/db.lck${normal}\n" 
+            printf "${yellow}If there's no other instance of pacman running, ${YELLOW}the file needs to be removed before continuing${normal}\n" 
+            printf "${yellow}Otherwise update-system will quit${normal}\n" 
+            readyn -p "Remove ${YELLOW}/var/lib/pacman/db.lck${GREEN}?" rm_dblck
+            if [[ "$rm_dblck" == 'y' ]]; then
+                sudo command rm /var/lib/pacman/db.lck 
+            else
+                exit 1
+            fi
+            unset rm_dblck 
+        fi
+        
+        if test -n "$YES"; then 
+            sudo pacman -Su --noconfirm
+        else 
+            sudo pacman -Su
+        fi
+        
         if test -n "$AUR_up"; then
             
             if test -n "$YES"; then 
@@ -345,11 +364,6 @@ function update-system() {
             fi
         fi 
         
-        if test -n "$YES"; then 
-            sudo pacman -Su --noconfirm
-        else 
-            sudo pacman -Su
-        fi
         
         if ! [[ "$SKIPKERNEL" == 'y' ]] && hash curl &> /dev/null && hash xmllint &> /dev/null; then 
             local latest_lts latest_lts1 prmpt
@@ -564,8 +578,7 @@ function update-system() {
         unset dev_up
         
     fi
-    export SYSTEM_UPDATED="TRUE"
-    unset YES 
+    export SYSTEM_UPDATED="TRUE" 
 }
 
 alias update-system-yes="update-system -y -s"

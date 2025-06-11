@@ -319,7 +319,7 @@ if [[ $ansr == "y" ]]; then
                 prmpt1=$prmpt
             elif ! hash dust &> /dev/null && hash dua &> /dev/null && ! hash ncdu &> /dev/null; then 
                 prmpt="${CYAN}'dua'${GREEN}" 
-                prmpt1=$prmpt
+                prmpt1="${CYAN}'dua interactive'${GREEN}"
             elif hash dust &> /dev/null && ! hash dua &> /dev/null && ! hash ncdu &> /dev/null; then 
                 prmpt="${CYAN}'dust'${GREEN}"
             elif hash dust &> /dev/null && hash dua &> /dev/null && ! hash ncdu &> /dev/null; then

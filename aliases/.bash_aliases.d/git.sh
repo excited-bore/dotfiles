@@ -32,13 +32,13 @@ if type wget &>/dev/null && type jq &>/dev/null; then
         fi
 
         new_url="$(echo "$gtb_link" | sed 's|https://github.com|https://api.github.com/repos|g')"
-        if ! [[ $gtb_link =~ '/releases' ]]; then
+        if ! [[ "$gtb_link" =~ '/releases' ]]; then
             new_url="$new_url/releases"
         fi
 
         printf "Analyzing ${CYAN}'$new_url'.${normal}\nDepending on how many releases are available this might take a while..\n"
 
-        releases=$(curl -sL "$new_url" | jq '.[0]' -r | jq -r '.assets' | grep --color=never "name" | sed 's/"name"://g' | tr '"' ' ' | tr ',' ' ' | sed 's/[[:space:]]//g')
+        releases=($(curl -sL "$new_url" | jq '.[0]' -r | jq -r '.assets' | grep --color=never "name" | sed 's/"name"://g' | tr '"' ' ' | tr ',' ' ' | sed 's/[[:space:]]//g'))
         versn=$(curl -sL "$new_url" | jq '.[0]' -r | jq -r '.tag_name')
 
         if [[ $gtb_link =~ '/releases' ]]; then
@@ -53,7 +53,7 @@ if type wget &>/dev/null && type jq &>/dev/null; then
         fi
 
         if test -n "$filtr"; then
-            for i in $releases; do
+            for i in ${releases[@]}; do
                 if [[ "$i" =~ "$filtr" ]]; then
                     nwreleases="$nwreleases$i\n" 
                 fi
