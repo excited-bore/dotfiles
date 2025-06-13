@@ -317,7 +317,7 @@ if hash pacman &> /dev/null; then
                
                 if ! grep -q $mirror /etc/pacman.d/mirrorlist; then 
                     if ! grep -q $country /etc/pacman.d/mirrorlist; then
-                       printf "\n## Country : $country\n" | sudo tee -a /etc/pacman.d/mirrorlist       
+                        sudo sed -i "1s/^/\n## Country : $country\n/" /etc/pacman.d/mirrorlist       
                     fi
                  
                     # Set awk variables with -v
@@ -339,7 +339,7 @@ if hash pacman &> /dev/null; then
                 fi
             fi
             
-            readyn -p "Refresh pacman using ${CYAN}pacman -Syyu${GREEN}, then ${CYAN}pacman -Suu${GREEN} (to remove newer packages)?" pack_up
+            readyn -p "Refresh pacman using ${CYAN}pacman -Syyu pacman${GREEN}, then ${CYAN}pacman -Suu${GREEN} (to remove newer packages)?" pack_up
             if [[ "$pack_up" == 'y' ]]; then 
                 sudo pacman -Syyu
                 sudo pacman -Suu
