@@ -272,9 +272,6 @@ if hash pacman &> /dev/null; then
 
         function pacman-fzf-remove(){ 
             
-            test -n "$ZSH_VERSION" &&
-                setopt KSH_ARRAYS
-
             local pre=""
             if test -n "$@"; then
                 pre="$@"
@@ -308,6 +305,8 @@ if hash pacman &> /dev/null; then
             # Turn mirrors into array in a bash and zsh compatible
             local mirrors2
             IFS=$'\n' read -r -d '' -A mirrors2 <<< "$(printf "%s\0" "$mirrors")" 
+        
+            printf "${green}Adding mirrors to ${CYAN}/etc/pacman.d/mirrorlist${normal}\n" 
 
             for i in ${mirrors2[@]}; do
                 # Remove 'Server', '=' and 'https;//...' before printing, then remove unnecesary spaces
@@ -329,15 +328,23 @@ if hash pacman &> /dev/null; then
             done
             readyn -p "Edit ${CYAN}/etc/pacman.d/mirrorlist${GREEN} to see if everything was configured properly?" check_edit
             if [[ "$check_edit" == 'y' ]]; then
-                test -n "$SUDO_EDITOR" &&
-                    sudo $SUDO_EDITOR /etc/pacman.d/mirrorlist ||
-                test -z "$SUDO_EDITOR" && test -n "$EDITOR" &&
-                    sudo $EDITOR /etc/pacman.d/mirrorlist ||
-                test -z "$EDITOR" && hash nano &> /dev/null &&
-                    sudo nano /etc/pacman.d/mirrorlist ||
-                test -z "$EDITOR" && hash edit &> /dev/null &&
+                if test -n "$SUDO_EDITOR"; then
+                    sudo $SUDO_EDITOR /etc/pacman.d/mirrorlist 
+                elif test -z "$SUDO_EDITOR" && test -n "$EDITOR"; then
+                    sudo $EDITOR /etc/pacman.d/mirrorlist
+                elif test -z "$EDITOR" && hash nano &> /dev/null; then
+                    sudo nano /etc/pacman.d/mirrorlist 
+                elif test -z "$EDITOR" && hash edit &> /dev/null; then
                     sudo edit /etc/pacman.d/mirrorlist
+                fi
             fi
+            
+            readyn -p "Refresh pacman using ${CYAN}pacman -Syyu${GREEN}, then ${CYAN}pacman -Suu${GREEN} (to remove newer packages)?" pack_up
+            if [[ "$pack_up" == 'y' ]]; then 
+                sudo pacman -Syyu
+                sudo pacman -Suu
+            fi
+
         }
          
     fi
