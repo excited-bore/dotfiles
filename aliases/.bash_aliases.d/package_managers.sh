@@ -225,64 +225,119 @@ if hash pacman &> /dev/null; then
 
     if hash fzf &> /dev/null; then
 
-         
-
         function pacman-fzf-install(){ 
-            if ! test -z "$@"; then
+            local nstall
+            if test -n "$@"; then
                 nstall="--query $@"
             fi
             nstall="$(pacman -Ss | paste -d "\t"  - - | fzf $nstall --ansi --multi --select-1 --reverse --sync --delimiter '\t' --with-nth 1 --height 33% --preview='echo {2}' --preview-window='down,10%,follow' | awk '{print $1}')" 
-            if ! test -z "$nstall"; then
+            if test -n "$nstall"; then
                 sudo pacman -S "$nstall" 
             fi
-            unset nstall
         }
         
         function pacman-fzf-install-by-group(){ 
-            nstall="" 
-            if ! test -z "$@"; then
+            local nstall="" 
+            if test -n "$@"; then
                 nstall="--query $@"
             fi
-            group="$(pacman -S --groups $nstall | sort -u | fzf --select-1 --reverse --sync --height 33%)" 
-            nstall="$(pacman -Ss $group | paste -d "\t"  - - | fzf $nstall --select-1 --multi --reverse --ansi --sync --delimiter '\t' --with-nth 1 --height 33% --preview='echo {2}' --preview-window='down,10%,follow' | awk '{print $1}')" 
-            if ! test -z "$nstall"; then
+            local group="$(pacman -S --groups $nstall | sort -u | fzf --select-1 --reverse --sync --height 33%)" 
+            local nstall="$(pacman -Ss $group | paste -d "\t"  - - | fzf $nstall --select-1 --multi --reverse --ansi --sync --delimiter '\t' --with-nth 1 --height 33% --preview='echo {2}' --preview-window='down,10%,follow' | awk '{print $1}')" 
+            if test -n "$nstall"; then
                 sudo pacman -S "$nstall" 
             fi
-            unset group nstall
         }
 
         function pacman-fzf-list-files-installed(){ 
-            pre='' 
-            if ! test -z "$@"; then
-                if ! test -z "$2"; then
+            local pre='' 
+            if test -n "$@"; then
+                if test -n "$2"; then
                     printf "Only give 1 argument\n"
                     exit 1
                 else
                     pre="--query $@"
                 fi
             fi 
-            nstall="$(pacman -Q | fzf $pre --ansi --multi --select-1 --preview 'cat <(pacman -Qk {1})' --preview-window='down,10%,follow' --reverse --sync --height 33%  | awk '{print $1}')" 
-            if ! test -z "$nstall"; then
+            
+            local nstall="$(pacman -Q | fzf $pre --ansi --multi --select-1 --preview 'cat <(pacman -Qk {1})' --preview-window='down,10%,follow' --reverse --sync --height 33%  | awk '{print $1}')" 
+            if test -n "$nstall"; then
                 for i in ${nstall[@]}; do
                     echo "${bold}$(pacman -Qk $i)"
                     pacman -Ql $i | awk '{$1="";print}' | sed 's| \(.*\)|\1|g'   
                     echo "" 
                 done | $PAGER
             fi
-            unset nstall
         }
          
 
         function pacman-fzf-remove(){ 
-            pre=""
-            if ! test -z "$@"; then
+            
+            test -n "$ZSH_VERSION" &&
+                setopt KSH_ARRAYS
+
+            local pre=""
+            if test -n "$@"; then
                 pre="$@"
             fi 
-            nstall="$(pacman -Q $pre | paste -d "\t"  - - | fzf --select-1 --multi --reverse --ansi --sync --delimiter '\t' --with-nth 1 --height 33% --preview='echo {2}' --preview-window='down,10%,follow' | awk '{print $1}')"      
-            if ! test -z "$nstall"; then
+            local nstall="$(pacman -Q $pre | paste -d "\t"  - - | fzf --select-1 --multi --reverse --ansi --sync --delimiter '\t' --with-nth 1 --height 33% --preview='echo {2}' --preview-window='down,10%,follow' | awk '{print $1}')"      
+            if test -n "$nstall"; then
                 sudo pacman -R "$nstall" 
             fi 
-            unset nstall
+        }
+        
+        function pacman-fzf-add-mirror(){ 
+            local only_https mirror 
+            if test -n "$1" && [[ "$1" == 'y' ]] || [[ "$1" == 'n' ]]; then
+                only_https="$1"
+            else
+                readyn -p "Only look for mirrors that use https?" only_https
+            fi
+            
+            if [[ "$only_https" == 'y' ]]; then
+                # Https only
+                mirror=https://archlinux.org/mirrorlist/all/https/ 
+            else 
+                # All
+                mirror=https://archlinux.org/mirrorlist/all/ 
+            fi
+           
+            # Asked Chatgpt for the awk part of the script
+            # grep -v '^[[:space:]]*$' => Print everything but empty lines / lines with spaces
+            local mirrors=$(curl -fsSL $mirror | tail -n +6 | awk '/^## / { section = substr($0, 4); next }; /^$/ { section = ""; print; next }; section != "" { print $0 "\t" section; next }; { print }' | sed 's/^#//g' | grep -v '^[[:space:]]*$' | fzf --ansi --multi --select-1 --reverse --sync --delimiter '\t' --with-nth 1 --height 33% --preview='echo {2}' --preview-window='down,10%,follow') 
+
+            # Turn mirrors into array in a bash and zsh compatible
+            local mirrors2
+            IFS=$'\n' read -r -d '' -A mirrors2 <<< "$(printf "%s\0" "$mirrors")" 
+
+            for i in ${mirrors2[@]}; do
+                # Remove 'Server', '=' and 'https;//...' before printing, then remove unnecesary spaces
+                local country=$(echo $i | awk '{$1="";$2="";$3=""; print}' | xargs)
+                
+                # Cut everything after tab (using ANSI-C quoting) 
+                local mirror=$(echo $i | cut -d$'\t' -f-1)
+               
+                if ! grep -q $mirror /etc/pacman.d/mirrorlist; then 
+                    if ! grep -q $country /etc/pacman.d/mirrorlist; then
+                       printf "\n## Country : $country\n" | sudo tee -a /etc/pacman.d/mirrorlist       
+                    fi
+                 
+                    # Set awk variables with -v
+                    cat /etc/pacman.d/mirrorlist | awk -v mirror="$mirror" '/'"$country"'/ { print; print mirror; next }1' | sudo tee /etc/pacman.d/mirrorlist 1> /dev/null 
+                else
+                    printf "${ORANGE}'$mirror'${yellow} is already in ${YELLOW}/etc/pacman.d/mirrorlist${normal}\n"
+                fi
+            done
+            readyn -p "Edit ${CYAN}/etc/pacman.d/mirrorlist${GREEN} to see if everything was configured properly?" check_edit
+            if [[ "$check_edit" == 'y' ]]; then
+                test -n "$SUDO_EDITOR" &&
+                    sudo $SUDO_EDITOR /etc/pacman.d/mirrorlist ||
+                test -z "$SUDO_EDITOR" && test -n "$EDITOR" &&
+                    sudo $EDITOR /etc/pacman.d/mirrorlist ||
+                test -z "$EDITOR" && hash nano &> /dev/null &&
+                    sudo nano /etc/pacman.d/mirrorlist ||
+                test -z "$EDITOR" && hash edit &> /dev/null &&
+                    sudo edit /etc/pacman.d/mirrorlist
+            fi
         }
          
     fi
@@ -387,10 +442,11 @@ if hash pacman &> /dev/null; then
         alias pamac-list-files-package="pacman-list-files-package" 
 
         function pamac-fzf-remove-package(){
+            local packg
             if test -z "$@"; then
-                compedit="$(pamac list | awk '{print $1}')" 
-                 if ! type fzf &> /dev/null; then  
-                    frst="$(echo $compedit | awk '{print $1}')"
+                 local compedit="$(pamac list | awk '{print $1}')" 
+                 if ! hash fzf &> /dev/null; then  
+                    local frst="$(echo $compedit | awk '{print $1}')"
                     compedit="$(echo $compedit | sed "s/\<$frst\> //g")"
                     reade -Q 'GREEN' -i "$frst $compedit" -p "Give up package: " packg
                  else
@@ -399,10 +455,9 @@ if hash pacman &> /dev/null; then
             else
                 packg="$@"     
             fi
-            if ! test -z $packg; then
+            if test -n $packg; then
                 pamac remove $packg
             fi
-            unset packg
         }
         alias pamac-checkupdates="pamac checkupdates -a"
         alias manjaro-update-packages="pamac-update"
@@ -426,9 +481,9 @@ if hash pacman &> /dev/null; then
         #}
         
         function pamac-fzf-list-files(){ 
-            pre='' 
-            if ! test -z "$@"; then
-                if ! test -z "$2"; then
+            local nstall pre='' 
+            if test -n "$@"; then
+                if test -n "$2"; then
                     printf "Only give 1 argument\n"
                     exit 1
                 else
@@ -439,13 +494,12 @@ if hash pacman &> /dev/null; then
             if ! test -z "$nstall"; then
                 pamac list --files $nstall  
             fi
-            unset nstall
         }
         
         function pamac-fzf-list-files-installed(){ 
-            pre='' 
-            if ! test -z "$@"; then
-                if ! test -z "$2"; then
+            local nstall pre='' 
+            if test -n "$@"; then
+                if test -n "$2"; then
                     printf "Only give 1 argument\n"
                     exit 1
                 else
@@ -453,15 +507,15 @@ if hash pacman &> /dev/null; then
                 fi
             fi 
             nstall="$(pamac list -i | fzf $pre --ansi --multi --select-1 --reverse --sync --height 33%  | awk '{print $1}')" 
-            if ! test -z "$nstall"; then
+            if test -n "$nstall"; then
                 pamac list --files $nstall  
             fi
-            unset nstall
         }
          
 
         function pamac-fzf-install-by-group(){ 
-            if ! test -z "$@"; then
+            local group nstall 
+            if test -n "$@"; then
                 group="$@"
             else 
                 group="$(pamac list --groups | sort -u | fzf --select-1 --reverse --sync --height 33%)" 
@@ -470,13 +524,12 @@ if hash pacman &> /dev/null; then
             if ! test -z "$nstall"; then
                 pamac install "$nstall" 
             fi
-            unset group nstall
         }
 
         function pamac-fzf-remove(){ 
-            pre=""
-            if ! test -z "$@"; then
-                if ! test -z "$2"; then
+            local nstall pre=""
+            if test -n "$@"; then
+                if test -n "$2"; then
                     printf "Only give 1 argument\n"
                     exit 1
                 else
@@ -484,10 +537,9 @@ if hash pacman &> /dev/null; then
                 fi
             fi 
             nstall="$(pamac list -i | fzf $pre --ansi --multi --select-1 --reverse --sync --height 33%  | awk '{print $1}')"      
-            if ! test -z "$nstall"; then
+            if test -n "$nstall"; then
                 pamac remove "$nstall" 
             fi 
-            unset nstall
         }
          
     fi
@@ -509,9 +561,9 @@ if hash pacman &> /dev/null; then
         # https://smarttech101.com/aur-arch-user-repository-and-yay-in-arch-linux 
         
         function yay-fzf-install(){ 
-            pre='' 
-            if ! test -z "$@"; then
-                if ! test -z "$2"; then
+            local pre='' 
+            if test -n "$@"; then
+                if test -n "$2"; then
                     printf "Only give 1 argument\n"
                     exit 1
                 else

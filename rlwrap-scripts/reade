@@ -1,7 +1,8 @@
 #!/bin/bash
 
 function reade() {
-    test -n "$ZSH_VERSION" && setopt local_options err_return local_traps extended_glob &&
+    test -n "$ZSH_VERSION" && 
+        setopt local_options err_return local_traps extended_glob &&
         HISTSIZE=1000 &&
         SAVEHIST=1000
 
