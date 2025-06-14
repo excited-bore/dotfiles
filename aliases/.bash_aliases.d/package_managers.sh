@@ -343,9 +343,9 @@ if hash pacman &> /dev/null; then
                 printf "${yellow}Since the distribution you're using is not ${CYAN}Arch${yellow} but ${CYAN}$distro${yellow}, you will need to reinstall ${CYAN}pacman${yellow} and other packages\nIt's ${YELLOW}important${yellow} that you update appropriate and ${GREEN}allow downgrades${yellow} when updating in order not to break anything\n${normal}" 
             fi
 
-            readyn -p "Refresh pacman using ${CYAN}sudo pacman -Syyuu --noconfirm${GREEN}?" pack_up
+            readyn -p "Refresh pacman using ${CYAN}sudo pacman -Syyuu${GREEN}?" pack_up
             if [[ "$pack_up" == 'y' ]]; then 
-                sudo pacman -Syyuu --noconfirm
+                sudo pacman -Syyuu
             fi
         }
          

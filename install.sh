@@ -25,11 +25,20 @@ fi
 
 if ! hash curl &>/dev/null && test -n "$pac_ins"; then
     printf "${CYAN}curl${normal} is not installed \n"
-    readyn -p "Install curl (for command related to URLS)?" ins_curl
+    readyn -p "Install curl (for querying URLS)?" ins_curl
     if [[ $ins_curl == 'y' ]]; then
         eval "${pac_ins} curl"
     fi
     unset ins_curl
+fi
+
+if ! hash fzf &>/dev/null && test -n "$pac_ins"; then
+    printf "${CYAN}fzf${normal} is not installed \n"
+    readyn -p "Install fzf (a fuzzy finder / TUI to make a selection - used in a multitude of functions/tools)?" ins_fzf
+    if [[ $ins_fzf == 'y' ]]; then
+        eval "${pac_ins} fzf"
+    fi
+    unset ins_fzf
 fi
 
 if ! hash jq &>/dev/null && test -n "$pac_ins"; then
