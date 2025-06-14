@@ -282,7 +282,7 @@ if hash pacman &> /dev/null; then
             fi 
         }
         
-        function pacman-fzf-add-mirror(){ 
+        function pacman-fzf-add-arch-mirror(){ 
             local only_https mirror 
             if test -n "$1" && [[ "$1" == 'y' ]] || [[ "$1" == 'n' ]]; then
                 only_https="$1"
@@ -321,7 +321,7 @@ if hash pacman &> /dev/null; then
                     fi
                  
                     # Set awk variables with -v
-                    cat /etc/pacman.d/mirrorlist | awk -v mirror="$mirror" '/'"$country"'/ { print; print mirror; next }1' | sudo tee /etc/pacman.d/mirrorlist 1> /dev/null 
+                    command cat /etc/pacman.d/mirrorlist | awk -v mirror="$mirror" '/'"$country"'/ { print; print mirror; next }1' | sudo tee /etc/pacman.d/mirrorlist 1> /dev/null 
                 else
                     printf "${ORANGE}'$mirror'${yellow} is already in ${YELLOW}/etc/pacman.d/mirrorlist${normal}\n"
                 fi
@@ -338,13 +338,15 @@ if hash pacman &> /dev/null; then
                     sudo edit /etc/pacman.d/mirrorlist
                 fi
             fi
-            
-            readyn -p "Refresh pacman using ${CYAN}pacman -Syyu pacman${GREEN}, then ${CYAN}pacman -Suu${GREEN} (to remove newer packages)?" pack_up
-            if [[ "$pack_up" == 'y' ]]; then 
-                sudo pacman -Syyu
-                sudo pacman -Suu
+           
+            if test -n "$distro" && ! [[ "$distro" == 'Arch' ]]; then
+                printf "${yellow}Since the distribution you're using is not ${CYAN}Arch${yellow} but ${CYAN}$distro${yellow}, you will need to reinstall ${CYAN}pacman${yellow} and other packages\nIt's ${YELLOW}important${yellow} that you update appropriate and ${GREEN}allow downgrades${yellow} when updating in order not to break anything\n${normal}" 
             fi
 
+            readyn -p "Refresh pacman using ${CYAN}sudo pacman -Syyuu --noconfirm${GREEN}?" pack_up
+            if [[ "$pack_up" == 'y' ]]; then 
+                sudo pacman -Syyuu --noconfirm
+            fi
         }
          
     fi
