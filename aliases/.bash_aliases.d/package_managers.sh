@@ -166,7 +166,7 @@ if hash apt &> /dev/null; then
                         fi
                     else
                         ansr=$(echo $ansr | sed 's,/,/+archive/ubuntu/,') 
-                        printf "Check for yourself at: https://launchpad.net/~$ansr"
+                        printf "Check for yourself at: https://launchpad.net/~$ansr\n"
                     fi
                 fi
             }
