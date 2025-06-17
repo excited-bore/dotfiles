@@ -416,38 +416,40 @@ function update-system() {
         test -n "$YES" && flag='--auto' || flag=''
        
         local cachcln 
-        
-        readyn $flag -p "Clean / autoremove orphan packages - dependencies that aren't used by any package?" cachcln
-        
-        if [[ $cachcln == 'y' ]]; then
+       
+        if test -n "$(pacman -Qdtq)"; then 
+            readyn $flag -p "Clean / autoremove orphan packages - dependencies that aren't used by any package?" cachcln
             
-            if [ -n "$AUR_clean" ]; then
+            if [[ $cachcln == 'y' ]]; then
                 
-                if test -n "$YES"; then 
+                if [ -n "$AUR_clean" ]; then
                     
-                    if [[ "$AUR" == "pamac" ]]; then
-                        pamac clean --no-confirm
+                    if test -n "$YES"; then 
+                        
+                        if [[ "$AUR" == "pamac" ]]; then
+                            pamac clean --no-confirm
+                        else
+                            eval "yes | $AUR_clean"
+                        fi
                     else
-                        eval "yes | $AUR_clean"
+                        eval "$AUR_clean"
                     fi
-                else
-                    eval "$AUR_clean"
-                fi
-	   
-            elif test -n "$pac_clean"; then
-            	
-                if test -n "$YES"; then 
-                    if [[ "$pac" == "pacman" ]]; then
-                        eval "$pac_clean --noconfirm"  
+               
+                elif test -n "$pac_clean"; then
+                    
+                    if test -n "$YES"; then 
+                        if [[ "$pac" == "pacman" ]]; then
+                            eval "$pac_clean --noconfirm"  
+                        else
+                            eval "yes | $pac_clean"                   
+                        fi
                     else
-                        eval "yes | $pac_clean"                   
+                        eval "$pac_clean"
                     fi
-                else
-                    eval "$pac_clean"
                 fi
-	    fi
+            fi
         fi
-        
+
     elif [[ "$distro" == "Gentoo" ]]; then
         #TODO Add update cycle for Gentoo systems
         continue

@@ -282,73 +282,88 @@ if hash pacman &> /dev/null; then
             fi 
         }
         
-        function pacman-fzf-add-arch-mirror(){ 
-            local only_https mirror 
-            if test -n "$1" && [[ "$1" == 'y' ]] || [[ "$1" == 'n' ]]; then
-                only_https="$1"
+        function pacman-fzf-add-arch-repositories(){ 
+            local only_https mirror add_mirror
+
+            if test -n "$distro" && ! [[ "$distro" == 'Arch' ]]; then
+                printf "${yellow}Since the distribution you're using is not ${CYAN}Arch${yellow} but ${CYAN}$distro${yellow}, you will basically ${ORANGE}change distribution by installing Arch specific repositories\n${YELLOW}This means certain $distro - related packages won't be available any longer!\n${normal}"
+                readyn -p 'Still proceed?' add_mirror
             else
-                readyn -p "Only look for mirrors that use https?" only_https
+                add_mirror='y'
             fi
             
-            if [[ "$only_https" == 'y' ]]; then
-                # Https only
-                mirror=https://archlinux.org/mirrorlist/all/https/ 
-            else 
-                # All
-                mirror=https://archlinux.org/mirrorlist/all/ 
-            fi
-           
-            # Asked Chatgpt for the awk part of the script
-            # grep -v '^[[:space:]]*$' => Print everything but empty lines / lines with spaces
-            local mirrors=$(curl -fsSL $mirror | tail -n +6 | awk '/^## / { section = substr($0, 4); next }; /^$/ { section = ""; print; next }; section != "" { print $0 "\t" section; next }; { print }' | sed 's/^#//g' | grep -v '^[[:space:]]*$' | fzf --ansi --multi --select-1 --reverse --sync --delimiter '\t' --with-nth 1 --height 33% --preview='echo {2}' --preview-window='down,10%,follow') 
+            if [[ "$add_mirror" == 'y' ]]; then
 
-            # Turn mirrors into array in a bash and zsh compatible
-            local mirrors2
-            IFS=$'\n' read -r -d '' -A mirrors2 <<< "$(printf "%s\0" "$mirrors")" 
-        
-            printf "${green}Adding mirrors to ${CYAN}/etc/pacman.d/mirrorlist${normal}\n" 
-
-            for i in ${mirrors2[@]}; do
-                # Remove 'Server', '=' and 'https;//...' before printing, then remove unnecesary spaces
-                local country=$(echo $i | awk '{$1="";$2="";$3=""; print}' | xargs)
-                
-                # Cut everything after tab (using ANSI-C quoting) 
-                local mirror=$(echo $i | cut -d$'\t' -f-1)
-               
-                if ! grep -q $mirror /etc/pacman.d/mirrorlist; then 
-                    if ! grep -q $country /etc/pacman.d/mirrorlist; then
-                        sudo sed -i "1s/^/\n## Country : $country\n/" /etc/pacman.d/mirrorlist       
-                    fi
-                 
-                    # Set awk variables with -v
-                    command cat /etc/pacman.d/mirrorlist | awk -v mirror="$mirror" '/'"$country"'/ { print; print mirror; next }1' | sudo tee /etc/pacman.d/mirrorlist 1> /dev/null 
+                if test -n "$1" && [[ "$1" == 'y' ]] || [[ "$1" == 'n' ]]; then
+                    only_https="$1"
                 else
-                    printf "${ORANGE}'$mirror'${yellow} is already in ${YELLOW}/etc/pacman.d/mirrorlist${normal}\n"
+                    readyn -p "Only look for mirrors that use https?" only_https
                 fi
-            done
-            readyn -p "Edit ${CYAN}/etc/pacman.d/mirrorlist${GREEN} to see if everything was configured properly?" check_edit
-            if [[ "$check_edit" == 'y' ]]; then
-                if test -n "$SUDO_EDITOR"; then
-                    sudo $SUDO_EDITOR /etc/pacman.d/mirrorlist 
-                elif test -z "$SUDO_EDITOR" && test -n "$EDITOR"; then
-                    sudo $EDITOR /etc/pacman.d/mirrorlist
-                elif test -z "$EDITOR" && hash nano &> /dev/null; then
-                    sudo nano /etc/pacman.d/mirrorlist 
-                elif test -z "$EDITOR" && hash edit &> /dev/null; then
-                    sudo edit /etc/pacman.d/mirrorlist
+                
+                if [[ "$only_https" == 'y' ]]; then
+                    # Https only
+                    mirror=https://archlinux.org/mirrorlist/all/https/ 
+                else 
+                    # All
+                    mirror=https://archlinux.org/mirrorlist/all/ 
                 fi
-            fi
-           
-            if test -n "$distro" && ! [[ "$distro" == 'Arch' ]]; then
-                printf "${yellow}Since the distribution you're using is not ${CYAN}Arch${yellow} but ${CYAN}$distro${yellow}, you will need to reinstall ${CYAN}pacman${yellow} and other packages\nIt's ${YELLOW}important${yellow} that you update appropriate and ${GREEN}allow downgrades${yellow} when updating in order not to break anything\n${normal}" 
-            fi
+               
+                # Asked Chatgpt for the awk part of the script
+                # grep -v '^[[:space:]]*$' => Print everything but empty lines / lines with spaces
+                local mirrors=$(curl -fsSL $mirror | tail -n +6 | awk '/^## / { section = substr($0, 4); next }; /^$/ { section = ""; print; next }; section != "" { print $0 "\t" section; next }; { print }' | sed 's/^#//g' | grep -v '^[[:space:]]*$' | fzf --ansi --multi --select-1 --reverse --sync --delimiter '\t' --with-nth 1 --height 33% --preview='echo {2}' --preview-window='down,10%,follow') 
 
-            readyn -p "Refresh pacman using ${CYAN}sudo pacman -Syyuu${GREEN}?" pack_up
-            if [[ "$pack_up" == 'y' ]]; then 
-                sudo pacman -Syyuu
+                # Turn mirrors into array in a bash and zsh compatible
+                local mirrors2
+                IFS=$'\n' read -r -d '' -A mirrors2 <<< "$(printf "%s\0" "$mirrors")" 
+            
+                printf "${green}Adding mirrors to ${CYAN}/etc/pacman.d/mirrorlist${normal}\n" 
+
+                for i in ${mirrors2[@]}; do
+                    # Remove 'Server', '=' and 'https;//...' before printing, then remove unnecesary spaces
+                    local country=$(echo $i | awk '{$1="";$2="";$3=""; print}' | xargs)
+                    
+                    # Cut everything after tab (using ANSI-C quoting) 
+                    local mirror=$(echo $i | cut -d$'\t' -f-1)
+                   
+                    if ! grep -q $mirror /etc/pacman.d/mirrorlist; then 
+                        if ! grep -q $country /etc/pacman.d/mirrorlist; then
+                            sudo sed -i "1s/^/\n## Country : $country\n/" /etc/pacman.d/mirrorlist       
+                        fi
+                     
+                        # Set awk variables with -v
+                        command cat /etc/pacman.d/mirrorlist | awk -v mirror="$mirror" '/'"$country"'/ { print; print mirror; next }1' | sudo tee /etc/pacman.d/mirrorlist 1> /dev/null 
+                    else
+                        printf "${ORANGE}'$mirror'${yellow} is already in ${YELLOW}/etc/pacman.d/mirrorlist${normal}\n"
+                    fi
+                done
+                readyn -p "Edit ${CYAN}/etc/pacman.d/mirrorlist${GREEN} to see if everything was configured properly?" check_edit
+                if [[ "$check_edit" == 'y' ]]; then
+                    if test -n "$SUDO_EDITOR"; then
+                        sudo $SUDO_EDITOR /etc/pacman.d/mirrorlist 
+                    elif test -z "$SUDO_EDITOR" && test -n "$EDITOR"; then
+                        sudo $EDITOR /etc/pacman.d/mirrorlist
+                    elif test -z "$EDITOR" && hash nano &> /dev/null; then
+                        sudo nano /etc/pacman.d/mirrorlist 
+                    elif test -z "$EDITOR" && hash edit &> /dev/null; then
+                        sudo edit /etc/pacman.d/mirrorlist
+                    fi
+                fi
+               
+                if test -n "$distro" && ! [[ "$distro" == 'Arch' ]]; then
+                    printf "${yellow}Since the distribution you're using is not ${CYAN}Arch${yellow} but ${CYAN}$distro${yellow}, you will need to reinstall ${CYAN}pacman${yellow} and other packages\nIt's ${YELLOW}important${yellow} that you update appropriate and ${GREEN}allow downgrades${yellow} when updating in order not to break anything\n${normal}" 
+                fi
+
+                readyn -p "Refresh pacman using ${CYAN}sudo pacman -Syyuu${GREEN}?" pack_up
+                if [[ "$pack_up" == 'y' ]]; then 
+                    sudo pacman -Syyuu
+                fi
+
+                if test -n "$distro" && [[ "$distro" == 'Manjaro' ]] && hash pacman-mirrors &> /dev/null; then
+                    printf "${green}If you ever change your mind and want to change back to manjaro, use:\n${CYAN}\t- sudo pacman-mirrors -f ${GREEN}- to restore manjaro repositories in /etc/pacman.d/mirrorlist\n\t${CYAN}- sudo pacman -Syyuu ${GREEN}- to refresh repositories and update while allowing downgrades\n${ORANGE}Just make sure not to remove the package 'pacman-mirrors'${normal}\n" 
+                fi
+                
             fi
         }
-         
     fi
 
     #if type perl &> /dev/null && type zcat &> /dev/null && ! test -f $HOME/.cache/AUR/packages-meta-ext-v1.json.extracted.txt; then
