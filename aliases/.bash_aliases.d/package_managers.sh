@@ -286,7 +286,7 @@ if hash pacman &> /dev/null; then
             local only_https mirror add_mirror
 
             if test -n "$distro" && ! [[ "$distro" == 'Arch' ]]; then
-                printf "${yellow}Since the distribution you're using is not ${CYAN}Arch${yellow} but ${CYAN}$distro${yellow}, you will basically ${ORANGE}change distribution by installing Arch specific repositories\n${YELLOW}This means certain $distro - related packages won't be available any longer!\n${normal}"
+                printf "${yellow}Since the distribution you're using is not ${CYAN}Arch${yellow} but ${CYAN}$distro${yellow}, you will basically ${ORANGE}change distribution by installing Arch specific repositories\n${YELLOW}This means certain $distro related packages won't be available to install/update any longer!\n${normal}"
                 readyn -p 'Still proceed?' add_mirror
             else
                 add_mirror='y'
@@ -350,16 +350,16 @@ if hash pacman &> /dev/null; then
                 fi
                
                 if test -n "$distro" && ! [[ "$distro" == 'Arch' ]]; then
-                    printf "${yellow}Since the distribution you're using is not ${CYAN}Arch${yellow} but ${CYAN}$distro${yellow}, you will need to reinstall ${CYAN}pacman${yellow} and other packages\nIt's ${YELLOW}important${yellow} that you update appropriate and ${GREEN}allow downgrades${yellow} when updating in order not to break anything\n${normal}" 
+                    printf "${yellow}Since the distribution you're using is not ${CYAN}Arch${yellow} but ${CYAN}$distro${yellow}, you will need to reinstall ${CYAN}pacman${yellow} and other packages\nIt's ${YELLOW}important${yellow} that you update appropriately and ${GREEN}allow downgrades${yellow} when updating in order not to break anything\n${normal}" 
                 fi
 
-                readyn -p "Refresh pacman using ${CYAN}sudo pacman -Syyuu${GREEN}?" pack_up
+                readyn -p "Force refresh pacman using ${CYAN}'sudo pacman -Syyuu'${GREEN}?" pack_up
                 if [[ "$pack_up" == 'y' ]]; then 
                     sudo pacman -Syyuu
                 fi
 
                 if test -n "$distro" && [[ "$distro" == 'Manjaro' ]] && hash pacman-mirrors &> /dev/null; then
-                    printf "${green}If you ever change your mind and want to change back to manjaro, use:\n${CYAN}\t- sudo pacman-mirrors -f ${GREEN}- to restore manjaro repositories in /etc/pacman.d/mirrorlist\n\t${CYAN}- sudo pacman -Syyuu ${GREEN}- to refresh repositories and update while allowing downgrades\n${ORANGE}Just make sure not to remove the package 'pacman-mirrors'${normal}\n" 
+                    printf "${green}If you ever change your mind and want to change back to manjaro, use:\n${CYAN}\t- sudo pacman-mirrors ( -c Global / *your country* ) ( --fasttrack (*number of mirrors*)) ${GREEN}- to restore manjaro repositories in /etc/pacman.d/mirrorlist, '(..)' indicates optional arguments, *something* needs to be replaced\n\t${CYAN}- sudo pacman -Syyuu ${GREEN}- to force refresh repositories and update while allowing downgrades\n${ORANGE}Just make sure not to remove the package 'pacman-mirrors'${normal}\n" 
                 fi
                 
             fi

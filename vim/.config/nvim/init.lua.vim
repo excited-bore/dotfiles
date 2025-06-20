@@ -384,7 +384,7 @@ require("lazy").setup({
             capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 
             local mason_lspconfig = require 'mason-lspconfig'
-            mason_lspconfig.setup_handlers( {
+            mason_lspconfig.setup( {
                 function(server)
                     nvim_lsp[server].setup({
                         capabilities = capabilities,

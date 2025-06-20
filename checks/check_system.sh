@@ -137,7 +137,8 @@ elif test -f /etc/manjaro-release && [[ $distro == / ]]; then
     pac="pacman"
     pac_up="sudo pacman -Su"
     pac_ins="sudo pacman -S"
-    pac_search="sudo pacman -Ss"
+    pac_search="pacman -Ss"
+    pac_info="pacman -Si"
     pac_rm="sudo pacman -R"
     pac_rm_casc="sudo pacman -Rc"
     pac_rm_orph="sudo pacman -Rs"
@@ -233,94 +234,131 @@ elif test -f /etc/arch-release && [[ $distro == / ]]; then
 
     # Check every package manager known by archwiki
     #
-    if type pamac &>/dev/null; then
-
+    if hash pamac &>/dev/null; then
+        # Doesn't need sudo 
         AUR_pac="pamac"
         AUR_up="pamac update"
         AUR_ins="pamac install"
         AUR_search="pamac search"
+        AUR_search="pamac info"
         AUR_rm="pamac remove"
         AUR_rm_casc="pamac remove --cascade"
         AUR_rm_orph="pamac remove --orphans"
         AUR_clean_cache="pamac clean"
         AUR_ls_ins="pamac list --installed"
-    elif type yay &>/dev/null; then
 
-        AUR_pac="sudo yay"
-        AUR_up="sudo yay -Syu"
-        AUR_ins="sudo yay -S"
-        AUR_search="sudo yay -Ss"
-        AUR_rm="sudo yay -R"
-        AUR_rm_casc="sudo yay -Rc"
-        AUR_rm_orph="sudo yay -Rs"
-        AUR_clean="sudo yay -Sc"
-        AUR_clean_cache="sudo yay -Scc"
-        AUR_ls_ins="sudo yay -Q"
-    elif type pikaur &>/dev/null; then
+    elif hash yay &>/dev/null; then
+        # Doesn't need sudo 
+        AUR_pac="yay"
+        AUR_up="yay -Syu"
+        AUR_ins="yay -S"
+        AUR_search="yay -Ss"
+        AUR_info="yay -Si"
+        AUR_rm="yay -R"
+        AUR_rm_casc="yay -Rc"
+        AUR_rm_orph="yay -Rs"
+        AUR_clean="yay -Sc"
+        AUR_clean_cache="yay -Scc"
+        AUR_ls_ins="yay -Q"
 
+    elif hash pikaur &>/dev/null; then
+        # Doesn't need sudo 
         AUR_pac="pikaur"
         AUR_up="pikaur -Syu"
         AUR_ins="pikaur -S"
         AUR_search="pikaur -Ss"
+        AUR_info="pikaur -Si"
         AUR_rm="pikaur -R"
         AUR_rm_casc="pikaur -Rc"
         AUR_rm_orph="pikaur -Rs"
         AUR_clean="pikaur -Sc"
         AUR_clean_cache="pikaur -Scc"
         AUR_ls_ins="pikaur -Q"
-    elif type pacaur &>/dev/null; then
 
+    elif hash pacaur &>/dev/null; then
+        # Doesn't need sudo 
         AUR_pac="pacaur"
         AUR_up="pacaur -Syu"
         AUR_ins="pacaur -S"
         AUR_search="pacaur -Ss"
+        AUR_info="pacaur -Si"
+        AUR_rm="pacaur -R"
+        AUR_rm_casc="pacaur -Rc"
+        AUR_rm_orph="pacaur -Rs"
         AUR_clean="pacaur -Sc"
+        AUR_clean_cache="pacaur -Scc"
         AUR_ls_ins="pacaur -Q"
 
-    elif type aura &>/dev/null; then
-
+    elif hash aura &>/dev/null; then
+        # Doesn't need sudo 
         AUR_pac="aura"
-        AUR_up="aura -Au"
-        AUR_ins="aura -A"
+        AUR_up="aura -Syu"
+        AUR_ins="aura -S"
         AUR_search="aura -Ss"
+        AUR_info="aura -Si"
+        AUR_rm="aura -R"
+        AUR_rm_casc="aura -Rc"
+        AUR_rm_orph="aura -Rs"
+        AUR_clean="aura -Sc"
+        AUR_clean_cache="aura -Scc"
         AUR_ls_ins="aura -Q"
 
-    elif type aurman &>/dev/null; then
+    elif hash pakku &>/dev/null; then
+        # Doesn't need sudo 
+        AUR_pac="pakku"
+        AUR_up="pakku -Syu"
+        AUR_ins="pakku -S"
+        AUR_search="pakku -Ss"
+        AUR_info="pakku -Si"
+        AUR_rm="pakku -R"
+        AUR_rm_casc="pakku -Rc"
+        AUR_rm_orph="pakku -Rs"
+        AUR_clean="pakku -Sc"
+        AUR_clean_cache="pakku -Scc"
+        AUR_ls_ins="pakku -Q"
 
+    elif hash paru &>/dev/null; then
+        # Doesn't need sudo 
+        AUR_pac="paru"
+        AUR_up="paru -Syu"
+        AUR_ins="paru -S"
+        AUR_search="paru -Ss"
+        AUR_info="paru -Si"
+        AUR_rm="paru -R"
+        AUR_rm_casc="paru -Rc"
+        AUR_rm_orph="paru -Rs"
+        AUR_clean="paru -Sc"
+        AUR_clean_cache="paru -Scc"
+        AUR_ls_ins="paru -Q"
+
+    elif hash trizen &>/dev/null; then
+        # Doesn't need sudo 
+        AUR_pac="trizen"
+        AUR_up="trizen -Syu"
+        AUR_ins="trizen -S"
+        AUR_search="trizen -Ss"
+        AUR_info="trizen -Si"
+        AUR_rm="trizen -R"
+        AUR_rm_casc="trizen -Rc"
+        AUR_rm_orph="trizen -Rs"
+        AUR_clean="trizen -Sc"
+        AUR_clean_cache="trizen -Scc"
+        AUR_ls_ins="trizen -Q"
+
+    elif hash aurman &>/dev/null; then
         AUR_pac="aurman"
         AUR_up="aurman -Syu"
         AUR_ins="aurman -S"
         AUR_search="aurman -Ss"
         AUR_ls_ins="aurman -Q"
 
-    elif type pakku &>/dev/null; then
-
-        AUR_pac="pakku"
-        AUR_up="pakku -Syu"
-        AUR_ins="pakku -S"
-        AUR_search="pakku -Ss"
-        AUR_ls_ins="pakku -Q"
-
-    elif type paru &>/dev/null; then
-        AUR_pac="paru"
-        AUR_up="paru -Syua"
-        AUR_ins="paru -S"
-        AUR_search="paru -Ss"
-        AUR_search="paru -Q"
-
-    elif type trizen &>/dev/null; then
-        AUR_pac="trizen"
-        AUR_up="trizen -Syu"
-        AUR_ins="trizen -S"
-        AUR_search="trizen -Ss"
-        AUR_ls_ins="trizen -Q"
-
     #
-    # SEARCH AND BUILD
+    # NON-PACMAN WRAPPERS 
+    # 'SEARCH AND BUILD' - ers
     #
 
     # Aurutils
-    elif type aur &>/dev/null; then
+    elif hash aur &>/dev/null; then
         AUR_pac="aur"
         AUR_up=""
         AUR_ins=""

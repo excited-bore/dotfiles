@@ -14,12 +14,12 @@ else
     . $SCRIPT_DIR/../checks/check_all.sh
 fi
 
-if ! hash yay &> /dev/null; then
+if ! hash auracle &> /dev/null; then
     if ! hash git &> /dev/null || ! hash makepkg &> /dev/null || ! hash fakeroot &> /dev/null; then
         eval "${pac_ins} --needed base-devel git fakeroot"
     fi
-    git clone https://aur.archlinux.org/yay.git $TMPDIR/yay
-    (cd $TMPDIR/yay
+    git clone https://aur.archlinux.org/auracle-git.git $TMPDIR/auracle
+    (cd $TMPDIR/auracle
     makepkg -fsri)
-    yay --version && echo "${green}${bold}Yay installed!${normal}"
+    yay --version && echo "${green}${bold}Auracle installed!${normal}"
 fi
