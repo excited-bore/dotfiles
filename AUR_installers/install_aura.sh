@@ -19,6 +19,10 @@ if ! type aura &> /dev/null; then
     git clone https://aur.archlinux.org/aura-bin.git $TMPDIR/aura-bin
     (cd $TMPDIR/aura-bin
     makepkg -fsri)
-    aura --version && echo "${green}${bold}Aura installed!"
+    aura --version && echo "${GREEN}Aura installed!"
+    
+    # Remove debug package if accidentally included
+    test -n "$(pacman -Qm aura-bin-debug)" &&
+        sudo pacman --noconfirm -R aura-bin-debug         
 fi
      

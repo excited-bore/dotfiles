@@ -2,29 +2,8 @@ if ! type reade &> /dev/null && test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh; 
     . ~/.bash_aliases.d/00-rlwrap_scripts.sh
 fi 
 
-
-#if ! type reade &> /dev/null; then
-#    if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
-#        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh) 
-#    elif test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh~/.bash_aliases.d/00-rlwrap_scripts.sh; then
-#       source ~/.bash_aliases.d/00-rlwrap_scripts.sh
-#    else
-#        . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
-#    
-#    fi
-#fi
-##
-
-#if test -z "$distro"; then 
-#    if ! test -f checks/check_system.sh; then
-#         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh) 
-#    else
-#        . ./checks/check_system.sh
-#    fi
-#fi
-#
-#if type pamac &> /dev/null && grep -q '#EnableAUR' /etc/pamac.conf; then
-#    if ! test -f checks/clheck_pamac.sh; then
+#if hash pamac &> /dev/null && grep -q '#EnableAUR' /etc/pamac.conf; then
+#    if ! test -f checks/check_pamac.sh; then
 #         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pamac.sh) 
 #    else
 #        . ./checks/check_pamac.sh
@@ -57,6 +36,7 @@ function version-higher() {
 # https://www.explainxkcd.com/wiki/index.php/1654:_Universal_Install_Script
 
 function update-system() {
+    local SCRIPT_DIR=$(get-script-dir) 
     local YES flag NOGUI KERNEL='lts' SKIPKERNEL='n' 
     while [[ $# -gt 0 ]]; do
         case $1 in
@@ -332,6 +312,7 @@ function update-system() {
     elif [[ "$pac" == "pacman" ]]; then
    
         if test -f /var/lib/pacman/db.lck; then
+            local rm_dblck 
             printf "${yellow}There's a lockfile ${ORANGE}/var/lib/pacman/db.lck${normal}\n" 
             printf "${yellow}If there's no other instance of pacman running, ${YELLOW}the file needs to be removed before continuing${normal}\n" 
             printf "${yellow}Otherwise update-system will quit${normal}\n" 
@@ -341,7 +322,6 @@ function update-system() {
             else
                 exit 1
             fi
-            unset rm_dblck 
         fi
         
         if test -n "$YES"; then 
@@ -349,21 +329,112 @@ function update-system() {
         else 
             sudo pacman -Su
         fi
+       
+        if test -z "$AUR_up" || test -z "$AUR_search" || test -z "$AUR_info"; then
+            local nstll_AUR pick_aur
+            printf "${YELLOW}No appropriate cli based AUR helper found!\n${normal}" 
+            printf "${CYAN}It's best to have a cli-based pacman wrapper/AUR helper installed for updating/managing AUR-based packages\n${normal}" 
+            readyn -p "Install a pacman wrapper/AUR helper?" nstll_AUR
+            if [[ "$nstll_AUR" == 'y' ]]; then
+                reade -Q 'GREEN' -i 'yay pacaur pikaur aura paru pakku trizen pamac' -p "Which one? [Yay/pacaur/pikaur/aura/paru/pakku/trizen/pamac]: " pick_aur
+                if [[ "$pick_aur" == 'yay' ]]; then
+                    if ! test -f $SCRIPT_DIR/../../AUR_installers/install_yay.sh; then
+                        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/AUR_installers/install_yay.sh) 
+                    else
+                        source $SCRIPT_DIR/../../AUR_installers/install_yay.sh 
+                    fi
+                elif [[ "$pick_aur" == 'pacaur' ]]; then
+                    if ! test -f $SCRIPT_DIR/../../AUR_installers/install_pacaur.sh; then
+                        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/AUR_installers/install_pacaur.sh) 
+                    else
+                        source $SCRIPT_DIR/../../AUR_installers/install_pacaur.sh 
+                    fi
+                elif [[ "$pick_aur" == 'pikaur' ]]; then
+                    if ! test -f $SCRIPT_DIR/../../AUR_installers/install_pikaur.sh; then
+                        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/AUR_installers/install_pikaur.sh) 
+                    else
+                        source $SCRIPT_DIR/../../AUR_installers/install_pikaur.sh 
+                    fi
+                elif [[ "$pick_aur" == 'aura' ]]; then
+                    if ! test -f $SCRIPT_DIR/../../AUR_installers/install_aura.sh; then
+                        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/AUR_installers/install_aura.sh) 
+                    else
+                        source $SCRIPT_DIR/../../AUR_installers/install_aura.sh 
+                    fi
+                elif [[ "$pick_aur" == 'paru' ]]; then
+                    if ! test -f $SCRIPT_DIR/../../AUR_installers/install_paru.sh; then
+                        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/AUR_installers/install_paru.sh) 
+                    else
+                        source $SCRIPT_DIR/../../AUR_installers/install_paru.sh 
+                    fi
+                elif [[ "$pick_aur" == 'pakku' ]]; then
+                    if ! test -f $SCRIPT_DIR/../../AUR_installers/install_pakku.sh; then
+                        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/AUR_installers/install_pakku.sh) 
+                    else
+                        source $SCRIPT_DIR/../../AUR_installers/install_pakku.sh 
+                    fi
+                elif [[ "$pick_aur" == 'trizen' ]]; then
+                    if ! test -f $SCRIPT_DIR/../../AUR_installers/install_trizen.sh; then
+                        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/AUR_installers/install_trizen.sh) 
+                    else
+                        source $SCRIPT_DIR/../../AUR_installers/install_trizen.sh 
+                    fi
+                elif [[ "$pick_aur" == 'pamac' ]]; then
+                    if ! test -f $SCRIPT_DIR/../../AUR_installers/install_pamac.sh; then
+                        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/AUR_installers/install_pamac.sh) 
+                    else
+                        source $SCRIPT_DIR/../../AUR_installers/install_pamac.sh 
+                    fi
+                    
+                fi
+                if test -n "$pick_aur"; then
+                   if ! test -f $SCRIPT_DIR/../../checks/check_system.sh; then
+                        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh) 
+                    else
+                        source $SCRIPT_DIR/../../checks/check_system.sh 
+                    fi  
+                fi
+            fi
+        fi
         
+        if [[ "$AUR" == 'pamac' ]] && (! test -f /etc/pamac.conf || ! grep -q '^EnableAUR' /etc/pamac.conf); then
+            if ! test -f /etc/pamac.conf; then
+                printf "${GREEN}Adding /etc/pamac.conf to enable the AUR for pamac\n${normal}"
+                sudo touch /etc/pamac.conf
+                printf '## Allow Pamac to search and install packages from AUR:\nEnableAUR\n' | sudo tee -a /etc/pamac.conf
+            else
+                printf "${GREEN}Adding 'EnableAUR' to /etc/pamac.conf to enable the AUR for pamac\n${normal}"
+                if grep -q 'EnableAUR' /etc/pamac.conf; then
+                    sudo sed -i 's/#EnableAUR/EnableAUR/g' /etc/pamac.conf
+                else 
+                    printf '## Allow Pamac to search and install packages from AUR:\nEnableAUR\n' | sudo tee -a /etc/pamac.conf
+                fi
+            fi
+        fi
+
         if test -n "$AUR_up"; then
             
             if test -n "$YES"; then 
                 
-                if [[ "$AUR_up" == "pamac update" ]]; then
+                if [[ "$AUR_pac" == "pamac" ]]; then
+                    pamac checkupdates  
                     pamac update --no-confirm
+                
+                elif test -n "$AUR_up_y"; then
+                    eval "${AUR_up_y}"
+                
                 else
-                    yes | eval ${AUR_up}
+                    yes | eval "${AUR_up}"
                 fi
+            
             else 
-                eval ${AUR_up}
+                [[ "$AUR_pac" == "pamac" ]] &&
+                    pamac checkupdates  
+                
+                eval "${AUR_up}"
             fi
         fi 
-       
+      
         local available prmpt 
         if [[ "$distro" == 'Manjaro' ]]; then
             available="$(mhwd-kernel -l | awk 'NR>1{print $2}' | tr '\n' ' ')"
@@ -412,9 +483,10 @@ function update-system() {
             printf "$prmpth" "linux-zen" "$zenv" "linux-zen-headers" "$zenhv" 
             printf "$prmpth1" "'Result of a collaborative effort of kernel hackers to provide the best Linux kernel possible for everyday systems.'"
 
-            if test -n "$AUR_search"; then
+            if test -n "$AUR_search" && test -n "$AUR_info"; then
                 local ltss=$(eval "$AUR_search linux-lts | grep 'linux-lts[[:digit:]+]' | cut -d- -f-2 | awk '{print $1}' | uniq | tr '\n' ' ' | xargs")
                 available="$available $ltss linux-lqx linux-git linux-mainline linux-next-git linux-drm-tip-git linux-drm-next-git linux-ck linux-clear linux-libre linux-pf linux-prjc linux-nitrous linux-vfio linux-vfio-lts linux-xanmod linux-xanmod-lts linux-xanmod-rt linux-xanmod-bore linux-cachyos" 
+                 
             fi
         fi
         
