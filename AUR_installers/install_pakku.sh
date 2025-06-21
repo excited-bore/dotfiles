@@ -21,6 +21,10 @@ if ! hash pakku &> /dev/null; then
     git clone https://aur.archlinux.org/pakku.git $TMPDIR/pakku
     (cd $TMPDIR/pakku
     makepkg -fsri)
-    pakku --version && echo "${green}${bold}Pakku installed!"
+    pakku --version && echo "${GREEN}Pakku installed!"
+    
+    # Remove debug package if accidentally included
+    test -n "$(pacman -Qm pakku-debug)" &&
+        sudo pacman --noconfirm -R pakku-debug         
 fi
 

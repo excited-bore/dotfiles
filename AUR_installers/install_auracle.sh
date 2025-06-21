@@ -21,5 +21,10 @@ if ! hash auracle &> /dev/null; then
     git clone https://aur.archlinux.org/auracle-git.git $TMPDIR/auracle
     (cd $TMPDIR/auracle
     makepkg -fsri)
-    yay --version && echo "${green}${bold}Auracle installed!${normal}"
+    auracle --version && echo "${GREEN}Auracle installed!${normal}"
+   
+    # Remove debug package if accidentally included
+    test -n "$(pacman -Qm auracle-git-debug)" &&
+        sudo pacman --noconfirm -R auracle-git-debug         
+    
 fi

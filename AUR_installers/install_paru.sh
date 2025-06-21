@@ -12,12 +12,16 @@ else
     . $SCRIPT_DIR/../checks/check_all.sh 
 fi
 
-if ! type paru &> /dev/null; then
-    if ! type git &> /dev/null || ! type makepkg &> /dev/null || ! type fakeroot &> /dev/null; then
-        eval ${pac_ins} --needed base-devel git fakeroot
+if ! hash paru &> /dev/null; then
+    if ! hash git &> /dev/null || ! hash makepkg &> /dev/null || ! hash fakeroot &> /dev/null; then
+        eval "${pac_ins} --needed base-devel git fakeroot"
     fi
     git clone https://aur.archlinux.org/paru.git $TMPDIR/paru
     (cd $TMPDIR/paru
     makepkg -fsri)
-    paru --version && echo "${green}${bold}Paru installed!"
+    paru --version && echo "${GREEN}Paru installed!"
+   
+    # Remove debug package if accidentally included
+    test -n "$(pacman -Qm paru-debug)" &&
+        sudo pacman --noconfirm -R paru-debug
 fi

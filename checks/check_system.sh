@@ -133,30 +133,6 @@ if test -f /etc/alpine-release && [[ $distro == / ]]; then
     pac="apk"
     distro_base="BSD"
     distro="Alpine"
-elif test -f /etc/manjaro-release && [[ $distro == / ]]; then
-    pac="pacman"
-    pac_up="sudo pacman -Su"
-    pac_ins="sudo pacman -S"
-    pac_search="pacman -Ss"
-    pac_info="pacman -Si"
-    pac_rm="sudo pacman -R"
-    pac_rm_casc="sudo pacman -Rc"
-    pac_rm_orph="sudo pacman -Rs"
-    pac_clean_cache="sudo pacman -Scc"
-    pac_ls_ins="pacman -Q"
-
-    AUR_pac="pamac"
-    AUR_up="pamac update"
-    AUR_ins="pamac install"
-    AUR_search="pamac search"
-    AUR_rm="pamac remove"
-    AUR_rm_casc="pamac remove --cascade"
-    AUR_rm_orph="pamac remove --orphans"
-    AUR_clean_cache="pamac clean"
-    AUR_ls_ins="pamac list --installed"
-
-    distro_base="Arch"
-    distro="Manjaro"
 
 elif test -f /etc/issue && grep -q "Ubuntu" /etc/issue && [[ $distro == / ]]; then
     pac="apt"
@@ -179,19 +155,23 @@ elif (test -f /etc/SuSE-release || test -f /etc/SUSE-brand) && [[ $distro == / ]
     fi
     distro_base="Slackware"
     distro="openSUSE"
+
 elif test -f /etc/gentoo-release && [[ $distro == / ]]; then
     pac="emerge"
     distro_base="Slackware"
     distro="Gentoo"
+
 elif test -f /etc/fedora-release && [[ $distro == / ]]; then
     pac="dnf"
     distro_base="RedHat"
     distro="Fedora"
+
 elif test -f /etc/redhat-release && [[ $distro == / ]]; then
     pac="yum"
     distro_base="RedHat"
     distro="Redhat"
-elif test -f /etc/arch-release && [[ $distro == / ]]; then
+
+elif (test -f /etc/arch-release || test -f /etc/manjaro-release) && [[ $distro == / ]]; then
 
     unset ansr ansr1
 
@@ -213,21 +193,40 @@ elif test -f /etc/arch-release && [[ $distro == / ]]; then
         fi
     fi
 
-    [[ "$ansr" == 'y' ]] || [[ "$ansr1" == 'y' ]] && sudo pacman -Syy
+    [[ "$ansr" == 'y' ]] || [[ "$ansr1" == 'y' ]] && 
+        sudo pacman -Syy
 
     unset ansr ansr1
 
     pac="pacman"
-    pac_up="sudo pacman -Su"
+    pac_y="--noconfirm"
     pac_ins="sudo pacman -S"
-    pac_search="sudo pacman -Ss"
-    pac_rm="pacman -R"
-    pac_rm_casc="pacman -Rc"
-    pac_rm_orph="pacman -Rs"
-    pac_clean="sudo pacman -R $(pacman -Qdtq)"
-    pac_clean_cache="pacman -Scc"
+    pac_ins_y="sudo pacman --noconfirm -S"
+    pac_refresh="sudo pacman -Sy"
+    pac_force_refresh="sudo pacman -Syy"
+    pac_up="sudo pacman -Su"
+    pac_up_y="sudo pacman --noconfirm -Su"
+    pac_refresh_up="sudo pacman -Syu"
+    pac_refresh_up_y="sudo pacman --noconfirm -Syu"
+    pac_force_refresh_up="sudo pacman -Syyuu"
+    pac_force_refresh_up_y="sudo pacman --noconfirm -Syyuu"
+    pac_search="pacman -Ss"
+    pac_info="pacman -Si"
+    pac_rm="sudo pacman -R"
+    pac_rm_y="sudo pacman --noconfirm -R"
+    pac_rm_casc="sudo pacman -Rc"
+    pac_rm_casc_y="sudo pacman --noconfirm -Rc"
+    pac_rm_orph="sudo pacman -Rs $(pacman -Qd --unrequired --quiet)"
+    pac_rm_orph_y="sudo pacman --noconfirm -Rs $(pacman -Qd --unrequired --quiet)"
+    pac_clean="sudo pacman -Sc"
+    pac_clean_y="sudo pacman --noconfirm -Sc"
+    pac_clean_full="sudo pacman -Scc"
+    pac_clean_full_y="sudo pacman --noconfirm -Scc"
     pac_ls_ins="pacman -Q"
-
+    pac_ls_orhpan="pacman -Qdtq" 
+    pac_ls_foreign="pacman -Qm"
+    
+   
     #
     # PACMAN WRAPPERS
     #
@@ -237,132 +236,275 @@ elif test -f /etc/arch-release && [[ $distro == / ]]; then
     if hash pamac &>/dev/null; then
         # Doesn't need sudo 
         AUR_pac="pamac"
+        AUR_pac_y="--no-confirm"
         AUR_up="pamac update"
+        AUR_up_y="pamac update --no-confirm"
         AUR_ins="pamac install"
         AUR_search="pamac search"
-        AUR_search="pamac info"
+        AUR_info="pamac info"
         AUR_rm="pamac remove"
         AUR_rm_casc="pamac remove --cascade"
         AUR_rm_orph="pamac remove --orphans"
-        AUR_clean_cache="pamac clean"
+        AUR_rm_orph_y="pamac remove --orphans --no-confirm"
+        AUR_clean="pamac clean"
+        AUR_clean_y="pamac clean --no-confirm"
         AUR_ls_ins="pamac list --installed"
+        AUR_ls_orphan="pamac list --orphans"
+        AUR_ls_foreign="pamac list --foreign"
 
     elif hash yay &>/dev/null; then
         # Doesn't need sudo 
         AUR_pac="yay"
-        AUR_up="yay -Syu"
+        AUR_y="--noconfirm"
         AUR_ins="yay -S"
+        AUR_ins_y="yay --noconfirm -S"
+        AUR_refresh="yay -Sy"
+        AUR_force_refresh="yay -Syy"
+        AUR_up="yay -Su"
+        AUR_up_y="yay --noconfirm -Su"
+        AUR_refresh_up="yay -Syu"
+        AUR_refresh_up_y="yay --noconfirm -Syu"
+        AUR_force_refresh_up="yay -Syyuu"
+        AUR_force_refresh_up_y="yay --noconfirm -Syyuu"
         AUR_search="yay -Ss"
         AUR_info="yay -Si"
         AUR_rm="yay -R"
+        AUR_rm_y="yay --noconfirm -R"
         AUR_rm_casc="yay -Rc"
-        AUR_rm_orph="yay -Rs"
+        AUR_rm_casc_y="yay --noconfirm -Rc"
+        AUR_rm_orph="yay -Rs $(yay -Qd --unrequired --quiet)"
+        AUR_rm_orph_y="yay --noconfirm -Rs $(yay -Qd --unrequired --quiet)"
         AUR_clean="yay -Sc"
-        AUR_clean_cache="yay -Scc"
+        AUR_clean_y="yay --noconfirm -Sc"
+        AUR_clean_full="yay -Scc"
+        AUR_clean_full_y="yay --noconfirm -Scc"
         AUR_ls_ins="yay -Q"
+        AUR_ls_orhpan="yay -Qdtq" 
+        AUR_ls_foreign="yay -Qm"
+       
 
     elif hash pikaur &>/dev/null; then
         # Doesn't need sudo 
         AUR_pac="pikaur"
-        AUR_up="pikaur -Syu"
+        AUR_y="--noconfirm"
         AUR_ins="pikaur -S"
+        AUR_ins_y="pikaur --noconfirm -S"
+        AUR_refresh="pikaur -Sy"
+        AUR_force_refresh="pikaur -Syy"
+        AUR_up="pikaur -Su"
+        AUR_up_y="pikaur --noconfirm -Su"
+        AUR_refresh_up="pikaur -Syu"
+        AUR_refresh_up_y="pikaur --noconfirm -Syu"
+        AUR_force_refresh_up="pikaur -Syyuu"
+        AUR_force_refresh_up_y="pikaur --noconfirm -Syyuu"
         AUR_search="pikaur -Ss"
         AUR_info="pikaur -Si"
         AUR_rm="pikaur -R"
+        AUR_rm_y="pikaur --noconfirm -R"
         AUR_rm_casc="pikaur -Rc"
-        AUR_rm_orph="pikaur -Rs"
+        AUR_rm_casc_y="pikaur --noconfirm -Rc"
+        AUR_rm_orph="pikaur -Rs $(pikaur -Qd --unrequired --quiet)"
+        AUR_rm_orph_y="pikaur --noconfirm -Rs $(pikaur -Qd --unrequired --quiet)"
         AUR_clean="pikaur -Sc"
-        AUR_clean_cache="pikaur -Scc"
+        AUR_clean_y="pikaur --noconfirm -Sc"
+        AUR_clean_full="pikaur -Scc"
+        AUR_clean_full_y="pikaur --noconfirm -Scc"
         AUR_ls_ins="pikaur -Q"
-
+        AUR_ls_orhpan="pikaur -Qdtq" 
+        AUR_ls_foreign="pikaur -Qm"
+        
     elif hash pacaur &>/dev/null; then
         # Doesn't need sudo 
         AUR_pac="pacaur"
-        AUR_up="pacaur -Syu"
+        AUR_y="--noconfirm"
         AUR_ins="pacaur -S"
+        AUR_ins_y="pacaur --noconfirm -S"
+        AUR_refresh="pacaur -Sy"
+        AUR_force_refresh="pacaur -Syy"
+        AUR_up="pacaur -Su"
+        AUR_up_y="pacaur --noconfirm -Su"
+        AUR_refresh_up="pacaur -Syu"
+        AUR_refresh_up_y="pacaur --noconfirm -Syu"
+        AUR_force_refresh_up="pacaur -Syyuu"
+        AUR_force_refresh_up_y="pacaur --noconfirm -Syyuu"
         AUR_search="pacaur -Ss"
         AUR_info="pacaur -Si"
         AUR_rm="pacaur -R"
+        AUR_rm_y="pacaur --noconfirm -R"
         AUR_rm_casc="pacaur -Rc"
-        AUR_rm_orph="pacaur -Rs"
+        AUR_rm_casc_y="pacaur --noconfirm -Rc"
+        AUR_rm_orph="pacaur -Rs $(pacaur -Qd --unrequired --quiet)"
+        AUR_rm_orph_y="pacaur --noconfirm -Rs $(pacaur -Qd --unrequired --quiet)"
         AUR_clean="pacaur -Sc"
-        AUR_clean_cache="pacaur -Scc"
+        AUR_clean_y="pacaur --noconfirm -Sc"
+        AUR_clean_full="pacaur -Scc"
+        AUR_clean_full_y="pacaur --noconfirm -Scc"
         AUR_ls_ins="pacaur -Q"
-
+        AUR_ls_orhpan="pacaur -Qdtq" 
+        AUR_ls_foreign="pacaur -Qm"    
+   
     elif hash aura &>/dev/null; then
         # Doesn't need sudo 
         AUR_pac="aura"
-        AUR_up="aura -Syu"
+        AUR_y="--noconfirm"
         AUR_ins="aura -S"
+        AUR_ins_y="aura --noconfirm -S"
+        AUR_refresh="aura -Sy"
+        AUR_force_refresh="aura -Syy"
+        AUR_up="aura -Su"
+        AUR_up_y="aura --noconfirm -Su"
+        AUR_refresh_up="aura -Syu"
+        AUR_refresh_up_y="aura --noconfirm -Syu"
+        AUR_force_refresh_up="aura -Syyuu"
+        AUR_force_refresh_up_y="aura --noconfirm -Syyuu"
         AUR_search="aura -Ss"
         AUR_info="aura -Si"
         AUR_rm="aura -R"
+        AUR_rm_y="aura --noconfirm -R"
         AUR_rm_casc="aura -Rc"
-        AUR_rm_orph="aura -Rs"
+        AUR_rm_casc_y="aura --noconfirm -Rc"
+        AUR_rm_orph="aura -Rs $(aura -Qd --unrequired --quiet)"
+        AUR_rm_orph_y="aura --noconfirm -Rs $(aura -Qd --unrequired --quiet)"
         AUR_clean="aura -Sc"
-        AUR_clean_cache="aura -Scc"
+        AUR_clean_y="aura --noconfirm -Sc"
+        AUR_clean_full="aura -Scc"
+        AUR_clean_full_y="aura --noconfirm -Scc"
         AUR_ls_ins="aura -Q"
+        AUR_ls_orhpan="aura -Qdtq" 
+        AUR_ls_foreign="aura -Qm"
 
     elif hash pakku &>/dev/null; then
         # Doesn't need sudo 
         AUR_pac="pakku"
-        AUR_up="pakku -Syu"
+        AUR_y="--noconfirm"
         AUR_ins="pakku -S"
+        AUR_ins_y="pakku --noconfirm -S"
+        AUR_refresh="pakku -Sy"
+        AUR_force_refresh="pakku -Syy"
+        AUR_up="pakku -Su"
+        AUR_up_y="pakku --noconfirm -Su"
+        AUR_refresh_up="pakku -Syu"
+        AUR_refresh_up_y="pakku --noconfirm -Syu"
+        AUR_force_refresh_up="pakku -Syyuu"
+        AUR_force_refresh_up_y="pakku --noconfirm -Syyuu"
         AUR_search="pakku -Ss"
         AUR_info="pakku -Si"
         AUR_rm="pakku -R"
+        AUR_rm_y="pakku --noconfirm -R"
         AUR_rm_casc="pakku -Rc"
-        AUR_rm_orph="pakku -Rs"
+        AUR_rm_casc_y="pakku --noconfirm -Rc"
+        AUR_rm_orph="pakku -Rs $(pakku -Qd --unrequired --quiet)"
+        AUR_rm_orph_y="pakku --noconfirm -Rs $(pakku -Qd --unrequired --quiet)"
         AUR_clean="pakku -Sc"
-        AUR_clean_cache="pakku -Scc"
+        AUR_clean_y="pakku --noconfirm -Sc"
+        AUR_clean_full="pakku -Scc"
+        AUR_clean_full_y="pakku --noconfirm -Scc"
         AUR_ls_ins="pakku -Q"
+        AUR_ls_orhpan="pakku -Qdtq" 
+        AUR_ls_foreign="pakku -Qm"
 
     elif hash paru &>/dev/null; then
         # Doesn't need sudo 
         AUR_pac="paru"
-        AUR_up="paru -Syu"
+        AUR_y="--noconfirm"
         AUR_ins="paru -S"
+        AUR_ins_y="paru --noconfirm -S"
+        AUR_refresh="paru -Sy"
+        AUR_force_refresh="paru -Syy"
+        AUR_up="paru -Su"
+        AUR_up_y="paru --noconfirm -Su"
+        AUR_refresh_up="paru -Syu"
+        AUR_refresh_up_y="paru --noconfirm -Syu"
+        AUR_force_refresh_up="paru -Syyuu"
+        AUR_force_refresh_up_y="paru --noconfirm -Syyuu"
         AUR_search="paru -Ss"
         AUR_info="paru -Si"
         AUR_rm="paru -R"
+        AUR_rm_y="paru --noconfirm -R"
         AUR_rm_casc="paru -Rc"
-        AUR_rm_orph="paru -Rs"
+        AUR_rm_casc_y="paru --noconfirm -Rc"
+        AUR_rm_orph="paru -Rs $(paru -Qd --unrequired --quiet)"
+        AUR_rm_orph_y="paru --noconfirm -Rs $(paru -Qd --unrequired --quiet)"
         AUR_clean="paru -Sc"
-        AUR_clean_cache="paru -Scc"
+        AUR_clean_y="paru --noconfirm -Sc"
+        AUR_clean_full="paru -Scc"
+        AUR_clean_full_y="paru --noconfirm -Scc"
         AUR_ls_ins="paru -Q"
+        AUR_ls_orhpan="paru -Qdtq" 
+        AUR_ls_foreign="paru -Qm"
 
     elif hash trizen &>/dev/null; then
         # Doesn't need sudo 
         AUR_pac="trizen"
-        AUR_up="trizen -Syu"
+        AUR_y="--noconfirm"
         AUR_ins="trizen -S"
+        AUR_ins_y="trizen --noconfirm -S"
+        AUR_refresh="trizen -Sy"
+        AUR_force_refresh="trizen -Syy"
+        AUR_up="trizen -Su"
+        AUR_up_y="trizen --noconfirm -Su"
+        AUR_refresh_up="trizen -Syu"
+        AUR_refresh_up_y="trizen --noconfirm -Syu"
+        AUR_force_refresh_up="trizen -Syyuu"
+        AUR_force_refresh_up_y="trizen --noconfirm -Syyuu"
         AUR_search="trizen -Ss"
         AUR_info="trizen -Si"
         AUR_rm="trizen -R"
+        AUR_rm_y="trizen --noconfirm -R"
         AUR_rm_casc="trizen -Rc"
-        AUR_rm_orph="trizen -Rs"
+        AUR_rm_casc_y="trizen --noconfirm -Rc"
+        AUR_rm_orph="trizen -Rs $(trizen -Qd --unrequired --quiet)"
+        AUR_rm_orph_y="trizen --noconfirm -Rs $(trizen -Qd --unrequired --quiet)"
         AUR_clean="trizen -Sc"
-        AUR_clean_cache="trizen -Scc"
+        AUR_clean_y="trizen --noconfirm -Sc"
+        AUR_clean_full="trizen -Scc"
+        AUR_clean_full_y="trizen --noconfirm -Scc"
         AUR_ls_ins="trizen -Q"
+        AUR_ls_orhpan="trizen -Qdtq" 
+        AUR_ls_foreign="trizen -Qm"
 
     elif hash aurman &>/dev/null; then
+        # Doesn't need sudo 
         AUR_pac="aurman"
-        AUR_up="aurman -Syu"
+        AUR_y="--noconfirm"
         AUR_ins="aurman -S"
+        AUR_ins_y="aurman --noconfirm -S"
+        AUR_refresh="aurman -Sy"
+        AUR_force_refresh="aurman -Syy"
+        AUR_up="aurman -Su"
+        AUR_up_y="aurman --noconfirm -Su"
+        AUR_refresh_up="aurman -Syu"
+        AUR_refresh_up_y="aurman --noconfirm -Syu"
+        AUR_force_refresh_up="aurman -Syyuu"
+        AUR_force_refresh_up_y="aurman --noconfirm -Syyuu"
         AUR_search="aurman -Ss"
+        AUR_info="aurman -Si"
+        AUR_rm="aurman -R"
+        AUR_rm_y="aurman --noconfirm -R"
+        AUR_rm_casc="aurman -Rc"
+        AUR_rm_casc_y="aurman --noconfirm -Rc"
+        AUR_rm_orph="aurman -Rs $(aurman -Qd --unrequired --quiet)"
+        AUR_rm_orph_y="aurman --noconfirm -Rs $(aurman -Qd --unrequired --quiet)"
+        AUR_clean="aurman -Sc"
+        AUR_clean_y="aurman --noconfirm -Sc"
+        AUR_clean_full="aurman -Scc"
+        AUR_clean_full_y="aurman --noconfirm -Scc"
         AUR_ls_ins="aurman -Q"
+        AUR_ls_orhpan="aurman -Qdtq" 
+        AUR_ls_foreign="aurman -Qm"
+        
 
     #
     # NON-PACMAN WRAPPERS 
     # 'SEARCH AND BUILD' - ers
-    #
+    # NO SUPPORT YET - WIP
 
     # Aurutils
-    elif hash aur &>/dev/null; then
-        AUR_pac="aur"
-        AUR_up=""
-        AUR_ins=""
-        AUR_search="aur search"
+    #elif hash aur &>/dev/null; then
+    #    AUR_pac="aur"
+    #    AUR_up=""
+    #    AUR_ins=""
+    #    AUR_search="aur search"
 
     #elif type repoctl &> /dev/null; then
     #    pac_AUR="repoctl"
@@ -388,19 +530,24 @@ elif test -f /etc/arch-release && [[ $distro == / ]]; then
     #    pac_AUR="PkgBrowser"
     #elif type yup &> /dev/null ; then
     #    pac_AUR="yup"
-    elif type auracle &>/dev/null; then
+    #elif type auracle &>/dev/null; then
 
-        AUR_pac="auracle"
-        AUR_up="auracle update"
-        AUR_ins=""
-        AUR_search="auracle search"
+    #    AUR_pac="auracle"
+    #    AUR_up="auracle update"
+    #    AUR_ins=""
+    #    AUR_search="auracle search"
 
     else
         no_aur='TRUE'
     fi
 
     distro_base="Arch"
-    distro="Arch"
+    
+    if test -f /etc/manjaro-release; then
+        distro="Manjaro"
+    else 
+        distro="Arch"
+    fi
 
 elif test -f /etc/rpi-issue && [[ $distro == / ]]; then
 
