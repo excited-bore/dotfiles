@@ -1023,7 +1023,7 @@ alias next-boot="boot-into"
 
 if hash grub-set-default &> /dev/null; then
         
-    function change-default-kernel(){
+    function switch-default-kernel(){
         if ! grep -q "^GRUB_DEFAULT=saved" /etc/default/grub; then
             local grb_def
             printf "${YELLOW}Setting the default kernel using 'grub-set-default' (which this function uses) relies on setting GRUB_DEFAULT=saved in ${CYAN}/etc/default/grub${normal}\n" 
@@ -1075,7 +1075,7 @@ if hash grub-set-default &> /dev/null; then
                     fi
                 done <<< "$kernels" 
                 
-                sudo grub-set-default "'$j>$h'"
+                sudo grub-set-default "$j>$h"
                 
                 echo "${YELLOW}A reboot is needed to take full effect!${normal}" 
                 return 0 

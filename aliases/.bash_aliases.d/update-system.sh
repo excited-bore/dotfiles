@@ -483,10 +483,14 @@ function update-system() {
             printf "$prmpth" "linux-zen" "$zenv" "linux-zen-headers" "$zenhv" 
             printf "$prmpth1" "'Result of a collaborative effort of kernel hackers to provide the best Linux kernel possible for everyday systems.'"
 
-            if test -n "$AUR_search" && test -n "$AUR_info"; then
-                local ltss=$(eval "$AUR_search linux-lts | grep 'linux-lts[[:digit:]+]' | cut -d- -f-2 | awk '{print $1}' | uniq | tr '\n' ' ' | xargs")
+            if test -n "$AUR_search_q" && test -n "$AUR_info"; then
+                #local ltss=$(eval "$AUR_search_q linux-lts | grep 'linux-lts[[:digit:]+]' | cut -d- -f-2 | awk '{print \$1}' | uniq | tr '\n' ' ' | xargs")
                 # No header : linux-drm-tip-git linux-drm-next-git  
-                available="$available $ltss linux-lqx linux-git linux-mainline linux-next-git linux-drm-tip-git linux-drm-next-git linux-ck linux-clear linux-libre linux-pf linux-prjc linux-nitrous linux-vfio linux-vfio-lts linux-xanmod linux-xanmod-linux-bin-x64v1 linux-xanmod-linux-bin-x64v2 linux-xanmod-linux-bin-x64v3 linux-xanmod-lts linux-xanmod-lts-linux-bin-x64v1 linux-xanmod-lts-linux-bin-x64v2 linux-xanmod-lts-linux-bin-x64v3 linux-xanmod-edge linux-xanmod-edge-linux-bin-x64v2 linux-xanmod-edge-linux-bin-x64v3 linux-xanmod-edge-linux-bin-x64v4 linux-xanmod-rt linux-xanmod-bore linux-xanmod-anbox linux-cachyos" 
+                local a=$(eval "$AUR_search linux | grep -i -B 1 -E 'kernel [^module]|kernel,' --no-group-separator | grep -E -v 'headers|docs|tools' | grep '^[^[:space:]]' | grep '^linux' | uniq | awk '{print \$1}'")
+                local b=$(pacman -Qs linux | grep -i -B 1 -E 'kernel [^module]|kernel,' --no-group-separator | grep -E -v 'headers|docs|tools' | grep '^[^[:space:]]' | sed 's|local/||g' | grep '^linux' | uniq | awk '{print $1}')
+                     
+                pamac search --installed linux | grep -i -B 1 'kernel [^module]' --no-group-separator | grep '^[^[:space:]]' | grep '^linux' | grep -E -v 'headers|docs|tools'
+                #available="$available $ltss linux-lqx linux-git linux-mainline linux-next-git linux-drm-tip-git linux-drm-next-git linux-ck linux-clear linux-libre linux-pf linux-prjc linux-nitrous linux-vfio linux-vfio-lts linux-xanmod linux-xanmod-linux-bin-x64v1 linux-xanmod-linux-bin-x64v2 linux-xanmod-linux-bin-x64v3 linux-xanmod-lts linux-xanmod-lts-linux-bin-x64v1 linux-xanmod-lts-linux-bin-x64v2 linux-xanmod-lts-linux-bin-x64v3 linux-xanmod-edge linux-xanmod-edge-linux-bin-x64v2 linux-xanmod-edge-linux-bin-x64v3 linux-xanmod-edge-linux-bin-x64v4 linux-xanmod-rt linux-xanmod-bore linux-xanmod-anbox linux-cachyos" 
                  
             fi
         fi
