@@ -742,7 +742,7 @@ complete -F _groups add_to_group
 #
 
 function set-executable-user() {
-    if ! test -z "$@"; then
+    if test -n "$@"; then
         for i in "$@"; do 
             if [[ "$(stat -c '%U' "$i")" == 'root' ]] || ! [[ "$(stat -c '%U' "$i")" == "$USER" ]]; then
                 sudo chmod u+x $i;
@@ -756,7 +756,7 @@ function set-executable-user() {
 }
 
 function set-executable-group() {
-    if ! test -z "$@"; then
+    if test -n "$@"; then
         for i in "$@"; do 
             if [[ "$(stat -c '%U' "$i")" == 'root' ]] || ! [[ "$(stat -c '%U' "$i")" == "$USER" ]]; then
                 sudo chmod g+x $i;
@@ -770,7 +770,7 @@ function set-executable-group() {
 }
 
 function set-executable-other() {
-    if ! test -z "$@"; then
+    if test -n "$@"; then
         for i in "$@"; do 
             if [[ "$(stat -c '%U' "$i")" == 'root' ]] || ! [[ "$(stat -c '%U' "$i")" == "$USER" ]]; then
                 sudo chmod o+x $i;
@@ -785,7 +785,7 @@ function set-executable-other() {
 
 
 function set-executable-all() {
-    if ! test -z "$@"; then
+    if test -n "$@"; then
         for i in "$@"; do 
             if [[ "$(stat -c '%U' "$i")" == 'root' ]] || ! [[ "$(stat -c '%U' "$i")" == "$USER" ]]; then
                 sudo chmod +x $i;
@@ -800,7 +800,7 @@ function set-executable-all() {
 
 
 function unset-executable-user() {
-    if ! test -z "$@"; then
+    if test -n "$@"; then
         for i in "$@"; do 
             if [[ "$(stat -c '%U' "$i")" == 'root' ]] || ! [[ "$(stat -c '%U' "$i")" == "$USER" ]]; then
                 sudo chmod u-x $i;
@@ -814,7 +814,7 @@ function unset-executable-user() {
 }
 
 function unset-executable-group() {
-    if ! test -z "$@"; then
+    if test -n "$@"; then
         for i in "$@"; do 
             if [[ "$(stat -c '%U' "$i")" == 'root' ]] || ! [[ "$(stat -c '%U' "$i")" == "$USER" ]]; then
                 sudo chmod g-x $i;
@@ -828,7 +828,7 @@ function unset-executable-group() {
 }
 
 function unset-executable-other() {
-    if ! test -z "$@"; then
+    if test -n "$@"; then
         for i in "$@"; do 
             if [[ "$(stat -c '%U' "$i")" == 'root' ]] || ! [[ "$(stat -c '%U' "$i")" == "$USER" ]]; then
                 sudo chmod o-x $i;
@@ -844,7 +844,8 @@ function unset-executable-other() {
 
 
 function unset-executable-all() {
-    if ! test -z "$@"; then
+    local i 
+    if test -n "$@"; then
         for i in "$@"; do 
             if [[ "$(stat -c '%U' "$i")" == 'root' ]] || ! [[ "$(stat -c '%U' "$i")" == "$USER" ]]; then
                 sudo chmod -x $i;
@@ -853,7 +854,6 @@ function unset-executable-all() {
             fi 
             llnh $i 
         done
-        unset i 
     fi
 }
 
@@ -883,7 +883,7 @@ alias locales-list-enabled="locale -a"
 
 # Escape pathnames to files and dirs properly before putting them on the prompt
 function print-path-to-prompt(){
-    lines="n"
+    local lines="n"
     while getopts ':l' flag; do
         case "${flag}" in
             l)  lines="y"
@@ -891,13 +891,12 @@ function print-path-to-prompt(){
                 ;;
         esac
     done && OPTIND=1;
-    fls=$(echo "$@" | sed 's| |\\ |g' | sed 's|\[|\\\[|g' | sed 's|\]|\\\]|g' | sed 's|(|\\(|g' | sed 's|)|\\)|g' | sed 's|{|\\{|g' | sed 's|}|\\}|g')
+    local fls=$(echo "$@" | sed 's| |\\ |g' | sed 's|\[|\\\[|g' | sed 's|\]|\\\]|g' | sed 's|(|\\(|g' | sed 's|)|\\)|g' | sed 's|{|\\{|g' | sed 's|}|\\}|g')
     if [[ $lines == 'n' ]]; then
         fls="$(echo $fls | tr "\n" ' ')"
     fi
     READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$fls${READLINE_LINE:$READLINE_POINT}"
     READLINE_POINT=$(( READLINE_POINT + ${#fls} ))
-    unset lines fls 
 }
 
 # Set an escape character \ before each space
@@ -1005,6 +1004,7 @@ alias motherboard-info-full="sudo dmidecode -t 1 && sudo dmidecode -t 2 && sudo 
 # Dual boot stuff
 
 function boot-into(){
+    local bootnt 
     local opts="$(efibootmgr | grep --color=never Boot00 | awk '{print $1;}' | sed 's/Boot//g' | cut -d* -f-1)" 
     local frst="$(echo $opts | awk '{print $1}')" 
     local opts="$(echo $opts | sed "s/\<$frst\> //g")"  
@@ -1016,34 +1016,110 @@ function boot-into(){
         printf "\n${CYAN}Will reboot in 5 seconds if not interrupted\n${normal}" 
         sleep 5 && reboot 
     fi
-    unset bootnt 
 }
 
 alias reboot-into="boot-into"
 alias next-boot="boot-into"
 
+if hash grub-set-default &> /dev/null; then
+        
+    function change-default-kernel(){
+        if ! grep -q "^GRUB_DEFAULT=saved" /etc/default/grub; then
+            local grb_def
+            printf "${YELLOW}Setting the default kernel using 'grub-set-default' (which this function uses) relies on setting GRUB_DEFAULT=saved in ${CYAN}/etc/default/grub${normal}\n" 
+            readyn -p "Set 'GRUB_DEFAULT=saved' in ${CYAN}/etc/default/grub${GREEN}?" grb_def
+            if [[ "$grb_def" == 'y' ]]; then
+                if grep -q '^GRUB_DEFAULT=' /etc/default/grub; then
+                    sudo sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=saved/g' /etc/default/grub
+                elif grep -q '#GRUB_DEFAULT=' /etc/default/grub; then 
+                    sudo sed -i 's/#GRUB_DEFAULT=.*/GRUB_DEFAULT=saved/g' /etc/default/grub
+                else
+                    sudo sed -i '1s/^/\nGRUB_DEFAULT=saved\n/' /etc/default/grub 
+                fi
+            fi
+        fi
+        
+        if grep -q "^GRUB_DEFAULT=saved" /etc/default/grub; then
+         
+            local lines=$(sudo grep -E '^menuentry | menuentry |submenu ' /boot/grub/grub.cfg | uniq | cut -d\' -f2 | cut -d\' -f1 | cut -d\" -f2 | sed '/UEFI/d') 
+            local j=0
+            while IFS= read -r i; do 
+                if [[ "$i" =~ 'Advanced' ]]; then
+                    break 
+                fi
+                j=$((j+1)) 
+            done <<< "$lines"
+            
+            printf "${CYAN}Current kernel:\n   ${GREEN}$(uname -r)\n\n${normal}"
+
+            local kernel kernels=$(sudo grep -e "[[:space:]+]menuentry '" /boot/grub/grub.cfg | grep 'Linux' | cut -d\( -f2 | cut -d\) -f1 | sed 's/Kernel: //g' | sed '/fallback initramfs/d') 
+            if hash fzf &> /dev/null; then
+                kernel=$(echo $kernels | fzf --reverse --height 10%)   
+            else
+                kernels=$(echo $kernels | sed 's/ /_/g') 
+                printf "${CYAN}Available kernels:\n${normal}" 
+                while IFS= read -r i; do 
+                    printf "${GREEN}   $i\n${normal}" 
+                done <<< "$kernels"
+                kernels=$(echo $kernels | tr '\n' ' ') 
+                reade -Q 'GREEN' -i "$kernels" -p 'Which one?: ' kernel 
+                kernel="$(echo $kernel | sed 's/_/ /g')" 
+            fi
+            
+            if test -n "$kernel"; then
+                local h kernels=$(sudo grep -e "[[:space:]+]menuentry '" /boot/grub/grub.cfg | grep 'Linux' | cut -d\( -f2 | cut -d\) -f1)
+                while IFS= read -r i; do 
+                    h=$(($h+1))
+                    if [[ "$i" =~ "$kernel" ]]; then
+                        break
+                    fi
+                done <<< "$kernels" 
+                
+                sudo grub-set-default "'$j>$h'"
+                
+                echo "${YELLOW}A reboot is needed to take full effect!${normal}" 
+                return 0 
+            else
+                return 1
+            fi
+        fi 
+        #sudo grep -E 'menuentry |submenu ' /boot/grub/grub.cfg | uniq | cut -d\' -f2 | cut -d\' -f1 | cut -d\" -f2
+    }
+fi
+
 function change-username-and-homefolder(){
-    ! shopt -q login_shell && printf "${RED}Not login shell\nLogout, press 'Ctrl+Alt+F1/F2/...F6' to drop to a login shell and login as root or a user other then the one you want to change.\n${YELLOW}(Make sure the root account is enabled with 'sudo passwd su' - you can disable it afterwards with 'sudo passwd -l su')${normal}\n" && return 1
+    ! shopt -q login_shell && 
+        printf "${RED}Not login shell\nLogout, press 'Ctrl+Alt+F1/F2/...F6' to drop to a login shell and login as root or a user other then the one you want to change.\n${YELLOW}(Make sure the root account is enabled with 'sudo passwd su' - you can disable it afterwards with 'sudo passwd -l su')${normal}\n" && 
+        return 1
+    
+    local usrname usrname_nw 
     local frst="$(echo $(users | word2line | uniq | grep -v root ) | awk '{print $1}')" 
     local words="$(echo $words | sed "s/\<$frst\> //g")" 
     reade -Q 'CYAN' -i "$frst $words" -p "Old username (Empty = $frst): " usrname 
-    test -z "$usrname" && usrname="$frst" 
-    [[ "$USER" == "$usrname" ]] && printf "${RED}Can't change username for $usrname while logged as said\nLogout, press 'Ctrl+Alt+F1/F2/...F6' to drop to a login shell (if not already in one) and login as root or a user other then the one you want to change.\n${YELLOW}(Make sure the root account is enabled with 'sudo passwd su' - you can disable it afterwards with 'sudo passwd -l su')${normal}\n" && return 1 
+    test -z "$usrname" && 
+        usrname="$frst" 
+    [[ "$USER" == "$usrname" ]] && 
+        printf "${RED}Can't change username for $usrname while logged as said\nLogout, press 'Ctrl+Alt+F1/F2/...F6' to drop to a login shell (if not already in one) and login as root or a user other then the one you want to change.\n${YELLOW}(Make sure the root account is enabled with 'sudo passwd su' - you can disable it afterwards with 'sudo passwd -l su')${normal}\n" && 
+        return 1 
+    
     reade -Q 'MAGENTA' -p 'New username: ' usrname_nw 
-    if ! test -z "$usrname_nw"; then
-        if ! test -z "$(ps -U $usrname 2> /dev/null)"; then
+    if test -n "$usrname_nw"; then
+        if test -n "$(ps -U $usrname 2> /dev/null)"; then
             printf "There are still processes running under user $usrname!\nKilling all processes for user..."  
             sleep 5
             sudo pkill -U $(id -u "$usrname") 
             printf "Done!\n" 
         fi
+        
         sudo usermod -l "$usrname_nw" -d /home/"$usrname_nw" -m "$usrname" &&  
         sudo groupmod -n "$usrname_nw" "$usrname" &&  
-        sudo test -f /etc/lightdm/lightdm.conf && sudo grep -q "autologin-user=$usrname" /etc/lightdm/lightdm.conf && sudo sed -i "s/^autologin-user=$usrname/autologin-user=$usrname_nw/g" /etc/lightdm/lightdm.conf &&
-        test -f /home/$usrname_nw/.config/starship.toml && grep -q "/home/$usrname" /home/$usrname_nw/.config/starship.toml && sed -i "s|/home/$usrname|/home/$usrname_nw|g" /home/$usrname_nw/.config/starship.toml   
-        printf "${GREEN}Changed username and homedirectory to $usrname_nw!${normal}\n" && 
-        unset usrname usrname_nw && 
-        return 0 || return 1; 
+        sudo test -f /etc/lightdm/lightdm.conf && sudo grep -q "autologin-user=$usrname" /etc/lightdm/lightdm.conf && 
+            sudo sed -i "s/^autologin-user=$usrname/autologin-user=$usrname_nw/g" /etc/lightdm/lightdm.conf &&
+        test -f /home/$usrname_nw/.config/starship.toml && grep -q "/home/$usrname" /home/$usrname_nw/.config/starship.toml && 
+            sed -i "s|/home/$usrname|/home/$usrname_nw|g" /home/$usrname_nw/.config/starship.toml   
+            printf "${GREEN}Changed username and homedirectory to $usrname_nw!${normal}\n" && 
+            return 0 || 
+            return 1; 
     else
         printf "${YELLOW}Please give up a new username to change to.${normal}\n"
         return 1 
@@ -1051,14 +1127,17 @@ function change-username-and-homefolder(){
 }
 
 function change-device-name-to(){
-    local oldname=$(hostname) 
+    local name oldname=$(hostname) 
     reade -Q 'CYAN' -p "New device name (hostname): " name
-    test -z "$name" && printf "Name cant be empty.\n" && return 1
+    test -z "$name" && 
+        printf "Name cant be empty.\n" && 
+        return 1
+    
     sudo hostnamectl set-hostname "$name" 
+    
     sudo sed -i "s/$oldname/$name/g" /etc/hosts &&
     sudo sed -i "s/$oldname/$name/g" /etc/hostname && 
-    unset name &&
     printf "${GREEN}Changed device name (hostname) to $name!${normal}\n" &&
-    return 0 || return 1;
+    return 0 || 
+    return 1;
 }
-

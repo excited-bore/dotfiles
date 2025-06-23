@@ -213,7 +213,7 @@ function update-system() {
         
         if test -n "$YES"; then
             if [[ "$pac" == "apt" ]]; then
-                eval ${pac_up} -y
+                eval "${pac_up} -y"
             else
                 eval "yes | ${pac_up}"
             fi
@@ -435,7 +435,7 @@ function update-system() {
             fi
         fi 
       
-        local available prmpt 
+        local available 
         if [[ "$distro" == 'Manjaro' ]]; then
             available="$(mhwd-kernel -l | awk 'NR>1{print $2}' | tr '\n' ' ')"
         elif [[ "$distro" == 'Arch' ]]; then
@@ -474,7 +474,7 @@ function update-system() {
             printf "$prmpth" "linux" "$stablev" "linux-headers" "$stablehv" 
             printf "$prmpth1" "'Vanilla Linux kernel and modules, with a few patches applied'"
             printf "$prmpth" "linux-lts" "$ltsv" "linux-lts-headers" "$ltshv" 
-            printf "$prmpth1" "'Long-term support (LTS) Linux kernel and modules with configuration options targeting usage in servers.'"
+            printf "$prmpth1" "'Long-term support (LTS) Linux gernel and modules with configuration options targeting usage in servers.'"
             printf "$prmpth" "linux-hardened" "$hardenedv" "linux-hardened-headers" "$hardenedhv" 
             printf "$prmpth1" "'A security-focused Linux kernel applying a set of hardening patches to mitigate kernel and userspace exploits. It also enables more upstream kernel hardening features than \"linux\".'"
             printf "$prmpth" "linux-rt" "$rtv" "linux-rt-headers" "$rthv" 
@@ -492,7 +492,7 @@ function update-system() {
         fi
         
         if ! [[ "$SKIPKERNEL" == 'y' ]] && hash curl &> /dev/null && hash xmllint &> /dev/null; then 
-            local latest_lts latest_lts1 prmpt
+            local latest_lts prmpt
             if [[ "$KERNEL" == 'lts' ]] || [[ "$KERNEL" == 'stable' ]] || [[ "$KERNEL" == 'mainline' ]]; then
                 prmpt="Latest $KERNEL linux kernel"
                 [[ "$KERNEL" == 'lts' ]] && 
@@ -500,30 +500,38 @@ function update-system() {
                     KERNEL='longterm'
                 
                 # https://www.kernel.org/feeds/kdist.xml 
-                latest_lts="$(curl -fsSL https://www.kernel.org | xmllint --html --xpath "(//td[text()='$KERNEL:'])[1]/following-sibling::td[1]/strong/text()" - 2> /dev/null | cut -d. -f-2 )"
+                latest_lts="$(curl -fsSL https://www.kernel.org | xmllint --html --xpath "(//td[text()='$KERNEL:'])[1]/following-sibling::td[1]/strong/text()" - 2> /dev/null)"
                 #latest_lts="$(curl -fsSL https://www.kernel.org/feeds/kdist.xml | xmllint --xpath '//title[contains(., "longterm")][1]/text()' - | awk 'NR==1{print $1;}' | cut -d: -f-1)"
-                latest_lts1="linux${latest_lts//"."}"
+                # Manjaro tends to be behind, so we only keep for the 'main' version number. Linux6.12 instead of Linux6.12.34 for example.. 
+                if [[ "$distro" == 'Manjaro' ]]; then
+                    latest_lts=$(echo $latest_lts | cut -d. -f-2)  
+                fi
             else 
                 latest_lts="$KERNEL"
                 prmpt="Kernel version $KERNEL"
             fi
-            #local latest_lts1="linux-image-$latest_lts"
 
-            if ! [[ "$(uname -r)" == "$latest_lts" ]] && ( [[ $latest_lts == $KERNEL ]] || version-higher $latest_lts $(uname -r) ); then
+            if ! [[ "$(uname -r)" =~ "$latest_lts" ]] && ( [[ $latest_lts == $KERNEL ]] || version-higher $latest_lts "$(uname -r)" ); then
 
                 test -n "$YES" && flag='--auto' || flag=''
 
-                readyn $flag -p "$prmpt not installed. Install ${CYAN}$latest_lts${GREEN} (and ${CYAN}$latest_lts-headers${GREEN})?" latest_ins
-                if [[ $latest_ins == 'y' ]]; then
+                local latest_ins
+                if [[ "$distro" == 'Manjaro' ]]; then
 
-                    test -n "$YES" && flag='--noconfirm' || flag=''
-
-                    eval "${pac_ins} $flag $latest_lts1 $latest_lts1-headers"
+                    readyn $flag -p "$prmpt not installed. Install ${CYAN}$latest_lts${GREEN} (and ${CYAN}$latest_lts-headers${GREEN})?" latest_ins
+                    if [[ $latest_ins == 'y' ]]; then
+                         
+                        test -n "$YES" && flag=$pac_y || flag=''
+                         
+                        local latest_lts1="linux${latest_lts//"."}"
+                        eval "${pac_ins} $flag $latest_lts1 $latest_lts1-headers"
+                        
+                    fi
                 fi
-                unset latest_ins
             fi
         fi
 
+        local hdrs hdrs_ins
         hdrs="$(echo $(uname -r) | cut -d. -f-2)"
         hdrs="linux${hdrs//"."}-headers"
         
@@ -538,9 +546,7 @@ function update-system() {
                
                 eval "${pac_ins} $flag $hdrs"
             fi
-            unset hdrs_ins
         fi
-        unset hdrs
        
         test -n "$YES" && flag='--auto' || flag=''
        
