@@ -419,82 +419,19 @@ function update-system() {
                 if [[ "$AUR_pac" == "pamac" ]]; then
                     pamac checkupdates  
                     pamac update --no-confirm
-                
                 elif test -n "$AUR_up_y"; then
-                    eval "${AUR_up_y}"
-                
+                    eval "$AUR_up_y"
                 else
-                    yes | eval "${AUR_up}"
+                    yes | eval "$AUR_up"
                 fi
             
             else 
                 [[ "$AUR_pac" == "pamac" ]] &&
                     pamac checkupdates  
-                
-                eval "${AUR_up}"
+                eval "$AUR_up"
             fi
         fi 
       
-        local available 
-        if [[ "$distro" == 'Manjaro' ]]; then
-            available="$(mhwd-kernel -l | awk 'NR>1{print $2}' | tr '\n' ' ')"
-        elif [[ "$distro" == 'Arch' ]]; then
-            available="linux linux-lts linux-hardened linux-rt linux-rt-lts linux-zen" 
-            local stablev=$(pacman -Si 'linux' | grep Version | awk '{$1="";$2=""; print}' | xargs) 
-            [[ "$stablev" == "$(pacman -Si 'linux-headers' | grep Version | awk '{$1="";$2=""; print}' | xargs)" ]] &&
-                local stablehv="${GREEN}o" ||
-                local stablehv="${RED}x"
-            local ltsv=$(pacman -Si 'linux-lts' | grep Version | awk '{$1="";$2=""; print}' | xargs) 
-            [[ "$ltsv" == "$(pacman -Si 'linux-lts-headers' | grep Version | awk '{$1="";$2=""; print}' | xargs)" ]] &&
-                local ltshv="${GREEN}o" ||
-                local ltshv="${RED}x"
-            local hardenedv=$(pacman -Si 'linux-hardened' | grep Version | awk '{$1="";$2=""; print}' | xargs) 
-            [[ "$hardenedv" == "$(pacman -Si 'linux-hardened-headers' | grep Version | awk '{$1="";$2=""; print}' | xargs)" ]] &&
-                local hardenedhv="${GREEN}o" ||
-                local hardenedhv="${RED}x"
-            local rtv=$(pacman -Si 'linux-rt' | grep Version | awk '{$1="";$2=""; print}' | xargs) 
-            [[ "$rtv" == "$(pacman -Si 'linux-rt-headers' | grep Version | awk '{$1="";$2=""; print}' | xargs)" ]] &&
-                local rthv="${GREEN}o" ||
-                local rthv="${RED}x"
-            local rtltsv=$(pacman -Si 'linux-rt-lts' | grep Version | awk '{$1="";$2=""; print}' | xargs) 
-            [[ "$rtltsv" == "$(pacman -Si 'linux-rt-lts-headers' | grep Version | awk '{$1="";$2=""; print}' | xargs)" ]] &&
-                local rtltshv="${GREEN}o" ||
-                local rtltshv="${RED}x"
-            local zenv=$(pacman -Si 'linux-zen' | grep Version | awk '{$1="";$2=""; print}' | xargs) 
-            [[ "$zenv" == "$(pacman -Si 'linux-zen-headers' | grep Version | awk '{$1="";$2=""; print}' | xargs)" ]] &&
-                local zenhv="${GREEN}o" ||
-                local zenhv="${RED}x"
-            
-            printf "${GREEN}Available Kernels:\n"
-            printf "${GREEN}%-15s %-20s %-25s %-25s\n" "Name" "Version" "Headers" "Headers-Version-Same"
-            
-            local prmpth="${green}%-15s %-20s %-25s %-25s\n" 
-            local prmpth1="${cyan}%s\n\n" 
-
-            printf "$prmpth" "linux" "$stablev" "linux-headers" "$stablehv" 
-            printf "$prmpth1" "'Vanilla Linux kernel and modules, with a few patches applied'"
-            printf "$prmpth" "linux-lts" "$ltsv" "linux-lts-headers" "$ltshv" 
-            printf "$prmpth1" "'Long-term support (LTS) Linux gernel and modules with configuration options targeting usage in servers.'"
-            printf "$prmpth" "linux-hardened" "$hardenedv" "linux-hardened-headers" "$hardenedhv" 
-            printf "$prmpth1" "'A security-focused Linux kernel applying a set of hardening patches to mitigate kernel and userspace exploits. It also enables more upstream kernel hardening features than \"linux\".'"
-            printf "$prmpth" "linux-rt" "$rtv" "linux-rt-headers" "$rthv" 
-            printf "$prmpth" "linux-rt-lts" "$rtltsv" "linux-rt-lts-headers" "$rtltshv" 
-            printf "$prmpth1" "'Maintained by a small group of core developers led by Ingo Molnar. This patch allows nearly all of the kernel to be preempted, with the exception of a few very small regions of code (\"raw_spinlock critical regions\"). This is done by replacing most kernel spinlocks with mutexes that support priority inheritance, as well as moving all interrupt and software interrupts to kernel threads.'"
-            printf "$prmpth" "linux-zen" "$zenv" "linux-zen-headers" "$zenhv" 
-            printf "$prmpth1" "'Result of a collaborative effort of kernel hackers to provide the best Linux kernel possible for everyday systems.'"
-
-            if test -n "$AUR_search_q" && test -n "$AUR_info"; then
-                #local ltss=$(eval "$AUR_search_q linux-lts | grep 'linux-lts[[:digit:]+]' | cut -d- -f-2 | awk '{print \$1}' | uniq | tr '\n' ' ' | xargs")
-                # No header : linux-drm-tip-git linux-drm-next-git  
-                local a=$(eval "$AUR_search linux | grep -i -B 1 -E 'kernel [^module]|kernel,' --no-group-separator | grep -E -v 'headers|docs|tools' | grep '^[^[:space:]]' | grep '^linux' | uniq | awk '{print \$1}'")
-                local b=$(pacman -Qs linux | grep -i -B 1 -E 'kernel [^module]|kernel,' --no-group-separator | grep -E -v 'headers|docs|tools' | grep '^[^[:space:]]' | sed 's|local/||g' | grep '^linux' | uniq | awk '{print $1}')
-                     
-                pamac search --installed linux | grep -i -B 1 'kernel [^module]' --no-group-separator | grep '^[^[:space:]]' | grep '^linux' | grep -E -v 'headers|docs|tools'
-                #available="$available $ltss linux-lqx linux-git linux-mainline linux-next-git linux-drm-tip-git linux-drm-next-git linux-ck linux-clear linux-libre linux-pf linux-prjc linux-nitrous linux-vfio linux-vfio-lts linux-xanmod linux-xanmod-linux-bin-x64v1 linux-xanmod-linux-bin-x64v2 linux-xanmod-linux-bin-x64v3 linux-xanmod-lts linux-xanmod-lts-linux-bin-x64v1 linux-xanmod-lts-linux-bin-x64v2 linux-xanmod-lts-linux-bin-x64v3 linux-xanmod-edge linux-xanmod-edge-linux-bin-x64v2 linux-xanmod-edge-linux-bin-x64v3 linux-xanmod-edge-linux-bin-x64v4 linux-xanmod-rt linux-xanmod-bore linux-xanmod-anbox linux-cachyos" 
-                 
-            fi
-        fi
-        
         if ! [[ "$SKIPKERNEL" == 'y' ]] && hash curl &> /dev/null && hash xmllint &> /dev/null; then 
             local latest_lts prmpt
             if [[ "$KERNEL" == 'lts' ]] || [[ "$KERNEL" == 'stable' ]] || [[ "$KERNEL" == 'mainline' ]]; then
@@ -561,29 +498,23 @@ function update-system() {
             
             if [[ $cachcln == 'y' ]]; then
                 
-                if [ -n "$AUR_clean" ]; then
+                if [ -n "$AUR_ls_orphan" ] && test -n $(eval "$AUR_ls_orphan"); then
                     
                     if test -n "$YES"; then 
-                        
-                        if [[ "$AUR" == "pamac" ]]; then
-                            pamac clean --no-confirm
-                        else
-                            eval "yes | $AUR_clean"
+                        if test -n "$AUR_rm_orph_y"; then
+                            eval "$AUR_rm_orph_y"
+                        elif test -n "$AUR_rm_orph"; then
+                            eval "yes | $AUR_rm_orph"
                         fi
                     else
-                        eval "$AUR_clean"
+                        eval "$AUR_rm_orph"
                     fi
                
-                elif test -n "$pac_clean"; then
-                    
+                elif test -n "$pac_ls_orhpan" && test -n $(eval "$pac_ls_orhpan"); then
                     if test -n "$YES"; then 
-                        if [[ "$pac" == "pacman" ]]; then
-                            eval "$pac_clean --noconfirm"  
-                        else
-                            eval "yes | $pac_clean"                   
-                        fi
+                        eval "$pac_rm_orph_y" 
                     else
-                        eval "$pac_clean"
+                        eval "$pac_rm_orph"
                     fi
                 fi
             fi
@@ -640,7 +571,7 @@ function update-system() {
         YES="--auto" 
     fi
 
-    if type nix-env &> /dev/null; then
+    if hash nix-env &> /dev/null; then
         readyn $YES --no -p "${normal}Update ${CYAN}nix packages?${normal} ${MAGENTA}(Fetching updated list could take a long time)${YELLOW}" nix_up
         if [[ "$nix_up" == 'y' ]]; then
             printf "Updating all ${MAGENTA}nix packages${normal} using 'nix-env -u *'\n" && nix-env -u * 2> /dev/null
@@ -649,8 +580,8 @@ function update-system() {
     fi
      
 
-    if type gpg &> /dev/null || type gpg2 &> /dev/null; then
-        if type gpg2 &> /dev/null; then
+    if hash gpg &> /dev/null || hash gpg2 &> /dev/null; then
+        if hash gpg2 &> /dev/null; then
             up_gpg=gpg2
         else
             up_gpg=gpg
@@ -658,7 +589,7 @@ function update-system() {
 
         readyn $YES --no -p "${normal}Refresh ${CYAN}gpg keys?${normal} ${MAGENTA}(Keyservers can be unstable so this might take a while)${YELLOW}" gpg_up
         if [[ "$gpg_up" == 'y' ]]; then
-            eval ${up_gpg} --refresh-keys  
+            eval "${up_gpg} --refresh-keys"  
         fi
     fi
     unset up_gpg gpg_up

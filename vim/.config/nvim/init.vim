@@ -1133,7 +1133,7 @@ vnoremap <C-Right>  El
 " Same for End of line, only you go down
 
 function! LastCheck()
-    if col(".") == col("$") || col('$') == 1 
+    if col(".") == col("$")-1 || col('$') == 1 
         return 1
     else
         return 0
@@ -1141,7 +1141,7 @@ function! LastCheck()
 endfunction 
 
 nnoremap <expr> <A-Left>    (col(".") ==? 1 ? '<Up>0' : '0')
-nnoremap <expr> <A-right>   LastCheck() ? '<Down>$<Right>' : '$<Right>'
+nnoremap <expr> <A-Right>   LastCheck() ? '<Down>$<Right>' : '$<Right>'
 inoremap <expr> <A-Left>    (col('.') ==? 1 ? '<Up><C-\><C-o>0' : '<C-\><C-o>0')
 inoremap <expr> <A-Right>   LastCheck() ? '<C-o><Down><C-\><C-o>$<Right>' : '<C-\><C-o>$<Right>'
 vnoremap <expr> <A-Left>    (col(".") ==? 1 ? '<Up>0' : '0')

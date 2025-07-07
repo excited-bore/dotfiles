@@ -359,7 +359,7 @@ if hash pacman &> /dev/null; then
                 fi
 
                 if test -n "$distro" && [[ "$distro" == 'Manjaro' ]] && hash pacman-mirrors &> /dev/null; then
-                    printf "${green}If you ever change your mind and want to change back to manjaro, use:\n${CYAN}\t- sudo pacman-mirrors ( -c Global / *your country* ) ( --fasttrack (*number of mirrors*)) ${GREEN}- to restore manjaro repositories in /etc/pacman.d/mirrorlist, '(..)' indicates optional arguments, *something* needs to be replaced\n\t${CYAN}- sudo pacman -Syyuu ${GREEN}- to force refresh repositories and update while allowing downgrades\n${ORANGE}Just make sure not to remove the package 'pacman-mirrors'${normal}\n" 
+                    printf "${green}If you ever change your mind and want to change back to manjaro, use:\n${CYAN}\t- sudo pacman-mirrors ( -c Global / *your country* ) ( --fasttrack (*number of mirrors*)) ${GREEN}- to restore manjaro repositories in /etc/pacman.d/mirrorlist, '(..)' indicates optional arguments, *something* needs to be replaced\n\t${CYAN}- sudo pacman -Syyuu ${GREEN}- to force refresh repositories and update while allowing downgrades\n${ORANGE}Just make sure not to remove the package 'pacman-mirrors'${normal}\n\n" 
                 fi
                 
             fi
@@ -583,19 +583,41 @@ if hash pacman &> /dev/null; then
 
         alias yay-list-files-package="pacman-list-files-package" 
         # https://smarttech101.com/aur-arch-user-repository-and-yay-in-arch-linux 
-        
-        function yay-fzf-install(){ 
-            local pre='' 
-            if test -n "$@"; then
-                if test -n "$2"; then
-                    printf "Only give 1 argument\n"
-                    exit 1
-                else
-                    pre="--query $@"
-                fi
-            fi 
-            yay -Slq | fzf $pre --ansi --reverse --multi --preview-window=80% --preview 'cat <(yay -Si {1} | bat -n --language txt --color=always) <(echo '') <(yay --getpkgbuild --print {1} | bat -n --language bash --color=always)' | xargs --no-run-if-empty --open-tty yay -Su --combinedupgrade 
-        }
+       
+        if hash fzf &> /dev/null; then 
+            
+            if hash bat &> /dev/null; then
+                function yay-fzf-install(){ 
+                    local pre='' 
+                    if test -n "$@"; then
+                        if test -n "$2"; then
+                            printf "Only give 1 argument\n"
+                            exit 1
+                        else
+                            pre="--query $@"
+                        fi
+                    fi 
+                    yay -Slq | fzf $pre --ansi --reverse --multi --preview-window=80% --preview 'cat <(yay -Si {1} | bat -n --language txt --color=always) <(echo '') <(yay --getpkgbuild --print {1} | bat -n --language bash --color=always)' | xargs --no-run-if-empty --open-tty yay -Su --combinedupgrade 
+                }
+            fi
+
+            function yay-fzf-remove(){ 
+                local pre=""
+                if test -n "$@"; then
+                    if test -n "$2"; then
+                        printf "Only give 1 argument\n"
+                        exit 1
+                    else
+                        pre="--query $@"
+                    fi
+                fi 
+                local nstall="$(yay -Q | fzf $pre --ansi --multi --select-1 --reverse --sync --height 33%  | awk '{print $1}')"      
+                if test -n "$nstall"; then
+                    yay -R "$nstall" 
+                fi 
+            }
+            
+        fi
        
         #function yay-fzf-list-files(){ 
         #    pre='' 
@@ -613,24 +635,6 @@ if hash pacman &> /dev/null; then
         #    fi
         #    #unset nstall
         #}
-        
-        function yay-fzf-remove(){ 
-            pre=""
-            if ! test -z "$@"; then
-                if ! test -z "$2"; then
-                    printf "Only give 1 argument\n"
-                    exit 1
-                else
-                    pre="--query $@"
-                fi
-            fi 
-            nstall="$(yay -Q | fzf $pre --ansi --multi --select-1 --reverse --sync --height 33%  | awk '{print $1}')"      
-            if ! test -z "$nstall"; then
-                yay -R "$nstall" 
-            fi 
-            unset nstall
-        }
-         
     fi
 fi
 
