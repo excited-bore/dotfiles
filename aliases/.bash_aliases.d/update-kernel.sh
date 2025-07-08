@@ -21,19 +21,21 @@ if test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_a
             local insk
              
             if test -n "$AUR_search_ins"; then
-                insk=$(eval "$AUR_search_ins linux | grep -i -B 1 -E 'kernel |kernel,' --no-group-separator | paste -d \"\t\" - - | grep -Eiv 'headers|docs|tool|kernel module' | sed 's|local/||g' | grep '^linux' | uniq | awk '{print \$1}' | sort -V")
+                insk=$(eval "$AUR_search_ins linux | grep -i -B 1 -E 'kernel |kernel,' --no-group-separator | paste -d \"\t\" - - | grep -Eiv '[^and ]headers|docs|tool|kernel module' | sed 's|local/||g' | grep '^linux' | uniq | awk '{print \$1}' | sort -V")
             else
-                insk=$(eval "$pac_search_ins linux | grep -i -B 1 -E 'kernel |kernel,' --no-group-separator | paste -d \"\t\" - - | grep -Eiv 'headers|docs|tool|kernel module' | sed 's|local/||g' | grep '^linux' | uniq | awk '{print \$1}' | sort -V")
+                insk=$(eval "$pac_search_ins linux | grep -i -B 1 -E 'kernel |kernel,' --no-group-separator | paste -d \"\t\" - - | grep -Eiv '[^and ]headers|docs|tool|kernel module' | sed 's|local/||g' | grep '^linux' | uniq | awk '{print \$1}' | sort -V")
             fi
 
-            local prmpth="${green}%-15s %-20s %-25s %-25s\n" 
+            local prmpth="${green}%-20s %-20s %-25s %-25s\n" 
             local prmpth1="${cyan}%s\n\n" 
              
             # pamac list --files linux54 | grep /usr/lib/modules/ | sed 's|/usr/lib/modules/\([^/]*\)/.*|\1|g' | uniq
-            printf "${GREEN}Installed Kernels:\n${normal}"
-            printf "${GREEN}%-15s %-20s %-25s %-25s\n" "Name" "Version" "Headers" "Headers-Version-Same"
+            printf "${GREEN}Installed kernels using pacman/$AUR_pac:\n${normal}"
+            printf "${GREEN}%-20s %-20s %-25s %-25s\n" "Name" "Version" "Headers" "Headers-Version-Same"
              
             local kv kh khv 
+            local known='n'
+            local knownk=($(ls /lib/modules/)) knownk2=()
             while IFS= read -r k; do
                 
                 kv=$(pacman -Qi "$k" | grep Version | awk '{$1="";$2=""; print}' | xargs) 
@@ -51,11 +53,41 @@ if test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_a
                         khv="${GREEN}o" ||
                         khv="${RED}x"
                 else
-                    kh="${red}Not installed" 
+                    if pacman -Qi $k | grep 'Description' | grep -qi 'and headers'; then
+                        kh="${green}Part of main kernel package" 
+                    else 
+                        kh="${red}Not installed" 
+                    fi
                     khv=""
                 fi
+               
+                known='n' 
+                for i in ${knownk[@]}; do 
+                    if [[ $known == 'n' ]] && pacman -Ql $k | grep -q $i; then
+                        known='y'
+                    else
+                        knownk2+=("$i") 
+                    fi
+                done
+                knownk=("${knownk2[@]}")
+                knownk2=()
                 printf "$prmpth" "$k" "$kv" "$kh" "$khv"  
+                 
             done <<< $insk
+          
+            if (( ${#knownk[@]} != 0 )); then
+                printf "${GREEN}Installed Custom Compiled Kernels:\n${normal}"
+                printf "${GREEN}%-20s %-20s\n" "Name/Version" "Headers"
+                local prmptc="${green}%-20s %-20s\n" 
+                for i in "${knownk[@]}"; do
+                    if test -n "$i"; then
+                        test -d /lib/modules/$i/build && test -n "$(ls /lib/modules/$i/build/*)" &&
+                            kh="${GREEN}o" ||
+                            kh="${RED}x"
+                        printf "$prmptc" "$i" "$kh"
+                    fi
+                done
+            fi
         fi
     } 
 
@@ -154,7 +186,7 @@ if test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_a
                
                 # Manjaro kernels 
                 if test -n "$(pacman -Ss '^linux[0-9]+$' 2> /dev/null)"; then
-                    local ks=$(eval "$pac_search '^linux[0-9]+$' | grep -i -B 1 -E 'kernel |kernel,' --no-group-separator | paste -d \"\t\" - - | grep -Eiv 'headers|docs|tool|kernel module|installed' | sed -E 's,core/|extra/|multilib/,,g' | grep '^linux' | uniq | awk '{print \$1}' | sed 's/\(x[0-9]\)/\1./' | sort -rV | sed 's/\.//g'")                     available="$available $ks"
+                    local ks=$(eval "$pac_search '^linux[0-9]+$' | grep -i -B 1 -E 'kernel |kernel,' --no-group-separator | paste -d \"\t\" - - | grep -Eiv '[^and ]headers|docs|tool|kernel module|installed' | sed -E 's,core/|extra/|multilib/,,g' | grep '^linux' | uniq | awk '{print \$1}' | sed 's/\(x[0-9]\)/\1./' | sort -rV | sed 's/\.//g'")                     available="$available $ks"
                     while IFS= read -r k; do
                         kv=$(pacman -Si "$k" | grep Version | awk '{$1="";$2=""; print}' | xargs) 
                         [[ "$kv" == "$(pacman -Si "$k-headers" | grep Version | awk '{$1="";$2=""; print}' | xargs)" ]] &&  
@@ -211,7 +243,7 @@ if test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_a
                
                 # Manjaro kernels 
                 if test -n "$(pacman -Ss '^linux[0-9]+-rt$' 2> /dev/null)"; then
-                    local ks=$(eval "$pac_search '^linux[0-9]+-rt$' | grep -i -B 1 -E 'kernel |kernel,' --no-group-separator | paste -d \"\t\" - - | grep -Eiv 'headers|docs|tool|kernel module' | grep '^[^[:space:]]' | grep -iv 'installed' | sed -E 's,core/|extra/|multilib/,,g' | grep '^linux' | uniq | awk '{print \$1}' | sed 's/\(x[0-9]\)/\1./' | sort -rV | sed 's/\.//g'")                     available="$available $ks"
+                    local ks=$(eval "$pac_search '^linux[0-9]+-rt$' | grep -i -B 1 -E 'kernel |kernel,' --no-group-separator | paste -d \"\t\" - - | grep -Eiv '[^and ]headers|docs|tool|kernel module' | grep '^[^[:space:]]' | grep -iv 'installed' | sed -E 's,core/|extra/|multilib/,,g' | grep '^linux' | uniq | awk '{print \$1}' | sed 's/\(x[0-9]\)/\1./' | sort -rV | sed 's/\.//g'")                     available="$available $ks"
                     while IFS= read -r k; do
                         local kv=$(pacman -Si "$k" | grep Version | awk '{$1="";$2=""; print}' | xargs) 
                         [[ "$kv" == "$(pacman -Si "$k-headers" | grep Version | awk '{$1="";$2=""; print}' | xargs)" ]] &&  
@@ -251,7 +283,7 @@ if test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_a
                     # local ltss=$(eval "$AUR_search_q linux-lts | grep 'linux-lts[[:digit:]+]' | cut -d- -f-2 | awk '{print \$1}' | uniq | tr '\n' ' ' | xargs")
                     # No header : linux-drm-tip-git linux-drm-next-git  
                     if hash fzf &> /dev/null; then
-                        local kernel=$(eval "$AUR_search linux | grep -i -B 1 -E 'kernel |kernel,' --no-group-separator | paste -d \"\t\" - - | grep -Eiv 'headers|docs|tool|kernel module|installed' | sed -E 's,core/|extra/|multilib/|aur/,,g' | grep '^linux' | uniq | awk '{print \$1}' | sort -V | fzf --reverse --preview 'cat <(yay -Si {1})'")
+                        local kernel=$(eval "$AUR_search linux | grep -i -B 1 -E 'kernel |kernel,' --no-group-separator | paste -d \"\t\" - - | grep -Eiv '[^and ]headers|docs|tool|kernel module|installed' | sed -E 's,core/|extra/|multilib/|aur/,,g' | grep '^linux' | uniq | awk '{print \$1}' | sort -V | fzf --reverse --preview 'cat <(yay -Si {1})'")
                     fi
                      
                     #local b=$(pacman -Qs linux | grep -i -B 1 -E 'kernel [^module]|kernel,' --no-group-separator | grep -E -v 'headers|docs|tools' | grep '^[^[:space:]]' | sed 's|local/||g' | grep '^linux' | uniq | awk '{print $1}')
@@ -259,7 +291,7 @@ if test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_a
                     #available="$available $ltss linux-lqx linux-git linux-mainline linux-next-git linux-drm-tip-git linux-drm-next-git linux-ck linux-clear linux-libre linux-pf linux-prjc linux-nitrous linux-vfio linux-vfio-lts linux-xanmod linux-xanmod-linux-bin-x64v1 linux-xanmod-linux-bin-x64v2 linux-xanmod-linux-bin-x64v3 linux-xanmod-lts linux-xanmod-lts-linux-bin-x64v1 linux-xanmod-lts-linux-bin-x64v2 linux-xanmod-lts-linux-bin-x64v3 linux-xanmod-edge linux-xanmod-edge-linux-bin-x64v2 linux-xanmod-edge-linux-bin-x64v3 linux-xanmod-edge-linux-bin-x64v4 linux-xanmod-rt linux-xanmod-bore linux-xanmod-anbox linux-cachyos" 
                 else
                     if hash fzf &> /dev/null; then
-                        local kernel=$(eval "$pac_search linux | grep -i -B 1 -E 'kernel |kernel,' --no-group-separator | paste -d \"\t\" - - | grep -Eiv 'headers|docs|tool|kernel module|installed' | sed -E 's,core/|extra/|multilib/,,g' | grep '^linux' | uniq | awk '{print \$1}' | sort -V | fzf --reverse --preview 'cat <(yay -Si {1})'")
+                        local kernel=$(eval "$pac_search linux | grep -i -B 1 -E 'kernel |kernel,' --no-group-separator | paste -d \"\t\" - - | grep -Eiv '[^and ]headers|docs|tool|kernel module|installed' | sed -E 's,core/|extra/|multilib/,,g' | grep '^linux' | uniq | awk '{print \$1}' | sort -V | fzf --reverse --preview 'cat <(yay -Si {1})'")
                     fi
                 fi
     
