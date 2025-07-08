@@ -28,6 +28,8 @@ if test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_a
 
             local prmpth="${green}%-15s %-20s %-25s %-25s\n" 
             local prmpth1="${cyan}%s\n\n" 
+             
+            # pamac list --files linux54 | grep /usr/lib/modules/ | sed 's|/usr/lib/modules/\([^/]*\)/.*|\1|g' | uniq
             printf "${GREEN}Installed Kernels:\n${normal}"
             printf "${GREEN}%-15s %-20s %-25s %-25s\n" "Name" "Version" "Headers" "Headers-Version-Same"
              
