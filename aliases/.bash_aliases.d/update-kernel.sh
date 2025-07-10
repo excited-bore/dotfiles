@@ -111,6 +111,31 @@ if test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_a
         fi
     } 
 
+    function remove-kernels(){
+        local kernels packages=() non_packages=()
+        if [[ "$distro" == 'Manjaro' ]]; then
+            kernels=( $(ls /boot/vmlinuz* | sed -E 's,/boot/|vmlinuz-|-x86_64,,g' | sed 's/^\([[:digit:]]\).\([[:digit:]+]\)/linux\1\2/g') )
+            
+            local remove  
+            if hash fzf &> /dev/null; then
+                remove=$(echo ${kernels[@]} | tr ' ' '\n' | fzf --reverse --height 50% --multi | tr '\n' ' ')
+                remove=( $(echo $remove) ) 
+                if test -n "$remove"; then
+                    for i in ${remove[@]}; do
+                        if ! [[ "$(pamac info $i)" =~ 'Error: ' ]]; then
+                            packages+=("$i")
+                        else
+                            non_packages+=("$i")
+                        fi
+                    done
+                    packages="${packages[@]}"
+                    printf "${GREEN}Removing ${CYAN}$packages${GREEN} using ${CYAN}pamac${normal}\n"
+                    pamac remove --no-confirm "$packages" 
+                fi
+            fi
+        fi
+    } 
+
     function update-kernel(){
         local latest_lts latest_lts1 choices
         
