@@ -178,6 +178,89 @@ if test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_a
         fi
     } 
 
+    if hash grub-set-default &> /dev/null; then
+            
+        function switch-default-kernel(){
+            local query=''
+            if test -n "$1"; then
+                query="$(echo $1 | sed -E 's/linux-|linux//g')"
+            fi
+            if ! grep -q "^GRUB_DEFAULT=saved" /etc/default/grub; then
+                local grb_def
+                printf "${YELLOW}Setting the default kernel using 'grub-set-default' (which this function uses) relies on setting GRUB_DEFAULT=saved in ${CYAN}/etc/default/grub${normal}\n" 
+                readyn -p "Set 'GRUB_DEFAULT=saved' in ${CYAN}/etc/default/grub${GREEN}?" grb_def
+                if [[ "$grb_def" == 'y' ]]; then
+                    if grep -q '^GRUB_DEFAULT=' /etc/default/grub; then
+                        sudo sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=saved/g' /etc/default/grub
+                    elif grep -q '#GRUB_DEFAULT=' /etc/default/grub; then 
+                        sudo sed -i 's/#GRUB_DEFAULT=.*/GRUB_DEFAULT=saved/g' /etc/default/grub
+                    else
+                        sudo sed -i '1s/^/\nGRUB_DEFAULT=saved\n/' /etc/default/grub 
+                    fi
+                fi
+            fi
+            
+            if grep -q "^GRUB_DEFAULT=saved" /etc/default/grub; then
+             
+                local lines=$(sudo grep -E '^menuentry | menuentry |submenu ' /boot/grub/grub.cfg | uniq | cut -d\' -f2 | cut -d\' -f1 | cut -d\" -f2 | sed '/UEFI/d') 
+                local j=0
+                while IFS= read -r i; do 
+                    if [[ "$i" =~ 'Advanced' ]]; then
+                        break 
+                    fi
+                    j=$((j+1)) 
+                done <<< "$lines"
+                
+                printf "${CYAN}Current kernel:\n   ${GREEN}$(uname -r)\n\n${normal}"
+
+                local kernel grb_entry kernels=$(sudo grep -e "[[:space:]+]menuentry '" /boot/grub/grub.cfg | grep 'Linux' | cut -d\( -f2 | cut -d\) -f1 | sed 's/Kernel: //g' | sed '/fallback initramfs/d') 
+                if hash fzf &> /dev/null; then
+                    kernel=$(echo $kernels | fzf --query="$query" --reverse --height 10%)   
+                else
+                    kernels=$(echo $kernels | sed 's/ /_/g') 
+                    if test -n "$query"; then
+                        while IFS= read -r i; do 
+                            if [[ $query =~ $i ]]; then 
+                                readyn -p "Is '$i' the right entry in grub?" grb_entry 
+                                if [[ $grb_entry == 'y' ]]; then
+                                    kernel=$i
+                                fi
+                            fi
+                        done <<< "$kernels"
+                    fi
+                    if test -z "$kernel"; then
+                        printf "${CYAN}Available kernels:\n${normal}" 
+                        while IFS= read -r i; do 
+                            printf "${GREEN}   $i\n${normal}" 
+                        done <<< "$kernels"
+                        kernels=$(echo $kernels | tr '\n' ' ') 
+                        reade -Q 'GREEN' -i "$kernels" -p 'Which one?: ' kernel 
+                        kernel="$(echo $kernel | sed 's/_/ /g')" 
+                    fi
+                fi
+                
+                if test -n "$kernel"; then
+                    local h kernels=$(sudo grep -e "[[:space:]+]menuentry '" /boot/grub/grub.cfg | grep 'Linux' | cut -d\( -f2 | cut -d\) -f1)
+                    while IFS= read -r i; do 
+                        h=$(($h+1))
+                        if [[ "$i" =~ "$kernel" ]]; then
+                            break
+                        fi
+                    done <<< "$kernels" 
+                    
+                    sudo grub-set-default "$j>$h"
+                    
+                    echo "${YELLOW}A reboot is needed to take full effect!${normal}" 
+                    return 0 
+                else
+                    return 1
+                fi
+            fi 
+            #sudo grep -E 'menuentry |submenu ' /boot/grub/grub.cfg | uniq | cut -d\' -f2 | cut -d\' -f1 | cut -d\" -f2
+        }
+    fi
+    
+
     function update-kernel(){
         local latest_lts latest_lts1 choices
         
@@ -449,6 +532,15 @@ if test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_a
                                eval "$pac_ins $kernel" 
                            fi
                         fi
+
+                        local defkern
+                        readyn -p "Set $kernel as default?" defkern
+                        if [[ $defkern == 'y' ]]; then
+                            switch-default-kernel $kernel     
+                        fi
+                        printf "${GREEN}You can list installed kernels using ${CYAN}'list-installed-kernels'${GREEN}\n"
+                        printf "${GREEN}, switch to another kernel using ${CYAN}'switch-default-kernel'${GREEN}\n"
+                        printf "${GREEN}and remove unused kernels using ${CYAN}'remove-kernels'${GREEN}\n" 
                     fi
                 elif [[ "$ansr" == 'headers' ]]; then
                     local current=$(uname -r) 
