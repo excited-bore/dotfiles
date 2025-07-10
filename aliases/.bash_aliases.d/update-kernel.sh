@@ -21,9 +21,9 @@ if test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_a
     function list-installed-kernels(){
    
         printf "${GREEN}Currently used kernel:\n${normal}"
-        printf "${GREEN}%-20s %-20s\n" "Name/Version" "Headers"
+        printf "${GREEN}%-25s %-25s\n" "Name/Version" "Headers"
 
-        local prmptc="${green}%-20s %-20s\n" 
+        local prmptc="${green}%-25s %-25s\n" 
         local ch 
         test -d /lib/modules/$(uname -r)/build && test -n "$(ls /lib/modules/$(uname -r)/build/*)" &&
             ch="${GREEN}o" ||
@@ -42,14 +42,14 @@ if test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_a
                 insk=$(eval "$pac_search_ins linux | grep -i -B 1 -E 'kernel |kernel,' --no-group-separator | paste -d \"\t\" - - | grep -Eiv '[^and ]headers|docs|tool|kernel module' | sed 's|local/||g' | grep '^linux' | uniq | awk '{print \$1}' | sort -V")
             fi
 
-            local prmpth="${green}%-20s %-20s %-25s %-25s\n" 
+            local prmpth="${green}%-25s %-25s %-25s %-25s\n" 
              
             if test -n "$AUR_pac"; then
                 printf "${GREEN}Installed kernels using pacman/$AUR_pac:\n${normal}"
             else
                 printf "${GREEN}Installed kernels using pacman:\n${normal}"
             fi
-            printf "${GREEN}%-20s %-20s %-25s %-25s\n" "Name" "Version" "Headers" "Headers-Version-Same"
+            printf "${GREEN}%-25s %-25s %-25s %-25s\n" "Name" "Version" "Headers" "Headers-Version-Same"
              
             local kv kh khv 
             local known='n'
@@ -97,8 +97,8 @@ if test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_a
 
             if (( ${#knownk[@]} != 0 )); then
                 printf "${GREEN}Installed Custom Compiled Kernels:\n${normal}"
-                printf "${GREEN}%-20s %-20s\n" "Name/Version" "Headers"
-                local prmptc="${green}%-20s %-20s\n" 
+                printf "${GREEN}%-25s %-25s\n" "Name/Version" "Headers"
+                local prmptc="${green}%-25s %-25s\n" 
                 for i in "${knownk[@]}"; do
                     if test -n "$i"; then
                         test -d /lib/modules/$i/build && test -n "$(ls /lib/modules/$i/build/*)" &&
@@ -121,18 +121,18 @@ if test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_a
             remove=( $(echo $remove) ) 
             if test -n "$remove"; then
                 remove=( $(echo ${remove[@]} | sed -E 's,vmlinuz-|-x86_64,,g' ) )
-                if [[ "$distro" == 'Manjaro' ]]; then
-                    for i in ${remove[@]}; do
-                        if test -n "$(pamac search --installed $i)"; then
-                            packages+=("$i")
-                        elif test -n "$(echo $i | sed 's/^\([[:digit:]]\).\([[:digit:]+]\)/linux\1\2/g' | xargs pamac search --installed)"; then
-                            packages+=("$i")
-                        else
-                            non_packages+=("$i")
-                        fi
-                    done
-                    packages=( "${packages[@]}" )
-                    local j
+                for i in ${remove[@]}; do
+                    if test -n "$(pamac search --installed $i)"; then
+                        packages+=("$i")
+                    elif [[ "$distro" == 'Manjaro' ]] && test -n "$(echo $i | sed 's/^\([[:digit:]]\).\([[:digit:]+]\)/linux\1\2/g' | xargs pamac search --installed)"; then
+                        packages+=("$i")
+                    else
+                        non_packages+=("$i")
+                    fi
+                done
+                    
+                local j
+                if (( ${#packages[@]} != 0 )); then 
                     for i in ${packages[@]}; do  
                         j=$(pamac search --installed --quiet $i | awk 'NR==1{print;}' ) 
                         if test -n "$(pamac search --installed linux-meta)" && pamac info linux-meta | grep 'Depends On' | grep -q $j; then
@@ -160,6 +160,9 @@ if test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_a
                             pamac remove --no-confirm "$j*" 
                         fi
                     done
+                fi
+                 
+                if (( ${#non_packages[@]} != 0 )); then
                     for i in ${non_packages[@]}; do
                         j="$(ls /boot/*$i*) /usr/lib/modules/$(ls /usr/lib/modules/ | grep $i)"
                         j="$(echo $j | tr '\n' ' ')"
@@ -170,7 +173,6 @@ if test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_a
                     done
                 fi
             fi
-            
         fi
     } 
 
@@ -409,7 +411,9 @@ if test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_a
         
                     if test -n "$kernel"; then
                         local kernelh="$kernel-headers" 
-                        if [[ $kernel == "linux-meta" ]]; then
+                        if [[ $kernel =~ "-bin" ]]; then
+                            kernelh=$(echo $kernel | sed 's/-bin/-headers-bin/g') 
+                        elif [[ $kernel == "linux-meta" ]]; then
                             kernelh="linux-headers-meta" 
                         elif [[ $kernel == "linux-lts-meta" ]]; then
                             kernelh="linux-lts-headers-meta" 
@@ -458,6 +462,14 @@ if test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_a
                     fi
                     
                     if test -n "$kernel"; then
+                        local pacc_search_q pacc_ins_y
+                        if test -n "$AUR_info"; then
+                            pacc_search_q="$AUR_search_q"
+                            pacc_ins_y="$AUR_ins_y"
+                        else
+                            pacc_search_q="$pac_search_q"
+                            pacc_ins_y="$pac_ins_y"
+                        fi
                         if [[ "$distro" == 'Manjaro' ]] && ( (test -n "$(pamac search --installed linux-meta)" && pamac info linux-meta | grep 'Depends On' | grep -q "$kernel") || (test -n "$(pamac search --installed linux-lts-meta)" && pamac info linux-lts-meta | grep 'Depends On' | grep -q "$kernel")); then
                             if test -n "$(pamac search --installed linux-meta)" && pamac info 'linux-meta' | grep 'Depends On' | grep -q "$kernel"; then 
                                 printf "${GREEN}Installing ${CYAN}linux-headers-meta${normal}\n" 
@@ -466,12 +478,13 @@ if test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_a
                                 printf "${GREEN}Installing ${CYAN}linux-lts-headers-meta${normal}\n" 
                                 pamac install --no-confirm linux-lts-headers-meta
                             fi
-                        elif test -n "$AUR_info" && test -n "$(eval "$AUR_info $kernel-headers")"; then
-                                printf "${GREEN}Installing ${CYAN}$kernel-headers${normal}\n" 
-                                eval "$AUR_ins_y $kernel-headers"
-                        elif test -n "$(eval "$pac_info $kernel-headers")"; then
-                                printf "${GREEN}Installing ${CYAN}$kernel-headers${normal}\n" 
-                                eval "$pac_ins_y $kernel-headers"         
+                        elif test -n "$(eval "$pacc_search_q $kernel-headers")"; then
+                            printf "${GREEN}Installing ${CYAN}$kernel-headers${normal}\n" 
+                            eval "$pacc_ins_y $kernel-headers"
+                        elif [[ "$kernel" =~ '-bin' ]] && test -n "$(eval "echo $kernel | sed 's/-bin/-headers-bin/g' | xargs $pacc_search_q" )"; then   
+                            local headers="$(echo $kernel | sed 's/-bin/-headers-bin/g')" 
+                            printf "${GREEN}Installing ${CYAN}$headers${normal}\n" 
+                            eval "$pacc_ins_y $headers"
                         fi
                     else
                         printf "${YELLOW}Uncertain which kernel package relevant for current kernel\nTry looking for yourself using your packagemanager (f.ex. pacman)\n"
