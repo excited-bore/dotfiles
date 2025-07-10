@@ -163,12 +163,14 @@ if test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_a
                 fi
                  
                 if (( ${#non_packages[@]} != 0 )); then
+                    local rmq 
                     for i in ${non_packages[@]}; do
                         j="$(ls /boot/*$i*) /usr/lib/modules/$(ls /usr/lib/modules/ | grep $i)"
                         j="$(echo $j | tr '\n' ' ')"
                         readyn -p "Remove ${CYAN}'$j'${GREEN}?" rmq
                         if [[ "$rmq" == 'y' ]]; then
-                            sudo rm -rv $j
+                            # No idea why 'sudo rm /boot/linux.img ..' doesn't work 
+                            eval "sudo rm $j" 
                         fi
                     done
                 fi
