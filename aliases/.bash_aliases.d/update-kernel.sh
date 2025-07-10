@@ -120,12 +120,12 @@ if test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_a
             remove=$(echo ${kernels[@]} | tr ' ' '\n' | fzf --reverse --height 50% --multi | tr '\n' ' ')
             remove=( $(echo $remove) ) 
             if test -n "$remove"; then
-                remove=( $(echo ${remove[@]} | sed -E 's,vmlinuz-|-x86_64,,g' ) )
+                remove=( $(echo ${remove[@]} | sed 's,vmlinuz-,,g' ) )
                 for i in ${remove[@]}; do
                     if test -n "$(pamac search --installed $i)"; then
                         packages+=("$i")
-                    elif [[ "$distro" == 'Manjaro' ]] && test -n "$(echo $i | sed 's/^\([[:digit:]]\).\([[:digit:]+]\)/linux\1\2/g' | xargs pamac search --installed)"; then
-                        packages+=("$i")
+                    elif [[ "$distro" == 'Manjaro' ]] && test -n "$(echo $i | sed 's,-x86_64,,g' | sed 's/^\([[:digit:]]\).\([[:digit:]+]\)/linux\1\2/g' | xargs pamac search --installed)"; then
+                        packages+=("$(echo $i | sed 's,-x86_64,,g' | sed 's/^\([[:digit:]]\).\([[:digit:]+]\)/linux\1\2/g')") 
                     else
                         non_packages+=("$i")
                     fi
