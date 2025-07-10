@@ -463,7 +463,7 @@ if test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_a
                     
                     if test -n "$kernel"; then
                         local pacc_search_q pacc_ins_y
-                        if test -n "$AUR_info"; then
+                        if test -n "$AUR_search_q"; then
                             pacc_search_q="$AUR_search_q"
                             pacc_ins_y="$AUR_ins_y"
                         else
