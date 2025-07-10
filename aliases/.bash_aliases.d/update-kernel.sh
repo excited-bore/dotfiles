@@ -1,12 +1,12 @@
-DIR=$(get-script-dir)
-
 if ! type reade &> /dev/null && test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh; then
     . ~/.bash_aliases.d/00-rlwrap_scripts.sh
 fi 
 
-if ! type reade &> /dev/null && test -f $DIR/aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
-    . $DIR/aliases/.bash_aliases.d/00-rlwrap_scripts.sh
+if ! type reade &> /dev/null && test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
+    . aliases/.bash_aliases.d/00-rlwrap_scripts.sh
 fi 
+
+DIR=$(get-script-dir)
 
 if test -f ~/.bash_aliases.d/package_managers.sh; then
     . ~/.bash_aliases.d/package_managers.sh
@@ -113,26 +113,57 @@ if test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_a
 
     function remove-kernels(){
         local kernels packages=() non_packages=()
-        if [[ "$distro" == 'Manjaro' ]]; then
-            kernels=( $(ls /boot/vmlinuz* | sed -E 's,/boot/|vmlinuz-|-x86_64,,g' | sed 's/^\([[:digit:]]\).\([[:digit:]+]\)/linux\1\2/g') )
-            
-            local remove  
-            if hash fzf &> /dev/null; then
-                remove=$(echo ${kernels[@]} | tr ' ' '\n' | fzf --reverse --height 50% --multi | tr '\n' ' ')
-                remove=( $(echo $remove) ) 
-                if test -n "$remove"; then
+        kernels=( $(ls /boot/vmlinuz* | sed 's|/boot/||g' ) )
+        
+        local remove  
+        if hash fzf &> /dev/null; then
+            remove=$(echo ${kernels[@]} | tr ' ' '\n' | fzf --reverse --height 50% --multi | tr '\n' ' ')
+            remove=( $(echo $remove) ) 
+            if test -n "$remove"; then
+                remove=( $(echo ${remove[@]} | sed -E 's,vmlinuz-|-x86_64,,g' ) )
+                if [[ "$distro" == 'Manjaro' ]]; then
                     for i in ${remove[@]}; do
-                        if ! [[ "$(pamac info $i)" =~ 'Error: ' ]]; then
+                        if test -n "$(pamac search --installed $i)"; then
+                            packages+=("$i")
+                        elif test -n "$(echo $i | sed 's/^\([[:digit:]]\).\([[:digit:]+]\)/linux\1\2/g' | xargs pamac search --installed)"; then
                             packages+=("$i")
                         else
                             non_packages+=("$i")
                         fi
                     done
-                    packages="${packages[@]}"
-                    printf "${GREEN}Removing ${CYAN}$packages${GREEN} using ${CYAN}pamac${normal}\n"
-                    pamac remove --no-confirm "$packages" 
+                    packages=( "${packages[@]}" )
+                    
+                    local j
+                    for i in ${packages[@]}; do  
+                        j=$(pamac search --installed --quiet $i | awk 'NR==1{print;}' ) 
+                        if test -n "$(pamac search --installed linux-meta)" && pamac info linux-meta | grep 'Depends On' | grep -q $j; then
+                            if test -n "$(pamac list --installed linux-headers-meta)"; then
+                                printf "${GREEN}Removing ${CYAN}linux-meta, linux-headers-meta${GREEN} and ${CYAN}$j*${GREEN} using ${CYAN}pamac${normal}\n"
+                                pamac remove --no-confirm linux-meta
+                                pamac remove --no-confirm linux-headers-meta
+                            else
+                                printf "${GREEN}Removing ${CYAN}linux-meta${GREEN} and ${CYAN}$j*${GREEN} using ${CYAN}pamac${normal}\n"
+                                pamac remove --no-confirm "linux-meta"
+                            fi
+                            pamac remove --no-confirm "linux-meta* $j*"
+                        elif test -n "$(pamac search --installed linux-lts-meta)" && pamac info linux-lts-meta | grep 'Depends On' | grep -q $j; then
+                            if test -n "$(pamac list --installed linux-lts-headers-meta)"; then
+                                printf "${GREEN}Removing ${CYAN}linux-lts-meta, linux-lts-headers-meta${GREEN} and ${CYAN}$j*${GREEN} using ${CYAN}pamac${normal}\n"
+                                pamac remove --no-confirm linux-lts-meta
+                                pamac remove --no-confirm linux-lts-headers-meta
+                            else
+                                printf "${GREEN}Removing ${CYAN}linux-lts-meta${GREEN} and ${CYAN}$j*${GREEN} using ${CYAN}pamac${normal}\n"
+                                pamac remove --no-confirm "linux-lts-meta"
+                            fi
+                            pamac remove --no-confirm "$j*"
+                        else
+                            printf "${GREEN}Removing ${CYAN}$j*${GREEN} using ${CYAN}pamac${normal}\n"
+                            pamac remove --no-confirm "$j*" 
+                        fi
+                    done
                 fi
             fi
+            
         fi
     } 
 
