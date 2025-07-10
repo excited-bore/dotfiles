@@ -1,8 +1,12 @@
+DIR=$(get-script-dir)
+
 if ! type reade &> /dev/null && test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh; then
     . ~/.bash_aliases.d/00-rlwrap_scripts.sh
 fi 
 
-DIR=$(get-script-dir)
+if ! type reade &> /dev/null && test -f $DIR/aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
+    . $DIR/aliases/.bash_aliases.d/00-rlwrap_scripts.sh
+fi 
 
 if test -f ~/.bash_aliases.d/package_managers.sh; then
     . ~/.bash_aliases.d/package_managers.sh
@@ -15,7 +19,7 @@ fi
 if test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_aliases.d/package_managers.sh; then
 
     function list-installed-kernels(){
-    
+   
         printf "${GREEN}Currently used kernel:\n${normal}"
         printf "${GREEN}%-20s %-20s\n" "Name/Version" "Headers"
 
@@ -40,7 +44,6 @@ if test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_a
 
             local prmpth="${green}%-20s %-20s %-25s %-25s\n" 
              
-            # pamac list --files linux54 | grep /usr/lib/modules/ | sed 's|/usr/lib/modules/\([^/]*\)/.*|\1|g' | uniq
             if test -n "$AUR_pac"; then
                 printf "${GREEN}Installed kernels using pacman/$AUR_pac:\n${normal}"
             else
@@ -69,7 +72,7 @@ if test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_a
                         khv="${RED}x"
                 else
                     if pacman -Qi $k | grep 'Description' | grep -qi 'and headers'; then
-                        kh="${green}Part of main kernel package" 
+                        kh="${green}Part of main package" 
                     else 
                         kh="${red}Not installed" 
                     fi
@@ -89,7 +92,9 @@ if test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_a
                 printf "$prmpth" "$k" "$kv" "$kh" "$khv"  
                  
             done <<< $insk
-          
+         
+            echo 
+
             if (( ${#knownk[@]} != 0 )); then
                 printf "${GREEN}Installed Custom Compiled Kernels:\n${normal}"
                 printf "${GREEN}%-20s %-20s\n" "Name/Version" "Headers"
@@ -116,6 +121,11 @@ if test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_a
             if ! hash fzf &> /dev/null; then
                 printf "${CYAN}fzf${GREEN} not installed and needed for for listing possible kernels packages. Installing..${normal}\n" 
                 sudo pacman -Su fzf --noconfirm 
+            fi
+
+            if ! hash xmllint &> /dev/null; then
+                printf "${CYAN}xmllint${GREEN} not installed and needed for for listing latest kernel versions from ${CYAN}www.kernel.org${GREEN}. Installing..${normal}\n" 
+                sudo pacman -Su xmllint --noconfirm 
             fi
 
             if test -z "$AUR_pac"; then
@@ -168,16 +178,29 @@ if test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_a
             list-installed-kernels
             echo 
 
+            local mainlinev="$(curl https://www.kernel.org/feeds/kdist.xml | xmllint --format --xpath '//title' - | grep '<title>[[:digit:]]' | grep 'mainline' | sed -E 's,<title>|<\/title>,,g' | cut -d: -f1 | awk 'NR==1 {print;}')" 
+            local stablev="$(curl https://www.kernel.org/feeds/kdist.xml | xmllint --format --xpath '//title' - | grep '<title>[[:digit:]]' | grep 'stable' | sed -E 's,<title>|<\/title>,,g' | cut -d: -f1 | awk 'NR==1 {print;}')" 
+            
+            local longtermv="$(curl https://www.kernel.org/feeds/kdist.xml | xmllint --format --xpath '//title' - | grep '<title>[[:digit:]]' | grep 'longterm' | sed -E 's,<title>|<\/title>,,g' | cut -d: -f1 | awk 'NR==1 {print;}')" 
+            
+            local prmpth="${green}%-20s %-20s %-25s %-25s\n" 
+            local prmpth0="${CYAN}%-20s ${green}%-20s\n" 
+            local prmpth1="${cyan}%s\n\n" 
+            printf "${GREEN}Latest kernels from ${CYAN}'www.kernel.org'${GREEN}:${normal}\n"
+            printf "${GREEN}%-20s %-20s\n" "Name" "Version"
+           
+            printf "$prmpth0" "- Mainline: " "$mainlinev"
+            printf "$prmpth0" "- Stable: " "$stablev"
+            printf "$prmpth0" "- Longterm: " "$longtermv"
+
+            echo
+
             if [[ "$distro_base" == 'Arch' ]]; then
-               
-                local prmpth="${green}%-15s %-20s %-25s %-25s\n" 
-                local prmpth1="${cyan}%s\n\n" 
-                
+
                 printf "${GREEN}Available Kernels:\n"
-                printf "${GREEN}%-15s %-20s %-25s %-25s\n" "Name" "Version" "Headers" "Headers-Version-Same"
+                printf "${GREEN}%-20s %-20s %-25s %-25s\n" "Name" "Version" "Headers" "Headers-Version-Same"
                 
-                
-                local available stablev stablehv ltsv ltshv harnenedv hardenedhv rtv rthv rtltsv rtltshv zenv zenhv 
+                local available stablehv ltsv ltshv harnenedv hardenedhv rtv rthv rtltsv rtltshv zenv zenhv 
                 if test -n "$(pacman -Si 'linux' 2> /dev/null)"; then
                     available="linux" 
                     stablev=$(pacman -Si 'linux' | grep Version | awk '{$1="";$2=""; print}' | xargs) 
