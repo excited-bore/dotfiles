@@ -132,7 +132,6 @@ if test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_a
                         fi
                     done
                     packages=( "${packages[@]}" )
-                    
                     local j
                     for i in ${packages[@]}; do  
                         j=$(pamac search --installed --quiet $i | awk 'NR==1{print;}' ) 
@@ -159,6 +158,14 @@ if test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_a
                         else
                             printf "${GREEN}Removing ${CYAN}$j*${GREEN} using ${CYAN}pamac${normal}\n"
                             pamac remove --no-confirm "$j*" 
+                        fi
+                    done
+                    for i in ${non_packages[@]}; do
+                        j="$(ls /boot/*$i*) /usr/lib/modules/$(ls /usr/lib/modules/ | grep $i)"
+                        j="$(echo $j | tr '\n' ' ')"
+                        readyn -p "Remove ${CYAN}'$j'${GREEN}?" rmq
+                        if [[ "$rmq" == 'y' ]]; then
+                            sudo rm -rv $j
                         fi
                     done
                 fi
