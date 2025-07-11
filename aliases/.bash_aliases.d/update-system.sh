@@ -439,14 +439,8 @@ function update-system() {
         if ! [[ "$SKIPKERNEL" == 'y' ]] && hash curl &> /dev/null && hash xmllint &> /dev/null; then 
             if [[ "$KERNEL" == 'lts' ]] || [[ "$KERNEL" == 'stable' ]] || [[ "$KERNEL" == 'mainline' ]]; then
                 local latest_lts latest_lts1 latest_stbl latest_stbl1 latest_main latest_main1 lt_header prmpt lts_ver
-                prmpt="Latest $KERNEL linux kernel"
-                if [[ "$KERNEL" == 'lts' ]]; then 
-                    prmpt='Latest longterm support linux kernel'
-                elif [[ "$KERNEL" == 'mainline' ]]; then 
-                    prmpt='Mainline (actual latest) linux kernel'
-                fi
-                
-                    #latest_lts="$(curl -fsSL https://www.kernel.org/feeds/kdist.xml | xmllint --xpath '//title[contains(., "longterm")][1]/text()' - | awk 'NR==1{print $1;}' | cut -d: -f-1)"
+
+                #latest_lts="$(curl -fsSL https://www.kernel.org/feeds/kdist.xml | xmllint --xpath '//title[contains(., "longterm")][1]/text()' - | awk 'NR==1{print $1;}' | cut -d: -f-1)"
                 # Manjaro tends to be behind, so we only keep for the 'main' version number. Linux6.12 instead of Linux6.12.34 for example.. 
                 test -n "$YES" && flag='--auto' || flag=''
                 
@@ -560,23 +554,43 @@ function update-system() {
                     
                     # https://www.kernel.org/feeds/kdist.xml 
                 elif [[ "$distro" == 'Arch' ]]; then
-                    if [[ "$KERNEL" == 'longterm' ]]; then
-                        latest_lts="linux-lts" 
+                    if [[ "$KERNEL" == 'lts' ]]; then
+                         
+                        pamac search '^linux-lts$' 
+                        
+                        readyn -p 'Also install headers?' lt_header
+                        if [[ "$lt_header" ]]; then
+                            sudo pacman -Su linux-lts linux-lts-headers 
+                        else 
+                            sudo pacman -Su linux-lts 
+                        fi
                     elif [[ "$KERNEL" == 'stable' ]]; then
-                        latest_lts="linux" 
+                        
+                        pamac search '^linux$' 
+                       
+                        readyn -p 'Also install headers?' lt_header
+                        if [[ "$lt_header" ]]; then
+                            sudo pacman -Su linux linux-headers 
+                        else 
+                            sudo pacman -Su linux 
+                        fi
                     elif [[ "$KERNEL" == 'mainline' ]]; then
                         if test -z "$AUR_pac"; then
                             printf "${YELLOW}Can't proceed: mainline linux kernel only available through AUR${normal}\n" 
                         else 
-                            latest_lts="linux-mainline" 
+                            
+                            eval "$AUR_search '^linux-mainline$'"
+
+                            readyn -p 'Also install headers?' lt_header
+                            if [[ "$lt_header" ]]; then
+                                eval "$AUR_pac linux-mainline linux-mainline-headers" 
+                            else 
+                                eval "$AUR_pac linux-mainline" 
+                            fi
                         fi
                     fi
                 fi
-            else 
-                latest_lts="$KERNEL"
-                prmpt="Kernel version $KERNEL"
             fi
-            
         fi
 
         local hdrs_ins
