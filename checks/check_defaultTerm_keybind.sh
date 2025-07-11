@@ -201,31 +201,28 @@ ${ORANGE}This can conflict with different applications' (custom) keybinds\n${nor
 
     # Set KP_Up/down/left/right to regular arrow keys? 
 
-    if [[ "$(xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/custom -l -v | grep --color=never 'tile')" =~ /xfwm4/custom/\<Super\>KP ]]; then
-        printf "${CYAN}xfce4${green} has tiling shortcuts set to ${YELLOW}Keypad arrowkeys${yellow} for tiling programs Up/down/left/right${normal}\n"
+    if test -z "$(xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/custom -l -v | grep --color=never 'tile')" || [[ "$(xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/custom -l -v | grep --color=never 'tile')" =~ /xfwm4/custom/\<Super\>KP ]]; then
+        printf "${CYAN}xfce4${green} has tiling shortcuts ${YELLOW}aren't bound/are set to keypad arrowkeys${green} for tiling programs Up/down/left/right${normal}\n"
         readyn -p "Bind ${CYAN}Windows/Commandkey-Arrowkey${GREEN} to tile programs?" super_arr
+        
         if [[ "$super_arr" == 'y' ]]; then
             xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/custom/\<Super\>KP_Down  -r 
-            xfconf-query -c xfce4-keyboard-shortcuts -n -p /xfwm4/custom/\<Super\>Down  -t string -s tile_down_key 
             xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/custom/\<Super\>KP_Up    -r 
-            xfconf-query -c xfce4-keyboard-shortcuts -n -p /xfwm4/custom/\<Super\>Up    -t string -s tile_up_key 
             xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/custom/\<Super\>KP_Right -r 
-            xfconf-query -c xfce4-keyboard-shortcuts -n -p /xfwm4/custom/\<Super\>Right -t string -s tile_right_key
             xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/custom/\<Super\>KP_Left  -r 
-            xfconf-query -c xfce4-keyboard-shortcuts -n -p /xfwm4/custom/\<Super\>Left  -t string -s tile_left_key 
-
             xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/custom/\<Super\>KP_End   -r 
-            xfconf-query -c xfce4-keyboard-shortcuts -n -p /xfwm4/custom/\<Super\>End   -t string -s tile_down_left_key 
-
             xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/custom/\<Super\>KP_Home  -r 
-            xfconf-query -c xfce4-keyboard-shortcuts -n -p /xfwm4/custom/\<Super\>Home  -t string -s tile_up_left_key 
-
             # Next instead of KP_Page_Down ?
             xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/custom/\<Super\>KP_Next  -r 
-            xfconf-query -c xfce4-keyboard-shortcuts -n -p /xfwm4/custom/\<Super\>Page_Down  -t string -s tile_down_right_key 
-
-
             xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/custom/\<Super\>KP_Page_Up -r 
+           
+            xfconf-query -c xfce4-keyboard-shortcuts -n -p /xfwm4/custom/\<Super\>Down  -t string -s tile_down_key 
+            xfconf-query -c xfce4-keyboard-shortcuts -n -p /xfwm4/custom/\<Super\>Up    -t string -s tile_up_key 
+            xfconf-query -c xfce4-keyboard-shortcuts -n -p /xfwm4/custom/\<Super\>Right -t string -s tile_right_key
+            xfconf-query -c xfce4-keyboard-shortcuts -n -p /xfwm4/custom/\<Super\>Left  -t string -s tile_left_key 
+            xfconf-query -c xfce4-keyboard-shortcuts -n -p /xfwm4/custom/\<Super\>End   -t string -s tile_down_left_key 
+            xfconf-query -c xfce4-keyboard-shortcuts -n -p /xfwm4/custom/\<Super\>Home  -t string -s tile_up_left_key 
+            xfconf-query -c xfce4-keyboard-shortcuts -n -p /xfwm4/custom/\<Super\>Page_Down  -t string -s tile_down_right_key 
             xfconf-query -c xfce4-keyboard-shortcuts -n -p /xfwm4/custom/\<Super\>Page_Up -t string -s tile_up_right_key 
 
 
