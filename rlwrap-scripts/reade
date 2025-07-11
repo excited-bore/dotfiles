@@ -63,7 +63,7 @@ function reade() {
 
     unset READE_VALUE
 
-    local hlpstr="${bold}READE${normal} [ -h / --help ] [ -v / --version] [ -i / --pregiven PREGIVEN(S) SPACESEPARATED STRING ] [ -e / --file-completion ]  [ -s / --no-echo ] [ -p / --prompt PROMPTSTRING ] [ -Q / --colour COLOURSTRING ] [ -r / --read-no-style ('nocomp'/'filecomp-only') ] [ -b/--break-chars BREAKCHARS-STRING ] ${bold}returnvar${normal}
+    local hlpstr="${bold}READE${normal} [ -h / --help ] [ -v / --version] [ -i / --pregiven PREGIVEN(S) SPACESEPARATED STRING ] [ -s / --no-echo ] [ -a / --auto ] [ -e / --file-completion ]  [ -p / --prompt PROMPTSTRING ] [ -Q / --colour COLOURSTRING ] [ -r / --read-no-style ('nocomp'/'filecomp-only') ] [ -b/--break-chars BREAKCHARS-STRING ] ${bold}returnvar${normal}
    
    reade version $VERSION
 
@@ -95,6 +95,11 @@ function reade() {
    -s, --no-echo 
 
         Doesn't echo what's being typed to the terminal - usefull for password prompts and the like
+
+   -a, --auto 
+            
+        Fill in with the pregiven immediately. Usefull when running variants of scripts that use readyn and are supposed to automatically fill in a default answer.
+        If multiple pregivens are supplied, the first one will become the automatic answer.
 
    -e, --file-completion 
 
@@ -153,6 +158,7 @@ function reade() {
             '--prompt')             set -- "$@" '-p' ;;
             '--file-completions')   set -- "$@" '-e' ;;
             '--pre-given')          set -- "$@" '-i' ;;
+            '--auto')               set -- "$@" '-a' ;;
             '--read-no-style')      set -- "$@" '-r' ;; 
             '--no-echo')            set -- "$@" '-s' ;;
             *)                      set -- "$@" "$arg" ;;
@@ -160,8 +166,10 @@ function reade() {
     done
 
     local fcomp='n'
+    local auto='n' 
     local nostyle='n'
     local noecho='n'
+    local prmpt=''
 
     if [[ "$READE_NOSTYLE" ]]; then
         [[ "$READE_NOSTYLE" == 'false' ]] && nostyle='n'  
@@ -170,8 +178,12 @@ function reade() {
         [[ "$READE_NOSTYLE" == 'filecomp-only' ]] && nostyle='f'  
     fi
 
-    while getopts 'rs:b:e:i:p:Q:r:' flag; do
+
+    while getopts 'ars:b:e:i:p:Q:r:' flag; do
         case "${flag}" in
+        a)
+            auto='y'
+            ;;
         e)
             fcomp='y'
             ;;
@@ -218,11 +230,12 @@ function reade() {
      
 	local oldhist=''
         local color=""
+        local arg='' 
         local args=''
         local tmpf=''
 	local eflag=0
         local pre=''
-        while getopts 'rsS:b:e:i:p:Q:' flag; do
+        while getopts 'arsS:b:e:i:p:Q:' flag; do
             case "${flag}" in
             b) ;;
             e)
@@ -335,28 +348,38 @@ function reade() {
                         shopt -s extglob
                         OPTARG="${OPTARG//$'\e'[\[(]*([0-9;])[@-n]/}"
                         readstr=$(echo "$readstr" | sed 's|read |read -p "'"${OPTARG}"'" |g')
-                        
+                        prmpt="${OPTARG}"
+
                         [[ "$pre" == 'off' ]] && 
                             shopt -u extglob 
                     
                     elif [[ $nostyle == 'c' ]]; then
                         readstr=$(echo "$readstr" | sed 's|read |read -p "'"${color}${OPTARG}${normal}"'" |g')
+                        prmpt="${color}${OPTARG}${normal}"
                     elif test -z "$color"; then
                         readstr=$(echo "$readstr" | sed 's|read |printf "'"${OPTARG}"'\n"; read |g') 
+                        prmpt="${OPTARG}"
                     else
                         readstr=$(echo "$readstr" | sed 's|read |printf "'"${color}${OPTARG}${normal}"'\n"; read |g')
+                        prmpt="${color}${OPTARG}${normal}"
                     fi
                 fi
 
                 if test -n "$ZSH_VERSION"; then
                     if [[ $noecho == 'y' ]]; then
-                        test -z "$color" &&
-                            readstr=$(echo "$readstr" | sed 's|vvvvvvvvvv|"?'"${OPTARG}"'" vvvvvvvvvv|g') ||
+                        if test -z "$color"; then
+                            readstr=$(echo "$readstr" | sed 's|vvvvvvvvvv|"?'"${OPTARG}"'" vvvvvvvvvv|g') 
+                            prmpt="${OPTARG}"
+                        else
                             readstr=$(echo "$readstr" | sed 's|vvvvvvvvvv|"?'"${color}${OPTARG}${normal}"'" vvvvvvvvvv|g')
+                            prmpt="${color}${OPTARG}${normal}"
+                        fi
                     elif test -n "$color"; then
                         readstr=$(echo "$readstr" | sed 's|vared |vared -p "'"${color}${OPTARG}${normal}"'" |g')
+                        prmpt="${color}${OPTARG}${normal}"
                     else
                         readstr=$(echo "$readstr" | sed 's|vared |vared -p "'"${optarg}"'" |g')
+                        prmpt="${OPTARG}"
                     fi
                 fi
                 ;;
@@ -370,43 +393,58 @@ function reade() {
 
         shift $((OPTIND - 1))
 
-        local oldtrps="$(trap)"
-
-        # https://stackoverflow.com/questions/14702148/how-to-fire-a-command-when-a-shell-script-is-interrupted
-
-        test -n "$BASH_VERSION" &&
-            trap "history -c; history -r $oldhist; command rm -f $tmpf; test -n \"$oldtrps\" && eval \"$oldtrps\" || trap - SIGINT; return" SIGINT
+        if [[ "$auto" == 'y' ]]; then
+            if test -z "$prmpt"; then
+                printf "$pre\n"; 
+            else
+                printf "$prmpt$pre${normal}\n"; 
+                #if test -n "$BASH_VERSION"; then
+                #elif test -n "$ZSH_VERSION"; then
+                #    printf "${(P)color}$prmpt$prmpt1$pre${normal}\n";   
+                #fi
+            fi
         
-	test -n "$ZSH_VERSION" &&
-	   TRAPINT() {
-	      fc -IR $oldhist
-              fc -IR
-	      command rm -f "$tmpf"
-              return $((128 + $1))
-           }
+        else 
 
-        eval "${readstr}"
+            local oldtrps="$(trap)"
+            
+            # https://stackoverflow.com/questions/14702148/how-to-fire-a-command-when-a-shell-script-is-interrupted
 
-        test -n "$BASH_VERSION" &&
-            history -c &&
-            history -r $oldhist
+            test -n "$BASH_VERSION" &&
+                trap "history -c; history -r $oldhist; command rm -f $tmpf; test -n \"$oldtrps\" && eval \"$oldtrps\" || trap - SIGINT; return" SIGINT
+            
+            test -n "$ZSH_VERSION" &&
+               TRAPINT() {
+                  fc -IR $oldhist
+                  fc -IR
+                  command rm -f "$tmpf"
+                  return $((128 + $1))
+               }
 
-        test -n "$ZSH_VERSION" &&
-	    fc -IR $oldhist
-             
+            eval "${readstr}"
 
-        if test -n "$oldtrps"; then
-            eval "$oldtrps"
-        else
-            trap - SIGINT
+            test -n "$BASH_VERSION" &&
+                history -c &&
+                history -r $oldhist
+
+            test -n "$ZSH_VERSION" &&
+                fc -IR $oldhist
+                 
+
+            if test -n "$oldtrps"; then
+                eval "$oldtrps"
+            else
+                trap - SIGINT
+            fi
+
+            [ -e "$tmpf" ] && command rm -f $tmpf
+
         fi
-
-        [ -e "$tmpf" ] && command rm -f $tmpf
-
-        if ! test -z "$pre" && test -z "$vvvvvvvvvv" || [[ "$vvvvvvvvvv" == "" ]]; then
+        
+        if test -n "$pre" && test -z "$vvvvvvvvvv" || [[ "$vvvvvvvvvv" == "" ]]; then
             vvvvvvvvvv="$pre"
         fi
-
+        
         export READE_VALUE="$vvvvvvvvvv"
         export REPLY="$vvvvvvvvvv"
 
@@ -425,6 +463,7 @@ function reade() {
         local tmpf=''
         local frst=''
         local args=''
+        local color='' 
         local rlwstring="rlwrap --ansi-colour-aware -s 1000 -D 0 -b \"$breaklines\" -o cat"
 
         while getopts ':b:e:i:p:Q:s:S:' flag; do
@@ -451,10 +490,12 @@ function reade() {
             # Prompt
             p)
                 rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-S \"${OPTARG}\" |g")
+                prmpt="${OPTARG}"
                 ;;
             # Prompt colours
             Q)
                 rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-p${OPTARG} |g")
+                color="${OPTARG}" 
                 ;;
             # Password
             s)
@@ -472,8 +513,21 @@ function reade() {
 
         unset vvvvvvvvvv ${@:$#:1} 
 
-        vvvvvvvv="$(eval $rlwstring)"
-
+        if [[ "$auto" == 'y' ]]; then
+            if test -z "$prmpt"; then
+                printf "$frst\n"; 
+            else
+                if test -n "$BASH_VERSION"; then
+                   printf "${!color}$prmpt${normal}$frst\n"; 
+                elif test -n "$ZSH_VERSION"; then
+                    printf "${(P)color}$prmpt${normal}$frst\n";   
+                fi
+            fi
+            vvvvvvvv=$frst       
+        else
+            vvvvvvvv="$(eval $rlwstring)"
+        fi
+        
         export REPLY="$vvvvvvvv"
         export READE_VALUE="$vvvvvvvv"
 
