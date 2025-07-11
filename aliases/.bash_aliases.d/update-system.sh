@@ -2,6 +2,10 @@ if ! type reade &> /dev/null && test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh; 
     . ~/.bash_aliases.d/00-rlwrap_scripts.sh
 fi 
 
+if ! type reade &> /dev/null && test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
+    . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
+fi 
+
 #if hash pamac &> /dev/null && grep -q '#EnableAUR' /etc/pamac.conf; then
 #    if ! test -f checks/check_pamac.sh; then
 #         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pamac.sh) 
