@@ -250,6 +250,7 @@ elif (test -f /etc/arch-release || test -f /etc/manjaro-release) && [[ $distro =
         AUR_search_ins_q="pamac search --installed --quiet"
         AUR_info="pamac info"
         AUR_rm="pamac remove"
+        AUR_rm_y="pamac remove --no-confirm"
         AUR_rm_casc="pamac remove --cascade"
         AUR_rm_orph="pamac remove --orphans"
         AUR_rm_orph_y="pamac remove --orphans --no-confirm"

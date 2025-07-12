@@ -6,6 +6,14 @@ if ! type reade &> /dev/null && test -f aliases/.bash_aliases.d/00-rlwrap_script
     . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
 fi 
 
+if ! type remove-kernels &> /dev/null && test -f ~/.bash_aliases.d/update-kernel.sh; then
+    . ~/.bash_aliases.d/update-kernel.sh
+fi 
+
+if ! type remove-kernels &> /dev/null && test -f aliases/.bash_aliases.d/update-kernel.sh; then
+    . ./aliases/.bash_aliases.d/update-kernel.sh
+fi 
+
 #if hash pamac &> /dev/null && grep -q '#EnableAUR' /etc/pamac.conf; then
 #    if ! test -f checks/check_pamac.sh; then
 #         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pamac.sh) 
@@ -583,9 +591,9 @@ function update-system() {
 
                             readyn -p 'Also install headers?' lt_header
                             if [[ "$lt_header" ]]; then
-                                eval "$AUR_pac linux-mainline linux-mainline-headers" 
+                                eval "$AUR_ins linux-mainline linux-mainline-headers" 
                             else 
-                                eval "$AUR_pac linux-mainline" 
+                                eval "$AUR_ins linux-mainline" 
                             fi
                         fi
                     fi
@@ -622,7 +630,7 @@ function update-system() {
         if test -n "$(pacman -Qdtq)"; then 
             readyn $flag -p "Clean / autoremove orphan packages - dependencies that aren't used by any package?" cachcln
             
-            if [[ $cachcln == 'y' ]]; then
+            if [[ "$cachcln" == 'y' ]]; then
                 
                 if [ -n "$AUR_ls_orphan" ] && test -n "$(eval "$AUR_ls_orphan")"; then
                     
@@ -643,6 +651,15 @@ function update-system() {
                         eval "$pac_rm_orph"
                     fi
                 fi
+            fi
+        fi
+
+
+        if [[ "$(ls /boot/vmlinuz* | wc -w)" -gt 1 ]]; then
+            local rm_unused_krn
+            readyn $flag -p "Multiple installed kernels detected. Remove unused ones?" rm_unused_krn
+            if [[ "$rm_unused_krn" == 'y' ]]; then
+                remove-kernels $flag --clean 
             fi
         fi
 

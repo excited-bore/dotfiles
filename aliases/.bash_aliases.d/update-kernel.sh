@@ -112,17 +112,84 @@ if test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_a
     } 
 
     function remove-kernels(){
-        local kernels packages=() non_packages=()
-        kernels=( $(ls /boot/vmlinuz* | sed 's|/boot/||g' ) )
-        
-        local remove  
-        if hash fzf &> /dev/null; then
-            remove=$(echo ${kernels[@]} | tr ' ' '\n' | fzf --reverse --height 50% --multi | tr '\n' ' ')
-            remove=( $(echo $remove) ) 
+       
+        local hlpstr="${bold}remove-kernels${normal} [ -h / --help ] [ -a / --auto ] [ -c / --clean [ KERNEL ]]${normal}
+   
+        remove-kernels either manually or all but the supplied kernel using -c / --clean. If no kernel is supplied, removes all kernels but the one currently running.
+        Best to supply the 'vmlinuz-..' kernel file. 
+        Otherwise, remove-kernels will try to check /boot/grub/grub.cfg for the right vmlinuz file
+        Pass -a/--auto to never prompt the user for with a question\n" 
+
+        while :; do
+            case $1 in
+            -h | -\? | --help)
+                printf "$hlpstr"
+                return 0
+                ;;
+            # Otherwise
+            *)
+                break
+                ;;
+            esac
+        done && OPTIND=1
+
+        #https://stackoverflow.com/questions/12022592/how-can-i-use-long-options-with-the-bash-getopts-builtin
+
+        if [[ $(ls /boot/vmlinuz* | wc -w) == 1 ]]; then 
+            printf "${RED}Only 1 kernel left in /boot/. Aborting...${normal}\n"
+            return 1
+        else
+          
+            for arg in "$@"; do
+                shift
+                case "$arg" in
+                    '--auto')    set -- "$@" '-a'   ;;
+                    '--clean')   set -- "$@" '-c'   ;;
+                    *)           set -- "$@" "$arg" ;;
+                esac
+            done
+          
+            local auto allbutone
+            while getopts 'acc:' flag; do
+                case $flag in 
+                    a) auto='--auto' 
+                       ;;
+                    c) if test -n "${OPTARG}"; then
+                           allbutone="${OPTARG}"
+                       else
+                           allbutone="$(uname -r)"                
+                       fi
+                       ;;
+               esac
+            done && OPTIND=1
+
+            local remove kernels packages=() non_packages=()
+            
+            if ! [[ "$allbutone" =~ 'vmlinuz' ]]; then
+                printf "Next ${red}sudo${normal} will check /boot/grub/grub.cfg for right ${cyan}'vmlinuz'${normal} file.\n" 
+                if sudo grep -q "$allbutone" /boot/grub/grub.cfg; then
+                    allbutone="$(sudo awk '/'$allbutone'/,0 { if ($0 ~ /vmlinuz/) {print $2; exit}}' /boot/grub/grub.cfg | sed 's,.*\(vmlinuz.*\).*,\1,g')" 
+                else 
+                    printf "${YELLOW}Couldn't find kernel specified! Try giving \"\$(uname -r)\" as argument or check /boot/ for the name of the right 'vmlinuz' file.${normal}\n"
+                    return 1 
+                fi
+            fi
+         
+            kernels=( $(ls /boot/vmlinuz* | sed 's|/boot/||g' ) )
+
+            if test -n "$allbutone"; then
+                remove=( ${kernels[@]/$allbutone} ) 
+            else
+                remove=$(echo ${kernels[@]} | tr ' ' '\n' | fzf --reverse --height 50% --multi | tr '\n' ' ')
+                remove=( $(echo $remove) ) 
+            fi
+            
             if test -n "$remove"; then
                 remove=( $(echo ${remove[@]} | sed 's,vmlinuz-,,g' ) )
                 for i in ${remove[@]}; do
-                    if test -n "$(pamac search --installed $i)"; then
+                    if test -n "$AUR_pac" && test -n "$(eval "$AUR_search_ins $i")"; then  
+                        packages+=("$i")
+                    elif test -n "$(eval "$pac_search_ins $i")"; then
                         packages+=("$i")
                     elif [[ "$distro" == 'Manjaro' ]] && test -n "$(echo $i | sed 's,-x86_64,,g' | sed 's/^\([[:digit:]]\).\([[:digit:]+]\)/linux\1\2/g' | xargs pamac search --installed)"; then
                         packages+=("$(echo $i | sed 's,-x86_64,,g' | sed 's/^\([[:digit:]]\).\([[:digit:]+]\)/linux\1\2/g')") 
@@ -134,8 +201,8 @@ if test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_a
                 local j
                 if (( ${#packages[@]} != 0 )); then 
                     for i in ${packages[@]}; do  
-                        j=$(pamac search --installed --quiet $i | awk 'NR==1{print;}' ) 
-                        if test -n "$(pamac search --installed linux-meta)" && pamac info linux-meta | grep 'Depends On' | grep -q $j; then
+                        j=$(eval "$pac_search_ins_q $i | awk 'NR==1{print;}'" ) 
+                        if [[ "$distro" == 'Manjaro' ]] && test -n "$(pamac search --installed linux-meta)" && pamac info linux-meta | grep 'Depends On' | grep -q $j; then
                             if test -n "$(pamac list --installed linux-headers-meta)"; then
                                 printf "${GREEN}Removing ${CYAN}linux-meta, linux-headers-meta${GREEN} and ${CYAN}$j*${GREEN} using ${CYAN}pamac${normal}\n"
                                 pamac remove --no-confirm linux-meta
@@ -145,7 +212,7 @@ if test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_a
                                 pamac remove --no-confirm "linux-meta"
                             fi
                             pamac remove --no-confirm "linux-meta* $j*"
-                        elif test -n "$(pamac search --installed linux-lts-meta)" && pamac info linux-lts-meta | grep 'Depends On' | grep -q $j; then
+                        elif [[ "$distro" == 'Manjaro' ]] && test -n "$(pamac search --installed linux-lts-meta)" && pamac info linux-lts-meta | grep 'Depends On' | grep -q $j; then
                             if test -n "$(pamac list --installed linux-lts-headers-meta)"; then
                                 printf "${GREEN}Removing ${CYAN}linux-lts-meta, linux-lts-headers-meta${GREEN} and ${CYAN}$j*${GREEN} using ${CYAN}pamac${normal}\n"
                                 pamac remove --no-confirm linux-lts-meta
@@ -157,7 +224,11 @@ if test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_a
                             pamac remove --no-confirm "$j*"
                         else
                             printf "${GREEN}Removing ${CYAN}$j*${GREEN} using ${CYAN}pamac${normal}\n"
-                            pamac remove --no-confirm "$j*" 
+                            if test -n "$AUR_pac"; then
+                                eval "$AUR_rm_y '$j*'" 
+                            else
+                                eval "$pac_rm_y '$j*'" 
+                            fi
                         fi
                     done
                 fi
@@ -167,13 +238,15 @@ if test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_a
                     for i in ${non_packages[@]}; do
                         j="$(ls /boot/*$i*) /usr/lib/modules/$(ls /usr/lib/modules/ | grep $i)"
                         j="$(echo $j | tr '\n' ' ')"
-                        readyn -p "Remove ${CYAN}'$j'${GREEN}?" rmq
+                        echo $auto 
+                        readyn $auto -p "Remove ${CYAN}'$j'${GREEN}?" rmq
                         if [[ "$rmq" == 'y' ]]; then
                             # No idea why 'sudo rm /boot/linux.img ..' doesn't work 
                             eval "sudo rm $j" 
                         fi
                     done
                 fi
+                sudo update-grub
             fi
         fi
     } 
