@@ -32,20 +32,18 @@ function list-installed-kernels(){
 
     local prmptc="${green}%-25s %-25s\n" 
     local ch 
-    test -d /lib/modules/$(uname -r)/build && test -n "$(ls /lib/modules/$(uname -r)/build/*)" &&
+    test -d /lib/modules/$(uname -r)/build && test -n "$(command ls /lib/modules/$(uname -r)/build/*)" &&
         ch="${GREEN}o" ||
         ch="${RED}x"
 
     printf "$prmptc" "$(uname -r)" "$ch" 
     echo 
 
-    local prmpth="${green}%-25s %-25s %-25s %-25s\n" 
-    local kv kh khv known='n' knownk=($(ls /lib/modules/)) knownk2=()
-
+    local insk kv kh khv known='n' knownk=($(command ls /lib/modules/)) knownk2=()
 
     if [[ "$distro_base" == 'Debian' ]]; then
 
-        local insk
+        local prmpth="${green}%-45s %-30s %-35s %-40s\n" 
 
         insk=$(dpkg-query -W -f '${db:Status-Status} ${Package}\n' 'linux-image-*' | awk '$1 != "not-installed" {print $2}')
         
@@ -55,12 +53,40 @@ function list-installed-kernels(){
             printf "${GREEN}Installed kernels using apt:\n${normal}"
         fi
 
-        printf "${GREEN}%-25s %-25s %-25s %-25s\n" "Name" "Version" "Headers" "Headers-Version-Same"
+        printf "${GREEN}%-45s %-30s %-35s %-40s\n" "Name" "Version" "Headers" "Headers-Version-Same"
 
+        while IFS= read -r k; do
+            kv="$(dpkg-query -W -f '${Version}' "$k")"     
+            if test -z "$kv"; then
+                kv="${YELLOW}Version not available!{}"
+            fi
+            kh=$(echo $k | sed 's/image/headers/g')
+            if test -z "$(dpkg-query -W "$kh" 2> /dev/null)" ; then
+                kh="${YELLOW}Headers package not available${normal}"
+                khv=""
+            else 
+                [[ "$kv" == "$(dpkg-query -f '${Version}' -W "$kh")" ]] &&  
+                    khv="${GREEN}o" ||
+                    khv="${RED}x"
+            fi
+
+            known='n' 
+            for i in ${knownk[@]}; do
+                if [[ $known == 'n' ]] && dpkg -L "$k" | grep -q $i; then
+                    known='y'
+                else
+                    knownk2+=("$i") 
+                fi
+            done
+            knownk=("${knownk2[@]}")
+            knownk2=()
+            printf "$prmpth" "$k" "$kv" "$kh" "$khv"  
+
+        done <<< $insk
 
     elif [[ "$distro_base" == 'Arch' ]]; then
-     
-        local insk
+    
+        local prmpth="${green}%-25s %-25s %-25s %-25s\n" 
          
         if test -n "$AUR_search_ins"; then
             insk=$(eval "$AUR_search_ins linux | grep -i -B 1 -E 'kernel |kernel,' --no-group-separator | paste -d \"\t\" - - | grep -Eiv '[^and ]headers|docs|tool|kernel module' | sed 's|local/||g' | grep '^linux' | uniq | awk '{print \$1}' | sort -V")
@@ -70,8 +96,8 @@ function list-installed-kernels(){
             printf "${GREEN}Installed kernels using pacman:\n${normal}"
         fi
          
-        printf "${GREEN}%-25s %-25s %-25s %-25s\n" "Name" "Version" "Headers" "Headers-Version-Same"
          
+        printf "${GREEN}%-25s %-25s %-25s %-25s\n" "Name" "Version" "Headers" "Headers-Version-Same"
         while IFS= read -r k; do
             
             kv=$(pacman -Qi "$k" | grep Version | awk '{$1="";$2=""; print}' | xargs) 
@@ -110,23 +136,26 @@ function list-installed-kernels(){
             printf "$prmpth" "$k" "$kv" "$kh" "$khv"  
              
         done <<< $insk
-     
-        echo 
-
-        if (( ${#knownk[@]} != 0 )); then
-            printf "${GREEN}Installed Custom Compiled Kernels:\n${normal}"
-            printf "${GREEN}%-25s %-25s\n" "Name/Version" "Headers"
-            local prmptc="${green}%-25s %-25s\n" 
-            for i in "${knownk[@]}"; do
-                if test -n "$i"; then
-                    test -d /lib/modules/$i/build && test -n "$(ls /lib/modules/$i/build/*)" &&
-                        kh="${GREEN}o" ||
-                        kh="${RED}x"
-                    printf "$prmptc" "$i" "$kh"
-                fi
-            done
-        fi
     fi
+   
+    echo 
+
+    if (( ${#knownk[@]} != 0 )); then
+        printf "${GREEN}Installed Custom Compiled Kernels:\n${normal}"
+        printf "${GREEN}%-25s %-25s\n" "Name/Version" "Headers"
+        local prmptc="${green}%-25s %-25s\n" 
+        for i in "${knownk[@]}"; do
+            if test -n "$i"; then
+                test -d /lib/modules/$i/build && test -n "$(ls /lib/modules/$i/build/*)" &&
+                    kh="${GREEN}o" ||
+                    kh="${RED}x"
+                printf "$prmptc" "$i" "$kh"
+            fi
+        done
+    fi
+    
+    echo 
+    
 } 
 
 function remove-kernels(){
