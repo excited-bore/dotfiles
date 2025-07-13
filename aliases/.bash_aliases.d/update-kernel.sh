@@ -56,13 +56,13 @@ function list-installed-kernels(){
         printf "${GREEN}%-45s %-30s %-35s %-40s\n" "Name" "Version" "Headers" "Headers-Version-Same"
 
         while IFS= read -r k; do
-            kv="$(dpkg-query -W -f '${Version}' "$k")"     
+            kv="$(dpkg-query -W -f '${Version}\n' "$k")"     
             if test -z "$kv"; then
                 kv="${YELLOW}Version not available!{}"
             fi
             kh=$(echo $k | sed 's/image/headers/g')
             if test -z "$(dpkg-query -W "$kh" 2> /dev/null)" ; then
-                kh="${YELLOW}Headers package not available${normal}"
+                kh="${YELLOW}Headers package not installed${normal}"
                 khv=""
             else 
                 [[ "$kv" == "$(dpkg-query -f '${Version}' -W "$kh")" ]] &&  
@@ -182,7 +182,7 @@ function remove-kernels(){
 
     #https://stackoverflow.com/questions/12022592/how-can-i-use-long-options-with-the-bash-getopts-builtin
 
-    if [[ $(ls /boot/vmlinuz* | wc -w) == 1 ]]; then 
+    if [[ $(command ls /boot/vmlinuz* | wc -w) == 1 ]]; then 
         printf "${RED}Only 1 kernel left in /boot/. Aborting...${normal}\n"
         return 1
     else
@@ -222,7 +222,7 @@ function remove-kernels(){
             fi
         fi
      
-        kernels=( $(ls /boot/vmlinuz* | sed 's|/boot/||g' ) )
+        kernels=( $(command ls /boot/vmlinuz* | sed 's|/boot/||g' ) )
 
         if test -n "$allbutone"; then
             remove=( ${kernels[@]/$allbutone} ) 
@@ -232,23 +232,37 @@ function remove-kernels(){
         fi
         
         if test -n "$remove"; then
-            remove=( $(echo ${remove[@]} | sed 's,vmlinuz-,,g' ) )
+            if [[ "$distro_base" == 'Debian' ]]; then
+                remove=( $(echo ${remove[@]} | sed 's,vmlinuz-,linux-image-,g' ) )
+            else 
+                remove=( $(echo ${remove[@]} | sed 's,vmlinuz-,,g' ) )
+            fi
+                
             for i in ${remove[@]}; do
-                if test -n "$AUR_pac" && test -n "$(eval "$AUR_search_ins $i")"; then  
-                    packages+=("$i")
-                elif test -n "$(eval "$pac_search_ins $i")"; then
-                    packages+=("$i")
-                elif [[ "$distro" == 'Manjaro' ]] && test -n "$(echo $i | sed 's,-x86_64,,g' | sed 's/^\([[:digit:]]\).\([[:digit:]+]\)/linux\1\2/g' | xargs pamac search --installed)"; then
-                    packages+=("$(echo $i | sed 's,-x86_64,,g' | sed 's/^\([[:digit:]]\).\([[:digit:]+]\)/linux\1\2/g')") 
-                else
-                    non_packages+=("$i")
+                # Make sure we ignore symbolic links 'vmlinuz' or 'vmlinuz.old' here
+                if ! test -h "/boot/$i"; then 
+                
+                    if [[ "$distro_base" == 'Arch' ]] && test -n "$AUR_pac" && test -n "$(eval "$AUR_search_ins $i")"; then  
+                        packages+=("$i")
+                    elif test -n "$(eval "$pac_search_ins $i")"; then
+                        packages+=("$i")
+                    elif [[ "$distro_base" == 'Debian' ]] && test -n "$(eval "$pac_search_ins '*$i*' 2> /dev/null")"; then
+                        echo $i
+                        packages+=("$i")
+                    elif [[ "$distro" == 'Manjaro' ]] && test -n "$(echo $i | sed 's,-x86_64,,g' | sed 's/^\([[:digit:]]\).\([[:digit:]+]\)/linux\1\2/g' | xargs pamac search --installed)"; then
+                        packages+=("$(echo $i | sed 's,-x86_64,,g' | sed 's/^\([[:digit:]]\).\([[:digit:]+]\)/linux\1\2/g')") 
+                    else
+                        non_packages+=("$i")
+                    fi
                 fi
             done
                 
             local j
             if (( ${#packages[@]} != 0 )); then 
                 for i in ${packages[@]}; do  
-                    j=$(eval "$pac_search_ins_q $i | awk 'NR==1{print;}'" ) 
+                    echo "$i" 
+                    j=$(eval "$pac_search_ins_q '$i' | awk 'NR==1{print;}'" ) 
+                    echo "$j" 
                     if [[ "$distro" == 'Manjaro' ]] && test -n "$(pamac search --installed linux-meta)" && pamac info linux-meta | grep 'Depends On' | grep -q $j; then
                         if test -n "$(pamac list --installed linux-headers-meta)"; then
                             printf "${GREEN}Removing ${CYAN}linux-meta, linux-headers-meta${GREEN} and ${CYAN}$j*${GREEN} using ${CYAN}pamac${normal}\n"
@@ -270,10 +284,11 @@ function remove-kernels(){
                         fi
                         pamac remove --no-confirm "$j*"
                     else
-                        printf "${GREEN}Removing ${CYAN}$j*${GREEN} using ${CYAN}pamac${normal}\n"
                         if test -n "$AUR_pac"; then
+                            printf "${GREEN}Removing ${CYAN}$j*${GREEN} using ${CYAN}$AUR_rm_y${normal}\n"
                             eval "$AUR_rm_y '$j*'" 
                         else
+                            printf "${GREEN}Removing ${CYAN}$j*${GREEN} using ${CYAN}$pac_rm_y${normal}\n"
                             eval "$pac_rm_y '$j*'" 
                         fi
                     fi
@@ -283,9 +298,10 @@ function remove-kernels(){
             if (( ${#non_packages[@]} != 0 )); then
                 local rmq 
                 for i in ${non_packages[@]}; do
-                    j="$(ls /boot/*$i*) /usr/lib/modules/$(ls /usr/lib/modules/ | grep $i)"
+                    j="$(command ls /boot/*$i*)"
+                    test -d "/usr/lib/modules/$i" && 
+                        j="$j /usr/lib/modules/$i"
                     j="$(echo $j | tr '\n' ' ')"
-                    echo $auto 
                     readyn $auto -p "Remove ${CYAN}'$j'${GREEN}?" rmq
                     if [[ "$rmq" == 'y' ]]; then
                         # No idea why 'sudo rm /boot/linux.img ..' doesn't work 
