@@ -257,39 +257,43 @@ function remove-kernels(){
                 fi
             done
                 
-            local j
+            local j pamcflag
+            test -n "$auto" &&
+                pamcflag='--no-confirm'
             if (( ${#packages[@]} != 0 )); then 
                 for i in ${packages[@]}; do  
-                    echo "$i" 
                     j=$(eval "$pac_search_ins_q '$i' | awk 'NR==1{print;}'" ) 
-                    echo "$j" 
                     if [[ "$distro" == 'Manjaro' ]] && test -n "$(pamac search --installed linux-meta)" && pamac info linux-meta | grep 'Depends On' | grep -q $j; then
                         if test -n "$(pamac list --installed linux-headers-meta)"; then
                             printf "${GREEN}Removing ${CYAN}linux-meta, linux-headers-meta${GREEN} and ${CYAN}$j*${GREEN} using ${CYAN}pamac${normal}\n"
-                            pamac remove --no-confirm linux-meta
-                            pamac remove --no-confirm linux-headers-meta
+                            pamac remove $pamcflag linux-meta
+                            pamac remove $pamcflag linux-headers-meta
                         else
                             printf "${GREEN}Removing ${CYAN}linux-meta${GREEN} and ${CYAN}$j*${GREEN} using ${CYAN}pamac${normal}\n"
-                            pamac remove --no-confirm "linux-meta"
+                            pamac remove $pamcflag "linux-meta"
                         fi
-                        pamac remove --no-confirm "linux-meta* $j*"
+                        pamac remove $pamcflag "linux-meta* $j*"
                     elif [[ "$distro" == 'Manjaro' ]] && test -n "$(pamac search --installed linux-lts-meta)" && pamac info linux-lts-meta | grep 'Depends On' | grep -q $j; then
                         if test -n "$(pamac list --installed linux-lts-headers-meta)"; then
                             printf "${GREEN}Removing ${CYAN}linux-lts-meta, linux-lts-headers-meta${GREEN} and ${CYAN}$j*${GREEN} using ${CYAN}pamac${normal}\n"
-                            pamac remove --no-confirm linux-lts-meta
-                            pamac remove --no-confirm linux-lts-headers-meta
+                            pamac remove $pamcflag linux-lts-meta
+                            pamac remove $pamcflag linux-lts-headers-meta
                         else
                             printf "${GREEN}Removing ${CYAN}linux-lts-meta${GREEN} and ${CYAN}$j*${GREEN} using ${CYAN}pamac${normal}\n"
-                            pamac remove --no-confirm "linux-lts-meta"
+                            pamac remove $pamcflag "linux-lts-meta"
                         fi
-                        pamac remove --no-confirm "$j*"
+                        pamac remove $pamcflag "$j*"
                     else
                         if test -n "$AUR_pac"; then
                             printf "${GREEN}Removing ${CYAN}$j*${GREEN} using ${CYAN}$AUR_rm_y${normal}\n"
-                            eval "$AUR_rm_y '$j*'" 
+                            test -n "$auto" && 
+                                eval "$AUR_rm_y '$j*'" ||
+                                eval "$AUR_rm '$j*'" 
                         else
                             printf "${GREEN}Removing ${CYAN}$j*${GREEN} using ${CYAN}$pac_rm_y${normal}\n"
-                            eval "$pac_rm_y '$j*'" 
+                            test -n "$auto" && 
+                                eval "$pac_rm_y '$j*'" || 
+                                eval "$pac_rm '$j*'" 
                         fi
                     fi
                 done
