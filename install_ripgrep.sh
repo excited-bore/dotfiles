@@ -6,7 +6,7 @@ else
     source aliases/.bash_aliases.d/package_managers.sh
 fi
 
-if ! type rg &> /dev/null; then 
+if ! hash rg &> /dev/null; then 
     if [[ $distro_base == "Arch" ]] || [[ "$distro_base" == 'Debian' ]]; then
         eval "${pac_ins} ripgrep"
     fi

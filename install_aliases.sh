@@ -536,6 +536,7 @@ unset int_r sig
 
 bashc=aliases/.bash_aliases.d/bash.sh
 update_sysm=aliases/.bash_aliases.d/update-system.sh
+update_kern=aliases/.bash_aliases.d/update-kernel.sh
 pacmn=aliases/.bash_aliases.d/package_managers.sh
 rgrp=aliases/.bash_aliases.d/ripgrep-directory.sh
 [[ $distro == "Manjaro" ]] && manjaro=aliases/.bash_aliases.d/manjaro.sh
@@ -549,6 +550,7 @@ hash python &>/dev/null && pthon=aliases/.bash_aliases.d/python.sh
 if ! test -d aliases/.bash_aliases.d/; then
     tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/bash.sh && bash=$tmp
     tmp1=$(mktemp) && curl -o $tmp1 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh && update_sysm=$tmp1
+    tmp11=$(mktemp) && curl -o $tmp11 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-kernel.sh && update_kern=$tmp11
     rgrp=$(mktemp) && curl -o $rgrp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/ripgrep-directory.sh 
     tmp3=$(mktemp) && curl -o $tmp4 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/package_managers.sh && pacmn=$tmp4
     [[ $distro == "Manjaro" ]] && tmp7=$(mktemp) && curl -o $tmp7 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/manjaro.sh && manjaro=$tmp7
@@ -573,11 +575,14 @@ yes-edit-no -f bash_u -g "$bashc" -p "Install bash.sh at ~/.bash_aliases.d/? (a 
 update_sysm_r() {
     sudo cp $update_sysm /root/.bash_aliases.d/
     sudo sed -i '/SYSTEM_UPDATED="TRUE"/d' /root/.bash_aliases.d/update-system.sh
+    sudo cp $update_kern /root/.bash_aliases.d/
 }
+
 update_sysm() {
     cp  $update_sysm ~/.bash_aliases.d/
     sed -i '/SYSTEM_UPDATED="TRUE"/d' ~/.bash_aliases.d/update-system.sh
-    
+    cp  $update_kern ~/.bash_aliases.d/
+
     if [[ $distro_base == 'Debian' ]]; then
         
         if ! hash mainline &>/dev/null; then
@@ -607,9 +612,9 @@ update_sysm() {
         fi
         unset xml_ins
     fi
-    yes-edit-no -Y "YELLOW" -f update_sysm_r -g "$update_sysm" -p "Install update-system.sh at /root/.bash_aliases.d//?" 
+    yes-edit-no -Y "YELLOW" -f update_sysm_r -g "$update_sysm" -p "Install update-system.sh and update-kernel.sh at /root/.bash_aliases.d//?" 
 }
-yes-edit-no -f update_sysm -g "$update_sysm" -p "Install update-system.sh at ~/.bash_aliases.d/? (Global system update function)?"
+yes-edit-no -f update_sysm -g "$update_sysm $update_kern" -p "Install update-system.sh and update-kernel.sh at ~/.bash_aliases.d/? (Global system update function)?"
 
 packman_r() {
     sudo cp $pacmn /root/.bash_aliases.d/

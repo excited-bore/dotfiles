@@ -120,91 +120,91 @@ fi
 
 alias get-script-dir='cd "$( dirname "$-1" )" && pwd'
 
-([[ "$(type unalias)" =~ 'aliased' ]] || [[ "$(type unalias)" =~ 'function' ]]) && 
-    alias unalias="builtin unalias"
-
-# Make sure cp copies forceably (without asking confirmation when overwriting) and verbosely
-
-if (hash xcp &> /dev/null || hash cpg &> /dev/null) && ! ([[ "$(type cp)" =~ "'cpg -fgv'" ]] || [[ "$(type cp)" =~ "'xcp'" ]]); then
-    if hash cpg &> /dev/null; then
-        echo "Since you have cpg installed, this next $(tput setaf 1)sudo$(tput sgr0) will check whether it can be used for the script (if it's sudo executable, it is)"
-        sudo bash -c "hash cpg" &&
-            alias cp='cpg -fgv' ||
-            alias cp='cp -fv'
-    elif hash xcp &> /dev/null; then
-        echo "Since you have xcp installed, this next $(tput setaf 1)sudo$(tput sgr0) will check whether it can be used for the script (if it's sudo executable, it is)"
-        sudo bash -c "hash xcp &> /dev/null" &&
-            alias cp='xcp' ||
-            alias cp='cp -fv'
-    fi
-elif ! (hash xcp &> /dev/null || hash cpg &> /dev/null); then
-    alias cp='cp -fv'
-fi
-
-# Make sure mv moves forceably (without asking confirmation when overwriting) and verbosely
-[[ "$(type mv)" =~ 'aliased' ]] && 
-    command unalias mv 
-alias mv='mv -fv'
-
-# Make sure rm removes forceably, recursively and verbosely 
-[[ "$(type rm)" =~ 'aliased' ]] &&
-    command unalias rm 
-alias rm='rm -rfv'
-
-# Make sure sudo isn't aliased to something weird
-command -v sudo &>/dev/null && [[ "$(type sudo)" =~ 'aliased' ]] &&
-    command unalias sudo
-# Keep aliases when using sudo
-alias sudo="sudo "
-
-# Wget only uses https - encrypted http
-command -v wget &>/dev/null && [[ "$(type wget)" =~ 'aliased' ]] &&
-    command unalias wget 
-alias wget='wget --https-only'
-
-alias wget-aria='wget'
-alias wget-aria-quiet='wget -q'
-alias wget-aria-dir='wget -P'
-alias wget-aria-name='wget -O'
-
-alias curl="curl -fsSL --proto '=https' --tlsv1.2"
-
-if ! hash curl &> /dev/null; then
-    alias wget-curl='wget -qO-'
-else
-    alias wget-curl='curl'
-fi
-
-if hash aria2c &>/dev/null; then 
-    if test -z "$WGET_ARIA"; then
-        builtin unalias wget-aria 
-        function wget-aria(){
-            readyn -p "Use 'aria2c' in favour of 'wget' for faster downloads?" wget_ar
-            if [[ $wget_ar == 'y' ]]; then
-                export WGET_ARIA=1 
-                alias wget-aria='aria2c'
-                alias wget-aria-quiet='aria2c -q'
-                alias wget-aria-dir='aria2c -d'
-                alias wget-aria-name='aria2c -o'
-                local frst="$1"
-                [[ "$frst" == "-P" ]] && frst="-d"  
-                [[ "$frst" == "-O" ]] && frst="-o"  
-                aria2c $frst ${@:2}
-            else
-                wget $@ 
-            fi
-            unset wget_ar
-        } 
-        alias wget-aria-quiet="wget-aria -q" 
-        alias wget-aria-dir="wget-aria -P" 
-        alias wget-aria-name="wget-aria -O" 
-    else
-        alias wget-aria='aria2c'
-        alias wget-aria-quiet='aria2c -q'
-        alias wget-aria-dir='aria2c -d'
-        alias wget-aria-name='aria2c -o'
-    fi
-fi
+#([[ "$(type unalias)" =~ 'aliased' ]] || [[ "$(type unalias)" =~ 'function' ]]) && 
+#    alias unalias="builtin unalias"
+#
+## Make sure cp copies forceably (without asking confirmation when overwriting) and verbosely
+#
+#if (hash xcp &> /dev/null || hash cpg &> /dev/null) && ! ([[ "$(type cp)" =~ "'cpg -fgv'" ]] || [[ "$(type cp)" =~ "'xcp'" ]]); then
+#    if hash cpg &> /dev/null; then
+#        echo "Since you have cpg installed, this next $(tput setaf 1)sudo$(tput sgr0) will check whether it can be used for the script (if it's sudo executable, it is)"
+#        sudo bash -c "hash cpg" &&
+#            alias cp='cpg -fgv' ||
+#            alias cp='cp -fv'
+#    elif hash xcp &> /dev/null; then
+#        echo "Since you have xcp installed, this next $(tput setaf 1)sudo$(tput sgr0) will check whether it can be used for the script (if it's sudo executable, it is)"
+#        sudo bash -c "hash xcp &> /dev/null" &&
+#            alias cp='xcp' ||
+#            alias cp='cp -fv'
+#    fi
+#elif ! (hash xcp &> /dev/null || hash cpg &> /dev/null); then
+#    alias cp='cp -fv'
+#fi
+#
+## Make sure mv moves forceably (without asking confirmation when overwriting) and verbosely
+#[[ "$(type mv)" =~ 'aliased' ]] && 
+#    command unalias mv 
+#alias mv='mv -fv'
+#
+## Make sure rm removes forceably, recursively and verbosely 
+#[[ "$(type rm)" =~ 'aliased' ]] &&
+#    command unalias rm 
+#alias rm='rm -rfv'
+#
+## Make sure sudo isn't aliased to something weird
+#command -v sudo &>/dev/null && [[ "$(type sudo)" =~ 'aliased' ]] &&
+#    command unalias sudo
+## Keep aliases when using sudo
+#alias sudo="sudo "
+#
+## Wget only uses https - encrypted http
+#command -v wget &>/dev/null && [[ "$(type wget)" =~ 'aliased' ]] &&
+#    command unalias wget 
+#alias wget='wget --https-only'
+#
+#alias wget-aria='wget'
+#alias wget-aria-quiet='wget -q'
+#alias wget-aria-dir='wget -P'
+#alias wget-aria-name='wget -O'
+#
+#alias curl="curl -fsSL --proto '=https' --tlsv1.2"
+#
+#if ! hash curl &> /dev/null; then
+#    alias wget-curl='wget -qO-'
+#else
+#    alias wget-curl='curl'
+#fi
+#
+#if hash aria2c &>/dev/null; then 
+#    if test -z "$WGET_ARIA"; then
+#        builtin unalias wget-aria 
+#        function wget-aria(){
+#            readyn -p "Use 'aria2c' in favour of 'wget' for faster downloads?" wget_ar
+#            if [[ $wget_ar == 'y' ]]; then
+#                export WGET_ARIA=1 
+#                alias wget-aria='aria2c'
+#                alias wget-aria-quiet='aria2c -q'
+#                alias wget-aria-dir='aria2c -d'
+#                alias wget-aria-name='aria2c -o'
+#                local frst="$1"
+#                [[ "$frst" == "-P" ]] && frst="-d"  
+#                [[ "$frst" == "-O" ]] && frst="-o"  
+#                aria2c $frst ${@:2}
+#            else
+#                wget $@ 
+#            fi
+#            unset wget_ar
+#        } 
+#        alias wget-aria-quiet="wget-aria -q" 
+#        alias wget-aria-dir="wget-aria -P" 
+#        alias wget-aria-name="wget-aria -O" 
+#    else
+#        alias wget-aria='aria2c'
+#        alias wget-aria-quiet='aria2c -q'
+#        alias wget-aria-dir='aria2c -d'
+#        alias wget-aria-name='aria2c -o'
+#    fi
+#fi
 
 
 # Less does raw control chars, use color and linenumbers, no sounds/bell and doesn't trigger your epilepsy

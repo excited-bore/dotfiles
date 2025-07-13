@@ -120,7 +120,7 @@ if ! test -f $HOME/.environment; then
 fi
 
 if [[ $machine == 'Linux' ]]; then
-    if [[ "$X11_WAY" == 'x11' ]] && (! hash xclip &>/dev/null || ! hash xsel &>/dev/null); then
+    if ! hash xclip &>/dev/null || ! hash xsel &>/dev/null; then
         printf "${CYAN}xclip${normal} and/or ${CYAN}xsel${normal} are not installed (clipboard tools for X11 based systems)\n"
         readyn -p "Install xclip and xsel?" nzp_ins
         if [[ $nzp_ins == 'y' ]]; then
@@ -368,7 +368,7 @@ if (hash cpg &>/dev/null || cp --help | grep -qF -- '-g') && hash xcp &>/dev/nul
     cpgp="[None/all/advcpmv/xcp]: "
     color="YELLOW"
 elif hash xcp &>/dev/null; then
-    printf "${CYAN}cpg/mvg${GREEN} are patches for the default coreutils 'cp (copy) / mv (move)' which gives an added flag to both for a progress bar with '-g/--progress-bar'\n" 
+    printf "${CYAN}cpg/mvg${GREEN} are patches for the default coreutils 'cp (copy) / mv (move)' which gives an added flag to both for a progress bar with '-g/--progress-bar'\n${normal}" 
     cpgi="advcpmv xcp all none"
     cpgp="[Advcpmv/xcp/all/none]: "
     color="GREEN"

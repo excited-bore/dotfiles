@@ -117,10 +117,10 @@ if [[ $machine == 'Mac' ]] && hash brew &> /dev/null; then
     #pac_rm_casc="sudo pacman -Rc"
 fi
 
-
 # https://unix.stackexchange.com/questions/202891/how-to-know-whether-wayland-or-x11-is-being-used
-[[ $machine == 'Linux' ]] &&
-    export X11_WAY="$(loginctl show-session $(loginctl | grep $(whoami) | awk 'NR=1{print $1}') -p Type | awk -F= 'NR==1{print $2}')"
+# Just use $XDG_SESSION_TYPE
+#[[ $machine == 'Linux' ]] &&
+#    export X11_WAY="$(loginctl show-session $(loginctl | grep $(whoami) | awk 'NR=1{print $1}') -p Type | awk -F= 'NR==1{print $2}')"
 
 no_aur=''
 
@@ -129,25 +129,45 @@ distro=/
 packagemanager=/
 arch=/
 
-if test -f /etc/alpine-release && [[ $distro == / ]]; then
+if test -f /etc/alpine-release; then
     pac="apk"
     distro_base="BSD"
     distro="Alpine"
 
-elif test -f /etc/issue && grep -q "Ubuntu" /etc/issue && [[ $distro == / ]]; then
+elif (test -f /etc/issue && grep -q "Ubuntu" /etc/issue) || test -f /etc/rpi-issue || test -f /etc/debian_version; then
+
     pac="apt"
-    pac_up="sudo apt update"
     pac_ins="sudo apt install"
+    pac_ins_y="sudo apt install -y"
+    pac_up="sudo apt upgrade"
+    pac_up_y="sudo apt upgrade"
+    pac_refresh="sudo apt update"
+    pac_refresh_y="sudo apt update -y"
+    pac_refresh_up="sudo update && sudo upgrade"
+    pac_refresh_up_y="sudo update -y && sudo upgrade -y"
     pac_search="apt search"
+    pac_search_ins="apt list --installed 2> /dev/null | grep "
+    pac_rm="sudo apt remove"
+    pac_rm_orph="sudo apt purge"
+    pac_clean="sudo apt autoremove"
+    pac_clean_cache="sudo apt clean"
+    pac_ls="apt list"
     pac_ls_ins="apt list --installed"
 
+
     distro_base="Debian"
-    distro="Ubuntu"
 
-    codename="$(lsb_release -a | grep --color=never 'Codename' | awk '{print $2}')"
-    release="$(lsb_release -a | grep --color=never 'Release' | awk '{print $2;}')"
+    if test -f /etc/issue && grep -q "Ubuntu" /etc/issue; then
+        distro="Ubuntu"
+        codename="$(lsb_release -a | grep --color=never 'Codename' | awk '{print $2}')"
+        release="$(lsb_release -a | grep --color=never 'Release' | awk '{print $2;}')"
+    elif test -f /etc/rpi-issue; then
+        distro="Raspbian"
+    elif test -f /etc/debian_version; then
+        distro="Debian" 
+    fi
 
-elif (test -f /etc/SuSE-release || test -f /etc/SUSE-brand) && [[ $distro == / ]]; then
+elif test -f /etc/SuSE-release || test -f /etc/SUSE-brand; then
     if ! test -z "$(lsb_release -a | grep Leap)"; then
         pac="zypper_leap"
     else
@@ -581,36 +601,6 @@ elif (test -f /etc/arch-release || test -f /etc/manjaro-release) && [[ $distro =
         distro="Arch"
     fi
 
-elif test -f /etc/rpi-issue && [[ $distro == / ]]; then
-
-    pac="apt"
-    pac_ins="sudo apt install"
-    pac_up="sudo apt update"
-    pac_upg="sudo apt upgrade"
-    pac_search="apt search"
-    pac_rm="sudo apt remove"
-    pac_rm_orph="sudo apt purge"
-    pac_clean="sudo apt autoremove"
-    pac_clean_cache="sudo apt clean"
-    pac_ls_ins="apt list --installed"
-
-    distro_base="Debian"
-    distro="Raspbian"
-
-elif test -f /etc/debian_version && [[ $distro == / ]]; then
-    pac="apt"
-    pac_ins="sudo apt install"
-    pac_up="sudo apt update"
-    pac_upg="sudo apt upgrade"
-    pac_search="apt search"
-    pac_rm="sudo apt remove"
-    pac_rm_orph="sudo apt purge"
-    pac_clean="sudo apt autoremove"
-    pac_clean_cache="sudo apt clean"
-    pac_ls_ins="apt list --installed"
-
-    distro_base="Debian"
-    distro="Debian"
 fi
 
 if hash nala &>/dev/null && [[ "$pac" == 'apt' ]]; then

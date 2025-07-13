@@ -163,7 +163,7 @@ nvim --version
 nvim --help | $PAGER
 
 if [[ $machine == 'Linux' ]]; then
-    if [[ $X11_WAY == 'x11' ]] && ! type xclip &>/dev/null; then
+    if ! hash xclip &>/dev/null || ! hash xsel &>/dev/null; then
         readyn -p "Install nvim clipboard? (xsel xclip)" clip
         if [[ "y" == "$clip" ]]; then
             eval "${pac_ins}" install xsel xclip
@@ -178,7 +178,7 @@ if [[ $machine == 'Linux' ]]; then
     fi
 fi
 
-if ! type gcc &>/dev/null || ! type npm &>/dev/null || ! type unzip &>/dev/null; then
+if ! hash gcc &>/dev/null || ! hash npm &>/dev/null || ! hash unzip &>/dev/null; then
     readyn -p "Install necessary tools for using supplied config? (tools include: gcc - GNU C compiler, npm - javascript package manager and unzip)" gccn
     if [[ "y" == $gccn ]]; then
         eval "${pac_ins}" gcc npm unzip
@@ -187,7 +187,7 @@ fi
 
 readyn -p "Install nvim code language support (python, javascript, ruby, perl, ..)?" langs
 if [[ "$langs" == 'y' ]]; then
-    if ! type pylint &>/dev/null; then
+    if ! hash pylint &>/dev/null; then
         readyn -p "Install nvim-python?" pyscripts
         if [[ "y" == "$pyscripts" ]]; then
             if ! hash pyenv &>/dev/null; then
@@ -198,7 +198,7 @@ if [[ "$langs" == 'y' ]]; then
                 fi
             fi
 
-            if ! type pipx &>/dev/null && ! test -f $HOME/.local/bin/pipx; then
+            if ! hash pipx &>/dev/null && ! test -f $HOME/.local/bin/pipx; then
                 if ! test -f $DIR/install_pipx.sh; then
                     source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)
                 else
@@ -206,7 +206,7 @@ if [[ "$langs" == 'y' ]]; then
                 fi
             fi
 
-            if ! type pipx &>/dev/null && test -f $HOME/.local/bin/pipx; then
+            if ! hash pipx &>/dev/null && test -f $HOME/.local/bin/pipx; then
                 $HOME/.local/bin/pipx install pynvim
                 $HOME/.local/bin/pipx install pylint
                 $HOME/.local/bin/pipx install jedi
@@ -217,14 +217,14 @@ if [[ "$langs" == 'y' ]]; then
             fi
         fi
     fi
-    if ! type npm &>/dev/null || ! npm list -g | grep neovim &>/dev/null; then
+    if ! hash npm &>/dev/null || ! npm list -g | grep neovim &>/dev/null; then
         readyn -p "Install nvim-javascript? " jsscripts
         if [[ "y" == "$jsscripts" ]]; then
             eval "${pac_ins}" npm nodejs
             sudo npm install -g neovim
         fi
     fi
-    if ! type gem &>/dev/null || ! gem list | grep neovim &>/dev/null; then
+    if ! hash gem &>/dev/null || ! gem list | grep neovim &>/dev/null; then
         readyn -p "Install nvim-ruby? " rubyscripts
         if [[ "y" == $rubyscripts ]]; then
             if ! test -f install_ruby.sh; then
@@ -238,7 +238,7 @@ if [[ "$langs" == 'y' ]]; then
 
     #printf "${CYAN}Checking whether perl modules for nvim are installed means initializing cpan ([perl package manager)${normal}\n"
 
-    if ! type cpan &>/dev/null; then
+    if ! hash cpan &>/dev/null; then
         readyn -p "Install Perl and cpanminus?" perlins
         if [[ $perlins == 'y' ]]; then
             eval "${pac_ins}" perl cpanminus
@@ -251,10 +251,10 @@ if [[ "$langs" == 'y' ]]; then
         if [[ "y" == $cpn ]]; then
             #printf "Pressing enter once in a while *seems* to speed up the process "
             cpan -l
-            if ! type cpanm &>/dev/null || ! cpan -l 2>/dev/null | grep -q Neovim::Ext; then
+            if ! hash cpanm &>/dev/null || ! cpan -l 2>/dev/null | grep -q Neovim::Ext; then
                 readyn -p "Install nvim-perl?" perlscripts
                 if [[ "y" == $perlscripts ]]; then
-                    if ! type cpanm &>/dev/null; then
+                    if ! hash cpanm &>/dev/null; then
                         eval "${pac_ins}" cpanminus
                     fi
                     cpanm --local-lib=~/perl5 local::lib && eval "$(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)"
@@ -265,7 +265,7 @@ if [[ "$langs" == 'y' ]]; then
     fi
 fi
 
-if ! type ctags &>/dev/null; then
+if ! hash ctags &>/dev/null; then
     readyn -p "Install ctags? (helps with generating tags for quick lookup of f.ex. functions - best supported for in C development)" ctags
     if [[ "y" == $ctags ]]; then
         if [[ $distro_base == 'Arch' ]]; then
@@ -278,7 +278,7 @@ fi
 
 unset rver paths clip x11f pyscripts jsscripts ctags rubyscripts perlscripts nvmbin
 
-if ! type rg &>/dev/null; then
+if ! hash rg &>/dev/null; then
     readyn -p "Install ripgrep (recursive grep)?" rg_ins
     if [[ "y" == "$rg_ins" ]]; then
         if ! test -f install_ripgrep.sh; then
@@ -291,7 +291,7 @@ fi
 
 unset rg_ins
 
-if ! type ast-grep &>/dev/null; then
+if ! hash ast-grep &>/dev/null; then
     readyn -p "Install ast-grep (search and rewrite code at large scale using precise AST pattern)?" ast_ins
     if [[ "y" == "$ast_ins" ]]; then
         if ! test -f install_ast-grep.sh; then
@@ -327,7 +327,7 @@ function instvim_r() {
         sudo bash -c 'gio trash /root/.config/nvim/*~'
     fi
     # Symlink configs to flatpak dirs for possible flatpak nvim use
-    if type flatpak &>/dev/null && echo "$(flatpak list)" | grep -q "neovim"; then
+    if hash flatpak &>/dev/null && echo "$(flatpak list)" | grep -q "neovim"; then
         sudo mkdir -p /root/.var/app/io.neovim.nvim/config/nvim/
         sudo ln -s /root/.config/nvim/* /root/.var/app/io.neovim.nvim/config/nvim/
     fi
@@ -380,7 +380,7 @@ function instvim() {
     fi
 
     # Symlink configs to flatpak dirs for possible flatpak nvim use
-    if type flatpak &>/dev/null && echo "$(flatpak list)" | grep -q "neovim"; then
+    if hash flatpak &>/dev/null && echo "$(flatpak list)" | grep -q "neovim"; then
         mkdir -p ~/.var/app/io.neovim.nvim/config/nvim/
         if ! test -L $(ls ~/.config/nvim/); then
             ln -s ~/.config/nvim/* ~/.var/app/io.neovim.nvim/config/nvim/
@@ -458,7 +458,7 @@ vimsh() {
 }
 yes-edit-no -f vimsh -g "$file $file1" -p "Install vim aliases at ~/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)?"
 
-if ! type nvimpager &>/dev/null; then
+if ! hash nvimpager &>/dev/null; then
     readyn -n -p "Install nvimpager?" vimrc
     if [[ "$vimrc" == "y" ]]; then
         if ! test -f install_nvimpager.sh; then

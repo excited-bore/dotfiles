@@ -166,7 +166,7 @@ fi
 
 # XCLIP
 if [[ $machine == 'Linux' ]]; then
-    if [[ "$X11_WAY" == 'x11' ]] && (! type xclip &>/dev/null || ! type xsel &>/dev/null); then
+    if (! hash xclip &>/dev/null || ! hash xsel &>/dev/null); then
         readyn -p "Install xclip? (Clipboard tool for Ctrl-R/Reverse history shortcut)" xclipp
         if [[ "$xclipp" == "y" ]]; then
             eval "${pac_ins} xclip xsel"

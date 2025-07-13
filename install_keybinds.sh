@@ -85,7 +85,7 @@ shell-keybinds() {
 
     sed -i "s|^setxkbmap |#setxkbmap |g" $binds
 
-    if [[ $X11_WAY == 'x11' ]]; then
+    if [[ "$XDG_SESSION_TYPE" == 'x11' ]]; then
         readyn -p "Set caps to escape? (Might cause X11 errors with SSH)" xtrm
         if [[ "$xtrm" = "y" ]]; then
             sed -i "s|#setxkbmap |setxkbmap |g" $binds
