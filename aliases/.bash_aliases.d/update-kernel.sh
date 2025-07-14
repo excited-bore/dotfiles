@@ -237,99 +237,104 @@ function remove-kernels(){
             else 
                 remove=( $(echo ${remove[@]} | sed 's,vmlinuz-,,g' ) )
             fi
-                
-            for i in ${remove[@]}; do
-                # Make sure we ignore symbolic links 'vmlinuz' or 'vmlinuz.old' here
-                if ! test -h "/boot/$i"; then 
-                
-                    if [[ "$distro_base" == 'Arch' ]] && test -n "$AUR_pac" && test -n "$(eval "$AUR_search_ins $i")"; then  
-                        packages+=("$i")
-                    elif test -n "$(eval "$pac_search_ins $i")"; then
-                        packages+=("$i")
-                    elif [[ "$distro_base" == 'Debian' ]] && test -n "$(eval "$pac_search_ins '*$i*' 2> /dev/null")"; then
-                        echo $i
-                        packages+=("$i")
-                    elif [[ "$distro" == 'Manjaro' ]] && test -n "$(echo $i | sed 's,-x86_64,,g' | sed 's/^\([[:digit:]]\).\([[:digit:]+]\)/linux\1\2/g' | xargs pamac search --installed)"; then
-                        packages+=("$(echo $i | sed 's,-x86_64,,g' | sed 's/^\([[:digit:]]\).\([[:digit:]+]\)/linux\1\2/g')") 
-                    else
-                        non_packages+=("$i")
+            
+            if [[ "${remove[@]}" =~ "$(uname -r)" ]]; then
+                printf "${yellow}One of the kernels marked to remove was ${YELLOW}'$(uname -r)'${yellow} - ${RED}the one currently running.\n${YELLOW}If you want to remove the currently running kernel, switch to another kernel and try again.\n${normal}"
+                return 1 
+            else 
+                for i in ${remove[@]}; do
+                    # Make sure we ignore symbolic links 'vmlinuz' or 'vmlinuz.old' here
+                    if ! test -h "/boot/$i"; then 
+                    
+                        if [[ "$distro_base" == 'Arch' ]] && test -n "$AUR_pac" && test -n "$(eval "$AUR_search_ins $i")"; then  
+                            packages+=("$i")
+                        elif test -n "$(eval "$pac_search_ins $i")"; then
+                            packages+=("$i")
+                        elif [[ "$distro_base" == 'Debian' ]] && test -n "$(eval "$pac_search_ins '*$i*' 2> /dev/null")"; then
+                            echo $i
+                            packages+=("$i")
+                        elif [[ "$distro" == 'Manjaro' ]] && test -n "$(echo $i | sed 's,-x86_64,,g' | sed 's/^\([[:digit:]]\).\([[:digit:]+]\)/linux\1\2/g' | xargs pamac search --installed)"; then
+                            packages+=("$(echo $i | sed 's,-x86_64,,g' | sed 's/^\([[:digit:]]\).\([[:digit:]+]\)/linux\1\2/g')") 
+                        else
+                            non_packages+=("$i")
+                        fi
                     fi
+                done
+                    
+                local j pamcflag
+                test -n "$auto" &&
+                    pamcflag='--no-confirm'
+                if (( ${#packages[@]} != 0 )); then 
+                    for i in ${packages[@]}; do  
+                        j=$(eval "$pac_search_ins_q '$i' | awk 'NR==1{print;}'" ) 
+                        
+                        # Check if package name is 'linux-image-unsigned-' for debian based systems...
+                        if [[ "$distro_base" == 'Debian' ]] && test -z "$(apt list $j 2> /dev/null | awk 'NR>1 {print;}')" && test -n "$(echo "$j" | sed 's/linux-image-/linux-image-unsigned-/' | xargs apt list 2> /dev/null | awk 'NR>1{print;}')"; then   
+                            j="$(echo "$j" | sed 's/linux-image-/linux-image-unsigned-/')" 
+                        fi
+                        
+                        if [[ "$distro" == 'Manjaro' ]] && test -n "$(pamac search --installed linux-meta)" && pamac info linux-meta | grep 'Depends On' | grep -q $j; then
+                            if test -n "$(pamac list --installed linux-headers-meta)"; then
+                                printf "${GREEN}Removing ${CYAN}linux-meta, linux-headers-meta${GREEN} and ${CYAN}$j*${GREEN} using ${CYAN}pamac${normal}\n"
+                                pamac remove $pamcflag linux-meta
+                                pamac remove $pamcflag linux-headers-meta
+                            else
+                                printf "${GREEN}Removing ${CYAN}linux-meta${GREEN} and ${CYAN}$j*${GREEN} using ${CYAN}pamac${normal}\n"
+                                pamac remove $pamcflag "linux-meta"
+                            fi
+                            pamac remove $pamcflag "linux-meta* $j*"
+                        elif [[ "$distro" == 'Manjaro' ]] && test -n "$(pamac search --installed linux-lts-meta)" && pamac info linux-lts-meta | grep 'Depends On' | grep -q $j; then
+                            if test -n "$(pamac list --installed linux-lts-headers-meta)"; then
+                                printf "${GREEN}Removing ${CYAN}linux-lts-meta, linux-lts-headers-meta${GREEN} and ${CYAN}$j*${GREEN} using ${CYAN}pamac${normal}\n"
+                                pamac remove $pamcflag linux-lts-meta
+                                pamac remove $pamcflag linux-lts-headers-meta
+                            else
+                                printf "${GREEN}Removing ${CYAN}linux-lts-meta${GREEN} and ${CYAN}$j*${GREEN} using ${CYAN}pamac${normal}\n"
+                                pamac remove $pamcflag "linux-lts-meta"
+                            fi
+                            pamac remove $pamcflag "$j*"
+                        else
+                            if test -n "$AUR_pac"; then
+                                if test -n "$auto"; then
+                                    printf "${GREEN}Removing ${CYAN}$j*${GREEN} using ${CYAN}$AUR_rm_y${normal}\n"
+                                    eval "$AUR_rm_y '$j*'"
+                                else
+                                    printf "${GREEN}Removing ${CYAN}$j*${GREEN} using ${CYAN}$AUR_rm${normal}\n"
+                                    eval "$AUR_rm '$j*'" 
+                                fi
+                            else
+                                if test -n "$auto"; then
+                                    printf "${GREEN}Removing ${CYAN}$j*${GREEN} using ${CYAN}$pac_rm_y${normal}\n"
+                                    eval "$pac_rm_y '$j*'" 
+                                else
+                                    printf "${GREEN}Removing ${CYAN}$j*${GREEN} using ${CYAN}$pac_rm${normal}\n"
+                                    eval "$pac_rm '$j*'"
+                                fi
+                            fi
+                        fi
+                    done
                 fi
-            done
                 
-            local j pamcflag
-            test -n "$auto" &&
-                pamcflag='--no-confirm'
-            if (( ${#packages[@]} != 0 )); then 
-                for i in ${packages[@]}; do  
-                    j=$(eval "$pac_search_ins_q '$i' | awk 'NR==1{print;}'" ) 
-                    
-                    # Check if package name is 'linux-image-unsigned-' for debian based systems...
-                    if [[ "$distro_base" == 'Debian' ]] && test -z "$(apt list $j 2> /dev/null | awk 'NR>1 {print;}')" && test -n "$(echo "$j" | sed 's/linux-image-/linux-image-unsigned-/' | xargs apt list 2> /dev/null | awk 'NR>1{print;}')"; then   
-                        j="$(echo "$j" | sed 's/linux-image-/linux-image-unsigned-/')" 
-                    fi
-                    
-                    if [[ "$distro" == 'Manjaro' ]] && test -n "$(pamac search --installed linux-meta)" && pamac info linux-meta | grep 'Depends On' | grep -q $j; then
-                        if test -n "$(pamac list --installed linux-headers-meta)"; then
-                            printf "${GREEN}Removing ${CYAN}linux-meta, linux-headers-meta${GREEN} and ${CYAN}$j*${GREEN} using ${CYAN}pamac${normal}\n"
-                            pamac remove $pamcflag linux-meta
-                            pamac remove $pamcflag linux-headers-meta
-                        else
-                            printf "${GREEN}Removing ${CYAN}linux-meta${GREEN} and ${CYAN}$j*${GREEN} using ${CYAN}pamac${normal}\n"
-                            pamac remove $pamcflag "linux-meta"
+                local hadcustom='n' 
+                if (( ${#non_packages[@]} != 0 )); then
+                    local rmq 
+                    for i in ${non_packages[@]}; do
+                        j="$(command ls /boot/*$i*)"
+                        test -d "/usr/lib/modules/$i" && 
+                            j="$j /usr/lib/modules/$i"
+                        j="$(echo $j | tr '\n' ' ')"
+                        readyn $auto -p "Remove ${CYAN}'$j'${GREEN}?" rmq
+                        if [[ "$rmq" == 'y' ]]; then
+                            hadcustom='y'   
+                            # No idea why 'sudo rm /boot/linux.img ..' doesn't work 
+                            eval "sudo rm $j" 
                         fi
-                        pamac remove $pamcflag "linux-meta* $j*"
-                    elif [[ "$distro" == 'Manjaro' ]] && test -n "$(pamac search --installed linux-lts-meta)" && pamac info linux-lts-meta | grep 'Depends On' | grep -q $j; then
-                        if test -n "$(pamac list --installed linux-lts-headers-meta)"; then
-                            printf "${GREEN}Removing ${CYAN}linux-lts-meta, linux-lts-headers-meta${GREEN} and ${CYAN}$j*${GREEN} using ${CYAN}pamac${normal}\n"
-                            pamac remove $pamcflag linux-lts-meta
-                            pamac remove $pamcflag linux-lts-headers-meta
-                        else
-                            printf "${GREEN}Removing ${CYAN}linux-lts-meta${GREEN} and ${CYAN}$j*${GREEN} using ${CYAN}pamac${normal}\n"
-                            pamac remove $pamcflag "linux-lts-meta"
-                        fi
-                        pamac remove $pamcflag "$j*"
-                    else
-                        if test -n "$AUR_pac"; then
-                            if test -n "$auto"; then
-                                printf "${GREEN}Removing ${CYAN}$j*${GREEN} using ${CYAN}$AUR_rm_y${normal}\n"
-                                eval "$AUR_rm_y '$j*'"
-                            else
-                                printf "${GREEN}Removing ${CYAN}$j*${GREEN} using ${CYAN}$AUR_rm${normal}\n"
-                                eval "$AUR_rm '$j*'" 
-                            fi
-                        else
-                            if test -n "$auto"; then
-                                printf "${GREEN}Removing ${CYAN}$j*${GREEN} using ${CYAN}$pac_rm_y${normal}\n"
-                                eval "$pac_rm_y '$j*'" 
-                            else
-                                printf "${GREEN}Removing ${CYAN}$j*${GREEN} using ${CYAN}$pac_rm${normal}\n"
-                                eval "$pac_rm '$j*'"
-                            fi
-                        fi
-                    fi
-                done
+                    done
+                fi
+                
+                [[ "$hadcustom" == 'y' ]] && 
+                    sudo update-grub
             fi
-            
-            local hadcustom='n' 
-            if (( ${#non_packages[@]} != 0 )); then
-                local rmq 
-                for i in ${non_packages[@]}; do
-                    j="$(command ls /boot/*$i*)"
-                    test -d "/usr/lib/modules/$i" && 
-                        j="$j /usr/lib/modules/$i"
-                    j="$(echo $j | tr '\n' ' ')"
-                    readyn $auto -p "Remove ${CYAN}'$j'${GREEN}?" rmq
-                    if [[ "$rmq" == 'y' ]]; then
-                        hadcustom='y'   
-                        # No idea why 'sudo rm /boot/linux.img ..' doesn't work 
-                        eval "sudo rm $j" 
-                    fi
-                done
-            fi
-            
-            [[ "$hadcustom" == 'y' ]] && 
-                sudo update-grub
         fi
     fi
 } 
