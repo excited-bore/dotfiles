@@ -152,7 +152,9 @@ elif (test -f /etc/issue && grep -q "Ubuntu" /etc/issue) || test -f /etc/rpi-iss
     pac_rm_y="sudo apt -y remove"
     pac_rm_orph="sudo apt purge"
     pac_clean="sudo apt autoremove"
+    pac_clean_y="sudo apt autoremove -y"
     pac_clean_cache="sudo apt clean"
+    pac_clean_cache_y="sudo apt clean -y"
     pac_ls="apt list"
     pac_ls_ins="apt list --installed"
 

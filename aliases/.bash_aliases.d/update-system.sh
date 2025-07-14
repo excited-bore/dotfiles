@@ -222,15 +222,17 @@ function update-system() {
         fi
     
     elif [[ "$pac" == "apt" ]] || [[ "$pac" == "nala" ]]; then
-        
+       
+        test -n "$YES" && flag='--auto' || flag=''
+
         if test -n "$YES"; then
-            if [[ "$pac" == "apt" ]]; then
-                eval "${pac_up} -y"
+            if test -n "$pac_refresh_y"; then
+                eval "${pac_refresh_y}"
             else
-                eval "yes | ${pac_up}"
+                eval "yes | ${pac_refresh}"
             fi
         else
-            eval "${pac_up}"
+            eval "${pac_refresh}"
         fi
         
         if ! [[ "$SKIPKERNEL" == 'y' ]] && hash curl &> /dev/null && hash mainline &> /dev/null && hash xmllint &> /dev/null; then
@@ -268,51 +270,49 @@ function update-system() {
             fi
         fi
 
+        apt list --upgradable 
+       
         echo "This next $(tput setaf 1)sudo$(tput sgr0) will try to update the packages for your system using the package managers it knows";
-        
-        test -n "$YES" && flag='--auto' || flag=''
-        
+         
         readyn $flag -p "Upgrade system?" upgrd
 
         if [[ $upgrd == 'y' ]];then
             if test -n "$YES"; then 
-                if [[ "$pac" == "apt" ]]; then
-                    eval "sudo ${pac} upgrade -y"
+                if test -n "$pac_up_y"; then
+                    eval "${pac_up_y}"
                 else
-                    eval "yes | sudo ${pac} upgrade"
+                    eval "yes | sudo ${pac_up}"
                 fi
                 
             else            
-                eval "sudo ${pac} upgrade" 
+                eval "sudo ${pac_up}" 
             fi
             
             if test -n "$YES"; then
-                if [[ "$pac" == "apt" ]]; then
-                    eval ${pac_up} -y
+                if test -n "$pac_refresh_y"; then
+                    eval "${pac_refresh_y}"
                 else
-                    eval "yes | ${pac_up}"
+                    eval "yes | ${pac_refresh}"
                 fi
             else
-                eval "${pac_up}"
+                eval "${pac_refresh}"
             fi
             
         fi
  
-        if apt --dry-run autoremove 2> /dev/null | grep -Po '^Remv \K[^ ]+'; then
-            
-            test -n "$YES" && flag='--auto' || flag=''
+        if apt --dry-run autoremove 2> /dev/null | grep -qPo '^Remv \K[^ ]+'; then
             
             readyn $flag -p 'Autoremove unneccesary packages?' remove
        
             if [[ "$remove" == 'y' ]]; then
-                if ! test -z "$YES"; then
-                    if [[ "$pac" == "apt" ]]; then
-                        eval "yes | sudo ${pac} autoremove -y"
+                if test -n "$YES"; then
+                    if test -n "$pac_clean_y"; then
+                        eval "${pac_clean_y}"
                     else
-                        eval "yes | sudo ${pac} autoremove" 
+                        eval "yes | ${pac_clean}" 
                     fi
                 else
-                    sudo ${pac} autoremove 
+                    eval "${pac_clean}" 
                 fi
             fi
         fi

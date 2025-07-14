@@ -61,64 +61,6 @@ blink=$(tput blink)
 underline=$(tput ul)
 italic=$(tput it)
 
-# ...
-# https://ss64.com/bash/tput.html
-
-# Arguments: Completions(string with space entries, AWK works too),return value(-a password prompt, -c complete filenames, -p prompt flag, -Q prompt colour, -b break-chars (when does a string break for autocomp), -e change char given for multiple autocompletions)
-# 'man rlwrap' to see all unimplemented options
-
-if ! type reade &>/dev/null; then
-    if test -f rlwrap-scripts/reade; then
-        . ./rlwrap-scripts/reade 1>/dev/null
-    else
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade) &>/dev/null
-    fi
-fi
-
-if ! type readyn &>/dev/null; then
-    if test -f rlwrap-scripts/readyn; then
-        . ./rlwrap-scripts/readyn 1>/dev/null
-    else
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/readyn) &>/dev/null
-    fi
-fi
-
-if ! type yes-edit-no &>/dev/null; then
-    if test -f rlwrap-scripts/yes-edit-no; then
-        . ./rlwrap-scripts/yes-edit-no 1>/dev/null
-    else
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/yes-edit-no) &>/dev/null
-    fi
-fi
-
-if ! test -f checks/check_system.sh; then
-    if type curl &>/dev/null; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)
-    fi
-else
-    . ./checks/check_system.sh
-fi
-
-# printf "${green} Will now start with updating system ${normal}\n"
-
-if ! type update-system &>/dev/null; then
-    if ! test -f aliases/.bash_aliases.d/update-system.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)
-    else
-        . ./aliases/.bash_aliases.d/update-system.sh
-    fi
-fi
-
-
-if test -z $SYSTEM_UPDATED; then
-    readyn -Y "CYAN" -p "Update system?" updatesysm
-    if [[ "$updatesysm" == "y" ]]; then
-        update-system-yes
-    fi
-    export SYSTEM_UPDATED="TRUE"
-fi
-
-
 alias get-script-dir='cd "$( dirname "$-1" )" && pwd'
 
 ([[ "$(type unalias)" =~ 'aliased' ]] || [[ "$(type unalias)" =~ 'function' ]]) && 
@@ -211,6 +153,65 @@ fi
 # Less does raw control chars, use color and linenumbers, no sounds/bell and doesn't trigger your epilepsy
 alias less='less -R --use-color --LINE-NUMBERS --quit-if-one-screen -Q --no-vbell'
 test -z "$PAGER" && PAGER="less"
+
+
+# ...
+# https://ss64.com/bash/tput.html
+
+# Arguments: Completions(string with space entries, AWK works too),return value(-a password prompt, -c complete filenames, -p prompt flag, -Q prompt colour, -b break-chars (when does a string break for autocomp), -e change char given for multiple autocompletions)
+# 'man rlwrap' to see all unimplemented options
+
+if ! type reade &>/dev/null; then
+    if test -f rlwrap-scripts/reade; then
+        . ./rlwrap-scripts/reade 1>/dev/null
+    else
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade) &>/dev/null
+    fi
+fi
+
+if ! type readyn &>/dev/null; then
+    if test -f rlwrap-scripts/readyn; then
+        . ./rlwrap-scripts/readyn 1>/dev/null
+    else
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/readyn) &>/dev/null
+    fi
+fi
+
+if ! type yes-edit-no &>/dev/null; then
+    if test -f rlwrap-scripts/yes-edit-no; then
+        . ./rlwrap-scripts/yes-edit-no 1>/dev/null
+    else
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/yes-edit-no) &>/dev/null
+    fi
+fi
+
+if ! test -f checks/check_system.sh; then
+    if type curl &>/dev/null; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)
+    fi
+else
+    . ./checks/check_system.sh
+fi
+
+# printf "${green} Will now start with updating system ${normal}\n"
+
+if ! type update-system &>/dev/null; then
+    if ! test -f aliases/.bash_aliases.d/update-system.sh; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)
+    else
+        . ./aliases/.bash_aliases.d/update-system.sh
+    fi
+fi
+
+
+if test -z $SYSTEM_UPDATED; then
+    readyn -Y "CYAN" -p "Update system?" updatesysm
+    if [[ "$updatesysm" == "y" ]]; then
+        update-system-yes
+    fi
+    export SYSTEM_UPDATED="TRUE"
+fi
+
 
 # https://stackoverflow.com/questions/4023830/how-to-compare-two-strings-in-dot-separated-version-format-in-bash
 
