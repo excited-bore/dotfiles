@@ -393,6 +393,7 @@ if hash grub-set-default &> /dev/null; then
                 sudo grub-set-default "$j>$h"
                 
                 echo "${YELLOW}A reboot is needed to take full effect!${normal}" 
+                echo "${YELLOW}If booting into the new kernel breaks, hold ${CYAN}'Shift'${YELLOW} while booting to load into grub, then choose an older kernel.${normal}" 
                 return 0 
             else
                 return 1
