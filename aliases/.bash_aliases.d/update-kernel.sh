@@ -8,13 +8,13 @@ fi
 
 DIR=$(get-script-dir)
 
-if test -f ~/.bash_aliases.d/package_managers.sh; then
-    . ~/.bash_aliases.d/package_managers.sh
-fi
-
-if test -f $DIR/aliases/.bash_aliases.d/package_managers.sh; then
-    . $DIR/aliases/.bash_aliases.d/package_managers.sh
-fi
+#if test -f ~/.bash_aliases.d/package_managers.sh; then
+#    . ~/.bash_aliases.d/package_managers.sh
+#fi
+#
+#if test -f $DIR/aliases/.bash_aliases.d/package_managers.sh; then
+#    . $DIR/aliases/.bash_aliases.d/package_managers.sh
+#fi
 
 #if [[ "$distro_base" == 'Debian' ]] && ! hash mainline &> /dev/null; then
 #    local mainins
@@ -43,7 +43,7 @@ function list-installed-kernels(){
 
     if [[ "$distro_base" == 'Debian' ]]; then
 
-        local prmpth="${green}%-45s %-30s %-35s %-40s\n" 
+        local prmpth="${green}%-45s %-30s %-40s %-40s\n" 
 
         insk=$(dpkg-query -W -f '${db:Status-Status} ${Package}\n' 'linux-image-*' | awk '$1 != "not-installed" {print $2}')
         
@@ -53,7 +53,7 @@ function list-installed-kernels(){
             printf "${GREEN}Installed kernels using apt:\n${normal}"
         fi
 
-        printf "${GREEN}%-45s %-30s %-35s %-40s\n" "Name" "Version" "Headers" "Headers-Version-Same"
+        printf "${GREEN}%-45s %-30s %-40s %-40s\n" "Name" "Version" "Headers" "Headers-Version-Same"
 
         while IFS= read -r k; do
             kv="$(dpkg-query -W -f '${Version}\n' "$k")"     
@@ -263,6 +263,12 @@ function remove-kernels(){
             if (( ${#packages[@]} != 0 )); then 
                 for i in ${packages[@]}; do  
                     j=$(eval "$pac_search_ins_q '$i' | awk 'NR==1{print;}'" ) 
+                    
+                    # Check if package name is 'linux-image-unsigned-' for debian based systems...
+                    if [[ "$distro_base" == 'Debian' ]] && test -z "$(apt list $j 2> /dev/null | awk 'NR>1 {print;}')" && test -n "$(echo "$j" | sed 's/linux-image-/linux-image-unsigned-/' | xargs apt list 2> /dev/null | awk 'NR>1{print;}')"; then   
+                        j="$(echo "$j" | sed 's/linux-image-/linux-image-unsigned-/')" 
+                    fi
+                    
                     if [[ "$distro" == 'Manjaro' ]] && test -n "$(pamac search --installed linux-meta)" && pamac info linux-meta | grep 'Depends On' | grep -q $j; then
                         if test -n "$(pamac list --installed linux-headers-meta)"; then
                             printf "${GREEN}Removing ${CYAN}linux-meta, linux-headers-meta${GREEN} and ${CYAN}$j*${GREEN} using ${CYAN}pamac${normal}\n"
@@ -285,20 +291,27 @@ function remove-kernels(){
                         pamac remove $pamcflag "$j*"
                     else
                         if test -n "$AUR_pac"; then
-                            printf "${GREEN}Removing ${CYAN}$j*${GREEN} using ${CYAN}$AUR_rm_y${normal}\n"
-                            test -n "$auto" && 
-                                eval "$AUR_rm_y '$j*'" ||
+                            if test -n "$auto"; then
+                                printf "${GREEN}Removing ${CYAN}$j*${GREEN} using ${CYAN}$AUR_rm_y${normal}\n"
+                                eval "$AUR_rm_y '$j*'"
+                            else
+                                printf "${GREEN}Removing ${CYAN}$j*${GREEN} using ${CYAN}$AUR_rm${normal}\n"
                                 eval "$AUR_rm '$j*'" 
+                            fi
                         else
-                            printf "${GREEN}Removing ${CYAN}$j*${GREEN} using ${CYAN}$pac_rm_y${normal}\n"
-                            test -n "$auto" && 
-                                eval "$pac_rm_y '$j*'" || 
-                                eval "$pac_rm '$j*'" 
+                            if test -n "$auto"; then
+                                printf "${GREEN}Removing ${CYAN}$j*${GREEN} using ${CYAN}$pac_rm_y${normal}\n"
+                                eval "$pac_rm_y '$j*'" 
+                            else
+                                printf "${GREEN}Removing ${CYAN}$j*${GREEN} using ${CYAN}$pac_rm${normal}\n"
+                                eval "$pac_rm '$j*'"
+                            fi
                         fi
                     fi
                 done
             fi
-             
+            
+            local hadcustom='n' 
             if (( ${#non_packages[@]} != 0 )); then
                 local rmq 
                 for i in ${non_packages[@]}; do
@@ -308,12 +321,15 @@ function remove-kernels(){
                     j="$(echo $j | tr '\n' ' ')"
                     readyn $auto -p "Remove ${CYAN}'$j'${GREEN}?" rmq
                     if [[ "$rmq" == 'y' ]]; then
+                        hadcustom='y'   
                         # No idea why 'sudo rm /boot/linux.img ..' doesn't work 
                         eval "sudo rm $j" 
                     fi
                 done
             fi
-            sudo update-grub
+            
+            [[ "$hadcustom" == 'y' ]] && 
+                sudo update-grub
         fi
     fi
 } 
@@ -407,19 +423,41 @@ fi
 function update-kernel(){
     local latest_lts latest_lts1 choices
     
+    if ! hash fzf &> /dev/null; then
+        printf "${CYAN}fzf${GREEN} not installed and needed for for listing possible kernels packages. Installing..${normal}\n" 
+        eval "${pac_ins_y} fzf" 
+    fi
+
+    if ! hash xmllint &> /dev/null; then
+        printf "${CYAN}xmllint${GREEN} not installed and needed for for listing latest kernel versions from ${CYAN}www.kernel.org${GREEN}. Installing..${normal}\n" 
+        eval "${pac_ins_y} xmllint" 
+    fi
+   
+    list-installed-kernels
+    echo 
+
+    local mainlinev="$(curl https://www.kernel.org/feeds/kdist.xml | xmllint --format --xpath '//title' - | grep '<title>[[:digit:]]' | grep 'mainline' | sed -E 's,<title>|<\/title>,,g' | cut -d: -f1 | awk 'NR==1 {print;}')" 
+    local stablev="$(curl https://www.kernel.org/feeds/kdist.xml | xmllint --format --xpath '//title' - | grep '<title>[[:digit:]]' | grep 'stable' | sed -E 's,<title>|<\/title>,,g' | cut -d: -f1 | awk 'NR==1 {print;}')" 
+    
+    local longtermv="$(curl https://www.kernel.org/feeds/kdist.xml | xmllint --format --xpath '//title' - | grep '<title>[[:digit:]]' | grep 'longterm' | sed -E 's,<title>|<\/title>,,g' | cut -d: -f1 | awk 'NR==1 {print;}')" 
+    
+    local prmpth="${green}%-20s %-20s %-25s %-25s\n" 
+    local prmpth0="${CYAN}%-20s ${green}%-20s\n${normal}" 
+    local prmpth1="${cyan}%s\n\n" 
+    printf "${GREEN}Latest kernels from ${CYAN}'www.kernel.org'${GREEN}:${normal}\n"
+    printf "${GREEN}%-20s %-20s\n" "Name" "Version"
+   
+    printf "$prmpth0" "- Mainline: " "$mainlinev"
+    printf "$prmpth0" "- Stable: " "$stablev"
+    printf "$prmpth0" "- Longterm: " "$longtermv"
+
+    echo
+
+
     if [[ "$distro_base" == 'Debian' ]]; then
         choices="lts liquorix" 
+    
     elif [[ "$distro_base" == "Arch" ]]; then
-
-        if ! hash fzf &> /dev/null; then
-            printf "${CYAN}fzf${GREEN} not installed and needed for for listing possible kernels packages. Installing..${normal}\n" 
-            sudo pacman -Su fzf --noconfirm 
-        fi
-
-        if ! hash xmllint &> /dev/null; then
-            printf "${CYAN}xmllint${GREEN} not installed and needed for for listing latest kernel versions from ${CYAN}www.kernel.org${GREEN}. Installing..${normal}\n" 
-            sudo pacman -Su xmllint --noconfirm 
-        fi
 
         if test -z "$AUR_pac"; then
             local insyay
@@ -440,7 +478,7 @@ function update-kernel(){
                     AUR_ls_ins="yay -Q"
                 fi
             fi
-        elif test -n "$AUR_pac" && [[ "$AUR_pac" == 'pamac' ]] && grep -q "#EnableAUR" /etc/pamac.conf; then
+        elif test -z "$AUR_pac" && hash pamac &> /dev/null && grep -q "#EnableAUR" /etc/pamac.conf; then
             
             local nable_aur
             if [[ "$distro" == 'Manjaro' ]]; then
@@ -456,278 +494,257 @@ function update-kernel(){
                 test -f ~/.bash_aliases.d/package_managers.sh && . ~/.bash_aliases.d/package_managers.sh
                 test -f $DIR/aliases/.bash_aliases.d/package_managers.sh && . $DIR/aliases/.bash_aliases.d/package_managers.sh
                 local nstall_arch
-                printf "${green}Another way to install the latest kernel for ${GREEN}$distro${green} is to basically 'change distribution to ${CYAN}Arch${green}' by configuring Arch-specific repositories (also called mirrors) for pacman to allow the installation of 'linux-lts' (and other kernels)\n${YELLOW}(Warning - this process is ${RED}highly risky when done incorrectly${YELLOW} and could lead to f.ex. pacman becoming unusable if not allowing packages to downgrade while updating after configuring said repositories, also certain $distro-specific packages (like mhwd or pacman-mirrors) will become impossible to install/update/maintain\!\!)\n" 
-                readyn -n -p "Install Arch specific repositories in ${CYAN}/etc/pacman.d/mirrorlist${YELLOW}, then update?\n" nstall_arch 
-                if [[ "$nstall_arch" == 'y' ]]; then
-                    if test -f ~/.bash_aliases.d/package_managers.sh; then
-                        . ~/.bash_aliases.d/package_managers.sh
-                    fi
-                    if test -f $DIR/aliases/.bash_aliases.d/package_managers.sh; then
-                        . $DIR/aliases/.bash_aliases.d/package_managers.sh
-                    fi
-                    pacman-fzf-add-arch-repositories
-                fi
+            #elif [[ "$nable_aur" == 'n' ]] && ! [[ "$distro" == 'Arch' ]]; then 
+            #    printf "${green}Another way to install the latest kernel for ${GREEN}$distro${green} is to basically 'change distribution to ${CYAN}Arch${green}' by configuring Arch-specific repositories (also called mirrors) for pacman to allow the installation of 'linux-lts' (and other kernels)\n${YELLOW}(Warning - this process is ${RED}highly risky when done incorrectly${YELLOW} and could lead to f.ex. pacman becoming unusable if not allowing packages to downgrade while updating after configuring said repositories, also certain $distro-specific packages (like mhwd or pacman-mirrors) will become impossible to install/update/maintain\!\!)\n" 
+            #    readyn -n -p "Install Arch specific repositories in ${CYAN}/etc/pacman.d/mirrorlist${YELLOW}, then update?\n" nstall_arch 
+            #    if [[ "$nstall_arch" == 'y' ]]; then
+            #        if test -f ~/.bash_aliases.d/package_managers.sh; then
+            #            . ~/.bash_aliases.d/package_managers.sh
+            #        fi
+            #        if test -f $DIR/aliases/.bash_aliases.d/package_managers.sh; then
+            #            . $DIR/aliases/.bash_aliases.d/package_managers.sh
+            #        fi
+            #        pacman-fzf-add-arch-repositories
+            #    fi
             fi
         fi
          
-        list-installed-kernels
-        echo 
 
-        local mainlinev="$(curl https://www.kernel.org/feeds/kdist.xml | xmllint --format --xpath '//title' - | grep '<title>[[:digit:]]' | grep 'mainline' | sed -E 's,<title>|<\/title>,,g' | cut -d: -f1 | awk 'NR==1 {print;}')" 
-        local stablev="$(curl https://www.kernel.org/feeds/kdist.xml | xmllint --format --xpath '//title' - | grep '<title>[[:digit:]]' | grep 'stable' | sed -E 's,<title>|<\/title>,,g' | cut -d: -f1 | awk 'NR==1 {print;}')" 
+        printf "${GREEN}Available Kernels:\n"
+        printf "${GREEN}%-20s %-20s %-25s %-25s\n" "Name" "Version" "Headers" "Headers-Version-Same"
         
-        local longtermv="$(curl https://www.kernel.org/feeds/kdist.xml | xmllint --format --xpath '//title' - | grep '<title>[[:digit:]]' | grep 'longterm' | sed -E 's,<title>|<\/title>,,g' | cut -d: -f1 | awk 'NR==1 {print;}')" 
-        
-        local prmpth="${green}%-20s %-20s %-25s %-25s\n" 
-        local prmpth0="${CYAN}%-20s ${green}%-20s\n" 
-        local prmpth1="${cyan}%s\n\n" 
-        printf "${GREEN}Latest kernels from ${CYAN}'www.kernel.org'${GREEN}:${normal}\n"
-        printf "${GREEN}%-20s %-20s\n" "Name" "Version"
+        local available stablehv ltsv ltshv harnenedv hardenedhv rtv rthv rtltsv rtltshv zenv zenhv 
+        if test -n "$(pacman -Si 'linux' 2> /dev/null)"; then
+            available="linux" 
+            stablev=$(pacman -Si 'linux' | grep Version | awk '{$1="";$2=""; print}' | xargs) 
+            [[ "$stablev" == "$(pacman -Si 'linux-headers' | grep Version | awk '{$1="";$2=""; print}' | xargs)" ]] &&
+                stablehv="${GREEN}o" ||
+                stablehv="${RED}x"
+            printf "$prmpth" "linux" "$stablev" "linux-headers" "$stablehv" 
+            printf "$prmpth1" "'Vanilla Linux kernel and modules, with a few patches applied'"
+        fi
        
-        printf "$prmpth0" "- Mainline: " "$mainlinev"
-        printf "$prmpth0" "- Stable: " "$stablev"
-        printf "$prmpth0" "- Longterm: " "$longtermv"
+        # Manjaro kernels 
+        if test -n "$(pacman -Si 'linux-meta' 2> /dev/null)"; then
+            available="$available linux-meta" 
+            local lhv lv=$(pacman -Si 'linux-meta' | grep Version | awk '{$1="";$2=""; print}' | xargs) 
+            [[ "$lv" == "$(pacman -Si 'linux-headers-meta' | grep Version | awk '{$1="";$2=""; print}' | xargs)" ]] &&
+                lhv="${GREEN}o" ||
+                lhv="${RED}x"
+            printf "$prmpth" "linux-meta" "$lv" "linux-headers-meta" "$lhv" 
+            printf "$prmpth1" "'Manjaro stable kernel'"
+        fi
+       
+        # Manjaro kernels 
+        if test -n "$(pacman -Ss '^linux[0-9]+$' 2> /dev/null)"; then
+            local ks=$(eval "$pac_search '^linux[0-9]+$' | sed -n '1p; /^[^[:space:]]/ {N;/[\^n]*\n\t/!p;}' | grep -i -B 1 -E 'kernel |kernel,' --no-group-separator | paste -d \"\t\" - - | grep -Eiv '[^and ]headers|docs|tool|kernel module|installed' | sed -E 's,core/|extra/|multilib/,,g' | grep '^linux' | uniq | awk '{print \$1}' | sed 's/\(x[0-9]\)/\1./' | sort -rV | sed 's/\.//g'")                     available="$available $ks"
+            while IFS= read -r k; do
+                kv=$(pacman -Si "$k" | grep Version | awk '{$1="";$2=""; print}' | xargs) 
+                [[ "$kv" == "$(pacman -Si "$k-headers" | grep Version | awk '{$1="";$2=""; print}' | xargs)" ]] &&  
+                    khv="${GREEN}o" ||
+                    khv="${RED}x"
+                printf "$prmpth" "$k" "$kv" "$k-headers" "$khv" 
+            done <<< $ks
+            printf "$prmpth1" "'Vanilla Linux kernels and modules, indicated by version number (f.ex. linux612 is linux v6.12)'"
+        fi
+         
+        if test -n "$(pacman -Si 'linux-lts' 2> /dev/null)"; then
+            available="$available linux-lts" 
+            ltsv=$(pacman -Si 'linux-lts' | grep Version | awk '{$1="";$2=""; print}' | xargs) 
+            [[ "$ltsv" == "$(pacman -Si 'linux-lts-headers' | grep Version | awk '{$1="";$2=""; print}' | xargs)" ]] &&
+                ltshv="${GREEN}o" ||
+                ltshv="${RED}x"
+            printf "$prmpth" "linux-lts" "$ltsv" "linux-lts-headers" "$ltshv" 
+            printf "$prmpth1" "'Long-term support (LTS) Linux kernel and modules with configuration options targeting usage in servers.'"
+        fi
+      
+        # Manjaro kernels 
+        if test -n "$(pacman -Si 'linux-lts-meta' 2> /dev/null)"; then
+            available="$available linux-lts-meta" 
+            local lthv ltv 
+            ltv=$(pacman -Si 'linux-lts-meta' | grep Version | awk '{$1="";$2=""; print}' | xargs) 
+            [[ "$ltv" == "$(pacman -Si 'linux-lts-headers-meta' | grep Version | awk '{$1="";$2=""; print}' | xargs)" ]] &&
+                lthv="${GREEN}o" ||
+                lthv="${RED}x"
+            printf "$prmpth" "linux-lts-meta" "$ltv" "linux-lts-headers-meta" "$lthv" 
+            printf "$prmpth1" "'Manjaro LTS kernel'"
+        fi
+         
 
-        echo
-
-        if [[ "$distro_base" == 'Arch' ]]; then
-
-            printf "${GREEN}Available Kernels:\n"
-            printf "${GREEN}%-20s %-20s %-25s %-25s\n" "Name" "Version" "Headers" "Headers-Version-Same"
-            
-            local available stablehv ltsv ltshv harnenedv hardenedhv rtv rthv rtltsv rtltshv zenv zenhv 
-            if test -n "$(pacman -Si 'linux' 2> /dev/null)"; then
-                available="linux" 
-                stablev=$(pacman -Si 'linux' | grep Version | awk '{$1="";$2=""; print}' | xargs) 
-                [[ "$stablev" == "$(pacman -Si 'linux-headers' | grep Version | awk '{$1="";$2=""; print}' | xargs)" ]] &&
-                    stablehv="${GREEN}o" ||
-                    stablehv="${RED}x"
-                printf "$prmpth" "linux" "$stablev" "linux-headers" "$stablehv" 
-                printf "$prmpth1" "'Vanilla Linux kernel and modules, with a few patches applied'"
-            fi
-           
-            # Manjaro kernels 
-            if test -n "$(pacman -Si 'linux-meta' 2> /dev/null)"; then
-                available="$available linux-meta" 
-                local lhv lv=$(pacman -Si 'linux-meta' | grep Version | awk '{$1="";$2=""; print}' | xargs) 
-                [[ "$lv" == "$(pacman -Si 'linux-headers-meta' | grep Version | awk '{$1="";$2=""; print}' | xargs)" ]] &&
-                    lhv="${GREEN}o" ||
-                    lhv="${RED}x"
-                printf "$prmpth" "linux-meta" "$lv" "linux-headers-meta" "$lhv" 
-                printf "$prmpth1" "'Manjaro stable kernel'"
-            fi
-           
-            # Manjaro kernels 
-            if test -n "$(pacman -Ss '^linux[0-9]+$' 2> /dev/null)"; then
-                local ks=$(eval "$pac_search '^linux[0-9]+$' | sed -n '1p; /^[^[:space:]]/ {N;/[\^n]*\n\t/!p;}' | grep -i -B 1 -E 'kernel |kernel,' --no-group-separator | paste -d \"\t\" - - | grep -Eiv '[^and ]headers|docs|tool|kernel module|installed' | sed -E 's,core/|extra/|multilib/,,g' | grep '^linux' | uniq | awk '{print \$1}' | sed 's/\(x[0-9]\)/\1./' | sort -rV | sed 's/\.//g'")                     available="$available $ks"
-                while IFS= read -r k; do
-                    kv=$(pacman -Si "$k" | grep Version | awk '{$1="";$2=""; print}' | xargs) 
-                    [[ "$kv" == "$(pacman -Si "$k-headers" | grep Version | awk '{$1="";$2=""; print}' | xargs)" ]] &&  
-                        khv="${GREEN}o" ||
-                        khv="${RED}x"
-                    printf "$prmpth" "$k" "$kv" "$k-headers" "$khv" 
-                done <<< $ks
-                printf "$prmpth1" "'Vanilla Linux kernels and modules, indicated by version number (f.ex. linux612 is linux v6.12)'"
-            fi
-             
-            if test -n "$(pacman -Si 'linux-lts' 2> /dev/null)"; then
-                available="$available linux-lts" 
-                ltsv=$(pacman -Si 'linux-lts' | grep Version | awk '{$1="";$2=""; print}' | xargs) 
-                [[ "$ltsv" == "$(pacman -Si 'linux-lts-headers' | grep Version | awk '{$1="";$2=""; print}' | xargs)" ]] &&
-                    ltshv="${GREEN}o" ||
-                    ltshv="${RED}x"
-                printf "$prmpth" "linux-lts" "$ltsv" "linux-lts-headers" "$ltshv" 
-                printf "$prmpth1" "'Long-term support (LTS) Linux kernel and modules with configuration options targeting usage in servers.'"
-            fi
-          
-            # Manjaro kernels 
-            if test -n "$(pacman -Si 'linux-lts-meta' 2> /dev/null)"; then
-                available="$available linux-lts-meta" 
-                local lthv ltv 
-                ltv=$(pacman -Si 'linux-lts-meta' | grep Version | awk '{$1="";$2=""; print}' | xargs) 
-                [[ "$ltv" == "$(pacman -Si 'linux-lts-headers-meta' | grep Version | awk '{$1="";$2=""; print}' | xargs)" ]] &&
-                    lthv="${GREEN}o" ||
-                    lthv="${RED}x"
-                printf "$prmpth" "linux-lts-meta" "$ltv" "linux-lts-headers-meta" "$lthv" 
-                printf "$prmpth1" "'Manjaro LTS kernel'"
-            fi
-             
-
-            if test -n "$(pacman -Si 'linux-hardened' 2> /dev/null)"; then
-                available="$available linux-hardened" 
-                hardenedv=$(pacman -Si 'linux-hardened' | grep Version | awk '{$1="";$2=""; print}' | xargs) 
-                [[ "$hardenedv" == "$(pacman -Si 'linux-hardened-headers' | grep Version | awk '{$1="";$2=""; print}' | xargs)" ]] &&
-                    hardenedhv="${GREEN}o" ||
-                    hardenedhv="${RED}x"
-                printf "$prmpth" "linux-hardened" "$hardenedv" "linux-hardened-headers" "$hardenedhv" 
-                printf "$prmpth1" "'A security-focused Linux kernel applying a set of hardening patches to mitigate kernel and userspace exploits. It also enables more upstream kernel hardening features than \"linux\".'"
-            fi
-            
-            if test -n "$(pacman -Si 'linux-rt' 2> /dev/null)"; then
-                available="$available linux-rt" 
-                rtv=$(pacman -Si 'linux-rt' | grep Version | awk '{$1="";$2=""; print}' | xargs) 
-                [[ "$rtv" == "$(pacman -Si 'linux-rt-headers' | grep Version | awk '{$1="";$2=""; print}' | xargs)" ]] &&
-                    rthv="${GREEN}o" ||
-                    rthv="${RED}x"
-                printf "$prmpth" "linux-rt" "$rtv" "linux-rt-headers" "$rthv" 
-                test -z "$(pacman -Si 'linux-rt-lts' 2> /dev/null)" && test -z "$(pacman -Ss '^linux[0-9]+$' 2> /dev/null)" &&
-                    printf "$prmpth1" "'Maintained by a small group of core developers led by Ingo Molnar. This patch allows nearly all of the kernel to be preempted, with the exception of a few very small regions of code (\"raw_spinlock critical regions\"). This is done by replacing most kernel spinlocks with mutexes that support priority inheritance, as well as moving all interrupt and software interrupts to kernel threads.'"
-            fi 
-           
-            # Manjaro kernels 
-            if test -n "$(pacman -Ss '^linux[0-9]+-rt$' 2> /dev/null)"; then
-                local ks=$(eval "$pac_search '^linux[0-9]+-rt$' | sed -n '1p; /^[^[:space:]]/ {N;/[\^n]*\n\t/!p;}' | grep -i -B 1 -E 'kernel |kernel,' --no-group-separator | paste -d \"\t\" - - | grep -Eiv '[^and ]headers|docs|tool|kernel module' | grep '^[^[:space:]]' | grep -iv 'installed' | sed -E 's,core/|extra/|multilib/,,g' | grep '^linux' | uniq | awk '{print \$1}' | sed 's/\(x[0-9]\)/\1./' | sort -rV | sed 's/\.//g'")                     available="$available $ks"
-                while IFS= read -r k; do
-                    local kv=$(pacman -Si "$k" | grep Version | awk '{$1="";$2=""; print}' | xargs) 
-                    [[ "$kv" == "$(pacman -Si "$k-headers" | grep Version | awk '{$1="";$2=""; print}' | xargs)" ]] &&  
-                        khv="${GREEN}o" ||
-                        khv="${RED}x"
-                    printf "$prmpth" "$k" "$kv" "$k-headers" "$khv" 
-                done <<< $ks
-                test -z "$(pacman -Si 'linux-rt-lts' 2> /dev/null)" &&
-                    printf "$prmpth1" "'Maintained by a small group of core developers led by Ingo Molnar. This patch allows nearly all of the kernel to be preempted, with the exception of a few very small regions of code (\"raw_spinlock critical regions\"). This is done by replacing most kernel spinlocks with mutexes that support priority inheritance, as well as moving all interrupt and software interrupts to kernel threads.'" 
-            fi
-             
-           
-            if test -n "$(pacman -Si 'linux-rt-lts' 2> /dev/null)"; then
-                available="$available linux-rt-lts" 
-                rtltsv=$(pacman -Si 'linux-rt-lts' | grep Version | awk '{$1="";$2=""; print}' | xargs) 
-                [[ "$rtltsv" == "$(pacman -Si 'linux-rt-lts-headers' | grep Version | awk '{$1="";$2=""; print}' | xargs)" ]] &&
-                    rtltshv="${GREEN}o" ||
-                    rtltshv="${RED}x"
-                printf "$prmpth" "linux-rt-lts" "$rtltsv" "linux-rt-lts-headers" "$rtltshv" 
+        if test -n "$(pacman -Si 'linux-hardened' 2> /dev/null)"; then
+            available="$available linux-hardened" 
+            hardenedv=$(pacman -Si 'linux-hardened' | grep Version | awk '{$1="";$2=""; print}' | xargs) 
+            [[ "$hardenedv" == "$(pacman -Si 'linux-hardened-headers' | grep Version | awk '{$1="";$2=""; print}' | xargs)" ]] &&
+                hardenedhv="${GREEN}o" ||
+                hardenedhv="${RED}x"
+            printf "$prmpth" "linux-hardened" "$hardenedv" "linux-hardened-headers" "$hardenedhv" 
+            printf "$prmpth1" "'A security-focused Linux kernel applying a set of hardening patches to mitigate kernel and userspace exploits. It also enables more upstream kernel hardening features than \"linux\".'"
+        fi
+        
+        if test -n "$(pacman -Si 'linux-rt' 2> /dev/null)"; then
+            available="$available linux-rt" 
+            rtv=$(pacman -Si 'linux-rt' | grep Version | awk '{$1="";$2=""; print}' | xargs) 
+            [[ "$rtv" == "$(pacman -Si 'linux-rt-headers' | grep Version | awk '{$1="";$2=""; print}' | xargs)" ]] &&
+                rthv="${GREEN}o" ||
+                rthv="${RED}x"
+            printf "$prmpth" "linux-rt" "$rtv" "linux-rt-headers" "$rthv" 
+            test -z "$(pacman -Si 'linux-rt-lts' 2> /dev/null)" && test -z "$(pacman -Ss '^linux[0-9]+$' 2> /dev/null)" &&
                 printf "$prmpth1" "'Maintained by a small group of core developers led by Ingo Molnar. This patch allows nearly all of the kernel to be preempted, with the exception of a few very small regions of code (\"raw_spinlock critical regions\"). This is done by replacing most kernel spinlocks with mutexes that support priority inheritance, as well as moving all interrupt and software interrupts to kernel threads.'"
-            fi
-            
-            if test -n "$(pacman -Si 'linux-zen' 2> /dev/null)"; then
-                available="$available linux-zen" 
-                zenv=$(pacman -Si 'linux-zen' | grep Version | awk '{$1="";$2=""; print}' | xargs) 
-                [[ "$zenv" == "$(pacman -Si 'linux-zen-headers' | grep Version | awk '{$1="";$2=""; print}' | xargs)" ]] &&
-                    zenhv="${GREEN}o" ||
-                    zenhv="${RED}x"
-                printf "$prmpth" "linux-zen" "$zenv" "linux-zen-headers" "$zenhv" 
-                printf "$prmpth1" "'Result of a collaborative effort of kernel hackers to provide the best Linux kernel possible for everyday systems.'"
-            fi 
-          
-            local pre='newkernel keepcurrent' prmpt='What to do? [Newkernel/keepcurrent]: ' ansr
-             
-            if ! test -d /lib/modules/$(uname -r)/build || test -z "$(ls /lib/modules/$(uname -r)/build/*)"; then
-                pre='headers newkernel keepcurrent'
-                prmpt="${YELLOW}No headers found of current kernel!${GREEN}\nWhat to do? [Headers/newkernel/keepcurrent]: "
-            fi
-            reade -Q 'GREEN' -i "$pre" -p "$prmpt" ansr 
-            
-            if [[ $ansr == 'newkernel' ]]; then
-                local kernel 
-                if test -n "$AUR_search_q" && test -n "$AUR_info"; then
-                    
-                    readyn -p "These kernel packages were only from official repositories. Also list unofficial (AUR) kernel packages?" kern_AUR 
-                    # local ltss=$(eval "$AUR_search_q linux-lts | grep 'linux-lts[[:digit:]+]' | cut -d- -f-2 | awk '{print \$1}' | uniq | tr '\n' ' ' | xargs")
-                    # No header : linux-drm-tip-git linux-drm-next-git  
-                    if [[ $kern_AUR == 'y' ]]; then
-                        if hash fzf &> /dev/null; then
-                            kernel=$(eval "$AUR_search linux | sed -n '1p; /^[^[:space:]]/ {N;/[\^n]*\n\t/!p;}' | grep -i -B 1 -E 'kernel |kernel,' --no-group-separator | paste -d \"\t\" - - | grep -Eiv '[^and ]headers|docs|tool|kernel module|installed' | sed -E 's,core/|extra/|multilib/|aur/,,g' | grep '^linux' | uniq | awk '{print \$1}' | sort -V | fzf --reverse --height 50% --preview 'cat <(yay -Si {1})'")
-                        fi
-                    else
-                        if hash fzf &> /dev/null; then
-                            kernel=$(eval "$pac_search linux | sed -n '1p; /^[^[:space:]]/ {N;/[\^n]*\n\t/!p;}' | grep -i -B 1 -E 'kernel |kernel,' --no-group-separator | paste -d \"\t\" - - | grep -Eiv '[^and ]headers|docs|tool|kernel module|installed' | sed -E 's,core/|extra/|multilib/,,g' | grep '^linux' | uniq | awk '{print \$1}' | sort -V | tac | fzf --reverse --height 50% --preview 'cat <(yay -Si {1})'")
-                        fi 
+        fi 
+       
+        # Manjaro kernels 
+        if test -n "$(pacman -Ss '^linux[0-9]+-rt$' 2> /dev/null)"; then
+            local ks=$(eval "$pac_search '^linux[0-9]+-rt$' | sed -n '1p; /^[^[:space:]]/ {N;/[\^n]*\n\t/!p;}' | grep -i -B 1 -E 'kernel |kernel,' --no-group-separator | paste -d \"\t\" - - | grep -Eiv '[^and ]headers|docs|tool|kernel module' | grep '^[^[:space:]]' | grep -iv 'installed' | sed -E 's,core/|extra/|multilib/,,g' | grep '^linux' | uniq | awk '{print \$1}' | sed 's/\(x[0-9]\)/\1./' | sort -rV | sed 's/\.//g'")                     available="$available $ks"
+            while IFS= read -r k; do
+                local kv=$(pacman -Si "$k" | grep Version | awk '{$1="";$2=""; print}' | xargs) 
+                [[ "$kv" == "$(pacman -Si "$k-headers" | grep Version | awk '{$1="";$2=""; print}' | xargs)" ]] &&  
+                    khv="${GREEN}o" ||
+                    khv="${RED}x"
+                printf "$prmpth" "$k" "$kv" "$k-headers" "$khv" 
+            done <<< $ks
+            test -z "$(pacman -Si 'linux-rt-lts' 2> /dev/null)" &&
+                printf "$prmpth1" "'Maintained by a small group of core developers led by Ingo Molnar. This patch allows nearly all of the kernel to be preempted, with the exception of a few very small regions of code (\"raw_spinlock critical regions\"). This is done by replacing most kernel spinlocks with mutexes that support priority inheritance, as well as moving all interrupt and software interrupts to kernel threads.'" 
+        fi
+         
+       
+        if test -n "$(pacman -Si 'linux-rt-lts' 2> /dev/null)"; then
+            available="$available linux-rt-lts" 
+            rtltsv=$(pacman -Si 'linux-rt-lts' | grep Version | awk '{$1="";$2=""; print}' | xargs) 
+            [[ "$rtltsv" == "$(pacman -Si 'linux-rt-lts-headers' | grep Version | awk '{$1="";$2=""; print}' | xargs)" ]] &&
+                rtltshv="${GREEN}o" ||
+                rtltshv="${RED}x"
+            printf "$prmpth" "linux-rt-lts" "$rtltsv" "linux-rt-lts-headers" "$rtltshv" 
+            printf "$prmpth1" "'Maintained by a small group of core developers led by Ingo Molnar. This patch allows nearly all of the kernel to be preempted, with the exception of a few very small regions of code (\"raw_spinlock critical regions\"). This is done by replacing most kernel spinlocks with mutexes that support priority inheritance, as well as moving all interrupt and software interrupts to kernel threads.'"
+        fi
+        
+        if test -n "$(pacman -Si 'linux-zen' 2> /dev/null)"; then
+            available="$available linux-zen" 
+            zenv=$(pacman -Si 'linux-zen' | grep Version | awk '{$1="";$2=""; print}' | xargs) 
+            [[ "$zenv" == "$(pacman -Si 'linux-zen-headers' | grep Version | awk '{$1="";$2=""; print}' | xargs)" ]] &&
+                zenhv="${GREEN}o" ||
+                zenhv="${RED}x"
+            printf "$prmpth" "linux-zen" "$zenv" "linux-zen-headers" "$zenhv" 
+            printf "$prmpth1" "'Result of a collaborative effort of kernel hackers to provide the best Linux kernel possible for everyday systems.'"
+        fi 
+      
+        local pre='newkernel keepcurrent' prmpt='What to do? [Newkernel/keepcurrent]: ' ansr
+         
+        if ! test -d /lib/modules/$(uname -r)/build || test -z "$(ls /lib/modules/$(uname -r)/build/*)"; then
+            pre='headers newkernel keepcurrent'
+            prmpt="${YELLOW}No headers found of current kernel!${GREEN}\nWhat to do? [Headers/newkernel/keepcurrent]: "
+        fi
+        reade -Q 'GREEN' -i "$pre" -p "$prmpt" ansr 
+        
+        if [[ $ansr == 'newkernel' ]]; then
+            local kernel 
+            if test -n "$AUR_search_q" && test -n "$AUR_info"; then
+                
+                readyn -p "These kernel packages were only from official repositories. Also list unofficial (AUR) kernel packages?" kern_AUR 
+                # local ltss=$(eval "$AUR_search_q linux-lts | grep 'linux-lts[[:digit:]+]' | cut -d- -f-2 | awk '{print \$1}' | uniq | tr '\n' ' ' | xargs")
+                # No header : linux-drm-tip-git linux-drm-next-git  
+                if [[ $kern_AUR == 'y' ]]; then
+                    if hash fzf &> /dev/null; then
+                        kernel=$(eval "$AUR_search linux | sed -n '1p; /^[^[:space:]]/ {N;/[\^n]*\n\t/!p;}' | grep -i -B 1 -E 'kernel |kernel,' --no-group-separator | paste -d \"\t\" - - | grep -Eiv '[^and ]headers|docs|tool|kernel module|installed' | sed -E 's,core/|extra/|multilib/|aur/,,g' | grep '^linux' | uniq | awk '{print \$1}' | sort -V | fzf --reverse --height 50% --preview 'cat <(yay -Si {1})'")
                     fi
                 else
                     if hash fzf &> /dev/null; then
                         kernel=$(eval "$pac_search linux | sed -n '1p; /^[^[:space:]]/ {N;/[\^n]*\n\t/!p;}' | grep -i -B 1 -E 'kernel |kernel,' --no-group-separator | paste -d \"\t\" - - | grep -Eiv '[^and ]headers|docs|tool|kernel module|installed' | sed -E 's,core/|extra/|multilib/,,g' | grep '^linux' | uniq | awk '{print \$1}' | sort -V | tac | fzf --reverse --height 50% --preview 'cat <(yay -Si {1})'")
-                    fi
+                    fi 
                 fi
-    
-                if test -n "$kernel"; then
-                    local kernelh="$kernel-headers" 
-                    if [[ $kernel =~ "-bin" ]]; then
-                        kernelh=$(echo $kernel | sed 's/-bin/-headers-bin/g') 
-                    elif [[ $kernel == "linux-meta" ]]; then
-                        kernelh="linux-headers-meta" 
-                    elif [[ $kernel == "linux-lts-meta" ]]; then
-                        kernelh="linux-lts-headers-meta" 
-                    fi
-                     
-                    local nstall_kh='n'
-                    if test -n "$AUR_search_q" && test -n "$AUR_info"; then
-                        if test -n "$(eval "$AUR_search_q $kernelh")" && test -z "$(pacman -Q $kernelh 2> /dev/null)"; then
-                            readyn -p "Kernel header ${CYAN}'$kernelh'${GREEN} available and not installed (C header files that allow external kernel modules to function using the kernel).\nAlso install ${CYAN}$kernelh${GREEN}?" nstall_kh
-                        else
-                            printf "${YELLOW}No header packages found for $kernel${normal}\n"
-                        fi
-                    else  
-                        if test -n "$(eval "$pac_search_q $kernelh")" && test -z "$(pacman -Q $kernelh 2> /dev/null)"; then
-                            readyn -p "Kernel header ${CYAN}'$kernelh'${GREEN} available and not installed (C header files that allow external kernel modules to function using the kernel).\nAlso install ${CYAN}$kernelh${GREEN}?" nstall_kh
-                        else
-                           printf "${YELLOW}No header packages found for $kernel${normal}\n"
-                        fi
-                    fi
-                     
-                    if [[ $nstall_kh == 'y' ]]; then
-                       if test -n "$AUR_ins"; then
-                           eval "$AUR_ins $kernel $kernelh" 
-                       else
-                           eval "$pac_ins $kernel $kernelh" 
-                       fi
-                    else    
-                       if test -n "$AUR_ins"; then
-                           eval "$AUR_ins $kernel" 
-                       else
-                           eval "$pac_ins $kernel" 
-                       fi
-                    fi
+            else
+                if hash fzf &> /dev/null; then
+                    kernel=$(eval "$pac_search linux | sed -n '1p; /^[^[:space:]]/ {N;/[\^n]*\n\t/!p;}' | grep -i -B 1 -E 'kernel |kernel,' --no-group-separator | paste -d \"\t\" - - | grep -Eiv '[^and ]headers|docs|tool|kernel module|installed' | sed -E 's,core/|extra/|multilib/,,g' | grep '^linux' | uniq | awk '{print \$1}' | sort -V | tac | fzf --reverse --height 50% --preview 'cat <(yay -Si {1})'")
+                fi
+            fi
 
-                    local defkern
-                    readyn -p "Set $kernel as default?" defkern
-                    if [[ $defkern == 'y' ]]; then
-                        switch-default-kernel $kernel     
-                    fi
-                    printf "${GREEN}You can list installed kernels using ${CYAN}'list-installed-kernels'${GREEN}\n"
-                    printf "${GREEN}, switch to another kernel using ${CYAN}'switch-default-kernel'${GREEN}\n"
-                    printf "${GREEN}and remove unused kernels using ${CYAN}'remove-kernels'${GREEN}\n" 
+            if test -n "$kernel"; then
+                local kernelh="$kernel-headers" 
+                if [[ $kernel =~ "-bin" ]]; then
+                    kernelh=$(echo $kernel | sed 's/-bin/-headers-bin/g') 
+                elif [[ $kernel == "linux-meta" ]]; then
+                    kernelh="linux-headers-meta" 
+                elif [[ $kernel == "linux-lts-meta" ]]; then
+                    kernelh="linux-lts-headers-meta" 
                 fi
-            elif [[ "$ansr" == 'headers' ]]; then
-                local current=$(uname -r) 
-                local upprdist=$(echo $distro | tr '[:lower:]' '[:upper:]')
-                if [[ $current =~ $upprdist ]]; then
-                    current=$(echo $current | sed "s/-$upprdist//g") 
-                fi
-                
-                if test -n "$AUR_search_ins"; then
-                    kernel=$(eval "$AUR_search_ins linux | sed -E '/headers|docs|tool/d' | sed 's|local/||g' | grep $current | awk 'NR==1{print \$1;}'")
-                else
-                    kernel=$(eval "$pac_search_ins linux | sed -E '/headers|docs|tool/d'| sed 's|local/||g' | grep $current | awk 'NR==1{print \$1;}'")
-                fi
-                
-                if test -n "$kernel"; then
-                    local pacc_search_q pacc_ins_y
-                    if test -n "$AUR_search_q"; then
-                        pacc_search_q="$AUR_search_q"
-                        pacc_ins_y="$AUR_ins_y"
+                 
+                local nstall_kh='n'
+                if test -n "$AUR_search_q" && test -n "$AUR_info"; then
+                    if test -n "$(eval "$AUR_search_q $kernelh")" && test -z "$(pacman -Q $kernelh 2> /dev/null)"; then
+                        readyn -p "Kernel header ${CYAN}'$kernelh'${GREEN} available and not installed (C header files that allow external kernel modules to function using the kernel).\nAlso install ${CYAN}$kernelh${GREEN}?" nstall_kh
                     else
-                        pacc_search_q="$pac_search_q"
-                        pacc_ins_y="$pac_ins_y"
+                        printf "${YELLOW}No header packages found for $kernel${normal}\n"
                     fi
-                    if [[ "$distro" == 'Manjaro' ]] && ( (test -n "$(pamac search --installed linux-meta)" && pamac info linux-meta | grep 'Depends On' | grep -q "$kernel") || (test -n "$(pamac search --installed linux-lts-meta)" && pamac info linux-lts-meta | grep 'Depends On' | grep -q "$kernel")); then
-                        if test -n "$(pamac search --installed linux-meta)" && pamac info 'linux-meta' | grep 'Depends On' | grep -q "$kernel"; then 
-                            printf "${GREEN}Installing ${CYAN}linux-headers-meta${normal}\n" 
-                            pamac install --no-confirm linux-headers-meta
-                        elif test -n "$(pamac search --installed linux-lts-meta)" && pamac info 'linux-lts-meta' | grep 'Depends On' | grep -q "$kernel"; then 
-                            printf "${GREEN}Installing ${CYAN}linux-lts-headers-meta${normal}\n" 
-                            pamac install --no-confirm linux-lts-headers-meta
-                        fi
-                    elif test -n "$(eval "$pacc_search_q $kernel-headers")"; then
-                        printf "${GREEN}Installing ${CYAN}$kernel-headers${normal}\n" 
-                        eval "$pacc_ins_y $kernel-headers"
-                    elif [[ "$kernel" =~ '-bin' ]] && test -n "$(eval "echo $kernel | sed 's/-bin/-headers-bin/g' | xargs $pacc_search_q" )"; then   
-                        local headers="$(echo $kernel | sed 's/-bin/-headers-bin/g')" 
-                        printf "${GREEN}Installing ${CYAN}$headers${normal}\n" 
-                        eval "$pacc_ins_y $headers"
+                else  
+                    if test -n "$(eval "$pac_search_q $kernelh")" && test -z "$(pacman -Q $kernelh 2> /dev/null)"; then
+                        readyn -p "Kernel header ${CYAN}'$kernelh'${GREEN} available and not installed (C header files that allow external kernel modules to function using the kernel).\nAlso install ${CYAN}$kernelh${GREEN}?" nstall_kh
+                    else
+                       printf "${YELLOW}No header packages found for $kernel${normal}\n"
                     fi
-                else
-                    printf "${YELLOW}Uncertain which kernel package relevant for current kernel\nTry looking for yourself using your packagemanager (f.ex. pacman)\n"
                 fi
+                 
+                if [[ $nstall_kh == 'y' ]]; then
+                   if test -n "$AUR_ins"; then
+                       eval "$AUR_ins $kernel $kernelh" 
+                   else
+                       eval "$pac_ins $kernel $kernelh" 
+                   fi
+                else    
+                   if test -n "$AUR_ins"; then
+                       eval "$AUR_ins $kernel" 
+                   else
+                       eval "$pac_ins $kernel" 
+                   fi
+                fi
+
+                local defkern
+                readyn -p "Set $kernel as default?" defkern
+                if [[ $defkern == 'y' ]]; then
+                    switch-default-kernel $kernel     
+                fi
+                printf "${GREEN}You can list installed kernels using ${CYAN}'list-installed-kernels'${GREEN}\n"
+                printf "${GREEN}, switch to another kernel using ${CYAN}'switch-default-kernel'${GREEN}\n"
+                printf "${GREEN}and remove unused kernels using ${CYAN}'remove-kernels'${GREEN}\n" 
+            fi
+        elif [[ "$ansr" == 'headers' ]]; then
+            local current=$(uname -r) 
+            local upprdist=$(echo $distro | tr '[:lower:]' '[:upper:]')
+            if [[ $current =~ $upprdist ]]; then
+                current=$(echo $current | sed "s/-$upprdist//g") 
+            fi
+            
+            if test -n "$AUR_search_ins"; then
+                kernel=$(eval "$AUR_search_ins linux | sed -E '/headers|docs|tool/d' | sed 's|local/||g' | grep $current | awk 'NR==1{print \$1;}'")
+            else
+                kernel=$(eval "$pac_search_ins linux | sed -E '/headers|docs|tool/d'| sed 's|local/||g' | grep $current | awk 'NR==1{print \$1;}'")
+            fi
+            
+            if test -n "$kernel"; then
+                local pacc_search_q pacc_ins_y
+                if test -n "$AUR_search_q"; then
+                    pacc_search_q="$AUR_search_q"
+                    pacc_ins_y="$AUR_ins_y"
+                else
+                    pacc_search_q="$pac_search_q"
+                    pacc_ins_y="$pac_ins_y"
+                fi
+                if [[ "$distro" == 'Manjaro' ]] && ( (test -n "$(pamac search --installed linux-meta)" && pamac info linux-meta | grep 'Depends On' | grep -q "$kernel") || (test -n "$(pamac search --installed linux-lts-meta)" && pamac info linux-lts-meta | grep 'Depends On' | grep -q "$kernel")); then
+                    if test -n "$(pamac search --installed linux-meta)" && pamac info 'linux-meta' | grep 'Depends On' | grep -q "$kernel"; then 
+                        printf "${GREEN}Installing ${CYAN}linux-headers-meta${normal}\n" 
+                        pamac install --no-confirm linux-headers-meta
+                    elif test -n "$(pamac search --installed linux-lts-meta)" && pamac info 'linux-lts-meta' | grep 'Depends On' | grep -q "$kernel"; then 
+                        printf "${GREEN}Installing ${CYAN}linux-lts-headers-meta${normal}\n" 
+                        pamac install --no-confirm linux-lts-headers-meta
+                    fi
+                elif test -n "$(eval "$pacc_search_q $kernel-headers")"; then
+                    printf "${GREEN}Installing ${CYAN}$kernel-headers${normal}\n" 
+                    eval "$pacc_ins_y $kernel-headers"
+                elif [[ "$kernel" =~ '-bin' ]] && test -n "$(eval "echo $kernel | sed 's/-bin/-headers-bin/g' | xargs $pacc_search_q" )"; then   
+                    local headers="$(echo $kernel | sed 's/-bin/-headers-bin/g')" 
+                    printf "${GREEN}Installing ${CYAN}$headers${normal}\n" 
+                    eval "$pacc_ins_y $headers"
+                fi
+            else
+                printf "${YELLOW}Uncertain which kernel package relevant for current kernel\nTry looking for yourself using your packagemanager (f.ex. pacman)\n"
             fi
         fi
     fi
