@@ -353,7 +353,7 @@ if hash grub-set-default &> /dev/null; then
             
             printf "${CYAN}Current kernel:\n   ${GREEN}$(uname -r)\n\n${normal}"
 
-            local kernel grb_entry kernels=$(sudo grep -e "[[:space:]+]menuentry '" /boot/grub/grub.cfg | grep --color=never 'Linux' | cut -d\' -f2 | cut -d\' -f1 | sed 's/Kernel: //g' | sed '/fallback initramfs/d') 
+            local kernel grb_entry kernels=$(sudo grep -e "[[:space:]+]menuentry '" /boot/grub/grub.cfg | grep --color=never 'Linux' | cut -d\' -f2 | cut -d\' -f1) 
             if hash fzf &> /dev/null; then
                 # Sed remove colors
                 kernel=$(echo "$kernels" | sed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2};?)?)?[mGK]//g" | fzf --query="$query" --reverse --height 10%)   
@@ -381,14 +381,15 @@ if hash grub-set-default &> /dev/null; then
             fi
             
             if test -n "$kernel"; then
-                local h kernels=$(sudo grep -e "[[:space:]+]menuentry '" /boot/grub/grub.cfg | grep 'Linux' | cut -d\( -f2 | cut -d\) -f1)
+                local h kernels=$(sudo grep -e "[[:space:]+]menuentry '" /boot/grub/grub.cfg | grep 'Linux' | cut -d\' -f2 | cut -d\' -f1)
                 while IFS= read -r i; do 
                     h=$(($h+1))
                     if [[ "$i" =~ "$kernel" ]]; then
                         break
                     fi
                 done <<< "$kernels" 
-                
+               
+                printf "${GREEN}Setting new default kernel with ${CYAN}'sudo grub-set-default "$j>$h"'${normal}\n" 
                 sudo grub-set-default "$j>$h"
                 
                 echo "${YELLOW}A reboot is needed to take full effect!${normal}" 
