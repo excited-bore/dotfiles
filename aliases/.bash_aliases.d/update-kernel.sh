@@ -464,11 +464,12 @@ function update-kernel(){
        
         if hash mainline &> /dev/null; then
             echo "${GREEN}Available kernels using mainline (includes headers): " 
-            local mainlines="$(mainline list --include-rc --include-flavors)" 
+            local mainlines='' mainlines1="$(mainline list --include-rc --include-flavors | sed -e 's/Running//g' -e 's/Installed//g')" 
             for i in $(mainline list --include-rc --include-flavors | grep --color=never -oPf <(echo '^\d\.\d+') | uniq); do
-                printf "${CYAN}%s\n${normal}" "  - $(echo "$mainlines" | grep --color=never -E "^$i\.|^$i[[:space:]]|^$i-" | head -1)"
+                local m=$(echo "$mainlines1" | grep --color=never -E "^$i\.|^$i[[:space:]]|^$i-" | head -1 | xargs) 
+                printf "${CYAN}%s\n${normal}" "  - $m"
+                test -z "$mainlines" && mainlines="$m" || mainlines="$mainlines $m"
             done
-            echo 
         fi 
 
         local prmpth="${green}%-45s %-30s %-40s %-40s\n${normal}" 
@@ -615,7 +616,7 @@ function update-kernel(){
 
             local howinstll 
             if hash mainline &> /dev/null; then
-                reade -Q 'GREEN' -i 'mainline both apt' -p "Install using mainline, apt or both [Mainline/both/apt]: " howinstll 
+                reade -Q 'GREEN' -i 'mainline both apt' -p "Choose to install with mainline, apt or both? [Mainline/both/apt]: " howinstll 
             else 
                 howinstll="apt" 
             fi
@@ -623,11 +624,25 @@ function update-kernel(){
             local nstll
             if hash fzf &> /dev/null; then
                 if [[ "$howinstll" == 'both' ]]; then 
-                    nstll=$(echo "$mainlines $available" | tr ' ' '\n' | fzf --reverse --height 50%)
+                    nstll=$(echo "$mainlines $available" | tr ' ' '\n' | fzf --reverse --height 50% --preview '[[ {1} =~ ^linux ]] && cat <(apt show {1} 2> /dev/null) || echo "Mainline kernel version {1} with headers"')
                 elif [[ "$howinstll" == 'mainline' ]]; then
-                    nstll=$(echo "$mainlines" | tr ' ' '\n' | fzf --reverse --height 50%)
+                    nstll=$(echo "$mainlines" | tr ' ' '\n' | fzf --reverse --height 50% --preview 'echo "Mainline kernel version {1} with headers"')
                 elif [[ "$howinstll" == 'apt' ]]; then
                     nstll=$(echo "$available" | tr ' ' '\n' | fzf --reverse --height 50% --preview 'cat <(apt show {1} 2> /dev/null)')
+                fi
+            fi
+            
+            if test -n "$nstll"; then
+                if [[ "$nstll" =~ ^linux ]]; then
+                    local nstllhdr hdrs=$(echo $nstll | sed 's/image/headers/')
+                    readyn -p "Also install headers package ${CYAN}'$hdrs'${GREEN}?" nstllhdr
+                    if [[ "$nstllhdr" == 'y' ]]; then
+                        eval "${pac_ins_y} $nstll $hdrs" 
+                    else
+                        eval "${pac_ins_y} $nstll" 
+                    fi
+                else
+                    mainline install $nstll
                 fi
             fi
         fi
@@ -691,14 +706,14 @@ function update-kernel(){
         printf "${GREEN}Available Kernels:\n"
         printf "${GREEN}%-20s %-20s %-25s %-25s\n" "Name" "Version" "Headers" "Headers-Version-Same"
         
-        local available stablehv ltsv ltshv harnenedv hardenedhv rtv rthv rtltsv rtltshv zenv zenhv 
+        local available stablv stablehv ltsv ltshv harnenedv hardenedhv rtv rthv rtltsv rtltshv zenv zenhv 
         if test -n "$(pacman -Si 'linux' 2> /dev/null)"; then
             available="linux" 
-            stablev=$(pacman -Si 'linux' | grep Version | awk '{$1="";$2=""; print}' | xargs) 
-            [[ "$stablev" == "$(pacman -Si 'linux-headers' | grep Version | awk '{$1="";$2=""; print}' | xargs)" ]] &&
+            stablv=$(pacman -Si 'linux' | grep Version | awk '{$1="";$2=""; print}' | xargs) 
+            [[ "$blev" == "$(pacman -Si 'linux-headers' | grep Version | awk '{$1="";$2=""; print}' | xargs)" ]] &&
                 stablehv="${GREEN}o" ||
                 stablehv="${RED}x"
-            printf "$prmpth" "linux" "$stablev" "linux-headers" "$stablehv" 
+            printf "$prmpth" "linux" "$stablv" "linux-headers" "$stablehv" 
             printf "$prmpth1" "'Vanilla Linux kernel and modules, with a few patches applied'"
         fi
        
