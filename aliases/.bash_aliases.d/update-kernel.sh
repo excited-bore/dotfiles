@@ -459,7 +459,6 @@ function update-kernel(){
 
     echo
 
-
     if [[ "$distro_base" == 'Debian' ]]; then
         choices="lts liquorix" 
        
@@ -493,7 +492,7 @@ function update-kernel(){
             for i in $(apt-cache -qq search 'linux-image-[[:digit:]+].*generic' | sort -V | grep --color=never -oPf <(echo 'linux-image-\d\.\d+') | uniq); do 
                 #kernels+=( "$(apt-cache search "$i.*-generic" | tac | head -1)" ); 
                 local k="$(echo "$i" | sed 's/linux-image-//')" 
-                available="$available linux-image-generic-$kernel" 
+                available="$available linux-image-generic-$k" 
                 kv=$(apt search "linux-image-generic-$k" 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
                 [[ "$kv" == "$(apt search "linux-headers-generic-$k" 2> /dev/null | awk 'NR==3{print $2;}' | xargs)" ]] &&  
                     khv="${GREEN}o" ||
@@ -613,13 +612,30 @@ function update-kernel(){
                 printf "$prmpth" "linux-image-virtual-hwe-$release-edge" "$lowedgv" "linux-headers-virtual-hwe-$release-edge" "$lowedghv" 
                 printf "${cyan}'Linux kernel is designed for use to run inside Virtual machines\nThe virtual kernel only includes the necessary drivers to run inside popular virtualization technologies such as KVM, Xen, Virtualbox and VMWare\n\n${normal}"
             fi
+
+            local howinstll 
+            if hash mainline &> /dev/null; then
+                reade -Q 'GREEN' -i 'mainline both apt' -p "Install using mainline, apt or both [Mainline/both/apt]: " howinstll 
+            else 
+                howinstll="apt" 
+            fi
+       
+            local nstll
+            if hash fzf &> /dev/null; then
+                if [[ "$howinstll" == 'both' ]]; then 
+                    nstll=$(echo "$mainlines $available" | tr ' ' '\n' | fzf --reverse --height 50%)
+                elif [[ "$howinstll" == 'mainline' ]]; then
+                    nstll=$(echo "$mainlines" | tr ' ' '\n' | fzf --reverse --height 50%)
+                elif [[ "$howinstll" == 'apt' ]]; then
+                    nstll=$(echo "$available" | tr ' ' '\n' | fzf --reverse --height 50% --preview 'cat <(apt show {1} 2> /dev/null)')
+                fi
+            fi
         fi
 
     elif [[ "$distro_base" == "Arch" ]]; then
 
         local prmpth="${green}%-20s %-20s %-25s %-25s\n" 
         local prmpth1="${cyan}%s\n\n" 
-
 
         if test -z "$AUR_pac"; then
             local insyay
@@ -799,24 +815,24 @@ function update-kernel(){
         reade -Q 'GREEN' -i "$pre" -p "$prmpt" ansr 
         
         if [[ $ansr == 'newkernel' ]]; then
-            local kernel 
-            if test -n "$AUR_search_q" && test -n "$AUR_info"; then
                 
+            local kernel kern_AUR 
+            if test -n "$AUR_search_q" && test -n "$AUR_info"; then
                 readyn -p "These kernel packages were only from official repositories. Also list unofficial (AUR) kernel packages?" kern_AUR 
                 # local ltss=$(eval "$AUR_search_q linux-lts | grep 'linux-lts[[:digit:]+]' | cut -d- -f-2 | awk '{print \$1}' | uniq | tr '\n' ' ' | xargs")
                 # No header : linux-drm-tip-git linux-drm-next-git  
                 if [[ $kern_AUR == 'y' ]]; then
                     if hash fzf &> /dev/null; then
-                        kernel=$(eval "$AUR_search linux | sed -n '1p; /^[^[:space:]]/ {N;/[\^n]*\n\t/!p;}' | grep -i -B 1 -E 'kernel |kernel,' --no-group-separator | paste -d \"\t\" - - | grep -Eiv '[^and ]headers|docs|tool|kernel module|installed' | sed -E 's,core/|extra/|multilib/|aur/,,g' | grep '^linux' | uniq | awk '{print \$1}' | sort -V | fzf --reverse --height 50% --preview 'cat <(yay -Si {1})'")
+                        kernel=$(eval "$AUR_search linux | sed -n '1p; /^[^[:space:]]/ {N;/[\^n]*\n\t/!p;}' | grep -i -B 1 -E 'kernel |kernel,' --no-group-separator | paste -d \"\t\" - - | grep -Eiv '[^and ]headers|docs|tool|kernel module|installed' | sed -E 's,core/|extra/|multilib/|aur/,,g' | grep '^linux' | uniq | awk '{print \$1}' | sort -V | fzf --reverse --height 50% --preview 'cat <(eval \"$AUR_info {1}\")'")
                     fi
                 else
                     if hash fzf &> /dev/null; then
-                        kernel=$(eval "$pac_search linux | sed -n '1p; /^[^[:space:]]/ {N;/[\^n]*\n\t/!p;}' | grep -i -B 1 -E 'kernel |kernel,' --no-group-separator | paste -d \"\t\" - - | grep -Eiv '[^and ]headers|docs|tool|kernel module|installed' | sed -E 's,core/|extra/|multilib/,,g' | grep '^linux' | uniq | awk '{print \$1}' | sort -V | tac | fzf --reverse --height 50% --preview 'cat <(yay -Si {1})'")
+                        kernel=$(eval "$pac_search linux | sed -n '1p; /^[^[:space:]]/ {N;/[\^n]*\n\t/!p;}' | grep -i -B 1 -E 'kernel |kernel,' --no-group-separator | paste -d \"\t\" - - | grep -Eiv '[^and ]headers|docs|tool|kernel module|installed' | sed -E 's,core/|extra/|multilib/,,g' | grep '^linux' | uniq | awk '{print \$1}' | sort -V | tac | fzf --reverse --height 50% --preview 'cat <(pacman -Si {1})'")
                     fi 
                 fi
             else
                 if hash fzf &> /dev/null; then
-                    kernel=$(eval "$pac_search linux | sed -n '1p; /^[^[:space:]]/ {N;/[\^n]*\n\t/!p;}' | grep -i -B 1 -E 'kernel |kernel,' --no-group-separator | paste -d \"\t\" - - | grep -Eiv '[^and ]headers|docs|tool|kernel module|installed' | sed -E 's,core/|extra/|multilib/,,g' | grep '^linux' | uniq | awk '{print \$1}' | sort -V | tac | fzf --reverse --height 50% --preview 'cat <(yay -Si {1})'")
+                    kernel=$(eval "$pac_search linux | sed -n '1p; /^[^[:space:]]/ {N;/[\^n]*\n\t/!p;}' | grep -i -B 1 -E 'kernel |kernel,' --no-group-separator | paste -d \"\t\" - - | grep -Eiv '[^and ]headers|docs|tool|kernel module|installed' | sed -E 's,core/|extra/|multilib/,,g' | grep '^linux' | uniq | awk '{print \$1}' | sort -V | tac | fzf --reverse --height 50% --preview 'cat <(pacman -Si {1})'")
                 fi
             fi
 

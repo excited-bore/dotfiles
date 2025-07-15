@@ -149,6 +149,7 @@ elif (test -f /etc/issue && grep -q "Ubuntu" /etc/issue) || test -f /etc/rpi-iss
     pac_search_q="apt-cache -qq search"
     pac_search_ins="dpkg-query -W"
     pac_search_ins_q="dpkg-query -f '\${Package}\n' -W "  
+    pac_info="apt show"  
     pac_rm="sudo apt remove"
     pac_rm_y="sudo apt -y remove"
     pac_rm_orph="sudo apt purge"
