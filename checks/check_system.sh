@@ -146,6 +146,7 @@ elif (test -f /etc/issue && grep -q "Ubuntu" /etc/issue) || test -f /etc/rpi-iss
     pac_refresh_up="sudo apt update && sudo apt upgrade"
     pac_refresh_up_y="sudo apt update -y && sudo apt upgrade -y"
     pac_search="apt search"
+    pac_search_q="apt-cache -qq search"
     pac_search_ins="dpkg-query -W"
     pac_search_ins_q="dpkg-query -f '\${Package}\n' -W "  
     pac_rm="sudo apt remove"

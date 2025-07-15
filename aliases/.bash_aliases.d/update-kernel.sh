@@ -58,16 +58,19 @@ function list-installed-kernels(){
         while IFS= read -r k; do
             kv="$(dpkg-query -W -f '${Version}\n' "$k")"     
             if test -z "$kv"; then
-                kv="${YELLOW}Version not available!{}"
+                kv="${YELLOW}Version not available!${normal}"
             fi
-            kh=$(echo $k | sed 's/image/headers/g')
-            if test -z "$(dpkg-query -W "$kh" 2> /dev/null)" ; then
-                kh="${YELLOW}Headers package not installed${normal}"
+            kh=$(echo $k | sed -e 's/image/headers/' -e 's/unsigned-//')
+            if echo "$(apt show $k 2> /dev/null)" | grep -q 'Depends:.*linux-headers'; then
+                kh="${green}Headers dependency of main package${normal}"
                 khv=""
-            else 
+            elif test -n "$(dpkg-query -W "$kh" 2> /dev/null)" ; then
                 [[ "$kv" == "$(dpkg-query -f '${Version}' -W "$kh")" ]] &&  
                     khv="${GREEN}o" ||
                     khv="${RED}x"
+            else 
+                kh="${YELLOW}Headers package not installed${normal}"
+                khv=""
             fi
 
             known='n' 
@@ -251,7 +254,6 @@ function remove-kernels(){
                         elif test -n "$(eval "$pac_search_ins $i")"; then
                             packages+=("$i")
                         elif [[ "$distro_base" == 'Debian' ]] && test -n "$(eval "$pac_search_ins '*$i*' 2> /dev/null")"; then
-                            echo $i
                             packages+=("$i")
                         elif [[ "$distro" == 'Manjaro' ]] && test -n "$(echo $i | sed 's,-x86_64,,g' | sed 's/^\([[:digit:]]\).\([[:digit:]+]\)/linux\1\2/g' | xargs pamac search --installed)"; then
                             packages+=("$(echo $i | sed 's,-x86_64,,g' | sed 's/^\([[:digit:]]\).\([[:digit:]+]\)/linux\1\2/g')") 
@@ -440,15 +442,14 @@ function update-kernel(){
    
     list-installed-kernels
     echo 
-
-    local mainlinev="$(curl https://www.kernel.org/feeds/kdist.xml | xmllint --format --xpath '//title' - | grep '<title>[[:digit:]]' | grep 'mainline' | sed -E 's,<title>|<\/title>,,g' | cut -d: -f1 | awk 'NR==1 {print;}')" 
-    local stablev="$(curl https://www.kernel.org/feeds/kdist.xml | xmllint --format --xpath '//title' - | grep '<title>[[:digit:]]' | grep 'stable' | sed -E 's,<title>|<\/title>,,g' | cut -d: -f1 | awk 'NR==1 {print;}')" 
-    
-    local longtermv="$(curl https://www.kernel.org/feeds/kdist.xml | xmllint --format --xpath '//title' - | grep '<title>[[:digit:]]' | grep 'longterm' | sed -E 's,<title>|<\/title>,,g' | cut -d: -f1 | awk 'NR==1 {print;}')" 
-    
-    local prmpth="${green}%-20s %-20s %-25s %-25s\n" 
+        
     local prmpth0="${CYAN}%-20s ${green}%-20s\n${normal}" 
-    local prmpth1="${cyan}%s\n\n" 
+
+    local mainlinev="$(curl -s https://www.kernel.org/feeds/kdist.xml | xmllint --format --xpath '//title' - | grep '<title>[[:digit:]]' | grep 'mainline' | sed -E 's,<title>|<\/title>,,g' | cut -d: -f1 | awk 'NR==1 {print;}')" 
+    local stablev="$(curl -s https://www.kernel.org/feeds/kdist.xml | xmllint --format --xpath '//title' - | grep '<title>[[:digit:]]' | grep 'stable' | sed -E 's,<title>|<\/title>,,g' | cut -d: -f1 | awk 'NR==1 {print;}')" 
+    
+    local longtermv="$(curl -s https://www.kernel.org/feeds/kdist.xml | xmllint --format --xpath '//title' - | grep '<title>[[:digit:]]' | grep 'longterm' | sed -E 's,<title>|<\/title>,,g' | cut -d: -f1 | awk 'NR==1 {print;}')" 
+    
     printf "${GREEN}Latest kernels from ${CYAN}'www.kernel.org'${GREEN}:${normal}\n"
     printf "${GREEN}%-20s %-20s\n" "Name" "Version"
    
@@ -461,8 +462,164 @@ function update-kernel(){
 
     if [[ "$distro_base" == 'Debian' ]]; then
         choices="lts liquorix" 
-    
+       
+        if hash mainline &> /dev/null; then
+            echo "${GREEN}Available kernels using mainline (includes headers): " 
+            local mainlines="$(mainline list --include-rc --include-flavors)" 
+            for i in $(mainline list --include-rc --include-flavors | grep --color=never -oPf <(echo '^\d\.\d+') | uniq); do
+                printf "${CYAN}%s\n${normal}" "  - $(echo "$mainlines" | grep --color=never -E "^$i\.|^$i[[:space:]]|^$i-" | head -1)"
+            done
+            echo 
+        fi 
+
+        local prmpth="${green}%-45s %-30s %-40s %-40s\n${normal}" 
+        local prmpth1="${cyan}%s\n\n${normal}" 
+
+        printf "${GREEN}Available kernels using apt:\n"
+        printf "${GREEN}%-45s %-30s %-40s %-40s\n" "Name" "Version" "Headers" "Headers-Version-Same"
+        
+        local available hwev hwehv hwedgv hwedghv ltsv ltshv harnenedv hardenedhv rtv rthv rtltsv rtltshv zenv zenhv 
+        if test -n "$(apt search '^linux-image-generic' 2> /dev/null)"; then
+            available="linux-image-generic" 
+            genv=$(apt search '^linux-image-generic$' 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
+            [[ "$genv" == "$(apt search '^linux-headers-generic$' 2> /dev/null | awk 'NR==3{print $2;}' | xargs)" ]] &&
+                genhv="${GREEN}o" ||
+                genhv="${RED}x"
+            printf "$prmpth" "linux-image-generic" "$genv" "linux-headers-generic" "$genhv" 
+            printf "$prmpth1" "'Meta package for the 'latest' generic Linux kernel image.'"
+        fi
+        
+        if test -n "$(apt search '^linux-image-generic-[0-9]+' 2> /dev/null)"; then
+            for i in $(apt-cache -qq search 'linux-image-[[:digit:]+].*generic' | sort -V | grep --color=never -oPf <(echo 'linux-image-\d\.\d+') | uniq); do 
+                #kernels+=( "$(apt-cache search "$i.*-generic" | tac | head -1)" ); 
+                local k="$(echo "$i" | sed 's/linux-image-//')" 
+                available="$available linux-image-generic-$kernel" 
+                kv=$(apt search "linux-image-generic-$k" 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
+                [[ "$kv" == "$(apt search "linux-headers-generic-$k" 2> /dev/null | awk 'NR==3{print $2;}' | xargs)" ]] &&  
+                    khv="${GREEN}o" ||
+                    khv="${RED}x"
+                printf "$prmpth" "linux-image-generic-$k" "$kv" "linux-headers-generic-$k" "$khv" 
+            done 
+            printf "$prmpth1" "'Specific versions of generic Linux kernels'"
+        fi 
+
+        if [[ "$distro" == 'Ubuntu' ]]; then
+            if test -n "$(apt search "^linux-image-generic-hwe-$release" 2> /dev/null)"; then
+                available="$available linux-image-generic-hwe-$release linux-image-generic-hwe-$release-edge" 
+                hwev=$(apt search "linux-image-generic-hwe-$release" 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
+                [[ "$hwev" == "$(apt search "linux-headers-generic-hwe-$release" 2> /dev/null | awk 'NR==3{print $2;}' | xargs)" ]] &&
+                    hwehv="${GREEN}o" ||
+                    hwehv="${RED}x"
+                hwedgv=$(apt search "linux-image-generic-hwe-$release-edge" 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
+                [[ "$hwedgv" == "$(apt search "linux-headers-generic-hwe-$release-edge" 2> /dev/null | awk 'NR==3{print $2;}' | xargs)" ]] &&
+                    hwedghv="${GREEN}o" ||
+                    hwedghv="${RED}x"
+                printf "$prmpth" "linux-image-generic-hwe-$release" "$hwev" "linux-headers-generic-hwe-$release" "$hwehv" 
+                printf "$prmpth" "linux-image-generic-hwe-$release-edge" "$hwedgv" "linux-headers-generic-hwe-$release-edge" "$hwedghv" 
+                printf "$prmpth1" "'Ubuntu Linux kernel images with Hardware Enablement (HWE), designed to keep up-to-date the newest hardware technologies.'"
+            fi
+       
+            local lowv lowhv lowedgv lowedghv  
+            
+            if test -n "$(apt search "^linux-image-lowlatency$" 2> /dev/null)"; then
+                available="$available linux-image-lowlatency" 
+                lowv=$(apt search "^linux-image-lowlatency$" 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
+                [[ "$lowv" == "$(apt search "^linux-headers-lowlatency$" 2> /dev/null | awk 'NR==3{print $2;}' | xargs)" ]] &&
+                    lowhv="${GREEN}o" ||
+                    lowhv="${RED}x"
+                printf "$prmpth" "linux-image-lowlatency" "$lowv" "linux-headers-lowlatency" "$lowhv" 
+                for i in $(apt-cache -qq search 'linux-image-lowlatency-[[:digit:]+].*' | sort -V | grep --color=never -oPf <(echo 'linux-image-lowlatency-\d\.\d+') | uniq); do 
+                    local k="$(echo "$i" | sed 's/linux-image-lowlatency-//')" 
+                    available="$available linux-image-lowlatency-$k" 
+                    lowv=$(apt search "linux-image-lowlatency-$k" 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
+                    [[ "$lowv" == "$(apt search "linux-headers-lowlatency-$k" 2> /dev/null | awk 'NR==3{print $2;}' | xargs)" ]] &&
+                        lowhv="${GREEN}o" ||
+                        lowhv="${RED}x"
+                    printf "$prmpth" "linux-image-lowlatency-$k" "$lowv" "linux-headers-lowlatency-$k" "$lowhv" 
+                done 
+                available="$available linux-image-lowlatency-hwe-$release linux-image-lowlatency-hwe-$release-edge" 
+                lowv=$(apt search "^linux-image-lowlatency-hwe-$release$" 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
+                [[ "$lowv" == "$(apt search "^linux-headers-lowlatency-hwe-$release$" 2> /dev/null | awk 'NR==3{print $2;}' | xargs)" ]] &&
+                    lowhv="${GREEN}o" ||
+                    lowhv="${RED}x"
+                lowedgv=$(apt search "^linux-image-lowlatency-hwe-$release-edge$" 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
+                [[ "$lowedgv" == "$(apt search "^linux-headers-lowlatency-hwe-$release-edge$" 2> /dev/null | awk 'NR==3{print $2;}' | xargs)" ]] &&
+                    lowedghv="${GREEN}o" ||
+                    lowedghv="${RED}x"
+                
+                printf "$prmpth" "linux-image-lowlatency-hwe-$release" "$lowv" "linux-headers-lowlatency-hwe-$release" "$lowhv" 
+                printf "$prmpth" "linux-image-lowlatency-hwe-$release-edge" "$lowedgv" "linux-headers-lowlatency-hwe-$release-edge" "$lowedghv" 
+                printf "${cyan}'Linux kernel designed to improve performance for applications that require low latency, such as audio and video production.\nNote: Lowlatency performance can also be performed with the generic kernel by setting specific kernel parameters.\nFollow this guide for that:\nhttps://discourse.ubuntu.com/t/fine-tuning-the-ubuntu-24-04-kernel-for-low-latency-throughput-and-power-efficiency/44834\n\n"
+            fi
+
+            if test -n "$(apt search "^linux-image-nvidia$" 2> /dev/null)"; then
+                available="$available linux-image-nvidia" 
+                lowv=$(apt search "^linux-image-nvidia$" 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
+                [[ "$lowv" == "$(apt search "^linux-headers-nvidia$" 2> /dev/null | awk 'NR==3{print $2;}' | xargs)" ]] &&
+                    lowhv="${GREEN}o" ||
+                    lowhv="${RED}x"
+                printf "$prmpth" "linux-image-nvidia" "$lowv" "linux-headers-nvidia" "$lowhv" 
+                for i in $(apt-cache -qq search 'linux-image-nvidia-[[:digit:]+].*' | sort -V | grep --color=never -oPf <(echo 'linux-image-nvidia-\d\.\d+') | uniq); do 
+                    local k="$(echo "$i" | sed 's/linux-image-nvidia-//')" 
+                    available="$available linux-image-nvidia-$k" 
+                    lowv=$(apt search "linux-image-nvidia-$k" 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
+                    [[ "$lowv" == "$(apt search "linux-headers-nvidia-$k" 2> /dev/null | awk 'NR==3{print $2;}' | xargs)" ]] &&
+                        lowhv="${GREEN}o" ||
+                        lowhv="${RED}x"
+                    printf "$prmpth" "linux-image-nvidia-$k" "$lowv" "linux-headers-nvidia-$k" "$lowhv" 
+                done 
+                available="$available linux-image-nvidia-hwe-$release linux-image-nvidia-hwe-$release-edge" 
+                lowv=$(apt search "^linux-image-nvidia-hwe-$release$" 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
+                [[ "$lowv" == "$(apt search "^linux-headers-nvidia-hwe-$release$" 2> /dev/null | awk 'NR==3{print $2;}' | xargs)" ]] &&
+                    lowhv="${GREEN}o" ||
+                    lowhv="${RED}x"
+                lowedgv=$(apt search "^linux-image-nvidia-hwe-$release-edge$" 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
+                [[ "$lowedgv" == "$(apt search "^linux-headers-nvidia-hwe-$release-edge$" 2> /dev/null | awk 'NR==3{print $2;}' | xargs)" ]] &&
+                    lowedghv="${GREEN}o" ||
+                    lowedghv="${RED}x"
+                
+                printf "$prmpth" "linux-image-nvidia-hwe-$release" "$lowv" "linux-headers-nvidia-hwe-$release" "$lowhv" 
+                printf "$prmpth" "linux-image-nvidia-hwe-$release-edge" "$lowedgv" "linux-headers-nvidia-hwe-$release-edge" "$lowedghv" 
+                printf "${cyan}'Linux kernel designed to improve performance while using nvidia devices, like GPU's.\n${YELLOW}Note: This mostly unnecesary and you would most definitely be getting very similar performance from using the latest up-to-date nvidia drivers on a generic kernel using up-to-date drivers and this kernel\n\n${normal}"
+            fi
+            
+            if test -n "$(apt search "^linux-image-virtual$" 2> /dev/null)"; then
+                available="$available linux-image-virtual" 
+                lowv=$(apt search "^linux-image-virtual$" 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
+                [[ "$lowv" == "$(apt search "^linux-headers-virtual$" 2> /dev/null | awk 'NR==3{print $2;}' | xargs)" ]] &&
+                    lowhv="${GREEN}o" ||
+                    lowhv="${RED}x"
+                printf "$prmpth" "linux-image-virtual" "$lowv" "linux-headers-virtual" "$lowhv" 
+                for i in $(apt-cache -qq search 'linux-image-virtual-[[:digit:]+].*' | sort -V | grep --color=never -oPf <(echo 'linux-image-virtual-\d\.\d+') | uniq); do 
+                    local k="$(echo "$i" | sed 's/linux-image-virtual-//')" 
+                    available="$available linux-image-virtual-$k" 
+                    lowv=$(apt search "linux-image-virtual-$k" 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
+                    [[ "$lowv" == "$(apt search "linux-headers-virtual-$k" 2> /dev/null | awk 'NR==3{print $2;}' | xargs)" ]] &&
+                        lowhv="${GREEN}o" ||
+                        lowhv="${RED}x"
+                    printf "$prmpth" "linux-image-virtual-$k" "$lowv" "linux-headers-virtual-$k" "$lowhv" 
+                done 
+                available="$available linux-image-virtual-hwe-$release linux-headers-virtual-hwe-$release-edge" 
+                lowv=$(apt search "^linux-image-virtual-hwe-$release$" 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
+                [[ "$lowv" == "$(apt search "^linux-headers-virtual-hwe-$release$" 2> /dev/null | awk 'NR==3{print $2;}' | xargs)" ]] &&
+                    lowhv="${GREEN}o" ||
+                    lowhv="${RED}x"
+                lowedgv=$(apt search "^linux-image-virtual-hwe-$release-edge$" 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
+                [[ "$lowedgv" == "$(apt search "^linux-headers-virtual-hwe-$release-edge$" 2> /dev/null | awk 'NR==3{print $2;}' | xargs)" ]] &&
+                    lowedghv="${GREEN}o" ||
+                    lowedghv="${RED}x"
+                
+                printf "$prmpth" "linux-image-virtual-hwe-$release" "$lowv" "linux-headers-virtual-hwe-$release" "$lowhv" 
+                printf "$prmpth" "linux-image-virtual-hwe-$release-edge" "$lowedgv" "linux-headers-virtual-hwe-$release-edge" "$lowedghv" 
+                printf "${cyan}'Linux kernel is designed for use to run inside Virtual machines\nThe virtual kernel only includes the necessary drivers to run inside popular virtualization technologies such as KVM, Xen, Virtualbox and VMWare\n\n${normal}"
+            fi
+        fi
+
     elif [[ "$distro_base" == "Arch" ]]; then
+
+        local prmpth="${green}%-20s %-20s %-25s %-25s\n" 
+        local prmpth1="${cyan}%s\n\n" 
+
 
         if test -z "$AUR_pac"; then
             local insyay
@@ -542,7 +699,8 @@ function update-kernel(){
        
         # Manjaro kernels 
         if test -n "$(pacman -Ss '^linux[0-9]+$' 2> /dev/null)"; then
-            local ks=$(eval "$pac_search '^linux[0-9]+$' | sed -n '1p; /^[^[:space:]]/ {N;/[\^n]*\n\t/!p;}' | grep -i -B 1 -E 'kernel |kernel,' --no-group-separator | paste -d \"\t\" - - | grep -Eiv '[^and ]headers|docs|tool|kernel module|installed' | sed -E 's,core/|extra/|multilib/,,g' | grep '^linux' | uniq | awk '{print \$1}' | sed 's/\(x[0-9]\)/\1./' | sort -rV | sed 's/\.//g'")                     available="$available $ks"
+            local ks=$(eval "$pac_search '^linux[0-9]+$' | sed -n '1p; /^[^[:space:]]/ {N;/[\^n]*\n\t/!p;}' | grep -i -B 1 -E 'kernel |kernel,' --no-group-separator | paste -d \"\t\" - - | grep -Eiv '[^and ]headers|docs|tool|kernel module|installed' | sed -E 's,core/|extra/|multilib/,,g' | grep '^linux' | uniq | awk '{print \$1}' | sed 's/\(x[0-9]\)/\1./' | sort -rV | sed 's/\.//g'")                     
+            available="$available $ks"
             while IFS= read -r k; do
                 kv=$(pacman -Si "$k" | grep Version | awk '{$1="";$2=""; print}' | xargs) 
                 [[ "$kv" == "$(pacman -Si "$k-headers" | grep Version | awk '{$1="";$2=""; print}' | xargs)" ]] &&  
