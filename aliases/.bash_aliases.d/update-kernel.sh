@@ -264,7 +264,7 @@ function remove-kernels(){
                         
                         # Check if package name is 'linux-image-unsigned-' for debian based systems...
                         if [[ "$distro_base" == 'Debian' ]] && test -z "$(apt list $j 2> /dev/null | awk 'NR>1 {print;}')" && test -n "$(echo "$j" | sed 's/linux-image-/linux-image-unsigned-/' | xargs apt list 2> /dev/null | awk 'NR>1{print;}')"; then   
-                            j="$(echo "$j" | sed 's/linux-image-/linux-image-unsigned-/')" 
+                            j="$(echo "$j" | sed 's/linux-image-/linux-image-unsigned-/')"  
                         fi
                         
                         if [[ "$distro" == 'Manjaro' ]] && test -n "$(pamac search --installed linux-meta)" && pamac info linux-meta | grep 'Depends On' | grep -q $j; then
@@ -297,14 +297,48 @@ function remove-kernels(){
                                     eval "$AUR_rm '$j*'" 
                                 fi
                             else
-                                if test -n "$auto"; then
-                                    printf "${GREEN}Removing ${CYAN}$j*${GREEN} using ${CYAN}$pac_rm_y${normal}\n"
-                                    eval "$pac_rm_y '$j*'" 
+                                local n prmpt="$j" 
+                                if [[ "$distro_base" == 'Debian' ]]; then
+                                    n=$(echo "$j" | grep -oP --color=never '\d+\.\d+\.\d+|\d+\.\d+')
+                                    prmpt=$(dpkg --get-selections | grep -v deinstall | awk '{print $1}' | grep --color=never "^linux.*$n")
+                                    j=$(echo $prmpt | tr '\n' ' ' | xargs)
                                 else
-                                    printf "${GREEN}Removing ${CYAN}$j*${GREEN} using ${CYAN}$pac_rm${normal}\n"
-                                    eval "$pac_rm '$j*'"
+                                    j="$j*"
+                                fi
+                                if test -n "$auto"; then
+                                    if [[ "$distro_base" == 'Debian' ]]; then
+                                        printf "${GREEN}Removing ${CYAN}$prmpt${GREEN} using ${CYAN}sudo dpkg --purge $j${normal}\n"
+                                        sudo dpkg --purge $j 
+                                    else 
+                                        printf "${GREEN}Removing ${CYAN}$prmpt${GREEN} using ${CYAN}$pac_rm_y${normal}\n"
+                                        eval "$pac_rm_y $j" 
+                                    fi
+                                else
+                                    if [[ "$distro_base" == 'Debian' ]]; then
+                                        printf "${GREEN}Removing ${CYAN}$prmpt${GREEN} using ${CYAN}sudo dpkg --purge $j${normal}\n" 
+                                        sudo dpkg --purge $j 
+                                    else 
+                                        printf "${GREEN}Removing ${CYAN}$prmpt${GREEN} using ${CYAN}$pac_rm${normal}\n" 
+                                        eval "$pac_rm $j"
+                                    fi
                                 fi
                             fi
+                            #if [[ "$distro_base" == 'Debian' ]]; then
+                            #    if test -n "$(command ls /boot/config-$n* 2> /dev/null)"; then
+                            #        local config="$(command ls /boot/config-$n*)" 
+                            #        sudo rm $config
+                            #    fi
+                            #    if test -n "$(command ls /lib/modules/$n* 2> /dev/null)"; then
+                            #        if [[ $(ls /lib/modules/* | grep $n | cut -d: -f1 | wc -w) == 1 ]]; then
+                            #            sudo rm -r $(ls /lib/modules/* | grep $n | cut -d: -f1)
+                            #        else
+                            #            local config=$(ls /lib/modules/* | grep $n | cut -d: -f1 | tr '\n' ' ')
+                            #            local which
+                            #            reade -Q 'GREEN' -i "$config" -p "Multiple directories found in '/lib/modules/'. Which one to delete?" which
+                            #            test -n "$which" && sudo rm -r "$which"
+                            #        fi
+                            #    fi
+                            #fi
                         fi
                     done
                 fi
@@ -406,7 +440,8 @@ if hash grub-set-default &> /dev/null; then
                
                 printf "${GREEN}Setting new default kernel with ${CYAN}'sudo grub-set-default "$j>$h"'${normal}\n" 
                 sudo grub-set-default "$j>$h"
-                
+                sudo update-grub
+               
                 echo "${YELLOW}A reboot is needed to take full effect!${normal}" 
                 echo "${YELLOW}If booting into the new kernel breaks, hold ${CYAN}'Shift'${YELLOW} while booting to load into grub, then choose an older kernel.${normal}" 
                 return 0 
@@ -670,11 +705,11 @@ function update-kernel(){
             if hash fzf &> /dev/null; then
                 available=$(echo "$(apt-cache -qq search '^linux*' 2> /dev/null | grep 'kernel' | grep -Eiv '[^and ]headers|[^and] drivers|extra drivers for|^linux-modules*|^linux-objects|^linux-signatures| docs | doc |^linux-doc |^linux-crashdump |tool|buildinfo|library|kernel module|daemon$|services$|installed' | awk '{print $1}')" $available | uniq) 
                 if [[ "$howinstll" == 'both' ]]; then 
-                    nstll=$(echo "$mainlines $available" | tr ' ' '\n' | fzf --reverse --height 50% --preview '[[ {1} =~ ^linux ]] && cat <(apt show {1} 2> /dev/null) || echo "Mainline kernel version {1} with headers"')
+                    nstll=$(eval "echo \"$mainlines $available\" | tr ' ' '\n' | fzf --reverse --height 50% --preview '[[ {1} =~ ^linux ]] && $pac_info {1} 2> /dev/null || echo \"Mainline kernel version {1} with headers\"'")
                 elif [[ "$howinstll" == 'mainline' ]]; then
                     nstll=$(echo "$mainlines" | tr ' ' '\n' | fzf --reverse --height 50% --preview 'echo "Mainline kernel version {1} with headers"')
                 elif [[ "$howinstll" == 'apt' ]]; then
-                    nstll=$(echo "$available" | tr ' ' '\n' | fzf --reverse --height 50% --preview 'cat <(apt show {1} 2> /dev/null)')
+                    nstll=$(eval "echo \"$available\" | tr ' ' '\n' | fzf --reverse --height 50% --preview '$pac_info {1} 2> /dev/null'")
                 fi
             fi
             

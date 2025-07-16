@@ -9,7 +9,7 @@
 
 #--bind "enter:become(echo {} +{2})" \
 ripgrep-dir() {
-    test -z $EDITOR && 
+    test -z "$EDITOR" && 
         (command -v nano && export EDITOR=/usr/bin/nano || export EDITOR=/usr/bin/vi) 
     RG_PREFIX="rg --fixed-strings --follow --column --line-number --no-heading --color=always --smart-case --glob='!.git*'" 
     INITIAL_QUERY="${*:-}"
@@ -18,10 +18,10 @@ ripgrep-dir() {
     --ansi \
     --multi \
     --bind "start:reload:$RG_PREFIX {q}" \
-    --bind "ctrl-t:transform:[[  \$FZF_PROMPT != \"$DEFAULT_PROMPT\"  ]] &&
+    --bind "ctrl-t:transform:[[ \$FZF_PROMPT != \"$DEFAULT_PROMPT\" ]] &&
     echo \"change-prompt($DEFAULT_PROMPT)+reload:$RG_PREFIX --no-ignore --hidden \{q} || true\" ||
     echo \"change-prompt(Dir (-hidden) > )+reload:$RG_PREFIX \{q} || true\"" \
-    --bind "change:transform:[[ \$FZF_PROMPT == \"$DEFAULT_PROMPT\"  ]] &&
+    --bind "change:transform:[[ \$FZF_PROMPT != \"$DEFAULT_PROMPT\" ]] &&
     echo \"reload:sleep 0.1; $RG_PREFIX \{q} || true\" ||
     echo \"reload:sleep 0.1; $RG_PREFIX --no-ignore --hidden \{q} || true\"" \
     --delimiter : \

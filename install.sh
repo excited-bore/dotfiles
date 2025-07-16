@@ -32,11 +32,20 @@ if ! hash curl &>/dev/null && test -n "$pac_ins"; then
     unset ins_curl
 fi
 
-if ! hash fzf &>/dev/null && test -n "$pac_ins"; then
+# Fzf version 0.6+ needed
+if ! hash fzf &>/dev/null || (hash fzf &> /dev/null && version-higher "$(fzf --version | awk '{print $1}')" '0.6'); then
     printf "${CYAN}fzf${normal} is not installed \n"
     readyn -p "Install fzf (a fuzzy finder / TUI to make a selection - used in a multitude of functions/tools)?" ins_fzf
     if [[ $ins_fzf == 'y' ]]; then
-        eval "${pac_ins} fzf"
+        if ! test -f install_fzf.sh; then
+            if hash curl &>/dev/null; then
+                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fzf.sh) "simple"
+            else
+                source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fzf.sh) "simple"
+            fi
+        else
+            . ./install_fzf.sh "simple"
+        fi
     fi
     unset ins_fzf
 fi

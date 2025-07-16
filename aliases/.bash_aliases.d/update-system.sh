@@ -302,17 +302,17 @@ function update-system() {
  
         if apt --dry-run autoremove 2> /dev/null | grep -qPo '^Remv \K[^ ]+'; then
             
-            readyn $flag -p 'Autoremove unneccesary packages?' remove
+            readyn $flag -p 'Autoremove orphaned/unnecessary packages (unused dependencies)?' remove
        
             if [[ "$remove" == 'y' ]]; then
                 if test -n "$YES"; then
-                    if test -n "$pac_clean_y"; then
-                        eval "${pac_clean_y}"
+                    if test -n "$pac_rm_orph_y"; then
+                        eval "${pac_rm_orph_y}"
                     else
-                        eval "yes | ${pac_clean}" 
+                        eval "yes | ${pac_rm_orph}" 
                     fi
                 else
-                    eval "${pac_clean}" 
+                    eval "${pac_rm_orph}" 
                 fi
             fi
         fi

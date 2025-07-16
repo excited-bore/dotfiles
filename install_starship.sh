@@ -100,14 +100,12 @@ else
     . ./aliases/.bash_aliases.d/starship.sh
 fi
 
-if type fzf &>/dev/null; then
+if hash fzf &>/dev/null; then
     starship-presets
-elif ! type fzf &>/dev/null && test -f ~/.fzf.bash; then
-    echo "No fzf found!!"
+elif ! hash fzf &>/dev/null && test -f ~/.fzf.bash; then
     [ -f ~/.fzf.bash ] && source ~/.fzf.bash
     starship-presets
-elif ! type fzf &> /dev/null && test -f ~/.fzf.zsh; then
-    echo "No fzf found!!"
+elif ! hash fzf &> /dev/null && test -f ~/.fzf.zsh; then
     [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
     starship-presets
 fi

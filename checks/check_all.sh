@@ -239,7 +239,7 @@ function version-higher() {
 }
 
 function compare-tput-escape_color() {
-    test -z $PAGER && PAGER=less
+    test -z "$PAGER" && PAGER=less
     for ((ansi = 0; ansi <= 120; ansi++)); do
         printf "$ansi $(tput setaf $ansi) tput foreground $(tput sgr0) $(tput setab $ansi) tput background $(tput sgr0)"
         echo -e " \033[$ansi;mEscape\033[0m"
