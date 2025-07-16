@@ -8,14 +8,6 @@ fi
 
 DIR=$(get-script-dir)
 
-#if test -f ~/.bash_aliases.d/package_managers.sh; then
-#    . ~/.bash_aliases.d/package_managers.sh
-#fi
-#
-#if test -f $DIR/aliases/.bash_aliases.d/package_managers.sh; then
-#    . $DIR/aliases/.bash_aliases.d/package_managers.sh
-#fi
-
 #if [[ "$distro_base" == 'Debian' ]] && ! hash mainline &> /dev/null; then
 #    local mainins
 #    readyn -p "${CYAN}'mainline'${GREEN} not installed (tool that helps with installing/managing kernels for Debian-based systems).\nInstall?" mainins
@@ -479,7 +471,13 @@ function update-kernel(){
         printf "${GREEN}%-45s %-30s %-40s %-40s\n" "Name" "Version" "Headers" "Headers-Version-Same"
         
         local available hwev hwehv hwedgv hwedghv ltsv ltshv harnenedv hardenedhv rtv rthv rtltsv rtltshv zenv zenhv 
-        if test -n "$(apt search '^linux-image-generic' 2> /dev/null)"; then
+        if test -n "$(apt search '^linux-generic' 2> /dev/null)"; then
+            available="linux-generic" 
+            genv=$(apt search '^linux-generic$' 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
+            [[ "$genv" == "$(apt search '^linux-headers-generic$' 2> /dev/null | awk 'NR==3{print $2;}' | xargs)" ]] &&
+                genhv="${GREEN}o" ||
+                genhv="${RED}x"
+            printf "$prmpth" "linux-generic" "$genv" "linux-headers-generic" "$genhv" 
             available="linux-image-generic" 
             genv=$(apt search '^linux-image-generic$' 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
             [[ "$genv" == "$(apt search '^linux-headers-generic$' 2> /dev/null | awk 'NR==3{print $2;}' | xargs)" ]] &&
@@ -489,6 +487,19 @@ function update-kernel(){
             printf "$prmpth1" "'Meta package for the 'latest' generic Linux kernel image.'"
         fi
         
+        if test -n "$(apt search '^linux-generic-[0-9]+' 2> /dev/null)"; then
+            for i in $(apt-cache -qq search 'linux-generic-[[:digit:]+]' | sort -V | grep --color=never -oPf <(echo 'linux-generic-\d\.\d+') | uniq); do 
+                #kernels+=( "$(apt-cache search "$i.*-generic" | tac | head -1)" ); 
+                local k="$(echo "$i" | sed 's/linux-generic-//')" 
+                available="$available linux-generic-$k" 
+                kv=$(apt search "linux-generic-$k" 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
+                [[ "$kv" == "$(apt search "linux-headers-generic-$k" 2> /dev/null | awk 'NR==3{print $2;}' | xargs)" ]] &&  
+                    khv="${GREEN}o" ||
+                    khv="${RED}x"
+                printf "$prmpth" "linux-generic-$k" "$kv" "linux-headers-generic-$k" "$khv" 
+            done 
+        fi 
+
         if test -n "$(apt search '^linux-image-generic-[0-9]+' 2> /dev/null)"; then
             for i in $(apt-cache -qq search 'linux-image-[[:digit:]+].*generic' | sort -V | grep --color=never -oPf <(echo 'linux-image-\d\.\d+') | uniq); do 
                 #kernels+=( "$(apt-cache search "$i.*-generic" | tac | head -1)" ); 
@@ -500,10 +511,26 @@ function update-kernel(){
                     khv="${RED}x"
                 printf "$prmpth" "linux-image-generic-$k" "$kv" "linux-headers-generic-$k" "$khv" 
             done 
-            printf "$prmpth1" "'Specific versions of generic Linux kernels'"
         fi 
+        printf "$prmpth1" "'Specific versions of generic Linux kernels'"
+
 
         if [[ "$distro" == 'Ubuntu' ]]; then
+            
+            if test -n "$(apt search "^linux-generic-hwe-$release" 2> /dev/null)"; then
+                available="$available linux-generic-hwe-$release linux-generic-hwe-$release-edge" 
+                hwev=$(apt search "linux-generic-hwe-$release" 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
+                [[ "$hwev" == "$(apt search "linux-headers-generic-hwe-$release" 2> /dev/null | awk 'NR==3{print $2;}' | xargs)" ]] &&
+                    hwehv="${GREEN}o" ||
+                    hwehv="${RED}x"
+                hwedgv=$(apt search "linux-generic-hwe-$release-edge" 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
+                [[ "$hwedgv" == "$(apt search "linux-headers-generic-hwe-$release-edge" 2> /dev/null | awk 'NR==3{print $2;}' | xargs)" ]] &&
+                    hwedghv="${GREEN}o" ||
+                    hwedghv="${RED}x"
+                printf "$prmpth" "linux-generic-hwe-$release" "$hwev" "linux-headers-generic-hwe-$release" "$hwehv" 
+                printf "$prmpth" "linux-generic-hwe-$release-edge" "$hwedgv" "linux-headers-generic-hwe-$release-edge" "$hwedghv" 
+            fi
+             
             if test -n "$(apt search "^linux-image-generic-hwe-$release" 2> /dev/null)"; then
                 available="$available linux-image-generic-hwe-$release linux-image-generic-hwe-$release-edge" 
                 hwev=$(apt search "linux-image-generic-hwe-$release" 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
@@ -516,12 +543,18 @@ function update-kernel(){
                     hwedghv="${RED}x"
                 printf "$prmpth" "linux-image-generic-hwe-$release" "$hwev" "linux-headers-generic-hwe-$release" "$hwehv" 
                 printf "$prmpth" "linux-image-generic-hwe-$release-edge" "$hwedgv" "linux-headers-generic-hwe-$release-edge" "$hwedghv" 
-                printf "$prmpth1" "'Ubuntu Linux kernel images with Hardware Enablement (HWE), designed to keep up-to-date the newest hardware technologies.'"
             fi
+            printf "$prmpth1" "'Ubuntu Linux kernel images with Hardware Enablement (HWE), designed to keep up-to-date the newest hardware technologies.'"
        
             local lowv lowhv lowedgv lowedghv  
             
-            if test -n "$(apt search "^linux-image-lowlatency$" 2> /dev/null)"; then
+            if test -n "$(apt search "^linux-lowlatency$" 2> /dev/null)"; then
+                available="$available linux-lowlatency" 
+                lowv=$(apt search "^linux-lowlatency$" 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
+                [[ "$lowv" == "$(apt search "^linux-headers-lowlatency$" 2> /dev/null | awk 'NR==3{print $2;}' | xargs)" ]] &&
+                    lowhv="${GREEN}o" ||
+                    lowhv="${RED}x"
+                printf "$prmpth" "linux-lowlatency" "$lowv" "linux-headers-lowlatency" "$lowhv" 
                 available="$available linux-image-lowlatency" 
                 lowv=$(apt search "^linux-image-lowlatency$" 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
                 [[ "$lowv" == "$(apt search "^linux-headers-lowlatency$" 2> /dev/null | awk 'NR==3{print $2;}' | xargs)" ]] &&
@@ -552,7 +585,13 @@ function update-kernel(){
                 printf "${cyan}'Linux kernel designed to improve performance for applications that require low latency, such as audio and video production.\nNote: Lowlatency performance can also be performed with the generic kernel by setting specific kernel parameters.\nFollow this guide for that:\nhttps://discourse.ubuntu.com/t/fine-tuning-the-ubuntu-24-04-kernel-for-low-latency-throughput-and-power-efficiency/44834\n\n"
             fi
 
-            if test -n "$(apt search "^linux-image-nvidia$" 2> /dev/null)"; then
+            if test -n "$(apt search "^linux-nvidia$" 2> /dev/null)"; then
+                available="$available linux-nvidia" 
+                lowv=$(apt search "^linux-nvidia$" 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
+                [[ "$lowv" == "$(apt search "^linux-headers-nvidia$" 2> /dev/null | awk 'NR==3{print $2;}' | xargs)" ]] &&
+                    lowhv="${GREEN}o" ||
+                    lowhv="${RED}x"
+                printf "$prmpth" "linux-nvidia" "$lowv" "linux-headers-nvidia" "$lowhv" 
                 available="$available linux-image-nvidia" 
                 lowv=$(apt search "^linux-image-nvidia$" 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
                 [[ "$lowv" == "$(apt search "^linux-headers-nvidia$" 2> /dev/null | awk 'NR==3{print $2;}' | xargs)" ]] &&
@@ -583,7 +622,13 @@ function update-kernel(){
                 printf "${cyan}'Linux kernel designed to improve performance while using nvidia devices, like GPU's.\n${YELLOW}Note: This mostly unnecesary and you would most definitely be getting very similar performance from using the latest up-to-date nvidia drivers on a generic kernel using up-to-date drivers and this kernel\n\n${normal}"
             fi
             
-            if test -n "$(apt search "^linux-image-virtual$" 2> /dev/null)"; then
+            if test -n "$(apt search "^linux-virtual$" 2> /dev/null)"; then
+                available="$available linux-virtual" 
+                lowv=$(apt search "^linux-virtual$" 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
+                [[ "$lowv" == "$(apt search "^linux-headers-virtual$" 2> /dev/null | awk 'NR==3{print $2;}' | xargs)" ]] &&
+                    lowhv="${GREEN}o" ||
+                    lowhv="${RED}x"
+                printf "$prmpth" "linux-virtual" "$lowv" "linux-headers-virtual" "$lowhv" 
                 available="$available linux-image-virtual" 
                 lowv=$(apt search "^linux-image-virtual$" 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
                 [[ "$lowv" == "$(apt search "^linux-headers-virtual$" 2> /dev/null | awk 'NR==3{print $2;}' | xargs)" ]] &&
@@ -623,6 +668,7 @@ function update-kernel(){
        
             local nstll
             if hash fzf &> /dev/null; then
+                available=$(echo "$(apt-cache -qq search '^linux*' 2> /dev/null | grep 'kernel' | grep -Eiv '[^and ]headers|[^and] drivers|extra drivers for|^linux-modules*|^linux-objects|^linux-signatures| docs | doc |^linux-doc |^linux-crashdump |tool|buildinfo|library|kernel module|daemon$|services$|installed' | awk '{print $1}')" $available | uniq) 
                 if [[ "$howinstll" == 'both' ]]; then 
                     nstll=$(echo "$mainlines $available" | tr ' ' '\n' | fzf --reverse --height 50% --preview '[[ {1} =~ ^linux ]] && cat <(apt show {1} 2> /dev/null) || echo "Mainline kernel version {1} with headers"')
                 elif [[ "$howinstll" == 'mainline' ]]; then
@@ -890,11 +936,11 @@ function update-kernel(){
                    fi
                 fi
 
-                local defkern
-                readyn -p "Set $kernel as default?" defkern
-                if [[ $defkern == 'y' ]]; then
-                    switch-default-kernel $kernel     
-                fi
+                #local defkern
+                #readyn -p "Set $kernel as default?" defkern
+                #if [[ $defkern == 'y' ]]; then
+                #    switch-default-kernel $kernel     
+                #fi
                 printf "${GREEN}You can list installed kernels using ${CYAN}'list-installed-kernels'${GREEN}\n"
                 printf "${GREEN}, switch to another kernel using ${CYAN}'switch-default-kernel'${GREEN}\n"
                 printf "${GREEN}and remove unused kernels using ${CYAN}'remove-kernels'${GREEN}\n" 
