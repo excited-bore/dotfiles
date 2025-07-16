@@ -715,7 +715,10 @@ function update-kernel(){
             
             if test -n "$nstll"; then
                 if [[ "$nstll" =~ ^linux ]]; then
-                    local nstllhdr hdrs=$(echo $nstll | sed 's/image/headers/')
+                    local nstllhdr 
+                    if [[ $nstll =~ 'image' ]]; then
+                        hdrs=$(echo $nstll | sed 's/image/headers/')
+                    fi
                     readyn -p "Also install headers package ${CYAN}'$hdrs'${GREEN}?" nstllhdr
                     if [[ "$nstllhdr" == 'y' ]]; then
                         eval "${pac_ins_y} $nstll $hdrs" 

@@ -1,5 +1,3 @@
-#DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-
 if ! test -f checks/check_all.sh; then
     if type curl &> /dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
@@ -19,7 +17,7 @@ fi
 
 
 
-if ! command -v moar &> /dev/null; then
+if ! hash moar &> /dev/null; then
     
     if [[ "$distro_base" == "Arch" ]]; then 
         

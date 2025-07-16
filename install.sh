@@ -133,7 +133,7 @@ if [[ $machine == 'Linux' ]]; then
         printf "${CYAN}xclip${normal} and/or ${CYAN}xsel${normal} are not installed (clipboard tools for X11 based systems)\n"
         readyn -p "Install xclip and xsel?" nzp_ins
         if [[ $nzp_ins == 'y' ]]; then
-            eval "${pac_ins}" xclip xsel
+            eval "$pac_ins_y xclip xsel"
         fi
         unset nzp_ins
     fi
@@ -154,7 +154,7 @@ if [[ $distro_base == 'Debian' ]]; then
         printf "${CYAN}manpages-posix${normal} is not installed (Manpages for posix-compliant (f.ex. bash) commands (f.ex. alias, test, type, etc...))\n"
         readyn -p "Install manpages-posix?" posixman_ins
         if [[ $posixman_ins == 'y' ]]; then
-            eval "${pac_ins}" manpages-posix
+            eval "$pac_ins_y manpages-posix"
         fi
         unset posixman_ins
     fi
@@ -164,7 +164,7 @@ if [[ $distro_base == 'Debian' ]]; then
             printf "${CYAN}add-apt-repository${normal} is not installed (cmd tool for installing extra repositories/ppas on debian systems)\n"
             readyn -p "Install add-apt-repository?" add_apt_ins
             if [[ $add_apt_ins == 'y' ]]; then
-                eval "yes | $pac_ins software-properties-common"
+                eval "$pac_ins_y software-properties-common"
             fi
             unset add_apt_ins
         fi
@@ -173,7 +173,7 @@ if [[ $distro_base == 'Debian' ]]; then
             printf "${CYAN}python3-launchpadlib${normal} is not installed (python3 library that adds support for ppas from Ubuntu's 'https://launchpad.net' to add-apt-repository)\n"
             readyn -p "Install python3-launchpadlib?" lpdlb_ins
             if [[ $lpdlb_ins == 'y' ]]; then
-                eval "yes | $pac_ins python3-launchpadlib"
+                eval "$pac_ins_y python3-launchpadlib"
             fi
             unset lpdlb_ins
 
@@ -181,17 +181,12 @@ if [[ $distro_base == 'Debian' ]]; then
     fi
 
     if hash add-apt-repository &>/dev/null; then
-        #if ! test -f $SCRIPT_DIR/install_list-ppa.sh; then
-        #    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_list-ppa.sh)
-        #else
-        #    . $SCRIPT_DIR/install_list-ppa.sh
-        #fi
 
         if ! hash xmllint &>/dev/null && test -n "$(apt search libxml2-utils 2>/dev/null | awk 'NR>2{print;}')"; then
             printf "${CYAN}xmllint${normal} is not installed (cmd tool for lint xml/html - used in helper script for installing PPA's)\n"
             readyn -p "Install xmllint?" xml_ins
             if [[ $xml_ins == 'y' ]]; then
-                eval "yes | ${pac_ins} libxml2-utils"
+                eval "$pac_ins_y libxml2-utils"
             fi
             unset xml_ins
         fi
@@ -202,7 +197,7 @@ if [[ $distro_base == 'Debian' ]]; then
             if [[ $mainl_ins == 'y' ]]; then
                 sudo add-apt-repository ppa:cappelikan/ppa 
                 eval "${pac_up}" 
-                eval "yes | ${pac_ins} mainline"
+                eval "$pac_ins_y mainline"
             fi
             unset mainl_ins
         fi 
@@ -211,7 +206,7 @@ if [[ $distro_base == 'Debian' ]]; then
             printf "${CYAN}ppa-purge${normal} is not installed (cmd tool for disabling installed PPA's)\n"
             readyn -p "Install ppa-purge?" ppa_ins
             if [[ $ppa_ins == 'y' ]]; then
-                eval "yes | ${pac_ins} ppa-purge"
+                eval "$pac_ins_y ppa-purge"
             fi
             unset ppa_ins
         fi
@@ -221,7 +216,7 @@ if [[ $distro_base == 'Debian' ]]; then
         printf "${CYAN}nala${normal} is not installed (A TUI wrapper for apt install, update, upgrade, search, etc..)\n"
         readyn -p "Install nala?" nala_ins
         if [[ $nala_ins == 'y' ]]; then
-            eval "${pac_ins}" nala
+            eval "$pac_ins_y nala"
             pac="nala"
             pac_ins="sudo nala install"
             pac_up="sudo nala update"
@@ -234,7 +229,7 @@ if [[ $distro_base == 'Debian' ]]; then
             printf "${CYAN}synaptic${normal} is not installed (Better GUI for package management)\n"
             readyn -p "Install synaptic? " ins_curl
             if [[ $ins_curl == 'y' ]]; then
-                eval "${pac_ins} synaptic -y"
+                eval "$pac_ins_y synaptic"
             fi
             unset ins_curl
         fi
