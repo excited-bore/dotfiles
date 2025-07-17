@@ -34,5 +34,9 @@ if ! hash less &> /dev/null || (hash less &> /dev/null && version-higher '633' "
     printf "Next ${RED}sudo${normal} will install ${CYAN}'less'${normal} in ${cyan}'/usr/local/bin'${normal}\n"
     sudo make install
     )
-    unset latest tdir 
+    readyn -p "Also install in ${CYAN}'/usr/bin'${GREEN}? (Since there's no less binary in /usr/bin, some programs might default to more instead..)" tousrbn
+    if [[ "$tousrbn" == 'y' ]]; then
+        sudo cp /usr/local/bin/less /usr/bin
+    fi
+    unset latest tdir tousrbn 
 fi

@@ -281,8 +281,8 @@ function remove-kernels(){
                             if test -n "$(pamac list --installed linux-lts-headers-meta)"; then
                                 printf "${GREEN}Removing ${CYAN}linux-lts-meta, linux-lts-headers-meta${GREEN} and ${CYAN}$j*${GREEN} using ${CYAN}pamac${normal}\n"
                                 pamac remove $pamcflag linux-lts-meta
-                                pamac remove $pamcflag linux-lts-headers-meta
                             else
+                                pamac remove $pamcflag linux-lts-headers-meta
                                 printf "${GREEN}Removing ${CYAN}linux-lts-meta${GREEN} and ${CYAN}$j*${GREEN} using ${CYAN}pamac${normal}\n"
                                 pamac remove $pamcflag "linux-lts-meta"
                             fi
@@ -323,22 +323,6 @@ function remove-kernels(){
                                     fi
                                 fi
                             fi
-                            #if [[ "$distro_base" == 'Debian' ]]; then
-                            #    if test -n "$(command ls /boot/config-$n* 2> /dev/null)"; then
-                            #        local config="$(command ls /boot/config-$n*)" 
-                            #        sudo rm $config
-                            #    fi
-                            #    if test -n "$(command ls /lib/modules/$n* 2> /dev/null)"; then
-                            #        if [[ $(ls /lib/modules/* | grep $n | cut -d: -f1 | wc -w) == 1 ]]; then
-                            #            sudo rm -r $(ls /lib/modules/* | grep $n | cut -d: -f1)
-                            #        else
-                            #            local config=$(ls /lib/modules/* | grep $n | cut -d: -f1 | tr '\n' ' ')
-                            #            local which
-                            #            reade -Q 'GREEN' -i "$config" -p "Multiple directories found in '/lib/modules/'. Which one to delete?" which
-                            #            test -n "$which" && sudo rm -r "$which"
-                            #        fi
-                            #    fi
-                            #fi
                         fi
                     done
                 fi
@@ -497,6 +481,7 @@ function update-kernel(){
                 printf "${CYAN}%s\n${normal}" "  - $m"
                 test -z "$mainlines" && mainlines="$m" || mainlines="$mainlines $m"
             done
+            echo
         fi 
 
         local prmpth="${green}%-45s %-30s %-40s %-40s\n${normal}" 
@@ -715,16 +700,34 @@ function update-kernel(){
             
             if test -n "$nstll"; then
                 if [[ "$nstll" =~ ^linux ]]; then
-                    local nstllhdr 
-                    if [[ $nstll =~ 'image' ]]; then
-                        hdrs=$(echo $nstll | sed 's/image/headers/')
-                    fi
-                    readyn -p "Also install headers package ${CYAN}'$hdrs'${GREEN}?" nstllhdr
-                    if [[ "$nstllhdr" == 'y' ]]; then
-                        eval "${pac_ins_y} $nstll $hdrs" 
-                    else
-                        eval "${pac_ins_y} $nstll" 
-                    fi
+                     
+                    local extra nstllextra extras=( $(apt show $nstll 2> /dev/null | grep 'Depends: ' | sed -e 's/Depends: //' -e 's/,//g' -e 's/(.*)//g' ) ) extras2=( $(apt show $nstll 2> /dev/null | grep 'Recommends: ' | sed -e 's/Recommends: //' -e 's/,//g' -e 's/(.*)//g' ) )
+
+                    for i in ${extras[@]}; do
+                        if ! [[ $i =~ 'image' || $i =~ 'ubuntu-kernel-accessories' ]]; then
+                            [[ "$i" =~ 'headers' ]] && 
+                                readyn -p "Also install headers package ${CYAN}'$i'${GREEN}?" nstllextra ||
+                                readyn -p "Also install package ${CYAN}'$i'${GREEN}?" nstllextra 
+                            if [[ "$nstllextra" == 'y' ]]; then
+                                nstll="$nstll $i"
+                            fi
+                            nstllextra=''
+                        fi
+                    done
+
+                    for i in ${extras2[@]}; do
+                        if ! [[ $i =~ 'image' || $i =~ 'ubuntu-kernel-accessories' ]]; then
+                            [[ $i =~ 'headers' ]] && 
+                                readyn -p "Also install headers package ${CYAN}'$i'${GREEN}?" nstllextra ||
+                                readyn -p "Also install package ${CYAN}'$i'${GREEN}?" nstllextra 
+                            if [[ "$nstllextra" == 'y' ]]; then
+                                nstll="$nstll $i"
+                            fi
+                            nstllextra=''
+                        fi
+                    done
+
+                    eval "${pac_ins_y} $nstll"
                 else
                     mainline install $nstll
                 fi
