@@ -482,7 +482,6 @@ function update-kernel(){
     echo
 
     if [[ "$distro_base" == 'Debian' ]]; then
-        choices="lts liquorix" 
        
         if hash mainline &> /dev/null; then
             echo "${GREEN}Available kernels using mainline (includes headers): " 
