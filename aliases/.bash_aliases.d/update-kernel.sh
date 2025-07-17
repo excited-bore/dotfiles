@@ -308,7 +308,7 @@ function remove-kernels(){
                                 if test -n "$auto"; then
                                     if [[ "$distro_base" == 'Debian' ]]; then
                                         printf "${GREEN}Removing ${CYAN}$prmpt${GREEN} using ${CYAN}sudo dpkg --purge $j${normal}\n"
-                                        sudo dpkg --purge $j 
+                                        eval "$pac_rm_purge_y $j" 
                                     else 
                                         printf "${GREEN}Removing ${CYAN}$prmpt${GREEN} using ${CYAN}$pac_rm_y${normal}\n"
                                         eval "$pac_rm_y $j" 
@@ -316,10 +316,23 @@ function remove-kernels(){
                                 else
                                     if [[ "$distro_base" == 'Debian' ]]; then
                                         printf "${GREEN}Removing ${CYAN}$prmpt${GREEN} using ${CYAN}sudo dpkg --purge $j${normal}\n" 
-                                        sudo dpkg --purge $j 
+                                        eval "$pac_rm_purge $j" 
                                     else 
                                         printf "${GREEN}Removing ${CYAN}$prmpt${GREEN} using ${CYAN}$pac_rm${normal}\n" 
                                         eval "$pac_rm $j"
+                                    fi
+                                fi
+                                if [[ "$distro_base" == 'Debian' ]]; then
+                                     if test -n "$(command ls /lib/modules/$n* 2> /dev/null)"; then                        
+                                        printf "Found unremoved directories in ${CYAN}'/lib/modules/'${normal}. Removing...\n" 
+                                        if [[ $(ls /lib/modules/* | grep $n | cut -d: -f1 | wc -w) == 1 ]]; then          
+                                            sudo rm -r $(ls /lib/modules/* | grep $n | cut -d: -f1)                       
+                                        else                                                                              
+                                            local config=$(ls /lib/modules/* | grep $n | cut -d: -f1 | tr '\n' ' ')       
+                                            local which                                                                   
+                                            reade -Q 'GREEN' -i "$config" -p "Multiple directories found in '/lib/modules/'. Which one to delete?" which       
+                                            test -n "$which" && sudo rm -r "$which"                                       
+                                        fi                                                                                
                                     fi
                                 fi
                             fi
@@ -701,7 +714,7 @@ function update-kernel(){
             if test -n "$nstll"; then
                 if [[ "$nstll" =~ ^linux ]]; then
                      
-                    local extra nstllextra extras=( $(apt show $nstll 2> /dev/null | grep 'Depends: ' | sed -e 's/Depends: //' -e 's/,//g' -e 's/(.*)//g' ) ) extras2=( $(apt show $nstll 2> /dev/null | grep 'Recommends: ' | sed -e 's/Recommends: //' -e 's/,//g' -e 's/(.*)//g' ) )
+                    local extra nstllextra extras=( $(apt show $nstll 2> /dev/null | grep 'Depends: ' | sed -e 's/Depends: //' -e 's/(.*),//g' -e 's/(.*)//g' -e 's/,//g' ) ) extras2=( $(apt show $nstll 2> /dev/null | grep 'Recommends: ' | sed -e 's/Recommends: //' -e 's/(.*),//g' -e 's/(.*)//g' -e 's/,//g' ) )
 
                     for i in ${extras[@]}; do
                         if ! [[ $i =~ 'image' || $i =~ 'ubuntu-kernel-accessories' ]]; then
