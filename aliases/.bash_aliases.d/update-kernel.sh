@@ -6,8 +6,6 @@ if ! type reade &> /dev/null && test -f aliases/.bash_aliases.d/00-rlwrap_script
     . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
 fi 
 
-DIR=$(get-script-dir)
-
 #if [[ "$distro_base" == 'Debian' ]] && ! hash mainline &> /dev/null; then
 #    local mainins
 #    readyn -p "${CYAN}'mainline'${GREEN} not installed (tool that helps with installing/managing kernels for Debian-based systems).\nInstall?" mainins
@@ -689,9 +687,52 @@ function update-kernel(){
                 
                 printf "$prmpth" "linux-image-virtual-hwe-$release" "$lowv" "linux-headers-virtual-hwe-$release" "$lowhv" 
                 printf "$prmpth" "linux-image-virtual-hwe-$release-edge" "$lowedgv" "linux-headers-virtual-hwe-$release-edge" "$lowedghv" 
-                printf "${cyan}'Linux kernel is designed for use to run inside Virtual machines\nThe virtual kernel only includes the necessary drivers to run inside popular virtualization technologies such as KVM, Xen, Virtualbox and VMWare\n\n${normal}"
+                printf "${cyan}'Linux kernel is designed for use to run inside Virtual machines\nThe virtual kernel only includes the necessary drivers to run inside popular virtualization technologies such as KVM, Xen, Virtualbox and VMWare'\n\n${normal}"
             fi
 
+            local lqrx lqrxh 
+            if test -n "$(apt search "linux-image-liquorix-amd64" 2> /dev/null)"; then
+                lqrx=$(apt search "linux-image-liquorix-amd64" 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
+                [[ "$lqrx" == "$(apt search "linux-headers-liquorix-amd64" 2> /dev/null | awk 'NR==3{print $2;}' | xargs)" ]] &&
+                    lqrxh="${GREEN}o" ||
+                    lqrxh="${RED}x"
+                printf "$prmpth" "linux-image-liquorix-amd64" "$lqrx" "linux-headers-liquorix-amd64" "$lqrxh"
+            else
+                printf "$prmpth" "linux-image-liquorix-amd64" "Not yet available" "-" "-"
+            fi
+            available="$available linux-image-liquorix-amd64" 
+            printf "${cyan}'Liquorix is an enthusiast Linux kernel designed for uncompromised responsiveness in interactive systems, enabling low latency compute in A/V production, and reduced frame time deviations in games.\n\n${normal}"
+            printf "${cyan}'Read more about it at: https://liquorix.net/'\n${normal}" 
+
+            local xanmlts1 xanmlts2 xanmlts3 xanm2 xanm3 xanmedg2 xanmedg3 xanmrt2 xanmrt3 
+            if test -n "$(apt search "linux-xanmod-lts-x64v1" 2> /dev/null)"; then
+                xanmlts1=$(apt search "linux-xanmod-lts-x64v1" 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
+                xanmlts2=$(apt search "linux-xanmod-lts-x64v2" 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
+                xanmlts3=$(apt search "linux-xanmod-lts-x64v3" 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
+                xanm2=$(apt search "linux-xanmod-x64v2" 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
+                xanm3=$(apt search "linux-xanmod-x64v3" 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
+                xanmedg2=$(apt search "linux-xanmod-edge-x64v2" 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
+                xanmedg3=$(apt search "linux-xanmod-edge-x64v3" 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
+            else
+                xanmlts1="Not yet available" xanmlts2="Not yet available" xanmlts3="Not yet available"  
+                xanm2="Not yet available" xanm3="Not yet available"  
+                xanmedg2="Not yet available" xanmedg3="Not yet available"  
+            fi
+            available="$available linux-xanmod-lts-x64v3 linux-xanmod-lts-x64v2 linux-xanmod-lts-x64v1 linux-xanmod-x64v3 linux-xanmod-x64v2 linux-xanmod-edge-x64v3 linux-xanmod-edge-x64v2 linux-xanmod-rt-x64v3 linux-xanmod-rt-x64v2" 
+            printf "$prmpth" "linux-xanmod-lts-x64v3" "$xanmlts3" "Headers included in main package" "-"
+            printf "$prmpth" "linux-xanmod-lts-x64v2" "$xanmlts2" "Headers included in main package" "-"
+            printf "$prmpth" "linux-xanmod-lts-x64v1" "$xanmlts1" "Headers included in main package" "-"
+            printf "$prmpth" "linux-xanmod-x64v3" "$xanm3" "Headers included in main package" "-"
+            printf "$prmpth" "linux-xanmod-x64v2" "$xanm2" "Headers included in main package" "-"
+            printf "$prmpth" "linux-xanmod-edge-x64v3" "$xanmedg3" "Headers included in main package" "-"
+            printf "$prmpth" "linux-xanmod-edge-x64v2" "$xanmedg2" "Headers included in main package" "-"
+
+            printf "${cyan}'XanMod is a general-purpose Linux kernel distribution with custom settings and new features. Built to provide a stable, smooth and solid system experience.'\n${normal}"
+            printf "${cyan}'x86-64 v1 support includes: AMD K8-family, AMD K10-family, AMD Family 10h (Barcelona), Intel Pentium 4 / Xeon (Nocona), Intel Core 2 (all variants), All x86-64 CPUs\n${normal}"
+            printf "${cyan}'x86-64 v2 support includes: AMD Family 14h - 16h (Bobcat - Steamroller, excluding 15h Excavator), Intel 1st Gen to 3rd Gen Core, Intel low-power Silvermont and Goldmont (all variants)\n${normal}"
+            printf "${cyan}'x86-64 v3 support includes: AMD Family 15h (Excavator), AMD Family 17h - 19h (Zen, Zen+, Zen 2 and Zen 3), Intel 4th Gen to 15th Gen Core (Haswell to Lunar / Arrow Lake), Intel low-power Silvermont and Goldmont (all variants)\n${normal}"
+            printf "${cyan}'See all architectures listed at: https://xanmod.org/'\n\n${normal}"
+           
             local howinstll 
             if hash mainline &> /dev/null; then
                 reade -Q 'GREEN' -i 'mainline both apt' -p "Choose to install with mainline, apt or both? [Mainline/both/apt]: " howinstll 
@@ -701,7 +742,7 @@ function update-kernel(){
        
             local nstll
             if hash fzf &> /dev/null; then
-                available=$(echo "$(apt-cache -qq search '^linux*' 2> /dev/null | grep 'kernel' | grep -Eiv '[^and ]headers|[^and] drivers|extra drivers for|^linux-modules*|^linux-objects|^linux-signatures| docs | doc |^linux-doc |^linux-crashdump |tool|buildinfo|library|kernel module|daemon$|services$|installed' | awk '{print $1}')" $available | uniq) 
+                available=$(echo "$available $(apt-cache -qq search '^linux*' 2> /dev/null | grep 'kernel' | grep -Eiv '[^and ]headers|[^and] drivers|extra drivers for|^linux-modules*|^linux-objects|^linux-signatures| docs | doc |^linux-doc |^linux-crashdump |tool|buildinfo|library|kernel module|daemon$|services$|installed' | awk '{print $1}')" | uniq) 
                 if [[ "$howinstll" == 'both' ]]; then 
                     nstll=$(eval "echo \"$mainlines $available\" | tr ' ' '\n' | fzf --reverse --height 50% --preview '[[ {1} =~ ^linux ]] && $pac_info {1} 2> /dev/null || echo \"Mainline kernel version {1} with headers\"'")
                 elif [[ "$howinstll" == 'mainline' ]]; then
@@ -713,7 +754,25 @@ function update-kernel(){
             
             if test -n "$nstll"; then
                 if [[ "$nstll" =~ ^linux ]]; then
-                     
+                   
+                    if [[ "$i" =~ 'liquorix' ]] && test -z "$(apt search "$i" 2> /dev/null)"; then
+                        if ! hash add-apt-repository &> /dev/null; then
+                            printf "${CYAN}add-apt-repository${normal} is not installed (cmd tool for installing extra repositories/ppas on debian systems - Needed for liquorix kernel)\n"
+                            readyn -p "Install add-apt-repository?" add_apt_ins
+                            if [[ $add_apt_ins == 'y' ]]; then
+                                eval "$pac_ins_y software-properties-common"
+                            fi
+                            unset add_apt_ins
+                        fi
+                        sudo add-apt-repository ppa:damentz/liquorix
+                        sudo apt update
+                    elif [[ "$i" =~ 'xanmod' ]] && test -z "$(apt search "$i" 2> /dev/null)"; then
+                        curl https://dl.xanmod.org/archive.key | sudo gpg --dearmor -vo /etc/apt/keyrings/xanmod-archive-keyring.gpg 
+                        echo "deb [signed-by=/etc/apt/keyrings/xanmod-archive-keyring.gpg] http://deb.xanmod.org $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/xanmod-release.list
+                        sudo apt update
+                    fi
+
+
                     local extra nstllextra extras=( $(apt show $nstll 2> /dev/null | grep 'Depends: ' | sed -e 's/Depends: //' -e 's/(.*),//g' -e 's/(.*)//g' -e 's/,//g' ) ) extras2=( $(apt show $nstll 2> /dev/null | grep 'Recommends: ' | sed -e 's/Recommends: //' -e 's/(.*),//g' -e 's/(.*)//g' -e 's/,//g' ) )
 
                     for i in ${extras[@]}; do
