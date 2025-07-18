@@ -68,13 +68,16 @@ alias get-script-dir='cd "$( dirname "$-1" )" && pwd'
 
 # Make sure cp copies forceably (without asking confirmation when overwriting) and verbosely
 
-if (hash xcp &> /dev/null || hash cpg &> /dev/null) && ! ([[ "$(type cp)" =~ "'cpg -fgv'" ]] || [[ "$(type cp)" =~ "'xcp'" ]]); then
+if test -z "$CP_ALIAS_CHECKED" && (hash xcp &> /dev/null || hash cpg &> /dev/null) && ! [[ "$(type cp)" =~ "'cpg -fgv'" ]] && ! [[ "$(type cp)" =~ "'xcp'" ]]; then
+    echo "Next ${RED}sudo${normal} will check for installed cp alternatives and whether their available for root as well as the user"
+    sudo ls &> /dev/null
     if hash cpg &> /dev/null && ! [[ "$((sudo -n xcp)2>&1)" =~ 'not found' ]]; then
         alias cp='cpg -fgv'
     fi
     if hash xcp &> /dev/null && ! [[ "$((sudo -n xcp)2>&1)" =~ 'not found' ]]; then
         alias cp='xcp' 
     fi
+    CP_ALIAS_CHECKED='y'
 elif ! (hash xcp &> /dev/null || hash cpg &> /dev/null); then
     alias cp='cp -fv'
 fi

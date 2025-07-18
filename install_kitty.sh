@@ -142,22 +142,22 @@ if [[ $ktty_cnf == 'y' ]]; then
         for i in ${lays[@]}; do
             j=$(($j + 1))
             layouts=""
-            if [[ $lays =~ 'split' ]]; then
+            if [[ "${lays[@]}" =~ 'split' ]]; then
                 layouts="$splits_lay"
             fi
-            if [[ $lays =~ 'horizontal' ]]; then
+            if [[ "${lays[@]}" =~ 'horizontal' ]]; then
                 layouts="$layouts $hor_lay"
             fi
-            if [[ $lays =~ 'vertical' ]]; then
+            if [[ "${lays[@]}" =~ 'vertical' ]]; then
                 layouts="$layouts $ver_lay"
             fi
-            if [[ $lays =~ 'tall' ]]; then
+            if [[ "${lays[@]}" =~ 'tall' ]]; then
                 layouts="$layouts $tall_lay"
             fi
-            if [[ $lays =~ 'fat' ]]; then
+            if [[ "${lays[@]}" =~ 'fat' ]]; then
                 layouts="$layouts $fat_lay"
             fi
-            if [[ $lays =~ 'grid' ]]; then
+            if [[ "${lays[@]}" =~ 'grid' ]]; then
                 layouts="$layouts $grid_lay"
             fi
 
@@ -173,9 +173,9 @@ if [[ $ktty_cnf == 'y' ]]; then
                 prompt="$j-th layout in list? "
             fi
 
-            frst="$(echo "$lays" | awk '{print $1}')"
-            layouts1=$(echo "$lays" | sed "s/\<"$frst"\> //g")
-            layout_p=$(echo "$lays" | tr ' ' '/')
+            frst="$(echo "${lays[@]}" | awk '{print $1}')"
+            layouts1=$(echo "${lays[@]}" | sed "s/\<"$frst"\> //g")
+            layout_p=$(echo "${lays[@]}" | tr ' ' '/')
 
             test -n "$BASH_VERSION" &&
 
@@ -186,9 +186,9 @@ if [[ $ktty_cnf == 'y' ]]; then
                 layout_p="$(tr '[:lower:]' '[:upper:]' <<<${layout_p:0:1})${layout_p:1}"
 
             reade -Q "GREEN" -i "$frst $layouts1" -p "$prompt? [$layout_p]: " ktty_splt
-            if [[ $ktty_splt == 'splits' ]]; then
+            if [[ "$ktty_splt" == 'splits' ]]; then
                 enbld="$enbld splits"
-                lays=$(echo "$lays" | sed "s/splits //g")
+                lays=( $(echo "${lays[@]}" | sed "s/splits //g") )
                 readyn -p "Set position new window?" ktty_splt1
 
                 if [[ $ktty_splt1 == 'y' ]]; then
@@ -215,19 +215,19 @@ if [[ $ktty_cnf == 'y' ]]; then
 
             elif [[ $ktty_splt == 'horizontal' ]]; then
                 enbld="$enbld horizontal"
-                lays=$(echo "$lays" | sed "s/horizontal //g")
+                lays=( $(echo "${lays[@]}" | sed "s/horizontal //g") )
             elif [[ $ktty_splt == 'vertical' ]]; then
                 enbld="$enbld vertical"
-                lays=$(echo "$lays" | sed "s/vertical //g")
+                lays=( $(echo "${lays[@]}" | sed "s/vertical //g") )
             elif [[ $ktty_splt == 'fat' ]]; then
                 enbld="$enbld fat"
-                lays=$(echo "$lays" | sed "s/fat //g")
+                lays=( $(echo "${lays[@]}" | sed "s/fat //g") )
             elif [[ $ktty_splt == 'tall' ]]; then
                 enbld="$enbld tall"
-                lays=$(echo "$lays" | sed "s/tall //g")
+                lays=( $(echo "${lays[@]}" | sed "s/tall //g") )
             elif [[ $ktty_splt == 'grid' ]]; then
                 enbld="$enbld grid"
-                lays=$(echo "$lays" | sed "s/grid //g")
+                lays=( $(echo "${lays[@]}" | sed "s/grid //g") )
             fi
         done
         enbld=$(echo $enbld | xargs | tr ' ' ',')

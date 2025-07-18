@@ -5,7 +5,7 @@ else
 fi
 
 
-if ! type dysk &> /dev/null; then
+if ! hash dysk &> /dev/null; then
     if test -n "$pac_ins"; then
         printf "Going to try to install dysk through the regular packagemanager\n"
         eval "${pac_ins}" dysk
@@ -20,5 +20,4 @@ if ! type dysk &> /dev/null; then
         cargo install --locked dysk
     fi
 fi
-test -z "$PAGER" && PAGER="less -Q --no-vbell --quit-if-one-screen -N --use-color"
 hash dysk &> /dev/null && dysk --help | $PAGER
