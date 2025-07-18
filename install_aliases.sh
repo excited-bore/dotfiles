@@ -534,8 +534,8 @@ if [[ "$int_r" == "both" ]] || [[ "$int_r" == 'exit' ]] || [[ "$int_r" == 'intr'
 fi
 unset int_r sig
 
-bashc=aliases/.bash_aliases.d/bash.sh
 update_sysm=aliases/.bash_aliases.d/update-system.sh
+bashc=aliases/.bash_aliases.d/bash.sh
 update_kern=aliases/.bash_aliases.d/update-kernel.sh
 pacmn=aliases/.bash_aliases.d/package_managers.sh
 rgrp=aliases/.bash_aliases.d/ripgrep-directory.sh
@@ -568,7 +568,7 @@ bash_r() {
 }
 bash_u() {
     cp $bashc ~/.bash_aliases.d/
-    yes-edit-no -f bash_r -g "$bashc" -p "Install bash.sh at /root/.bash_aliases.d//?" 
+    yes-edit-no -f bash_r -g "$bashc" -p "Install bash.sh at /root/.bash_aliases.d/?" 
 }
 yes-edit-no -f bash_u -g "$bashc" -p "Install bash.sh at ~/.bash_aliases.d/? (a few bash related helper functions)?"
 

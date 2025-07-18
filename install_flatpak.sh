@@ -29,7 +29,7 @@ if ! type flatpak &> /dev/null; then
         else 
             eval "${pac_ins} flatpak python3 gir1.2-xdpgtk* gir1.2-flatpak*"
         fi
-        flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+        flatpak remote-add --assumeyes --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
     fi
 fi
 
@@ -79,7 +79,7 @@ unset pam file dir1
 if ! echo $(flatpak list --columns=name) | grep -q "Flatseal"; then
     readyn -p "Install GUI for configuring flatpak permissions - flatseal?" fltseal
     if [[ "y" == $fltseal ]]; then
-        flatpak install flatseal
+        flatpak install --assumeyes flatseal
     fi
 fi
 unset fltseal

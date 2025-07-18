@@ -20,8 +20,13 @@ if ! [ -d ~/.bash_aliases.d/ ]; then
     mkdir ~/.bash_aliases.d/
 fi
 
-
-if test -f ~/.bashrc && ! grep -q '~/.bash_aliases' ~/.bashrc; then
+if test -f ~/.bashrc && ! grep -q '\[ -f ~/.bash_aliases \] && . ~/.bash_aliases' ~/.bashrc; then
+    if grep -q '^if \[ -f ~/.bash_aliases \]; then' ~/.bashrc; then
+        sed -i -e 's|\(if \[ -f \~/.bash_aliases \]; then\)|#This is commented out since there'\''s a one-liner which sources ~/.bash_aliases later down ~/.bashrc\n\n#\1|g' -e 's|\(^\s*\. ~/.bash_aliases\)|#\1|' ~/.bashrc
+        ubbashrcfi="$(awk '/\. ~\/.bash_aliases/{print NR+1};' ~/.bashrc)" 
+        sed -i "$ubbashrcfi s/^fi/#fi/" ~/.bashrc   
+    fi
+   
     if grep -q '\[ -f ~/.keybinds \]' ~/.bashrc; then
         sed -i 's|\(\[ -f \~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\1\n\n\[ -f \~/.keybinds \] \&\& source \~/.keybinds\n|g' ~/.bashrc
     else

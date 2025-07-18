@@ -69,16 +69,11 @@ alias get-script-dir='cd "$( dirname "$-1" )" && pwd'
 # Make sure cp copies forceably (without asking confirmation when overwriting) and verbosely
 
 if (hash xcp &> /dev/null || hash cpg &> /dev/null) && ! ([[ "$(type cp)" =~ "'cpg -fgv'" ]] || [[ "$(type cp)" =~ "'xcp'" ]]); then
-    if hash cpg &> /dev/null; then
-        echo "Since you have cpg installed, this next $(tput setaf 1)sudo$(tput sgr0) will check whether it can be used for the script (if it's sudo executable, it is)"
-        sudo bash -c "hash cpg" &&
-            alias cp='cpg -fgv' ||
-            alias cp='cp -fv'
-    elif hash xcp &> /dev/null; then
-        echo "Since you have xcp installed, this next $(tput setaf 1)sudo$(tput sgr0) will check whether it can be used for the script (if it's sudo executable, it is)"
-        sudo bash -c "hash xcp &> /dev/null" &&
-            alias cp='xcp' ||
-            alias cp='cp -fv'
+    if hash cpg &> /dev/null && ! [[ "$((sudo -n xcp)2>&1)" =~ 'not found' ]]; then
+        alias cp='cpg -fgv'
+    fi
+    if hash xcp &> /dev/null && ! [[ "$((sudo -n xcp)2>&1)" =~ 'not found' ]]; then
+        alias cp='xcp' 
     fi
 elif ! (hash xcp &> /dev/null || hash cpg &> /dev/null); then
     alias cp='cp -fv'
@@ -151,7 +146,7 @@ fi
 
 
 # Less does raw control chars, use color and linenumbers, no sounds/bell and doesn't trigger your epilepsy
-alias less='less -R --use-color --LINE-NUMBERS --quit-if-one-screen -Q --no-vbell'
+alias less='less -R --use-color --LINE-NUMBERS --prompt "Press q to quit" --quit-if-one-screen -Q --no-vbell'
 test -z "$PAGER" && PAGER="less"
 
 
