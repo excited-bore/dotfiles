@@ -27,7 +27,7 @@ fi
 # Fzf (Fuzzy Finder)
 
 # Remove older versions
-if version-higher "$(fzf --version | awk '{print $1}')" '0.6'; then
+if version-higher '0.6' "$(fzf --version | awk '{print $1}')"; then
    eval "${pac_rm_y} fzf" 
 fi
 

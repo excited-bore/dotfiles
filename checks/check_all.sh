@@ -68,14 +68,20 @@ alias get-script-dir='cd "$( dirname "$-1" )" && pwd'
 
 # Make sure cp copies forceably (without asking confirmation when overwriting) and verbosely
 
-if test -z "$CP_ALIAS_CHECKED" && (hash xcp &> /dev/null || hash cpg &> /dev/null) && ! [[ "$(type cp)" =~ "'cpg -fgv'" ]] && ! [[ "$(type cp)" =~ "'xcp'" ]]; then
-    echo "Next ${RED}sudo${normal} will check for installed cp alternatives and whether their available for root as well as the user"
-    sudo ls &> /dev/null
-    if hash cpg &> /dev/null && ! [[ "$((sudo -n xcp)2>&1)" =~ 'not found' ]]; then
-        alias cp='cpg -fgv'
-    fi
-    if hash xcp &> /dev/null && ! [[ "$((sudo -n xcp)2>&1)" =~ 'not found' ]]; then
-        alias cp='xcp' 
+if test -z "$CP_ALIAS_CHECKED" && [[ "$((cp -g)2>&1)" =~ "missing file operand" ]] && (hash xcp &> /dev/null || hash cpg &> /dev/null) && ! [[ "$(type cp)" =~ "'cpg -fgv'" ]] && ! [[ "$(type cp)" =~ "'xcp'" ]]; then
+    
+    # Cpg is installed and replaced regular cp
+    if [[ "$((cp -g)2>&1)" =~ "missing file operand" ]]; then
+        alias cp='cp -fgv' 
+    else
+        echo "Next ${RED}sudo${normal} will check for installed cp alternatives and whether their available for root as well as the user"
+        sudo ls &> /dev/null
+        if hash cpg &> /dev/null && ! [[ "$((sudo -n xcp)2>&1)" =~ 'not found' ]]; then
+            alias cp='cpg -fgv'
+        fi
+        if hash xcp &> /dev/null && ! [[ "$((sudo -n xcp)2>&1)" =~ 'not found' ]]; then
+            alias cp='xcp' 
+        fi
     fi
     CP_ALIAS_CHECKED='y'
 elif ! (hash xcp &> /dev/null || hash cpg &> /dev/null); then

@@ -272,27 +272,28 @@ function update-system() {
 
         apt list --upgradable 
        
-        if test -z "$APT_UPGRADE_YN"; then
+        if test -z "$APT_FULLUPGRADE_YN"; then
             local full_partial 
             printf "${CYAN}${pac}${normal} can either update using:
  - ${CYAN}${pac_up}${normal} upgrades packages that don't need to remove previously installed versions before installing a new version, to be on the safer side
- - ${CYAN}${pac_fullup}${nornal} upgrades all packages, independent of needing to remove packages beforehand or not\n"
-            reade -Q 'GREEN' -i 'full partial' -p "How do you prefer upgrading? [Full/partial]" full_partial
+ - ${CYAN}${pac_fullup}${normal} upgrades all packages, independent of needing to remove packages beforehand or not\n"
+            reade -Q 'GREEN' -i 'full partial' -p "How do you prefer upgrading? [Full/partial]: " full_partial
             if [[ "$full_partial" == 'full' ]]; then
                 export APT_FULLUPGRADE_YN='y'
             elif [[ "$full_partial" == 'partial' ]]; then
                 export APT_FULLUPGRADE_YN='n'
             fi
-            printf "If you don't want to this prompt to come up again, put ${CYAN}'export APT_UPGRADE_YN=\"y\"' or \"n\" in a ${GREEN}$HOME/.environment${normal} or ${GREEN}$HOME/.profile${normal} or in whatever file that gets sourced before ${GREEN}update-system.sh${normal}.\n"
+            printf "If you don't want to this prompt to come up again, put ${CYAN}'export APT_FULLUPGRADE_YN=\"y\"'${normal} or ${CYAN}\"n\"${normal} in a ${GREEN}$HOME/.environment${normal} or ${GREEN}$HOME/.profile${normal} or in whatever file that gets sourced before ${GREEN}update-system.sh${normal}.\n"
          
         fi
       
-        if test -n "$APT_UPGRADE_YN"; then 
+        if test -n "$APT_FULLUPGRADE_YN"; then 
 
-            if [[ "$APT_UPGRADE_YN" == 'y' ]]; then
+            local pac_upg 
+            if [[ "$APT_FULLUPGRADE_YN" == 'y' ]]; then
                 pac_upg="$pac_fullup" 
                 pac_upg_y="$pac_fullup_y" 
-            elif [[ "$APT_UPGRADE_YN" == 'n' ]]; then
+            elif [[ "$APT_FULLUPGRADE_YN" == 'n' ]]; then
                 pac_upg="$pac_up" 
                 pac_upg_y="$pac_up_y" 
             fi  
@@ -301,7 +302,7 @@ function update-system() {
 
             echo "This next $(tput setaf 1)sudo$(tput sgr0) will try to update the packages for your system using the package managers it knows";
              
-            readyn $flag -p "Upgrade system using $pac_upg?" upgrd
+            readyn $flag -p "Upgrade system using '$pac_upg'?" upgrd
 
             if [[ $upgrd == 'y' ]];then
                 if test -n "$YES"; then 

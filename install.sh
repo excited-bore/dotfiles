@@ -33,7 +33,7 @@ if ! hash curl &>/dev/null && test -n "$pac_ins"; then
 fi
 
 # Fzf version 0.6+ needed
-if ! hash fzf &>/dev/null || (hash fzf &> /dev/null && version-higher "$(fzf --version | awk '{print $1}')" '0.6'); then
+if ! hash fzf &>/dev/null || (hash fzf &> /dev/null && version-higher '0.6' "$(fzf --version | awk '{print $1}')"); then
     printf "${CYAN}fzf${normal} is not installed \n"
     readyn -p "Install fzf (a fuzzy finder / TUI to make a selection - used in a multitude of functions/tools)?" ins_fzf
     if [[ $ins_fzf == 'y' ]]; then
@@ -507,7 +507,7 @@ elif hash dysk &>/dev/null && hash duf &>/dev/null; then
     prmpt=" [None/duf/dysk/both]: "
 fi
 
-reade -Q "$color" -i "$pre" -p "Install ${CYAN}duf${GREEN}, ${CYAN}dysk${GREEN} or both? (Both are modern replacements for df - tools list hard drive disk space)$prmpt" duf_dysk
+reade -Q "$color" -i "$pre" -p "Install ${CYAN}duf${color}, ${CYAN}dysk${color} or both? (Both are modern replacements for df - tools list hard drive disk space)$prmpt" duf_dysk
 if [[ "both" == "$duf_dysk" ]] || [[ "duf" == "$duf_dysk" ]]; then
     if ! test -f $SCRIPT_DIR/install_duf.sh; then
         source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_duf.sh)
