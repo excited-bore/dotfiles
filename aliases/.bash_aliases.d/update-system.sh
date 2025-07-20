@@ -155,7 +155,7 @@ function update-system() {
     if type timedatectl &> /dev/null && ! [[ "$(timedatectl show | grep '^NTP' | head -n 1 | awk 'BEGIN { FS = "=" } ; {print $2}')" == "yes" ]]; then 
         readyn -p "Timedate NTP not set (Automatic timesync). This can cause issues with syncing to repositories. Activate it?" set_ntp
         if [[ "$set_ntp" == "y" ]]; then
-            sudo timedatectl set-ntp true
+            eval "sudo timedatectl set-ntp true"
             timedatectl status
         fi
     fi
@@ -724,7 +724,7 @@ function update-system() {
 
     if type flatpak &> /dev/null; then
 	if test -n "$YES"; then 
-            flatpak update -y
+            flatpak update --assumeyes
         else
             flatpak update
         fi

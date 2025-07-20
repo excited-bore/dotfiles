@@ -155,7 +155,7 @@ fi
 
 
 # Less does raw control chars, use color and linenumbers, no sounds/bell and doesn't trigger your epilepsy
-alias less='less -R --use-color --LINE-NUMBERS --prompt "Press q to quit" --quit-if-one-screen -Q --no-vbell'
+export LESS='-R --use-color --LINE-NUMBERS --quit-if-one-screen -Q --no-vbell --prompt "Press q to quit"'
 test -z "$PAGER" && PAGER="less"
 
 

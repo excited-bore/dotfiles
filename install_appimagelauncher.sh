@@ -44,7 +44,7 @@ if ! type AppImageLauncher &>/dev/null; then
             #    eval "$pac_ins libfuse2t64 -y "
             #fi
             if ! $(apt search jq &>/dev/null | awk 'NR>2 {print;}'); then
-                eval "$pac_ins jq -y "
+                eval "$pac_ins_y jq "
             fi
             tmpd=$(mktemp -d)
             tag=$(curl https://api.github.com/repos/TheAssassin/AppImageLauncher/releases/latest | jq -r ".tag_name")

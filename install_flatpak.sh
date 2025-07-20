@@ -29,7 +29,7 @@ if ! type flatpak &> /dev/null; then
         else 
             eval "${pac_ins} flatpak python3 gir1.2-xdpgtk* gir1.2-flatpak*"
         fi
-        flatpak remote-add --assumeyes --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+        flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
     fi
 fi
 

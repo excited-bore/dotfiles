@@ -18,8 +18,12 @@ MINGW*)
 *) machine="UNKNOWN:${unameOut}" ;;
 esac
 
-if test -z $TMPDIR; then
+if test -z "$TMPDIR"; then
     TMPDIR=$(mktemp -d)
+fi
+
+if test -z "$TMP"; then
+    TMP=$TMPDIR
 fi
 
 pthdos2unix=""

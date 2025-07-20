@@ -18,7 +18,7 @@ if ! (hash zip &>/dev/null || hash unzip &>/dev/null) && test -n "$pac_ins"; the
     printf "${CYAN}zip${normal} and/or ${CYAN}unzip${normal} are not installed \n"
     readyn -p "Install zip and unzip?" nzp_ins
     if [[ $nzp_ins == 'y' ]]; then
-        eval "${pac_ins} zip unzip"
+        eval "$pac_ins_y zip unzip"
     fi
     unset nzp_ins
 fi
@@ -27,9 +27,34 @@ if ! hash curl &>/dev/null && test -n "$pac_ins"; then
     printf "${CYAN}curl${normal} is not installed \n"
     readyn -p "Install curl (for querying URLS)?" ins_curl
     if [[ $ins_curl == 'y' ]]; then
-        eval "${pac_ins} curl"
+        eval "$pac_ins_y curl"
     fi
     unset ins_curl
+fi
+
+# We at minimum need the 630 version for the '--no-vbell' option for people with epilepsy
+if ! hash less &> /dev/null || (hash less &> /dev/null && version-higher '633' "$(command less -V | awk 'NR==1{print $2}')"); then
+    printf "${CYAN}less${normal} is not installed or is under version 633, which is the version that has a flag that allowas disabling the 'virtual bell', which automatically activates when disabling the audible bell feature for a white screen flash for whenever the audible bell normally would sound, which can be triggering for people with epilespy\n"
+    readyn -p "Install latest version of less?" ins_less
+    if [[ $ins_less == 'y' ]]; then
+        if ! test -f $SCRIPT_DIR/install_less.sh; then
+            source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_less.sh)
+        else 
+            . $SCRIPT_DIR/install_less.sh 
+        fi
+    fi
+    unset ins_less
+fi
+
+
+# Jq - Javascript query tool
+if ! hash jq &>/dev/null && test -n "$pac_ins"; then
+    printf "${CYAN}jq${normal} is not installed \n"
+    readyn -p "Install jq (for querying javascript - used to get latest release(s) from github)?" ins_jq
+    if [[ $ins_jq == 'y' ]]; then
+        eval "${pac_ins_y} jq"
+    fi
+    unset ins_jq
 fi
 
 # Fzf version 0.6+ needed
@@ -50,15 +75,6 @@ if ! hash fzf &>/dev/null || (hash fzf &> /dev/null && version-higher '0.6' "$(f
     unset ins_fzf
 fi
 
-if ! hash jq &>/dev/null && test -n "$pac_ins"; then
-    printf "${CYAN}jq${normal} is not installed \n"
-    readyn -p "Install jq (for querying javascript - used to get latest release(s) from github)?" ins_jq
-    if [[ $ins_jq == 'y' ]]; then
-        eval "${pac_ins} jq"
-    fi
-    unset ins_jq
-fi
-
 if ! hash aria2c &>/dev/null && test -n "$pac_ins"; then
     printf "${CYAN}aria2c${normal} is not installed \n"
     readyn -p "Install aria2c (for fetching files from internet - multithreaded versus singlethreaded wget -> faster downloads)?" ins_ar
@@ -76,9 +92,6 @@ if ! hash rlwrap &>/dev/null; then
     fi
 fi
 
-#if ! hash rlwrap &> /dev/null; then
-#   read
-#fi
 
 printf "${green}If all necessary files are sourced correctly, this text looks green.\nIf not, something went wrong.\n"
 if hash gio &>/dev/null; then
@@ -496,6 +509,7 @@ unset dua_dust_ncdu color pre prmpt
 # Duf and Dysk - Df replacement
 
 color='GREEN'
+color1="${GREEN}"
 pre="duf dysk both none"
 prmpt=" [Duf/dysk/both/none]: "
 if ! hash dysk &>/dev/null && hash duf &>/dev/null; then
@@ -503,11 +517,12 @@ if ! hash dysk &>/dev/null && hash duf &>/dev/null; then
     prmpt=" [Dysk/duf/both/none]: "
 elif hash dysk &>/dev/null && hash duf &>/dev/null; then
     color='YELLOW'
+    color1="${YELLOW}"
     pre="none duf dysk both"
     prmpt=" [None/duf/dysk/both]: "
 fi
 
-reade -Q "$color" -i "$pre" -p "Install ${CYAN}duf${color}, ${CYAN}dysk${color} or both? (Both are modern replacements for df - tools list hard drive disk space)$prmpt" duf_dysk
+reade -Q "$color" -i "$pre" -p "Install ${CYAN}duf${color1}, ${CYAN}dysk${color1} or both? (Both are modern replacements for df - tools list hard drive disk space)$prmpt" duf_dysk
 if [[ "both" == "$duf_dysk" ]] || [[ "duf" == "$duf_dysk" ]]; then
     if ! test -f $SCRIPT_DIR/install_duf.sh; then
         source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_duf.sh)

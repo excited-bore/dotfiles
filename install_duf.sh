@@ -30,5 +30,4 @@ if ! type duf &> /dev/null; then
         go build)
     fi
 fi
-test -z "$PAGER" && PAGER="less -Q --no-vbell --quit-if-one-screen -N --use-color"
 hash duf &> /dev/null && duf --help | $PAGER
