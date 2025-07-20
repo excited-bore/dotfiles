@@ -289,7 +289,7 @@ function update-system() {
       
         if test -n "$APT_FULLUPGRADE_YN"; then 
 
-            local pac_upg 
+            local pac_upg pac_upg_y 
             if [[ "$APT_FULLUPGRADE_YN" == 'y' ]]; then
                 pac_upg="$pac_fullup" 
                 pac_upg_y="$pac_fullup_y" 
@@ -301,7 +301,6 @@ function update-system() {
             local upgrd 
 
             echo "This next $(tput setaf 1)sudo$(tput sgr0) will try to update the packages for your system using the package managers it knows";
-             
             readyn $flag -p "Upgrade system using '$pac_upg'?" upgrd
 
             if [[ $upgrd == 'y' ]];then
@@ -311,7 +310,6 @@ function update-system() {
                     else
                         eval "yes | ${pac_upg}"
                     fi
-                    
                 else            
                     eval "${pac_upg}" 
                 fi
@@ -325,7 +323,6 @@ function update-system() {
                 else
                     eval "${pac_refresh}"
                 fi
-                
             fi
         fi
  
