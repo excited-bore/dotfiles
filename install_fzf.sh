@@ -39,10 +39,11 @@ if ! hash fzf &> /dev/null; then
         sudo tar xf $dir/fzf.tar.gz -C /usr/local/bin
         unset dir 
     else 
-        eval "${pac_ins} fzf" 
+        eval "$pac_ins_y fzf" 
     fi
 fi
 
+fzf --help | $PAGER
 
 if test -z "$1"; then
 

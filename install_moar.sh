@@ -59,7 +59,7 @@ fi
 
 if hash moar &> /dev/null; then
     
-    moar --help | less -R
+    moar --help | $PAGER
     
     readyn -p "Set moar as default pager for $USER?" moar_usr
     if [[ "y" == "$moar_usr" ]]; then
@@ -94,5 +94,8 @@ if hash moar &> /dev/null; then
             printf "export SYSTEMD_PAGERSECURE=1\n" | sudo tee -a $ENV_R 1> /dev/null
         fi
     fi
+   
+    PAGER='moar' 
+
 fi
     #./setup_git_build_from_source.sh "y" "" "https://github.com" "neovim/neovim" "stable" "sudo apt update; eval "$pac_ins ninja-build gettext libtool libtool-bin cmake g++ pkg-config unzip curl doxygen" "make CMAKE_BUILD_TYPE=RelWithDebInfo; sudo make install" "sudo make uninstall" "make distclean; make deps" "y""
