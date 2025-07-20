@@ -556,7 +556,7 @@ function yes-edit-no() {
                 #    color=$ocolor
                 #fi 
 
-                prmpt1=" [${bold}${choicesp[$i]^}"  
+                prmpt1=" ${bold}[${choicesp[$i]^}"  
                 unset choicesp[$i] 
                 for j in "${!choicesp[@]}"; do                          
                     #if ! [[ $j == $i ]]; then 
@@ -601,7 +601,7 @@ function yes-edit-no() {
                # fi 
                    
                 local fst="$(sed 's/\([[:alpha:]](\)/\U\1/' <<<${choicesp[$i]})" 
-                prmpt1=" [${bold}$fst" 
+                prmpt1=" ${bold}[$fst" 
                 choicesp[$i]=() 
                 for i in "${choicesp[@]}"; do
                     prmpt1="$prmpt1/$i" 

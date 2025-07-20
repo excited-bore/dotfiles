@@ -391,6 +391,8 @@ function reade() {
             esac
         done
 
+        unset flag 
+
         shift $((OPTIND - 1))
 
         if [[ "$auto" == 'y' ]]; then
@@ -508,6 +510,8 @@ function reade() {
             *) ;;
             esac
         done
+
+        unset flag 
 
         shift $((OPTIND - 1))
 

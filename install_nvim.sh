@@ -190,13 +190,14 @@ if [[ "$langs" == 'y' ]]; then
     if ! hash pylint &>/dev/null; then
         readyn -p "Install nvim-python?" pyscripts
         if [[ "y" == "$pyscripts" ]]; then
-            if ! hash pyenv &>/dev/null; then
-                if ! test -f $DIR/install_pyenv.sh; then
-                    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pyenv.sh)
-                else
-                    . $DIR/install_pyenv.sh
-                fi
-            fi
+
+	    #if ! hash pyenv &>/dev/null; then
+            #    if ! test -f $DIR/install_pyenv.sh; then
+            #        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pyenv.sh)
+            #    else
+            #        . $DIR/install_pyenv.sh
+            #    fi
+            #fi
 
             if ! hash pipx &>/dev/null && ! test -f $HOME/.local/bin/pipx; then
                 if ! test -f $DIR/install_pipx.sh; then

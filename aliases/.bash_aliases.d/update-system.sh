@@ -279,9 +279,9 @@ function update-system() {
  - ${CYAN}${pac_fullup}${normal} upgrades all packages, independent of needing to remove packages beforehand or not\n"
             reade -Q 'GREEN' -i 'full partial' -p "How do you prefer upgrading? [Full/partial]: " full_partial
             if [[ "$full_partial" == 'full' ]]; then
-                export APT_FULLUPGRADE_YN='y'
+                APT_FULLUPGRADE_YN='y'
             elif [[ "$full_partial" == 'partial' ]]; then
-                export APT_FULLUPGRADE_YN='n'
+                APT_FULLUPGRADE_YN='n'
             fi
             printf "If you don't want to this prompt to come up again, put ${CYAN}'export APT_FULLUPGRADE_YN=\"y\"'${normal} or ${CYAN}\"n\"${normal} in a ${GREEN}$HOME/.environment${normal} or ${GREEN}$HOME/.profile${normal} or in whatever file that gets sourced before ${GREEN}update-system.sh${normal}.\n"
          
@@ -301,7 +301,7 @@ function update-system() {
             local upgrd 
 
             echo "This next $(tput setaf 1)sudo$(tput sgr0) will try to update the packages for your system using the package managers it knows";
-            readyn $flag -p "Upgrade system using '$pac_upg'?" upgrd
+            readyn $flag -p "Upgrade system using $pac_upg?" upgrd
 
             if [[ $upgrd == 'y' ]];then
                 if test -n "$YES"; then 
@@ -730,17 +730,17 @@ function update-system() {
         fi
     fi
 
+    if test -n "$YES"; then
+        YES="--auto" 
+    fi
 
     if test -z "$NOGUI" && type snap &> /dev/null; then
-	readyn --auto -p "Update (refresh) snap packages?" snaprfrsh
+	readyn $YES -p "Update (refresh) snap packages?" snaprfrsh
 	if [[ "$snaprfrsh" == 'y' ]]; then 
             snap refresh
         fi
     fi
 
-    if test -n "$YES"; then
-        YES="--auto" 
-    fi
 
     if hash nix-env &> /dev/null; then
         readyn $YES --no -p "${normal}Update ${CYAN}nix packages?${normal} ${MAGENTA}(Fetching updated list could take a long time)${YELLOW}" nix_up
