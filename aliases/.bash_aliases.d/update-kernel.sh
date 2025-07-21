@@ -435,7 +435,7 @@ if hash grub-set-default &> /dev/null; then
                
                 printf "${GREEN}Setting new default kernel with ${CYAN}'sudo grub-set-default "$j>$h"'${normal}\n" 
                 sudo grub-set-default "$j>$h"
-                sudo update-grub
+                #sudo update-grub
                
                 echo "${YELLOW}A reboot is needed to take full effect!${normal}" 
                 echo "${YELLOW}If booting into the new kernel breaks, hold ${CYAN}'Shift'${YELLOW} while booting to load into grub, then choose an older kernel.${normal}" 
@@ -461,38 +461,97 @@ function update-kernel(){
         printf "${CYAN}xmllint${GREEN} not installed and needed for for listing latest kernel versions from ${CYAN}www.kernel.org${GREEN}. Installing..${normal}\n" 
         eval "${pac_ins_y} xmllint" 
     fi
-   
-    list-installed-kernels
-    echo 
+  
+    local HEADER 
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+        -h|-\?|--help)  
+        printf "Kernel and kernel header updater using *most* known packagemanagers.\n
+    Includes: 
+        - apt 
+        - nala
+        - pacman 
+            ${GREEN1}AUR-helpers${green1}
+            - yay
+            - pamac
+            - pikaur 
+            - pacaur 
+            - aura 
+            - aurman 
+            - auracle
+            - pakku
+            - paru
+            - trizen 
+        - dnf
+        - yum
+        - nix profile + nix-env
+        - zypper 
+        - apk
+
+    -h / --help  
+
+            Show this help message and exit
+                
+    -H / --header 
+               
+            Only look to install headers for current kernel.
+    "
+                exit 0 
+                ;;
+            -H|--header)
+                HEADER="y"
+                shift 
+                ;;
+            -*|--*)
+                echo "Unknown option '$1'"
+                exit 1
+                ;;
+            *)
+                break
+                ;;
+          esac
+        done
+
+    local curr
+
+    if test -z "$HEADER"; then
+    
+        list-installed-kernels
+        echo 
+            
+        local prmpth0="${CYAN}%-20s ${green}%-20s\n${normal}" 
+
+        local mainlinev="$(curl -s https://www.kernel.org/feeds/kdist.xml | xmllint --format --xpath '//title' - | grep '<title>[[:digit:]]' | grep 'mainline' | sed -E 's,<title>|<\/title>,,g' | cut -d: -f1 | awk 'NR==1 {print;}')" 
+        local stablev="$(curl -s https://www.kernel.org/feeds/kdist.xml | xmllint --format --xpath '//title' - | grep '<title>[[:digit:]]' | grep 'stable' | sed -E 's,<title>|<\/title>,,g' | cut -d: -f1 | awk 'NR==1 {print;}')" 
         
-    local prmpth0="${CYAN}%-20s ${green}%-20s\n${normal}" 
+        local longtermv="$(curl -s https://www.kernel.org/feeds/kdist.xml | xmllint --format --xpath '//title' - | grep '<title>[[:digit:]]' | grep 'longterm' | sed -E 's,<title>|<\/title>,,g' | cut -d: -f1 | awk 'NR==1 {print;}')" 
+        
+        printf "${GREEN}Latest kernels from ${CYAN}'www.kernel.org'${GREEN}:${normal}\n"
+        printf "${GREEN}%-20s %-20s\n" "Name" "Version"
+       
+        printf "$prmpth0" "- Mainline: " "$mainlinev"
+        printf "$prmpth0" "- Stable: " "$stablev"
+        printf "$prmpth0" "- Longterm: " "$longtermv"
 
-    local mainlinev="$(curl -s https://www.kernel.org/feeds/kdist.xml | xmllint --format --xpath '//title' - | grep '<title>[[:digit:]]' | grep 'mainline' | sed -E 's,<title>|<\/title>,,g' | cut -d: -f1 | awk 'NR==1 {print;}')" 
-    local stablev="$(curl -s https://www.kernel.org/feeds/kdist.xml | xmllint --format --xpath '//title' - | grep '<title>[[:digit:]]' | grep 'stable' | sed -E 's,<title>|<\/title>,,g' | cut -d: -f1 | awk 'NR==1 {print;}')" 
-    
-    local longtermv="$(curl -s https://www.kernel.org/feeds/kdist.xml | xmllint --format --xpath '//title' - | grep '<title>[[:digit:]]' | grep 'longterm' | sed -E 's,<title>|<\/title>,,g' | cut -d: -f1 | awk 'NR==1 {print;}')" 
-    
-    printf "${GREEN}Latest kernels from ${CYAN}'www.kernel.org'${GREEN}:${normal}\n"
-    printf "${GREEN}%-20s %-20s\n" "Name" "Version"
-   
-    printf "$prmpth0" "- Mainline: " "$mainlinev"
-    printf "$prmpth0" "- Stable: " "$stablev"
-    printf "$prmpth0" "- Longterm: " "$longtermv"
-
-    echo
+        echo
+    else
+        curr=$(uname -r) 
+    fi 
 
     if [[ "$distro_base" == 'Debian' ]]; then
-       
-        if hash mainline &> /dev/null; then
-            echo "${GREEN}Available kernels using mainline (includes headers): " 
-            local mainlines='' mainlines1="$(mainline list --include-rc --include-flavors | sed -e 's/Running//g' -e 's/Installed//g')" 
-            for i in $(mainline list --include-rc --include-flavors | grep --color=never -oPf <(echo '^\d\.\d+') | uniq); do
-                local m=$(echo "$mainlines1" | grep --color=never -E "^$i\.|^$i[[:space:]]|^$i-" | head -1 | xargs) 
-                printf "${CYAN}%s\n${normal}" "  - $m"
-                test -z "$mainlines" && mainlines="$m" || mainlines="$mainlines $m"
-            done
-            echo
-        fi 
+      
+        if test -z "$HEADER"; then
+            if hash mainline &> /dev/null; then
+                echo "${GREEN}Available kernels using mainline (includes headers): " 
+                local mainlines='' mainlines1="$(mainline list --include-rc --include-flavors | sed -e 's/Running//g' -e 's/Installed//g')" 
+                for i in $(mainline list --include-rc --include-flavors | grep --color=never -oPf <(echo '^\d\.\d+') | uniq); do
+                    local m=$(echo "$mainlines1" | grep --color=never -E "^$i\.|^$i[[:space:]]|^$i-" | head -1 | xargs) 
+                    printf "${CYAN}%s\n${normal}" "  - $m"
+                    test -z "$mainlines" && mainlines="$m" || mainlines="$mainlines $m"
+                done
+                echo
+            fi
+        fi
 
         local prmpth="${green}%-45s %-30s %-40s %-40s\n${normal}" 
         local prmpth1="${cyan}%s\n\n${normal}" 
@@ -507,7 +566,14 @@ function update-kernel(){
             [[ "$genv" == "$(apt search '^linux-headers-generic$' 2> /dev/null | awk 'NR==3{print $2;}' | xargs)" ]] &&
                 genhv="${GREEN}o" ||
                 genhv="${RED}x"
-            printf "$prmpth" "linux-generic" "$genv" "linux-headers-generic" "$genhv" 
+            
+            if test -z "$HEADER"; then
+                printf "$prmpth" "linux-generic" "$genv" "linux-headers-generic" "$genhv" 
+            else
+                if test -n "$(apt list --installed linux-generic 2> /dev/null)" && [[ "$(apt-cache show linux-generic | grep 'Version: ' | awk '{print $2;}')" =~ "$curr" ]]; then
+                    sudo apt install linux-headers-generic 
+                fi
+            fi
             available="linux-image-generic" 
             genv=$(apt search '^linux-image-generic$' 2> /dev/null | awk 'NR==3{print $2;}' | xargs) 
             [[ "$genv" == "$(apt search '^linux-headers-generic$' 2> /dev/null | awk 'NR==3{print $2;}' | xargs)" ]] &&
@@ -700,7 +766,7 @@ function update-kernel(){
                 printf "$prmpth" "linux-image-liquorix-amd64" "Not yet available" "-" "-"
             fi
             available="$available linux-image-liquorix-amd64" 
-            printf "${cyan}'Liquorix is an enthusiast Linux kernel designed for uncompromised responsiveness in interactive systems, enabling low latency compute in A/V production, and reduced frame time deviations in games.\n\n${normal}"
+            printf "${cyan}'Liquorix is an enthusiast Linux kernel designed for uncompromised responsiveness in interactive systems, enabling low latency compute in A/V production, and reduced frame time deviations in games.\n${normal}"
             printf "${cyan}'Read more about it at: https://liquorix.net/'\n${normal}" 
 
             local xanmlts1 xanmlts2 xanmlts3 xanm2 xanm3 xanmedg2 xanmedg3 xanmrt2 xanmrt3 

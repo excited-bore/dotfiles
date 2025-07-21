@@ -28,6 +28,8 @@ if ! hash less &> /dev/null || (hash less &> /dev/null && version-higher '633' "
    
     eval "$pac_ins_y debhelper-compat devscripts build-essential fakeroot" 
 
+    # from https://launchpad.net/ubuntu/+source/less 
+
     tmpd=$(mktemp -d $TMPDIR/less-688-1-XXXXXX) 
     (cd $tmpd
     wget-aria-dir $tmpd https://launchpadlibrarian.net/786750047/less_668-1.dsc

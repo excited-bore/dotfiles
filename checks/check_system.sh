@@ -171,6 +171,7 @@ elif (test -f /etc/issue && grep -q "Ubuntu" /etc/issue) || test -f /etc/rpi-iss
     pac_rm_cache_full_y="sudo apt distclean -y"
     pac_ls="apt list"
     pac_ls_ins="apt list --installed"
+    pac_ls_upg="apt list --upgradable"
 
 
     distro_base="Debian"
@@ -670,6 +671,7 @@ if hash nala &>/dev/null && [[ "$pac" == 'apt' ]]; then
     pac_rm_cache_y="sudo nala clean -y"
     pac_ls="nala list"
     pac_ls_ins="nala list --installed"
+    pac_ls_upg="nala list --upgradable"
 fi
 
 # TODO: Change this to uname -sm?

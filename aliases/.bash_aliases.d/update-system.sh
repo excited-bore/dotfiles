@@ -49,7 +49,7 @@ function version-higher() {
 
 function update-system() {
     local SCRIPT_DIR=$(get-script-dir) 
-    local YES flag NOGUI KERNEL='lts' SKIPKERNEL='n' 
+    local YES flag NOGUI 
     while [[ $# -gt 0 ]]; do
         case $1 in
         -h|-\?|--help)  
@@ -101,15 +101,9 @@ function update-system() {
 
             Show this help message and exit
                 
-    -y / --yes [ skipkernelcheck ${bold}1(default)${normal}/0 ] 
+    -y / --yes 
                
             Auto update without prompting. 
-            Optional : Skip newer kernel check if 1
-
-    -k / --kernel [ ${bold}lts(default)${normal}/stable/mainline ]   
-                           
-            Looks for the latest lts (long term support) tagged kernel version. 
-            Optional: Set tag specifically for the newest stable or mainline tagged version 
 
     -s / --skip-gui : 
              
@@ -119,27 +113,12 @@ function update-system() {
                 ;;
             -y|--yes)
                 YES="-y"
-                SKIPKERNEL='y' 
-                if [[ "$2" == '0' ]] || [[ "$2" == '1' ]]; then 
-                    [[ "$2" == '0' ]] && SKIPKERNEL='n' 
-                    shift 2 
-                else
-                    shift 
-                fi
+                shift 
                 ;;
 	    -s|--skip-gui)
 	        NOGUI='y'
 	        shift
 	        ;;
-            -k|--kernel)
-                if ! ([[ "$2" =~ -* ]] || [[ "$2" =~ --* ]]); then
-                    KERNEL="$2"
-                    shift 2
-                else
-                    KERNEL='lts'
-                    shift
-                fi
-                ;;
             -*|--*)
                 echo "Unknown option '$1'"
                 exit 1
@@ -147,8 +126,8 @@ function update-system() {
             *)
                 break
                 ;;
-          esac
-        done
+        esac
+    done
     
     local hdrs
 
@@ -206,7 +185,7 @@ function update-system() {
         
         echo "This next $(tput setaf 1)sudo$(tput sgr0) will try to update the packages for your system using the package managers it knows";
        
-        pac=softwareupdate
+        pac="softwareupdate"
         
         sudo softwareupdate -i -a
        
@@ -235,31 +214,8 @@ function update-system() {
             eval "${pac_refresh}"
         fi
         
-        if ! [[ "$SKIPKERNEL" == 'y' ]] && hash curl &> /dev/null && hash mainline &> /dev/null && hash xmllint &> /dev/null; then
-            local latest_lts prmpt
-            if [[ "$KERNEL" == 'lts' ]] || [[ "$KERNEL" == 'stable' ]] || [[ "$KERNEL" == 'mainline' ]]; then
-                prmpt="Latest $KERNEL linux kernel"
-                [[ "$KERNEL" == 'lts' ]] && prmpt='Latest longterm support linux kernel'
-                latest_lts="$(curl -fsSL https://www.kernel.org | xmllint --html --xpath "(//td[text()='$KERNEL:'])[1]/following-sibling::td[1]/strong/text()" - 2> /dev/null)"
-            else 
-                latest_lts="$KERNEL"
-                prmpt="Kernel version $KERNEL"
-            fi
-            #local latest_lts1="linux-image-$latest_lts"
 
-            if ! [[ "$(uname -r)" == "$latest_lts" ]] && ( [[ $latest_lts == $KERNEL ]] || version-higher $latest_lts $(uname -r) ); then
-
-                test -n "$YES" && flag='--auto' || flag=''
-
-                readyn $flag -p "$prmpt not installed. Install ${CYAN}$latest_lts${GREEN} (and ${CYAN}$latest_lts-headers${GREEN})?" latest_ins
-                if [[ $latest_ins == 'y' ]]; then
-                    mainline install $latest_lts
-                fi
-                unset latest_ins
-            fi
-        fi
-
-        hdrs="linux-headers-$(uname -r)"
+        local hdrs="linux-headers-$(uname -r)"
         if test -z "$(apt list --installed 2> /dev/null | grep $hdrs)"; then
             
             test -n "$YES" && flag='--auto' || flag=''
@@ -270,7 +226,7 @@ function update-system() {
             fi
         fi
 
-        apt list --upgradable 
+        eval "${pac_ls_upg}" 
        
         if test -z "$APT_FULLUPGRADE_YN"; then
             local full_partial 
@@ -291,11 +247,21 @@ function update-system() {
 
             local pac_upg pac_upg_y 
             if [[ "$APT_FULLUPGRADE_YN" == 'y' ]]; then
-                pac_upg="$pac_fullup" 
-                pac_upg_y="$pac_fullup_y" 
+                if [[ "$distro" == 'Ubuntu' ]]; then
+                    pac_upg="sudo apt full-upgrade" 
+                    pac_upg_y="sudo apt full-upgrade -y" 
+                else 
+                    pac_upg="$pac_fullup" 
+                    pac_upg_y="$pac_fullup_y" 
+                fi
             elif [[ "$APT_FULLUPGRADE_YN" == 'n' ]]; then
-                pac_upg="$pac_up" 
-                pac_upg_y="$pac_up_y" 
+                if [[ "$distro" == 'Ubuntu' ]]; then
+                    pac_upg="sudo apt upgrade" 
+                    pac_upg_y="sudo apt upgrade -y" 
+                else 
+                    pac_upg="$pac_up" 
+                    pac_upg_y="$pac_up_y"
+                fi
             fi  
 
             local upgrd 
@@ -472,163 +438,6 @@ function update-system() {
             fi
         fi 
       
-        if ! [[ "$SKIPKERNEL" == 'y' ]] && hash curl &> /dev/null && hash xmllint &> /dev/null; then 
-            if [[ "$KERNEL" == 'lts' ]] || [[ "$KERNEL" == 'stable' ]] || [[ "$KERNEL" == 'mainline' ]]; then
-                local latest_lts latest_lts1 latest_stbl latest_stbl1 latest_main latest_main1 lt_header prmpt lts_ver
-
-                #latest_lts="$(curl -fsSL https://www.kernel.org/feeds/kdist.xml | xmllint --xpath '//title[contains(., "longterm")][1]/text()' - | awk 'NR==1{print $1;}' | cut -d: -f-1)"
-                # Manjaro tends to be behind, so we only keep for the 'main' version number. Linux6.12 instead of Linux6.12.34 for example.. 
-                test -n "$YES" && flag='--auto' || flag=''
-                
-                if [[ "$distro" == 'Manjaro' ]]; then
-                    
-                    latest_lts="$(curl -fsSL https://www.kernel.org | xmllint --html --xpath "(//td[text()='longterm:'])[1]/following-sibling::td[1]/strong/text()" - 2> /dev/null)"
-                    latest_lts1=$(echo $latest_lts | cut -d. -f-2)  
-                    latest_lts1="linux${latest_lts1//"."}" 
-                    
-                    latest_stbl="$(curl -fsSL https://www.kernel.org | xmllint --html --xpath "(//td[text()='stable:'])[1]/following-sibling::td[1]/strong/text()" - 2> /dev/null)"
-                    latest_stbl1=$(echo $latest_stbl | cut -d. -f-2)  
-                    latest_stbl1="linux${latest_stbl//"."}" 
-                    
-                    latest_main="$(curl -fsSL https://www.kernel.org | xmllint --html --xpath "(//td[text()='mainline:'])[1]/following-sibling::td[1]/strong/text()" - 2> /dev/null)"
-                    latest_main1=$(echo $latest_main | cut -d. -f-2)
-                    latest_main1="linux${latest_main1//"."}" 
-                  
-
-                    if [[ "$KERNEL" == 'lts' ]] && test -z "$(pamac list --quiet --installed '^linux-lts-meta$')" && test -z "$(pamac list --quiet --installed "^$latest_lts$")" && test -z "$(pamac list --quiet --installed "^linux-lts-versioned-bin$")"; then
-                       
-                        printf "${GREEN}%s ${CYAN}%s\n" "Latest longterm support version:" "$latest_lts" 
-
-                        pamac search '^linux-lts-meta$' 
-                        pamac search "^$latest_lts1$" 
-
-                        if test -n "$AUR_pac"; then 
-                            
-                            pamac search '^linux-lts-versioned-bin$' 
-                            
-                            reade $flag -Q 'GREEN' -p "Manjaro doesn't have great support for the latest longterm kernel.\nThe 'linux-lts-meta' package tends to be out of date .\nChoosing between manjaro's versioned kernels - linux612, linux614, etc. - for the one that is closest to the 'longterm' kernel's full version is an alternative (however this can also be a few minor versions behind)\nSince AUR support is enabled, there's the option for 'linux-lts-versioned-bin' which is by all means actually 'up-to-date'\nWhich is preferred? [Versionlts/aurlts/metalts]: " -i 'versionlts aurlts metalts' lts_ver
-                        else
-                            reade $flag -Q 'GREEN' -p "Manjaro doesn't have great support for the latest longterm kernel.\nThe 'linux-lts-meta' package tends to be out of date .\nChoosing between manjaro's versioned kernels - linux612, linux614, etc. - for the one that is closest to the 'longterm' kernel's full version is an alternative (however this can also be a few minor versions behind)\nWhich is preferred? [Versionlts/metalts]: " -i 'versionlts metalts' lts_ver
-                        fi
-                        
-                        if [[ $lts_ver == 'aurlts' ]]; then
-                            readyn $flag -p "Also install headers?" lt_header
-                            if [[ $lt_header == 'y' ]]; then
-                                pamac install --no-confirm linux-lts-versioned-bin linux-lts-versioned-headers-bin       
-                            else 
-                                pamac install --no-confirm linux-lts-versioned-bin 
-                            fi
-                        elif [[ $lts_ver == 'versionlts' ]]; then
-                            readyn $flag -p "Also install headers?" lt_header
-                            if [[ $lt_header == 'y' ]]; then
-                                pamac install --no-confirm "$latest_lts1 $latest_lts1-headers"       
-                            else
-                                pamac install --no-confirm $latest_lts1      
-                            fi
-                        elif [[ $lts_ver == 'metalts' ]]; then
-                            readyn $flag -p "Also install headers?" lt_header
-                            if [[ $lt_header == 'y' ]]; then
-                                pamac install --no-confirm linux-lts-meta linux-lts-headers-meta       
-                            else
-                                pamac install --no-confirm linux-lts-meta      
-                            fi
-                        fi
-
-                    elif [[ "$KERNEL" == 'stable' ]] && test -z "$(pamac list --quiet --installed '^linux-meta$')" && test -z "$(pamac list --quiet --installed "^$latest_stbl$")"; then
-                        printf "${GREEN}%s ${CYAN}%s\n" "Latest stable version:" "$latest_stbl" 
-
-                        pamac search '^linux-meta$' 
-                        pamac search "^$latest_stbl1$" 
-
-                        reade $flag -Q 'GREEN' -p "Which is preferred? [Meta/version]: " -i 'meta version' lts_ver
-                        if [[ "$lts_ver" == 'meta' ]]; then
-                            readyn $flag -p "Also install headers?" lt_header
-                            if [[ $lt_header == 'y' ]]; then
-                                pamac install --no-confirm linux-meta linux-headers-meta       
-                            else
-                                pamac install --no-confirm linux-meta      
-                            fi
-                             
-                        elif [[ "$lts_ver" == 'version' ]]; then
-                            readyn $flag -p "Also install headers?" lt_header
-                            if [[ $lt_header == 'y' ]]; then
-                                pamac install --no-confirm "$latest_stbl1 $latest_stbl1-headers"       
-                            else
-                                pamac install --no-confirm $latest_stbl1     
-                            fi
-                        
-                        fi
-                    
-                    elif [[ "$KERNEL" == 'mainline' ]] && test -z "$(pamac list --quiet --installed '^linux-mainline$')" && test -z "$(pamac list --quiet --installed "^$latest_main$")"; then
-                        printf "${GREEN}%s ${CYAN}%s\n" "Latest mainline version:" "$latest_main" 
-                       
-                        pamac search "^$latest_main1$" 
-
-                        if test -n "$AUR_pac"; then
-                            pamac search "^linux-mainline$" 
-                            reade $flag -Q 'GREEN' -p "Which is preferred? [Version/mainline]: " -i 'version mainline' lts_ver
-                        else 
-                            readyn $flag -p "Install $latest_main1?" lts_ver 
-                        fi
-                        
-                        if [[ "$lts_ver" == 'version' ]] || [[ "$lts_ver" == 'y' ]]; then
-                            readyn $flag -p "Also install headers?" lt_header
-                            if [[ $lt_header == 'y' ]]; then
-                                pamac install --no-confirm "$latest_main1 $latest_main1-headers" 
-                            else 
-                                pamac install --no-confirm "$latest_main1" 
-                            fi
-                        elif [[ "$lts_ver" == 'mainline' ]]; then
-                            readyn $flag -p "Also install headers?" lt_header
-                            if [[ $lt_header == 'y' ]]; then
-                                pamac install --no-confirm "linux-mainline linux-mainline-headers" 
-                            else 
-                                pamac install --no-confirm "linux-mainline" 
-                            fi
-                        fi
-                    fi
-                    
-                    # https://www.kernel.org/feeds/kdist.xml 
-                elif [[ "$distro" == 'Arch' ]]; then
-                    if [[ "$KERNEL" == 'lts' ]]; then
-                         
-                        pamac search '^linux-lts$' 
-                        
-                        readyn -p 'Also install headers?' lt_header
-                        if [[ "$lt_header" ]]; then
-                            sudo pacman -Su linux-lts linux-lts-headers 
-                        else 
-                            sudo pacman -Su linux-lts 
-                        fi
-                    elif [[ "$KERNEL" == 'stable' ]]; then
-                        
-                        pamac search '^linux$' 
-                       
-                        readyn -p 'Also install headers?' lt_header
-                        if [[ "$lt_header" ]]; then
-                            sudo pacman -Su linux linux-headers 
-                        else 
-                            sudo pacman -Su linux 
-                        fi
-                    elif [[ "$KERNEL" == 'mainline' ]]; then
-                        if test -z "$AUR_pac"; then
-                            printf "${YELLOW}Can't proceed: mainline linux kernel only available through AUR${normal}\n" 
-                        else 
-                            
-                            eval "$AUR_search '^linux-mainline$'"
-
-                            readyn -p 'Also install headers?' lt_header
-                            if [[ "$lt_header" ]]; then
-                                eval "$AUR_ins linux-mainline linux-mainline-headers" 
-                            else 
-                                eval "$AUR_ins linux-mainline" 
-                            fi
-                        fi
-                    fi
-                fi
-            fi
-        fi
-
         local hdrs_ins
         
         test -n "$YES" && flag='--auto' || flag=''
