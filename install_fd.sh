@@ -13,9 +13,9 @@ fi
 
 if ! type fd &> /dev/null; then
     if [[ $distro_base == "Arch" ]]; then
-        eval "$pac_ins fd"
+        eval "$pac_ins_y fd"
     elif [[ $distro_base == "Debian" ]]; then
-        eval "$pac_ins fd-find"
+        eval "$pac_ins_y fd-find"
         if ! test -f ~/.local/bin/fd; then
             ln -s $(which fdfind) ~/.local/bin/fd
         fi

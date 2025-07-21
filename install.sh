@@ -163,13 +163,16 @@ if test -z "$(eval "$pac_ls_ins groff 2> /dev/null")"; then
 fi
 
 if [[ $distro_base == 'Debian' ]]; then
-    if test -z "$(${pac_ls_ins} manpages-posix 2>/dev/null)"; then
-        printf "${CYAN}manpages-posix${normal} is not installed (Manpages for posix-compliant (f.ex. bash) commands (f.ex. alias, test, type, etc...))\n"
-        readyn -p "Install manpages-posix?" posixman_ins
-        if [[ $posixman_ins == 'y' ]]; then
-            eval "$pac_ins_y manpages-posix"
+    
+    if [[ "$distro" == 'Ubuntu' ]]; then
+        if test -z "$(${pac_ls_ins} manpages-posix 2>/dev/null)"; then
+            printf "${CYAN}manpages-posix${normal} is not installed (Manpages for posix-compliant (f.ex. bash) commands (f.ex. alias, test, type, etc...))\n"
+            readyn -p "Install manpages-posix?" posixman_ins
+            if [[ $posixman_ins == 'y' ]]; then
+                eval "$pac_ins_y manpages-posix"
+            fi
+            unset posixman_ins
         fi
-        unset posixman_ins
     fi
 
     if test -z "$(apt list --installed software-properties-common 2>/dev/null | awk 'NR>1{print;}')" || test -z "$(apt list --installed python3-launchpadlib 2>/dev/null | awk 'NR>1{print;}')"; then

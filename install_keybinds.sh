@@ -18,6 +18,11 @@ else
 fi
 
 
+if ! hash pcregrep &> /dev/null; then
+    eval "${pac_ins_y} pcregrep" 
+fi
+
+
 # Shell-keybinds
 
 binds=$SCRIPT_DIR/keybinds/.inputrc
