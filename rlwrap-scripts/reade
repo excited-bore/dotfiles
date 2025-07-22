@@ -228,18 +228,18 @@ function reade() {
             fi
         fi
      
-	local oldhist=''
+	    local oldhist=''
         local color=""
         local arg='' 
         local args=''
         local tmpf=''
-	local eflag=0
+	    local eflag=0
         local pre=''
         while getopts 'arsS:b:e:i:p:Q:' flag; do
             case "${flag}" in
             b) ;;
             e)
-                if test -n "$BASH_VERSION" || [[ $noecho == 'y' ]]; then
+                if test -n "$BASH_VERSION" || [[ "$noecho" == 'y' ]]; then
                     readstr=$(echo "$readstr" | sed 's|read |read -e |g')
                 fi
                 if test -n "$ZSH_VERSION"; then
@@ -253,7 +253,7 @@ function reade() {
 
                 local eflag='-e' 
 
-                [[ $nostyle == 'c' ]] && eflag=''
+                [[ "$nostyle" == 'c' ]] && eflag=''
 
                 if test -n "$BASH_VERSION"; then
                     readstr=$(echo "$readstr" | sed 's|read |read '"$eflag"' -i "'"$arg"'" |g')
@@ -378,7 +378,7 @@ function reade() {
                         readstr=$(echo "$readstr" | sed 's|vared |vared -p "'"${color}${OPTARG}${normal}"'" |g')
                         prmpt="${color}${OPTARG}${normal}"
                     else
-                        readstr=$(echo "$readstr" | sed 's|vared |vared -p "'"${optarg}"'" |g')
+                        readstr=$(echo "$readstr" | sed 's|vared |vared -p "'"${OPTARG}"'" |g')
                         prmpt="${OPTARG}"
                     fi
                 fi

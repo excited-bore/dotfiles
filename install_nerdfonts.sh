@@ -41,7 +41,7 @@ fi
 fonts=$(mktemp -d)
 get-latest-releases-github https://github.com/ryanoasis/nerd-fonts $fonts/ "$tar_zip"
 
-if [[ "$(ls $fonts/* 2> /dev/null)" ]]; then
+if [[ "$(command ls $fonts/* 2> /dev/null)" ]]; then
 
     if [[ "$tar_zip" == 'zip' ]]; then
         for i in $(command ls $fonts/*.zip); do

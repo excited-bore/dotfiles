@@ -61,12 +61,13 @@ if type wget &>/dev/null && type jq &>/dev/null; then
             releases="$nwreleases"
         fi
 
-        if command -v fzf &>/dev/null; then
+        if hash fzf &>/dev/null; then
             test -n "$quer" &&
                 quer="--query $quer"
             res="$(printf "$releases" | fzf $quer --multi --reverse --height 50%)"
         else
             printf "Files: \n${cyan}$releases${normal}\n"
+            releases=$(echo "$releases" | tr '\n' ' ')
             reade -Q 'CYAN' -i "$quer $releases" -p "Which one?: " res
         fi
 
@@ -74,8 +75,8 @@ if type wget &>/dev/null && type jq &>/dev/null; then
             if test -z "$2"; then
                 reade -Q 'GREEN' -i "$HOME/Downloads" -p "Download Folder?: " -e dir
             fi
-           
-            for i in $res; do 
+
+            for i in ${res[@]}; do 
                 if test -d "$dir"; then
                     
                     # Remove stray '/' when it's a dir
@@ -115,12 +116,17 @@ function git-add-ssh-key() {
         mkdir ~/.ssh
         touch ~/.ssh/config
     fi
-    read -p "Give up name (Default:'id_keytype'): " name
+    if test -n "$BASH_VERSION"; then
+        read -p "Give up name (Default:'id_keytype'): " name
+    elif test -n "$ZSH_VERSION"; then
+        read "?Give up name (Default: 'id_keytype'): " name
+    fi
+
     reade -i "dsa ecdsa ecdsa-sk ed25519 ed25519-sk rsa" -p "Give up keytype \(dsa \| ecdsa \| ecdsa-sk \| ed25519 (Default) \| ed25519-sk \| rsa\): " keytype
-    if [ -z $keytype ]; then
+    if [ -z "$keytype" ]; then
         keytype="ed25519"
     fi
-    if [ -z $name ]; then
+    if [ -z "$name" ]; then
         name="id_$keytype"
     fi
     ssh-keygen -t $keytype -f ~/.ssh/$name
