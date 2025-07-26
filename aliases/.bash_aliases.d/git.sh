@@ -3,7 +3,7 @@ if ! type reade &>/dev/null && test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh; t
     source ~/.bash_aliases.d/00-rlwrap_scripts.sh
 fi
 
-if type wget &>/dev/null && type jq &>/dev/null; then
+if hash wget &>/dev/null && hash jq &>/dev/null; then
 
     function get-latest-releases-github() {
         
@@ -38,8 +38,13 @@ if type wget &>/dev/null && type jq &>/dev/null; then
 
         printf "Analyzing ${CYAN}'$new_url'.${normal}\nDepending on how many releases are available this might take a while..\n"
 
-        releases=($(curl -sL "$new_url" | jq '.[0]' -r | jq -r '.assets' | grep --color=never "name" | sed 's/"name"://g' | tr '"' ' ' | tr ',' ' ' | sed 's/[[:space:]]//g'))
-        versn=$(curl -sL "$new_url" | jq '.[0]' -r | jq -r '.tag_name')
+	if hash curl &> /dev/null; then
+            releases=($(curl -sL "$new_url" | jq '.[0]' -r | jq -r '.assets' | grep --color=never "name" | sed 's/"name"://g' | tr '"' ' ' | tr ',' ' ' | sed 's/[[:space:]]//g'))
+            versn=$(curl -sL "$new_url" | jq '.[0]' -r | jq -r '.tag_name')
+	else
+	    releases=($(wget -qO- "$new_url" | jq '.[0]' -r | jq -r '.assets' | grep --color=never "name" | sed 's/"name"://g' | tr '"' ' ' | tr ',' ' ' | sed 's/[[:space:]]//g'))
+            versn=$(wget -qO- "$new_url" | jq '.[0]' -r | jq -r '.tag_name')
+	fi
 
         if [[ $gtb_link =~ '/releases' ]]; then
             link="$gtb_link/download/$versn/"
@@ -67,7 +72,7 @@ if type wget &>/dev/null && type jq &>/dev/null; then
             res="$(printf "$releases" | fzf $quer --multi --reverse --height 50%)"
         else
             printf "Files: \n${cyan}$releases${normal}\n"
-            releases=$(echo "$releases" | tr '\n' ' ')
+	    releases=$(printf "$releases" | tr '\n' ' ')
             reade -Q 'CYAN' -i "$quer $releases" -p "Which one?: " res
         fi
 

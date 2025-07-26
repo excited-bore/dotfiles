@@ -1,6 +1,6 @@
-[[ "$XDG_SESSION_TYPE" == 'x11' ]] && hash jq &>/dev/null && hash unzip &>/dev/null && hash fzf &>/dev/null && hash display &> /dev/null && hash ueberzugpp &> /dev/null &&
+[[ "$XDG_SESSION_TYPE" == 'x11' ]] && hash jq &>/dev/null && hash unzip &>/dev/null && hash fzf &>/dev/null && hash magick &> /dev/null && hash ueberzugpp &> /dev/null &&
     SYSTEM_UPDATED='TRUE'
-[[ "$XDG_SESSION_TYPE" == 'wayland' ]] && hash jq &>/dev/null && hash unzip &>/dev/null && hash fzf &>/dev/null && hash display &> /dev/null && hash nsxiv &> /dev/null && 
+[[ "$XDG_SESSION_TYPE" == 'wayland' ]] && hash jq &>/dev/null && hash unzip &>/dev/null && hash fzf &>/dev/null && hash magick &> /dev/null && hash nsxiv &> /dev/null && 
     SYSTEM_UPDATED='TRUE'
 
 
@@ -16,7 +16,7 @@ else
 fi
 
 if ! test -f aliases/.bash_aliases.d/git.sh; then
-    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/git.sh)
+    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/git.sh)
 else
     . ./aliases/.bash_aliases.d/git.sh
 fi
@@ -25,10 +25,15 @@ if ! [ -d $XDG_DATA_HOME/fonts ]; then
     mkdir $XDG_DATA_HOME/fonts
 fi
 
+if ! test -f install_fzf.sh; then
+    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fzf.sh 'simple')
+else
+    . ./install_fzf.sh 'simple'
+fi
+
 if ! hash jq &>/dev/null; then
     eval "$pac_ins_y jq"
 fi
-
 
 reade -Q 'GREEN' -i 'tar zip' -p "Would you like the script to get '.zip' files or '.tar.xz' files (need to install 'unzip' for '.zip' files if it's not already installed) [Tar/zip]: " tar_zip
 
@@ -69,29 +74,32 @@ fi
 
 if test -n "$name"; then
     if [[ "$XDG_SESSION_TYPE" == 'x11' ]]; then
-        if ! hash display &> /dev/null || ! hash ueberzugpp &> /dev/null; then
+        if ! hash magick &> /dev/null || ! hash ueberzugpp &> /dev/null; then
             readyn -p "Install 'imagemagick' and 'ueberzugpp' to preview/show fonts?" yhno
             if [[ "$yhno" == 'y' ]]; then
                 if ! test -f install_imagemagick.sh; then
-                    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_imagemagick.sh)
+                    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_imagemagick.sh)
                 else
                     . ./install_imagemagick.sh 
                 fi
-                eval "$pac_ins_y ueberzugpp"
+		if ! test -f install_ueberzugpp.sh; then
+		    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ueberzugpp.sh)
+                else
+                    . ./install_ueberzugpp.sh
+		fi
             fi
         fi
-    elif [[ "$XDG_SESSION_TYPE" == 'wayland' ]]; then 
-        if ! hash display &> /dev/null || ! hash nsxiv &> /dev/null || ! hash ydotool &> /dev/null; then
-            curl -o $TMPDIR/fontpreview.sh https://git.io/raw_fontpreview   
-            chmod u+x fontpreview.sh
-         
-        fi 
+    elif [[ "$XDG_SESSION_TYPE" == 'wayland' ]]; then
+        if ! hash magick &> /dev/null || ! hash nsxiv &> /dev/null || ! hash ydotool &> /dev/null; then
+            wget-curl https://git.io/raw_fontpreview > $TMPDIR/fontpreview.sh
+            chmod u+x $TMPDIR/fontpreview.sh 
+        fi
     fi
     
     # get github.com/xlucn/fontpreview-ueberzug
     
-    if (hash display &> /dev/null && hash ueberzug &> /dev/null && ! [[ "$XDG_SESSION_TYPE" == 'wayland' ]]); then
-        curl -o $TMPDIR/fontpreview.sh https://raw.githubusercontent.com/xlucn/fontpreview-ueberzug/refs/heads/master/fontpreview-ueberzug
+    if (hash magick &> /dev/null && hash ueberzugpp &> /dev/null && ! [[ "$XDG_SESSION_TYPE" == 'wayland' ]]); then
+        wget-curl https://raw.githubusercontent.com/xlucn/fontpreview-ueberzug/refs/heads/master/fontpreview-ueberzug $TMPDIR/fontpreview.sh
         if hash magick &> /dev/null; then
 	    sed -i 's/convert/magick/g' $TMPDIR/fontpreview.sh
         fi
@@ -102,10 +110,10 @@ if test -n "$name"; then
     fi
   
     #while : ; do 
-    #    if hash display &> /dev/null; then
+    #    if hash magick &> /dev/null; then
     #        files=$(printf "$name" | sort  -t '-'  -k1,1 | uniq | fzf --header="Which fonts to preview?" --query='Regular' --multi --reverse --height 50%) 
     #        for i in $files; do 
-    #            display $(echo "$XDG_DATA_HOME/fonts/$i" | sed 's/.*[[:space:]]//g'); 
+    #            magick $(echo "$XDG_DATA_HOME/fonts/$i" | sed 's/.*[[:space:]]//g'); 
     #        done
     #    fi
     #    readyn -p "Preview more fonts?" prvwmore
@@ -126,7 +134,7 @@ if test -n "$name"; then
                 #if [[ $(echo "$files" | wc -w) == 1 ]]; then
                 #    quer="--query=$files" 
                 #fi
-                ! (hash display &> /dev/null && hash ueberzug &> /dev/null) && 
+                ! (hash magick &> /dev/null && hash ueberzug &> /dev/null) && 
                     file=$(printf "$name" | sort  -t '-'  -k1,1 | uniq | fzf --header="Which font?" $quer --reverse --height 50%) ||
                     file=$(FONTPREVIEW_FILES="$name" $TMPDIR/fontpreview.sh) 
                 style=$(echo $file | cut -d. -f-1 | cut -d- -f2) 
@@ -147,7 +155,7 @@ if test -n "$name"; then
                 #if [[ $(echo "$files" | wc -w) == 1 ]]; then
                 #    quer="--query=$files" 
                 #fi
-                ! (hash display &> /dev/null && hash ueberzug &> /dev/null) && 
+                ! (hash magick &> /dev/null && hash ueberzug &> /dev/null) && 
                     file=$(printf "$name" | sort  -t '-'  -k1,1 | uniq | fzf --header="Which font?" $quer --reverse --height 50%) ||
                     file=$(FONTPREVIEW_FILES="$name" $TMPDIR/fontpreview.sh) 
                 style=$(echo $file | cut -d. -f-1 | cut -d- -f2) 
@@ -204,7 +212,7 @@ if test -n "$name"; then
                 #elif [[ $(echo "$files" | wc -w) == 1 ]]; then
                 #    quer="--query=$files" 
                 fi
-                ! (hash display &> /dev/null && hash ueberzug &> /dev/null) && 
+                ! (hash magick &> /dev/null && hash ueberzug &> /dev/null) && 
                     file=$(printf "$name" | sort  -t '-'  -k1,1 | uniq | fzf --header="Which font?" $quer --reverse --height 50%) ||
                     file=$(FONTPREVIEW_QUERY="$file" FONTPREVIEW_FILES="$name" $TMPDIR/fontpreview.sh) 
                 style=$(echo $file | cut -d. -f-1 | cut -d- -f2) 
