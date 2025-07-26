@@ -19,7 +19,11 @@ MINGW*)
 esac
 
 if test -z "$TMPDIR"; then
-    TMPDIR=$(mktemp -d)
+    if test -d /tmp; then
+        TMPDIR=/tmp
+    else
+        TMPDIR=$(mktemp -d)
+    fi
 fi
 
 if test -z "$TMP"; then

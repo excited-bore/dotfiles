@@ -12,11 +12,11 @@ fi
 if ! hash magick &> /dev/null; then
     if [[ "$distro_base" == 'Debian' ]]; then
         # Installing latest version of imagemagick 'imagemagick easy installer'
-        # https://github.com/SoftCreatR/imei 
-        t=$(mktemp) 
-        wget 'https://dist.1-2.dev/imei.sh' -qO "$t"
-        bash "$t" 
-        rm "$t" 
+        # https://github.com/SoftCreatR/imei  
+        wget-curl 'https://dist.1-2.dev/imei.sh' > $TMPDIR/imei.sh
+        chmod u+x $TMPDIR/imei.sh
+        sudo $TMPDIR/imei.sh 
+        rm "$TMPDIR/imei.sh" 
     else
         eval "$pac_ins_y imagemagick"
     fi

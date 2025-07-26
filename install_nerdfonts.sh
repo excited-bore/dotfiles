@@ -77,38 +77,58 @@ if test -n "$name"; then
         if ! hash magick &> /dev/null || ! hash ueberzugpp &> /dev/null; then
             readyn -p "Install 'imagemagick' and 'ueberzugpp' to preview/show fonts?" yhno
             if [[ "$yhno" == 'y' ]]; then
+                if ! hash magick &> /dev/null; then 
+                    if ! test -f install_imagemagick.sh; then
+                        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_imagemagick.sh)
+                    else
+                        . ./install_imagemagick.sh 
+                    fi
+                fi
+                if ! hash ueberzugpp &> /dev/null; then
+                    if ! test -f install_ueberzugpp.sh; then
+                        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ueberzugpp.sh)
+                    else
+                        . ./install_ueberzugpp.sh
+                    fi
+                fi
+            fi
+        fi
+        # get github.com/xlucn/fontpreview-ueberzug
+        
+        if (hash magick &> /dev/null && hash ueberzugpp &> /dev/null && [[ "$XDG_SESSION_TYPE" == 'x11' ]]); then
+            wget-curl https://raw.githubusercontent.com/xlucn/fontpreview-ueberzug/refs/heads/master/fontpreview-ueberzug $TMPDIR/fontpreview.sh
+            if hash magick &> /dev/null; then
+                sed -i 's/convert/magick/g' $TMPDIR/fontpreview.sh
+            fi
+            sed -i 's/fc-list -f/\tif [ -z "$FONTPREVIEW_FILES" ]; then\n\tfc-list -f/g' $TMPDIR/fontpreview.sh
+            sed -i 's,wrap",wrap"\n\telse\n\t(cd $XDG_DATA_HOME/fonts/\n\t\ttest -n "$FONTPREVIEW_QUERY" \&\& quer="--query=$FONTPREVIEW_QUERY" || quer=""\n\tprintf "$FONTPREVIEW_FILES" | sort -t "-" -k1\,1 | uniq |\n\tfzf --header="Which font?" $quer --layout=reverse --preview "sh $0 {}" --preview-window "left:50%:noborder:wrap")\n\tfi,g' $TMPDIR/fontpreview.sh 
+            chmod u+x $TMPDIR/fontpreview.sh   
+        
+        fi
+        
+    elif [[ "$XDG_SESSION_TYPE" == 'wayland' ]]; then
+        if ! hash magick &> /dev/null || ! hash nsxiv &> /dev/null; then
+            if ! hash magick &> /dev/null; then
                 if ! test -f install_imagemagick.sh; then
                     source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_imagemagick.sh)
                 else
                     . ./install_imagemagick.sh 
-                fi
-		if ! test -f install_ueberzugpp.sh; then
-		    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ueberzugpp.sh)
-                else
-                    . ./install_ueberzugpp.sh
-		fi
+                fi 
+            fi
+            if ! hash nsxiv &> /dev/null; then
+                eval "$pac_ins_y nsxiv" 
             fi
         fi
-    elif [[ "$XDG_SESSION_TYPE" == 'wayland' ]]; then
-        if ! hash magick &> /dev/null || ! hash nsxiv &> /dev/null || ! hash ydotool &> /dev/null; then
-            wget-curl https://git.io/raw_fontpreview > $TMPDIR/fontpreview.sh
-            chmod u+x $TMPDIR/fontpreview.sh 
+        
+        wget-curl https://git.io/raw_fontpreview > $TMPDIR/fontpreview.sh
+        if [[ "$XDG_CURRENT_DESKTOP" == 'GNOME' ]]; then
+            sed -i 's/xdotool, //; s/(xdotool\ /(\ /; /xdotool/d;' $TMPDIR/fontpreview.sh
+        else
+            sed -i 's/xdotool, //; s/(xdotool\ /(\ /; /xdotool/d;' $TMPDIR/fontpreview.sh
         fi
+        chmod u+x $TMPDIR/fontpreview.sh
     fi
     
-    # get github.com/xlucn/fontpreview-ueberzug
-    
-    if (hash magick &> /dev/null && hash ueberzugpp &> /dev/null && ! [[ "$XDG_SESSION_TYPE" == 'wayland' ]]); then
-        wget-curl https://raw.githubusercontent.com/xlucn/fontpreview-ueberzug/refs/heads/master/fontpreview-ueberzug $TMPDIR/fontpreview.sh
-        if hash magick &> /dev/null; then
-	    sed -i 's/convert/magick/g' $TMPDIR/fontpreview.sh
-        fi
-	sed -i 's/fc-list -f/\tif [ -z "$FONTPREVIEW_FILES" ]; then\n\tfc-list -f/g' $TMPDIR/fontpreview.sh
-        sed -i 's,wrap",wrap"\n\telse\n\t(cd $XDG_DATA_HOME/fonts/\n\t\ttest -n "$FONTPREVIEW_QUERY" \&\& quer="--query=$FONTPREVIEW_QUERY" || quer=""\n\tprintf "$FONTPREVIEW_FILES" | sort -t "-" -k1\,1 | uniq |\n\tfzf --header="Which font?" $quer --layout=reverse --preview "sh $0 {}" --preview-window "left:50%:noborder:wrap")\n\tfi,g' $TMPDIR/fontpreview.sh 
-        chmod u+x $TMPDIR/fontpreview.sh   
-    
-    fi
-  
     #while : ; do 
     #    if hash magick &> /dev/null; then
     #        files=$(printf "$name" | sort  -t '-'  -k1,1 | uniq | fzf --header="Which fonts to preview?" --query='Regular' --multi --reverse --height 50%) 
