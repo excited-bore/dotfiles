@@ -77,8 +77,10 @@ if test -n "$name"; then
     
     if (hash display &> /dev/null && hash ueberzug &> /dev/null); then
         curl -o $TMPDIR/fontpreview.sh https://raw.githubusercontent.com/xlucn/fontpreview-ueberzug/refs/heads/master/fontpreview-ueberzug
-        sed -i 's/convert/magick/g' $TMPDIR/fontpreview.sh
-        sed -i 's/fc-list -f/\tif [ -z "$FONTPREVIEW_FILES" ]; then\n\tfc-list -f/g' $TMPDIR/fontpreview.sh
+        if hash magick &> /dev/null; then
+	    sed -i 's/convert/magick/g' $TMPDIR/fontpreview.sh
+        fi
+	sed -i 's/fc-list -f/\tif [ -z "$FONTPREVIEW_FILES" ]; then\n\tfc-list -f/g' $TMPDIR/fontpreview.sh
         sed -i 's,wrap",wrap"\n\telse\n\t\t(cd $XDG_DATA_HOME/fonts/\n\t\ttest -n "$FONTPREVIEW_QUERY" \&\& quer="--query=$FONTPREVIEW_QUERY" || quer=""\n\t\tprintf "$FONTPREVIEW_FILES" | sort -t "-" -k1\,1 | uniq |\n\t\tfzf --header="Which font?" $quer --layout=reverse --preview "sh $0 {}" --preview-window "left:50%:noborder:wrap")\n\tfi,g' $TMPDIR/fontpreview.sh 
         chmod u+x $TMPDIR/fontpreview.sh   
     fi

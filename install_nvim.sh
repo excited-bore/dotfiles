@@ -36,60 +36,121 @@ if [[ "$distro_base" == "Debian" ]]; then
     if test -n "$(sudo apt list --installed 2>/dev/null | grep neovim)"; then
         readyn -p "Uninstall apt version of neovim?" nvmapt
         if [[ "y" == "$nvmapt" ]]; then
-            sudo apt remove neovim
+            sudo apt remove -y neovim
         fi
     fi
 
     pre="appimage"
-    choices="flatpak apt build"
-    prompt="Which one (Appimage/flatpak/apt/build from source)? [Appimage/flatpak/apt/build]: "
-    if type add-apt-repository &>/dev/null; then
-        if ! echo $(check-ppa ppa:neovim-ppa/unstable) | grep -q 'NOT'; then
+    choices="makedeb flatpak apt build"
+    prompt="Which one (Appimage/makedeb/flatpak/apt/build from source)? [Appimage/makedeb/flatpak/apt/build]: "
+    
+    if [[ "$distro" == 'Ubuntu' ]]; then
+	if ! echo $(check-ppa ppa:neovim-ppa/unstable) | grep -q 'NOT' && ! echo $(check-ppa ppa:neovim-ppa/stable) | grep -q 'NOT'; then  
+            pre="ppa-stable"
+            choices="ppa-unstable appimage makedeb flatpak apt build"
+            prompt="Which one (Ppa-stable/ppa-unstable/appimage/makedeb/flatpak/apt/build from source)? [Ppa-stable/ppa-unstable/appimage/makedeb/flatpak/apt/build]: "
+        elif ! echo $(check-ppa ppa:neovim-ppa/unstable) | grep -q 'NOT'; then
             pre="ppa-unstable"
-            choices="appimage flatpak apt build"
-            prompt="Which one (Ppa-unstable/appimage/flatpak/apt/build from source)? [Ppa-unstable/appimage/flatpak/apt/build]: "
+            choices="appimage makedeb flatpak apt build"
+            prompt="Which one (Ppa-unstable/appimage/makedeb/flatpak/apt/build from source)? [Ppa-unstable/appimage/makedeb/flatpak/apt/build]: "
+        elif ! echo $(check-ppa ppa:neovim-ppa/stable) | grep -q 'NOT'; then
+            pre="ppa-stable"
+            choices="appimage makedeb flatpak apt build"
+            prompt="Which one (Ppa-stable/appimage/makedeb/flatpak/apt/build from source)? [Ppa-stable/appimage/makedeb/flatpak/apt/build]: "
         fi
+    else
+        pre='appimage' 
+        choices="makedeb flatpak apt build"
+        prompt="Which one (Appimage/makedeb/flatpak/apt/build from source)? [Appimage/makedeb/flatpak/apt/build]: "
     fi
+    
     if [[ "$arch" =~ "arm" ]]; then
         echo "${cyan}Arm architecture${normal} sadly still does not support ${red}appimages${normal}"
-        if ! [[ "$pre" == 'ppa-unstable' ]]; then
-            pre="flatpak"
-            choices="apt build"
-            prompt="Which one (Flatpak/build from source)? [Flatpak/apt/build]: "
-        else
-            pre="ppa-unstable"
+        if ! [[ "$pre" == 'ppa-unstable' ]] && ! [[ "$pre" == 'ppa-stable' ]]; then
+            pre="makedeb"
             choices="flatpak apt build"
-            prompt="Which one (Ppa-unstable/flatpak/build from source)? [Ppa-unstable/flatpak/apt/build]: "
+            prompt="Which one (makedeb/flatpak/apt/build from source)? [Makedeb/flatpak/apt/build]: "
+        else
+	    if [[ "$prompt" =~ 'ppa-unstable' ]] || [[ "$prompt" =~ 'ppa-stable' ]]; then
+	    	if [[ "$prompt" =~ 'ppa-unstable' ]] && [[ "$prompt" =~ 'ppa-stable' ]]; then
+		    pre='ppa-stable'
+	            choices="ppa-unstable makedeb flatpak apt build"
+		    prompt="Which one (Ppa-stable/ppa-unstable/makedeb/flatpak/build from source)? [Ppa-stable/ppa-unstable/makedeb/flatpak/apt/build]: "
+	    	elif [[ "$prompt" =~ 'ppa-unstable' ]]; then
+	    	    pre='ppa-unstable'
+	            choices="makedeb flatpak apt build"
+		    prompt="Which one (Ppa-unstable/makedeb/flatpak/build from source)? [Ppa-unstable/makedeb/flatpak/apt/build]: "
+		elif [[ "$prompt" =~ 'ppa-stable' ]]; then
+		    pre='ppa-stable'
+	            choices="makedeb flatpak apt build"
+		    prompt="Which one (Ppa-stable/makedeb/flatpak/build from source)? [Ppa-stable/makedeb/flatpak/apt/build]: "
+		fi 
+	    fi
         fi
     fi
+    
     reade -Q "GREEN" -i "$pre $choices" -p "$prompt" nvmappmg
     if [[ "$nvmappmg" == 'ppa-unstable' ]]; then
         sudo add-apt-repository ppa:neovim-ppa/unstable
-        sudo apt update
-        eval "${pac_ins} neovim"
+        eval "${pac_up}"
+        eval "${pac_ins_y} neovim"
+    elif [[ "$nvmappmg" == 'ppa-stable' ]]; then
+        sudo add-apt-repository ppa:neovim-ppa/stable
+        eval "${pac_up}"
+        eval "${pac_ins_y} neovim"
+    elif [[ "$nvmappmg" == 'makedeb' ]]; then
+        if ! test -f install_makedeb.sh; then
+            source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_makedeb.sh)
+        else
+            ./install_makedeb.sh 
+        fi
+        tmpd=$(mktemp -d)
+        git clone https://mpr.makedeb.org/neovim $tmpd
+        (cd $tmpd/
+        makedeb -si)
     elif [[ "appimage" == "$nvmappmg" ]]; then
         if ! test -f checks/check_appimage_ready.sh; then
             source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_appimage_ready.sh)
         else
             . ./checks/check_appimage_ready.sh
         fi
-        if ! test -z "$(sudo apt list --installed 2>/dev/null | grep libfuse2)"; then
-            if ! type curl &>/dev/null; then
-                eval "${pac_ins}" curl
+        if test -n "$(sudo apt list --installed 2>/dev/null | grep libfuse2)"; then
+            if ! hash curl &>/dev/null; then
+                eval "${pac_ins_y}" curl
             fi
-            if ! type jq &>/dev/null; then
-                eval "${pac_ins}" jq
+            if ! hash jq &>/dev/null; then
+                eval "${pac_ins_y}" jq
             fi
             ltstv=$(curl -sL https://api.github.com/repos/neovim/neovim/releases/latest | jq -r ".tag_name")
             tmpdir=$(mktemp -d -t nvim-XXXXXXXXXX)
-            curl -o $tmpdir/nvim.appimage https://github.com/neovim/neovim/releases/download/$ltstv/nvim.appimage
-            curl -o $tmpdir/nvim.appimage.sha256sum https://github.com/neovim/neovim/releases/download/$ltstv/nvim.appimage.sha256sum
-            if ! [[ "$(sha256sum $tmpdir/nvim.appimage | awk '{print $1}')" == "$(cat $tmpdir/nvim.appimage.sha256sum | awk '{print $1}')" ]]; then
-                echo "Something went wrong: Sha256sums aren't the same. Try again later"
-            else
-                chmod u+x $tmpdir/nvim.appimage
-                sudo mv "$tmpdir/nvim.appimage" /usr/local/bin/nvim
+            if [[ "$arch" == 'amd64' ]] || [[ "$arch" == 'amd32' ]] || [[ "$arch" == '386' ]]; then
+                nvarch='x86_64' 
+            elif [[ "$arch" =~ 'arm' ]]; then
+                nvarch='arm64'
             fi
+            wget-aria-name $tmpdir/nvim.appimage https://github.com/neovim/neovim/releases/download/$ltstv/nvim-linux-$nvarch.appimage
+            
+            # Shasum became unsupported in later versions ig 
+            #wget-aria-name $tmpdir/nvim.appimage.sha256sum https://github.com/neovim/neovim/releases/download/$ltstv/nvim.appimage.sha256sum
+            #if ! [[ "$(sha256sum $tmpdir/nvim.appimage | awk '{print $1}')" == "$(cat $tmpdir/nvim.appimage.sha256sum | awk '{print $1}')" ]]; then
+            #    echo "Something went wrong: Sha256sums aren't the same. Try again later"
+            #else
+            chmod u+x $tmpdir/nvim.appimage
+            sudo mv "$tmpdir/nvim.appimage" /usr/local/bin/nvim
+            #fi
+            #if [[ "$distro_base" == 'Debian' ]]; then
+                # update default paths for Debian-based systems, taken straight from nvim github wiki 
+                # https://github.com/neovim/neovim/wiki/Installing-Neovim/921fe8c40c34dd1f3fb35d5b48c484db1b8ae94b#debian
+
+                # Set the above with the correct path, then run the rest of the commands:
+                #CUSTOM_NVIM_PATH=/usr/local/bin/nvim.appimage
+                #set -u
+                #sudo update-alternatives --install /usr/bin/ex ex "${CUSTOM_NVIM_PATH}" 110
+                #sudo update-alternatives --install /usr/bin/vi vi "${CUSTOM_NVIM_PATH}" 110
+                #sudo update-alternatives --install /usr/bin/view view "${CUSTOM_NVIM_PATH}" 110
+                #sudo update-alternatives --install /usr/bin/vim vim "${CUSTOM_NVIM_PATH}" 110
+                #sudo update-alternatives --install /usr/bin/vimdiff vimdiff "${CUSTOM_NVIM_PATH}" 110 
+            #fi
         else
             pre="flatpak"
             choices="build"
@@ -166,7 +227,7 @@ if [[ $machine == 'Linux' ]]; then
     if ! hash xclip &>/dev/null || ! hash xsel &>/dev/null; then
         readyn -p "Install nvim clipboard? (xsel xclip)" clip
         if [[ "y" == "$clip" ]]; then
-            eval "${pac_ins}" install xsel xclip
+            eval "${pac_ins_y}" xsel xclip
             echo "${green} If this is for use with ssh on serverside, X11 needs to be forwarded"
             echo "${green} At clientside, 'ForwardX11 yes' also needs to be put in ~/.ssh/config under Host"
             echo "${green} Connection also need to start with -X flag (ssh -X ..@..)${normal}"
@@ -181,7 +242,7 @@ fi
 if ! hash gcc &>/dev/null || ! hash npm &>/dev/null || ! hash unzip &>/dev/null; then
     readyn -p "Install necessary tools for using supplied config? (tools include: gcc - GNU C compiler, npm - javascript package manager and unzip)" gccn
     if [[ "y" == $gccn ]]; then
-        eval "${pac_ins}" gcc npm unzip
+        eval "${pac_ins_y}" gcc npm unzip
     fi
 fi
 
@@ -221,13 +282,13 @@ if [[ "$langs" == 'y' ]]; then
     if ! hash npm &>/dev/null || ! npm list -g | grep neovim &>/dev/null; then
         readyn -p "Install nvim-javascript? " jsscripts
         if [[ "y" == "$jsscripts" ]]; then
-            eval "${pac_ins}" npm nodejs
+            eval "${pac_ins_y}" npm nodejs
             sudo npm install -g neovim
         fi
     fi
     if ! hash gem &>/dev/null || ! gem list | grep neovim &>/dev/null; then
         readyn -p "Install nvim-ruby? " rubyscripts
-        if [[ "y" == $rubyscripts ]]; then
+        if [[ "y" == "$rubyscripts" ]]; then
             if ! test -f install_ruby.sh; then
                 source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ruby.sh)
             else
@@ -241,8 +302,8 @@ if [[ "$langs" == 'y' ]]; then
 
     if ! hash cpan &>/dev/null; then
         readyn -p "Install Perl and cpanminus?" perlins
-        if [[ $perlins == 'y' ]]; then
-            eval "${pac_ins}" perl cpanminus
+        if [[ "$perlins" == 'y' ]]; then
+            eval "${pac_ins_y}" perl cpanminus
         fi
     fi
 
@@ -252,11 +313,11 @@ if [[ "$langs" == 'y' ]]; then
         if [[ "y" == $cpn ]]; then
             #printf "Pressing enter once in a while *seems* to speed up the process "
             cpan -l
-            if ! hash cpanm &>/dev/null || ! cpan -l 2>/dev/null | grep -q Neovim::Ext; then
+            if ! hash cpanm &>/dev/null || (hash cpan &>/dev/null && ! cpan -l 2>/dev/null | grep -q Neovim::Ext); then
                 readyn -p "Install nvim-perl?" perlscripts
                 if [[ "y" == $perlscripts ]]; then
                     if ! hash cpanm &>/dev/null; then
-                        eval "${pac_ins}" cpanminus
+                        eval "${pac_ins_y}" cpanminus
                     fi
                     cpanm --local-lib=~/perl5 local::lib && eval "$(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)"
                     sudo cpanm --sudo -n Neovim::Ext

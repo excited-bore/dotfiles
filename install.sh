@@ -180,7 +180,7 @@ if [[ $distro_base == 'Debian' ]]; then
             printf "${CYAN}add-apt-repository${normal} is not installed (cmd tool for installing extra repositories/ppas on debian systems)\n"
             readyn -p "Install add-apt-repository?" add_apt_ins
             if [[ $add_apt_ins == 'y' ]]; then
-                eval "$pac_ins_y software-properties-common"
+                eval "$pac_ins_y software-properties-common python3-launchpadlib"
             fi
             unset add_apt_ins
         fi
