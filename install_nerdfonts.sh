@@ -128,7 +128,7 @@ if test -n "$name"; then
         sed -i 's/\(fontpreview very customizable\)/\1\n\t\[\[ $FONTPREVIEW_FONTS != "" \]\] \&\& FONTS=$FONTPREVIEW_FONTS/' $TMPDIR/fontpreview.sh
         sed -i 's/\(--search-prompt)\)/\t--fonts)\n\tFONTPREVIEW_FONTS=$2\n\t;;\n\t\1/' $TMPDIR/fontpreview.sh 
         sed -i 's/\(search-prompt:,)\)/fonts:,\1/' $TMPDIR/fontpreview.sh 
-        sed -i 's|\(font=$(magick -list font.*)\)|\tif test -z "$FONTPREVIEW_FONTS"; then\n\t\1\n\telse\n\tfont=$(printf "$FONTPREVIEW_FONTS" \| sort -t "-" -k1\,1 \| uniq \| fzf --header="Which font?(Ctrl+C to quit - last seen will be selected)" $quer --layout=reverse --prompt="$SEARCH_PROMPT")\n\techo "$font"\n\tfi\n|' $TMPDIR/fontpreview.sh
+        sed -i 's|\(font=$(magick -list font.*)\)|\tif test -z "$FONTPREVIEW_FONTS"; then\n\t\1\n\telse\n\tfont=$(printf "$FONTPREVIEW_FONTS" \| sort -t "-" -k1\,1 \| uniq \| fzf --header="Which font? (Ctrl+C to quit - last selected will be used)" $quer --layout=reverse --prompt="$SEARCH_PROMPT")\n\techo "$font"\n\tfi\n|' $TMPDIR/fontpreview.sh
         sed -i 's|\[\[ -z $font \]\].*|if test -z $font; then\n\treturn\n\telse\n\tstyle=$(echo $font \| cut -d- -f2 \| cut -d. -f1)\n\tfont=$(fc-match $font \| awk '\''{$1=""; print}'\'' \| xargs \| sed "s/Regular/$style/; s/ /-/g; s/-Regular//g")\n\tfi|' $TMPDIR/fontpreview.sh 
         sed -i 's/^main$/echo $(main | awk '\''{print $NF}'\'')/' $TMPDIR/fontpreview.sh 
         chmod u+x $TMPDIR/fontpreview.sh

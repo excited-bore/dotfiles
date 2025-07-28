@@ -40,28 +40,28 @@ if [[ "$distro_base" == "Debian" ]]; then
         fi
     fi
 
-    pre="appimage"
-    choices="makedeb flatpak apt build"
-    prompt="Which one (Appimage/makedeb/flatpak/apt/build from source)? [Appimage/makedeb/flatpak/apt/build]: "
+    pre="makedeb"
+    choices="appimage flatpak apt build"
+    prompt="Which one (Makedeb/appimage/flatpak/apt/build from source)? [Makedeb/appimage/flatpak/apt/build]: "
     
     if [[ "$distro" == 'Ubuntu' ]]; then
 	if ! echo $(check-ppa ppa:neovim-ppa/unstable) | grep -q 'NOT' && ! echo $(check-ppa ppa:neovim-ppa/stable) | grep -q 'NOT'; then  
             pre="ppa-stable"
-            choices="ppa-unstable appimage makedeb flatpak apt build"
-            prompt="Which one (Ppa-stable/ppa-unstable/appimage/makedeb/flatpak/apt/build from source)? [Ppa-stable/ppa-unstable/appimage/makedeb/flatpak/apt/build]: "
+            choices="ppa-unstable makedeb appimage flatpak apt build"
+            prompt="Which one (Ppa-stable/ppa-unstable/makedeb/appimage/flatpak/apt/build from source)? [Ppa-stable/ppa-unstable/makedeb/appimage/flatpak/apt/build]: "
         elif ! echo $(check-ppa ppa:neovim-ppa/unstable) | grep -q 'NOT'; then
             pre="ppa-unstable"
-            choices="appimage makedeb flatpak apt build"
-            prompt="Which one (Ppa-unstable/appimage/makedeb/flatpak/apt/build from source)? [Ppa-unstable/appimage/makedeb/flatpak/apt/build]: "
+            choices="makedeb appimage flatpak apt build"
+            prompt="Which one (Ppa-unstable/makedeb/appimage/flatpak/apt/build from source)? [Ppa-unstable/makedeb/appimage/flatpak/apt/build]: "
         elif ! echo $(check-ppa ppa:neovim-ppa/stable) | grep -q 'NOT'; then
             pre="ppa-stable"
-            choices="appimage makedeb flatpak apt build"
-            prompt="Which one (Ppa-stable/appimage/makedeb/flatpak/apt/build from source)? [Ppa-stable/appimage/makedeb/flatpak/apt/build]: "
+            choices="makedeb appimage flatpak apt build"
+            prompt="Which one (Ppa-stable/makedeb/appimage/flatpak/apt/build from source)? [Ppa-stable/makedeb/appimage/flatpak/apt/build]: "
         fi
     else
-        pre='appimage' 
-        choices="makedeb flatpak apt build"
-        prompt="Which one (Appimage/makedeb/flatpak/apt/build from source)? [Appimage/makedeb/flatpak/apt/build]: "
+        pre='makedeb' 
+        choices="appimage flatpak apt build"
+        prompt="Which one (Makedeb/appimage/flatpak/apt/build from source)? [Makedeb/appimage/flatpak/apt/build]: "
     fi
     
     if [[ "$arch" =~ "arm" ]]; then
