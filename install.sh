@@ -446,7 +446,7 @@ unset rmp
 
 # Fzf (Fuzzy Finder)
 
-readyn -p "Install fzf? (Fuzzy file/folder finder - replaces Ctrl-R/reverse-search, binds fzf search files on Ctrl+T and fuzzy search directories on Alt-C + Custom script: Ctrl-f becomes system-wide file opener)" -c "! test -f key-bindings.bash" findr
+readyn -p "Install fzf? (Fuzzy file/folder finder - replaces Ctrl-R/reverse-search, binds fzf search files on Ctrl+T and fuzzy search directories on Alt-C + Custom script: Ctrl-f becomes system-wide file opener)" -c "! test -f fzf-bindings.bash" findr
 
 if [[ "y" == "$findr" ]]; then
     if ! test -f $SCRIPT_DIR/install_fzf.sh; then

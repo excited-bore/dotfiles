@@ -62,16 +62,16 @@ if test -z "$1"; then
     #fi
 
     printf "${cyan}Fzf${normal} keybinds:\n\t - Fzf history on Ctrl-R (replaces reverse-search-history)\n\t - Filepath retriever on Ctrl-T\n\t - Directory navigator on Alt-C\n\t - **<TAB> for fzf completion on some commands\n"
-    readyn -p "Use fzf keybinds?" -c "test -f ~/.keybinds.d/fzf-bindings.bash" fzf_key
+    readyn -p "Use fzf keybinds?" -c "! test -f ~/.keybinds.d/fzf-bindings.bash" fzf_key
     if [[ "$fzf_key" == 'y' ]]; then
         test -f $BASH_KEYBIND_FILEDIR/fzf-bindings.bash && 
             rm $BASH_KEYBIND_FILEDIR/fzf-bindings.bash
-            wget-aria-dir $HOME/.keybinds.d/ https://raw.githubusercontent.com/junegunn/fzf/refs/heads/master/shell/key-bindings.bash
+        wget-aria-name $HOME/.keybinds.d/fzf-bindings.bash https://raw.githubusercontent.com/junegunn/fzf/refs/heads/master/shell/key-bindings.bash
     fi
 
     if test -f $BASH_KEYBIND_FILEDIR/keybinds.bash; then
         grep -q '^bind -m emacs-standard  '\''"\\C-z": vi-undo'\''' $BASH_KEYBIND_FILEDIR/keybinds.bash &&
-            sed -i 's|\\\C-z|\\\C-o|g' ~/.fzf/shell/key-bindings.bash
+            sed -i 's|\\\C-z|\\\C-o|g' $HOME/.keybinds.d/fzf-bindings.bash
     fi
     unset fzf_key
 
@@ -265,9 +265,9 @@ if test -z "$1"; then
     #if type kitty &> /dev/null; then
     #    readyn -p "Add shortcut for fzf-autocompletion? (Ctrl-Tab) "" comp_key
     #    if [ "$comp_key" == "y" ]; then
-    #        if ! test -f .keybinds.d/keybinds.bash && ! grep -q "(Kitty)" ~/.fzf/shell/key-bindings.bash; then
-    #            printf "\n# (Kitty) Ctrl-tab for fzf autocompletion" >> ~/.fzf/shell/key-bindings.bash
-    #            printf "\nbind '\"\\\e[9;5u\": \" **\\\t\"'" >> ~/.fzf/shell/key-bindings.bash
+    #        if ! test -f .keybinds.d/keybinds.bash && ! grep -q "(Kitty)" ~/keybinds.d/fzf-bindings.bash; then
+    #            printf "\n# (Kitty) Ctrl-tab for fzf autocompletion" >> ~/keybinds.d/fzf-bindings.bash
+    #            printf "\nbind '\"\\\e[9;5u\": \" **\\\t\"'" >> ~/keybinds.d/fzf-bindings.bash
     #       fi
     #     fi
     #fi
@@ -296,43 +296,43 @@ if test -z "$1"; then
                 cp ranger/.config/ranger/rifle.conf ~/.config/ranger/
                 cp fzf/.bash_aliases.d/fzf-rifle.sh ~/.bash_aliases.d/
             fi
-            sed -i 's/\\\C-f//g' ~/.fzf/shell/key-bindings.bash
-            sed -i "s|\(bind -m vi-insert '\"\\\C-t\":.*\)|\1\n\n    # CTRL-F - Search with previews and other handy additions\n    bind -m emacs-standard '\"\\\C-f\": \"\\\C-t\"'\n    bind -m vi-command '\"\\\C-f\": \"\\\C-o\\\C-f\\\C-o\"'\n    bind -m vi-insert '\"\\\C-f\": \"\\\C-o\\\C-f\\\C-o\"'|g" ~/.fzf/shell/key-bindings.bash
-            sed -i "s|\(bind -m vi-insert -x '\"\\\C-t\":.*\)|\1\n\n    # CTRL-F - Search with previews and other handy additions\n    bind -m emacs-standard -x '\"\\\C-f\": fzf_rifle'\n    bind -m vi-command -x '\"\\\C-f\": fzf_rifle'\n    bind -m vi-insert -x '\"\\\C-f\":  fzf_rifle'|g" ~/.fzf/shell/key-bindings.bash
+            sed -i 's/\\\C-f//g' ~/keybinds.d/fzf-bindings.bash
+            sed -i "s|\(bind -m vi-insert '\"\\\C-t\":.*\)|\1\n\n    # CTRL-F - Search with previews and other handy additions\n    bind -m emacs-standard '\"\\\C-f\": \"\\\C-t\"'\n    bind -m vi-command '\"\\\C-f\": \"\\\C-o\\\C-f\\\C-o\"'\n    bind -m vi-insert '\"\\\C-f\": \"\\\C-o\\\C-f\\\C-o\"'|g" ~/keybinds.d/fzf-bindings.bash
+            sed -i "s|\(bind -m vi-insert -x '\"\\\C-t\":.*\)|\1\n\n    # CTRL-F - Search with previews and other handy additions\n    bind -m emacs-standard -x '\"\\\C-f\": fzf_rifle'\n    bind -m vi-command -x '\"\\\C-f\": fzf_rifle'\n    bind -m vi-insert -x '\"\\\C-f\":  fzf_rifle'|g" ~/keybinds.d/fzf-bindings.bash
         fi
     fi
     unset fzf_f
 
     #readyn -p "Add shortcut for riflesearch on Ctrl-F? (Fzf and paste in console)" fzf_t
     #if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ] ; then
-    #    #sed -i 's|# CTRL-T|# CTRL-F|g' ~/.fzf/shell/key-bindings.bash
+    #    #sed -i 's|# CTRL-T|# CTRL-F|g' ~/keybinds.d/fzf-bindings.bash
     #
-    #    #sed -i 's|bind -m vi-command '\''"\\C-t": |bind -m vi-command '\''"\\C-f": |g' ~/.fzf/shell/key-bindings.bash
-    #    #sed -i 's|bind -m vi-insert '\''"\\C-t": |bind -m vi-insert '\''"\\C-f": |g' ~/.fzf/shell/key-bindings.bash
-    #    #sed -i 's|bind -m emacs-standard -x '\''"\\C-t": |bind -m emacs-standard -x '\''"\\C-f": |g' ~/.fzf/shell/key-bindings.bash
-    #    #sed -i 's|bind -m vi-command -x '\''"\\C-t": |bind -m vi-command -x '\''"\\C-f": |g' ~/.fzf/shell/key-bindings.bash
-    #    #sed -i 's|bind -m vi-insert -x '\''"\\C-t": |bind -m vi-insert -x '\''"\\C-f": |g' ~/.fzf/shell/key-bindings.bash
+    #    #sed -i 's|bind -m vi-command '\''"\\C-t": |bind -m vi-command '\''"\\C-f": |g' ~/keybinds.d/fzf-bindings.bash
+    #    #sed -i 's|bind -m vi-insert '\''"\\C-t": |bind -m vi-insert '\''"\\C-f": |g' ~/keybinds.d/fzf-bindings.bash
+    #    #sed -i 's|bind -m emacs-standard -x '\''"\\C-t": |bind -m emacs-standard -x '\''"\\C-f": |g' ~/keybinds.d/fzf-bindings.bash
+    #    #sed -i 's|bind -m vi-command -x '\''"\\C-t": |bind -m vi-command -x '\''"\\C-f": |g' ~/keybinds.d/fzf-bindings.bash
+    #    #sed -i 's|bind -m vi-insert -x '\''"\\C-t": |bind -m vi-insert -x '\''"\\C-f": |g' ~/keybinds.d/fzf-bindings.bash
     #fi
 
     # readyn -p "Change Alt-C shortcut to Ctrl-S for fzf cd?" fzf_t
     # if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ]; then
-    #     sed -i 's|# ALT-C - cd into the selected directory|# CTRL-S - cd into the selected directory|g' ~/.fzf/shell/key-bindings.bash
-    #     sed -i 's|\\ec|\\C-s|g'  ~/.fzf/shell/key-bindings.bash
-    #     #sed -i 's|bind -m emacs-standard '\''"\\ec"|bind -m emacs-standard '\''"\\es"|g'  ~/.fzf/shell/key-bindings.bash
-    #     #sed -i 's|bind -m vi-command '\''"\\ec"|bind -m vi-command '\''"\\es"|g' ~/.fzf/shell/key-bindings.bash
-    #     #sed -i 's|bind -m vi-insert  '\''"\\ec"|bind -m vi-insert  '\''"\\es"|g' ~/.fzf/shell/key-bindings.bash
+    #     sed -i 's|# ALT-C - cd into the selected directory|# CTRL-S - cd into the selected directory|g' ~/keybinds.d/fzf-bindings.bash
+    #     sed -i 's|\\ec|\\C-s|g'  ~/keybinds.d/fzf-bindings.bash
+    #     #sed -i 's|bind -m emacs-standard '\''"\\ec"|bind -m emacs-standard '\''"\\es"|g'  ~/keybinds.d/fzf-bindings.bash
+    #     #sed -i 's|bind -m vi-command '\''"\\ec"|bind -m vi-command '\''"\\es"|g' ~/keybinds.d/fzf-bindings.bash
+    #     #sed -i 's|bind -m vi-insert  '\''"\\ec"|bind -m vi-insert  '\''"\\es"|g' ~/keybinds.d/fzf-bindings.bash
     # fi
     #unset fzf_t;
 
     if ! test -f ~/.bash_aliases.d/docker-fzf.sh; then
-        readyn -p "Install fzf-docker (fzf aliases for docker)?" fzf_d
+        readyn -p "Install fzf-docker (fzf aliases for docker)?" -c "! test -f $HOME/.bash_aliases.d/docker-fzf.sh" fzf_d
         if [[ "$fzf_d" == "y" ]]; then
             if ! test -f checks/check_aliases_dir.sh; then
-                source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)
+                source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)
             else
                 . ./checks/check_aliases_dir.sh
             fi
-            wget-aria-dir ~/.bash_aliases.d/ https://raw.githubusercontent.com/MartinRamm/fzf-docker/master/docker-fzf
+            wget-aria-name ~/.bash_aliases.d/docker-fzf.sh https://raw.githubusercontent.com/MartinRamm/fzf-docker/master/docker-fzf
         fi
     fi
     unset fzf_t

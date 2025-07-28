@@ -12,7 +12,7 @@ fi
 SCRIPT_DIR=$(get-script-dir)
 
 if ! test -f $SCRIPT_DIR/checks/check_defaultTerm_keybind.sh; then
-   source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_defaultTerm_keybind.sh)
+   source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_defaultTerm_keybind.sh)
 else
    source $SCRIPT_DIR/checks/check_defaultTerm_keybind.sh 
 fi

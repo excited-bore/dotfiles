@@ -1,6 +1,3 @@
-#!/usr/bin/env bash
-
-
 if ! grep -q "/usr/share/bash-completion/bash_completion" ~/.bashrc; then
     echo "[ -r /usr/share/bash-completion/bash_completion ] && . /usr/share/bash-completion/bash_completion" >>~/.bashrc
 fi
@@ -13,7 +10,7 @@ if ! test -f ~/.bash_aliases; then
     if test -f aliases/.bash_aliases; then
         cp aliases/.bash_aliases ~/
     else
-        curl -o ~/.bash_aliases https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases
+        wget -O ~/.bash_aliases https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases 
     fi
 fi
 
@@ -25,7 +22,7 @@ if ! test -f ~/.bash_completion; then
     if test -f completions/.bash_completion; then
         cp completions/.bash_completion ~/
     else
-        curl -o ~/.bash_completion https://raw.githubusercontent.com/excited-bore/dotfiles/main/completions/.bash_completion
+        wget -O ~/.bash_completion https://raw.githubusercontent.com/excited-bore/dotfiles/main/completions/.bash_completion
     fi
 fi
 
@@ -37,16 +34,21 @@ if ! test -f ~/.keybinds; then
     if test -f keybinds/.keybinds; then
         cp keybinds/.keybinds ~/
     else
-        curl -o ~/.keybinds https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds
+        wget -O ~/.keybinds https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds
     fi
 fi
 
+# Best to source this at start of ~/.bashrc
 if test -f ~/.environment && ! grep -q "~/.environment" ~/.bashrc; then
-    printf "\n[ -f ~/.environment ] && source ~/.environment\n\n" >>~/.bashrc
+    sed -i '1s/^/\[ -f ~\/.environment \] \&\& source ~\/.environment\n\n/' ~/.bashrc 
 fi
 
-if ! grep -q "~/.keybinds" ~/.bashrc; then
-    printf "\n[ -f ~/.keybinds ] && source ~/.keybinds\n\n" >>~/.bashrc
+if ! grep -q "~/.bash_completion" ~/.bashrc; then
+    if grep -q "~/.bash_aliases" ~/.bashrc; then
+        sed -i 's|\(\[ -f ~/.bash_aliases \] && source ~/.bash_aliases\)|\[ -f \~/.bash_completion \] \&\& source \~/.bash_completion\n\1\n|g' ~/.bashrc
+    else
+        printf "\n[ -f ~/.bash_completion ] && source ~/.bash_completion\n\n" >>~/.bashrc
+    fi
 fi
 
 if ! grep -q "~/.bash_aliases" ~/.bashrc; then
@@ -56,12 +58,8 @@ if ! grep -q "~/.bash_aliases" ~/.bashrc; then
     fi
 fi
 
-if ! grep -q "~/.bash_completion" ~/.bashrc; then
-    if grep -q "~/.bash_aliases" ~/.bashrc; then
-        sed -i 's|\(\[ -f ~/.bash_aliases \] && source ~/.bash_aliases\)|\[ -f \~/.bash_completion \] \&\& source \~/.bash_completion\n\1\n|g' ~/.bashrc
-    else
-        printf "\n[ -f ~/.bash_completion ] && source ~/.bash_completion\n\n" >>~/.bashrc
-    fi
+if ! grep -q "~/.keybinds" ~/.bashrc; then
+    printf "\n[ -f ~/.keybinds ] && source ~/.keybinds\n\n" >>~/.bashrc
 fi
 
 # I put this here from unused install_fzf code because I hate composing sed commands like these again

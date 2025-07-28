@@ -60,7 +60,7 @@ if hash pay-respects &> /dev/null; then
         if test -f ~/.zshrc; then
             sed -i '/eval \"\$(pay-respects zsh/d' ~/.zshrc
             if [[ "$ansr" == 'f' ]]; then
-                printf "eval \"\$(pay-respects zsh)\"\n" >>~/.bashrc
+                printf "eval \"\$(pay-respects zsh)\"\n" >>~/.zshrc
             else
                 printf "eval \"\$(pay-respects zsh --alias $ansr)\"\n" >>~/.zshrc
             fi
@@ -68,5 +68,4 @@ if hash pay-respects &> /dev/null; then
 
         unset ansr
     fi
-
 fi

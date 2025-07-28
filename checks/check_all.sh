@@ -68,15 +68,15 @@ alias get-script-dir='cd "$( dirname "$-1" )" && pwd'
 
 # Make sure cp copies forceably (without asking confirmation when overwriting) and verbosely
 
-if test -z "$CP_ALIAS_CHECKED" && [[ "$((cp -g)2>&1)" =~ "missing file operand" ]] && (hash xcp &> /dev/null || hash cpg &> /dev/null) && ! [[ "$(type cp)" =~ "'cpg -fgv'" ]] && ! [[ "$(type cp)" =~ "'xcp'" ]]; then
+if test -z "$CP_ALIAS_CHECKED" && (cp --help | grep -qF -- '-g' || hash xcp &> /dev/null || hash cpg &> /dev/null) && ! [[ "$(type cp)" =~ "'cpg -fgv'" ]] && ! [[ "$(type cp)" =~ "'xcp'" ]]; then
     
     # Cpg is installed and replaced regular cp
-    if [[ "$((cp -g)2>&1)" =~ "missing file operand" ]]; then
+    if cp --help | grep -qF -- '-g'; then
         alias cp='cp -fgv' 
     else
         echo "Next ${RED}sudo${normal} will check for installed cp alternatives and whether their available for root as well as the user"
         sudo ls &> /dev/null
-        if hash cpg &> /dev/null && ! [[ "$((sudo -n xcp)2>&1)" =~ 'not found' ]]; then
+        if hash cpg &> /dev/null && ! [[ "$((sudo -n cpg)2>&1)" =~ 'not found' ]]; then
             alias cp='cpg -fgv'
         fi
         if hash xcp &> /dev/null && ! [[ "$((sudo -n xcp)2>&1)" =~ 'not found' ]]; then
@@ -84,7 +84,7 @@ if test -z "$CP_ALIAS_CHECKED" && [[ "$((cp -g)2>&1)" =~ "missing file operand" 
         fi
     fi
     CP_ALIAS_CHECKED='y'
-elif ! (hash xcp &> /dev/null || hash cpg &> /dev/null); then
+elif ! (cp --help | grep -qF -- '-g' || hash xcp &> /dev/null || hash cpg &> /dev/null); then
     alias cp='cp -fv'
 fi
 
@@ -99,13 +99,13 @@ alias mv='mv -fv'
 alias rm='rm -rfv'
 
 # Make sure sudo isn't aliased to something weird
-command -v sudo &>/dev/null && [[ "$(type sudo)" =~ 'aliased' ]] &&
+hash sudo &>/dev/null && [[ "$(type sudo)" =~ 'aliased' ]] &&
     command unalias sudo
 # Keep aliases when using sudo
 alias sudo="sudo "
 
 # Wget only uses https - encrypted http
-command -v wget &>/dev/null && [[ "$(type wget)" =~ 'aliased' ]] &&
+hash wget &>/dev/null && [[ "$(type wget)" =~ 'aliased' ]] &&
     command unalias wget 
 alias wget='wget --https-only'
 
@@ -126,21 +126,21 @@ if hash aria2c &>/dev/null; then
     if test -z "$WGET_ARIA"; then
         builtin unalias wget-aria 
         function wget-aria(){
+            local wget_ar
             readyn -p "Use 'aria2c' in favour of 'wget' for faster downloads?" wget_ar
             if [[ $wget_ar == 'y' ]]; then
                 export WGET_ARIA=1 
                 alias wget-aria='aria2c'
                 alias wget-aria-quiet='aria2c -q'
                 alias wget-aria-dir='aria2c -d'
-                alias wget-aria-name='aria2c -o'
+                alias wget-aria-name='aria2c --force-sequential -o'
                 local frst="$1"
                 [[ "$frst" == "-P" ]] && frst="-d"  
-                [[ "$frst" == "-O" ]] && frst="-o"  
+                [[ "$frst" == "-O" ]] && frst="--force-sequential -o"  
                 aria2c $frst ${@:2}
             else
                 wget $@ 
             fi
-            unset wget_ar
         } 
         alias wget-aria-quiet="wget-aria -q" 
         alias wget-aria-dir="wget-aria -P" 
@@ -166,33 +166,15 @@ test -z "$PAGER" && PAGER="less"
 # 'man rlwrap' to see all unimplemented options
 
 if ! type reade &>/dev/null; then
-    if test -f rlwrap-scripts/reade; then
-        . ./rlwrap-scripts/reade 1>/dev/null
+   if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)
     else
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade) &>/dev/null
-    fi
-fi
-
-if ! type readyn &>/dev/null; then
-    if test -f rlwrap-scripts/readyn; then
-        . ./rlwrap-scripts/readyn 1>/dev/null
-    else
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/readyn) &>/dev/null
-    fi
-fi
-
-if ! type yes-edit-no &>/dev/null; then
-    if test -f rlwrap-scripts/yes-edit-no; then
-        . ./rlwrap-scripts/yes-edit-no 1>/dev/null
-    else
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/yes-edit-no) &>/dev/null
+        . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
     fi
 fi
 
 if ! test -f checks/check_system.sh; then
-    if type curl &>/dev/null; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)
-    fi
+    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)
 else
     . ./checks/check_system.sh
 fi
@@ -201,7 +183,7 @@ fi
 
 if ! type update-system &>/dev/null; then
     if ! test -f aliases/.bash_aliases.d/update-system.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)
     else
         . ./aliases/.bash_aliases.d/update-system.sh
     fi
@@ -214,6 +196,7 @@ if test -z $SYSTEM_UPDATED; then
         update-system-yes
     fi
     export SYSTEM_UPDATED="TRUE"
+    unset updatesysm 
 fi
 
 
@@ -240,13 +223,4 @@ function version-higher() {
         fi
     done
     return 0
-}
-
-function compare-tput-escape_color() {
-    test -z "$PAGER" && PAGER=less
-    for ((ansi = 0; ansi <= 120; ansi++)); do
-        printf "$ansi $(tput setaf $ansi) tput foreground $(tput sgr0) $(tput setab $ansi) tput background $(tput sgr0)"
-        echo -e " \033[$ansi;mEscape\033[0m"
-    done | $PAGER
-    unset ansi
 }

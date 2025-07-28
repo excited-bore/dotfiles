@@ -2,7 +2,7 @@ if ! test -f checks/check_all.sh; then
     if hash curl &> /dev/null; then 
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)  
     else  
-        continue  
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)  
     fi 
 else 
     . ./checks/check_all.sh 
@@ -10,7 +10,7 @@ fi
 
 if ! [ -f ~/.bash_aliases ]; then
     if ! test -f aliases/.bash_aliases; then
-        curl -o ~/.bash_aliases https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases  
+        wget -O ~/.bash_aliases https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases  
     else
         cp aliases/.bash_aliases ~/
     fi 
@@ -20,11 +20,12 @@ if ! [ -d ~/.bash_aliases.d/ ]; then
     mkdir ~/.bash_aliases.d/
 fi
 
-if test -f ~/.bashrc && ! grep -q '\[ -f ~/.bash_aliases \] && . ~/.bash_aliases' ~/.bashrc; then
+if test -f ~/.bashrc && ! grep -q '\[ -f ~/.bash_aliases \] && source ~/.bash_aliases' ~/.bashrc; then
     if grep -q '^if \[ -f ~/.bash_aliases \]; then' ~/.bashrc; then
         sed -i -e 's|\(if \[ -f \~/.bash_aliases \]; then\)|#This is commented out since there'\''s a one-liner which sources ~/.bash_aliases later down ~/.bashrc\n\n#\1|g' -e 's|\(^\s*\. ~/.bash_aliases\)|#\1|' ~/.bashrc
         ubbashrcfi="$(awk '/\. ~\/.bash_aliases/{print NR+1};' ~/.bashrc)" 
         sed -i "$ubbashrcfi s/^fi/#fi/" ~/.bashrc   
+        unset ubbashrcfi 
     fi
    
     if grep -q '\[ -f ~/.keybinds \]' ~/.bashrc; then
@@ -60,21 +61,23 @@ fi
 if ! sudo grep -q ".bash_aliases" /root/.bashrc; then
     printf "[ -f ~/.bash_aliases ] && source ~/.bash_aliases \n" | sudo tee -a /root/.bashrc > /dev/null
 fi
-if sudo test -f /root/.bashrc && ! sudo grep -q '~/.bash_aliases' /root/.bashrc; then
+if sudo test -f /root/.bashrc && ! sudo grep -q '\[ -f ~/.bash_aliases \] && source ~/.bash_aliases' /root/.bashrc; then
+    if sudo grep -q '^if \[ -f ~/.bash_aliases \]; then' /root/.bashrc; then
+        sudo sed -i -e 's|\(if \[ -f \~/.bash_aliases \]; then\)|#This is commented out since there'\''s a one-liner which sources ~/.bash_aliases later down ~/.bashrc\n\n#\1|g' -e 's|\(^\s*\. ~/.bash_aliases\)|#\1|' /root/.bashrc
+        ubbashrcfi="$(sudo awk '/\. ~\/.bash_aliases/{print NR+1};' /root/.bashrc)" 
+        sudo sed -i "$ubbashrcfi s/^fi/#fi/" /root/.bashrc   
+        unset ubbashrcfi 
+    fi
+   
     if sudo grep -q '\[ -f ~/.keybinds \]' /root/.bashrc; then
-        sudo sed -i 's|\(\[ -f \~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\1\n\n\[ -f \~/.keybinds \] \&\& source \~/.keybinds\n|g' /root/.bashrc
+        sudo sed -i 's|\(\[ -f \~/.keybinds \] \&\& source \~/.keybinds\)|\[ -f \~/.bash_aliases \] \&\& source \~/.bash_aliases\n\n\1|g' /root/.bashrc
     else
-        printf '[ -f ~/.bash_aliases ] && source ~/.bash_aliases\n' | sudo tee -a ~/.bashrc &> /dev/null
+        echo '[ -f ~/.bash_aliases ] && source ~/.bash_aliases' | sudo tee -a /root/.bashrc
     fi
 fi
 
 if ! test -f ./checks/check_bash_source_order.sh; then
-    if type curl &>/dev/null; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_bash_source_order.sh)
-    else
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-        return 1 || exit 1
-    fi
+    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_bash_source_order.sh)
 else
     . ./checks/check_bash_source_order.sh
 fi
