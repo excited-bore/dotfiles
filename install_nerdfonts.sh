@@ -25,10 +25,12 @@ if ! [ -d $XDG_DATA_HOME/fonts ]; then
     mkdir $XDG_DATA_HOME/fonts
 fi
 
-if ! test -f install_fzf.sh; then
-    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fzf.sh 'simple')
-else
-    . ./install_fzf.sh 'simple'
+if ! hash fzf &> /dev/null; then
+    if ! test -f install_fzf.sh; then
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fzf.sh 'simple')
+    else
+        . ./install_fzf.sh 'simple'
+    fi
 fi
 
 if ! hash jq &>/dev/null; then
@@ -68,6 +70,7 @@ if [[ "$(command ls $fonts/* 2> /dev/null)" ]]; then
         name1="$name1$XDG_DATA_HOME/fonts/$(basename "$i")\n" 
     done 
 
+    echo $name 
     command mv $fonts/* $XDG_DATA_HOME/fonts
     sudo fc-cache -fv
 fi
@@ -100,10 +103,9 @@ if test -n "$name"; then
             if hash magick &> /dev/null; then
                 sed -i 's/convert/magick/g' $TMPDIR/fontpreview.sh
             fi
-            sed -i 's/fc-list -f/\tif [ -z "$FONTPREVIEW_FILES" ]; then\n\tfc-list -f/g' $TMPDIR/fontpreview.sh
-            sed -i 's,wrap",wrap"\n\telse\n\t(cd $XDG_DATA_HOME/fonts/\n\t\ttest -n "$FONTPREVIEW_QUERY" \&\& quer="--query=$FONTPREVIEW_QUERY" || quer=""\n\tprintf "$FONTPREVIEW_FILES" | sort -t "-" -k1\,1 | uniq |\n\tfzf --header="Which font?" $quer --layout=reverse --preview "sh $0 {}" --preview-window "left:50%:noborder:wrap")\n\tfi,g' $TMPDIR/fontpreview.sh 
+            sed -i 's/fc-list -f/\tif [ -z "$FONTPREVIEW_FONTS" ]; then\n\tfc-list -f/g' $TMPDIR/fontpreview.sh
+            sed -i 's,wrap",wrap"\n\telse\n\t(cd $XDG_DATA_HOME/fonts/\n\t\ttest -n "$FONTPREVIEW_QUERY" \&\& quer="--query=$FONTPREVIEW_QUERY" || quer=""\n\tprintf "$FONTPREVIEW_FONTS" | sort -t "-" -k1\,1 | uniq |\n\tfzf --header="Which font?" $quer --layout=reverse --preview "sh $0 {}" --preview-window "left:50%:noborder:wrap")\n\tfi,g' $TMPDIR/fontpreview.sh 
             chmod u+x $TMPDIR/fontpreview.sh   
-        
         fi
         
     elif [[ "$XDG_SESSION_TYPE" == 'wayland' ]]; then
@@ -121,11 +123,14 @@ if test -n "$name"; then
         fi
         
         wget-curl https://git.io/raw_fontpreview > $TMPDIR/fontpreview.sh
-        if [[ "$XDG_CURRENT_DESKTOP" == 'GNOME' ]]; then
-            sed -i 's/xdotool, //; s/(xdotool\ /(\ /; /xdotool/d;' $TMPDIR/fontpreview.sh
-        else
-            sed -i 's/xdotool, //; s/(xdotool\ /(\ /; /xdotool/d;' $TMPDIR/fontpreview.sh
-        fi
+        #if [[ "$XDG_CURRENT_DESKTOP" == 'GNOME' ]]; then
+        sed -i 's/xdotool, //; s/(xdotool\ /(\ /; /xdotool/d;' $TMPDIR/fontpreview.sh
+        sed -i 's/\(fontpreview very customizable\)/\1\n\t\[\[ $FONTPREVIEW_FONTS != "" \]\] \&\& FONTS=$FONTPREVIEW_FONTS/' $TMPDIR/fontpreview.sh
+        sed -i 's/\(--search-prompt)\)/\t--fonts)\n\tFONTPREVIEW_FONTS=$2\n\t;;\n\t\1/' $TMPDIR/fontpreview.sh 
+        sed -i 's/\(search-prompt:,)\)/fonts:,\1/' $TMPDIR/fontpreview.sh 
+        sed -i 's|\(font=$(magick -list font.*)\)|\tif test -z "$FONTPREVIEW_FONTS"; then\n\t\1\n\telse\n\tfont=$(printf "$FONTPREVIEW_FONTS" \| sort -t "-" -k1\,1 \| uniq \| fzf --header="Which font?(Ctrl+C to quit - last seen will be selected)" $quer --layout=reverse --prompt="$SEARCH_PROMPT")\n\techo "$font"\n\tfi\n|' $TMPDIR/fontpreview.sh
+        sed -i 's|\[\[ -z $font \]\].*|if test -z $font; then\n\treturn\n\telse\n\tstyle=$(echo $font \| cut -d- -f2 \| cut -d. -f1)\n\tfont=$(fc-match $font \| awk '\''{$1=""; print}'\'' \| xargs \| sed "s/Regular/$style/; s/ /-/g; s/-Regular//g")\n\tfi|' $TMPDIR/fontpreview.sh 
+        sed -i 's/^main$/echo $(main | awk '\''{print $NF}'\'')/' $TMPDIR/fontpreview.sh 
         chmod u+x $TMPDIR/fontpreview.sh
     fi
     
@@ -143,7 +148,7 @@ if test -n "$name"; then
     #done
     #unset prvwmore
     
-    unset FONTPREVIEW_FILES 
+    unset FONTPREVIEW_FONTS 
 
     if ( hash xfconf-query &> /dev/null || hash gsettings &> /dev/null || test -f $XDG_CONFIG_HOME/kitty/kitty.conf) ; then 
         if [[ "$DESKTOP_SESSION" == 'xfce' ]]; then 
@@ -156,7 +161,7 @@ if test -n "$name"; then
                 #fi
                 ! (hash magick &> /dev/null && hash ueberzug &> /dev/null) && 
                     file=$(printf "$name" | sort  -t '-'  -k1,1 | uniq | fzf --header="Which font?" $quer --reverse --height 50%) ||
-                    file=$(FONTPREVIEW_FILES="$name" $TMPDIR/fontpreview.sh) 
+                    file=$(FONTPREVIEW_FONTS="$name" quer="$quer" $TMPDIR/fontpreview.sh) 
                 style=$(echo $file | cut -d. -f-1 | cut -d- -f2) 
                 familystyle=$(fc-query "$XDG_DATA_HOME/fonts/$file" --format "%{family} %{style}\n" | uniq) 
                 reade -Q 'GREEN' -i "10 $(seq 1 48 | tr '\n' ' ')" -p "Default fontsize (Default 10): " size 
@@ -177,7 +182,7 @@ if test -n "$name"; then
                 #fi
                 ! (hash magick &> /dev/null && hash ueberzug &> /dev/null) && 
                     file=$(printf "$name" | sort  -t '-'  -k1,1 | uniq | fzf --header="Which font?" $quer --reverse --height 50%) ||
-                    file=$(FONTPREVIEW_FILES="$name" $TMPDIR/fontpreview.sh) 
+                    file=$(FONTPREVIEW_FONTS="$name" $TMPDIR/fontpreview.sh) 
                 style=$(echo $file | cut -d. -f-1 | cut -d- -f2) 
                 familystyle=$(fc-query "$XDG_DATA_HOME/fonts/$file" --format "%{family} %{style}\n" | uniq) 
                 reade -Q 'GREEN' -i "10 $(seq 1 48 | tr '\n' ' ')" -p "Default fontsize (Default 10): " size 
@@ -234,7 +239,7 @@ if test -n "$name"; then
                 fi
                 ! (hash magick &> /dev/null && hash ueberzug &> /dev/null) && 
                     file=$(printf "$name" | sort  -t '-'  -k1,1 | uniq | fzf --header="Which font?" $quer --reverse --height 50%) ||
-                    file=$(FONTPREVIEW_QUERY="$file" FONTPREVIEW_FILES="$name" $TMPDIR/fontpreview.sh) 
+                    file=$(FONTPREVIEW_QUERY="$file" FONTPREVIEW_FONTS="$name" $TMPDIR/fontpreview.sh) 
                 style=$(echo $file | cut -d. -f-1 | cut -d- -f2) 
                 familystyle=$(fc-query "$XDG_DATA_HOME/fonts/$file" --format "%{family} %{style}\n" | uniq) 
                 reade -Q 'GREEN' -i "10 $(seq 1 48 | tr '\n' ' ')" -p "Default fontsize (Default 10): " size 
