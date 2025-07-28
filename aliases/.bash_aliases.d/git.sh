@@ -59,7 +59,7 @@ if hash wget &>/dev/null && hash jq &>/dev/null; then
 
         if test -n "$filtr"; then
             for i in ${releases[@]}; do
-                if [[ "$i" =~ "$filtr" ]]; then
+                if [[ "$i" =~ $filtr ]]; then
                     nwreleases="$nwreleases$i\n" 
                 fi
             done

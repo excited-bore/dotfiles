@@ -53,11 +53,11 @@ fi
 
 if [[ "$distro_base" == "Arch" ]]; then
     if [[ $pager == "diff-so-fancy" ]]; then
-        eval "$pac_ins diff-so-fancy"
+        eval "$pac_ins_y diff-so-fancy"
     elif [[ $pager == "colordiff" ]]; then
-        eval "$pac_ins colordiff"
+        eval "$pac_ins_y colordiff"
     elif [[ $pager == "delta" ]]; then
-        eval "$pac_ins git-delta"
+        eval "$pac_ins_y git-delta"
     elif [[ $pager == "ydiff" ]]; then
         if ! type pipx &>/dev/null && ! test -f install_pipx.sh; then
             source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)
@@ -68,12 +68,18 @@ if [[ "$distro_base" == "Arch" ]]; then
     fi
 elif [[ "$distro_base" == "Debian" ]]; then
     if [[ $pager == "diff-so-fancy" ]]; then
-        eval "$pac_ins npm"
+        eval "$pac_ins_y npm"
         sudo npm -g install diff-so-fancy
     elif [[ $pager == "colordiff" ]]; then
-        eval "$pac_ins colordiff"
+        eval "$pac_ins_y colordiff"
     elif [[ $pager == "delta" ]]; then
-        eval "$pac_ins git-delta"
+        if ! test -f aliases/.bash_aliases.d/git.sh; then
+            source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/git.sh)
+        else
+            . ./aliases/.bash_aliases.d/git.sh
+        fi
+        get-latest-releases-github 'https://github.com/dandavison/delta/releases' "$TMPDIR" 'git-delta_.*_amd64.deb' 
+        sudo dpkg -i $TMPDIR/git-delta_*_amd64.deb 
     elif [[ $pager == "ydiff" ]]; then
         if ! type pipx &>/dev/null && ! test -f install_pipx.sh; then
             source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)
