@@ -76,7 +76,7 @@ if test -z "$CP_ALIAS_CHECKED" && (cp --help | grep -qF -- '-g' || hash xcp &> /
     else
         echo "Next ${RED}sudo${normal} will check for installed cp alternatives and whether their available for root as well as the user"
         sudo ls &> /dev/null
-        if hash cpg &> /dev/null && ! [[ "$((sudo -n cpg)2>&1)" =~ 'not found' ]]; then
+        if (hash cpg &> /dev/null && ! [[ "$((sudo -n cpg)2>&1)" =~ 'not found' ]]); then
             alias cp='cpg -fgv'
         fi
         if hash xcp &> /dev/null && ! [[ "$((sudo -n xcp)2>&1)" =~ 'not found' ]]; then
@@ -133,11 +133,17 @@ if hash aria2c &>/dev/null; then
                 alias wget-aria='aria2c'
                 alias wget-aria-quiet='aria2c -q'
                 alias wget-aria-dir='aria2c -d'
-                alias wget-aria-name='aria2c --force-sequential -o'
+                function wget-aria-name(){
+                    aria2c --dir $(dirname $1) -o $(basename $1)  
+                }
                 local frst="$1"
-                [[ "$frst" == "-P" ]] && frst="-d"  
-                [[ "$frst" == "-O" ]] && frst="--force-sequential -o"  
-                aria2c $frst ${@:2}
+                if [[ "$frst" == "-P" ]]; then
+                    aria2c --dir ${@:2}
+                elif [[ "$frst" == "-O" ]]; then
+                    aria2c --dir $(dirname $2) --out=$(basename $2) ${@:3}  
+                else
+                    aria2c $frst ${@:2}
+                fi 
             else
                 wget $@ 
             fi
@@ -149,7 +155,9 @@ if hash aria2c &>/dev/null; then
         alias wget-aria='aria2c'
         alias wget-aria-quiet='aria2c -q'
         alias wget-aria-dir='aria2c -d'
-        alias wget-aria-name='aria2c -o'
+        function wget-aria-name(){
+            aria2c --dir $(dirname $1) -o $(basename $1)  
+        }
     fi
 fi
 

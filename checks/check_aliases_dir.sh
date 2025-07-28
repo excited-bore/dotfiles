@@ -1,12 +1,3 @@
-if ! test -f checks/check_all.sh; then 
-    if hash curl &> /dev/null; then 
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)  
-    else  
-        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)  
-    fi 
-else 
-    . ./checks/check_all.sh 
-fi
 
 if ! [ -f ~/.bash_aliases ]; then
     if ! test -f aliases/.bash_aliases; then
@@ -51,16 +42,19 @@ fi
 
 
 echo "Next $(tput setaf 1)sudo$(tput sgr0) will install '.bash_aliases.d' in /root and source it with '/root/.bash_aliases' in /root/.bashrc"
+
 if ! [ -f /root/.bash_aliases ]; then
     if ! test -f aliases/.bash_aliases; then
-        sudo curl -o /root/.bash_aliases https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases  
+        sudo wget -O /root/.bash_aliases https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases  
     else
         sudo cp aliases/.bash_aliases /root/
     fi 
 fi
+
 if ! sudo grep -q ".bash_aliases" /root/.bashrc; then
     printf "[ -f ~/.bash_aliases ] && source ~/.bash_aliases \n" | sudo tee -a /root/.bashrc > /dev/null
 fi
+
 if sudo test -f /root/.bashrc && ! sudo grep -q '\[ -f ~/.bash_aliases \] && source ~/.bash_aliases' /root/.bashrc; then
     if sudo grep -q '^if \[ -f ~/.bash_aliases \]; then' /root/.bashrc; then
         sudo sed -i -e 's|\(if \[ -f \~/.bash_aliases \]; then\)|#This is commented out since there'\''s a one-liner which sources ~/.bash_aliases later down ~/.bashrc\n\n#\1|g' -e 's|\(^\s*\. ~/.bash_aliases\)|#\1|' /root/.bashrc
@@ -77,7 +71,11 @@ if sudo test -f /root/.bashrc && ! sudo grep -q '\[ -f ~/.bash_aliases \] && sou
 fi
 
 if ! test -f ./checks/check_bash_source_order.sh; then
-    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_bash_source_order.sh)
+    if hash curl &> /dev/null; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_bash_source_order.sh)
+    else 
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_bash_source_order.sh)
+    fi
 else
     . ./checks/check_bash_source_order.sh
 fi

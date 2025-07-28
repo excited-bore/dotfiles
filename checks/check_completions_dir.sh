@@ -15,9 +15,21 @@ if [ ! -d ~/.bash_completion.d/ ]; then
     mkdir ~/.bash_completion.d/
 fi
 
+# Make sure the ~/.bash_completion sources BEFORE ~/.bash_aliases to prevent bashalias-completions from breaking
 if ! grep -q "~/.bash_completion" ~/.bashrc; then
-    printf "\n[ -f ~/.bash_completion ] && source ~/.bash_completion\n\n" >> ~/.bashrc
+    if grep -q "\[ -f ~/.bash_aliases \] \&\& source ~/.bash_aliases" ~/.bashrc || grep -q '^if [ -f ~/.bash_aliases ]; then' ~/.bashrc; then
+        if grep -q "\[ -f ~/.bash_aliases \] \&\& source ~/.bash_aliases" ~/.bashrc; then
+            sed -i 's|\(\[ -f ~/.bash_aliases \] \&\& source ~/.bash_aliases\)|[ -f ~/.bash_completion \] \&\& source ~/.bash_completion\n\n\1|' ~/.bashrc 
+        else
+            sed -i 's|\(\^if [ -f ~/.bash_aliases ]; then\)|[ -f ~/.bash_completion \] \&\& source ~/.bash_completion\n\n\1|' ~/.bashrc 
+        fi
+    else
+        printf "\n[ -f ~/.bash_completion ] && source ~/.bash_completion\n\n" >> ~/.bashrc
+    fi
 fi
+
+
+echo "Next $(tput setaf 1)sudo$(tput sgr0) will install '.bash_completion.d' in /root and source it with '/root/.bash_completion' in /root/.bashrc"
 
 if ! sudo test -f /root/.bash_completion; then
     echo "Next $(tput setaf 1)sudo$(tput sgr0) will install '.bash_completion.d' in /root and source it with '/root/.bash_completion"
@@ -28,11 +40,21 @@ if ! sudo test -f /root/.bash_completion; then
             sudo cp completions/.bash_completion /root/
         fi 
     fi
-    if ! sudo test -d /root/.bash_completion.d/; then
-        sudo mkdir /root/.bash_completion.d/
-    fi
-    if ! sudo grep -q "~/.bash_completion" /root/.bashrc; then
-        printf "\n[ -f ~/.bash_completion/ ] && source ~/.bash_completion\n\n" | sudo tee -a /root/.bashrc > /dev/null
+fi
+
+if ! sudo test -d /root/.bash_completion.d/; then
+    sudo mkdir /root/.bash_completion.d/
+fi
+
+if ! sudo grep -q "~/.bash_completion" /root/.bashrc; then
+    if sudo grep -q "\[ -f ~/.bash_aliases \] \&\& source ~/.bash_aliases" /root/.bashrc || sudo grep -q '^if [ -f ~/.bash_aliases ]; then' /root/.bashrc; then
+        if sudo grep -q "\[ -f ~/.bash_aliases \] \&\& source ~/.bash_aliases" /root/.bashrc; then
+            sudo sed -i 's|\(\[ -f ~/.bash_aliases \] \&\& source ~/.bash_aliases\)|[ -f ~/.bash_completion \] \&\& source ~/.bash_completion\n\n\1|' /root/.bashrc 
+        else
+            sudo sed -i 's|\(\^if [ -f ~/.bash_aliases ]; then\)|[ -f ~/.bash_completion \] \&\& source ~/.bash_completion\n\n\1|' /root/.bashrc 
+        fi
+    else
+        printf "\n[ -f ~/.bash_completion ] && source ~/.bash_completion\n\n" | sudo tee -a /root/.bashrc
     fi
 fi 
 

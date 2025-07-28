@@ -35,7 +35,7 @@ if ! hash fzf &> /dev/null; then
     if [[ $distro_base == 'Debian' ]]; then
         FZF_VERSION=$(curl -s "https://api.github.com/repos/junegunn/fzf/releases/latest" | grep -Po '"tag_name": "v\K[0-9.]+') 
         dir=$(mktemp -d)
-        curl -o $dir/fzf.tar.gz https://github.com/junegunn/fzf/releases/latest/download/fzf-$FZF_VERSION-linux_amd64.tar.gz
+        wget-aria-name $dir/fzf.tar.gz https://github.com/junegunn/fzf/releases/latest/download/fzf-$FZF_VERSION-linux_amd64.tar.gz
         sudo tar xf $dir/fzf.tar.gz -C /usr/local/bin
         unset dir 
     else 
@@ -50,8 +50,7 @@ if test -z "$1"; then
     # Bash completion issue with fzf fix
     # https://github.com/cykerway/complete-alias/issues/46
     ! [ -f ~/.bash_completion.d/fzf-completion.bash ] &&
-        (cd ~/.bash_completion.d/
-        wget-aria-name fzf-completion.bash https://raw.githubusercontent.com/junegunn/fzf/refs/heads/master/shell/completion.bash)
+        wget-aria-name ~/.bash_completion.d/fzf-completion.bash https://raw.githubusercontent.com/junegunn/fzf/refs/heads/master/shell/completion.bash
 
     #if ! test -d ~/.fzf || test -f ~/.fzf.bash; then
         #git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
@@ -66,7 +65,7 @@ if test -z "$1"; then
     if [[ "$fzf_key" == 'y' ]]; then
         test -f $BASH_KEYBIND_FILEDIR/fzf-bindings.bash && 
             rm $BASH_KEYBIND_FILEDIR/fzf-bindings.bash
-        wget-aria-name $HOME/.keybinds.d/fzf-bindings.bash https://raw.githubusercontent.com/junegunn/fzf/refs/heads/master/shell/key-bindings.bash
+        wget-aria-name ~/.keybinds.d/fzf-bindings.bash https://raw.githubusercontent.com/junegunn/fzf/refs/heads/master/shell/key-bindings.bash
     fi
 
     if test -f $BASH_KEYBIND_FILEDIR/keybinds.bash; then

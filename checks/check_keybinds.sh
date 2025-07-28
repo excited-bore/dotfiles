@@ -1,6 +1,6 @@
 if [ ! -f ~/.keybinds ]; then
     if ! test -f keybinds/.keybinds; then
-        wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds > ~/.keybinds  
+        wget -O ~/.keybinds https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds   
     else
         cp keybinds/.keybinds ~/
     fi 
@@ -10,16 +10,56 @@ if [ ! -d ~/.keybinds.d/ ]; then
     mkdir ~/.keybinds.d/
 fi
 
-if ! grep -q ".keybinds" ~/.bashrc; then
-    printf "\n[ -f ~/.keybinds ] && source ~/.keybinds\n\n" >> ~/.bashrc 
+# Make sure the ~/.keybinds sources AFTER ~/.bash_aliases to prevent certain keybinds from breaking
+if ! grep -q "source ~/.keybinds" ~/.bashrc; then
+    if grep -q "\[ -f ~/.bash_aliases \] \&\& source ~/.bash_aliases" ~/.bashrc || grep -q '^if [ -f ~/.bash_aliases ]; then' ~/.bashrc; then
+        if grep -q "\[ -f ~/.bash_aliases \] \&\& source ~/.bash_aliases" ~/.bashrc; then
+            sed -i 's|\(\[ -f ~/.keybinds \] \&\& source ~/.keybinds\)|\1\n\n[ -f ~/.keybinds \] \&\& source ~/.keybinds|' ~/.bashrc 
+        else
+            sed -i -e 's|\(if \[ -f \~/.bash_aliases \]; then\)|#This is commented out since there'\''s a one-liner which sources ~/.bash_aliases later down ~/.bashrc\n\n#\1|g' -e 's|\(^\s*\. ~/.bash_aliases\)|#\1|' ~/.bashrc
+            ubbashrcfi="$(awk '/\. ~\/.bash_aliases/{print NR+1};' ~/.bashrc)" 
+            sed -i "$ubbashrcfi s/^fi/#fi/" ~/.bashrc   
+            unset ubbashrcfi 
+            sed -i 's|\(\^if [ -f ~/.bash_aliases ]; then\)|[ -f ~/.bash_completion \] \&\& source ~/.bash_completion\n\n\1|' ~/.bashrc 
+            printf '[ -f ~/.bash_aliases ] && source ~/.bash_aliases\n\n' >> ~/.bashrc
+            echo '[ -f ~/.keybinds ] && source ~/.keybinds' >> ~/.bashrc
+        fi
+    else
+        printf "\n[ -f ~/.bash_completion ] && source ~/.bash_completion\n\n" >> ~/.bashrc
+    fi
 fi
+
+echo "Next $(tput setaf 1)sudo$(tput sgr0) will install '.keybinds.d' in /root and source it with '/root/.keybinds' in /root/.bashrc"
+
+if ! test -f /root/.keybinds; then
+    if ! test -f keybinds/.keybinds; then
+        sudo wget -O /root/.keybinds https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds 
+    else
+        sudo cp keybinds/.keybinds /root/
+    fi 
+fi 
+
 
 if ! sudo test -d /root/.keybinds.d/ ; then
     sudo mkdir /root/.keybinds.d/
 fi
 
-if ! sudo grep -q ".keybinds" /root/.bashrc; then
-    sudo printf "\n[ -f ~/.keybinds ] && source ~/.keybinds\n\n" | sudo tee -a /root/.bashrc &> /dev/null
+if ! sudo grep -q "source ~/.keybinds" /root/.bashrc; then
+    if sudo grep -q "\[ -f ~/.bash_aliases \] \&\& source ~/.bash_aliases" /root/.bashrc || sudo grep -q '^if [ -f ~/.bash_aliases ]; then' /root/.bashrc; then
+        if sudo grep -q "\[ -f ~/.bash_aliases \] \&\& source ~/.bash_aliases" /root/.bashrc; then
+            sudo sed -i 's|\(\[ -f ~/.keybinds \] \&\& source ~/.keybinds\)|\1\n\n[ -f ~/.keybinds \] \&\& source ~/.keybinds|' /root/.bashrc 
+        else
+            sudo sed -i -e 's|\(if \[ -f \~/.bash_aliases \]; then\)|#This is commented out since there'\''s a one-liner which sources ~/.bash_aliases later down ~/.bashrc\n\n#\1|g' -e 's|\(^\s*\. ~/.bash_aliases\)|#\1|' /root/.bashrc
+            ubbashrcfi="$(sudo awk '/\. ~\/.bash_aliases/{print NR+1};' /root/.bashrc)" 
+            sudo sed -i "$ubbashrcfi s/^fi/#fi/" /root/.bashrc   
+            unset ubbashrcfi 
+            sudo sed -i 's|\(\^if [ -f ~/.bash_aliases ]; then\)|[ -f ~/.bash_completion \] \&\& source ~/.bash_completion\n\n\1|' /root/.bashrc 
+            printf '[ -f ~/.bash_aliases ] && source ~/.bash_aliases\n\n' | sudo tee -a /root/.bashrc
+            echo '[ -f ~/.keybinds ] && source ~/.keybinds' | sudo tee -a /root/.bashrc
+        fi
+    else
+        printf "\n[ -f ~/.bash_completion ] && source ~/.bash_completion\n\n" | sudo tee -a /root/.bashrc
+    fi
 fi
 
 # Check one last time if ~/.bash_preexec - for both $USER and root - is the last line in their ~/.bash_profile and ~/.bashrc
