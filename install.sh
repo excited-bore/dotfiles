@@ -38,7 +38,7 @@ if ! hash less &> /dev/null || (hash less &> /dev/null && version-higher '633' "
     readyn -p "Install latest version of less?" ins_less
     if [[ $ins_less == 'y' ]]; then
         if ! test -f $SCRIPT_DIR/install_less.sh; then
-            source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_less.sh)
+            source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_less.sh)
         else 
             . $SCRIPT_DIR/install_less.sh 
         fi
@@ -79,7 +79,7 @@ if ! hash aria2c &>/dev/null && test -n "$pac_ins"; then
     printf "${CYAN}aria2c${normal} is not installed \n"
     readyn -p "Install aria2c (for fetching files from internet - multithreaded versus singlethreaded wget -> faster downloads)?" ins_ar
     if [[ $ins_ar == 'y' ]]; then
-        eval "${pac_ins} aria2"
+        eval "${pac_ins_y} aria2"
     fi
     unset ins_aria2c
 fi
@@ -156,7 +156,7 @@ if test -z "$(eval "$pac_ls_ins groff 2> /dev/null")"; then
     printf "${CYAN}groff${normal} is not installed (Necessary for 'man' (manual) command)\n"
     readyn -p "Install groff?" groff_ins
     if [[ $groff_ins == 'y' ]]; then
-        eval "${pac_ins}" groff
+        eval "${pac_ins_y}" groff
         printf "Logout and login (or reboot) to take effect\n"
     fi
     unset groff_ins
@@ -241,9 +241,11 @@ if [[ $distro_base == 'Debian' ]]; then
         readyn -p "Install nala?" nala_ins
         if [[ $nala_ins == 'y' ]]; then
             eval "$pac_ins_y nala"
-            pac="nala"
-            pac_ins="sudo nala install"
-            pac_up="sudo nala update"
+            if ! test -f checks/check_system.sh; then
+                source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)
+            else 
+                . ./checks/check_system.sh 
+            fi
         fi
         unset nala_ins
     fi
@@ -270,7 +272,7 @@ elif [[ $distro_base == 'Arch' ]]; then
     fi
     unset pacmn_cntr
 
-    if ! hash yay &>/dev/null; then
+    if test -z "$AUR_pac" &>/dev/null; then
         printf "${CYAN}yay${normal} is not installed (Pacman wrapper for installing AUR packages, needed for yay-fzf-install)\n"
         readyn -p "Install yay?" insyay
         if [[ "y" == "$insyay" ]]; then
@@ -280,11 +282,11 @@ elif [[ $distro_base == 'Arch' ]]; then
                 . $SCRIPT_DIR/AUR_installers/install_yay.sh
             fi
             if hash yay &>/dev/null; then
-                AUR_pac="yay"
-                AUR_up="yay -Syu"
-                AUR_ins="yay -S"
-                AUR_search="yay -Ss"
-                AUR_ls_ins="yay -Q"
+                if ! test -f checks/check_system.sh; then
+                    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)
+                else 
+                    . ./checks/check_system.sh 
+                fi
             fi
         fi
         unset insyay
@@ -292,7 +294,7 @@ elif [[ $distro_base == 'Arch' ]]; then
 
     if hash pamac &>/dev/null; then
         if ! test -f $SCRIPT_DIR/checks/check_pamac.sh; then
-            source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pamac.sh)
+            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pamac.sh)
         else
             . $SCRIPT_DIR/checks/check_pamac.sh
         fi
@@ -302,7 +304,7 @@ elif [[ $distro_base == 'Arch' ]]; then
         printf "${CYAN}pacseek${normal} (A TUI for managing packages from pacman and AUR) is not installed\n"
         readyn -p "Install pacseek? " pacs_ins
         if [[ "$pacs_ins" == 'y' ]]; then
-            eval "yes | ${AUR_ins} pacseek"
+            eval "${AUR_ins_y} pacseek"
         fi
         unset pacs_ins
     fi
@@ -314,7 +316,7 @@ if ! sudo test -f /etc/polkit/49-nopasswd_global.pkla && ! sudo test -f /etc/pol
     readyn -Y "YELLOW" -p "Install polkit files for automatic authentication for passwords?" plkit
     if [[ "y" == "$plkit" ]]; then
         if ! test -f $SCRIPT_DIR/install_polkit_wheel.sh; then
-            source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_polkit_wheel.sh)
+            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_polkit_wheel.sh)
         else
             . $SCRIPT_DIR/install_polkit_wheel.sh
         fi
@@ -325,13 +327,13 @@ fi
 SCRIPT_DIR=$(get-script-dir)
 
 if ! test -f $SCRIPT_DIR/checks/check_envvar.sh; then
-    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)
+    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)
 else
     . $SCRIPT_DIR/checks/check_envvar.sh
 fi
 
 if ! test -f $SCRIPT_DIR/checks/checkn_completions_dir.sh; then
-    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)
+    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)
 else
     . $SCRIPT_DIR/checks/check_completions_dir.sh
 fi
@@ -343,7 +345,7 @@ if ! hash AppImageLauncher &>/dev/null; then
     readyn -p "Check if appimage ready and install appimagelauncher?" appimage_install
     if [[ "$appimage_install" == 'y' ]]; then
         if ! test -f $SCRIPT_DIR/install_appimagelauncher.sh; then
-            source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_appimagelauncher.sh)
+            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_appimagelauncher.sh)
         else
             . $SCRIPT_DIR/install_appimagelauncher.sh
         fi
@@ -357,7 +359,7 @@ fi
 readyn -p "Install (or just configure) Flatpak?" -c "test -z \"$FLATPAK\"" insflpk
 if [[ "y" == "$insflpk" ]]; then
     if ! test -f $SCRIPT_DIR/install_flatpak.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_flatpak.sh)
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_flatpak.sh)
     else
         . $SCRIPT_DIR/install_flatpak.sh
     fi
@@ -368,7 +370,7 @@ if ! hash snap &>/dev/null; then
     readyn -Y "MAGENTA" -p "Install snap?" -n inssnap
     if [[ "y" == "$inssnap" ]]; then
         if ! test -f $SCRIPT_DIR/install_snapd.sh; then
-            source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_snapd.sh)
+            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_snapd.sh)
         else
             . $SCRIPT_DIR/install_snapd.sh
         fi
@@ -382,7 +384,7 @@ readyn -p "Install eza? (A modern replacement for ls)" -c "! hash eza &> /dev/nu
 
 if [[ "y" == "$rmp" ]]; then
     if ! test -f $SCRIPT_DIR/install_eza.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_eza.sh)
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_eza.sh)
     else
         . $SCRIPT_DIR/install_eza.sh
     fi
@@ -415,14 +417,14 @@ fi
 reade -Q "$color" -i "$cpgi" -p "Install advcpmv, xcp, all or none? $cpgp" cpg
 if [[ "all" == "$cpg" ]] || [[ "advcpmv" == "$cpg" ]]; then
     if ! test -f $SCRIPT_DIR/install_advcpmv.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_advcpmv.sh)
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_advcpmv.sh)
     else
         . $SCRIPT_DIR/install_advcpmv.sh
     fi
 fi
 if [[ "all" == "$cpg" ]] || [[ "xcp" == "$cpg" ]]; then
     if ! test -f $SCRIPT_DIR/install_xcp.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_xcp.sh)
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_xcp.sh)
     else
         . $SCRIPT_DIR/install_xcp.sh
     fi
@@ -435,7 +437,7 @@ readyn -p "Install rm-prompt? (Rm but lists files/directories before deletion)" 
 
 if [[ "y" == "$rmp" ]]; then
     if ! test -f $SCRIPT_DIR/install_rmprompt.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_rmprompt.sh)
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_rmprompt.sh)
     else
         $SCRIPT_DIR/install_rmprompt.sh
     fi
@@ -444,11 +446,11 @@ unset rmp
 
 # Fzf (Fuzzy Finder)
 
-readyn -p "Install fzf? (Fuzzy file/folder finder - replaces Ctrl-R/reverse-search, binds fzf search files on Ctrl+T and fuzzy search directories on Alt-C + Custom script: Ctrl-f becomes system-wide file opener)" -c "! hash fzf &> /dev/null" findr
+readyn -p "Install fzf? (Fuzzy file/folder finder - replaces Ctrl-R/reverse-search, binds fzf search files on Ctrl+T and fuzzy search directories on Alt-C + Custom script: Ctrl-f becomes system-wide file opener)" -c "! test -f key-bindings.bash" findr
 
 if [[ "y" == "$findr" ]]; then
     if ! test -f $SCRIPT_DIR/install_fzf.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fzf.sh)
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fzf.sh)
     else
         . $SCRIPT_DIR/install_fzf.sh
     fi
@@ -461,7 +463,7 @@ readyn -c "! hash ack &> /dev/null" -p "Install ack? (A modern replacement for g
 
 if [[ "y" == "$ack" ]]; then
     if ! test -f $SCRIPT_DIR/install_ack.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ack.sh)
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ack.sh)
     else
         . $SCRIPT_DIR/install_ack.sh
     fi
@@ -496,21 +498,21 @@ fi
 reade -Q "$color" -i "$pre" -p "Install dua, dust, ncdu or all? $prmpt" dua_dust_ncdu
 if [[ "all" == "$dua_dust_ncdu" ]] || [[ "dua" == "$dua_dust_ncdu" ]]; then
     if ! test -f $SCRIPT_DIR/install_dua_cli.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_dua_cli.sh)
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_dua_cli.sh)
     else
         . $SCRIPT_DIR/install_dua_cli.sh
     fi
 fi
 if [[ "all" == "$dua_dust_ncdu" ]] || [[ "dust" == "$dua_dust_ncdu" ]]; then
     if ! test -f $SCRIPT_DIR/install_dust.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_dust.sh)
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_dust.sh)
     else
         . $SCRIPT_DIR/install_dust.sh
     fi
 fi
 if [[ "all" == "$dua_dust_ncdu" ]] || [[ "ncdu" == "$dua_dust_ncdu" ]]; then
     if ! test -f $SCRIPT_DIR/install_ncdu.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ncdu.sh)
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ncdu.sh)
     else
         . $SCRIPT_DIR/install_ncdu.sh
     fi
@@ -548,14 +550,14 @@ if [[ "both" == "$duf_dysk" ]] || [[ "dysk" == "$duf_dysk" ]]; then
         . $SCRIPT_DIR/install_dysk.sh
     fi
 fi
-unset duf_dysk color pre prmpt
+unset duf_dysk color color1 pre prmpt
 
 # Bash alias completions
 
 readyn -p "Install bash completions for aliases in ~/.bash_completion.d?" -c "! test -f ~/.bash_completion.d/complete_alias" compl
 if [[ "y" == "$compl" ]]; then
     if ! test -f $SCRIPT_DIR/install_bashalias_completions.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bashalias_completions.sh)
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bashalias_completions.sh)
     else
         . $SCRIPT_DIR/install_bashalias_completions.sh
     fi
@@ -567,7 +569,7 @@ unset compl
 readyn -p "Install python completions in ~/.bash_completion.d?" -c "! hash activate-global-python-argcomplete &> /dev/null" pycomp
 if [[ "y" == "$pycomp" ]]; then
     if ! test -f $SCRIPT_DIR/install_python_completions.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_python_completions.sh)
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_python_completions.sh)
     else
         . $SCRIPT_DIR/install_python_completions.sh
     fi
@@ -632,7 +634,7 @@ if [[ "y" == "$h" ]]; then
         readyn -p "Install ack and then hhighlighter?" ansr
         if [[ "$ansr" == 'y' ]]; then
             if ! test -f $SCRIPT_DIR/install_ack.sh; then
-                source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ack.sh)
+                source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ack.sh)
             else
                 . $SCRIPT_DIR/install_ack.sh
             fi
@@ -642,7 +644,7 @@ if [[ "y" == "$h" ]]; then
         unset ansr
     fi
     if ! test -f $SCRIPT_DIR/install_hhighlighter.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_hhighlighter.sh)
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_hhighlighter.sh)
     else
         . $SCRIPT_DIR/install_hhighlighter.sh
     fi
@@ -670,7 +672,7 @@ readyn -p "Install a Nerdfont? (Type of font with icons to distinguish filetypes
 
 if [[ "y" == "$nstll_nerdfont" ]]; then
     if ! test -f $SCRIPT_DIR/install_nerdfonts.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nerdfonts.sh)
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nerdfonts.sh)
     else
         . $SCRIPT_DIR/install_nerdfonts.sh
     fi
@@ -683,7 +685,7 @@ readyn -p "Install Kitty? (Terminal emulator)" -c "! hash kitty &> /dev/null" ki
 
 if [[ "y" == "$kittn" ]]; then
     if ! test -f $SCRIPT_DIR/install_kitty.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_kitty.sh)
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_kitty.sh)
     else
         . $SCRIPT_DIR/install_kitty.sh
     fi
@@ -693,7 +695,7 @@ unset kittn
 # Keybinds
 
 if ! test -f install_keybinds.sh; then
-    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_keybinds.sh)
+    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_keybinds.sh)
 else
     . ./install_keybinds.sh
 fi
@@ -703,7 +705,7 @@ fi
 readyn -p "Install pre-execution hooks for bash in ~/.bash_preexec?" -c "! test -f ~/.bash_preexec.sh || ! test -f /root/.bash_preexec.sh" bash_preexec
 if [[ "y" == "$bash_preexec" ]]; then
     if ! test -f $SCRIPT_DIR/install_bash_preexec.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bash_preexec.sh)
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bash_preexec.sh)
     else
         . $SCRIPT_DIR/install_bash_preexec.sh
     fi
