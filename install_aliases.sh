@@ -127,39 +127,48 @@ if [[ $ansr == "y" ]]; then
         cp_vr=''
         cp_ov=''
         cp_der=''
-        if hash cpg &> /dev/null || hash xcp &> /dev/null; then
-            if hash cpg &> /dev/null && hash xcp &> /dev/null; then
-                readyn -p "Both '${CYAN}cpg${GREEN}' and '${CYAN}xcp${GREEN}' are installed. Use either instead of regular 'cp'?" cp_xcpq
+        if hash cpg &> /dev/null || hash xcp &> /dev/null || [[ "$((cp -g)2>&1)" =~ "missing file operand" ]]; then
+            if (hash cpg &> /dev/null || [[ "$((cp -g)2>&1)" =~ "missing file operand" ]]) && hash xcp &> /dev/null; then
+                readyn -p "Both '${CYAN}cpg/cp -g${GREEN}' and '${CYAN}xcp${GREEN}' are installed. Use either instead of regular 'cp' for cp with progress bar?" cp_xcpq
                 if [[ "$cp_xcpq" == 'y' ]]; then
                     reade -Q 'GREEN' -i 'cpg xcp' -p 'Which one? [Cpg/xcp]: ' cp_xcp
-                    if [[ "$cp_xcpq" == 'xcp' ]]; then
-                        cp_xcp='xcp --glob'
+                    if [[ "$cp_xcpq" == 'cpg' ]]; then
+                        if [[ "$((cp -g)2>&1)" =~ "missing file operand" ]]; then 
+                            cp_xcp='cp -g'
+                        elif hash cpg &> /dev/null; then
+                            cp_xcp='cpg -g'
+                        fi
+                    elif [[ "$cp_xcpq" == 'xcp' ]]; then
+                        cp_xcp='xcp --glob --progress-bar'
                     fi
                 fi
             else
-                if hash cpg &>/dev/null; then
-                    readyn -p "${CYAN}cpg${GREEN} installed. Use cpg instead of cp?" cp_xcpq
+                if [[ "$((cp -g)2>&1)" =~ "missing file operand" ]]; then
+                    readyn -p "${CYAN}cp -g${GREEN} installed. Use cp -g instead of cp? (add progress bar)" cp_xcpq
                     if [[ "$cp_xcpq" == 'y' ]]; then
-                        cp_xcp='cpg'
+                        cp_xcp='cp -g'
                     fi
-                fi
-
-                if hash xcp &>/dev/null; then
-                    readyn -p "${CYAN}xcp${GREEN} installed. Use xcp instead of cp (might conflict with sudo cp if cargo not available is sudo path / secure_path in /etc/sudoers)?" cp_xcpq
+                elif hash cpg &>/dev/null; then
+                    readyn -p "${CYAN}cpg${GREEN} installed. Use cpg instead of cp? (add progress bar)" cp_xcpq
                     if [[ "$cp_xcpq" == 'y' ]]; then
-                        cp_xcp='xcp --glob'
+                        cp_xcp='cpg -g'
+                    fi
+                elif hash xcp &>/dev/null; then
+                    readyn -p "${CYAN}xcp${GREEN} installed. Use xcp instead of cp (add progress bar - might conflict with sudo cp if cargo not available for sudo path in /etc/sudoers)?" cp_xcpq
+                    if [[ "$cp_xcpq" == 'y' ]]; then
+                        cp_xcp='xcp --glob --progress-bar'
                     fi
                 fi
             fi
-
-            if [[ "$cp_xcp" == 'xcp --glob' ]] || [[ "$cp_xcp" == 'cpg' ]]; then
-                readyn -p "Set progress bar?" cp_prgsq
-                if [[ "$cp_prgsq" == 'y' ]]; then
-                    [[ "$cp_xcp" == 'cpg' ]] && cp_prgs='--progress-bar'
-                else
-                    [[ "$cp_xcp" == 'xcp --glob' ]] && cp_prgs='--no-progress'
-                fi
-            fi
+            
+            #if [[ "$cp_xcp" == 'xcp --glob' ]] || [[ "$cp_xcp" == 'cpg' ]]; then
+            #    readyn -p "Set progress bar?" cp_prgsq
+            #    if [[ "$cp_prgsq" == 'y' ]]; then
+            #        [[ "$cp_xcp" == 'cpg' ]] && cp_prgs='--progress-bar'
+            #    else
+            #        [[ "$cp_xcp" == 'xcp --glob' ]] && cp_prgs='--no-progress'
+            #    fi
+            #fi
              
         fi
         readyn -p "Be recursive? (Recursive means copy everything inside directories without aborting)" cp_rq

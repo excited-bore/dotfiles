@@ -28,9 +28,9 @@ if test -f ~/.bashrc && ! grep -q '\[ -f ~/.bash_aliases \] && . ~/.bash_aliases
     fi
    
     if grep -q '\[ -f ~/.keybinds \]' ~/.bashrc; then
-        sed -i 's|\(\[ -f \~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\1\n\n\[ -f \~/.keybinds \] \&\& source \~/.keybinds\n|g' ~/.bashrc
+        sed -i 's|\(\[ -f \~/.keybinds \] \&\& source \~/.keybinds\)|\[ -f \~/.bash_aliases \] \&\& source \~/.bash_aliases\n\n\1|g' ~/.bashrc
     else
-        echo '[ -f ~/.bash_aliases ] && source ~/.bash_aliases' >>~/.bashrc
+        echo '[ -f ~/.bash_aliases ] && source ~/.bash_aliases' >> ~/.bashrc
     fi
 fi
 

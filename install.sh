@@ -470,8 +470,8 @@ unset ack
 
 # Dust, dua and ncdu - Du replacement(s)
 
-if ! (hash dua &>/dev/null && hash dust &>/dev/null && hash ncdu &>/dev/null); then
-    if ! (hash dua &>/dev/null || hash dust &>/dev/null || hash ncdu &>/dev/null); then 
+if ! (hash dua &>/dev/null || hash dust &>/dev/null || hash ncdu &>/dev/null); then
+    if ! hash dua &>/dev/null && ! hash dust &>/dev/null && ! hash ncdu &>/dev/null; then 
         printf "${CYAN}'Dua'${GREEN} and ${CYAN}'dust'${GREEN} are modern cli replacements of du\n${CYAN}'Dua interactive'${GREEN} and ${CYAN}'ncdu'${GREEN} are interactive TUI replacements that also help remove unnecessary files${normal}\n"
         color='GREEN'
         pre="dua dust ncdu all none"
@@ -949,7 +949,7 @@ unset nmap
 # Ufw / Gufw
 
 readyn -p "Install ufw? (Uncomplicated firewall - Iptables wrapper)" -c "! hash ufw &> /dev/null" ins_ufw
-if [[ $ins_ufw == "y" ]]; then
+if [[ "$ins_ufw" == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_ufw.sh; then
         source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ufw.sh)
     else

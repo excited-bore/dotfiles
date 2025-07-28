@@ -14,10 +14,10 @@ SCRIPT_DIR=$(get-script-dir)
 
 if ! type kitty &>/dev/null; then
     if [[ "$distro_base" == "Arch" ]] || [[ "$distro_base" == "Debian" ]]; then
-        eval "${pac_ins}" kitty
-        if [[ "$distro_base" == "Debian" ]] && ! type kitten &>/dev/null; then
-            sudo ln -s ~/.local/share/kitty-ssh-kitten/kitty/bin/kitten
-        fi
+        eval "${pac_ins_y} kitty"
+        #if [[ "$distro_base" == "Debian" ]] && ! type kitten &>/dev/null; then
+        #    sudo ln -s ~/.local/share/kitty-ssh-kitten/kitty/bin/kitten
+        #fi
     fi
 fi
 
@@ -26,7 +26,7 @@ eval "kitty --help | $PAGER"
 if [[ "$distro_base" == 'Arch' ]] && ! ls /usr/share/fonts/noto | grep -i -q emoji; then
     readyn -p 'Install noto-emoji font for kitty?' emoji
     if [[ $emoji == 'y' ]]; then
-        eval "${pac_ins}" noto-fonts-emoji
+        eval "${pac_ins_y} noto-fonts-emoji"
     fi
     unset emoji
 fi

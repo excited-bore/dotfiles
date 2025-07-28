@@ -204,17 +204,19 @@ function update-system() {
        
         test -n "$YES" && flag='--auto' || flag=''
 
-        if test -n "$YES"; then
-            if test -n "$pac_refresh_y"; then
-                eval "${pac_refresh_y}"
+        # Nala does apt update && apt upgrade (--no-full) at default
+        if ! [[ "$pac" == 'nala' ]]; then
+            if test -n "$YES"; then
+                if test -n "$pac_refresh_y"; then
+                    eval "${pac_refresh_y}"
+                else
+                    eval "yes | ${pac_refresh}"
+                fi
             else
-                eval "yes | ${pac_refresh}"
+                eval "${pac_refresh}"
             fi
-        else
-            eval "${pac_refresh}"
         fi
         
-
         local hdrs="linux-headers-$(uname -r)"
         if test -z "$(apt list --installed 2> /dev/null | grep $hdrs)"; then
             
@@ -280,15 +282,15 @@ function update-system() {
                     eval "${pac_upg}" 
                 fi
                 
-                if test -n "$YES"; then
-                    if test -n "$pac_refresh_y"; then
-                        eval "${pac_refresh_y}"
-                    else
-                        eval "yes | ${pac_refresh}"
-                    fi
-                else
-                    eval "${pac_refresh}"
-                fi
+                #if test -n "$YES"; then
+                #    if test -n "$pac_refresh_y"; then
+                #        eval "${pac_refresh_y}"
+                #    else
+                #        eval "yes | ${pac_refresh}"
+                #    fi
+                #else
+                #    eval "${pac_refresh}"
+                #fi
             fi
         fi
  
