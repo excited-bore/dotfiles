@@ -176,10 +176,10 @@ if test -z "$1"; then
 
             readyn -p "Add shortcut for ripgrep files in dir? (Ctrl-g)" rpgrpdir
             if [[ "$rpgrpdir" == "y" ]]; then
-                if test -f fzf/.bash_aliases.d/ripgrep-directory.sh; then
-                    cp fzf/.bash_aliases.d/ripgrep-directory.sh ~/.bash_aliases.d/
+                if test -f aliases/.bash_aliases.d/ripgrep-directory.sh; then
+                    cp aliases/.bash_aliases.d/ripgrep-directory.sh ~/.bash_aliases.d/
                 else
-                    wget-aria-dir ~/.bash_aliases.d/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/.bash_aliases.d/ripgrep-directory.sh
+                    wget-aria-dir ~/.bash_aliases.d/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/ripgrep-directory.sh
                 fi
             fi
         fi
@@ -278,9 +278,9 @@ if test -z "$1"; then
             if ! type rifle &>/dev/null; then
                 if ! type python &>/dev/null; then
                     if [[ "$distro_base" == 'Debian' ]]; then
-                        eval "${pac_ins}" python3 python-is-python3
+                        eval "${pac_ins_y}" python3 python-is-python3
                     elif [[ "$distro_base" == 'Arch' ]]; then
-                        eval "${pac_ins}" python
+                        eval "${pac_ins_y}" python
                     fi
                 fi
                 sudo wget-aria-dir /usr/bin/ https://raw.githubusercontent.com/ranger/ranger/master/ranger/ext/rifle.py

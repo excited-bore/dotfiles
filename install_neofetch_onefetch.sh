@@ -11,14 +11,14 @@ fi
 
 SCRIPT_DIR=$(get-script-dir)
 
-if ! type neofetch &>/dev/null && ! type fastfetch &>/dev/null && ! type screenFetch &>/dev/null; then
+if ! hash neofetch &>/dev/null && ! hash fastfetch &>/dev/null && ! hash screenFetch &>/dev/null; then
     #readyn -p "Install neofetch/fastfetch/screenFetch? "" sym2
     #if test "$sym2" == "y"; then
 
     reade -Q "CYAN" -i "fast neo screen" -p "Which one? [Fast/neo/screen]: " sym2
     if [[ "$sym2" == "neo" ]]; then
         if [["$distro_base" == "Debian" ]] || [[ "$distro_base" == "Arch" ]]; then
-            eval "${pac_ins}" neofetch
+            eval "${pac_ins_y}" neofetch
         fi
 
         if ! test -f ~/.config/neofetch/config.conf; then
@@ -39,8 +39,8 @@ if ! type neofetch &>/dev/null && ! type fastfetch &>/dev/null && ! type screenF
         fi
     elif [[ "$sym2" == "fast" ]]; then
         if [[ $distro_base == "Debian" ]]; then
-            if ! type jq &>/dev/null; then
-                eval "${pac_ins}" jq
+            if ! hash jq &>/dev/null; then
+                eval "${pac_ins_y}" jq
             fi
             if [[ $arch =~ "arm" ]]; then
                 fetch_arch="armv7l"
@@ -55,40 +55,44 @@ if ! type neofetch &>/dev/null && ! type fastfetch &>/dev/null && ! type screenF
             wget-aria-dir $tmp https://github.com/fastfetch-cli/fastfetch/releases/download/$ltstv/fastfetch-$os-$fetch_arch.deb
             sudo dpkg -i $tmp/fastfetch-$os-$fetch_arch.deb
         elif [[ $distro_base == "Arch" ]]; then
-            eval "${pac_ins}" fastfetch
+            eval "${pac_ins_y}" fastfetch
         fi
         fastfetch
     elif [[ "$sym2" == "screen" ]]; then
         if [[ $distro_base == "Debian" ]] || [[ $distro_base == "Arch" ]]; then
-            eval "${pac_ins}" screenfetch
+            eval "${pac_ins_y}" screenfetch
         fi
         screenfetch
     fi
 fi
 
-if ! type onefetch &>/dev/null; then
+if ! hash onefetch &>/dev/null; then
     readyn -p "Install onefetch? (lists github stats like lines of codes)" nftch
     if [[ $nftch == 'y' ]]; then
         if [[ $distro_base == 'Arch' ]]; then
-            eval "${pac_ins}" onefetch
-        elif [[ $distro_base == 'Debian' ]] && type add-apt-repository &>/dev/null && [[ $(check-ppa ppa:o2sh/onefetch) =~ 'OK' ]]; then
+            eval "${pac_ins_y}" onefetch
+        elif [[ $distro_base == 'Debian' ]] && hash add-apt-repository &>/dev/null && [[ $(check-ppa ppa:o2sh/onefetch) =~ 'OK' ]]; then
             sudo add-apt-repository ppa:o2sh/onefetch
-            eval "${pac_up}"
-            eval "${pac_ins}" onefetch
+            eval "${pac_up_y}"
+            eval "${pac_ins_y}" onefetch
         elif [[ "$distro" == 'Fedora' ]]; then
             sudo dnf copr enable varlad/onefetch
             sudo dnf install onefetch
         elif [[ "$distro" == 'alpine' ]]; then
             apk update
             apk add onefetch
-        elif [[ $machine == 'Mac' ]] && type brew &>/dev/null; then
+        elif [[ $machine == 'Mac' ]] && hash brew &>/dev/null; then
             brew install onefetch
         elif [[ $machine == 'Windows' ]]; then
             winget install onefetch
         elif type nix-env &>/dev/null; then
             nix-env -i onefetch
         else
-            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+            if ! test -f install_cargo.sh; then
+                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)
+            else
+                . ./install_cargo.sh
+            fi
             cargo install onefetch
         fi
         onefetch

@@ -26,7 +26,7 @@ if ! hash less &> /dev/null || (hash less &> /dev/null && version-higher '633' "
         eval "$pac_rm_y less" 
     fi
    
-    eval "$pac_ins_y debhelper-compat devscripts build-essential fakeroot" 
+    eval "$pac_ins_y debhelper-compat devscripts build-essential fakeroot libncurses-dev" 
 
     # from https://launchpad.net/ubuntu/+source/less 
 
