@@ -211,9 +211,17 @@ if [[ $distro_base == 'Debian' ]]; then
             printf "${CYAN}mainline${normal} is not installed (GUI and cmd tool for managing installation of (newer) kernel versions)\n"
             readyn -p "Install mainline?" mainl_ins
             if [[ $mainl_ins == 'y' ]]; then
-                sudo add-apt-repository ppa:cappelikan/ppa 
-                eval "${pac_up}" 
-                eval "$pac_ins_y mainline"
+                if [[ "$distro" == 'Ubuntu' ]]; then
+                    sudo add-apt-repository ppa:cappelikan/ppa 
+                    eval "${pac_up}" 
+                    eval "$pac_ins_y mainline"
+                else
+                    eval "$pac_ins_y libgee-0.8-dev git libjson-glib-dev libvte-2.91-dev valac aria2 lsb-release" 
+                    git clone https://github.com/bkw777/mainline.git $TMPDIR 
+                    (cd $TMPDIR/mainline
+                    make
+                    sudo make install) 
+                fi
             fi
             unset mainl_ins
         fi 
