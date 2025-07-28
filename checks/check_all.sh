@@ -67,11 +67,10 @@ alias get-script-dir='cd "$( dirname "$-1" )" && pwd'
     alias unalias="builtin unalias"
 
 # Make sure cp copies forceably (without asking confirmation when overwriting) and verbosely
-
-if test -z "$CP_ALIAS_CHECKED" && (cp --help | grep -qF -- '-g' || hash xcp &> /dev/null || hash cpg &> /dev/null) && ! [[ "$(type cp)" =~ "'cpg -fgv'" ]] && ! [[ "$(type cp)" =~ "'xcp'" ]]; then
-    
+if test -z "$CP_ALIAS_CHECKED" && (hash xcp &> /dev/null || hash cpg &> /dev/null || command cp --help | grep -qF -- '-g') && ! [[ "$(type cp)" =~ "'cpg -fgv'" ]] && ! [[ "$(type cp)" =~ "'xcp'" ]]; then
+     
     # Cpg is installed and replaced regular cp
-    if cp --help | grep -qF -- '-g'; then
+    if command cp --help | grep -qF -- '-g'; then
         alias cp='cp -fgv' 
     else
         echo "Next ${RED}sudo${normal} will check for installed cp alternatives and whether their available for root as well as the user"
@@ -84,7 +83,7 @@ if test -z "$CP_ALIAS_CHECKED" && (cp --help | grep -qF -- '-g' || hash xcp &> /
         fi
     fi
     CP_ALIAS_CHECKED='y'
-elif ! (cp --help | grep -qF -- '-g' || hash xcp &> /dev/null || hash cpg &> /dev/null); then
+elif ! (hash xcp &> /dev/null || hash cpg &> /dev/null || cp --help | grep -qF -- '-g'); then
     alias cp='cp -fv'
 fi
 

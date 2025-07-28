@@ -127,13 +127,13 @@ if [[ $ansr == "y" ]]; then
         cp_vr=''
         cp_ov=''
         cp_der=''
-        if hash cpg &> /dev/null || hash xcp &> /dev/null || cp --help | grep -qF -- '-g'; then
-            if (hash cpg &> /dev/null || cp --help | grep -qF -- '-g') && hash xcp &> /dev/null; then
+        if hash cpg &> /dev/null || hash xcp &> /dev/null || command cp --help | grep -qF -- '-g'; then
+            if (hash cpg &> /dev/null || command cp --help | grep -qF -- '-g') && hash xcp &> /dev/null; then
                 readyn -p "Both '${CYAN}cpg/cp -g${GREEN}' and '${CYAN}xcp${GREEN}' are installed. Use either instead of regular 'cp' for cp with progress bar?" cp_xcpq
                 if [[ "$cp_xcpq" == 'y' ]]; then
                     reade -Q 'GREEN' -i 'cpg xcp' -p 'Which one? [Cpg/xcp]: ' cp_xcp
                     if [[ "$cp_xcpq" == 'cpg' ]]; then
-                        if cp --help | grep -qF -- '-g'; then 
+                        if command cp --help | grep -qF -- '-g'; then 
                             cp_xcp='cp -g'
                         elif hash cpg &> /dev/null; then
                             cp_xcp='cpg -g'
@@ -143,7 +143,7 @@ if [[ $ansr == "y" ]]; then
                     fi
                 fi
             else
-                if cp --help | grep -qF -- '-g'; then
+                if command cp --help | grep -qF -- '-g'; then
                     readyn -p "${CYAN}cp -g${GREEN} installed. Use cp -g instead of cp? (add progress bar)" cp_xcpq
                     if [[ "$cp_xcpq" == 'y' ]]; then
                         cp_xcp='cp -g'
