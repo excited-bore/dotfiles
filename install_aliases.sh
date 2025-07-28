@@ -131,7 +131,7 @@ if [[ $ansr == "y" ]]; then
             if (hash cpg &> /dev/null || command cp --help | grep -qF -- '-g') && hash xcp &> /dev/null; then
                 readyn -p "Both '${CYAN}cpg/cp -g${GREEN}' and '${CYAN}xcp${GREEN}' are installed. Use either instead of regular 'cp' for cp with progress bar?" cp_xcpq
                 if [[ "$cp_xcpq" == 'y' ]]; then
-                    reade -Q 'GREEN' -i 'cpg xcp' -p 'Which one? [Cpg/xcp]: ' cp_xcp
+                    reade -Q 'GREEN' -i 'cpg xcp' -p 'Which one? [Cpg/xcp]: ' cp_xcpq
                     if [[ "$cp_xcpq" == 'cpg' ]]; then
                         if command cp --help | grep -qF -- '-g'; then 
                             cp_xcp='cp -g'
