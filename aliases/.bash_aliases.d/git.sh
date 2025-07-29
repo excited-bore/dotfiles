@@ -69,7 +69,7 @@ if hash wget &>/dev/null && hash jq &>/dev/null; then
         if hash fzf &>/dev/null; then
             test -n "$quer" &&
                 quer="--query $quer"
-            res="$(printf "$releases" | fzf $quer --multi --reverse --height 50%)"
+            res="$(printf "$releases" | fzf $quer --select-1 --multi --reverse --height 50%)"
         else
             printf "Files: \n${cyan}$releases${normal}\n"
 	    releases=$(printf "$releases" | tr '\n' ' ')

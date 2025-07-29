@@ -1,32 +1,25 @@
 if ! test -f checks/check_all.sh; then
-    if type curl &> /dev/null; then
+    if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        printf "Curl not found and uninstallable. Exiting..."
-        return 1
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
     . ./checks/check_all.sh
 fi
-
-if ! test -f checks/check_AUR.sh; then
-    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_AUR.sh)
-else
-    . ./checks/check_AUR.sh
-fi
-
 
 
 if ! hash moar &> /dev/null; then
     
     if [[ "$distro_base" == "Arch" ]]; then 
         
-        #local answer
-        readyn -p "Install moar?"  answer
-        if [[ "$answer" == "y" ]]; then
-            eval "${AUR_ins} moar-git";
+        if ! test -f checks/check_AUR.sh; then
+            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_AUR.sh)
+        else
+            . ./checks/check_AUR.sh
         fi
-    	unset answer
+        
+        eval "${AUR_ins_y} moar-git";
     else
         
         printf "Package manager unknown or PM doesn't offer moar (f.ex. apt).\n"; 
@@ -35,24 +28,31 @@ if ! hash moar &> /dev/null; then
             if ! hash wget &> /dev/null || ! hash jq &> /dev/null; then
                 readyn -p "Need wget and jq for this to work (tool to fetch file from the internet and tool to query JSON format). Install wget and jq?"  ins_wget
                 if [[ $ins_wget == 'y' ]]; then
-                    eval "${pac_ins} wget jq"
+                    eval "${pac_ins_y} wget jq"
                 fi
                 unset ins_wget 
             fi
+            if ! test -f aliases/.bash_aliases.d/git.sh; then
+                source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/git.sh)
+            else
+                . ./aliases/.bash_aliases.d/git.sh
+            fi
+            
             if [[ $arch == "armv7l" ]] || [[ $arch == "arm64" ]]; then
-                arch="arm"
+                archm="arm"
+            elif [[ $arch == "amd64" ]] || [[ $arch == "amd32" ]]; then
+                archm="386"
             fi
-            if [[ $arch == "amd64" ]] || [[ $arch == "amd32" ]]; then
-                arch="386"
-            fi
-            latest=$(curl -sL "https://api.github.com/repos/walles/moar/releases" | jq '.[0]' -r | jq -r '.assets' | grep --color=never "name" | sed 's/"name"://g' | tr '"' ' ' | tr ',' ' ' | sed 's/[[:space:]]//g')                          
-            moar=$(echo "$latest" | grep --color=never $arch)
-            tmpd=$(mktemp -d)
-            tag=$(echo $moar | sed "s/moar-\(.*\)-linux.*/\1/g") 
-            wget-aria-dir $tmpd https://github.com/walles/moar/releases/download/$tag/$moar
-            chmod u+x $tmpd/moar*
-            sudo mv $tmpd/moar* /usr/bin/moar
+            latest=$(wget-curl -sL "https://api.github.com/repos/walles/moar/releases" | jq '.[0]' -r | jq -r '.assets' | grep --color=never "name" | sed 's/"name"://g' | tr '"' ' ' | tr ',' ' ' | sed 's/[[:space:]]//g')                          
+            moar=$(echo "$latest" | grep --color=never $archm)
+            #tmpd=$(mktemp -d)
+            #tag=$(echo $moar | sed "s/moar-\(.*\)-linux.*/\1/g") 
+            #wget-aria-dir $tmpd https://github.com/walles/moar/releases/download/$tag/$moar
+            get-latest-releases-github https://github.com/walles/moar $TMPDIR $moar  
+            sudo chmod 0755 $TMPDIR/$moar
+            sudo mv $TMPDIR/$moar /usr/bin/moar
             echo "Done!"
+            unset archm latest moar
         fi
     fi
 fi
