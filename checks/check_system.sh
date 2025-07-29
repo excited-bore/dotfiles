@@ -5,18 +5,33 @@ fi
 
 unameOut="$(uname -s)"
 case "${unameOut}" in
-Linux*) machine=Linux ;;
-Darwin*) machine=Mac ;;
-CYGWIN*)
-    machine=Windows
-    win_bash_shell=Cygwin
-    ;;
-MINGW*)
-    machine=Windows
-    win_bash_shell=Git
-    ;;
-*) machine="UNKNOWN:${unameOut}" ;;
+    Linux*) machine=Linux ;;
+    Darwin*) machine=Mac ;;
+    CYGWIN*)
+        machine=Windows
+        win_bash_shell=Cygwin
+        ;;
+    MINGW*)
+        machine=Windows
+        win_bash_shell=Git
+        ;;
+    *) machine="UNKNOWN:${unameOut}" ;;
 esac
+
+if test -z "$XDG_CONFIG_HOME"; then
+   if ! test -d $HOME/.config; then
+       mkdir $HOME/.config
+   fi
+   export XDG_CONFIG_HOME=$HOME/.config
+fi
+
+if test -z "$XDG_DATA_HOME"; then
+   if ! test -d $HOME/.local/share; then
+       mkdir $HOME/.local/share
+   fi
+   export XDG_DATA_HOME=$HOME/.local/share
+fi
+
 
 if test -z "$TMPDIR"; then
     if test -d /tmp; then

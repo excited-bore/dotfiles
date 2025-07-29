@@ -8,6 +8,10 @@ else
     . ./checks/check_all.sh
 fi
 
+if [[ "$distro_base" == 'Arch' ]] && hash ueberzug &> /dev/null; then
+   eval "$pac_rm_y ueberzug" 
+fi
+
 if [[ "$distro_base" == 'Debian' ]]; then
     if ! hash makedeb &> /dev/null; then
 	if ! test -f install_makedeb.sh; then
@@ -24,4 +28,6 @@ if [[ "$distro_base" == 'Debian' ]]; then
         sed -i 's/\(-DENABLE_OPENGL=ON \\\)/\1\n\t-DENABLE_OPENCV=OFF \\/' PKGBUILD
     fi
     makedeb -si)
+else
+    eval "${pac_ins_y} ueberzugpp"
 fi

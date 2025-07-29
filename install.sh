@@ -63,11 +63,7 @@ if ! hash fzf &>/dev/null || (hash fzf &> /dev/null && version-higher '0.6' "$(f
     readyn -p "Install fzf (a fuzzy finder / TUI to make a selection - used in a multitude of functions/tools)?" ins_fzf
     if [[ $ins_fzf == 'y' ]]; then
         if ! test -f install_fzf.sh; then
-            if hash curl &>/dev/null; then
-                source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fzf.sh) "simple"
-            else
-                source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fzf.sh) "simple"
-            fi
+           source <(wget-curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fzf.sh) "simple"
         else
             . ./install_fzf.sh "simple"
         fi
@@ -86,7 +82,7 @@ fi
 
 if ! hash rlwrap &>/dev/null; then
     if ! test -f $SCRIPT_DIR/checks/check_rlwrap.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_rlwrap.sh)
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_rlwrap.sh)
     else
         . $SCRIPT_DIR/checks/check_rlwrap.sh
     fi
@@ -125,7 +121,21 @@ if test -d /etc/modprobe.d && ! test -f /etc/modprobe.d/nobeep.conf; then
         echo "blacklist pcspkr" | sudo tee /etc/modprobe.d/nobeep.conf 1>/dev/null
     fi
 fi
+
+if ! hash numlockx &> /dev/null || ! ((test -f ~/.xinitrc && grep -q 'numlockx on' ~/.xinitrc) || (test -f ~/.bash_profile && ! grep -q 'numlockx on' ~/.bash_profile) || (test -f ~/.zprofile && ! grep -q 'numlockx on' ~/.zprofile) || (test -f ~/.profile && ! grep -q 'numlockx on' ~/.profile)); then
+    readyn -p "Right now if you were to have a keyboard with a numberpad and reboot, ${YELLOW}numlock would reset\n${GREEN}Disable this by installing and configuring ${CYAN}numlockx${GREEN}?" nmlcx
+    if [[ "$nmlcx" == "y" ]]; then
+        if ! test -f install_numlockx.sh; then
+            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_numlockx.sh) 
+        else
+            . ./install_numlockx.sh 
+        fi
+    fi
+fi
 unset sym1 sym2 sym3 beep
+
+unset sym1 sym2 sym3 beep
+
 
 SCRIPT_DIR=$(get-script-dir)
 
@@ -267,7 +277,7 @@ elif [[ $distro_base == 'Arch' ]]; then
         printf "${CYAN}pacman-contrib${normal} is not installed (Includes tools like pactree, pacsearch, pacdiff..)\n"
         readyn -p 'Install pacman-contrib package?' -c '! hash pactree &> /dev/null' pacmn_cntr
         if [[ "$pacmn_cntr" == 'y' ]]; then
-            sudo pacman -Su pacman-contrib
+            sudo pacman -Su --noconfirm pacman-contrib
         fi
     fi
     unset pacmn_cntr

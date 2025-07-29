@@ -19,7 +19,8 @@ elif [[ $distro_base == "Debian" ]]; then
     fi
 fi
 
-echo "Next $(tput setaf 1)sudo$(tput sgr0) will set the ownership from /var/lib/gems to $USER:$USER"
+echo "Next $(tput setaf 1)sudo$(tput sgr0) will create /var/lib/gems and set the ownership to $USER:$USER"
+sudo mkdir /var/lib/gems
 sudo chown -R $USER:$USER /var/lib/gems/
 
 if test -f ~/.bashrc && ! grep -q 'eval "$(rbenv init -)' ~/.bashrc; then

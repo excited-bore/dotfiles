@@ -1,10 +1,8 @@
-#!/bin/bash
-
 if ! test -f checks/check_all.sh; then
-    if type curl &>/dev/null; then
+    if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        continue
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
     . ./checks/check_all.sh
@@ -13,12 +11,12 @@ fi
 if [[ $machine == 'Mac' ]] && hash brew &>/dev/null; then
     brew install pyenv
 elif [[ "$distro_base" == "Arch" ]]; then
-    eval "${pac_ins} base-devel openssl zlib xz tk pyenv"
+    eval "${pac_ins_y} base-devel openssl zlib xz tk pyenv"
 elif [[ $distro_base == "Debian" ]]; then
-    eval "${pac_ins} build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev curl git libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev"
-    curl https://pyenv.run | bash
+    eval "${pac_ins_y} build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev curl git libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev"
+    wget-curl https://pyenv.run | bash
 else
-    curl https://pyenv.run | bash
+    wget-curl https://pyenv.run | bash
 fi
 
 readyn -p 'Enable pyenv shell integration for current shell?' shell_init

@@ -1,34 +1,32 @@
-# !/bin/bash
-
 if ! test -f checks/check_all.sh; then
-    if type curl &>/dev/null; then
+    if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-        return 1 || exit 1
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
     . ./checks/check_all.sh
 fi
-if ! type bat &> /dev/null; then 
+
+if ! hash bat &> /dev/null; then 
     if [[ $distro_base == "Arch" ]]; then
-        eval "$pac_ins bat"
+        eval "$pac_ins_y bat"
     elif [[ $distro_base == "Debian" ]]; then
-        eval "$pac_ins bat"
-        if type batcat &> /dev/null; then
+        eval "$pac_ins_y bat"
+        if hash batcat &> /dev/null; then
             mkdir -p ~/.local/bin
             ln -s /usr/bin/batcat ~/.local/bin/bat
         fi
     else
-        eval "$pac_ins bat"
+        eval "$pac_ins_y bat"
     fi
 fi 
 
-if ! type batdiff &> /dev/null; then 
+if ! hash batdiff &> /dev/null; then 
     readyn -p "Install bat-extras (includes batdiff/batgrep/batman/bat-modules/batpipe/batwatch)" bat
     if [[ "$bat" == "y" ]]; then
         if [[ "$distro_base" == "Arch" ]];then
-            eval "$pac_ins bat-extras"
+            eval "$pac_ins_y bat-extras"
         elif [[ $distro_base == "Debian" ]]; then
             #yes | eval "$pac_ins golang"
             #go install mvdan.cc/sh/v3/cmd/shfmt@latest

@@ -5,11 +5,10 @@
 
 
 if ! test -f checks/check_all.sh; then
-    if type curl &>/dev/null; then
+    if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-        return 1 || exit 1
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
     . ./checks/check_all.sh
@@ -76,17 +75,18 @@ if [[ "$(command ls $fonts/* 2> /dev/null)" ]]; then
 fi
 
 if test -n "$name"; then
+    if ! hash magick &> /dev/null; then 
+        if ! test -f install_imagemagick.sh; then
+            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_imagemagick.sh)
+        else
+            . ./install_imagemagick.sh 
+        fi
+    fi
+    
     if [[ "$XDG_SESSION_TYPE" == 'x11' ]]; then
         if ! hash magick &> /dev/null || ! hash ueberzugpp &> /dev/null; then
             readyn -p "Install 'imagemagick' and 'ueberzugpp' to preview/show fonts?" yhno
             if [[ "$yhno" == 'y' ]]; then
-                if ! hash magick &> /dev/null; then 
-                    if ! test -f install_imagemagick.sh; then
-                        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_imagemagick.sh)
-                    else
-                        . ./install_imagemagick.sh 
-                    fi
-                fi
                 if ! hash ueberzugpp &> /dev/null; then
                     if ! test -f install_ueberzugpp.sh; then
                         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ueberzugpp.sh)
@@ -98,8 +98,8 @@ if test -n "$name"; then
         fi
         # get github.com/xlucn/fontpreview-ueberzug
         
-        if (hash magick &> /dev/null && hash ueberzugpp &> /dev/null && [[ "$XDG_SESSION_TYPE" == 'x11' ]]); then
-            wget-curl https://raw.githubusercontent.com/xlucn/fontpreview-ueberzug/refs/heads/master/fontpreview-ueberzug $TMPDIR/fontpreview.sh
+        if hash magick &> /dev/null && hash ueberzugpp &> /dev/null; then
+            wget-aria-name $TMPDIR/fontpreview.sh https://raw.githubusercontent.com/xlucn/fontpreview-ueberzug/refs/heads/master/fontpreview-ueberzug 
             if hash magick &> /dev/null; then
                 sed -i 's/convert/magick/g' $TMPDIR/fontpreview.sh
             fi
@@ -109,18 +109,10 @@ if test -n "$name"; then
         fi
         
     elif [[ "$XDG_SESSION_TYPE" == 'wayland' ]]; then
-        if ! hash magick &> /dev/null || ! hash nsxiv &> /dev/null; then
-            if ! hash magick &> /dev/null; then
-                if ! test -f install_imagemagick.sh; then
-                    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_imagemagick.sh)
-                else
-                    . ./install_imagemagick.sh 
-                fi 
-            fi
-            if ! hash nsxiv &> /dev/null; then
-                eval "$pac_ins_y nsxiv" 
-            fi
-        fi
+
+    if ! hash nsxiv &> /dev/null; then
+        eval "$pac_ins_y nsxiv" 
+    fi
         
         wget-curl https://git.io/raw_fontpreview > $TMPDIR/fontpreview.sh
         #if [[ "$XDG_CURRENT_DESKTOP" == 'GNOME' ]]; then

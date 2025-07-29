@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
 
 if ! test -f checks/check_all.sh; then
-    if type curl &>/dev/null; then
+    if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-        return 1 || exit 1
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
     . ./checks/check_all.sh
@@ -14,7 +13,7 @@ fi
 DIR=$(get-script-dir)
 
 if ! test -f checks/check_envvar_aliases_completions_keybinds.sh; then
-    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar_aliases_completions_keybinds.sh)
+    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar_aliases_completions_keybinds.sh)
 else
     . ./checks/check_envvar_aliases_completions_keybinds.sh
 fi
@@ -36,7 +35,7 @@ if [[ "$distro_base" == "Debian" ]]; then
     if test -n "$(sudo apt list --installed 2>/dev/null | grep neovim)"; then
         readyn -p "Uninstall apt version of neovim?" nvmapt
         if [[ "y" == "$nvmapt" ]]; then
-            sudo apt remove -y neovim
+            eval "$pac_rm_y neovim"
         fi
     fi
 
@@ -100,7 +99,7 @@ if [[ "$distro_base" == "Debian" ]]; then
         eval "${pac_ins_y} neovim"
     elif [[ "$nvmappmg" == 'makedeb' ]]; then
         if ! test -f install_makedeb.sh; then
-            source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_makedeb.sh)
+            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_makedeb.sh)
         else
             ./install_makedeb.sh 
         fi
@@ -110,7 +109,7 @@ if [[ "$distro_base" == "Debian" ]]; then
         makedeb -si)
     elif [[ "appimage" == "$nvmappmg" ]]; then
         if ! test -f checks/check_appimage_ready.sh; then
-            source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_appimage_ready.sh)
+            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_appimage_ready.sh)
         else
             . ./checks/check_appimage_ready.sh
         fi
@@ -121,7 +120,7 @@ if [[ "$distro_base" == "Debian" ]]; then
             if ! hash jq &>/dev/null; then
                 eval "${pac_ins_y}" jq
             fi
-            ltstv=$(curl -sL https://api.github.com/repos/neovim/neovim/releases/latest | jq -r ".tag_name")
+            ltstv=$(wget-curl https://api.github.com/repos/neovim/neovim/releases/latest | jq -r ".tag_name")
             tmpdir=$(mktemp -d -t nvim-XXXXXXXXXX)
             if [[ "$arch" == 'amd64' ]] || [[ "$arch" == 'amd32' ]] || [[ "$arch" == '386' ]]; then
                 nvarch='x86_64' 
@@ -160,7 +159,7 @@ if [[ "$distro_base" == "Debian" ]]; then
                 readyn -p "Install flatpak?" insflpk
                 if [[ "y" == "$insflpk" ]]; then
                     if ! test -f install_flatpak.sh; then
-                        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_flatpak.sh)
+                        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_flatpak.sh)
                     else
                         . ./install_flatpak.sh
                     fi
@@ -190,7 +189,7 @@ if [[ "$distro_base" == "Debian" ]]; then
         readyn -p "Install flatpak? " insflpk
         if [[ "y" == "$insflpk" ]]; then
             if ! test -f install_flatpak.sh; then
-                source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_flatpak.sh)
+                source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_flatpak.sh)
             else
                 . ./install_flatpak.sh
             fi
@@ -204,7 +203,7 @@ if [[ "$distro_base" == "Debian" ]]; then
             echo "Then, install some necessary buildtools"
         fi
         sudo apt update
-        sudo apt-get install git ninja-build gettext libtool libtool-bin autoconf automake cmake g++ pkg-config unzip curl doxygen
+        sudo apt-get install git ninja-build gettext libtool libtool-bin autoconf automake cmake g++ pkg-config unzip wget-curl doxygen
         tmpdir=$(mktemp -d -t nvim-XXXXXXXXXX)
         git clone https://github.com/neovim/neovim $tmpdir
         (
@@ -262,7 +261,7 @@ if [[ "$langs" == 'y' ]]; then
 
             if ! hash pipx &>/dev/null && ! test -f $HOME/.local/bin/pipx; then
                 if ! test -f $DIR/install_pipx.sh; then
-                    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)
+                    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)
                 else
                     . $DIR/install_pipx.sh
                 fi
@@ -290,7 +289,7 @@ if [[ "$langs" == 'y' ]]; then
         readyn -p "Install nvim-ruby? " rubyscripts
         if [[ "y" == "$rubyscripts" ]]; then
             if ! test -f install_ruby.sh; then
-                source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ruby.sh)
+                source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ruby.sh)
             else
                 . ./install_ruby.sh
             fi
@@ -319,8 +318,8 @@ if [[ "$langs" == 'y' ]]; then
                     if ! hash cpanm &>/dev/null; then
                         eval "${pac_ins_y}" cpanminus
                     fi
-                    cpanm --local-lib=~/perl5 local::lib && eval "$(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)"
-                    sudo cpanm --sudo -n Neovim::Ext
+                    /usr/bin/vendor_perl/cpanm --local-lib=~/perl5 local::lib && eval "$(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)"
+                    sudo /usr/bin/vendor_perl/cpanm --sudo -n Neovim::Ext
                 fi
             fi
         fi
@@ -344,7 +343,7 @@ if ! hash rg &>/dev/null; then
     readyn -p "Install ripgrep (recursive grep)?" rg_ins
     if [[ "y" == "$rg_ins" ]]; then
         if ! test -f install_ripgrep.sh; then
-            source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ripgrep.sh)
+            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ripgrep.sh)
         else
             . ./install_ripgrep.sh
         fi
@@ -357,7 +356,7 @@ if ! hash ast-grep &>/dev/null; then
     readyn -p "Install ast-grep (search and rewrite code at large scale using precise AST pattern)?" ast_ins
     if [[ "y" == "$ast_ins" ]]; then
         if ! test -f install_ast-grep.sh; then
-            source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ast-grep.sh)
+            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ast-grep.sh)
         else
             . ./install_ast-grep.sh
         fi
@@ -370,7 +369,7 @@ dir=vim/.config/nvim
 if ! test -d vim/; then
     tmpdir=$(mktemp -d -t nvim-XXXXXXXXXX)
     tmpfile=$(mktemp)
-    curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/download_git_directory.sh | tee "$tmpfile" &>/dev/null
+    wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/download_git_directory.sh | tee "$tmpfile" &>/dev/null
     chmod u+x "$tmpfile"
     eval $tmpfile https://github.com/excited-bore/dotfiles/tree/main/vim/.config/nvim $tmpdir
     dir=$tmpdir/vim/.config/nvim
@@ -502,8 +501,8 @@ echo "Check installed nvim plugins with 'Lazy' / Check installed vim plugins wit
 file=vim/.bash_aliases.d/vim_nvim.sh
 file1=vim/.bash_completion.d/vim_nvim
 if ! test -d vim/.bash_aliases.d/ || ! test -d vim/.bash_completion.d/; then
-    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/vim/.bash_aliases.d/vim_nvim.sh
-    tmp1=$(mktemp) && curl -o $tmp1 https://raw.githubusercontent.com/excited-bore/dotfiles/main/vim/.bash_completion.d/vim_nvim
+    tmp=$(mktemp) && wget-aria-name $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/vim/.bash_aliases.d/vim_nvim.sh
+    tmp1=$(mktemp) && wget-aria-name $tmp1 https://raw.githubusercontent.com/excited-bore/dotfiles/main/vim/.bash_completion.d/vim_nvim
     file=$tmp
     file1=$tmp1
 fi
@@ -524,7 +523,7 @@ if ! hash nvimpager &>/dev/null; then
     readyn -n -p "Install nvimpager?" vimrc
     if [[ "$vimrc" == "y" ]]; then
         if ! test -f install_nvimpager.sh; then
-            source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nvimpager.sh)
+            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nvimpager.sh)
         else
             . ./install_nvimpager.sh
         fi

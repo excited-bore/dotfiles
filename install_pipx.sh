@@ -27,7 +27,7 @@ if ! type pipx &>/dev/null; then
             fi
         elif [[ "$distro_base" == "Arch" ]]; then
             echo "This next $(tput setaf 1)sudo$(tput sgr0) will install pipx"
-            eval "${pac_ins}" python-pipx
+            eval "${pac_ins_y}" python-pipx
             if awk "BEGIN {exit !($(pipx --version) < 1.6.0)}"; then
                 pipx install pipx
                 pipx upgrade pipx
@@ -37,7 +37,7 @@ if ! type pipx &>/dev/null; then
             fi
         elif [[ "$distro_base" == "Debian" ]]; then
             echo "This next $(tput setaf 1)sudo$(tput sgr0) will install pipx"
-            eval "${pac_ins}" pipx
+            eval "${pac_ins_y}" pipx
             if awk "BEGIN {exit !($(pipx --version) < 1.6.0)}"; then
                 pipx install pipx
                 pipx upgrade pipx
