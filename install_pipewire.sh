@@ -1,22 +1,23 @@
-
-#https://bbs.archlinux.org/viewtopic.php?id=271850
 if ! test -f checks/check_all.sh; then
-    if type curl &>/dev/null; then
+    if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-        return 1 || exit 1
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
     . ./checks/check_all.sh
 fi
 
 if [[ "$distro" == "Manjaro" ]]; then
-    eval "$pac_ins pipewire pipewire-jack wireplumber pipewire-pulse manjaro-pipewire"
+    # Manjaro keeps complaining about this so yeh
+    if pamac list --installed jack | grep -q 'jack2'; then
+        eval "$pac_rm_y jack2"
+    fi
+    eval "$pac_ins_y pipewire pipewire-jack wireplumber pipewire-pulse manjaro-pipewire"
 elif [[ "$distro_base" == "Arch" ]]; then
-    eval "$pac_ins pipewire pipewire-jack wireplumber pipewire-pulse"
+    eval "$pac_ins_y pipewire pipewire-jack wireplumber pipewire-pulse"
 elif [[ "$distro_base" == "Debian" ]]; then
-    eval "$pac_ins pipewire pipewire-jack wireplumber pipewire-pulse"
+    eval "$pac_ins_y pipewire pipewire-jack wireplumber pipewire-pulse"
 fi 
 
 if ! test -f ~/.bash_completion.d/pipewire; then
@@ -24,7 +25,7 @@ if ! test -f ~/.bash_completion.d/pipewire; then
     if [[ $comps == 'y' ]]; then
 
         if ! test -f checks/check_completions_dir.sh; then
-             source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh) 
+             source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh) 
         else
             . ./checks/check_completions_dir.sh
         fi
@@ -40,7 +41,7 @@ fi
 
 mkdir -p ~/.config/wireplumber/wireplumber.conf.d/
 
-if echo $(wpctl status) | grep -q 'HMDI'; then
+if wpctl status | grep -q 'HMDI'; then
     readyn -p "Unlist all HDMI audio devices from pipewire?" unlst_hdmi
     if [[ "$unlst_hdmi" == 'y' ]]; then
         hdmi_f="$HOME/.config/wireplumber/wireplumber.conf.d/51-HDMI-disable.conf"  
@@ -63,6 +64,7 @@ if echo $(wpctl status) | grep -q 'HMDI'; then
     fi
 fi
 
+#https://bbs.archlinux.org/viewtopic.php?id=271850
 # https://wiki.archlinux.org/title/PipeWire#Sound_does_not_automatically_switch_when_connecting_a_new_device
 if type systemctl &> /dev/null && ! test -f /etc/systemd/user/pipewire-load-switch-on-connect.service; then
     #printf "${CYAN}You should test first whether sounds autoswitches when connected${normal}\n"
@@ -198,7 +200,7 @@ if ! type qwpgraph &> /dev/null; then
     readyn -p "Install patchbay interface 'qpwgraph'? (create and manage audiostreams)" -c "! type patchbay &> /dev/null" patchb
     if [[ "$patchb" == 'y' ]]; then
         if [[ "$distro_base" == 'Arch' ]] || [[ "$distro_base" == 'Debian' ]]; then
-            eval "${pac_ins} qpwgraph"
+            eval "${pac_ins_y} qpwgraph"
         fi
     fi
     unset patchb 
@@ -208,7 +210,7 @@ if ! type easyeffects &> /dev/null; then
     readyn -p "Install sound effect configurator 'easyeffects'? (Enable/disable audio effects on audiostreams)" ezff
     if [[ "$ezff" == 'y' ]]; then
         if [[ "$distro_base" == 'Arch' ]] || [[ "$distro_base" == 'Debian' ]]; then
-            eval "${pac_ins} easyeffects"
+            eval "${pac_ins_y} easyeffects"
         fi
     fi
     unset ezff 
