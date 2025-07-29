@@ -1,28 +1,26 @@
-#!/bin/bash
-
 if ! test -f checks/check_all.sh; then
-    if type curl &>/dev/null; then
+    if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        continue
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
     . ./checks/check_all.sh
 fi
 
 
-#if ! type ruby &>/dev/null || ! type gem &> /dev/null || ! type rbenv &> /dev/null; then
-
 if [[ "$distro_base" == "Arch" ]]; then
-    eval "${pac_ins} ruby ruby-build rbenv"
+    eval "${pac_ins_y} ruby ruby-build rbenv"
 elif [[ $distro_base == "Debian" ]]; then
-    eval "${pac_up}"
-    eval "${pac_rm} ruby"       
-    eval "${pac_ins} ruby-build ruby-dev rbenv"
-    eval "${pac_up}"
-else
-    eval "${pac_ins} ruby rbenv"
+    if (! hash ruby &>/dev/null || ! apt list --installed 2> /dev/null | grep -q 'ruby-dev') || ! hash gem &> /dev/null || ! hash rbenv &> /dev/null; then 
+        eval "${pac_up}"
+        eval "${pac_rm_y} ruby"       
+        eval "${pac_ins_y} ruby-build ruby-dev rbenv"
+    fi
 fi
+
+echo "Next $(tput setaf 1)sudo$(tput sgr0) will set the ownership from /var/lib/gems to $USER:$USER"
+sudo chown -R $USER:$USER /var/lib/gems/
 
 if test -f ~/.bashrc && ! grep -q 'eval "$(rbenv init -)' ~/.bashrc; then
     printf "eval \"\$(rbenv init -)\"\n" >>~/.bashrc

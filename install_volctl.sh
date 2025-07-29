@@ -19,16 +19,20 @@ else
     . $SCRIPT_DIR/checks/check_AUR.sh
 fi
 
-if [[ $distro_base == 'Arch' ]]; then
-    eval "${AUR_ins} volctl" 
-else
-    git clone https://github.com/buzz/volctl $TMPDIR/volctl
-    (cd $TMPDIR/volctl 
-    sudo ./setup.py install
-    sudo update-desktop-database 
-    test -d /usr/share/glib-2.0/schemas/ &&
-        sudo glib-compile-schemas /usr/share/glib-2.0/schemas/
-    test -d /usr/local/share/glib-2.0/schemas/ &&
-        sudo glib-compile-schemas /usr/local/share/glib-2.0/schemas/
-    ) 
+if [[ "$XDG_SESSION_TYPE" == 'wayland' ]]; then
+    echo "${RED}Wayland${red} is sadly not supported. Exiting...${normal}"
+else 
+    if [[ $distro_base == 'Arch' ]]; then
+        eval "${AUR_ins} volctl" 
+    else
+        git clone https://github.com/buzz/volctl $TMPDIR/volctl
+        (cd $TMPDIR/volctl 
+        sudo ./setup.py install
+        sudo update-desktop-database 
+        test -d /usr/share/glib-2.0/schemas/ &&
+            sudo glib-compile-schemas /usr/share/glib-2.0/schemas/
+        test -d /usr/local/share/glib-2.0/schemas/ &&
+            sudo glib-compile-schemas /usr/local/share/glib-2.0/schemas/
+        ) 
+    fi
 fi
