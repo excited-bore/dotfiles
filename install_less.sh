@@ -8,11 +8,6 @@ else
     . ./checks/check_all.sh
 fi
 
-if ! test -f install_ppa.sh; then
-    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ppa.sh)
-else
-    . ./install_ppa.sh
-fi
 
 #if ! test -f install_xmllint.sh; then
 #    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_xmllint.sh)
@@ -27,7 +22,13 @@ if ! hash less &> /dev/null || (hash less &> /dev/null && version-higher '633' "
     fi
 
     if [[ "$distro_base" == 'Debian' ]]; then   
-   	eval "$pac_ins_y debhelper-compat devscripts build-essential fakeroot libncurses-dev" 
+    	if ! test -f install_ppa.sh; then
+            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ppa.sh)
+        else
+            . ./install_ppa.sh
+        fi
+        
+        eval "$pac_ins_y debhelper-compat devscripts build-essential fakeroot libncurses-dev" 
 
    	# from https://launchpad.net/ubuntu/+source/less 
 
@@ -41,7 +42,11 @@ if ! hash less &> /dev/null || (hash less &> /dev/null && version-higher '633' "
    	cd less-668 
    	debuild -us -uc 
    	cd .. 
-   	sudo dpkg -i less_668-1_amd64.deb 
+        if [[ "$arch" == '386' || "$arch" == 'amd32'  || "$arch" == 'amd64' ]]; then
+            sudo dpkg -i less_668-1_amd64.deb 
+        elif [[ "$arch" =~ 'arm' ]]; then 
+            sudo dpkg -i less_668-1_$arch.deb
+        fi
    	) 
    	#latest="$(curl -fsSL https://greenwoodsoftware.com/less/download.html | xmllint --html --xpath '//a' - | grep '.tar' | head -n 1 | cut -d\" -f-2 | cut -d\" -f2)"
    	#tdir=$(mktemp -d)

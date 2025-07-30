@@ -79,7 +79,7 @@ if test -z "$CP_ALIAS_CHECKED" && (hash xcp &> /dev/null || hash cpg &> /dev/nul
             alias cp='cpg -fgv'
         fi
         if hash xcp &> /dev/null && ! [[ "$((sudo -n xcp)2>&1)" =~ 'not found' ]]; then
-            alias cp='xcp' 
+            alias cp='command xcp' 
         fi
     fi
     CP_ALIAS_CHECKED='y'

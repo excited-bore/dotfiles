@@ -22,12 +22,12 @@ if [[ "$swtch" == 'y' ]]; then
     
     if ! hash calamares &> /dev/null; then
         echo "Installing calamares to use for keyboard configuration."
-        eval "${pac_ins} calamares" 
+        eval "${pac_ins_y} calamares" 
     fi
 
-    if ! test -d calamares || ! test -f calamares/settings.conf; then
+    if ! test -d calamares || ! test -f calamares/settings-keyboard.conf; then
         tmpd=$(mktemp -d)
-        wget-aria-dir $tmpd https://raw.githubusercontent.com/excited-bore/dotfiles/main/calamares/settings.conf
+        wget-aria-name $tmpd/settings.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/calamares/settings-keyboard.conf
         (cd $tmpd
         sudo calamares -d 1> /dev/null)
         command rm -rf $tmpd
