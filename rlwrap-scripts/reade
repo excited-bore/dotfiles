@@ -1,4 +1,5 @@
 #!/bin/bash
+# Shebang not really except for nvim bash language server registering
 
 function reade() {
     test -n "$ZSH_VERSION" && 
@@ -63,7 +64,7 @@ function reade() {
 
     unset READE_VALUE
 
-    local hlpstr="${bold}READE${normal} [ -h / --help ] [ -v / --version] [ -i / --pregiven PREGIVEN(S) SPACESEPARATED STRING ] [ -s / --no-echo ] [ -a / --auto ] [ -e / --file-completion ]  [ -p / --prompt PROMPTSTRING ] [ -Q / --colour COLOURSTRING ] [ -r / --read-no-style ('nocomp'/'filecomp-only') ] [ -b/--break-chars BREAKCHARS-STRING ] ${bold}returnvar${normal}
+    local hlpstr="${bold}READE${normal} [ -h / --help ] [ -v / --version] [ -i / --pregiven PREGIVEN(S) SPACESEPARATED STRING ] [ -s / --no-echo ] [ -a / --auto ( ${bold}always${normal}/oneoption ) ] [ -e / --file-completion ]  [ -p / --prompt PROMPTSTRING ] [ -Q / --colour COLOURSTRING ] [ -r / --read-no-style ( ${bold}never${normal}/nocomp/filecomp-only ) ] [ -b/--break-chars BREAKCHARS-STRING ] ${bold}returnvar${normal}
    
    reade version $VERSION
 
@@ -96,11 +97,14 @@ function reade() {
 
         Doesn't echo what's being typed to the terminal - usefull for password prompts and the like
 
-   -a, --auto 
+   -a, --auto ( ${bold}always${normal}/oneoption ) 
             
         Fill in with the pregiven immediately. Usefull when running variants of scripts that use readyn and are supposed to automatically fill in a default answer.
-        If multiple pregivens are supplied, the first one will become the automatic answer.
-
+        If multiple pregivens are supplied with -i / --pre-given, the first one will become the automatic answer.
+        Two optional arguments: 
+            - 'always': always autocomplete (Default behaviour)
+            - 'oneoption': only autocomplete if there's only one option available
+            
    -e, --file-completion 
 
         Use filecompletions. 
@@ -117,10 +121,12 @@ function reade() {
         This flag ${bold}${underline_on}mitigates that${normal}, which will remove all applied colors/styles and thus mitigate the need to avoid using 'read -p' 
         (with an extra style removing check on the supplied prompt to make sure no style is passed).
         
-        No option will set never set a style
+        No option will never leave a style
         Option (optional) can be one of these: 
-            - 'filecomp-only' will cause reade to only remove colors/styles when using read's filecompletion flag '-e'.
-            - 'nocomp' will ${bold}not${normal} remove colors/styles but will instead read will opt to never use multiple autocompletion (to avoid moving arrowkeys up and down breaking prompts) ${bold}apart from the first pregiven/prefix ${underline_on}which will be returned if flag is supplied and answer is empty${normal} 
+            - 'never': never leave any style (Default behaviour) 
+            - 'filecomp-only' causes reade to only remove colors/styles when using read's filecompletion flag '-e'.
+            - 'nocomp' causes reade to ${bold}allow colors/styles but never use multiple autocompletions feature${normal} to avoid moving arrowkeys up and down, the cause of prompts breaking)
+            In other words nocomp will not autocomplete ${bold}apart from the first (or only) pregiven/prefix${normal} 
 
         There's also a environment variable READE_NOSTYLE that can be set beforehand with options: 'true', 'false', 'nocomp', 'filecomp-only'
         This flag will preceed the option set with READE_NOSTYLE. 
@@ -146,9 +152,11 @@ function reade() {
             break
             ;;
         esac
-    done && OPTIND=1
+    done 
+    OPTIND=1
 
-    #https://stackoverflow.com/questions/12022592/how-can-i-use-long-options-with-the-bash-getopts-builtin
+    # https://stackoverflow.com/questions/12022592/how-can-i-use-long-options-with-the-bash-getopts-builtin
+    # I'm ignoring this because I don't want to deal with the hassle of making sure the GNU/right version of getopt is installed
 
     for arg in "$@"; do
         shift
@@ -165,11 +173,7 @@ function reade() {
         esac
     done
 
-    local fcomp='n'
-    local auto='n' 
-    local nostyle='n'
-    local noecho='n'
-    local prmpt=''
+    local fcomp='n' auto='n' nostyle='n' noecho='n' prmpt=''
 
     if [[ "$READE_NOSTYLE" ]]; then
         [[ "$READE_NOSTYLE" == 'false' ]] && nostyle='n'  
@@ -178,11 +182,30 @@ function reade() {
         [[ "$READE_NOSTYLE" == 'filecomp-only' ]] && nostyle='f'  
     fi
 
+    # a = flag without argument
+    # a: = flag with argument
+    # a:: = flag with optional argument (bash > 4.3 only)
+    # I'm ignoring this because I need this script to be ZSH compatible
 
-    while getopts 'ars:b:e:i:p:Q:r:' flag; do
+    local flag 
+
+    while getopts ':sb:e:i:p:Q:r:a:' flag; do
         case "${flag}" in
         a)
             auto='y'
+            if [[ "${OPTARG}" ]]; then
+                if [[ "${OPTARG}" == 'always' ]]; then
+                    auto='y'
+                elif [[ "${OPTARG}" == 'oneoption' ]]; then
+                    auto='one'
+                elif [[ "${OPTARG}" == '-Q' || "${OPTARG}" == '-b' || "${OPTARG}" == '-e' || "${OPTARG}" == '-i' || "${OPTARG}" == '-p' || "${OPTARG}" == '-r' ]]; then
+                    OPTIND=$(($OPTIND - 1)) 
+                else 
+                    echo "${red}'${OPTARG}'${normal} is not an option for -a/--always"
+                    echo "Choose between --auto always or --auto oneoption"
+                    return 1
+                fi
+            fi 
             ;;
         e)
             fcomp='y'
@@ -190,12 +213,17 @@ function reade() {
         r)
             nostyle='y'
             if [[ "${OPTARG}" ]]; then
-                if [[ "${OPTARG}" == 'nocomp' ]]; then
+                if [[ "${OPTARG}" == 'never' ]]; then
+                    nostyle= 'y'
+                elif [[ "${OPTARG}" == 'nocomp' ]]; then
                     nostyle= 'c'
                 elif [[ "${OPTARG}" == 'filecomp-only' ]]; then
                     nostyle='f'
+                elif [[ "${OPTARG}" == '-Q' || "${OPTARG}" == '-b' || "${OPTARG}" == '-e' || "${OPTARG}" == '-i' || "${OPTARG}" == '-p' || "${OPTARG}" == '-a' ]]; then 
+                    OPTIND=$(($OPTIND - 1))
                 else
-                    echo "${red}'${OPTARG}'${normal} is not an option for -r, --read-no-style"
+                    echo "${red}'${OPTARG}'${normal} is not an option for -r/--read-no-style"
+                    echo "Choose between --read-no-style never, --read-no-style nocomp or --read-no-style filecomp-only" 
                     return 1
                 fi
             fi
@@ -204,7 +232,8 @@ function reade() {
             noecho='y'
             ;;
         esac
-    done && OPTIND=1
+    done 
+    OPTIND=1
 
     local rlwrap_installable='y'
 
@@ -228,174 +257,175 @@ function reade() {
             fi
         fi
      
-	    local oldhist=''
-        local color=""
-        local arg='' 
-        local args=''
-        local tmpf=''
-	    local eflag=0
-        local pre=''
-        while getopts 'arsS:b:e:i:p:Q:' flag; do
+	local oldhist='' color="" arg='' args='' tmpf='' eflag=0 one='n' pre=''
+        while getopts ':sb:e:i:p:Q:a:r:' flag; do
             case "${flag}" in
-            b) ;;
-            e)
-                if test -n "$BASH_VERSION" || [[ "$noecho" == 'y' ]]; then
-                    readstr=$(echo "$readstr" | sed 's|read |read -e |g')
-                fi
-                if test -n "$ZSH_VERSION"; then
-                    readstr=$(echo "$readstr" | sed 's|vvvvvvvvvv=.*; vared|vvvvvvvvvv="\$(pwd)"; vared|g')
-                fi
-                ;;
+                a)  if [[ "${OPTARG}" == '-Q' || "${OPTARG}" == '-b' || "${OPTARG}" == '-e' || "${OPTARG}" == '-i' || "${OPTARG}" == '-p' || "${OPTARG}" == '-r' ]]; then 
+                         OPTIND=$(($OPTIND-1))
+                    fi 
+                    ;;
+                r)  if [[ "${OPTARG}" == '-Q' || "${OPTARG}" == '-b' || "${OPTARG}" == '-e' || "${OPTARG}" == '-i' || "${OPTARG}" == '-p' || "${OPTARG}" == '-a' ]]; then 
+                         OPTIND=$(($OPTIND-1))
+                    fi
+                    ;;
+                b) ;;
+                e)
+                    if test -n "$BASH_VERSION" || [[ "$noecho" == 'y' ]]; then
+                        readstr=$(echo "$readstr" | sed 's|read |read -e |g')
+                    fi
+                    if test -n "$ZSH_VERSION"; then
+                        readstr=$(echo "$readstr" | sed 's|vvvvvvvvvv=.*; vared|vvvvvvvvvv="\$(pwd)"; vared|g')
+                    fi
+                    ;;
                 #  Even though it's in the read man for bash, -i (on it's own) does not actually work
-            i)
-                arg="$(echo ${OPTARG} | awk '{print $1;}')"
-                args="$(echo ${OPTARG} | sed "s/\<$arg\> //g")"
+                i)
+                    arg="$(echo ${OPTARG} | awk '{print $1;}')"
+                    args="$(echo ${OPTARG} | sed "s/\<$arg\>//g" | xargs)"
 
-                local eflag='-e' 
+                    local eflag='-e' 
 
-                [[ "$nostyle" == 'c' ]] && eflag=''
-
-                if test -n "$BASH_VERSION"; then
-                    readstr=$(echo "$readstr" | sed 's|read |read '"$eflag"' -i "'"$arg"'" |g')
-                fi
-
-                if test -n "$ZSH_VERSION" && [[ $noecho == 'n' ]]; then
-                    readstr=$(echo "$readstr" | sed 's|vvvvvvvvvv=.*; vared|vvvvvvvvvv=""; vared -h|g')
-                fi
-                pre="$arg"
-
-                if test -n "$args" && ! [[ "$nostyle" == 'c' ]]; then
-                    args=$(echo "$args" | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }')
-                    args=$(echo "$args" | tr ' ' '\n')
-
-                    tmpf=$(mktemp)
-
-                    echo "$args" >"$tmpf"
-
-                    #test -e $HISTFILE &&
-
-                    #! test -e $HISTFILE && test -n $BASH_VERSION && test -f ~/.bash_history && test -n "$(cat ~/.bash_history)" &&
-                    #    oldhist=~/.bash_history
-
-                    #if test -n $ZSH_VERSION; then
-                    #    if [[ $machine == 'Mac' ]] && test -f ~/.zsh_history && test -n "$(cat ~/.zsh_history)"; then
-                    #        oldhist=~/.zsh_history
-                    #    elif test -f ~/.zhistory && test -n "$(cat ~/.zhistory)"; then
-                    #        oldhist=~/.zhistory
-                    #    fi
-                    #fi
-
-                    #if ! test -e "$HISTFILE"; then
-                    oldhist=$(mktemp)
-                    echo -e "$(history | awk '{$1=""; print;}')" > $oldhist
-                    #fi
+                    [[ "$nostyle" == 'c' ]] && eflag=''
 
                     if test -n "$BASH_VERSION"; then
-                        while IFS='' read -r LINE || [ -n "${LINE}" ]; do
-                            history -s "${LINE}"
-                        done <"$tmpf"
-                        history -c
-                        history -r $tmpf
+                        readstr=$(echo "$readstr" | sed 's|read |read '"$eflag"' -i "'"$arg"'" |g')
+                    fi
+
+                    if test -n "$ZSH_VERSION" && [[ $noecho == 'n' ]]; then
+                        readstr=$(echo "$readstr" | sed 's|vvvvvvvvvv=.*; vared|vvvvvvvvvv=""; vared -h|g')
+                    fi
+                    pre="$arg"
+
+                    if test -z "$args"; then 
+                        one='y'
+                    elif test -n "$args" && ! [[ "$nostyle" == 'c' ]]; then
+                        args=$(echo "$args" | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }')
+                        args=$(echo "$args" | tr ' ' '\n')
+
+                        tmpf=$(mktemp)
+
+                        echo "$args" >"$tmpf"
+
+                        #test -e $HISTFILE &&
+
+                        #! test -e $HISTFILE && test -n $BASH_VERSION && test -f ~/.bash_history && test -n "$(cat ~/.bash_history)" &&
+                        #    oldhist=~/.bash_history
+
+                        #if test -n $ZSH_VERSION; then
+                        #    if [[ $machine == 'Mac' ]] && test -f ~/.zsh_history && test -n "$(cat ~/.zsh_history)"; then
+                        #        oldhist=~/.zsh_history
+                        #    elif test -f ~/.zhistory && test -n "$(cat ~/.zhistory)"; then
+                        #        oldhist=~/.zhistory
+                        #    fi
+                        #fi
+
+                        #if ! test -e "$HISTFILE"; then
+                        oldhist=$(mktemp)
+                        echo -e "$(history | awk '{$1=""; print;}')" > $oldhist
+                        #fi
+
+                        if test -n "$BASH_VERSION"; then
+                            while IFS='' read -r LINE || [ -n "${LINE}" ]; do
+                                history -s "${LINE}"
+                            done <"$tmpf"
+                            history -c
+                            history -r $tmpf
+                        fi
+
+                        if test -n "$ZSH_VERSION"; then
+                            echo "$arg" >>"$tmpf"
+
+                            while IFS='' read -r LINE || [ -n "${LINE}" ]; do
+                                print -S "${LINE}"
+                            done <$tmpf
+                            # Write to current historyfile
+                            fc -W
+                            # Then load different one - no need to clear
+                            fc -p "$tmpf"
+                        fi
+
+                        # https://unix.stackexchange.com/questions/265957/zsh-histfile-still-read-from-zsh-history
+                    fi
+                    ;;
+                Q)
+                    if [[ "${OPTARG}" =~ ^[[:upper:]]+$ ]]; then
+                        color="${bold}"
+                    fi
+                    OPTARG=$(echo "${OPTARG}" | awk '{print tolower($0)}')
+                    if [[ "${OPTARG}" =~ "red" ]]; then
+                        color=$color"${red}"
+                    elif [[ "${OPTARG}" =~ "green" ]]; then
+                        color=$color"${green}"
+                    elif [[ "${OPTARG}" =~ "blue" ]]; then
+                        color=$color"${blue}"
+                    elif [[ "${OPTARG}" =~ "yellow" ]]; then
+                        color=$color"${yellow}"
+                    elif [[ "${OPTARG}" =~ "cyan" ]]; then
+                        color=$color"${cyan}"
+                    elif [[ "${OPTARG}" =~ "magenta" ]]; then
+                        color=$color"${magenta}"
+                    elif [[ "${OPTARG}" =~ "black" ]]; then
+                        color=$color"${black}"
+                    elif [[ "${OPTARG}" =~ "white" ]]; then
+                        color=$color"${white}"
+                    fi
+                    ;;
+                p)
+                    if test -n "$BASH_VERSION"; then
+                        
+                        if [[ $nostyle == 'y' ]] || ([[ $nostyle == 'f' ]] && [[ $fcomp == 'y' ]]); then 
+                           
+                            # Removing other styles and colours from prompt using sed
+                            # https://stackoverflow.com/questions/58096998/how-to-remove-color-style-format-from-a-variable 
+                            
+                            local pre="$(echo shopt | grep 'extglob' | awk '{print $2;}')"
+                            shopt -s extglob
+                            OPTARG="${OPTARG//$'\e'[\[(]*([0-9;])[@-n]/}"
+                            readstr=$(echo "$readstr" | sed 's|read |read -p "'"${OPTARG}"'" |g')
+                            prmpt="${OPTARG}"
+
+                            [[ "$pre" == 'off' ]] && 
+                                shopt -u extglob 
+                        
+                        elif [[ $nostyle == 'c' ]]; then
+                            readstr=$(echo "$readstr" | sed 's|read |read -p "'"${color}${OPTARG}${normal}"'" |g')
+                            prmpt="${color}${OPTARG}${normal}"
+                        elif test -z "$color"; then
+                            readstr=$(echo "$readstr" | sed 's|read |printf "'"${OPTARG}"'\n"; read |g') 
+                            prmpt="${OPTARG}"
+                        else
+                            readstr=$(echo "$readstr" | sed 's|read |printf "'"${color}${OPTARG}${normal}"'\n"; read |g')
+                            prmpt="${color}${OPTARG}${normal}"
+                        fi
                     fi
 
                     if test -n "$ZSH_VERSION"; then
-                        echo "$arg" >>"$tmpf"
-
-                        while IFS='' read -r LINE || [ -n "${LINE}" ]; do
-                            print -S "${LINE}"
-                        done <$tmpf
-			# Write to current historyfile
-			fc -W
-			# Then load different one - no need to clear
-			fc -p "$tmpf"
-                    fi
-
-                    # https://unix.stackexchange.com/questions/265957/zsh-histfile-still-read-from-zsh-history
-                fi
-                ;;
-            Q)
-                if [[ "${OPTARG}" =~ ^[[:upper:]]+$ ]]; then
-                    color="${bold}"
-                fi
-                OPTARG=$(echo "${OPTARG}" | awk '{print tolower($0)}')
-                if [[ "${OPTARG}" =~ "red" ]]; then
-                    color=$color"${red}"
-                elif [[ "${OPTARG}" =~ "green" ]]; then
-                    color=$color"${green}"
-                elif [[ "${OPTARG}" =~ "blue" ]]; then
-                    color=$color"${blue}"
-                elif [[ "${OPTARG}" =~ "yellow" ]]; then
-                    color=$color"${yellow}"
-                elif [[ "${OPTARG}" =~ "cyan" ]]; then
-                    color=$color"${cyan}"
-                elif [[ "${OPTARG}" =~ "magenta" ]]; then
-                    color=$color"${magenta}"
-                elif [[ "${OPTARG}" =~ "black" ]]; then
-                    color=$color"${black}"
-                elif [[ "${OPTARG}" =~ "white" ]]; then
-                    color=$color"${white}"
-                fi
-                ;;
-            p)
-                if test -n "$BASH_VERSION"; then
-                    
-                    if [[ $nostyle == 'y' ]] || ([[ $nostyle == 'f' ]] && [[ $fcomp == 'y' ]]); then 
-                       
-                        # Removing other styles and colours from prompt using sed
-                        # https://stackoverflow.com/questions/58096998/how-to-remove-color-style-format-from-a-variable 
-                        
-                        local pre="$(echo shopt | grep 'extglob' | awk '{print $2;}')"
-                        shopt -s extglob
-                        OPTARG="${OPTARG//$'\e'[\[(]*([0-9;])[@-n]/}"
-                        readstr=$(echo "$readstr" | sed 's|read |read -p "'"${OPTARG}"'" |g')
-                        prmpt="${OPTARG}"
-
-                        [[ "$pre" == 'off' ]] && 
-                            shopt -u extglob 
-                    
-                    elif [[ $nostyle == 'c' ]]; then
-                        readstr=$(echo "$readstr" | sed 's|read |read -p "'"${color}${OPTARG}${normal}"'" |g')
-                        prmpt="${color}${OPTARG}${normal}"
-                    elif test -z "$color"; then
-                        readstr=$(echo "$readstr" | sed 's|read |printf "'"${OPTARG}"'\n"; read |g') 
-                        prmpt="${OPTARG}"
-                    else
-                        readstr=$(echo "$readstr" | sed 's|read |printf "'"${color}${OPTARG}${normal}"'\n"; read |g')
-                        prmpt="${color}${OPTARG}${normal}"
-                    fi
-                fi
-
-                if test -n "$ZSH_VERSION"; then
-                    if [[ $noecho == 'y' ]]; then
-                        if test -z "$color"; then
-                            readstr=$(echo "$readstr" | sed 's|vvvvvvvvvv|"?'"${OPTARG}"'" vvvvvvvvvv|g') 
-                            prmpt="${OPTARG}"
-                        else
-                            readstr=$(echo "$readstr" | sed 's|vvvvvvvvvv|"?'"${color}${OPTARG}${normal}"'" vvvvvvvvvv|g')
+                        if [[ $noecho == 'y' ]]; then
+                            if test -z "$color"; then
+                                readstr=$(echo "$readstr" | sed 's|vvvvvvvvvv|"?'"${OPTARG}"'" vvvvvvvvvv|g') 
+                                prmpt="${OPTARG}"
+                            else
+                                readstr=$(echo "$readstr" | sed 's|vvvvvvvvvv|"?'"${color}${OPTARG}${normal}"'" vvvvvvvvvv|g')
+                                prmpt="${color}${OPTARG}${normal}"
+                            fi
+                        elif test -n "$color"; then
+                            readstr=$(echo "$readstr" | sed 's|vared |vared -p "'"${color}${OPTARG}${normal}"'" |g')
                             prmpt="${color}${OPTARG}${normal}"
+                        else
+                            readstr=$(echo "$readstr" | sed 's|vared |vared -p "'"${OPTARG}"'" |g')
+                            prmpt="${OPTARG}"
                         fi
-                    elif test -n "$color"; then
-                        readstr=$(echo "$readstr" | sed 's|vared |vared -p "'"${color}${OPTARG}${normal}"'" |g')
-                        prmpt="${color}${OPTARG}${normal}"
-                    else
-                        readstr=$(echo "$readstr" | sed 's|vared |vared -p "'"${OPTARG}"'" |g')
-                        prmpt="${OPTARG}"
                     fi
-                fi
-                ;;
-            s)
-                readstr=$(echo "$readstr" | sed 's|read |read -s |g')
-                ;;
-            S) ;;
-            *) ;;
+                    ;;
+                s)
+                    readstr=$(echo "$readstr" | sed 's|read |read -s |g')
+                    ;;
+                *) ;;
             esac
         done
 
-        unset flag 
-
         shift $((OPTIND - 1))
 
-        if [[ "$auto" == 'y' ]]; then
+        if [[ "$auto" == 'y' ]] || [[ "$auto" == 'one' && "$one" == 'y' ]]; then
             if test -z "$prmpt"; then
                 printf "$pre\n"; 
             else
@@ -450,7 +480,7 @@ function reade() {
         export READE_VALUE="$vvvvvvvvvv"
         export REPLY="$vvvvvvvvvv"
 
-        if test -n "$@"; then
+        if [[ -n "$@" ]]; then
             eval "${@:$#:1}='$vvvvvvvvvv'"
         fi
 	
@@ -461,63 +491,63 @@ function reade() {
             return 1
         fi
 
-        local breaklines=''
-        local tmpf=''
-        local frst=''
-        local args=''
-        local color='' 
-        local rlwstring="rlwrap --ansi-colour-aware -s 1000 -D 0 -b \"$breaklines\" -o cat"
+        local breaklines='' tmpf='' frst='' args='' color='' rlwstring="rlwrap --ansi-colour-aware -s 1000 -D 0 -b \"$breaklines\" -o cat"
 
-        while getopts ':b:e:i:p:Q:s:S:' flag; do
+        while getopts ':a:b:e:i:p:Q:r:s:' flag; do
             case "${flag}" in
-            b)
-                breaklines=${OPTARG}
-                ;;
-            # File completions
-            e) #rlwstring=$(echo $rlwstring | sed "s| -f <(echo \"${args[@]}\") | |g");
-                rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-c |g")
-                ;;
-            # Pre-filled answer
-            i)
-                frst="$(echo ${OPTARG} | awk '{print $1}')"
-                rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-P \"$frst\" |g")
-                args=$(echo ${OPTARG} | sed "s|\<$frst\> ||g")
-                test -n "$args" &&
-                    args=$(echo $args | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }') &&
-                    args=$(echo $args | tr ' ' '\n') &&
-                    tmpf=$(mktemp) &&
-                    echo "$args" >"$tmpf" &&
-                    rlwstring=$(echo $rlwstring | sed 's| -o cat| \-H $tmpf  \-f <(echo \"${args[@]}\") -o cat|g')
-                ;;
-            # Prompt
-            p)
-                rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-S \"${OPTARG}\" |g")
-                prmpt="${OPTARG}"
-                ;;
-            # Prompt colours
-            Q)
-                rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-p${OPTARG} |g")
-                color="${OPTARG}" 
-                ;;
-            # Password
-            s)
-                rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-aN\"${OPTARG}\" |g")
-                ;;
-            # Always echo *** w/ passwords
-            S)
-                rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-E\"${OPTARG}\" |g")
-                ;;
-            *) ;;
+                a)  if [[ "${OPTARG}" == '-Q' || "${OPTARG}" == '-b' || "${OPTARG}" == '-e' || "${OPTARG}" == '-i' || "${OPTARG}" == '-p' || "${OPTARG}" == '-r' ]]; then 
+                         OPTIND=$(($OPTIND-1))
+                    fi 
+                    ;;
+                r)  if [[ "${OPTARG}" == '-Q' || "${OPTARG}" == '-b' || "${OPTARG}" == '-e' || "${OPTARG}" == '-i' || "${OPTARG}" == '-p' || "${OPTARG}" == '-a' ]]; then 
+                         OPTIND=$(($OPTIND-1))
+                    fi
+                    ;;
+                b)
+                    breaklines=${OPTARG}
+                    ;;
+                # File completions
+                e) #rlwstring=$(echo $rlwstring | sed "s| -f <(echo \"${args[@]}\") | |g");
+                    rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-c |g")
+                    ;;
+                # Pre-filled answer
+                i)
+                    frst="$(echo ${OPTARG} | awk '{print $1}')"
+                    rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-P \"$frst\" |g")
+                    args=$(echo ${OPTARG} | sed "s|\<$frst\>||g" | xargs)
+                    if test -z "$args"; then 
+                        one='y' 
+                    elif test -n "$args"; then
+                        args=$(echo $args | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }')
+                        args=$(echo $args | tr ' ' '\n')
+                        tmpf=$(mktemp)
+                        echo "$args" >"$tmpf"
+                        rlwstring=$(echo $rlwstring | sed 's| -o cat| \-H $tmpf  \-f <(echo \"${args[@]}\") -o cat|g')
+                    fi
+                    ;;
+                # Prompt
+                p)
+                    rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-S \"${OPTARG}\" |g")
+                    prmpt="${OPTARG}"
+                    ;;
+                # Prompt colours
+                Q)
+                    rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-p${OPTARG} |g")
+                    color="${OPTARG}" 
+                    ;;
+                # Password
+                s)
+                    rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-aEN\"${OPTARG}\" |g")
+                    ;;
+                *) ;;
             esac
         done
-
-        unset flag 
 
         shift $((OPTIND - 1))
 
         unset vvvvvvvvvv ${@:$#:1} 
 
-        if [[ "$auto" == 'y' ]]; then
+        if [[ "$auto" == 'y' ]] || [[ "$auto" == 'one' && "$one" == 'y' ]]; then
             if test -z "$prmpt"; then
                 printf "$frst\n"; 
             else

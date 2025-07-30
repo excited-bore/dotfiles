@@ -66,6 +66,7 @@ if hash wget &>/dev/null && hash jq &>/dev/null; then
             releases="$nwreleases"
         fi
 
+        echo $releases 
         if hash fzf &>/dev/null; then
             test -n "$quer" &&
                 quer="--query $quer"
@@ -73,7 +74,7 @@ if hash wget &>/dev/null && hash jq &>/dev/null; then
         else
             printf "Files: \n${cyan}$releases${normal}\n"
 	    releases=$(printf "$releases" | tr '\n' ' ')
-            reade -Q 'CYAN' -i "$quer $releases" -p "Which one?: " res
+            reade --auto oneoption -Q 'CYAN' $quer -i "$releases" -p "Which one?: " res
         fi
 
         if test -n "$res"; then
