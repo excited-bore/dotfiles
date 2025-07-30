@@ -11,21 +11,24 @@ fi
 
 SCRIPT_DIR=$(get-script-dir)
 
-if ! type lazygit &>/dev/null; then
+if ! hash lazygit &>/dev/null; then
     if [[ "$distro_base" == "Arch" ]]; then
-        eval "${pac_ins}" lazygit
+        eval "${pac_ins_y}" lazygit
     elif [[ "$distro_base" == "Debian" ]]; then
-        if ! test -z "$(apt search --names-only lazygit 2>/dev/null | awk 'NR>2 {print;}')"; then
-            eval "${pac_ins}" lazygit
+        if test -n "$(apt-cache show lazygit)"; then
+            eval "${pac_ins_y}" lazygit
         else
-            if ! type curl &>/dev/null; then
-                eval "${pac_ins} curl"
+            LAZYGIT_VERSION=$(wget-curl "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po --color=never '"tag_name": "v\K[^"]*')
+            if [[ "$arch" == '386' || "$arch" == 'amd32' || "$arch" == 'amd64' ]]; then
+                 archl='x86_64'
+            elif [[ "$arch" =~ arm ]]; then  
+                  archl=$arch            
             fi
-            LAZYGIT_VERSION=$(curl "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po --color=never '"tag_name": "v\K[^"]*')
             (cd $TMPDIR  
-            wget-aria-name lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
-            tar xf lazygit.tar.gz lazygit)
-            sudo install $TMPDIR/lazygit -D -t /usr/local/bin
+            wget-aria-name lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_$archl.tar.gz"
+            tar xf lazygit.tar.gz lazygit
+            sudo install -t /usr/local/bin lazygit)
+            unset archl 
         fi
     fi
     unset nstll
