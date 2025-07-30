@@ -94,6 +94,7 @@ if test -n "$name"; then
                         . ./install_ueberzugpp.sh
                     fi
                 fi
+            unset yhno
             fi
         fi
         # get github.com/xlucn/fontpreview-ueberzug
@@ -110,9 +111,9 @@ if test -n "$name"; then
         
     elif [[ "$XDG_SESSION_TYPE" == 'wayland' ]]; then
 
-    if ! hash nsxiv &> /dev/null; then
-        eval "$pac_ins_y nsxiv" 
-    fi
+        if ! hash nsxiv &> /dev/null; then
+            eval "$pac_ins_y nsxiv" 
+        fi
         
         wget-curl https://git.io/raw_fontpreview > $TMPDIR/fontpreview.sh
         #if [[ "$XDG_CURRENT_DESKTOP" == 'GNOME' ]]; then

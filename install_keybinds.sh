@@ -155,7 +155,7 @@ if [[ "$DESKTOP_SESSION" == 'xfce' ]]; then
                 value="$emulatr"
             else
                 termems="xfce4-terminal" 
-                if type kitty &> /dev/null; then
+                if hash kitty &> /dev/null; then
                     termems="kitty $termems" 
                 fi
                  

@@ -1,31 +1,29 @@
 if ! test -f checks/check_all.sh; then
-    if type curl &>/dev/null; then
+    if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-        return 1 || exit 1
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
     . ./checks/check_all.sh
-fi
-
-if ! test -f checks/check_AUR.sh; then
-    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_AUR.sh)
-else
-    . ./checks/check_AUR.sh
 fi
 
 
 SCRIPT_DIR=$(get-script-dir)
 
 if ! hash pay-respects &>/dev/null; then
-    if [[ $machine == 'Mac' ]] && type brew &>/dev/null; then
+    if [[ $machine == 'Mac' ]] && hash brew &>/dev/null; then
         brew install thefuck    
     elif [[ $distro_base == 'Arch' ]]; then
-        eval "${AUR_ins} pay-respects"
+        if ! test -f checks/check_AUR.sh; then
+            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_AUR.sh)
+        else
+            . ./checks/check_AUR.sh
+        fi
+        eval "${AUR_ins_y} pay-respects"
     else
         if ! test -f install_cargo.sh; then
-            source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)
+            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)
         else
             . ./install_cargo.sh
         fi
@@ -65,7 +63,6 @@ if hash pay-respects &> /dev/null; then
                 printf "eval \"\$(pay-respects zsh --alias $ansr)\"\n" >>~/.zshrc
             fi
         fi
-
         unset ansr
     fi
 fi

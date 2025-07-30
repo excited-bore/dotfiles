@@ -27,7 +27,7 @@ fi
 # Fzf (Fuzzy Finder)
 
 # Remove older versions
-if version-higher '0.6' "$(fzf --version | awk '{print $1}')"; then
+if hash fzf &> /dev/null && version-higher '0.6' "$(fzf --version | awk '{print $1}')"; then
    eval "${pac_rm_y} fzf" 
 fi
 
@@ -140,7 +140,7 @@ if test -z "$1"; then
     fi
 
     #TODO: fzf-rifle.sh still has ffmpegthumbnailer part (could use sed check)
-    if ! type ffmpegthumbnailer &>/dev/null; then
+    if ! hash ffmpegthumbnailer &>/dev/null; then
         readyn -p "Install ffmpegthumbnailer? (Video thumbnails for riflesearch)" ffmpg
         if [[ "$ffmpg" == "y" ]]; then
             if ! test -f install_ffmpegthumbnailer.sh; then

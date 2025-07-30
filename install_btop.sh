@@ -1,11 +1,8 @@
-#!/usr/bin/env bash
-
 if ! test -f checks/check_all.sh; then
-    if type curl &>/dev/null; then
+    if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-        return 1 || exit 1
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
     . ./checks/check_all.sh
@@ -13,13 +10,13 @@ fi
 
 SCRIPT_DIR=$(get-script-dir)
 
-if ! type btop &>/dev/null; then
+if ! hash btop &>/dev/null; then
     readyn -p "Install btop?" sym2
     if [[ "$sym2" == "y" ]]; then
         #reade -Q "CYAN" -i "btop" -p "Which one? [Btop/bpytop/bashtop]: " "bpytop bashtop" sym2
         #if test "$sym2" == "btop"; then
         if [[ "$distro_base" == "Debian" ]] || [[ "$distro_base" == "Arch" ]]; then
-            eval "${pac_ins}" btop
+            eval "${pac_ins_y}" btop
         fi
         #elif test "$sym2" == "bpytop"; then
         #   if test $distro_base == "Debian"; then

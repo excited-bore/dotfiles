@@ -1,11 +1,8 @@
-#!/usr/bin/env bash
-
 if ! test -f checks/check_all.sh; then
-    if type curl &>/dev/null; then
+    if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-        return 1 || exit 1
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
     . ./checks/check_all.sh
@@ -13,11 +10,11 @@ fi
 
 SCRIPT_DIR=$(get-script-dir)
 
-if ! type exiftool &>/dev/null; then
+if ! hash exiftool &>/dev/null; then
     if [[ "$distro_base" == "Arch" ]]; then
-        eval "${pac_ins}" perl-image-exiftool
+        eval "${pac_ins_y}" perl-image-exiftool
     elif [[ $distro_base == "Debian" ]]; then
-        eval "${pac_ins}" libimage-exiftool-perl
+        eval "${pac_ins_y}" libimage-exiftool-perl
     fi
 fi
 

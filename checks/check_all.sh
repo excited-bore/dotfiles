@@ -133,8 +133,9 @@ if hash aria2c &>/dev/null; then
                 alias wget-aria-quiet='aria2c -q'
                 alias wget-aria-dir='aria2c -d'
                 function wget-aria-name(){
-                    aria2c --dir $(dirname $1) -o $(basename $1)  
+                    aria2c --dir $(dirname $1) --out=$(basename $1) ${@:2}  
                 }
+                alias wget-aria-name='wget-aria-name'
                 local frst="$1"
                 if [[ "$frst" == "-P" ]]; then
                     aria2c --dir ${@:2}
@@ -155,7 +156,7 @@ if hash aria2c &>/dev/null; then
         alias wget-aria-quiet='aria2c -q'
         alias wget-aria-dir='aria2c -d'
         function wget-aria-name(){
-            aria2c --dir $(dirname $1) -o $(basename $1)  
+            aria2c --dir $(dirname $1) -o $(basename $1) ${@:2} 
         }
     fi
 fi

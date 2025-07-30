@@ -1031,7 +1031,7 @@ unset kittn
 
 # Ffmpeg
 
-readyn -p "Install ffmpeg? (video/audio/image file converter)" -c "! hash ffmpeg &> /dev/null" ffmpg
+readyn -p "Install ffmpeg? (video/audio/image file converter)" -c "! hash ffmpeg &> /dev/null || ! test -f $HOME/.bash_aliases.d/ffmpeg.sh" ffmpg
 if [[ "$ffmpg" == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_ffmpeg.sh; then
         source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ffmpeg.sh)

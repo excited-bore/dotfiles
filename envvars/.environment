@@ -38,7 +38,7 @@ export MANPAGER='nvim +Man!'
 
 # LESS
 # Instead of less=more, try LESS='less --redraw-on-quit' or smth
-export LESS="  --quit-on-intr --redraw-on-quit --LINE-NUMBERS --line-num-width=2 --window=10 --use-color --color=Pkg$ --IGNORE-CASE --LONG-PROMPT --chop-long-lines --raw-control-chars --underline-special --mouse --QUIET --status-line --no-vbell --follow-name --exit-follow-on-close --quit-if-one-screen --squeeze-blank-lines"
+export LESS=" "
 #export LESSEDIT=$EDITOR
 
 # MOAR
@@ -135,7 +135,7 @@ export XDG_RUNTIME_DIR=/run/user/1000
 # https://systemd.io/ENVIRONMENT/
 # Pager stuff
 export SYSTEMD_PAGER="$PAGER"
-export SYSTEMD_PAGERSECURE=1
+export SYSTEMD_PAGERSECURE=0
 export SYSTEMD_COLORS=256
 export SYSTEMD_LESS="FRXMK $LESS --line-num-width=5"
 

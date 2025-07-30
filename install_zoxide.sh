@@ -1,9 +1,8 @@
 if ! test -f checks/check_all.sh; then
-    if type curl &>/dev/null; then
+    if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-        return 1 || exit 1
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
     . ./checks/check_all.sh
@@ -13,12 +12,12 @@ SCRIPT_DIR=$(get-script-dir)
 
 # https://github.com/ajeetdsouza/zoxide?tab=readme-ov-file#installation
 if ! hash zoxide &>/dev/null; then
-    if [[ $machine == 'Mac' ]] && type brew &>/dev/null; then
+    if [[ $machine == 'Mac' ]] && hash brew &>/dev/null; then
         brew install zoxide
     elif [[ $distro_base == 'Arch' ]]; then
-        sudo pacman -S zoxide
-    elif [[ $distro_base == 'Debian' ]]; then
-        sudo apt install zoxide
+        eval "$pac_ins_y zoxide"
+    elif [[ "$distro_base" == 'Debian' ]]; then
+        eval "$pac_ins_y zoxide"
     elif [[ $distro == 'Fedora' ]]; then
         sudo dnf install zoxide
     elif [[ $distro == 'openSUSE' ]]; then
@@ -32,7 +31,7 @@ if ! hash zoxide &>/dev/null; then
     else
         if ! hash cargo &>/dev/null; then
             if ! test -f install_cargo.sh; then
-                source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)
+                source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)
             else
                 . ./install_cargo.sh
             fi
@@ -45,19 +44,21 @@ if ! grep -q 'eval "$(zoxide init bash)"' ~/.bashrc; then
     printf 'eval "$(zoxide init bash)"\n' >>~/.bashrc
 fi
 
-if type autojump &>/dev/null; then
+if hash autojump &>/dev/null; then
     readyn -p 'Import data from autojump?' fse
     if [[ $fse == 'y' ]]; then
         if [[ $machine == 'Mac' ]]; then
-            test -f $HOME/Library/autojump/autojump.txt && zoxide import --from=autojump "$HOME/Library/autojump/autojump.txt"
+            test -f $HOME/Library/autojump/autojump.txt && 
+                zoxide import --from=autojump "$HOME/Library/autojump/autojump.txt"
         else
-            test -f $HOME/.local/share/autojump/autojump.txt && zoxide import --from=autojump "$HOME/.local/share/autojump/autojump.txt"
+            test -f $HOME/.local/share/autojump/autojump.txt && 
+                zoxide import --from=autojump "$HOME/.local/share/autojump/autojump.txt"
         fi
     fi
     unset fse
 fi
 
-if type fzf &>/dev/null && test -d ~/.bash_completion.d/ && ! test -f ~/.bash_completion.d/complete-zoxide; then
+if hash fzf &>/dev/null && test -d ~/.bash_completion.d/ && ! test -f ~/.bash_completion.d/complete-zoxide; then
     touch ~/.bash_completion.d/complete-zoxide
     printf "function __zoxide_zi() {     
     builtin local result;     

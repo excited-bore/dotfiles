@@ -1,13 +1,10 @@
-#!/usr/bin/env bash
-
 SYSTEM_UPDATED="TRUE"
 
 if ! test -f checks/check_all.sh; then
-    if ! hash curl &>/dev/null; then
+    if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-        return 1 || exit 1
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
     . ./checks/check_all.sh
@@ -49,7 +46,7 @@ environment-variables_r() {
          
         if test -f /root/.bash_profile && ! sudo grep -q "/root/.environment" /root/.bash_profile; then
             printf "${GREEN}Just source ${YELLOW}/root/.environment${normal} in ${YELLOW}/root/.bash_profile\n${normal}"
-            reade -Q GREEN -i 'source delete' -p "Or copy everything from ${YELLOW}/root/.bash_profile${GREEN} into ${YELLOW}/root/.profile${GREEN} and also delete ${YELLOW}/root/.bash_profile${GREEN}? [Source/delete]: " bprof_r 
+            reade -Q 'GREEN' -i 'source delete' -p "Or copy everything from ${YELLOW}/root/.bash_profile${GREEN} into ${YELLOW}/root/.profile${GREEN} and also delete ${YELLOW}/root/.bash_profile${GREEN}? [Source/delete]: " bprof_r 
 
             if [[ $bprof_r == 'source' ]]; then
                 if ! sudo grep -q "/root/.environment" /root/.bash_profile; then 
@@ -256,7 +253,8 @@ environment-variables() {
 
 pathvr=$(pwd)/envvars/.environment
 if ! test -f $pathvr; then
-    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/envvars/.environment
+    tmp=$(mktemp) && 
+        wget -O $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/envvars/.environment
     pathvr=$tmp
 fi
 
@@ -732,12 +730,7 @@ fi
 # Check one last time if ~/.bash_preexec - for both $USER and root - is the last line in their ~/.bash_profile and ~/.bashrc
 
 if ! test -f ./checks/check_bash_source_order.sh; then
-    if type curl &>/dev/null; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_bash_source_order.sh)
-    else
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-        return 1 || exit 1
-    fi
+    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_bash_source_order.sh)
 else
     . ./checks/check_bash_source_order.sh
 fi

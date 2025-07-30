@@ -1,11 +1,8 @@
-#!/bin/bash
-
 if ! test -f checks/check_all.sh; then
-    if type curl &>/dev/null; then
+    if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-        return 1 || exit 1
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
     . ./checks/check_all.sh
@@ -20,9 +17,9 @@ if type rifle &>/dev/null && ! type ranger &>/dev/null; then
 fi
 
 # Ranger (File explorer)
-if ! type ranger &>/dev/null; then
+if ! hash ranger &>/dev/null; then
     if [[ $distro_base == "Arch" ]] || [[ $distro_base == "Debian" ]]; then
-        eval "${pac_ins}" ranger
+        eval "${pac_ins_y}" ranger
     fi
 fi
 
@@ -38,12 +35,12 @@ if [ -f /usr/bin/ranger ] && ! grep -q 'rm -f -- "$temp_file" 2>/dev/null' /usr/
 fi
 
 # Remove message ('Removed /tmp/ranger_cd54qzd') after quitting ranger
-if [ -f /home/burp/.local/bin/ranger ] && ! grep -q 'rm -f -- "$temp_file" 2>/dev/null' /home/burp/.local/bin/ranger; then
-    sudo sed -i 's|rm -f -- "$temp_file"|rm -f -- "$temp_file" 2>/dev/null|g' /home/burp/.local/bin/ranger
+if [ -f $HOME/.local/bin/ranger ] && ! grep -q 'rm -f -- "$temp_file" 2>/dev/null' $HOME/.local/bin/ranger; then
+    sudo sed -i 's|rm -f -- "$temp_file"|rm -f -- "$temp_file" 2>/dev/null|g' $HOME/.local/bin/ranger
 fi
 
 #ranger --copy-config=all
-ranger --confdir=/home/$USER/.config/ranger --copy-config=all
+ranger --confdir=$HOME/.config/ranger --copy-config=all
 if [[ $ENV == ~/.environment ]]; then
     sed -i 's|#export RANGER_LOAD_DEFAULT_RC=|export RANGER_LOAD_DEFAULT_RC=|g' $ENV
     sudo sed -i 's|#export RANGER_LOAD_DEFAULT_RC=|export RANGER_LOAD_DEFAULT_RC=|g' $ENV_R
@@ -56,19 +53,19 @@ if [ -d ~/.bash_aliases.d/ ]; then
     if test -f ranger/.bash_aliases.d/ranger.sh; then
         cp ranger/.bash_aliases.d/ranger.sh ~/.bash_aliases.d/ranger.sh
     else
-        curl -o ~/.bash_aliases.d/ranger.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/.bash_aliases.d/ranger.sh
+        wget -O ~/.bash_aliases.d/ranger.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/.bash_aliases.d/ranger.sh
     fi
 
-    if type gio &>/dev/null && test -f ~/.bash_aliases.d/ranger.sh~; then
+    if hash gio &>/dev/null && test -f ~/.bash_aliases.d/ranger.sh~; then
         gio trash ~/.bash_aliases.d/ranger.sh~
     fi
 fi
 
 if ! [ -d ranger/.config/ranger/ ]; then
     tmpdir=$(mktemp -d -t ranger-XXXXXXXXXX)
-    curl -o $tmpdir/rc.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/.config/ranger/rc.conf
-    curl -o $tmpdir/scope.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/.config/ranger/scope.sh
-    curl -o $tmpdir/rifle.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/.config/ranger/rifle.conf
+    wget -O $tmpdir/rc.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/.config/ranger/rc.conf
+    wget -O $tmpdir/scope.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/.config/ranger/scope.sh
+    wget -O $tmpdir/rifle.conf https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/.config/ranger/rifle.conf
     dir=$tmpdir
 else
     dir=ranger/.config/ranger
@@ -80,7 +77,7 @@ rangr_cnf() {
     fi
 
     cp -t ~/.config/ranger $dir/rc.conf $dir/rifle.conf $dir/scope.sh
-    if type gio &>/dev/null; then
+    if hash gio &>/dev/null; then
         if test -f ~/.config/ranger/rc.conf~; then
             gio trash ~/.config/ranger/rc.conf~
         fi
@@ -117,12 +114,12 @@ if ! test -d ~/.config/ranger/plugins/devicons2; then
         mkdir -p ~/.config/ranger/plugins
         git clone https://github.com/cdump/ranger-devicons2 ~/.config/ranger/plugins/devicons2
         if [[ "$distro" == "Arch" ]]; then
-            eval "${pac_ins}" ttf-nerd-fonts-symbols-common ttf-nerd-fonts-symbols ttf-nerd-fonts-symbols-mono
+            eval "${pac_ins_y}" ttf-nerd-fonts-symbols-common ttf-nerd-fonts-symbols ttf-nerd-fonts-symbols-mono
         elif [[ "$distro_base" == "Debian" ]]; then
             readyn -p "Install Nerdfonts from binary - no apt? (Special FontIcons)" nrdfnts
             if [[ $nrdfnts == "y" ]]; then
                 if ! test -f ./install_nerdfonts.sh; then
-                    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nerdfonts.sh)
+                    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nerdfonts.sh)
                 else
                     . ./install_nerdfonts.sh
                 fi
