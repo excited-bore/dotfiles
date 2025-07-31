@@ -122,8 +122,12 @@ if test -d /etc/modprobe.d && ! test -f /etc/modprobe.d/nobeep.conf; then
     fi
 fi
 
-if [[ "$XDG_CURRENT_DESKTOP" == 'GNOME' ||  ]] [[ "$XDG_CURRENT_DESKTOP" == 'XFCE' && $(xfconf-query -c keyboards -lv | grep -i numlock | awk '{print $2}') == 'false' ]]; then
-    
+if [[ "$XDG_CURRENT_DESKTOP" == 'GNOME' && "$(gsettings get org.gnome.desktop.peripherals.keyboard remember-numlock-state)" == "false"  ]] || [[ "$XDG_CURRENT_DESKTOP" == 'XFCE' && $(xfconf-query -c keyboards -lv | grep -i numlock | awk '{print $2}') == 'false' ]]; then
+    if ! test -f check/check_numlock.sh; then
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/check/check_numlock.sh) 
+    else
+        . ./check/check_numlock.sh 
+    fi
 fi
  
 #if ! hash numlockx &> /dev/null || ! ((test -f ~/.xinitrc && grep -q 'numlockx on' ~/.xinitrc) || (test -f ~/.bash_profile && ! grep -q 'numlockx on' ~/.bash_profile) || (test -f ~/.zprofile && ! grep -q 'numlockx on' ~/.zprofile) || (test -f ~/.profile && ! grep -q 'numlockx on' ~/.profile)); then
