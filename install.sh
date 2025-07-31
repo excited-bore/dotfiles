@@ -122,17 +122,20 @@ if test -d /etc/modprobe.d && ! test -f /etc/modprobe.d/nobeep.conf; then
     fi
 fi
 
-if ! hash numlockx &> /dev/null || ! ((test -f ~/.xinitrc && grep -q 'numlockx on' ~/.xinitrc) || (test -f ~/.bash_profile && ! grep -q 'numlockx on' ~/.bash_profile) || (test -f ~/.zprofile && ! grep -q 'numlockx on' ~/.zprofile) || (test -f ~/.profile && ! grep -q 'numlockx on' ~/.profile)); then
-    readyn -p "Right now if you were to have a keyboard with a numberpad and reboot, ${YELLOW}numlock would reset\n${GREEN}Disable this by installing and configuring ${CYAN}numlockx${GREEN}?" nmlcx
-    if [[ "$nmlcx" == "y" ]]; then
-        if ! test -f install_numlockx.sh; then
-            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_numlockx.sh) 
-        else
-            . ./install_numlockx.sh 
-        fi
-    fi
+if [[ "$XDG_CURRENT_DESKTOP" == 'GNOME' ||  ]] [[ "$XDG_CURRENT_DESKTOP" == 'XFCE' && $(xfconf-query -c keyboards -lv | grep -i numlock | awk '{print $2}') == 'false' ]]; then
+    
 fi
-unset sym1 sym2 sym3 beep
+ 
+#if ! hash numlockx &> /dev/null || ! ((test -f ~/.xinitrc && grep -q 'numlockx on' ~/.xinitrc) || (test -f ~/.bash_profile && ! grep -q 'numlockx on' ~/.bash_profile) || (test -f ~/.zprofile && ! grep -q 'numlockx on' ~/.zprofile) || (test -f ~/.profile && ! grep -q 'numlockx on' ~/.profile)); then
+#    readyn -p "Right now if you were to have a keyboard with a numberpad and reboot, ${YELLOW}numlock would reset\n${GREEN}Disable this by installing and configuring ${CYAN}numlockx${GREEN}?" nmlcx
+#    if [[ "$nmlcx" == "y" ]]; then
+#        if ! test -f install_numlockx.sh; then
+#            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_numlockx.sh) 
+#        else
+#            . ./install_numlockx.sh 
+#        fi
+#    fi
+#fi
 
 unset sym1 sym2 sym3 beep
 
