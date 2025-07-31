@@ -1,0 +1,19 @@
+Traceback (most recent call last):
+  File "/home/burp/.local/bin/numlockw", line 7, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/burp/.local/pipx/venvs/numlockw/lib/python3.11/site-packages/numlockw/__main__.py", line 199, in main
+    args.func()
+  File "/home/burp/.local/pipx/venvs/numlockw/lib/python3.11/site-packages/numlockw/__main__.py", line 105, in on
+    toggle(True)
+  File "/home/burp/.local/pipx/venvs/numlockw/lib/python3.11/site-packages/numlockw/__main__.py", line 99, in toggle
+    numlock_switch(devices)
+  File "/home/burp/.local/pipx/venvs/numlockw/lib/python3.11/site-packages/numlockw/__main__.py", line 47, in numlock_switch
+    devices = [UInput(name=UINPOUT_DEVICE_NAME)]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/burp/.local/pipx/venvs/numlockw/lib/python3.11/site-packages/evdev/uinput.py", line 147, in __init__
+    self._verify()
+  File "/home/burp/.local/pipx/venvs/numlockw/lib/python3.11/site-packages/evdev/uinput.py", line 291, in _verify
+    raise UInputError(msg.format(self.devnode))
+evdev.uinput.UInputError: "/dev/uinput" cannot be opened for writing
+
