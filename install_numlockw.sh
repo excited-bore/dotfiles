@@ -23,7 +23,7 @@ if [[ $XDG_SESSION_TYPE == 'wayland' ]]; then
         fi
     fi
 
-    if hash pipx &> /dev/null; then
+    if hash pipx &> /dev/null && ! hash numlockw &> /dev/null; then
         # For Arch users: Refer to https://wiki.archlinux.org/title/Udev#Allowing_regular_users_to_use_devices
         sudo usermod -a -G plugdev $USER  
         # or pipx install git+https://github.com/xz-dev/numlockw.git 
@@ -35,7 +35,7 @@ if [[ $XDG_SESSION_TYPE == 'wayland' ]]; then
            touch ~/.profile 
         fi
 
-        if [[ "$XDG_SESSION_TYPE" == 'x11' ]] && test -f ~/.xinitrc && ! grep -q 'numlockw on' ~/.xinitrc; then
+        if [[ "$XDG_SESSION_TYPE" == 'wayland' ]] && test -f ~/.xinitrc && ! grep -q 'numlockw on' ~/.xinitrc; then
             echo "numlockw on" >> ~/.xinitrc
         elif test -f ~/.bash_profile && ! grep -q 'numlockw on' ~/.bash_profile; then
             echo "numlockw on" >> ~/.bash_profile
