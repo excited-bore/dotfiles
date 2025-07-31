@@ -35,9 +35,14 @@ if ! hash fzf &> /dev/null; then
     if [[ $distro_base == 'Debian' ]]; then
         FZF_VERSION=$(curl -s "https://api.github.com/repos/junegunn/fzf/releases/latest" | grep -Po '"tag_name": "v\K[0-9.]+') 
         dir=$(mktemp -d)
-        wget-aria-name $dir/fzf.tar.gz https://github.com/junegunn/fzf/releases/latest/download/fzf-$FZF_VERSION-linux_amd64.tar.gz
+        if [[ "$arch" == '386' || "$arch" == 'amd64' || "$arch" == 'amd32' ]]; then
+            archf='amd64' 
+        elif [[ "$arch" =~ arm ]]; then
+            archf=$arch 
+        fi
+        wget-aria-name $dir/fzf.tar.gz "https://github.com/junegunn/fzf/releases/latest/download/fzf-$FZF_VERSION-linux_$archf.tar.gz"
         sudo tar xf $dir/fzf.tar.gz -C /usr/local/bin
-        unset dir 
+        unset dir archf 
     else 
         eval "$pac_ins_y fzf" 
     fi
