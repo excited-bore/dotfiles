@@ -43,8 +43,8 @@ if ! hash moar &> /dev/null; then
             elif [[ $arch == "amd64" ]] || [[ $arch == "amd32" ]]; then
                 archm="386"
             fi
-            latest=$(wget-curl -sL "https://api.github.com/repos/walles/moar/releases" | jq '.[0]' -r | jq -r '.assets' | grep --color=never "name" | sed 's/"name"://g' | tr '"' ' ' | tr ',' ' ' | sed 's/[[:space:]]//g')                          
-            moar=$(echo "$latest" | grep --color=never $archm)
+            latest=$(wget-curl "https://api.github.com/repos/walles/moar/releases" | jq '.[0]' -r | jq -r '.assets' | grep --color=never "name" | sed 's/"name"://g' | tr '"' ' ' | tr ',' ' ' | sed 's/[[:space:]]//g')                          
+            moar=$(echo "$latest" | grep --color=never "linux-$archm")
             #tmpd=$(mktemp -d)
             #tag=$(echo $moar | sed "s/moar-\(.*\)-linux.*/\1/g") 
             #wget-aria-dir $tmpd https://github.com/walles/moar/releases/download/$tag/$moar

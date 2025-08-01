@@ -66,7 +66,6 @@ if hash wget &>/dev/null && hash jq &>/dev/null; then
             releases="$nwreleases"
         fi
 
-        echo $releases 
         if hash fzf &>/dev/null; then
             test -n "$quer" &&
                 quer="--query $quer"
