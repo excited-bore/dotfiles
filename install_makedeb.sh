@@ -23,7 +23,7 @@ if ! hash makedeb &> /dev/null; then
     if [[ "$arch" == 'arm32' ]]; then
         sudo sed -i 's/CARCH=".*"/CARCH="armhf"/ s/CHOST=".*"/CHOST="armv6l-unknown-linux-gnueabihf"/; s/-march=x86-64 -mtune=generic -O2 -pipe/-march=armv6 -mfloat-abi=hard -mfpu=vfp -O2 -pipe -fstack-protector-strong/' /etc/makepkg.conf 
     elif [[ "$arch" == 'arm64' ]]; then 
-        sudo sed -i 's/CARCH=".*"/CARCH="arm64"/; s/CHOST=".*"/CHOST="aarch64-unknown-linux-gnu"/; s/-march=x86-64 -mtune=generic -O2 -pipe/-march=armv8-a -O2 -pipe -fstack-protector-strong' /etc/makepkg.conf 
+        sudo sed -i 's/CARCH=".*"/CARCH="arm64"/; s/CHOST=".*"/CHOST="aarch64-unknown-linux-gnu"/; s/-march=x86-64 -mtune=generic -O2 -pipe/-march=armv8-a -O2 -pipe -fstack-protector-strong/' /etc/makepkg.conf 
     fi
 
     #if ! hash just &> /dev/null; then

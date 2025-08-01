@@ -99,12 +99,12 @@ if [[ "$distro_base" == "Debian" ]]; then
         eval "${pac_up}"
         eval "${pac_ins_y} neovim"
     elif [[ "$nvmappmg" == 'makedeb' ]]; then
-        tmpd=$(mktemp -d)
-        git clone https://mpr.makedeb.org/neovim $tmpd
-        if ! test -f install_makedeb.sh; then
+        if ! hash makedeb &> /dev/null; then
+            if ! test -f install_makedeb.sh; then
                 source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_makedeb.sh)
-        else
-            . ./install_makedeb.sh 
+            else
+                . ./install_makedeb.sh 
+            fi
         fi
 
         tmpd=$(mktemp -d)
