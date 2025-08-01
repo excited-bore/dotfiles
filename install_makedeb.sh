@@ -16,17 +16,6 @@ if ! hash makedeb &> /dev/null; then
     bash -ci "$(wget-curl 'https://shlink.makedeb.org/install')"
     # Arm support is broken? Even after building manually on latest alpha, neovim makedeb still throws errors being confused by -march=x86_64??
   
-    # Nevermind, apparently it's a configuration file error
-    # https://github.com/makedeb/makedeb/issues/263 
-    #TODO: revisit different armv*number* versions
-
-    if [[ "$arch" == 'arm32' ]]; then
-        sudo sed -i 's/CARCH=".*"/CARCH="armhf"/ s/CHOST=".*"/CHOST="armv6l-unknown-linux-gnueabihf"/; s/-march=x86-64 -mtune=generic -O2 -pipe/-march=armv6 -mfloat-abi=hard -mfpu=vfp -O2 -pipe -fstack-protector-strong/; s/-fcf-protection//' /etc/makepkg.conf 
-
-    elif [[ "$arch" == 'arm64' ]]; then 
-        sudo sed -i 's/CARCH=".*"/CARCH="arm64"/; s/CHOST=".*"/CHOST="aarch64-unknown-linux-gnu"/; s/-march=x86-64 -mtune=generic -O2 -pipe/-march=armv8-a -O2 -pipe -fstack-protector-strong/; s/-fcf-protection//' /etc/makepkg.conf 
-    fi
-
     #if ! hash just &> /dev/null; then
     #    if ! test -f $SCRIPT_DIR/install_just.sh; then
     #        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/install_just.sh)
@@ -57,6 +46,18 @@ if ! hash makedeb &> /dev/null; then
     #sudo DESTDIR='/usr/local/bin' just package
     #)
 fi
+
+# Nevermind, apparently it's a configuration file error
+# https://github.com/makedeb/makedeb/issues/263 
+#TODO: revisit different armv*number* versions
+
+if [[ "$arch" == 'arm32' ]]; then
+    sudo sed -i 's/CARCH=".*"/CARCH="armhf"/ s/CHOST=".*"/CHOST="armv6l-unknown-linux-gnueabihf"/; s/-march=x86-64 -mtune=generic -O2 -pipe/-march=armv6 -mfloat-abi=hard -mfpu=vfp -O2 -pipe -fstack-protector-strong/; s/-fcf-protection//' /etc/makepkg.conf 
+
+elif [[ "$arch" == 'arm64' ]]; then 
+    sudo sed -i 's/CARCH=".*"/CARCH="arm64"/; s/CHOST=".*"/CHOST="aarch64-unknown-linux-gnu"/; s/-march=x86-64 -mtune=generic -O2 -pipe/-march=armv8-a -O2 -pipe -fstack-protector-strong/; s/-fcf-protection//' /etc/makepkg.conf 
+fi
+
 
 if ! test -f $SCRIPT_DIR/checks/check_aliases_dir.sh; then
     source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)
