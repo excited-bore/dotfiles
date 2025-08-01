@@ -98,15 +98,26 @@ if [[ "$distro_base" == "Debian" ]]; then
         eval "${pac_up}"
         eval "${pac_ins_y} neovim"
     elif [[ "$nvmappmg" == 'makedeb' ]]; then
+        tmpd=$(mktemp -d)
+        git clone https://mpr.makedeb.org/neovim $tmpd
         if ! test -f install_makedeb.sh; then
-            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_makedeb.sh)
+                source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_makedeb.sh)
         else
             . ./install_makedeb.sh 
         fi
+
         tmpd=$(mktemp -d)
         git clone https://mpr.makedeb.org/neovim $tmpd
-        (cd $tmpd/
-        makedeb -si)
+        if ! [[ "$arch" =~ arm ]]; then
+            (cd $tmpd/
+            makedeb -si)
+        else
+            (cd $tmpd/
+            makedeb -s
+            cd neovim-*/
+            make CMAKE_BULD_TYPE='release'
+            sudo make CMAKE_INSTALL_PREFIX='/usr' install)
+        fi
     elif [[ "appimage" == "$nvmappmg" ]]; then
         if ! test -f checks/check_appimage_ready.sh; then
             source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_appimage_ready.sh)
@@ -169,11 +180,11 @@ if [[ "$distro_base" == "Debian" ]]; then
                 echo "Make sure you test yourself if branch stable fails. Check 'install_nvim.sh' and checkout different branches"
                 if ! test -z "$(sudo apt list --installed | grep neovim)" &>/dev/null; then
                     echo "Lets start by removing stuff related to installed 'neovim' packages"
-                    sudo apt autoremove neovim
+                    sudo apt autoremove -y neovim
                     echo "Then, install some necessary buildtools"
                 fi
                 sudo apt update
-                sudo apt-get install git ninja-build gettext libtool libtool-bin autoconf automake cmake g++ pkg-config unzip curl doxygen
+                eval "$pac_ins_y git ninja-build gettext libtool libtool-bin autoconf automake cmake g++ pkg-config unzip curl doxygen"
                 tmpdir=$(mktemp -d -t nvim-XXXXXXXXXX)
                 git clone https://github.com/neovim/neovim $tmpdir
                 (
@@ -199,7 +210,7 @@ if [[ "$distro_base" == "Debian" ]]; then
         echo "Make sure you test yourself if branch stable fails. Check 'install_nvim.sh' and checkout different branches"
         if ! test -z "$(sudo apt list --installed 2>/dev/null | grep neovim)" &>/dev/null; then
             echo "Lets start by removing stuff related to installed 'neovim' packages"
-            sudo apt autoremove neovim
+            sudo apt autoremove -y neovim
             echo "Then, install some necessary buildtools"
         fi
         sudo apt update
@@ -216,7 +227,7 @@ if [[ "$distro_base" == "Debian" ]]; then
     fi
     unset nvmapt nvmappmg insflpk nvmflpk
 else
-    eval "${pac_ins}" neovim
+    eval "${pac_ins_y}" neovim
 fi
 
 nvim --version
