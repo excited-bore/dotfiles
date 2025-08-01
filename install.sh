@@ -38,7 +38,7 @@ if ! hash less &> /dev/null || (hash less &> /dev/null && version-higher '633' "
     readyn -p "Install latest version of less?" ins_less
     if [[ $ins_less == 'y' ]]; then
         if ! test -f $SCRIPT_DIR/install_less.sh; then
-            source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_less.sh)
+            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_less.sh)
         else 
             . $SCRIPT_DIR/install_less.sh 
         fi

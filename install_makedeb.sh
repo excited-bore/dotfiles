@@ -13,7 +13,31 @@ fi
 SCRIPT_DIR=$(get-script-dir)
 
 if ! hash makedeb &> /dev/null; then
-    bash -ci "$(wget -qO - 'https://shlink.makedeb.org/install')"
+    # These instructions don't seem to work for arm architectures
+    # bash -ci "$(wget -qO - 'https://shlink.makedeb.org/install')"
+    # just building it seems more reliable
+    
+    #if ! hash just &> /dev/null; then
+    #    if ! test -f $SCRIPT_DIR/install_just.sh; then
+    #        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/install_just.sh)
+    #    else
+    #        . $SCRIPT_DIR/install_just.sh
+    #    fi
+    #fi
+    tmpd=$(mktemp -d) 
+    git clone 'https://github.com/makedeb/makedeb' $tmpd
+    (cd $tmpd
+    # Set to commit hash for version v16.0.0 
+    git checkout dc8ad0d 
+    source <(TARGET=apt RELEASE=alpha PKGBUILD/pkgbuild.sh)    
+    eval "$pac_ins_y ${makedepends[@]} ${depends[@]}"
+    make prepare PKGVER="16.0.0" RELEASE="stable" TARGET="apt" CURRENT_VERSION="0"
+    sudo make package TARGET="apt"
+     
+    #VERSION='16.0.0' RELEASE='alpha' TARGET='mpr' BUILD_COMMIT='2653879' just prepare
+    #DPKG_ARCHITECTURE=$(dpkg --print-architecture) just build
+    #DESTDIR='/usr/local/bin' just package
+    )
 fi
 
 if ! test -f $SCRIPT_DIR/checks/check_aliases_dir.sh; then

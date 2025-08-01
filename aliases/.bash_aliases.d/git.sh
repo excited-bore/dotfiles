@@ -33,7 +33,11 @@ if hash wget &>/dev/null && hash jq &>/dev/null; then
 
         new_url="$(echo "$gtb_link" | sed 's|https://github.com|https://api.github.com/repos|g')"
         if ! [[ "$gtb_link" =~ '/releases' ]]; then
-            new_url="$new_url/releases"
+            if [[ "$(printf $gtb_link | tail -c 1)" == '/' ]]; then
+                new_url="$new_url""releases"
+            else 
+                new_url="$new_url/releases"
+            fi
         fi
 
         printf "Analyzing ${CYAN}'$new_url'.${normal}\nDepending on how many releases are available this might take a while..\n"
