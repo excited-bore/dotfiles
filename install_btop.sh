@@ -1,3 +1,7 @@
+# https://github.com/aristocratos/btop
+# https://github.com/aristocratos/bpytop
+# https://github.com/aristocratos/bashtop
+
 if ! test -f checks/check_all.sh; then
     if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
@@ -8,11 +12,9 @@ else
     . ./checks/check_all.sh
 fi
 
-SCRIPT_DIR=$(get-script-dir)
-
 if ! hash btop &>/dev/null; then
-    readyn -p "Install btop?" sym2
-    if [[ "$sym2" == "y" ]]; then
+    #readyn -p "Install btop?" sym2
+    #if [[ "$sym2" == "y" ]]; then
         #reade -Q "CYAN" -i "btop" -p "Which one? [Btop/bpytop/bashtop]: " "bpytop bashtop" sym2
         #if test "$sym2" == "btop"; then
         if [[ "$distro_base" == "Debian" ]] || [[ "$distro_base" == "Arch" ]]; then
@@ -36,5 +38,5 @@ if ! hash btop &>/dev/null; then
         #        (cd $TMPDIR/bashtop && sudo make install)
         #    fi
         #fi
-    fi
+    #fi
 fi
