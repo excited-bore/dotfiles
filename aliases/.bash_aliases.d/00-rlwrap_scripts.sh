@@ -1,4 +1,4 @@
-SYSTEM_UPDATED='TRUE'
+#SYSTEM_UPDATED='TRUE'
 READE_NOSTYLE='filecomp-only'
 
 #! type wget &> /dev/null && command -v brew &> /dev/null &&
@@ -109,13 +109,13 @@ if ! type update-system &>/dev/null; then
 fi
 
 
-if test -z $SYSTEM_UPDATED; then
-    readyn -Y "CYAN" -p "Update system?" updatesysm
-    if [[ "$updatesysm" == "y" ]]; then
-        update-system-yes
-    fi
-    export SYSTEM_UPDATED="TRUE"
-fi
+#if test -z $SYSTEM_UPDATED; then
+#    readyn -Y "CYAN" -p "Update system?" updatesysm
+#    if [[ "$updatesysm" == "y" ]]; then
+#        update-system-yes
+#    fi
+#    export SYSTEM_UPDATED="TRUE"
+#fi
 
 
 alias get-script-dir='cd "$( dirname "$-1" )" && pwd'
@@ -213,28 +213,54 @@ test -z "$PAGER" && PAGER="less"
 
 # https://stackoverflow.com/questions/4023830/how-to-compare-two-strings-in-dot-separated-version-format-in-bash
 
+
 function version-higher() {
     if [[ $1 == $2 ]]; then
         return 1
     fi
-    local IFS=.
-    local i ver1=($1) ver2=($2)
+    local IFS=. i 
+    if test -n "$BASH_VERSION"; then
+        local ver1=($1) ver2=($2) j=0
+    elif test -n "$ZSH_VERSION"; then
+        setopt shwordsplit 
+        local ver1=(${=1}) ver2=(${=2}) j=1 
+    fi
     # fill empty fields in ver1 with zeros
-    test -n "$BASH_VERSION" && local j=0 
-    test -n "$ZSH_VERSION" && local j=1 
     for ((i = ${#ver1[@]}; i < ${#ver2[@]}; i++)); do
-        ver1[i]=$j
+        ver1[i]=0
     done
-    for ((i = $j; i < ${#ver1[@]}; i++)); do
-        if ((10#${ver1[i]:=$j} > 10#${ver2[i]:=$j})); then
-            return 0
-        fi
-        if ((10#${ver1[i]} < 10#${ver2[i]})); then
-            return 1
-        fi
-    done
+    if test -n "$BASH_VERSION"; then
+        
+        for ((i = $j; $i < ${#ver1[@]}; i++)); do
+            
+            # 10#$variable forces variable to be a base 10 integer (relative to f.ex. an octal/hexadecimal integer)  
+            # $var:=$j means 'if variable is null or unset, give it the value of $j' 
+            if ((10#${ver1[i]:=$j} > 10#${ver2[i]:=$j})); then
+                return 0
+            fi
+            if ((10#${ver1[i]:=$j} < 10#${ver2[i]:=$j})); then
+                return 1
+            fi
+        done
+    elif test -n "$ZSH_VERSION"; then
+        
+        for ((i = $j; (($i-1)) < ${#ver1[@]}; i++)); do
+            
+            # 10#$variable forces variable to be a base 10 integer (relative to f.ex. an octal/hexadecimal integer)  
+            [[ -z 10#${ver1[i]} ]] && ver1[i]=0 
+            [[ -z 10#${ver2[i]} ]] && ver2[i]=0 
+            
+            if ((10#${ver1[i]} > 10#${ver2[i]})); then
+                return 0
+            fi
+            if ((10#${ver1[i]} < 10#${ver2[i]})); then
+                return 1
+            fi
+        done
+    fi
     return 0
 }
+
 
 function compare-tput-escape_color() {
     test -z $PAGER && PAGER=less
