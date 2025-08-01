@@ -22,20 +22,21 @@ fi
 
 if [[ "$distro_base" == "Debian" ]]; then
 
-    vrs=10
+    vrs=0
     lazi=8
     #ruby=0.10.0
 
     #Minimum version for Lazy plugin manager
     vrs=$(apt search neovim 2>/dev/null | awk 'NR>2 {print;}' | grep '^neovim/' | awk '{print $2}' | sed 's/~.*//g' | sed 's|\(.*\..*\)\..*|\1|g' | cut -d. -f2)
 
-    [[ $vrs < $lazi ]] && echo "Neovim apt version ($(apt search neovim 2>/dev/null | awk 'NR>2 {print;}' | grep '^neovim/' | awk '{print $2}') is below 0.$lazi wich is too low to run Lazy.nvim (nvim plugin manager)"
-
-    #[[ $vrs < $ruby ]] && echo "Neovim apt version is below $ruby wich is too low to install ruby dependencies for nvim"
-    if test -n "$(sudo apt list --installed 2>/dev/null | grep neovim)"; then
-        readyn -p "Uninstall apt version of neovim?" nvmapt
-        if [[ "y" == "$nvmapt" ]]; then
-            eval "$pac_rm_y neovim"
+    if version-higher $lazi $vrs; then
+        echo "Neovim apt version ($(apt search neovim 2>/dev/null | awk 'NR>2 {print;}' | grep '^neovim/' | awk '{print $2}') is below 0.$lazi wich is too low to run Lazy.nvim (nvim plugin manager)"
+        #version-higher $ruby $vrs && echo "Neovim apt version is below $ruby wich is too low to install ruby dependencies for nvim"
+        if test -n "$(sudo apt list --installed 2>/dev/null | grep neovim)"; then
+            readyn -p "Uninstall apt version of neovim?" nvmapt
+            if [[ "y" == "$nvmapt" ]]; then
+                eval "$pac_rm_y neovim"
+            fi
         fi
     fi
 
