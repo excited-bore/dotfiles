@@ -13,11 +13,18 @@ fi
 SCRIPT_DIR=$(get-script-dir)
 
 if ! hash makedeb &> /dev/null; then
-    # These instructions don't seem to work for arm architectures
-    bash -ci "$(wget -qO - 'https://shlink.makedeb.org/install')"
-    # Arm support is broken? Even though it might be more reliable at some point by building/compiling it manually, 
-    # having tested the latest alpha release (as for now: https://github.com/makedeb/makedeb/tree/26538790f84e3fb9ab5f283a28de4d15e2b216b1) on a raspberry pi, 
-    # neovim makedeb still throws errors being confused by -march=x86_64??
+    bash -ci "$(wget-curl 'https://shlink.makedeb.org/install')"
+    # Arm support is broken? Even after building manually on latest alpha, neovim makedeb still throws errors being confused by -march=x86_64??
+  
+    # Nevermind, apparently it's a configuration file error
+    # https://github.com/makedeb/makedeb/issues/263 
+    #TODO: revisit different armv*number* versions
+
+    if [[ "$arch" == 'arm32' ]]; then
+        sudo sed -i 's/CARCH=".*"/CARCH="armhf"/ s/CHOST=".*"/CHOST="armv6l-unknown-linux-gnueabihf"/; s/-march=x86-64 -mtune=generic -O2 -pipe/-march=armv6 -mfloat-abi=hard -mfpu=vfp -O2 -pipe -fstack-protector-strong/' /etc/makepkg.conf 
+    elif [[ "$arch" == 'arm64' ]]; then 
+        sudo sed -i 's/CARCH=".*"/CARCH="arm64"/; s/CHOST=".*"/CHOST="aarch64-unknown-linux-gnu"/; s/-march=x86-64 -mtune=generic -O2 -pipe/-march=armv8-a -O2 -pipe -fstack-protector-strong' /etc/makepkg.conf 
+    fi
 
     #if ! hash just &> /dev/null; then
     #    if ! test -f $SCRIPT_DIR/install_just.sh; then

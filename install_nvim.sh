@@ -109,16 +109,16 @@ if [[ "$distro_base" == "Debian" ]]; then
 
         tmpd=$(mktemp -d)
         git clone https://mpr.makedeb.org/neovim $tmpd
-        if ! [[ "$arch" =~ arm ]]; then
+        #if ! [[ "$arch" =~ arm ]]; then
             (cd $tmpd/
             makedeb -si)
-        else
-            (cd $tmpd/
-            makedeb -s
-            cd neovim-*/
-            make CMAKE_BULD_TYPE='release'
-            sudo make CMAKE_INSTALL_PREFIX='/usr' install)
-        fi
+        #else
+        #    (cd $tmpd/
+        #    makedeb -s
+        #    cd neovim-*/
+        #    make CMAKE_BULD_TYPE='release'
+        #    sudo make CMAKE_INSTALL_PREFIX='/usr' install)
+        #fi
     elif [[ "appimage" == "$nvmappmg" ]]; then
         if ! test -f checks/check_appimage_ready.sh; then
             source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_appimage_ready.sh)
@@ -305,7 +305,7 @@ if [[ "$langs" == 'y' ]]; then
             else
                 . ./install_ruby.sh
             fi
-            gem install neovim
+            sudo gem install neovim
         fi
     fi
 
