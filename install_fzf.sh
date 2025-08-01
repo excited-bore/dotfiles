@@ -269,9 +269,9 @@ if test -z "$1"; then
     #if type kitty &> /dev/null; then
     #    readyn -p "Add shortcut for fzf-autocompletion? (Ctrl-Tab) "" comp_key
     #    if [ "$comp_key" == "y" ]; then
-    #        if ! test -f .keybinds.d/keybinds.bash && ! grep -q "(Kitty)" ~/keybinds.d/fzf-bindings.bash; then
-    #            printf "\n# (Kitty) Ctrl-tab for fzf autocompletion" >> ~/keybinds.d/fzf-bindings.bash
-    #            printf "\nbind '\"\\\e[9;5u\": \" **\\\t\"'" >> ~/keybinds.d/fzf-bindings.bash
+    #        if ! test -f .keybinds.d/keybinds.bash && ! grep -q "(Kitty)" ~/.keybinds.d/fzf-bindings.bash; then
+    #            printf "\n# (Kitty) Ctrl-tab for fzf autocompletion" >> ~/.keybinds.d/fzf-bindings.bash
+    #            printf "\nbind '\"\\\e[9;5u\": \" **\\\t\"'" >> ~/.keybinds.d/fzf-bindings.bash
     #       fi
     #     fi
     #fi
@@ -289,8 +289,8 @@ if test -z "$1"; then
                     fi
                 fi
                 sudo wget-aria-dir /usr/bin/ https://raw.githubusercontent.com/ranger/ranger/master/ranger/ext/rifle.py
-                sudo mv -v /usr/bin/rifle.py /usr/bin/rifle
-                sudo chmod +x /usr/bin/rifle
+                sudo mv -v /usr/bin/rifle.py /usr/local/bin/rifle
+                sudo chmod 755 /usr/bin/rifle
             fi
             if ! test -f ranger/.config/ranger/rifle.conf; then
                 wget-aria-dir ~/.config/ranger/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/.config/ranger/rifle.conf
@@ -300,31 +300,31 @@ if test -z "$1"; then
                 cp ranger/.config/ranger/rifle.conf ~/.config/ranger/
                 cp fzf/.bash_aliases.d/fzf-rifle.sh ~/.bash_aliases.d/
             fi
-            sed -i 's/\\\C-f//g' ~/keybinds.d/fzf-bindings.bash
-            sed -i "s|\(bind -m vi-insert '\"\\\C-t\":.*\)|\1\n\n    # CTRL-F - Search with previews and other handy additions\n    bind -m emacs-standard '\"\\\C-f\": \"\\\C-t\"'\n    bind -m vi-command '\"\\\C-f\": \"\\\C-o\\\C-f\\\C-o\"'\n    bind -m vi-insert '\"\\\C-f\": \"\\\C-o\\\C-f\\\C-o\"'|g" ~/keybinds.d/fzf-bindings.bash
-            sed -i "s|\(bind -m vi-insert -x '\"\\\C-t\":.*\)|\1\n\n    # CTRL-F - Search with previews and other handy additions\n    bind -m emacs-standard -x '\"\\\C-f\": fzf_rifle'\n    bind -m vi-command -x '\"\\\C-f\": fzf_rifle'\n    bind -m vi-insert -x '\"\\\C-f\":  fzf_rifle'|g" ~/keybinds.d/fzf-bindings.bash
+            sed -i 's/\\\C-f//g' ~/.keybinds.d/fzf-bindings.bash
+            sed -i "s|\(bind -m vi-insert '\"\\\C-t\":.*\)|\1\n\n    # CTRL-F - Search with previews and other handy additions\n    bind -m emacs-standard '\"\\\C-f\": \"\\\C-t\"'\n    bind -m vi-command '\"\\\C-f\": \"\\\C-o\\\C-f\\\C-o\"'\n    bind -m vi-insert '\"\\\C-f\": \"\\\C-o\\\C-f\\\C-o\"'|g" ~/.keybinds.d/fzf-bindings.bash
+            sed -i "s|\(bind -m vi-insert -x '\"\\\C-t\":.*\)|\1\n\n    # CTRL-F - Search with previews and other handy additions\n    bind -m emacs-standard -x '\"\\\C-f\": fzf_rifle'\n    bind -m vi-command -x '\"\\\C-f\": fzf_rifle'\n    bind -m vi-insert -x '\"\\\C-f\":  fzf_rifle'|g" ~/.keybinds.d/fzf-bindings.bash
         fi
     fi
     unset fzf_f
 
     #readyn -p "Add shortcut for riflesearch on Ctrl-F? (Fzf and paste in console)" fzf_t
     #if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ] ; then
-    #    #sed -i 's|# CTRL-T|# CTRL-F|g' ~/keybinds.d/fzf-bindings.bash
+    #    #sed -i 's|# CTRL-T|# CTRL-F|g' ~/.keybinds.d/fzf-bindings.bash
     #
-    #    #sed -i 's|bind -m vi-command '\''"\\C-t": |bind -m vi-command '\''"\\C-f": |g' ~/keybinds.d/fzf-bindings.bash
-    #    #sed -i 's|bind -m vi-insert '\''"\\C-t": |bind -m vi-insert '\''"\\C-f": |g' ~/keybinds.d/fzf-bindings.bash
-    #    #sed -i 's|bind -m emacs-standard -x '\''"\\C-t": |bind -m emacs-standard -x '\''"\\C-f": |g' ~/keybinds.d/fzf-bindings.bash
-    #    #sed -i 's|bind -m vi-command -x '\''"\\C-t": |bind -m vi-command -x '\''"\\C-f": |g' ~/keybinds.d/fzf-bindings.bash
-    #    #sed -i 's|bind -m vi-insert -x '\''"\\C-t": |bind -m vi-insert -x '\''"\\C-f": |g' ~/keybinds.d/fzf-bindings.bash
+    #    #sed -i 's|bind -m vi-command '\''"\\C-t": |bind -m vi-command '\''"\\C-f": |g' ~/.keybinds.d/fzf-bindings.bash
+    #    #sed -i 's|bind -m vi-insert '\''"\\C-t": |bind -m vi-insert '\''"\\C-f": |g' ~/.keybinds.d/fzf-bindings.bash
+    #    #sed -i 's|bind -m emacs-standard -x '\''"\\C-t": |bind -m emacs-standard -x '\''"\\C-f": |g' ~/.keybinds.d/fzf-bindings.bash
+    #    #sed -i 's|bind -m vi-command -x '\''"\\C-t": |bind -m vi-command -x '\''"\\C-f": |g' ~/.keybinds.d/fzf-bindings.bash
+    #    #sed -i 's|bind -m vi-insert -x '\''"\\C-t": |bind -m vi-insert -x '\''"\\C-f": |g' ~/.keybinds.d/fzf-bindings.bash
     #fi
 
     # readyn -p "Change Alt-C shortcut to Ctrl-S for fzf cd?" fzf_t
     # if [ "$fzf_t" == "y" ] || [ -z "$fzf_t" ]; then
-    #     sed -i 's|# ALT-C - cd into the selected directory|# CTRL-S - cd into the selected directory|g' ~/keybinds.d/fzf-bindings.bash
-    #     sed -i 's|\\ec|\\C-s|g'  ~/keybinds.d/fzf-bindings.bash
-    #     #sed -i 's|bind -m emacs-standard '\''"\\ec"|bind -m emacs-standard '\''"\\es"|g'  ~/keybinds.d/fzf-bindings.bash
-    #     #sed -i 's|bind -m vi-command '\''"\\ec"|bind -m vi-command '\''"\\es"|g' ~/keybinds.d/fzf-bindings.bash
-    #     #sed -i 's|bind -m vi-insert  '\''"\\ec"|bind -m vi-insert  '\''"\\es"|g' ~/keybinds.d/fzf-bindings.bash
+    #     sed -i 's|# ALT-C - cd into the selected directory|# CTRL-S - cd into the selected directory|g' ~/.keybinds.d/fzf-bindings.bash
+    #     sed -i 's|\\ec|\\C-s|g'  ~/.keybinds.d/fzf-bindings.bash
+    #     #sed -i 's|bind -m emacs-standard '\''"\\ec"|bind -m emacs-standard '\''"\\es"|g'  ~/.keybinds.d/fzf-bindings.bash
+    #     #sed -i 's|bind -m vi-command '\''"\\ec"|bind -m vi-command '\''"\\es"|g' ~/.keybinds.d/fzf-bindings.bash
+    #     #sed -i 's|bind -m vi-insert  '\''"\\ec"|bind -m vi-insert  '\''"\\es"|g' ~/.keybinds.d/fzf-bindings.bash
     # fi
     #unset fzf_t;
 
