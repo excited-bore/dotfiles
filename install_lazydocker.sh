@@ -36,7 +36,7 @@ if ! hash lazydocker &>/dev/null; then
             archl='arm64' 
         fi
        
-        get-latest-releases-github https://github.com/jesseduffield/lazydocker $TMPDIR lazydocker_*_Linux_$archl.tar.gz   
+        get-latest-releases-github https://github.com/jesseduffield/lazydocker $TMPDIR lazydocker_.*_Linux_$archl.tar.gz   
         sudo tar xf $TMPDIR/lazydocker_*_Linux_$archl.tar.gz -C /usr/local/bin 
         sudo chmod 755 /usr/local/bin/lazydocker
         unset archl
