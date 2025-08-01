@@ -692,14 +692,16 @@ sshh() {
 }
 yes-edit-no -f sshh -g "$sshs" -p "Install ssh.sh at ~/.bash_aliases.d/ (ssh aliases)?" 
 
-ps1_r() {
-    sudo cp $ps1 /root/.bash_aliases.d/
-}
-ps11() {
-    cp $ps1 ~/.bash_aliases.d/
-    yes-edit-no -Y 'YELLOW' -f ps1_r -g "$ps1" -p "Install PS1_colours.sh at /root/.bash_aliases.d/?" 
-}
-yes-edit-no -f ps11 -g "$ps1" -p "Install PS1_colours.sh at ~/.bash_aliases.d/ (Coloured command prompt)?" 
+if ! hash starship &> /dev/null; then
+    ps1_r() {
+        sudo cp $ps1 /root/.bash_aliases.d/
+    }
+    ps11() {
+        cp $ps1 ~/.bash_aliases.d/
+        yes-edit-no -Y 'YELLOW' -f ps1_r -g "$ps1" -p "Install PS1_colours.sh at /root/.bash_aliases.d/?" 
+    }
+    yes-edit-no -f ps11 -g "$ps1" -p "Install PS1_colours.sh at ~/.bash_aliases.d/ (Coloured command prompt)?" 
+fi
 
 if hash python &>/dev/null; then
     pthon() {

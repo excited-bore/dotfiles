@@ -625,6 +625,19 @@ yes-edit-no -f xresources -g "$xterm" -p "Install .Xresources at ~/? (Xterm conf
 #fi
 #unset insrde
 
+# Starship
+
+readyn -p "Install Starship? (Snazzy looking prompt)" -c "! hash starship &> /dev/null" strshp
+if [[ "$strshp" == "y" ]]; then
+    if ! test -f $SCRIPT_DIR/install_starship.sh; then
+        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_starship.sh)
+    else
+        . $SCRIPT_DIR/install_starship.sh
+    fi
+fi
+unset strshp
+
+
 # Aliases
 
 readyn -p "Install bash aliases and other config?" scripts
@@ -928,18 +941,6 @@ if [[ "$zoxs" == "y" ]]; then
     fi
 fi
 unset zoxs
-
-# Starship
-
-readyn -p "Install Starship? (Snazzy looking prompt)" -c "! hash starship &> /dev/null" strshp
-if [[ "$strshp" == "y" ]]; then
-    if ! test -f $SCRIPT_DIR/install_starship.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_starship.sh)
-    else
-        . $SCRIPT_DIR/install_starship.sh
-    fi
-fi
-unset strshp
 
 # Thefuck
 # i mean pay-respects
