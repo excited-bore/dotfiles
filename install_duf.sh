@@ -9,7 +9,7 @@ else
 fi
 
 
-if ! type hash &> /dev/null; then
+if ! hash duf &> /dev/null; then
     if test -n "$pac_ins"; then
         printf "Going to try to install duf through the regular packagemanager\n"
         eval "${pac_ins_y}" duf
