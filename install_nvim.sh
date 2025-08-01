@@ -101,7 +101,7 @@ if [[ "$distro_base" == "Debian" ]]; then
         if ! test -f install_makedeb.sh; then
             source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_makedeb.sh)
         else
-            ./install_makedeb.sh 
+            . ./install_makedeb.sh 
         fi
         tmpd=$(mktemp -d)
         git clone https://mpr.makedeb.org/neovim $tmpd

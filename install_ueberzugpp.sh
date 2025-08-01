@@ -14,14 +14,14 @@ fi
 
 if [[ "$distro_base" == 'Debian' ]]; then
     if ! hash makedeb &> /dev/null; then
-	if ! test -f install_makedeb.sh; then
-	    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_makedeb.sh)
-	else
-	    ./install_makedeb.sh
-	fi
+	    if ! test -f install_makedeb.sh; then
+	        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_makedeb.sh)
+	    else
+	       . ./install_makedeb.sh
+	    fi
     fi
     tmpd=$(mktemp -d)
-    eval "${pac_ins_y} freeglut3-dev libxcb-image0-dev libwayland-dev"
+    eval "${pac_ins_y} git freeglut3-dev libxcb-image0-dev libwayland-dev"
     git clone 'https://mpr.makedeb.org/ueberzugpp' $tmpd
     (cd $tmpd/
     if ! grep -q "DENABLE_OPENCV=OFF" PKGBUILD; then

@@ -631,12 +631,13 @@ readyn -p "Install bash aliases and other config?" scripts
 if [[ "y" == "$scripts" ]]; then
 
     if ! test -f $SCRIPT_DIR/checks/check_aliases_dir.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)
     else
         . $SCRIPT_DIR/checks/check_aliases_dir.sh
     fi
+    
     if ! test -f $SCRIPT_DIR/install_aliases.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/install_aliases.sh)
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/install_aliases.sh)
     else
         . $SCRIPT_DIR/install_aliases.sh
     fi
