@@ -30,9 +30,9 @@ if ! hash lazydocker &>/dev/null; then
             archl='x86' 
         elif [[ "$arch" == 'amd64' ]]; then
             archl='x86_64' 
-        if [[ "$arch" == 'arm32' ]]; then
+        elif [[ "$arch" == 'arm32' ]]; then
             archl=$(lspcu | awk 'NR==1${print $2}') 
-        if [[ "$arch" == 'arm64' ]]; then
+        elif [[ "$arch" == 'arm64' ]]; then
             archl='arm64' 
         fi
        
