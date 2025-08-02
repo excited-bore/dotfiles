@@ -1,6 +1,4 @@
-#!/bin/bash
-
-export SYSTEM_UPDATED="TRUE"
+SYSTEM_UPDATED="TRUE"
 
 if ! test -f checks/check_all.sh; then
     if type curl &>/dev/null; then
@@ -14,7 +12,7 @@ else
 fi
 
 if ! test -f checks/check_aliases_dir.sh; then
-    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)
+    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)
 else
     . ./checks/check_aliases_dir.sh
 fi

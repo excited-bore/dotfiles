@@ -50,7 +50,7 @@ else
     sudo sed -i 's,#export PATH=\$PATH:\$HOME/.cargo,export PATH=\$PATH:\$HOME/.cargo,g' $ENV_R
 fi
     
-echo "This next $(tput setaf 1)sudo$(tput sgr0) will check if something along the lines of 'Defaults secure_path=\"$HOME\.cargo/bin\"' is being kept in /etc/sudoers";
+echo "This next $(tput setaf 1)sudo$(tput sgr0) will check if something along the lines of 'Defaults secure_path=\"$HOME/.cargo/bin\"' is being kept in /etc/sudoers";
 
 if test -f /etc/sudoers && ! sudo grep -q "$HOME/.cargo/bin" /etc/sudoers; then
     readyn -p "Add ${RED}$HOME/.cargo/bin${GREEN} to /etc/sudoers? (so rust applications installed with cargo can be executed using sudo)?" ansr

@@ -1,6 +1,6 @@
 INSTALL=1
-unalias curl &>/dev/null
-unalias wget &>/dev/null
+builtin unalias curl &>/dev/null
+builtin unalias wget &>/dev/null
 
 if ! test -f checks/check_all.sh; then
     if hash curl &>/dev/null; then
@@ -237,7 +237,7 @@ if [[ $distro_base == 'Debian' ]]; then
                     eval "$pac_ins_y mainline"
                 else
                     eval "$pac_ins_y libgee-0.8-dev git libjson-glib-dev libvte-2.91-dev valac aria2 lsb-release" 
-                    git clone https://github.com/bkw777/mainline.git $TMPDIR 
+                    git clone https://github.com/bkw777/mainline.git $TMPDIR/mainline 
                     (cd $TMPDIR/mainline
                     make
                     sudo make install) 
@@ -633,13 +633,14 @@ yes-edit-no -f xresources -g "$xterm" -p "Install .Xresources at ~/? (Xterm conf
 readyn -p "Install Starship? (Snazzy looking prompt)" -c "! hash starship &> /dev/null" strshp
 if [[ "$strshp" == "y" ]]; then
     if ! test -f $SCRIPT_DIR/install_starship.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_starship.sh)
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_starship.sh)
     else
         . $SCRIPT_DIR/install_starship.sh
     fi
 fi
 unset strshp
 
+SCRIPT_DIR=$(get-script-dir)
 
 # Aliases
 
