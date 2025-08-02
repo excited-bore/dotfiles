@@ -119,9 +119,11 @@ ssh-key-and-add-to-agent-by-host() {
         echo "Remote username can't be empty";
         return 0
     fi
-    readyn -p "Forward X11? Needed for xclip" sx11
-    if [ -z "$sx11" ] || [ "$sx11" == "y" ]; then
-        opts="  ForwardX11 yes\n  ForwardX11Trusted yes\n"
+    if [[ "$XDG_SESSION_TYPE" == 'x11' ]]; then
+        readyn -p "Forward X11? Needed for xclip" sx11
+        if [[ "$sx11" == "y" ]]; then
+            opts="  ForwardX11 yes\n  ForwardX11Trusted yes\n"
+        fi
     fi
     if [ -z $keytype ]; then
         keytype=ed25519

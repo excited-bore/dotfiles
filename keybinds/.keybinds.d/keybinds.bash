@@ -69,10 +69,10 @@ stty werase 'undef'
 # xrdb -merge ~/.Xresources
 # .Inputrc (readline conf) however has to be compiled, so restart shell
 
-[[ $machine == 'Linux' ]] &&
-    X11_WAY="$(loginctl show-session $(loginctl | grep $(whoami) | awk 'NR=1{print $1}') -p Type | awk -F= 'NR==1{print $2}')"
+[[ $machine == 'Linux' ]] && [[ -z $XDG_SESSION_TYPE ]] &&
+    XDG_SESSION_TYPE="$(loginctl show-session $(loginctl | grep $(whoami) | awk 'NR=1{print $1}') -p Type | awk -F= 'NR==1{print $2}')"
 
-if [[ "$X11_WAY" == 'x11' ]]; then
+if [[ "$XDG_SESSION_TYPE" == 'x11' ]]; then
     # Set caps to Escape
     setxkbmap -option caps:escape
 
@@ -673,46 +673,66 @@ bind -m emacs-standard -x '"\C-e\C-e":_edit_wo_executing'
 
 # RLWRAP
 
-#if type rlwrap &> /dev/null; then
+#if hash rlwrap &> /dev/null; then
 #    bind -m emacs-standard '"\C-x\C-e" : rlwrap-call-editor'
 #    bind -m vi-command '"\C-e" : rlwrap-call-editor'
 #    bind -m vi-insert '"\C-e" : rlwrap-call-editor'
 #fi
 
-if type osc &>/dev/null; then
-    bind -m emacs-standard -x '"\C-s" : printf "$READLINE_LINE" | osc copy'
-    bind -m vi-command -x '"\C-s" : printf "$READLINE_LINE" | osc copy'
-    bind -m vi-insert -x '"\C-s" : printf "$READLINE_LINE" | osc copy'
-
-    function osc-print-to-prompt() {
-        pasters="$(osc paste)"
+if hash osc &>/dev/null; then
+    
+    function osc-copy() {
+        echo -n "$READLINE_LINE" | osc copy
+    }
+    
+    function osc-paste() {
+        local pasters="$(osc paste)"
         READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$pasters${READLINE_LINE:$READLINE_POINT}"
         READLINE_POINT=$((READLINE_POINT + ${#pasters}))
     }
+    
+    bind -m emacs-standard -x '"\C-s" : osc-copy'
+    bind -m vi-command -x '"\C-s" : osc-copy'
+    bind -m vi-insert -x '"\C-s" : osc-copy'
 
     # Ctrl-v: Proper paste
     #Q="'"
     #bind -x $'"\237": echo bind $Q\\"\\\\225\\": \\"$(osc paste)\\"$Q > /tmp/paste.sh && source /tmp/paste.sh'
-    bind -m emacs-standard -x '"\C-v": osc-print-to-prompt'
-    bind -m vi-command -x '"\C-v": osc-print-to-prompt'
-    bind -m vi-insert -x '"\C-v": osc-print-to-prompt'
+    bind -m emacs-standard -x '"\C-v": osc-paste'
+    bind -m vi-command -x '"\C-v": osc-paste'
+    bind -m vi-insert -x '"\C-v": osc-paste'
 
-elif type xclip &>/dev/null; then
-    # Ctrl-s: Proper copy
-    bind -m emacs-standard -x '"\C-s" : printf "$READLINE_LINE" | xclip -i -sel c'
-    bind -m vi-command -x '"\C-s" : printf "$READLINE_LINE" | xclip -i -sel c'
-    bind -m vi-insert -x '"\C-s" : printf "$READLINE_LINE" | xclip -i -sel c'
+elif ([[ "$XDG_SESSION_TYPE" == 'x11' ]] && hash xclip &>/dev/null) || ([[ "$XDG_SESSION_TYPE" == 'wayland' ]] && hash wl-copy &> /dev/null); then
+  
+    function clip-copy() {
+        if [[ "$XDG_SESSION_TYPE" == 'x11' ]]; then  
+            echo -n "$READLINE_LINE" | xclip -i -sel c
+        elif [[ "$XDG_SESSION_TYPE" == 'wayland' ]]; then
+            echo -n "$READLINE_LINE" | wl-copy
+        fi
+    }
 
-    function xclip-print-to-prompt() {
-        pasters="$(xclip -o -sel c)"
+    function clip-paste() {
+        
+        if [[ "$XDG_SESSION_TYPE" == 'x11' ]]; then  
+            local pasters="$(xclip -o -sel c)"
+        elif [[ "$XDG_SESSION_TYPE" == 'wayland' ]]; then
+            local pasters="$(wl-paste)"
+        fi
         READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$pasters${READLINE_LINE:$READLINE_POINT}"
         READLINE_POINT=$((READLINE_POINT + ${#pasters}))
     }
+    
+    # Ctrl-s: Proper copy
+    bind -m emacs-standard -x '"\C-s" : clip-copy'
+    bind -m vi-command -x '"\C-s" : clip-copy'
+    bind -m vi-insert -x '"\C-s" : clip-copy'
+
 
     # Ctrl-v: Proper paste
-    bind -m emacs-standard -x '"\C-v": xclip-print-to-prompt'
-    bind -m vi-command -x '"\C-v": xclip-print-to-prompt'
-    bind -m vi-insert -x '"\C-v": xclip-print-to-prompt'
+    bind -m emacs-standard -x '"\C-v": clip-paste'
+    bind -m vi-command -x '"\C-v": clip-paste'
+    bind -m vi-insert -x '"\C-v": clip-paste'
 
     #Q="'"
     #bind -x $'"\237": echo bind $Q\\"\\\\225\\": \\"$(xclip -o -sel c)\\"$Q > /tmp/paste.sh && source /tmp/paste.sh'
@@ -721,14 +741,14 @@ elif type xclip &>/dev/null; then
     #bind -m vi-insert      '"\C-v": "\237\225"'
 fi
 
-if type autojump &>/dev/null; then
+if hash autojump &>/dev/null; then
     # Ctrl-x Ctrl-j for autojump
     bind -m emacs-standard '"\C-x\C-j": "j \C-i"'
     bind -m vi-command '"\C-x\C-j": "j \C-i"'
     bind -m vi-insert '"\C-x\C-j": "j \C-i"'
 fi
 
-if type fzf &>/dev/null; then
+if hash fzf &>/dev/null; then
     
     #if [[ "$TERM" == 'xterm-kitty' ]]; then
     #    # (Kitty only) Ctrl-tab for fzf autocompletion
@@ -758,7 +778,7 @@ if type fzf &>/dev/null; then
 fi
 
 # F2 - ranger (file explorer)
-if type ranger &>/dev/null; then
+if hash ranger &>/dev/null; then
     bind -x '"\201": ranger'
     bind -m emacs-standard '"\eOQ": "\201\n\C-l"'
     bind -m vi-command '"\eOQ": "\201\n\C-l"'
@@ -766,7 +786,7 @@ if type ranger &>/dev/null; then
 fi
 
 # F3 - lazygit (Git helper)
-if type lazygit &>/dev/null; then
+if hash lazygit &>/dev/null; then
     bind -x '"\202": stty sane && lazygit'
     bind -m emacs-standard '"\eOR": "\202\n\C-l"'
     bind -m vi-command '"\eOR": "\202\n\C-l"'
@@ -781,27 +801,27 @@ bind -m vi-command '"\e[15~": "\205\206"'
 bind -m vi-insert '"\e[15~": "\205\206"'
 
 # F6 - (neo/fast/screen)fetch (System overview)
-if type neofetch &>/dev/null || type fastfetch &>/dev/null || type screenfetch &>/dev/null || type onefetch &>/dev/null; then
+if hash neofetch &>/dev/null || hash fastfetch &>/dev/null || hash screenfetch &>/dev/null || hash onefetch &>/dev/null; then
 
     # Last one loaded is the winner
-    if type neofetch &>/dev/null; then
+    if hash neofetch &>/dev/null; then
         bind -x '"\207": stty sane && neofetch'
         fetch="neofetch"
     fi
 
-    if type screenfetch &>/dev/null; then
+    if hash screenfetch &>/dev/null; then
         bind -x '"\207": stty sane && screenfetch'
         fetch="screenfetch"
     fi
 
-    if type fastfetch &>/dev/null; then
+    if hash fastfetch &>/dev/null; then
         bind -x '"\207": stty sane && fastfetch'
         fetch="fastfetch"
     fi
 
-    if type onefetch &>/dev/null; then
-        if type neofetch &>/dev/null || type fastfetch &>/dev/null || type screenfetch &>/dev/null; then
-            bind -x '"\207": stty sane; type git &> /dev/null && git rev-parse --git-dir &> /dev/null && readyn -p "Use onefetch? (lists github stats): " gstats && [[ $gstats == "y" ]] && onefetch || '"$fetch"' '
+    if hash onefetch &>/dev/null; then
+        if hash neofetch &>/dev/null || hash fastfetch &>/dev/null || hash screenfetch &>/dev/null; then
+            bind -x '"\207": stty sane; hash git &> /dev/null && git rev-parse --git-dir &> /dev/null && readyn -p "Use onefetch? (lists github stats): " gstats && [[ $gstats == "y" ]] && onefetch || '"$fetch"' '
         else
             bind -x '"\207": stty sane && '"$fetch"''
         fi
@@ -819,17 +839,17 @@ bind -x '"\208": stty sane && readyn -p "Start htop as root?" ansr && [[ "$ansr"
 
 # Last one loaded is the winner
 
-if type bashtop &>/dev/null || type btop &>/dev/null || type bpytop &>/dev/null; then
+if hash bashtop &>/dev/null || hash btop &>/dev/null || hash bpytop &>/dev/null; then
 
-    if type bpytop &>/dev/null; then
+    if hash bpytop &>/dev/null; then
         bind -x '"\208": stty sane && readyn -p "Start htop as root?" ansr && [[ "$ansr" == "y" ]] && sudo htop || readyn -p "Use bpytop instead of htop?" ansr && [[ "$ansr" == "y" ]] && bpytop || htop'
     fi
 
-    if type bashtop &>/dev/null; then
+    if hash bashtop &>/dev/null; then
         bind -x '"\208": stty sane && readyn -p "Start htop as root?" ansr && [[ "$ansr" == "y" ]] && sudo htop || readyn -p "Use bashtop instead of htop?" ansr && [[ "$ansr" == "y" ]] && bashtop || htop'
     fi
 
-    if type btop &>/dev/null; then
+    if hash btop &>/dev/null; then
         bind -x '"\208": stty sane && readyn -p "Start btop as root?" ansr && [[ "$ansr" == "y" ]] && sudo btop || btop'
     fi
 
@@ -840,7 +860,7 @@ bind -m vi-command '"\e[18~": "\208\n\C-l"'
 bind -m vi-insert '"\e[18~": "\208\n\C-l"'
 
 # F8 - Lazydocker (Docker TUI)
-if type lazydocker &>/dev/null; then
+if hash lazydocker &>/dev/null; then
 
     bind -x '"\209": stty sane && lazydocker'
     bind -m emacs-standard '"\e[19~": "\209\n"'

@@ -89,9 +89,11 @@ unset tmuxx
 
 readyn -p "Install tmux clipboard plugin? (tmux-yank)" tmuxx
 if [[ "$tmuxx" == "y" ]]; then
-    if ! hash xclip &>/dev/null || ! hash xsel &>/dev/null; then
-        if [[ "$distro_base" == "Arch" ]] || [[ $distro_base == "Debian" ]]; then
-            eval "${pac_ins}" xclip xsel
+    if ([[ "$XDG_SESSION_TYPE" == 'x11' ]] && (! hash xclip &> /dev/null || ! hash xsel &> /dev/null)) || ([[ "$XDG_SESSION_TYPE" == 'wayland' ]] && (! hash wl-copy &> /dev/null || ! hash wl-paste &> /dev/null)); then
+        if ! test -f $SCRIPT_DIR/install_linux_clipboard.sh; then
+            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_linux_clipboard.sh)
+        else
+            . $SCRIPT_DIR/install_linux_clipboard.sh
         fi
     fi
     sed -i 's|#set -g @plugin '\''tmux-plugins/tmux-yank'\''|set -g @plugin '\''tmux-plugins/tmux-yank'\''|g' ~/.tmux.conf

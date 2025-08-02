@@ -1,10 +1,10 @@
+# https://github.com/junegunn/fzf
 
 if ! test -f checks/check_all.sh; then
-    if type curl &>/dev/null; then
+    if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-        return 1 || exit 1
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
     . ./checks/check_all.sh
@@ -16,7 +16,7 @@ SCRIPT_DIR=$(get-script-dir)
 
 if test -z "$1"; then
     if ! test -f checks/check_envvar_aliases_completions_keybinds.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar_aliases_completions_keybinds.sh)
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar_aliases_completions_keybinds.sh)
     else
         . ./checks/check_envvar_aliases_completions_keybinds.sh
     fi
@@ -33,7 +33,7 @@ fi
 
 if ! hash fzf &> /dev/null; then
     if [[ $distro_base == 'Debian' ]]; then
-        FZF_VERSION=$(curl -s "https://api.github.com/repos/junegunn/fzf/releases/latest" | grep -Po '"tag_name": "v\K[0-9.]+') 
+        FZF_VERSION=$(wget-curl "https://api.github.com/repos/junegunn/fzf/releases/latest" | grep -Po '"tag_name": "v\K[0-9.]+') 
         dir=$(mktemp -d)
         if [[ "$arch" == '386' || "$arch" == 'amd64' || "$arch" == 'amd32' ]]; then
             archf='amd64' 
@@ -164,7 +164,7 @@ if test -z "$1"; then
         readyn -y -p "Install ripgrep? (Recursive grep, opens possibility for line by line fzf )" rpgrp
         if [[ "$rpgrp" == "y" ]]; then
             if ! test -f install_ripgrep.sh; then
-                source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ripgrep.sh)
+                source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ripgrep.sh)
             else
                 . ./install_ripgrep.sh
             fi
@@ -191,26 +191,34 @@ if test -z "$1"; then
         unset rpgrp rpgrpdir
     fi
 
-    # XCLIP
+    # XCLIP / WL-CLIPBOARD
     if [[ $machine == 'Linux' ]]; then
-        if (! hash xclip &>/dev/null || ! hash xsel &>/dev/null); then
-            readyn -p "Install xclip? (Clipboard tool for Ctrl-R/Reverse history shortcut)" xclipp
-            if [[ "$xclipp" == "y" ]]; then
-                eval "${pac_ins} xclip xsel"
-            fi
-            if [[ $ENV == ~/.environment ]]; then
-                sed -i 's|#export FZF_CTRL_R_OPTS=|export FZF_CTRL_R_OPTS=|g' $ENV
-            elif ! grep -q "export FZF_CTRL_R_OPTS=" $ENV; then
-                printf "\nexport FZF_CTRL_R_OPTS=\" --preview 'echo {}' --preview-window up:3:hidden:wrap --bind 'ctrl-t:toggle-preview' --bind 'alt-c:execute-silent(echo -n {2..} | xclip -i -sel c)+abort' --color header:italic --header 'Press ALT-C to copy command into clipboard'\"" >>$ENV &>/dev/null
-            fi
-            if [[ $ENV_R == /root/.environment ]]; then
-                sudo sed -i 's|#export FZF_CTRL_R_OPTS==|export FZF_CTRL_R_OPTS=|g' $ENV_R
-            elif ! sudo grep -q "export FZF_CTRL_R_OPTS" $ENV_R; then
-                printf "\nexport FZF_CTRL_R_OPTS=\" --preview 'echo {}' --preview-window up:3:hidden:wrap --bind 'ctrl-t:toggle-preview' --bind 'alt-c:execute-silent(echo -n {2..} | xclip -i -sel c)+abort' --color header:italic --header 'Press ALT-C to copy command into clipboard'\"" | sudo tee -a $ENV_R
+        if ([[ "$XDG_SESSION_TYPE" == 'x11' ]] && (! hash xclip &> /dev/null || ! hash xsel &> /dev/null)) || ([[ "$XDG_SESSION_TYPE" == 'wayland' ]] && (! hash wl-copy &> /dev/null || ! hash wl-paste &> /dev/null)); then
+            if ! test -f install_linux_clipboard.sh; then
+                source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_linux_clipboard.sh)
+            else
+                . ./install_linux_clipboard.sh
             fi
         fi
+        if ([[ "$XDG_SESSION_TYPE" == 'x11' ]] && (hash xclip &> /dev/null)) || ([[ "$XDG_SESSION_TYPE" == 'wayland' ]] && (hash wl-copy &> /dev/null)); then
+            if [[ "$XDG_SESSION_TYPE" == 'x11' ]] && hash xclip &> /dev/null; then
+                clip="xclip -i -sel c" 
+            elif [[ "$XDG_SESSION_TYPE" == 'wayland' ]] && hash wl-copy &> /dev/null; then
+                clip="wl-copy" 
+            fi
+            if [[ "$ENV" == ~/.environment ]]; then
+                sed -i 's|#export FZF_CTRL_R_OPTS=|export FZF_CTRL_R_OPTS=|g' $ENV
+            elif ! grep -q "export FZF_CTRL_R_OPTS=" $ENV; then
+                printf "\nexport FZF_CTRL_R_OPTS=\" --preview 'echo {}' --preview-window up:3:hidden:wrap --bind 'ctrl-t:toggle-preview' --bind 'alt-c:execute-silent(echo -n {2..} | $clip)+abort' --color header:italic --header 'Press ALT-C to copy command into clipboard'\"" >>$ENV &>/dev/null
+            fi
+            if [[ "$ENV_R" == /root/.environment ]]; then
+                sudo sed -i 's|#export FZF_CTRL_R_OPTS==|export FZF_CTRL_R_OPTS=|g' $ENV_R
+            elif ! sudo grep -q "export FZF_CTRL_R_OPTS" $ENV_R; then
+                printf "\nexport FZF_CTRL_R_OPTS=\" --preview 'echo {}' --preview-window up:3:hidden:wrap --bind 'ctrl-t:toggle-preview' --bind 'alt-c:execute-silent(echo -n {2..} | $clip)+abort' --color header:italic --header 'Press ALT-C to copy command into clipboard'\"" | sudo tee -a $ENV_R
+            fi
+            unset clip 
+        fi
     fi
-    unset xclip
 
     #echo "${green}Fzf will use '${CYAN}$fnd${normal}${green}'. Set default options that are fzf related to:${normal}"
     #readyn -p "    Search globally instead of in current folder?" fndgbl

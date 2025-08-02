@@ -235,19 +235,23 @@ nvim --version
 nvim --help | $PAGER
 
 if [[ $machine == 'Linux' ]]; then
-    if ! hash xclip &>/dev/null || ! hash xsel &>/dev/null; then
-        readyn -p "Install nvim clipboard? (xsel xclip)" clip
-        if [[ "y" == "$clip" ]]; then
-            eval "${pac_ins_y}" xsel xclip
+    if ([[ "$XDG_SESSION_TYPE" == 'x11' ]] && (! hash xclip &> /dev/null || ! hash xsel &> /dev/null)) || ([[ "$XDG_SESSION_TYPE" == 'wayland' ]] && (! hash wl-copy &> /dev/null || ! hash wl-paste &> /dev/null)); then
+        if ! test -f $DIR/install_linux_clipboard.sh; then
+            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_linux_clipboard.sh)
+        else
+            . $DIR/install_linux_clipboard.sh
+        fi
+        if [[ "$XDG_SESSION_TYPE" == 'x11' ]] && hash xclip &> /dev/null && hash xsel &> /dev/null && test -f /etc/ssh/sshd.config; then
             echo "${green} If this is for use with ssh on serverside, X11 needs to be forwarded"
             echo "${green} At clientside, 'ForwardX11 yes' also needs to be put in ~/.ssh/config under Host"
             echo "${green} Connection also need to start with -X flag (ssh -X ..@..)${normal}"
-            readyn -p "Forward X11 in /etc/ssh/sshd.config?" x11f
+            readyn -n -p "Forward X11 in /etc/ssh/sshd.config?" x11f
             if test -z "$x11f" || [[ "y" == "$x11f" ]]; then
                 sudo sed -i 's|.X11Forwarding yes|X11Forwarding yes|g' /etc/ssh/sshd.config
             fi
         fi
     fi
+    unset clip x11f
 fi
 
 if ! hash gcc &>/dev/null || ! hash npm &>/dev/null || ! hash unzip &>/dev/null; then

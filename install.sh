@@ -159,13 +159,16 @@ if ! test -f $HOME/.environment; then
 fi
 
 if [[ $machine == 'Linux' ]]; then
-    if ! hash xclip &>/dev/null || ! hash xsel &>/dev/null; then
-        printf "${CYAN}xclip${normal} and/or ${CYAN}xsel${normal} are not installed (clipboard tools for X11 based systems)\n"
-        readyn -p "Install xclip and xsel?" nzp_ins
-        if [[ $nzp_ins == 'y' ]]; then
-            eval "$pac_ins_y xclip xsel"
+    if ([[ "$XDG_SESSION_TYPE" == 'x11' ]] && (! hash xclip &> /dev/null || ! hash xsel &> /dev/null)) || ([[ "$XDG_SESSION_TYPE" == 'wayland' ]] && (! hash wl-copy &> /dev/null || ! hash wl-paste &> /dev/null)); then
+        readyn -p "Install commandline clipboard? (xsel/xclip on x11, wl-copy/wl-paste on wayland)" clip
+        if [[ "y" == "$clip" ]]; then
+            if ! test -f $SCRIPT_DIR/install_linux_clipboard.sh; then
+                source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_linux_clipboard.sh)
+            else
+                . $SCRIPT_DIR/install_linux_clipboard.sh
+            fi
         fi
-        unset nzp_ins
+        unset clip
     fi
 fi
 
