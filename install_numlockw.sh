@@ -34,18 +34,20 @@ if [[ $XDG_SESSION_TYPE == 'wayland' ]]; then
     fi
     
     if hash numlockw &> /dev/null; then 
-        if ! test -f ~/.xinitrc && ! test -f ~/.bash_profile && ! test -f ~/.zprofile && ! test -f ~/.profile; then
+        if ! test -f ~/.bash_profile && ! test -f ~/.zprofile && ! test -f ~/.profile; then
            touch ~/.profile 
         fi
-
-        if [[ "$XDG_SESSION_TYPE" == 'wayland' ]] && test -f ~/.xinitrc && ! grep -q 'numlockw on' ~/.xinitrc; then
-            echo "numlockw on" >> ~/.xinitrc
-        elif test -f ~/.bash_profile && ! grep -q 'numlockw on' ~/.bash_profile; then
+    
+        if test -f ~/.bash_profile && ! grep -q 'numlockw on' ~/.bash_profile; then
             echo "numlockw on" >> ~/.bash_profile
         elif test -f ~/.zprofile && ! grep -q 'numlockw on' ~/.zprofile; then
             echo "numlockw on" >> ~/.zprofile
         elif test -f ~/.profile && ! grep -q 'numlockw on' ~/.profile; then
             echo "numlockw on" >> ~/.profile
+        fi
+    
+        if [[ "$XDG_CURRENT_DESKTOP" == 'labwc:wlroots' ]] && ! grep -q 'numlockw on' ~/.config/labwc/autostart; then
+            echo "numlockw on" >> ~/.config/labwc/autostart 
         fi
     fi     
 fi
