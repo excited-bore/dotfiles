@@ -46,9 +46,9 @@ if [[ "$distro_base" == "Debian" ]]; then
     
     if [[ "$distro" == 'Ubuntu' ]]; then
 	if ! echo $(check-ppa ppa:neovim-ppa/unstable) | grep -q 'NOT' && ! echo $(check-ppa ppa:neovim-ppa/stable) | grep -q 'NOT'; then  
-            pre="ppa-stable"
-            choices="ppa-unstable makedeb appimage flatpak apt build"
-            prompt="Which one (Ppa-stable/ppa-unstable/makedeb/appimage/flatpak/apt/build from source)? [Ppa-stable/ppa-unstable/makedeb/appimage/flatpak/apt/build]: "
+            pre="ppa-unstable"
+            choices="ppa-stable makedeb appimage flatpak apt build"
+            prompt="Which one (Ppa-unstable/ppa-stable/makedeb/appimage/flatpak/apt/build from source)? [Ppa-unstable/ppa-stable/makedeb/appimage/flatpak/apt/build]: "
         elif ! echo $(check-ppa ppa:neovim-ppa/unstable) | grep -q 'NOT'; then
             pre="ppa-unstable"
             choices="makedeb appimage flatpak apt build"
@@ -73,9 +73,9 @@ if [[ "$distro_base" == "Debian" ]]; then
         else
 	    if [[ "$prompt" =~ 'ppa-unstable' ]] || [[ "$prompt" =~ 'ppa-stable' ]]; then
 	    	if [[ "$prompt" =~ 'ppa-unstable' ]] && [[ "$prompt" =~ 'ppa-stable' ]]; then
-		    pre='ppa-stable'
-	            choices="ppa-unstable makedeb flatpak apt build"
-		    prompt="Which one (Ppa-stable/ppa-unstable/makedeb/flatpak/build from source)? [Ppa-stable/ppa-unstable/makedeb/flatpak/apt/build]: "
+		    pre='ppa-unstable'
+	            choices="ppa-stable makedeb flatpak apt build"
+		    prompt="Which one (Ppa-unstable/ppa-stable/makedeb/flatpak/build from source)? [Ppa-unstable/ppa-stable/makedeb/flatpak/apt/build]: "
 	    	elif [[ "$prompt" =~ 'ppa-unstable' ]]; then
 	    	    pre='ppa-unstable'
 	            choices="makedeb flatpak apt build"
