@@ -1,11 +1,18 @@
-#/bin/bash
+# https://github.com/dandavison/delta
+# https://github.com/so-fancy/diff-so-fancy
+# https://github.com/walles/riff
+# https://github.com/ymattw/ydiff
+# https://github.com/mookid/diffr
+# https://github.com/daveewart/colordiff
+# https://github.com/Wilfred/difftastic
+# https://github.com/czusual/p4merge
+# https://github.com/KDE/kdiff3
 
 if ! test -f checks/check_all.sh; then
-    if type curl &>/dev/null; then
+    if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-        return 1 || exit 1
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
     . ./checks/check_all.sh
@@ -21,14 +28,14 @@ reade -Q "GREEN" -i "delta difftastic diff-so-fancy riff ydiff diffr colordiff" 
 
 if [[ $pager == "bat" ]]; then
     if ! test -f install_bat.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bat.sh)
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bat.sh)
     else
         . ./install_bat.sh
     fi
 
 elif [[ $pager == "riff" ]]; then
     if ! test -f install_cargo.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)
     else
         . ./install_cargo.sh
     fi
@@ -36,7 +43,7 @@ elif [[ $pager == "riff" ]]; then
 
 elif [[ $pager == "difftastic" ]]; then
     if ! test -f install_cargo.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)
     else
         . ./install_cargo.sh
     fi
@@ -44,7 +51,7 @@ elif [[ $pager == "difftastic" ]]; then
 
 elif [[ $pager == "diffr" ]]; then
     if ! test -f install_cargo.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)
     else
         . ./install_cargo.sh
     fi
@@ -60,7 +67,7 @@ if [[ "$distro_base" == "Arch" ]]; then
         eval "$pac_ins_y git-delta"
     elif [[ $pager == "ydiff" ]]; then
         if ! type pipx &>/dev/null && ! test -f install_pipx.sh; then
-            source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)
+            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)
         elif ! type pipx &>/dev/null; then
             . ./install_pipx.sh
         fi
@@ -74,7 +81,7 @@ elif [[ "$distro_base" == "Debian" ]]; then
         eval "$pac_ins_y colordiff"
     elif [[ $pager == "delta" ]]; then
         if ! test -f aliases/.bash_aliases.d/git.sh; then
-            source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/git.sh)
+            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/git.sh)
         else
             . ./aliases/.bash_aliases.d/git.sh
         fi
@@ -82,7 +89,7 @@ elif [[ "$distro_base" == "Debian" ]]; then
         sudo dpkg -i $TMPDIR/git-delta_*_amd64.deb 
     elif [[ $pager == "ydiff" ]]; then
         if ! type pipx &>/dev/null && ! test -f install_pipx.sh; then
-            source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)
+            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)
         elif ! type pipx &>/dev/null; then
             . ./install_pipx.sh
         fi

@@ -1,10 +1,10 @@
-#!/bin/bash
+# https://rustup.rs/
 
 if ! test -f checks/check_all.sh; then
-    if type curl &>/dev/null; then
+    if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        continue
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
     . ./checks/check_all.sh
@@ -17,9 +17,9 @@ DIR=$(get-script-dir)
 #fi
 
 if [[ "$distro_base" == "Debian" ]]; then
-    if ! hash cargo &> /dev/null || version-higher "0.7" "$(apt-cache madison cargo | awk 'NR==1 {print $3}')"; then
-        eval "${pac_rm} cargo rustc"
-        eval "${pac_ins} curl build-essential gcc make"
+    if ! hash cargo &> /dev/null || (test -n "$(eval "$pac_ls_ins cargo 2> /dev/null")" && version-higher "$(apt-cache madison cargo | awk 'NR==1 {print $3}' | cut -d+ -f1)"  "0.7"); then
+        eval "${pac_rm_y} cargo rustc"
+        eval "${pac_ins_y} curl build-essential gcc make"
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
         ! grep -q 'source ~/.cargo/env' $ENV &&
             printf "# CARGO\n[ -f ~/.cargo/env ] && source ~/.cargo/env\n" >> $ENV ||

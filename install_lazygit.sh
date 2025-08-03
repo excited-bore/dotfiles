@@ -1,9 +1,10 @@
+# https://github.com/jesseduffield/lazygit
+
 if ! test -f checks/check_all.sh; then
-    if type curl &>/dev/null; then
+    if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-        return 1 || exit 1
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
     . ./checks/check_all.sh
@@ -22,7 +23,7 @@ if ! hash lazygit &>/dev/null; then
             if [[ "$arch" == '386' || "$arch" == 'amd32' || "$arch" == 'amd64' ]]; then
                  archl='x86_64'
             elif [[ "$arch" =~ arm ]]; then  
-                  archl=$arch            
+                 archl=$arch            
             fi
             (cd $TMPDIR  
             wget-aria-name lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_$archl.tar.gz"
@@ -48,17 +49,17 @@ if [[ 'y' == $conflazy ]]; then
     }
     yes-edit-no -g "$file" -p 'Copy an example lazygit yaml config file into ~/.config/lazygit/?' -f cp_lazy_conf -c "test -f ~/.config/lazygit/config.yml.example || ! (test -f ~/.config/lazygit/config.yml.example && test -n $(diff ~/.config/lazygit/config.yml.example $file 2>/dev/null)) &> /dev/null"
     if ! test -f install_differ_pager.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_git.sh)
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_git.sh)
     else
         . ./install_git.sh
     fi
 
     readyn -Y "CYAN" -p "Configure custom interactive diff filter for Lazygit?" gitdiff1
     if [[ "y" == "$gitdiff1" ]]; then
-        readyn -n -p "Install custom diff syntax highlighter?" gitpgr
+        readyn -p "Install custom diff syntax highlighter?" -c "hash delta &> /dev/null || hash diff-so-fancy &> /dev/null || hash riff &> /dev/null || hash ydiff &> /dev/null || hash diffr &> /dev/null || hash colordiff &> /dev/null || hash kdiff3 &> /dev/null || hash p4merge &> /dev/null || hash difft &> /dev/null" gitpgr
         if [[ "$gitpgr" == "y" ]]; then
             if ! test -f install_differ.sh; then
-                source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_differ.sh)
+                source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_differ.sh)
             else
                 . ./install_differ.sh
             fi
