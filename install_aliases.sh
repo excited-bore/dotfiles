@@ -591,17 +591,15 @@ update_sysm() {
     cp  $update_kern ~/.bash_aliases.d/
 
     if [[ $distro_base == 'Debian' ]]; then
-        
         if ! hash mainline &>/dev/null; then
             printf "${CYAN}mainline${normal} is not installed (GUI and cmd tool for managing installation of (newer) kernel versions)\n"
             readyn -p "Install mainline?" mainl_ins
             if [[ $mainl_ins == 'y' ]]; then
-                if test -z "$(apt list --installed software-properties-common 2>/dev/null | awk 'NR>1{print;}')"; then
-                    sudo apt install -y software-properties-common
-                fi 
-                sudo add-apt-repository ppa:cappelikan/ppa 
-                eval "${pac_up}" 
-                sudo apt install -y mainline
+                if ! test -f $SCRIPT_DIR/install_mainline.sh; then
+                    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_mainline.sh)
+                else
+                    . $SCRIPT_DIR/install_mainline.sh
+                fi
             fi
             unset mainl_ins
         fi

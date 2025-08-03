@@ -216,6 +216,19 @@ if [[ $distro_base == 'Debian' ]]; then
         fi
     fi
 
+    if ! hash mainline &> /dev/null; then
+        printf "${CYAN}mainline${normal} is not installed (GUI and cmd tool for managing installation of (newer) kernel versions)\n"
+        readyn -p "Install mainline?" mainl_ins
+        if [[ $mainl_ins == 'y' ]]; then
+            if ! test -f $SCRIPT_DIR/install_mainline.sh; then
+                source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_mainline.sh)
+            else
+                . $SCRIPT_DIR/install_mainline.sh
+            fi
+        fi
+        unset mainl_ins
+    fi
+    
     if hash add-apt-repository &>/dev/null; then
 
         if ! hash xmllint &>/dev/null && test -n "$(apt search libxml2-utils 2>/dev/null | awk 'NR>2{print;}')"; then
@@ -226,25 +239,6 @@ if [[ $distro_base == 'Debian' ]]; then
             fi
             unset xml_ins
         fi
-
-        if ! hash mainline &>/dev/null; then
-            printf "${CYAN}mainline${normal} is not installed (GUI and cmd tool for managing installation of (newer) kernel versions)\n"
-            readyn -p "Install mainline?" mainl_ins
-            if [[ $mainl_ins == 'y' ]]; then
-                if [[ "$distro" == 'Ubuntu' ]]; then
-                    sudo add-apt-repository ppa:cappelikan/ppa 
-                    eval "${pac_up}" 
-                    eval "$pac_ins_y mainline"
-                else
-                    eval "$pac_ins_y libgee-0.8-dev git libjson-glib-dev libvte-2.91-dev valac aria2 lsb-release" 
-                    git clone https://github.com/bkw777/mainline.git $TMPDIR/mainline 
-                    (cd $TMPDIR/mainline
-                    make
-                    sudo make install) 
-                fi
-            fi
-            unset mainl_ins
-        fi 
 
         if ! hash ppa-purge &>/dev/null && test -n "$(apt search ppa-purge 2>/dev/null | awk 'NR>2{print;}')"; then
             printf "${CYAN}ppa-purge${normal} is not installed (cmd tool for disabling installed PPA's)\n"
