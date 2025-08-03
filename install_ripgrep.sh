@@ -1,14 +1,24 @@
-#!/bin/bash
+# https://github.com/BurntSushi/ripgrep
+
+if ! test -f checks/check_all.sh; then
+    if hash curl &>/dev/null; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
+    else
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
+    fi
+else
+    . ./checks/check_all.sh
+fi
 
 if ! test -f aliases/.bash_aliases.d/package_managers.sh; then
-    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/package_managers.sh)
+    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/package_managers.sh)
 else
     source aliases/.bash_aliases.d/package_managers.sh
 fi
 
 if ! hash rg &> /dev/null; then 
     if [[ $distro_base == "Arch" ]] || [[ "$distro_base" == 'Debian' ]]; then
-        eval "${pac_ins} ripgrep"
+        eval "${pac_ins_y} ripgrep"
     fi
 fi
 
@@ -16,7 +26,7 @@ if test -f ripgrep/.ripgreprc; then
     file=ripgrep/.ripgreprc
 else
     dir1="$(mktemp -d -t rg-XXXXXXXXXX)"
-    curl -s -o $dir1/.ripgreprc https://raw.githubusercontent.com/excited-bore/dotfiles/main/ripgrep/.ripgreprc
+    curl -o $dir1/.ripgreprc https://raw.githubusercontent.com/excited-bore/dotfiles/main/ripgrep/.ripgreprc
     file=$dir1/.ripgreprc
 fi
 
@@ -30,7 +40,7 @@ if ! test -f ~/.ripgreprc; then
             echo 'export RIPGREP_CONFIG_PATH=$HOME/.ripgreprc' >> $ENV &> /dev/null
         fi
     } 
-    yes-edit-no -f ripgrep_conf -g "$file" -p "Install .ripgreprc at $HOME?" -c "test -f ~/.ripgreprc || test -n \"$(test -f ~/.ripgreprc && diff $file ~/.ripgreprc)\"" 
+    yes-edit-no -f ripgrep_conf -g "$file" -p "Install .ripgreprc at $HOME?" -c "! test -f ~/.ripgreprc || test -n \"\$(test -f ~/.ripgreprc && diff $file ~/.ripgreprc)\"" 
 fi
 
 echo "Next $(tput setaf 1)sudo$(tput sgr0) will check whether root dir exists and whether it contains a .ripgreprc config file"
