@@ -122,6 +122,8 @@ if test -d /etc/modprobe.d && ! test -f /etc/modprobe.d/nobeep.conf; then
     fi
 fi
 
+unset sym1 sym2 sym3 beep
+
 if [[ "$XDG_CURRENT_DESKTOP" == 'GNOME' && "$(gsettings get org.gnome.desktop.peripherals.keyboard remember-numlock-state)" == "false"  ]] || [[ "$XDG_CURRENT_DESKTOP" == 'XFCE' && $(xfconf-query -c keyboards -lv | grep -i numlock | awk '{print $2}') == 'false' ]] || ([[ "$XDG_CURRENT_DESKTOP" == 'labwc:wlroots' ]] && ! hash numlockw &> /dev/null) ; then
     if ! test -f checsk/check_numlock.sh; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_numlock.sh) 
@@ -141,7 +143,6 @@ fi
 #    fi
 #fi
 
-unset sym1 sym2 sym3 beep
 
 
 SCRIPT_DIR=$(get-script-dir)
@@ -354,7 +355,7 @@ fi
 
 # Appimagelauncher
 
-if ! hash AppImageLauncher &>/dev/null; then
+if ! hash appImageLauncher &>/dev/null; then
     printf "${GREEN}If you want to install applications using appimages, there is a helper called 'appimagelauncher'\n"
     readyn -p "Check if appimage ready and install appimagelauncher?" appimage_install
     if [[ "$appimage_install" == 'y' ]]; then

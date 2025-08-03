@@ -142,17 +142,17 @@ if [[ $ansr == "y" ]]; then
                 fi
             else
                 if command cp --help | grep -qF -- '-g'; then
-                    readyn -p "${CYAN}cp -g${GREEN} installed. Use cp -g instead of cp? (add progress bar)" cp_xcpq
+                    readyn -p "${CYAN}cp -g${GREEN} installed. Use cp -g instead of cp? (adds progress bar)" cp_xcpq
                     if [[ "$cp_xcpq" == 'y' ]]; then
                         cp_xcp='cp -g'
                     fi
                 elif hash cpg &>/dev/null; then
-                    readyn -p "${CYAN}cpg${GREEN} installed. Use cpg instead of cp? (add progress bar)" cp_xcpq
+                    readyn -p "${CYAN}cpg${GREEN} installed. Use cpg instead of cp and set flag '-g'? (adds progress bar)" cp_xcpq
                     if [[ "$cp_xcpq" == 'y' ]]; then
                         cp_xcp='cpg -g'
                     fi
                 elif hash xcp &>/dev/null; then
-                    readyn -p "${CYAN}xcp${GREEN} installed. Use xcp instead of cp (add progress bar - might conflict with sudo cp if cargo not available for sudo path in /etc/sudoers)?" cp_xcpq
+                    readyn -p "${CYAN}xcp${GREEN} installed. Use xcp instead of cp (adds progress bar - might conflict with sudo cp if cargo not available for sudo path in /etc/sudoers)?" cp_xcpq
                     if [[ "$cp_xcpq" == 'y' ]]; then
                         cp_xcp='xcp --glob --progress-bar'
                     fi
@@ -223,14 +223,16 @@ if [[ $ansr == "y" ]]; then
         mv_prgs=''
         mv_ov='' 
         mv_v=''
-        if hash mvg &> /dev/null; then
-            readyn -p "'${CYAN}mvg${GREEN}' installed. Use instead of regular 'mv'?" mv_mvgq
-            if [[ "$mv_mvgq" == 'y' ]]; then
-                mv_mvg='mvg'
-                
-                readyn -p "Set progress bar?" mv_prgsq
-                if [[ "$mv_prgsq" == 'y' ]]; then
-                    mv_prgs='--progress-bar'
+        if hash mvg &> /dev/null || command mv --help | grep -qF -- '-g'; then
+            if command mv --help | grep -qF -- '-g'; then
+                readyn -p "${CYAN}mv -g${GREEN} installed. Use mv -g instead of mv? (adds progress bar)" mv_mvgq
+                if [[ "$mv_mvgq" == 'y' ]]; then
+                    mv_mvg='mv -g'
+                fi
+            elif hash mvg &>/dev/null; then
+                readyn -p "${CYAN}mvg${GREEN} installed. Use mvg instead of mv and set flag '-g'? (adds progress bar)" mv_mvgq
+                if [[ "$mv_mvgq" == 'y' ]]; then
+                    mv_mvg='mvg -g'
                 fi
             fi
         fi
