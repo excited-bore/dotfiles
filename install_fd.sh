@@ -14,7 +14,7 @@ if ! hash fd &> /dev/null; then
     elif [[ $distro_base == "Debian" ]]; then
         eval "$pac_ins_y fd-find"
         if ! test -f ~/.local/bin/fd; then
-            ln -s $(which fdfind) ~/.local/bin/fd
+            ln -s /usr/bin/fdfind ~/.local/bin/fd
         fi
     fi
 fi
