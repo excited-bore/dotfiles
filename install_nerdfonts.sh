@@ -178,7 +178,7 @@ if test -n "$name"; then
                     xfconf-query -c xsettings -p /Gtk/FontName -s "$familystyle $size"
                 fi
             fi
-        elif [[ "$XDG_CURRENT_DESKTOP" == 'GNOME' ]]; then 
+        elif [[ "$XDG_CURRENT_DESKTOP" =~ 'GNOME' ]]; then 
             readyn -p "Set one installed font as the default for the entire system - for ${CYAN}GNOME${GREEN}?" yhno
             if [[ "$yhno" == 'y' ]]; then
                
