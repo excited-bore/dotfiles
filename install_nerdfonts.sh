@@ -76,11 +76,15 @@ fi
 
 if test -n "$name"; then
     if ! hash magick &> /dev/null; then 
-        if ! test -f install_imagemagick.sh; then
-            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_imagemagick.sh)
-        else
-            . ./install_imagemagick.sh 
+        readyn -p "${GREEN}Latest version of ${CYAN}imagemagick${GREEN} not installed.\n${YELLOW}Warning - installing latest version could take a while\n${GREEN}Install ${CYAN}imagemagick${GREEN}?" nstll_mgmagick 
+        if [[ "$nstll_mgmagick" == 'y' ]]; then 
+            if ! test -f install_imagemagick.sh; then
+                source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_imagemagick.sh)
+            else
+                . ./install_imagemagick.sh 
+            fi
         fi
+        unset nstll_mgmagick
     fi
     
     if [[ "$XDG_SESSION_TYPE" == 'x11' ]]; then
@@ -94,8 +98,8 @@ if test -n "$name"; then
                         . ./install_ueberzugpp.sh
                     fi
                 fi
-            unset yhno
             fi
+            unset yhno
         fi
         # get github.com/xlucn/fontpreview-ueberzug
         
@@ -114,19 +118,22 @@ if test -n "$name"; then
         if ! hash nsxiv &> /dev/null; then
             eval "$pac_ins_y nsxiv" 
         fi
-        
-        wget-curl https://git.io/raw_fontpreview > $TMPDIR/fontpreview.sh
-        #if [[ "$XDG_CURRENT_DESKTOP" == 'GNOME' ]]; then
-        sed -i 's/xdotool, //; s/(xdotool\ /(\ /; /xdotool/d;' $TMPDIR/fontpreview.sh
-        sed -i 's/\(fontpreview very customizable\)/\1\n\t\[\[ $FONTPREVIEW_FONTS != "" \]\] \&\& FONTS=$FONTPREVIEW_FONTS/' $TMPDIR/fontpreview.sh
-        sed -i 's/\(--search-prompt)\)/\t--fonts)\n\tFONTPREVIEW_FONTS=$2\n\t;;\n\t\1/' $TMPDIR/fontpreview.sh 
-        sed -i 's/\(search-prompt:,)\)/fonts:,\1/' $TMPDIR/fontpreview.sh 
-        sed -i 's|\(font=$(magick -list font.*)\)|\tif test -z "$FONTPREVIEW_FONTS"; then\n\t\1\n\telse\n\tfont=$(printf "$FONTPREVIEW_FONTS" \| sort -t "-" -k1\,1 \| uniq \| fzf --header="Which font? (Ctrl+C to quit - last selected will be used)" $quer --layout=reverse --prompt="$SEARCH_PROMPT")\n\techo "$font"\n\tfi\n|' $TMPDIR/fontpreview.sh
-        #sed -i 's|\[\[ -z $font \]\].*|if test -z $font; then\n\treturn\n\telse\n\tstyle=$(echo $font \| cut -d- -f2 \| cut -d. -f1)\n\tfont=$(fc-match $font \| awk '\''{$1=""; print}'\'' \| xargs \| sed "s/Regular/$style/; s/ /-/g; s/-Regular//g")\n\tfi|' $TMPDIR/fontpreview.sh 
-        sed -i 's|\[\[ -z $font \]\].*|if test -z $font; then\n\treturn\n\telse\n\ttest -n "$FONTPREVIEW_FONTS" \&\& font=$(fc-query -f "%{fullname}\\n" $XDG_DATA_HOME/fonts/$font \| sed "s/ /-/g;")\n\tfi|' $TMPDIR/fontpreview.sh 
+       
+        if hash magick &> /dev/null && hash nsxiv &> /dev/null; then
          
-        sed -i 's/^main$/echo $(main | awk '\''{print $NF}'\'')/' $TMPDIR/fontpreview.sh 
-        chmod u+x $TMPDIR/fontpreview.sh
+            wget-curl https://git.io/raw_fontpreview > $TMPDIR/fontpreview.sh
+            #if [[ "$XDG_CURRENT_DESKTOP" == 'GNOME' ]]; then
+            sed -i 's/xdotool, //; s/(xdotool\ /(\ /; /xdotool/d;' $TMPDIR/fontpreview.sh
+            sed -i 's/\(fontpreview very customizable\)/\1\n\t\[\[ $FONTPREVIEW_FONTS != "" \]\] \&\& FONTS=$FONTPREVIEW_FONTS/' $TMPDIR/fontpreview.sh
+            sed -i 's/\(--search-prompt)\)/\t--fonts)\n\tFONTPREVIEW_FONTS=$2\n\t;;\n\t\1/' $TMPDIR/fontpreview.sh 
+            sed -i 's/\(search-prompt:,)\)/fonts:,\1/' $TMPDIR/fontpreview.sh 
+            sed -i 's|\(font=$(magick -list font.*)\)|\tif test -z "$FONTPREVIEW_FONTS"; then\n\t\1\n\telse\n\tfont=$(printf "$FONTPREVIEW_FONTS" \| sort -t "-" -k1\,1 \| uniq \| fzf --header="Which font? (Ctrl+C to quit - last selected will be used)" $quer --layout=reverse --prompt="$SEARCH_PROMPT")\n\techo "$font"\n\tfi\n|' $TMPDIR/fontpreview.sh
+            #sed -i 's|\[\[ -z $font \]\].*|if test -z $font; then\n\treturn\n\telse\n\tstyle=$(echo $font \| cut -d- -f2 \| cut -d. -f1)\n\tfont=$(fc-match $font \| awk '\''{$1=""; print}'\'' \| xargs \| sed "s/Regular/$style/; s/ /-/g; s/-Regular//g")\n\tfi|' $TMPDIR/fontpreview.sh 
+            sed -i 's|\[\[ -z $font \]\].*|if test -z $font; then\n\treturn\n\telse\n\ttest -n "$FONTPREVIEW_FONTS" \&\& font=$(fc-query -f "%{fullname}\\n" $XDG_DATA_HOME/fonts/$font \| sed "s/ /-/g;")\n\tfi|' $TMPDIR/fontpreview.sh 
+             
+            sed -i 's/^main$/echo $(main | awk '\''{print $NF}'\'')/' $TMPDIR/fontpreview.sh 
+            chmod u+x $TMPDIR/fontpreview.sh
+        fi 
     fi
     
     #while : ; do 
@@ -146,7 +153,7 @@ if test -n "$name"; then
     unset FONTPREVIEW_FONTS 
 
     if ( hash xfconf-query &> /dev/null || hash gsettings &> /dev/null || test -f $XDG_CONFIG_HOME/kitty/kitty.conf) ; then 
-        if [[ "$DESKTOP_SESSION" == 'xfce' ]]; then 
+        if [[ "$XDG_CURRENT_DESKTOP" == 'XFCE' ]]; then 
             readyn -p "Set one installed font as the default for the entire system - for ${CYAN}xfce${GREEN}?" yhno
             if [[ "$yhno" == 'y' ]]; then
                
@@ -167,7 +174,7 @@ if test -n "$name"; then
                     xfconf-query -c xsettings -p /Gtk/FontName -s "$familystyle $size"
                 fi
             fi
-        elif [[ "$DESKTOP_SESSION" == 'gnome' ]]; then 
+        elif [[ "$XDG_CURRENT_DESKTOP" == 'GNOME' ]]; then 
             readyn -p "Set one installed font as the default for the entire system - for ${CYAN}GNOME${GREEN}?" yhno
             if [[ "$yhno" == 'y' ]]; then
                

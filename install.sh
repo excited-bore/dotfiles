@@ -541,9 +541,11 @@ color1="${GREEN}"
 pre="duf dysk both none"
 prmpt=" [Duf/dysk/both/none]: "
 if ! hash dysk &>/dev/null && hash duf &>/dev/null; then
-    pre="dysk duf both none"
-    prmpt=" [Dysk/duf/both/none]: "
-elif hash dysk &>/dev/null && hash duf &>/dev/null; then
+    color='YELLOW'
+    color1="${YELLOW}"
+    pre="none dysk duf both"
+    prmpt=" [None/dysk/duf/both]: "
+elif hash dysk &>/dev/null || hash duf &>/dev/null; then
     color='YELLOW'
     color1="${YELLOW}"
     pre="none duf dysk both"

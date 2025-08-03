@@ -52,7 +52,7 @@ if ! [ -f /root/.bash_aliases ]; then
 fi
 
 if ! sudo grep -q ".bash_aliases" /root/.bashrc; then
-    printf "[ -f ~/.bash_aliases ] && source ~/.bash_aliases \n" | sudo tee -a /root/.bashrc > /dev/null
+    printf "[ -f ~/.bash_aliases ] && source ~/.bash_aliases \n" | sudo tee -a /root/.bashrc &> /dev/null
 fi
 
 if sudo test -f /root/.bashrc && ! sudo grep -q '\[ -f ~/.bash_aliases \] && source ~/.bash_aliases' /root/.bashrc; then
@@ -66,7 +66,7 @@ if sudo test -f /root/.bashrc && ! sudo grep -q '\[ -f ~/.bash_aliases \] && sou
     if sudo grep -q '\[ -f ~/.keybinds \]' /root/.bashrc; then
         sudo sed -i 's|\(\[ -f \~/.keybinds \] \&\& source \~/.keybinds\)|\[ -f \~/.bash_aliases \] \&\& source \~/.bash_aliases\n\n\1|g' /root/.bashrc
     else
-        echo '[ -f ~/.bash_aliases ] && source ~/.bash_aliases' | sudo tee -a /root/.bashrc
+        echo '[ -f ~/.bash_aliases ] && source ~/.bash_aliases' | sudo tee -a /root/.bashrc &> /dev/null
     fi
 fi
 

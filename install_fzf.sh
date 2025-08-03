@@ -107,7 +107,7 @@ if test -z "$1"; then
         readyn -p "Install fd and use for fzf? (Faster find)" fdr
         if [[ "$fdr" == "y" ]]; then
             if ! test -f install_fd.sh; then
-                source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fd.sh)
+                source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fd.sh)
             else
                 . ./install_fd.sh
             fi
@@ -119,11 +119,11 @@ if test -z "$1"; then
     fi
 
     # BAT
-    if ! type bat &>/dev/null; then
+    if ! hash bat &>/dev/null; then
         readyn -p "Install bat? (File previews/thumbnails for riflesearch)" bat
         if [[ "$bat" == "y" ]]; then
             if ! test -f install_bat.sh; then
-                source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bat.sh)
+                source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bat.sh)
             else
                 . ./install_bat.sh
             fi
@@ -132,11 +132,11 @@ if test -z "$1"; then
     fi
 
     # TREE
-    if ! type tree &>/dev/null; then
+    if ! hash tree &>/dev/null; then
         readyn -p "Install tree? (Builtin cd shortcut gets a nice directory tree preview )" tree
         if [[ "$tree" == "y" ]]; then
             if ! test -f install_tree.sh; then
-                source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_tree.sh)
+                source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_tree.sh)
             else
                 . ./install_tree.sh
             fi
@@ -149,7 +149,7 @@ if test -z "$1"; then
         readyn -p "Install ffmpegthumbnailer? (Video thumbnails for riflesearch)" ffmpg
         if [[ "$ffmpg" == "y" ]]; then
             if ! test -f install_ffmpegthumbnailer.sh; then
-                source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ffmpegthumbnailer.sh)
+                source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ffmpegthumbnailer.sh)
             else
                 . ./install_ffmpegthumbnailer.sh
             fi
@@ -160,7 +160,7 @@ if test -z "$1"; then
     # RIPGREP
     # TODO: Check export for ripgrep
     # TODO: Do more with ripgrep
-    if ! type rg &>/dev/null; then
+    if ! hash rg &>/dev/null; then
         readyn -y -p "Install ripgrep? (Recursive grep, opens possibility for line by line fzf )" rpgrp
         if [[ "$rpgrp" == "y" ]]; then
             if ! test -f install_ripgrep.sh; then
@@ -176,7 +176,7 @@ if test -z "$1"; then
             if [[ $ENV_R == /root/.environment ]]; then
                 sudo sed -i 's|#export RG_PREFIX|export RG_PREFIX|g' $ENV_R
             elif ! sudo grep -q "export RG_PREFIX" $ENV_R; then
-                printf "\n# RIPGREP\nexport RG_PREFIX='rg --column --line-number --no-heading --color=always --smart-case \"" | sudo tee -a $ENV_R
+                printf "\n# RIPGREP\nexport RG_PREFIX='rg --column --line-number --no-heading --color=always --smart-case \"" | sudo tee -a $ENV_R &> /dev/null
             fi
 
             readyn -p "Add shortcut for ripgrep files in dir? (Ctrl-g)" rpgrpdir
@@ -209,12 +209,12 @@ if test -z "$1"; then
             if [[ "$ENV" == ~/.environment ]]; then
                 sed -i 's|#export FZF_CTRL_R_OPTS=|export FZF_CTRL_R_OPTS=|g' $ENV
             elif ! grep -q "export FZF_CTRL_R_OPTS=" $ENV; then
-                printf "\nexport FZF_CTRL_R_OPTS=\" --preview 'echo {}' --preview-window up:3:hidden:wrap --bind 'ctrl-t:toggle-preview' --bind 'alt-c:execute-silent(echo -n {2..} | $clip)+abort' --color header:italic --header 'Press ALT-C to copy command into clipboard'\"" >>$ENV &>/dev/null
+                printf "\nexport FZF_CTRL_R_OPTS=\" --preview 'echo {}' --preview-window up:3:hidden:wrap --bind 'ctrl-t:toggle-preview' --bind 'alt-c:execute-silent(echo -n {2..} | $clip)+abort' --color header:italic --header 'Press ALT-C to copy command into clipboard'\"\n" >> $ENV &>/dev/null
             fi
             if [[ "$ENV_R" == /root/.environment ]]; then
                 sudo sed -i 's|#export FZF_CTRL_R_OPTS==|export FZF_CTRL_R_OPTS=|g' $ENV_R
             elif ! sudo grep -q "export FZF_CTRL_R_OPTS" $ENV_R; then
-                printf "\nexport FZF_CTRL_R_OPTS=\" --preview 'echo {}' --preview-window up:3:hidden:wrap --bind 'ctrl-t:toggle-preview' --bind 'alt-c:execute-silent(echo -n {2..} | $clip)+abort' --color header:italic --header 'Press ALT-C to copy command into clipboard'\"" | sudo tee -a $ENV_R
+                printf "\nexport FZF_CTRL_R_OPTS=\" --preview 'echo {}' --preview-window up:3:hidden:wrap --bind 'ctrl-t:toggle-preview' --bind 'alt-c:execute-silent(echo -n {2..} | $clip)+abort' --color header:italic --header 'Press ALT-C to copy command into clipboard'\"\n" | sudo tee -a $ENV_R &>/dev/null
             fi
             unset clip 
         fi
@@ -285,11 +285,11 @@ if test -z "$1"; then
     #fi
     #unset comp_key
 
-    if ! test -f /usr/bin/rifle || ! test -f ~/.bash_aliases.d/fzf-rifle.sh && grep -q "fzf_rifle" ~/.keybinds.d/keybinds.bash; then
+    if ! test -f /usr/bin/rifle || ! test -f $HOME/.bash_aliases.d/fzf-rifle.sh; then
         readyn -p "Use rifle (file opener from 'ranger') to open found files and dirs with a custom Ctrl-F filesearch shortcut?" fzf_f
-        if [[ "$fzf_f" == "y" ]]; then
-            if ! type rifle &>/dev/null; then
-                if ! type python &>/dev/null; then
+        if [[ "$fzf_f" == "y" ]]; the   n
+            if ! hash rifle &>/dev/null; then
+                if ! hash python &>/dev/null; then
                     if [[ "$distro_base" == 'Debian' ]]; then
                         eval "${pac_ins_y}" python3 python-is-python3
                     elif [[ "$distro_base" == 'Arch' ]]; then
