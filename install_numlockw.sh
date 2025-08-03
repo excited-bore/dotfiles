@@ -24,6 +24,11 @@ if [[ $XDG_SESSION_TYPE == 'wayland' ]]; then
     fi
 
     if hash pipx &> /dev/null && ! hash numlockw &> /dev/null; then
+        
+        if [[ "$distro_base" == 'Debian' ]]; then
+            eval "${pac_ins_y} python3-dev" 
+        fi
+        
         # For Arch users: Refer to https://wiki.archlinux.org/title/Udev#Allowing_regular_users_to_use_devices
         sudo usermod -a -G plugdev $USER  
         # or pipx install git+https://github.com/xz-dev/numlockw.git 
