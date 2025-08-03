@@ -54,7 +54,7 @@ if ! sudo grep -q "~/.bash_completion" /root/.bashrc; then
             sudo sed -i 's|\(\^if [ -f ~/.bash_aliases ]; then\)|[ -f ~/.bash_completion \] \&\& source ~/.bash_completion\n\n\1|' /root/.bashrc 
         fi
     else
-        printf "\n[ -f ~/.bash_completion ] && source ~/.bash_completion\n\n" | sudo tee -a /root/.bashrc
+        printf "\n[ -f ~/.bash_completion ] && source ~/.bash_completion\n\n" | sudo tee -a /root/.bashrc &> /dev/null
     fi
 fi 
 

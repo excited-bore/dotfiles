@@ -355,7 +355,7 @@ fi
 
 # Appimagelauncher
 
-if ! hash appImageLauncher &>/dev/null; then
+if ! hash AppImageLauncher &>/dev/null; then
     printf "${GREEN}If you want to install applications using appimages, there is a helper called 'appimagelauncher'\n"
     readyn -p "Check if appimage ready and install appimagelauncher?" appimage_install
     if [[ "$appimage_install" == 'y' ]]; then
@@ -424,8 +424,8 @@ elif (hash cpg &>/dev/null || cp --help | grep -qF -- '-g'); then
     color="GREEN"
 else
     printf "${CYAN}cpg/mvg${GREEN} are patches for the default coreutils 'cp (copy) / mv (move)' which gives an added flag to both for a progress bar with '-g/--progress-bar'\n${CYAN}xcp${GREEN} is an 'extended', rust-written cp that copies faster and also comes with a progress bar${normal}\n"
-    cpgi="all advcpmv xcp none"
-    cpgp="[All/advcpmv/xcp/none]: "
+    cpgi="advcpmv xcp all none"
+    cpgp="[Advcpmv/xcp/all/none]: "
     color="GREEN"
 fi
 
