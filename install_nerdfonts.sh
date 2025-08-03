@@ -165,7 +165,7 @@ if test -n "$name"; then
                 #if [[ $(echo "$files" | wc -w) == 1 ]]; then
                 #    quer="--query=$files" 
                 #fi
-                ! (hash magick &> /dev/null && hash ueberzug &> /dev/null) && 
+                (! hash magick &> /dev/null || ! (hash ueberzug &> /dev/null || hash ueberzugpp &> /dev/null)) && 
                     file=$(printf "$name" | sort  -t '-'  -k1,1 | uniq | fzf --header="Which font?" $quer --reverse --height 50%) ||
                     file=$(FONTPREVIEW_FONTS="$name" quer="$quer" $TMPDIR/fontpreview.sh) 
                 style=$(echo $file | cut -d. -f-1 | cut -d- -f2) 
@@ -186,7 +186,7 @@ if test -n "$name"; then
                 #if [[ $(echo "$files" | wc -w) == 1 ]]; then
                 #    quer="--query=$files" 
                 #fi
-                ! (hash magick &> /dev/null && hash ueberzug &> /dev/null) && 
+                (! hash magick &> /dev/null || ! (hash ueberzug &> /dev/null || hash ueberzugpp &> /dev/null)) && 
                     file=$(printf "$name" | sort  -t '-'  -k1,1 | uniq | fzf --header="Which font?" $quer --reverse --height 50%) ||
                     file=$(FONTPREVIEW_FONTS="$name" $TMPDIR/fontpreview.sh) 
                 style=$(echo $file | cut -d. -f-1 | cut -d- -f2) 
@@ -243,7 +243,7 @@ if test -n "$name"; then
                 #elif [[ $(echo "$files" | wc -w) == 1 ]]; then
                 #    quer="--query=$files" 
                 fi
-                ! (hash magick &> /dev/null && hash ueberzug &> /dev/null) && 
+                (! hash magick &> /dev/null || ! (hash ueberzug &> /dev/null || hash ueberzugpp &> /dev/null)) &&
                     file=$(printf "$name" | sort  -t '-'  -k1,1 | uniq | fzf --header="Which font?" $quer --reverse --height 50%) ||
                     file=$(FONTPREVIEW_QUERY="$file" FONTPREVIEW_FONTS="$name" $TMPDIR/fontpreview.sh) 
                 style=$(echo $file | cut -d. -f-1 | cut -d- -f2) 
