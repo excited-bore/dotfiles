@@ -76,7 +76,11 @@ fi
 
 if test -n "$name"; then
     if ! hash magick &> /dev/null; then 
-        readyn -p "${GREEN}Latest version of ${CYAN}imagemagick${GREEN} not installed.\n${YELLOW}Warning - installing latest version could take a while\n${GREEN}Install ${CYAN}imagemagick${GREEN}?" nstll_mgmagick 
+        if [[ "$distro_base" == 'Debian' ]]; then
+            readyn -p "${GREEN}Latest version of ${CYAN}imagemagick${GREEN} not installed.\n${YELLOW}Warning - installing latest version could take a while\n${GREEN}Install ${CYAN}imagemagick${GREEN}?" nstll_mgmagick 
+        else
+            nstll_mgmagick='y'
+        fi
         if [[ "$nstll_mgmagick" == 'y' ]]; then 
             if ! test -f install_imagemagick.sh; then
                 source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_imagemagick.sh)
