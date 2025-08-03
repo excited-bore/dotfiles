@@ -28,6 +28,9 @@ if [[ $XDG_SESSION_TYPE == 'wayland' ]]; then
         sudo usermod -a -G plugdev $USER  
         # or pipx install git+https://github.com/xz-dev/numlockw.git 
         pipx install numlockw 
+        if [[ "$distro_base" == 'Arch' || "$distro_base" == 'Debian' ]]; then
+            echo 'KERNEL=="uinput", SUBSYSTEM=="misc", OPTIONS+="static_node=uinput", TAG+="uaccess", GROUP="input", MODE="0660"' | sudo tee /etc/udev/rules.d/10-evdevremapkeys.rules &> /dev/null  
+        fi
     fi
     
     if hash numlockw &> /dev/null; then 
