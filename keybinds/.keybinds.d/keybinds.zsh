@@ -278,45 +278,45 @@ transpose_words() {
    
     # Checks leading and trailing spaces, for escaped spaced words which it quotes using '', then exit
     local re='(([^[:space:]'\'']*\\ )+[^[:space:]'\'']*)'
-    if [[ "${READLINE_LINE}" =~ $re ]] || [[ "${READLINE_LINE: -1}" == ' ' ]] || [[ ${READLINE_LINE:0:1} == ' ' ]]; then
+    if [[ "${BUFFER}" =~ $re ]] || [[ "${BUFFER: -1}" == ' ' ]] || [[ ${BUFFER:0:1} == ' ' ]]; then
          
         local quoteds
-        global_rematch "${READLINE_LINE}" "$re" quoteds 
+        global_rematch "${BUFFER}" "$re" quoteds 
 
-        while [[ "${READLINE_LINE}" =~ $re ]] || [[ "${READLINE_LINE: -1}" == ' ' ]] || [[ ${READLINE_LINE:0:1} == ' ' ]]; do
+        while [[ "${BUFFER}" =~ $re ]] || [[ "${BUFFER: -1}" == ' ' ]] || [[ ${BUFFER:0:1} == ' ' ]]; do
 
             # Remove leading whitespace
-            if [[ "${READLINE_LINE:0:1}" == ' ' ]]; then
-                READLINE_LINE="${READLINE_LINE:1}" 
+            if [[ "${BUFFER:0:1}" == ' ' ]]; then
+                BUFFER="${BUFFER:1}" 
             fi
 
             # Remove trailing whitespace
-            if [[ "${READLINE_LINE: -1}" == ' ' ]]; then
-                READLINE_LINE="${READLINE_LINE::-1}" 
+            if [[ "${BUFFER: -1}" == ' ' ]]; then
+                BUFFER="${BUFFER::-1}" 
             fi
             
             # Quoted escaped spaced words
-            if [[ "${READLINE_LINE}" =~ $re ]]; then
+            if [[ "${BUFFER}" =~ $re ]]; then
                 local i=${BASH_REMATCH[0]}
                 #echo "'$i'" 
                 local j="'$(eval "echo $i")'"
                 local ree='.*'$(printf %q "$i")''
                 
-                if [[ $READLINE_LINE =~ $ree ]]; then
+                if [[ $BUFFER =~ $ree ]]; then
                     local suffxcount=$(($(echo "${BASH_REMATCH[0]}" | wc --chars)))
                     local preffxcount=$(($suffxcount - $(echo $i | wc --chars)))
                     #echo "'${BASH_REMATCH[0]}'"
-                    #echo "Suffix: '${READLINE_LINE:$suffxcount}'" 
-                    #echo "Suffix - 1: '${READLINE_LINE:$((suffxcount - 1))}'" 
-                    #echo "Prefix: '${READLINE_LINE:0:$preffxcount}'" 
+                    #echo "Suffix: '${BUFFER:$suffxcount}'" 
+                    #echo "Suffix - 1: '${BUFFER:$((suffxcount - 1))}'" 
+                    #echo "Prefix: '${BUFFER:0:$preffxcount}'" 
                     
                     # Idk but if it loops over multiple (similar??) words that need quoting, it miscounts and IDK ive gone over it multiple times im doing this terribleness  
                     if [[ ${#quoteds} -gt 1 ]]; then
-                        READLINE_LINE="${READLINE_LINE:0:$preffxcount}$j${READLINE_LINE:$((suffxcount - 1))}" 
+                        BUFFER="${BUFFER:0:$preffxcount}$j${BUFFER:$((suffxcount - 1))}" 
                     else
-                        READLINE_LINE="${READLINE_LINE:0:$preffxcount}$j${READLINE_LINE:$suffxcount}" 
+                        BUFFER="${BUFFER:0:$preffxcount}$j${BUFFER:$suffxcount}" 
                     fi
-                    #echo $READLINE_LINE 
+                    #echo $BUFFER 
                 fi
             
             fi
@@ -324,7 +324,7 @@ transpose_words() {
         return 0 
     fi
 
-    global_rematch "${READLINE_LINE}" "$words" arr
+    global_rematch "${BUFFER}" "$words" arr
     
     local args=${#arr[@]} 
     if [[ $args -gt 1 ]]; then 
@@ -335,9 +335,9 @@ transpose_words() {
         
         if [[ "$wordsorspace" == 'space' ]] && [[ $TRANSPOSE_QUOTED ]]; then
             local placeholder=$'\x01'  
-            line=$(echo "${READLINE_LINE}" | sed -E 's/"[^"]*"|'\''[^'\'']*'\''/'"$placeholder"'/g') 
+            line=$(echo "${BUFFER}" | sed -E 's/"[^"]*"|'\''[^'\'']*'\''/'"$placeholder"'/g') 
         else
-            line="${READLINE_LINE}"
+            line="${BUFFER}"
         fi
 
         global_rematch "$line" $non_words arrr
@@ -346,7 +346,7 @@ transpose_words() {
         local olderprefix='' oldprefix='' prefix='' olderword='' olderspcl='' lastword=${arr[0]} lastspcl=${arrr[0]} newword=${arr[1]}  
         while ([[ ${#arr[@]} -ge 1 ]] || [[ ${#arrr[@]} -ge 1 ]]); do 
            
-            local linechar=${READLINE_LINE:$index:1}
+            local linechar=${BUFFER:$index:1}
 
             local charcount=$(($(echo "${arr[0]}" | wc --chars) - 1)) 
             index=$(($index + $charcount)) 
@@ -354,23 +354,23 @@ transpose_words() {
             # get the firstword count and the count of the string up to the last alphanumerical 
             local firstword lasttword cntuptolastword
 
-            if [[ $READLINE_LINE =~ $firstwordpattrn ]]; then
+            if [[ $BUFFER =~ $firstwordpattrn ]]; then
                 firstword=$(($(echo "${BASH_REMATCH[0]}" | wc --chars) - 1)) 
             fi
 
-            if [[ $READLINE_LINE =~ $tolastwordpattrn ]]; then
+            if [[ $BUFFER =~ $tolastwordpattrn ]]; then
                 lasttword=$(($(echo "${BASH_REMATCH[0]}" | wc --chars) - 1)) 
-                cntuptolastword=$(($(echo "$READLINE_LINE" | wc --chars) - 1 - $lasttword)) 
+                cntuptolastword=$(($(echo "$BUFFER" | wc --chars) - 1 - $lasttword)) 
             fi 
 
             if [[ "$lastword" =~ "$linechar" ]]; then
 
                 local prfxcnt=$(($(echo "$prefix" | wc --chars) - 1))
                 local oldprfxcnt line
-                if [[ $index -eq $(($READLINE_POINT - 1)) ]] && [[ $READLINE_POINT == $cntuptolastword ]] && [[ "$directn" == 'right' ]]; then
-                    line="$READLINE_LINE"
-                    oldprfxcnt=${#READLINE_LINE}
-                elif [[ $index -ge $READLINE_POINT ]]; then
+                if [[ $index -eq $(($CURSOR - 1)) ]] && [[ $CURSOR == $cntuptolastword ]] && [[ "$directn" == 'right' ]]; then
+                    line="$BUFFER"
+                    oldprfxcnt=${#BUFFER}
+                elif [[ $index -ge $CURSOR ]]; then
                     if test -n "$olderprefix"; then
                         oldprfxcnt=$(($(echo "$olderprefix" | wc --chars) - 1))
                         if [[ "${#arr[@]}" == 1 ]] && [[ "$directn" == 'left' ]]; then
@@ -378,16 +378,16 @@ transpose_words() {
                         else 
                             if [[ "$directn" == 'left' ]]; then
                                 local lntcnt=$(($(echo "$oldprefix$lastword" | wc --chars) - 1))
-                                local suffix=${READLINE_LINE:$lntcnt}
+                                local suffix=${BUFFER:$lntcnt}
                                 line="$olderprefix$lastword$olderspcl$olderword$suffix" 
-                            elif [[ $READLINE_POINT -lt $cntuptolastword ]]; then
+                            elif [[ $CURSOR -lt $cntuptolastword ]]; then
                                 oldprfxcnt=$(($(echo "$oldprefix$newword$lastspcl" | wc --chars) - 1)) 
                                 local lntcnt=$(($(echo "$oldprefix$lastword$lastspcl$newword" | wc --chars) - 1))
-                                local suffix=${READLINE_LINE:$lntcnt}
+                                local suffix=${BUFFER:$lntcnt}
                                 line="$oldprefix$newword$lastspcl$lastword$suffix" 
                             else
-                                [[ "$directn" == 'right' ]] && ! [[ $READLINE_POINT = ${#READLINE_LINE} ]] &&
-                                    READLINE_POINT=${#READLINE_LINE}
+                                [[ "$directn" == 'right' ]] && ! [[ $CURSOR = ${#BUFFER} ]] &&
+                                    CURSOR=${#BUFFER}
                                 break
                             fi
                         fi
@@ -397,40 +397,40 @@ transpose_words() {
                             test -z "$olderspcl" && olderspcl="$lastspcl" && lastspcl=${arrr[1]}
                             if [[ "$directn" == 'left' ]]; then
                                 local lntcnt=$(($(echo "$lastword$olderspcl$olderword" | wc --chars) - 1))
-                                local suffix=${READLINE_LINE:$lntcnt}
+                                local suffix=${BUFFER:$lntcnt}
                                 line="$lastword$olderspcl$olderword$suffix" 
                             else
                                 test -z "$prefix" && 
                                     prfxcnt=$(($(echo "${arr[0]}" | wc --chars) - 1))
                                 oldprfxcnt=$(($(echo "$olderword$olderspcl$newword$lastspcl" | wc --chars) - 1))
                                 local lntcnt=$(($(echo "$olderword$olderspcl$newword$lastspcl$lastword" | wc --chars) - 1))
-                                local suffix=${READLINE_LINE:$lntcnt}
+                                local suffix=${BUFFER:$lntcnt}
                                 line="$olderword$olderspcl$newword$lastspcl$lastword$suffix" 
                             fi
-                        elif ([[ "$directn" == 'left' ]] && [[ $READLINE_POINT -gt $firstword ]]) || [[ "$directn" == 'right' ]]; then
+                        elif ([[ "$directn" == 'left' ]] && [[ $CURSOR -gt $firstword ]]) || [[ "$directn" == 'right' ]]; then
                             [[ "$directn" == 'right' ]] && 
                                 oldprfxcnt=$(($(echo "$lastword$lastspcl$newword" | wc --chars) - 1)) 
                             test -z "$prefix" && prfxcnt=$(($(echo "$lastword" | wc --chars) - 1))
                             local wordcnt=$(($(echo "$lastword$lastspcl$newword" | wc --chars) - 1)) 
-                            local suffix=${READLINE_LINE:$(($wordcnt))}
-                            #    line="${READLINE_LINE $lastword$lastspcl$newword$suffix" ||
+                            local suffix=${BUFFER:$(($wordcnt))}
+                            #    line="${BUFFER $lastword$lastspcl$newword$suffix" ||
                             line="$newword$lastspcl$lastword$suffix" 
                         else
                             if [[ "$directn" == 'left' ]]; then
                                 local firstwordcnt=$(($(echo "$firstword" | wc --chars)))
-                                if [[ $READLINE_POINT == $firstwordcnt ]]; then
+                                if [[ $CURSOR == $firstwordcnt ]]; then
                                     local wordcnt=$(($(echo "$lastword$lastspcl$newword" | wc --chars) - 1)) 
-                                    local suffix=${READLINE_LINE:$(($wordcnt))} 
+                                    local suffix=${BUFFER:$(($wordcnt))} 
                                     line="$newword$lastspcl$lastword$suffix" 
                                 fi
-                                READLINE_POINT=0
+                                CURSOR=0
                             fi
                             break
                         fi
                     fi
-                    local relpoint=$(($READLINE_POINT - $prfxcnt + $oldprfxcnt))
-                    READLINE_LINE=$line
-                    READLINE_POINT=$relpoint
+                    local relpoint=$(($CURSOR - $prfxcnt + $oldprfxcnt))
+                    BUFFER=$line
+                    CURSOR=$relpoint
                     break
                 fi
 
@@ -446,36 +446,36 @@ transpose_words() {
             fi
 
             
-            linechar=${READLINE_LINE:$index:1}
+            linechar=${BUFFER:$index:1}
             charcount=$(($(echo "${arrr[0]}" | wc --chars) - 1)) 
             index=$(($index + $charcount))
 
             if [[ "$lastspcl" =~ "$linechar" ]]; then
                 
-                if [[ $index -ge $READLINE_POINT ]]; then
+                if [[ $index -ge $CURSOR ]]; then
                     local oldprfxcnt line prfxcnt=0 relpoint
                     if test -n "$olderprefix"; then
                         prfxcnt=$(($(echo "$olderprefix" | wc --chars) - 1))
-                        if [[ "$directn" == 'left' ]] && ([[ "${#arr[@]}" == 1 ]] || [[ $READLINE_POINT == ${#READLINE_LINE} ]] || [[ $READLINE_POINT == ${#arrr[-1]} ]]); then
+                        if [[ "$directn" == 'left' ]] && ([[ "${#arr[@]}" == 1 ]] || [[ $CURSOR == ${#BUFFER} ]] || [[ $CURSOR == ${#arrr[-1]} ]]); then
                             relpoint=$(($(echo "$olderprefix" | wc --chars) - 1)) 
                             local lntcnt=$(($(echo "$olderprefix$lastword$lastspcl$olderword" | wc --chars) - 1))
-                            local suffix=${READLINE_LINE:$lntcnt}
+                            local suffix=${BUFFER:$lntcnt}
                             line="$olderprefix$newword$olderspcl$olderword" 
                         else 
                             if [[ "$directn" == 'left' ]]; then
                                 relpoint=$(($(echo "$olderprefix" | wc --chars) - 1)) 
 
                                 local lntcnt=$(($(echo "$olderprefix$lastword$lastspcl$olderword" | wc --chars) - 1))
-                                local suffix=${READLINE_LINE:$lntcnt}
+                                local suffix=${BUFFER:$lntcnt}
                                 line="$olderprefix$lastword$lastspcl$olderword$suffix" 
-                            elif [[ $READLINE_POINT -lt $cntuptolastword ]]; then 
+                            elif [[ $CURSOR -lt $cntuptolastword ]]; then 
                                 relpoint=$(($(echo "$oldprefix$olderword$lastspcl$newword${arrr[1]}" | wc --chars) - 1)) 
                                 local wordcnt=$(($(echo "$oldprefix$olderword$lastspcl$newword${arrr[1]}$lastword" | wc --chars) - 1)) 
-                                local suffix=${READLINE_LINE:$wordcnt}
+                                local suffix=${BUFFER:$wordcnt}
                                 line="$oldprefix$olderword$lastspcl$newword${arrr[1]}$lastword$suffix" 
                             else
-                                [[ "$directn" == 'right' ]] && ! [[ $READLINE_POINT = ${#READLINE_LINE} ]] &&
-                                    READLINE_POINT=${#READLINE_LINE}
+                                [[ "$directn" == 'right' ]] && ! [[ $CURSOR = ${#BUFFER} ]] &&
+                                    CURSOR=${#BUFFER}
                                 break
                             fi
                         fi
@@ -484,44 +484,44 @@ transpose_words() {
                        if test -n "$oldprefix"; then
                             test -z "$olderspcl" && olderspcl="$lastspcl" && lastspcl="${arrr[1]}"
 
-                            if [[ $READLINE_POINT -ge $cntuptolastword ]] && [[ "$directn" == 'right' ]]; then 
-                                line="$READLINE_LINE"
-                                relpoint=${#READLINE_LINE}
+                            if [[ $CURSOR -ge $cntuptolastword ]] && [[ "$directn" == 'right' ]]; then 
+                                line="$BUFFER"
+                                relpoint=${#BUFFER}
                             else
                                 if [[ "$directn" == 'left' ]]; then
                                     
                                     if [[ ${#arr[@]} == '1' ]]; then
                                         relpoint=0 
                                         local lntcnt=$(($(echo "$olderword" | wc --chars) - 1))
-                                        local suffix=${READLINE_LINE:$lntcnt}
+                                        local suffix=${BUFFER:$lntcnt}
                                         line="$lastword$suffix" 
                                     else
                                         relpoint=$(($(echo "$oldprefix" | wc --chars) - 1)) 
                                         local lntcnt=$(($(echo "$olderword$olderspcl$lastword" | wc --chars) - 1))
-                                        local suffix=${READLINE_LINE:$lntcnt}
+                                        local suffix=${BUFFER:$lntcnt}
                                         line="$olderword$olderspcl$lastword$suffix" 
                                     fi
                                 else
-                                    relpoint=${#READLINE_LINE}
-                                    line="$READLINE_LINE" 
+                                    relpoint=${#BUFFER}
+                                    line="$BUFFER" 
                                 fi
                             fi
-                        elif [[ "$directn" == 'right' ]] || ([[ "$directn" == 'left' ]] && [[ $READLINE_POINT -gt $firstword ]]); then
+                        elif [[ "$directn" == 'right' ]] || ([[ "$directn" == 'left' ]] && [[ $CURSOR -gt $firstword ]]); then
                             oldprfxcnt=$(($(echo "$lastword" | wc --chars) - 1)) &&
                             prfxcnt=$(($(echo "$prefix$lastspcl" | wc --chars) - 1))
                             local wordcnt=$(($(echo "$lastword$lastspcl$newword" | wc --chars) - 1)) 
-                            local suffix=${READLINE_LINE:$(($wordcnt))}
+                            local suffix=${BUFFER:$(($wordcnt))}
                             line="$newword$lastspcl$lastword$suffix" 
                         else
-                            [[ "$directn" == 'left' ]] && ! [[ $READLINE_POINT = 0 ]] &&
-                                READLINE_POINT=0
+                            [[ "$directn" == 'left' ]] && ! [[ $CURSOR = 0 ]] &&
+                                CURSOR=0
                             break
                         fi
 
                     fi
-                    ! [[ $relpoint ]] && relpoint=$(($READLINE_POINT - $prfxcnt))
-                    READLINE_LINE=$line
-                    READLINE_POINT=$relpoint
+                    ! [[ $relpoint ]] && relpoint=$(($CURSOR - $prfxcnt))
+                    BUFFER=$line
+                    CURSOR=$relpoint
                     break
                 fi
                 olderspcl="$lastspcl" 
@@ -752,7 +752,7 @@ bindkey -v "\C-o" emacs-mode
 bindkey -e "\C-o" vi-ins-mode
 
 # vi-command ' / emacs C-x ' helps with adding quotes to bash strings
-_quote_all() { READLINE_LINE="${READLINE_LINE@Q}"; }
+_quote_all() { BUFFER="${BUFFER@Q}"; }
 bindkey -e -s '\C-x'\''' '_quote_all'
 bindkey -a -s ''\''' '_quote_all'
 #bindkey -v -s '\C-x'\''' '_quote_all'
@@ -765,8 +765,8 @@ edit-wo-executing() {
     $EDITOR "$tmpf"
     # https://stackoverflow.com/questions/6675492/how-can-i-remove-all-newlines-n-using-sed
     #[ "$(sed -n '/^#!\/bin\/bash/p;q' "$tmpf")" ] && sed -i 1d "$tmpf"
-    READLINE_LINE="$(<"$tmpf")"
-    READLINE_POINT="${#BUFFER}"
+    BUFFER="$(<"$tmpf")"
+    CURSOR="${#BUFFER}"
     command rm "$tmpf" &>/dev/null
 }
 
