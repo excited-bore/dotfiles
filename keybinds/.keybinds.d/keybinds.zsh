@@ -558,19 +558,41 @@ transpose_words() {
 #bindkey -v -s "\e[1;4C" 'transpose_words words right'
 
 
-alias __='clear && tput cup $(($LINE_TPUT+1)) $TPUT_COL && tput sc && tput cuu1 && echo "${PS1@P}" && tput cuu1'
+function clear-screen(){ 
+    clear 
+    tput cup $(($LINE_TPUT+1)) $TPUT_COL 
+    tput sc 
+    tput cuu1 
+    zle reset-prompt 
+    tput cuu1
+}
+
+function show-cd(){ 
+    clear 
+    tput cup $(($LINE_TPUT+1)) $TPUT_COL 
+    tput sc 
+    tput cuu1 
+    # If the current buffer doesn't start with 'cd ', insert it
+    if [[ "$BUFFER" != cd\ * && "$BUFFER" != cd ]]; then
+        BUFFER="cd "
+        CURSOR=${#BUFFER}  # move cursor to end
+    fi 
+    zle reset-prompt 
+    zle menu-select
+}
+
+zle -N clear-screen
+zle -N show-cd
 
 # Shift up => Clean reset
-#bindkey -s '"\e288": "cd \C-i\n"'
-bindkey -s "\e288" "__\n"
-bindkey -e '"\e[1;2A": "\C-e\C-u\e288"'
-bindkey -a '"\e[1;2A": "ddi\e288"'
-bindkey -v '"\e[1;2A": "\eddi\e288"'
+bindkey -e "\e[1;2A" clear-screen
+bindkey -a "\e[1;2A" clear-screen
+bindkey -v "\e[1;2A" clear-screen
 
 # Shift down => cd shortcut
-bindkey -e '"\e[1;2B": "\C-e\C-u\e288cd \C-i"'
-bindkey -v '"\e[1;2B": "\eddi\e288cd \C-i"'
-bindkey -a '"\e[1;2B": "\eddi\e288cd \C-i"'
+bindkey -e "\e[1;2B" show-cd 
+bindkey -v "\e[1;2B" show-cd
+bindkey -a "\e[1;2B" show-cd
 
 # Shift left/right to jump from bigwords (ignore spaces when jumping) instead of chars
 #bindkey -e -x '"\e[1;2D": clear && let COL_TPUT=$COL_TPUT-1 && if [ $COL_TPUT -lt 0 ];then COL_TPUT=$COLUMNS;fi && tput cup $LINE_TPUT $COL_TPUT && tput sc 1 && echo "${PS1@P}" && tput cuu1'
@@ -582,13 +604,13 @@ bindkey -a '"\e[1;2B": "\eddi\e288cd \C-i"'
 #bindkey -v      -x '"\e[1;2C": clear && let COL_TPUT=$COL_TPUT+1 && if [ $COL_TPUT -gt $COLUMNS ];then COL_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && tput sc 1 && echo "${PS1@P}" && tput cuu1'
 
 # Alt left/right to jump to beginning/end line instead of chars
-bindkey -e '"\e[1;3D": beginning-of-line'
-bindkey -a '"\e[1;3D": beginning-of-line'
-bindkey -v '"\e[1;3D": beginning-of-line'
+bindkey -e "\e[1;3D" beginning-of-line
+bindkey -a "\e[1;3D" beginning-of-line
+bindkey -v "\e[1;3D" beginning-of-line
 
-bindkey -e '"\e[1;3C": end-of-line'
-bindkey -a '"\e[1;3C": end-of-line'
-bindkey -v '"\e[1;3C": end-of-line'
+bindkey -e "\e[1;3C" end-of-line
+bindkey -a "\e[1;3C" end-of-line
+bindkey -v "\e[1;3C" end-of-line
 
 # Alt up/down to change cursor line
 function mv_prmpt_up(){ 
@@ -614,71 +636,120 @@ function mv_prmpt_dwn(){
     fi 
     tput cup $LINE_TPUT $COL_TPUT
     zle reset-prompt
-    tput sc }
+    tput sc 
+}
+
+zle -N mv_prmpt_up
 zle -N mv_prmpt_dwn
+
+bindkey -a "\e[1;3A" mv_prmpt_up
+bindkey -e "\e[1;3A" mv_prmpt_up
+bindkey -v "\e[1;3A" mv_prmpt_up
+
 bindkey -e "\e[1;3B" mv_prmpt_dwn
 bindkey -a "\e[1;3B" mv_prmpt_dwn
 bindkey -v "\e[1;3B" mv_prmpt_dwn
-#
+
+function expand-aliases() {
+    local cmd=${BUFFER%% *}
+    local rest=${BUFFER#"$cmd"}
+    local expansion=$(alias "$cmd" 2>/dev/null | sed -E "s/^$cmd='(.*)'$/\1/")
+
+    if [[ -n "$expansion" ]]; then
+        BUFFER="$expansion$rest"
+        CURSOR=${#BUFFER}
+    fi
+}
+
+zle -N expand-aliases
+
 # Ctrl-w expands aliases
-bindkey -e '"\C-w": history-and-alias-expand-line'
-bindkey -a '"\C-w": history-and-alias-expand-line'
-bindkey -v '"\C-w": history-and-alias-expand-line'
+bindkey -e "\C-w" expand-aliases
+bindkey -a "\C-w" expand-aliases
+bindkey -v "\C-w" expand-aliases
 
 # Expand by looping through options
-bindkey -e 'Tab: menu-complete'
-bindkey -a 'Tab: menu-complete'
-bindkey -v 'Tab: menu-complete'
+bindkey -e 'Tab' menu-complete
+bindkey -a 'Tab' menu-complete
+bindkey -v 'Tab' menu-complete
 
 # Shift+Tab for reverse
-bindkey -e '"\e[Z": menu-complete-backward'
-bindkey -a '"\e[Z": menu-complete-backward'
-bindkey -v '"\e[Z": menu-complete-backward'
+bindkey -e "\e[Z" reverse-menu-complete
+bindkey -a "\e[Z" reverse-menu-complete 
+bindkey -v "\e[Z" reverse-menu-complete 
 
 if [[ "$TERM" == 'xterm-kitty' ]]; then
     # (Kitty only) Ctrl-tab for variable autocompletion
-    bindkey -e '"\e[9;5u": possible-variable-completions'
-    bindkey -a '"\e[9;5u": possible-variable-completions'
-    bindkey -v '"\e[9;5u": possible-variable-completions'
-
+    bindkey -e "\e[9;5u" complete-word
+    bindkey -a "\e[9;5u" complete-word
+    bindkey -v "\e[9;5u" complete-word
 fi
 
 
 # Ctrl-q quits terminal
-bindkey -e -s "\C-q" 'exit\n'
-bindkey -a -s "\C-q" 'exit\n'
-bindkey -v -s "\C-q" 'exit\n'
+bindkey -e "\C-q" exit
+bindkey -a "\C-q" exit
+bindkey -v "\C-q" exit
 
 # Ctrl+z is vi-undo (after being unbound in stty) instead of only on Ctrl+_
-bindkey -e '"\C-z": vi-undo'
-bindkey -a '"\C-z": vi-undo'
-bindkey -v '"\C-z": vi-undo'
+bindkey -e "\C-z" vi-undo-change
+bindkey -a "\C-z" vi-undo-change
+bindkey -v "\C-z" vi-undo-change 
 
 # Ctrl-backspace deletes (kills) line backward
-bindkey -e '"\C-h": backward-kill-word'
-bindkey -a '"\C-h": backward-kill-word'
-bindkey -v '"\C-h": backward-kill-word'
+bindkey -e "\C-h" backward-kill-word
+bindkey -a "\C-h" backward-kill-word
+bindkey -v "\C-h" backward-kill-word
 
 # Ctrl-l clears
-bindkey -e -s '\C-l' '__'
-bindkey -a -s '\C-l' '__'
-bindkey -v -s '\C-l' '__'
+bindkey -a '\C-l' clear-screen
+bindkey -e '\C-l' clear-screen
+bindkey -v '\C-l' clear-screen
+
+function delete-first-char() {
+    if [[ -n "$BUFFER" ]]; then
+        BUFFER=${BUFFER:1}       
+        (( CURSOR > 0 )) && (( CURSOR-- ))  
+    fi
+}
+
+zle -N delete-first-char
 
 # Ctrl-d: Delete first character on line
-bindkey -e '"\C-d": "\C-a\e[3~"'
-bindkey -a '"\C-d": "\e[1;3D\e[3~"'
-bindkey -v '"\C-d": "\e[1;3D\e[3~"'
+bindkey -e "\C-d" delete-first-char
+bindkey -a "\C-d" delete-first-char
+bindkey -v "\C-d" delete-first-char  
 
 # Ctrl+b: (Ctrl+x Ctrl+b emacs mode) is quoted insert - Default Ctrl+v - Gives (f.ex. 'Ctrl-a') back as '^A'
-bindkey -e '"\C-x\C-b": quoted-insert'
-bindkey -a '"\C-b": quoted-insert'
-bindkey -v '"\C-b": quoted-insert'
+bindkey -e "\C-x\C-b" quoted-insert
+bindkey -a "\C-b" quoted-insert
+bindkey -v "\C-b" quoted-insert
+
+function emacs-mode() {
+    bindkey -e
+    zle reset-prompt      
+}
+
+function vi-cmd-mode() {
+    bindkey -a
+    zle reset-prompt      
+}
+
+function vi-ins-mode() {
+    bindkey -v
+    zle reset-prompt      
+}
+
+zle -N emacs-mode
+zle -N vi-cmd-mode
+zle -N vi-ins-mode
+
 
 # Ctrl+o: Change from vi-mode to emacs mode and back
 # This is also configured in ~/.fzf/shell/key-bindings-bash.sh if you have fzf keybinds installed
-bindkey -a '"\C-o": emacs-editing-mode'
-bindkey -v '"\C-o": emacs-editing-mode'
-bindkey -e '"\C-o": vi-editing-mode'
+bindkey -a "\C-o" emacs-mode
+bindkey -v "\C-o" emacs-mode
+bindkey -e "\C-o" vi-ins-mode
 
 # vi-command ' / emacs C-x ' helps with adding quotes to bash strings
 _quote_all() { READLINE_LINE="${READLINE_LINE@Q}"; }
@@ -687,22 +758,24 @@ bindkey -a -s ''\''' '_quote_all'
 #bindkey -v -s '\C-x'\''' '_quote_all'
 
 # https://unix.stackexchange.com/questions/85391/where-is-the-bash-feature-to-open-a-command-in-editor-documented
-_edit_wo_executing() {
+edit-wo-executing() {
     local editor="${EDITOR:-nano}"
     tmpf="$(mktemp).sh"
-    printf "$READLINE_LINE" >"$tmpf"
+    printf "$BUFFER" >"$tmpf"
     $EDITOR "$tmpf"
     # https://stackoverflow.com/questions/6675492/how-can-i-remove-all-newlines-n-using-sed
     #[ "$(sed -n '/^#!\/bin\/bash/p;q' "$tmpf")" ] && sed -i 1d "$tmpf"
     READLINE_LINE="$(<"$tmpf")"
-    READLINE_POINT="${#READLINE_LINE}"
+    READLINE_POINT="${#BUFFER}"
     command rm "$tmpf" &>/dev/null
 }
 
-bindkey -v -s "\C-e" '_edit_wo_executing'
-bindkey -a -s "v" '_edit_wo_executing'
-bindkey -a -s "\C-e" '_edit_wo_executing'
-bindkey -e -s "\C-e\C-e" '_edit_wo_executing'
+zle -N edit-wo-executing
+
+bindkey -v "\C-e" edit-wo-executing
+bindkey -a "v" edit-wo-executing
+bindkey -a "\C-e" edit-wo-executing
+bindkey -e "\C-e\C-e" edit-wo-executing
 
 # RLWRAP
 
@@ -715,70 +788,81 @@ bindkey -e -s "\C-e\C-e" '_edit_wo_executing'
 if hash osc &>/dev/null; then
     
     function osc-copy() {
-        echo -n "$READLINE_LINE" | osc copy
+        echo -n "$BUFFER" | osc copy
     }
     
     function osc-paste() {
         local pasters="$(osc paste)"
-        READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$pasters${READLINE_LINE:$READLINE_POINT}"
-        READLINE_POINT=$((READLINE_POINT + ${#pasters}))
+        BUFFER="${BUFFER:0:$CURSOR}$pasters${BUFFER:$CURSOR}"
+        CURSOR=$((CURSOR + ${#pasters}))
     }
-    
-    bindkey -e -s "\C-s"  'osc-copy\n'
-    bindkey -a -s "\C-s"  'osc-copy\n'
-    bindkey -v -s "\C-s"  'osc-copy\n'
+   
+    zle -N osc-copy
+    zle -N osc-paste
 
-    # Ctrl-v: Proper paste
-    #Q="'"
-    #bindkey -s $'"\237": echo bind $Q\\"\\\\225\\": \\"$(osc paste)\\"$Q > /tmp/paste.sh && source /tmp/paste.sh\n'
-    bindkey -e -s "\C-v" 'osc-paste\n'
-    bindkey -a -s "\C-v" 'osc-paste\n'
-    bindkey -v -s "\C-v" 'osc-paste\n'
+    bindkey -e "\C-s" osc-copy
+    bindkey -a "\C-s" osc-copy
+    bindkey -v "\C-s" osc-copy
+
+    bindkey -a "\C-v" osc-paste
+    bindkey -e "\C-v" osc-paste
+    bindkey -v "\C-v" osc-paste
 
 elif ([[ "$XDG_SESSION_TYPE" == 'x11' ]] && hash xclip &>/dev/null) || ([[ "$XDG_SESSION_TYPE" == 'wayland' ]] && hash wl-copy &> /dev/null); then
   
     function clip-copy() {
         if [[ "$XDG_SESSION_TYPE" == 'x11' ]]; then  
-            echo -n "$READLINE_LINE" | xclip -i -sel c
+            echo -n "$BUFFER" | xclip -i -sel c
         elif [[ "$XDG_SESSION_TYPE" == 'wayland' ]]; then
-            echo -n "$READLINE_LINE" | wl-copy
+            echo -n "$BUFFER" | wl-copy
         fi
     }
 
     function clip-paste() {
-        
         if [[ "$XDG_SESSION_TYPE" == 'x11' ]]; then  
             local pasters="$(xclip -o -sel c)"
         elif [[ "$XDG_SESSION_TYPE" == 'wayland' ]]; then
             local pasters="$(wl-paste)"
         fi
-        READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$pasters${READLINE_LINE:$READLINE_POINT}"
-        READLINE_POINT=$((READLINE_POINT + ${#pasters}))
+        BUFFER="${BUFFER:0:$CURSOR}$pasters${BUFFER:$CURSOR}"
+        CURSOR=$((CURSOR + ${#pasters}))
     }
-    
-    # Ctrl-s: Proper copy
-    bindkey -e -s "\C-s"  'clip-copy\n'
-    bindkey -a -s "\C-s"  'clip-copy\n'
-    bindkey -v -s "\C-s"  'clip-copy\n'
+   
+    zle -N clip-copy
+    zle -N clip-paste
 
+    # Ctrl-s: Proper copy
+    bindkey -e "\C-s" clip-copy
+    bindkey -a "\C-s" clip-copy
+    bindkey -v "\C-s" clip-copy
 
     # Ctrl-v: Proper paste
-    bindkey -e -s "\C-v": 'clip-paste\n'
-    bindkey -a -s "\C-v": 'clip-paste\n'
-    bindkey -v -s "\C-v": 'clip-paste\n'
+    bindkey -e "\C-v" clip-paste
+    bindkey -a "\C-v" clip-paste
+    bindkey -v "\C-v" clip-paste
 
-    #Q="'"
-    #bindkey -s $'"\237": echo bind $Q\\"\\\\225\\": \\"$(xclip -o -sel c)\\"$Q > /tmp/paste.sh && source /tmp/paste.sh\n'
-    #bindkey -e '"\C-v": "\237\225"'
-    #bindkey -a     '"\C-v": "\237\225"'
-    #bindkey -v      '"\C-v": "\237\225"'
 fi
 
 if hash autojump &>/dev/null; then
+    function show-j(){ 
+        clear 
+        tput cup $(($LINE_TPUT+1)) $TPUT_COL 
+        tput sc 
+        tput cuu1 
+        if [[ "$BUFFER" != j\ * && "$BUFFER" != j ]]; then
+            BUFFER="j "
+            CURSOR=${#BUFFER}
+        fi 
+        zle reset-prompt 
+        zle menu-select
+    }
+          
+    zle -N show-j   
+
     # Ctrl-x Ctrl-j for autojump
-    bindkey -e '"\C-x\C-j": "j \C-i"'
-    bindkey -a '"\C-x\C-j": "j \C-i"'
-    bindkey -v '"\C-x\C-j": "j \C-i"'
+    bindkey -e "\C-x\C-j" show-j 
+    bindkey -a "\C-j" show-j 
+    bindkey -v "\C-j" show-j 
 fi
 
 if hash fzf &>/dev/null; then
@@ -791,112 +875,198 @@ if hash fzf &>/dev/null; then
     #fi
 
     if type ripgrep-dir &>/dev/null; then
-        # Alt-g: Ripgrep function overview
-        bindkey -e -s "\C-g" "ripgrep-dir\n"
-        bindkey -a -s "\C-g" "ripgrep-dir\n"
-        bindkey -v -s "\C-g" "ripgrep-dir\n"
+        
+        function ripgrep-dir-zsh(){
+            ripgrep-dir
+            zle reset-prompt
+        }
+         
+        zle -N ripgrep-dir-zsh
+        
+        # Ctrl-g: Ripgrep function overview
+        bindkey -e "\C-g" ripgrep-dir-zsh
+        bindkey -a "\C-g" ripgrep-dir-zsh
+        bindkey -v "\C-g" ripgrep-dir-zsh
     fi
 
     if type fzf_rifle &>/dev/null; then
+       
+        function fzf_rifle-zsh(){
+            fzf_rifle
+            zle reset-prompt
+        }
+         
+        zle -N fzf_rifle-zsh
+       
         # CTRL-F - Paste the selected file path into the command line
-        bindkey -e -s "\C-f" 'fzf_rifle\n'
-        bindkey -a -s "\C-f" 'fzf_rifle\n'
-        bindkey -v -s "\C-f" 'fzf_rifle\n'
+        bindkey -e "\C-f" fzf_rifle-zsh
+        bindkey -a "\C-f" fzf_rifle-zsh
+        bindkey -v "\C-f" fzf_rifle-zsh
 
         # F4 - Rifle search
-        bindkey -e -s "\eOS" "fzf_rifle\n"
-        bindkey -a -s "\eOS" "fzf_rifle\n"
-        bindkey -v -s "\eOS" "fzf_rifle\n"
+        bindkey -e "\eOS" fzf_rifle-zsh
+        bindkey -a "\eOS" fzf_rifle-zsh
+        bindkey -v "\eOS" fzf_rifle-zsh
     fi
 fi
 
 # F2 - ranger (file explorer)
 if hash ranger &>/dev/null; then
-    bindkey -s '\201' 'ranger\n'
-    bindkey -e '"\eOQ": "\201\n\C-l"'
-    bindkey -a '"\eOQ": "\201\n\C-l"'
-    bindkey -v '"\eOQ": "\201\n\C-l"'
+    # https://unix.stackexchange.com/questions/475310/how-to-bind-a-keyboard-shortcut-in-zsh-to-a-program-requiring-stdin 
+    function ranger-zsh () {
+        ranger --choosedir=$HOME/.rangerdir < $TTY
+        LASTDIR=`cat $HOME/.rangerdir`
+        cd "$LASTDIR"
+        zle reset-prompt
+        unset LASTDIR 
+    }
+    
+    zle -N ranger-zsh 
+   
+    bindkey -e "\eOQ" ranger-zsh
+    bindkey -a "\eOQ" ranger-zsh
+    bindkey -v "\eOQ" ranger-zsh
 fi
 
 # F3 - lazygit (Git helper)
 if hash lazygit &>/dev/null; then
-    bindkey -s '\202' 'stty sane && lazygit\n'
-    bindkey -e '"\eOR": "\202\n\C-l"'
-    bindkey -a '"\eOR": "\202\n\C-l"'
-    bindkey -v '"\eOR": "\202\n\C-l"'
+    function lazygit-zsh () {
+        lazygit
+        zle reset-prompt
+    }
+    
+    zle -N lazygit-zsh
+    bindkey -e "\eOR" lazygit-zsh
+    bindkey -a "\eOR" lazygit-zsh
+    bindkey -v "\eOR" lazygit-zsh
 fi
 
-# F5, Ctrl-r - Reload .bashrc
+# F5, Ctrl-r - Reload .zshrc
 #bind '"\205": re-read-init-file;'
-bindkey -s '\206' 'source ~/.zshrc\n'
-bindkey -e '"\e[15~": "\206"'
-bindkey -a '"\e[15~": "\206"'
-bindkey -v '"\e[15~": "\206"'
+function resource-zsh(){ source ~/.zshrc }
+zle -N resource-zsh
+bindkey -e "\e[15~" resource-zsh
+bindkey -a "\e[15~" resource-zsh 
+bindkey -v "\e[15~" resource-zsh 
 
 # F6 - (neo/fast/screen)fetch (System overview)
 if hash neofetch &>/dev/null || hash fastfetch &>/dev/null || hash screenfetch &>/dev/null || hash onefetch &>/dev/null; then
 
-    # Last one loaded is the winner
-    if hash neofetch &>/dev/null; then
-        bindkey -s '\207' 'stty sane && neofetch\n'
-        fetch="neofetch"
-    fi
-
-    if hash screenfetch &>/dev/null; then
-        bindkey -s '\207' 'stty sane && screenfetch\n'
-        fetch="screenfetch"
-    fi
-
-    if hash fastfetch &>/dev/null; then
-        bindkey -s '\207' 'stty sane && fastfetch\n'
-        fetch="fastfetch"
-    fi
-
     if hash onefetch &>/dev/null; then
         if hash neofetch &>/dev/null || hash fastfetch &>/dev/null || hash screenfetch &>/dev/null; then
-            bindkey -s '\207' 'stty sane; hash git &> /dev/null && git rev-parse --git-dir &> /dev/null && readyn -p "Use onefetch? (lists github stats): " gstats && [[ $gstats == "y" ]] && onefetch || '"$fetch"'\n'
+            function fetchbind-zsh(){
+                if hash git &> /dev/null && git rev-parse --git-dir &> /dev/null; then
+                    local gstats 
+                    readyn -p "Use onefetch? (lists github stats)" gstats 
+                    if [[ "$gstats" == "y" ]]; then
+                        onefetch 
+                    else
+                        echo 
+                        if hash fastfetch &>/dev/null; then
+                            fastfetch
+                        elif hash screenfetch &>/dev/null; then
+                            screenfetch
+                        elif hash neofetch &>/dev/null; then
+                            neofetch
+                        fi
+                    fi
+                else
+                    echo 
+                    if hash fastfetch &>/dev/null; then
+                        fastfetch
+                    elif hash screenfetch &>/dev/null; then
+                        screenfetch
+                    elif hash neofetch &>/dev/null; then
+                        neofetch
+                    fi
+                fi
+                zle reset-prompt
+            }
         else
-            bindkey -s '\207' 'stty sane && '"$fetch"'\n'
+            function fetchbind-zsh(){ stty sane; onefetch }
+        fi
+    else
+        if hash neofetch &>/dev/null; then
+            function fetchbind-zsh(){ stty sane; echo; neofetch }
+        fi
+
+        if hash screenfetch &>/dev/null; then
+            function fetchbind-zsh(){ stty sane; echo;screenfetch }
+        fi
+
+        if hash fastfetch &>/dev/null; then
+            function fetchbind-zsh(){ stty sane; echo; fastfetch }
         fi
     fi
+    
+    zle -N fetchbind-zsh
 
-    bindkey -e '"\e[17~": "\207\n"'
-    bindkey -a '"\e[17~": "\207\n"'
-    bindkey -v '"\e[17~": "\207\n"'
+    bindkey -e "\e[17~" fetchbind-zsh
+    bindkey -a "\e[17~" fetchbind-zsh 
+    bindkey -v "\e[17~" fetchbind-zsh 
+    
+    unset fetch
 fi
-unset fetch
 
 # F7 - Htop and alternatives
 
-bindkey -s '\208' 'stty sane && readyn -p "Start htop as root?" ansr && [[ "$ansr" == "y" ]] && sudo htop || htop\n'
-
-# Last one loaded is the winner
-
-if hash bashtop &>/dev/null || hash btop &>/dev/null || hash bpytop &>/dev/null; then
-
-    if hash bpytop &>/dev/null; then
-        bindkey -s '\208' 'stty sane && readyn -p "Start htop as root?" ansr && [[ "$ansr" == "y" ]] && sudo htop || readyn -p "Use bpytop instead of htop?" ansr && [[ "$ansr" == "y" ]] && bpytop || htop\n'
-    fi
-
-    if hash bashtop &>/dev/null; then
-        bindkey -s '\208' 'stty sane && readyn -p "Start htop as root?" ansr && [[ "$ansr" == "y" ]] && sudo htop || readyn -p "Use bashtop instead of htop?" ansr && [[ "$ansr" == "y" ]] && bashtop || htop\n'
-    fi
-
+function htop-btop-zsh(){
+    stty sane
+    local ansr ansr1 
     if hash btop &>/dev/null; then
-        bindkey -s '\208' 'stty sane && readyn -p "Start btop as root?" ansr && [[ "$ansr" == "y" ]] && sudo btop || btop\n'
+         readyn -p "Use btop instead of htop?" ansr 
+         if [[ "$ansr" == "y" ]]; then
+             readyn -p "Start btop as root?" ansr1 
+             if [[ "$ansr1" == "y" ]]; then
+                sudo btop
+             else 
+                btop
+             fi
+         fi
+    
+    elif hash bashtop &>/dev/null; then
+         readyn -p "Use bashtop instead of htop?" ansr 
+         if [[ "$ansr" == "y" ]]; then
+             readyn -p "Start bashtop as root?" ansr1 
+             if [[ "$ansr1" == "y" ]]; then
+                sudo bashtop
+             else 
+                bashtop
+             fi
+         fi
+    elif hash bpytop &>/dev/null; then
+         readyn -p "Use bpytop instead of htop?" ansr 
+         if [[ "$ansr" == "y" ]]; then
+             readyn -p "Start bpytop as root?" ansr1 
+             if [[ "$ansr1" == "y" ]]; then
+                sudo bpytop
+             else 
+                bpytop
+             fi
+         fi
     fi
+    
+    if (! hash bpytop &> /dev/null && ! hash bpytop &> /dev/null && ! hash bpytop &> /dev/null) || [[ "$ansr" == 'n' ]]; then
+        readyn -p "Start htop as root?" ansr1 && [[ "$ansr1" == "y" ]] && sudo htop || htop
+    fi
+    zle reset-prompt 
+}
 
-fi
+zle -N htop-btop-zsh
 
-bindkey -e '"\e[18~": "\208\n\C-l"'
-bindkey -a '"\e[18~": "\208\n\C-l"'
-bindkey -v '"\e[18~": "\208\n\C-l"'
+bindkey -e "\e[18~" htop-btop-zsh
+bindkey -a "\e[18~" htop-btop-zsh
+bindkey -v "\e[18~" htop-btop-zsh
 
 # F8 - Lazydocker (Docker TUI)
 if hash lazydocker &>/dev/null; then
-
-    bindkey -s '\209' 'stty sane && lazydocker\n'
-    bindkey -e '"\e[19~": "\209\n"'
-    bindkey -a '"\e[19~": "\209\n"'
-    bindkey -v '"\e[19~": "\209\n"'
+    function lazydocker-zsh () {
+        lazydocker
+        zle reset-prompt
+    }
+    
+    zle -N lazydocker-zsh
+    bindkey -e "\e[19~" lazydocker-zsh
+    bindkey -a "\e[19~" lazydocker-zsh 
+    bindkey -v "\e[19~" lazydocker-zsh 
 fi
