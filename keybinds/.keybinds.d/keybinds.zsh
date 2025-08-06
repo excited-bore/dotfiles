@@ -1,8 +1,15 @@
+
 #!/bin/zsh
+
+# TTY
+# https://stackoverflow.com/questions/16727459/what-makes-ctrlq-work-in-zsh
+
+unsetopt flow_control
 
 # Bash_aliases at ~/.bash_aliases.d/
 # global bashrc -> /etc/bash.bashrc
 # root shell profiles -> /etc/profile
+
 
 # https://stackoverflow.com/questions/8366450/complex-keybinding-in-bash
 
@@ -33,35 +40,6 @@ if hash xfconf-query &> /dev/null; then
         done) | $PAGER
     }
 fi
-
-
-
-# TTY
-
-# To see the complete character string sent by a key, you can use this command, and type the key within 2 seconds:
-# stty raw; sleep 2; echo; stty cooked
-# But Ctrl-v, then keycombination still works best
-
-# Turn off flow control and free up Ctrl-s and Ctrl-q
-stty -ixon
-stty -ixoff
-stty start 'undef'
-stty stop 'undef'
-
-# Unset redraw current line (Default C-r).
-# stty rprnt 'undef'
-
-# Unset quoted insert from (Default C-v)
-stty lnext 'undef'
-
-# Unset suspend signal shortcut (Default Ctrl+z)
-stty susp 'undef'
-
-# Unset backward word erase shortcut (Default Ctrl+w)
-stty werase 'undef'
-
-# unbinds ctrl-c and bind the function to ctrl-s
-#stty intr '^c'
 
 # XRESOURCES
 
@@ -107,47 +85,78 @@ fi
 
 # Up and down arrow will now intelligently complete partially completed
 # commands by searching through the existing history.
-bindkey -e "\e[A" 'history-search-backward'
-bindkey -a "\e[A" 'history-search-backward'
-bindkey -v "\e[A" 'history-search-backward'
+bindkey -e "\e[A" history-search-backward
+bindkey -a "\e[A" history-search-backward
+bindkey -v "\e[A" history-search-backward
 
-bindkey -e "\e[B" 'history-search-forward'
-bindkey -a "\e[B" 'history-search-forward'
-bindkey -v "\e[B" 'history-search-forward'
+bindkey -e "\e[B" history-search-forward
+bindkey -a "\e[B" history-search-forward
+bindkey -v "\e[B" history-search-forward
 
 # Control left/right to jump from bigwords (ignore spaces when jumping) instead of chars
-bindkey -e '\e[1;5D' 'vi-backward-word'
-bindkey -a '\e[1;5D' 'vi-backward-word'
-bindkey -v '\e[1;5D' 'vi-backward-word'
+bindkey -e '\e[1;5D' vi-backward-word
+bindkey -a '\e[1;5D' vi-backward-word
+bindkey -v '\e[1;5D' vi-backward-word
 
-bindkey -e '\e[1;5C' 'vi-forward-word'
-bindkey -a '\e[1;5C' 'vi-forward-word'
-bindkey -v '\e[1;5C' 'vi-forward-word'
+bindkey -e '\e[1;5C' vi-forward-word
+bindkey -a '\e[1;5C' vi-forward-word
+bindkey -v '\e[1;5C' vi-forward-word
 
 # Full path dirs
 alias dirs="dirs -l"
 alias dirs-col="dirs -v | column -c $COLUMNS"
-alias dirs-col-pretty="dirs -v | column -c $COLUMNS | sed -e 's/ 0 \\([^\t]*\\)/'\${GREEN}' 0 \\1'\${normal}'/'"
+alias dirs-col-pretty="dirs -v | column -c $COLUMNS | sed -E \"s|^(0\t[^\t]+)|${GREEN}\1${normal}|\""
+
+function cd-w() {
+    if ! test -d $@; then 
+        builtin cd -- "$@" 
+        return 1 
+    fi
+    
+    local push=1
+    local j=0
+    if [[ "$1" == "--" ]]; then
+        shift;
+    fi 
+    
+    for i in ${(f)$(dirs -l 2>/dev/null)}; do
+        if test -e "$i"; then
+            if [[ -z "${@}" && "$i" == "$home" ]] || test "$(realpath ${@: -1:1})" == "$i"; then
+                push=0
+                pushd -n +$j &>/dev/null
+            fi
+            j=$(($j+1));
+        fi
+    done
+    
+    if [ $push == 1 ]; then
+        pushd "$(pwd)" &>/dev/null;  
+    fi
+    builtin cd -- "$@"; 
+    #export DIRS="$(dirs -l)" 
+    #if test "$TERM" == 'xterm-kitty' && test -f ~/.config/kitty/env.conf; then
+    #    sed -i "s|env DIRS.*|env DIRS=""$DIRS""|g" ~/.config/kitty/env.conf
+    #fi
+}
+
 
 #'Silent' clear
-if hash starship &>/dev/null && grep -q "^eval \"\$(starship init bash)\"" ~/.bashrc && (grep -q '\\n' ~/.config/starship.toml || (grep -q 'line_break' ~/.config/starship.toml && ! pcregrep -qM "[line_break]\$(.|\n)*^disabled = true" ~/.config/starship.toml)); then
-    function clr1(){ tput cuu1 && tput cuu1 && tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null }
-    function clr2(){ tput cuu1 && tput cuu1 && tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i < $(dirs -v | column -c ${COLUMNS} | wc -l) ; i++)); do tput cuu1; done && dirs-col-pretty && history -d -1 &>/dev/null }
-elif hash starship &>/dev/null && grep -q "^eval \"\$(starship init bash)\"" ~/.zshrc; then
-    function clr1(){ tput cuu1 && tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null }
-    function clr2(){ tput cuu1 && tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i < $(dirs -v | column -c ${COLUMNS} | wc -l) ; i++)); do tput cuu1; done && tput cuu1 && dirs-col-pretty && tput rc && history -d -1 &>/dev/null }
+if hash starship &>/dev/null && grep -q "^eval \"\$(starship init zsh)\"" ~/.zshrc && (grep -q '\\n' ~/.config/starship.toml || (grep -q 'line_break' ~/.config/starship.toml && ! pcregrep -qM "[line_break]\$(.|\n)*^disabled = true" ~/.config/starship.toml)); then
+    function clr1(){ tput cuu1 && tput cuu1 && tput cuu1 && tput sc; clear && tput rc }
+    function clr2(){ tput cuu1 && tput cuu1 && tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i < $(dirs -v | column -c ${COLUMNS} | wc -l) ; i++)); do tput cuu1; done; dirs-col-pretty }
+elif hash starship &>/dev/null && grep -q "^eval \"\$(starship init zsh)\"" ~/.zshrc; then
+    function clr1(){ tput cuu1 && tput cuu1 && tput sc; clear && tput rc }
+    function clr2(){ tput cuu1 && tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i < $(dirs -v | column -c ${COLUMNS} | wc -l) ; i++)); do tput cuu1; done && tput cuu1 && dirs-col-pretty && tput rc }
 else
-    function clr1(){ tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null }
-    function clr2(){ tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i <= $(dirs -v | column -c ${COLUMNS} | wc -l) ; i++)); do tput cuu1; done && dirs-col-pretty && tput rc && history -d -1 &>/dev/null }
+    function clr1(){ tput cuu1 && tput sc; clear && tput rc }
+    function clr2(){ tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i <= $(dirs -v | column -c ${COLUMNS} | wc -l) ; i++)); do tput cuu1; done && dirs-col-pretty && tput rc }
 fi
 
-zle -N clr1
-zle -N clr2
-
 updir(){
-    pushd +1 &>/dev/null
     zle beginning-of-line
-    zle clr2
+    pushd +1 &>/dev/null
+    clr2
+    zle reset-prompt 
 }
 
 zle -N updir
@@ -159,11 +168,17 @@ bindkey -a '\e[1;5A' updir
 bindkey -v '\e[1;5A' updir
 
 # Ctrl-Down -> Dir Down
-#bindkey -s '"\e266": pushd $(dirs -p | awk '\''END { print }'\'') &>/dev/null\n'
-bindkey '\e266' 'cd ..'
-bindkey -e "\e[1;5B" "\C-e\C-u\e266 _.\C-m"
-bindkey -a "\e[1;5B" "ddi\C-u\e266 _.\C-m"
-bindkey -v "\e[1;5B" "\eddi\e266 _.\C-m"
+downdir(){
+    zle beginning-of-line
+    cd-w ..
+    clr2
+    zle reset-prompt 
+}
+
+zle -N downdir
+bindkey -e "\e[1;5B" downdir
+bindkey -a "\e[1;5B" downdir
+bindkey -v "\e[1;5B" downdir
 
 # Ctrl-Down -> Rotate between 2 last directories
 #bindkey -s '"\e266": pushd -1 &>/dev/null\n'
@@ -578,7 +593,7 @@ function show-cd(){
         CURSOR=${#BUFFER}  # move cursor to end
     fi 
     zle reset-prompt 
-    zle menu-select
+    zle menu-complete
 }
 
 zle -N clear-screen
@@ -621,7 +636,8 @@ function mv_prmpt_up(){
     fi 
     tput cup $LINE_TPUT $COL_TPUT
     zle reset-prompt
-    tput sc }
+    tput sc 
+}
 zle -N mv_prmpt_up
 bindkey -a "\e[1;3A" mv_prmpt_up
 bindkey -e "\e[1;3A" mv_prmpt_up
@@ -685,11 +701,14 @@ if [[ "$TERM" == 'xterm-kitty' ]]; then
     bindkey -v "\e[9;5u" complete-word
 fi
 
+function exit-zsh(){ exit }
+
+zle -N exit-zsh
 
 # Ctrl-q quits terminal
-bindkey -e "\C-q" exit
-bindkey -a "\C-q" exit
-bindkey -v "\C-q" exit
+bindkey -e '\C-q' exit-zsh
+bindkey -a '\C-q' exit-zsh
+bindkey -v '\C-q' exit-zsh
 
 # Ctrl+z is vi-undo (after being unbound in stty) instead of only on Ctrl+_
 bindkey -e "\C-z" vi-undo-change
@@ -752,9 +771,10 @@ bindkey -v "\C-o" emacs-mode
 bindkey -e "\C-o" vi-ins-mode
 
 # vi-command ' / emacs C-x ' helps with adding quotes to bash strings
-_quote_all() { BUFFER="${BUFFER@Q}"; }
-bindkey -e -s '\C-x'\''' '_quote_all'
-bindkey -a -s ''\''' '_quote_all'
+function quote-all-zsh() { BUFFER="${BUFFER@Q}"; zle reset-prompt }
+zle -N quote-all-zsh
+bindkey -e -s '\C-x'\''' quote-all-zsh
+bindkey -a -s ''\''' quote-all-zsh
 #bindkey -v -s '\C-x'\''' '_quote_all'
 
 # https://unix.stackexchange.com/questions/85391/where-is-the-bash-feature-to-open-a-command-in-editor-documented
@@ -854,7 +874,7 @@ if hash autojump &>/dev/null; then
             CURSOR=${#BUFFER}
         fi 
         zle reset-prompt 
-        zle menu-select
+        zle menu-complete
     }
           
     zle -N show-j   
