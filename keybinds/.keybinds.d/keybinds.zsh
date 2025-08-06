@@ -118,10 +118,10 @@ function cd-w() {
     if [[ "$1" == "--" ]]; then
         shift;
     fi 
-    
-    for i in ${(f)$(dirs -l 2>/dev/null)}; do
+    local b=($(dirs -l 2>/dev/null))
+    for i in ${b[@]}; do
         if test -e "$i"; then
-            if [[ -z "${@}" && "$i" == "$home" ]] || test "$(realpath ${@: -1:1})" == "$i"; then
+            if [[ -z "${@}" && "$i" == "$home" ]] || [[ "$(realpath ${@[${#@}]})" == "$i" ]]; then
                 push=0
                 pushd -n +$j &>/dev/null
             fi
@@ -129,7 +129,7 @@ function cd-w() {
         fi
     done
     
-    if [ $push == 1 ]; then
+    if [[ "$push" == "1" ]]; then
         pushd "$(pwd)" &>/dev/null;  
     fi
     builtin cd -- "$@"; 
