@@ -1,4 +1,3 @@
-
 #!/bin/zsh
 
 # TTY
@@ -107,49 +106,18 @@ alias dirs="dirs -l"
 alias dirs-col="dirs -v | column -c $COLUMNS"
 alias dirs-col-pretty="dirs -v | column -c $COLUMNS | sed -E \"s|^(0\t[^\t]+)|${GREEN}\1${normal}|\""
 
-function cd-w() {
-    if ! test -d $@; then 
-        builtin cd -- "$@" 
-        return 1 
-    fi
-    
-    local push=1
-    local j=0
-    if [[ "$1" == "--" ]]; then
-        shift;
-    fi 
-    local b=($(dirs -l 2>/dev/null))
-    for i in ${b[@]}; do
-        if test -e "$i"; then
-            if [[ -z "${@}" && "$i" == "$home" ]] || [[ "$(realpath ${@[${#@}]})" == "$i" ]]; then
-                push=0
-                pushd -n +$j &>/dev/null
-            fi
-            j=$(($j+1));
-        fi
-    done
-    
-    if [[ "$push" == "1" ]]; then
-        pushd "$(pwd)" &>/dev/null;  
-    fi
-    builtin cd -- "$@"; 
-    #export DIRS="$(dirs -l)" 
-    #if test "$TERM" == 'xterm-kitty' && test -f ~/.config/kitty/env.conf; then
-    #    sed -i "s|env DIRS.*|env DIRS=""$DIRS""|g" ~/.config/kitty/env.conf
-    #fi
-}
-
+setopt autopushd PUSHD_IGNORE_DUPS
 
 #'Silent' clear
 if hash starship &>/dev/null && grep -q "^eval \"\$(starship init zsh)\"" ~/.zshrc && (grep -q '\\n' ~/.config/starship.toml || (grep -q 'line_break' ~/.config/starship.toml && ! pcregrep -qM "[line_break]\$(.|\n)*^disabled = true" ~/.config/starship.toml)); then
     function clr1(){ tput cuu1 && tput cuu1 && tput cuu1 && tput sc; clear && tput rc }
-    function clr2(){ tput cuu1 && tput cuu1 && tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i < $(dirs -v | column -c ${COLUMNS} | wc -l) ; i++)); do tput cuu1; done; dirs-col-pretty }
+    function clr2(){ tput cuu1 && tput cuu1 && tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i < $(dirs -v | column -c ${COLUMNS} | wc -l) ; i++)); do tput cuu1; done; tput cuu1; tput rc; echoti cr; dirs-col-pretty  }
 elif hash starship &>/dev/null && grep -q "^eval \"\$(starship init zsh)\"" ~/.zshrc; then
     function clr1(){ tput cuu1 && tput cuu1 && tput sc; clear && tput rc }
-    function clr2(){ tput cuu1 && tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i < $(dirs -v | column -c ${COLUMNS} | wc -l) ; i++)); do tput cuu1; done && tput cuu1 && dirs-col-pretty && tput rc }
+    function clr2(){ tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i < $(dirs -v | column -c ${COLUMNS} | wc -l) ; i++)); do tput cuu1; done; tput cuu1 && tput cuu1; tput rc; echoti cr; dirs-col-pretty }
 else
     function clr1(){ tput cuu1 && tput sc; clear && tput rc }
-    function clr2(){ tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i <= $(dirs -v | column -c ${COLUMNS} | wc -l) ; i++)); do tput cuu1; done && dirs-col-pretty && tput rc }
+    function clr2(){ tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i <= $(dirs -v | column -c ${COLUMNS} | wc -l) ; i++)); do tput cuu1; done; echoti cr; dirs-col-pretty }
 fi
 
 updir(){
@@ -170,7 +138,7 @@ bindkey -v '\e[1;5A' updir
 # Ctrl-Down -> Dir Down
 downdir(){
     zle beginning-of-line
-    cd-w ..
+    cd ..
     clr2
     zle reset-prompt 
 }
