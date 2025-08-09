@@ -106,9 +106,7 @@ alias dirs="dirs -l"
 alias dirs-col="dirs -v | column -c $COLUMNS"
 alias dirs-col-pretty="dirs -v | column -c $COLUMNS | sed -E \"s|^(0\t[^\t]+)|${GREEN}\1${normal}|\""
 
-setopt autopushd PUSHD_IGNORE_DUPS
 
-#'Silent' clear
 if hash starship &>/dev/null && grep -q "^eval \"\$(starship init zsh)\"" ~/.zshrc && (grep -q '\\n' ~/.config/starship.toml || (grep -q 'line_break' ~/.config/starship.toml && ! pcregrep -qM "[line_break]\$(.|\n)*^disabled = true" ~/.config/starship.toml)); then
     function clr1(){ tput cuu1 && tput cuu1 && tput cuu1 && tput sc; clear && tput rc }
     function clr2(){ tput cuu1 && tput cuu1 && tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i < $(dirs -v | column -c ${COLUMNS} | wc -l) ; i++)); do tput cuu1; done; tput cuu1; tput rc; echoti cr; dirs-col-pretty  }
@@ -137,6 +135,11 @@ bindkey -v '\e[1;5A' updir
 
 # Ctrl-Down -> Dir Down
 downdir(){
+    # Setting these options saves us from have to use a hacky, selfwritten cd wrapper like in bash
+    # localoptions -> options only applicable to function 
+    # autopushd -> Make cd push the old directory onto the directory stack. 
+    # pushdignoredups -> Ignore duplicates in the directory stack 
+    setopt localoptions autopushd pushdignoredups 
     zle beginning-of-line
     cd ..
     clr2

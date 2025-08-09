@@ -2,10 +2,15 @@
 # Shebang not really except for nvim bash language server registering
 
 function reade() {
-    test -n "$ZSH_VERSION" && 
-        setopt local_options err_return local_traps extended_glob &&
-        HISTSIZE=1000 &&
-        SAVEHIST=1000
+    if test -n "$ZSH_VERSION"; then 
+        setopt local_options err_return local_traps hist_fcntl_lock extended_glob
+        if [[ -z $HISTSIZE || $HISTSIZE -lt 1000 ]]; then
+            HISTSIZE=1000 
+        fi
+        if [[ -z $SAVEHIST || $SAVEHIST -lt 1000 ]]; then
+            SAVEHIST=1000
+        fi
+    fi
 
     local red=$(tput sgr0 && tput setaf 1)
     local red1=$(tput sgr0 && tput setaf 9)

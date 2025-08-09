@@ -724,9 +724,9 @@ elif ([[ "$XDG_SESSION_TYPE" == 'x11' ]] && hash xclip &>/dev/null) || ([[ "$XDG
     }
     
     # Ctrl-s: Proper copy
-    bind -m emacs-standard -x '"\C-s" : clip-copy'
-    bind -m vi-command -x '"\C-s" : clip-copy'
-    bind -m vi-insert -x '"\C-s" : clip-copy'
+    bind -m emacs-standard -x '"\C-s": clip-copy'
+    bind -m vi-command -x '"\C-s": clip-copy'
+    bind -m vi-insert -x '"\C-s": clip-copy'
 
 
     # Ctrl-v: Proper paste

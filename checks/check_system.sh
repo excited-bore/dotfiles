@@ -693,12 +693,23 @@ if hash nala &>/dev/null && [[ "$pac" == 'apt' ]]; then
     pac_ls_upg="nala list --upgradable"
 fi
 
+# VARS
+
+if [[ $machine == 'Linux' ]]; then
+    if [[ "$distro" == 'Manjaro' ]]; then
+        KERNEL="linux$(uname -r | cut -d. -f-2 | tr -d '.')"  
+    else 
+        KERNEL="linux-$(uname -r)" 
+    fi
+fi
+
 # TODO: Change this to uname -sm?
 if [[ $machine == 'Linux' ]]; then
     arch_cmd="lscpu"
 elif [[ $machine == 'Mac' ]]; then
     arch_cmd="sysctl -n machdep.cpu.brand_string"
 fi
+
 
 if eval "${arch_cmd} | grep -q 'Intel'"; then
     arch="386"
@@ -714,7 +725,6 @@ elif eval "${arch_cmd} | grep -q 'aarch'"; then
     arch="arm64"
 fi
 
-# VARS
 
 if test -z "$XDG_CONFIG_HOME"; then
     if [[ "$machine" == 'Linux' ]]; then

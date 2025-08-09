@@ -445,8 +445,7 @@ function update-system() {
         test -n "$YES" && flag='--auto' || flag=''
         
         if [[ "$distro" == 'Manjaro' ]]; then
-            hdrs="$(echo $(uname -r) | cut -d. -f-2)"
-            hdrs="linux${hdrs//"."}-headers"
+            hdrs="linux$(uname -r | cut -d. -f-2 | tr -d '.')-headers"
         fi
        
         if test -n "$hdrs" && test -z "$(pacman -Q $hdrs 2> /dev/null)"; then
