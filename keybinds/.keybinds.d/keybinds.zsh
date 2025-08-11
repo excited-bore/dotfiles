@@ -5,17 +5,72 @@
 
 unsetopt flow_control
 
-# Bash_aliases at ~/.bash_aliases.d/
-# global bashrc -> /etc/bash.bashrc
+# XRESOURCES
+
+# Install bindings from xterm
+# xrdb -merge ~/.Xresources
+# .Inputrc (readline conf) however has to be compiled, so restart shell
+
+if [[ $machine == 'Linux' ]] && [[ -z $XDG_SESSION_TYPE ]]; then
+    XDG_SESSION_TYPE="$(loginctl show-session $(loginctl | grep $(whoami) | awk 'NR=1{print $1}') -p Type | awk -F= 'NR==1{print $2}')"
+fi
+
+if [[ "$XDG_SESSION_TYPE" == 'x11' ]]; then
+    # Set caps to Escape
+    setxkbmap -option caps:escape
+
+    # Set Shift delete to backspace
+    xmodmap -e "keycode 119 = Delete BackSpace"
+fi
+
+
+# Zsh_aliases at ~/.zsh_aliases.d/
+# global zshrc -> /etc/zsh.zshrc
 # root shell profiles -> /etc/profile
 
 
-# https://stackoverflow.com/questions/8366450/complex-keybinding-in-bash
+# At default, ZSH starts in emacs-mode
+# If EDITOR is set to anything resembling *vi*, it will jump to vi-mode
+# Why??? I don't know, but we better be sure and forceably set it to emacs-mode
+bindkey -e
 
-alias list-binds-zsh="bindkey -l"
+# We could also set it to vi-insert mode without the EDITOR being set to vi, vim, nvim...
+#bindkey -a
+
+# Or set it straight to vi-cmd mode
+#bindkey -v
+
+[[ -z $PAGER ]] && PAGER='less'
+
 alias list-binds-stty="stty -a"
-alias list-binds-xterm="xrdb -query -all"
-alias list-binds-kitty='kitty +kitten show_key -m kitty'
+alias list-binds-zsh-emacs="bindkey -M emacs | $PAGER"
+alias list-binds-zsh-vi-insert="bindkey -M viins | $PAGER"
+alias list-binds-zsh-vi-cmd="bindkey -M vicmd | $PAGER"
+
+function list-binds-zsh(){
+    local CYAN=$(tput setaf 6 && tput bold)
+    local normal=$(tput sgr0)
+     
+    (printf "\t${CYAN}Emacs${normal}\n\n" 
+    bindkey -M emacs 
+    echo
+
+    printf "\t${CYAN}Vi-insert${normal}\n\n" 
+    bindkey -M viins
+    echo
+
+    printf "\t${CYAN}Vi-cmd${normal}\n\n" 
+    bindkey -M vicmd) | $PAGER 
+
+}
+
+if hash xrdb &> /dev/null; then
+    alias list-binds-xterm="xrdb -query -all"
+fi
+
+if hash kitty &> /dev/null; then
+    alias list-binds-kitty='kitty +kitten show_key -m kitty'
+fi
 
 if hash xfconf-query &> /dev/null; then
     function list-binds-xfce4(){
@@ -40,24 +95,7 @@ if hash xfconf-query &> /dev/null; then
     }
 fi
 
-# XRESOURCES
-
-# Install bindings from xterm
-# xrdb -merge ~/.Xresources
-# .Inputrc (readline conf) however has to be compiled, so restart shell
-
-[[ $machine == 'Linux' ]] && [[ -z $XDG_SESSION_TYPE ]] &&
-    XDG_SESSION_TYPE="$(loginctl show-session $(loginctl | grep $(whoami) | awk 'NR=1{print $1}') -p Type | awk -F= 'NR==1{print $2}')"
-
-if [[ "$XDG_SESSION_TYPE" == 'x11' ]]; then
-    # Set caps to Escape
-    setxkbmap -option caps:escape
-
-    # Set Shift delete to backspace
-    xmodmap -e "keycode 119 = Delete BackSpace"
-fi
-
-# READLINE
+# ZLE (ZSH line editor)
 
 # \C : Ctrl
 # \M : Meta (alt)
@@ -67,20 +105,10 @@ fi
 # \n : newline
 # nop => no operation, but 'redraw-current-line' might work better
 # https://unix.stackexchange.com/questions/556703/how-to-bind-a-key-combination-to-null-in-inputrc
-# 'bind -l' for all options
-# 'bind -p' for all bindings
+# 'bindkey -M <emacs/viins/vicmd>' for mode specific bindings
 # You can also run 'read' (or 'cat' + Ctrl+v)
 # That way you can read the characters escape sequences
-# The ^[ indicates an escape character in your shell, so this means that your f.ex. Home key has an escape code of [1~ and you End key has an escape code of [4~. Since these escape codes are not listed in the default Readline configuration, you will need to add them: \e[1~ or \e[4~
-# It's good to use unused keys for complex keybindings since you can't combine readline commands with regular bash expressions in the same bind
-# Also
-# https://unix.stackexchange.com/questions/548726/bash-readline-inputrc-bind-key-to-a-sequence-of-multiple-commands
-#
-#
-# Change editing mode
-#bindkey -M vicmd '"\C-a": emacs-editing-mode'
-#bind -m vi-insert '"\C-a": emacs-editing-mode'
-#bindkey -M emacs '"\C-a": vi-editing-mode'
+
 
 # Up and down arrow will now intelligently complete partially completed
 # commands by searching through the existing history.
@@ -550,7 +578,6 @@ function clear-screen(){
     tput sc 
     tput cuu1 
     zle reset-prompt 
-    tput cuu1
 }
 
 function show-cd(){ 
@@ -715,31 +742,35 @@ bindkey -M emacs "\C-x\C-b" quoted-insert
 bindkey -M vicmd "\C-b" quoted-insert
 bindkey -M viins "\C-b" quoted-insert
 
+
+
 function emacs-mode() {
-    bindkey -M emacs
-    zle reset-prompt      
+    if [[ "${KEYMAP}" == 'vicmd' ]]; then
+        zle vi-insert 
+    fi
+    setopt emacs
+    PS1=$(echo $PS1 | sed 's/^(vi)//' | sed 's/^(emacs)//')  
+    PS1="(emacs)$PS1" 
+    zle reset-prompt 
 }
 
-function vi-cmd-mode() {
-    bindkey -M vicmd
-    zle reset-prompt      
-}
-
-function vi-ins-mode() {
-    bindkey -M viins
-    zle reset-prompt      
+function vi-mode() {
+    setopt vi
+    PS1=$(echo $PS1 | sed 's/^(vi)//' | sed 's/^(emacs)//')  
+    PS1="(vi)$PS1" 
+    zle reset-prompt 
 }
 
 zle -N emacs-mode
-zle -N vi-cmd-mode
-zle -N vi-ins-mode
+zle -N vi-mode
 
 
 # Ctrl+o: Change from vi-mode to emacs mode and back
 # This is also configured in ~/.fzf/shell/key-bindings-bash.sh if you have fzf keybinds installed
 bindkey -M vicmd "\C-o" emacs-mode
 bindkey -M viins "\C-o" emacs-mode
-bindkey -M emacs "\C-o" vi-ins-mode
+bindkey -M emacs "\C-o" vi-mode
+
 
 # vi-command ' / emacs C-x ' helps with adding quotes to bash strings
 function quote-all-zsh() { BUFFER="${BUFFER@Q}"; zle reset-prompt }
@@ -748,25 +779,17 @@ bindkey -M emacs -s '\C-x'\''' quote-all-zsh
 bindkey -M vicmd -s ''\''' quote-all-zsh
 #bindkey -M viins -s '\C-x'\''' '_quote_all'
 
-# https://unix.stackexchange.com/questions/85391/where-is-the-bash-feature-to-open-a-command-in-editor-documented
-edit-wo-executing() {
-    local editor="${EDITOR:-nano}"
-    tmpf="$(mktemp).sh"
-    printf "$BUFFER" >"$tmpf"
-    $EDITOR "$tmpf"
-    # https://stackoverflow.com/questions/6675492/how-can-i-remove-all-newlines-n-using-sed
-    #[ "$(sed -n '/^#!\/bin\/bash/p;q' "$tmpf")" ] && sed -i 1d "$tmpf"
-    BUFFER="$(<"$tmpf")"
-    CURSOR="${#BUFFER}"
-    command rm "$tmpf" &>/dev/null
-}
 
-zle -N edit-wo-executing
+#https://thevaluable.dev/zsh-install-configure-mouseless/
 
-bindkey -M viins "\C-e" edit-wo-executing
-bindkey -M vicmd "v" edit-wo-executing
-bindkey -M vicmd "\C-e" edit-wo-executing
-bindkey -M emacs "\C-e\C-e" edit-wo-executing
+zstyle :zle:edit-command-line editor $EDITOR
+autoload -Uz edit-command-line
+zle -N edit-command-line
+
+bindkey -M viins "\C-e" edit-command-line
+bindkey -M vicmd "\C-e" edit-command-line
+bindkey -M emacs "\C-e\C-e" edit-command-line
+
 
 # RLWRAP
 

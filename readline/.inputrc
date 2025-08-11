@@ -19,21 +19,36 @@ set show-mode-in-prompt on
 # 
 
 $if term=linux
-	#Version with color (insert - purple / command - blue)
-        #set vi-ins-mode-string \1\e[35;1m\2(ins)\1\e[?0c\2\1\e[3m\2
-	#set vi-cmd-mode-string \1\e[34;1m\2(cmd)\1\e[?8c\2\1\e[3m\2
-	#set emacs-mode-string  \1\e[35;1m\2(emacs)\1\e[?0c\2\1\e[3m\2
-        set vi-ins-mode-string (ins)\1\e[?0c\2\1\e[3m\2
-	set vi-cmd-mode-string (cmd)\1\e[?8c\2\1\e[3m\2
-	set emacs-mode-string  (emacs)\1\e[?0c\2\1\e[3m\2
-$else
-        #set vi-ins-mode-string \1\e[35;1m\2(ins)\1\e[5 q\2\1\e[3m\2
-	#set vi-cmd-mode-string \1\e[34;1m\2(cmd)\1\e[2 q\2\1\e[3m\2
-	#set emacs-mode-string  \1\e[35;1m\2(emacs)\1\e[5 q\2\1\e[3m\2
-        set vi-ins-mode-string (ins)\1\e[5 q\2\1\e[3m\2
-	set vi-cmd-mode-string (cmd)\1\e[2 q\2\1\e[3m\2
-	set emacs-mode-string  (emacs)\1\e[5 q\2\1\e[3m\2
+        # Normal without showing terminal modes
+        set vi-ins-mode-string \1\e[?0c\2\1\e[3m\2
+	set vi-cmd-mode-string \1\e[?8c\2\1\e[3m\2
+	set emacs-mode-string  \1\e[?0c\2\1\e[3m\2
         
+        # Show terminal mode (emacs / ins / cmd)
+        #set vi-ins-mode-string (vi-ins)\1\e[?0c\2\1\e[3m\2
+	#set vi-cmd-mode-string (vi-cmd)\1\e[?8c\2\1\e[3m\2
+	#set emacs-mode-string  (emacs)\1\e[?0c\2\1\e[3m\2
+	
+        #Version with color (insert - purple / command - blue)
+        #set vi-ins-mode-string \1\e[35;1m\2(vi-ins)\1\e[?0c\2\1\e[3m\2
+	#set vi-cmd-mode-string \1\e[34;1m\2(vi-cmd)\1\e[?8c\2\1\e[3m\2
+	#set emacs-mode-string  \1\e[35;1m\2(emacs)\1\e[?0c\2\1\e[3m\2
+        
+$else
+        # Normal without showing terminal modes
+        set vi-ins-mode-string \1\e[5 q\2\1\e[3m\2
+	set vi-cmd-mode-string \1\e[2 q\2\1\e[3m\2
+	set emacs-mode-string  \1\e[5 q\2\1\e[3m\2
+        
+        # Show terminal mode (emacs / ins / cmd)
+        #set vi-ins-mode-string (vi-ins)\1\e[5 q\2\1\e[3m\2
+	#set vi-cmd-mode-string (vi-cmd)\1\e[2 q\2\1\e[3m\2
+	#set emacs-mode-string  (emacs)\1\e[5 q\2\1\e[3m\2
+        
+        # Version with color (insert - purple / command - blue)
+        #set vi-ins-mode-string \1\e[35;1m\2(vi-ins)\1\e[5 q\2\1\e[3m\2
+	#set vi-cmd-mode-string \1\e[34;1m\2(vi-cmd)\1\e[2 q\2\1\e[3m\2
+	#set emacs-mode-string  \1\e[35;1m\2(emacs)\1\e[5 q\2\1\e[3m\2
 $endif
 
 
