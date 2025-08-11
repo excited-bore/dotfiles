@@ -497,9 +497,9 @@ function instvim() {
     fi
     unset vimrc
 
-    readyn -Y 'YELLOW' -p "Make symlink for init.vim at ~/.vimrc for user? (Might conflict with nvim +checkhealth)" -c "! test -f ~/.vimrc" vimrc
+    readyn -Y 'YELLOW' -p "Make symlink for init.vim at ~/.vimrc for user? (Might conflict with nvim +checkhealth)" -c "! test -f ~/.vimrc && ! test -L ~/.vimrc" vimrc
     if [[ $vimrc == 'y' ]]; then
-        if ! test -L ~/.config/nvim/init.vim; then
+        if ! [[ -L ~/.vimrc ]]; then
             ln -s ~/.config/nvim/init.vim ~/.vimrc
         fi
     fi
