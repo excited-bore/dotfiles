@@ -41,7 +41,7 @@ fi
 
 #ranger --copy-config=all
 ranger --confdir=$HOME/.config/ranger --copy-config=all
-if [[ $ENV == ~/.environment ]]; then
+if [[ $ENV == ~/.environment.env ]]; then
     sed -i 's|#export RANGER_LOAD_DEFAULT_RC=|export RANGER_LOAD_DEFAULT_RC=|g' $ENV
     sudo sed -i 's|#export RANGER_LOAD_DEFAULT_RC=|export RANGER_LOAD_DEFAULT_RC=|g' $ENV_R
 else

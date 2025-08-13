@@ -79,7 +79,7 @@
     "envvars": {
         "dest": "/home/burp/dotfiles",
         "src": [
-            "/home/burp/.environment"
+            "/home/burp/.environment.env"
         ]
     },
     "xterm": {

@@ -109,16 +109,20 @@ fi
 # You can also run 'read' (or 'cat' + Ctrl+v)
 # That way you can read the characters escape sequences
 
+# Up and down arrow will now intelligently complete partially completed commands by searching through the existing history.
+# Otherwise, when it doesn't find what's been typed it'll just go up the last history entry 
+# https://bbs.archlinux.org/viewtopic.php?id=153646
+autoload -Uz up-line-or-beginning-search down-line-or-beginning-search
+zle -N up-line-or-beginning-search 
+zle -N down-line-or-beginning-search
 
-# Up and down arrow will now intelligently complete partially completed
-# commands by searching through the existing history.
-bindkey -M emacs "\e[A" history-search-backward
-bindkey -M vicmd "\e[A" history-search-backward
-bindkey -M viins "\e[A" history-search-backward
+bindkey -M emacs "\e[A" up-line-or-beginning-search
+bindkey -M vicmd "\e[A" up-line-or-beginning-search
+bindkey -M viins "\e[A" up-line-or-beginning-search
 
-bindkey -M emacs "\e[B" history-search-forward
-bindkey -M vicmd "\e[B" history-search-forward
-bindkey -M viins "\e[B" history-search-forward
+bindkey -M emacs "\e[B" down-line-or-beginning-search
+bindkey -M vicmd "\e[B" down-line-or-beginning-search
+bindkey -M viins "\e[B" down-line-or-beginning-search
 
 # Control left/right to jump from bigwords (ignore spaces when jumping) instead of chars
 bindkey -M emacs '\e[1;5D' vi-backward-word

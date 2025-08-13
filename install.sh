@@ -149,7 +149,7 @@ SCRIPT_DIR=$(get-script-dir)
 
 # Environment variables
 
-if ! test -f $HOME/.environment; then
+if ! test -f $HOME/.environment.env; then
     if ! test -f $SCRIPT_DIR/install_envvars.sh; then
         tmp=$(mktemp -d) &&
             wget-aria-dir $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_envvars.sh
@@ -1069,15 +1069,15 @@ unset yt_dlp
 #othr='n'
 #color='GREEN'
 #prmpt='[Y/n]: '
-#echo "Next $(tput setaf 1)sudo$(tput sgr0) check for /root/.environment' "
-#if test -f ~/.environment && sudo test -f /root/.environment; then
+#echo "Next $(tput setaf 1)sudo$(tput sgr0) check for /root/.environment.env' "
+#if test -f ~/.environment.env && sudo test -f /root/.environment.env; then
 #    pre='n'
 #    othr='y'
 #    color='YELLOW'
 #    prmpt='[N/y]: '
 #fi
 
-#reade -Q "$color" -i "$pre" -p "Check existence/create .environment and link it to .bashrc in $HOME/ and /root/? $prmpt" "$othr" envvars
+#reade -Q "$color" -i "$pre" -p "Check existence/create .environment.env and link it to .bashrc in $HOME/ and /root/? $prmpt" "$othr" envvars
 #if [[ "$envvars" == "y" ]] || [[ -z "$envvars" ]]  then
 if ! test -f $SCRIPT_DIR/install_envvars.sh; then
     source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_envvars.sh)

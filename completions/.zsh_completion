@@ -3,6 +3,21 @@
 autoload -U compinit 
 compinit
 
+
+if [ -d ~/.zsh_completion.d/ ] && [ "$(command ls -A ~/.zsh_completion.d/)" ]; then
+    for compl in ~/.zsh_completion.d/*; do
+        source "$compl" 
+         
+        # https://github.com/Aloxaf/fzf-tab
+        if [[ "$compl" == "fzf-tab.plugin.zsh" ]]; then
+            if hash eza &> /dev/null; then
+                # preview directory's content with eza using icons when completing cd
+                zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --header --color=always --icons=always $realpath' 
+            fi
+        fi
+  done
+fi
+
 #
 # https://thevaluable.dev/zsh-completion-guide-examples/
 #
@@ -47,7 +62,7 @@ compinit
 # Case insensitive tab completion
 zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}'     
 
-# Colored completion (different colors for dirs/files/etc)
+# Colored completion use the same colors as shown by ls instead of those from the ZSH_COLOR variable
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"                               
 
 # Automatically find new executables in path 
@@ -71,12 +86,3 @@ zstyle ':completion:*' cache-path "$XDG_CACHE_HOME/zsh/.zcompcache"
 # Usually, on Unix systems, // is expanded to /. 
 # If you prefer this behavior, you can set the style squeeze-slashes to true as follows:
 #zstyle ':completion:*' squeeze-slashes true
-
-# https://github.com/Aloxaf/fzf-tab
-if hash fzf &> /dev/null && [[ -f ~/.zsh_completion.d/fzf-tab.plugin.zsh ]]; then
-    source ~/.zsh_completion.d/fzf-tab.plugin.zsh
-    if hash eza &> /dev/null; then
-        # preview directory's content with eza when completing cd
-        zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --header --color=always --icons=always $realpath' 
-    fi
-fi

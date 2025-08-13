@@ -24,7 +24,7 @@ If you don't have the github cloned/downloaded, you could try to run this comman
 source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install.sh)
 ```
 
-Creates `.environment` for global environment variables (Helps setting up variables for MAN,LESS,PAGER,EDITOR/VISUAL,SYSTEMD,XDG, etc..)  
+Creates `.environment.env` for global environment variables (Helps setting up variables for MAN,LESS,PAGER,EDITOR/VISUAL,SYSTEMD,XDG, etc..)  
 Creates `~/.keybinds.d/` and `~/.keybinds.d/keybinds.bash` for Bash (readline) keybindings  
 Creates `~/.bash_aliases` and `~/.bash_aliases.d/` for bash-aliases  
 Creates `~/.bash_completion` and `~/.bash_completion.d/` for bash-completions  

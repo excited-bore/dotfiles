@@ -3,7 +3,10 @@
 
 function reade() {
     if test -n "$ZSH_VERSION"; then 
-        setopt local_options err_return local_traps hist_fcntl_lock extended_glob
+        setopt localoptions errreturn localtraps histfcntllock nohistsavebycopy extendedglob
+        #autoload -Uz up-line-or-beginning-search down-line-or-beginning-search
+        #zle -N up-line-or-beginning-search 
+        #zle -N down-line-or-beginning-search
         if [[ -z $HISTSIZE || $HISTSIZE -lt 1000 ]]; then
             HISTSIZE=1000 
         fi
@@ -262,7 +265,7 @@ function reade() {
             fi
         fi
      
-	local oldhist='' color="" arg='' args='' tmpf='' eflag=0 one='n' pre=''
+	local old_up old_down oldhist='' color="" arg='' args='' tmpf='' eflag=0 one='n' pre=''
         while getopts ':sb:e:i:p:Q:a:r:' flag; do
             case "${flag}" in
                 a)  if [[ "${OPTARG}" == '-Q' || "${OPTARG}" == '-b' || "${OPTARG}" == '-e' || "${OPTARG}" == '-i' || "${OPTARG}" == '-p' || "${OPTARG}" == '-r' ]]; then 
@@ -291,18 +294,18 @@ function reade() {
 
                     [[ "$nostyle" == 'c' ]] && eflag=''
 
-                    if test -n "$BASH_VERSION"; then
+                    if [[ -n "$BASH_VERSION" ]]; then
                         readstr=$(echo "$readstr" | sed 's|read |read '"$eflag"' -i "'"$arg"'" |g')
                     fi
 
-                    if test -n "$ZSH_VERSION" && [[ $noecho == 'n' ]]; then
-                        readstr=$(echo "$readstr" | sed 's|vvvvvvvvvv=.*; vared|vvvvvvvvvv=""; vared -h|g')
+                    if [[ -n "$ZSH_VERSION" ]] && [[ $noecho == 'n' ]]; then
+                        readstr=$(echo "$readstr" | sed "s|vvvvvvvvvv=.*; vared|vvvvvvvvvv="$arg"; vared -h|g")
                     fi
                     pre="$arg"
 
-                    if test -z "$args"; then 
+                    if [[ -z "$args" ]]; then 
                         one='y'
-                    elif test -n "$args" && ! [[ "$nostyle" == 'c' ]]; then
+                    elif [[ -n "$args" ]] && ! [[ "$nostyle" == 'c' ]]; then
                         args=$(echo "$args" | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }')
                         args=$(echo "$args" | tr ' ' '\n')
 
@@ -337,11 +340,18 @@ function reade() {
                         fi
 
                         if test -n "$ZSH_VERSION"; then
-                            echo "$arg" >>"$tmpf"
 
                             while IFS='' read -r LINE || [ -n "${LINE}" ]; do
                                 print -S "${LINE}"
                             done <$tmpf
+                           
+                            # Let's make sure we use proper keybindings for up/down
+                            old_up=$(bindkey '\e[A') 
+                            old_down=$(bindkey '\e[B') 
+
+                            bindkey '\e[A' up-line-or-history  
+                            bindkey '\e[B' down-line-or-history
+                            
                             # Write to current historyfile
                             fc -W
                             # Then load different one - no need to clear
@@ -451,27 +461,36 @@ function reade() {
                 trap "history -c; history -r $oldhist; command rm -f $tmpf; test -n \"$oldtrps\" && eval \"$oldtrps\" || trap - SIGINT; return" SIGINT
             
             test -n "$ZSH_VERSION" &&
-               TRAPINT() {
-                  fc -IR $oldhist
-                  fc -IR
-                  command rm -f "$tmpf"
-                  return $((128 + $1))
-               }
+                TRAPINT() {
+                    ! [[ -z $old_up ]] && [[ $old_up =~ "bindkey: no binding" ]] &&
+                        eval "bindkey $old_up"      
+                    ! [[ -z $old_down ]] &&! [[ $old_down =~ "bindkey: no binding" ]] &&
+                        eval "bindkey $old_down"      
+                    fc -IR $oldhist
+                    fc -IR
+                    command rm -f "$tmpf"
+                    return $((128 + $1))
+                }
 
             eval "${readstr}"
 
-            test -n "$BASH_VERSION" &&
-                history -c &&
+            if test -n "$BASH_VERSION"; then
+                history -c
                 history -r $oldhist
+                
+                if test -n "$oldtrps"; then
+                    eval "$oldtrps"
+                else
+                    trap - SIGINT
+                fi
+            fi
 
-            test -n "$ZSH_VERSION" &&
+            if test -n "$ZSH_VERSION"; then
+                ! [[ -z $old_up ]] && [[ $old_up =~ "bindkey: no binding" ]] &&
+                    eval "bindkey $old_up"      
+                ! [[ -z $old_down ]] &&! [[ $old_down =~ "bindkey: no binding" ]] &&
+                    eval "bindkey $old_down"      
                 fc -IR $oldhist
-                 
-
-            if test -n "$oldtrps"; then
-                eval "$oldtrps"
-            else
-                trap - SIGINT
             fi
 
             [ -e "$tmpf" ] && command rm -f $tmpf

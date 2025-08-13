@@ -1,0 +1,7 @@
+# vim: set filetype=zsh
+
+if [ -d ~/.zsh_aliases.d/ ] && [ "$(command ls -A ~/.zsh_aliases.d/)" ]; then
+    for alias in ~/.zsh_aliases.d/*; do
+        source "$alias"
+    done
+fi

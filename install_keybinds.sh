@@ -41,8 +41,8 @@ if ! test -f /etc/inputrc; then
 fi
 
 shell-keybinds_r() {
-    if test -f /root/.environment; then
-        sudo sed -i 's|#export INPUTRC.*|export INPUTRC=~/.inputrc|g' /root/.environment
+    if test -f /root/.environment.env; then
+        sudo sed -i 's|#export INPUTRC.*|export INPUTRC=~/.inputrc|g' /root/.environment.env
     fi
     sudo cp $binds1 /root/.keybinds.d/
     sudo cp $binds2 /root/.keybinds
@@ -108,8 +108,8 @@ shell-keybinds() {
         fi
     fi
 
-    if [ -f ~/.environment ]; then
-        sed -i 's|#export INPUTRC.*|export INPUTRC=~/.inputrc|g' ~/.environment
+    if [ -f ~/.environment.env ]; then
+        sed -i 's|#export INPUTRC.*|export INPUTRC=~/.inputrc|g' ~/.environment.env
     fi
     unset vimde vivisual xterm
     yes-edit-no -Y "YELLOW" -f shell-keybinds_r -g "$binds $binds2 $binds1" -p "Install .inputrc and keybinds.bash at /root/ and /root/.keybinds.d/?"

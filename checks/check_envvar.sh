@@ -5,16 +5,16 @@ if ! test -f ~/.profile; then
 fi
 
 if test -z $ENV; then
-    if test -f ~/.environment; then
-        export ENV=~/.environment  
+    if test -f ~/.environment.env; then
+        export ENV=~/.environment.env  
     else
         export ENV=~/.profile
     fi
 fi
 
 if test -z $BASH_ENV; then 
-    if test -f ~/.environment; then
-        export BASH_ENV=~/.environment
+    if test -f ~/.environment.env; then
+        export BASH_ENV=~/.environment.env
     elif test -f ~/.bash_profile; then 
         export BASH_ENV=~/.bash_profile
     else
@@ -24,8 +24,8 @@ fi
 
 if test -f ~/.zshenv; then
     export ZSH_ENV=~/.zshenv
-elif test -f ~/.environment; then
-    export ZSH_ENV=~/.environment
+elif test -f ~/.environment.env; then
+    export ZSH_ENV=~/.environment.env
 elif test -f ~/.zprofile; then
     export ZSH_ENV=~/.zprofile
 fi
@@ -72,14 +72,14 @@ if ! sudo test -f /root/.profile; then
     sudo touch /root/.profile
 fi
 
-if sudo test -f /root/.environment; then
-    export ENV_R=/root/.environment  
+if sudo test -f /root/.environment.env; then
+    export ENV_R=/root/.environment.env  
 else
     export ENV_R=/root/.profile
 fi
 
-if sudo test -f /root/.environment; then
-    export BASH_ENV_R=/root/.environment
+if sudo test -f /root/.environment.env; then
+    export BASH_ENV_R=/root/.environment.env
 elif sudo test -f /root/.bash_profile; then
     export BASH_ENV_R=/root/.bash_profile
 else
@@ -88,8 +88,8 @@ fi
 
 if sudo test -f /root/.zshenv; then
     export ZSH_ENV_R=/root/.zshenv
-elif sudo test -f /root/.environment; then
-    export ZSH_ENV_R=/root/.environment
+elif sudo test -f /root/.environment.env; then
+    export ZSH_ENV_R=/root/.environment.env
 elif sudo test -f /root/.zprofile; then
     export ZSH_ENV_R=/root/.zprofile
 fi

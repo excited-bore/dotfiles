@@ -79,11 +79,11 @@ if test -z "$1"; then
     fi
     unset fzf_key
 
-    #if [[ $ENV =~ '.environment' ]]; then
+    #if [[ $ENV =~ '.environment.env' ]]; then
     #    sed -i 's|.export PATH=$PATH:$HOME/.fzf/bin|export PATH=$PATH:$HOME/.fzf/bin|g' $ENV
     #elif ! grep -q '.fzf/bin' $ENV; then
-    #    if grep -q '~/.environment' $ENV; then
-    #        sed -i 's|\(\[ -f ~/.environment\] \&\& source \~/.environment\)|\export PATH=$PATH:$HOME/.fzf/bin\n\n\1\n|g' $ENV
+    #    if grep -q '~/.environment.env' $ENV; then
+    #        sed -i 's|\(\[ -f ~/.environment.env\] \&\& source \~/.environment.env\)|\export PATH=$PATH:$HOME/.fzf/bin\n\n\1\n|g' $ENV
     #    elif grep -q '~/.bash_aliases' $ENV; then
     #        sed -i 's|\(\[ -f ~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\export PATH=$PATH:$HOME/.fzf/bin/\n\n\1\n|g' $ENV
     #        sed -i 's|\(if \[ -f ~/.bash_aliases \]; then\)|export PATH=$PATH:$HOME/.fzf/bin\n\n\1\n|g' $ENV
@@ -168,12 +168,12 @@ if test -z "$1"; then
             else
                 . ./install_ripgrep.sh
             fi
-            if [[ $ENV == ~/.environment ]]; then
+            if [[ $ENV == ~/.environment.env ]]; then
                 sed -i 's|#export RG_PREFIX|export RG_PREFIX|g' $ENV
             elif ! grep -q "export RG_PREFIX" $ENV; then
                 printf "\n# RIPGREP\nexport RG_PREFIX='rg --column --line-number --no-heading --color=always --smart-case \"" >>$ENV &>/dev/null
             fi
-            if [[ $ENV_R == /root/.environment ]]; then
+            if [[ $ENV_R == /root/.environment.env ]]; then
                 sudo sed -i 's|#export RG_PREFIX|export RG_PREFIX|g' $ENV_R
             elif ! sudo grep -q "export RG_PREFIX" $ENV_R; then
                 printf "\n# RIPGREP\nexport RG_PREFIX='rg --column --line-number --no-heading --color=always --smart-case \"" | sudo tee -a $ENV_R &> /dev/null
@@ -206,12 +206,12 @@ if test -z "$1"; then
             elif [[ "$XDG_SESSION_TYPE" == 'wayland' ]] && hash wl-copy &> /dev/null; then
                 clip="wl-copy" 
             fi
-            if [[ "$ENV" == ~/.environment ]]; then
+            if [[ "$ENV" == ~/.environment.env ]]; then
                 sed -i 's|#export FZF_CTRL_R_OPTS=|export FZF_CTRL_R_OPTS=|g' $ENV
             elif ! grep -q "export FZF_CTRL_R_OPTS=" $ENV; then
                 printf "\nexport FZF_CTRL_R_OPTS=\" --preview 'echo {}' --preview-window up:3:hidden:wrap --bind 'ctrl-t:toggle-preview' --bind 'alt-c:execute-silent(echo -n {2..} | $clip)+abort' --color header:italic --header 'Press ALT-C to copy command into clipboard'\"\n" >> $ENV &>/dev/null
             fi
-            if [[ "$ENV_R" == /root/.environment ]]; then
+            if [[ "$ENV_R" == /root/.environment.env ]]; then
                 sudo sed -i 's|#export FZF_CTRL_R_OPTS==|export FZF_CTRL_R_OPTS=|g' $ENV_R
             elif ! sudo grep -q "export FZF_CTRL_R_OPTS" $ENV_R; then
                 printf "\nexport FZF_CTRL_R_OPTS=\" --preview 'echo {}' --preview-window up:3:hidden:wrap --bind 'ctrl-t:toggle-preview' --bind 'alt-c:execute-silent(echo -n {2..} | $clip)+abort' --color header:italic --header 'Press ALT-C to copy command into clipboard'\"\n" | sudo tee -a $ENV_R &>/dev/null
@@ -235,7 +235,7 @@ if test -z "$1"; then
     #fi
     #unset fndgbl fndfle fndhiddn
 
-    if [[ $ENV == ~/.environment ]]; then
+    if [[ $ENV == ~/.environment.env ]]; then
         sed -i 's|#export FZF_DEFAULT_COMMAND|export FZF_DEFAULT_COMMAND|g' $ENV
         sed -i 's|#export FZF_CTRL_T_COMMAND|export FZF_CTRL_T_COMMAND|g' $ENV
         sed -i 's|#export FZF_CTRL_R_OPTS|export FZF_CTRL_R_OPTS|g' $ENV
@@ -255,7 +255,7 @@ if test -z "$1"; then
     fi
 
     echo "Next $(tput setaf 1)sudo$(tput sgr0) will update FZF environment variables in $ENV_R'"
-    if [[ $ENV_R == /root/.environment ]]; then
+    if [[ $ENV_R == /root/.environment.env ]]; then
         sudo sed -i 's|#export FZF_DEFAULT_COMMAND|export FZF_DEFAULT_COMMAND |g' $ENV_R
         sudo sed -i 's|#export FZF_CTRL_T_COMMAND|export FZF_CTRL_T_COMMAND|g' $ENV_R
         sudo sed -i 's|#export FZF_CTRL_R_OPTS|export FZF_CTRL_R_OPTS|g' $ENV_R
