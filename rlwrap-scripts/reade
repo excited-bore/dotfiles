@@ -4,9 +4,6 @@
 function reade() {
     if test -n "$ZSH_VERSION"; then 
         setopt localoptions errreturn localtraps histfcntllock nohistsavebycopy extendedglob
-        #autoload -Uz up-line-or-beginning-search down-line-or-beginning-search
-        #zle -N up-line-or-beginning-search 
-        #zle -N down-line-or-beginning-search
         if [[ -z $HISTSIZE || $HISTSIZE -lt 1000 ]]; then
             HISTSIZE=1000 
         fi
@@ -311,7 +308,7 @@ function reade() {
 
                         tmpf=$(mktemp)
 
-                        echo "$args" >"$tmpf"
+                        echo "$args" > "$tmpf"
 
                         #test -e $HISTFILE &&
 
@@ -328,7 +325,7 @@ function reade() {
 
                         #if ! test -e "$HISTFILE"; then
                         oldhist=$(mktemp)
-                        echo -e "$(history | awk '{$1=""; print;}')" > $oldhist
+                        echo -e "$(history | awk '{$1=""; print;}' | sed 's/^\ //g')" > $oldhist
                         #fi
 
                         if test -n "$BASH_VERSION"; then
@@ -341,10 +338,12 @@ function reade() {
 
                         if test -n "$ZSH_VERSION"; then
 
-                            while IFS='' read -r LINE || [ -n "${LINE}" ]; do
-                                print -S "${LINE}"
-                            done <$tmpf
-                           
+                            # Write to current historyfile
+                            fc -W
+                            
+                            # Then load different one - no need to clear
+                            fc -ap "$tmpf"
+                            
                             # Let's make sure we use proper keybindings for up/down
                             old_up=$(bindkey '\e[A') 
                             old_down=$(bindkey '\e[B') 
@@ -352,10 +351,6 @@ function reade() {
                             bindkey '\e[A' up-line-or-history  
                             bindkey '\e[B' down-line-or-history
                             
-                            # Write to current historyfile
-                            fc -W
-                            # Then load different one - no need to clear
-                            fc -p "$tmpf"
                         fi
 
                         # https://unix.stackexchange.com/questions/265957/zsh-histfile-still-read-from-zsh-history
@@ -462,9 +457,9 @@ function reade() {
             
             test -n "$ZSH_VERSION" &&
                 TRAPINT() {
-                    ! [[ -z $old_up ]] && [[ $old_up =~ "bindkey: no binding" ]] &&
+                    ! [[ -z $old_up ]] && ! [[ $old_up =~ "bindkey: no binding" ]] &&
                         eval "bindkey $old_up"      
-                    ! [[ -z $old_down ]] &&! [[ $old_down =~ "bindkey: no binding" ]] &&
+                    ! [[ -z $old_down ]] && ! [[ $old_down =~ "bindkey: no binding" ]] &&
                         eval "bindkey $old_down"      
                     fc -IR $oldhist
                     fc -IR
@@ -486,9 +481,9 @@ function reade() {
             fi
 
             if test -n "$ZSH_VERSION"; then
-                ! [[ -z $old_up ]] && [[ $old_up =~ "bindkey: no binding" ]] &&
+                ! [[ -z $old_up ]] && ! [[ $old_up =~ "bindkey: no binding" ]] &&
                     eval "bindkey $old_up"      
-                ! [[ -z $old_down ]] &&! [[ $old_down =~ "bindkey: no binding" ]] &&
+                ! [[ -z $old_down ]] && ! [[ $old_down =~ "bindkey: no binding" ]] &&
                     eval "bindkey $old_down"      
                 fc -IR $oldhist
             fi
