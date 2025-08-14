@@ -794,11 +794,19 @@ if hash lazygit &>/dev/null; then
 fi
 
 # F5, Ctrl-r - Reload .bashrc
-bind '"\205": re-read-init-file;'
-bind -x '"\206": source ~/.bashrc'
-bind -m emacs-standard '"\e[15~": "\205\206"'
-bind -m vi-command '"\e[15~": "\205\206"'
-bind -m vi-insert '"\e[15~": "\205\206"'
+if [ -z "${BLE_VERSION-}" ]; then
+    bind '"\205": re-read-init-file;'
+    bind -x '"\206": source ~/.bashrc'
+    bind -m emacs-standard '"\e[15~": "\205\206"'
+    bind -m vi-command '"\e[15~": "\205\206"'
+    bind -m vi-insert '"\e[15~": "\205\206"'
+else
+    bind -x '"\206": source ~/.bashrc'
+    bind -m emacs-standard '"\e[15~": "\206"'
+    bind -m vi-command '"\e[15~": "\206"'
+    bind -m vi-insert '"\e[15~": "\206"'
+fi
+
 
 # F6 - (neo/fast/screen)fetch (System overview)
 if hash neofetch &>/dev/null || hash fastfetch &>/dev/null || hash screenfetch &>/dev/null || hash onefetch &>/dev/null; then
