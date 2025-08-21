@@ -16,12 +16,24 @@ sh -c "$(wget-curl https://starship.rs/install.sh)" -y -f
 
 readyn -p "Install starship for user?" strship
 if [[ "y" == "$strship" ]]; then
-    # It's best that starship is initialized on the last line
-    # Otherwise it doesn't play nice with ~/.bash_preexec.sh
+    # If we're using ble.sh's vim mode and want to add what editing mode were using, we need to adjust starship's bash prompt
+    # We're not gonna check for whether ble is installed or whether PS1_MODE is a variable; we're just gonna always make sure there's a file 'starship.bash' other then using the 1-liner 'eval $(starship init bash)' 
     if grep -q "starship" ~/.bashrc; then
         sed -i '/starship init bash/d' ~/.bashrc 
     fi
-    printf "\neval \"\$(starship init bash)\"\n" >>~/.bashrc
+
+    if ! test -f checks/check_prompt_dir.sh; then
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_prompt_dir.sh)
+    else
+        . ./checks/check_prompt_dir.sh
+    fi
+  
+    # We need to add a specific condition inside starship.bash related to vi/emacs-mode prompts ( (vi/cmd/vis) ) 
+    if ! test -f ~/.prompt.d/starship.bash; then
+        /usr/local/bin/starship init bash --print-full-init > ~/.prompt.d/starship.bash 
+        sed -i 's|\(PS1="$(/usr/local/bin/starship prompt "${ARGS\[@\]}")"\)|\1\n    # If we have a vi mode from ble.sh, we make sure the first character is removed in PS1 since it seems to be some kind of newline character\n    if [[ -n "$PS1_MODE" ]]; then\n        PS1="$PS1_MODE""${PS1:1}"\n    fi\n|g' ~/.prompt.d/starship.bash 
+    fi
+
     if ! grep -q "starship" ~/.zshrc; then
         printf "\neval \"\$(starship init zsh)\"\n" >>~/.zshrc
     fi

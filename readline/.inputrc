@@ -3,12 +3,17 @@
 # This line carries over site-wide readline configuration to the user configuration. Usually /etc/inputrc includes some goodies.
 $include /etc/inputrc
 
+
+### EDITING-MODE ###
+
 # Vi/emacs style editing shortcuts/interface
 # https://unix.stackexchange.com/questions/303479/what-are-readlines-modes-keymaps-and-their-default-bindings
-set editing-mode vi
+# set editing-mode vi
+
+### PROMPT ### 
 
 # Show whether it's normal or insert mode (@ - Change back with Alt-p)
-set show-mode-in-prompt on
+# set show-mode-in-prompt on
 
 # You can set a different cursor shape for each mode by using "\1 .. \2" escapes: 
 # Insert mode / Emacs mode have small cursor, command mode has block cursor
@@ -17,40 +22,26 @@ set show-mode-in-prompt on
 # Insert mode / Emacs mode are magenta, command mode is blue
 # https://github.com/calid/bash
 # 
+# $if term=linux
+# 	#Version with color (insert - purple / command - blue)
+#       #set vi-ins-mode-string \1\e[35;1m\2(ins)\1\e[?0c\2\1\e[3m\2
+# 	#set vi-cmd-mode-string \1\e[34;1m\2(cmd)\1\e[?8c\2\1\e[3m\2
+# 	#set emacs-mode-string  \1\e[35;1m\2(emacs)\1\e[?0c\2\1\e[3m\2
+#       set vi-ins-mode-string (ins)\1\e[?0c\2\1\e[3m\2
+# 	set vi-cmd-mode-string (cmd)\1\e[?8c\2\1\e[3m\2
+#       set emacs-mode-string  (emacs)\1\e[?0c\2\1\e[3m\2
+# $else
+#       #set vi-ins-mode-string \1\e[35;1m\2(ins)\1\e[5 q\2\1\e[3m\2
+# 	#set vi-cmd-mode-string \1\e[34;1m\2(cmd)\1\e[2 q\2\1\e[3m\2
+# 	#set emacs-mode-string  \1\e[35;1m\2(emacs)\1\e[5 q\2\1\e[3m\2
+#       set vi-ins-mode-string (ins)\1\e[5 q\2\1\e[3m\2
+# 	set vi-cmd-mode-string (cmd)\1\e[2 q\2\1\e[3m\2
+#       set emacs-mode-string  (emacs)\1\e[5 q\2\1\e[3m\2
+#         
+# $endif
 
-$if term=linux
-        # Normal without showing terminal modes
-        set vi-ins-mode-string \1\e[?0c\2\1\e[3m\2
-	set vi-cmd-mode-string \1\e[?8c\2\1\e[3m\2
-	set emacs-mode-string  \1\e[?0c\2\1\e[3m\2
-        
-        # Show terminal mode (emacs / ins / cmd)
-        #set vi-ins-mode-string (vi-ins)\1\e[?0c\2\1\e[3m\2
-	#set vi-cmd-mode-string (vi-cmd)\1\e[?8c\2\1\e[3m\2
-	#set emacs-mode-string  (emacs)\1\e[?0c\2\1\e[3m\2
-	
-        #Version with color (insert - purple / command - blue)
-        #set vi-ins-mode-string \1\e[35;1m\2(vi-ins)\1\e[?0c\2\1\e[3m\2
-	#set vi-cmd-mode-string \1\e[34;1m\2(vi-cmd)\1\e[?8c\2\1\e[3m\2
-	#set emacs-mode-string  \1\e[35;1m\2(emacs)\1\e[?0c\2\1\e[3m\2
-        
-$else
-        # Normal without showing terminal modes
-        set vi-ins-mode-string \1\e[5 q\2\1\e[3m\2
-	set vi-cmd-mode-string \1\e[2 q\2\1\e[3m\2
-	set emacs-mode-string  \1\e[5 q\2\1\e[3m\2
-        
-        # Show terminal mode (emacs / ins / cmd)
-        #set vi-ins-mode-string (vi-ins)\1\e[5 q\2\1\e[3m\2
-	#set vi-cmd-mode-string (vi-cmd)\1\e[2 q\2\1\e[3m\2
-	#set emacs-mode-string  (emacs)\1\e[5 q\2\1\e[3m\2
-        
-        # Version with color (insert - purple / command - blue)
-        #set vi-ins-mode-string \1\e[35;1m\2(vi-ins)\1\e[5 q\2\1\e[3m\2
-	#set vi-cmd-mode-string \1\e[34;1m\2(vi-cmd)\1\e[2 q\2\1\e[3m\2
-	#set emacs-mode-string  \1\e[35;1m\2(emacs)\1\e[5 q\2\1\e[3m\2
-$endif
 
+### MISCELLANEOUS ###
 
 # https://stackoverflow.com/questions/67535351/how-to-provide-arguments-to-readline-functions-via-inputrc
 set comment-begin #

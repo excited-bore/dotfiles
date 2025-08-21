@@ -4,6 +4,12 @@
 # global bashrc -> /etc/bash.bashrc
 # root shell profiles -> /etc/profile
 
+# Vi/emacs style editing shortcuts/interface
+# https://unix.stackexchange.com/questions/303479/what-are-readlines-modes-keymaps-and-their-default-bindings
+# bind 'set editing-mode vi'
+#bind 'set editing-mode emacs'
+
+
 # https://stackoverflow.com/questions/8366450/complex-keybinding-in-bash
 
 alias list-binds-stty="stty -a"
@@ -115,6 +121,24 @@ bind -m emacs-standard '"\e[B": history-search-forward'
 bind -m vi-command '"\e[B": history-search-forward'
 bind -m vi-insert '"\e[B": history-search-forward'
 
+# Shift Arrow Key fix
+# https://unix.stackexchange.com/questions/444214/bash-shiftarrow-keys-make-a-b-c-d
+
+bind '"\e101": set-mark'
+bind '"\e102": exchange-point-and-mark'
+bind '"\e103": backward-char'
+bind '"\e104": forward-char'
+
+
+bind -m emacs-standard '"\e[1;2C": "\e101\e104\e102\e102"'
+bind -m vi-command '"\e[1;2C": "\e101\e104\e102\e102"'
+bind -m vi-insert '"\e[1;2C": "\e101\e104\e102\e102"'
+
+bind -m emacs-standard '"\e[1;2D": "\e101\e103\e102\e102"'
+bind -m vi-command '"\e[1;2D": "\e101\e103\e102\e102"'
+bind -m vi-insert '"\e[1;2D": "\e101\e103\e102\e102"'
+
+
 # Control left/right to jump from bigwords (ignore spaces when jumping) instead of chars
 bind -m emacs-standard '"\e[1;5D": vi-backward-word'
 bind -m vi-command '"\e[1;5D": vi-backward-word'
@@ -123,6 +147,9 @@ bind -m vi-insert '"\e[1;5D": vi-backward-word'
 bind -m emacs-standard '"\e[1;5C": vi-forward-word'
 bind -m vi-command '"\e[1;5C": vi-forward-word'
 bind -m vi-insert '"\e[1;5C": vi-forward-word'
+
+# Make sure $COLUMNS gets set
+shopt -s checkwinsize
 
 # Full path dirs
 alias dirs="dirs -l"
@@ -525,40 +552,44 @@ transpose_words() {
     unset arr arrr
 }
 
-# Transpose space-separated words on Shift Left/Right
-
-bind -m emacs-standard -x '"\e[1;2D": transpose_words space left'
-bind -m vi-command -x '"\e[1;2D": transpose_words space left'
-bind -m vi-insert -x '"\e[1;2D": transpose_words space left'
-
-bind -m emacs-standard -x '"\e[1;2C": transpose_words space right'
-bind -m vi-command -x '"\e[1;2C": transpose_words space right'
-bind -m vi-insert -x '"\e[1;2C": transpose_words space right'
-
-# Transpose special character separated words on Alt+Shift Left/Right
-
-bind -m emacs-standard -x '"\e[1;4D": transpose_words words left'
-bind -m vi-command -x '"\e[1;4D": transpose_words words left'
-bind -m vi-insert -x '"\e[1;4D": transpose_words words left'
-
-bind -m emacs-standard -x '"\e[1;4C": transpose_words words right'
-bind -m vi-command -x '"\e[1;4C": transpose_words words right'
-bind -m vi-insert -x '"\e[1;4C": transpose_words words right'
-
-
 alias __='clear && tput cup $(($LINE_TPUT+1)) $TPUT_COL && tput sc && tput cuu1 && echo "${PS1@P}" && tput cuu1'
 
-# Shift up => Clean reset
-#bind -x '"\e288": "cd \C-i"'
-bind -x '"\e288": "__"'
-bind -m emacs-standard '"\e[1;2A": "\C-e\C-u\e288"'
-bind -m vi-command '"\e[1;2A": "ddi\e288"'
-bind -m vi-insert '"\e[1;2A": "\eddi\e288"'
 
-# Shift down => cd shortcut
-bind -m emacs-standard '"\e[1;2B": "\C-e\C-u\e288cd \C-i"'
-bind -m vi-insert '"\e[1;2B": "\eddi\e288cd \C-i"'
-bind -m vi-command '"\e[1;2B": "\eddi\e288cd \C-i"'
+#    bind -m vi-command -x '"\e[1;2D": vi-set-mark'
+#    bind -m vi-insert '"\e[1;2D": vi-set-mark'
+#
+#    # Transpose space-separated words on Shift Left/Right
+#    
+#    #bind -m emacs-standard -x '"\e[1;2D": transpose_words space left'
+#    #bind -m vi-command -x '"\e[1;2D": transpose_words space left'
+#    #bind -m vi-insert -x '"\e[1;2D": transpose_words space left'
+#
+#    bind -m emacs-standard -x '"\e[1;2C": transpose_words space right'
+#    bind -m vi-command -x '"\e[1;2C": transpose_words space right'
+#    bind -m vi-insert -x '"\e[1;2C": transpose_words space right'
+#
+#    # Transpose special character separated words on Alt+Shift Left/Right
+#
+#    bind -m emacs-standard -x '"\e[1;4D": transpose_words words left'
+#    bind -m vi-command -x '"\e[1;4D": transpose_words words left'
+#    bind -m vi-insert -x '"\e[1;4D": transpose_words words left'
+#
+#    bind -m emacs-standard -x '"\e[1;4C": transpose_words words right'
+#    bind -m vi-command -x '"\e[1;4C": transpose_words words right'
+#    bind -m vi-insert -x '"\e[1;4C": transpose_words words right'
+#
+#    # Shift up => Clean reset
+#    #bind -x '"\e288": "cd \C-i"'
+#    bind -x '"\e288": "__"'
+#    bind -m emacs-standard '"\e[1;2A": "\C-e\C-u\e288"'
+#    bind -m vi-command '"\e[1;2A": "ddi\e288"'
+#    bind -m vi-insert '"\e[1;2A": "\eddi\e288"'
+#
+#    # Shift down => cd shortcut
+#    bind -m emacs-standard '"\e[1;2B": "\C-e\C-u\e288cd \C-i"'
+#    bind -m vi-insert '"\e[1;2B": "\eddi\e288cd \C-i"'
+#    bind -m vi-command '"\e[1;2B": "\eddi\e288cd \C-i"'
+
 
 # Shift left/right to jump from bigwords (ignore spaces when jumping) instead of chars
 #bind -m emacs-standard -x '"\e[1;2D": clear && let COL_TPUT=$COL_TPUT-1 && if [ $COL_TPUT -lt 0 ];then COL_TPUT=$COLUMNS;fi && tput cup $LINE_TPUT $COL_TPUT && tput sc 1 && echo "${PS1@P}" && tput cuu1'
@@ -667,7 +698,6 @@ _edit_wo_executing() {
 }
 
 bind -m vi-insert -x '"\C-e":_edit_wo_executing'
-bind -m vi-command -x '"v":_edit_wo_executing'
 bind -m vi-command -x '"\C-e":_edit_wo_executing'
 bind -m emacs-standard -x '"\C-e\C-e":_edit_wo_executing'
 
@@ -794,18 +824,11 @@ if hash lazygit &>/dev/null; then
 fi
 
 # F5, Ctrl-r - Reload .bashrc
-if [ -z "${BLE_VERSION-}" ]; then
-    bind '"\205": re-read-init-file;'
-    bind -x '"\206": source ~/.bashrc'
-    bind -m emacs-standard '"\e[15~": "\205\206"'
-    bind -m vi-command '"\e[15~": "\205\206"'
-    bind -m vi-insert '"\e[15~": "\205\206"'
-else
-    bind -x '"\206": source ~/.bashrc'
-    bind -m emacs-standard '"\e[15~": "\206"'
-    bind -m vi-command '"\e[15~": "\206"'
-    bind -m vi-insert '"\e[15~": "\206"'
-fi
+#bind '"\205": re-read-init-file;'
+bind -x '"\206": bind -f ~/.inputrc && source ~/.bashrc'
+bind -m emacs-standard '"\e[15~": "\C-u\206\n"'
+bind -m vi-command '"\e[15~": "\C-u\206\n"'
+bind -m vi-insert '"\e[15~": "\C-u\206\n"'
 
 
 # F6 - (neo/fast/screen)fetch (System overview)
