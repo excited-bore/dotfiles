@@ -735,9 +735,11 @@ if hash osc &>/dev/null; then
     function osc-copy() {
         if [[ -n $READLINE_MARK_SET ]]; then 
             if [[ $READLINE_MARK -gt $READLINE_POINT ]]; then
-                echo -n "${READLINE_LINE:$READLINE_POINT:$READLINE_MARK}" | osc copy
+                local len=$(( $READLINE_MARK - $READLINE_POINT )) 
+                echo -n "${READLINE_LINE:$READLINE_POINT:$len}" | osc copy
             else 
-                echo -n "${READLINE_LINE:$READLINE_MARK:$READLINE_POINT}" | osc copy
+                local len=$(( $READLINE_POINT - $READLINE_MARK )) 
+                echo -n "${READLINE_LINE:$READLINE_MARK:$len}" | osc copy
             fi
         else
             echo -n "$READLINE_LINE" | osc copy
@@ -776,9 +778,11 @@ elif ([[ "$XDG_SESSION_TYPE" == 'x11' ]] && hash xclip &>/dev/null) || ([[ "$XDG
         if [[ "$XDG_SESSION_TYPE" == 'x11' ]]; then  
             if [[ -n $READLINE_MARK_SET ]]; then 
                 if [[ $READLINE_MARK -gt $READLINE_POINT ]]; then
-                    echo -n "${READLINE_LINE:$READLINE_POINT:$READLINE_MARK}" | xclip -i -sel c
+                    local len=$(( $READLINE_MARK - $READLINE_POINT )) 
+                    echo -n "${READLINE_LINE:$READLINE_POINT:$len}" | xclip -i -sel c
                 else 
-                    echo -n "${READLINE_LINE:$READLINE_MARK:$READLINE_POINT}" | xclip -i -sel c
+                    local len=$(( $READLINE_POINT - $READLINE_MARK )) 
+                    echo -n "${READLINE_LINE:$READLINE_MARK:$len}" | xclip -i -sel c
                 fi
             else
                 echo -n "$READLINE_LINE" | xclip -i -sel c
@@ -786,9 +790,11 @@ elif ([[ "$XDG_SESSION_TYPE" == 'x11' ]] && hash xclip &>/dev/null) || ([[ "$XDG
         elif [[ "$XDG_SESSION_TYPE" == 'wayland' ]]; then
             if [[ -n $READLINE_MARK_SET ]]; then 
                 if [[ $READLINE_MARK -gt $READLINE_POINT ]]; then
-                    echo -n "${READLINE_LINE:$READLINE_POINT:$READLINE_MARK}" | wl-copy
+                    local len=$(( $READLINE_MARK - $READLINE_POINT )) 
+                    echo -n "${READLINE_LINE:$READLINE_POINT:$len}" | wl-copy
                 else 
-                    echo -n "${READLINE_LINE:$READLINE_MARK:$READLINE_POINT}" | wl-copy
+                    local len = $(( $READLINE_POINT - $READLINE_MARK )) 
+                    echo -n "${READLINE_LINE:$READLINE_MARK:$len}" | wl-copy
                 fi
             else
                 echo -n "$READLINE_LINE" | wl-copy
