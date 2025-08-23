@@ -7,7 +7,7 @@ if hash wget &>/dev/null && hash jq &>/dev/null; then
 
     function get-latest-releases-github() {
         
-        local gtb_link new_url releases nwreleases versn link res dir filtr quer i
+        local gtb_link new_url nwreleases releases versn link res dir filtr quer i
 
         if test -z "$1"; then
             reade -Q 'GREEN' -i "https://github.com/" -p 'Github link: ' gtb_link
@@ -43,10 +43,10 @@ if hash wget &>/dev/null && hash jq &>/dev/null; then
         printf "Analyzing ${CYAN}'$new_url'.${normal}\nDepending on how many releases are available this might take a while..\n"
 
 	if hash curl &> /dev/null; then
-            releases=($(curl -sL "$new_url" | jq '.[0]' -r | jq -r '.assets' | grep --color=never "name" | sed 's/"name"://g' | tr '"' ' ' | tr ',' ' ' | sed 's/[[:space:]]//g'))
+            releases=($(curl -sL "$new_url" | jq '.[0]' -r | jq -r '.assets' | grep --color=never "name" | sed 's|"name":||g' | tr '"' ' ' | tr ',' ' ' | sed 's|[[:space:]]||g'))
             versn=$(curl -sL "$new_url" | jq '.[0]' -r | jq -r '.tag_name')
 	else
-	    releases=($(wget -qO- "$new_url" | jq '.[0]' -r | jq -r '.assets' | grep --color=never "name" | sed 's/"name"://g' | tr '"' ' ' | tr ',' ' ' | sed 's/[[:space:]]//g'))
+	    releases=($(wget -qO- "$new_url" | jq '.[0]' -r | jq -r '.assets' | grep --color=never "name" | sed 's|"name":||g' | tr '"' ' ' | tr ',' ' ' | sed 's|[[:space:]]||g'))
             versn=$(wget -qO- "$new_url" | jq '.[0]' -r | jq -r '.tag_name')
 	fi
 
@@ -69,36 +69,45 @@ if hash wget &>/dev/null && hash jq &>/dev/null; then
             done
             releases="$nwreleases"
         fi
-
+        
         if hash fzf &>/dev/null; then
             test -n "$quer" &&
                 quer="--query $quer"
-            res="$(printf "$releases" | fzf $quer --select-1 --multi --reverse --height 50%)"
+            res="$(echo "${releases[@]}" | tr ' ' '\n' | fzf $quer --select-1 --multi --reverse --height 50%)"
         else
-            printf "Files: \n${cyan}$releases${normal}\n"
-	    releases=$(printf "$releases" | tr '\n' ' ')
+            echo "${cyan}Files: ${normal}"
+            for i in ${releases[@]}; do
+                echo " - ${cyan}$i${normal}"
+            done
+	    releases=$(echo "${releases[@]}" | tr '\n' ' ')
             reade --auto oneoption -Q 'CYAN' $quer -i "$releases" -p "Which one?: " res
         fi
 
         if test -n "$res"; then
             if test -z "$2"; then
-                reade -Q 'GREEN' -i "$HOME/Downloads" -p "Download Folder?: " -e dir
+                reade -i "$HOME/Downloads" -p "Download Folder?: " -e dir
             fi
 
             for i in ${res[@]}; do 
+                
                 if test -d "$dir"; then
                     
                     # Remove stray '/' when it's a dir
-                    [[ "${dir: -1}" == '/' ]] &&
-                        dir="${dir%?}"
+                    if [[ -n "$BASH_VERSION" && "${dir: -1}" == '/' ]] || [[ -n "$ZSH_VERSION" && "${dir[-1]}" == '/' ]]; then
+                       dir="${dir%?}"
+                    fi
                    
-                    type wget-aria &> /dev/null &&
-                        wget-aria-dir $dir "$link$i" ||
+                    if type wget-aria &> /dev/null; then
+                        wget-aria-dir $dir "$link$i"
+                    else
                         wget -P $dir "$link$i" 
+                    fi
                 else
-                    type wget-aria &> /dev/null &&
-                        wget-aria-name $dir "$link$i" ||
+                    if type wget-aria &> /dev/null; then
+                        wget-aria-name $dir "$link$i"
+                    else
                         wget -O $dir "$link$i" 
+                    fi
                 fi
             done 
         fi

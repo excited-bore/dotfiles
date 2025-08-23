@@ -194,7 +194,7 @@ function reade() {
 
     local flag 
 
-    while getopts ':sb:e:i:p:Q:r:a:' flag; do
+    while getopts ':seb:i:p:Q:r:a:' flag; do
         case "${flag}" in
         a)
             auto='y'
@@ -262,8 +262,8 @@ function reade() {
             fi
         fi
      
-	local old_up old_down oldhist='' color="" arg='' args='' tmpf='' eflag=0 one='n' pre=''
-        while getopts ':sb:e:i:p:Q:a:r:' flag; do
+	local old_up old_down oldhist='' color="" arg='' args='' tmpf='' eflag=0 one='n' pre='' keymap upmap upmapx downmap downmapx
+        while getopts ':seb:i:p:Q:a:r:' flag; do
             case "${flag}" in
                 a)  if [[ "${OPTARG}" == '-Q' || "${OPTARG}" == '-b' || "${OPTARG}" == '-e' || "${OPTARG}" == '-i' || "${OPTARG}" == '-p' || "${OPTARG}" == '-r' ]]; then 
                          OPTIND=$(($OPTIND-1))
@@ -285,7 +285,7 @@ function reade() {
                 #  Even though it's in the read man for bash, -i (on it's own) does not actually work
                 i)
                     arg="$(echo ${OPTARG} | awk '{print $1;}')"
-                    args="$(echo ${OPTARG} | sed "s/\<$arg\>//g" | xargs)"
+                    args="$(echo ${OPTARG} | sed "s \<$arg\>  g" | xargs)"
 
                     local eflag='-e' 
 
@@ -293,9 +293,7 @@ function reade() {
 
                     if [[ -n "$BASH_VERSION" ]]; then
                         readstr=$(echo "$readstr" | sed 's|read |read '"$eflag"' -i "'"$arg"'" |g')
-                    fi
-
-                    if [[ -n "$ZSH_VERSION" ]] && [[ $noecho == 'n' ]]; then
+                    elif [[ -n "$ZSH_VERSION" ]] && [[ $noecho == 'n' ]]; then
                         readstr=$(echo "$readstr" | sed "s|vvvvvvvvvv=.*; vared|vvvvvvvvvv="$arg"; vared -h|g")
                     fi
                     pre="$arg"
@@ -334,9 +332,40 @@ function reade() {
                             done <"$tmpf"
                             history -c
                             history -r $tmpf
-                        fi
-
-                        if test -n "$ZSH_VERSION"; then
+                            
+                            # Gotta check if the up and down arrow keys are actually bound to previous/next-history
+                            if ! bind -p | grep -q '"\\e\[A": previous-history' || ! bind -p | grep -q '"\\e\[B": next-history'; then
+                                if set -o | grep -Eq 'emacs\s+on'; then
+                                    keymap="emacs-standard"
+                                else
+                                    keymap="vi-insert" 
+                                fi
+                                
+                                if ! bind -p | grep -q '"\\e\[A": previous-history'; then 
+                                    if bind -m $keymap -p | grep -q '"\\e\[A":'; then
+                                        upmap=$(bind -m $keymap -p | grep '"\\e\[A":' | awk '{print $2}')
+                                    elif bind -m $keymap -s | grep -q '"\\e\[A":'; then
+                                        upmap=$(bind -m $keymap -s | grep '"\\e\[A":' | awk '{print $2}')
+                                    elif bind -m $keymap -X | grep -q '"\\e\[A"'; then
+                                        upmapx='-x ' 
+                                        upmap=$(bind -m $keymap -X | grep '"\\e\[A"' | awk '{print $2}')
+                                    fi
+                                    bind -m $keymap '"\e[A": previous-history'  
+                                fi
+                                
+                                if ! bind -p | grep -q '"\\e\[B": next-history'; then 
+                                    if bind -m $keymap -p | grep -q '"\\e\[B":'; then
+                                        downmap=$(bind -m $keymap -p | grep '"\\e\[B":' | awk '{print $2}')
+                                    elif bind -m $keymap -s | grep -q '"\\e\[B":'; then
+                                        downmap=$(bind -m $keymap -s | grep '"\\e\[B":' | awk '{print $2}')
+                                    elif bind -m $keymap -X | grep -q '"\\e\[B"'; then
+                                        downmapx='-x '
+                                        downmap=$(bind -m $keymap -X | grep '"\\e\[B"' | awk '{print $2}')
+                                    fi
+                                    bind -m $keymap '"\e[B": next-history' 
+                                fi
+                            fi
+                        elif test -n "$ZSH_VERSION"; then
 
                             # Write to current historyfile
                             fc -W
@@ -453,7 +482,7 @@ function reade() {
             # https://stackoverflow.com/questions/14702148/how-to-fire-a-command-when-a-shell-script-is-interrupted
 
             test -n "$BASH_VERSION" &&
-                trap "history -c; history -r $oldhist; command rm -f $tmpf; test -n \"$oldtrps\" && eval \"$oldtrps\" || trap - SIGINT; return" SIGINT
+                trap "history -c; history -r $oldhist; command rm -f $tmpf; test -n \"$oldtrps\" && eval \"$oldtrps\" || trap - SIGINT; [[ -n $upmap ]] && bind -m $keymap $upmapx '\"\e[A\": $upmap'; [[ -n $downmap ]] && bind -m $keymap $downmapx '\"\e[B\": $downmap'; return" SIGINT
             
             test -n "$ZSH_VERSION" &&
                 TRAPINT() {
@@ -466,7 +495,6 @@ function reade() {
                     command rm -f "$tmpf"
                     return $((128 + $1))
                 }
-
             eval "${readstr}"
 
             if test -n "$BASH_VERSION"; then
@@ -478,6 +506,12 @@ function reade() {
                 else
                     trap - SIGINT
                 fi
+             
+                [[ -n $upmap ]] && 
+                    bind -m $keymap $upmapx '"\e[A": '$upmap''
+                
+                [[ -n $downmap ]] && 
+                    bind -m $keymap $downmapx '"\e[B": '$downmap''
             fi
 
             if test -n "$ZSH_VERSION"; then
@@ -533,7 +567,7 @@ function reade() {
                 i)
                     frst="$(echo ${OPTARG} | awk '{print $1}')"
                     rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-P \"$frst\" |g")
-                    args=$(echo ${OPTARG} | sed "s|\<$frst\>||g" | xargs)
+                    args=$(echo ${OPTARG} | sed "s \<$frst\>  g" | xargs)
                     if test -z "$args"; then 
                         one='y' 
                     elif test -n "$args"; then
