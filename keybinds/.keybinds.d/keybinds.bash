@@ -733,13 +733,30 @@ bind -m emacs-standard -x '"\C-e\C-e":_edit_wo_executing'
 if hash osc &>/dev/null; then
     
     function osc-copy() {
-        echo -n "$READLINE_LINE" | osc copy
+        if [[ -n $READLINE_MARK_SET ]]; then 
+            if [[ $READLINE_MARK -gt $READLINE_POINT ]]; then
+                echo -n "${READLINE_LINE:$READLINE_POINT:$READLINE_MARK}" | osc copy
+            else 
+                echo -n "${READLINE_LINE:$READLINE_MARK:$READLINE_POINT}" | osc copy
+            fi
+        else
+            echo -n "$READLINE_LINE" | osc copy
+        fi
+        READLINE_MARK_SET=
     }
     
     function osc-paste() {
+        if [[ -n $READLINE_MARK_SET ]]; then 
+            if [[ $READLINE_MARK -gt $READLINE_POINT ]]; then 
+                READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}${READLINE_LINE:$READLINE_MARK}"
+            else
+                READLINE_LINE="${READLINE_LINE:0:$READLINE_MARK}${READLINE_LINE:$READLINE_POINT}"
+            fi
+        fi 
         local pasters="$(osc paste)"
         READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$pasters${READLINE_LINE:$READLINE_POINT}"
         READLINE_POINT=$((READLINE_POINT + ${#pasters}))
+        READLINE_MARK_SET=
     }
     
     bind -m emacs-standard -x '"\C-s" : osc-copy'
@@ -873,13 +890,13 @@ fi
 bind '"\205": re-read-init-file'
 bind -x '"\206": source ~/.bashrc'
 if [[ -z "$BLE_VERSION" ]]; then
-    bind -m emacs-standard '"\e[15~": "\C-u\205\206\C-m"'
-    bind -m vi-command '"\e[15~": "\C-u\205\206\C-m"'
-    bind -m vi-insert '"\e[15~": "\C-u\205\206\C-m"'
+    bind -m emacs-standard '"\e[15~": "\C-u\205\206\n"'
+    bind -m vi-command '"\e[15~": "\C-u\205\206\n"'
+    bind -m vi-insert '"\e[15~": "\C-u\205\206\n"'
 else 
-    bind -m emacs-standard '"\e[15~": "\C-u\206\C-m"'
-    bind -m vi-command '"\e[15~": "\C-u\206\C-m"'
-    bind -m vi-insert '"\e[15~": "\C-u\206\C-m"'
+    bind -m emacs-standard '"\e[15~": "\C-u\206\n"'
+    bind -m vi-command '"\e[15~": "\C-u\206\n"'
+    bind -m vi-insert '"\e[15~": "\C-u\206\n"'
 fi
 
 
