@@ -161,23 +161,23 @@ bind -m vi-insert '"\e[D": "\e105\e103"'
 bind '"\e109": vi-forward-word'
 bind '"\e110": vi-backward-word'
 
-bind -m emacs-standard '"\e[1;5C": \e105\e109'
-bind -m vi-command '"\e[1;5C": \e105\e109'
-bind -m vi-insert '"\e[1;5C": \e105\e109'
+bind -m emacs-standard '"\e[1;5C": "\e105\e109"'
+bind -m vi-command '"\e[1;5c": "\e105\e109"'
+bind -m vi-insert '"\e[1;5c": "\e105\e109"'
 
-bind -m emacs-standard '"\e[1;5D": \e105\e110'
-bind -m vi-command '"\e[1;5D": \e105\e110'
-bind -m vi-insert '"\e[1;5D": \e105\e110'
+bind -m emacs-standard '"\e[1;5d": "\e105\e110"'
+bind -m vi-command '"\e[1;5d": "\e105\e110"'
+bind -m vi-insert '"\e[1;5d": "\e105\e110"'
 
-# Make sure $COLUMNS gets set
+# make sure $columns gets set
 shopt -s checkwinsize
 
-# Full path dirs
+# full path dirs
 alias dirs="dirs -l"
-alias dirs-col="dirs -v | column -c $COLUMNS"
-alias dirs-col-pretty="dirs -v | column -c $COLUMNS | sed -e 's/ 0 \\([^\t]*\\)/'\${GREEN}' 0 \\1'\${normal}'/'"
+alias dirs-col="dirs -v | column -c $columns"
+alias dirs-col-pretty="dirs -v | column -c $columns | sed -e 's/ 0 \\([^\t]*\\)/'\${green}' 0 \\1'\${normal}'/'"
 
-#'Silent' clear
+#'silent' clear
 if hash starship &>/dev/null && grep -q "^eval \"\$(starship init bash)\"" ~/.bashrc && (grep -q '\\n' ~/.config/starship.toml || (grep -q 'line_break' ~/.config/starship.toml && ! pcregrep -qM "[line_break]\$(.|\n)*^disabled = true" ~/.config/starship.toml)); then
     alias _="tput cuu1 && tput cuu1 && tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null"
     alias _.="tput cuu1 && tput cuu1 && tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i < \$(dirs -v | column -c \${COLUMNS} | wc -l) ; i++)); do tput cuu1; done && dirs-col-pretty && history -d -1 &>/dev/null"
