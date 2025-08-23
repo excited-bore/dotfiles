@@ -130,6 +130,7 @@ bind '"\e102": exchange-point-and-mark'
 #bind '"\e101": set-mark'
 bind '"\e103": backward-char'
 bind '"\e104": forward-char'
+bind -x '"\e105": READLINE_MARK_SET=""'
 bind -x '"\e106": echo "Mark: $READLINE_MARK"; echo "Point: $READLINE_POINT"'
 bind -x '"\e107": [[ $READLINE_MARK == $READLINE_POINT && -n $READLINE_MARK_SET ]] && READLINE_MARK=$(($READLINE_MARK - 1))'
 bind -x '"\e108": [[ $READLINE_MARK == $READLINE_POINT && -n $READLINE_MARK_SET ]] && READLINE_MARK=$(($READLINE_MARK + 1))'
@@ -145,7 +146,6 @@ bind -m vi-insert '"\e[1;2D": "\e101\e103\e108\e102\e102"'
 
 # Arrow Key resets mark / selection
 
-bind -x '"\e105": READLINE_MARK_SET=""'
 
 bind -m emacs-standard '"\e[C": "\e105\e104"'
 bind -m vi-command '"\e[C": "\e105\e104"'
@@ -157,13 +157,17 @@ bind -m vi-insert '"\e[D": "\e105\e103"'
 
 
 # Control left/right to jump from bigwords (ignore spaces when jumping) instead of chars
-bind -m emacs-standard '"\e[1;5D": vi-backward-word'
-bind -m vi-command '"\e[1;5D": vi-backward-word'
-bind -m vi-insert '"\e[1;5D": vi-backward-word'
 
-bind -m emacs-standard '"\e[1;5C": vi-forward-word'
-bind -m vi-command '"\e[1;5C": vi-forward-word'
-bind -m vi-insert '"\e[1;5C": vi-forward-word'
+bind '"\e109": vi-forward-word'
+bind '"\e110": vi-backward-word'
+
+bind -m emacs-standard '"\e[1;5C": \e105\e109'
+bind -m vi-command '"\e[1;5C": \e105\e109'
+bind -m vi-insert '"\e[1;5C": \e105\e109'
+
+bind -m emacs-standard '"\e[1;5D": \e105\e110'
+bind -m vi-command '"\e[1;5D": \e105\e110'
+bind -m vi-insert '"\e[1;5D": \e105\e110'
 
 # Make sure $COLUMNS gets set
 shopt -s checkwinsize
@@ -773,7 +777,7 @@ elif ([[ "$XDG_SESSION_TYPE" == 'x11' ]] && hash xclip &>/dev/null) || ([[ "$XDG
                 echo -n "$READLINE_LINE" | wl-copy
             fi
         fi
-         
+        READLINE_MARK_SET=
     }
 
     function clip-paste() {
@@ -792,6 +796,7 @@ elif ([[ "$XDG_SESSION_TYPE" == 'x11' ]] && hash xclip &>/dev/null) || ([[ "$XDG
         fi
         READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$pasters${READLINE_LINE:$READLINE_POINT}"
         READLINE_POINT=$((READLINE_POINT + ${#pasters}))
+        READLINE_MARK_SET=
     }
     
     # Ctrl-s: Proper copy
