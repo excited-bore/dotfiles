@@ -7,13 +7,12 @@
 # Vi/emacs style editing shortcuts/interface
 # https://unix.stackexchange.com/questions/303479/what-are-readlines-modes-keymaps-and-their-default-bindings
 # bind 'set editing-mode vi'
-#bind 'set editing-mode emacs'
-
+# bind 'set editing-mode emacs'
 
 # https://stackoverflow.com/questions/8366450/complex-keybinding-in-bash
 
 alias list-binds-stty="stty -a"
-alias list-binds-readline="{ printf \"\nList commands bound to keys\n\n\n\" ; bind -X ; echo; echo \"List key sequences that invoke macros and their values\"; echo; bind -S ; echo ;  echo \"List readline functions (possibly) bound to keys\"; bind -P; } | $PAGER"
+alias list-binds-readline="{ printf \"\nList commands bound to keys\n\n\" ; bind -X ; echo; echo \"List key sequences that invoke macros and their values\"; echo; bind -S ; echo ;  echo \"List readline functions (possibly) bound to keys\"; bind -P; } | $PAGER"
 alias list-binds-xterm="xrdb -query -all"
 alias list-binds-kitty='kitty +kitten show_key -m kitty'
 
@@ -146,7 +145,6 @@ bind -m vi-insert '"\e[1;2D": "\e101\e103\e108\e102\e102"'
 
 # Arrow Key resets mark / selection
 
-
 bind -m emacs-standard '"\e[C": "\e105\e104"'
 bind -m vi-command '"\e[C": "\e105\e104"'
 bind -m vi-insert '"\e[C": "\e105\e104"'
@@ -174,8 +172,8 @@ shopt -s checkwinsize
 
 # full path dirs
 alias dirs="dirs -l"
-alias dirs-col="dirs -v | column -c $columns"
-alias dirs-col-pretty="dirs -v | column -c $columns | sed -e 's/ 0 \\([^\t]*\\)/'\${green}' 0 \\1'\${normal}'/'"
+alias dirs-col="dirs -v | column -c $COLUMNS"
+alias dirs-col-pretty="dirs -v | column -c $COLUMNS | sed -e 's/ 0 \\([^\t]*\\)/'\${GREEN}' 0 \\1'\${normal}'/'"
 
 #'silent' clear
 if hash starship &>/dev/null && grep -q "^eval \"\$(starship init bash)\"" ~/.bashrc && (grep -q '\\n' ~/.config/starship.toml || (grep -q 'line_break' ~/.config/starship.toml && ! pcregrep -qM "[line_break]\$(.|\n)*^disabled = true" ~/.config/starship.toml)); then
@@ -189,19 +187,30 @@ else
     alias _.="tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i <= \$(dirs -v | column -c \${COLUMNS} | wc -l) ; i++)); do tput cuu1; done && dirs-col-pretty && tput rc && history -d -1 &>/dev/null"
 fi
 
+alias __='clear && tput cup $(($LINE_TPUT+1)) $TPUT_COL && tput sc && tput cuu1 && echo "${PS1@P}" && tput cuu1'
+
+# Ctrl-Up/Down to change cursor line
+bind -m emacs-standard -x '"\e[1;5A": clear && let LINE_TPUT=$LINE_TPUT-1; if [ $LINE_TPUT -lt 0 ];then let LINE_TPUT=$LINES;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
+bind -m vi-command -x '"\e[1;5A": clear && let LINE_TPUT=$LINE_TPUT-1; if [ $LINE_TPUT -lt 0 ];then let LINE_TPUT=$LINES;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
+bind -m vi-insert -x '"\e[1;5A": clear && let LINE_TPUT=$LINE_TPUT-1; if [ $LINE_TPUT -lt 0 ];then let LINE_TPUT=$LINES;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
+
+bind -m emacs-standard -x '"\e[1;5B": clear && let LINE_TPUT=$LINE_TPUT+1; if [ $LINE_TPUT -gt $LINES ];then let LINE_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
+bind -m vi-command -x '"\e[1;5B": clear && let LINE_TPUT=$LINE_TPUT+1; if [ $LINE_TPUT -gt $LINES ];then let LINE_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
+bind -m vi-insert -x '"\e[1;5B": clear && let LINE_TPUT=$LINE_TPUT+1; if [ $LINE_TPUT -gt $LINES ];then let LINE_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
+
 # 'dirs' builtins shows all directories in stack
 # Ctrl-Up arrow rotates over directory history
-bind -x '"\e277": pushd +1 &>/dev/null'
-bind -m emacs-standard '"\e[1;5A": "\C-e\C-u\e277 _.\C-m"'
-bind -m vi-command '"\e[1;5A": "ddi\e277 _.\C-m"'
-bind -m vi-insert '"\e[1;5A": "\eddi\e277 _.\C-m"'
+#bind -x '"\e277": pushd +1 &>/dev/null'
+#bind -m emacs-standard '"\e[1;5A": "\C-e\C-u\e277 _.\C-m"'
+#bind -m vi-command '"\e[1;5A": "ddi\e277 _.\C-m"'
+#bind -m vi-insert '"\e[1;5A": "\eddi\e277 _.\C-m"'
 
 # Ctrl-Down -> Dir Down
 #bind -x '"\e266": pushd $(dirs -p | awk '\''END { print }'\'') &>/dev/null'
-bind -x '"\e266": cd ..'
-bind -m emacs-standard '"\e[1;5B": "\C-e\C-u\e266 _.\C-m"'
-bind -m vi-command '"\e[1;5B": "ddi\C-u\e266 _.\C-m"'
-bind -m vi-insert '"\e[1;5B": "\eddi\e266 _.\C-m"'
+#bind -x '"\e266": cd ..'
+#bind -m emacs-standard '"\e[1;5B": "\C-e\C-u\e266 _.\C-m"'
+#bind -m vi-command '"\e[1;5B": "ddi\C-u\e266 _.\C-m"'
+#bind -m vi-insert '"\e[1;5B": "\eddi\e266 _.\C-m"'
 
 # Ctrl-Down -> Rotate between 2 last directories
 #bind -x '"\e266": pushd -1 &>/dev/null'
@@ -211,405 +220,37 @@ bind -m vi-insert '"\e[1;5B": "\eddi\e266 _.\C-m"'
 
 # Shift left/right to jump from words instead of chars
 
-# EEEEEUUUUUUH BASH REGEX?????
-# https://unix.stackexchange.com/questions/421460/bash-regex-and-https-regex101-com
-
-# This explains a ton
-# https://unix.stackexchange.com/questions/251013/bash-regex-capture-group
-
-
-global_rematch() { 
-    local s=$1 regex=$2 
-
-    # https://stackoverflow.com/questions/10582763/how-to-return-an-array-in-bash-without-using-globals
-    local -n array=$3
-    array=()
-    
-    while [[ $s =~ $regex ]]; do 
-        array+=("${BASH_REMATCH[0]}")
-        s=${s#*"${BASH_REMATCH[0]}"}
-    done
-}
-
-unset_array(){
-    local -n array=$1
-    local indx
-    if test -z $2; then
-        indx=0
-    else
-        indx=$2
-    fi
-    local new_array
-    for i in "${!array[@]}"; do
-        if ! [[ $i == $indx ]]; then
-            new_array+=( "${array[$i]}" )
-        fi
-    done
-    array=("${new_array[@]}")
-    unset new_array
-}
-
-TRANSPOSE_QUOTED=1
-
-transpose_words() {
-    local wordsorspace='space' 
-    if test -n "$1" && ! [[ "$1" == 'space' ]]; then
-        wordsorspace='words' 
-    fi
-    
-    local directn='left'
-    if test -n "$2" && ! [[ "$2" == 'left' ]]; then
-        directn='right' 
-    fi
-
-    local only_exclude_spaces='[^[:space:]]+'
-    local include_only_alphanums='[A-Za-z0-9]+' 
-
-    local notquotedspace_exclude_space='("[^"]*")+|('\''[^'\'']*'\'')+|[^[:space:]]+' 
-   
-    local words 
-    if [[ "$wordsorspace" == 'space' ]]; then 
-        [[ $TRANSPOSE_QUOTED ]] && 
-            words=$notquotedspace_exclude_space || 
-            words=$only_exclude_spaces
-    else
-        words=$include_only_alphanums
-    fi
-
-    local only_include_spaces='[[:space:]]+'  
-    local exclude_only_aphanums='[^A-Za-z0-9]+' 
-   
-    local non_words
-    if [[ "$wordsorspace" == 'space' ]]; then
-        non_words=$only_include_spaces
-    else
-        non_words=$exclude_only_aphanums   
-    fi 
-
-    local firstnonspaceword='^([^[:space:]]+)' 
-    local firstalphanumericword='^([A-Za-z0-9]+)'
-
-    local quotedfirstnonspaceword='^(("[^"]*"+|'\''[^'\'']*'\''+)*[^[:space:]]+)' 
-
-    local firstwordpattrn
-    if [[ "$wordsorspace" == 'space' ]]; then
-        [[ $TRANSPOSE_QUOTED ]] && 
-            firstwordpattrn=$quotedfirstnonspaceword || 
-            firstwordpattrn=$firstnonspaceword
-    else
-        firstwordpattrn=$firstalphanumericword   
-    fi
-
-
-    local tolastnonspaceword='[[:space:]]+[^[:space:]]+$'
-
-    local tolastalphanumericword='[^A-Za-z0-9]+[A-Za-z0-9]+$' 
-
-    local tolastwordpattrn
-    if [[ "$wordsorspace" == 'space' ]]; then
-        tolastwordpattrn=$tolastnonspaceword  
-    else
-        tolastwordpattrn=$tolastalphanumericword   
-    fi    
-    
-    local arr arrr line
-   
-    # Checks leading and trailing spaces, for escaped spaced words which it quotes using '', then exit
-    local re='(([^[:space:]'\'']*\\ )+[^[:space:]'\'']*)'
-    if [[ "${READLINE_LINE}" =~ $re ]] || [[ "${READLINE_LINE: -1}" == ' ' ]] || [[ ${READLINE_LINE:0:1} == ' ' ]]; then
-         
-        local quoteds
-        global_rematch "${READLINE_LINE}" "$re" quoteds 
-
-        while [[ "${READLINE_LINE}" =~ $re ]] || [[ "${READLINE_LINE: -1}" == ' ' ]] || [[ ${READLINE_LINE:0:1} == ' ' ]]; do
-
-            # Remove leading whitespace
-            if [[ "${READLINE_LINE:0:1}" == ' ' ]]; then
-                READLINE_LINE="${READLINE_LINE:1}" 
-            fi
-
-            # Remove trailing whitespace
-            if [[ "${READLINE_LINE: -1}" == ' ' ]]; then
-                READLINE_LINE="${READLINE_LINE::-1}" 
-            fi
-            
-            # Quoted escaped spaced words
-            if [[ "${READLINE_LINE}" =~ $re ]]; then
-                local i=${BASH_REMATCH[0]}
-                #echo "'$i'" 
-                local j="'$(eval "echo $i")'"
-                local ree='.*'$(printf %q "$i")''
-                
-                if [[ $READLINE_LINE =~ $ree ]]; then
-                    local suffxcount=$(($(echo "${BASH_REMATCH[0]}" | wc --chars)))
-                    local preffxcount=$(($suffxcount - $(echo $i | wc --chars)))
-                    #echo "'${BASH_REMATCH[0]}'"
-                    #echo "Suffix: '${READLINE_LINE:$suffxcount}'" 
-                    #echo "Suffix - 1: '${READLINE_LINE:$((suffxcount - 1))}'" 
-                    #echo "Prefix: '${READLINE_LINE:0:$preffxcount}'" 
-                    
-                    # Idk but if it loops over multiple (similar??) words that need quoting, it miscounts and IDK ive gone over it multiple times im doing this terribleness  
-                    if [[ ${#quoteds} -gt 1 ]]; then
-                        READLINE_LINE="${READLINE_LINE:0:$preffxcount}$j${READLINE_LINE:$((suffxcount - 1))}" 
-                    else
-                        READLINE_LINE="${READLINE_LINE:0:$preffxcount}$j${READLINE_LINE:$suffxcount}" 
-                    fi
-                    #echo $READLINE_LINE 
-                fi
-            
-            fi
-        done 
-        return 0 
-    fi
-
-    global_rematch "${READLINE_LINE}" "$words" arr
-    
-    local args=${#arr[@]} 
-    if [[ $args -gt 1 ]]; then 
-
-        # Chatgpt helped me with this one
-        # Use a rare control char as placeholder,
-        # then replace double-quoted and single-quoted strings with said placeholder
-        
-        if [[ "$wordsorspace" == 'space' ]] && [[ $TRANSPOSE_QUOTED ]]; then
-            local placeholder=$'\x01'  
-            line=$(echo "${READLINE_LINE}" | sed -E 's/"[^"]*"|'\''[^'\'']*'\''/'"$placeholder"'/g') 
-        else
-            line="${READLINE_LINE}"
-        fi
-
-        global_rematch "$line" $non_words arrr
-        
-        local index=0
-        local olderprefix='' oldprefix='' prefix='' olderword='' olderspcl='' lastword=${arr[0]} lastspcl=${arrr[0]} newword=${arr[1]}  
-        while ([[ ${#arr[@]} -ge 1 ]] || [[ ${#arrr[@]} -ge 1 ]]); do 
-           
-            local linechar=${READLINE_LINE:$index:1}
-
-            local charcount=$(($(echo "${arr[0]}" | wc --chars) - 1)) 
-            index=$(($index + $charcount)) 
-            
-            # get the firstword count and the count of the string up to the last alphanumerical 
-            local firstword lasttword cntuptolastword
-
-            if [[ $READLINE_LINE =~ $firstwordpattrn ]]; then
-                firstword=$(($(echo "${BASH_REMATCH[0]}" | wc --chars) - 1)) 
-            fi
-
-            if [[ $READLINE_LINE =~ $tolastwordpattrn ]]; then
-                lasttword=$(($(echo "${BASH_REMATCH[0]}" | wc --chars) - 1)) 
-                cntuptolastword=$(($(echo "$READLINE_LINE" | wc --chars) - 1 - $lasttword)) 
-            fi 
-
-            if [[ "$lastword" =~ "$linechar" ]]; then
-
-                local prfxcnt=$(($(echo "$prefix" | wc --chars) - 1))
-                local oldprfxcnt line
-                if [[ $index -eq $(($READLINE_POINT - 1)) ]] && [[ $READLINE_POINT == $cntuptolastword ]] && [[ "$directn" == 'right' ]]; then
-                    line="$READLINE_LINE"
-                    oldprfxcnt=${#READLINE_LINE}
-                elif [[ $index -ge $READLINE_POINT ]]; then
-                    if test -n "$olderprefix"; then
-                        oldprfxcnt=$(($(echo "$olderprefix" | wc --chars) - 1))
-                        if [[ "${#arr[@]}" == 1 ]] && [[ "$directn" == 'left' ]]; then
-                            line="$olderprefix$newword$olderspcl$lastword" 
-                        else 
-                            if [[ "$directn" == 'left' ]]; then
-                                local lntcnt=$(($(echo "$oldprefix$lastword" | wc --chars) - 1))
-                                local suffix=${READLINE_LINE:$lntcnt}
-                                line="$olderprefix$lastword$olderspcl$olderword$suffix" 
-                            elif [[ $READLINE_POINT -lt $cntuptolastword ]]; then
-                                oldprfxcnt=$(($(echo "$oldprefix$newword$lastspcl" | wc --chars) - 1)) 
-                                local lntcnt=$(($(echo "$oldprefix$lastword$lastspcl$newword" | wc --chars) - 1))
-                                local suffix=${READLINE_LINE:$lntcnt}
-                                line="$oldprefix$newword$lastspcl$lastword$suffix" 
-                            else
-                                [[ "$directn" == 'right' ]] && ! [[ $READLINE_POINT = ${#READLINE_LINE} ]] &&
-                                    READLINE_POINT=${#READLINE_LINE}
-                                break
-                            fi
-                        fi
-                    else
-                        oldprfxcnt=0
-                        if test -n "$oldprefix"; then
-                            test -z "$olderspcl" && olderspcl="$lastspcl" && lastspcl=${arrr[1]}
-                            if [[ "$directn" == 'left' ]]; then
-                                local lntcnt=$(($(echo "$lastword$olderspcl$olderword" | wc --chars) - 1))
-                                local suffix=${READLINE_LINE:$lntcnt}
-                                line="$lastword$olderspcl$olderword$suffix" 
-                            else
-                                test -z "$prefix" && 
-                                    prfxcnt=$(($(echo "${arr[0]}" | wc --chars) - 1))
-                                oldprfxcnt=$(($(echo "$olderword$olderspcl$newword$lastspcl" | wc --chars) - 1))
-                                local lntcnt=$(($(echo "$olderword$olderspcl$newword$lastspcl$lastword" | wc --chars) - 1))
-                                local suffix=${READLINE_LINE:$lntcnt}
-                                line="$olderword$olderspcl$newword$lastspcl$lastword$suffix" 
-                            fi
-                        elif ([[ "$directn" == 'left' ]] && [[ $READLINE_POINT -gt $firstword ]]) || [[ "$directn" == 'right' ]]; then
-                            [[ "$directn" == 'right' ]] && 
-                                oldprfxcnt=$(($(echo "$lastword$lastspcl$newword" | wc --chars) - 1)) 
-                            test -z "$prefix" && prfxcnt=$(($(echo "$lastword" | wc --chars) - 1))
-                            local wordcnt=$(($(echo "$lastword$lastspcl$newword" | wc --chars) - 1)) 
-                            local suffix=${READLINE_LINE:$(($wordcnt))}
-                            #    line="${READLINE_LINE $lastword$lastspcl$newword$suffix" ||
-                            line="$newword$lastspcl$lastword$suffix" 
-                        else
-                            if [[ "$directn" == 'left' ]]; then
-                                local firstwordcnt=$(($(echo "$firstword" | wc --chars)))
-                                if [[ $READLINE_POINT == $firstwordcnt ]]; then
-                                    local wordcnt=$(($(echo "$lastword$lastspcl$newword" | wc --chars) - 1)) 
-                                    local suffix=${READLINE_LINE:$(($wordcnt))} 
-                                    line="$newword$lastspcl$lastword$suffix" 
-                                fi
-                                READLINE_POINT=0
-                            fi
-                            break
-                        fi
-                    fi
-                    local relpoint=$(($READLINE_POINT - $prfxcnt + $oldprfxcnt))
-                    READLINE_LINE=$line
-                    READLINE_POINT=$relpoint
-                    break
-                fi
-
-                test -n "$oldprefix" && olderprefix=$oldprefix
-                oldprefix=$prefix
-                prefix="$prefix${arr[0]}"
-                test -z "$oldprefix" && oldprefix=$prefix 
-                unset_array arr 0; 
-                olderword=$lastword 
-                test -n "${arr[1]}" && 
-                    lastword=$newword && newword=${arr[1]} ||
-                    newword=${arr[0]}
-            fi
-
-            
-            linechar=${READLINE_LINE:$index:1}
-            charcount=$(($(echo "${arrr[0]}" | wc --chars) - 1)) 
-            index=$(($index + $charcount))
-
-            if [[ "$lastspcl" =~ "$linechar" ]]; then
-                
-                if [[ $index -ge $READLINE_POINT ]]; then
-                    local oldprfxcnt line prfxcnt=0 relpoint
-                    if test -n "$olderprefix"; then
-                        prfxcnt=$(($(echo "$olderprefix" | wc --chars) - 1))
-                        if [[ "$directn" == 'left' ]] && ([[ "${#arr[@]}" == 1 ]] || [[ $READLINE_POINT == ${#READLINE_LINE} ]] || [[ $READLINE_POINT == ${#arrr[-1]} ]]); then
-                            relpoint=$(($(echo "$olderprefix" | wc --chars) - 1)) 
-                            local lntcnt=$(($(echo "$olderprefix$lastword$lastspcl$olderword" | wc --chars) - 1))
-                            local suffix=${READLINE_LINE:$lntcnt}
-                            line="$olderprefix$newword$olderspcl$olderword" 
-                        else 
-                            if [[ "$directn" == 'left' ]]; then
-                                relpoint=$(($(echo "$olderprefix" | wc --chars) - 1)) 
-
-                                local lntcnt=$(($(echo "$olderprefix$lastword$lastspcl$olderword" | wc --chars) - 1))
-                                local suffix=${READLINE_LINE:$lntcnt}
-                                line="$olderprefix$lastword$lastspcl$olderword$suffix" 
-                            elif [[ $READLINE_POINT -lt $cntuptolastword ]]; then 
-                                relpoint=$(($(echo "$oldprefix$olderword$lastspcl$newword${arrr[1]}" | wc --chars) - 1)) 
-                                local wordcnt=$(($(echo "$oldprefix$olderword$lastspcl$newword${arrr[1]}$lastword" | wc --chars) - 1)) 
-                                local suffix=${READLINE_LINE:$wordcnt}
-                                line="$oldprefix$olderword$lastspcl$newword${arrr[1]}$lastword$suffix" 
-                            else
-                                [[ "$directn" == 'right' ]] && ! [[ $READLINE_POINT = ${#READLINE_LINE} ]] &&
-                                    READLINE_POINT=${#READLINE_LINE}
-                                break
-                            fi
-                        fi
-                    else
-                       oldprfxcnt=0
-                       if test -n "$oldprefix"; then
-                            test -z "$olderspcl" && olderspcl="$lastspcl" && lastspcl="${arrr[1]}"
-
-                            if [[ $READLINE_POINT -ge $cntuptolastword ]] && [[ "$directn" == 'right' ]]; then 
-                                line="$READLINE_LINE"
-                                relpoint=${#READLINE_LINE}
-                            else
-                                if [[ "$directn" == 'left' ]]; then
-                                    
-                                    if [[ ${#arr[@]} == '1' ]]; then
-                                        relpoint=0 
-                                        local lntcnt=$(($(echo "$olderword" | wc --chars) - 1))
-                                        local suffix=${READLINE_LINE:$lntcnt}
-                                        line="$lastword$suffix" 
-                                    else
-                                        relpoint=$(($(echo "$oldprefix" | wc --chars) - 1)) 
-                                        local lntcnt=$(($(echo "$olderword$olderspcl$lastword" | wc --chars) - 1))
-                                        local suffix=${READLINE_LINE:$lntcnt}
-                                        line="$olderword$olderspcl$lastword$suffix" 
-                                    fi
-                                else
-                                    relpoint=${#READLINE_LINE}
-                                    line="$READLINE_LINE" 
-                                fi
-                            fi
-                        elif [[ "$directn" == 'right' ]] || ([[ "$directn" == 'left' ]] && [[ $READLINE_POINT -gt $firstword ]]); then
-                            oldprfxcnt=$(($(echo "$lastword" | wc --chars) - 1)) &&
-                            prfxcnt=$(($(echo "$prefix$lastspcl" | wc --chars) - 1))
-                            local wordcnt=$(($(echo "$lastword$lastspcl$newword" | wc --chars) - 1)) 
-                            local suffix=${READLINE_LINE:$(($wordcnt))}
-                            line="$newword$lastspcl$lastword$suffix" 
-                        else
-                            [[ "$directn" == 'left' ]] && ! [[ $READLINE_POINT = 0 ]] &&
-                                READLINE_POINT=0
-                            break
-                        fi
-
-                    fi
-                    ! [[ $relpoint ]] && relpoint=$(($READLINE_POINT - $prfxcnt))
-                    READLINE_LINE=$line
-                    READLINE_POINT=$relpoint
-                    break
-                fi
-                olderspcl="$lastspcl" 
-                prefix="$prefix$lastspcl"
-                oldprefix=$prefix
-                unset_array arrr 0; 
-                test -n "${arrr[0]}" && lastspcl="${arrr[0]}"; 
-            fi
-        done
-    fi
-    unset arr arrr
-}
-
-alias __='clear && tput cup $(($LINE_TPUT+1)) $TPUT_COL && tput sc && tput cuu1 && echo "${PS1@P}" && tput cuu1'
-
-
-#    bind -m vi-command -x '"\e[1;2D": vi-set-mark'
-#    bind -m vi-insert '"\e[1;2D": vi-set-mark'
+## Transpose space-separated words on Shift Left/Right
 #
-#    # Transpose space-separated words on Shift Left/Right
-#    
-#    #bind -m emacs-standard -x '"\e[1;2D": transpose_words space left'
-#    #bind -m vi-command -x '"\e[1;2D": transpose_words space left'
-#    #bind -m vi-insert -x '"\e[1;2D": transpose_words space left'
+##bind -m emacs-standard -x '"\e[1;2D": transpose_words space left'
+##bind -m vi-command -x '"\e[1;2D": transpose_words space left'
+##bind -m vi-insert -x '"\e[1;2D": transpose_words space left'
 #
-#    bind -m emacs-standard -x '"\e[1;2C": transpose_words space right'
-#    bind -m vi-command -x '"\e[1;2C": transpose_words space right'
-#    bind -m vi-insert -x '"\e[1;2C": transpose_words space right'
+#bind -m emacs-standard -x '"\e[1;2C": transpose_words space right'
+#bind -m vi-command -x '"\e[1;2C": transpose_words space right'
+#bind -m vi-insert -x '"\e[1;2C": transpose_words space right'
 #
-#    # Transpose special character separated words on Alt+Shift Left/Right
+## Transpose special character separated words on Alt+Shift Left/Right
 #
-#    bind -m emacs-standard -x '"\e[1;4D": transpose_words words left'
-#    bind -m vi-command -x '"\e[1;4D": transpose_words words left'
-#    bind -m vi-insert -x '"\e[1;4D": transpose_words words left'
+#bind -m emacs-standard -x '"\e[1;4D": transpose_words words left'
+#bind -m vi-command -x '"\e[1;4D": transpose_words words left'
+#bind -m vi-insert -x '"\e[1;4D": transpose_words words left'
 #
-#    bind -m emacs-standard -x '"\e[1;4C": transpose_words words right'
-#    bind -m vi-command -x '"\e[1;4C": transpose_words words right'
-#    bind -m vi-insert -x '"\e[1;4C": transpose_words words right'
+#bind -m emacs-standard -x '"\e[1;4C": transpose_words words right'
+#bind -m vi-command -x '"\e[1;4C": transpose_words words right'
+#bind -m vi-insert -x '"\e[1;4C": transpose_words words right'
 #
-#    # Shift up => Clean reset
-#    #bind -x '"\e288": "cd \C-i"'
-#    bind -x '"\e288": "__"'
-#    bind -m emacs-standard '"\e[1;2A": "\C-e\C-u\e288"'
-#    bind -m vi-command '"\e[1;2A": "ddi\e288"'
-#    bind -m vi-insert '"\e[1;2A": "\eddi\e288"'
+## Shift up => Clean reset
+##bind -x '"\e299": "cd \C-i"'
+#bind -m emacs-standard '"\e[1;2A": "\C-e\C-u\e299"'
+#bind -m vi-command '"\e[1;2A": "ddi\e299"'
+#bind -m vi-insert '"\e[1;2A": "\eddi\e299"'
 #
-#    # Shift down => cd shortcut
-#    bind -m emacs-standard '"\e[1;2B": "\C-e\C-u\e288cd \C-i"'
-#    bind -m vi-insert '"\e[1;2B": "\eddi\e288cd \C-i"'
-#    bind -m vi-command '"\e[1;2B": "\eddi\e288cd \C-i"'
+## Shift down => cd shortcut
+#bind -x '"\e299": "__"'
+#bind -m emacs-standard '"\e[1;2B": "\C-e\C-u\e299cd \C-i"'
+#bind -m vi-insert '"\e[1;2B": "\eddi\e299cd \C-i"'
+#bind -m vi-command '"\e[1;2B": "\eddi\e299cd \C-i"'
 
 
 # Shift left/right to jump from bigwords (ignore spaces when jumping) instead of chars
@@ -621,24 +262,52 @@ alias __='clear && tput cup $(($LINE_TPUT+1)) $TPUT_COL && tput sc && tput cuu1 
 #bind -m vi-command     -x '"\e[1;2C": clear && let COL_TPUT=$COL_TPUT+1 && if [ $COL_TPUT -gt $COLUMNS ];then COL_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && tput sc 1 && echo "${PS1@P}" && tput cuu1'
 #bind -m vi-insert      -x '"\e[1;2C": clear && let COL_TPUT=$COL_TPUT+1 && if [ $COL_TPUT -gt $COLUMNS ];then COL_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && tput sc 1 && echo "${PS1@P}" && tput cuu1'
 
+
+# Alt-Right arrow rotates forward over directory history
+bind -x '"\e277": pushd +1 &>/dev/null'
+bind -m emacs-standard '"\e[1;3C": "\C-e\C-u\e277 _.\C-m"'
+bind -m vi-command '"\e[1;3C": "ddi\e277 _.\C-m"'
+bind -m vi-insert '"\e[1;3C": "\eddi\e277 _.\C-m"'
+
+# Alt-Left arrow rotates backward over directory history
+bind -x '"\e266": pushd -0 &>/dev/null'
+bind -m emacs-standard '"\e[1;3D": "\C-e\C-u\e266 _.\C-m"'
+bind -m vi-command '"\e[1;3D": "ddi\C-u\e266 _.\C-m"'
+bind -m vi-insert '"\e[1;3D": "\eddi\e266 _.\C-m"'
+
+# Alt-Up goes up one directory
+bind -x '"\e288": cd ..'
+bind -m emacs-standard '"\e[1;3A": "\C-e\C-u\e288 _.\C-m"'
+bind -m vi-command '"\e[1;3A": "\C-e\C-u\e288 _.\C-m"'
+bind -m vi-insert '"\e[1;3A": "\C-e\C-u\e288 _.\C-m"'
+
+if ! hash fzf &> /dev/null || ! [ -f $HOME/.keybinds.d/fzf-bindings.bash ]; then
+    bind -x '"\e299": "__"'
+    bind -m emacs-standard '"\e[1;3B": "\C-e\C-u\e299cd \C-i"'
+    bind -m vi-command '"\e[1;3B": "\eddi\e299cd \C-i"'
+    bind -m vi-insert '"\e[1;3B": "\eddi\e299cd \C-i"'
+fi
+
+
 # Alt left/right to jump to beginning/end line instead of chars
-bind -m emacs-standard '"\e[1;3D": beginning-of-line'
-bind -m vi-command '"\e[1;3D": beginning-of-line'
-bind -m vi-insert '"\e[1;3D": beginning-of-line'
-
-bind -m emacs-standard '"\e[1;3C": end-of-line'
-bind -m vi-command '"\e[1;3C": end-of-line'
-bind -m vi-insert '"\e[1;3C": end-of-line'
-
-# Alt up/down to change cursor line
-bind -m emacs-standard -x '"\e[1;3A": clear && let LINE_TPUT=$LINE_TPUT-1; if [ $LINE_TPUT -lt 0 ];then let LINE_TPUT=$LINES;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
-bind -m vi-command -x '"\e[1;3A": clear && let LINE_TPUT=$LINE_TPUT-1; if [ $LINE_TPUT -lt 0 ];then let LINE_TPUT=$LINES;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
-bind -m vi-insert -x '"\e[1;3A": clear && let LINE_TPUT=$LINE_TPUT-1; if [ $LINE_TPUT -lt 0 ];then let LINE_TPUT=$LINES;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
-
-bind -m emacs-standard -x '"\e[1;3B": clear && let LINE_TPUT=$LINE_TPUT+1; if [ $LINE_TPUT -gt $LINES ];then let LINE_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
-bind -m vi-command -x '"\e[1;3B": clear && let LINE_TPUT=$LINE_TPUT+1; if [ $LINE_TPUT -gt $LINES ];then let LINE_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
-bind -m vi-insert -x '"\e[1;3B": clear && let LINE_TPUT=$LINE_TPUT+1; if [ $LINE_TPUT -gt $LINES ];then let LINE_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
+#bind -m emacs-standard '"\e[1;3D": beginning-of-line'
+#bind -m vi-command '"\e[1;3D": beginning-of-line'
+#bind -m vi-insert '"\e[1;3D": beginning-of-line'
 #
+#bind -m emacs-standard '"\e[1;3C": end-of-line'
+#bind -m vi-command '"\e[1;3C": end-of-line'
+#bind -m vi-insert '"\e[1;3C": end-of-line'
+#
+#
+## Alt up/down to change cursor line
+#bind -m emacs-standard -x '"\e[1;3A": clear && let LINE_TPUT=$LINE_TPUT-1; if [ $LINE_TPUT -lt 0 ];then let LINE_TPUT=$LINES;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
+#bind -m vi-command -x '"\e[1;3A": clear && let LINE_TPUT=$LINE_TPUT-1; if [ $LINE_TPUT -lt 0 ];then let LINE_TPUT=$LINES;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
+#bind -m vi-insert -x '"\e[1;3A": clear && let LINE_TPUT=$LINE_TPUT-1; if [ $LINE_TPUT -lt 0 ];then let LINE_TPUT=$LINES;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
+#
+#bind -m emacs-standard -x '"\e[1;3B": clear && let LINE_TPUT=$LINE_TPUT+1; if [ $LINE_TPUT -gt $LINES ];then let LINE_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
+#bind -m vi-command -x '"\e[1;3B": clear && let LINE_TPUT=$LINE_TPUT+1; if [ $LINE_TPUT -gt $LINES ];then let LINE_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
+#bind -m vi-insert -x '"\e[1;3B": clear && let LINE_TPUT=$LINE_TPUT+1; if [ $LINE_TPUT -gt $LINES ];then let LINE_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
+
 # Ctrl-w expands aliases
 bind -m emacs-standard '"\C-w": history-and-alias-expand-line'
 bind -m vi-command '"\C-w": history-and-alias-expand-line'

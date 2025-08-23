@@ -74,13 +74,19 @@ if hash wget &>/dev/null && hash jq &>/dev/null; then
             test -n "$quer" &&
                 quer="--query $quer"
             res="$(echo "${releases[@]}" | tr ' ' '\n' | fzf $quer --select-1 --multi --reverse --height 50%)"
-        else
+        elif type reade &> /dev/null; then
             echo "${cyan}Files: ${normal}"
             for i in ${releases[@]}; do
                 echo " - ${cyan}$i${normal}"
             done
 	    releases=$(echo "${releases[@]}" | tr '\n' ' ')
             reade --auto oneoption -Q 'CYAN' $quer -i "$releases" -p "Which one?: " res
+        else
+            echo "${cyan}Files: ${normal}"
+            select res in ${releases[@]}; do
+                res=$res  
+                break 
+            done
         fi
 
         if test -n "$res"; then
