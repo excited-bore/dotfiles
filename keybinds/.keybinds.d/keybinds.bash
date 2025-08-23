@@ -124,19 +124,36 @@ bind -m vi-insert '"\e[B": history-search-forward'
 # Shift Arrow Key fix
 # https://unix.stackexchange.com/questions/444214/bash-shiftarrow-keys-make-a-b-c-d
 
-bind '"\e101": set-mark'
+bind -x '"\e105": echo point: $READLINE_POINT; echo mark: $READLINE_MARK'
+bind -x '"\e101": if [[ -z $READLINE_MARK_SET ]]; then READLINE_MARK_SET=1; READLINE_MARK=$READLINE_POINT; fi'
 bind '"\e102": exchange-point-and-mark'
+#bind '"\e101": set-mark'
 bind '"\e103": backward-char'
 bind '"\e104": forward-char'
+bind -x '"\e106": echo "Mark: $READLINE_MARK"; echo "Point: $READLINE_POINT"'
+bind -x '"\e107": [[ $READLINE_MARK == $READLINE_POINT && -n $READLINE_MARK_SET ]] && READLINE_MARK=$(($READLINE_MARK - 1))'
+bind -x '"\e108": [[ $READLINE_MARK == $READLINE_POINT && -n $READLINE_MARK_SET ]] && READLINE_MARK=$(($READLINE_MARK + 1))'
+
+bind -m emacs-standard '"\e[1;2C": "\e101\e104\e107\e102\e102"'
+bind -m vi-command '"\e[1;2C": "\e101\e104\e107\e102\e102"'
+bind -m vi-insert '"\e[1;2C": "\e101\e104\e107\e102\e102"'
+
+bind -m emacs-standard '"\e[1;2D": "\e101\e103\e108\e102\e102"'
+bind -m vi-command '"\e[1;2D": "\e101\e103\e108\e102\e102"'
+bind -m vi-insert '"\e[1;2D": "\e101\e103\e108\e102\e102"'
 
 
-bind -m emacs-standard '"\e[1;2C": "\e101\e104\e102\e102"'
-bind -m vi-command '"\e[1;2C": "\e101\e104\e102\e102"'
-bind -m vi-insert '"\e[1;2C": "\e101\e104\e102\e102"'
+# Arrow Key resets mark / selection
 
-bind -m emacs-standard '"\e[1;2D": "\e101\e103\e102\e102"'
-bind -m vi-command '"\e[1;2D": "\e101\e103\e102\e102"'
-bind -m vi-insert '"\e[1;2D": "\e101\e103\e102\e102"'
+bind -x '"\e105": READLINE_MARK_SET=""'
+
+bind -m emacs-standard '"\e[C": "\e105\e104"'
+bind -m vi-command '"\e[C": "\e105\e104"'
+bind -m vi-insert '"\e[C": "\e105\e104"'
+
+bind -m emacs-standard '"\e[D": "\e105\e103"'
+bind -m vi-command '"\e[D": "\e105\e103"'
+bind -m vi-insert '"\e[D": "\e105\e103"'
 
 
 # Control left/right to jump from bigwords (ignore spaces when jumping) instead of chars
@@ -736,14 +753,38 @@ elif ([[ "$XDG_SESSION_TYPE" == 'x11' ]] && hash xclip &>/dev/null) || ([[ "$XDG
   
     function clip-copy() {
         if [[ "$XDG_SESSION_TYPE" == 'x11' ]]; then  
-            echo -n "$READLINE_LINE" | xclip -i -sel c
+            if [[ -n $READLINE_MARK_SET ]]; then 
+                if [[ $READLINE_MARK -gt $READLINE_POINT ]]; then
+                    echo -n "${READLINE_LINE:$READLINE_POINT:$READLINE_MARK}" | xclip -i -sel c
+                else 
+                    echo -n "${READLINE_LINE:$READLINE_MARK:$READLINE_POINT}" | xclip -i -sel c
+                fi
+            else
+                echo -n "$READLINE_LINE" | xclip -i -sel c
+            fi
         elif [[ "$XDG_SESSION_TYPE" == 'wayland' ]]; then
-            echo -n "$READLINE_LINE" | wl-copy
+            if [[ -n $READLINE_MARK_SET ]]; then 
+                if [[ $READLINE_MARK -gt $READLINE_POINT ]]; then
+                    echo -n "${READLINE_LINE:$READLINE_POINT:$READLINE_MARK}" | wl-copy
+                else 
+                    echo -n "${READLINE_LINE:$READLINE_MARK:$READLINE_POINT}" | wl-copy
+                fi
+            else
+                echo -n "$READLINE_LINE" | wl-copy
+            fi
         fi
+         
     }
 
     function clip-paste() {
-        
+        if [[ -n $READLINE_MARK_SET ]]; then 
+            if [[ $READLINE_MARK -gt $READLINE_POINT ]]; then 
+                READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}${READLINE_LINE:$READLINE_MARK}"
+            else
+                READLINE_LINE="${READLINE_LINE:0:$READLINE_MARK}${READLINE_LINE:$READLINE_POINT}"
+            fi
+        fi  
+
         if [[ "$XDG_SESSION_TYPE" == 'x11' ]]; then  
             local pasters="$(xclip -o -sel c)"
         elif [[ "$XDG_SESSION_TYPE" == 'wayland' ]]; then
@@ -824,11 +865,17 @@ if hash lazygit &>/dev/null; then
 fi
 
 # F5, Ctrl-r - Reload .bashrc
-#bind '"\205": re-read-init-file;'
-bind -x '"\206": bind -f ~/.inputrc && source ~/.bashrc'
-bind -m emacs-standard '"\e[15~": "\C-u\206\n"'
-bind -m vi-command '"\e[15~": "\C-u\206\n"'
-bind -m vi-insert '"\e[15~": "\C-u\206\n"'
+bind '"\205": re-read-init-file'
+bind -x '"\206": source ~/.bashrc'
+if [[ -z "$BLE_VERSION" ]]; then
+    bind -m emacs-standard '"\e[15~": "\C-u\205\206\C-m"'
+    bind -m vi-command '"\e[15~": "\C-u\205\206\C-m"'
+    bind -m vi-insert '"\e[15~": "\C-u\205\206\C-m"'
+else 
+    bind -m emacs-standard '"\e[15~": "\C-u\206\C-m"'
+    bind -m vi-command '"\e[15~": "\C-u\206\C-m"'
+    bind -m vi-insert '"\e[15~": "\C-u\206\C-m"'
+fi
 
 
 # F6 - (neo/fast/screen)fetch (System overview)
