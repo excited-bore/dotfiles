@@ -262,6 +262,13 @@ bind -m vi-insert -x '"\e[1;5B": clear && let LINE_TPUT=$LINE_TPUT+1; if [ $LINE
 #bind -m vi-insert      -x '"\e[1;2C": clear && let COL_TPUT=$COL_TPUT+1 && if [ $COL_TPUT -gt $COLUMNS ];then COL_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && tput sc 1 && echo "${PS1@P}" && tput cuu1'
 
 
+# Ctrl+o: Change from vi-mode to emacs mode and back
+# This is also configured in ~/.fzf/shell/key-bindings-bash.sh if you have fzf keybinds installed
+bind -m vi-command '"\C-o": emacs-editing-mode'
+bind -m vi-insert '"\C-o": emacs-editing-mode'
+bind -m emacs-standard '"\C-o": vi-editing-mode'
+
+
 # Alt-Right arrow rotates forward over directory history
 bind -x '"\e277": pushd +1 &>/dev/null'
 bind -m emacs-standard '"\e[1;3C": "\C-e\C-u\e277 _.\C-m"'
@@ -288,6 +295,21 @@ if ! hash fzf &> /dev/null || ! [ -f $HOME/.keybinds.d/fzf-bindings.bash ]; then
     bind -m vi-command '"\e[1;3B": "\eddi\e299cd \C-i"'
     bind -m vi-insert '"\e[1;3B": "\eddi\e299cd \C-i"'
 else
+    if ! [ -f $HOME/.keybinds.d/fzf-bindings.bash ]; then
+        __fzf_cd__() {
+          local dir
+          dir=$(
+            FZF_DEFAULT_COMMAND=${FZF_ALT_C_COMMAND:-} \
+            FZF_DEFAULT_OPTS=$(__fzf_defaults "--reverse --walker=dir,follow,hidden --scheme=path" "${FZF_ALT_C_OPTS-} +m") \
+            FZF_DEFAULT_OPTS_FILE='' $(__fzfcmd)
+          ) && printf 'builtin cd -- %q' "$(builtin unset CDPATH && builtin cd -- "$dir" && builtin pwd)"
+        }
+
+        bind -m emacs-standard '"\er": redraw-current-line'
+        bind -m emacs-standard '"\e[1;3B": " \C-b\C-k \C-u`__fzf_cd__`\e\C-e\er\C-m\C-y\C-h\e \C-y\ey\C-x\C-x\C-d\C-y\ey\C-_"'
+        bind -m vi-command '"\e[1;3B": "\C-o\e[1;3B\C-o"'
+        bind -m vi-insert '"\e[1;3B": "\C-o\e[1;3B\C-o"'
+    fi
     if hash bfs &> /dev/null; then
         FZF_ALT_C_COMMAND="bfs -x -type d -exclude -name '.git' -exclude -name 'node_modules'" 
     fi
@@ -370,12 +392,6 @@ bind -m vi-insert -x '"\C-l": __'
 #bind -m emacs-standard '"\C-x\C-b": quoted-insert'
 #bind -m vi-command '"\C-b": quoted-insert'
 #bind -m vi-insert '"\C-b": quoted-insert'
-
-# Ctrl+o: Change from vi-mode to emacs mode and back
-# This is also configured in ~/.fzf/shell/key-bindings-bash.sh if you have fzf keybinds installed
-bind -m vi-command '"\C-o": emacs-editing-mode'
-bind -m vi-insert '"\C-o": emacs-editing-mode'
-bind -m emacs-standard '"\C-o": vi-editing-mode'
 
 # vi-command ' / emacs C-x ' helps with adding quotes to bash strings
 _quote_all() { READLINE_LINE="${READLINE_LINE@Q}"; }
