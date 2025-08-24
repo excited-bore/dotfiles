@@ -123,10 +123,9 @@ bind -m vi-insert '"\e[B": history-search-forward'
 # Shift Arrow Key fix
 # https://unix.stackexchange.com/questions/444214/bash-shiftarrow-keys-make-a-b-c-d
 
-bind -x '"\e105": echo point: $READLINE_POINT; echo mark: $READLINE_MARK'
+#bind '"\e101": set-mark'
 bind -x '"\e101": if [[ -z $READLINE_MARK_SET ]]; then READLINE_MARK_SET=1; READLINE_MARK=$READLINE_POINT; fi'
 bind '"\e102": exchange-point-and-mark'
-#bind '"\e101": set-mark'
 bind '"\e103": backward-char'
 bind '"\e104": forward-char'
 bind -x '"\e105": READLINE_MARK_SET=""'
@@ -281,11 +280,22 @@ bind -m emacs-standard '"\e[1;3A": "\C-e\C-u\e288 _.\C-m"'
 bind -m vi-command '"\e[1;3A": "\C-e\C-u\e288 _.\C-m"'
 bind -m vi-insert '"\e[1;3A": "\C-e\C-u\e288 _.\C-m"'
 
+# Alt-Down prompts you to select a folder to go into
+# With fzf keybinds or with tabcomplete
 if ! hash fzf &> /dev/null || ! [ -f $HOME/.keybinds.d/fzf-bindings.bash ]; then
     bind -x '"\e299": "__"'
     bind -m emacs-standard '"\e[1;3B": "\C-e\C-u\e299cd \C-i"'
     bind -m vi-command '"\e[1;3B": "\eddi\e299cd \C-i"'
     bind -m vi-insert '"\e[1;3B": "\eddi\e299cd \C-i"'
+else
+    if hash bfs &> /dev/null; then
+        FZF_ALT_C_COMMAND="bfs -x -type d -exclude -name '.git' -exclude -name 'node_modules'" 
+    fi
+    if hash eza &> /dev/null; then
+        FZF_ALT_C_OPTS=" --preview 'eza --tree --color=always --icons=always --all {}'"
+    elif hash tree &> /dev/null; then 
+        FZF_ALT_C_OPTS=" --preview 'tree -C {}'"
+    fi
 fi
 
 
@@ -331,7 +341,6 @@ if [[ "$TERM" == 'xterm-kitty' ]]; then
 
 fi
 
-
 # Ctrl-q quits terminal
 bind -m emacs-standard -x '"\C-q": exit'
 bind -m vi-command -x '"\C-q": exit'
@@ -353,14 +362,14 @@ bind -m vi-command -x '"\C-l": __'
 bind -m vi-insert -x '"\C-l": __'
 
 # Ctrl-d: Delete first character on line
-bind -m emacs-standard '"\C-d": "\C-a\e[3~"'
-bind -m vi-command '"\C-d": "\e[1;3D\e[3~"'
-bind -m vi-insert '"\C-d": "\e[1;3D\e[3~"'
+#bind -m emacs-standard '"\C-d": "\C-a\e[3~"'
+#bind -m vi-command '"\C-d": "\e[1;3D\e[3~"'
+#bind -m vi-insert '"\C-d": "\e[1;3D\e[3~"'
 
 # Ctrl+b: (Ctrl+x Ctrl+b emacs mode) is quoted insert - Default Ctrl+v - Gives (f.ex. 'Ctrl-a') back as '^A'
-bind -m emacs-standard '"\C-x\C-b": quoted-insert'
-bind -m vi-command '"\C-b": quoted-insert'
-bind -m vi-insert '"\C-b": quoted-insert'
+#bind -m emacs-standard '"\C-x\C-b": quoted-insert'
+#bind -m vi-command '"\C-b": quoted-insert'
+#bind -m vi-insert '"\C-b": quoted-insert'
 
 # Ctrl+o: Change from vi-mode to emacs mode and back
 # This is also configured in ~/.fzf/shell/key-bindings-bash.sh if you have fzf keybinds installed

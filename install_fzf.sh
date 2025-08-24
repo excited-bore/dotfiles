@@ -23,7 +23,6 @@ if test -z "$1"; then
 fi
 
 
-
 # Fzf (Fuzzy Finder)
 
 # Remove older versions
@@ -73,10 +72,10 @@ if test -z "$1"; then
         wget-aria-name ~/.keybinds.d/fzf-bindings.bash https://raw.githubusercontent.com/junegunn/fzf/refs/heads/master/shell/key-bindings.bash
     fi
 
-    if test -f $BASH_KEYBIND_FILEDIR/keybinds.bash; then
-        grep -q '^bind -m emacs-standard  '\''"\\C-z": vi-undo'\''' $BASH_KEYBIND_FILEDIR/keybinds.bash &&
-            sed -i 's|\\\C-z|\\\C-o|g' $HOME/.keybinds.d/fzf-bindings.bash
-    fi
+    grep -q '^bind -m vi-command '\''"\\C-z": emacs-editing-mode'\''' $BASH_KEYBIND_FILEDIR/fzf-bindings.bash &&
+        sed -i 's|\\\C-z|\\\C-o|g' $BASH_KEYBIND_FILEDIR/fzf-bindings.bash
+    grep -q 'bind -m emacs-standard '\''"\\ec"' $BASH_KEYBIND_FILEDIR/fzf-bindings.bash &&
+        sed -i 's|\\\ec|\\\e[1;3B|g' $BASH_KEYBIND_FILEDIR/fzf-bindings.bash
     unset fzf_key
 
     #if [[ $ENV =~ '.environment.env' ]]; then
@@ -287,7 +286,7 @@ if test -z "$1"; then
 
     if ! test -f /usr/bin/rifle || ! test -f $HOME/.bash_aliases.d/fzf-rifle.sh; then
         readyn -p "Use rifle (file opener from 'ranger') to open found files and dirs with a custom Ctrl-F filesearch shortcut?" fzf_f
-        if [[ "$fzf_f" == "y" ]]; the   n
+        if [[ "$fzf_f" == "y" ]]; then
             if ! hash rifle &>/dev/null; then
                 if ! hash python &>/dev/null; then
                     if [[ "$distro_base" == 'Debian' ]]; then
