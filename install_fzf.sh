@@ -91,19 +91,15 @@ if test -z "$1"; then
     #    fi
     #fi
 
-
-
     #export PATH="$PATH:$HOME/.fzf/bin"
 
     if ! [ -f ~/.fzf_history ]; then
         touch ~/.fzf_history
     fi
 
-    fnd="find"
-
     # TODO: Make better check: https://github.com/sharkdp/fd
     if ! hash fd-find &>/dev/null && ! hash fd &>/dev/null; then
-        readyn -p "Install fd and use for fzf? (Faster find)" fdr
+        readyn -p "Install fd and use for fzf? (A faster variant of 'find')" fdr
         if [[ "$fdr" == "y" ]]; then
             if ! test -f install_fd.sh; then
                 source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fd.sh)
@@ -113,9 +109,29 @@ if test -z "$1"; then
         fi
     fi
 
-    if hash fd-find &>/dev/null || type hash &>/dev/null; then
-        fnd="fd"
+    # BFS: Mostly usefull for Alt-C / Alt-Down keybind but still very usefull in that regard 
+    if ! hash bfs &>/dev/null; then
+        readyn -p "Install bfs (A breadth-first find variant rather then depth-first - first results are closer to current directory)?" bfsnstll
+        if [[ "$bfsnstll" == "y" ]]; then
+            if ! test -f install_bfs.sh; then
+                source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bfs.sh)
+            else
+                . ./install_bfs.sh
+            fi
+        fi
     fi
+
+    opts="find"
+    printf "${GREEN}The options for Fzf's internal command at default are:\n" 
+    printf "${green}\t- ${CYAN}find${green}: The default UNIX command finding files and folders. It is depth-first so it will show the longest pathnames before shorter ones\n${normal}" 
+    (hash fd-find &> /dev/null || hash fd &> /dev/null) && 
+        printf "${green}\t- ${CYAN}fd${green}: A faster variant of 'find' written in rust and although it has not all of find's features, it's results come with way more distinct colors out of the box. It is also depth-first.\n${normal}" &&
+        opts="$opts fd" 
+    hash bfs &> /dev/null && 
+        printf "${green}\t- ${CYAN}bfs${green}: A 'breadth-first' find variant that unlike find or fd will show short pathnames relative to the current path faster then longer pathnames. It also is written in C.\n${normal}" &&
+        opts="$opts bfs" 
+    
+    reade -Q 'GREEN' -i "$opts" -p "Which command should be default for fzf?" fnd
 
     # BAT
     if ! hash bat &>/dev/null; then
