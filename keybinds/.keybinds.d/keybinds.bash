@@ -315,10 +315,13 @@ else
     elif hash fd &> /dev/null; then
         FZF_ALT_C_COMMAND="fd -H --type d --exclude '.git' --exclude 'node_modules'" 
     fi
+    
+    FZF_ALT_C_OPTS='--bind "ctrl-v:become(vlc --recursive expand {})"
+                    --bind "ctrl-g:become(. ~/.bash_aliases.d/ripgrep-directory.sh && cd {} && ripgrep-dir > /dev/tty)"' 
     if hash eza &> /dev/null; then
-        FZF_ALT_C_OPTS=" --preview 'eza --tree --color=always --icons=always --all {}'"
+        FZF_ALT_C_OPTS="$FZF_ALT_C_OPTS --preview 'eza --tree --color=always --icons=always --all {}'"
     elif hash tree &> /dev/null; then 
-        FZF_ALT_C_OPTS=" --preview 'tree -C {}'"
+        FZF_ALT_C_OPTS="$FZF_ALT_C_OPTS --preview 'tree -C {}'"
     fi
 fi
 

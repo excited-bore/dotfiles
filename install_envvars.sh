@@ -289,6 +289,13 @@ if [[ "$envvars" == "y" ]] && [[ "$1" == 'n' ]]; then
     sed -i 's/  --preview-window/ #--preview-window/' $pathvr
     sed -i 's/  --color/ #--color/' $pathvr
 
+    # Check whether fd is installed, comment it out cause it's faster for fzf 
+    if hash fd &> /dev/null || hash fd-find &> /dev/null; then
+        sed -i 's/#export FZF_DEFAULT_COMMAND="fd/export FZF_DEFAULT_COMMAND="fd/g' $pathvr 
+    else 
+        sed -i 's/#export FZF_DEFAULT_COMMAND="find/export FZF_DEFAULT_COMMAND="find/g' $pathvr 
+    fi
+
     # Set TMPDIR
     sed -i 's|#export TMPDIR|export TMPDIR|' $pathvr
 
