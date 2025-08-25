@@ -103,31 +103,149 @@ fi
 # It's good to use unused keys for complex keybindings since you can't combine readline commands with regular bash expressions in the same bind
 # Also
 # https://unix.stackexchange.com/questions/548726/bash-readline-inputrc-bind-key-to-a-sequence-of-multiple-commands
+#
+#
+# Change editing mode
+#bind -m vi-command '"\C-a": emacs-editing-mode'
+#bind -m vi-insert '"\C-a": emacs-editing-mode'
+#bind -m emacs-standard '"\C-a": vi-editing-mode'
 
-
-
-# Up and down arrow will now intelligently complete partially completed
+# up and down arrow will now intelligently complete partially completed
 # commands by searching through the existing history.
-bind -m emacs-standard '"\e[A": history-search-backward'
-bind -m vi-command '"\e[A": history-search-backward'
-bind -m vi-insert '"\e[A": history-search-backward'
+bind -m emacs-standard '"\e[a": history-search-backward'
+bind -m vi-command '"\e[a": history-search-backward'
+bind -m vi-insert '"\e[a": history-search-backward'
 
-bind -m emacs-standard '"\e[B": history-search-forward'
-bind -m vi-command '"\e[B": history-search-forward'
-bind -m vi-insert '"\e[B": history-search-forward'
+bind -m emacs-standard '"\e[b": history-search-forward'
+bind -m vi-command '"\e[b": history-search-forward'
+bind -m vi-insert '"\e[b": history-search-forward'
 
-# Shift Arrow Key fix
+# Shift arrow key fix
 # https://unix.stackexchange.com/questions/444214/bash-shiftarrow-keys-make-a-b-c-d
 
-#bind '"\e101": set-mark'
-bind -x '"\e101": if [[ -z $READLINE_MARK_SET ]]; then READLINE_MARK_SET=1; READLINE_MARK=$READLINE_POINT; fi'
+# also shift arrow keys left/right now select stuff by setting the mark
+# i use `exchange-point-and-mark` twice over `set-mark` since this highlights the region properly
+# *n o  i d e a* why there's not even an option in readline that allows `set-mark` to do the same, it ig this at least works so *whatever*..
+
+
+# Ctrl-Alt-Left/Right should move the region 1 char to the left/right
+# And since the only way to reactivate the region after moving is, is by using a readline function bound to a key..
+# ....We basically have to make a function that does this, then bind a key to that and a escape sequence bound to the activation of the region
+# .... Because we can only use readline functions when they're bound to a key/escape sequence
+# ... and then rebind Ctrl-Alt-Left/Right after the region becomes deactivated
+
+function move-region(){
+    local len word prevc nextc linelen="${#READLINE_LINE}"
+    if [[ $READLINE_POINT -lt $READLINE_MARK ]]; then
+        len=$(( $READLINE_MARK - $READLINE_POINT )) 
+        word="${READLINE_LINE:$READLINE_POINT:$len}"
+        if [[ $1 == 'left' && $READLINE_POINT != 0 ]]; then
+            prevc="${READLINE_LINE:$(($READLINE_POINT-1)):1}"
+            READLINE_LINE="${READLINE_LINE:0:$(($READLINE_POINT-1))}$word$prevc${READLINE_LINE:$READLINE_MARK}"
+            READLINE_POINT=$((READLINE_POINT-1))
+            READLINE_MARK=$((READLINE_MARK-1))
+        elif [[ $1 == 'right' && $READLINE_MARK != $linelen ]]; then
+            nextc="${READLINE_LINE:$READLINE_MARK:1}"
+            READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$nextc$word${READLINE_LINE:$((READLINE_MARK+1))}"
+            READLINE_POINT=$((READLINE_POINT+1))
+            READLINE_MARK=$((READLINE_MARK+1))
+        fi
+    elif [[ $READLINE_MARK -lt $READLINE_POINT ]]; then
+        len=$(( $READLINE_POINT - $READLINE_MARK )) 
+        word="${READLINE_LINE:$READLINE_MARK:$len}" 
+        if [[ $1 == 'left' && $READLINE_MARK != 0 ]]; then
+            prevc="${READLINE_LINE:$(($READLINE_MARK-1)):1}"
+            READLINE_LINE="${READLINE_LINE:0:$(($READLINE_MARK-1))}$word$prevc${READLINE_LINE:$READLINE_POINT}"
+            READLINE_POINT=$((READLINE_POINT-1))
+            READLINE_MARK=$((READLINE_MARK-1))
+        elif [[ $1 == 'right' && $READLINE_POINT != $linelen ]]; then
+            nextc="${READLINE_LINE:$READLINE_POINT:1}"
+            READLINE_LINE="${READLINE_LINE:0:$READLINE_MARK}$nextc$word${READLINE_LINE:$((READLINE_POINT+1))}"
+            READLINE_POINT=$((READLINE_POINT+1))
+            READLINE_MARK=$((READLINE_MARK+1))
+        fi
+    fi
+} 
+
 bind '"\e102": exchange-point-and-mark'
+bind -x '"\e113": "move-region left"'  
+bind -x '"\e114": "move-region right"'  
+
+READLINE_MARK_SET=''
+
+function set-mark-and-bind-move-region(){
+    local keymap leftmap leftmapx rightmap rightmapx
+    
+    if [[ -z $READLINE_MARK_SET ]]; then 
+        READLINE_MARK_SET=1; 
+        READLINE_MARK=$READLINE_POINT; 
+       
+        # Check which keymap is active 
+        if set -o | grep -Eq 'emacs\s+on'; then
+            keymap="emacs-standard"
+        else
+            keymap="vi-insert" 
+        fi
+        
+        CTRL_ALT_KM=$keymap
+        
+        if ! bind -m $keymap -X | grep -q '\\e\[1;7D": "\\e113\\e102\\e102'; then
+            # Ctrl-Alt-Left should move a region 1 char to the left 
+            if bind -m $keymap -p | grep -q '"\\e\[1;7D":'; then
+                leftmap=$(bind -m $keymap -p | grep '"\\e\[1;7D":' | awk '{$1=""; print}' | xargs)
+            elif bind -m $keymap -s | grep -q '"\\e\[1;7D":'; then
+                leftmap=$(bind -m $keymap -s | grep '"\\e\[1;7D":' | awk '{$1=""; print}' | xargs)
+            elif bind -m $keymap -X | grep -q '"\\e\[1;7D"'; then
+                leftmapx='-x ' 
+                leftmap=$(bind -m $keymap -X | grep '"\\e\[1;7D"' | awk '{$1=""; print}' | xargs)
+            fi
+            bind -m $keymap '"\e[1;7D": "\e113\e102\e102"' 
+            CTRL_ALT_LEFTX=$leftmapx
+            CTRL_ALT_LEFTM=$leftmap
+        fi
+         
+        if ! bind -m $keymap -X | grep -q '\\e\[1;7C": "\\e114\\e102\\e102'; then
+            if bind -m $keymap -p | grep -q '"\\e\[1;7C":'; then
+                rightmap=$(bind -m $keymap -p | grep '"\\e\[1;7C":' | awk '{$1=""; print}' | xargs)
+            elif bind -m $keymap -s | grep -q '"\\e\[1;7C":'; then
+                rightmap=$(bind -m $keymap -s | grep '"\\e\[1;7C":' | awk '{$1=""; print}' | xargs)
+            elif bind -m $keymap -X | grep -q '"\\e\[1;7C"'; then
+                rightmapx='-x '
+                rightmap=$(bind -m $keymap -X | grep '"\\e\[1;7C"' | awk '{$1=""; print}' | xargs)
+            fi
+            bind -m $keymap '"\e[1;7C": "\e114\e102\e102"' 
+            CTRL_ALT_RIGHTX=$rightmapx
+            CTRL_ALT_RIGHTM=$rightmap
+        fi
+    fi
+}
+
+function reset-mark(){
+   READLINE_MARK=$READLINE_POINT 
+   READLINE_MARK_SET=""
+   if [[ -n $CTRL_ALT_LEFTM ]]; then
+       bind -m $CTRL_ALT_KM $CTRL_ALT_LEFTX "\"\e[1;7D\": \"$CTRL_ALT_LEFTM\""
+       CTRL_ALT_LEFTM="" 
+   fi
+   if [[ -n $CTRL_ALT_RIGHTM ]]; then
+       bind -m $CTRL_ALT_KM $CTRL_ALT_RIGHTX "\"\e[1;7C\": \"$CTRL_ALT_RIGHTM\""
+       CTRL_ALT_RIGHTM="" 
+   fi
+}
+
+#bind '"\e101": set-mark'
+bind -x '"\e101": set-mark-and-bind-move-region'
+bind -x '"\e105": reset-mark'
+bind -x '"\e106": echo "Mark: $READLINE_MARK"; echo "Point: $READLINE_POINT"'
+
 bind '"\e103": backward-char'
 bind '"\e104": forward-char'
-bind -x '"\e105": READLINE_MARK_SET=""'
-bind -x '"\e106": echo "Mark: $READLINE_MARK"; echo "Point: $READLINE_POINT"'
+
+# Fix for after expanding region to the left
 bind -x '"\e107": [[ $READLINE_MARK == $READLINE_POINT && -n $READLINE_MARK_SET ]] && READLINE_MARK=$(($READLINE_MARK - 1))'
+# Fix for after expanding region to the right
 bind -x '"\e108": [[ $READLINE_MARK == $READLINE_POINT && -n $READLINE_MARK_SET ]] && READLINE_MARK=$(($READLINE_MARK + 1))'
+
 
 bind -m emacs-standard '"\e[1;2C": "\e101\e104\e107\e102\e102"'
 bind -m vi-command '"\e[1;2C": "\e101\e104\e107\e102\e102"'
@@ -137,6 +255,18 @@ bind -m emacs-standard '"\e[1;2D": "\e101\e103\e108\e102\e102"'
 bind -m vi-command '"\e[1;2D": "\e101\e103\e108\e102\e102"'
 bind -m vi-insert '"\e[1;2D": "\e101\e103\e108\e102\e102"'
 
+# Shift Up/Down selects untill the beginning/end of a line
+
+bind '"\e111": beginning-of-line'
+bind '"\e112": end-of-line'
+
+bind -m emacs-standard '"\e[1;2A": "\e101\e111\e107\e102\e102"'
+bind -m vi-command '"\e[1;2A": "\e101\e111\e107\e102\e102"'
+bind -m vi-insert '"\e[1;2A": "\e101\e111\e107\e102\e102"'
+
+bind -m emacs-standard '"\e[1;2B": "\e101\e112\e108\e102\e102"'
+bind -m vi-command '"\e[1;2B": "\e101\e112\e108\e102\e102"'
+bind -m vi-insert '"\e[1;2B": "\e101\e112\e108\e102\e102"'
 
 # Arrow Key resets mark / selection
 
@@ -162,6 +292,16 @@ bind -m emacs-standard '"\e[1;5d": "\e105\e110"'
 bind -m vi-command '"\e[1;5d": "\e105\e110"'
 bind -m vi-insert '"\e[1;5d": "\e105\e110"'
 
+# Control Up/Down - Move to beginning or end of line
+
+bind -m emacs-standard '"\e[1;5A": "\e105\e111"' 
+bind -m vi-command '"\e[1;5A": "\e105\e111"'
+bind -m vi-insert '"\e[1;5A": "\e105\e111"'
+
+bind -m emacs-standard '"\e[1;5B": "\e105\e112"'
+bind -m vi-command '"\e[1;5B": "\e105\e112"'
+bind -m vi-insert '"\e[1;5B": "\e105\e112"'
+
 # make sure $columns gets set
 shopt -s checkwinsize
 
@@ -184,68 +324,35 @@ fi
 
 alias __='clear && tput cup $(($LINE_TPUT+1)) $TPUT_COL && tput sc && tput cuu1 && echo "${PS1@P}" && tput cuu1'
 
-# Ctrl-Up/Down to change cursor line
-bind -m emacs-standard -x '"\e[1;5A": clear && let LINE_TPUT=$LINE_TPUT-1; if [ $LINE_TPUT -lt 0 ];then let LINE_TPUT=$LINES;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
-bind -m vi-command -x '"\e[1;5A": clear && let LINE_TPUT=$LINE_TPUT-1; if [ $LINE_TPUT -lt 0 ];then let LINE_TPUT=$LINES;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
-bind -m vi-insert -x '"\e[1;5A": clear && let LINE_TPUT=$LINE_TPUT-1; if [ $LINE_TPUT -lt 0 ];then let LINE_TPUT=$LINES;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
+# Control-Alt-Up/Down to change cursor line
+bind -m emacs-standard -x '"\e[1;7A": clear && let LINE_TPUT=$LINE_TPUT-1; if [ $LINE_TPUT -lt 0 ];then let LINE_TPUT=$LINES;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
+bind -m vi-command -x '"\e[1;7A": clear && let LINE_TPUT=$LINE_TPUT-1; if [ $LINE_TPUT -lt 0 ];then let LINE_TPUT=$LINES;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
+bind -m vi-insert -x '"\e[1;7A": clear && let LINE_TPUT=$LINE_TPUT-1; if [ $LINE_TPUT -lt 0 ];then let LINE_TPUT=$LINES;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
 
-bind -m emacs-standard -x '"\e[1;5B": clear && let LINE_TPUT=$LINE_TPUT+1; if [ $LINE_TPUT -gt $LINES ];then let LINE_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
-bind -m vi-command -x '"\e[1;5B": clear && let LINE_TPUT=$LINE_TPUT+1; if [ $LINE_TPUT -gt $LINES ];then let LINE_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
-bind -m vi-insert -x '"\e[1;5B": clear && let LINE_TPUT=$LINE_TPUT+1; if [ $LINE_TPUT -gt $LINES ];then let LINE_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
+bind -m emacs-standard -x '"\e[1;7B": clear && let LINE_TPUT=$LINE_TPUT+1; if [ $LINE_TPUT -gt $LINES ];then let LINE_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
+bind -m vi-command -x '"\e[1;7B": clear && let LINE_TPUT=$LINE_TPUT+1; if [ $LINE_TPUT -gt $LINES ];then let LINE_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
+bind -m vi-insert -x '"\e[1;7B": clear && let LINE_TPUT=$LINE_TPUT+1; if [ $LINE_TPUT -gt $LINES ];then let LINE_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
 
-# 'dirs' builtins shows all directories in stack
-# Ctrl-Up arrow rotates over directory history
-#bind -x '"\e277": pushd +1 &>/dev/null'
-#bind -m emacs-standard '"\e[1;5A": "\C-e\C-u\e277 _.\C-m"'
-#bind -m vi-command '"\e[1;5A": "ddi\e277 _.\C-m"'
-#bind -m vi-insert '"\e[1;5A": "\eddi\e277 _.\C-m"'
 
-# Ctrl-Down -> Dir Down
-#bind -x '"\e266": pushd $(dirs -p | awk '\''END { print }'\'') &>/dev/null'
-#bind -x '"\e266": cd ..'
-#bind -m emacs-standard '"\e[1;5B": "\C-e\C-u\e266 _.\C-m"'
-#bind -m vi-command '"\e[1;5B": "ddi\C-u\e266 _.\C-m"'
-#bind -m vi-insert '"\e[1;5B": "\eddi\e266 _.\C-m"'
+# Control-Alt-Left/Right -> transpose space-separated words 
 
-# Ctrl-Down -> Rotate between 2 last directories
-#bind -x '"\e266": pushd -1 &>/dev/null'
-#bind -m emacs-standard '"\e[1;5B": "\C-e\C-u\e266 _.\C-m"'
-#bind -m vi-command     '"\e[1;5B": "ddi\C-u\e266 _.\C-m"'
-#bind -m vi-insert      '"\e[1;5B": "\eddi\e266 _.\C-m"'
+bind -m emacs-standard -x '"\e[1;7D": transpose_words space left'
+bind -m vi-command -x '"\e[1;7D": transpose_words space left'
+bind -m vi-insert -x '"\e[1;7D": transpose_words space left'
 
-# Shift left/right to jump from words instead of chars
+bind -m emacs-standard -x '"\e[1;7C": transpose_words space right'
+bind -m vi-command -x '"\e[1;7C": transpose_words space right'
+bind -m vi-insert -x '"\e[1;7C": transpose_words space right'
 
-## Transpose space-separated words on Shift Left/Right
-#
-##bind -m emacs-standard -x '"\e[1;2D": transpose_words space left'
-##bind -m vi-command -x '"\e[1;2D": transpose_words space left'
-##bind -m vi-insert -x '"\e[1;2D": transpose_words space left'
-#
-#bind -m emacs-standard -x '"\e[1;2C": transpose_words space right'
-#bind -m vi-command -x '"\e[1;2C": transpose_words space right'
-#bind -m vi-insert -x '"\e[1;2C": transpose_words space right'
-#
-## Transpose special character separated words on Alt+Shift Left/Right
-#
-#bind -m emacs-standard -x '"\e[1;4D": transpose_words words left'
-#bind -m vi-command -x '"\e[1;4D": transpose_words words left'
-#bind -m vi-insert -x '"\e[1;4D": transpose_words words left'
-#
-#bind -m emacs-standard -x '"\e[1;4C": transpose_words words right'
-#bind -m vi-command -x '"\e[1;4C": transpose_words words right'
-#bind -m vi-insert -x '"\e[1;4C": transpose_words words right'
-#
-## Shift up => Clean reset
-##bind -x '"\e299": "cd \C-i"'
-#bind -m emacs-standard '"\e[1;2A": "\C-e\C-u\e299"'
-#bind -m vi-command '"\e[1;2A": "ddi\e299"'
-#bind -m vi-insert '"\e[1;2A": "\eddi\e299"'
-#
-## Shift down => cd shortcut
-#bind -x '"\e299": "__"'
-#bind -m emacs-standard '"\e[1;2B": "\C-e\C-u\e299cd \C-i"'
-#bind -m vi-insert '"\e[1;2B": "\eddi\e299cd \C-i"'
-#bind -m vi-command '"\e[1;2B": "\eddi\e299cd \C-i"'
+# Transpose special character separated words on Alt+Shift Left/Right
+
+#bind -m emacs-standard -x '"\e[1;7D": transpose_words words left'
+#bind -m vi-command -x '"\e[1;7D": transpose_words words left'
+#bind -m vi-insert -x '"\e[1;7D": transpose_words words left'
+
+#bind -m emacs-standard -x '"\e[1;7C": transpose_words words right'
+#bind -m vi-command -x '"\e[1;7C": transpose_words words right'
+#bind -m vi-insert -x '"\e[1;7C": transpose_words words right'
 
 
 # Shift left/right to jump from bigwords (ignore spaces when jumping) instead of chars
@@ -264,7 +371,7 @@ bind -m vi-command '"\C-o": emacs-editing-mode'
 bind -m vi-insert '"\C-o": emacs-editing-mode'
 bind -m emacs-standard '"\C-o": vi-editing-mode'
 
-
+# 'dirs' builtins shows all directories in stack
 # Alt-Right arrow rotates forward over directory history
 bind -x '"\e277": pushd +1 &>/dev/null'
 bind -m emacs-standard '"\e[1;3C": "\C-e\C-u\e277 _.\C-m"'
@@ -322,16 +429,6 @@ else
 fi
 
 
-# Alt left/right to jump to beginning/end line instead of chars
-#bind -m emacs-standard '"\e[1;3D": beginning-of-line'
-#bind -m vi-command '"\e[1;3D": beginning-of-line'
-#bind -m vi-insert '"\e[1;3D": beginning-of-line'
-#
-#bind -m emacs-standard '"\e[1;3C": end-of-line'
-#bind -m vi-command '"\e[1;3C": end-of-line'
-#bind -m vi-insert '"\e[1;3C": end-of-line'
-#
-#
 ## Alt up/down to change cursor line
 #bind -m emacs-standard -x '"\e[1;3A": clear && let LINE_TPUT=$LINE_TPUT-1; if [ $LINE_TPUT -lt 0 ];then let LINE_TPUT=$LINES;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
 #bind -m vi-command -x '"\e[1;3A": clear && let LINE_TPUT=$LINE_TPUT-1; if [ $LINE_TPUT -lt 0 ];then let LINE_TPUT=$LINES;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
@@ -461,8 +558,6 @@ if hash osc &>/dev/null; then
     bind -m vi-insert -x '"\C-s" : osc-copy'
 
     # Ctrl-v: Proper paste
-    #Q="'"
-    #bind -x $'"\237": echo bind $Q\\"\\\\225\\": \\"$(osc paste)\\"$Q > /tmp/paste.sh && source /tmp/paste.sh'
     bind -m emacs-standard -x '"\C-v": osc-paste'
     bind -m vi-command -x '"\C-v": osc-paste'
     bind -m vi-insert -x '"\C-v": osc-paste'
@@ -522,17 +617,18 @@ elif ([[ "$XDG_SESSION_TYPE" == 'x11' ]] && hash xclip &>/dev/null) || ([[ "$XDG
     bind -m vi-command -x '"\C-s": clip-copy'
     bind -m vi-insert -x '"\C-s": clip-copy'
 
-
+    # There is a thing called 'bracketed-paste' and a readline function called `bracketed-paste-begin`/`bracketed-paste-end` which are supposed to paste the content inside a highlighted region (to show a possible ^M/newline escape sequence that automatically enters the code you paste), but i've got no clue whatsoever how to make that work with this sort of paste 
+    # Chatgpt announced that bracketed-paste, using my pasting function, prevents trailing newlines from immediately executing by inserting it into the line by using READLINE_LINE instead of pasteing by feeding the line keystrokes
+    # - for what that's worth??
+    
+    #bind -m emacs-standard -x '"\e199": clip-paste'
+    #bind -m emacs-standard '"\C-v": "\x1b[200~\e199\x1b[201~'
+    
     # Ctrl-v: Proper paste
     bind -m emacs-standard -x '"\C-v": clip-paste'
     bind -m vi-command -x '"\C-v": clip-paste'
     bind -m vi-insert -x '"\C-v": clip-paste'
 
-    #Q="'"
-    #bind -x $'"\237": echo bind $Q\\"\\\\225\\": \\"$(xclip -o -sel c)\\"$Q > /tmp/paste.sh && source /tmp/paste.sh'
-    #bind -m emacs-standard '"\C-v": "\237\225"'
-    #bind -m vi-command     '"\C-v": "\237\225"'
-    #bind -m vi-insert      '"\C-v": "\237\225"'
 fi
 
 if hash autojump &>/dev/null; then
@@ -591,13 +687,13 @@ fi
 bind '"\205": re-read-init-file'
 bind -x '"\206": source ~/.bashrc'
 if [[ -z "$BLE_VERSION" ]]; then
-    bind -m emacs-standard '"\e[15~": "\C-u\205\206\n"'
-    bind -m vi-command '"\e[15~": "\C-u\205\206\n"'
-    bind -m vi-insert '"\e[15~": "\C-u\205\206\n"'
+    bind -m emacs-standard '"\e[15~": "\C-e\C-u\205\206\n"'
+    bind -m vi-command '"\e[15~": "\C-e\C-u\205\206\n"'
+    bind -m vi-insert '"\e[15~": "\C-e\C-u\205\206\n"'
 else 
-    bind -m emacs-standard '"\e[15~": "\C-u\206\n"'
-    bind -m vi-command '"\e[15~": "\C-u\206\n"'
-    bind -m vi-insert '"\e[15~": "\C-u\206\n"'
+    bind -m emacs-standard '"\e[15~": "\C-e\C-u\206\n"'
+    bind -m vi-command '"\e[15~": "\C-e\C-u\206\n"'
+    bind -m vi-insert '"\e[15~": "\C-e\C-u\206\n"'
 fi
 
 
