@@ -267,7 +267,7 @@ alias cp-lookup-symlinks="cp --dereference --driver parblock"
 
 # mv (recursively native) verbose and only ask for interaction when overwriting newer files
 
-alias mv="mv  --force --verbose"
+alias mv="mv -g  --force --verbose"
 alias mv-skip-existing="mv -nv"
 alias move="mv"
 alias switch-destination="mv --exchange"
@@ -329,7 +329,7 @@ function mv-trash(){
 } 
 
 
-alias mv="mv  --force --verbose"
+alias mv="mv -g  --force --verbose"
 
 
 # Rm 
@@ -975,7 +975,7 @@ if ! hash ncdu &> /dev/null && hash dua &> /dev/null; then
    alias ncdu='dua interactive' 
 fi
 
-alias du="ncdu"
+alias du="dua"
 alias du="dua interactive"
 
 alias folder-size="du"

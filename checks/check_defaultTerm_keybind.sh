@@ -180,13 +180,15 @@ if [[ $DESKTOP_SESSION == 'xfce' ]]; then
    
     # Control-Alt to Superkey? 
 
-    if [[ "$(xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/custom -l -v)" =~ /xfwm4/custom/\<Alt\>\<Control\> ]] || [[ "$(xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/custom -l -v)" =~ /xfwm4/custom/\<Shift\>\<Control\>\<Alt\> ]]; then
+    if [[ "$(xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/custom -l -v)" =~ /xfwm4/custom/\<Primary\>\<Alt\> || "$(xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/custom -l -v)" =~ /xfwm4/custom/\<Control\>\<Alt\> || "$(xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/custom -l -v)" =~ /xfwm4/custom/\<Alt\>\<Control\> || "$(xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/custom -l -v)" =~ /xfwm4/custom/\<Shift\>\<Control\>\<Alt\> ]]; then
         printf "${CYAN}Control-Alt${normal}${green} used for ${CYAN}xfce4's window management${normal}
 ${ORANGE}This can conflict with different applications' (custom) keybinds\n${normal}"
         readyn -p "Set ${CYAN}Control-Alt${GREEN} to ${CYAN}Control-Windows/Commandkey${GREEN}?" ctrl_alt_super
         if [[ $ctrl_alt_super == 'y' ]]; then
             vars=$(xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/custom -l -v | grep --color=never '<Primary><Alt>' | awk '{print $1}') 
-            vars="$vars\n$(xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/custom -l -v | grep --color=never '<Shift><Control><Alt>' | awk '{print $1}')"
+            vars="$vars $(xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/custom -l -v | grep --color=never '<Control><Alt>' | awk '{print $1}')"
+            vars="$vars $(xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/custom -l -v | grep --color=never '<Alt><Control>' | awk '{print $1}')"
+            vars="$vars $(xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/custom -l -v | grep --color=never '<Shift><Control><Alt>' | awk '{print $1}')"
 
             for i in $(echo "$vars"); do
                 value="$(xfconf-query -c xfce4-keyboard-shortcuts -p $i -l -v | awk '{$1=""; print}')"
@@ -234,12 +236,12 @@ ${ORANGE}This can conflict with different applications' (custom) keybinds\n${nor
 
     if test -z "$(xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/custom -l -v | grep --color=never 'monitor')"; then
         printf "${CYAN}xfce4${green} has ${YELLOW}no shortcuts${yellow} for moving programs accross monitors${normal}\n"
-        readyn -p "Bind ${CYAN}Alt-Windows/Commandkey-Arrowkey${GREEN} to move program from monitor to monitor?" alt_super_arr
+        readyn -p "Bind ${CYAN}Control-Windows/Commandkey-Arrowkey${GREEN} to move program from monitor to monitor?" alt_super_arr
         if [[ $alt_super_arr == 'y' ]]; then
-            xfconf-query -c xfce4-keyboard-shortcuts -n -p /xfwm4/custom/\<Alt\>\<Super\>Down -t string -s move_window_to_monitor_down_key 
-            xfconf-query -c xfce4-keyboard-shortcuts -n -p /xfwm4/custom/\<Alt\>\<Super\>Up -t string -s move_window_to_monitor_up_key 
-            xfconf-query -c xfce4-keyboard-shortcuts -n -p /xfwm4/custom/\<Alt\>\<Super\>Left -t string -s move_window_to_monitor_left_key 
-            xfconf-query -c xfce4-keyboard-shortcuts -n -p /xfwm4/custom/\<Alt\>\<Super\>Right -t string -s move_window_to_monitor_right_key 
+            xfconf-query -c xfce4-keyboard-shortcuts -n -p /xfwm4/custom/\<Primary\>\<Super\>Down -t string -s move_window_to_monitor_down_key 
+            xfconf-query -c xfce4-keyboard-shortcuts -n -p /xfwm4/custom/\<Primary\>\<Super\>Up -t string -s move_window_to_monitor_up_key 
+            xfconf-query -c xfce4-keyboard-shortcuts -n -p /xfwm4/custom/\<Primary\>\<Super\>Left -t string -s move_window_to_monitor_left_key 
+            xfconf-query -c xfce4-keyboard-shortcuts -n -p /xfwm4/custom/\<Primary\>\<Super\>Right -t string -s move_window_to_monitor_right_key 
 
         fi
         unset alt_super_arr

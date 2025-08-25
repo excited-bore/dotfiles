@@ -62,12 +62,13 @@ if hash wget &>/dev/null && hash jq &>/dev/null; then
         fi
 
         if test -n "$filtr"; then
+            nwreleases="" 
             for i in ${releases[@]}; do
                 if [[ "$i" =~ $filtr ]]; then
-                    nwreleases="$nwreleases$i\n" 
+                    nwreleases="$nwreleases $i" 
                 fi
             done
-            releases="$nwreleases"
+            releases="$(echo $nwreleases | xargs)"
         fi
         
         if hash fzf &>/dev/null; then
