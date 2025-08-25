@@ -103,12 +103,8 @@ fi
 # It's good to use unused keys for complex keybindings since you can't combine readline commands with regular bash expressions in the same bind
 # Also
 # https://unix.stackexchange.com/questions/548726/bash-readline-inputrc-bind-key-to-a-sequence-of-multiple-commands
-#
-#
-# Change editing mode
-#bind -m vi-command '"\C-a": emacs-editing-mode'
-#bind -m vi-insert '"\C-a": emacs-editing-mode'
-#bind -m emacs-standard '"\C-a": vi-editing-mode'
+
+
 
 # Up and down arrow will now intelligently complete partially completed
 # commands by searching through the existing history.

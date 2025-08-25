@@ -65,7 +65,7 @@ shell-keybinds_r() {
 
 shell-keybinds() {
     if ! test -f $SCRIPT_DIR/checks/check_keybinds.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_keybinds.sh)
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_keybinds.sh)
     else
         . $SCRIPT_DIR/checks/check_keybinds.sh
     fi
@@ -75,9 +75,10 @@ shell-keybinds() {
     readyn -Y "CYAN" -p "Startup in ${MAGENTA}vi-mode${CYAN} instead of ${GREEN}emacs${CYAN} mode? (might cause issues with pasteing)" vimde
 
     sed -i "s|^set editing-mode .*|#set editing-mode vi|g" $binds
+    sed -i "s|^bind 'set editing-mode vi'|# bind 'set editing-mode vi'|g" $binds1
 
     if [[ "$vimde" == "y" ]]; then
-        sed -i "s|.set editing-mode .*|set editing-mode vi|g" $binds
+        sed -i "s|# bind 'set editing-mode vi'|bind 'set editing-mode vi'|g" $binds1
     fi
 
     sed -i "s|^set show-mode-in-prompt .*|#set show-mode-in-prompt on|g" $binds
