@@ -25,7 +25,7 @@ fi
 # Shell-keybinds
 
 binds=$SCRIPT_DIR/keybinds/.inputrc
-binds1=$SCRIPT_DIR/keybinds/.keybinds.d/keybinds.bash
+binds1=$SCRIPT_DIR/keybinds/.keybinds.d/01-keybinds.bash
 binds2=$SCRIPT_DIR/keybinds/.keybinds
 if ! test -f $binds; then
     tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.inputrc

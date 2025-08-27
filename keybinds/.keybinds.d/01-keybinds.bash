@@ -39,8 +39,6 @@ if hash xfconf-query &> /dev/null; then
     }
 fi
 
-
-
 # TTY
 
 # To see the complete character string sent by a key, you can use this command, and type the key within 2 seconds:
@@ -371,6 +369,48 @@ bind -m vi-command '"\C-o": emacs-editing-mode'
 bind -m vi-insert '"\C-o": emacs-editing-mode'
 bind -m emacs-standard '"\C-o": vi-editing-mode'
 
+# Cd wrapper
+function cd-w() {
+    
+    local push=1
+    local j=0
+    if [[ "$1" == "--" ]]; then
+        shift;
+    fi 
+    
+    # Just give the standard cd error if one argument is no directory 
+    for i in $@; do
+        if ! [ -d $i ]; then 
+            builtin cd -- "$i" 
+            return 1
+        fi
+    done
+     
+    for i in $(dirs -l 2>/dev/null); do
+        if test -e "$i"; then
+            if [[ -z "${@}" && "$i" == "$HOME" ]] || [[ "$(realpath ${@: -1:1})" == "$i" ]]; then
+                push=0
+                pushd -n +$j &>/dev/null
+            fi
+            j=$(($j+1));
+        fi
+    done
+    if [ $push == 1 ]; then
+        pushd "$(pwd)" &>/dev/null;  
+    fi
+    builtin cd -- "$@"; 
+    return 0 
+}
+
+complete -F _cd cd-w
+
+if type _fzf_dir_completion &> /dev/null; then
+    complete -F _fzf_dir_completion cd
+fi
+
+alias cd='cd-w'
+
+
 # 'dirs' builtins shows all directories in stack
 # Alt-Right arrow rotates forward over directory history
 bind -x '"\e277": pushd +1 &>/dev/null'
@@ -414,7 +454,10 @@ else
         bind -m vi-insert '"\e[1;3B": "\C-o\e[1;3B\C-o"'
     fi
     if hash bfs &> /dev/null; then
-        FZF_ALT_C_COMMAND="bfs -x -type d -exclude -name '.git' -exclude -name 'node_modules'" 
+        # https://github.com/tavianator/bfs/issues/163 
+        FZF_ALT_C_COMMAND="bfs -s -x -type d -printf '%P\n' -exclude -name '.git' -exclude -name 'node_modules' | sed '/^[[:space:]]*$/d'" 
+        # Alternative with previous directory added
+        # FZF_ALT_C_COMMAND="echo \"..\n\$(bfs -s -x -type d -printf '%P\n' -exclude -name '.git' -exclude -name 'node_modules' | sed '/^[[:space:]]*$/d')\"" 
     elif hash fd &> /dev/null; then
         FZF_ALT_C_COMMAND="fd -H --type d --exclude '.git' --exclude 'node_modules'" 
     fi

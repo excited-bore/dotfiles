@@ -72,10 +72,8 @@ if test -z "$1"; then
         wget-aria-name ~/.keybinds.d/fzf-bindings.bash https://raw.githubusercontent.com/junegunn/fzf/refs/heads/master/shell/key-bindings.bash
     fi
 
-    grep -q '^bind -m vi-command '\''"\\C-z": emacs-editing-mode'\''' $BASH_KEYBIND_FILEDIR/fzf-bindings.bash &&
-        sed -i 's|\\\C-z|\\\C-o|g' $BASH_KEYBIND_FILEDIR/fzf-bindings.bash
-    grep -q 'bind -m emacs-standard '\''"\\ec"' $BASH_KEYBIND_FILEDIR/fzf-bindings.bash &&
-        sed -i 's|\\\ec|\\\e[1;3B|g' $BASH_KEYBIND_FILEDIR/fzf-bindings.bash
+    sed -i 's|\\\C-z|\\\C-o|g; s|) \&\& printf '\''builtin cd -- %q'\'' "$(builtin unset CDPATH \&\& builtin cd -- "$dir" \&\& builtin pwd)"|); [[ -n $dir ]] \&\& cd -- "$dir"|g; s|\(if \[\[ "${FZF_ALT_C_COMMAND-x}" != "" \]\]; then\)|\1\n  bind -x '\''"\\e987": "__fzf_cd__"'\''|g; s|\(bind -m emacs-standard '\''"\).*|\1\\\e[1;3B": "\\e987_\\C-m"'\''|g; s|\(bind -m vi-command '\''"\).*|\1\\\e[1;3B": "\\e987_\\C-m"'\''|g; s|\(bind -m vi-insert '\''"\).*|\1\\\e[1;3B": "\\e987_\\C-m"'\''|g' $BASH_KEYBIND_FILEDIR/fzf-bindings.bash
+
     unset fzf_key
 
     #if [[ $ENV =~ '.environment.env' ]]; then

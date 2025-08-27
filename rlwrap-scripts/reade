@@ -343,24 +343,24 @@ function reade() {
                                 
                                 if ! bind -p | grep -q '"\\e\[A": previous-history'; then 
                                     if bind -m $keymap -p | grep -q '"\\e\[A":'; then
-                                        upmap=$(bind -m $keymap -p | grep '"\\e\[A":' | awk '{print $2}')
+                                        upmap=$(bind -m $keymap -p | grep '"\\e\[A":' | awk '{$1=""; print}' | xargs)
                                     elif bind -m $keymap -s | grep -q '"\\e\[A":'; then
-                                        upmap=$(bind -m $keymap -s | grep '"\\e\[A":' | awk '{print $2}')
+                                        upmap=$(bind -m $keymap -s | grep '"\\e\[A":' | awk '{$1=""; print}' | xargs)
                                     elif bind -m $keymap -X | grep -q '"\\e\[A"'; then
                                         upmapx='-x ' 
-                                        upmap=$(bind -m $keymap -X | grep '"\\e\[A"' | awk '{print $2}')
+                                        upmap=$(bind -m $keymap -X | grep '"\\e\[A"' | awk '{$1=""; print}' | xargs)
                                     fi
                                     bind -m $keymap '"\e[A": previous-history'  
                                 fi
                                 
                                 if ! bind -p | grep -q '"\\e\[B": next-history'; then 
                                     if bind -m $keymap -p | grep -q '"\\e\[B":'; then
-                                        downmap=$(bind -m $keymap -p | grep '"\\e\[B":' | awk '{print $2}')
+                                        downmap=$(bind -m $keymap -p | grep '"\\e\[B":' | awk '{$1=""; print}' | xargs)
                                     elif bind -m $keymap -s | grep -q '"\\e\[B":'; then
-                                        downmap=$(bind -m $keymap -s | grep '"\\e\[B":' | awk '{print $2}')
+                                        downmap=$(bind -m $keymap -s | grep '"\\e\[B":' | awk '{$1=""; print}' | xargs)
                                     elif bind -m $keymap -X | grep -q '"\\e\[B"'; then
                                         downmapx='-x '
-                                        downmap=$(bind -m $keymap -X | grep '"\\e\[B"' | awk '{print $2}')
+                                        downmap=$(bind -m $keymap -X | grep '"\\e\[B"' | awk '{$1=""; print}' | xargs)
                                     fi
                                     bind -m $keymap '"\e[B": next-history' 
                                 fi
@@ -508,10 +508,10 @@ function reade() {
                 fi
              
                 [[ -n $upmap ]] && 
-                    bind -m $keymap $upmapx '"\e[A": '$upmap''
+                    bind -m $keymap $upmapx "\"\e[A\": \"$upmap\""
                 
                 [[ -n $downmap ]] && 
-                    bind -m $keymap $downmapx '"\e[B": '$downmap''
+                    bind -m $keymap $downmapx "\"\e[B\": \"$downmap\""
             fi
 
             if test -n "$ZSH_VERSION"; then
