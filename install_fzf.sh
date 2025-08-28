@@ -72,7 +72,7 @@ if test -z "$1"; then
         wget-aria-name ~/.keybinds.d/fzf-bindings.bash https://raw.githubusercontent.com/junegunn/fzf/refs/heads/master/shell/key-bindings.bash
     fi
 
-    sed -i 's|\\\C-z|\\\C-o|g; s|) \&\& printf '\''builtin cd -- %q'\'' "$(builtin unset CDPATH \&\& builtin cd -- "$dir" \&\& builtin pwd)"|); [[ -n $dir ]] \&\& cd -- "$dir"|g; s|\(if \[\[ "${FZF_ALT_C_COMMAND-x}" != "" \]\]; then\)|\1\n  bind -x '\''"\\e987": "__fzf_cd__"'\''|g; s|\(bind -m emacs-standard '\''"\).*|\1\\\e[1;3B": "\\e987_\\C-m"'\''|g; s|\(bind -m vi-command '\''"\).*|\1\\\e[1;3B": "\\e987_\\C-m"'\''|g; s|\(bind -m vi-insert '\''"\).*|\1\\\e[1;3B": "\\e987_\\C-m"'\''|g' $BASH_KEYBIND_FILEDIR/fzf-bindings.bash
+    sed -i 's|\\\C-z|\\\C-o|g; s|) \&\& printf '\''builtin cd -- %q'\'' "$(builtin unset CDPATH \&\& builtin cd -- "$dir" \&\& builtin pwd)"|); [[ -n $dir ]] \&\& cd -- "$dir"|g; s|\(if \[\[ "${FZF_ALT_C_COMMAND-x}" != "" \]\]; then\)|\1\n  bind -x '\''"\\e987": "__fzf_cd__"'\''|g; s|\(bind -m emacs-standard '\''"\).*|\1\\\e[1;7B": "\\e987_\\C-m"'\''|g; s|\(bind -m vi-command '\''"\).*|\1\\\e[1;3B": "\\e987_\\C-m"'\''|g; s|\(bind -m vi-insert '\''"\).*|\1\\\e[1;3B": "\\e987_\\C-m"'\''|g' $BASH_KEYBIND_FILEDIR/fzf-bindings.bash
 
     unset fzf_key
 
@@ -124,12 +124,12 @@ if test -z "$1"; then
     printf "${green}\t- ${CYAN}find${green}: The default UNIX command finding files and folders. It is depth-first so it will show the longest pathnames before shorter ones\n${normal}" 
     (hash fd-find &> /dev/null || hash fd &> /dev/null) && 
         printf "${green}\t- ${CYAN}fd${green}: A faster variant of 'find' written in rust and although it has not all of find's features, it's results come with way more distinct colors out of the box. It is also depth-first.\n${normal}" &&
-        opts="$opts fd" 
+        opts="fd $opts" 
     hash bfs &> /dev/null && 
         printf "${green}\t- ${CYAN}bfs${green}: A 'breadth-first' find variant that unlike find or fd will show short pathnames relative to the current path faster then longer pathnames. It also is written in C.\n${normal}" &&
-        opts="$opts bfs" 
+        opts="bfs $opts" 
     
-    reade -Q 'GREEN' -i "$opts" -p "Which command should be default for fzf?" fnd
+    reade -Q 'GREEN' -i "$opts" -p "Which command should be default for fzf?: " fnd
 
     # BAT
     if ! hash bat &>/dev/null; then
