@@ -1,3 +1,8 @@
+# Use this to move spaces separated/special character separated 'words' the cursors is hovering over to the left or right. Based on the readline function equivalent
+# Fun fact: I made this function before realizing I could fix the region/marker readline functionality and use that to make even more usefull keybinds, 
+# Also, this function uses a lot of '$(echo $word | wc --chars)' to count the amount of characters in a word. However that methods tends to be 'funny' when it comes down to words containing spaces??
+# This causes bugs in meriad of different situations. I kind of tested whether replacing those parts of the function with bash variable expansion method '${#word}', saw it broke the function more then it fixes it, reverted back and left it as is
+
 # EEEEEUUUUUUH BASH REGEX?????
 # https://unix.stackexchange.com/questions/421460/bash-regex-and-https-regex101-com
 
