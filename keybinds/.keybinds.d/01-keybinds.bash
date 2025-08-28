@@ -279,8 +279,8 @@ bind -m vi-insert '"\e[1;2D": "\e101\e103\e108\e102\e102"'
 
 # Shift Up/Down selects untill the beginning/end of a line
 
-bind '"\e111": beginning-of-line'
-bind '"\e112": end-of-line'
+bind '"\e111": end-of-line'
+bind '"\e112": beginning-of-line'
 
 bind -m emacs-standard '"\e[1;2A": "\e101\e111\e107\e102\e102"'
 bind -m vi-command '"\e[1;2A": "\e101\e111\e107\e102\e102"'
