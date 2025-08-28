@@ -237,7 +237,53 @@ function backwards-delete-char-or-remove-region(){
     fi
 }
 
-bind -x '"\C-?": "backwards-delete-char-or-remove-region"'
+bind -m emacs-standard -x '"\C-?": "backwards-delete-char-or-remove-region"'
+bind -m vi-command -x '"\C-?": "backwards-delete-char-or-remove-region"'
+bind -m vi-insert -x '"\C-?": "backwards-delete-char-or-remove-region"'
+
+
+function delete-char-or-remove-region(){
+    if [[ -n "$READLINE_MARK_SET" ]]; then
+        remove-region
+    else
+        if [[ $READLINE_POINT != ${#READLINE_LINE} ]]; then
+            READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}${READLINE_LINE:$((READLINE_POINT+1))}" 
+        fi
+    fi
+}
+
+bind -m emacs-standard -x '"\e[3~": "delete-char-or-remove-region"'
+bind -m vi-command -x '"\e[3~": "delete-char-or-remove-region"'
+bind -m vi-insert -x '"\e[3~": "delete-char-or-remove-region"'
+
+
+function backward-kill-word-or-remove-region(){
+    if [[ -n "$READLINE_MARK_SET" ]]; then
+        remove-region
+    else
+        if [[ $READLINE_POINT != 0 ]]; then
+            local word="${READLINE_LINE:0:$READLINE_POINT}" 
+            # https://stackoverflow.com/questions/19083488/counting-trailing-white-spaces
+            # Haven't looked into how to optimize this awk prompt but w/e
+            local spaces=$(echo "$word" | awk '{t=length($0);sub(" *$","");print t-length($0)}') 
+            word="$(echo $word | awk '{print $NF}')" 
+            local len="$(($READLINE_POINT - ${#word} - $spaces))" 
+            READLINE_LINE="${READLINE_LINE:0:$len}${READLINE_LINE:$READLINE_POINT}" 
+            READLINE_POINT=$len 
+        fi
+    fi
+}
+
+
+# Ctrl-backspace deletes (kills) line backward
+bind -m emacs-standard -x '"\C-h": backward-kill-word-or-remove-region'
+bind -m vi-command -x '"\C-h": backward-kill-word-or-remove-region'
+bind -m vi-insert -x '"\C-h": backward-kill-word-or-remove-region'
+
+#bind -m emacs-standard '"\C-h": backward-kill-word'
+#bind -m vi-command '"\C-h": backward-kill-word'
+#bind -m vi-insert '"\C-h": backward-kill-word'
+
 
 function set-mark-and-bind-move-region(){
     local keymap leftmap leftmapx rightmap rightmapx backsmap backsmapx
@@ -256,7 +302,7 @@ function set-mark-and-bind-move-region(){
         CTRL_ALT_KM=$keymap
         
         if ! bind -m $keymap -X | grep -q '\\e\[1;7D": "\\e101\\e108\\e113\\e102\\e102'; then
-            # Ctrl-Alt-Left should move a region 1 char to the left 
+            # Alt-Left should move a region 1 char to the left 
             if bind -m $keymap -p | grep -q '"\\e\[1;7D":'; then
                 leftmap=$(bind -m $keymap -p | grep '"\\e\[1;7D":' | awk '{$1=""; print}' | xargs)
             elif bind -m $keymap -s | grep -q '"\\e\[1;7D":'; then
@@ -359,10 +405,10 @@ function self-insert-or-remove-region(){
 #done
 #unset b
 
-# Control left/right to jump from bigwords (ignore spaces when jumping) instead of chars
+# Control left/right to jump from words instead of chars
 
-bind '"\e109": vi-forward-word'
-bind '"\e110": vi-backward-word'
+bind '"\e109": forward-word'
+bind '"\e110": backward-word'
 
 bind -m emacs-standard '"\e[1;5C": "\e109\e105"'
 bind -m vi-command '"\e[1;5C": "\e109\e105"'
@@ -579,11 +625,6 @@ bind -m vi-insert -x '"\C-q": exit'
 bind -m emacs-standard '"\C-z": vi-undo'
 bind -m vi-command '"\C-z": vi-undo'
 bind -m vi-insert '"\C-z": vi-undo'
-
-# Ctrl-backspace deletes (kills) line backward
-bind -m emacs-standard '"\C-h": backward-kill-word'
-bind -m vi-command '"\C-h": backward-kill-word'
-bind -m vi-insert '"\C-h": backward-kill-word'
 
 # Ctrl-l clears
 bind -m emacs-standard -x '"\C-l": __'

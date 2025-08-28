@@ -249,7 +249,7 @@ if test -z "$1"; then
     #unset fndgbl fndfle fndhiddn
 
     if [[ $ENV == ~/.environment.env ]]; then
-        sed -i 's|#export FZF_DEFAULT_COMMAND|export FZF_DEFAULT_COMMAND|g' $ENV
+        sed -i 's|#export FZF_DEFAULT_COMMAND="'$fnd'|export FZF_DEFAULT_COMMAND="'$fnd'|g' $ENV
         sed -i 's|#export FZF_CTRL_T_COMMAND|export FZF_CTRL_T_COMMAND|g' $ENV
         sed -i 's|#export FZF_CTRL_R_OPTS|export FZF_CTRL_R_OPTS|g' $ENV
         sed -i 's|#export FZF_BIND_TYPES|export FZF_BIND_TYPES|g' $ENV
@@ -269,7 +269,7 @@ if test -z "$1"; then
 
     echo "Next $(tput setaf 1)sudo$(tput sgr0) will update FZF environment variables in $ENV_R'"
     if [[ $ENV_R == /root/.environment.env ]]; then
-        sudo sed -i 's|#export FZF_DEFAULT_COMMAND|export FZF_DEFAULT_COMMAND |g' $ENV_R
+        sudo sed -i 's|#export FZF_DEFAULT_COMMAND="'$fnd'|export FZF_DEFAULT_COMMAND="'$fnd'|g' $ENV_R
         sudo sed -i 's|#export FZF_CTRL_T_COMMAND|export FZF_CTRL_T_COMMAND|g' $ENV_R
         sudo sed -i 's|#export FZF_CTRL_R_OPTS|export FZF_CTRL_R_OPTS|g' $ENV_R
         sudo sed -i 's|#export FZF_BIND_TYPES|export FZF_BIND_TYPES|g' $ENV_R
