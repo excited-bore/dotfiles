@@ -72,7 +72,7 @@ if test -z "$1"; then
         wget-aria-name ~/.keybinds.d/fzf-bindings.bash https://raw.githubusercontent.com/junegunn/fzf/refs/heads/master/shell/key-bindings.bash
     fi
 
-    sed -i 's|\\\C-z|\\\C-o|g; s|) \&\& printf '\''builtin cd -- %q'\'' "$(builtin unset CDPATH \&\& builtin cd -- "$dir" \&\& builtin pwd)"|); [[ -n $dir ]] \&\& cd -- "$dir"|g; s|\(if \[\[ "${FZF_ALT_C_COMMAND-x}" != "" \]\]; then\)|\1\n  bind -m emacs-standard -x '\''"\\e987": "__fzf_cd__"'\''|g; s|\(bind -m emacs-standard '\''"\)\\ec.*|\1\\\e[1;7B": "\\e987_\\C-m"'\''|g; s|\(bind -m vi-command '\''"\)\\ec".*|\1\\\e[1;3B": "\\C-o\\e987_\\C-m\\C-o"'\''|g; s|\(bind -m vi-insert '\''"\)\\ec.*|\1\\\e[1;3B": "\\C-o\\e987_\\C-m\\C-o"'\''|g' $BASH_KEYBIND_FILEDIR/fzf-bindings.bash
+    sed -i 's|\\\C-z|\\\C-o|g; s|) \&\& printf '\''builtin cd -- %q'\'' "$(builtin unset CDPATH \&\& builtin cd -- "$dir" \&\& builtin pwd)"|); [[ -n $dir ]] \&\& cd -- "$dir"|g; s|\(if \[\[ "${FZF_ALT_C_COMMAND-x}" != "" \]\]; then\)|\1\n  bind -m emacs-standard -x '\''"\\e987": "__fzf_cd__"'\''|g; s|\(bind -m emacs-standard '\''"\)\\ec.*|\1\\\e[1;7B": "\\e987_\\C-m"'\''|g; s|\(bind -m vi-command '\''"\)\\ec".*|\1\\\e[1;7B": "\\C-o\\e987_\\C-m\\C-o"'\''|g; s|\(bind -m vi-insert '\''"\)\\ec.*|\1\\\e[1;7B": "\\C-o\\e987_\\C-m\\C-o"'\''|g' $BASH_KEYBIND_FILEDIR/fzf-bindings.bash
 
     unset fzf_key
 

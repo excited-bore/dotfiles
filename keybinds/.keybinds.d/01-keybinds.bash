@@ -383,11 +383,11 @@ bind -m vi-insert -x '"\e108": [[ $READLINE_MARK == $READLINE_POINT && -n $READL
 
 
 bind -m emacs-standard '"\e[1;2C": "\e101\e104\e108\e102\e102"'
-bind -m vi-command '"\e[1;2C": "\e101\e104\e108\e102\e102"'
+bind -m vi-command '"\e[1;2C": "i\e101\e104\e108\e102\e102"'
 bind -m vi-insert '"\e[1;2C": "\e101\e104\e108\e102\e102"'
 
 bind -m emacs-standard '"\e[1;2D": "\e101\e103\e108\e102\e102"'
-bind -m vi-command '"\e[1;2D": "\e101\e103\e108\e102\e102"'
+bind -m vi-command '"\e[1;2D": "i\e101\e103\e108\e102\e102"'
 bind -m vi-insert '"\e[1;2D": "\e101\e103\e108\e102\e102"'
 
 # Shift Up/Down selects untill the beginning/end of a line
@@ -500,14 +500,14 @@ bind -m emacs-standard -x '"\e[1;3B": clear && let LINE_TPUT=$LINE_TPUT+1; if [ 
 bind -m vi-command -x '"\e[1;3B": clear && let LINE_TPUT=$LINE_TPUT+1; if [ $LINE_TPUT -gt $LINES ];then let LINE_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
 bind -m vi-insert -x '"\e[1;3B": clear && let LINE_TPUT=$LINE_TPUT+1; if [ $LINE_TPUT -gt $LINES ];then let LINE_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
 
-# Alt+Shift Left/Right => Move character or region
+# Alt Left/Right => Move character or region
 
 bind -m emacs-standard '"\e[1;3D": "\e101\e108\e113\e102\e102"'
-bind -m vi-command '"\e[1;3D": "\e101\e108\e113\e102\e102"'
+bind -m vi-command '"\e[1;3D": "i\e101\e108\e113\e102\e102"'
 bind -m vi-insert '"\e[1;3D": "\e101\e108\e113\e102\e102"'
 
 bind -m emacs-standard '"\e[1;3C": "\e101\e108\e114\e102\e102"'
-bind -m vi-command '"\e[1;3C": "\e101\e108\e114\e102\e102"'
+bind -m vi-command '"\e[1;3C": "i\e101\e108\e114\e102\e102"'
 bind -m vi-insert '"\e[1;3C": "\e101\e108\e114\e102\e102"'
 
 # Transpose special character separated words on Alt+Shift Left/Right
@@ -945,8 +945,8 @@ bind -m vi-insert -x '"\206": "source ~/.bashrc"'
 
 if [[ -z "$BLE_VERSION" ]]; then
     bind -m emacs-standard '"\e[15~": "\C-e\C-u\205\206\n"'
-    bind -m vi-command '"\e[15~": "dd\205\206\n"'
-    bind -m vi-insert '"\e[15~": "\edd\205\206\n"'
+    bind -m vi-command '"\e[15~": "ddi\205\206\n"'
+    bind -m vi-insert '"\e[15~": "\eddi\205\206\n"'
 else 
     bind -m emacs-standard '"\e[15~": "\C-e\C-u\206\n"'
     bind -m vi-command '"\e[15~": "ddi\206\n"'
