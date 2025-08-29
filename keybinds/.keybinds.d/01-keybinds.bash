@@ -278,7 +278,14 @@ function backward-kill-word-or-remove-region(){
             global_rematch "$word" '[A-Za-z0-9]+' reslt
             global_rematch "$word" '[^A-Za-z0-9]+' spcl
 
-            local len="$(($READLINE_POINT - ${#reslt[-1]} - ${#spcl[-1]}))" 
+            local len=$READLINE_POINT 
+            if [ -n "$reslt" ]; then
+                len=$((len - ${#reslt[-1]})) 
+            fi
+            if [ -n "$spcl" ]; then
+                len=$((len - ${#spcl[-1]})) 
+            fi
+
             READLINE_LINE="${READLINE_LINE:0:$len}${READLINE_LINE:$READLINE_POINT}" 
             READLINE_POINT=$len 
         fi
@@ -931,10 +938,10 @@ fi
 
 # F5, Ctrl-r - Reload .bashrc
 bind -m emacs-standard '"\205": re-read-init-file'
-bind -m vi-command '"\205": re-read-init-file'
+bind -m vi-insert '"\205": re-read-init-file'
 
-bind -m emacs-standard -x '"\206": source ~/.bashrc'
-bind -m vi-command -x '"\206": source ~/.bashrc'
+bind -m emacs-standard -x '"\206": "source ~/.bashrc"'
+bind -m vi-insert -x '"\206": "source ~/.bashrc"'
 
 if [[ -z "$BLE_VERSION" ]]; then
     bind -m emacs-standard '"\e[15~": "\C-e\C-u\205\206\n"'
@@ -942,8 +949,8 @@ if [[ -z "$BLE_VERSION" ]]; then
     bind -m vi-insert '"\e[15~": "\edd\205\206\n"'
 else 
     bind -m emacs-standard '"\e[15~": "\C-e\C-u\206\n"'
-    bind -m vi-command '"\e[15~": "dd\206\n"'
-    bind -m vi-insert '"\e[15~": "\edd\206\n"'
+    bind -m vi-command '"\e[15~": "ddi\206\n"'
+    bind -m vi-insert '"\e[15~": "\eddi\206\n"'
 fi
 
 
