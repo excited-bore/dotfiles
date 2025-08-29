@@ -660,11 +660,6 @@ bind -m emacs-standard -x '"\C-l": __'
 bind -m vi-command -x '"\C-l": __'
 bind -m vi-insert -x '"\C-l": __'
 
-# Ctrl-d: Delete first character on line
-bind -m emacs-standard -x '"\C-d": "remove-region"'
-#bind -m vi-command '"\C-d": "\e[1;3D\e[3~"'
-#bind -m vi-insert '"\C-d": "\e[1;3D\e[3~"'
-
 # Ctrl+b: (Ctrl+x Ctrl+b emacs mode) is quoted insert - Default Ctrl+v - Gives (f.ex. 'Ctrl-a') back as '^A'
 #bind -m emacs-standard '"\C-x\C-b": quoted-insert'
 #bind -m vi-command '"\C-b": quoted-insert'
@@ -715,7 +710,7 @@ if hash osc &>/dev/null; then
         else
             echo -n "$READLINE_LINE" | osc copy
         fi
-        READLINE_MARK_SET=
+        reset-mark
     }
     
     function osc-paste() {
@@ -729,9 +724,26 @@ if hash osc &>/dev/null; then
         local pasters="$(osc paste)"
         READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$pasters${READLINE_LINE:$READLINE_POINT}"
         READLINE_POINT=$((READLINE_POINT + ${#pasters}))
-        READLINE_MARK_SET=
+        reset-mark
     }
-    
+  
+    function osc-cut(){
+        if [[ -n $READLINE_MARK_SET ]]; then
+            if [[ $READLINE_MARK -gt $READLINE_POINT ]]; then
+                local len=$(( $READLINE_MARK - $READLINE_POINT )) 
+                echo -n "${READLINE_LINE:$READLINE_POINT:$len}" | osc copy
+            else 
+                local len=$(( $READLINE_POINT - $READLINE_MARK )) 
+                echo -n "${READLINE_LINE:$READLINE_MARK:$len}" | osc copy
+            fi
+            remove-region
+        else
+            echo -n "$READLINE_LINE" | osc copy
+            READLINE_LINE=""
+        fi
+    }
+
+    # Ctrl-s: Copy line or region
     bind -m emacs-standard -x '"\C-s" : osc-copy'
     bind -m vi-command -x '"\C-s" : osc-copy'
     bind -m vi-insert -x '"\C-s" : osc-copy'
@@ -740,6 +752,12 @@ if hash osc &>/dev/null; then
     bind -m emacs-standard -x '"\C-v": osc-paste'
     bind -m vi-command -x '"\C-v": osc-paste'
     bind -m vi-insert -x '"\C-v": osc-paste'
+
+    # Ctrl-d: Cut region or line
+    bind -m emacs-standard -x '"\C-d": "osc-cut"'
+    bind -m vi-command -x '"\C-d": "osc-cut"'
+    bind -m vi-insert -x '"\C-d": "osc-cut"'
+
 
 elif ([[ "$XDG_SESSION_TYPE" == 'x11' ]] && hash xclip &>/dev/null) || ([[ "$XDG_SESSION_TYPE" == 'wayland' ]] && hash wl-copy &> /dev/null); then
   
@@ -769,7 +787,7 @@ elif ([[ "$XDG_SESSION_TYPE" == 'x11' ]] && hash xclip &>/dev/null) || ([[ "$XDG
                 echo -n "$READLINE_LINE" | wl-copy
             fi
         fi
-        READLINE_MARK_SET=
+        reset-mark
     }
 
     function clip-paste() {
@@ -788,9 +806,42 @@ elif ([[ "$XDG_SESSION_TYPE" == 'x11' ]] && hash xclip &>/dev/null) || ([[ "$XDG
         fi
         READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$pasters${READLINE_LINE:$READLINE_POINT}"
         READLINE_POINT=$((READLINE_POINT + ${#pasters}))
-        READLINE_MARK_SET=
+        reset-mark
     }
-    
+   
+
+    function clip-cut(){
+        if [[ "$XDG_SESSION_TYPE" == 'x11' ]]; then  
+            if [[ -n $READLINE_MARK_SET ]]; then 
+                if [[ $READLINE_MARK -gt $READLINE_POINT ]]; then
+                    local len=$(( $READLINE_MARK - $READLINE_POINT )) 
+                    echo -n "${READLINE_LINE:$READLINE_POINT:$len}" | xclip -i -sel c
+                else 
+                    local len=$(( $READLINE_POINT - $READLINE_MARK )) 
+                    echo -n "${READLINE_LINE:$READLINE_MARK:$len}" | xclip -i -sel c
+                fi
+                remove-region 
+            else
+                echo -n "$READLINE_LINE" | xclip -i -sel c
+                READLINE_LINE=""
+            fi
+        elif [[ "$XDG_SESSION_TYPE" == 'wayland' ]]; then
+            if [[ -n $READLINE_MARK_SET ]]; then 
+                if [[ $READLINE_MARK -gt $READLINE_POINT ]]; then
+                    local len=$(( $READLINE_MARK - $READLINE_POINT )) 
+                    echo -n "${READLINE_LINE:$READLINE_POINT:$len}" | wl-copy
+                else 
+                    local len = $(( $READLINE_POINT - $READLINE_MARK )) 
+                    echo -n "${READLINE_LINE:$READLINE_MARK:$len}" | wl-copy
+                fi
+                remove-region 
+            else
+                echo -n "$READLINE_LINE" | wl-copy
+                READLINE_LINE=""
+            fi
+        fi
+    }
+
     # Ctrl-s: Proper copy
     bind -m emacs-standard -x '"\C-s": clip-copy'
     bind -m vi-command -x '"\C-s": clip-copy'
@@ -807,6 +858,11 @@ elif ([[ "$XDG_SESSION_TYPE" == 'x11' ]] && hash xclip &>/dev/null) || ([[ "$XDG
     bind -m emacs-standard -x '"\C-v": clip-paste'
     bind -m vi-command -x '"\C-v": clip-paste'
     bind -m vi-insert -x '"\C-v": clip-paste'
+
+    # Ctrl-d: Cut region or line
+    bind -m emacs-standard -x '"\C-d": "clip-cut"'
+    bind -m vi-command -x '"\C-d": "clip-cut"'
+    bind -m vi-insert -x '"\C-d": "clip-cut"'
 
 fi
 
@@ -864,21 +920,19 @@ fi
 
 # F5, Ctrl-r - Reload .bashrc
 bind -m emacs-standard '"\205": re-read-init-file'
-bind -m vi-insert '"\205": re-read-init-file'
 bind -m vi-command '"\205": re-read-init-file'
 
 bind -m emacs-standard -x '"\206": source ~/.bashrc'
-bind -m vi-insert -x '"\206": source ~/.bashrc'
 bind -m vi-command -x '"\206": source ~/.bashrc'
 
 if [[ -z "$BLE_VERSION" ]]; then
     bind -m emacs-standard '"\e[15~": "\C-e\C-u\205\206\n"'
-    bind -m vi-command '"\e[15~": "\C-o\C-e\C-u\C-o\205\206\n"'
-    bind -m vi-insert '"\e[15~": "\C-o\C-e\C-u\C-o\205\206\n"'
+    bind -m vi-command '"\e[15~": "dd\205\206\n"'
+    bind -m vi-insert '"\e[15~": "\edd\205\206\n"'
 else 
     bind -m emacs-standard '"\e[15~": "\C-e\C-u\206\n"'
-    bind -m vi-command '"\e[15~": "\C-o\C-e\C-u\C-o\206\n"'
-    bind -m vi-insert '"\e[15~": "\C-o\C-e\C-u\C-o\206\n"'
+    bind -m vi-command '"\e[15~": "dd\206\n"'
+    bind -m vi-insert '"\e[15~": "\edd\206\n"'
 fi
 
 
