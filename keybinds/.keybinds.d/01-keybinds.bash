@@ -256,18 +256,29 @@ bind -m emacs-standard -x '"\e[3~": "delete-char-or-remove-region"'
 bind -m vi-command -x '"\e[3~": "delete-char-or-remove-region"'
 bind -m vi-insert -x '"\e[3~": "delete-char-or-remove-region"'
 
+global_rematch() { 
+    local s=$1 regex=$2 
+
+    # https://stackoverflow.com/questions/10582763/how-to-return-an-array-in-bash-without-using-globals
+    local -n array=$3
+    array=()
+    
+    while [[ $s =~ $regex ]]; do 
+        array+=("${BASH_REMATCH[0]}")
+        s=${s#*"${BASH_REMATCH[0]}"}
+    done
+}
 
 function backward-kill-word-or-remove-region(){
     if [[ -n "$READLINE_MARK_SET" ]]; then
         remove-region
     else
         if [[ $READLINE_POINT != 0 ]]; then
-            local word="${READLINE_LINE:0:$READLINE_POINT}" 
-            # https://stackoverflow.com/questions/19083488/counting-trailing-white-spaces
-            # Haven't looked into how to optimize this awk prompt but w/e
-            local spaces=$(echo "$word" | awk '{t=length($0);sub(" *$","");print t-length($0)}') 
-            word="$(echo $word | awk '{print $NF}')" 
-            local len="$(($READLINE_POINT - ${#word} - $spaces))" 
+            local reslt spcl word="${READLINE_LINE:0:$READLINE_POINT}"
+            global_rematch "$word" '[A-Za-z0-9]+' reslt
+            global_rematch "$word" '[^A-Za-z0-9]+' spcl
+
+            local len="$(($READLINE_POINT - ${#reslt[-1]} - ${#spcl[-1]}))" 
             READLINE_LINE="${READLINE_LINE:0:$len}${READLINE_LINE:$READLINE_POINT}" 
             READLINE_POINT=$len 
         fi
@@ -430,7 +441,7 @@ bind -m emacs-standard '"\e109": forward-word'
 bind -m vi-command '"\e109": forward-word'
 bind -m vi-insert '"\e109": forward-word'
 
-bind -m emacs-standard '"\e109": forward-word'
+bind -m emacs-standard '"\e110": backward-word'
 bind -m vi-command '"\e110": backward-word'
 bind -m vi-insert '"\e110": backward-word'
 
