@@ -34,6 +34,19 @@ if hash xfconf-query &> /dev/null; then
     }
 fi
 
+# TTY
+
+# To see the complete character string sent by a key, you can use this command, and type the key within 2 seconds:
+# stty raw; sleep 2; echo; stty cooked
+# But Ctrl-v, then keycombination still works best
+
+# Turn off flow control and free up Ctrl-s and Ctrl-q
+# We make sure that when this is being run in an interactive (and real) shell 
+# since resourcing ~/.zshrc could mean this line was being rerun
+if [[ $- == *i* ]] && tty -s; then
+    stty -ixon
+fi
+
 # XRESOURCES
 
 # Install bindings from xterm
@@ -72,28 +85,28 @@ fi
 #
 #
 # Change editing mode
-#bindkey -a '"\C-a": emacs-editing-mode'
-#bind -m vi-insert '"\C-a": emacs-editing-mode'
-#bindkey -e '"\C-a": vi-editing-mode'
+#bindkey -M viins '"\C-a": emacs-editing-mode'
+#bindkey -M vicmd '"\C-a": emacs-editing-mode'
+#bindkey -M emacs '"\C-a": vi-editing-mode'
 
 # Up and down arrow will now intelligently complete partially completed
 # commands by searching through the existing history.
-bindkey -e "\e[A" history-search-backward
-bindkey -a "\e[A" history-search-backward
-bindkey -v "\e[A" history-search-backward
+bindkey -M emacs "\e[A" history-search-backward
+bindkey -M viins "\e[A" history-search-backward
+bindkey -M vicmd "\e[A" history-search-backward
 
-bindkey -e "\e[B" history-search-forward
-bindkey -a "\e[B" history-search-forward
-bindkey -v "\e[B" history-search-forward
+bindkey -M emacs "\e[B" history-search-forward
+bindkey -M viins "\e[B" history-search-forward
+bindkey -M vicmd "\e[B" history-search-forward
 
 # Control left/right to jump from bigwords (ignore spaces when jumping) instead of chars
-bindkey -e '\e[1;5D' vi-backward-word
-bindkey -a '\e[1;5D' vi-backward-word
-bindkey -v '\e[1;5D' vi-backward-word
+bindkey -M emacs '\e[1;5D' vi-backward-word
+bindkey -M viins '\e[1;5D' vi-backward-word
+bindkey -M vicmd '\e[1;5D' vi-backward-word
 
-bindkey -e '\e[1;5C' vi-forward-word
-bindkey -a '\e[1;5C' vi-forward-word
-bindkey -v '\e[1;5C' vi-forward-word
+bindkey -M emacs '\e[1;5C' vi-forward-word
+bindkey -M viins '\e[1;5C' vi-forward-word
+bindkey -M vicmd '\e[1;5C' vi-forward-word
 
 # Full path dirs
 alias dirs="dirs -l"
@@ -101,10 +114,10 @@ alias dirs-col="dirs -v | column -c $COLUMNS"
 alias dirs-col-pretty="dirs -v | column -c $COLUMNS | sed -e 's/ 0 \\([^\t]*\\)/'\${GREEN}' 0 \\1'\${normal}'/'"
 
 #'Silent' clear
-if hash starship &>/dev/null && grep -q "^eval \"\$(starship init bash)\"" ~/.bashrc && (grep -q '\\n' ~/.config/starship.toml || (grep -q 'line_break' ~/.config/starship.toml && ! pcregrep -qM "[line_break]\$(.|\n)*^disabled = true" ~/.config/starship.toml)); then
+if hash starship &>/dev/null && [[ $STARSHIP_SHELL == 'zsh' ]] && (grep -q '\\n' ~/.config/starship.toml || (grep -q 'line_break' ~/.config/starship.toml && ! pcregrep -qM "[line_break]\$(.|\n)*^disabled = true" ~/.config/starship.toml)); then
     function clr1(){ tput cuu1 && tput cuu1 && tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null }
     function clr2(){ tput cuu1 && tput cuu1 && tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i < $(dirs -v | column -c ${COLUMNS} | wc -l) ; i++)); do tput cuu1; done && dirs-col-pretty && history -d -1 &>/dev/null }
-elif hash starship &>/dev/null && grep -q "^eval \"\$(starship init bash)\"" ~/.zshrc; then
+elif hash starship &>/dev/null && [[ $STARSHIP_SHELL == 'zsh' ]]; then
     function clr1(){ tput cuu1 && tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null }
     function clr2(){ tput cuu1 && tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i < $(dirs -v | column -c ${COLUMNS} | wc -l) ; i++)); do tput cuu1; done && tput cuu1 && dirs-col-pretty && tput rc && history -d -1 &>/dev/null }
 else
@@ -115,37 +128,122 @@ fi
 zle -N clr1
 zle -N clr2
 
-updir(){
+rightdir(){
     pushd +1 &>/dev/null
     zle beginning-of-line
     zle clr2
 }
 
-zle -N updir
+leftdir(){
+    pushd -0 &>/dev/null
+    zle beginning-of-line
+    zle clr2
+}
+
+zle -N rightdir
+zle -N leftdir
 
 # 'dirs' builtins shows all directories in stack
-# Ctrl-Up arrow rotates over directory history
-bindkey -e '\e[1;5A' updir
-bindkey -a '\e[1;5A' updir
-bindkey -v '\e[1;5A' updir
+# Ctrl-Alt-Left/Right arrow rotates over directory history
+bindkey -M emacs '\e[1;7C' rightdir
+bindkey -M viins '\e[1;7C' rightdir
+bindkey -M vicmd '\e[1;7C' rightdir
 
-# Ctrl-Down -> Dir Down
-downdir(){
+bindkey -M emacs '\e[1;7D' leftdir
+bindkey -M viins '\e[1;7D' leftdir
+bindkey -M vicmd '\e[1;7D' leftdir
+
+# Ctrl-Alt-Up -> Dir Up
+updir(){
     zle beginning-of-line
     cd ..
     zle clr2
 }
 
-zle -N downdir
-bindkey -e "\e[1;5B" downdir
-bindkey -a "\e[1;5B" downdir
-bindkey -v "\e[1;5B" downdir
+zle -N updir
+bindkey -M emacs "\e[1;7A" updir
+bindkey -M viins "\e[1;7A" updir
+bindkey -M vicmd "\e[1;7A" updir
 
-# Ctrl-Down -> Rotate between 2 last directories
-#bindkey -s '"\e266": pushd -1 &>/dev/null\n'
-#bindkey -e '"\e[1;5B": "\C-e\C-u\e266 _.\C-m"'
-#bindkey -a     '"\e[1;5B": "ddi\C-u\e266 _.\C-m"'
-#bindkey -v      '"\e[1;5B": "\eddi\e266 _.\C-m"'
+# Ctrl-Alt-Down prompts you to select a folder to go into
+# With fzf keybinds or with tabcomplete
+if ! hash fzf &> /dev/null; then
+    
+    # Ctrl-Alt-Down -> Dir Select
+    function show-cd(){ 
+        clear 
+        tput cup $(($LINE_TPUT+1)) $TPUT_COL 
+        tput sc 
+        tput cuu1 
+        # If the current buffer doesn't start with 'cd ', insert it
+        if [[ "$BUFFER" != cd\ * && "$BUFFER" != cd ]]; then
+            BUFFER="cd "
+            CURSOR=${#BUFFER}  # move cursor to end
+        fi 
+        zle -C complete-cd expand-or-complete _cd 
+        zle reset-prompt 
+        zle complete-word
+    }
+    zle -N show-cd
+     
+    bindkey -M emacs '\e[1;7B' show-cd
+    bindkey -M vicmd '\e[1;7B' show-cd
+    bindkey -M viins '\e[1;7B' show-cd
+else
+    if ! [ -f $HOME/.keybinds.d/fzf-bindings.zsh ]; then
+        __fzf_defaults() {
+          printf '%s\n' "--height ${FZF_TMUX_HEIGHT:-40%} --min-height 20+ --bind=ctrl-z:ignore $1"
+          command cat "${FZF_DEFAULT_OPTS_FILE-}" 2> /dev/null
+          printf '%s\n' "${FZF_DEFAULT_OPTS-} $2"
+        } 
+        
+        __fzfcmd() {
+          [ -n "${TMUX_PANE-}" ] && { [ "${FZF_TMUX:-0}" != 0 ] || [ -n "${FZF_TMUX_OPTS-}" ]; } &&
+            echo "fzf-tmux ${FZF_TMUX_OPTS:--d${FZF_TMUX_HEIGHT:-40%}} -- " || echo "fzf"
+        } 
+        
+        fzf-cd-widget() {
+          setopt localoptions pipefail no_aliases 2> /dev/null
+          local dir="$(
+            FZF_DEFAULT_COMMAND=${FZF_ALT_C_COMMAND:-} \
+            FZF_DEFAULT_OPTS=$(__fzf_defaults "--reverse --walker=dir,follow,hidden --scheme=path" "${FZF_ALT_C_OPTS-} +m") \
+            FZF_DEFAULT_OPTS_FILE='' $(__fzfcmd) < /dev/tty)"
+          if [[ -z "$dir" ]]; then
+            zle redisplay
+            return 0
+          fi
+          zle push-line # Clear buffer. Auto-restored on next prompt.
+          BUFFER="builtin cd -- ${(q)dir:a}"
+          zle accept-line
+          local ret=$?
+          unset dir # ensure this doesn't end up appearing in prompt expansion
+          zle reset-prompt
+          return $ret
+        }
+        if [[ "${FZF_ALT_C_COMMAND-x}" != "" ]]; then
+          zle -N fzf-cd-widget
+          bindkey -M emacs '\e[1;7B' fzf-cd-widget
+          bindkey -M vicmd '\e[1;7B' fzf-cd-widget
+          bindkey -M viins '\e[1;7B' fzf-cd-widget
+        fi
+    fi
+    if hash bfs &> /dev/null; then
+        # https://github.com/tavianator/bfs/issues/163 
+        FZF_ALT_C_COMMAND="[[ -n \"\$(command ls -Ahp | command grep \".*/$\")\" ]] && bfs -s -x -type d -printf '%P\n' -exclude -name '.git' -exclude -name 'node_modules' | sed '/^[[:space:]]*$/d' || echo .." 
+        # Alternative with previous directory added
+        # FZF_ALT_C_COMMAND="[[ -n \"\$(command ls -Ahp | command grep \".*/$\")\" ]] && echo \"..\n\$(bfs -s -x -type d -printf '%P\n' -exclude -name '.git' -exclude -name 'node_modules' | sed '/^[[:space:]]*$/d')\" || echo .." 
+    elif hash fd &> /dev/null; then
+        FZF_ALT_C_COMMAND="fd -H --type d --exclude '.git' --exclude 'node_modules'" 
+    fi
+    
+    FZF_ALT_C_OPTS='--bind "ctrl-v:become(vlc --recursive expand {})"
+                    --bind "ctrl-g:become(. ~/.bash_aliases.d/ripgrep-directory.sh && cd {} && ripgrep-dir > /dev/tty)"' 
+    if hash eza &> /dev/null; then
+        FZF_ALT_C_OPTS="$FZF_ALT_C_OPTS --preview 'eza --tree --color=always --icons=always --all {}'"
+    elif hash tree &> /dev/null; then 
+        FZF_ALT_C_OPTS="$FZF_ALT_C_OPTS --preview 'tree -C {}'"
+    fi
+fi
 
 # Shift left/right to jump from words instead of chars
  
@@ -158,51 +256,25 @@ function clear-screen(){
     tput cuu1
 }
 
-function show-cd(){ 
-    clear 
-    tput cup $(($LINE_TPUT+1)) $TPUT_COL 
-    tput sc 
-    tput cuu1 
-    # If the current buffer doesn't start with 'cd ', insert it
-    if [[ "$BUFFER" != cd\ * && "$BUFFER" != cd ]]; then
-        BUFFER="cd "
-        CURSOR=${#BUFFER}  # move cursor to end
-    fi 
-    zle -C complete-cd expand-or-complete _cd 
-    zle reset-prompt 
-    zle menu-select
-}
-
 zle -N clear-screen
-zle -N show-cd
-
-# Shift up => Clean reset
-bindkey -e "\e[1;2A" clear-screen
-bindkey -a "\e[1;2A" clear-screen
-bindkey -v "\e[1;2A" clear-screen
-
-# Shift down => cd shortcut
-bindkey -e "\e[1;2B" show-cd 
-bindkey -v "\e[1;2B" show-cd
-bindkey -a "\e[1;2B" show-cd
 
 # Shift left/right to jump from bigwords (ignore spaces when jumping) instead of chars
-#bindkey -e -x '"\e[1;2D": clear && let COL_TPUT=$COL_TPUT-1 && if [ $COL_TPUT -lt 0 ];then COL_TPUT=$COLUMNS;fi && tput cup $LINE_TPUT $COL_TPUT && tput sc 1 && echo "${PS1@P}" && tput cuu1'
-#bindkey -a     -x '"\e[1;2D": clear && let COL_TPUT=$COL_TPUT-1 && if [ $COL_TPUT -lt 0 ];then COL_TPUT=$COLUMNS;fi && tput cup $LINE_TPUT $COL_TPUT && tput sc 1 && echo "${PS1@P}" && tput cuu1'
-#bindkey -v      -x '"\e[1;2D": clear && let COL_TPUT=$COL_TPUT-1 && if [ $COL_TPUT -lt 0 ];then COL_TPUT=$COLUMNS;fi && tput cup $LINE_TPUT $COL_TPUT && tput sc 1 && echo "${PS1@P}" && tput cuu1'
+#bindkey -M emacs -x '"\e[1;2D": clear && let COL_TPUT=$COL_TPUT-1 && if [ $COL_TPUT -lt 0 ];then COL_TPUT=$COLUMNS;fi && tput cup $LINE_TPUT $COL_TPUT && tput sc 1 && echo "${PS1@P}" && tput cuu1'
+#bindkey -M viins     -x '"\e[1;2D": clear && let COL_TPUT=$COL_TPUT-1 && if [ $COL_TPUT -lt 0 ];then COL_TPUT=$COLUMNS;fi && tput cup $LINE_TPUT $COL_TPUT && tput sc 1 && echo "${PS1@P}" && tput cuu1'
+#bindkey -M vicmd      -x '"\e[1;2D": clear && let COL_TPUT=$COL_TPUT-1 && if [ $COL_TPUT -lt 0 ];then COL_TPUT=$COLUMNS;fi && tput cup $LINE_TPUT $COL_TPUT && tput sc 1 && echo "${PS1@P}" && tput cuu1'
 #
-#bindkey -e -x '"\e[1;2C": clear && let COL_TPUT=$COL_TPUT+1 && if [ $COL_TPUT -gt $COLUMNS ];then COL_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && tput sc 1 && echo "${PS1@P}" && tput cuu1'
-#bindkey -a     -x '"\e[1;2C": clear && let COL_TPUT=$COL_TPUT+1 && if [ $COL_TPUT -gt $COLUMNS ];then COL_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && tput sc 1 && echo "${PS1@P}" && tput cuu1'
-#bindkey -v      -x '"\e[1;2C": clear && let COL_TPUT=$COL_TPUT+1 && if [ $COL_TPUT -gt $COLUMNS ];then COL_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && tput sc 1 && echo "${PS1@P}" && tput cuu1'
+#bindkey -M emacs -x '"\e[1;2C": clear && let COL_TPUT=$COL_TPUT+1 && if [ $COL_TPUT -gt $COLUMNS ];then COL_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && tput sc 1 && echo "${PS1@P}" && tput cuu1'
+#bindkey -M viins     -x '"\e[1;2C": clear && let COL_TPUT=$COL_TPUT+1 && if [ $COL_TPUT -gt $COLUMNS ];then COL_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && tput sc 1 && echo "${PS1@P}" && tput cuu1'
+#bindkey -M vicmd      -x '"\e[1;2C": clear && let COL_TPUT=$COL_TPUT+1 && if [ $COL_TPUT -gt $COLUMNS ];then COL_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && tput sc 1 && echo "${PS1@P}" && tput cuu1'
 
 # Alt left/right to jump to beginning/end line instead of chars
-bindkey -e "\e[1;3D" beginning-of-line
-bindkey -a "\e[1;3D" beginning-of-line
-bindkey -v "\e[1;3D" beginning-of-line
+bindkey -M emacs "\e[1;3D" beginning-of-line
+bindkey -M viins "\e[1;3D" beginning-of-line
+bindkey -M vicmd "\e[1;3D" beginning-of-line
 
-bindkey -e "\e[1;3C" end-of-line
-bindkey -a "\e[1;3C" end-of-line
-bindkey -v "\e[1;3C" end-of-line
+bindkey -M emacs "\e[1;3C" end-of-line
+bindkey -M viins "\e[1;3C" end-of-line
+bindkey -M vicmd "\e[1;3C" end-of-line
 
 # Alt up/down to change cursor line
 function mv_prmpt_up(){ 
@@ -215,9 +287,9 @@ function mv_prmpt_up(){
     zle reset-prompt
     tput sc }
 zle -N mv_prmpt_up
-bindkey -a "\e[1;3A" mv_prmpt_up
-bindkey -e "\e[1;3A" mv_prmpt_up
-bindkey -v "\e[1;3A" mv_prmpt_up
+bindkey -M viins "\e[1;3A" mv_prmpt_up
+bindkey -M emacs "\e[1;3A" mv_prmpt_up
+bindkey -M vicmd "\e[1;3A" mv_prmpt_up
 
 
 function mv_prmpt_dwn(){ 
@@ -234,13 +306,13 @@ function mv_prmpt_dwn(){
 zle -N mv_prmpt_up
 zle -N mv_prmpt_dwn
 
-bindkey -a "\e[1;3A" mv_prmpt_up
-bindkey -e "\e[1;3A" mv_prmpt_up
-bindkey -v "\e[1;3A" mv_prmpt_up
+bindkey -M viins "\e[1;3A" mv_prmpt_up
+bindkey -M emacs "\e[1;3A" mv_prmpt_up
+bindkey -M vicmd "\e[1;3A" mv_prmpt_up
 
-bindkey -e "\e[1;3B" mv_prmpt_dwn
-bindkey -a "\e[1;3B" mv_prmpt_dwn
-bindkey -v "\e[1;3B" mv_prmpt_dwn
+bindkey -M emacs "\e[1;3B" mv_prmpt_dwn
+bindkey -M viins "\e[1;3B" mv_prmpt_dwn
+bindkey -M vicmd "\e[1;3B" mv_prmpt_dwn
 
 function expand-aliases() {
     local cmd=${BUFFER%% *}
@@ -256,50 +328,50 @@ function expand-aliases() {
 zle -N expand-aliases
 
 # Ctrl-w expands aliases
-bindkey -e "\C-w" expand-aliases
-bindkey -a "\C-w" expand-aliases
-bindkey -v "\C-w" expand-aliases
+bindkey -M emacs "\C-w" expand-aliases
+bindkey -M viins "\C-w" expand-aliases
+bindkey -M vicmd "\C-w" expand-aliases
 
 # Expand by looping through options
-bindkey -e 'Tab' menu-complete
-bindkey -a 'Tab' menu-complete
-bindkey -v 'Tab' menu-complete
+bindkey -M emacs 'Tab' menu-complete
+bindkey -M viins 'Tab' menu-complete
+bindkey -M vicmd 'Tab' menu-complete
 
 # Shift+Tab for reverse
-bindkey -e "\e[Z" reverse-menu-complete
-bindkey -a "\e[Z" reverse-menu-complete 
-bindkey -v "\e[Z" reverse-menu-complete 
+bindkey -M emacs "\e[Z" reverse-menu-complete
+bindkey -M viins "\e[Z" reverse-menu-complete 
+bindkey -M vicmd "\e[Z" reverse-menu-complete 
 
 if [[ "$TERM" == 'xterm-kitty' ]]; then
     # (Kitty only) Ctrl-tab for variable autocompletion
-    bindkey -e "\e[9;5u" complete-word
-    bindkey -a "\e[9;5u" complete-word
-    bindkey -v "\e[9;5u" complete-word
+    bindkey -M emacs "\e[9;5u" complete-word
+    bindkey -M viins "\e[9;5u" complete-word
+    bindkey -M vicmd "\e[9;5u" complete-word
 fi
 
-function exit-zsh(){exit; zle reset-prompt}
+# Ctrl-q quits terminal
 
+function exit-zsh(){ exit }
 zle -N exit-zsh
 
-# Ctrl-q quits terminal
-bindkey -e "\C-q" exit-zsh
-bindkey -a "\C-q" exit-zsh
-bindkey -v "\C-q" exit-zsh
+bindkey -M emacs "\C-q" exit-zsh
+bindkey -M viins "\C-q" exit-zsh
+bindkey -M vicmd "\C-q" exit-zsh
 
 # Ctrl+z is vi-undo (after being unbound in stty) instead of only on Ctrl+_
-bindkey -e "\C-z" vi-undo-change
-bindkey -a "\C-z" vi-undo-change
-bindkey -v "\C-z" vi-undo-change 
+bindkey -M emacs "\C-z" vi-undo-change
+bindkey -M viins "\C-z" vi-undo-change
+bindkey -M vicmd "\C-z" vi-undo-change 
 
 # Ctrl-backspace deletes (kills) line backward
-bindkey -e "\C-h" backward-kill-word
-bindkey -a "\C-h" backward-kill-word
-bindkey -v "\C-h" backward-kill-word
+bindkey -M emacs "\C-h" backward-kill-word
+bindkey -M viins "\C-h" backward-kill-word
+bindkey -M vicmd "\C-h" backward-kill-word
 
 # Ctrl-l clears
-bindkey -a '\C-l' clear-screen
-bindkey -e '\C-l' clear-screen
-bindkey -v '\C-l' clear-screen
+bindkey -M viins '\C-l' clear-screen
+bindkey -M emacs '\C-l' clear-screen
+bindkey -M vicmd '\C-l' clear-screen
 
 function delete-first-char() {
     if [[ -n "$BUFFER" ]]; then
@@ -311,14 +383,14 @@ function delete-first-char() {
 zle -N delete-first-char
 
 # Ctrl-d: Delete first character on line
-bindkey -e "\C-d" delete-first-char
-bindkey -a "\C-d" delete-first-char
-bindkey -v "\C-d" delete-first-char  
+bindkey -M emacs "\C-d" delete-first-char
+bindkey -M viins "\C-d" delete-first-char
+bindkey -M vicmd "\C-d" delete-first-char  
 
 # Ctrl+b: (Ctrl+x Ctrl+b emacs mode) is quoted insert - Default Ctrl+v - Gives (f.ex. 'Ctrl-a') back as '^A'
-bindkey -e "\C-x\C-b" quoted-insert
-bindkey -a "\C-b" quoted-insert
-bindkey -v "\C-b" quoted-insert
+bindkey -M emacs "\C-x\C-b" quoted-insert
+bindkey -M viins "\C-b" quoted-insert
+bindkey -M vicmd "\C-b" quoted-insert
 
 function emacs-mode() {
     bindkey -e
@@ -342,16 +414,16 @@ zle -N vi-ins-mode
 
 # Ctrl+o: Change from vi-mode to emacs mode and back
 # This is also configured in ~/.fzf/shell/key-bindings-bash.sh if you have fzf keybinds installed
-bindkey -a "\C-o" emacs-mode
-bindkey -v "\C-o" emacs-mode
-bindkey -e "\C-o" vi-ins-mode
+bindkey -M viins "\C-o" emacs-mode
+bindkey -M vicmd "\C-o" emacs-mode
+bindkey -M emacs "\C-o" vi-ins-mode
 
 # vi-command ' / emacs C-x ' helps with adding quotes to bash strings
 function quote-all-zsh() { BUFFER="${BUFFER@Q}"; zle reset-prompt }
 zle -N quote-all-zsh
-bindkey -e -s '\C-x'\''' quote-all-zsh
-bindkey -a -s ''\''' quote-all-zsh
-#bindkey -v -s '\C-x'\''' '_quote_all'
+bindkey -M emacs -s '\C-x'\''' quote-all-zsh
+bindkey -M viins -s ''\''' quote-all-zsh
+#bindkey -M vicmd -s '\C-x'\''' '_quote_all'
 
 # https://unix.stackexchange.com/questions/85391/where-is-the-bash-feature-to-open-a-command-in-editor-documented
 edit-wo-executing() {
@@ -368,17 +440,17 @@ edit-wo-executing() {
 
 zle -N edit-wo-executing
 
-bindkey -v "\C-e" edit-wo-executing
-bindkey -a "v" edit-wo-executing
-bindkey -a "\C-e" edit-wo-executing
-bindkey -e "\C-e\C-e" edit-wo-executing
+bindkey -M vicmd "\C-e" edit-wo-executing
+bindkey -M viins "v" edit-wo-executing
+bindkey -M viins "\C-e" edit-wo-executing
+bindkey -M emacs "\C-e\C-e" edit-wo-executing
 
 # RLWRAP
 
 #if hash rlwrap &> /dev/null; then
-#    bindkey -e '"\C-x\C-e" : rlwrap-call-editor'
-#    bindkey -a '"\C-e" : rlwrap-call-editor'
-#    bindkey -v '"\C-e" : rlwrap-call-editor'
+#    bindkey -M emacs '"\C-x\C-e" : rlwrap-call-editor'
+#    bindkey -M viins '"\C-e" : rlwrap-call-editor'
+#    bindkey -M vicmd '"\C-e" : rlwrap-call-editor'
 #fi
 
 if hash osc &>/dev/null; then
@@ -396,13 +468,13 @@ if hash osc &>/dev/null; then
     zle -N osc-copy
     zle -N osc-paste
 
-    bindkey -e "\C-s" osc-copy
-    bindkey -a "\C-s" osc-copy
-    bindkey -v "\C-s" osc-copy
+    bindkey -M emacs "\C-s" osc-copy
+    bindkey -M viins "\C-s" osc-copy
+    bindkey -M vicmd "\C-s" osc-copy
 
-    bindkey -a "\C-v" osc-paste
-    bindkey -e "\C-v" osc-paste
-    bindkey -v "\C-v" osc-paste
+    bindkey -M viins "\C-v" osc-paste
+    bindkey -M emacs "\C-v" osc-paste
+    bindkey -M vicmd "\C-v" osc-paste
 
 elif ([[ "$XDG_SESSION_TYPE" == 'x11' ]] && hash xclip &>/dev/null) || ([[ "$XDG_SESSION_TYPE" == 'wayland' ]] && hash wl-copy &> /dev/null); then
   
@@ -428,14 +500,14 @@ elif ([[ "$XDG_SESSION_TYPE" == 'x11' ]] && hash xclip &>/dev/null) || ([[ "$XDG
     zle -N clip-paste
 
     # Ctrl-s: Proper copy
-    bindkey -e "\C-s" clip-copy
-    bindkey -a "\C-s" clip-copy
-    bindkey -v "\C-s" clip-copy
+    bindkey -M emacs "\C-s" clip-copy
+    bindkey -M viins "\C-s" clip-copy
+    bindkey -M vicmd "\C-s" clip-copy
 
     # Ctrl-v: Proper paste
-    bindkey -e "\C-v" clip-paste
-    bindkey -a "\C-v" clip-paste
-    bindkey -v "\C-v" clip-paste
+    bindkey -M emacs "\C-v" clip-paste
+    bindkey -M viins "\C-v" clip-paste
+    bindkey -M vicmd "\C-v" clip-paste
 
 fi
 
@@ -456,18 +528,18 @@ if hash autojump &>/dev/null; then
     zle -N show-j   
 
     # Ctrl-x Ctrl-j for autojump
-    bindkey -e "\C-x\C-j" show-j 
-    bindkey -a "\C-j" show-j 
-    bindkey -v "\C-j" show-j 
+    bindkey -M emacs "\C-x\C-j" show-j 
+    bindkey -M viins "\C-j" show-j 
+    bindkey -M vicmd "\C-j" show-j 
 fi
 
 if hash fzf &>/dev/null; then
     
     #if [[ "$TERM" == 'xterm-kitty' ]]; then
     #    # (Kitty only) Ctrl-tab for fzf autocompletion
-    #    bindkey -e '"\e[9;5u": " **\t"'
-    #    bindkey -a '"\e[9;5u": " **\t"'
-    #    bindkey -v '"\e[9;5u": " **\t"'
+    #    bindkey -M emacs '"\e[9;5u": " **\t"'
+    #    bindkey -M viins '"\e[9;5u": " **\t"'
+    #    bindkey -M vicmd '"\e[9;5u": " **\t"'
     #fi
 
     if type ripgrep-dir &>/dev/null; then
@@ -480,9 +552,9 @@ if hash fzf &>/dev/null; then
         zle -N ripgrep-dir-zsh
         
         # Ctrl-g: Ripgrep function overview
-        bindkey -e "\C-g" ripgrep-dir-zsh
-        bindkey -a "\C-g" ripgrep-dir-zsh
-        bindkey -v "\C-g" ripgrep-dir-zsh
+        bindkey -M emacs "\C-g" ripgrep-dir-zsh
+        bindkey -M viins "\C-g" ripgrep-dir-zsh
+        bindkey -M vicmd "\C-g" ripgrep-dir-zsh
     fi
 
     if type fzf_rifle &>/dev/null; then
@@ -495,14 +567,14 @@ if hash fzf &>/dev/null; then
         zle -N fzf_rifle-zsh
        
         # CTRL-F - Paste the selected file path into the command line
-        bindkey -e "\C-f" fzf_rifle-zsh
-        bindkey -a "\C-f" fzf_rifle-zsh
-        bindkey -v "\C-f" fzf_rifle-zsh
+        bindkey -M emacs "\C-f" fzf_rifle-zsh
+        bindkey -M viins "\C-f" fzf_rifle-zsh
+        bindkey -M vicmd "\C-f" fzf_rifle-zsh
 
         # F4 - Rifle search
-        bindkey -e "\eOS" fzf_rifle-zsh
-        bindkey -a "\eOS" fzf_rifle-zsh
-        bindkey -v "\eOS" fzf_rifle-zsh
+        bindkey -M emacs "\eOS" fzf_rifle-zsh
+        bindkey -M viins "\eOS" fzf_rifle-zsh
+        bindkey -M vicmd "\eOS" fzf_rifle-zsh
     fi
 fi
 
@@ -519,9 +591,9 @@ if hash ranger &>/dev/null; then
     
     zle -N ranger-zsh 
    
-    bindkey -e "\eOQ" ranger-zsh
-    bindkey -a "\eOQ" ranger-zsh
-    bindkey -v "\eOQ" ranger-zsh
+    bindkey -M emacs "\eOQ" ranger-zsh
+    bindkey -M viins "\eOQ" ranger-zsh
+    bindkey -M vicmd "\eOQ" ranger-zsh
 fi
 
 # F3 - lazygit (Git helper)
@@ -532,18 +604,17 @@ if hash lazygit &>/dev/null; then
     }
     
     zle -N lazygit-zsh
-    bindkey -e "\eOR" lazygit-zsh
-    bindkey -a "\eOR" lazygit-zsh
-    bindkey -v "\eOR" lazygit-zsh
+    bindkey -M emacs "\eOR" lazygit-zsh
+    bindkey -M viins "\eOR" lazygit-zsh
+    bindkey -M vicmd "\eOR" lazygit-zsh
 fi
 
 # F5, Ctrl-r - Reload .zshrc
-#bind '"\205": re-read-init-file;'
-function resource-zsh(){ source ~/.zshrc }
+function resource-zsh(){ source ~/.zshrc; zle reset-prompt }
 zle -N resource-zsh
-bindkey -e "\e[15~" resource-zsh
-bindkey -a "\e[15~" resource-zsh 
-bindkey -v "\e[15~" resource-zsh 
+bindkey -M emacs "\e[15~" resource-zsh
+bindkey -M viins "\e[15~" resource-zsh 
+bindkey -M vicmd "\e[15~" resource-zsh 
 
 # F6 - (neo/fast/screen)fetch (System overview)
 if hash neofetch &>/dev/null || hash fastfetch &>/dev/null || hash screenfetch &>/dev/null || hash onefetch &>/dev/null; then
@@ -597,9 +668,9 @@ if hash neofetch &>/dev/null || hash fastfetch &>/dev/null || hash screenfetch &
     
     zle -N fetchbind-zsh
 
-    bindkey -e "\e[17~" fetchbind-zsh
-    bindkey -a "\e[17~" fetchbind-zsh 
-    bindkey -v "\e[17~" fetchbind-zsh 
+    bindkey -M emacs "\e[17~" fetchbind-zsh
+    bindkey -M viins "\e[17~" fetchbind-zsh 
+    bindkey -M vicmd "\e[17~" fetchbind-zsh 
     
     unset fetch
 fi
@@ -607,7 +678,7 @@ fi
 # F7 - Htop and alternatives
 
 function htop-btop-zsh(){
-    stty sane
+    
     local ansr ansr1 
     if hash btop &>/dev/null; then
          readyn -p "Use btop instead of htop?" ansr 
@@ -641,18 +712,34 @@ function htop-btop-zsh(){
              fi
          fi
     fi
-    
-    if (! hash bpytop &> /dev/null && ! hash bpytop &> /dev/null && ! hash bpytop &> /dev/null) || [[ "$ansr" == 'n' ]]; then
+   
+    if ! (hash btop &> /dev/null || hash bashtop &> /dev/null || hash bpytop &> /dev/null) || [[ "$ansr" == 'n' ]]; then
         readyn -p "Start htop as root?" ansr1 && [[ "$ansr1" == "y" ]] && sudo htop || htop
     fi
     zle reset-prompt 
 }
 
+function htop-btop-zsh(){
+    local REPLY
+    autoload -Uz read-from-minibuffer
+
+      # Create a sub-prompt, pre-populated with the current contents of the command line.
+      read-from-minibuffer 'History search: ' $LBUFFER $RBUFFER
+
+      BUFFER="" 
+      # Use the modified input to search history & update the command line with it.
+      #LBUFFER=$(echo "$(fc -ln $REPLY $REPLY)" )
+      #RBUFFER=''
+
+      # Put some informational text below the command line.
+      #zle -M "History result for '$REPLY'."
+}
+
 zle -N htop-btop-zsh
 
-bindkey -e "\e[18~" htop-btop-zsh
-bindkey -a "\e[18~" htop-btop-zsh
-bindkey -v "\e[18~" htop-btop-zsh
+bindkey -M emacs "\e[18~" htop-btop-zsh
+bindkey -M viins "\e[18~" htop-btop-zsh
+bindkey -M vicmd "\e[18~" htop-btop-zsh
 
 # F8 - Lazydocker (Docker TUI)
 if hash lazydocker &>/dev/null; then
@@ -662,7 +749,7 @@ if hash lazydocker &>/dev/null; then
     }
     
     zle -N lazydocker-zsh
-    bindkey -e "\e[19~" lazydocker-zsh
-    bindkey -a "\e[19~" lazydocker-zsh 
-    bindkey -v "\e[19~" lazydocker-zsh 
+    bindkey -M emacs "\e[19~" lazydocker-zsh
+    bindkey -M viins "\e[19~" lazydocker-zsh 
+    bindkey -M vicmd "\e[19~" lazydocker-zsh 
 fi

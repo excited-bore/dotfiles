@@ -492,8 +492,7 @@ function update-system() {
             fi
         fi
 
-
-        if [[ "$(ls /boot/vmlinuz* | wc -w)" -gt 1 ]]; then
+        if [[ "$(command ls /boot/vmlinuz* | wc -w)" -gt 1 ]]; then
             local rm_unused_krn
             readyn $flag -p "Multiple installed kernels detected. Remove unused ones?" rm_unused_krn
             if [[ "$rm_unused_krn" == 'y' ]]; then
