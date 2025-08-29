@@ -70,22 +70,62 @@ shell-keybinds() {
         . $SCRIPT_DIR/checks/check_keybinds.sh
     fi
 
+    sed -i "s|^set show-mode-in-prompt .*|#set show-mode-in-prompt on|g" $binds
+
+    sed -i "s|\([[:space:]+]\)set vi-ins-mode-string|\1#set set-vi-ins-mode-prompt|g" $binds
+    sed -i "s|\([[:space:]+]\)set vi-cmd-mode-string|\1#set set-vi-cmd-mode-prompt|g" $binds
+    sed -i "s|\([[:space:]+]\)set emacs-mode-string|\1#set set-emacs-mode-prompt|g" $binds
+
+    printf "${GREEN}%s${normal}\n" "The readline options for your prompt are: "
+    printf "${green}%s${normal}\n" " - Show a different cursor for emacs and vi-insert mode ('|' instead of '█')"
+    printf "${green} - Show a different cursor for emacs/vi-insert mode ${GREEN}and${green}\n   Show a visual indicator for which mode is currently active '(emacs)/(vi)/(cmd)'\n${normal}"
+    printf "${green} - Do both of these but with a colored mode indicator (magenta for (emacs), blue for (vi)/(cmd))'\n${normal}"
+     
+    reade -Q 'GREEN' -i "cursor-mode cursor cursor-colored-mode none" -p "Which do you prefer?: [Cursor-mode/cursor/cursor-colored-mode/none]: " vivisual
+    if [[ "$vivisual" == "cursor" ]]; then
+        sed -i "s|.set show-mode-in-prompt .*|set show-mode-in-prompt on|g" $binds
+        
+        sed -i 's|#\(set vi-ins-mode-string \\1\\e\[?0c.*\)|\1|g' $binds
+        sed -i 's|#\(set vi-cmd-mode-string \\1\\e\[?8c.*\)|\1|g' $binds
+        sed -i 's|#\(set emacs-mode-string  \\1\\e\[?0c.*\)|\1|g' $binds
+
+        sed -i 's|#\(set vi-ins-mode-string \\1\\e\[5 q.*\)|\1|g' $binds
+        sed -i 's|#\(set vi-cmd-mode-string \\1\\e\[2 q.*\)|\1|g' $binds
+        sed -i 's|#\(set emacs-mode-string  \\1\\e\[5 q.*\)|\1|g' $binds
+    
+    elif [[ "$vivisual" == "cursor-mode" ]]; then
+        sed -i "s|.set show-mode-in-prompt .*|set show-mode-in-prompt on|g" $binds
+        
+        sed -i 's|#\(set vi-ins-mode-string (ins)\\1\\e\[?0c.*\)|\1|g' $binds
+        sed -i 's|#\(set vi-cmd-mode-string (cmd)\\1\\e\[?8c.*\)|\1|g' $binds
+        sed -i 's|#\(set emacs-mode-string  (emacs)\\1\\e\[?0c.*\)|\1|g' $binds
+
+        sed -i 's|#\(set vi-ins-mode-string (ins)\\1\\e\[5 q.*\)|\1|g' $binds
+        sed -i 's|#\(set vi-cmd-mode-string (cmd)\\1\\e\[2 q.*\)|\1|g' $binds
+        sed -i 's|#\(set emacs-mode-string  (emacs)\\1\\e\[5 q.*\)|\1|g' $binds
+    
+    elif [[ "$vivisual" == "cursor-colored-mode" ]]; then
+        sed -i "s|.set show-mode-in-prompt .*|set show-mode-in-prompt on|g" $binds
+        
+        sed -i 's|#\(set vi-ins-mode-string \\1\\e\[34;1m\\2(ins)\\1\\e\[?0c.*\)|\1|g' $binds
+        sed -i 's|#\(set vi-cmd-mode-string \\1\\e\[34;1m\\2(cmd)\\1\\e\[?8c.*\)|\1|g' $binds
+        sed -i 's|#\(set emacs-mode-string  \\1\\e\[35;1m\\2(emacs)\\1\\e\[?0c.*\)|\1|g' $binds
+
+        sed -i 's|#\(set vi-ins-mode-string \\1\\e\[34;1m\\2(ins)\\1\\e\[5 q.*\)|\1|g' $binds
+        sed -i 's|#\(set vi-cmd-mode-string \\1\\e\[34;1m\\2(cmd)\\1\\e\[2 q.*\)|\1|g' $binds
+        sed -i 's|#\(set emacs-mode-string  \\1\\e\[35;1m\\2(emacs)\\1\\e\[5 q.*\)|\1|g' $binds
+         
+    fi
+
     printf "${cyan}You can always switch between vi/emacs mode with ${CYAN}Ctrl-o${normal}\n"
 
-    readyn -Y "CYAN" -p "Startup in ${MAGENTA}vi-mode${CYAN} instead of ${GREEN}emacs${CYAN} mode? (might cause issues with pasteing)" vimde
+    readyn -n -N "CYAN" -p "Startup in ${MAGENTA}vi-mode${CYAN} instead of ${GREEN}emacs${CYAN} mode? (might cause issues with pasteing)" vimde
 
     sed -i "s|^set editing-mode .*|#set editing-mode vi|g" $binds
     sed -i "s|^bind 'set editing-mode vi'|# bind 'set editing-mode vi'|g" $binds1
 
     if [[ "$vimde" == "y" ]]; then
         sed -i "s|# bind 'set editing-mode vi'|bind 'set editing-mode vi'|g" $binds1
-    fi
-
-    sed -i "s|^set show-mode-in-prompt .*|#set show-mode-in-prompt on|g" $binds
-
-    readyn -p "Enable visual que for vi/emacs toggle? (Displayed as '(ins)/(cmd) - (emacs)')" vivisual
-    if [[ "$vivisual" == "y" ]]; then
-        sed -i "s|.set show-mode-in-prompt .*|set show-mode-in-prompt on|g" $binds
     fi
 
     sed -i "s|^setxkbmap |#setxkbmap |g" $binds

@@ -336,17 +336,32 @@ function set-mark-and-bind-move-region(){
 #\C-?
 
 #bind '"\e101": set-mark'
-bind -x '"\e101": set-mark-and-bind-move-region'
-bind -x '"\e105": reset-mark'
+bind -m emacs-standard -x '"\e101": set-mark-and-bind-move-region'
+bind -m vi-command -x '"\e101": set-mark-and-bind-move-region'
+bind -m vi-insert -x '"\e101": set-mark-and-bind-move-region'
+
+bind -m emacs-standard -x '"\e105": reset-mark'
+bind -m vi-command -x '"\e105": reset-mark'
+bind -m vi-insert -x '"\e105": reset-mark'
 bind -x '"\e106": echo "Mark: $READLINE_MARK"; echo "Point: $READLINE_POINT"'
 
-bind '"\e103": backward-char'
-bind '"\e104": forward-char'
+bind -m emacs-standard '"\e103": backward-char'
+bind -m vi-insert '"\e103": backward-char'
+bind -m vi-command '"\e103": backward-char'
+
+bind -m emacs-standard '"\e104": forward-char'
+bind -m vi-insert '"\e104": forward-char'
+bind -m vi-command '"\e104": forward-char'
 
 # Fix for after expanding region to the left
-bind -x '"\e107": [[ $READLINE_MARK == $READLINE_POINT && -n $READLINE_MARK_SET ]] && READLINE_MARK=$(($READLINE_MARK - 1))'
+bind -m emacs-standard -x '"\e107": [[ $READLINE_MARK == $READLINE_POINT && -n $READLINE_MARK_SET ]] && READLINE_MARK=$(($READLINE_MARK - 1))'
+bind -m vi-insert -x '"\e107": [[ $READLINE_MARK == $READLINE_POINT && -n $READLINE_MARK_SET ]] && READLINE_MARK=$(($READLINE_MARK - 1))'
+bind -m vi-command -x '"\e107": [[ $READLINE_MARK == $READLINE_POINT && -n $READLINE_MARK_SET ]] && READLINE_MARK=$(($READLINE_MARK - 1))'
+
 # Fix for after expanding region to the right
-bind -x '"\e108": [[ $READLINE_MARK == $READLINE_POINT && -n $READLINE_MARK_SET ]] && READLINE_MARK=$(($READLINE_MARK + 1));'
+bind -m emacs-standard -x '"\e108": [[ $READLINE_MARK == $READLINE_POINT && -n $READLINE_MARK_SET ]] && READLINE_MARK=$(($READLINE_MARK + 1));'
+bind -m vi-command -x '"\e108": [[ $READLINE_MARK == $READLINE_POINT && -n $READLINE_MARK_SET ]] && READLINE_MARK=$(($READLINE_MARK + 1));'
+bind -m vi-insert -x '"\e108": [[ $READLINE_MARK == $READLINE_POINT && -n $READLINE_MARK_SET ]] && READLINE_MARK=$(($READLINE_MARK + 1));'
 
 
 bind -m emacs-standard '"\e[1;2C": "\e101\e104\e108\e102\e102"'
@@ -359,8 +374,13 @@ bind -m vi-insert '"\e[1;2D": "\e101\e103\e108\e102\e102"'
 
 # Shift Up/Down selects untill the beginning/end of a line
 
-bind '"\e111": end-of-line'
-bind '"\e112": beginning-of-line'
+bind -m emacs-standard '"\e111": end-of-line'
+bind -m vi-command '"\e111": end-of-line'
+bind -m vi-insert '"\e111": end-of-line'
+
+bind -m emacs-standard '"\e112": beginning-of-line'
+bind -m vi-command '"\e112": beginning-of-line'
+bind -m vi-insert '"\e112": beginning-of-line'
 
 bind -m emacs-standard '"\e[1;2A": "\e101\e111\e107\e102\e102"'
 bind -m vi-command '"\e[1;2A": "\e101\e111\e107\e102\e102"'
@@ -406,20 +426,23 @@ function self-insert-or-remove-region(){
 #unset b
 
 # Control left/right to jump from words instead of chars
+bind -m emacs-standard '"\e109": forward-word'
+bind -m vi-command '"\e109": forward-word'
+bind -m vi-insert '"\e109": forward-word'
 
-bind '"\e109": forward-word'
-bind '"\e110": backward-word'
+bind -m emacs-standard '"\e109": forward-word'
+bind -m vi-command '"\e110": backward-word'
+bind -m vi-insert '"\e110": backward-word'
 
-bind -m emacs-standard '"\e[1;5C": "\e109\e105"'
-bind -m vi-command '"\e[1;5C": "\e109\e105"'
-bind -m vi-insert '"\e[1;5C": "\e109\e105"'
+bind -m emacs-standard '"\e[1;5C": "\e105\e109"'
+bind -m vi-command '"\e[1;5C": "\e105\e109"'
+bind -m vi-insert '"\e[1;5C": "\e105\e109"'
 
 bind -m emacs-standard '"\e[1;5D": "\e110\e105"'
 bind -m vi-command '"\e[1;5D": "\e110\e105"'
 bind -m vi-insert '"\e[1;5D": "\e110\e105"'
 
 # Control Up/Down - Move to beginning or end of lin e
-
 bind -m emacs-standard '"\e[1;5A": "\e111\e105"' 
 bind -m vi-command '"\e[1;5A": "\e111\e105"'
 bind -m vi-insert '"\e[1;5A": "\e111\e105"'
@@ -535,31 +558,36 @@ fi
 alias cd='cd-w'
 
 # 'dirs' builtins shows all directories in stack
-# Alt-Right arrow rotates forward over directory history
-bind -x '"\e277": pushd +1 &>/dev/null'
+# Ctrl-Alt-Right arrow rotates forward over directory history
+bind -m emacs-standard -x '"\e277": pushd +1 &>/dev/null'
+
 bind -m emacs-standard '"\e[1;7C": "\C-e\C-u\e277 _.\C-m"'
-bind -m vi-command '"\e[1;7C": "ddi\e277 _.\C-m"'
-bind -m vi-insert '"\e[1;7C": "\eddi\e277 _.\C-m"'
+bind -m vi-command '"\e[1;7C": "\C-o\C-e\C-u\e277 _.\C-m\C-o"'
+bind -m vi-insert '"\e[1;7C": "\C-o\C-e\C-u\e277 _.\C-m\C-o"'
 
-# Alt-Left arrow rotates backward over directory history
-bind -x '"\e266": pushd -0 &>/dev/null'
+# Ctrl-Alt-Left arrow rotates backward over directory history
+bind -m emacs-standard -x '"\e266": pushd -0 &>/dev/null'
+
 bind -m emacs-standard '"\e[1;7D": "\C-e\C-u\e266 _.\C-m"'
-bind -m vi-command '"\e[1;7D": "ddi\C-u\e266 _.\C-m"'
-bind -m vi-insert '"\e[1;7D": "\eddi\e266 _.\C-m"'
+bind -m vi-command '"\e[1;7D": "\C-o\C-e\C-u\e266 _.\C-m\C-o"'
+bind -m vi-insert '"\e[1;7D": "\C-o\C-e\C-u\e266 _.\C-m\C-o"'
 
-# Alt-Up goes up one directory
-bind -x '"\e288": cd ..'
+# Ctrl-Alt-Up goes up one directory
+bind -m emacs-standard -x '"\e288": cd ..'
+
 bind -m emacs-standard '"\e[1;7A": "\C-e\C-u\e288 _.\C-m"'
-bind -m vi-command '"\e[1;7A": "\C-e\C-u\e288 _.\C-m"'
-bind -m vi-insert '"\e[1;7A": "\C-e\C-u\e288 _.\C-m"'
+bind -m vi-command '"\e[1;7A": "\C-o\C-e\C-u\e288 _.\C-m\C-o"'
+bind -m vi-insert '"\e[1;7A": "\C-o\C-e\C-u\e288 _.\C-m\C-o"'
 
-# Alt-Down prompts you to select a folder to go into
+# Ctrl-Alt-Down prompts you to select a folder to go into
 # With fzf keybinds or with tabcomplete
 if ! hash fzf &> /dev/null; then
-    bind -x '"\e299": "__"'
+    bind -m emacs-standard -x '"\e299": "__"'
+    bind -m vi-insert -x '"\e299": "__"'
+
     bind -m emacs-standard '"\e[1;7B": "\C-e\C-u\e299cd \C-i"'
-    bind -m vi-command '"\e[1;7B": "\eddi\e299cd \C-i"'
-    bind -m vi-insert '"\e[1;7B": "\eddi\e299cd \C-i"'
+    bind -m vi-command '"\e[1;7B": "\C-o\C-e\C-u\C-o\e299cd \C-i"'
+    bind -m vi-insert '"\e[1;7B": "\C-o\C-e\C-u\C-o\e299cd \C-i"'
 else
     if ! [ -f $HOME/.keybinds.d/fzf-bindings.bash ]; then
         __fzf_cd__() {
@@ -569,10 +597,11 @@ else
             FZF_DEFAULT_OPTS_FILE='' $(__fzfcmd)
           ); [[ -n $dir ]] && cd -- "$dir"
         }
-        bind -x '"\e987": "__fzf_cd__"'
+        bind -m emacs-standard -x '"\e987": "__fzf_cd__"'
+        
         bind -m emacs-standard '"\e[1;7B": "\e987_\C-m"'
-        bind -m vi-command '"\e[1;7B": "\e987_\C-m"'
-        bind -m vi-insert '"\e[1;7B": "\e987_\C-m"'
+        bind -m vi-insert '"\e[1;7B": "\C-o\e987_\C-m\C-o"'
+        bind -m vi-command '"\e[1;7B": "\C-o\e987_\C-m\C-o"'
     fi
     if hash bfs &> /dev/null; then
         # https://github.com/tavianator/bfs/issues/163 
@@ -834,16 +863,22 @@ if hash lazygit &>/dev/null; then
 fi
 
 # F5, Ctrl-r - Reload .bashrc
-bind '"\205": re-read-init-file'
-bind -x '"\206": source ~/.bashrc'
+bind -m emacs-standard '"\205": re-read-init-file'
+bind -m vi-insert '"\205": re-read-init-file'
+bind -m vi-command '"\205": re-read-init-file'
+
+bind -m emacs-standard -x '"\206": source ~/.bashrc'
+bind -m vi-insert -x '"\206": source ~/.bashrc'
+bind -m vi-command -x '"\206": source ~/.bashrc'
+
 if [[ -z "$BLE_VERSION" ]]; then
     bind -m emacs-standard '"\e[15~": "\C-e\C-u\205\206\n"'
-    bind -m vi-command '"\e[15~": "\C-e\C-u\205\206\n"'
-    bind -m vi-insert '"\e[15~": "\C-e\C-u\205\206\n"'
+    bind -m vi-command '"\e[15~": "\C-o\C-e\C-u\C-o\205\206\n"'
+    bind -m vi-insert '"\e[15~": "\C-o\C-e\C-u\C-o\205\206\n"'
 else 
     bind -m emacs-standard '"\e[15~": "\C-e\C-u\206\n"'
-    bind -m vi-command '"\e[15~": "\C-e\C-u\206\n"'
-    bind -m vi-insert '"\e[15~": "\C-e\C-u\206\n"'
+    bind -m vi-command '"\e[15~": "\C-o\C-e\C-u\C-o\206\n"'
+    bind -m vi-insert '"\e[15~": "\C-o\C-e\C-u\C-o\206\n"'
 fi
 
 
