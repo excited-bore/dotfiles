@@ -251,7 +251,7 @@ function reade() {
     # This means reade is being run inside a custom ZSH widget, so rlwrap/read/vared won't work
     if [[ -n $ZSH_VERSION ]] && [[ -n $WIDGET ]]; then
        
-        #local REPLY
+        local REPLY
         autoload -Uz read-from-minibuffer
         local first=''
         while getopts ':seb:i:p:Q:a:r:' flag; do
@@ -318,6 +318,10 @@ function reade() {
             ! [[ -z $old_down ]] && ! [[ $old_down =~ "bindkey: no binding" ]] &&
                 eval "bindkey $old_down"      
             [[ -f $tmpf ]] && command rm -f "$tmpf"
+            
+            # We can't clear the line/BUFFER since BUFFER is a read-only variable inside of a trap function???
+            # So we send keys to ZLE to clear the line/BUFFER
+            zle -U $'\C-U'
             return $((128 + $1))
         } 
 
@@ -344,6 +348,7 @@ function reade() {
 
         zle reset-prompt 
 
+        export REPLY="$REPLY"
         export READE_VALUE="$REPLY"
 
         if [[ -n "$@" ]]; then
