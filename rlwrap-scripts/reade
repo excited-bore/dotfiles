@@ -178,7 +178,7 @@ function reade() {
         esac
     done
 
-    local fcomp='n' auto='n' nostyle='n' noecho='n' prmpt=''
+    local fcomp='n' auto='n' nostyle='n' noecho='n'
 
     if [[ "$READE_NOSTYLE" ]]; then
         [[ "$READE_NOSTYLE" == 'false' ]] && nostyle='n'  
@@ -246,15 +246,119 @@ function reade() {
         rlwrap_installable='n'
     fi
 
-    if ! hash rlwrap &>/dev/null || [[ "$fcomp" == 'y' ]] || [[ "$rlwrap_installable" == 'n' ]]; then
+    local old_up old_down prmpt oldhist='' color="" arg='' args='' tmpf='' eflag=0 one='n' pre='' keymap upmap upmapx downmap downmapx breaklines=''
+
+    # This means reade is being run inside a custom ZSH widget, so rlwrap/read/vared won't work
+    if [[ -n $ZSH_VERSION ]] && [[ -n $WIDGET ]]; then
+       
+        #local REPLY
+        autoload -Uz read-from-minibuffer
+        local first=''
+        while getopts ':seb:i:p:Q:a:r:' flag; do
+            case "${flag}" in
+                # Auto flag already handled
+                a)  if [[ "${OPTARG}" == '-Q' || "${OPTARG}" == '-b' || "${OPTARG}" == '-e' || "${OPTARG}" == '-i' || "${OPTARG}" == '-p' || "${OPTARG}" == '-r' ]]; then 
+                         OPTIND=$(($OPTIND-1))
+                    fi 
+                    ;;
+                # Read-no-style flag already handled
+                r)  if [[ "${OPTARG}" == '-Q' || "${OPTARG}" == '-b' || "${OPTARG}" == '-e' || "${OPTARG}" == '-i' || "${OPTARG}" == '-p' || "${OPTARG}" == '-a' ]]; then 
+                         OPTIND=$(($OPTIND-1))
+                    fi
+                    ;;
+                # Colours don't work using read-from-minibuffer - tested this out 
+                Q)  if [[ "${OPTARG}" == '-r' || "${OPTARG}" == '-b' || "${OPTARG}" == '-e' || "${OPTARG}" == '-i' || "${OPTARG}" == '-p' || "${OPTARG}" == '-a' ]]; then 
+                         OPTIND=$(($OPTIND-1))
+                    fi
+                    ;;
+                e) ;;
+                i)  #arg="$(echo ${OPTARG} | awk '{print $1;}')"
+                    #args="$(echo ${OPTARG} | sed "s \<$arg\>  g" | xargs)"
+                    args="${OPTARG}"
+                    args=$(echo "$args" | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }')
+                    args=$(echo "$args" | tr ' ' '\n') 
+                    tmpf=$(mktemp)
+                    echo "$args" > "$tmpf" 
+                    
+                    # Make sure up/down arrow keys are bound to something sensible 
+                    if ! [[ $(bindkey '^[[A') =~ 'up-line' ]]; then  
+                        old_up=$(bindkey '^[[A')
+                        bindkey '^[[A' up-line-or-history  
+                    fi
+                    
+                    if ! [[ $(bindkey '^[[B') =~ 'down-line' ]]; then  
+                        old_down=$(bindkey '^[[B') 
+                        bindkey '^[[B' down-line-or-history
+                    fi 
+                    
+                    # Write to current historyfile
+                    fc -W
+                    
+                    # Then load different one - no need to clear
+                    fc -ap "$tmpf"
+
+                    # Make sure we set the first pregiven instead of leaving the prompt empty
+                    zle up-line-or-history 
+                    ;;
+                p)  # We make sure color is removed from the prompt because it comes out wrong
+                    setopt EXTENDED_GLOB
+                    prmpt="${OPTARG//$'\e'[\[(]#([0-9;]#)[@-n]/}"
+                   ;;
+                b) ;;
+                s) ;;
+                *) ;;
+            esac
+        done
+
+        shift $((OPTIND - 1))
+
+        TRAPINT() {
+            ! [[ -z $old_up ]] && ! [[ $old_up =~ "bindkey: no binding" ]] &&
+                eval "bindkey $old_up"      
+            ! [[ -z $old_down ]] && ! [[ $old_down =~ "bindkey: no binding" ]] &&
+                eval "bindkey $old_down"      
+            [[ -f $tmpf ]] && command rm -f "$tmpf"
+            return $((128 + $1))
+        } 
+
+        # Now the normal prompt would normally also going up the history, so we're just going to hide it
+        # Most terminals are like 50 lines high, so idk we go up one line and echo nothing 60 times to be sure the terminal looks blank 
+        if [[ -n $args ]]; then
+            clear
+            for i in $(seq 1 60); do
+                tput cuu1
+                echo
+            done
+        fi
+        # Create a sub-prompt, pre-populated with the current contents of the command line.
+        # https://superuser.com/questions/1045605/zsh-read-input-in-zle-widget
+        read-from-minibuffer "$prmpt" $LBUFFER $RBUFFER
+        
+        [[ -n $args ]] && BUFFER="" 
+
+        ! [[ -z $old_up ]] && ! [[ $old_up =~ "bindkey: no binding" ]] &&
+            eval "bindkey $old_up"      
+        ! [[ -z $old_down ]] && ! [[ $old_down =~ "bindkey: no binding" ]] &&
+            eval "bindkey $old_down"      
+        [[ -f $tmpf ]] && command rm -f "$tmpf"
+
+        zle reset-prompt 
+
+        export READE_VALUE="$REPLY"
+
+        if [[ -n "$@" ]]; then
+            eval "${@:$#:1}='$REPLY'"
+        fi 
+
+    elif ! hash rlwrap &>/dev/null || [[ "$fcomp" == 'y' ]] || [[ "$rlwrap_installable" == 'n' ]]; then
 
         local readstr=''
 
-        if test -n "$BASH_VERSION"; then
+        if [[ -n "$BASH_VERSION" ]]; then
             readstr="read -r vvvvvvvvvv"
         fi
 
-        if test -n "$ZSH_VERSION"; then
+        if [[ -n "$ZSH_VERSION" ]]; then
             if [[ "$noecho" == 'y' ]]; then
                 readstr="read vvvvvvvvvv"
             elif [[ "$noecho" == 'n' ]]; then
@@ -262,7 +366,6 @@ function reade() {
             fi
         fi
      
-	local old_up old_down oldhist='' color="" arg='' args='' tmpf='' eflag=0 one='n' pre='' keymap upmap upmapx downmap downmapx
         while getopts ':seb:i:p:Q:a:r:' flag; do
             case "${flag}" in
                 a)  if [[ "${OPTARG}" == '-Q' || "${OPTARG}" == '-b' || "${OPTARG}" == '-e' || "${OPTARG}" == '-i' || "${OPTARG}" == '-p' || "${OPTARG}" == '-r' ]]; then 
@@ -273,22 +376,20 @@ function reade() {
                          OPTIND=$(($OPTIND-1))
                     fi
                     ;;
-                b) ;;
-                e)
-                    if test -n "$BASH_VERSION" || [[ "$noecho" == 'y' ]]; then
+                b)  ;;
+                e)  if [[ -n "$BASH_VERSION" ]] || [[ "$noecho" == 'y' ]]; then
                         readstr=$(echo "$readstr" | sed 's|read |read -e |g')
                     fi
-                    if test -n "$ZSH_VERSION"; then
+                    if [[ -n "$ZSH_VERSION" ]]; then
                         readstr=$(echo "$readstr" | sed 's|vvvvvvvvvv=.*; vared|vvvvvvvvvv="\$(pwd)"; vared|g')
                     fi
                     ;;
-                #  Even though it's in the read man for bash, -i (on it's own) does not actually work
-                i)
-                    arg="$(echo ${OPTARG} | awk '{print $1;}')"
+                    
+                    # Even though it's in the read man for bash, -i (on it's own) does not actually work
+                i)  arg="$(echo ${OPTARG} | awk '{print $1;}')"
                     args="$(echo ${OPTARG} | sed "s \<$arg\>  g" | xargs)"
 
                     local eflag='-e' 
-
                     [[ "$nostyle" == 'c' ]] && eflag=''
 
                     if [[ -n "$BASH_VERSION" ]]; then
@@ -326,7 +427,7 @@ function reade() {
                         echo -e "$(history | awk '{$1=""; print;}' | sed 's/^\ //g')" > $oldhist
                         #fi
 
-                        if test -n "$BASH_VERSION"; then
+                        if [[ -n "$BASH_VERSION" ]]; then
                             while IFS='' read -r LINE || [ -n "${LINE}" ]; do
                                 history -s "${LINE}"
                             done <"$tmpf"
@@ -365,7 +466,7 @@ function reade() {
                                     bind -m $keymap '"\e[B": next-history' 
                                 fi
                             fi
-                        elif test -n "$ZSH_VERSION"; then
+                        elif [[ -n "$ZSH_VERSION" ]]; then
 
                             # Write to current historyfile
                             fc -W
@@ -374,8 +475,8 @@ function reade() {
                             fc -ap "$tmpf"
                             
                             # Let's make sure we use proper keybindings for up/down
-                            old_up=$(bindkey '\e[A') 
-                            old_down=$(bindkey '\e[B') 
+                            old_up=$(bindkey '^[[A') 
+                            old_down=$(bindkey '^[[B') 
 
                             bindkey '\e[A' up-line-or-history  
                             bindkey '\e[B' down-line-or-history
@@ -409,7 +510,7 @@ function reade() {
                     fi
                     ;;
                 p)
-                    if test -n "$BASH_VERSION"; then
+                    if [[ -n "$BASH_VERSION" ]]; then
                         
                         if [[ $nostyle == 'y' ]] || ([[ $nostyle == 'f' ]] && [[ $fcomp == 'y' ]]); then 
                            
@@ -428,7 +529,7 @@ function reade() {
                         elif [[ $nostyle == 'c' ]]; then
                             readstr=$(echo "$readstr" | sed 's|read |read -p "'"${color}${OPTARG}${normal}"'" |g')
                             prmpt="${color}${OPTARG}${normal}"
-                        elif test -z "$color"; then
+                        elif [[ -z "$color" ]]; then
                             readstr=$(echo "$readstr" | sed 's|read |printf "'"${OPTARG}"'\n"; read |g') 
                             prmpt="${OPTARG}"
                         else
@@ -437,16 +538,16 @@ function reade() {
                         fi
                     fi
 
-                    if test -n "$ZSH_VERSION"; then
+                    if [[ -n "$ZSH_VERSION" ]]; then
                         if [[ $noecho == 'y' ]]; then
-                            if test -z "$color"; then
+                            if [[ -z "$color" ]]; then
                                 readstr=$(echo "$readstr" | sed 's|vvvvvvvvvv|"?'"${OPTARG}"'" vvvvvvvvvv|g') 
                                 prmpt="${OPTARG}"
                             else
                                 readstr=$(echo "$readstr" | sed 's|vvvvvvvvvv|"?'"${color}${OPTARG}${normal}"'" vvvvvvvvvv|g')
                                 prmpt="${color}${OPTARG}${normal}"
                             fi
-                        elif test -n "$color"; then
+                        elif [[ -n "$color" ]]; then
                             readstr=$(echo "$readstr" | sed 's|vared |vared -p "'"${color}${OPTARG}${normal}"'" |g')
                             prmpt="${color}${OPTARG}${normal}"
                         else
@@ -465,7 +566,7 @@ function reade() {
         shift $((OPTIND - 1))
 
         if [[ "$auto" == 'y' ]] || [[ "$auto" == 'one' && "$one" == 'y' ]]; then
-            if test -z "$prmpt"; then
+            if [[ -z "$prmpt" ]]; then
                 printf "$pre\n"; 
             else
                 printf "$prmpt$pre${normal}\n"; 
@@ -481,10 +582,10 @@ function reade() {
             
             # https://stackoverflow.com/questions/14702148/how-to-fire-a-command-when-a-shell-script-is-interrupted
 
-            test -n "$BASH_VERSION" &&
-                trap "history -c; history -r $oldhist; command rm -f $tmpf; test -n \"$oldtrps\" && eval \"$oldtrps\" || trap - SIGINT; [[ -n $upmap ]] && bind -m $keymap $upmapx '\"\e[A\": $upmap'; [[ -n $downmap ]] && bind -m $keymap $downmapx '\"\e[B\": $downmap'; return" SIGINT
+            [[ -n "$BASH_VERSION" ]] &&
+                trap "history -c; history -r $oldhist; [[ -f $tmpf ]] && command rm -f $tmpf; test -n \"$oldtrps\" && eval \"$oldtrps\" || trap - SIGINT; [[ -n $upmap ]] && bind -m $keymap $upmapx '\"\e[A\": $upmap'; [[ -n $downmap ]] && bind -m $keymap $downmapx '\"\e[B\": $downmap'; return" SIGINT
             
-            test -n "$ZSH_VERSION" &&
+            [[ -n "$ZSH_VERSION" ]] &&
                 TRAPINT() {
                     ! [[ -z $old_up ]] && ! [[ $old_up =~ "bindkey: no binding" ]] &&
                         eval "bindkey $old_up"      
@@ -492,16 +593,19 @@ function reade() {
                         eval "bindkey $old_down"      
                     fc -IR $oldhist
                     fc -IR
-                    command rm -f "$tmpf"
+                    [[ -f $tmpf ]] && command rm -f "$tmpf"
                     return $((128 + $1))
                 }
+           
+
             eval "${readstr}"
 
-            if test -n "$BASH_VERSION"; then
+
+            if [[ -n "$BASH_VERSION" ]]; then
                 history -c
                 history -r $oldhist
                 
-                if test -n "$oldtrps"; then
+                if [[ -n "$oldtrps" ]]; then
                     eval "$oldtrps"
                 else
                     trap - SIGINT
@@ -514,7 +618,7 @@ function reade() {
                     bind -m $keymap $downmapx "\"\e[B\": \"$downmap\""
             fi
 
-            if test -n "$ZSH_VERSION"; then
+            if [[ -n "$ZSH_VERSION" ]]; then
                 ! [[ -z $old_up ]] && ! [[ $old_up =~ "bindkey: no binding" ]] &&
                     eval "bindkey $old_up"      
                 ! [[ -z $old_down ]] && ! [[ $old_down =~ "bindkey: no binding" ]] &&
@@ -522,11 +626,11 @@ function reade() {
                 fc -IR $oldhist
             fi
 
-            [ -e "$tmpf" ] && command rm -f $tmpf
+            [[ -f $tmpf ]] && command rm -f $tmpf
 
         fi
         
-        if test -n "$pre" && test -z "$vvvvvvvvvv" || [[ "$vvvvvvvvvv" == "" ]]; then
+        if [[ -n "$pre" ]] && [[ -z "$vvvvvvvvvv" ]] || [[ "$vvvvvvvvvv" == "" ]]; then
             vvvvvvvvvv="$pre"
         fi
         
@@ -543,10 +647,10 @@ function reade() {
             echo "- A variable for the return string"
             return 1
         fi
+    
+        local rlwstring="rlwrap --ansi-colour-aware -s 1000 -D 0 -b \"$breaklines\" -o cat"
 
-        local breaklines='' tmpf='' frst='' args='' color='' rlwstring="rlwrap --ansi-colour-aware -s 1000 -D 0 -b \"$breaklines\" -o cat"
-
-        while getopts ':a:b:e:i:p:Q:r:s:' flag; do
+        while getopts ':sea:b:i:p:Q:r:' flag; do
             case "${flag}" in
                 a)  if [[ "${OPTARG}" == '-Q' || "${OPTARG}" == '-b' || "${OPTARG}" == '-e' || "${OPTARG}" == '-i' || "${OPTARG}" == '-p' || "${OPTARG}" == '-r' ]]; then 
                          OPTIND=$(($OPTIND-1))
@@ -565,9 +669,9 @@ function reade() {
                     ;;
                 # Pre-filled answer
                 i)
-                    frst="$(echo ${OPTARG} | awk '{print $1}')"
-                    rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-P \"$frst\" |g")
-                    args=$(echo ${OPTARG} | sed "s \<$frst\>  g" | xargs)
+                    arg="$(echo ${OPTARG} | awk '{print $1}')"
+                    rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-P \"$arg\" |g")
+                    args=$(echo ${OPTARG} | sed "s \<$arg\>  g" | xargs)
                     if test -z "$args"; then 
                         one='y' 
                     elif test -n "$args"; then
@@ -602,15 +706,15 @@ function reade() {
 
         if [[ "$auto" == 'y' ]] || [[ "$auto" == 'one' && "$one" == 'y' ]]; then
             if test -z "$prmpt"; then
-                printf "$frst\n"; 
+                printf "$arg\n"; 
             else
                 if test -n "$BASH_VERSION"; then
-                   printf "${!color}$prmpt${normal}$frst\n"; 
+                   printf "${!color}$prmpt${normal}$arg\n"; 
                 elif test -n "$ZSH_VERSION"; then
-                    printf "${(P)color}$prmpt${normal}$frst\n";   
+                    printf "${(P)color}$prmpt${normal}$arg\n";   
                 fi
             fi
-            vvvvvvvv=$frst       
+            vvvvvvvv=$arg       
         else
             vvvvvvvv="$(eval $rlwstring)"
         fi
@@ -620,6 +724,6 @@ function reade() {
 
         ! test $# -eq 0 && eval "${@:$#:1}=$vvvvvvvv"
 
-        command rm $tmpf &>/dev/null
+        [[ -f $tmpf ]] && command rm $tmpf &>/dev/null
     fi
 }

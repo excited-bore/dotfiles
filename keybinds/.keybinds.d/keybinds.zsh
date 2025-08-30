@@ -678,16 +678,20 @@ fi
 # F7 - Htop and alternatives
 
 function htop-btop-zsh(){
-    
     local ansr ansr1 
+    
+    # Flush zle's state / clean it up  
+    zle -I 
+    
     if hash btop &>/dev/null; then
          readyn -p "Use btop instead of htop?" ansr 
          if [[ "$ansr" == "y" ]]; then
              readyn -p "Start btop as root?" ansr1 
              if [[ "$ansr1" == "y" ]]; then
-                sudo btop
+                 # Redirect btop to tty, otherwise it doesn't work 
+                 sudo btop </dev/tty
              else 
-                btop
+                btop </dev/tty
              fi
          fi
     
@@ -696,9 +700,9 @@ function htop-btop-zsh(){
          if [[ "$ansr" == "y" ]]; then
              readyn -p "Start bashtop as root?" ansr1 
              if [[ "$ansr1" == "y" ]]; then
-                sudo bashtop
+                sudo bashtop </dev/tty
              else 
-                bashtop
+                bashtop </dev/tty
              fi
          fi
     elif hash bpytop &>/dev/null; then
@@ -706,33 +710,18 @@ function htop-btop-zsh(){
          if [[ "$ansr" == "y" ]]; then
              readyn -p "Start bpytop as root?" ansr1 
              if [[ "$ansr1" == "y" ]]; then
-                sudo bpytop
+                sudo bpytop </dev/tty
              else 
-                bpytop
+                bpytop </dev/tty
              fi
          fi
     fi
    
     if ! (hash btop &> /dev/null || hash bashtop &> /dev/null || hash bpytop &> /dev/null) || [[ "$ansr" == 'n' ]]; then
-        readyn -p "Start htop as root?" ansr1 && [[ "$ansr1" == "y" ]] && sudo htop || htop
+        readyn -p "Start htop as root?" ansr1 
+        [[ "$ansr1" == "y" ]] && sudo htop </dev/tty || htop </dev/tty
     fi
     zle reset-prompt 
-}
-
-function htop-btop-zsh(){
-    local REPLY
-    autoload -Uz read-from-minibuffer
-
-      # Create a sub-prompt, pre-populated with the current contents of the command line.
-      read-from-minibuffer 'History search: ' $LBUFFER $RBUFFER
-
-      BUFFER="" 
-      # Use the modified input to search history & update the command line with it.
-      #LBUFFER=$(echo "$(fc -ln $REPLY $REPLY)" )
-      #RBUFFER=''
-
-      # Put some informational text below the command line.
-      #zle -M "History result for '$REPLY'."
 }
 
 zle -N htop-btop-zsh
