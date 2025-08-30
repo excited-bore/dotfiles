@@ -113,20 +113,91 @@ alias dirs="dirs -l"
 alias dirs-col="dirs -v | column -c $COLUMNS"
 alias dirs-col-pretty="dirs -v | column -c $COLUMNS | sed -e 's/ 0 \\([^\t]*\\)/'\${GREEN}' 0 \\1'\${normal}'/'"
 
-#'Silent' clear
+# A clear for alt-right/left that displays dirs/dirs-col/dirs-col-pretty
+# echo -en "\e[2K\r" clears the line we're on, and moves the cursor to the start of the line 
 if hash starship &>/dev/null && [[ $STARSHIP_SHELL == 'zsh' ]] && (grep -q '\\n' ~/.config/starship.toml || (grep -q 'line_break' ~/.config/starship.toml && ! pcregrep -qM "[line_break]\$(.|\n)*^disabled = true" ~/.config/starship.toml)); then
-    function clr1(){ tput cuu1 && tput cuu1 && tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null }
-    function clr2(){ tput cuu1 && tput cuu1 && tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i < $(dirs -v | column -c ${COLUMNS} | wc -l) ; i++)); do tput cuu1; done && dirs-col-pretty && history -d -1 &>/dev/null }
+    function clr1(){ 
+        echo -en "\e[2K\r"
+        tput cuu1
+        tput cuu1
+        tput cuu1
+        tput sc;
+        clear
+        zle reset-prompt    
+    }
+    function clr2(){ 
+        echo -en "\e[2K\r"
+        tput cuu1 
+        tput cuu1 
+        tput cuu1 
+        tput sc;
+        clear 
+        tput rc 
+        for ((i = 0 ; i < $(dirs -v | column -c ${COLUMNS} | wc -l) ; i++)); do
+            tput cuu1;
+        done 
+        echo 
+        dirs-col-pretty
+        echo
+        zle reset-prompt    
+    }
 elif hash starship &>/dev/null && [[ $STARSHIP_SHELL == 'zsh' ]]; then
-    function clr1(){ tput cuu1 && tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null }
-    function clr2(){ tput cuu1 && tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i < $(dirs -v | column -c ${COLUMNS} | wc -l) ; i++)); do tput cuu1; done && tput cuu1 && dirs-col-pretty && tput rc && history -d -1 &>/dev/null }
+    function clr1(){ 
+        echo -en "\e[2K\r"
+        tput cuu1 
+        tput cuu1
+        tput sc; 
+        clear 
+        tput rc 
+        zle reset-prompt    
+    }
+    function clr2(){ 
+        echo -en "\e[2K\r"
+        tput cuu1 
+        tput cuu1 
+        tput sc; 
+        clear
+        tput rc 
+        for ((i = 0 ; i < $(dirs -v | column -c ${COLUMNS} | wc -l) ; i++)); do 
+            tput cuu1; 
+        done 
+        echo 
+        dirs-col-pretty
+        echo 
+        zle reset-prompt
+    }
 else
-    function clr1(){ tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null }
-    function clr2(){ tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i <= $(dirs -v | column -c ${COLUMNS} | wc -l) ; i++)); do tput cuu1; done && dirs-col-pretty && tput rc && history -d -1 &>/dev/null }
+    function clr1(){ 
+        echo -en "\e[2K\r"
+        tput sc; 
+        clear
+        tput rc
+        zle reset-prompt    
+        zle redisplay 
+    }
+    function clr2(){ 
+        echo -en "\e[2K\r"
+        tput sc; 
+        clear; 
+        tput rc;
+        for ((i = 0 ; i <= $(dirs -v | column -c ${COLUMNS} | wc -l) ; i++)); do 
+            tput cuu1; 
+        done;
+        tput cuu1 
+        echo 
+        dirs-col-pretty;
+        echo 
+        zle redisplay 
+        zle reset-prompt    
+    }
 fi
 
 zle -N clr1
 zle -N clr2
+
+# We set this option so every time we change directory, we add said directory to the dir stack 
+# (used by dirs/pushd/popd)
+setopt autopushd
 
 rightdir(){
     pushd +1 &>/dev/null
@@ -213,7 +284,7 @@ else
             return 0
           fi
           zle push-line # Clear buffer. Auto-restored on next prompt.
-          BUFFER="builtin cd -- ${(q)dir:a}"
+          builtin cd -- ${(q)dir:a}
           zle accept-line
           local ret=$?
           unset dir # ensure this doesn't end up appearing in prompt expansion
@@ -295,7 +366,7 @@ bindkey -M vicmd "\e[1;3A" mv_prmpt_up
 function mv_prmpt_dwn(){ 
     clear 
     let LINE_TPUT=$LINE_TPUT+1
-    if [ $LINE_TPUT -gt $LINES ];then 
+    if [ $LINE_TPUT -gt $LINES ]; then 
         let LINE_TPUT=0;
     fi 
     tput cup $LINE_TPUT $COL_TPUT
@@ -610,7 +681,10 @@ if hash lazygit &>/dev/null; then
 fi
 
 # F5, Ctrl-r - Reload .zshrc
-function resource-zsh(){ source ~/.zshrc; zle reset-prompt }
+function resource-zsh(){ 
+    source ~/.zshrc; 
+    zle reset-prompt 
+}
 zle -N resource-zsh
 bindkey -M emacs "\e[15~" resource-zsh
 bindkey -M viins "\e[15~" resource-zsh 

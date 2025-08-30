@@ -14,7 +14,7 @@ SCRIPT_DIR=$(get-script-dir)
 
 # Doesn't matter the argument, will just asume were doing a simple installation
 
-if test -z "$1"; then
+if [[ -z "$1" ]]; then
     if ! test -f checks/check_envvar_aliases_completions_keybinds.sh; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar_aliases_completions_keybinds.sh)
     else
@@ -49,7 +49,7 @@ fi
 
 fzf --help | $PAGER
 
-if test -z "$1"; then
+if [[ -z "$1" ]]; then
 
     # Bash completion issue with fzf fix
     # https://github.com/cykerway/complete-alias/issues/46
