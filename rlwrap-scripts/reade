@@ -10,7 +10,7 @@ function reade() {
         if [[ -z $SAVEHIST || $SAVEHIST -lt 1000 ]]; then
             SAVEHIST=1000
         fi
-    fi
+    fi 
 
     local red=$(tput sgr0 && tput setaf 1)
     local red1=$(tput sgr0 && tput setaf 9)
@@ -73,10 +73,14 @@ function reade() {
    
    reade version $VERSION
 
-   Simplifies prompt for ${bold}read/rlwrap${normal}: Will use 'rlwrap' if it is installed, otherwise resorts to 'read' 
-   Takes at least one argument, otherwise will prompt help page.
+   Simplifies prompt for ${bold}read/vared/read-from-minibuffer/rlwrap${normal} in both Bash and Zsh. 
+   If 'reade' is run inside a Zsh widget, it will 'read-from-minifbuffer', otherwise it will check if 'rlwrap' is installed and use that, 
+   otherwise 'reade' resorts to a combination of 'printf' and 'read' for Bash, and 'vared' for Zsh.
+   
+   Takes at least one argument, otherwise it will prompt this help page.
 
-   Any pre-given choice can be toggled between using the ${bold}up${normal} and ${bold}down${normal} arrow keys
+   If '-i/--pre-given' is supplied with arguments, any single argument can be chosen between without typing by using the ${bold}up${normal} and ${bold}down${normal} arrow keys when the command is running.
+   The first argument given to '-i/--pre-given' will fill automatically when the command runs. For example 'reade -p \"Question?: \" -i \"first-answer\"' will result in 'Question?: ' with 'first-answer' already typed out.
 
    Supply at least 1 variable: 
 
@@ -90,9 +94,39 @@ function reade() {
         
         Print version and exit
 
-   -Q ${underline_on}Colour${underline_off}
+   -p, --prompt ${underline_on}Promptstring${underline_off}
+        
+        Supply this flag with a string for the prompt. Similar to read -p 'STRING' in bash or read '?STRING' in zsh.
 
-        Use  one  of  the  colour names black, red, green, yellow, blue, cyan, purple (=magenta) or white, or an ANSI-conformant <colour_spec> to colour any prompt displayed  by  command.\n An uppercase colour name (Yellow or YELLOW ) gives a bold prompt.\n Prompts that already contain (colour) escape sequences or one of the readline \"ignore markers\" (ASCII 0x01 and 0x02) are not coloured.
+   -Q, --colour ${underline_on}Colour${underline_off}
+
+        Use  one  of  the  colour names black, red, green, yellow, blue, cyan, purple (=magenta) or white, or an ANSI-conformant <colour_spec> to colour any prompt displayed  by  command.\n An uppercase colour name (Yellow or YELLOW ) gives a bold prompt.\n Prompts that already contain (colour) escape sequences or one of the readline \"ignore markers\" (ASCII 0x01 and 0x02) are not coloured.\n
+        Available colours in both normal (undercase) and ${bold}bold${normal} (UPPERCASE) versions are:
+            - ${red}red${normal}
+            - ${red1}red1${normal}
+            - ${orange}orange${normal}
+            - ${green}green${normal}
+            - ${green1}green1${normal}
+            - ${yellow}yellow${normal}
+            - ${yellow1}yellow1${normal}
+            - ${blue}blue${normal}
+            - ${blue}blue1${normal}
+            - ${magenta}magenta${normal}
+            - ${magenta1}magenta1${normal}
+            - ${cyan}cyan${normal}
+            - ${cyan1}cyan1${normal}
+            - ${white}white${normal}
+            - ${white1}white1${normal}
+            - ${black}black${normal}
+            - ${grey}grey${normal}
+    
+        There are also '${bold}bold${normal}' and '${underline_on}underline_on${underline_off}/underline_off'
+        
+        ! You don't *need* to use the colour flag, certainly if you want to mix different colours/styles or use them only for specific words / parts of the prompt
+        When supplying the --prompt/-p flag, you can use variable expansion (after a backslash) on any of the styles/colours to activate them untill the end of the prompt. F.ex : '\\\${blue}'
+        !! If you end up doing this, do *always* add the '\\\${normal}' variable expansion to the end of the string. This makes sure all styles and colours are reset. 
+        !! If -p is supplied with a colour/style but \${normal}/\$(tput sgr0) is left out, the terminal ${bold}will${normal} keep these colors/styles activate even after the command is done running !!
+        Example: 'reade -p \"What \\\${cyan}${cyan}day${normal}\\\${normal} of the week do you want to select?: \" -i 'monday tuesday wednesday thursday friday saturday sunday' day'
 
     -i, --pre-given ${underline_on}PREGIVEN(S) - SPACESEPERATED WORD STRING${underline_off} 
 
@@ -113,7 +147,8 @@ function reade() {
    -e, --file-completion 
 
         Use filecompletions. 
-        Will stop using rlwrap if it is installed because 'rlwrap' doesn't properly add slashed before spaces in filenames/directorynames and will use 'read -e' which does properly do this instead
+        When supplied, this flag will prevent using rlwrap if it is installed because 'rlwrap' doesn't properly add slashed before spaces in filenames/directorynames
+        Will force the use of 'read -e' on Bash and 'vared' on Zsh.
    
     -r, --read-no-style [ OPTION - ${bold}'nocomp'/'filecomp-only'${normal} ] 
 
@@ -414,19 +449,6 @@ function reade() {
 
                         echo "$args" > "$tmpf"
 
-                        #test -e $HISTFILE &&
-
-                        #! test -e $HISTFILE && test -n $BASH_VERSION && test -f ~/.bash_history && test -n "$(cat ~/.bash_history)" &&
-                        #    oldhist=~/.bash_history
-
-                        #if test -n $ZSH_VERSION; then
-                        #    if [[ $machine == 'Mac' ]] && test -f ~/.zsh_history && test -n "$(cat ~/.zsh_history)"; then
-                        #        oldhist=~/.zsh_history
-                        #    elif test -f ~/.zhistory && test -n "$(cat ~/.zhistory)"; then
-                        #        oldhist=~/.zhistory
-                        #    fi
-                        #fi
-
                         #if ! test -e "$HISTFILE"; then
                         oldhist=$(mktemp)
                         echo -e "$(history | awk '{$1=""; print;}' | sed 's/^\ //g')" > $oldhist
@@ -479,12 +501,16 @@ function reade() {
                             # Then load different one - no need to clear
                             fc -ap "$tmpf"
                             
-                            # Let's make sure we use proper keybindings for up/down
-                            old_up=$(bindkey '^[[A') 
-                            old_down=$(bindkey '^[[B') 
-
-                            bindkey '\e[A' up-line-or-history  
-                            bindkey '\e[B' down-line-or-history
+                            # Make sure up/down arrow keys are bound to something sensible 
+                            if ! [[ $(bindkey '^[[A') =~ 'up-line' ]]; then  
+                                old_up=$(bindkey '^[[A')
+                                bindkey '^[[A' up-line-or-history  
+                            fi
+                            
+                            if ! [[ $(bindkey '^[[B') =~ 'down-line' ]]; then  
+                                old_down=$(bindkey '^[[B') 
+                                bindkey '^[[B' down-line-or-history
+                            fi
                             
                         fi
 
@@ -588,7 +614,7 @@ function reade() {
             # https://stackoverflow.com/questions/14702148/how-to-fire-a-command-when-a-shell-script-is-interrupted
 
             [[ -n "$BASH_VERSION" ]] &&
-                trap "history -c; history -r $oldhist; [[ -f $tmpf ]] && command rm -f $tmpf; test -n \"$oldtrps\" && eval \"$oldtrps\" || trap - SIGINT; [[ -n $upmap ]] && bind -m $keymap $upmapx '\"\e[A\": $upmap'; [[ -n $downmap ]] && bind -m $keymap $downmapx '\"\e[B\": $downmap'; return" SIGINT
+                trap "history -c; history -r $oldhist; [[ -f $tmpf ]] && command rm -f $tmpf; [[ -n \"$oldtrps\" ]] && eval \"$oldtrps\" || trap - SIGINT; [[ -n $upmap ]] && bind -m $keymap $upmapx '\"\e[A\": $upmap'; [[ -n $downmap ]] && bind -m $keymap $downmapx '\"\e[B\": $downmap'; return" SIGINT
             
             [[ -n "$ZSH_VERSION" ]] &&
                 TRAPINT() {
@@ -710,12 +736,12 @@ function reade() {
         unset vvvvvvvvvv ${@:$#:1} 
 
         if [[ "$auto" == 'y' ]] || [[ "$auto" == 'one' && "$one" == 'y' ]]; then
-            if test -z "$prmpt"; then
+            if [[ -z "$prmpt" ]]; then
                 printf "$arg\n"; 
             else
-                if test -n "$BASH_VERSION"; then
+                if [[ -n "$BASH_VERSION" ]]; then
                    printf "${!color}$prmpt${normal}$arg\n"; 
-                elif test -n "$ZSH_VERSION"; then
+                elif [[ -n "$ZSH_VERSION" ]]; then
                     printf "${(P)color}$prmpt${normal}$arg\n";   
                 fi
             fi
@@ -727,7 +753,7 @@ function reade() {
         export REPLY="$vvvvvvvv"
         export READE_VALUE="$vvvvvvvv"
 
-        ! test $# -eq 0 && eval "${@:$#:1}=$vvvvvvvv"
+        [[ $# != 0 ]] && eval "${@:$#:1}=$vvvvvvvv"
 
         [[ -f $tmpf ]] && command rm $tmpf &>/dev/null
     fi
