@@ -11,6 +11,12 @@ alias list-binds-stty="stty -a"
 alias list-binds-xterm="xrdb -query -all"
 alias list-binds-kitty='kitty +kitten show_key -m kitty'
 
+GREEN=$(tput setaf 2)
+GREEN=$(tput setaf 2 && tput bold)
+# reset
+normal=$(tput sgr0)
+
+
 if hash xfconf-query &> /dev/null; then
     function list-binds-xfce4(){
         local usedkeysp="$(xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/custom -l -v | sed 's|/xfwm4/custom/||g; s|<Primary>|<Control>|g; s|<Super>|<Windowkey>|g; s|><|-|g; s|<||g; s|>|-|g;' | sort -V)"
@@ -89,6 +95,107 @@ fi
 #bindkey -M vicmd '"\C-a": emacs-editing-mode'
 #bindkey -M emacs '"\C-a": vi-editing-mode'
 
+# Shift-select
+# https://github.com/jirutka/zsh-shift-select
+
+# Move cursor to the end of the buffer.
+# This is an alternative to builtin end-of-buffer-or-history.
+function end-of-buffer() {
+    CURSOR=${#BUFFER}
+    zle end-of-line -w  # trigger syntax highlighting redraw
+}
+zle -N end-of-buffer
+
+# Move cursor to the beginning of the buffer.
+# This is an alternative to builtin beginning-of-buffer-or-history.
+function beginning-of-buffer() {
+    CURSOR=0
+    zle beginning-of-line -w  # trigger syntax highlighting redraw
+}
+zle -N beginning-of-buffer
+
+# Kill the selected region and switch back to the main keymap.
+function shift-select::kill-region() {
+    zle kill-region -w
+    zle -K main
+}
+zle -N shift-select::kill-region
+
+# Deactivate the selection region, switch back to the main keymap and process
+# the typed keys again.
+function shift-select::deselect-and-input() {
+    zle deactivate-region -w
+    # Switch back to the main keymap (emacs).
+    zle -K main
+    # Push the typed keys back to the input stack, i.e. process them again,
+    # but now with the main keymap.
+    zle -U "$KEYS"
+}
+zle -N shift-select::deselect-and-input
+
+# If the selection region is not active, set the mark at the cursor position,
+# switch to the shift-select keymap, and call $WIDGET without 'shift-select::'
+# prefix. This function must be used only for shift-select::<widget> widgets.
+function shift-select::select-and-invoke() {
+    if (( !REGION_ACTIVE )); then
+        zle set-mark-command -w
+        zle -K shift-select
+    fi
+    zle ${WIDGET#shift-select::} -w
+}
+
+# Create a new keymap for the shift-selection mode.
+bindkey -N shift-select
+
+# Bind all possible key sequences to deselect-and-input, i.e. it will be used
+# as a fallback for "unbound" key sequences.
+bindkey -M shift-select -R '^@'-'^?' shift-select::deselect-and-input
+
+local kcap seq seq_mac widget
+
+# Bind Shift keys in the emacs and shift-select keymaps.
+for kcap   seq          seq_mac    widget (             
+    # Shift + LeftArrow / RightArrow
+    kLFT   '^[[1;2D'    x          backward-char        
+    kRIT   '^[[1;2C'    x          forward-char         
+    # Shift + UpArrow / DownArrow
+    kri    '^[[1;2A'    x          up-line              
+    kind   '^[[1;2B'    x          down-line            
+    # Shift + Home / End
+    kHOM   '^[[1;2H'    x          beginning-of-line    
+    kEND   '^[[1;2F'    x          end-of-line          
+    # Unbinding these because I prefer the kitty - switch window - features 
+    # Shift + Ctrl + A
+    # x      '^[[97;6u'   x          beginning-of-line    
+    # Shift + Ctrl + E
+    # x      '^[[101;6u'  x          end-of-line          
+    # Shift + Ctrl/Option + LeftArrow / RightArrow
+    # x      '^[[1;6D'    '^[[1;4D'  backward-word        
+    # x      '^[[1;6C'    '^[[1;4C'  forward-word         
+    # Shift + Ctrl/Option + Home / End
+    # x      '^[[1;6H'    '^[[1;4H'  beginning-of-buffer  
+    # x      '^[[1;6F'    '^[[1;4F'  end-of-buffer        
+); do
+    # Use alternative sequence (Option instead of Ctrl) on macOS, if defined.
+    [[ "$OSTYPE" = darwin* && "$seq_mac" != x ]] && seq=$seq_mac
+
+    zle -N shift-select::$widget shift-select::select-and-invoke
+    bindkey -M emacs ${terminfo[$kcap]:-$seq} shift-select::$widget
+    bindkey -M shift-select ${terminfo[$kcap]:-$seq} shift-select::$widget
+done
+
+# Bind keys in the shift-select keymap.
+for	kcap   seq        widget (                          # key name
+        # Delete
+        kdch1  '^[[3~'    shift-select::kill-region         
+        # Backspace
+        bs     '^?'       shift-select::kill-region         
+); do
+   bindkey -M shift-select ${terminfo[$kcap]:-$seq} $widget
+done
+
+
+
 # Up and down arrow will now intelligently complete partially completed
 # commands by searching through the existing history.
 bindkey -M emacs "\e[A" history-search-backward
@@ -111,7 +218,7 @@ bindkey -M vicmd '\e[1;5C' vi-forward-word
 # Full path dirs
 alias dirs="dirs -l"
 alias dirs-col="dirs -v | column -c $COLUMNS"
-alias dirs-col-pretty="dirs -v | column -c $COLUMNS | sed -e 's/ 0 \\([^\t]*\\)/'\${GREEN}' 0 \\1'\${normal}'/'"
+alias dirs-col-pretty="dirs -p -v | column -c $COLUMNS | sed -E 's|^0[[:space:]]+([^[:space:]]+)|'\${GREEN}'0\t\1'\${normal}'|'"
 
 # A clear for alt-right/left that displays dirs/dirs-col/dirs-col-pretty
 # echo -en "\e[2K\r" clears the line we're on, and moves the cursor to the start of the line 
