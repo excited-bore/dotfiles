@@ -144,6 +144,8 @@ function shift-select::select-and-invoke() {
     zle ${WIDGET#shift-select::} -w
 }
 
+
+
 # Create a new keymap for the shift-selection mode.
 bindkey -N shift-select
 
@@ -154,27 +156,19 @@ bindkey -M shift-select -R '^@'-'^?' shift-select::deselect-and-input
 local kcap seq seq_mac widget
 
 # Bind Shift keys in the emacs and shift-select keymaps.
-for kcap   seq          seq_mac    widget (             
-    # Shift + LeftArrow / RightArrow
-    kLFT   '^[[1;2D'    x          backward-char        
-    kRIT   '^[[1;2C'    x          forward-char         
-    # Shift + UpArrow / DownArrow
-    kri    '^[[1;2A'    x          up-line              
-    kind   '^[[1;2B'    x          down-line            
-    # Shift + Home / End
-    kHOM   '^[[1;2H'    x          beginning-of-line    
-    kEND   '^[[1;2F'    x          end-of-line          
-    # Unbinding these because I prefer the kitty - switch window - features 
-    # Shift + Ctrl + A
-    # x      '^[[97;6u'   x          beginning-of-line    
-    # Shift + Ctrl + E
-    # x      '^[[101;6u'  x          end-of-line          
-    # Shift + Ctrl/Option + LeftArrow / RightArrow
-    # x      '^[[1;6D'    '^[[1;4D'  backward-word        
-    # x      '^[[1;6C'    '^[[1;4C'  forward-word         
-    # Shift + Ctrl/Option + Home / End
-    # x      '^[[1;6H'    '^[[1;4H'  beginning-of-buffer  
-    # x      '^[[1;6F'    '^[[1;4F'  end-of-buffer        
+for	kcap   seq          seq_mac    widget (             # key name
+        kLFT   '^[[1;2D'    x          backward-char        # Shift + LeftArrow
+        kRIT   '^[[1;2C'    x          forward-char         # Shift + RightArrow
+        kri    '^[[1;2A'    x          up-line              # Shift + UpArrow
+        kind   '^[[1;2B'    x          down-line            # Shift + DownArrow
+        kHOM   '^[[1;2H'    x          beginning-of-line    # Shift + Home
+        kEND   '^[[1;2F'    x          end-of-line          # Shift + End
+        #x      '^[[97;6u'   x          beginning-of-line    # Shift + Ctrl + A
+        #x      '^[[101;6u'  x          end-of-line          # Shift + Ctrl + E
+        #x      '^[[1;6D'    '^[[1;4D'  backward-word        # Shift + Ctrl/Option + LeftArrow
+        #x      '^[[1;6C'    '^[[1;4C'  forward-word         # Shift + Ctrl/Option + RightArrow
+        #x      '^[[1;6H'    '^[[1;4H'  beginning-of-buffer  # Shift + Ctrl/Option + Home
+        #x      '^[[1;6F'    '^[[1;4F'  end-of-buffer        # Shift + Ctrl/Option + End
 ); do
     # Use alternative sequence (Option instead of Ctrl) on macOS, if defined.
     [[ "$OSTYPE" = darwin* && "$seq_mac" != x ]] && seq=$seq_mac
@@ -186,14 +180,11 @@ done
 
 # Bind keys in the shift-select keymap.
 for	kcap   seq        widget (                          # key name
-        # Delete
-        kdch1  '^[[3~'    shift-select::kill-region         
-        # Backspace
-        bs     '^?'       shift-select::kill-region         
+        kdch1  '^[[3~'    shift-select::kill-region         # Delete
+        bs     '^?'       shift-select::kill-region         # Backspace
 ); do
-   bindkey -M shift-select ${terminfo[$kcap]:-$seq} $widget
+    bindkey -M shift-select ${terminfo[$kcap]:-$seq} $widget
 done
-
 
 
 # Up and down arrow will now intelligently complete partially completed
@@ -296,6 +287,8 @@ else
         echo 
         zle redisplay 
         zle reset-prompt    
+        
+        # Make sure when powerlevel10k/9k is active the prompt updates 
         [[ -n $POWERLEVEL9K_STATUS_OK ]] &&
             zle accept-line &&
             tput cuu1
@@ -466,8 +459,11 @@ function mv_prmpt_up(){
     fi 
     tput cup $LINE_TPUT $COL_TPUT
     zle reset-prompt
-    tput sc }
+    tput sc 
+}
+
 zle -N mv_prmpt_up
+
 bindkey -M viins "\e[1;3A" mv_prmpt_up
 bindkey -M emacs "\e[1;3A" mv_prmpt_up
 bindkey -M vicmd "\e[1;3A" mv_prmpt_up
@@ -637,7 +633,17 @@ bindkey -M emacs "\C-e\C-e" edit-wo-executing
 if hash osc &>/dev/null; then
     
     function osc-copy() {
-        echo -n "$BUFFER" | osc copy
+        if (( REGION_ACTIVE )); then
+            if [[ $MARK -gt $CURSOR ]]; then
+                echo -n ${BUFFER[$((CURSOR+1)),$MARK]} | osc copy 
+            else 
+                echo -n ${BUFFER[$((MARK+1)),$CURSOR]} | osc copy 
+            fi
+            zle deactivate-region -w
+            zle -K main
+        else 
+            echo -n "$BUFFER" | osc copy
+        fi
     }
     
     function osc-paste() {
@@ -652,6 +658,7 @@ if hash osc &>/dev/null; then
     bindkey -M emacs "\C-s" osc-copy
     bindkey -M viins "\C-s" osc-copy
     bindkey -M vicmd "\C-s" osc-copy
+    bindkey -M shift-select "\C-s" osc-copy
 
     bindkey -M viins "\C-v" osc-paste
     bindkey -M emacs "\C-v" osc-paste
@@ -661,9 +668,29 @@ elif ([[ "$XDG_SESSION_TYPE" == 'x11' ]] && hash xclip &>/dev/null) || ([[ "$XDG
   
     function clip-copy() {
         if [[ "$XDG_SESSION_TYPE" == 'x11' ]]; then  
-            echo -n "$BUFFER" | xclip -i -sel c
+            if (( REGION_ACTIVE )); then
+                if [[ $MARK -gt $CURSOR ]]; then
+                    echo -n ${BUFFER[$((CURSOR+1)),$MARK]} | xclip -i -sel c 
+                else 
+                    echo -n ${BUFFER[$((MARK+1)),$CURSOR]} | xclip -i -sel c 
+                fi
+                zle deactivate-region -w
+                zle -K main
+            else 
+                echo -n "$BUFFER" | xclip -i -sel c
+            fi
         elif [[ "$XDG_SESSION_TYPE" == 'wayland' ]]; then
-            echo -n "$BUFFER" | wl-copy
+            if (( REGION_ACTIVE )); then
+                if [[ $MARK -gt $CURSOR ]]; then
+                    echo -n ${BUFFER[$((CURSOR+1)),$MARK]} | wl-copy 
+                else 
+                    echo -n ${BUFFER[$((MARK+1)),$CURSOR]} | wl-copy 
+                fi
+                zle deactivate-region -w
+                zle -K main
+            else 
+                echo -n "$BUFFER" | wl-copy
+            fi
         fi
     }
 
@@ -684,6 +711,7 @@ elif ([[ "$XDG_SESSION_TYPE" == 'x11' ]] && hash xclip &>/dev/null) || ([[ "$XDG
     bindkey -M emacs "\C-s" clip-copy
     bindkey -M viins "\C-s" clip-copy
     bindkey -M vicmd "\C-s" clip-copy
+    bindkey -M shift-select "\C-s" clip-copy
 
     # Ctrl-v: Proper paste
     bindkey -M emacs "\C-v" clip-paste
