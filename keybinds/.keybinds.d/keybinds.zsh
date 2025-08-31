@@ -189,6 +189,9 @@ else
         echo 
         zle redisplay 
         zle reset-prompt    
+        [[ -n $POWERLEVEL9K_STATUS_OK ]] &&
+            zle accept-line &&
+            tput cuu1
     }
 fi
 
