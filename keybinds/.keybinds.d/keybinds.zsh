@@ -16,7 +16,6 @@ GREEN=$(tput setaf 2 && tput bold)
 # reset
 normal=$(tput sgr0)
 
-
 if hash xfconf-query &> /dev/null; then
     function list-binds-xfce4(){
         local usedkeysp="$(xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/custom -l -v | sed 's|/xfwm4/custom/||g; s|<Primary>|<Control>|g; s|<Super>|<Windowkey>|g; s|><|-|g; s|<||g; s|>|-|g;' | sort -V)"
@@ -121,6 +120,65 @@ function shift-select::kill-region() {
 }
 zle -N shift-select::kill-region
 
+function move-region() {
+    local len word prevc nextc linelen="${#BUFFER}"
+    if [[ $CURSOR -lt $MARK ]]; then
+        len=$(( $MARK - $CURSOR )) 
+        word="${BUFFER:$CURSOR:$len}"
+        if [[ $1 == 'left' ]]; then
+            if [[ $CURSOR != 0 ]]; then
+                prevc="${BUFFER:$(($CURSOR-1)):1}"
+                BUFFER="${BUFFER:0:$(($CURSOR-1))}$word$prevc${BUFFER:$MARK}"
+                CURSOR=$((CURSOR-1))
+                MARK=$((MARK-1))
+            else 
+                BUFFER="${BUFFER:${#word}}$word"
+                CURSOR=$((${#BUFFER}-${#word}))
+                MARK=${#BUFFER}
+            fi
+        elif [[ $1 == 'right' ]]; then
+            if [[ $MARK != $linelen ]]; then
+                nextc="${BUFFER:$MARK:1}"
+                BUFFER="${BUFFER:0:$CURSOR}$nextc$word${BUFFER:$((MARK+1))}"
+                CURSOR=$((CURSOR+1))
+                MARK=$((MARK+1))
+            else
+                BUFFER="$word${BUFFER:0:$((${#BUFFER} - ${#word}))}"
+                CURSOR=0
+                MARK=${#word}
+            fi
+        fi
+    elif [[ $MARK -lt $CURSOR ]]; then
+        len=$(( $CURSOR - $MARK )) 
+        word="${BUFFER:$MARK:$len}" 
+        if [[ $1 == 'left' ]]; then
+            if [[ $MARK != 0 ]]; then
+                prevc="${BUFFER:$(($MARK-1)):1}"
+                BUFFER="${BUFFER:0:$(($MARK-1))}$word$prevc${BUFFER:$CURSOR}"
+                CURSOR=$((CURSOR-1))
+                MARK=$((MARK-1))
+            else
+                BUFFER="${BUFFER:${#word}}$word"
+                MARK=$((${#BUFFER}-${#word}))
+                CURSOR=${#BUFFER}
+            fi
+        elif [[ $1 == 'right' ]]; then
+            if [[ $CURSOR != $linelen ]]; then
+                nextc="${BUFFER:$CURSOR:1}"
+                BUFFER="${BUFFER:0:$MARK}$nextc$word${BUFFER:$((CURSOR+1))}"
+                CURSOR=$((CURSOR+1))
+                MARK=$((MARK+1))
+            else
+                BUFFER="$word${BUFFER:0:$((${#BUFFER} - ${#word}))}"
+                MARK=0
+                CURSOR=${#word}
+            fi
+        fi
+    fi
+
+}
+
+
 # Deactivate the selection region, switch back to the main keymap and process
 # the typed keys again.
 function shift-select::deselect-and-input() {
@@ -182,9 +240,28 @@ done
 for	kcap   seq        widget (                          # key name
         kdch1  '^[[3~'    shift-select::kill-region         # Delete
         bs     '^?'       shift-select::kill-region         # Backspace
+
 ); do
     bindkey -M shift-select ${terminfo[$kcap]:-$seq} $widget
 done
+
+shift-select::move-region-left(){ move-region left }
+shift-select::move-region-right(){ move-region right }
+
+zle -N shift-select::move-region-left
+zle -N shift-select::move-region-right
+
+# Alt-Right - Move region left/right
+bindkey -M emacs '\e[1;3C' shift-select::move-region-right  
+bindkey -M viins '\e[1;3C' shift-select::move-region-right  
+bindkey -M vicmd '\e[1;3C' shift-select::move-region-right  
+bindkey -M shift-select '\e[1;3C' shift-select::move-region-right  
+
+# Alt-Left - Move region left/right
+bindkey -M emacs '\e[1;3D' shift-select::move-region-left  
+bindkey -M viins '\e[1;3D' shift-select::move-region-left  
+bindkey -M vicmd '\e[1;3D' shift-select::move-region-left  
+bindkey -M shift-select '\e[1;3D' shift-select::move-region-left  
 
 
 # Up and down arrow will now intelligently complete partially completed
@@ -198,13 +275,13 @@ bindkey -M viins "\e[B" history-search-forward
 bindkey -M vicmd "\e[B" history-search-forward
 
 # Control left/right to jump from bigwords (ignore spaces when jumping) instead of chars
-bindkey -M emacs '\e[1;5D' vi-backward-word
-bindkey -M viins '\e[1;5D' vi-backward-word
-bindkey -M vicmd '\e[1;5D' vi-backward-word
+bindkey -M emacs '\e[1;5D' backward-word
+bindkey -M viins '\e[1;5D' backward-word
+bindkey -M vicmd '\e[1;5D' backward-word
 
-bindkey -M emacs '\e[1;5C' vi-forward-word
-bindkey -M viins '\e[1;5C' vi-forward-word
-bindkey -M vicmd '\e[1;5C' vi-forward-word
+bindkey -M emacs '\e[1;5C' forward-word
+bindkey -M viins '\e[1;5C' forward-word
+bindkey -M vicmd '\e[1;5C' forward-word
 
 # Full path dirs
 alias dirs="dirs -l"
@@ -222,6 +299,7 @@ if hash starship &>/dev/null && [[ $STARSHIP_SHELL == 'zsh' ]] && (grep -q '\\n'
         tput sc;
         clear
         zle reset-prompt    
+        zle redisplay 
     }
     function clr2(){ 
         echo -en "\e[2K\r"
@@ -238,6 +316,7 @@ if hash starship &>/dev/null && [[ $STARSHIP_SHELL == 'zsh' ]] && (grep -q '\\n'
         dirs-col-pretty
         echo
         zle reset-prompt    
+        zle redisplay 
     }
 elif hash starship &>/dev/null && [[ $STARSHIP_SHELL == 'zsh' ]]; then
     function clr1(){ 
@@ -248,6 +327,7 @@ elif hash starship &>/dev/null && [[ $STARSHIP_SHELL == 'zsh' ]]; then
         clear 
         tput rc 
         zle reset-prompt    
+        zle redisplay 
     }
     function clr2(){ 
         echo -en "\e[2K\r"
@@ -263,6 +343,7 @@ elif hash starship &>/dev/null && [[ $STARSHIP_SHELL == 'zsh' ]]; then
         dirs-col-pretty
         echo 
         zle reset-prompt
+        zle redisplay 
     }
 else
     function clr1(){ 
@@ -276,6 +357,10 @@ else
     function clr2(){ 
         echo -en "\e[2K\r"
         tput sc; 
+        zle kill-whole-line
+        # Make sure when powerlevel10k/9k is active the prompt updates 
+        [[ -n $POWERLEVEL9K_STATUS_OK ]] &&
+            zle accept-line
         clear; 
         tput rc;
         for ((i = 0 ; i <= $(dirs -v | column -c ${COLUMNS} | wc -l) ; i++)); do 
@@ -284,14 +369,10 @@ else
         tput cuu1 
         echo 
         dirs-col-pretty;
-        echo 
-        zle redisplay 
-        zle reset-prompt    
-        
-        # Make sure when powerlevel10k/9k is active the prompt updates 
-        [[ -n $POWERLEVEL9K_STATUS_OK ]] &&
-            zle accept-line &&
-            tput cuu1
+        # P10k doesn't like this 
+        [[ -z $POWERLEVEL9K_STATUS_OK ]] && 
+            echo && 
+            zle reset-prompt &&    
     }
 fi
 
@@ -300,7 +381,7 @@ zle -N clr2
 
 # We set this option so every time we change directory, we add said directory to the dir stack 
 # (used by dirs/pushd/popd)
-setopt autopushd
+setopt autopushd pushdignoredups
 
 rightdir(){
     pushd +1 &>/dev/null
