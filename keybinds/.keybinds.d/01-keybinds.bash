@@ -47,7 +47,8 @@ fi
 
 # Turn off flow control and free up Ctrl-s and Ctrl-q
 stty -ixon
-stty -ixoff
+#stty -ixoff
+
 stty start 'undef'
 stty stop 'undef'
 
@@ -407,6 +408,27 @@ bind -m vi-insert '"\e[1;2A": "\e101\e111\e107\e102\e102"'
 bind -m emacs-standard '"\e[1;2B": "\e101\e112\e108\e102\e102"'
 bind -m vi-command '"\e[1;2B": "\e101\e112\e108\e102\e102"'
 bind -m vi-insert '"\e[1;2B": "\e101\e112\e108\e102\e102"'
+
+# Same for Alt+Shift Up/Down 
+
+bind -m emacs-standard '"\e[1;4A": "\e[1;2A"'
+bind -m vi-command '"\e[1;4A": "\e[1;2A"'
+bind -m vi-insert '"\e[1;4A": "\e[1;2A"'
+
+bind -m emacs-standard '"\e[1;4B": "\e[1;2B"'
+bind -m vi-command '"\e[1;4B": "\e[1;2B"'
+bind -m vi-insert '"\e[1;4B": "\e[1;2B"'
+
+# AND Alt+Shift Left/Right
+
+bind -m emacs-standard '"\e[1;4C": "\e[1;2A"'
+bind -m vi-command '"\e[1;4C": "\e[1;2A"'
+bind -m vi-insert '"\e[1;4C": "\e[1;2A"'
+
+bind -m emacs-standard '"\e[1;4D": "\e[1;2B"'
+bind -m vi-command '"\e[1;4D": "\e[1;2B"'
+bind -m vi-insert '"\e[1;4D": "\e[1;2B"'
+
 
 # Arrow Key resets mark / selection
 

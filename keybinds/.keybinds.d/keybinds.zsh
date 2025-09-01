@@ -221,6 +221,10 @@ for	kcap   seq          seq_mac    widget (             # key name
         kind   '^[[1;2B'    x          down-line            # Shift + DownArrow
         kHOM   '^[[1;2H'    x          beginning-of-line    # Shift + Home
         kEND   '^[[1;2F'    x          end-of-line          # Shift + End
+        x      '^[[1;4A'    x          beginning-of-buffer  # Shift + Alt + UpArrow
+        x      '^[[1;4B'    x          end-of-buffer        # Shift + Alt + DownArrow
+        x      '^[[1;4D'    x          beginning-of-line    # Shift + Alt + RightArrow
+        x      '^[[1;4C'    x          end-of-line          # Shift + Alt + LeftArrow
         #x      '^[[97;6u'   x          beginning-of-line    # Shift + Ctrl + A
         #x      '^[[101;6u'  x          end-of-line          # Shift + Ctrl + E
         #x      '^[[1;6D'    '^[[1;4D'  backward-word        # Shift + Ctrl/Option + LeftArrow
@@ -981,7 +985,8 @@ function htop-btop-zsh(){
          if [[ "$ansr" == "y" ]]; then
              readyn -p "Start btop as root?" ansr1 
              if [[ "$ansr1" == "y" ]]; then
-                 # Redirect btop to tty, otherwise it doesn't work 
+                 # ZSH widgets apparently run detached from TTY's standard input???  
+                 # Redirect stdin from TTY to btop, otherwise we can't see what jobs are running  
                  sudo btop </dev/tty
              else 
                 btop </dev/tty
