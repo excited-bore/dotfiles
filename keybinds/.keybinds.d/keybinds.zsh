@@ -504,8 +504,6 @@ else
     fi
 fi
 
-# Shift left/right to jump from words instead of chars
- 
 function clear-screen(){ 
     clear 
     tput cup $(($LINE_TPUT+1)) $TPUT_COL 
@@ -691,7 +689,15 @@ bindkey -M viins -s ''\''' quote-all-zsh
 edit-wo-executing() {
     local editor="${EDITOR:-nano}"
     tmpf="$(mktemp).sh"
-    printf "$BUFFER" >"$tmpf"
+    if (( REGION_ACTIVE )); then
+        if [[ $MARK -gt $CURSOR ]]; then
+            echo -n ${BUFFER[$((CURSOR+1)),$MARK]} > "$tmpf" 
+        else 
+            echo -n ${BUFFER[$((MARK+1)),$CURSOR]} > "$tmpf" 
+        fi 
+    else
+        echo -n "$BUFFER" >"$tmpf"
+    fi
     $EDITOR "$tmpf"
     # https://stackoverflow.com/questions/6675492/how-can-i-remove-all-newlines-n-using-sed
     #[ "$(sed -n '/^#!\/bin\/bash/p;q' "$tmpf")" ] && sed -i 1d "$tmpf"
@@ -703,9 +709,11 @@ edit-wo-executing() {
 zle -N edit-wo-executing
 
 bindkey -M vicmd "\C-e" edit-wo-executing
-bindkey -M viins "v" edit-wo-executing
+bindkey -M vicmd "v" edit-wo-executing
 bindkey -M viins "\C-e" edit-wo-executing
 bindkey -M emacs "\C-e\C-e" edit-wo-executing
+bindkey -M shift-select "\C-e" edit-wo-executing
+
 
 # RLWRAP
 
@@ -736,18 +744,44 @@ if hash osc &>/dev/null; then
         BUFFER="${BUFFER:0:$CURSOR}$pasters${BUFFER:$CURSOR}"
         CURSOR=$((CURSOR + ${#pasters}))
     }
-   
+  
+    function osc-cut(){
+        if (( REGION_ACTIVE )); then
+            if [[ $MARK -gt $CURSOR ]]; then
+                local len=$(( $MARK - $CURSOR )) 
+                echo -n "${BUFFER:$CURSOR:$len}" | osc copy
+            else 
+                local len=$(( $CURSOR - $MARK )) 
+                echo -n "${BUFFER:$MARK:$len}" | osc copy
+            fi
+            shift-select::kill-region
+        else
+            echo -n "$BUFFER" | osc copy
+            zle kill-buffer 
+        fi
+    } 
+
     zle -N osc-copy
     zle -N osc-paste
+    zle -N osc-cut
 
+    # Ctrl-s: Proper copy 
     bindkey -M emacs "\C-s" osc-copy
     bindkey -M viins "\C-s" osc-copy
     bindkey -M vicmd "\C-s" osc-copy
     bindkey -M shift-select "\C-s" osc-copy
 
+    # Ctrl-p: Proper paste 
     bindkey -M viins "\C-v" osc-paste
     bindkey -M emacs "\C-v" osc-paste
     bindkey -M vicmd "\C-v" osc-paste
+
+    # Ctrl-d: Proper cut 
+    bindkey -M emacs "\C-d" osc-cut
+    bindkey -M viins "\C-d" osc-cut
+    bindkey -M vicmd "\C-d" osc-cut
+    bindkey -M shift-select "\C-d" osc-cut
+
 
 elif ([[ "$XDG_SESSION_TYPE" == 'x11' ]] && hash xclip &>/dev/null) || ([[ "$XDG_SESSION_TYPE" == 'wayland' ]] && hash wl-copy &> /dev/null); then
   
@@ -788,9 +822,42 @@ elif ([[ "$XDG_SESSION_TYPE" == 'x11' ]] && hash xclip &>/dev/null) || ([[ "$XDG
         BUFFER="${BUFFER:0:$CURSOR}$pasters${BUFFER:$CURSOR}"
         CURSOR=$((CURSOR + ${#pasters}))
     }
-   
+  
+    function clip-cut(){
+        if [[ "$XDG_SESSION_TYPE" == 'x11' ]]; then  
+            if (( REGION_ACTIVE )); then
+                if [[ $MARK -gt $CURSOR ]]; then
+                    local len=$(( $MARK - $CURSOR )) 
+                    echo -n "${BUFFER:$CURSOR:$len}" | xclip -i -sel c
+                else 
+                    local len=$(( $CURSOR - $MARK )) 
+                    echo -n "${BUFFER:$MARK:$len}" | xclip -i -sel c
+                fi
+                shift-select::kill-region
+            else
+                echo -n "$BUFFER" | xclip -i -sel c
+                zle kill-buffer 
+            fi
+        elif [[ "$XDG_SESSION_TYPE" == 'wayland' ]]; then
+            if (( REGION_ACTIVE )); then
+                if [[ $MARK -gt $CURSOR ]]; then
+                    local len=$(( $MARK - $CURSOR )) 
+                    echo -n "${BUFFER:$CURSOR:$len}" | wl-copy
+                else 
+                    local len=$(( $CURSOR - $MARK )) 
+                    echo -n "${BUFFER:$MARK:$len}" | wl-copy
+                fi
+                shift-select::kill-region
+            else
+                echo -n "$BUFFER" | wl-copy
+                zle kill-buffer 
+            fi
+        fi
+    }
+
     zle -N clip-copy
     zle -N clip-paste
+    zle -N clip-cut
 
     # Ctrl-s: Proper copy
     bindkey -M emacs "\C-s" clip-copy
@@ -802,6 +869,12 @@ elif ([[ "$XDG_SESSION_TYPE" == 'x11' ]] && hash xclip &>/dev/null) || ([[ "$XDG
     bindkey -M emacs "\C-v" clip-paste
     bindkey -M viins "\C-v" clip-paste
     bindkey -M vicmd "\C-v" clip-paste
+
+    # Ctrl-d: Proper cut
+    bindkey -M emacs "\C-d" clip-cut
+    bindkey -M viins "\C-d" clip-cut
+    bindkey -M vicmd "\C-d" clip-cut
+    bindkey -M shift-select "\C-d" clip-cut
 
 fi
 

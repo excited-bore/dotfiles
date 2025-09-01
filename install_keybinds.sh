@@ -25,30 +25,36 @@ fi
 # Shell-keybinds
 
 binds=$SCRIPT_DIR/keybinds/.inputrc
-binds1=$SCRIPT_DIR/keybinds/.keybinds.d/01-keybinds.bash
-binds2=$SCRIPT_DIR/keybinds/.keybinds
-if ! test -f $binds; then
+binds1=$SCRIPT_DIR/keybinds/.keybinds.d/01-cdw.bash
+binds2=$SCRIPT_DIR/keybinds/.keybinds.d/02-keybinds.bash
+binds3=$SCRIPT_DIR/keybinds/.keybinds
+if ! [[ -f $binds ]]; then
     tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.inputrc
-    tmp1=$(mktemp) && curl -o $tmp1 https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds.d/keybinds.bash
-    tmp2=$(mktemp) && curl -o $tmp2 https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds
+    tmp1=$(mktemp) && curl -o $tmp1 https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds.d/01-cdw.bash
+    tmp2=$(mktemp) && curl -o $tmp2 https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds.d/02-keybinds.bash
+    tmp3=$(mktemp) && curl -o $tmp3 https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds
     binds=$tmp
     binds1=$tmp1
     binds2=$tmp2
+    binds3=$tmp3
 fi
 
-if ! test -f /etc/inputrc; then
+if ! [[ -f /etc/inputrc ]]; then
     sed -i 's/^$include \/etc\/inputrc/#$include \/etc\/inputrc/g' $binds
 fi
 
 shell-keybinds_r() {
-    if test -f /root/.environment.env; then
+    if [[ -f /root/.environment.env ]]; then
         sudo sed -i 's|#export INPUTRC.*|export INPUTRC=~/.inputrc|g' /root/.environment.env
     fi
+    
     sudo cp $binds1 /root/.keybinds.d/
-    sudo cp $binds2 /root/.keybinds
+    sudo cp $binds2 /root/.keybinds.d/
+    sudo cp $binds3 /root/.keybinds
     sudo cp $binds /root/
+    
     echo "Next $(tput setaf 1)sudo$(tput sgr0) will check whether '~/.keybinds' is sourced in /root/.bashrc"
-    if test -f /root/.bashrc && ! grep -q '[ -f /root/.keybinds ]' /root/.bashrc; then
+    if [[ -f /root/.bashrc ]] && ! grep -q '[ -f /root/.keybinds ]' /root/.bashrc; then
         if sudo grep -q '[ -f /root/.bash_aliases ]' /root/.bashrc; then
             sudo sed -i 's|\(\[ -f \/root/.bash_aliases \] \&\& source \/root/.bash_aliases\)|\1\n\[ -f \/root/.keybinds \] \&\& source \/root/.keybinds\n|g' /root/.bashrc
         else
@@ -64,7 +70,7 @@ shell-keybinds_r() {
 }
 
 shell-keybinds() {
-    if ! test -f $SCRIPT_DIR/checks/check_keybinds.sh; then
+    if ! [[ -f $SCRIPT_DIR/checks/check_keybinds.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_keybinds.sh)
     else
         . $SCRIPT_DIR/checks/check_keybinds.sh
@@ -122,10 +128,10 @@ shell-keybinds() {
     readyn -n -N "CYAN" -p "Startup in ${MAGENTA}vi-mode${CYAN} instead of ${GREEN}emacs${CYAN} mode? (might cause issues with pasteing)" vimde
 
     sed -i "s|^set editing-mode .*|#set editing-mode vi|g" $binds
-    sed -i "s|^bind 'set editing-mode vi'|# bind 'set editing-mode vi'|g" $binds1
+    sed -i "s|^bind 'set editing-mode vi'|# bind 'set editing-mode vi'|g" $binds2
 
     if [[ "$vimde" == "y" ]]; then
-        sed -i "s|# bind 'set editing-mode vi'|bind 'set editing-mode vi'|g" $binds1
+        sed -i "s|# bind 'set editing-mode vi'|bind 'set editing-mode vi'|g" $binds2
     fi
 
     sed -i "s|^setxkbmap |#setxkbmap |g" $binds
@@ -138,7 +144,8 @@ shell-keybinds() {
     fi
 
     cp $binds1 ~/.keybinds.d/
-    cp $binds2 ~/.keybinds
+    cp $binds2 ~/.keybinds.d/
+    cp $binds3 ~/.keybinds
     cp $binds ~/
 
     if test -f ~/.bashrc && ! grep -q '~/.keybinds' ~/.bashrc; then
@@ -153,10 +160,10 @@ shell-keybinds() {
         sed -i 's|#export INPUTRC.*|export INPUTRC=~/.inputrc|g' ~/.environment.env
     fi
     unset vimde vivisual xterm
-    yes-edit-no -Y "YELLOW" -f shell-keybinds_r -g "$binds $binds2 $binds1" -p "Install .inputrc and keybinds.bash at /root/ and /root/.keybinds.d/?"
+    yes-edit-no -Y "YELLOW" -f shell-keybinds_r -g "$binds $binds3 $binds1 $binds2" -p "Install .inputrc and keybinds.bash at /root/ and /root/.keybinds.d/?"
 }
 
-yes-edit-no -f shell-keybinds -g "$binds $binds2 $binds1" -p "Install .inputrc and keybinds.bash at ~/ and ~/.keybinds.d/? (keybinds configuration)"
+yes-edit-no -f shell-keybinds -g "$binds $binds3 $binds1 $binds2" -p "Install .inputrc and keybinds.bash at ~/ and ~/.keybinds.d/? (keybinds configuration)"
 
 
 if [[ "$DESKTOP_SESSION" == 'xfce' ]]; then
