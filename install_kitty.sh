@@ -132,12 +132,12 @@ readyn -p "Install kitty.conf and ssh.conf at ~/.config/kitty/ (kitty config)?" 
 
 if [[ $ktty_cnf == 'y' ]]; then
    
-    sed -i 's|\(map shift+alt+up    scroll_line_up\)|#\1|' $dir/kitty.conf 
-    sed -i 's|\(map shift+alt+down    scroll_line_down\)|#\1|' $dir/kitty.conf 
+    sed -i 's|\(^map shift+alt+up    scroll_line_up\)|# \1|' $dir/kitty.conf 
+    sed -i 's|\(^map shift+alt+down    scroll_line_down\)|# \1|' $dir/kitty.conf 
     readyn -p "Add mapping to scroll Up/Down using Shift+Alt+Up/Down" ktty_scrll_updwn
     if [[ $ktty_scrll_updwn == 'y' ]]; then
-        sed -i 's|#\(map shift+alt+up    scroll_line_up\)|\1|' $dir/kitty.conf 
-        sed -i 's|#\(map shift+alt+down    scroll_line_down\)|\1|' $dir/kitty.conf 
+        sed -i 's|# \(map shift+alt+up    scroll_line_up\)|\1|' $dir/kitty.conf 
+        sed -i 's|# \(map shift+alt+down    scroll_line_down\)|\1|' $dir/kitty.conf 
     fi
 
     sed -i 's|enabled_layouts .*|enabled_layouts \*|g' $dir/kitty.conf
@@ -175,11 +175,11 @@ if [[ $ktty_cnf == 'y' ]]; then
             printf "$layouts"
             #done
 
-            prompt='Initial layout in list? '
+            prompt='Initial layout in list?'
             if [[ $j == 2 ]]; then
-                prompt='2nd layout in list? '
+                prompt='2nd layout in list?'
             elif [[ $j > 2 ]]; then
-                prompt="$j-th layout in list? "
+                prompt="$j-th layout in list?"
             fi
 
             frst="$(echo "${lays[@]}" | awk '{print $1}')"
@@ -194,7 +194,7 @@ if [[ $ktty_cnf == 'y' ]]; then
                 # Zsh variant
                 layout_p="$(tr '[:lower:]' '[:upper:]' <<<${layout_p:0:1})${layout_p:1}"
 
-            reade -Q "GREEN" -i "$frst $layouts1" -p "$prompt? [$layout_p]: " ktty_splt
+            reade -Q "GREEN" -i "$frst $layouts1" -p "$prompt [$layout_p]: " ktty_splt
             if [[ "$ktty_splt" == 'splits' ]]; then
                 enbld="$enbld splits"
                 lays=( $(echo "${lays[@]}" | sed "s/splits //g") )
@@ -259,9 +259,9 @@ if [[ $ktty_cnf == 'y' ]]; then
     grep --color=always -n 'enabled_layouts' $dir/kitty.conf
     ! test -z $ktty_splt1 && [[ $ktty_splt1 == 'y' ]] && grep --color=always -n 'map kitty_mod+enter ' $dir/kitty.conf
     ! test -z $ktty_splt2 && [[ $ktty_splt2 == 'y' ]] && grep --color=always -n 'map kitty_mod+alt+enter' $dir/kitty.conf
-    ! test -z $ktty_scrll_updwn && [[ $ktty_scrll_updwn == 'y' ]] && 
-        grep --color=always -n 'map shift+alt+up    scroll_line_up' $dir/kitty.conf &&
-        grep --color=always -n 'map shift+alt+down    scroll_line_down' $dir/kitty.conf
+    [[ $ktty_scrll_updwn == 'y' ]] && 
+        grep --color=always -n 'map shift+alt+up' $dir/kitty.conf &&
+        grep --color=always -n 'map shift+alt+down' $dir/kitty.conf
     [[ $ktty_trns == 'y' ]] && grep --color=always -n '^ background_opacity' $dir/kitty.conf
 
     function kitty_conf() {
