@@ -166,6 +166,7 @@ if [[ $DESKTOP_SESSION == 'xfce' ]]; then
         return 0
     }
 
+
     # Solution to 'accidently' resetting application shortcuts to custom
     # https://forum.xfce.org/viewtopic.php?pid=76178#p76178
 
@@ -246,5 +247,18 @@ ${ORANGE}This can conflict with different applications' (custom) keybinds\n${nor
         fi
         unset alt_super_arr
     fi
+    
+    # For xfce-terminal, rebind Shift-Up/Down to Shift-Alt-Up/Down to move up/down line?
 
+    if [[ -f "${XDG_CONFIG_HOME}/xfce4/terminal/accels.scm" ]] && ( ! grep -q '<Actions>/terminal-widget/shift-up" "<Shift><Alt>Up' "${XDG_CONFIG_HOME}/xfce4/terminal/accels.scm" || ! grep -q '<Actions>/terminal-widget/shift-down" "<Shift><Alt>Down' "${XDG_CONFIG_HOME}/xfce4/terminal/accels.scm" ); then
+        echo "In ${GREEN}xfce-terminal${normal}, the keys for ${CYAN}'Scroll One Line Up/Down'${normal} are bound to ${green}'Shift-Up/Down'${normal}\n"
+        readyn -p "Would you like to change this to ${CYAN}'Shift-Alt-Up/Down'${GREEN}?" shft_alt_updwn
+        if [[ $shft_alt_updwn == 'y' ]]; then
+            sed -i 's|; (gtk_accel_path "<Actions>/terminal-widget/shift-up"|(gtk_accel_path "<Actions>/terminal-widget/shift-up"|g' "${XDG_CONFIG_HOME}/xfce4/terminal/accels.scm" 
+            sed -i 's|(gtk_accel_path "<Actions>/terminal-widget/shift-up" *|(gtk_accel_path "<Actions>/terminal-widget/shift-up" "<Shift><Alt>Up")|g' "${XDG_CONFIG_HOME}/xfce4/terminal/accels.scm" 
+            
+            sed -i 's|; (gtk_accel_path "<Actions>/terminal-widget/shift-down"|(gtk_accel_path "<Actions>/terminal-widget/shift-down"|g' "${XDG_CONFIG_HOME}/xfce4/terminal/accels.scm" 
+            sed -i 's|(gtk_accel_path "<Actions>/terminal-widget/shift-down" *|(gtk_accel_path "<Actions>/terminal-widget/shift-down" "<Shift><Alt>Down")|g' "${XDG_CONFIG_HOME}/xfce4/terminal/accels.scm" 
+        fi
+    fi
 fi

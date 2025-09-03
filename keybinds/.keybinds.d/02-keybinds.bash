@@ -193,7 +193,9 @@ function move-region(){
     fi
 } 
 
-bind '"\e102": exchange-point-and-mark'
+bind -m emacs '"\e102": exchange-point-and-mark'
+bind -m vi-insert '"\e102": exchange-point-and-mark'
+bind -m vi-command '"\e102": exchange-point-and-mark'
 bind -x '"\e113": "move-region left"'  
 bind -x '"\e114": "move-region right"'  
 
@@ -203,11 +205,11 @@ function reset-mark(){
    READLINE_MARK=$READLINE_POINT 
    unset READLINE_MARK_SET
    if [[ -n $CTRL_ALT_LEFTM ]]; then
-       bind -m $CTRL_ALT_KM $CTRL_ALT_LEFTX "\"\e[1;7D\": \"$CTRL_ALT_LEFTM\""
+       bind -m $CTRL_ALT_KM $CTRL_ALT_LEFTX "\"\e[1;3D\": \"$CTRL_ALT_LEFTM\""
        unset CTRL_ALT_LEFTM CTRL_ALT_LEFTX 
    fi
    if [[ -n $CTRL_ALT_RIGHTM ]]; then
-       bind -m $CTRL_ALT_KM $CTRL_ALT_RIGHTX "\"\e[1;7C\": \"$CTRL_ALT_RIGHTM\""
+       bind -m $CTRL_ALT_KM $CTRL_ALT_RIGHTX "\"\e[1;3C\": \"$CTRL_ALT_RIGHTM\""
        unset CTRL_ALT_RIGHTM CTRL_ALT_RIGHTX 
    fi
    if [[ -n $BACKSM ]]; then
@@ -319,32 +321,37 @@ function set-mark-and-bind-move-region(){
         fi
         
         CTRL_ALT_KM=$keymap
-        
-        if ! bind -m $keymap -X | grep -q '\\e\[1;7D": "\\e101\\e108\\e113\\e102\\e102'; then
+       
+        local i="" 
+        if [[ $keymap == 'vi-command' ]]; then
+            i="i"
+        fi
+
+        if ! bind -m $keymap -s | grep -q '\\e\[1;3D": "'$i'\\e101\\e108\\e113\\e102\\e102'; then
             # Alt-Left should move a region 1 char to the left 
-            if bind -m $keymap -p | grep -q '"\\e\[1;7D":'; then
-                leftmap=$(bind -m $keymap -p | grep '"\\e\[1;7D":' | awk '{$1=""; print}' | xargs)
-            elif bind -m $keymap -s | grep -q '"\\e\[1;7D":'; then
-                leftmap=$(bind -m $keymap -s | grep '"\\e\[1;7D":' | awk '{$1=""; print}' | xargs)
-            elif bind -m $keymap -X | grep -q '"\\e\[1;7D"'; then
+            if bind -m $keymap -p | grep -q '"\\e\[1;3D":'; then
+                leftmap=$(bind -m $keymap -p | grep '"\\e\[1;3D":' | awk '{$1=""; print}' | xargs)
+            elif bind -m $keymap -s | grep -q '"\\e\[1;3D":'; then
+                leftmap=$(bind -m $keymap -s | grep '"\\e\[1;3D":' | awk '{$1=""; print}' | xargs)
+            elif bind -m $keymap -X | grep -q '"\\e\[1;3D"'; then
                 leftmapx='-x ' 
-                leftmap=$(bind -m $keymap -X | grep '"\\e\[1;7D"' | awk '{$1=""; print}' | xargs)
+                leftmap=$(bind -m $keymap -X | grep '"\\e\[1;3D"' | awk '{$1=""; print}' | xargs)
             fi
-            bind -m $keymap '"\e[1;7D": "\e101\e108\e113\e102\e102"' 
+            bind -m $keymap '"\e[1;3D": "'$i'\e101\e108\e113\e102\e102"' 
             CTRL_ALT_LEFTX=$leftmapx
             CTRL_ALT_LEFTM=$leftmap
         fi
          
-        if ! bind -m $keymap -X | grep -q '\\e\[1;7C": "\\e101\\e108\\e114\\e102\\e102'; then
-            if bind -m $keymap -p | grep -q '"\\e\[1;7C":'; then
-                rightmap=$(bind -m $keymap -p | grep '"\\e\[1;7C":' | awk '{$1=""; print}' | xargs)
-            elif bind -m $keymap -s | grep -q '"\\e\[1;7C":'; then
-                rightmap=$(bind -m $keymap -s | grep '"\\e\[1;7C":' | awk '{$1=""; print}' | xargs)
-            elif bind -m $keymap -X | grep -q '"\\e\[1;7C"'; then
+        if ! bind -m $keymap -s | grep -q '\\e\[1;3C": "'$i'\\e101\\e108\\e114\\e102\\e102'; then
+            if bind -m $keymap -p | grep -q '"\\e\[1;3C":'; then
+                rightmap=$(bind -m $keymap -p | grep '"\\e\[1;3C":' | awk '{$1=""; print}' | xargs)
+            elif bind -m $keymap -s | grep -q '"\\e\[1;3C":'; then
+                rightmap=$(bind -m $keymap -s | grep '"\\e\[1;3C":' | awk '{$1=""; print}' | xargs)
+            elif bind -m $keymap -X | grep -q '"\\e\[1;3C"'; then
                 rightmapx='-x '
-                rightmap=$(bind -m $keymap -X | grep '"\\e\[1;7C"' | awk '{$1=""; print}' | xargs)
+                rightmap=$(bind -m $keymap -X | grep '"\\e\[1;3C"' | awk '{$1=""; print}' | xargs)
             fi
-            bind -m $keymap '"\e[1;7C": "\e101\e108\e114\e102\e102"' 
+            bind -m $keymap '"\e[1;3C": "'$i'\e101\e108\e114\e102\e102"' 
             CTRL_ALT_RIGHTX=$rightmapx
             CTRL_ALT_RIGHTM=$rightmap
         fi
@@ -522,15 +529,15 @@ bind -m emacs-standard -x '"\e[1;3B": clear && let LINE_TPUT=$LINE_TPUT+1; if [ 
 bind -m vi-command -x '"\e[1;3B": clear && let LINE_TPUT=$LINE_TPUT+1; if [ $LINE_TPUT -gt $LINES ];then let LINE_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
 bind -m vi-insert -x '"\e[1;3B": clear && let LINE_TPUT=$LINE_TPUT+1; if [ $LINE_TPUT -gt $LINES ];then let LINE_TPUT=0;fi && tput cup $LINE_TPUT $COL_TPUT && echo "${PS1@P}" && tput cuu1 && tput sc'
 
-# Alt Left/Right => Move character or region
+# Alt Left/Right => Move to beginning/end of line
 
-bind -m emacs-standard '"\e[1;3D": "\e101\e108\e113\e102\e102"'
-bind -m vi-command '"\e[1;3D": "i\e101\e108\e113\e102\e102"'
-bind -m vi-insert '"\e[1;3D": "\e101\e108\e113\e102\e102"'
+bind -m emacs-standard '"\e[1;3D": "\e105\e112"'
+bind -m vi-command '"\e[1;3D": "\e105\e112"'
+bind -m vi-insert '"\e[1;3D": "\e105\e112"'
 
-bind -m emacs-standard '"\e[1;3C": "\e101\e108\e114\e102\e102"'
-bind -m vi-command '"\e[1;3C": "i\e101\e108\e114\e102\e102"'
-bind -m vi-insert '"\e[1;3C": "\e101\e108\e114\e102\e102"'
+bind -m emacs-standard '"\e[1;3C": "\e105\e111"'
+bind -m vi-command '"\e[1;3C": "\e105\e111"'
+bind -m vi-insert '"\e[1;3C": "\e105\e111"'
 
 # Transpose special character separated words on Alt+Shift Left/Right
 #bind -m emacs-standard -x '"\e[1;3D": transpose_words space left'
