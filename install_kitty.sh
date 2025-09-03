@@ -131,6 +131,15 @@ lays=("splits" "horizontal" "vertical" "tall" "fat" "grid")
 readyn -p "Install kitty.conf and ssh.conf at ~/.config/kitty/ (kitty config)?" ktty_cnf
 
 if [[ $ktty_cnf == 'y' ]]; then
+   
+    sed -i 's|\(map shift+alt+up    scroll_line_up\)|#\1|' $dir/kitty.conf 
+    sed -i 's|\(map shift+alt+down    scroll_line_down\)|#\1|' $dir/kitty.conf 
+    readyn -p "Add mapping to scroll Up/Down using Shift+Alt+Up/Down" ktty_scrll_updwn
+    if [[ $ktty_scrll_updwn == 'y' ]]; then
+        sed -i 's|#\(map shift+alt+up    scroll_line_up\)|\1|' $dir/kitty.conf 
+        sed -i 's|#\(map shift+alt+down    scroll_line_down\)|\1|' $dir/kitty.conf 
+    fi
+
     sed -i 's|enabled_layouts .*|enabled_layouts \*|g' $dir/kitty.conf
     sed -i 's|map kitty_mod+enter[^+].*|map kitty_mod+enter new_window|g' $dir/kitty.conf
     sed -i 's|background_opacity [0-9]\.[0-9]|background_opacity 1.0|g' $dir/kitty.conf
@@ -245,10 +254,14 @@ if [[ $ktty_cnf == 'y' ]]; then
         reade -Q "GREEN" -i "1.0 0.9 0.8 0.7 0.6 0.5 .4 0.3 0.2 0.1" -p "Opacity : " ktty_trns1
         sed -i "s|background_opacity [0-9]\.[0-9]|background_opacity $ktty_trns1|g" $dir/kitty.conf
     fi
+    
     printf "${cyan}kitty.conf:${normal} \n"
     grep --color=always -n 'enabled_layouts' $dir/kitty.conf
     ! test -z $ktty_splt1 && [[ $ktty_splt1 == 'y' ]] && grep --color=always -n 'map kitty_mod+enter ' $dir/kitty.conf
     ! test -z $ktty_splt2 && [[ $ktty_splt2 == 'y' ]] && grep --color=always -n 'map kitty_mod+alt+enter' $dir/kitty.conf
+    ! test -z $ktty_scrll_updwn && [[ $ktty_scrll_updwn == 'y' ]] && 
+        grep --color=always -n 'map shift+alt+up    scroll_line_up' $dir/kitty.conf &&
+        grep --color=always -n 'map shift+alt+down    scroll_line_down' $dir/kitty.conf
     [[ $ktty_trns == 'y' ]] && grep --color=always -n '^ background_opacity' $dir/kitty.conf
 
     function kitty_conf() {
