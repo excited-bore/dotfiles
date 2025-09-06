@@ -23,9 +23,11 @@ if ! hash autokey-run &> /dev/null; then
         get-latest-releases-github https://github.com/autokey/autokey $temp 'common'
         get-latest-releases-github https://github.com/autokey/autokey $temp $gtk_qt
         (cd $temp
-        VERSION="$(command ls | sed -E 's/autokey-common_|_all.deb//g')"
-        sudo dpkg --install autokey-common_${VERSION}_all.deb
-        sudo apt --fix-broken install)
+        #VERSION="$(command ls | sed -E 's/autokey-common_|_all.deb//g')"
+        sudo dpkg --install *
+        sudo apt --fix-broken install
+        cd ..
+        command rm -rf $temp)
     
     elif [[ "$distro_base" == 'Arch' ]]; then
         if ! test -f checks/check_AUR.sh; then
