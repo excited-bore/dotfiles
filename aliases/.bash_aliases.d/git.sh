@@ -198,6 +198,9 @@ git-ssh-to-https() {
 
 alias git-list-remotes="git remote -v"
 
+# https://xnacly.me/posts/2023/corrupted-git/
+alias git-fix-empty-objects="find .git/objects -size 0 -delete; git pull"
+
 alias git-test-conn-github="ssh -vT git@github.com;"
 alias git-status="git status"
 #git-config-using-vars() { git config --global user.email \"$EMAIL\" && git config --global user.name \"$GITNAME\"; }
