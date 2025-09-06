@@ -77,7 +77,7 @@ hash go && gopath=$(go env | grep --color=never GOPATH | cut -d= -f2 | sed "s/'/
 
 echo "This next $(tput setaf 1)sudo$(tput sgr0) will check if something along the lines of '$gopath/bin' is being kept in /etc/sudoers";
 
-if test -f /etc/sudoers && hash go && ! sudo grep -q "$gopath/bin" /etc/sudoers; then
+if hash go &> /dev/null && ! sudo -n go help &> /dev/null; then
     readyn -p "Add ${RED}$gopath/bin${GREEN} to /etc/sudoers? (let go applications installed with 'go install' can be executed using sudo)?" ansr
     if [[ "$ansr" == 'y' ]]; then
         sudo sed -i 's,Defaults secure_path="\(.*\)",Defaults secure_path="\1:'"$gopath"'/bin/",g' /etc/sudoers

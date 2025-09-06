@@ -1,6 +1,6 @@
 # https://github.com/autokey/autokey
 
-if (! hash autokey &> /dev/null && ! [[ "$XDG_SESSION_TYPE" == 'wayland' ]]) || [[ "$XDG_SESSION_TYPE" == 'wayland' ]]; then 
+if hash autokey &> /dev/null || [[ "$XDG_SESSION_TYPE" == 'wayland' ]]; then 
     SYSTEM_UPDATED=TRUE
 fi
 
