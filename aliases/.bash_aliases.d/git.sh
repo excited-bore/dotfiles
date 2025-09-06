@@ -68,7 +68,10 @@ if hash wget &>/dev/null && hash jq &>/dev/null; then
                     nwreleases="$nwreleases $i" 
                 fi
             done
-            releases="$(echo $nwreleases | xargs)"
+            if test -n $nwreleases; then
+                unset releases
+                releases="$(echo $nwreleases | xargs)"
+            fi
         fi
         
         if hash fzf &>/dev/null; then
