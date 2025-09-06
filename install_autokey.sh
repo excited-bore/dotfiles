@@ -1,5 +1,9 @@
 # https://github.com/autokey/autokey
 
+if (! hash autokey &> /dev/null && ! [[ "$XDG_SESSION_TYPE" == 'wayland' ]]) || [[ "$XDG_SESSION_TYPE" == 'wayland' ]]; then 
+    SYSTEM_UPDATED=TRUE
+fi
+
 if ! test -f checks/check_all.sh; then
     if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
@@ -10,8 +14,9 @@ else
     . ./checks/check_all.sh
 fi
 
-
-if ! hash autokey-run &> /dev/null; then
+if [[ $XDG_SESSION_TYPE == 'wayland' ]]; then
+    echo "${YELLOW}Current session type - ${RED}Wayland${YELLOW} - is not supported by autokey${normal}" 
+elif ! hash autokey &> /dev/null; then
     if [[ "$distro_base" == 'Debian' ]]; then
         if ! test -f aliases/.bash_aliases.d/git.sh; then
             source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/git.sh) 
