@@ -49,3 +49,5 @@ if ! hash dotool &> /devv/null; then
         sudo systemctl restart udev 
     fi
 fi
+
+dotool --help

@@ -883,6 +883,21 @@ elif ([[ "$XDG_SESSION_TYPE" == 'x11' ]] && hash xclip &>/dev/null) || ([[ "$XDG
 
 fi
 
+# On GNOME-terminal, we can't rebind scroll line up/down to any other key other then ctrl+shift+up/down since it's hardcoded into gnome terminal
+# See, under 'Other': https://help.gnome.org/users/gnome-terminal/stable/adv-keyboard-shortcuts.html.en
+# Which is confusing when hopping between kitty or any other terminal emulator
+# So if dotool is installed, we use that to rebind Shift+alt+Up/Down
+if [[ -n "$GNOME_TERMINAL_SCREEN" || -n "$GNOME_TERMINAL_SERVICE" ]] && hash dotool &> /dev/null; then
+    bind -m emacs-standard -x '"\e[1;4A": "{ echo keydown ctrl+shift+up; } | dotool"'
+    bind -m vi-command -x '"\e[1;4A": "{ echo keydown ctrl+shift+up; } | dotool"'
+    bind -m vi-insert -x '"\e[1;4A": "{ echo keydown ctrl+shift+up; } | dotool"'
+
+    bind -m emacs-standard -x '"\e[1;4B": "{ echo keydown ctrl+shift+down; } | dotool"'
+    bind -m vi-command -x '"\e[1;4B": "{ echo keydown ctrl+shift+down; } | dotool"'
+    bind -m vi-insert -x '"\e[1;4B": "{ echo keydown ctrl+shift+down; } | dotool"'
+fi
+
+
 if hash autojump &>/dev/null; then
     # Ctrl-x Ctrl-j for autojump
     bind -m emacs-standard '"\C-x\C-j": "j \C-i"'
