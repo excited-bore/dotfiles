@@ -436,7 +436,6 @@ bind -m emacs-standard '"\e[1;4D": "\e[1;2B"'
 bind -m vi-command '"\e[1;4D": "\e[1;2B"'
 bind -m vi-insert '"\e[1;4D": "\e[1;2B"'
 
-
 # Arrow Key resets mark / selection
 
 bind -m emacs-standard '"\e[C": "\e104\e105"'
@@ -446,6 +445,46 @@ bind -m vi-insert '"\e[C": "\e104\e105"'
 bind -m emacs-standard '"\e[D": "\e103\e105"'
 bind -m vi-command '"\e[D": "\e103\e105"'
 bind -m vi-insert '"\e[D": "\e103\e105"'
+
+# PageUp/PageDown reset mark and are bound to regular PageUp/PageDown
+
+bind -m emacs-standard '"\e[5~": "\e104\e[5~"'
+bind -m vi-command '"\e[5~": "\e104\e[5~"'
+bind -m vi-insert '"\e[5~": "\e104\e[5~"'
+
+bind -m emacs-standard '"\e[6~": "\e104\e[6~"'
+bind -m vi-command '"\e[6~": "\e104\e[6~"'
+bind -m vi-insert '"\e[6~": "\e104\e[6~"'
+
+# Same for Ctrl-PageUp/PageDown 
+
+bind -m emacs-standard '"\e[5;5~": "\e104\e[5~"'
+bind -m vi-command '"\e[5;5~": "\e104\e[5~"'
+bind -m vi-insert '"\e[5;5~": "\e104\e[5~"'
+
+bind -m emacs-standard '"\e[6;5~": "\e104\e[6~"'
+bind -m vi-command '"\e[6;5~": "\e104\e[6~"'
+bind -m vi-insert '"\e[6;5~": "\e104\e[6~"'
+
+# Same for Shift-PageUp/PageDown 
+
+bind -m emacs-standard '"\e[5;2~": "\e104\e[5~"'
+bind -m vi-command '"\e[5;2~": "\e104\e[5~"'
+bind -m vi-insert '"\e[5;2~": "\e104\e[5~"'
+
+bind -m emacs-standard '"\e[6;2~": "\e104\e[6~"'
+bind -m vi-command '"\e[6;2~": "\e104\e[6~"'
+bind -m vi-insert '"\e[6;2~": "\e104\e[6~"'
+
+# Same for Alt-PageUp/PageDown 
+
+bind -m emacs-standard '"\e[5;3~": "\e104\e[5~"'
+bind -m vi-command '"\e[5;3~": "\e104\e[5~"'
+bind -m vi-insert '"\e[5;3~": "\e104\e[5~"'
+
+bind -m emacs-standard '"\e[6;3~": "\e104\e[6~"'
+bind -m vi-command '"\e[6;3~": "\e104\e[6~"'
+bind -m vi-insert '"\e[6;3~": "\e104\e[6~"'
 
 
 function self-insert-or-remove-region(){
