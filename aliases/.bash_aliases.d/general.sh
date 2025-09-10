@@ -1,4 +1,17 @@
 ## GENERAL ###
+
+# Background task peculiarity for gnome-terminal/xfce4-terminal
+# https://unix.stackexchange.com/questions/176839/closing-parent-processterminal-doesnt-close-a-specific-child-process
+
+# &, disown and nohup difference
+# https://unix.stackexchange.com/questions/3886/difference-between-nohup-disown-and
+
+# Ultimate process seperator
+# https://stackoverflow.com/questions/19955260/what-is-dev-null-in-bash/19956266#19956266
+
+# Deep dive into SIGTTIN/SIGTTOU
+# http://curiousthing.org/sigttin-sigttou-deep-dive-linux
+
 if ! type reade &> /dev/null && test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh; then
     . ~/.bash_aliases.d/00-rlwrap_scripts.sh
 fi
