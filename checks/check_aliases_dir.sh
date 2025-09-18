@@ -51,6 +51,10 @@ if ! [ -f /root/.bash_aliases ]; then
     fi 
 fi
 
+if ! [ -d /root/.bash_aliases.d/ ]; then
+    sudo mkdir /root/.bash_aliases.d/
+fi
+
 if ! sudo grep -q ".bash_aliases" /root/.bashrc; then
     printf "[ -f ~/.bash_aliases ] && source ~/.bash_aliases \n" | sudo tee -a /root/.bashrc &> /dev/null
 fi
