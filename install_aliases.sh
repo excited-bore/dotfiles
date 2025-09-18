@@ -137,7 +137,7 @@ if [[ $ansr == "y" ]]; then
                             cp_xcp='cpg -g'
                         fi
                     elif [[ "$cp_xcpq" == 'xcp' ]]; then
-                        cp_xcp='xcp --glob --progress-bar'
+                        cp_xcp='xcp --glob'
                     fi
                 fi
             else
