@@ -75,11 +75,11 @@ if test -z "$CP_ALIAS_CHECKED" && (hash xcp &> /dev/null || hash cpg &> /dev/nul
     else
         echo "Next ${RED}sudo${normal} will check for installed cp alternatives and whether their available for root as well as the user"
         sudo ls &> /dev/null
-        if (hash cpg &> /dev/null && ! [[ "$((sudo -n cpg)2>&1)" =~ 'not found' ]]); then
+        if (hash cpg &> /dev/null && ! [[ "$((sudo -n 'cpg') 2>&1)" =~ 'not found' ]]); then
             alias cp='cpg -fgv'
         fi
-        if hash xcp &> /dev/null && ! [[ "$((sudo -n xcp)2>&1)" =~ 'not found' ]]; then
-            alias cp='command xcp' 
+        if hash xcp &> /dev/null && ! [[ "$((sudo -n 'xcp') 2>&1)" =~ 'not found' ]]; then
+            alias cp='xcp' 
         fi
     fi
     CP_ALIAS_CHECKED='y'
