@@ -1,4 +1,5 @@
 #!/bin/bash
+# Shebang only there to trigger nvim's language server (if installed)
 
 # Bash_aliases at ~/.bash_aliases.d/
 # global bashrc -> /etc/bash.bashrc
@@ -199,25 +200,31 @@ bind -m vi-command '"\e102": exchange-point-and-mark'
 bind -x '"\e113": "move-region left"'  
 bind -x '"\e114": "move-region right"'  
 
-READLINE_MARK_SET=''
+if ! type reset-mark &> /dev/null; then
+    READLINE_MARK_SET=''
 
-function reset-mark(){
-   READLINE_MARK=$READLINE_POINT 
-   unset READLINE_MARK_SET
-   if [[ -n $CTRL_ALT_LEFTM ]]; then
-       bind -m $CTRL_ALT_KM $CTRL_ALT_LEFTX "\"\e[1;3D\": \"$CTRL_ALT_LEFTM\""
-       unset CTRL_ALT_LEFTM CTRL_ALT_LEFTX 
-   fi
-   if [[ -n $CTRL_ALT_RIGHTM ]]; then
-       bind -m $CTRL_ALT_KM $CTRL_ALT_RIGHTX "\"\e[1;3C\": \"$CTRL_ALT_RIGHTM\""
-       unset CTRL_ALT_RIGHTM CTRL_ALT_RIGHTX 
-   fi
-   if [[ -n $BACKSM ]]; then
-       bind -m $CTRL_ALT_KM $BACKSX "\"\e[3~\": \"$BACKSM\""
-       unset BACKSM BACKSX 
-   fi
-    
-}
+    function reset-mark(){
+       READLINE_MARK=$READLINE_POINT 
+       unset READLINE_MARK_SET
+       if [[ -n $CTRL_ALT_LEFTM ]]; then
+           bind -m $CTRL_ALT_KM $CTRL_ALT_LEFTX "\"\e[1;3D\": \"$CTRL_ALT_LEFTM\""
+           unset CTRL_ALT_LEFTM CTRL_ALT_LEFTX 
+       fi
+       if [[ -n $CTRL_ALT_RIGHTM ]]; then
+           bind -m $CTRL_ALT_KM $CTRL_ALT_RIGHTX "\"\e[1;3C\": \"$CTRL_ALT_RIGHTM\""
+           unset CTRL_ALT_RIGHTM CTRL_ALT_RIGHTX 
+       fi
+       if [[ -n $BACKSM ]]; then
+           bind -m $CTRL_ALT_KM $BACKSX "\"\e[3~\": \"$BACKSM\""
+           unset BACKSM BACKSX 
+       fi
+        
+    }
+
+    bind -m emacs-standard -x '"\e105": reset-mark'
+    bind -m vi-command -x '"\e105": reset-mark'
+    bind -m vi-insert -x '"\e105": reset-mark'
+fi
 
 function remove-region(){
     if [[ $READLINE_POINT -lt $READLINE_MARK ]]; then
@@ -366,11 +373,6 @@ bind -m emacs-standard -x '"\e101": set-mark-and-bind-move-region'
 bind -m vi-command -x '"\e101": set-mark-and-bind-move-region'
 bind -m vi-insert -x '"\e101": set-mark-and-bind-move-region'
 
-bind -m emacs-standard -x '"\e105": reset-mark'
-bind -m vi-command -x '"\e105": reset-mark'
-bind -m vi-insert -x '"\e105": reset-mark'
-bind -x '"\e106": echo "Mark: $READLINE_MARK"; echo "Point: $READLINE_POINT"'
-
 bind -m emacs-standard '"\e103": backward-char'
 bind -m vi-insert '"\e103": backward-char'
 bind -m vi-command '"\e103": backward-char'
@@ -446,45 +448,6 @@ bind -m emacs-standard '"\e[D": "\e103\e105"'
 bind -m vi-command '"\e[D": "\e103\e105"'
 bind -m vi-insert '"\e[D": "\e103\e105"'
 
-# PageUp/PageDown reset mark and are bound to regular PageUp/PageDown
-
-bind -m emacs-standard '"\e[5~": "\e104\e[5~"'
-bind -m vi-command '"\e[5~": "\e104\e[5~"'
-bind -m vi-insert '"\e[5~": "\e104\e[5~"'
-
-bind -m emacs-standard '"\e[6~": "\e104\e[6~"'
-bind -m vi-command '"\e[6~": "\e104\e[6~"'
-bind -m vi-insert '"\e[6~": "\e104\e[6~"'
-
-# Same for Ctrl-PageUp/PageDown 
-
-bind -m emacs-standard '"\e[5;5~": "\e104\e[5~"'
-bind -m vi-command '"\e[5;5~": "\e104\e[5~"'
-bind -m vi-insert '"\e[5;5~": "\e104\e[5~"'
-
-bind -m emacs-standard '"\e[6;5~": "\e104\e[6~"'
-bind -m vi-command '"\e[6;5~": "\e104\e[6~"'
-bind -m vi-insert '"\e[6;5~": "\e104\e[6~"'
-
-# Same for Shift-PageUp/PageDown 
-
-bind -m emacs-standard '"\e[5;2~": "\e104\e[5~"'
-bind -m vi-command '"\e[5;2~": "\e104\e[5~"'
-bind -m vi-insert '"\e[5;2~": "\e104\e[5~"'
-
-bind -m emacs-standard '"\e[6;2~": "\e104\e[6~"'
-bind -m vi-command '"\e[6;2~": "\e104\e[6~"'
-bind -m vi-insert '"\e[6;2~": "\e104\e[6~"'
-
-# Same for Alt-PageUp/PageDown 
-
-bind -m emacs-standard '"\e[5;3~": "\e104\e[5~"'
-bind -m vi-command '"\e[5;3~": "\e104\e[5~"'
-bind -m vi-insert '"\e[5;3~": "\e104\e[5~"'
-
-bind -m emacs-standard '"\e[6;3~": "\e104\e[6~"'
-bind -m vi-command '"\e[6;3~": "\e104\e[6~"'
-bind -m vi-insert '"\e[6;3~": "\e104\e[6~"'
 
 
 function self-insert-or-remove-region(){
@@ -926,15 +889,17 @@ fi
 # See, under 'Other': https://help.gnome.org/users/gnome-terminal/stable/adv-keyboard-shortcuts.html.en
 # Which is confusing when hopping between kitty or any other terminal emulator
 # So if dotool is installed, we use that to rebind Shift+alt+Up/Down
-if [[ -n "$GNOME_TERMINAL_SCREEN" || -n "$GNOME_TERMINAL_SERVICE" ]] && hash dotool &> /dev/null; then
-    bind -m emacs-standard -x '"\e[1;4A": "{ echo keydown ctrl+shift+up; } | dotool"'
-    bind -m vi-command -x '"\e[1;4A": "{ echo keydown ctrl+shift+up; } | dotool"'
-    bind -m vi-insert -x '"\e[1;4A": "{ echo keydown ctrl+shift+up; } | dotool"'
 
-    bind -m emacs-standard -x '"\e[1;4B": "{ echo keydown ctrl+shift+down; } | dotool"'
-    bind -m vi-command -x '"\e[1;4B": "{ echo keydown ctrl+shift+down; } | dotool"'
-    bind -m vi-insert -x '"\e[1;4B": "{ echo keydown ctrl+shift+down; } | dotool"'
-fi
+# Nevermind, it's super laggy
+#if [[ -n "$GNOME_TERMINAL_SCREEN" || -n "$GNOME_TERMINAL_SERVICE" ]] && hash dotool &> /dev/null; then
+#    bind -m emacs-standard -x '"\e[1;4A": "{ echo keydown ctrl+shift+up; } | dotool"'
+#    bind -m vi-command -x '"\e[1;4A": "{ echo keydown ctrl+shift+up; } | dotool"'
+#    bind -m vi-insert -x '"\e[1;4A": "{ echo keydown ctrl+shift+up; } | dotool"'
+#
+#    bind -m emacs-standard -x '"\e[1;4B": "{ echo keydown ctrl+shift+down; } | dotool"'
+#    bind -m vi-command -x '"\e[1;4B": "{ echo keydown ctrl+shift+down; } | dotool"'
+#    bind -m vi-insert -x '"\e[1;4B": "{ echo keydown ctrl+shift+down; } | dotool"'
+#fi
 
 
 if hash autojump &>/dev/null; then
