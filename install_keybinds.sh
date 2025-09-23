@@ -25,15 +25,18 @@ fi
 # Shell-keybinds
 
 binds=$SCRIPT_DIR/keybinds/.inputrc
+binds0=$SCRIPT_DIR/keybinds/.keybinds.d/00-bind-empty.bash
 binds1=$SCRIPT_DIR/keybinds/.keybinds.d/01-cdw.bash
 binds2=$SCRIPT_DIR/keybinds/.keybinds.d/02-keybinds.bash
 binds3=$SCRIPT_DIR/keybinds/.keybinds
 if ! [[ -f $binds ]]; then
     tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.inputrc
+    tmp0=$(mktemp) && curl -o $tmp0 https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds.d/00-binds-empty.bash
     tmp1=$(mktemp) && curl -o $tmp1 https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds.d/01-cdw.bash
     tmp2=$(mktemp) && curl -o $tmp2 https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds.d/02-keybinds.bash
     tmp3=$(mktemp) && curl -o $tmp3 https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds
     binds=$tmp
+    binds0=$tmp0
     binds1=$tmp1
     binds2=$tmp2
     binds3=$tmp3
@@ -47,7 +50,8 @@ shell-keybinds_r() {
     if [[ -f /root/.environment.env ]]; then
         sudo sed -i 's|#export INPUTRC.*|export INPUTRC=~/.inputrc|g' /root/.environment.env
     fi
-    
+   
+    sudo cp $binds0 /root/.keybinds.d/
     sudo cp $binds1 /root/.keybinds.d/
     sudo cp $binds2 /root/.keybinds.d/
     sudo cp $binds3 /root/.keybinds
@@ -64,8 +68,8 @@ shell-keybinds_r() {
 
     # X based settings is generally not for root and will throw errors
     echo "Next $(tput setaf 1)sudo$(tput sgr0) will check whether 'setxkbmap *' is part of /root/.keybinds.d/keybinds.bash and comment this line out to prevent errors"
-    if sudo grep -q '^setxkbmap' /root/.keybinds.d/keybinds.bash; then
-        sudo sed -i 's|^setxkbmap|#setxkbmap|g' /root/.keybinds.d/keybinds.bash
+    if sudo grep -q '^setxkbmap' /root/.keybinds.d/02-keybinds.bash; then
+        sudo sed -i 's|^setxkbmap|#setxkbmap|g' /root/.keybinds.d/02-keybinds.bash
     fi
 }
 
@@ -143,6 +147,7 @@ shell-keybinds() {
         fi
     fi
 
+    cp $binds0 ~/.keybinds.d/
     cp $binds1 ~/.keybinds.d/
     cp $binds2 ~/.keybinds.d/
     cp $binds3 ~/.keybinds
@@ -160,10 +165,10 @@ shell-keybinds() {
         sed -i 's|#export INPUTRC.*|export INPUTRC=~/.inputrc|g' ~/.environment.env
     fi
     unset vimde vivisual xterm
-    yes-edit-no -Y "YELLOW" -f shell-keybinds_r -g "$binds $binds3 $binds1 $binds2" -p "Install .inputrc and keybinds.bash at /root/ and /root/.keybinds.d/?"
+    yes-edit-no -Y "YELLOW" -f shell-keybinds_r -g "$binds $binds3 $binds0 $binds1 $binds2" -p "Install ${CYAN}.inputrc${GREEN} at ${YELLOW}/root/${GREEN} and ${CYAN}00-bind-empty.bash${GREEN}, ${CYAN}01-cdw.bash${GREEN} and ${CYAN}02-keybinds.bash${GREEN} at ${YELLOW}/root/.keybinds.d/${GREEN}?"
 }
 
-yes-edit-no -f shell-keybinds -g "$binds $binds3 $binds1 $binds2" -p "Install .inputrc and keybinds.bash at ~/ and ~/.keybinds.d/? (keybinds configuration)"
+yes-edit-no -f shell-keybinds -g "$binds $binds3 $binds0 $binds1 $binds2" -p "Install ${CYAN}.inputrc${GREEN} at ${BLUE}$HOME${GREEN} and ${CYAN}00-bind-empty.bash${GREEN}, ${CYAN}01-cdw.bash${GREEN} and ${CYAN}02-keybinds.bash${GREEN} at ${BLUE}$HOME/.keybinds.d/${GREEN}? (keybinds configuration)"
 
 
 if [[ "$DESKTOP_SESSION" == 'xfce' ]]; then
@@ -179,7 +184,7 @@ if [[ "$DESKTOP_SESSION" == 'xfce' ]]; then
             fi
              
             reade -Q 'GREEN' -i "$termems" -p 'Which emulator?: ' emulatr
-            if test -n "$emulatr"; then
+            if [[ -n "$emulatr" ]]; then
                 echo "TerminalEmulator=$emulatr" >> $XDG_CONFIG_HOME/xfce4/helpers.rc 
             fi
         fi
@@ -199,7 +204,7 @@ if [[ "$DESKTOP_SESSION" == 'xfce' ]]; then
             emulatr=$(grep --color=never 'TerminalEmulator' $XDG_CONFIG_HOME/xfce4/helpers.rc | cut -d= -f2)
             readyn -p "Set keybind for the default terminal emulator set for xfce4 - ${CYAN}$emulatr${GREEN}?" setermemkeybind
         else
-            if test -n "$emulatr"; then
+            if [[ -n "$emulatr" ]]; then
                 value="$emulatr"
             else
                 termems="xfce4-terminal" 
@@ -219,7 +224,7 @@ if [[ "$DESKTOP_SESSION" == 'xfce' ]]; then
             list-binds-xfce4
             reade -Q 'GREEN' -i 'Control-Alt-t Windowkey-t' -p 'What keybind?: ' keyb
                 
-            while test -n "$keyb"; do 
+            while [[ -n "$keyb" ]]; do 
                 usedkeys=$(xfconf-query -c xfce4-keyboard-shortcuts -p /commands/custom -l -v | awk '{print $1;}' | sed 's|/commands/custom/||g; s|<Primary>|<Control>|g; s|<Super>|<Windowkey>|g; s|><|-|g; s|<||g; s|>|-|g;' )
                 
                 for i in ${usedkeys[@]}; do
