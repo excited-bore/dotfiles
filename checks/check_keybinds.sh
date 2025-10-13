@@ -29,6 +29,25 @@ if ! grep -q "source ~/.keybinds" ~/.bashrc; then
     fi
 fi
 
+if ! grep -q "source ~/.keybinds" ~/.zshrc; then
+    if grep -q "\[ -f ~/.zsh_aliases \] \&\& source ~/.zsh_aliases" ~/.zshrc || grep -q '^if [ -f ~/.zsh_aliases ]; then' ~/.zshrc; then
+        if grep -q "\[ -f ~/.zsh_aliases \] \&\& source ~/.zsh_aliases" ~/.zshrc; then
+            sed -i 's|\(\[ -f ~/.keybinds \] \&\& source ~/.keybinds\)|\1\n\n[ -f ~/.keybinds \] \&\& source ~/.keybinds|' ~/.zshrc 
+        else
+            sed -i -e 's|\(if \[ -f \~/.zsh_aliases \]; then\)|#This is commented out since there'\''s a one-liner which sources ~/.zsh_aliases later down ~/.zshrc\n\n#\1|g' -e 's|\(^\s*\. ~/.zsh_aliases\)|#\1|' ~/.zshrc
+            ubzshrcfi="$(awk '/\. ~\/.zsh_aliases/{print NR+1};' ~/.zshrc)" 
+            sed -i "$ubzshrcfi s/^fi/#fi/" ~/.zshrc   
+            unset ubzshrcfi 
+            sed -i 's|\(\^if [ -f ~/.zsh_aliases ]; then\)|[ -f ~/.zsh_completion \] \&\& source ~/.zsh_completion\n\n\1|' ~/.zshrc 
+            printf '[ -f ~/.zsh_aliases ] && source ~/.zsh_aliases\n\n' >> ~/.zshrc
+            echo '[ -f ~/.keybinds ] && source ~/.keybinds' >> ~/.zshrc
+        fi
+    else
+        printf "\n[ -f ~/.zsh_completion ] && source ~/.zsh_completion\n\n" >> ~/.zshrc
+    fi
+fi
+
+
 echo "Next $(tput setaf 1)sudo$(tput sgr0) will install '.keybinds.d' in /root and source it with '/root/.keybinds' in /root/.bashrc"
 
 if ! test -f /root/.keybinds; then
@@ -61,6 +80,25 @@ if ! sudo grep -q "source ~/.keybinds" /root/.bashrc; then
         printf "\n[ -f ~/.bash_completion ] && source ~/.bash_completion\n\n" | sudo tee -a /root/.bashrc
     fi
 fi
+
+if ! sudo grep -q "source ~/.keybinds" /root/.zshrc; then
+    if sudo grep -q "\[ -f ~/.zsh_aliases \] \&\& source ~/.zsh_aliases" /root/.zshrc || sudo grep -q '^if [ -f ~/.zsh_aliases ]; then' /root/.zshrc; then
+        if sudo grep -q "\[ -f ~/.zsh_aliases \] \&\& source ~/.zsh_aliases" /root/.zshrc; then
+            sudo sed -i 's|\(\[ -f ~/.keybinds \] \&\& source ~/.keybinds\)|\1\n\n[ -f ~/.keybinds \] \&\& source ~/.keybinds|' /root/.zshrc 
+        else
+            sudo sed -i -e 's|\(if \[ -f \~/.zsh_aliases \]; then\)|#This is commented out since there'\''s a one-liner which sources ~/.zsh_aliases later down ~/.zshrc\n\n#\1|g' -e 's|\(^\s*\. ~/.zsh_aliases\)|#\1|' /root/.zshrc
+            ubzshrcfi="$(sudo awk '/\. ~\/.zsh_aliases/{print NR+1};' /root/.zshrc)" 
+            sudo sed -i "$ubzshrcfi s/^fi/#fi/" /root/.zshrc   
+            unset ubzshrcfi 
+            sudo sed -i 's|\(\^if [ -f ~/.zsh_aliases ]; then\)|[ -f ~/.zsh_completion \] \&\& source ~/.zsh_completion\n\n\1|' /root/.zshrc 
+            printf '[ -f ~/.zsh_aliases ] && source ~/.zsh_aliases\n\n' | sudo tee -a /root/.zshrc
+            echo '[ -f ~/.keybinds ] && source ~/.keybinds' | sudo tee -a /root/.zshrc
+        fi
+    else
+        printf "\n[ -f ~/.zsh_completion ] && source ~/.zsh_completion\n\n" | sudo tee -a /root/.zshrc
+    fi
+fi
+
 
 # Check one last time if ~/.bash_preexec - for both $USER and root - is the last line in their ~/.bash_profile and ~/.bashrc
 

@@ -1,11 +1,10 @@
 SYSTEM_UPDATED="TRUE"
 
 if ! test -f checks/check_all.sh; then
-    if type curl &>/dev/null; then
+    if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-        return 1 || exit 1
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
     . ./checks/check_all.sh
@@ -20,6 +19,8 @@ fi
 #[[ "$(type sudo)" =~ 'aliased' ]] && unalias sudo
 #[[ "$(type cp)" =~ 'aliased' ]] &&
 #    unalias cp && alias cp='cp -fv'
+
+reade -Q 'GREEN' -i 'both bash zsh' -p "Install aliases and functions for both or either ${CYAN}BASH${GREEN} and/or ${CYAN}ZSH${GREEN}?" bash_zsh
 
 
 SCRIPT_DIR=$(get-script-dir)
@@ -61,21 +62,31 @@ csysm() {
 }
 yes-edit-no -y -f csysm -g "$csysm" -p "Install check_system.sh at ~/.bash_aliases.d/ (do a checkup on what kind of system this is - used for later scripts)?" 
 
-genr=aliases/.bash_aliases.d/general.sh
-genrc=aliases/.bash_completion.d/general
+genrb=aliases/.bash_aliases.d/general.sh
+genrbc=aliases/.bash_completion.d/general
 if ! test -f aliases/.bash_aliases.d/general.sh; then
     tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/general.sh
     tmp1=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliasases/.bash_completion.d/general
-    genr=$tmp
-    genrc=$tmp1
+    genrb=$tmp
+    genrbc=$tmp1
 fi
+
+genrz=aliases/.zsh_aliases.d/general.sh
+genrzc=aliases/.zsh_completion.d/general
+if ! test -f aliases/.zsh_aliases.d/general.sh; then
+    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.zsh_aliases.d/general.sh
+    tmp1=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliasases/.zsh_completion.d/general
+    genrz=$tmp
+    genrzc=$tmp1
+fi
+
 
 readyn -p "Install general.sh at ~/? (aliases related to general actions - cd/mv/cp/rm + completion script replacement for 'read -e')" ansr
 
 if [[ $ansr == "y" ]]; then
-    if test -f ~/.environment; then
-        sed -i 's|^export TRASH_BIN_LIMIT=|export TRASH_BIN_LIMIT=|g' ~/.environment
-    fi
+    if [[ -f ~/.environment.env ]]; then
+        sed -i 's|^export TRASH_BIN_LIMIT=|export TRASH_BIN_LIMIT=|g' ~/.environment.env
+    i
 
     #if type gio &> /dev/null; then
     #    readyn -p "Set cp/mv (when overwriting) to backup files? (will also trash backups) "" ansr

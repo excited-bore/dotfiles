@@ -1,0 +1,11 @@
+_trash() {
+  # Get current word being completed
+  local curcontext="$curcontext" state line
+  local -a trash_items
+
+  # Get the list of trashed items (URIs)
+  trash_items=(${(f)"$(gio trash --list | awk '{print $1}' | sed 's|trash:///|trash\\:///|g')"})
+
+  _describe 'trash items' trash_items
+}
+

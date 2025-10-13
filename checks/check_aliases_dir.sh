@@ -1,4 +1,3 @@
-
 if ! [ -f ~/.bash_aliases ]; then
     if ! test -f aliases/.bash_aliases; then
         wget -O ~/.bash_aliases https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases  
@@ -11,7 +10,7 @@ if ! [ -d ~/.bash_aliases.d/ ]; then
     mkdir ~/.bash_aliases.d/
 fi
 
-if test -f ~/.bashrc && ! grep -q '\[ -f ~/.bash_aliases \] && source ~/.bash_aliases' ~/.bashrc; then
+if [[ -f ~/.bashrc ]] && ! grep -q '\[ -f ~/.bash_aliases \] && source ~/.bash_aliases' ~/.bashrc; then
     if grep -q '^if \[ -f ~/.bash_aliases \]; then' ~/.bashrc; then
         sed -i -e 's|\(if \[ -f \~/.bash_aliases \]; then\)|#This is commented out since there'\''s a one-liner which sources ~/.bash_aliases later down ~/.bashrc\n\n#\1|g' -e 's|\(^\s*\. ~/.bash_aliases\)|#\1|' ~/.bashrc
         ubbashrcfi="$(awk '/\. ~\/.bash_aliases/{print NR+1};' ~/.bashrc)" 
@@ -23,6 +22,33 @@ if test -f ~/.bashrc && ! grep -q '\[ -f ~/.bash_aliases \] && source ~/.bash_al
         sed -i 's|\(\[ -f \~/.keybinds \] \&\& source \~/.keybinds\)|\[ -f \~/.bash_aliases \] \&\& source \~/.bash_aliases\n\n\1|g' ~/.bashrc
     else
         echo '[ -f ~/.bash_aliases ] && source ~/.bash_aliases' >> ~/.bashrc
+    fi
+fi
+
+if ! [ -f ~/.zsh_aliases ]; then
+    if ! [[ -f aliases/.zsh_aliases ]]; then
+        wget -O ~/.zsh_aliases https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.zsh_aliases  
+    else
+        cp aliases/.zsh_aliases ~/
+    fi 
+fi
+
+if ! [ -d ~/.zsh_aliases.d/ ]; then
+    mkdir ~/.zsh_aliases.d/
+fi
+
+if [[ -f ~/.zshrc ]] && ! grep -q '\[ -f ~/.zsh_aliases \] && source ~/.zsh_aliases' ~/.zshrc; then
+    if grep -q '^if \[ -f ~/.zsh_aliases \]; then' ~/.zshrc; then
+        sed -i -e 's|\(if \[ -f \~/.zsh_aliases \]; then\)|#This is commented out since there'\''s a one-liner which sources ~/.zsh_aliases later down ~/.zshrc\n\n#\1|g' -e 's|\(^\s*\. ~/.zsh_aliases\)|#\1|' ~/.zshrc
+        ubzshrcfi="$(awk '/\. ~\/.zsh_aliases/{print NR+1};' ~/.zshrc)" 
+        sed -i "$ubzshrcfi s/^fi/#fi/" ~/.zshrc   
+        unset ubzshrcfi 
+    fi
+   
+    if grep -q '\[ -f ~/.keybinds \]' ~/.zshrc; then
+        sed -i 's|\(\[ -f \~/.keybinds \] \&\& source \~/.keybinds\)|\[ -f \~/.zsh_aliases \] \&\& source \~/.zsh_aliases\n\n\1|g' ~/.zshrc
+    else
+        echo '[ -f ~/.zsh_aliases ] && source ~/.zsh_aliases' >> ~/.zshrc
     fi
 fi
 
@@ -73,6 +99,38 @@ if sudo test -f /root/.bashrc && ! sudo grep -q '\[ -f ~/.bash_aliases \] && sou
         echo '[ -f ~/.bash_aliases ] && source ~/.bash_aliases' | sudo tee -a /root/.bashrc &> /dev/null
     fi
 fi
+
+if ! [ -f /root/.zsh_aliases ]; then
+    if ! test -f aliases/.zsh_aliases; then
+        sudo wget -O /root/.zsh_aliases https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.zsh_aliases  
+    else
+        sudo cp aliases/.zsh_aliases /root/
+    fi 
+fi
+
+if ! [ -d /root/.zsh_aliases.d/ ]; then
+    sudo mkdir /root/.zsh_aliases.d/
+fi
+
+if ! sudo grep -q ".zsh_aliases" /root/.zshrc; then
+    printf "[ -f ~/.zsh_aliases ] && source ~/.zsh_aliases \n" | sudo tee -a /root/.zshrc &> /dev/null
+fi
+
+if sudo test -f /root/.zshrc && ! sudo grep -q '\[ -f ~/.zsh_aliases \] && source ~/.zsh_aliases' /root/.zshrc; then
+    if sudo grep -q '^if \[ -f ~/.zsh_aliases \]; then' /root/.zshrc; then
+        sudo sed -i -e 's|\(if \[ -f \~/.zsh_aliases \]; then\)|#This is commented out since there'\''s a one-liner which sources ~/.zsh_aliases later down ~/.zshrc\n\n#\1|g' -e 's|\(^\s*\. ~/.zsh_aliases\)|#\1|' /root/.zshrc
+        ubzshrcfi="$(sudo awk '/\. ~\/.zsh_aliases/{print NR+1};' /root/.zshrc)" 
+        sudo sed -i "$ubzshrcfi s/^fi/#fi/" /root/.zshrc   
+        unset ubzshrcfi 
+    fi
+   
+    if sudo grep -q '\[ -f ~/.keybinds \]' /root/.zshrc; then
+        sudo sed -i 's|\(\[ -f \~/.keybinds \] \&\& source \~/.keybinds\)|\[ -f \~/.zsh_aliases \] \&\& source \~/.zsh_aliases\n\n\1|g' /root/.zshrc
+    else
+        echo '[ -f ~/.zsh_aliases ] && source ~/.zsh_aliases' | sudo tee -a /root/.zshrc &> /dev/null
+    fi
+fi
+
 
 if ! test -f ./checks/check_bash_source_order.sh; then
     if hash curl &> /dev/null; then
