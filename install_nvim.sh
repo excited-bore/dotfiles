@@ -514,26 +514,26 @@ nvim +checkhealth
 echo "Install Completion language plugins with ':CocInstall coc-..' / Update with :CocUpdate"
 echo "Check installed nvim plugins with 'Lazy' / Check installed vim plugins with 'PlugInstalled' (only work on nvim and vim respectively)"
 
-file=vim/.bash_aliases.d/vim_nvim.sh
+file=vim/.aliases.d/vim_nvim.sh
 file1=vim/.bash_completion.d/vim_nvim
-if ! test -d vim/.bash_aliases.d/ || ! test -d vim/.bash_completion.d/; then
-    tmp=$(mktemp) && wget-aria-name $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/vim/.bash_aliases.d/vim_nvim.sh
+if ! test -d vim/.aliases.d/ || ! test -d vim/.bash_completion.d/; then
+    tmp=$(mktemp) && wget-aria-name $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/vim/.aliases.d/vim_nvim.sh
     tmp1=$(mktemp) && wget-aria-name $tmp1 https://raw.githubusercontent.com/excited-bore/dotfiles/main/vim/.bash_completion.d/vim_nvim
     file=$tmp
     file1=$tmp1
 fi
 
 vimsh_r() {
-    sudo cp $file /root/.bash_aliases.d/
+    sudo cp $file /root/.aliases.d/
     sudo cp $file1 /root/.bash_completion.d/
 }
 
 vimsh() {
-    cp $file ~/.bash_aliases.d/
+    cp $file ~/.aliases.d/
     cp $file1 ~/.bash_completion.d/
-    yes-edit-no -f vimsh_r -g "$file $file1" -p "Install vim aliases at /root/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)?"
+    yes-edit-no -f vimsh_r -g "$file $file1" -p "Install vim aliases at /root/.aliases.d/ (and completions at ~/.bash_completion.d/)?"
 }
-yes-edit-no -f vimsh -g "$file $file1" -p "Install vim aliases at ~/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)?"
+yes-edit-no -f vimsh -g "$file $file1" -p "Install vim aliases at ~/.aliases.d/ (and completions at ~/.bash_completion.d/)?"
 
 if ! hash nvimpager &>/dev/null; then
     readyn -n -p "Install nvimpager?" vimrc

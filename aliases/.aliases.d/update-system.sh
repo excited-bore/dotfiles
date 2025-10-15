@@ -1,17 +1,17 @@
-if ! type reade &> /dev/null && test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh; then
-    . ~/.bash_aliases.d/00-rlwrap_scripts.sh
+if ! type reade &> /dev/null && test -f ~/.aliases.d/00-rlwrap_scripts.sh; then
+    . ~/.aliases.d/00-rlwrap_scripts.sh
 fi 
 
-if ! type reade &> /dev/null && test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
-    . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
+if ! type reade &> /dev/null && test -f aliases/.aliases.d/00-rlwrap_scripts.sh; then
+    . ./aliases/.aliases.d/00-rlwrap_scripts.sh
 fi 
 
-if ! type remove-kernels &> /dev/null && test -f ~/.bash_aliases.d/update-kernel.sh; then
-    . ~/.bash_aliases.d/update-kernel.sh
+if ! type remove-kernels &> /dev/null && test -f ~/.aliases.d/update-kernel.sh; then
+    . ~/.aliases.d/update-kernel.sh
 fi 
 
-if ! type remove-kernels &> /dev/null && test -f aliases/.bash_aliases.d/update-kernel.sh; then
-    . ./aliases/.bash_aliases.d/update-kernel.sh
+if ! type remove-kernels &> /dev/null && test -f aliases/.aliases.d/update-kernel.sh; then
+    . ./aliases/.aliases.d/update-kernel.sh
 fi 
 
 #if hash pamac &> /dev/null && grep -q '#EnableAUR' /etc/pamac.conf; then
@@ -131,7 +131,7 @@ function update-system() {
     
     local hdrs
 
-    if type timedatectl &> /dev/null && ! [[ "$(timedatectl show | grep '^NTP' | head -n 1 | awk 'BEGIN { FS = "=" } ; {print $2}')" == "yes" ]]; then 
+    if hash timedatectl &>/dev/null && ! [[ "$(timedatectl show | grep '^NTP' | head -n 1 | awk 'BEGIN { FS = "=" } ; {print $2}')" == "yes" ]]; then 
         readyn -p "Timedate NTP not set (Automatic timesync). This can cause issues with syncing to repositories. Activate it?" set_ntp
         if [[ "$set_ntp" == "y" ]]; then
             eval "sudo timedatectl set-ntp true"
@@ -155,7 +155,7 @@ function update-system() {
                 brew install wget 
             fi
         fi
-    elif [[ $machine == 'Windows' ]] && [[ $win_bash_shell == 'Git' ]] && ! test -d "/c/cygwin$ARCH_WIN" && ! test -d '/c/git-sdk-32' && ! type wsl &> /dev/null; then
+    elif [[ $machine == 'Windows' ]] && [[ $win_bash_shell == 'Git' ]] && ! test -d "/c/cygwin$ARCH_WIN" && ! test -d '/c/git-sdk-32' && ! hash wsl &>/dev/null; then
         printf "${GREEN}Git bash is an environment without a package manager.\n\t - Cygwin is a collection of UNIX related tools (with a pm if you install 'apt-cyg')\n\t- Git SDK for windows comes with pacman (arch package manager)\n${normal}"
         reade -Q 'CYAN' -i 'wsl sdk cyg n' -p 'Install WSL, git SDK, Cygwin? [Wsl/sdk/cyg/n]: ' cyg
         if [[ "$cyg" == 'cyg' ]]; then
@@ -189,9 +189,9 @@ function update-system() {
         
         sudo softwareupdate -i -a
        
-        if hash brew &> /dev/null; then
+        if hash brew &>/dev/null; then
             pac=brew       
-            if hash yes &> /dev/null && test -n "$YES" ;then
+            if hash yes &>/dev/null && test -n "$YES" ;then
                 yes | brew update  
                 yes | brew upgrade 
             else
@@ -531,7 +531,7 @@ function update-system() {
     
     unset hdrs hdrs_ins 
 
-    if type flatpak &> /dev/null; then
+    if hash flatpak &>/dev/null; then
 	if test -n "$YES"; then 
             flatpak update --assumeyes
         else
@@ -543,7 +543,7 @@ function update-system() {
         YES="--auto" 
     fi
 
-    if test -z "$NOGUI" && type snap &> /dev/null; then
+    if test -z "$NOGUI" && hash snap &>/dev/null; then
 	readyn $YES -p "Update (refresh) snap packages?" snaprfrsh
 	if [[ "$snaprfrsh" == 'y' ]]; then 
             snap refresh
@@ -574,11 +574,11 @@ function update-system() {
     fi
     unset up_gpg gpg_up
 
-    if type pipx &> /dev/null || type npm &> /dev/null || type gem &> /dev/null || type cargo &> /dev/null; then 
+    if hash pipx &>/dev/null || hash npm &>/dev/null || hash gem &>/dev/null || hash cargo &>/dev/null; then 
         readyn $YES --no -p "${normal}Update ${CYAN}packages for development package-managers - pipx, npm, gem, cargo...${normal} ${MAGENTA}(WARNING: this could take a lot longer relative to regular pm's)${YELLOW}" "y" dev_up
         if [[ "$dev_up" == "y" ]]; then
             
-            if type pipx &> /dev/null; then
+            if hash pipx &> /dev/null; then
                 readyn -Y "MAGENTA" -p "Update pipx? (Python standalone packages)" pipx_up
                 if [[ "$pipx_up" == "y" ]]; then
                     pipx upgrade-all
@@ -586,7 +586,7 @@ function update-system() {
             fi
             unset pipx_up
 
-            if type npm &> /dev/null; then
+            if hash npm &>/dev/null; then
                 #reade -Q "magenta" -i "y" -p "Update local npm packages? (Javascript) [Y/n]: " "n" npm_up
                 #if [[ "$npm_up" == "y" ]]; then
                 #    npm update
@@ -602,7 +602,7 @@ function update-system() {
                 unset npm_up
             fi
             
-            if type cargo &> /dev/null; then
+            if hash cargo &>/dev/null; then
                 readyn -Y "magenta" -p "Update cargo (rust)?"  cargo_up
                 if [[ "$cargo_up" == "y" ]]; then
                     if test -z "$(cargo --list | grep 'install-update')"; then
@@ -619,7 +619,7 @@ function update-system() {
                 unset cargo_up
             fi
 
-            if type gem &> /dev/null; then
+            if hash gem &>/dev/null; then
                 readyn -Y "magenta" -p "Update local gems? (Ruby-on-rails)" gem_up
                 if [[ "$gem_up" == "y" ]]; then
                     gem update 
@@ -630,7 +630,6 @@ function update-system() {
         unset dev_up
         
     fi
-    export SYSTEM_UPDATED="TRUE" 
 }
 
 alias update-system-yes="update-system -y -s"

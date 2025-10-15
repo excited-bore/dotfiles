@@ -1,7 +1,7 @@
 # https://www.makedeb.org/
 
 if ! test -f checks/check_all.sh; then
-    if hash curl &>/dev/null; then
+    if hash curl &> /dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
@@ -65,4 +65,4 @@ else
     . $SCRIPT_DIR/checks/check_aliases_dir.sh
 fi
 
-wget-curl https://raw.githubusercontent.com/makedeb/makedeb/refs/heads/alpha/completions/makedeb.bash > $HOME/.bash_aliases.d/makedeb.bash
+wget-curl https://raw.githubusercontent.com/makedeb/makedeb/refs/heads/alpha/completions/makedeb.bash > $HOME/.aliases.d/makedeb.bash

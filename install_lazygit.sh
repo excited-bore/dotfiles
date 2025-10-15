@@ -16,7 +16,7 @@ if ! hash lazygit &>/dev/null; then
     if [[ "$distro_base" == "Arch" ]]; then
         eval "${pac_ins_y}" lazygit
     elif [[ "$distro_base" == "Debian" ]]; then
-        if test -n "$(apt-cache show lazygit)"; then
+        if [[ -n "$(apt-cache show lazygit)" ]]; then
             eval "${pac_ins_y}" lazygit
         else
             LAZYGIT_VERSION=$(wget-curl "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po --color=never '"tag_name": "v\K[^"]*')
@@ -47,7 +47,7 @@ if [[ 'y' == $conflazy ]]; then
         mkdir -p ~/.config/lazygit/
         cp $file ~/.config/lazygit/config.yml.example
     }
-    yes-edit-no -g "$file" -p 'Copy an example lazygit yaml config file into ~/.config/lazygit/?' -f cp_lazy_conf -c "test -f ~/.config/lazygit/config.yml.example || ! (test -f ~/.config/lazygit/config.yml.example && test -n $(diff ~/.config/lazygit/config.yml.example $file 2>/dev/null)) &> /dev/null"
+    yes-edit-no -g "$file" -p 'Copy an example lazygit yaml config file into ~/.config/lazygit/?' -f cp_lazy_conf -c "test -f ~/.config/lazygit/config.yml.example || ! (test -f ~/.config/lazygit/config.yml.example && [[ -n $(diff ~/.config/lazygit/config.yml.example $file 2>/dev/null) ]])"
     if ! test -f install_differ_pager.sh; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_git.sh)
     else
@@ -80,7 +80,7 @@ fi
 #fi
 #
 #if type copy-to &>/dev/null; then
-#    if ! test -d ~/.bash_aliases.d/ || ! test -f ~/.bash_aliases.d/lazygit.sh || (test -f ~/.bash_aliases.d/lazygit.sh && ! grep -q "copy-to" ~/.bash_aliases.d/lazygit.sh); then
+#    if ! test -d ~/.aliases.d/ || ! test -f ~/.aliases.d/lazygit.sh || (test -f ~/.aliases.d/lazygit.sh && ! grep -q "copy-to" ~/.aliases.d/lazygit.sh); then
 #        readyn -p "Set up an alias so copy-to does a 'run all' when starting up lazygit?" nstll
 #        if [[ "$nstll" == "y" ]]; then
 #            if ! test -f checks/check_aliases_dir.sh; then
@@ -88,9 +88,9 @@ fi
 #            else
 #                . ./checks/check_aliases_dir.sh
 #            fi
-#            if ! test -f ~/.bash_aliases.d/lazygit.sh; then
-#                printf "alias lazygit=\"copy-to run all; lazygit\"\n" >~/.bash_aliases.d/lazygit.sh
-#                echo "$(tput setaf 2)File in ~/.bash_aliases.d/lazygit.sh"
+#            if ! test -f ~/.aliases.d/lazygit.sh; then
+#                printf "alias lazygit=\"copy-to run all; lazygit\"\n" >~/.aliases.d/lazygit.sh
+#                echo "$(tput setaf 2)File in ~/.aliases.d/lazygit.sh"
 #            fi
 #        fi
 #        unset nstll

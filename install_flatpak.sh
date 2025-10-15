@@ -1,24 +1,21 @@
-#!/usr/bin/env bash
-
-if ! test -f checks/check_all.sh; then
-    if type curl &> /dev/null; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh) 
-    else 
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n" 
-        return 1 || exit 1 
+if ! [ -f checks/check_all.sh ]; then
+    if hash curl &>/dev/null; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
+    else
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
     . ./checks/check_all.sh
 fi
 
-if ! test -f checks/check_envvar_aliases_completions_keybinds.sh; then
-     source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar_aliases_completions_keybinds.sh) 
+if ! [ -f checks/check_envvar_aliases_completions_keybinds.sh ]; then
+     source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar_aliases_completions_keybinds.sh) 
 else
     . ./checks/check_envvar_aliases_completions_keybinds.sh
 fi
 
 
-if ! type flatpak &> /dev/null; then
+if ! hash flatpak &> /dev/null; then
     if [[ "$distro" == "Manjaro" ]]; then
         pamac install flatpak libpamac-flatpak-plugin python
     elif [[ "$distro_base" == "Arch" ]]; then
@@ -33,7 +30,7 @@ if ! type flatpak &> /dev/null; then
     fi
 fi
 
-if hash flatpak &> /dev/null && test -z "$FLATPAK"; then
+if hash flatpak &> /dev/null && [ -z $FLATPAK ]; then
     readyn -p "Add flatpak dirs to path? (XDG_DATA_DIRS)" flpkvrs 
     if [[ "$flpkvrs" == "y" ]]; then
         if grep -q "FLATPAK" $ENV; then
@@ -51,26 +48,26 @@ if hash flatpak &> /dev/null && test -z "$FLATPAK"; then
 fi
 unset flpkvrs
 
-if ! test -f ~/.bash_aliases.d/flatpacks.sh; then
+if ! [ -f ~/.aliases.d/flatpacks.sh ]; then
     readyn -p "Install flatpackwrapper? (For one-word flatpak aliases in terminal)" pam
     if [[ "y" == $pam ]]; then
-        if ! test -f install_bashalias_completions.sh; then
+        if ! [ -f install_bashalias_completions.sh ]; then
              source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bashalias_completions.sh) 
         else
              . ./install_bashalias_completions.sh
         fi
 
-        if test -f flatpak/.bash_aliases.d/flatpacks.sh; then
-            file=flatpak/.bash_aliases.d/flatpacks.sh
+        if [ -f flatpak/.aliases.d/flatpacks.sh ]; then
+            file=flatpak/.aliases.d/flatpacks.sh
         else
             dir1="$(mktemp -d -t flatpak-XXXXXXXXXX)"
-            curl -o $file1/flatpacks.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/flatpak/.bash_aliases.d/flatpacks.sh
+            curl -o $file1/flatpacks.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/flatpak/.aliases.d/flatpacks.sh
             file=$dir1/flatpacks.sh
         fi
          
-        if ! test -f ~/.bash_aliases.d/flatpacks.sh; then
-            cp $file ~/.bash_aliases.d/ 
-            test -n "$BASH_VERSION" && source ~/.bash_aliases.d/flatpacks.sh 
+        if ! [ -f ~/.aliases.d/flatpacks.sh ]; then
+            cp $file ~/.aliases.d/ 
+            [ -n "$BASH_VERSION" ] && source ~/.aliases.d/flatpacks.sh 
         fi
     fi    
 fi
@@ -84,11 +81,11 @@ if ! echo $(flatpak list --columns=name) | grep -q "Flatseal"; then
 fi
 unset fltseal
 
-if ! sudo test -f /etc/polkit/49-nopasswd_global.pkla && ! sudo test -f /etc/polkit-1/localauthority.conf.d/90-nopasswd_global.conf && ! sudo test -f /etc/polkit-1/rules.d/90-nopasswd_global.rules; then
+if ! sudo [ -f /etc/polkit/49-nopasswd_global.pkla ] && ! sudo [ -f /etc/polkit-1/localauthority.conf.d/90-nopasswd_global.conf ] && ! sudo [ -f /etc/polkit-1/rules.d/90-nopasswd_global.rules ]; then
     readyn -p "Run installer for no password with pam / polkit?" pam
     if [[ "y" == "$pam" ]]; then
-        if ! test -f install_polkit_wheel.sh; then
-             source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_polkit_wheel.sh) 
+        if ! [ -f install_polkit_wheel.sh ]; then
+             source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_polkit_wheel.sh) 
         else
             . ./install_polkit_wheel.sh
         fi

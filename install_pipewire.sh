@@ -1,5 +1,5 @@
 if ! test -f checks/check_all.sh; then
-    if hash curl &>/dev/null; then
+    if hash curl &> /dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
@@ -66,7 +66,7 @@ fi
 
 #https://bbs.archlinux.org/viewtopic.php?id=271850
 # https://wiki.archlinux.org/title/PipeWire#Sound_does_not_automatically_switch_when_connecting_a_new_device
-if type systemctl &> /dev/null && ! test -f /etc/systemd/user/pipewire-load-switch-on-connect.service; then
+if hash systemctl &> /dev/null && ! test -f /etc/systemd/user/pipewire-load-switch-on-connect.service; then
     #printf "${CYAN}You should test first whether sounds autoswitches when connected${normal}\n"
     readyn -p "Create 'USB-audiodevice-autoswitch-on-connect' configuration file?" auto_s
     if [[ $auto_s == 'y' ]]; then
@@ -127,7 +127,7 @@ fi
 if ! test -f $HOME/.config/wireplumber/wireplumber.conf.d/51-dualshock4-disable.conf; then
     mkdir -p ~/.config/wireplumber/wireplumber.conf.d/
     readyn -p "Unlist dualshock 4 audio sources from pipewire? (prevents usb-autoconnect from triggering)" ds4
-    if [[ "y" == $ds4 ]] || [[ "Y" == $ds4 ]]; then
+    if [[ "y" == $ds4 || "Y" == $ds4 ]]; then
         touch $HOME/.config/wireplumber/wireplumber.conf.d/51-dualshock4-disable.conf   
         printf "monitor.alsa.rules = [
   {
@@ -196,8 +196,8 @@ monitor.bluez.rules = [
 fi
 
 
-if ! type qwpgraph &> /dev/null; then
-    readyn -p "Install patchbay interface 'qpwgraph'? (create and manage audiostreams)" -c "! type patchbay &> /dev/null" patchb
+if ! hash qwpgraph &> /dev/null; then
+    readyn -p "Install patchbay interface 'qpwgraph'? (create and manage audiostreams)" -c "! hash patchbay &> /dev/null" patchb
     if [[ "$patchb" == 'y' ]]; then
         if [[ "$distro_base" == 'Arch' ]] || [[ "$distro_base" == 'Debian' ]]; then
             eval "${pac_ins_y} qpwgraph"
@@ -206,10 +206,10 @@ if ! type qwpgraph &> /dev/null; then
     unset patchb 
 fi
 
-if ! type easyeffects &> /dev/null; then
+if ! hash easyeffects &> /dev/null; then
     readyn -p "Install sound effect configurator 'easyeffects'? (Enable/disable audio effects on audiostreams)" ezff
     if [[ "$ezff" == 'y' ]]; then
-        if [[ "$distro_base" == 'Arch' ]] || [[ "$distro_base" == 'Debian' ]]; then
+        if [[ "$distro_base" == 'Arch' || "$distro_base" == 'Debian' ]]; then
             eval "${pac_ins_y} easyeffects"
         fi
     fi
@@ -218,27 +218,27 @@ fi
 
 SCRIPT_DIR=$(get-script-dir) 
 
-file=$SCRIPT_DIR/pipewire/.bash_aliases.d/pipewire.sh
+file=$SCRIPT_DIR/pipewire/.aliases.d/pipewire.sh
 file1=$SCRIPT_DIR/pipewire/.bash_completion.d/pipewire
 if ! test -f $file || ! test -f $file1; then
     tmpd=$(mktemp -d)
-    wget-aria-dir $tmpd https://raw.githubusercontent.com/excited-bore/dotfiles/main/pipewire/.bash_aliases.d/pipewire.sh
+    wget-aria-dir $tmpd https://raw.githubusercontent.com/excited-bore/dotfiles/main/pipewire/.aliases.d/pipewire.sh
     wget-aria-dir $tmpd https://raw.githubusercontent.com/excited-bore/dotfiles/main/pipewire/.bash_completions.d/pipewire
     file=$tmpd/pipewire.sh
     file1=$tmpd/pipewire
 fi
 
 pipewire_r(){ 
-    sudo cp $file /root/.bash_aliases.d/; 
+    sudo cp $file /root/.aliases.d/; 
     sudo cp $file1 /root/.bash_completion.d/; 
 }
 
 pipewiresh(){
-    cp $file ~/.bash_aliases.d/;
+    cp $file ~/.aliases.d/;
     cp $file1 ~/.bash_completion.d/;
-    yes-edit-no -Y 'YELLOW' -f pipewire_r -g "$file $file1" -p "Install pipewire aliases at /root/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)?"
+    yes-edit-no -Y 'YELLOW' -f pipewire_r -g "$file $file1" -p "Install pipewire aliases at /root/.aliases.d/ (and completions at ~/.bash_completion.d/)?"
 }
-yes-edit-no -f pipewiresh -g "$file $file1" -p "Install pipewire aliases at ~/.bash_aliases.d/ (and completions at ~/.bash_completion.d/)?"
+yes-edit-no -f pipewiresh -g "$file $file1" -p "Install pipewire aliases at ~/.aliases.d/ (and completions at ~/.bash_completion.d/)?"
 
 
 if type systemctl &> /dev/null; then

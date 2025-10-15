@@ -1,6 +1,6 @@
 ### SSH ###                           
-if ! type reade &> /dev/null && test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh; then
-    . ~/.bash_aliases.d/00-rlwrap_scripts.sh
+if ! type reade &> /dev/null && test -f ~/.aliases.d/00-rlwrap_scripts.sh; then
+    . ~/.aliases.d/00-rlwrap_scripts.sh
 fi
 
 # SSH in Kitty only really w
@@ -12,7 +12,7 @@ fi
 # So we need to set the DISPLAY to the host's (you) by passing your IP to DISPLAY before connecting
 
 if [[ $machine == 'Linux' ]]; then
-    if [[ $X11_WAY == 'x11' ]] && type nmcli &> /dev/null; then
+    if [[ $XDG_SESSION_TYPE == 'x11' ]] && hash nmcli &> /dev/null; then
         addr=$(nmcli device show | grep IP4.ADDR | awk 'NR==1{print $2}'| sed 's|\(.*\)/.*|\1|')
     fi
 fi
@@ -62,7 +62,7 @@ function valid-ip(){
 }
 
 function add-known-ip(){
-    ! test -f ~/.bash_aliases.d/ssh1.sh && touch ~/.bash_aliases.d/ssh1.sh 
+    ! test -f ~/.aliases.d/ssh1.sh && touch ~/.aliases.d/ssh1.sh 
     ips=$( ( set -o posix ; set ) | grep --color=never ^ip )
     ipss=0
     for i in ${ips[@]}; do
@@ -83,7 +83,7 @@ function add-known-ip(){
 
 
 function add-ssh-alias(){
-    ! test -f ~/.bash_aliases.d/ssh1.sh && touch ~/.bash_aliases.d/ssh1.sh 
+    ! test -f ~/.aliases.d/ssh1.sh && touch ~/.aliases.d/ssh1.sh 
     local servers servr nam ipnr ips ipn ipss 
     servers=$( ( set -o posix ; alias ) | grep --color=never ^server )
     servr='server1' 

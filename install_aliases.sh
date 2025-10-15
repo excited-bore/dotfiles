@@ -20,18 +20,16 @@ fi
 #[[ "$(type cp)" =~ 'aliased' ]] &&
 #    unalias cp && alias cp='cp -fv'
 
-reade -Q 'GREEN' -i 'both bash zsh' -p "Install aliases and functions for both or either ${CYAN}BASH${GREEN} and/or ${CYAN}ZSH${GREEN}?" bash_zsh
-
 
 SCRIPT_DIR=$(get-script-dir)
 
-rlwrpscrpt=aliases/.bash_aliases.d/00-rlwrap_scripts.sh
+rlwrpscrpt=aliases/.aliases.d/00-rlwrap_scripts.sh
 reade=rlwrap-scripts/reade
 readyn=rlwrap-scripts/readyn
 yesnoedit=rlwrap-scripts/yes-edit-no
 csysm=checks/check_system.sh
 if ! test -d checks/; then
-    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh && rlwrapscrpt=$tmp
+    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/00-rlwrap_scripts.sh && rlwrapscrpt=$tmp
     tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade && reade=$tmp
     tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/readyn && readyn=$tmp
     tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/yes-edit-no && yesnoedit=$tmp
@@ -39,54 +37,44 @@ if ! test -d checks/; then
 fi
 
 reade_r() {
-    sudo cp $rlwrpscrpt /root/.bash_aliases.d/
-    sudo cp $reade /root/.bash_aliases.d/01-reade.sh
-    sudo cp $readyn /root/.bash_aliases.d/02-readyn.sh
-    sudo cp $yesnoedit /root/.bash_aliases.d/03-yes-edit-no.sh
+    sudo cp $rlwrpscrpt /root/.aliases.d/
+    sudo cp $reade /root/.aliases.d/01-reade.sh
+    sudo cp $readyn /root/.aliases.d/02-readyn.sh
+    sudo cp $yesnoedit /root/.aliases.d/03-yes-edit-no.sh
 }
 readeu() {
-    cp $rlwrpscrpt ~/.bash_aliases.d/
-    cp $reade ~/.bash_aliases.d/01-reade.sh
-    cp $readyn ~/.bash_aliases.d/02-readyn.sh
-    cp $yesnoedit ~/.bash_aliases.d/03-yes-edit-no.sh
-    yes-edit-no -y -Y "YELLOW" -f reade_r -g "$reade $readyn $yesnoedit $rlwrpscrpt" -p "Install reade, readyn and yes-edit-no at /root/.bash_aliases.d/?" 
+    cp $rlwrpscrpt ~/.aliases.d/
+    cp $reade ~/.aliases.d/01-reade.sh
+    cp $readyn ~/.aliases.d/02-readyn.sh
+    cp $yesnoedit ~/.aliases.d/03-yes-edit-no.sh
+    yes-edit-no -y -Y "YELLOW" -f reade_r -g "$reade $readyn $yesnoedit $rlwrpscrpt" -p "Install reade, readyn and yes-edit-no at /root/.aliases.d/?" 
 }
-yes-edit-no -y -f readeu -g "$reade $readyn $yesnoedit $rlwrpscrpt" -p "Install reade, readyn, yes-edit-no and rlwrap_scripts at ~/.bash_aliases.d/ (rlwrap/read functions that are used in other aliases)? "
+yes-edit-no -y -f readeu -g "$reade $readyn $yesnoedit $rlwrpscrpt" -p "Install reade, readyn, yes-edit-no and rlwrap_scripts at ~/.aliases.d/ (rlwrap/read functions that are used in other aliases)? "
 
 csysm_r() {
-    sudo cp $csysm /root/.bash_aliases.d/04-check_system.sh
+    sudo cp $csysm /root/.aliases.d/04-check_system.sh
 }
 csysm() {
-    cp $csysm ~/.bash_aliases.d/04-check_system.sh
+    cp $csysm ~/.aliases.d/04-check_system.sh
     yes-edit-no -y -Y "YELLOW" -f csysm_r -g "$csysm" -p "Install check_system.sh at /root/?" 
 }
-yes-edit-no -y -f csysm -g "$csysm" -p "Install check_system.sh at ~/.bash_aliases.d/ (do a checkup on what kind of system this is - used for later scripts)?" 
+yes-edit-no -y -f csysm -g "$csysm" -p "Install check_system.sh at ~/.aliases.d/ (do a checkup on what kind of system this is - used for later scripts)?" 
 
-genrb=aliases/.bash_aliases.d/general.sh
-genrbc=aliases/.bash_completion.d/general
-if ! test -f aliases/.bash_aliases.d/general.sh; then
-    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/general.sh
-    tmp1=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliasases/.bash_completion.d/general
-    genrb=$tmp
-    genrbc=$tmp1
+genr=aliases/.aliases.d/general.sh
+genrc=aliases/.bash_completion.d/general.bash
+if ! test -f aliases/.aliases.d/general.sh; then
+    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/general.sh
+    tmp1=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliasases/.bash_completion.d/general.bash
+    genr=$tmp
+    genrc=$tmp1
 fi
-
-genrz=aliases/.zsh_aliases.d/general.sh
-genrzc=aliases/.zsh_completion.d/general
-if ! test -f aliases/.zsh_aliases.d/general.sh; then
-    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.zsh_aliases.d/general.sh
-    tmp1=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliasases/.zsh_completion.d/general
-    genrz=$tmp
-    genrzc=$tmp1
-fi
-
 
 readyn -p "Install general.sh at ~/? (aliases related to general actions - cd/mv/cp/rm + completion script replacement for 'read -e')" ansr
 
 if [[ $ansr == "y" ]]; then
     if [[ -f ~/.environment.env ]]; then
         sed -i 's|^export TRASH_BIN_LIMIT=|export TRASH_BIN_LIMIT=|g' ~/.environment.env
-    i
+    fi
 
     #if type gio &> /dev/null; then
     #    readyn -p "Set cp/mv (when overwriting) to backup files? (will also trash backups) "" ansr
@@ -486,11 +474,11 @@ if [[ $ansr == "y" ]]; then
     fi
 
     general_r() {
-        sudo cp $genr /root/.bash_aliases.d/
+        sudo cp $genr /root/.aliases.d/
         sudo cp $genrc /root/.bash_completion.d/
     }
     general() {
-        cp $genr ~/.bash_aliases.d/
+        cp $genr ~/.aliases.d/
         cp $genrc ~/.bash_completion.d/
         yes-edit-no -y -Y 'YELLOW' -f general_r -p "Install general.sh at /root/?" -g "$genr $genrc"
     }
@@ -554,54 +542,43 @@ if [[ "$int_r" == "both" ]] || [[ "$int_r" == 'exit' ]] || [[ "$int_r" == 'intr'
 fi
 unset int_r sig
 
-update_sysm=aliases/.bash_aliases.d/update-system.sh
-bashc=aliases/.bash_aliases.d/bash.sh
-update_kern=aliases/.bash_aliases.d/update-kernel.sh
-pacmn=aliases/.bash_aliases.d/package_managers.sh
-rgrp=aliases/.bash_aliases.d/ripgrep-directory.sh
-[[ $distro == "Manjaro" ]] && manjaro=aliases/.bash_aliases.d/manjaro.sh
-hash systemctl &>/dev/null && systemd=aliases/.bash_aliases.d/systemctl.sh
-hash sudo &>/dev/null && dosu=aliases/.bash_aliases.d/sudo.sh
-hash git &>/dev/null && gits=aliases/.bash_aliases.d/git.sh
-hash ssh &>/dev/null && sshs=aliases/.bash_aliases.d/ssh.sh
-ps1=aliases/.bash_aliases.d/PS1_colours.sh
-variti=aliases/.bash_aliases.d/variety.sh
-hash python &>/dev/null && pthon=aliases/.bash_aliases.d/python.sh
-if ! test -d aliases/.bash_aliases.d/; then
-    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/bash.sh && bash=$tmp
-    tmp1=$(mktemp) && curl -o $tmp1 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh && update_sysm=$tmp1
-    tmp11=$(mktemp) && curl -o $tmp11 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-kernel.sh && update_kern=$tmp11
-    rgrp=$(mktemp) && curl -o $rgrp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/ripgrep-directory.sh 
-    tmp3=$(mktemp) && curl -o $tmp4 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/package_managers.sh && pacmn=$tmp4
-    [[ $distro == "Manjaro" ]] && tmp7=$(mktemp) && curl -o $tmp7 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/manjaro.sh && manjaro=$tmp7
-    hash systemctl &>/dev/null && tmp2=$(mktemp) && curl -o $tmp2 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/systemctl.sh && systemd=$tmp2
-    hash sudo &>/dev/null && tmp3=$(mktemp) && curl -o $tmp3 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/sudo.sh && dosu=$tmp3
-    hash git &>/dev/null && tmp10=$(mktemp) && curl -o $tmp10 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/git.sh && gits=$tmp5
-    hash ssh &>/dev/null && tmp5=$(mktemp) && curl -o $tmp5 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/ssh.sh && sshs=$tmp5
-    tmp6=$(mktemp) && curl -o $tmp6 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/ps1.sh && ps1=$tmp6
-    tmp8=$(mktemp) && curl -o $tmp8 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/variety.sh && variti=$tmp8
-    hash python &>/dev/null && tmp9=$(mktemp) && curl -o $tmp9 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/python.sh && pthon=$tmp9
+update_sysm=aliases/.aliases.d/update-system.sh
+update_kern=aliases/.aliases.d/update-kernel.sh
+pacmn=aliases/.aliases.d/package_managers.sh
+rgrp=aliases/.aliases.d/ripgrep-directory.sh
+[[ $distro == "Manjaro" ]] && manjaro=aliases/.aliases.d/manjaro.sh
+hash systemctl &>/dev/null && systemd=aliases/.aliases.d/systemctl.sh
+hash sudo &>/dev/null && dosu=aliases/.aliases.d/sudo.sh
+hash git &>/dev/null && gits=aliases/.aliases.d/git.sh
+hash ssh &>/dev/null && sshs=aliases/.aliases.d/ssh.sh
+ps1=aliases/.aliases.d/PS1_colours.sh
+variti=aliases/.aliases.d/variety.sh
+hash python &>/dev/null && pthon=aliases/.aliases.d/python.sh
+if ! test -d aliases/.aliases.d/; then
+    tmp1=$(mktemp) && curl -o $tmp1 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/update-system.sh && update_sysm=$tmp1
+    tmp11=$(mktemp) && curl -o $tmp11 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/update-kernel.sh && update_kern=$tmp11
+    rgrp=$(mktemp) && curl -o $rgrp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/ripgrep-directory.sh 
+    tmp3=$(mktemp) && curl -o $tmp4 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/package_managers.sh && pacmn=$tmp4
+    [[ $distro == "Manjaro" ]] && tmp7=$(mktemp) && curl -o $tmp7 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/manjaro.sh && manjaro=$tmp7
+    hash systemctl &>/dev/null && tmp2=$(mktemp) && curl -o $tmp2 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/systemctl.sh && systemd=$tmp2
+    hash sudo &>/dev/null && tmp3=$(mktemp) && curl -o $tmp3 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/sudo.sh && dosu=$tmp3
+    hash git &>/dev/null && tmp10=$(mktemp) && curl -o $tmp10 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/git.sh && gits=$tmp5
+    hash ssh &>/dev/null && tmp5=$(mktemp) && curl -o $tmp5 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/ssh.sh && sshs=$tmp5
+    tmp6=$(mktemp) && curl -o $tmp6 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/ps1.sh && ps1=$tmp6
+    tmp8=$(mktemp) && curl -o $tmp8 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/variety.sh && variti=$tmp8
+    hash python &>/dev/null && tmp9=$(mktemp) && curl -o $tmp9 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/python.sh && pthon=$tmp9
 fi
 
-bash_r() {
-    sudo cp $bashc /root/.bash_aliases.d/
-}
-bash_u() {
-    cp $bashc ~/.bash_aliases.d/
-    yes-edit-no -f bash_r -g "$bashc" -p "Install bash.sh at /root/.bash_aliases.d/?" 
-}
-yes-edit-no -f bash_u -g "$bashc" -p "Install bash.sh at ~/.bash_aliases.d/? (a few bash related helper functions)?"
-
 update_sysm_r() {
-    sudo cp $update_sysm /root/.bash_aliases.d/
-    sudo sed -i '/SYSTEM_UPDATED="TRUE"/d' /root/.bash_aliases.d/update-system.sh
-    sudo cp $update_kern /root/.bash_aliases.d/
+    sudo cp $update_sysm /root/.aliases.d/
+    sudo sed -i '/SYSTEM_UPDATED="TRUE"/d' /root/.aliases.d/update-system.sh
+    sudo cp $update_kern /root/.aliases.d/
 }
 
 update_sysm() {
-    cp  $update_sysm ~/.bash_aliases.d/
-    sed -i '/SYSTEM_UPDATED="TRUE"/d' ~/.bash_aliases.d/update-system.sh
-    cp  $update_kern ~/.bash_aliases.d/
+    cp  $update_sysm ~/.aliases.d/
+    sed -i '/SYSTEM_UPDATED="TRUE"/d' ~/.aliases.d/update-system.sh
+    cp  $update_kern ~/.aliases.d/
 
     if [[ $distro_base == 'Debian' ]]; then
         if ! hash mainline &>/dev/null; then
@@ -630,105 +607,105 @@ update_sysm() {
         fi
         unset xml_ins
     fi
-    yes-edit-no -Y "YELLOW" -f update_sysm_r -g "$update_sysm" -p "Install update-system.sh and update-kernel.sh at /root/.bash_aliases.d//?" 
+    yes-edit-no -Y "YELLOW" -f update_sysm_r -g "$update_sysm" -p "Install update-system.sh and update-kernel.sh at /root/.aliases.d//?" 
 }
-yes-edit-no -f update_sysm -g "$update_sysm $update_kern" -p "Install update-system.sh and update-kernel.sh at ~/.bash_aliases.d/? (Global system update function)?"
+yes-edit-no -f update_sysm -g "$update_sysm $update_kern" -p "Install update-system.sh and update-kernel.sh at ~/.aliases.d/? (Global system update function)?"
 
 packman_r() {
-    sudo cp $pacmn /root/.bash_aliases.d/
+    sudo cp $pacmn /root/.aliases.d/
 }
 packman() {
-    cp $pacmn ~/.bash_aliases.d/
-    yes-edit-no -Y 'YELLOW' -f packman_r -g "$pacmn" -p "Install package_managers.sh at /root/.bash_aliases.d/?"
+    cp $pacmn ~/.aliases.d/
+    yes-edit-no -Y 'YELLOW' -f packman_r -g "$pacmn" -p "Install package_managers.sh at /root/.aliases.d/?"
 }
-yes-edit-no -f packman -g "$pacmn" -p "Install package_managers.sh at ~/.bash_aliases.d/ (package manager aliases)?" 
+yes-edit-no -f packman -g "$pacmn" -p "Install package_managers.sh at ~/.aliases.d/ (package manager aliases)?" 
 
 rgrep_r() {
-    sudo cp $rgrp /root/.bash_aliases.d/
+    sudo cp $rgrp /root/.aliases.d/
 }
 rgrep() {
-    cp $rgrp ~/.bash_aliases.d/
-    yes-edit-no -Y 'YELLOW' -f rgrep_r -g "$rgrp" -p "Install ripgrep-directory.sh at /root/.bash_aliases.d/?"
+    cp $rgrp ~/.aliases.d/
+    yes-edit-no -Y 'YELLOW' -f rgrep_r -g "$rgrp" -p "Install ripgrep-directory.sh at /root/.aliases.d/?"
 }
-yes-edit-no -f rgrep -g "$rgrp" -p "Install ripgrep-directory.sh at ~/.bash_aliases.d/ (search files through pattern in directory)?" 
+yes-edit-no -f rgrep -g "$rgrp" -p "Install ripgrep-directory.sh at ~/.aliases.d/ (search files through pattern in directory)?" 
 
 
 if [[ "$distro" == "Manjaro" ]]; then
     manj_r() {
-        sudo cp $manjaro /root/.bash_aliases.d/
+        sudo cp $manjaro /root/.aliases.d/
     }
     manj() {
-        cp $manjaro ~/.bash_aliases.d/
-        yes-edit-no -Y 'YELLOW' -f manj_r -g "$manjaro" -p "Install manjaro.sh at /root/.bash_aliases.d/?"
+        cp $manjaro ~/.aliases.d/
+        yes-edit-no -Y 'YELLOW' -f manj_r -g "$manjaro" -p "Install manjaro.sh at /root/.aliases.d/?"
     }
-    yes-edit-no -f manj -g "$manjaro" -p "Install manjaro.sh at ~/.bash_aliases.d/ (manjaro specific aliases)?"
+    yes-edit-no -f manj -g "$manjaro" -p "Install manjaro.sh at ~/.aliases.d/ (manjaro specific aliases)?"
 fi
 
 systemd_r() {
-    sudo cp $systemd /root/.bash_aliases.d/
+    sudo cp $systemd /root/.aliases.d/
 }
 systemd() {
-    cp $systemd ~/.bash_aliases.d/
-    yes-edit-no -Y 'YELLOW' -f systemd_r -g "$systemd" -p "Install systemctl.sh at /root/.bash_aliases.d/?"
+    cp $systemd ~/.aliases.d/
+    yes-edit-no -Y 'YELLOW' -f systemd_r -g "$systemd" -p "Install systemctl.sh at /root/.aliases.d/?"
 }
-yes-edit-no -f systemd -g "$systemd" -p "Install systemctl.sh at ~/.bash_aliases.d/? (systemctl aliases/functions)?"
+yes-edit-no -f systemd -g "$systemd" -p "Install systemctl.sh at ~/.aliases.d/? (systemctl aliases/functions)?"
 
 dosu_r() {
-    sudo cp $dosu /root/.bash_aliases.d/
+    sudo cp $dosu /root/.aliases.d/
 }
 
 dosu() {
-    cp $dosu ~/.bash_aliases.d/
-    yes-edit-no -Y 'YELLOW' -f dosu_r -g "$dosu" -p "Install sudo.sh at /root/.bash_aliases.d/?"
+    cp $dosu ~/.aliases.d/
+    yes-edit-no -Y 'YELLOW' -f dosu_r -g "$dosu" -p "Install sudo.sh at /root/.aliases.d/?"
 }
-yes-edit-no -f dosu -g "$dosu" -p "Install sudo.sh at ~/.bash_aliases.d/ (sudo aliases)?"
+yes-edit-no -f dosu -g "$dosu" -p "Install sudo.sh at ~/.aliases.d/ (sudo aliases)?"
 
 git_r() {
-    sudo cp $gits /root/.bash_aliases.d/
+    sudo cp $gits /root/.aliases.d/
 }
 gith() {
-    cp $gits ~/.bash_aliases.d/
-    yes-edit-no -Y 'YELLOW' -f git_r -g "$gits" -p "Install git.sh at /root/.bash_aliases.d/?"
+    cp $gits ~/.aliases.d/
+    yes-edit-no -Y 'YELLOW' -f git_r -g "$gits" -p "Install git.sh at /root/.aliases.d/?"
 }
-yes-edit-no -f gith -g "$gits" -p "Install git.sh at ~/.bash_aliases.d/ (git aliases)?" 
+yes-edit-no -f gith -g "$gits" -p "Install git.sh at ~/.aliases.d/ (git aliases)?" 
 
 ssh_r() {
-    sudo cp $sshs /root/.bash_aliases.d/
+    sudo cp $sshs /root/.aliases.d/
 }
 sshh() {
-    cp $sshs ~/.bash_aliases.d/
-    yes-edit-no -Y 'YELLOW' -f ssh_r -g "$sshs" -p "Install ssh.sh at /root/.bash_aliases.d/?" 
+    cp $sshs ~/.aliases.d/
+    yes-edit-no -Y 'YELLOW' -f ssh_r -g "$sshs" -p "Install ssh.sh at /root/.aliases.d/?" 
 }
-yes-edit-no -f sshh -g "$sshs" -p "Install ssh.sh at ~/.bash_aliases.d/ (ssh aliases)?" 
+yes-edit-no -f sshh -g "$sshs" -p "Install ssh.sh at ~/.aliases.d/ (ssh aliases)?" 
 
 if ! hash starship &> /dev/null; then
     ps1_r() {
-        sudo cp $ps1 /root/.bash_aliases.d/
+        sudo cp $ps1 /root/.aliases.d/
     }
     ps11() {
-        cp $ps1 ~/.bash_aliases.d/
-        yes-edit-no -Y 'YELLOW' -f ps1_r -g "$ps1" -p "Install PS1_colours.sh at /root/.bash_aliases.d/?" 
+        cp $ps1 ~/.aliases.d/
+        yes-edit-no -Y 'YELLOW' -f ps1_r -g "$ps1" -p "Install PS1_colours.sh at /root/.aliases.d/?" 
     }
-    yes-edit-no -f ps11 -g "$ps1" -p "Install PS1_colours.sh at ~/.bash_aliases.d/ (Coloured command prompt)?" 
+    yes-edit-no -f ps11 -g "$ps1" -p "Install PS1_colours.sh at ~/.aliases.d/ (Coloured command prompt)?" 
 fi
 
 if hash python &>/dev/null; then
     pthon() {
-        cp $pthon ~/.bash_aliases.d/
+        cp $pthon ~/.aliases.d/
     }
-    yes-edit-no -f pthon -g "$pthon" -p "Install python.sh at ~/.bash_aliases.d/ (aliases for a python development)?"
+    yes-edit-no -f pthon -g "$pthon" -p "Install python.sh at ~/.aliases.d/ (aliases for a python development)?"
 fi
 
 # Variety aliases
 #
 variti_r() {
-    sudo cp $variti /root/.bash_aliases.d/
+    sudo cp $variti /root/.aliases.d/
 }
 variti() {
-    cp $variti ~/.bash_aliases.d/
+    cp $variti ~/.aliases.d/
     yes-edit-no -Y 'YELLOW' -f variti_r -g "$variti" -p "Install variety.sh at /root/?"
 }
-yes-edit-no -f variti -g "$variti" -p "Install variety.sh at ~/.bash_aliases.d/ (aliases for a variety of tools)?"
+yes-edit-no -f variti -g "$variti" -p "Install variety.sh at ~/.aliases.d/ (aliases for a variety of tools)?"
 
 # Check one last time if ~/.bash_preexec - for both $USER and root - is the last line in their ~/.bash_profile and ~/.bashrc
 

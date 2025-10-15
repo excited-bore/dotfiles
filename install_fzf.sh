@@ -1,7 +1,7 @@
 # https://github.com/junegunn/fzf
 
-if ! test -f checks/check_all.sh; then
-    if hash curl &>/dev/null; then
+if ! [ -f checks/check_all.sh ]; then
+    if hash curl &> /dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
@@ -15,7 +15,7 @@ SCRIPT_DIR=$(get-script-dir)
 # Doesn't matter the argument, will just asume were doing a simple installation
 
 if [[ -z "$1" ]]; then
-    if ! test -f checks/check_envvar_aliases_completions_keybinds.sh; then
+    if ! [ -f checks/check_envvar_aliases_completions_keybinds.sh ]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar_aliases_completions_keybinds.sh)
     else
         . ./checks/check_envvar_aliases_completions_keybinds.sh
@@ -56,7 +56,7 @@ if [[ -z "$1" ]]; then
     ! [ -f ~/.bash_completion.d/fzf-completion.bash ] &&
         wget-aria-name ~/.bash_completion.d/fzf-completion.bash https://raw.githubusercontent.com/junegunn/fzf/refs/heads/master/shell/completion.bash
 
-    #if ! test -d ~/.fzf || test -f ~/.fzf.bash; then
+    #if ! [ -d ~/.fzf ] || [ -f ~/.fzf.bash ]; then
         #git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
         #~/.fzf/install
         #command rm -v ~/.fzf.bash
@@ -65,9 +65,9 @@ if [[ -z "$1" ]]; then
     #fi
 
     printf "${cyan}Fzf${normal} keybinds:\n\t - Fzf history on Ctrl-R (replaces reverse-search-history)\n\t - Filepath retriever on Ctrl-T\n\t - Directory navigator on Alt-C\n\t - **<TAB> for fzf completion on some commands\n"
-    readyn -p "Use fzf keybinds?" -c "! test -f ~/.keybinds.d/fzf-bindings.bash" fzf_key
+    readyn -p "Use fzf keybinds?" -c "! [ -f ~/.keybinds.d/fzf-bindings.bash ]" fzf_key
     if [[ "$fzf_key" == 'y' ]]; then
-        test -f $BASH_KEYBIND_FILEDIR/fzf-bindings.bash && 
+        [ -f $BASH_KEYBIND_FILEDIR/fzf-bindings.bash ] && 
             rm $BASH_KEYBIND_FILEDIR/fzf-bindings.bash
         wget-aria-name ~/.keybinds.d/fzf-bindings.bash https://raw.githubusercontent.com/junegunn/fzf/refs/heads/master/shell/key-bindings.bash
     fi
@@ -96,10 +96,10 @@ if [[ -z "$1" ]]; then
     fi
 
     # TODO: Make better check: https://github.com/sharkdp/fd
-    if ! hash fd-find &>/dev/null && ! hash fd &>/dev/null; then
+    if ! hash fd-find &> /dev/null && ! hash fd &> /dev/null; then
         readyn -p "Install fd and use for fzf? (A faster variant of 'find')" fdr
         if [[ "$fdr" == "y" ]]; then
-            if ! test -f install_fd.sh; then
+            if ! [ -f install_fd.sh ]; then
                 source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fd.sh)
             else
                 . ./install_fd.sh
@@ -108,7 +108,7 @@ if [[ -z "$1" ]]; then
     fi
 
     # BFS: Mostly usefull for Alt-C / Alt-Down keybind but still very usefull in that regard 
-    if ! hash bfs &>/dev/null; then
+    if ! hash bfs &> /dev/null; then
         readyn -p "Install bfs (A breadth-first find variant rather then depth-first - first results are closer to current directory)?" bfsnstll
         if [[ "$bfsnstll" == "y" ]]; then
             if ! test -f install_bfs.sh; then
@@ -132,7 +132,7 @@ if [[ -z "$1" ]]; then
     reade -Q 'GREEN' -i "$opts" -p "Which command should be default for fzf?: " fnd
 
     # BAT
-    if ! hash bat &>/dev/null; then
+    if ! hash bat &> /dev/null; then
         readyn -p "Install bat? (File previews/thumbnails for riflesearch)" bat
         if [[ "$bat" == "y" ]]; then
             if ! test -f install_bat.sh; then
@@ -145,7 +145,7 @@ if [[ -z "$1" ]]; then
     fi
 
     # TREE
-    if ! hash tree &>/dev/null; then
+    if ! hash tree &> /dev/null; then
         readyn -p "Install tree? (Builtin cd shortcut gets a nice directory tree preview )" tree
         if [[ "$tree" == "y" ]]; then
             if ! test -f install_tree.sh; then
@@ -158,7 +158,7 @@ if [[ -z "$1" ]]; then
     fi
 
     #TODO: fzf-rifle.sh still has ffmpegthumbnailer part (could use sed check)
-    if ! hash ffmpegthumbnailer &>/dev/null; then
+    if ! hash ffmpegthumbnailer &> /dev/null; then
         readyn -p "Install ffmpegthumbnailer? (Video thumbnails for riflesearch)" ffmpg
         if [[ "$ffmpg" == "y" ]]; then
             if ! test -f install_ffmpegthumbnailer.sh; then
@@ -173,7 +173,7 @@ if [[ -z "$1" ]]; then
     # RIPGREP
     # TODO: Check export for ripgrep
     # TODO: Do more with ripgrep
-    if ! hash rg &>/dev/null; then
+    if ! hash rg &> /dev/null; then
         readyn -y -p "Install ripgrep? (Recursive grep, opens possibility for line by line fzf )" rpgrp
         if [[ "$rpgrp" == "y" ]]; then
             if ! test -f install_ripgrep.sh; then
@@ -194,10 +194,10 @@ if [[ -z "$1" ]]; then
 
             readyn -p "Add shortcut for ripgrep files in dir? (Ctrl-g)" rpgrpdir
             if [[ "$rpgrpdir" == "y" ]]; then
-                if test -f aliases/.bash_aliases.d/ripgrep-directory.sh; then
-                    cp aliases/.bash_aliases.d/ripgrep-directory.sh ~/.bash_aliases.d/
+                if test -f aliases/.aliases.d/ripgrep-directory.sh; then
+                    cp aliases/.aliases.d/ripgrep-directory.sh ~/.aliases.d/
                 else
-                    wget-aria-dir ~/.bash_aliases.d/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/ripgrep-directory.sh
+                    wget-aria-dir ~/.aliases.d/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/ripgrep-directory.sh
                 fi
             fi
         fi
@@ -238,13 +238,13 @@ if [[ -z "$1" ]]; then
     #readyn -p "    Search only files?" fndfle
     #readyn -p "    Include hidden files?" fndhiddn
     #if [ $fnd == "find" ]; then
-    #   test "$fndgbl" == "y" && fnd="find /"
-    #   test "$fndfle" == "y" && fnd="$fnd -type f"
-    #   test "$fndhiddn" == "y" && fnd="$fnd -iname \".*\""
+    #   [[ "$fndgbl" == "y" ]] && fnd="find /"
+    #   [[ "$fndfle" == "y" ]] && fnd="$fnd -type f"
+    #   [[ "$fndhiddn" == "y" ]] && fnd="$fnd -iname \".*\""
     #else
-    #   test "$fndgbl" == "y" && fnd="fd --search-path /"
-    #   test "$fndfle" == "y" && fnd="$fnd --type f"
-    #   test "$fndhiddn" == "y" && fnd="$fnd --hidden"
+    #   [[ "$fndgbl" == "y" ]] && fnd="fd --search-path /"
+    #   [[ "$fndfle" == "y" ]] && fnd="$fnd --type f"
+    #   [[ "$fndhiddn" == "y" ]] && fnd="$fnd --hidden"
     #fi
     #unset fndgbl fndfle fndhiddn
 
@@ -277,12 +277,12 @@ if [[ -z "$1" ]]; then
         sudo sed -i 's/--bind/#--bind/' $ENV_R
         sudo sed -i 's/--preview-window/#--preview-window/' $ENV_R
         sudo sed -i 's/--color/#--color/' $ENV_R
-        if hash tree &>/dev/null; then
+        if hash tree &> /dev/null; then
             sudo sed -i 's|#export FZF_ALT_C_OPTS=|export FZF_ALT_C_OPTS=|g' $ENV_R
         fi
     elif ! sudo grep -q "export FZF_DEFAULT_COMMAND" $ENV_R; then
         printf "\n# FZF\nexport FZF_DEFAULT_COMMAND=\"$fnd\"\nexport FZF_CTRL_T_COMMAND='$FZF_DEFAULT_COMMAND'" | sudo tee -a $ENV_R &>/dev/null
-        if hash tree &>/dev/null; then
+        if hash tree &> /dev/null; then
             printf "\nexport FZF_ALT_C_OPTS=\"--preview 'tree -C {}\"\n" | sudo tee -a $ENV_R &>/dev/null
         fi
     fi
@@ -298,11 +298,11 @@ if [[ -z "$1" ]]; then
     #fi
     #unset comp_key
 
-    if ! test -f /usr/bin/rifle || ! test -f $HOME/.bash_aliases.d/fzf-rifle.sh; then
+    if ! test -f /usr/bin/rifle || ! test -f $HOME/.aliases.d/fzf-rifle.sh; then
         readyn -p "Use rifle (file opener from 'ranger') to open found files and dirs with a custom Ctrl-F filesearch shortcut?" fzf_f
         if [[ "$fzf_f" == "y" ]]; then
-            if ! hash rifle &>/dev/null; then
-                if ! hash python &>/dev/null; then
+            if ! hash rifle &> /dev/null; then
+                if ! hash python &> /dev/null; then
                     if [[ "$distro_base" == 'Debian' ]]; then
                         eval "${pac_ins_y}" python3 python-is-python3
                     elif [[ "$distro_base" == 'Arch' ]]; then
@@ -315,11 +315,11 @@ if [[ -z "$1" ]]; then
             fi
             if ! test -f ranger/.config/ranger/rifle.conf; then
                 wget-aria-dir ~/.config/ranger/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/.config/ranger/rifle.conf
-                wget-aria-dir ~/.bash_aliases.d/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/.bash_aliases.d/fzf-rifle.sh
+                wget-aria-dir ~/.aliases.d/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/fzf/.aliases.d/fzf-rifle.sh
             else
                 mkdir -p ~/.config/ranger
                 cp ranger/.config/ranger/rifle.conf ~/.config/ranger/
-                cp fzf/.bash_aliases.d/fzf-rifle.sh ~/.bash_aliases.d/
+                cp fzf/.aliases.d/fzf-rifle.sh ~/.aliases.d/
             fi
             sed -i 's/\\\C-f//g' ~/.keybinds.d/fzf-bindings.bash
             sed -i "s|\(bind -m vi-insert '\"\\\C-t\":.*\)|\1\n\n    # CTRL-F - Search with previews and other handy additions\n    bind -m emacs-standard '\"\\\C-f\": \"\\\C-t\"'\n    bind -m vi-command '\"\\\C-f\": \"\\\C-o\\\C-f\\\C-o\"'\n    bind -m vi-insert '\"\\\C-f\": \"\\\C-o\\\C-f\\\C-o\"'|g" ~/.keybinds.d/fzf-bindings.bash
@@ -349,15 +349,15 @@ if [[ -z "$1" ]]; then
     # fi
     #unset fzf_t;
 
-    if ! test -f ~/.bash_aliases.d/docker-fzf.sh; then
-        readyn -p "Install fzf-docker (fzf aliases for docker)?" -c "! test -f $HOME/.bash_aliases.d/docker-fzf.sh" fzf_d
+    if ! test -f ~/.aliases.d/docker-fzf.sh; then
+        readyn -p "Install fzf-docker (fzf aliases for docker)?" -c "! test -f $HOME/.aliases.d/docker-fzf.sh" fzf_d
         if [[ "$fzf_d" == "y" ]]; then
             if ! test -f checks/check_aliases_dir.sh; then
                 source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)
             else
                 . ./checks/check_aliases_dir.sh
             fi
-            wget-aria-name ~/.bash_aliases.d/docker-fzf.sh https://raw.githubusercontent.com/MartinRamm/fzf-docker/master/docker-fzf
+            wget-aria-name ~/.aliases.d/docker-fzf.sh https://raw.githubusercontent.com/MartinRamm/fzf-docker/master/docker-fzf
         fi
     fi
     unset fzf_t

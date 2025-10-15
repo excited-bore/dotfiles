@@ -1,24 +1,10 @@
-#source /usr/share/bash-completion/completions/systemctl 
+### SYSTEMCTL ###
 
-function print-path-to-prompt(){
-    lines="n"
-    while getopts ':l' flag; do
-        case "${flag}" in
-            l)  lines="y"
-                shift 
-                ;;
-        esac
-    done && OPTIND=1;
-    fls=$(echo "$@" | sed 's| |\\ |g' | sed 's|\[|\\\[|g' | sed 's|\]|\\\]|g' | sed 's|(|\\(|g' | sed 's|)|\\)|g' | sed 's|{|\\{|g' | sed 's|}|\\}|g')
-    if test $lines == 'n'; then
-        fls="$(echo $fls | tr "\n" ' ')"
-#    else
-#        fls="$(echo $fls | tr "\n" "/ \n")"
-    fi
-    READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$fls${READLINE_LINE:$READLINE_POINT}"
-    READLINE_POINT=$(( READLINE_POINT + ${#fls} ))
-    unset lines fls 
-}
+if ! type reade &> /dev/null && test -f ~/.aliases.d/00-rlwrap_scripts.sh; then
+    . ~/.aliases.d/00-rlwrap_scripts.sh
+fi
+
+#source /usr/share/bash-completion/completions/systemctl 
 
 alias service-system-list-units="sudo systemctl list-units --all"
 alias service-user-list-units="systemctl --user list-units --all"
@@ -41,19 +27,7 @@ alias status-bluetooth="systemctl status bluetooth.service"
 alias restart-display="sudo systemctl restart display-manager"  
 alias status-display="sudo systemctl status display-manager"  
 
-__get_all_units1(){
- { SYSTEMD_COLORS=0 __systemctl $1 list-unit-files  --legend=false "$2*"
-   SYSTEMD_COLORS=0 __systemctl $1 list-units --all --legend=false "$2*"
- } |
- { while read -r a b
-   do echo " $a"
-   done
- }
-}
-
 alias systemctl-find-service-file="systemctl show -P FragmentPath "
-
-complete -F __get_all_units1 systemctl-find-service-file
 
 if systemctl list-units --full -all | grep -Fq "ssh.service"; then
     servs="ssh sshd" 
@@ -95,7 +69,7 @@ if systemctl list-units --full -all | grep -Fq "tor.service"; then
     unset servs 
 fi
 
-if type docker &> /dev/null; then
+if hash docker &> /dev/null; then
     servs="docker" 
     alias stop-docker="sudo systemctl stop  $servs"
     alias start-docker="sudo systemctl start  $servs"
@@ -109,7 +83,7 @@ if type docker &> /dev/null; then
 fi
 
 
-if type pipewire &> /dev/null; then
+if hash pipewire &> /dev/null; then
     servs="pipewire" 
     if type wireplumber &> /dev/null; then
         servs=$servs" wireplumber" 
@@ -128,8 +102,9 @@ if type pipewire &> /dev/null; then
     unset servs 
 fi
 
-if type fzf &> /dev/null; then
+if hash fzf &> /dev/null; then
     function systemctl-running-units-fzf() {
+        local unit actn now 
         if test -z $1; then
             unit=$(systemctl --no-pager --state running | head -n -6 | tail -n +2 | fzf --multi --ansi| awk '{print $1;}')
         else
@@ -138,45 +113,42 @@ if type fzf &> /dev/null; then
         echo $unit 
         reade -Q "GREEN" -i "status stop restart enable disable edit print" -p "What to do? [Status/stop/restart/enable/disable/edit/print]: " actn 
         if ! test -z $actn; then
-            if test $actn == 'status'; then
+            if [[ $actn == 'status' ]]; then
                 systemctl status $unit 
-            elif test $actn == 'stop'; then
+            elif [[ $actn == 'stop' ]]; then
                 systemctl status $unit 
                 systemctl stop $unit 
-            elif test $actn == 'restart'; then
+            elif [[ $actn == 'restart' ]]; then
                 systemctl restart $unit 
                 systemctl status $unit 
-            elif test $actn == 'enable'; then
-                reade -Q "GREEN" -i "n" -p "Also start $unit? [N/y]: " "y" now
-                if test $now == 'y'; then
+            elif [[ $actn == 'enable' ]]; then
+                readyn -p "Also start $unit?" now
+                if [[ $now == 'y' ]]; then
                     systemctl enable --now $unit 
                     systemctl status $unit 
                 else
                     systemctl enable $unit 
                     systemctl status $unit 
                 fi
-                unset $now 
-            elif test $actn == 'disable'; then
+            elif [[ $actn == 'disable' ]]; then
                 readyn -n -p "Also stop $unit? " now
-                if test $now == 'y'; then
+                if [[ $now == 'y' ]]; then
                     systemctl disable --now $unit 
                     systemctl status $unit 
                 else
                     systemctl disable $unit 
                     systemctl status $unit 
                 fi
-                unset $now 
-            elif test $actn == 'edit'; then
+            elif [[ $actn == 'edit' ]]; then
                  files='' 
                  for un in $unit; do
                      files=$files"/lib/systemd/system/$un " 
                  done
                  $EDITOR $files 
-            elif test $actn == 'print'; then
+            elif [[ $actn == 'print' ]]; then
                 echo "$unit"         
             fi
         fi
-        unset unit actn  
     }
 fi
 
@@ -185,42 +157,11 @@ system-service-start(){
     systemctl status $@;
 }
 
-_system-service-start(){
-    local cur=${COMP_WORDS[COMP_CWORD]} prev=${COMP_WORDS[COMP_CWORD-1]}
-    cur_orig=$cur
-    if [[ $cur =~ '\\' ]]; then
-        cur="$(echo $cur | xargs echo)"
-    else
-        cur_orig="$(printf '%q' $cur)"
-    fi
-    comps=$( __get_startable_units --system "$cur" )
-    compopt -o filenames
-    COMPREPLY=( $(compgen -o filenames -W '$comps' -- "$cur_orig") )
-    return 0
-}
-
-complete -F _system-service-start system-service-start
 
 service-start(){
     systemctl --user start $@;
     systemctl --user status $@;
 }
-
-_service-start(){
-    local cur=${COMP_WORDS[COMP_CWORD]} prev=${COMP_WORDS[COMP_CWORD-1]}
-    cur_orig=$cur
-    if [[ $cur =~ '\\' ]]; then
-        cur="$(echo $cur | xargs echo)"
-    else
-        cur_orig="$(printf '%q' $cur)"
-    fi
-    comps=$( __get_startable_units --user "$cur" )
-    compopt -o filenames
-    COMPREPLY=( $(compgen -o filenames -W '$comps' -- "$cur_orig") )
-    return 0
-}
-
-complete -F _service-start service-start
 
 
 alias system-service-stop="sudo systemctl stop "
@@ -231,42 +172,10 @@ system-service-restart(){
     sudo systemctl status $@;
 }
 
-_system-service-restart(){
-    local cur=${COMP_WORDS[COMP_CWORD]} prev=${COMP_WORDS[COMP_CWORD-1]}
-    cur_orig=$cur
-    if [[ $cur =~ '\\' ]]; then
-        cur="$(echo $cur | xargs echo)"
-    else
-        cur_orig="$(printf '%q' $cur)"
-    fi
-    comps=$( __get_stoppable_units --system "$cur" )
-    compopt -o filenames
-    COMPREPLY=( $(compgen -o filenames -W '$comps' -- "$cur_orig") )
-    return 0
-}
-
-complete -F _system-service-restart system-service-restart
-
 service-restart(){
     systemctl --user restart $@;
     systemctl --user status $@;
 }
-
-_service-restart(){
-    local cur=${COMP_WORDS[COMP_CWORD]} prev=${COMP_WORDS[COMP_CWORD-1]}
-    cur_orig=$cur
-    if [[ $cur =~ '\\' ]]; then
-        cur="$(echo $cur | xargs echo)"
-    else
-        cur_orig="$(printf '%q' $cur)"
-    fi
-    comps=$( __get_stoppable_units --system "$cur" )
-    compopt -o filenames
-    COMPREPLY=( $(compgen -o filenames -W '$comps' -- "$cur_orig") )
-    return 0
-}
-
-complete -F _service-restart service-restart
 
 
 system-service-enable-now(){
@@ -274,42 +183,11 @@ system-service-enable-now(){
     sudo systemctl status $@;
 }
 
-_system-service-enable-now(){
-    local cur=${COMP_WORDS[COMP_CWORD]} prev=${COMP_WORDS[COMP_CWORD-1]}
-    cur_orig=$cur
-    if [[ $cur =~ '\\' ]]; then
-        cur="$(echo $cur | xargs echo)"
-    else
-        cur_orig="$(printf '%q' $cur)"
-    fi
-    comps=$( __get_stoppable_units --system "$cur" )
-    compopt -o filenames
-    COMPREPLY=( $(compgen -o filenames -W '$comps' -- "$cur_orig") )
-    return 0
-}
-
-complete -F _system-service-enable-now system-service-enable-now
 
 service-enable-now(){
     systemctl --user enable --now $@;
     systemctl --user status $@;
 }
-
-_service-enable-now(){
-    local cur=${COMP_WORDS[COMP_CWORD]} prev=${COMP_WORDS[COMP_CWORD-1]}
-    cur_orig=$cur
-    if [[ $cur =~ '\\' ]]; then
-        cur="$(echo $cur | xargs echo)"
-    else
-        cur_orig="$(printf '%q' $cur)"
-    fi
-    comps=$( __get_stoppable_units --system "$cur" )
-    compopt -o filenames
-    COMPREPLY=( $(compgen -o filenames -W '$comps' -- "$cur_orig") )
-    return 0
-}
-
-complete -F _service-enable-now service-enable-now
 
 alias systemctl-failed='systemctl --failed'
 alias systemctl-failed-root='sudo systemctl --failed'
@@ -339,49 +217,76 @@ alias service-user-logs-live="journalctl -xf"
 alias service-system-logs-reverse="sudo journalctl -xr"
 alias service-user-logs-reverse="journalctl -xr"
 
-function service-system-create(){
-    read -p "Give up a '*.service' name (script adds file extension .service): " inpt;
+function systemctl-create-systemwide-service(){
+    local inpt serv start exec="/bin/bash /home/$USER/my_script.sh"
+    reade -Q 'GREEN' -p "Give up a name for the service file: " inpt;
     if [ -z "$inpt" ]; then
         echo "Give up a viable filename please";
-        return;
+        return 1;
     else
-        servF="$inpt.service";
-        touch $servF;
-        echo "[Unit]" >> $servF;
-        echo "Description=$inpt service." >> $servF;
+        printf "${CYAN}For example: ${GREEN}/bin/bash /home/$USER/my_script.sh\n${normal}" 
+        reade -Q 'GREEN' -p "Give up command or (shell)script file: " exec;
+        if [ -f $TMPDIR/$inpt ]; then
+            command rm $TMPDIR/$inpt  
+        fi
+        touch $TMPDIR/$inpt;
+        echo "[Unit]" >> $TMPDIR/$inpt;
+        echo "Description=$inpt service" >> $TMPDIR/$inpt;
 
-        echo "[Service]" >> $servF;
-        echo "ExecStart=/bin/bash /usr/bin/test_service.sh" >> $servF;
+        echo "[Service]" >> $TMPDIR/$inpt;
+        echo "ExecStart=$exec" >> $TMPDIR/$inpt;
 
-        echo "[Install]" >> $servF;
-        echo "WantedBy=multi-user.target" >> $servF;
-        sudo chmod 644 $servF;
-        sudoedit $servF;
+        echo "[Install]" >> $TMPDIR/$inpt;
+        echo "WantedBy=multi-user.target" >> $TMPDIR/$inpt;
+        
+        sudo mv $TMPDIR/$inpt /etc/systemd/system/$inpt.service
         serv="/etc/systemd/system/$inpt.service";
-        sudo mv -f $servF $serv;
-        systemd-start-systemservice $serv;
+        sudo chmod 644 $serv;
+        sudoedit $serv;
+        reade -Q 'GREEN' -i 'start enable neither' -p "Start or enable ${CYAN}$serv${GREEN}? [Start/enable/none]: " start
+        if [[ "$start" == 'start' ]]; then
+            sudo systemctl start $serv;
+        elif [[ "$start" == 'enable' ]]; then  
+            sudo systemctl enable $serv;
+        fi
+        sudo systemctl status $serv 
     fi
 }
 
-function service-user-create(){
-    read -p "Give up a '*.service' name (script adds file extension .service): " inpt;
+function systemctl-create-user-service(){
+    local inpt serv start exec="/bin/bash /home/$USER/my_script.sh"
+    reade -Q 'GREEN' -p "Give up a name for the service file: " inpt;
     if [ -z "$inpt" ]; then
         echo "Give up a viable filename please";
-        return;
+        return 1;
     else
-        serv="~/.config/systemd/system/$inpt.service";
-        touch $serv;
-        echo "[Unit]" >> $serv;
-        echo "Description=$serv service." >> $serv;
+        printf "${CYAN}For example: ${GREEN}/bin/bash /home/$USER/my_script.sh\n${normal}" 
+        reade -Q 'GREEN' -p "Give up command or (shell)script file: " exec;
+        if [ -f $TMPDIR/$inpt ]; then
+            command rm $TMPDIR/$inpt  
+        fi
+        touch $TMPDIR/$inpt;
+        echo "[Unit]" >> $TMPDIR/$inpt;
+        echo "Description=$inpt service" >> $TMPDIR/$inpt;
 
-        echo "[Service]" >> $serv;
-        echo "ExecStart=/bin/bash /usr/bin/test_service.sh" >> $serv;
+        echo "[Service]" >> $TMPDIR/$inpt;
+        echo "ExecStart=$exec" >> $TMPDIR/$inpt;
 
-        echo "[Install]" >> $serv;
-        echo "WantedBy=default.target" >> $serv;
-        $EDITOR $serv;
-        systemd-start-userservice $serv;
-    fi
+        echo "[Install]" >> $TMPDIR/$inpt;
+        echo "WantedBy=default.target" >> $TMPDIR/$inpt;
+        
+        mv $TMPDIR/$inpt $XDG_DATA_HOME/systemd/system/$inpt.service
+        serv="$XDG_DATA_HOME/systemd/system/$inpt.service";
+        chmod 644 $serv;
+        $EDITOR $serv
+        reade -Q 'GREEN' -i 'start enable neither' -p "Start or enable ${CYAN}$serv${GREEN}? [Start/enable/none]: " start
+        if [[ "$start" == 'start' ]]; then
+            systemctl --user start $serv;
+        elif [[ "$start" == 'enable' ]]; then  
+            systemctl --user enable $serv;
+        fi
+        systemctl --user status $serv
+    fi 
 }
 
 #if test $XDG_SESSION_TYPE == 'x11'; then

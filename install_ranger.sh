@@ -49,15 +49,15 @@ else
     printf "export RANGER_LOAD_DEFAULT_RC=FALSE\n" | sudo tee -a $ENV_R
 fi
 
-if [ -d ~/.bash_aliases.d/ ]; then
-    if test -f ranger/.bash_aliases.d/ranger.sh; then
-        cp ranger/.bash_aliases.d/ranger.sh ~/.bash_aliases.d/ranger.sh
+if [ -d ~/.aliases.d/ ]; then
+    if test -f ranger/.aliases.d/ranger.sh; then
+        cp ranger/.aliases.d/ranger.sh ~/.aliases.d/ranger.sh
     else
-        wget -O ~/.bash_aliases.d/ranger.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/.bash_aliases.d/ranger.sh
+        wget -O ~/.aliases.d/ranger.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/ranger/.aliases.d/ranger.sh
     fi
 
-    if hash gio &>/dev/null && test -f ~/.bash_aliases.d/ranger.sh~; then
-        gio trash ~/.bash_aliases.d/ranger.sh~
+    if hash gio &>/dev/null && test -f ~/.aliases.d/ranger.sh~; then
+        gio trash ~/.aliases.d/ranger.sh~
     fi
 fi
 

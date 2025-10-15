@@ -2,7 +2,7 @@
 
 READE_NOSTYLE='filecomp-only'
 
-#! type wget &> /dev/null && command -v brew &> /dev/null &&
+#! hash wget &> /dev/null && hash brew &> /dev/null &&
 #    brew install wget 
 
 
@@ -67,7 +67,7 @@ alias get-script-dir='cd "$( dirname "$-1" )" && pwd'
     alias unalias="builtin unalias"
 
 # Make sure cp copies forceably (without asking confirmation when overwriting) and verbosely
-if test -z "$CP_ALIAS_CHECKED" && (hash xcp &> /dev/null || hash cpg &> /dev/null || command cp --help | grep -qF -- '-g') && ! [[ "$(type cp)" =~ "'cpg -fgv'" ]] && ! [[ "$(type cp)" =~ "'xcp'" ]]; then
+if [ -z "$CP_ALIAS_CHECKED" ] && (hash xcp &> /dev/null || hash cpg &> /dev/null || command cp --help | grep -qF -- '-g') && ! [[ "$(type cp)" =~ "'cpg -fgv'" ]] && ! [[ "$(type cp)" =~ "'xcp'" ]]; then
      
     # Cpg is installed and replaced regular cp
     if command cp --help | grep -qF -- '-g'; then
@@ -122,7 +122,7 @@ else
 fi
 
 if hash aria2c &>/dev/null; then 
-    if test -z "$WGET_ARIA"; then
+    if [ -z "$WGET_ARIA" ]; then
         builtin unalias wget-aria 
         function wget-aria(){
             local wget_ar
@@ -164,7 +164,7 @@ fi
 
 # Less does raw control chars, use color and linenumbers, no sounds/bell and doesn't trigger your epilepsy
 export LESS='-R --use-color --LINE-NUMBERS --quit-if-one-screen -Q --no-vbell --prompt "Press q to quit"'
-test -z "$PAGER" && PAGER="less"
+[ -z "$PAGER" ] && PAGER="less"
 
 
 # ...
@@ -174,14 +174,14 @@ test -z "$PAGER" && PAGER="less"
 # 'man rlwrap' to see all unimplemented options
 
 if ! type reade &>/dev/null; then
-   if ! test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
-        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)
+   if ! [ -f aliases/.aliases.d/00-rlwrap_scripts.sh ]; then
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/00-rlwrap_scripts.sh)
     else
-        . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
+        . ./aliases/.aliases.d/00-rlwrap_scripts.sh
     fi
 fi
 
-if ! test -f checks/check_system.sh; then
+if ! [ -f checks/check_system.sh ]; then
     source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)
 else
     . ./checks/check_system.sh
@@ -190,15 +190,15 @@ fi
 # printf "${green} Will now start with updating system ${normal}\n"
 
 if ! type update-system &>/dev/null; then
-    if ! test -f aliases/.bash_aliases.d/update-system.sh; then
-        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh)
+    if ! [ -f aliases/.aliases.d/update-system.sh ]; then
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/update-system.sh)
     else
-        . ./aliases/.bash_aliases.d/update-system.sh
+        . ./aliases/.aliases.d/update-system.sh
     fi
 fi
 
 
-if test -z "$SYSTEM_UPDATED"; then
+if [ -z "$SYSTEM_UPDATED" ]; then
     readyn -Y "CYAN" -p "Update system?" updatesysm
     if [[ "$updatesysm" == "y" ]]; then
         update-system-yes
@@ -215,9 +215,9 @@ function version-higher() {
         return 1
     fi
     local IFS=. i 
-    if test -n "$BASH_VERSION"; then
+    if [ -n "$BASH_VERSION" ]; then
         local ver1=($1) ver2=($2) j=0
-    elif test -n "$ZSH_VERSION"; then
+    elif [ -n "$ZSH_VERSION" ]; then
         setopt shwordsplit 
         local ver1=(${=1}) ver2=(${=2}) j=1 
     fi
@@ -225,7 +225,7 @@ function version-higher() {
     for ((i = ${#ver1[@]}; i < ${#ver2[@]}; i++)); do
         ver1[i]=0
     done
-    if test -n "$BASH_VERSION"; then
+    if [ -n "$BASH_VERSION" ]; then
         
         for ((i = $j; $i < ${#ver1[@]}; i++)); do
             
@@ -238,7 +238,7 @@ function version-higher() {
                 return 1
             fi
         done
-    elif test -n "$ZSH_VERSION"; then
+    elif [ -n "$ZSH_VERSION" ]; then
         
         for ((i = $j; (($i-1)) < ${#ver1[@]}; i++)); do
             

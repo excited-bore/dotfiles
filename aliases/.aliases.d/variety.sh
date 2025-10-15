@@ -1,6 +1,6 @@
 # !/bin/bash
-if ! type reade &> /dev/null && test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh; then
-    . ~/.bash_aliases.d/00-rlwrap_scripts.sh
+if ! type reade &> /dev/null && test -f ~/.aliases.d/00-rlwrap_scripts.sh; then
+    . ~/.aliases.d/00-rlwrap_scripts.sh
 fi 
 
 if ! type ble &> /dev/null; then
@@ -12,24 +12,24 @@ fi
 # Kdocker is a system tray app
 # thunderbird does not support trays on linux, which why we do this
 
-if type kdocker &> /dev/null && type thunderbird &> /dev/null; then
+if hash kdocker &> /dev/null && hash thunderbird &> /dev/null; then
     alias thunderbird="kdocker thunderbird"
 fi
 
-if type lowfi &> /dev/null; then
+if hash lowfi &> /dev/null; then
     alias lowfi-play="lowfi play"
 fi
 
-if type nyx &> /dev/null; then
+if hash nyx &> /dev/null; then
     alias status-tor="nyx"
 fi
 
-if type java &> /dev/null; then
+if hash java &> /dev/null; then
     alias java-jar="java -jar"
 fi
 
 
-if type torsocks &> /dev/null; then
+if hash torsocks &> /dev/null; then
     alias tor-shell-on="source torsocks on"
     alias tor-shell-off="source torsocks off"
 fi
@@ -40,7 +40,7 @@ if test -f /opt/anaconda/bin/activate; then
     #CRYPTOGRAPHY_OPENSSL_NO_LEGACY=1 source /opt/anaconda/bin/activate root 
 fi
 
-if type nmap &> /dev/null; then
+if hash nmap &> /dev/null; then
     function net-open-ports-outgoing(){
         if test -z $@; then
             printf "No arguments. This could take a while.\n" 
@@ -49,19 +49,18 @@ if type nmap &> /dev/null; then
             time nmap -p "$@" portquiz.net 
         fi
     }
-    complete -W "$(seq 1 10000)" net-open-ports-outgoing 
 fi
 
-if type ss &> /dev/null; then
+if hash ss &> /dev/null; then
     alias ports-listen-tcp="ss -nlt"
   #alias net-list-active-ports="ss -tulpn | awk '{print \$5;}' | grep --color=never '[^\:][0-9]$' | cut -d: -f2 | xargs | tr ' ' '\n' | sort -u"  
 fi
 
 
-if type netstat &> /dev/null; then
+if hash netstat &> /dev/null; then
     # Netstat deprecated 
     # https://blog.pcarleton.com/post/netstat-vs-ss/
-    if type ss &> /dev/null; then
+    if hash ss &> /dev/null; then
         alias netstat-is-installed-but-use-ss='ss'
     fi
     alias netstat-list-all-ports="netstat -a"
@@ -83,7 +82,7 @@ if type netstat &> /dev/null; then
     alias netstat-ip4v6-group-membership='netstat -g | $PAGER' 
     
     function netstat-search-program-port(){
-        if ! test -z "$@"; then
+        if test -n "$@"; then
             for i in "$@"; do
                 printf "${CYAN}Port $i ${normal}\n" 
                 netstat -an | grep ":$i" 
@@ -91,20 +90,19 @@ if type netstat &> /dev/null; then
         fi
     }
     #if ! type ss &> /dev/null; then
-        complete -W "$(seq 1 10000)" netstat-search-program-port 
     #else
     #    complete -W "$(net-list-all-active-ports)" netstat-search-program-port 
     #fi
 fi
 
 
-if type exiftool &> /dev/null; then
+if hash exiftool &> /dev/null; then
     alias exiftool-folder="exiftool -r -all= $(pwd)"
     function exiftool-add-cron-wipe-all-metadata-rec-dir(){
+        local min dir 
         reade -Q 'GREEN' -i '0,5,10,15,25,30,35,40,45,5,55 0 5 10 15 25 30 35 40 45 50 55' -p 'Minutes? (0-59): '  min
         reade -Q 'GREEN' -p "Dir?: " -e dir
         (crontab -l; echo "$min * * * * exiftool -r -all= $dir") | sort -u | crontab -; crontab -l 
-        unset min dir 
     } 
     alias exiftool-add-cron-wipe-all-metadata-rec-picture-dir="(crontab -l; echo '0,5,10,15,25,30,35,40,45,5,55 * * * * exiftool -r -all= $HOME/Pictures') | sort -u | crontab -; crontab -l"
 fi
@@ -114,17 +112,17 @@ fi
 #fi
 
 # Discord and discord overlay
-if type discord &> /dev/null && type discover-overlay &> /dev/null; then
+if hash discord &>/dev/null && hash discover-overlay &>/dev/null; then
     alias discord="discover-overlay && discord"
 fi
 
 #alias mullvad-sessions="mullvad-exclude thunderbird; mullvad-exclude ferdium; mullvad connect"
 
 # Mullvad
-if type fzf &> /dev/null && type mullvad &> /dev/null; then
+if hash fzf &>/dev/null && hash mullvad &>/dev/null; then
     function mullvad-sessions(){
         mullvad disconnect
-        ssns="$(printf "mullvad-exclude firefox &\nmullvad-exclude thunderbird &\nmullvad-exclude ferdium &\nmullvad-exclude steam &\n" | fzf --multi)"
+        local ssns="$(printf "mullvad-exclude firefox &\nmullvad-exclude thunderbird &\nmullvad-exclude ferdium &\nmullvad-exclude steam &\n" | fzf --multi)"
         if ! test -z "$(echo "$ssns" | grep -q 'firefox')" && ! test -z "$(ps -aux | grep firefox | awk '{print $2}')"; then
             pkill -f firefox
         fi
@@ -134,7 +132,7 @@ fi
 
 
 # rg stuff
-if type rg &> /dev/null; then
+if hash rg &>/dev/null; then
     function rg-search-and-replace() {
         if test -z "$1" || test -z "$2"; then
             echo "rg-search-and-replace needs 2 arguments: "
@@ -142,13 +140,12 @@ if type rg &> /dev/null; then
             echo "  - the replacement"
             return 1
         fi
-        frst=$(echo $1 | sed 's|"|\\"|g' | sed 's|\[|\\[|g' | sed 's|\]|\\]|g') 
-        scnd=$(echo $2 | sed 's|"|\\"|g' | sed 's|\[|\\[|g' | sed 's|\]|\\]|g') 
+        local frst=$(echo $1 | sed 's|"|\\"|g; s|\[|\\[|g; s|\]|\\]|g') 
+        local scnd=$(echo $2 | sed 's|"|\\"|g; s|\[|\\[|g; s|\]|\\]|g') 
         printf 'Replacing '"${CYAN}$frst${normal}"' with '"${YELLOW}$scnd${normal}""\n" 
         #echo $frst'|'$scnd 
         rg "$(echo $frst | sed 's|?|\\\?|g')" --multiline --files-with-matches 
         rg "$(echo $frst | sed 's|?|\\?|g')" --multiline --color=never --files-with-matches | xargs sed -i "s|${frst}|${scnd}|g"
-        unset $frst $scnd 
     }
 fi
 

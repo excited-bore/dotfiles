@@ -1,20 +1,20 @@
 #!/bin/bash
 
 ### FLATPAK ###                           
-if ! type reade &> /dev/null && test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh; then
-    . ~/.bash_aliases.d/00-rlwrap_scripts.sh
+if ! type reade &> /dev/null && test -f ~/.aliases.d/00-rlwrap_scripts.sh; then
+    . ~/.aliases.d/00-rlwrap_scripts.sh
 fi
 
 function flatpak (){
   env -u SESSION_MANAGER flatpak "$@"
   pack="${@: -1}" 
-  if [ "$1" == "install" ] && flatpak list --columns=name | grep -i -q --color=never "$pack" && ! grep -q "$pack" ~/.bash_aliases.d/flatpacks.sh; then
+  if [ "$1" == "install" ] && flatpak list --columns=name | grep -i -q --color=never "$pack" && ! grep -q "$pack" ~/.aliases.d/flatpacks.sh; then
         #python /usr/bin/update_flatpak_cli.py
         name="$(flatpak list --columns=name | grep -i --color=never "$pack" | tr ' ' '-' | tr '[:upper:]' '[:lower:]' | awk '{print;}')"
         app_id="$(flatpak list --columns=application,name | grep -i --color=never "$pack" | awk '{print $1;}')"
-        readyn -p "No previous aliases for app detected. Create alias? (alias $name='flatpak run --file-forwarding $app_id' -> ~/.bash_aliases.d/flatpacks.sh)" ansr
-        if test $ansr == 'y'; then
-            printf "if flatpak list --columns=name | grep \"$name\" &> /dev/null; then\n\talias $name='flatpak run --file-forwarding $app_id'\nfi\n" >> ~/.bash_aliases.d/flatpacks.sh 
+        readyn -p "No previous aliases for app detected. Create alias? (alias $name='flatpak run --file-forwarding $app_id' -> ~/.aliases.d/flatpacks.sh)" ansr
+        if [[ $ansr == 'y' ]]; then
+            printf "if flatpak list --columns=name | grep \"$name\" &> /dev/null; then\n\talias $name='flatpak run --file-forwarding $app_id'\nfi\n" >> ~/.aliases.d/flatpacks.sh 
             alias $name="flatpak run --file-forwarding $app_id" 
         fi
         unset ansr name name_noup app_id 

@@ -4,27 +4,26 @@ if ! test -f checks/check_all.sh; then
     if type curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-        return 1 || exit 1
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
     . ./checks/check_all.sh
 fi
 
 
-if ! type nvim > /dev/null ; then
+if ! hash nvim &> /dev/null ; then
    if ! test -f ./install_nvim.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/install_fzf.sh)
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/install_fzf.sh)
     else
         . ./install_nvim.sh
     fi
 fi
 
-if ! type scdoc &> /dev/null; then
+if ! hash scdoc &> /dev/null; then
    eval "$pac_ins scdoc"
 fi
 
-if ! type nvimpager &> /dev/null; then
+if ! hash nvimpager &> /dev/null; then
     (cd $TMPDIR
     git clone https://github.com/lucc/nvimpager
     cd nvimpager

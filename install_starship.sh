@@ -1,5 +1,5 @@
 if ! test -f checks/check_all.sh; then
-    if hash curl &>/dev/null; then
+    if hash curl &> /dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
@@ -47,15 +47,15 @@ if [[ "y" == "$strship" ]]; then
     #    sed -i '/eval "$(starship init bash)"/d' ~/.bashrc
     #    sed -i 's|\(\[ -f ~/.bash_preexec \] \&\& source \~/.bash_preexec\)|\neval "$(starship init bash)"\n\1\n|g' ~/.bashrc
     #fi
-    if [ -d ~/.bash_aliases.d/ ]; then
-        if test -f aliases/.bash_aliases.d/starship.sh; then
-            cp aliases/.bash_aliases.d/starship.sh ~/.bash_aliases.d/
+    if [ -d ~/.aliases.d/ ]; then
+        if test -f aliases/.aliases.d/starship.sh; then
+            cp aliases/.aliases.d/starship.sh ~/.aliases.d/
         else
-            wget-aria-dir ~/.bash_aliases.d/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/starship.sh
+            wget-aria-dir ~/.aliases.d/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/starship.sh
         fi
 
-        if hash gio &>/dev/null && test -f ~/.bash_aliases.d/starship.sh~; then
-            gio trash ~/.bash_aliases.d/starship.sh~*
+        if hash gio &> /dev/null && test -f ~/.aliases.d/starship.sh~; then
+            gio trash ~/.aliases.d/starship.sh~*
         fi
     fi
 fi
@@ -79,14 +79,14 @@ if [[ "y" == "$strship" ]]; then
     fi
     sudo touch /root/.bash_completion.d/starship
     starship completions bash | sudo tee -a /root/.bash_completion.d/starship &>/dev/null
-    if [ -d /root/.bash_aliases.d/ ]; then
-        if test -f aliases/.bash_aliases.d/starship.sh; then
-            sudo cp aliases/.bash_aliases.d/starship.sh /root/.bash_aliases.d/
+    if [ -d /root/.aliases.d/ ]; then
+        if test -f aliases/.aliases.d/starship.sh; then
+            sudo cp aliases/.aliases.d/starship.sh /root/.aliases.d/
         else
-            sudo -E wget-aria-dir /root/.bash_aliases.d/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/starship.sh
+            sudo -E wget-aria-dir /root/.aliases.d/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/starship.sh
         fi
-        if hash gio &>/dev/null && test -f /root/.bash_aliases.d/starship.sh~; then
-            sudo gio trash /root/.bash_aliases.d/starship.sh~*
+        if hash gio &> /dev/null && test -f /root/.aliases.d/starship.sh~; then
+            sudo gio trash /root/.aliases.d/starship.sh~*
         fi
     fi
 fi
@@ -101,15 +101,15 @@ fi
 test -n "$BASH_VERSION" && eval "$(starship init bash)"
 test -n "$ZSH_VERSION" && eval "$(starship init zsh)"
 
-if ! test -f aliases/.bash_aliases.d/starship.sh; then
-    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/starship.sh)
+if ! test -f aliases/.aliases.d/starship.sh; then
+    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/starship.sh)
 else
-    . ./aliases/.bash_aliases.d/starship.sh
+    . ./aliases/.aliases.d/starship.sh
 fi
 
-if hash fzf &>/dev/null; then
+if hash fzf &> /dev/null; then
     starship-presets
-elif ! hash fzf &>/dev/null && test -f ~/.fzf.bash; then
+elif ! hash fzf &> /dev/null && test -f ~/.fzf.bash; then
     [ -f ~/.fzf.bash ] && source ~/.fzf.bash
     starship-presets
 elif ! hash fzf &> /dev/null && test -f ~/.fzf.zsh; then

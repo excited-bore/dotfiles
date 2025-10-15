@@ -1,9 +1,9 @@
 ### GIT ###
-if ! type reade &>/dev/null && test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh; then
-    source ~/.bash_aliases.d/00-rlwrap_scripts.sh
+if ! type reade &>/dev/null && test -f ~/.aliases.d/00-rlwrap_scripts.sh; then
+    source ~/.aliases.d/00-rlwrap_scripts.sh
 fi
 
-if hash wget &>/dev/null && hash jq &>/dev/null; then
+if hash wget &> /dev/null && hash jq &> /dev/null; then
 
     function get-latest-releases-github() {
         
@@ -68,25 +68,25 @@ if hash wget &>/dev/null && hash jq &>/dev/null; then
                     nwreleases="$nwreleases $i" 
                 fi
             done
-            if test -n $nwreleases; then
+            if test -n "$nwreleases"; then
                 unset releases
                 releases="$(echo $nwreleases | xargs)"
             fi
         fi
         
-        if hash fzf &>/dev/null; then
+        if hash fzf &> /dev/null; then
             test -n "$quer" &&
                 quer="--query $quer"
             res="$(echo "${releases[@]}" | tr ' ' '\n' | fzf $quer --select-1 --multi --reverse --height 50%)"
         elif type reade &> /dev/null; then
-            echo "${cyan}Files: ${normal}"
+            echo "${cyan}files: ${normal}"
             for i in ${releases[@]}; do
                 echo " - ${cyan}$i${normal}"
             done
 	    releases=$(echo "${releases[@]}" | tr '\n' ' ')
-            reade --auto oneoption -Q 'CYAN' $quer -i "$releases" -p "Which one?: " res
+            reade --auto oneoption -q 'cyan' $quer -i "$releases" -p "which one?: " res
         else
-            echo "${cyan}Files: ${normal}"
+            echo "${cyan}files: ${normal}"
             select res in ${releases[@]}; do
                 res=$res  
                 break 
@@ -140,15 +140,12 @@ alias git-config-pull-fastforward-only="git config --global pull.ff only"
 alias git-safe-force-push="git push --force-with-lease"
 
 function git-add-ssh-key() {
-    if [ ! -f ~/.ssh/config ]; then
+    if ! [ -f ~/.ssh/config ]; then
         mkdir ~/.ssh
         touch ~/.ssh/config
     fi
-    if test -n "$BASH_VERSION"; then
-        read -p "Give up name (Default:'id_keytype'): " name
-    elif test -n "$ZSH_VERSION"; then
-        read "?Give up name (Default: 'id_keytype'): " name
-    fi
+  
+    reade -p "Give up name (Default: 'id_keytype'): " name
 
     reade -i "dsa ecdsa ecdsa-sk ed25519 ed25519-sk rsa" -p "Give up keytype \(dsa \| ecdsa \| ecdsa-sk \| ed25519 (Default) \| ed25519-sk \| rsa\): " keytype
     if [ -z "$keytype" ]; then
@@ -168,6 +165,7 @@ function git-add-ssh-key() {
 }
 
 git-https-to-ssh() {
+    local gitRm 
     if [ -z $1 ]; then
         echo "You should give up the name of a remote"
         readyn -p "Do you want me to look for 'origin'?" resp
@@ -184,6 +182,7 @@ git-https-to-ssh() {
 }
 
 git-ssh-to-https() {
+    local gitRm 
     if [ -z $1 ]; then
         echo "You should give up the name of a remote"
         readyn -p "Do you want me to look for 'origin'?" resp
@@ -228,7 +227,7 @@ alias git-blame-full-branch="git blame -w -C -C -C "
 
 function git-commit() {
 
-    if git status; then
+    if git status &> /dev/null; then
 
         #if test -f $(git rev-parse --show-toplevel)/.git/hooks/pre-commit; then
         #    sh $(git rev-parse --show-toplevel)/.git/hooks/pre-commit
@@ -259,7 +258,7 @@ function git-commit() {
 }
 
 function git-commit-push-all() {
-    if [ ! -z "$1" ]; then
+    if ! [ -z "$1" ]; then
         git add -A && git commit -m "$1" && git push
     else
         git add -A && git commit && git push
@@ -275,18 +274,19 @@ alias git-create-and-switch-branch="git checkout -b - "
 alias git-push-to-branch="git push -u origin "
 
 git-switch-commit() {
-    commit=$(git --no-pager log --oneline --color=always | nl | fzf --ansi --track --no-sort --layout=reverse-list | awk '{print $2}')
+    local commit=$(git --no-pager log --oneline --color=always | nl | fzf --ansi --track --no-sort --layout=reverse-list | awk '{print $2}')
     git checkout "$commit"
 }
 
 git-add-worktree-and-ignore() {
+    local path 
     reade -Q "CYAN" -p "Give up a (new) worktree path: " -e path
-    if [ ! -z "$path" ]; then
+    if ! [ -z "$path" ]; then
         git worktree add "$path"
         if [ "${path: -1}" != "/" ]; then
             path="$path/"
         fi
-        if [ ! -f ./.gitignore ]; then
+        if ! [ -f ./.gitignore ]; then
             touch .gitignore
         fi
         echo "$path" >>.gitignore
@@ -295,12 +295,12 @@ git-add-worktree-and-ignore() {
 
 git-add-worktree-and-ignore() {
     reade -Q "CYAN" -p "Give up a (new) worktree path: " -e path
-    if [ ! -z "$path" ]; then
+    if ! [ -z "$path" ]; then
         git worktree add "$path"
         if [ "${path: -1}" != "/" ]; then
             path="$path/"
         fi
-        if [ ! -f ./.gitignore ]; then
+        if ! [ -f ./.gitignore ]; then
             touch .gitignore
         fi
         echo "$path" >>.gitignore
@@ -308,15 +308,15 @@ git-add-worktree-and-ignore() {
 }
 
 git-remove-worktree-and-ignore() {
-    wrktree=$(git worktree list -v | tail -n +2 | nl | fzf --ansi --track --no-sort --layout=reverse-list | awk '{print $2}')
-    if [ ! -z "$wrktree" ]; then
+    local wrktree=$(git worktree list -v | tail -n +2 | nl | fzf --ansi --track --no-sort --layout=reverse-list | awk '{print $2}')
+    if ! [ -z "$wrktree" ]; then
         git worktree remove "$wrktree"
-        top=$(git rev-parse --show-toplevel)
-        path=$(echo $wrktree | sed "s|$top/||")
+        local top=$(git rev-parse --show-toplevel)
+        local path=$(echo $wrktree | sed "s|$top/||")
         if [ "${path: -1}" != "/" ]; then
             path="$path/"
         fi
-        if [ ! -f ./.gitignore ]; then
+        if ! [ -f ./.gitignore ]; then
             touch .gitignore
         fi
         sed -i "s|.*$path.*||" .gitignore
@@ -326,43 +326,41 @@ git-remove-worktree-and-ignore() {
 }
 
 git-add-branch() {
+    local commit branch 
     reade -Q "GREEN" -p "Give up a new branch name: " branch
     commit=$(git log --oneline --color=always | nl | fzf --ansi --track --no-sort --layout=reverse-list | awk '{print $2}')
-    if [ ! -z "$branch" ]; then
+    if [ -z "$branch" ]; then
         git checkout -b "$branch" "$commit"
     fi
 }
 
 #https://stackoverflow.com/questions/1125968/how-do-i-force-git-pull-to-overwrite-local-files
 git-backup-branch-and-reset-to-remote() {
-    remote=origin
-    branch=master
-    backp_branch=1
-    stash=false
+    local remote=origin branch=master backp_branch=1 stash=false
 
-    if ! test -z "$1" && [[ ! $(git remotes -v | grep -q $1) ]]; then
+    if ! test -z "$1" && ! [[ $(git remotes -v | grep -q $1) ]]; then
         echo "Use a legit remote or add it using 'git-add-remote-ssh' or 'git-add-remote-url'"
-    elif ! test -z "$1"; then
+    elif test -n "$1"; then
         remote=$1
     fi
     echo "Using '$1' as remote\n"
 
-    if ! test -z "$2" && [[ ! $(git branch --list | grep -q $2) ]]; then
+    if test -n "$2" && ! [[ $(git branch --list | grep -q $2) ]]; then
         echo "Use a legit branch or add it using 'git-add-branch'"
     elif ! test -z "$2"; then
         remote=$2
     fi
     echo "Using '$2' as branch\n"
 
-    if ! test -z "$3" && ! [[ "$3" == true ]]; then
-        for cnt in $(git branch --list | grep --regex 'main.' | wc -l); do
+    if test -n "$3" && ! [[ "$3" == true ]]; then
+        for cnt in $(git branch --list | grep --regex $branch | wc -l); do
             $backp_branch+=1
         done
     elif [[ "$3" == true ]]; then
         stash=true
     fi
 
-    if ! test -z "$1" && ! test -z "$2"; then
+    if test -n "$1" && test -n "$2"; then
         git checkout "$2"
         git stash
         git fetch --all
@@ -373,7 +371,7 @@ git-backup-branch-and-reset-to-remote() {
         else
             echo "No uncomitted changes kept. They can be reapplied with 'git stash pop'"
         fi
-    elif ! test -z "$1" && test -z "$2"; then
+    elif test -n "$1" && test -n "$2"; then
         git checkout main
         git stash
         git branch "$3"

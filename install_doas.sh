@@ -1,15 +1,13 @@
-#!/usr/bin/env bash
-
-if ! test -f checks/check_all.sh; then
-    if type curl &>/dev/null; then
+if ! [ -f checks/check_all.sh ]; then
+    if hash curl &> /dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-        return 1 || exit 1
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
     . ./checks/check_all.sh
 fi
+
 
 if [[ $distro_base == "Arch" ]]; then
     eval "$pac_ins opendoas "
@@ -22,22 +20,22 @@ sudo cp doas/doas.conf /etc/doas.conf
 
 #./install_polkit_wheel.sh
 
-readyn -p "Install doas.sh? (~/.bash_aliases.d/doas.sh)" doas
+readyn -p "Install doas.sh? (~/.aliases.d/doas.sh)" doas
 if [[ $doas == 'y' ]]; then 
-    if ! [ -d ~/.bash_aliases.d/ ]; then
-        mkdir ~/.bash_aliases.d/
+    if ! [ -d ~/.aliases.d/ ]; then
+        mkdir ~/.aliases.d/
     fi
-    cp doas/doas.sh ~/.bash_aliases.d/doas.sh
-    readyn -p "Install doas.sh globally? (/root/.bash_aliases.d/doas.sh" gdoas
+    cp doas/doas.sh ~/.aliases.d/doas.sh
+    readyn -p "Install doas.sh globally? (/root/.aliases.d/doas.sh" gdoas
     if [[ $gdoas == 'y' ]]; then
-        if ! sudo test -d ~/.bash_aliases.d/ ; then
-            sudo mkdir /root/.bash_aliases.d/
+        if ! sudo test -d ~/.aliases.d/ ; then
+            sudo mkdir /root/.aliases.d/
         fi
-        if ! sudo grep -q "/root/.bash_aliases.d" /root/.bashrc; then
+        if ! sudo grep -q "/root/.aliases.d" /root/.bashrc; then
 
-            printf "\nif [[ -d /root/.bash_aliases.d/ ]]; then\n  for alias in /root/.bash_aliases.d/*.sh; do\n      . \"\$alias\" \n  done\nfi" | sudo tee -a /root/.bashrc > /dev/null
+            printf "\nif [[ -d /root/.aliases.d/ ]]; then\n  for alias in /root/.aliases.d/*.sh; do\n      . \"\$alias\" \n  done\nfi" | sudo tee -a /root/.bashrc &> /dev/null
         fi
-        sudo cp doas/doas.sh /root/.bash_aliases.d/doas.sh
+        sudo cp doas/doas.sh /root/.aliases.d/doas.sh
     fi
 fi
 

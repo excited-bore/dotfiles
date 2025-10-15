@@ -1,10 +1,10 @@
 ##### GPG ####
 
-if ! type reade &> /dev/null ; then
-    source ~/.bash_aliases.d/00-rlwrap_scripts.sh
+if ! type reade &> /dev/null && test -f ~/.aliases.d/00-rlwrap_scripts.sh; then
+    source ~/.aliases.d/00-rlwrap_scripts.sh
 fi
 
-type gpg2 &> /dev/null && export GPG='gpg2' || export GPG='gpg'
+hash gpg2 &> /dev/null && export GPG='gpg2' || export GPG='gpg'
 if test -z $GNUPGHOME; then
     GNUPGHOME=$HOME/.gnupg
 fi
@@ -22,6 +22,72 @@ alias gpg-list-publickey-mails="$GPG --list-keys | grep --color=never \< | cut -
 alias gpg-list-privatekey-mails="$GPG --list-secret-keys | grep --color=never \< | cut -d'<' -f2- | cut -d'>' -f1"
 alias gpg-list-known-keyservers="grep --color=never "^keyserver" $GNUPGHOME/gpg.conf | grep -v --color=never "keyserver-" | awk '{print $2}' | tr '\n' ' '"
 
+alias gpg-encrypt-file-gpg="gpg --symmetric"
+alias gpg-encrypt-file-unreadable="gpg --symmetric"
+alias gpg-encrypt-file-asc="gpg --armor --symmetric"
+alias gpg-encrypt-file-readable="gpg --armor --symmetric"
+
+function gpg-encrypt-custom-algo(){
+    if test -z $1; then
+        reade -Q 'GREEN' -p "File/Folder?: " -e file
+    else
+        file=$1
+    fi
+
+    cmd="gpg --symmetric --cipher-algo"
+    if $(type gpg-zip &> /dev/null || type gpgtar &> /dev/null) && test -d $file; then
+        if type gpgtar &> /dev/null; then
+            cmd='gpgtar --symmetric --gpg-args'
+        elif type gpg-zip &> /dev/null; then 
+            cmd='gpg-zip --symmetric' 
+        fi
+    fi
+
+    cphrs=$(gpg --version | grep Cipher | cut -d: -f2 | sed 's|,||g')
+    prm="AES128/${YELLOW}$(echo $cphrs | tr ' ' '/' | sed 's|/AES|${GREEN}/AES|')" 
+    reade -Q 'GREEN' -i "AES128 $cphrs" -p "Algorithm? [$prm]: "  algo
+    if [[ $algo == '3DES' || $algo == 'IDEA' || $algo == 'CAST5' || $algo == 'BLOWFISH' ]]; then
+        printf "${red}$algo is an older cipher algorithm${normal}\n" 
+        readyn -n -N 'YELLOW' -p "Use anyway?" algo_old
+        if [[ $algo_old == 'y' ]]; then
+            algo=$algo" --allow-old-cipher-algo" 
+        else 
+            echo "Aborted"
+            return 1 
+        fi
+    fi
+
+    readyn -n -N 'YELLOW' -p "Readable format (.asc - ASCII)?" asc
+    arm=''
+    if [[ $asc == 'y' ]]; then
+        arm='--armour'
+    fi
+
+    readyn -Q 'GREEN' -p "Output (empty - same file/dir + .gpg)?: "  outpt
+    utpt=''
+    if ! test -z $outpt; then
+        utpt="--output $outpt.gpg" 
+    elif test -d $file; then
+        utpt="--output ${file%/}.gpg" 
+    fi
+
+    if ! test -z "$algo" ; then
+        eval "$cmd --cipher-algo=$algo $arm $utpt $file"
+    else
+        echo "Aborted"
+    fi
+}
+
+
+function gpg-decrypt-asc(){ 
+    for i in "$@"; do 
+        arm=''
+        if [[ $i =~ ".asc" ]]; then
+            arm="--armor"
+        fi
+        echo "${i%.*}" | { read file; gpg --decrypt "$arm" "$i" > "$file"; }
+    done
+}
 
 #fingerprints_all=$("$GPG" --list-keys --list-options show-only-fpr-mbox 2>/dev/null | awk '{print $1;}')
 alias gpg-list-key-fingerprints="$GPG --list-keys --list-options show-only-fpr-mbox | awk '{print $1;}'"
@@ -44,9 +110,9 @@ function receive-mails-csv-file(){
             s='chrome'
             d="[Chrome/firefox]"
         fi
-        reade -Q "GREEN" -i "$s" -p "Chrome or firefox based? $d: " "chrome" based
+        reade -Q "GREEN" -i "$s firefox chrome" -p "Chrome or firefox based? $d: " based
         
-        if test $based == 'firefox'; then
+        if [[ $based == 'firefox' ]]; then
             b=$(cat "$file" | tr ',' ' '| awk '{print $2;}')
         else
             b=$(cat "$file" | tr ',' ' '| awk '{print $3;}')
@@ -79,27 +145,27 @@ function gpg-publish-key() {
     fi 
     if test -z "$2"; then 
         mails=$($GPG $dir --list-keys --list-options show-only-fpr-mbox | awk '{print $2;}')
-        reade -Q "GREEN" -i "' '" -p "Get fingerprints from which mails? (All is option - Separate by spaces and add quotation marks around if using multiple fingerprints): " "all $mails" keyid
+        reade -Q "GREEN" -i "' ' all $mails" -p "Get fingerprints from which mails? (All is option - Separate by spaces and add quotation marks around if using multiple fingerprints): "  keyid
         keyid=$($GPG --list-keys --list-options show-only-fpr-mbox $keyid | awk '{print $1;}' )
     else
         keyid="$2"
     fi
-    reade -Q "GREEN" -i "n" -p "Set keyserver? (Otherwise looks for last defined keyserver in \$GNUPGHOME/.gnupg/gpg.conf) [N/y]: " "y" c_srv
-    if test "$c_srv" == "y"; then
+    readyn -n -N "GREEN" -p "Set keyserver? (Otherwise looks for last defined keyserver in \$GNUPGHOME/.gnupg/gpg.conf)" c_srv
+    if [[ "$c_srv" == "y" ]]; then
         printf "Known keyservers from \$GNUPGHOME/gpg.conf: \n"
         for i in $keyservers_all; do
             printf "\t- ${CYAN}$i${normal}\n"
         done
-        reade -Q "GREEN" -i "' '" -p "Keyserver? (separate by spaces and add quotation marks around if using multiple servers; f.ex. 'keys.openpgp.org keys.mailvelope.com' ): " "all $keyservers_all" serv 
-        if test "$serv" == "all"; then
+        reade -Q "GREEN" -i "' ' all $keyservers_all" -p "Keyserver? (separate by spaces and add quotation marks around if using multiple servers; f.ex. 'keys.openpgp.org keys.mailvelope.com' ): " serv 
+        if [[ "$serv" == "all" ]]; then
             for srv in $keyservers_all; do
                 succeeded=0
-                while test $succeeded == 0; do
+                while [[ $succeeded == 0 ]]; do
                     printf "Trying to send ${bold}${magenta}$srv${normal} fingerprint(s)/keyid(s)\n ${CYAN}$keyid${normal}\n"
                     "$GPG" $dir --verbose --keyserver "$srv" --send-key $keyid  
                     if [[ $? > 0 ]]; then
-                        reade -Q "YELLOW" -i "y" -p "Failed sending key to server. Retry? [Y/n]: " "n" retry 
-                        if test $retry == 'n'; then
+                        readyn -Y "YELLOW" -p "Failed sending key to server. Retry?" retry 
+                        if [[ $retry == 'n' ]]; then
                             succeeded=1    
                         fi
                     else
@@ -111,12 +177,12 @@ function gpg-publish-key() {
             for s in $serv; do
                 succeeded=0
                 echo $keyid
-                while test $succeeded == 0; do
+                while [[ $succeeded == 0 ]]; do
                     printf "Trying to send ${bold}${magenta}$s${normal} fingerprint(s)/keyid(s):\n ${CYAN}$keyid${normal}\n"
                     "$GPG" $dir --verbose --keyserver "$s" --send-key $keyid  
                     if [[ $? > 0 ]]; then
-                        reade -Q "YELLOW" -i "y" -p "Failed sending key to server. Retry? [Y/n]: " "n" retry 
-                        if test $retry == 'n'; then
+                        readyn -Y "YELLOW" -p "Failed sending key to server. Retry?" retry 
+                        if [[ $retry == 'n' ]]; then
                             succeeded=1    
                         fi
                     else
@@ -127,12 +193,12 @@ function gpg-publish-key() {
         fi
     else 
         succeeded=0
-        while test $succeeded == 0; do
+        while [[ $succeeded == 0 ]]; do
             printf "Trying to send fingerprint(s)/keyid(s):\n ${CYAN}$keyid${normal}\n"
             "$GPG" $dir --verbose --send-key $keyid  
             if [[ $? > 0 ]]; then
-                reade -Q "YELLOW" -i "y" -p "Failed sending key to server. Retry? [Y/n]: " "n" retry 
-                if test $retry == 'n'; then
+                readyn -Y "YELLOW" -p "Failed sending key to server. Retry?" retry 
+                if [[ $retry == 'n' ]]; then
                     succeeded=1    
                 fi
             else
@@ -152,7 +218,7 @@ function gpg-get-emails-exported-browserlogins-and-generate-keys(){
     
     if test -z $1; then 
         mails=$(receive-mails-csv-file)
-        if test "$mails" == 1; then
+        if [[ "$mails" == 1 ]]; then
             return 1
         fi
     else
@@ -171,31 +237,31 @@ function gpg-get-emails-exported-browserlogins-and-generate-keys(){
 
     default_key=''
     #reade -Q "CYAN" -i "n" -p "Set custom algorithm? (Default \"ed25519/cert,sign+cv25519/encr\") [N/y]: " "y" algo 
-    reade -Q "CYAN" -i "n" -p "Set custom algorithm? (Default Ecc type 'ed25519' for cert,sign and seperate 'cv25519' key for encr) [N/y]: " "y" algo 
+    readyn -n -N "CYAN" -p "Set custom algorithm? (Default Ecc type 'ed25519' for cert,sign and seperate 'cv25519' key for encr)" algo 
     
-    if test "$algo" == 'y'; then
+    if [[ "$algo" == 'y' ]]; then
         printf "Default suggestions GPG defaults\n"
-        reade -Q "GREEN" -i 'ecc' -p "Signing/Certifying key algorithm? (Elliptic-curve/Rivest–Shamir–Adleman/Digital Signature Algorithm) [ecc/rsa/dsa]: " "rsa dsa" pubkey
-        if test $pubkey == 'rsa' || test $pubkey == 'dsa'; then   
-                reade -Q "GREEN" -i '8192' -p "Set the length (in bits) for the keys. 8192 is given at default because it automatically shifts to the highest amount in bits possible: " "4096 2048 1024" length               
+        reade -Q "GREEN" -i 'ecc rsa dsa' -p "Signing/Certifying key algorithm? (Elliptic-curve/Rivest–Shamir–Adleman/Digital Signature Algorithm) [ecc/rsa/dsa]: " pubkey
+        if [[ $pubkey == 'rsa' || $pubkey == 'dsa' ]]; then   
+                reade -Q "GREEN" -i '8192 4096 2048 1024' -p "Set the length (in bits) for the keys. 8192 is given at default because it automatically shifts to the highest amount in bits possible: " length               
                 pubkey="$pubkey$length"
-        elif test $pubkey == 'ecc'; then
-            reade -Q "GREEN" -i 'ed25519' -p "What Elliptic-curve cryptography keyalgorithm would you like? [ed25519/ed488/nistp256/nistp384/nistp521/brainpoolP256r1/brainpoolP384r1/brainpoolP512r1/secp256k1]: " "ed488 nistp256 nistp384 nistp521 brainpoolP256r1 brainpoolP384r1 brainpoolP512r1 secp256k1" pubkey
+        elif [[ $pubkey == 'ecc' ]]; then
+            reade -Q "GREEN" -i 'ed25519 ed488 nistp256 nistp384 nistp521 brainpoolP256r1 brainpoolP384r1 brainpoolP512r1 secp256k1' -p "What Elliptic-curve cryptography keyalgorithm would you like? [ed25519/ed488/nistp256/nistp384/nistp521/brainpoolP256r1/brainpoolP384r1/brainpoolP512r1/secp256k1]: " pubkey
         fi
 
-        reade -Q "GREEN" -i 'cert,sign' -p "Keyuse: (Default: signing and certification) [cert,sign/cert/sign]: " "cert sign" cert_sign
+        reade -Q "GREEN" -i 'cert,sign cert sign' -p "Keyuse: (Default: signing and certification) [cert,sign/cert/sign]: " cert_sign
 
-        reade -Q "GREEN" -i 'y' -p "Set custom expiration date for primary key? (Default: 3 years) [Y/n]: " "n" exp
-        if test $exp == 'y'; then
+        readyn -n -N "GREEN" -p "Set custom expiration date for primary key? (Default: 3 years)" exp
+        if [[ $exp == 'y' ]]; then
             printf "${CYAN}\t - Set expiration to a set date\n\t - Set to date including hours, minutes and seconds\n\t - Set by period valid\n\t - Set to never expire \n\t(f.ex. 25/02/2059 vs 2059-11-13T10:39:35 vs 10y vs never)\n"
-            reade -Q "GREEN" -i 'period' -p "[Period/date-hour/date/never]?: " "date date-hour never" exp
+            reade -Q "GREEN" -i 'period date date-hour never' -p "[Period/date-hour/date/never]?: " exp
             year=$(expr $(date --iso-8601 | tr '-' ' ' |  awk '{print $1}') + 3)
             month=$(date --iso-8601 | tr '-' ' ' |  awk '{print $2}')
             day=$(date --iso-8601 | tr '-' ' ' |  awk '{print $3}')
-            if test $exp == 'date'; then
-                reade -Q "GREEN" -i "$year" -p "Year? : " "" year
-                reade -Q "GREEN" -i "$month" -p "Month? : " "" month
-                reade -Q "GREEN" -i "$day" -p "Day? : " "" day
+            if [[ $exp == 'date' ]]; then
+                reade -Q "GREEN" -i "$year" -p "Year? : " year
+                reade -Q "GREEN" -i "$month" -p "Month? : " month
+                reade -Q "GREEN" -i "$day" -p "Day? : " day
                 if [[ ${#month} < 2 ]]; then
                     month="0$month"
                 fi
@@ -203,13 +269,13 @@ function gpg-get-emails-exported-browserlogins-and-generate-keys(){
                     day="0$day"
                 fi
                 exp="$year-$month-$day"
-            elif test $exp == 'date-hour'; then
-                reade -Q "GREEN" -i "$year" -p "Year?: " "" year
-                reade -Q "GREEN" -i "$month" -p "Month?: " "" month
-                reade -Q "GREEN" -i "$day" -p "Day?: " "" day
-                reade -Q "GREEN" -i "00" -p "Hour?: " "" hour
-                reade -Q "GREEN" -i "00" -p "Minute?: " "" minute
-                reade -Q "GREEN" -i "00" -p "Seconds?: " "" seconds
+            elif [[ $exp == 'date-hour' ]]; then
+                reade -Q "GREEN" -i "$year" -p "Year?: " year
+                reade -Q "GREEN" -i "$month" -p "Month?: " month
+                reade -Q "GREEN" -i "$day" -p "Day?: " day
+                reade -Q "GREEN" -i "00" -p "Hour?: " hour
+                reade -Q "GREEN" -i "00" -p "Minute?: " minute
+                reade -Q "GREEN" -i "00" -p "Seconds?: " seconds
                 if [[ ${#month} < 2 ]]; then
                     month="0$month"
                 fi
@@ -226,34 +292,34 @@ function gpg-get-emails-exported-browserlogins-and-generate-keys(){
                     seconds="0$seconds"
                 fi
                 exp="$year$month$day""T""$hour$minute$seconds"
-            elif test $exp == 'period'; then
-                reade -Q "GREEN" -i "years" -p "Period? [Years/months/weeks/days/seconds]: " "months weeks days seconds" period
-                reade -Q "GREEN" -i "3" -p "Number of $period?: " "" num_period
+            elif [[ $exp == 'period' ]]; then
+                reade -Q "GREEN" -i "years months weeks days seconds" -p "Period? [Years/months/weeks/days/seconds]: " period
+                reade -Q "GREEN" -i "3" -p "Number of $period?: " num_period
                 exp="$num_period$period"
             fi
         fi
 
-        reade -Q "GREEN" -i 'y' -p "Add encryption subkey? (Using a different key for signing/verifying and encryption/decryption is good practice) [Y/n]: " "n" enckeys
-        if test $enckeys == 'y' && ! [[ $pubkey =~ 'dsa' ]]; then
-            reade -Q "GREEN" -i 'y' -p "Same algorithm for encryption subkey? [Y/n]: " "n" enckeys
-            if test $enckeys == 'n'; then
-                reade -Q "GREEN" -i 'elg' -p "Wich encryption algorithm? [elg (ElGamal - Default)/rsa/ecc(Elliptic-curve cryptography)]: " "rsa ecc" enckey
-                if test $enckey == 'rsa' || test $enckey == 'elg'; then   
-                    reade -Q "GREEN" -i '8192' -p "Set the length (in bits) for the keys. 8192 is given at default because it automatically shifts to the highest amount in bits possible: " "4096 2048 1024" lengthenc            
+        readyn -p "Add encryption subkey? (Using a different key for signing/verifying and encryption/decryption is good practice)" enckeys
+        if [[ $enckeys == 'y' ]] && ! [[ $pubkey =~ 'dsa' ]]; then
+            readyn -p "Same algorithm for encryption subkey?" enckeys
+            if [[ $enckeys == 'n' ]]; then
+                reade -Q "GREEN" -i 'elg rsa ecc' -p "Wich encryption algorithm? [elg (ElGamal - Default)/rsa/ecc(Elliptic-curve cryptography)]: " enckey
+                if [[ $enckey == 'rsa' || $enckey == 'elg' ]]; then   
+                    reade -Q "GREEN" -i '8192 4096 2048 1024' -p "Set the length (in bits) for the keys. 8192 is given at default because it automatically shifts to the highest amount in bits possible: " lengthenc            
                     enckey="$enckey$lengthenc"
-                elif test $enckey == 'ecc'; then
-                    reade -Q "GREEN" -i 'cv25519' -p "What Elliptic-curve cryptography keyalgorithm would you like? [cv25519/cv488/nistp256/nistp384/nistp521/brainpoolP256r1/brainpoolP384r1/brainpoolP512r1/secp256k1]: " "cv488 nistp256 nistp384 nistp521 brainpoolP256r1 brainpoolP384r1 brainpoolP512r1 secp256k1" enckey
+                elif [[ $enckey == 'ecc' ]]; then
+                    reade -Q "GREEN" -i 'cv25519 cv488 nistp256 nistp384 nistp521 brainpoolP256r1 brainpoolP384r1 brainpoolP512r1 secp256k1' -p "What Elliptic-curve cryptography keyalgorithm would you like? [cv25519/cv488/nistp256/nistp384/nistp521/brainpoolP256r1/brainpoolP384r1/brainpoolP512r1/secp256k1]: " enckey
                 fi   
                 #default_key="$pubkey/cert,sign+$enckey/encr"
             fi
         elif [[ $pubkey =~ 'dsa' ]]; then
             printf "Need a different algorithm for encryption (Dsa is only for signing)\n"
-            reade -Q "GREEN" -i 'elg' -p "Wich encryption algorithm? [elg (ElGamal - Default)/rsa/ecc(Elliptic-curve cryptography)]: " "rsa ecc" enckey
-            if test $enckey == 'rsa' || test $enckey == 'elg'; then   
-                reade -Q "GREEN" -i '8192' -p "Set the length (in bits) for the keys. 8192 is given at default because it automatically shifts to the highest amount in bits possible: " "4096 2048 1024" lengthenc            
+            reade -Q "GREEN" -i 'elg rsa ecc' -p "Wich encryption algorithm? [elg (ElGamal - Default)/rsa/ecc(Elliptic-curve cryptography)]: " enckey
+            if [[ $enckey == 'rsa' || $enckey == 'elg' ]]; then   
+                reade -Q "GREEN" -i '8192 4096 2048 1024' -p "Set the length (in bits) for the keys. 8192 is given at default because it automatically shifts to the highest amount in bits possible: " lengthenc            
                 enckey="$enckey$lengthenc"
-            elif test $enckey == 'ecc'; then
-                reade -Q "GREEN" -i 'cv25519' -p "What Elliptic-curve cryptography keyalgorithm would you like? [cv25519/cv488/nistp256/nistp384/nistp521/brainpoolP256r1/brainpoolP384r1/brainpoolP512r1/secp256k1]: " "cv488 nistp256 nistp384 nistp521 brainpoolP256r1 brainpoolP384r1 brainpoolP512r1 secp256k1" enckey
+            elif [[ $enckey == 'ecc' ]]; then
+                reade -Q "GREEN" -i 'cv25519 cv488 nistp256 nistp384 nistp521 brainpoolP256r1 brainpoolP384r1 brainpoolP512r1 secp256k1' -p "What Elliptic-curve cryptography keyalgorithm would you like? [cv25519/cv488/nistp256/nistp384/nistp521/brainpoolP256r1/brainpoolP384r1/brainpoolP512r1/secp256k1]: " enckey
             fi
             #default_key="$pubkey/cert,sign+$enckey/encr"
             #default_key="$pubkey/cert,sign"
@@ -261,17 +327,17 @@ function gpg-get-emails-exported-browserlogins-and-generate-keys(){
             enckey=$(echo $pubkey | sed 's|ed|cv|')
         fi
         
-        reade -Q "GREEN" -i 'y' -p "Set custom expiration date for subkey? (Default: 3 years) [Y/n]: " "n" exp
-        if test $exp == 'y'; then
+        readyn -Q "GREEN" -p "Set custom expiration date for subkey? (Default: 3 years)" exp
+        if [[ $exp == 'y' ]]; then
             printf "${CYAN}\t - Set expiration to a set date\n\t - Set to date including hours, minutes and seconds\n\t - Set by period valid\n\t - Set to never expire \n\t(f.ex. 25/02/2059 vs 2059-11-13T10:39:35 vs 10y vs never)\n"
-            reade -Q "GREEN" -i 'date' -p "[Date/Date-hour/period/never]?: " "date-hour period never" exp
+            reade -Q "GREEN" -i 'date date-hour period never' -p "[Date/Date-hour/period/never]?: " exp
             year=$(expr $(date --iso-8601 | tr '-' ' ' |  awk '{print $1}') + 3)
             month=$(date --iso-8601 | tr '-' ' ' |  awk '{print $2}')
             day=$(date --iso-8601 | tr '-' ' ' |  awk '{print $3}')
-            if test $exp == 'date'; then
-                reade -Q "GREEN" -i "$year" -p "Year? : " "" year
-                reade -Q "GREEN" -i "$month" -p "Month? : " "" month
-                reade -Q "GREEN" -i "$day" -p "Day? : " "" day
+            if [[ $exp == 'date' ]]; then
+                reade -Q "GREEN" -i "$year" -p "Year? : " year
+                reade -Q "GREEN" -i "$month" -p "Month? : " month
+                reade -Q "GREEN" -i "$day" -p "Day? : " day
                 if [[ ${#month} < 2 ]]; then
                     month="0$month"
                 fi
@@ -279,38 +345,38 @@ function gpg-get-emails-exported-browserlogins-and-generate-keys(){
                     day="0$day"
                 fi
                 exp="$year-$month-$day"
-            elif test $exp == 'date-hour'; then
-                reade -Q "GREEN" -i "$year" -p "Year?: " "" year
-                reade -Q "GREEN" -i "$month" -p "Month?: " "" month
-                reade -Q "GREEN" -i "$day" -p "Day?: " "" day
-                reade -Q "GREEN" -i "00" -p "Hour?: " "" hour
-                reade -Q "GREEN" -i "00" -p "Minute?: " "" minute
-                reade -Q "GREEN" -i "00" -p "Seconds?: " "" seconds
-                if [[ ${#month} < 2 ]]; then
+            elif [[ $exp == 'date-hour' ]]; then
+                reade -Q "GREEN" -i "$year" -p "Year?: " year
+                reade -Q "GREEN" -i "$month" -p "Month?: " month
+                reade -Q "GREEN" -i "$day" -p "Day?: " day
+                reade -Q "GREEN" -i "00" -p "Hour?: " hour
+                reade -Q "GREEN" -i "00" -p "Minute?: " minute
+                reade -Q "GREEN" -i "00" -p "Seconds?: " seconds
+                if [[ ${#month} -lt 2 ]]; then
                     month="0$month"
                 fi
-                if [[ ${#day} < 2 ]]; then
+                if [[ ${#day} -lt 2 ]]; then
                     day="0$day"
                 fi
-                if [[ ${#hour} < 2 ]]; then
+                if [[ ${#hour} -lt 2 ]]; then
                     hour="0$hour"
                 fi
-                if [[ ${#minute} < 2 ]]; then
+                if [[ ${#minute} -lt 2 ]]; then
                     minute="0$minute"
                 fi
-                if [[ ${#seconds} < 2 ]]; then
+                if [[ ${#seconds} -lt 2 ]]; then
                     seconds="0$seconds"
                 fi
                 exp="$year$month$day""T""$hour$minute$seconds"
-            elif test $exp == 'period'; then
-                reade -Q "GREEN" -i "years" -p "Period? [Years/months/weeks/days/seconds]: " "months weeks days seconds" period
-                reade -Q "GREEN" -i "3" -p "Number of $period?: " "" num_period
+            elif [[ $exp == 'period' ]]; then
+                reade -Q "GREEN" -i "years months weeks days seconds" -p "Period? [Years/months/weeks/days/seconds]: " period
+                reade -Q "GREEN" -i "3" -p "Number of $period?: " num_period
                 exp="$num_period$period"
             fi
         fi
         
     fi
-    reade -Q "YELLOW" -i "n" -p "Never use passwords when generating keys? [N/y]: " 'y' always_no_pw
+    reade -n -N "YELLOW" -p "Never use passwords when generating keys?" always_no_pw
 
     private_mails=$("$GPG" $dir --list-secret-keys | grep --color=never \< | cut -d'<' -f2- | cut -d'>' -f1)
     
@@ -322,18 +388,18 @@ function gpg-get-emails-exported-browserlogins-and-generate-keys(){
         i=${i%"\""}
         
         # Get name by printing mail with any numbers, cutting away the part after @, replace _/-/. with spaces and then uppercase first letter of each space seperated word
-        i_name="$(printf '%s\n' ${i//[[:digit:]]/} | cut -d@ -f1 | sed 's|_| |g' | sed 's|-| |g' | sed 's|\.| |' | sed -r 's/[^[:space:]]*[0-9][^[:space:]]* ?//g' | sed -e 's/\b\(.\)/\u\1/g')"
+        i_name="$(printf '%s\n' ${i//[[:digit:]]/} | cut -d@ -f1 | sed 's|_| |g; s|-| |g; s|\.| |g' | sed -r 's/[^[:space:]]*[0-9][^[:space:]]* ?//g' | sed -e 's/\b\(.\)/\u\1/g')"
 
         if ! echo "$private_mails" | grep $i; then
-            reade -Q "GREEN" -i "y" -p "No secret key found for ${CYAN}$i${GREEN}. Generate key? [Y/n]: " "n" gen
+            readyn -p "No secret key found for ${CYAN}$i${GREEN}. Generate key?" gen
             #if ! $same_way; then
-            if test $gen == 'y'; then
+            if [[ $gen == 'y' ]]; then
                 mails_with_gen_keys="$mails_with_gen_keys $i"
-                reade -Q "GREEN" -i "'$i_name'" -p "Name? (Can remain empty, use 'John Doe' when using spaces): " "" name
-                reade -Q "GREEN" -i "''" -p "Comment? (Can remain empty): " "" comment
+                reade -Q "GREEN" -i "'$i_name'" -p "Name? (Can remain empty, use 'John Doe' when using spaces): " name
+                reade -Q "GREEN" -i "''" -p "Comment? (Can remain empty): " comment
 
-                if test $always_no_pw == 'n'; then
-                    reade -Q "YELLOW" -i "n" -p "No password? [N/y]: " 'y' nopw
+                if [[ $always_no_pw == 'n' ]]; then
+                    readyn -n -p "No password?" nopw
                 else
                     nopw="$always_no_pw"
                 fi
@@ -342,7 +408,7 @@ function gpg-get-emails-exported-browserlogins-and-generate-keys(){
                     comment="($comment)"
                 fi
 
-                if test $nopw == 'y' ; then
+                if [[ $nopw == 'y' ]]; then
                     if ! test -z $pubkey; then
                         echo '' | $GPG $dir --batch --yes --passphrase-fd 0 --quick-generate-key "$name $comment <$i>" $pubkey $cert_sign $exp
                     else
@@ -356,9 +422,9 @@ function gpg-get-emails-exported-browserlogins-and-generate-keys(){
                     fi 
                 fi
 
-                if test $enckeys == 'y'; then
+                if [[ $enckeys == 'y' ]]; then
                     fpr=$(gpg --list-options show-only-fpr-mbox --list-secret-keys $i | awk '{print $1;}')
-                    if test $nopw == 'y' ; then
+                    if [[ $nopw == 'y' ]]; then
                         echo '' | $GPG $dir --batch --yes --passphrase-fd 0 --quick-generate-key $fpr $enckey encrypt $exp_sub
                     else
                         $GPG $dir --batch --pinentry-mode=loopback --quick-add-key $fpr $enckey encrypt $exp_sub
@@ -369,15 +435,15 @@ function gpg-get-emails-exported-browserlogins-and-generate-keys(){
     done
     $GPG $dir --list-secret-keys $mails_with_gen_keys
     
-    reade -Q "CYAN" -i "n" -p "Publish keys to keyserver(s)? [N/y]: " "y" publish
-    if test $publish == 'y'; then
+    reade -n -N "CYAN" -p "Publish keys to keyserver(s)?" publish
+    if [[ $publish == 'y' ]]; then
         printf "Generated keys for these mails:\n ${CYAN}$mails_with_gen_keys${normal}\n"     
-        reade -Q "GREEN" -i 'y' -p "Publish keys from these emails? [Y/n]: " "n" add_mail
-        if test $add_mail == 'n'; then
+        reade -p "Publish keys from these emails?" add_mail
+        if [[ $add_mail == 'n' ]]; then
             privatekey_mails=$("$GPG" $dir --list-secret-keys | grep --color=never \< | cut -d'<' -f2- | cut -d'>' -f1)
             printf "Known mails: \n$privatekey_mails\n"
-            reade -Q "GREEN" -i "' '" -p "Which mails ? (tab completion enabled - leave quotation marks when giving multiple - remove for all): " "all $privatekey_mails" mails_with_gen_keys
-            if test "$mails_with_gen_keys" == 'all'; then
+            reade -Q "GREEN" -i "' ' all $privatekey_mails" -p "Which mails ? (tab completion enabled - leave quotation marks when giving multiple - remove for all): " mails_with_gen_keys
+            if [[ "$mails_with_gen_keys" == 'all' ]]; then
                 mails_with_gen_keys=''
                 for m in $privatekey_mails; do
                     mails_with_gen_keys="$mails_with_gen_keys $m"
@@ -390,8 +456,8 @@ function gpg-get-emails-exported-browserlogins-and-generate-keys(){
 
     printf "${GREEN}Done!\n"
 
-    reade -Q "GREEN" -i "n" -p "Remove ${CYAN}$file? [N/y]: " "y" rm_file
-    if test $rm_file == 'y'; then
+    readyn -n -N 'GREEN' -p "Remove ${CYAN}$file?" rm_file
+    if [[ $rm_file == 'y' ]]; then
         rm -v $file
     fi
     
@@ -406,8 +472,8 @@ alias gpg-generate-key-full="$GPG --full-generate-key"
 
 
 function gpg-generate-key-full(){
-     reade -Q "CYAN" -i "n" -p "Expert mode (allow things like generating unusual keytypes)? [N/y]: " "y" xprt
-     if test "$xprt" == "y"; then
+     readyn -n -N "CYAN" -p "Expert mode (allow things like generating unusual keytypes)?" xprt
+     if [[ "$xprt" == "y" ]]; then
          $GPG --expert --full-generate-key
      else
          $GPG --full-generate-key
@@ -431,18 +497,18 @@ function gpg-list-packets-from-key(){
     publickey_mails=$("$GPG" --list-keys | grep --color=never \< | cut -d'<' -f2- | cut -d'>' -f1)
     privatekey_mails=$("$GPG" --list-secret-keys | grep --color=never \< | cut -d'<' -f2- | cut -d'>' -f1)
     if test -z "$@"; then
-        reade -Q "GREEN" -i "public" -p "Public keys, Private (Secret) keys or Private Subkeys? [Public/private/private-sub]: " "private private-sub" keytype
-        if test "$keytype" == "public"; then
+        reade -Q "GREEN" -i "public private private-sub" -p "Public keys, Private (Secret) keys or Private Subkeys? [Public/private/private-sub]: " keytype
+        if [[ "$keytype" == "public" ]]; then
             export_keys="--export" 
-            reade -Q "GREEN" -i "all" -p "By name or all?: " "$publickey_mails" mail
-        elif test "$keytype" == "private"; then
+            reade -Q "GREEN" -i "all $publickey_mails" -p "By name or all?: " mail
+        elif [[ "$keytype" == "private" ]]; then
             export_keys="--export-secret-keys" 
-            reade -Q "GREEN" -i "all" -p "By name or all?: " "$privatekey_mails" mail
-        elif test "$keytype" == "private-sub"; then
+            reade -Q "GREEN" -i "all $privatekey_mails" -p "By name or all?: " mail
+        elif [[ "$keytype" == "private-sub" ]]; then
             export_keys="--export-secret-subkeys" 
-            reade -Q "GREEN" -i "all" -p "By name or all?: " "$privatekey_mails" mail
+            reade -Q "GREEN" -i "all $privatekey_mails" -p "By name or all?: " mail
         fi
-        if ! test $mail == 'all'; then
+        if ! [[ $mail == 'all' ]]; then
             "$GPG" $export_keys "$mail" | "$GPG" --list-packets | $PAGER 
         else
             "$GPG" $export_keys | "$GPG" --list-packets | $PAGER  
@@ -458,51 +524,51 @@ alias gpg-edit-key="$GPG --edit-key"
 alias gpg-import="$GPG --import"
 
 function gpg-export-public-keys(){
-    reade -Q "GREEN" -i "keys" -p "File name? (Script will add file-extension .asc): " "" name
+    reade -Q "GREEN" -i "keys" -p "File name? (Script will add file-extension .asc): " name
     mails=$($GPG --list-keys --list-options show-only-fpr-mbox | awk '{print $2;}')
-    reade -Q "GREEN" -i "' '" -p "Based on which mails ? (all is a choice - leave quotation marks when giving multiple - tab completion enabled): " "all $mails" mails
-    if test "$mails" == "all"; then
+    reade -Q "GREEN" -i "' ' all $mails" -p "Based on which mails ? (all is a choice - leave quotation marks when giving multiple - tab completion enabled): " mails
+    if [[ "$mails" == "all" ]]; then
        mails='' 
     fi
     $GPG -v --armor --export $mails > $name.asc
     echo "Exported keys to ./$name.asc!"
-    reade -Q "GREEN" -i "y" -p "Import to gpg located in other dir? [Y/n]: " "n" dir
-    if test $dir == 'y'; then 
+    readyn -p "Import to gpg located in other dir?" dir
+    if [[ $dir == 'y' ]]; then 
         reade -Q "GREEN" -p "Where is other GPG homedir?: " -e dir
         $GPG --homedir $dir --import $name.asc
     fi
 }
 
 function gpg-export-secret-keys(){
-    reade -Q "GREEN" -i "keys" -p "File name? (Script will add file-extension .asc): " "" name
+    reade -Q "GREEN" -i "keys" -p "File name? (Script will add file-extension .asc): " name
     mails=$($GPG --list-keys --list-options show-only-fpr-mbox | awk '{print $2;}')
-    reade -Q "GREEN" -i "' '" -p "Based on which mails ? (all is a choice - leave quotation marks when giving multiple - tab completion enabled): " "all $mails" mails
-    if test "$mails" == "all"; then
+    reade -Q "GREEN" -i "' ' all $mails" -p "Based on which mails ? (all is a choice - leave quotation marks when giving multiple - tab completion enabled): " mails
+    if [[ "$mails" == "all" ]]; then
        mails='' 
     fi
     $GPG --armor --export-secret-keys $mails > $name.asc
     $GPG --armor --export-secret-subkeys $mails | tee -a $name.asc &> /dev/null
     echo "Exported keys to ./$name.asc!"
-    reade -Q "GREEN" -i "y" -p "Import to gpg located in other dir? [Y/n]: " "n" dir
-    if test $dir == 'y'; then 
+    readyn -p "Import to gpg located in other dir?" dir
+    if [[ $dir == 'y' ]]; then 
         reade -Q "GREEN" -p "Where is other GPG homedir?: " -e dir
         $GPG --homedir $dir --import $name.asc
     fi 
 }
 
 function gpg-export-public-and-secret-keys(){
-    reade -Q "GREEN" -i "keys" -p "File name? (Script will add file-extension .asc): " "" name
+    reade -Q "GREEN" -i "keys" -p "File name? (Script will add file-extension .asc): " name
     mails=$($GPG --list-keys --list-options show-only-fpr-mbox | awk '{print $2;}')
-    reade -Q "GREEN" -i "' '" -p "Based on which mails ? (all is a choice - leave quotation marks when giving multiple - tab completion enabled): " "all $mails" mails
-    if test "$mails" == "all"; then
+    reade -Q "GREEN" -i "' ' all $mails" -p "Based on which mails ? (all is a choice - leave quotation marks when giving multiple - tab completion enabled): " mails
+    if [[ "$mails" == "all" ]]; then
        mails='' 
     fi
     $GPG --armor --export $mails > $name.asc 
     $GPG --armor --export-secret-keys $mails | tee -a $name.asc &> /dev/null
     $GPG --armor --export-secret-subkeys $mails | tee -a $name.asc &> /dev/null
     echo "Exported keys to ./$name.asc!"
-    reade -Q "GREEN" -i "y" -p "Import to gpg located in other dir? [Y/n]: " "n" dir
-    if test $dir == 'y'; then 
+    readyn -p "Import to gpg located in other dir?" dir
+    if [[ $dir == 'y' ]]; then 
         reade -Q "GREEN" -p "Where is other GPG homedir?: " -e dir
         $GPG --homedir $dir --import $name.asc
     fi
@@ -519,27 +585,27 @@ function gpg-search-keys-keyserver-by-mail() {
     fingerprints_all=$("$GPG" --list-keys --list-options show-only-fpr-mbox | awk '{print $1;}')
 
     if test -z "$1"; then 
-        reade -Q "GREEN" -i "' '" -p "Name/Email/Fingerprint/Keyid?: " "all-mails all-finger $publickey_mails $fingerprints_all" mail
+        reade -Q "GREEN" -i "' ' all-mails all-finger $publickey_mails $fingerprints_all" -p "Name/Email/Fingerprint/Keyid?: " mail
     elif test -f "$1"; then
         mail=$(cat "$1" | awk '{print $2;}')  
     else
         mail="$1"
     fi
 
-    if test "$mail" == 'all-mails'; then
+    if [[ "$mail" == 'all-mails' ]]; then
         mail="$publickey_mails"
-    elif test "$mail" == 'all-finger'; then
+    elif [[ "$mail" == 'all-finger' ]]; then
         mail="$fingerprints_all"
     fi
-    reade -Q "GREEN" -i "n" -p "Set keyserver? (Otherwise looks for last defined keyserver in \$GNUPGHOME/.gnupg/gpg.conf) [N/y]: " "y" c_srv
-    if test "$c_srv" == "y"; then
+    reade -n -N "GREEN" -p "Set keyserver? (Otherwise looks for last defined keyserver in \$GNUPGHOME/.gnupg/gpg.conf)" c_srv
+    if [[ "$c_srv" == "y" ]]; then
         #reade -Q "GREEN" -i "hkp://keys.openpgp.org" -p "Keyserver?: " "hkp://keyserver.ubuntu.com hkp://pgp.mit.edu hkp://pool.sks-keyservers.net hkps://keys.mailvelope.com hkps://api.protonmail.ch" serv 
         printf "Known keyservers from \$GNUPGHOME/gpg.conf: \n"
         for i in $keyservers_all; do
             printf "\t- ${CYAN}$i${normal}\n"
         done
-        reade -Q "GREEN" -i "all" -p "Keyserver? (Default: all known): " "$keyservers_all" serv 
-        if test "$serv" == "all"; then
+        reade -Q "GREEN" -i "all $keyservers_all" -p "Keyserver? (Default: all known): " serv 
+        if [[ "$serv" == "all" ]]; then
             for srv in $keyservers_all; do
                 echo "Searching ${bold}${magenta}$srv${normal}"
                 "$GPG" --verbose --keyserver "$srv" --search "$mail"  
@@ -559,36 +625,36 @@ function gpg-receive-keys-keyserver-by-fingerprints() {
     fingerprints_all=$("$GPG" --list-keys --list-options show-only-fpr-mbox | awk '{print $1;}')
     
     if test -z "$1"; then 
-        reade -Q "GREEN" -i "mail" -p "Lookup fingerprint by mail or select fingerprint directly? [Mail/fingerprint]: " "fingerprint" fingrprnt_mail
-        if test $fingrprnt_mail == 'mail' ; then
-            reade -Q "GREEN" -i "' '" -p "Mail(s)?: " "all $publickey_mails" mails
-            if test $mails == all; then
+        reade -Q "GREEN" -i "mail fingerprint" -p "Lookup fingerprint by mail or select fingerprint directly? [Mail/fingerprint]: " fingrprnt_mail
+        if [[ $fingrprnt_mail == 'mail' ]]; then
+            reade -Q "GREEN" -i "' ' all $publickey_mails" -p "Mail(s)?: " mails
+            if [[ $mails  == "all" ]]; then
                 mails="$publickey_mails"
             fi
             $GPG --list-keys --list-options show-only-fpr-mbox $mails
             fingerprints_some=$($GPG --list-keys --list-options show-only-fpr-mbox $mails | awk '{print $1;}')
-            reade -Q "GREEN" -i "' '" -p "Fingerprint(s)?: " "all $fingerprints_some" fingrprnt
-            if test $fingrprnt == all; then
+            reade -Q "GREEN" -i "' '" -p "Fingerprint(s)?: " fingrprnt
+            if [[ $fingrprnt == "all" ]]; then
                 fingrprnt="$fingerprints_some"
             fi 
         else
-            reade -Q "GREEN" -i "' '" -p "Fingerprint(s)?: " "all $fingerprints_all" fingrprnt
+            reade -Q "GREEN" -i "' ' all $fingerprints_all" -p "Fingerprint(s)?: " fingrprnt
         fi
     else
         fingrprnt="$1"
     fi
-    if test "$fingrprnt" == 'all'; then
+    if [[ "$fingrprnt" == 'all' ]]; then
         fingrprnt="$fingerprints_all"
     fi
-    reade -Q "GREEN" -i "n" -p "Set keyserver? (Otherwise looks for last defined keyserver in \$GNUPGHOME/.gnupg/gpg.conf) [N/y]: " "y" c_srv
-    if test "$c_srv" == 'y'; then
+    readyn -n -p "Set keyserver? (Otherwise looks for last defined keyserver in \$GNUPGHOME/.gnupg/gpg.conf)" c_srv
+    if [[ "$c_srv" == 'y' ]]; then
         #reade -Q "GREEN" -i "hkp://keys.openpgp.org" -p "Keyserver?: " "hkp://keyserver.ubuntu.com hkp://pgp.mit.edu hkp://pool.sks-keyservers.net hkps://keys.mailvelope.com hkps://api.protonmail.ch" serv 
         printf "Known keyservers from \$GNUPGHOME/gpg.conf: \n"
         for i in $keyservers_all; do
             printf "\t- ${CYAN}$i${normal}\n"
         done
-        reade -Q "GREEN" -i "all" -p "Keyserver? (Default: all known): " "$keyservers_all" serv 
-        if test "$serv" == 'all'; then
+        reade -Q "GREEN" -i "all $keyservers_all" -p "Keyserver? (Default: all known): " serv 
+        if [[ "$serv" == 'all' ]]; then
             for srv in $keyservers_all; do
                 echo "Searching ${bold}${magenta}$srv${normal}"
                 "$GPG" --verbose --keyserver "$srv" --receive-keys $fingrprnt  

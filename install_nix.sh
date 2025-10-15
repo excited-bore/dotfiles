@@ -1,45 +1,43 @@
-#/bin/bash
-
 if ! test -f checks/check_all.sh; then
-    if type curl &>/dev/null; then
+    if hash curl &> /dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-        return 1 || exit 1
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
     . ./checks/check_all.sh
 fi
 
+
 if ! test -f checks/check_envvar_aliases_completions_keybinds.sh; then
-     source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar_aliases_completions_keybinds.sh) 
+     source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar_aliases_completions_keybinds.sh) 
 else
     . ./checks/check_envvar_aliases_completions_keybinds.sh
 fi
 
 
-if ! type nix &> /dev/null; then
+if ! hash nix &> /dev/null; then
     reade -Q 'GREEN' -i 'system user' -p "Install nix systemwide or only $USER [System/user]: " glob
     if [[ $glob == 'system' ]]; then
-        sh <(curl -L https://nixos.org/nix/install) --daemon
+        sh <(wget-curl https://nixos.org/nix/install) --daemon
     else
-        sh <(curl -L https://nixos.org/nix/install) --no-daemon	
+        sh <(wget-curl https://nixos.org/nix/install) --no-daemon	
     fi
 fi
 
-if type nix &> /dev/null; then
-    local nixsh=$(pwd)/aliases/.bash_aliases.d/nix.sh
+if hash nix &> /dev/null; then
+    local nixsh=$(pwd)/aliases/.aliases.d/nix.sh
     if ! test -f $nixsh; then
-       tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/nix.sh
+       tmp=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/nix.sh > $tmp
        nixsh=$tmp
     fi
 
     function ins_nix_r(){
-        sudo cp $nixsh /root/.bash_aliases.d/
+        sudo cp $nixsh /root/.aliases.d/
     }	
 
     function ins_nix(){
-        cp $nixsh ~/.bash_aliases.d/nix.sh
+        cp $nixsh ~/.aliases.d/nix.sh
         yes-edit-no -f ins_nix_r -g "$nixsh" -p "Install nix.sh to /root? (nix bash aliases)" 
     }	
     yes-edit-no -f ins_nix -g "$nixsh" -p "Install nix.sh to $HOME? (nix bash aliases)"

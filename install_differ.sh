@@ -9,7 +9,7 @@
 # https://github.com/KDE/kdiff3
 
 if ! test -f checks/check_all.sh; then
-    if hash curl &>/dev/null; then
+    if hash curl &> /dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
@@ -66,9 +66,9 @@ if [[ "$distro_base" == "Arch" ]]; then
     elif [[ $pager == "delta" ]]; then
         eval "$pac_ins_y git-delta"
     elif [[ $pager == "ydiff" ]]; then
-        if ! type pipx &>/dev/null && ! test -f install_pipx.sh; then
+        if ! hash pipx &> /dev/null && ! test -f install_pipx.sh; then
             source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)
-        elif ! type pipx &>/dev/null; then
+        elif ! hash pipx &> /dev/null; then
             . ./install_pipx.sh
         fi
         pipx install ydiff
@@ -80,17 +80,17 @@ elif [[ "$distro_base" == "Debian" ]]; then
     elif [[ $pager == "colordiff" ]]; then
         eval "$pac_ins_y colordiff"
     elif [[ $pager == "delta" ]]; then
-        if ! test -f aliases/.bash_aliases.d/git.sh; then
-            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/git.sh)
+        if ! test -f aliases/.aliases.d/git.sh; then
+            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/git.sh)
         else
-            . ./aliases/.bash_aliases.d/git.sh
+            . ./aliases/.aliases.d/git.sh
         fi
         get-latest-releases-github 'https://github.com/dandavison/delta/releases' "$TMPDIR" 'git-delta_.*_amd64.deb' 
         sudo dpkg -i $TMPDIR/git-delta_*_amd64.deb 
     elif [[ $pager == "ydiff" ]]; then
-        if ! type pipx &>/dev/null && ! test -f install_pipx.sh; then
+        if ! hash pipx &> /dev/null && ! test -f install_pipx.sh; then
             source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)
-        elif ! type pipx &>/dev/null; then
+        elif ! hash pipx &> /dev/null; then
             . ./install_pipx.sh
         fi
         pipx install ydiff

@@ -2,23 +2,22 @@
 # Install Butterfish
 # Author: Peter Bakkum
 
-if ! test -f checks/check_all.sh; then
-    if type curl &>/dev/null; then
+if ! [ -f checks/check_all.sh ]; then
+    if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-        return 1 || exit 1
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
     . ./checks/check_all.sh
 fi
 
-if ! type go &> /dev/null; then
+if ! hash go &> /dev/null; then
     echo "Go is not installed. Installing Go..."
-    if ! test -f install_go.sh; then
-         source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh) 
+    if ! [ -f install_go.sh ]; then
+         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/00-rlwrap_scripts.sh) 
     else
-        . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
+        . ./aliases/.aliases.d/00-rlwrap_scripts.sh
     fi
 fi
 
@@ -35,3 +34,4 @@ if [[ "$response" == "y" ]]; then
     printf "OPENAI_TOKEN=" > ~/.config/butterfish/butterfish.env
     $EDITOR ~/.config/butterfish/butterfish.env
 fi
+unset response

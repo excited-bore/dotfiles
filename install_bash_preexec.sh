@@ -13,7 +13,7 @@ else
 fi
 
 if ! test -f ~/.bash_preexec; then
-    wget -O ~/.bash_preexec https://raw.githubusercontent.com/rcaloras/bash-preexec/master/bash-preexec.sh
+    curl-wget https://raw.githubusercontent.com/rcaloras/bash-preexec/master/bash-preexec.sh > ~/.bash_preexec
 fi
 
 if test -f ~/.bash_profile; then

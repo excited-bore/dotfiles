@@ -1,7 +1,7 @@
 ### PACKAGE MANAGERS ###
 
-if ! type reade &> /dev/null && test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh; then
-    . ~/.bash_aliases.d/00-rlwrap_scripts.sh
+if ! type reade &> /dev/null && test -f ~/.aliases.d/00-rlwrap_scripts.sh; then
+    . ~/.aliases.d/00-rlwrap_scripts.sh
 fi
 
 ## FZF completions??
@@ -31,24 +31,13 @@ if hash apt &> /dev/null; then
             fi
             for APT in `find $first -name $second`; do
                 ppa=$(grep "URIs" $APT | grep --color=never 'ppa' | awk '{print $2;}' | sed 's|https://ppa.launchpadcontent\.net/|ppa:|g' | sed 's|/ubuntu/||g')
-                if test -n "$ppa"; then 
+                if [[ -n "$ppa" ]]; then 
                     printf "$ppa\n" 
                 fi
             done
         }
         
-        _ppa_purge(){
-            #WORD_ORIG=$COMP_WORDBREAKS
-            #COMP_WORDBREAKS=${COMP_WORDBREAKS/:/}
-            _get_comp_words_by_ref -n : cur
-            COMPREPLY=($(compgen -W "-p -o -s -d -y -i -h $(apt-list-ppa-installed)" -- "$cur") )
-            __ltrim_colon_completions "$cur"
-            #COMP_WORDBREAKS=$WORD_ORIG
-            return 0
-        } 
-       
         if hash ppa-purge &> /dev/null; then
-            complete -F _ppa_purge ppa-purge 
             alias remove-apt-ppa='ppa-purge'
             alias apt-remove-ppa='ppa-purge'
         fi
@@ -130,10 +119,8 @@ if hash apt &> /dev/null; then
             ppa_verification "$PPA"
         }
 
-        complete -W "-h --help" check-ppa
-         
      
-        if type readyn &>/dev/null && hash curl &>/dev/null && hash xmllint &>/dev/null && hash fzf &>/dev/null; then
+        if type readyn &>/dev/null && hash curl &> /dev/null && hash xmllint &> /dev/null && hash fzf &> /dev/null; then
             function urlencode() {
                 # Usage: urlencode "string"
                 local LC_ALL=C
@@ -366,13 +353,13 @@ if hash pacman &> /dev/null; then
         }
     fi
 
-    #if type perl &> /dev/null && type zcat &> /dev/null && ! test -f $HOME/.cache/AUR/packages-meta-ext-v1.json.extracted.txt; then
+    #if hash perl &> /dev/null && hash zcat &> /dev/null && ! test -f $HOME/.cache/AUR/packages-meta-ext-v1.json.extracted.txt; then
     #    # https://stackoverflow.com/questions/50596286/how-to-programmably-get-the-metadata-of-all-packages-available-from-aur-in-archl 
     #    zcat <(curl -sSL https://aur.archlinux.org/packages-meta-ext-v1.json.gz) | jq --compact-output '.[] | {Name, Version, Description, Keywords, PackageBase, URL, Popularity, OutOfDate, Maintainer, FirstSubmitted, LastModified, Depends, MakeDepends, License}' | perl -pe 's/^\{\"|\"?,"(?![^:]+\])/\n/g' | perl -pe 's/\\(?=")|\"(?=:)|:\K\[?\"\[?\"?|\"?\]\}?$//gm' | perl -pe 's/\",\" ?/ /gm' | perl -pe 's/^([^:]+)(:)(.*)$/$1                    $2 $3/gm' | perl -pe 's/^.{16}\K +//gm' | perl -0777 -pe 's/\n+(?=Name)/\n\n\nRepository      : AUR\n/gm' $HOME/.cache/AUR/packages-meta-ext-v1.json.extracted.txt
 
     #fi
 
-    #if type xdg-open &> /dev/null && type zcat &> /dev/null && type fzf &> /dev/null; then
+    #if hash xdg-open &> /dev/null && hash zcat &> /dev/null && hash fzf &> /dev/null; then
     #    continue 
         #function AUR-fzf-list-website(){
         #    Q=''
@@ -391,7 +378,7 @@ if hash pacman &> /dev/null; then
         #function AUR-fzf-packages(){
         #    packages="$(cat $HOME/.cache/AUR/packages-meta-ext-v1.json.extracted.txt | grep --color=never -e 'Name.*:' -e 'Description.*:' | awk '{ $1=$2=""; print $0}' | paste -d "\t"  - - | fzf -i --ansi --select-1 --multi --reverse --sync --delimiter '\t' --with-nth 1 --height 33% --preview='echo {2}' --preview-window='down,10%,follow' | sed 's/^ *//g' | awk '{print $1}')" 
         #    if ! test -z $packages; then
-        #       if type pamac &> /dev/null; then
+        #       if hash pamac &> /dev/null; then
         #           reslt=$(printf "Install\nInstall dependencies\n" | fzf --reverse  --height 33%)
         #           if ! test -z "$reslt"; then
         #               if test "$reslt" == 'Install'; then 
@@ -479,7 +466,7 @@ if hash pacman &> /dev/null; then
             else
                 packg="$@"     
             fi
-            if test -n $packg; then
+            if [[ -n $packg ]]; then
                 pamac remove $packg
             fi
         }
@@ -515,7 +502,7 @@ if hash pacman &> /dev/null; then
                 fi
             fi 
             nstall="$(pamac list | fzf $pre --ansi --multi --select-1 --reverse --sync --height 33%  | awk '{print $1}')" 
-            if ! test -z "$nstall"; then
+            if test -n "$nstall"; then
                 pamac list --files $nstall  
             fi
         }
@@ -642,12 +629,12 @@ fi
 
 ### NPM ###
 
-if type npm &> /dev/null; then
+if hash npm &> /dev/null; then
     alias npm-update="npm update"
 fi
 
 ### PIP ###
 
-if type pip &> /dev/null; then
+if hash pip &> /dev/null; then
     alias pip-upgrade="python3 -m pip install --upgrade pip"
 fi

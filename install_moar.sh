@@ -32,10 +32,10 @@ if ! hash moar &> /dev/null; then
                 fi
                 unset ins_wget 
             fi
-            if ! test -f aliases/.bash_aliases.d/git.sh; then
-                source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/git.sh)
+            if ! test -f aliases/.aliases.d/git.sh; then
+                source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/git.sh)
             else
-                . ./aliases/.bash_aliases.d/git.sh
+                . ./aliases/.aliases.d/git.sh
             fi
             
             if [[ $arch == "armv7l" ]] || [[ $arch == "arm64" ]]; then

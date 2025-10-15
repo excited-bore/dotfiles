@@ -1,25 +1,25 @@
 if ! test -f checks/check_all.sh; then
-    if type curl &>/dev/null; then
+    if hash curl &> /dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-        return 1 || exit 1
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
     . ./checks/check_all.sh
 fi
 
+
 SCRIPT_DIR=$(get-script-dir)
 
 
 if ! test -f checks/check_envvar_aliases_completions_keybinds.sh; then
-    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar_aliases_completions_keybinds.sh)
+    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar_aliases_completions_keybinds.sh)
 else
     . ./checks/check_envvar_aliases_completions_keybinds.sh
 fi
 
 if ! [ -e ~/.bash_completion.d/complete_alias ]; then
-    curl https://raw.githubusercontent.com/cykerway/complete-alias/master/complete_alias 1> ~/.bash_completion.d/complete_alias
+    wget-curl https://raw.githubusercontent.com/cykerway/complete-alias/master/complete_alias 1> ~/.bash_completion.d/complete_alias
     sed -i 's/#complete -F _complete_alias "\(.*\)"/complete -F _complete_alias "\1"/g' ~/.bash_completion.d/complete_alias
     
 fi
@@ -48,7 +48,7 @@ if [[ "y" == $rcompl ]]; then
     echo "Next $(tput setaf 1)sudo$(tput sgr0) will install 'complete_alias' in '/root/.bash_completion.d/'"
 
     if ! sudo test -e /root/.bash_completion.d/complete_alias; then
-        curl https://raw.githubusercontent.com/cykerway/complete-alias/master/complete_alias | sudo tee /root/.bash_completion.d/complete_alias 1>/dev/null
+        wget-curl https://raw.githubusercontent.com/cykerway/complete-alias/master/complete_alias | sudo tee /root/.bash_completion.d/complete_alias 1>/dev/null
         sudo sed -i 's/#complete -F _complete_alias "\(.*\)"/complete -F _complete_alias "\1"/g' /root/.bash_completion.d/complete_alias
     fi
     if sudo test -f /root/.bashrc && ! sudo grep -q '^complete -F _complete_alias' /root/.bashrc; then

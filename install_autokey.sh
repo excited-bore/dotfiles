@@ -4,7 +4,7 @@ if hash autokey &> /dev/null || [[ "$XDG_SESSION_TYPE" == 'wayland' ]]; then
     SYSTEM_UPDATED=TRUE
 fi
 
-if ! test -f checks/check_all.sh; then
+if ! [ -f checks/check_all.sh ]; then
     if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
@@ -18,10 +18,10 @@ if [[ $XDG_SESSION_TYPE == 'wayland' ]]; then
     echo "${YELLOW}Current session type - ${RED}Wayland${YELLOW} - is not supported by autokey${normal}" 
 elif ! hash autokey &> /dev/null; then
     if [[ "$distro_base" == 'Debian' ]]; then
-        if ! test -f aliases/.bash_aliases.d/git.sh; then
-            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/git.sh) 
+        if ! [ -f aliases/.aliases.d/git.sh ]; then
+            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/git.sh) 
         else
-            . ./aliases/.bash_aliases.d/git.sh
+            . ./aliases/.aliases.d/git.sh
         fi
         reade -Q 'GREEN' -i 'gtk qt' -p "Do you want autokey's GUI to be ${cyan}gtk-based${GREEN} or ${cyan}qt-based${GREEN} [Gtk/qt]: " gtk_qt 
         temp=$(mktemp -d)
@@ -35,7 +35,7 @@ elif ! hash autokey &> /dev/null; then
         command rm -rf $temp)
     
     elif [[ "$distro_base" == 'Arch' ]]; then
-        if ! test -f checks/check_AUR.sh; then
+        if ! [ -f checks/check_AUR.sh ]; then
             source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_AUR.sh) 
         else
             . ./checks/check_AUR.sh
@@ -47,7 +47,7 @@ elif ! hash autokey &> /dev/null; then
    
     else
         if ! hash pipx &> /dev/null; then
-            if ! test -f install_pipx.sh; then
+            if ! [ -f install_pipx.sh ]; then
                 source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh) 
             else
                 . ./install_pipx.sh

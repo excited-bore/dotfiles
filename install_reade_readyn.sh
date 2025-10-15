@@ -11,6 +11,6 @@ if ! test -f $file; then
 fi
 
 
-echo "Next operation will install $(tput setaf 2)reade$(tput sgr0),$(tput setaf 2) readyn$(tput sgr0) and $(tput setaf 2)yes-edit-no$(tput sgr0) inside $(tput bold)$HOME/.bash_aliases.d/$(tput sgr0)"
+echo "Next operation will install $(tput setaf 2)reade$(tput sgr0),$(tput setaf 2) readyn$(tput sgr0) and $(tput setaf 2)yes-edit-no$(tput sgr0) inside $(tput bold)$HOME/.aliases.d/$(tput sgr0)"
 
-cp -t ~/.bash_aliases.d/ $file $file1 $file2 
+cp -t ~/.aliases.d/ $file $file1 $file2 

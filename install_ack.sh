@@ -16,13 +16,13 @@ fi
 
 
 if ! hash ack &> /dev/null; then
-    if test -n "$AUR_ins"; then
+    if [ -n "$AUR_ins" ]; then
         eval "${AUR_ins_y}" ack 
-    elif test -n "$pac_ins"; then
+    elif [ -n "$pac_ins" ]; then
         printf "Going try to install ack through the regular packagemanager\n"
         eval "${pac_ins_y}" ack
     fi
-    if ! [[ $? == 0 ]] || test -z "$pac_ins"; then
+    if ! [[ $? == 0 ]] || [ -z "$pac_ins" ]; then
         printf "Installing through regular packagemanager failed. Will just get it straight from beyongrep.com..\n"
         wget-aria-name $TMPDIR/ack https://beyondgrep.com/ack-2.16-single-file
         sudo mv $TMPDIR/ack /usr/bin/ack 

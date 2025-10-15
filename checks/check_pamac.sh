@@ -1,9 +1,11 @@
-#!/bin/bash
-
 if ! type reade &> /dev/null; then
-     source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)
+    if hash curl &> /dev/null; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/00-rlwrap_scripts.sh)
+    else
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/00-rlwrap_scripts.sh)
+    fi
 else
-    . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
+    . ./aliases/.aliases.d/00-rlwrap_scripts.sh
 fi 
 
 
@@ -40,7 +42,7 @@ if grep -q "#CheckAURVCSUpdates" /etc/pamac.conf; then
     fi
     unset aurset1
 fi
-if type flatpak &> /dev/null && grep -q "#EnableFlatpak" /etc/pamac.conf; then
+if hash flatpak &> /dev/null && grep -q "#EnableFlatpak" /etc/pamac.conf; then
     readyn -p "Enable flatpak in pamac?" fltpak
     if [[ "$fltpak" == "y" ]]; then
         eval "${pac_ins} libpamac-flatpak-plugin"
@@ -57,7 +59,7 @@ if type flatpak &> /dev/null && grep -q "#EnableFlatpak" /etc/pamac.conf; then
     fi
 fi
 
-if type snap &> /dev/null && grep -q "#EnableSnap" /etc/pamac.conf; then
+if hash snap &> /dev/null && grep -q "#EnableSnap" /etc/pamac.conf; then
     readyn -p "Enable snap in pamac? " snap
     if [[ "$snap" == "y" ]]; then
         eval "$pac_ins libpamac-snap-plugin"

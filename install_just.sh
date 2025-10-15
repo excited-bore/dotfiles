@@ -1,6 +1,6 @@
 # https://github.com/casey/just
 
-if ! test -f checks/check_all.sh; then
+if ! [ -f checks/check_all.sh ]; then
     if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
@@ -12,7 +12,7 @@ fi
 
 if ! hash just &> /dev/null; then
     if ! hash cargo &> /dev/null; then
-        if ! test -f install_cargo.sh; then
+        if ! [ -f install_cargo.sh ]; then
             source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_cargo.sh)
         else 
             . ./install_cargo.sh
@@ -22,10 +22,10 @@ if ! hash just &> /dev/null; then
     cargo install just 
     
     if ! [[ $? == 0 ]] || ! hash cargo &> /dev/null; then
-        if ! test -f aliases/.bash_aliases.d/git.sh; then
-            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/git.sh)
+        if ! [ -f aliases/.aliases.d/git.sh ]; then
+            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/git.sh)
         else 
-            . aliases/.bash_aliases.d/git.sh
+            . aliases/.aliases.d/git.sh
         fi
      
         if [[ "$arch" == '386' || "$arch" == 'amd32' || "$arch" == 'amd64' ]]; then

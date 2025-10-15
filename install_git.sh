@@ -23,7 +23,7 @@ fi
 
 #if ! type fzf &> /dev/null ; then
 #   if ! test -f ./install_fzf.sh; then
-#        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/install_fzf.sh)
+#        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/install_fzf.sh)
 #    else
 #        ./install_fzf.sh
 #    fi
@@ -1338,7 +1338,7 @@ gitt() {
 
     # FZF is cool but ripgrep-dir is cooler
 
-    #if ! test -f ~/.bash_aliases.d/fzf-git.sh; then
+    #if ! test -f ~/.aliases.d/fzf-git.sh; then
     #    readyn -p "Install fzf-git? (Extra fzf stuff on leader-key C-g): "" gitfzf
     #    if [ "$fzfgit" == "y" ]; then
     #        if ! test -f checks/check_aliases_dir.sh; then
@@ -1346,22 +1346,22 @@ gitt() {
     #        else
     #           . ./checks/check_aliases_dir.sh
     #        fi
-    #        curl -o ~/.bash_aliases.d/fzf-git.sh https://raw.githubusercontent.com/junegunn/fzf-git.sh/main/fzf-git.sh
+    #        curl -o ~/.aliases.d/fzf-git.sh https://raw.githubusercontent.com/junegunn/fzf-git.sh/main/fzf-git.sh
     #    fi
     #fi
 
     local gitals
     readyn -p "Install git.sh? (Git aliases)" gitals
     if [[ "$gitals" == "y" ]]; then
-        if ! test -f checks/check_aliases_dir.sh; then
+        if ! [ -f checks/check_aliases_dir.sh ]; then
             source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)
         else
             . ./checks/check_aliases_dir.sh
         fi
-        if ! test -f aliases/.bash_aliases.d/git.sh; then
-            curl -o ~/.bash_aliases.d/git.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/git.sh
+        if ! [ -f aliases/.aliases.d/git.sh ]; then
+            curl -o ~/.aliases.d/git.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/git.sh
         else
-            cp aliases/.bash_aliases.d/git.sh ~/.bash_aliases.d/
+            cp aliases/.aliases.d/git.sh ~/.aliases.d/
         fi
     fi
 

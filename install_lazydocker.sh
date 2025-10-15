@@ -20,10 +20,10 @@ if ! hash lazydocker &>/dev/null; then
         fi
         eval "${AUR_ins_y}" lazydocker
     else
-        if ! test -f $DIR/aliases/.bash_aliases.d/git.sh; then
-            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/git.sh)
+        if ! test -f $DIR/aliases/.aliases.d/git.sh; then
+            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/git.sh)
         else
-            . $DIR/aliases/.bash_aliases.d/git.sh
+            . $DIR/aliases/.aliases.d/git.sh
         fi
          
         if [[ "$arch" == 'amd32' ]]; then

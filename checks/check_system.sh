@@ -1,6 +1,6 @@
 if ! type reade &>/dev/null; then
-    test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh && source aliases/.bash_aliases.d/00-rlwrap_scripts.sh ||
-    test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh && source ~/.bash_aliases.d/00-rlwrap_scripts.sh
+    [ -f aliases/.aliases.d/00-rlwrap_scripts.sh ] && source aliases/.aliases.d/00-rlwrap_scripts.sh ||
+    [ -f ~/.aliases.d/00-rlwrap_scripts.sh ] && source ~/.aliases.d/00-rlwrap_scripts.sh
 fi
 
 unameOut="$(uname -s)"
@@ -18,30 +18,30 @@ case "${unameOut}" in
     *) machine="UNKNOWN:${unameOut}" ;;
 esac
 
-if test -z "$XDG_CONFIG_HOME"; then
-   if ! test -d $HOME/.config; then
+if [ -z "$XDG_CONFIG_HOME" ]; then
+   if ! [ -d $HOME/.config ]; then
        mkdir $HOME/.config
    fi
    export XDG_CONFIG_HOME=$HOME/.config
 fi
 
-if test -z "$XDG_DATA_HOME"; then
-   if ! test -d $HOME/.local/share; then
+if [ -z "$XDG_DATA_HOME" ]; then
+   if ! [ -d $HOME/.local/share ]; then
        mkdir $HOME/.local/share
    fi
    export XDG_DATA_HOME=$HOME/.local/share
 fi
 
 
-if test -z "$TMPDIR"; then
-    if test -d /tmp; then
+if [ -z "$TMPDIR" ]; then
+    if [ -d /tmp ]; then
         TMPDIR=/tmp
     else
         TMPDIR=$(mktemp -d)
     fi
 fi
 
-if test -z "$TMP"; then
+if [ -z "$TMP" ]; then
     TMP=$TMPDIR
 fi
 
@@ -91,19 +91,19 @@ fi
 # Shell that script is run in
 # https://stackoverflow.com/questions/5166657/how-do-i-tell-what-type-my-shell-is
 
-if test -n "$BASH_VERSION"; then
+if [ -n "$BASH_VERSION" ]; then
     SSHELL=bash
-elif test -n "$ZSH_VERSION"; then
+elif [ -n "$ZSH_VERSION" ]; then
     SSHELL=zsh
-elif test -n "$KSH_VERSION" || test -n "$FCEDIT"; then
+elif [ -n "$KSH_VERSION" || -n "$FCEDIT" ]; then
     SSHELL=ksh
-elif test -n "$PS3"; then
+elif [ -n "$PS3" ]; then
     SSHELL=unknown
 else
     SSHELL=sh
 fi
 
-if test -z "$EDITOR"; then
+if [ -z $EDITOR ]; then
     if hash nano &>/dev/null; then
         EDITOR=nano
     elif hash vi &>/dev/null; then
@@ -152,12 +152,12 @@ distro=/
 packagemanager=/
 arch=/
 
-if test -f /etc/alpine-release; then
+if [ -f /etc/alpine-release ]; then
     pac="apk"
     distro_base="BSD"
     distro="Alpine"
 
-elif (test -f /etc/issue && grep -q "Ubuntu" /etc/issue) || test -f /etc/rpi-issue || test -f /etc/debian_version; then
+elif ([ -f /etc/issue ] && grep -q "Ubuntu" /etc/issue) || [ -f /etc/rpi-issue ] || [ -f /etc/debian_version ]; then
 
     pac="apt"
     pac_ins="sudo apt --fix-broken install"
@@ -195,18 +195,18 @@ elif (test -f /etc/issue && grep -q "Ubuntu" /etc/issue) || test -f /etc/rpi-iss
 
     distro_base="Debian"
 
-    if test -f /etc/issue && grep -q "Ubuntu" /etc/issue; then
+    if [ -f /etc/issue ] && grep -q "Ubuntu" /etc/issue; then
         distro="Ubuntu"
         codename="$(lsb_release -a | grep --color=never 'Codename' | awk '{print $2}')"
         release="$(lsb_release -a | grep --color=never 'Release' | awk '{print $2;}')"
-    elif test -f /etc/rpi-issue; then
+    elif [ -f /etc/rpi-issue ]; then
         distro="Raspbian"
-    elif test -f /etc/debian_version; then
+    elif [ -f /etc/debian_version ]; then
         distro="Debian" 
     fi
 
-elif test -f /etc/SuSE-release || test -f /etc/SUSE-brand; then
-    if ! test -z "$(lsb_release -a | grep Leap)"; then
+elif [ -f /etc/SuSE-release ] || [ -f /etc/SUSE-brand ]; then
+    if ! [ -z "$(lsb_release -a | grep Leap)" ]; then
         pac="zypper_leap"
     else
         pac="zypper_tumble"
@@ -214,22 +214,22 @@ elif test -f /etc/SuSE-release || test -f /etc/SUSE-brand; then
     distro_base="Slackware"
     distro="openSUSE"
 
-elif test -f /etc/gentoo-release && [[ $distro == / ]]; then
+elif [[ -f /etc/gentoo-release && $distro == / ]]; then
     pac="emerge"
     distro_base="Slackware"
     distro="Gentoo"
 
-elif test -f /etc/fedora-release && [[ $distro == / ]]; then
+elif [[ -f /etc/fedora-release && $distro == / ]]; then
     pac="dnf"
     distro_base="RedHat"
     distro="Fedora"
 
-elif test -f /etc/redhat-release && [[ $distro == / ]]; then
+elif [[ -f /etc/redhat-release && $distro == / ]]; then
     pac="yum"
     distro_base="RedHat"
     distro="Redhat"
 
-elif (test -f /etc/arch-release || test -f /etc/manjaro-release) && [[ $distro == / ]]; then
+elif ([ -f /etc/arch-release ] || [ -f /etc/manjaro-release ]) && [[ $distro == / ]]; then
 
     unset ansr ansr1
 
@@ -657,7 +657,7 @@ elif (test -f /etc/arch-release || test -f /etc/manjaro-release) && [[ $distro =
 
     distro_base="Arch"
     
-    if test -f /etc/manjaro-release; then
+    if [ -f /etc/manjaro-release ]; then
         distro="Manjaro"
     else 
         distro="Arch"
@@ -726,76 +726,76 @@ elif eval "${arch_cmd} | grep -q 'aarch'"; then
 fi
 
 
-if test -z "$XDG_CONFIG_HOME"; then
+if [ -z "$XDG_CONFIG_HOME" ]; then
     if [[ "$machine" == 'Linux' ]]; then
         export XDG_CONFIG_HOME=$HOME/.config
     fi
 fi
 
-if test -z "$XDG_DATA_HOME"; then
+if [ -z "$XDG_DATA_HOME" ]; then
     if [[ "$machine" == 'Linux' ]]; then
         export XDG_DATA_HOME=$HOME/.local/share
     fi
 fi
 
 
-if ! test -f ~/.profile; then
+if ! [ -f ~/.profile ]; then
     touch ~/.profile
 fi
 
-if test -z $ENV; then
-    if test -f ~/.environment.env; then
+if [ -z $ENV ]; then
+    if [ -f ~/.environment.env ]; then
         export ENV=~/.environment.env  
     else
         export ENV=~/.profile
     fi
 fi
 
-if test -z $BASH_ENV; then 
-    if test -f ~/.environment.env; then
+if [ -z $BASH_ENV ]; then 
+    if [ -f ~/.environment.env ]; then
         export BASH_ENV=~/.environment.env
-    elif test -f ~/.bash_profile; then 
+    elif [ -f ~/.bash_profile ]; then 
         export BASH_ENV=~/.bash_profile
     else
         export BASH_ENV=~/.profile
     fi
 fi
 
-if test -f ~/.zshenv; then
+if [ -f ~/.zshenv ]; then
     export ZSH_ENV=~/.zshenv
-elif test -f ~/.environment.env; then
+elif [ -f ~/.environment.env ]; then
     export ZSH_ENV=~/.environment.env
-elif test -f ~/.zprofile; then
+elif [ -f ~/.zprofile ]; then
     export ZSH_ENV=~/.zprofile
 fi
 
 export BASH_ALIAS=~/.bashrc
 
-if test -f ~/.bash_aliases; then
+if [ -f ~/.bash_aliases ]; then
     export BASH_ALIAS=~/.bash_aliases
 fi
 
-if test -d ~/.bash_aliases.d/; then
-    export BASH_ALIAS_FILEDIR=~/.bash_aliases.d
+if [ -d ~/.aliases.d/ ]; then
+    export BASH_ALIAS_FILEDIR=~/.aliases.d
 fi
 
 export BASH_COMPLETION=~/.bashrc
 
-if test -f ~/.bash_completion; then
+if [ -f ~/.bash_completion ]; then
     export BASH_COMPLETION=~/.bash_completion
 fi
 
-if test -d ~/.bash_completion.d/; then
+if [ -d ~/.bash_completion.d/ ]; then
     export BASH_COMPLETION_FILEDIR=~/.bash_completion.d
 fi
 
 export BASH_KEYBIND=~/.bashrc
 
-if test -f ~/.keybinds; then
+if [ -f ~/.keybinds ]; then
     export BASH_KEYBIND=~/.keybinds
 fi
 
-if test -d ~/.keybinds.d/; then
+if [ -d ~/.keybinds.d/ ]; then
     export BASH_KEYBIND_FILEDIR=~/.keybinds.d
 fi
 
@@ -809,48 +809,48 @@ export BASH_KEYBIND_R=/root/.bashrc
 
 
 
-if test -f /root/.environment.env; then
+if [ -f /root/.environment.env ]; then
     export ENV_R=/root/.environment.env  
-elif test -f /root/.profile; then
+elif [ -f /root/.profile ]; then
     export ENV_R=/root/.profile
 fi
 
-if test -f /root/.environment.env; then
+if [ -f /root/.environment.env ]; then
     export BASH_ENV_R=/root/.environment.env
-elif test -f /root/.bash_profile; then
+elif [ -f /root/.bash_profile ]; then
     export BASH_ENV_R=/root/.bash_profile
 else
     export BASH_ENV_R=/root/.profile
 fi
 
-if test -f /root/.zshenv; then
+if [ -f /root/.zshenv ]; then
     export ZSH_ENV_R=/root/.zshenv
-elif test -f /root/.environment.env; then
+elif [ -f /root/.environment.env ]; then
     export ZSH_ENV_R=/root/.environment.env
-elif test -f /root/.zprofile; then
+elif [ -f /root/.zprofile ]; then
     export ZSH_ENV_R=/root/.zprofile
 fi
 
-if test -f /root/.bash_aliases; then
+if [ -f /root/.bash_aliases ]; then
     export BASH_ALIAS_R=/root/.bash_aliases
 fi
 
-if test -d /root/.bash_aliases.d/; then
-    export BASH_ALIAS_FILEDIR_R=/root/.bash_aliases.d
+if [ -d /root/.aliases.d/ ]; then
+    export BASH_ALIAS_FILEDIR_R=/root/.aliases.d
 fi
 
-if test -f /root/.bash_completion; then
+if [ -f /root/.bash_completion ]; then
     export BASH_COMPLETION_R=/root/.bash_completion
 fi
 
-if test -d /root/.bash_completion.d/; then
+if [ -d /root/.bash_completion.d/ ]; then
     export BASH_COMPLETION_FILEDIR_R=/root/.bash_completion.d
 fi
 
-if test -f /root/.keybinds; then
+if [ -f /root/.keybinds ]; then
     export BASH_KEYBIND_R=/root/.keybinds
 fi
 
-if test -d /root/.keybinds.d/; then
+if [ -d /root/.keybinds.d/ ]; then
     export BASH_KEYBIND_FILEDIR_R=/root/.keybindsd.d
 fi

@@ -15,10 +15,10 @@ else
     . ./checks/check_appimage_ready.sh
 fi
 
-if ! test -f aliases/.bash_aliases.d/package_managers.sh; then
-    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/package_managers.sh)
+if ! test -f aliases/.aliases.d/package_managers.sh; then
+    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/package_managers.sh)
 else
-    source aliases/.bash_aliases.d/package_managers.sh
+    source aliases/.aliases.d/package_managers.sh
 fi
 
 if ! type AppImageLauncher &>/dev/null; then

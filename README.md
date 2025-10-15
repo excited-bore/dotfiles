@@ -26,7 +26,7 @@ source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main
 
 Creates `.environment.env` for global environment variables (Helps setting up variables for MAN,LESS,PAGER,EDITOR/VISUAL,SYSTEMD,XDG, etc..)  
 Creates `~/.keybinds.d/` and `~/.keybinds.d/keybinds.bash` for Bash (readline) keybindings  
-Creates `~/.bash_aliases` and `~/.bash_aliases.d/` for bash-aliases  
+Creates `~/.bash_aliases` and `~/.aliases.d/` for bash-aliases  
 Creates `~/.bash_completion` and `~/.bash_completion.d/` for bash-completions  
 
 
@@ -72,7 +72,7 @@ Then it helps with installing/configuring:
 &nbsp;&nbsp;- Diffr: https://github.com/mookid/diffr  
 
 
-Also helps configuring global gitconfig and global gitignore, and gives the option to install all kinds of bash-aliases/.bash_aliases.d/functions
+Also helps configuring global gitconfig and global gitignore, and gives the option to install all kinds of bash-aliases/.aliases.d/functions
 
 
 ## switch_keyboard.sh
@@ -106,7 +106,7 @@ source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main
 System updater. Try it out with:
 
 ```
-source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/update-system.sh) && update-system-yes
+source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/update-system.sh) && update-system-yes
 ```
 
 ## Install_aliases.sh

@@ -1,7 +1,5 @@
-#!/bin/bash
-
-if ! type reade &> /dev/null && test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh; then
-    source ~/.bash_aliases.d/00-rlwrap_scripts.sh
+if ! type reade &> /dev/null && test -f ~/.aliases.d/00-rlwrap_scripts.sh; then
+    source ~/.aliases.d/00-rlwrap_scripts.sh
 fi
 
 #linux_curr=$(sudo mhwd-kernel --listinstalled | awk 'NR==1{print $4;}' | cut -d\( -f2- | cut -d\) -f1)
@@ -22,24 +20,23 @@ function manjaro-GPU-remove-driver-by-name(){
 }
 
 function manjaro-install-kernel(){
-    kernels="$(sudo mhwd-kernel --list | awk 'NR>1{print $2;}')"
+    local kernels="$(sudo mhwd-kernel --list | awk 'NR>1{print $2;}')"
     kernels="$(echo $kernels | sed "s/\<$linux_lts\> //g")"
     readyn -p "Remove current kernel after installation?" rm_af
-    rm_af="$(test $rm_af == 'y' && echo 'rmc' || echo '')"    
-    kernels_p=$(echo $kernels | tr " " '/')
-    linux_lts_p="$(echo $linux_lts | tr '[:lower:]' '[:upper:]')"
+    local rm_af="$(test $rm_af == 'y' && echo 'rmc' || echo '')"    
+    local kernels_p=$(echo $kernels | tr " " '/')
+    local kern linux_lts_p="$(echo $linux_lts | tr '[:lower:]' '[:upper:]')"
     reade -Q 'GREEN' -i "$linux_lts $kernels" -p "Install which one [$linux_lts_p/$kernels_p]: " kern
     sudo mhwd-kernel -i $kern $rm_af
     sudo mhwd-kernel --listinstalled
-    unset kern kernels rm_af linux_lts_p kernels_p 
 }
 
 function manjaro-remove-kernel(){
-    kernels="$(sudo mhwd-kernel --listinstalled | awk 'NR>2{print $2;}')"
-    frst="$(echo $kernels | awk '{print $1}')"
-    frst_p="$(echo $frst | tr '[:lower:]' '[:upper:]')"
-    kernels="$(echo $kernels | sed "s/\<$frst\>//g")"
-    if ! test -z $kernels; then
+    local kernels="$(sudo mhwd-kernel --listinstalled | awk 'NR>2{print $2;}')"
+    local frst="$(echo $kernels | awk '{print $1}')"
+    local frst_p="$(echo $frst | tr '[:lower:]' '[:upper:]')"
+    local kern kernels="$(echo $kernels | sed "s/\<$frst\>//g")"
+    if test -n $kernels; then
         kernels_p="/$(echo $kernels | tr " " '/')"
     else
         kernels_p=''
@@ -47,5 +44,4 @@ function manjaro-remove-kernel(){
     reade -Q 'GREEN' -i "$frst $kernels" -p "Remove which one [$frst_p$kernels_p]: "  kern
     sudo mhwd-kernel -r $kern
     sudo mhwd-kernel --listinstalled
-    unset kern kernels frst frst_p kernels_p 
 } 

@@ -1,5 +1,5 @@
 if ! test -f checks/check_all.sh; then
-    if hash curl &>/dev/null; then
+    if hash curl &> /dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
@@ -11,21 +11,21 @@ fi
 
 SCRIPT_DIR=$(get-script-dir)
 
-if ! hash tmux &>/dev/null; then
-    if [[ "$distro_base" == "Arch" ]] || [[ "$distro_base" == "Debian" ]]; then
+if ! hash tmux &> /dev/null; then
+    if [[ "$distro_base" == "Arch" || "$distro_base" == "Debian" ]]; then
         eval "${pac_ins_y}" tmux
     fi
 fi
 
 tmux --help
 
-#if [ ! -d ~/.bash_aliases.d/ ]; then
-#   mkdir ~/.bash_aliases.d/
+#if [ ! -d ~/.aliases.d/ ]; then
+#   mkdir ~/.aliases.d/
 #fi
 #
-#if ! grep -q "~/.bash_aliases.d" ~/.bashrc; then
-#    echo "if [[ -d ~/.bash_aliases.d/ ]]; then" >> ~/.bashrc
-#    echo "  for alias in ~/.bash_aliases.d/*.sh; do" >> ~/.bashrc
+#if ! grep -q "~/.aliases.d" ~/.bashrc; then
+#    echo "if [[ -d ~/.aliases.d/ ]]; then" >> ~/.bashrc
+#    echo "  for alias in ~/.aliases.d/*.sh; do" >> ~/.bashrc
 #    echo "      . \"\$alias\" " >> ~/.bashrc
 #    echo "  done" >> ~/.bashrc
 #    echo "fi" >> ~/.bashrc
@@ -66,7 +66,7 @@ sed -i 's|^set -g @continuum-restore '\''on'\''|#set -g @continuum-restore '\''o
 yes-edit-no -p "Install tmux.conf? (tmux conf at ~/.tmux.conf)" -g "$file" tmuxc
 if [[ "$tmuxc" == "y" ]]; then
     cp $file ~/
-    if test -f $file~ && hash gio &>/dev/null; then
+    if test -f $file~ && hash gio &> /dev/null; then
         gio trash $file~
     fi
 fi
@@ -135,7 +135,7 @@ if [[ "$tmuxx" == "y" ]]; then
 fi
 unset tmuxx
 
-if type nvim &>/dev/null && type kitty &>/dev/null; then
+if hash nvim &> /dev/null && hash kitty &> /dev/null; then
     readyn -p "Install vim-tmux-kitty navigator plugin? (tmux-sensible)" tmuxx
     if [[ "$tmuxx" == "y" ]]; then
         sed -i 's|#set -g @plugin '\''excited-bore/vim-tmux-kitty-navigator'\''|set -g @plugin '\''excited-bore/vim-tmux-kitty-navigator'\''|g' ~/.tmux.conf
@@ -207,25 +207,25 @@ if [[ "$tmuux" == "y" ]]; then
 fi
 unset tmuux
 
-readyn -p "Install tmux.sh at ~/.bash_aliases.d/? (tmux aliases)" tmuxx
+readyn -p "Install tmux.sh at ~/.aliases.d/? (tmux aliases)" tmuxx
 if [[ "$tmuxx" == "y" ]]; then
-    if test -f tmux/.bash_aliases.d/tmux.sh; then
-        cp tmux/.bash_aliases.d/tmux.sh ~/.bash_aliases.d/
+    if test -f tmux/.aliases.d/tmux.sh; then
+        cp tmux/.aliases.d/tmux.sh ~/.aliases.d/
     else
-        curl -o ~/.bash_aliases.d/tmux.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/tmux/.bash_aliases.d/tmux.sh
+        curl -o ~/.aliases.d/tmux.sh https://raw.githubusercontent.com/excited-bore/dotfiles/main/tmux/.aliases.d/tmux.sh
     fi
-    if type gio &>/dev/null && test -f ~/.bash_aliases.d/tmux.sh~; then
-        gio trash ~/.bash_aliases.d/tmux.sh~
+    if type gio &>/dev/null && test -f ~/.aliases.d/tmux.sh~; then
+        gio trash ~/.aliases.d/tmux.sh~
     fi
 fi
 unset tmuxx
 
 readyn -n -p "Set tmux at shell login for SSH? (Conflicts with vim-tmux-kitty navigator)" tmuxxx
 if [[ "$tmuxxx" == "y" ]]; then
-    touch ~/.bash_aliases.d/tmux_startup.sh
-    echo 'if [[ $- =~ i ]] && [[ -z "$TMUX" ]] && [[ -n "$SSH_TTY" ]]; then' >>~/.bash_aliases.d/tmux_startup.sh
-    echo '  tmux attach-session -t ssh_tmux || tmux new-session -s ssh_tmux;' >>~/.bash_aliases.d/tmux_startup.sh
-    echo 'fi' >>~/.bash_aliases.d/tmux_startup.sh
+    touch ~/.aliases.d/tmux_startup.sh
+    echo 'if [[ $- =~ i ]] && [[ -z "$TMUX" ]] && [[ -n "$SSH_TTY" ]]; then' >>~/.aliases.d/tmux_startup.sh
+    echo '  tmux attach-session -t ssh_tmux || tmux new-session -s ssh_tmux;' >>~/.aliases.d/tmux_startup.sh
+    echo 'fi' >>~/.aliases.d/tmux_startup.sh
 fi
 unset tmuxxx
 

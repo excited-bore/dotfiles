@@ -1,11 +1,11 @@
-[[ "$XDG_SESSION_TYPE" == 'x11' ]] && hash jq &>/dev/null && hash unzip &>/dev/null && hash fzf &>/dev/null && hash magick &> /dev/null && hash ueberzugpp &> /dev/null &&
+[[ "$XDG_SESSION_TYPE" == 'x11' ]] && hash jq &> /dev/null && hash unzip &> /dev/null && hash fzf &> /dev/null && hash magick &> /dev/null && hash ueberzugpp &> /dev/null &&
     SYSTEM_UPDATED='TRUE'
-[[ "$XDG_SESSION_TYPE" == 'wayland' ]] && hash jq &>/dev/null && hash unzip &>/dev/null && hash fzf &>/dev/null && hash magick &> /dev/null && hash nsxiv &> /dev/null && 
+[[ "$XDG_SESSION_TYPE" == 'wayland' ]] && hash jq &> /dev/null && hash unzip &> /dev/null && hash fzf &> /dev/null && hash magick &> /dev/null && hash nsxiv &> /dev/null && 
     SYSTEM_UPDATED='TRUE'
 
 
 if ! test -f checks/check_all.sh; then
-    if hash curl &>/dev/null; then
+    if hash curl &> /dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
@@ -14,10 +14,10 @@ else
     . ./checks/check_all.sh
 fi
 
-if ! test -f aliases/.bash_aliases.d/git.sh; then
-    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/git.sh)
+if ! test -f aliases/.aliases.d/git.sh; then
+    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/git.sh)
 else
-    . ./aliases/.bash_aliases.d/git.sh
+    . ./aliases/.aliases.d/git.sh
 fi
 
 if ! [ -d $XDG_DATA_HOME/fonts ]; then
@@ -32,7 +32,7 @@ if ! hash fzf &> /dev/null; then
     fi
 fi
 
-if ! hash jq &>/dev/null; then
+if ! hash jq &> /dev/null; then
     eval "$pac_ins_y jq"
 fi
 
@@ -40,7 +40,7 @@ reade -Q 'GREEN' -i 'tar zip' -p "Would you like the script to get '.zip' files 
 
 if [[ "$tar_zip" == 'zip' ]]; then 
     tar_zip='.zip' 
-    if ! hash unzip &>/dev/null; then
+    if ! hash unzip &> /dev/null; then
         eval "$pac_ins_y unzip"
     fi
 else
@@ -127,15 +127,14 @@ if test -n "$name"; then
          
             wget-curl https://git.io/raw_fontpreview > $TMPDIR/fontpreview.sh
             #if [[ "$XDG_CURRENT_DESKTOP" == 'GNOME' ]]; then
-            sed -i 's/xdotool, //; s/(xdotool\ /(\ /; /xdotool/d;' $TMPDIR/fontpreview.sh
-            sed -i 's/\(fontpreview very customizable\)/\1\n\t\[\[ $FONTPREVIEW_FONTS != "" \]\] \&\& FONTS=$FONTPREVIEW_FONTS/' $TMPDIR/fontpreview.sh
-            sed -i 's/\(--search-prompt)\)/\t--fonts)\n\tFONTPREVIEW_FONTS=$2\n\t;;\n\t\1/' $TMPDIR/fontpreview.sh 
-            sed -i 's/\(search-prompt:,)\)/fonts:,\1/' $TMPDIR/fontpreview.sh 
-            sed -i 's|\(font=$(magick -list font.*)\)|\tif test -z "$FONTPREVIEW_FONTS"; then\n\t\1\n\telse\n\tfont=$(printf "$FONTPREVIEW_FONTS" \| sort -t "-" -k1\,1 \| uniq \| fzf --header="Which font? (Ctrl+C to quit - last selected will be used)" $quer --layout=reverse --prompt="$SEARCH_PROMPT")\n\techo "$font"\n\tfi\n|' $TMPDIR/fontpreview.sh
+            sed -i 's/xdotool, //; s/(xdotool\ /(\ /; /xdotool/d;
+            s/\(fontpreview very customizable\)/\1\n\t\[\[ $FONTPREVIEW_FONTS != "" \]\] \&\& FONTS=$FONTPREVIEW_FONTS/;
+            s/\(--search-prompt)\)/\t--fonts)\n\tFONTPREVIEW_FONTS=$2\n\t;;\n\t\1/;
+            s/\(search-prompt:,)\)/fonts:,\1/;
+            s|\(font=$(magick -list font.*)\)|\tif test -z "$FONTPREVIEW_FONTS"; then\n\t\1\n\telse\n\tfont=$(printf "$FONTPREVIEW_FONTS" \| sort -t "-" -k1\,1 \| uniq \| fzf --header="Which font? (Ctrl+C to quit - last selected will be used)" $quer --layout=reverse --prompt="$SEARCH_PROMPT")\n\techo "$font"\n\tfi\n|; 
+            s|\[\[ -z $font \]\].*|if test -z $font; then\n\treturn\n\telse\n\ttest -n "$FONTPREVIEW_FONTS" \&\& font=$(fc-query -f "%{fullname}\\n" $XDG_DATA_HOME/fonts/$font \| sed "s/ /-/g;")\n\tfi|; 
+            s/^main$/echo $(main | awk '\''{print $NF}'\'')/' $TMPDIR/fontpreview.sh 
             #sed -i 's|\[\[ -z $font \]\].*|if test -z $font; then\n\treturn\n\telse\n\tstyle=$(echo $font \| cut -d- -f2 \| cut -d. -f1)\n\tfont=$(fc-match $font \| awk '\''{$1=""; print}'\'' \| xargs \| sed "s/Regular/$style/; s/ /-/g; s/-Regular//g")\n\tfi|' $TMPDIR/fontpreview.sh 
-            sed -i 's|\[\[ -z $font \]\].*|if test -z $font; then\n\treturn\n\telse\n\ttest -n "$FONTPREVIEW_FONTS" \&\& font=$(fc-query -f "%{fullname}\\n" $XDG_DATA_HOME/fonts/$font \| sed "s/ /-/g;")\n\tfi|' $TMPDIR/fontpreview.sh 
-             
-            sed -i 's/^main$/echo $(main | awk '\''{print $NF}'\'')/' $TMPDIR/fontpreview.sh 
             chmod u+x $TMPDIR/fontpreview.sh
         fi 
     fi
@@ -165,7 +164,7 @@ if test -n "$name"; then
                 #if [[ $(echo "$files" | wc -w) == 1 ]]; then
                 #    quer="--query=$files" 
                 #fi
-                (! hash magick &> /dev/null || ! (hash ueberzug &> /dev/null || hash ueberzugpp &> /dev/null || hash nsxixv &> /dev/null)) && 
+                (! hash magick &> /dev/null || ! (hash ueberzug &> /dev/null || hash ueberzugpp &> /dev/null || hash nsxixv &> /dev/null )) && 
                     file=$(printf "$name" | sort  -t '-'  -k1,1 | uniq | fzf --header="Which font?" $quer --reverse --height 50%) ||
                     file=$(FONTPREVIEW_FONTS="$name" quer="$quer" $TMPDIR/fontpreview.sh) 
                 style=$(echo $file | cut -d. -f-1 | cut -d- -f2) 
@@ -253,8 +252,8 @@ if test -n "$name"; then
                 if ! [[ $size =~ $re ]] ; then
                     echo "${RED}$size${normal} is not a number!" 
                 else
-                    sed -i "s/font_family.*/font_family\t$familystyle/g" $XDG_CONFIG_HOME/kitty/kitty.conf
-                    sed -i "s/font_size.*/font_size\t$size/g" $XDG_CONFIG_HOME/kitty/kitty.conf
+                    sed -i "s/font_family.*/font_family\t$familystyle/g;
+                    s/font_size.*/font_size\t$size/g" $XDG_CONFIG_HOME/kitty/kitty.conf
                 fi
             fi 
         fi

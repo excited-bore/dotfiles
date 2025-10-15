@@ -1,7 +1,6 @@
-#!/bin/bash
 # Shebang only there to trigger nvim's language server (if installed)
 
-# Bash_aliases at ~/.bash_aliases.d/
+# Bash_aliases at ~/.aliases.d/
 # global bashrc -> /etc/bash.bashrc
 # root shell profiles -> /etc/profile
 
@@ -17,7 +16,7 @@ alias list-binds-readline="{ printf \"\nList commands bound to keys\n\n\" ; bind
 alias list-binds-xterm="xrdb -query -all"
 alias list-binds-kitty='kitty +kitten show_key -m kitty'
 
-if hash xfconf-query &> /dev/null; then
+if hash xfconf-query; then
     function list-binds-xfce4(){
         local usedkeysp="$(xfconf-query -c xfce4-keyboard-shortcuts -p /xfwm4/custom -l -v | sed 's|/xfwm4/custom/||g; s|<Primary>|<Control>|g; s|<Super>|<Windowkey>|g; s|><|-|g; s|<||g; s|>|-|g;' | sort -V)"
         local usedkeysp1="$(xfconf-query -c xfce4-keyboard-shortcuts -p /commands/custom -l -v | sed 's|/commands/custom/||g; s|<Primary>|<Control>|g; s|<Super>|<Windowkey>|g; s|><|-|g; s|<||g; s|>|-|g;' | sort -V)" 
@@ -509,10 +508,10 @@ alias dirs-col="dirs -v | column -c $COLUMNS"
 alias dirs-col-pretty="dirs -v | column -c $COLUMNS | sed -e 's/ 0 \\([^\t]*\\)/'\${GREEN}' 0 \\1'\${normal}'/'"
 
 #'silent' clear
-if hash starship &>/dev/null && [[ $STARSHIP_SHELL == 'bash' ]] && (grep -q '\\n' ~/.config/starship.toml || (grep -q 'line_break' ~/.config/starship.toml && ! pcregrep -qM "[line_break]\$(.|\n)*^disabled = true" ~/.config/starship.toml)); then
+if hash starship && [[ $STARSHIP_SHELL == 'bash' ]] && (grep -q '\\n' ~/.config/starship.toml || (grep -q 'line_break' ~/.config/starship.toml && ! pcregrep -qM "[line_break]\$(.|\n)*^disabled = true" ~/.config/starship.toml)); then
     alias _="tput cuu1 && tput cuu1 && tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null"
     alias _.="tput cuu1 && tput cuu1 && tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i < \$(dirs -v | column -c \${COLUMNS} | wc -l) ; i++)); do tput cuu1; done && dirs-col-pretty && history -d -1 &>/dev/null"
-elif hash starship &>/dev/null && [[ $STARSHIP_SHELL == 'bash' ]]; then
+elif hash starship && [[ $STARSHIP_SHELL == 'bash' ]]; then
     alias _="tput cuu1 && tput cuu1 && tput sc; clear && tput rc && history -d -1 &>/dev/null"
     alias _.="tput cuu1 && tput cuu1 && tput sc; clear && tput rc && for ((i = 0 ; i < \$(dirs -v | column -c \${COLUMNS} | wc -l) ; i++)); do tput cuu1; done && dirs-col-pretty && tput rc && history -d -1 &>/dev/null"
 else
@@ -590,7 +589,7 @@ bind -m vi-insert '"\e[1;7A": "\C-o\C-e\C-u\e288 _.\C-m\C-o"'
 
 # Ctrl-Alt-Down prompts you to select a folder to go into
 # With fzf keybinds or with tabcomplete
-if ! hash fzf &> /dev/null; then
+if ! hash fzf; then
     bind -m emacs-standard -x '"\e299": "__"'
     bind -m vi-insert -x '"\e299": "__"'
 
@@ -612,20 +611,20 @@ else
         bind -m vi-insert '"\e[1;7B": "\C-o\e987_\C-m\C-o"'
         bind -m vi-command '"\e[1;7B": "\C-o\e987_\C-m\C-o"'
     fi
-    if hash bfs &> /dev/null; then
+    if hash bfs; then
         # https://github.com/tavianator/bfs/issues/163 
         FZF_ALT_C_COMMAND="[[ -n \"\$(command ls -Ahp | command grep \".*/$\")\" ]] && bfs -s -x -type d -printf '%P\n' -exclude -name '.git' -exclude -name 'node_modules' | sed '/^[[:space:]]*$/d' || echo .." 
         # Alternative with previous directory added
         # FZF_ALT_C_COMMAND="[[ -n \"\$(command ls -Ahp | command grep \".*/$\")\" ]] && echo \"..\n\$(bfs -s -x -type d -printf '%P\n' -exclude -name '.git' -exclude -name 'node_modules' | sed '/^[[:space:]]*$/d')\" || echo .." 
-    elif hash fd &> /dev/null; then
+    elif hash fd; then
         FZF_ALT_C_COMMAND="fd -H --type d --exclude '.git' --exclude 'node_modules'" 
     fi
     
     FZF_ALT_C_OPTS='--bind "ctrl-v:become(vlc --recursive expand {})"
-                    --bind "ctrl-g:become(. ~/.bash_aliases.d/ripgrep-directory.sh && cd {} && ripgrep-dir > /dev/tty)"' 
-    if hash eza &> /dev/null; then
+                    --bind "ctrl-g:become(. ~/.aliases.d/ripgrep-directory.sh && cd {} && ripgrep-dir > /dev/tty)"' 
+    if hash eza; then
         FZF_ALT_C_OPTS="$FZF_ALT_C_OPTS --preview 'eza --tree --color=always --icons=always --all {}'"
-    elif hash tree &> /dev/null; then 
+    elif hash tree; then 
         FZF_ALT_C_OPTS="$FZF_ALT_C_OPTS --preview 'tree -C {}'"
     fi
 fi
@@ -709,13 +708,13 @@ bind -m emacs-standard -x '"\C-e\C-e":_edit_wo_executing'
 
 # RLWRAP
 
-#if hash rlwrap &> /dev/null; then
+#if hash rlwrap; then
 #    bind -m emacs-standard '"\C-x\C-e" : rlwrap-call-editor'
 #    bind -m vi-command '"\C-e" : rlwrap-call-editor'
 #    bind -m vi-insert '"\C-e" : rlwrap-call-editor'
 #fi
 
-if hash osc &>/dev/null; then
+if hash osc; then
     
     function osc-copy() {
         if [[ -n $READLINE_MARK_SET ]]; then 
@@ -778,7 +777,7 @@ if hash osc &>/dev/null; then
     bind -m vi-insert -x '"\C-d": "osc-cut"'
 
 
-elif ([[ "$XDG_SESSION_TYPE" == 'x11' ]] && hash xclip &>/dev/null) || ([[ "$XDG_SESSION_TYPE" == 'wayland' ]] && hash wl-copy &> /dev/null); then
+elif ([[ "$XDG_SESSION_TYPE" == 'x11' ]] && hash xclip) || ([[ "$XDG_SESSION_TYPE" == 'wayland' ]] && hash wl-copy); then
   
     function clip-copy() {
         if [[ "$XDG_SESSION_TYPE" == 'x11' ]]; then  
@@ -891,7 +890,7 @@ fi
 # So if dotool is installed, we use that to rebind Shift+alt+Up/Down
 
 # Nevermind, it's super laggy
-#if [[ -n "$GNOME_TERMINAL_SCREEN" || -n "$GNOME_TERMINAL_SERVICE" ]] && hash dotool &> /dev/null; then
+#if [[ -n "$GNOME_TERMINAL_SCREEN" || -n "$GNOME_TERMINAL_SERVICE" ]] && hash dotool; then
 #    bind -m emacs-standard -x '"\e[1;4A": "{ echo keydown ctrl+shift+up; } | dotool"'
 #    bind -m vi-command -x '"\e[1;4A": "{ echo keydown ctrl+shift+up; } | dotool"'
 #    bind -m vi-insert -x '"\e[1;4A": "{ echo keydown ctrl+shift+up; } | dotool"'
@@ -902,14 +901,14 @@ fi
 #fi
 
 
-if hash autojump &>/dev/null; then
+if hash autojump; then
     # Ctrl-x Ctrl-j for autojump
     bind -m emacs-standard '"\C-x\C-j": "j \C-i"'
     bind -m vi-command '"\C-x\C-j": "j \C-i"'
     bind -m vi-insert '"\C-x\C-j": "j \C-i"'
 fi
 
-if hash fzf &>/dev/null; then
+if hash fzf; then
     
     #if [[ "$TERM" == 'xterm-kitty' ]]; then
     #    # (Kitty only) Ctrl-tab for fzf autocompletion
@@ -939,7 +938,7 @@ if hash fzf &>/dev/null; then
 fi
 
 # F2 - ranger (file explorer)
-if hash ranger &>/dev/null; then
+if hash ranger; then
     bind -x '"\201": ranger'
     bind -m emacs-standard '"\eOQ": "\201\n\C-l"'
     bind -m vi-command '"\eOQ": "\201\n\C-l"'
@@ -947,7 +946,7 @@ if hash ranger &>/dev/null; then
 fi
 
 # F3 - lazygit (Git helper)
-if hash lazygit &>/dev/null; then
+if hash lazygit; then
     bind -x '"\202": stty sane && lazygit'
     bind -m emacs-standard '"\eOR": "\202\n\C-l"'
     bind -m vi-command '"\eOR": "\202\n\C-l"'
@@ -973,27 +972,27 @@ fi
 
 
 # F6 - (neo/fast/screen)fetch (System overview)
-if hash neofetch &>/dev/null || hash fastfetch &>/dev/null || hash screenfetch &>/dev/null || hash onefetch &>/dev/null; then
+if hash neofetch || hash fastfetch || hash screenfetch || hash onefetch; then
 
     # Last one loaded is the winner
-    if hash neofetch &>/dev/null; then
+    if hash neofetch; then
         bind -x '"\207": stty sane && neofetch'
         fetch="neofetch"
     fi
 
-    if hash screenfetch &>/dev/null; then
+    if hash screenfetch; then
         bind -x '"\207": stty sane && screenfetch'
         fetch="screenfetch"
     fi
 
-    if hash fastfetch &>/dev/null; then
+    if hash fastfetch; then
         bind -x '"\207": stty sane && fastfetch'
         fetch="fastfetch"
     fi
 
-    if hash onefetch &>/dev/null; then
-        if hash neofetch &>/dev/null || hash fastfetch &>/dev/null || hash screenfetch &>/dev/null; then
-            bind -x '"\207": stty sane; hash git &> /dev/null && git rev-parse --git-dir &> /dev/null && readyn -p "Use onefetch? (lists github stats): " gstats && [[ $gstats == "y" ]] && onefetch || '"$fetch"' '
+    if hash onefetch; then
+        if hash neofetch || hash fastfetch || hash screenfetch; then
+            bind -x '"\207": stty sane; hash git && git rev-parse --git-dir &> /dev/null && readyn -p "Use onefetch? (lists github stats): " gstats && [[ $gstats == "y" ]] && onefetch || '"$fetch"' '
         else
             bind -x '"\207": stty sane && '"$fetch"''
         fi
@@ -1011,17 +1010,17 @@ bind -x '"\208": stty sane && readyn -p "Start htop as root?" ansr && [[ "$ansr"
 
 # Last one loaded is the winner
 
-if hash bashtop &>/dev/null || hash btop &>/dev/null || hash bpytop &>/dev/null; then
+if hash bashtop || hash btop || hash bpytop ; then
 
-    if hash bpytop &>/dev/null; then
+    if hash bpytop; then
         bind -x '"\208": stty sane && readyn -p "Start htop as root?" ansr && [[ "$ansr" == "y" ]] && sudo htop || readyn -p "Use bpytop instead of htop?" ansr && [[ "$ansr" == "y" ]] && bpytop || htop'
     fi
 
-    if hash bashtop &>/dev/null; then
+    if hash bashtop; then
         bind -x '"\208": stty sane && readyn -p "Start htop as root?" ansr && [[ "$ansr" == "y" ]] && sudo htop || readyn -p "Use bashtop instead of htop?" ansr && [[ "$ansr" == "y" ]] && bashtop || htop'
     fi
 
-    if hash btop &>/dev/null; then
+    if hash btop; then
         bind -x '"\208": stty sane && readyn -p "Start btop as root?" ansr && [[ "$ansr" == "y" ]] && sudo btop || btop'
     fi
 
@@ -1032,7 +1031,7 @@ bind -m vi-command '"\e[18~": "\208\n\C-l"'
 bind -m vi-insert '"\e[18~": "\208\n\C-l"'
 
 # F8 - Lazydocker (Docker TUI)
-if hash lazydocker &>/dev/null; then
+if hash lazydocker; then
 
     bind -x '"\209": stty sane && lazydocker'
     bind -m emacs-standard '"\e[19~": "\209\n"'

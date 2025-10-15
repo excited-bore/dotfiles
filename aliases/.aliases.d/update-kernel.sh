@@ -1,12 +1,12 @@
-if ! type reade &> /dev/null && test -f ~/.bash_aliases.d/00-rlwrap_scripts.sh; then
-    . ~/.bash_aliases.d/00-rlwrap_scripts.sh
+if ! type reade &> /dev/null && test -f ~/.aliases.d/00-rlwrap_scripts.sh; then
+    . ~/.aliases.d/00-rlwrap_scripts.sh
 fi 
 
-if ! type reade &> /dev/null && test -f aliases/.bash_aliases.d/00-rlwrap_scripts.sh; then
-    . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
+if ! type reade &> /dev/null && test -f aliases/.aliases.d/00-rlwrap_scripts.sh; then
+    . ./aliases/.aliases.d/00-rlwrap_scripts.sh
 fi 
 
-#if [[ "$distro_base" == 'Debian' ]] && ! hash mainline &> /dev/null; then
+#if [[ "$distro_base" == 'Debian' ]] && ! hash mainline &>/dev/null; then
 #    local mainins
 #    readyn -p "${CYAN}'mainline'${GREEN} not installed (tool that helps with installing/managing kernels for Debian-based systems).\nInstall?" mainins
 #    if [[ "$mainins" == 'y' ]]; then
@@ -37,7 +37,7 @@ function list-installed-kernels(){
 
         insk=$(dpkg-query -W -f '${db:Status-Status} ${Package}\n' 'linux-image-*' | awk '$1 != "not-installed" {print $2}')
         
-        if hash mainline &> /dev/null; then
+        if hash mainline &>/dev/null; then
             printf "${GREEN}Installed kernels using apt/mainline:\n${normal}"
         else
             printf "${GREEN}Installed kernels using apt:\n${normal}"
@@ -895,7 +895,7 @@ function update-kernel(){
                     AUR_ls_ins="yay -Q"
                 fi
             fi
-        elif test -z "$AUR_pac" && hash pamac &> /dev/null && grep -q "#EnableAUR" /etc/pamac.conf; then
+        elif test -z "$AUR_pac" && hash pamac &>/dev/null && grep -q "#EnableAUR" /etc/pamac.conf; then
             
             local nable_aur
             if [[ "$distro" == 'Manjaro' ]]; then
@@ -907,19 +907,19 @@ function update-kernel(){
             readyn -p "Enable installing AUR packages for pamac?" nable_aur
             if [[ "$nable_aur" == 'y' ]]; then
                 sudo sed -i 's|#EnableAUR|EnableAUR|g' /etc/pamac.conf 
-                elif [[ "$distro" == 'Manjaro' ]] && (test -f ~/.bash_aliases.d/package_managers.sh || test -f $DIR/aliases/.bash_aliases.d/package_managers.sh); then  
-                test -f ~/.bash_aliases.d/package_managers.sh && . ~/.bash_aliases.d/package_managers.sh
-                test -f $DIR/aliases/.bash_aliases.d/package_managers.sh && . $DIR/aliases/.bash_aliases.d/package_managers.sh
+                elif [[ "$distro" == 'Manjaro' ]] && (test -f ~/.aliases.d/package_managers.sh || test -f $DIR/aliases/.aliases.d/package_managers.sh); then  
+                test -f ~/.aliases.d/package_managers.sh && . ~/.aliases.d/package_managers.sh
+                test -f $DIR/aliases/.aliases.d/package_managers.sh && . $DIR/aliases/.aliases.d/package_managers.sh
                 local nstall_arch
             #elif [[ "$nable_aur" == 'n' ]] && ! [[ "$distro" == 'Arch' ]]; then 
             #    printf "${green}Another way to install the latest kernel for ${GREEN}$distro${green} is to basically 'change distribution to ${CYAN}Arch${green}' by configuring Arch-specific repositories (also called mirrors) for pacman to allow the installation of 'linux-lts' (and other kernels)\n${YELLOW}(Warning - this process is ${RED}highly risky when done incorrectly${YELLOW} and could lead to f.ex. pacman becoming unusable if not allowing packages to downgrade while updating after configuring said repositories, also certain $distro-specific packages (like mhwd or pacman-mirrors) will become impossible to install/update/maintain\!\!)\n" 
             #    readyn -n -p "Install Arch specific repositories in ${CYAN}/etc/pacman.d/mirrorlist${YELLOW}, then update?\n" nstall_arch 
             #    if [[ "$nstall_arch" == 'y' ]]; then
-            #        if test -f ~/.bash_aliases.d/package_managers.sh; then
-            #            . ~/.bash_aliases.d/package_managers.sh
+            #        if test -f ~/.aliases.d/package_managers.sh; then
+            #            . ~/.aliases.d/package_managers.sh
             #        fi
-            #        if test -f $DIR/aliases/.bash_aliases.d/package_managers.sh; then
-            #            . $DIR/aliases/.bash_aliases.d/package_managers.sh
+            #        if test -f $DIR/aliases/.aliases.d/package_managers.sh; then
+            #            . $DIR/aliases/.aliases.d/package_managers.sh
             #        fi
             #        pacman-fzf-add-arch-repositories
             #    fi
@@ -1061,7 +1061,7 @@ function update-kernel(){
                 # local ltss=$(eval "$AUR_search_q linux-lts | grep 'linux-lts[[:digit:]+]' | cut -d- -f-2 | awk '{print \$1}' | uniq | tr '\n' ' ' | xargs")
                 # No header : linux-drm-tip-git linux-drm-next-git  
                 if [[ $kern_AUR == 'y' ]]; then
-                    if hash fzf &> /dev/null; then
+                    if hash fzf &>/dev/null; then
                         kernel=$(eval "$AUR_search linux | sed -n '1p; /^[^[:space:]]/ {N;/[\^n]*\n\t/!p;}' | grep -i -B 1 -E 'kernel |kernel,' --no-group-separator | paste -d \"\t\" - - | grep -Eiv '[^and ]headers|docs|tool|kernel module|installed' | sed -E 's,core/|extra/|multilib/|aur/,,g' | grep '^linux' | uniq | awk '{print \$1}' | sort -V | fzf --reverse --height 50% --preview 'cat <(eval \"$AUR_info {1}\")'")
                     fi
                 else

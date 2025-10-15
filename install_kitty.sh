@@ -1,10 +1,8 @@
-
-if ! test -f checks/check_all.sh; then
-    if type curl &>/dev/null; then
+if ! [ -f checks/check_all.sh ]; then
+    if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-        return 1 || exit 1
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
     . ./checks/check_all.sh
@@ -12,8 +10,8 @@ fi
 
 SCRIPT_DIR=$(get-script-dir)
 
-if ! type kitty &>/dev/null; then
-    if [[ "$distro_base" == "Arch" ]] || [[ "$distro_base" == "Debian" ]]; then
+if ! hash kitty &>/dev/null; then
+    if [[ "$distro_base" == "Arch" || "$distro_base" == "Debian" ]]; then
         eval "${pac_ins_y} kitty"
         #if [[ "$distro_base" == "Debian" ]] && ! type kitten &>/dev/null; then
         #    sudo ln -s ~/.local/share/kitty-ssh-kitten/kitty/bin/kitten
@@ -31,18 +29,18 @@ if [[ "$distro_base" == 'Arch' ]] && ! ls /usr/share/fonts/noto | grep -i -q emo
     unset emoji
 fi
 
-if ! test -d kitty/.config/kitty; then
+if ! [ -d kitty/.config/kitty ]; then
     tmpdir=$(mktemp -d -t kitty-XXXXXXXXXX)
     tmpfile=$(mktemp)
-    curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/download_git_directory.sh | tee "$tmpfile" &>/dev/null
+    wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/download_git_directory.sh | tee "$tmpfile" &>/dev/null
     chmod u+x "$tmpfile"
     eval $tmpfile https://github.com/excited-bore/dotfiles/tree/main/kitty/.config/kitty $tmpdir
-    wget-aria-dir $tmpdir https://raw.githubusercontent.com/excited-bore/dotfiles/main/kitty/.bash_aliases.d/kitty.sh
+    wget-aria-dir $tmpdir https://raw.githubusercontent.com/excited-bore/dotfiles/main/kitty/.aliases.d/kitty.sh
     dir=$tmpdir/kitty/.config/kitty
     file=$tmpdir/kitty.sh
 else
     dir=kitty/.config/kitty
-    file=kitty/.bash_aliases.d/kitty.sh
+    file=kitty/.aliases.d/kitty.sh
 fi
 
 splits_lay="\t  ${bold}Splits${normal}
@@ -186,7 +184,7 @@ if [[ $ktty_cnf == 'y' ]]; then
             layouts1=$(echo "${lays[@]}" | sed "s/\<"$frst"\> //g")
             layout_p=$(echo "${lays[@]}" | tr ' ' '/')
 
-            test -n "$BASH_VERSION" &&
+            [ -n "$BASH_VERSION" ] &&
 
                 # Bash variant
                 layout_p="${layout_p^}" ||
@@ -257,8 +255,8 @@ if [[ $ktty_cnf == 'y' ]]; then
     
     printf "${cyan}kitty.conf:${normal} \n"
     grep --color=always -n 'enabled_layouts' $dir/kitty.conf
-    ! test -z $ktty_splt1 && [[ $ktty_splt1 == 'y' ]] && grep --color=always -n 'map kitty_mod+enter ' $dir/kitty.conf
-    ! test -z $ktty_splt2 && [[ $ktty_splt2 == 'y' ]] && grep --color=always -n 'map kitty_mod+alt+enter' $dir/kitty.conf
+    ! [ -z $ktty_splt1 ] && [[ $ktty_splt1 == 'y' ]] && grep --color=always -n 'map kitty_mod+enter ' $dir/kitty.conf
+    ! [ -z $ktty_splt2 ] && [[ $ktty_splt2 == 'y' ]] && grep --color=always -n 'map kitty_mod+alt+enter' $dir/kitty.conf
     [[ $ktty_scrll_updwn == 'y' ]] && 
         grep --color=always -n 'map shift+alt+up' $dir/kitty.conf &&
         grep --color=always -n 'map shift+alt+down' $dir/kitty.conf
@@ -268,10 +266,10 @@ if [[ $ktty_cnf == 'y' ]]; then
         mkdir -p ~/.config/kitty
         cp $dir/kitty.conf ~/.config/kitty/kitty.conf
         cp $dir/ssh.conf ~/.config/kitty/ssh.conf
-        if type gio &>/dev/null && [ -f ~/.config/kitty/kitty.conf~ ]; then
+        if hash gio &>/dev/null && [ -f ~/.config/kitty/kitty.conf~ ]; then
             gio trash ~/.config/kitty/kitty.conf~
         fi
-        if type gio &>/dev/null && [ -f ~/.config/kitty/ssh.conf~ ]; then
+        if hash gio &>/dev/null && [ -f ~/.config/kitty/ssh.conf~ ]; then
             gio trash ~/.config/kitty/ssh.conf~
         fi
     }
@@ -279,16 +277,16 @@ if [[ $ktty_cnf == 'y' ]]; then
 fi
 unset ktty_conf
 
-readyn -p "Install kitty aliases? (at ~/.bash_aliases.d/kitty.sh)" kittn
+readyn -p "Install kitty aliases? (at ~/.aliases.d/kitty.sh)" kittn
 if [[ "y" == "$kittn" ]]; then
-    if ! test -f checks/check_aliases_dir.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)
+    if ! [ -f checks/check_aliases_dir.sh ]; then
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)
     else
         . ./checks/check_aliases_dir.sh
     fi
-    cp $file ~/.bash_aliases.d/kitty.sh
-    if type gio &>/dev/null && [ -f ~/.bash_aliases.d/kitty.sh~ ]; then
-        gio trash ~/.bash_aliases.d/kitty.sh~
+    cp $file ~/.aliases.d/kitty.sh
+    if hash gio &>/dev/null && [ -f ~/.aliases.d/kitty.sh~ ]; then
+        gio trash ~/.aliases.d/kitty.sh~
     fi
 fi
 unset kittn

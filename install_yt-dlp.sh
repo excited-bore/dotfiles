@@ -1,5 +1,5 @@
 if ! test -f checks/check_all.sh; then
-    if hash curl &>/dev/null; then
+    if hash curl &> /dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
@@ -16,9 +16,9 @@ else
     . ./checks/check_aliases_dir.sh
 fi
 
-if ! hash yt-dlp &>/dev/null; then
+if ! hash yt-dlp &> /dev/null; then
     if ! test pipx &>/dev/null; then
-        if [[ $machine == 'Mac' ]] && type brew &>/dev/null; then
+        if [[ $machine == 'Mac' ]] && hash brew &> /dev/null; then
             brew install pipx
         elif [[ $distro_base == "Arch" ]]; then
             eval "${pac_ins_y}" python-pipx
@@ -29,7 +29,7 @@ if ! hash yt-dlp &>/dev/null; then
     pipx install yt-dlp
 fi
 
-if ! hash ffmpeg &>/dev/null; then
+if ! hash ffmpeg &> /dev/null; then
     readyn -p 'Install ffmpeg (usefull for video/audio conversion)?' ffmpeg
     if [[ $ffmpeg == 'y' ]]; then
         if ! test -f install_ffmpeg.sh; then
@@ -40,13 +40,13 @@ if ! hash ffmpeg &>/dev/null; then
     fi
 fi
 
-ytbe=aliases/.bash_aliases.d/youtube.sh
-if ! test -d aliases/.bash_aliases.d/; then
-    wget-aria-dir $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/youtube.sh
+ytbe=aliases/.aliases.d/youtube.sh
+if ! test -d aliases/.aliases.d/; then
+    wget-aria-dir $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/youtube.sh
     ytbe=$TMPDIR/youtube.sh
 fi
 
 ytbe() {
-    cp "$ytbe" ~/.bash_aliases.d/
+    cp "$ytbe" ~/.aliases.d/
 }
-yes-edit-no -f ytbe -g "$ytbe" -p "Install yt-dlp (youtube cli download) and youtube.sh at ~/.bash_aliases.d/ (yt-dlp aliases)?"
+yes-edit-no -f ytbe -g "$ytbe" -p "Install yt-dlp (youtube cli download) and youtube.sh at ~/.aliases.d/ (yt-dlp aliases)?"

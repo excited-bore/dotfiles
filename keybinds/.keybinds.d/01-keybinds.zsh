@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-# Bash_aliases at ~/.bash_aliases.d/
+# Bash_aliases at ~/.aliases.d/
 # global bashrc -> /etc/bash.bashrc
 # root shell profiles -> /etc/profile
 
@@ -294,7 +294,7 @@ alias dirs-col-pretty="dirs -p -v | column -c $COLUMNS | sed -E 's|^0[[:space:]]
 
 # A clear for alt-right/left that displays dirs/dirs-col/dirs-col-pretty
 # echo -en "\e[2K\r" clears the line we're on, and moves the cursor to the start of the line 
-if hash starship &>/dev/null && [[ $STARSHIP_SHELL == 'zsh' ]] && (grep -q '\\n' ~/.config/starship.toml || (grep -q 'line_break' ~/.config/starship.toml && ! pcregrep -qM "[line_break]\$(.|\n)*^disabled = true" ~/.config/starship.toml)); then
+if hash starship &> /dev/null && [[ $STARSHIP_SHELL == 'zsh' ]] && (grep -q '\\n' ~/.config/starship.toml || (grep -q 'line_break' ~/.config/starship.toml && ! pcregrep -qM "[line_break]\$(.|\n)*^disabled = true" ~/.config/starship.toml)); then
     function clr1(){ 
         echo -en "\e[2K\r"
         tput cuu1
@@ -322,7 +322,7 @@ if hash starship &>/dev/null && [[ $STARSHIP_SHELL == 'zsh' ]] && (grep -q '\\n'
         zle reset-prompt    
         zle redisplay 
     }
-elif hash starship &>/dev/null && [[ $STARSHIP_SHELL == 'zsh' ]]; then
+elif hash starship &> /dev/null && [[ $STARSHIP_SHELL == 'zsh' ]]; then
     function clr1(){ 
         echo -en "\e[2K\r"
         tput cuu1 
@@ -496,7 +496,7 @@ else
     fi
     
     FZF_ALT_C_OPTS='--bind "ctrl-v:become(vlc --recursive expand {})"
-                    --bind "ctrl-g:become(. ~/.bash_aliases.d/ripgrep-directory.sh && cd {} && ripgrep-dir > /dev/tty)"' 
+                    --bind "ctrl-g:become(. ~/.aliases.d/ripgrep-directory.sh && cd {} && ripgrep-dir > /dev/tty)"' 
     if hash eza &> /dev/null; then
         FZF_ALT_C_OPTS="$FZF_ALT_C_OPTS --preview 'eza --tree --color=always --icons=always --all {}'"
     elif hash tree &> /dev/null; then 
@@ -723,7 +723,7 @@ bindkey -M shift-select "\C-e" edit-wo-executing
 #    bindkey -M vicmd '"\C-e" : rlwrap-call-editor'
 #fi
 
-if hash osc &>/dev/null; then
+if hash osc &> /dev/null; then
     
     function osc-copy() {
         if (( REGION_ACTIVE )); then
@@ -783,7 +783,7 @@ if hash osc &>/dev/null; then
     bindkey -M shift-select "\C-d" osc-cut
 
 
-elif ([[ "$XDG_SESSION_TYPE" == 'x11' ]] && hash xclip &>/dev/null) || ([[ "$XDG_SESSION_TYPE" == 'wayland' ]] && hash wl-copy &> /dev/null); then
+elif ([[ "$XDG_SESSION_TYPE" == 'x11' ]] && hash xclip &> /dev/null) || ([[ "$XDG_SESSION_TYPE" == 'wayland' ]] && hash wl-copy &> /dev/null); then
   
     function clip-copy() {
         if [[ "$XDG_SESSION_TYPE" == 'x11' ]]; then  
@@ -878,7 +878,7 @@ elif ([[ "$XDG_SESSION_TYPE" == 'x11' ]] && hash xclip &>/dev/null) || ([[ "$XDG
 
 fi
 
-if hash autojump &>/dev/null; then
+if hash autojump &> /dev/null; then
     function show-j(){ 
         clear 
         tput cup $(($LINE_TPUT+1)) $TPUT_COL 
@@ -900,7 +900,7 @@ if hash autojump &>/dev/null; then
     bindkey -M vicmd "\C-j" show-j 
 fi
 
-if hash fzf &>/dev/null; then
+if hash fzf &> /dev/null; then
     
     #if [[ "$TERM" == 'xterm-kitty' ]]; then
     #    # (Kitty only) Ctrl-tab for fzf autocompletion
@@ -946,7 +946,7 @@ if hash fzf &>/dev/null; then
 fi
 
 # F2 - ranger (file explorer)
-if hash ranger &>/dev/null; then
+if hash ranger &> /dev/null; then
     # https://unix.stackexchange.com/questions/475310/how-to-bind-a-keyboard-shortcut-in-zsh-to-a-program-requiring-stdin 
     function ranger-zsh () {
         ranger --choosedir=$HOME/.rangerdir < $TTY
@@ -964,7 +964,7 @@ if hash ranger &>/dev/null; then
 fi
 
 # F3 - lazygit (Git helper)
-if hash lazygit &>/dev/null; then
+if hash lazygit &> /dev/null; then
     function lazygit-zsh () {
         lazygit
         zle reset-prompt
@@ -987,10 +987,10 @@ bindkey -M viins "\e[15~" resource-zsh
 bindkey -M vicmd "\e[15~" resource-zsh 
 
 # F6 - (neo/fast/screen)fetch (System overview)
-if hash neofetch &>/dev/null || hash fastfetch &>/dev/null || hash screenfetch &>/dev/null || hash onefetch &>/dev/null; then
+if hash neofetch &> /dev/null || hash fastfetch &> /dev/null || hash screenfetch &> /dev/null || hash onefetch &> /dev/null; then
 
-    if hash onefetch &>/dev/null; then
-        if hash neofetch &>/dev/null || hash fastfetch &>/dev/null || hash screenfetch &>/dev/null; then
+    if hash onefetch &> /dev/null; then
+        if hash neofetch &> /dev/null || hash fastfetch &> /dev/null || hash screenfetch &> /dev/null; then
             function fetchbind-zsh(){
                 if hash git &> /dev/null && git rev-parse --git-dir &> /dev/null; then
                     local gstats 
@@ -999,21 +999,21 @@ if hash neofetch &>/dev/null || hash fastfetch &>/dev/null || hash screenfetch &
                         onefetch 
                     else
                         echo 
-                        if hash fastfetch &>/dev/null; then
+                        if hash fastfetch &> /dev/null; then
                             fastfetch
-                        elif hash screenfetch &>/dev/null; then
+                        elif hash screenfetch &> /dev/null; then
                             screenfetch
-                        elif hash neofetch &>/dev/null; then
+                        elif hash neofetch &> /dev/null; then
                             neofetch
                         fi
                     fi
                 else
                     echo 
-                    if hash fastfetch &>/dev/null; then
+                    if hash fastfetch &> /dev/null; then
                         fastfetch
-                    elif hash screenfetch &>/dev/null; then
+                    elif hash screenfetch &> /dev/null; then
                         screenfetch
-                    elif hash neofetch &>/dev/null; then
+                    elif hash neofetch &> /dev/null; then
                         neofetch
                     fi
                 fi
@@ -1023,15 +1023,15 @@ if hash neofetch &>/dev/null || hash fastfetch &>/dev/null || hash screenfetch &
             function fetchbind-zsh(){ stty sane; onefetch }
         fi
     else
-        if hash neofetch &>/dev/null; then
+        if hash neofetch &> /dev/null; then
             function fetchbind-zsh(){ stty sane; echo; neofetch }
         fi
 
-        if hash screenfetch &>/dev/null; then
-            function fetchbind-zsh(){ stty sane; echo;screenfetch }
+        if hash screenfetch &> /dev/null; then
+            function fetchbind-zsh(){ stty sane; echo; screenfetch }
         fi
 
-        if hash fastfetch &>/dev/null; then
+        if hash fastfetch &> /dev/null; then
             function fetchbind-zsh(){ stty sane; echo; fastfetch }
         fi
     fi
@@ -1053,7 +1053,7 @@ function htop-btop-zsh(){
     # Flush zle's state / clean it up  
     zle -I 
     
-    if hash btop &>/dev/null; then
+    if hash btop &> /dev/null; then
          readyn -p "Use btop instead of htop?" ansr 
          if [[ "$ansr" == "y" ]]; then
              readyn -p "Start btop as root?" ansr1 
@@ -1066,7 +1066,7 @@ function htop-btop-zsh(){
              fi
          fi
     
-    elif hash bashtop &>/dev/null; then
+    elif hash bashtop &> /dev/null; then
          readyn -p "Use bashtop instead of htop?" ansr 
          if [[ "$ansr" == "y" ]]; then
              readyn -p "Start bashtop as root?" ansr1 
@@ -1076,7 +1076,7 @@ function htop-btop-zsh(){
                 bashtop </dev/tty
              fi
          fi
-    elif hash bpytop &>/dev/null; then
+    elif hash bpytop &> /dev/null; then
          readyn -p "Use bpytop instead of htop?" ansr 
          if [[ "$ansr" == "y" ]]; then
              readyn -p "Start bpytop as root?" ansr1 
@@ -1102,7 +1102,7 @@ bindkey -M viins "\e[18~" htop-btop-zsh
 bindkey -M vicmd "\e[18~" htop-btop-zsh
 
 # F8 - Lazydocker (Docker TUI)
-if hash lazydocker &>/dev/null; then
+if hash lazydocker &> /dev/null; then
     function lazydocker-zsh () {
         lazydocker
         zle reset-prompt

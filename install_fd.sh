@@ -22,7 +22,7 @@ if ! hash fd &> /dev/null; then
 fi
 
 # TODO: Make better check: https://github.com/sharkdp/fd
-if hash fd-find &> /dev/null || type fd &> /dev/null; then
+if hash fd-find &> /dev/null || hash fd &> /dev/null; then
     echo "${green}Fd can read from global gitignore file${normal}"
     readyn -n -p "Generate global gitignore using 'themed' templates? (https://github.com/github/gitignore)" fndgbl
     if [[ $fndgbl == 'y' ]]; then

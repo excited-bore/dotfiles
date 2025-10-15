@@ -12,18 +12,40 @@
 # Deep dive into SIGTTIN/SIGTTOU
 # http://curiousthing.org/sigttin-sigttou-deep-dive-linux
 
-if ! type reade &> /dev/null; then
-    if [[ -f ~/.bash_aliases.d/00-rlwrap_scripts.sh ]]; then
-        . ~/.bash_aliases.d/00-rlwrap_scripts.sh
-    elif [[ -f ~/.zsh_aliases.d/00-rlwrap_scripts.sh ]]; then
-        . ~/.zsh_aliases.d/00-rlwrap_scripts.sh
-    fi
+if ! type reade &> /dev/null && [[ -f ~/.aliases.d/00-rlwrap_scripts.sh ]]; then
+    . ~/.aliases.d/00-rlwrap_scripts.sh
 fi
 
-alias list-all-aliases="alias | awk '{\$1=\"\"; print}' | \$PAGER"
-alias list-all-functions="declare -f | \$PAGER"
-alias list-all-aliases-and-fucntions="(alias | awk '{\$1=\"\"; print}'; declare -f) | \$PAGER"
+[ -z "$PAGER" ] && hash less &>/dev/null && 
+    PAGER="$(whereis less | awk '{print $2}')"
 
+[ -z "$MANPAGER" ] &&
+    MANPAGER=$PAGER
+
+if [ -n "$BASH_VERSION" ]; then
+    
+    man-bash(){
+        help -m $@ | $MANPAGER;
+    }
+     
+    alias list-commands-bash="compgen -c | $PAGER"
+    alias list-keywords-bash="compgen -k | $PAGER"
+    alias list-builtins-bash="compgen -b | $PAGER"
+    alias list-aliases-bash="compgen -a | $PAGER"
+    alias list-users-bash="compgen -u | $PAGER"
+    alias list-functions-bash="compgen -A function | $PAGER"
+    alias list-function-content-bash="declare -f"
+    alias list-directory-bash="compgen -d | $PAGER"
+    alias list-groups-bash="compgen -g | $PAGER"
+    alias list-services-bash="compgen -s | $PAGER"
+    alias list-exports-bash="compgen -e | $PAGER"
+    alias list-shellvars-bash="compgen -v | $PAGER"
+    alias list-file-and-dirs-bash="compgen -f | $PAGER"
+fi
+
+alias list-all-aliases="alias | sed 's|^alias ||g' | \$PAGER"
+alias list-all-functions="declare -f | \$PAGER"
+alias list-all-aliases-and-functions="(alias | sed 's|^alias ||g'; declare -f) | \$PAGER"
 
 if [ -z $TRASHBIN_LIMIT ]; then
    TRASHBIN_LIMIT=100 
@@ -47,32 +69,30 @@ if hash curl &> /dev/null; then
    alias curl="curl --proto '=https' --tlsv1.2" 
 fi
 
-alias r="source ~/.zshrc"
+if [[ -n "$BASH_VERSION" ]]; then
+    alias r="stty sane && source ~/.bashrc"
+elif [[ -n "$ZSH_VERSION" ]]; then
+    alias r="source ~/.zshrc"
+fi
 
 alias my-folder="sudo chown -R $USER:$USER ./"
 
 #source_profile=""
-#if test -z $PROFILE; then
-#    if test -f ~/.profile; then
+#if [ -z $PROFILE ]; then
+#    if [ -f ~/.profile ]; then
 #        #PROFILE=~/.profile 
 #        #source_profile="source ~/.profile" 
 #        alias r="stty sane && source ~/.profile && source ~/.bashrc"
 #    fi
-#    if test -f ~/.bash_profile; then
+#    if [ -f ~/.bash_profile ]; then
 #        #PROFILE=~/.bash_profile 
 #        #source_profile="source ~/.bash_profile" 
 #        alias r="stty sane && source ~/.bash_profile && source ~/.bashrc"
 #    fi
-#elif ! test -z $PROFILE; then
+#elif ! [ -z $PROFILE ]; then
 #    alias r="stty sane && source $PROFILE && source ~/.bashrc"
 #else
 #fi
-
-#if test -z $PAGER; then
-#    PAGER=less
-#fi
-#alias pager=" | $PAGER"
-
 
 # TRY and keep command line at bottom
 #alias b="tput cup $(tput lines) 0" 
@@ -85,8 +105,40 @@ alias my-folder="sudo chown -R $USER:$USER ./"
 
 alias disable-glob="set -f"
 
-if type _fzf_dir_completion &> /dev/null; then
-    compdef _fzf_dir_completion cd
+if [ -n "$BASH_VERSION" ]; then
+    
+    # Cd wrapper
+    function cd-w() {
+        
+        if ! [ -d $@ ]; then 
+            builtin cd -- "$@" 
+            return 1 
+        fi
+        
+        local push=1
+        local j=0
+        if [[ "$1" == "--" ]]; then
+            shift;
+        fi 
+        for i in $(dirs -l 2>/dev/null); do
+            if [[ -e "$i" ]]; then
+                if [[ -z "${@}" && "$i" == "$HOME" ]] || [[ "$(realpath ${@: -1:1})" == "$i" ]]; then
+                    push=0
+                    pushd -n +$j &>/dev/null
+                fi
+                j=$(($j+1));
+            fi
+        done
+        if [[ $push == 1 ]]; then
+            pushd "$(pwd)" &>/dev/null;  
+        fi
+        builtin cd -- "$@"; 
+        #export DIRS="$(dirs -l)" 
+        #if [[ "$TERM" == 'xterm-kitty' ]] && [ -f ~/.config/kitty/env.conf ]; then
+        #    sed -i "s|env DIRS.*|env DIRS=""$DIRS""|g" ~/.config/kitty/env.conf
+        #fi
+    }
+    alias cd='cd-w'
 fi
 
 # cp recursively, verbose ()
@@ -105,13 +157,12 @@ function cp-all-to(){
     else
         reade -Q "GREEN" -i "~/" -p "This will do a recursive copy in the current directory to: " -e dest
     fi
-    if ! [[ -z "$dest" ]]; then
+    if ! [ -z "$dest" ]; then
         cp -rv -t "$dest" .[!.]*;
     fi
 }
 
 alias cpf-bckup="cp -f -b"
-
 
 function cp-trash(){
     
@@ -178,7 +229,7 @@ function cp-trash(){
         local s 
         for s in "${sorce[@]}"; do
             local trgt 
-            if test -f $target; then
+            if [ -f $target ]; then
                 trgt=$target 
             else
                 trgt="$target/$(basename $s)" 
@@ -256,7 +307,7 @@ alias mv-exchange="mv --exchange"
 function mv-dir-to(){
     local dest
     reade -Q "GREEN" -i "~/" -p "This will copy the entire directory to: " -e dest
-    if ! [[ -z "$dest" ]]; then
+    if ! [ -z "$dest" ]; then
         mv -t "$dest" .[!.]* *;
     fi
 } 
@@ -297,18 +348,18 @@ function mv-trash(){
     
     if [ $target == 1 ] ; then
         for s in "${sorce[@]}"; do
-            if test -a "$dest/$s$suff"; then 
+            if [[ -a "$dest/$s$suff" ]]; then 
                 trash "$dest/$(basename $s$suff)" 
-            echo "Backup $dest/$(basename $s$suff) put in trash."
+                echo "Backup $dest/$(basename $s$suff) put in trash."
             fi 
         done
-    elif test -f "$dest$suff"; then
+    elif [[ -f "$dest$suff" ]]; then
         trash "$dest$suff"  
         echo "Backup(s) put in trash. Use 'gio trash --list' to list / 'gio trash --restore' to restore"
     fi
 } 
 
-alias mv="mv -g --force --verbose"
+alias mv="mv -g  --force --verbose"
 
 # Rm 
 
@@ -367,7 +418,6 @@ alias ll-pager="ls-all-pager"
 alias llp="ls-all-pager"
 alias lp="ls-all-pager"
 
-
 # With parent directories and verbose
 alias mkdir="mkdir -pv"
 
@@ -381,15 +431,19 @@ alias grep-no-case-sensitivwe='grep --ignore-case'
 alias rg='rg --color=always'
 
 # Refresh output command every 0.1s
-alias refresh="watch -n0 --color bash -ic"
-alias refresh-diff="watch -n0 -d --color bash -ic"
 
-compdef _commands refresh refresh-diff
+if [[ -n "$BASH_VERSION" ]]; then
+    alias refresh="watch -n0 --color bash -ic"
+    alias refresh-diff="watch -n0 -d --color bash -ic"
+elif [[ -n "$ZSH_VERSION" ]]; then
+    alias refresh="watch -n0 --color zsh -ic"
+    alias refresh-diff="watch -n0 -d --color zsh -ic"
+fi
 
-hash viddy &> /dev/null && 
-   alias refresh="viddy --interval 0.1 --disable_auto_save --shell-options '--login' -- " && 
-   alias refresh-diff="viddy -D --interval 0.1 --disable_auto_save --shell-options '--login' -- " &&
-   compdef _commands viddy
+if hash viddy &> /dev/null; then
+    alias refresh="viddy --interval 0.1 --disable_auto_save --shell-options '--login' -- " 
+    alias refresh-diff="viddy -D --interval 0.1 --disable_auto_save --shell-options '--login' -- "
+fi
 
 #alias cat="bat"
 
@@ -410,7 +464,7 @@ if hash nmcli &> /dev/null; then
 fi
 
 alias q='exit'
-#alias q='! test -z jobs && kill -2 "$(jobs -p)" && reade -Q "GREEN" -i "y" -p "Jobs are still running in the background. Send interrupt signal (kill)?: " "n" kill_ && test "$kill_" == "y" && kill "$(jobs -p)" && exit || kill -18 "$(jobs -p)" || exit'
+#alias q='! [ -z jobs ] && kill -2 "$(jobs -p)" && reade -Q "GREEN" -i "y" -p "Jobs are still running in the background. Send interrupt signal (kill)?: " "n" kill_ && [ "$kill_" == "y" ] && kill "$(jobs -p)" && exit || kill -18 "$(jobs -p)" || exit'
 alias d="dirs"
 alias c="cd"
 alias x="cd .."
@@ -481,6 +535,7 @@ extract-archive(){
    fi
 }
 
+
 # whereis    
 if hash whereis &> /dev/null; then
      function edit-whereis(){
@@ -495,8 +550,6 @@ if hash whereis &> /dev/null; then
         fi
         $EDITOR $(whereis $1 | awk '{print $2;}')
      } 
-    
-     compdef _commands edit-whereis  
 fi
 
 alias start-cups="sudo cupsctl WebInterface=y; xdg-open 'http://localhost:631'"
@@ -527,7 +580,6 @@ alias weather-full="curl wttr.in | $PAGER"
 alias cron-list='crontab -l'
 alias crontab-list='crontab -l'
 
-
 function cron-list-all-user-jobs(){
     local mktemp_f=$(mktemp) 
     for user in $(cut -f1 -d: /etc/passwd); do 
@@ -542,8 +594,8 @@ function cron-list-all-user-jobs(){
 alias crontab-list-all-user-jobs="cron-list-all-user-jobs"
 alias list-all-cronjobs-user="cron-list-all-user-jobs"
 
-alias crontab-edit="env VISUAL=$CRONEDITOR crontab -e"
-alias cron-edit="env VISUAL=$CRONEDITOR crontab -e"
+alias crontab-edit="VISUAL=$CRONEDITOR crontab -e"
+alias cron-edit="VISUAL=$CRONEDITOR crontab -e"
 
 alias crontab-add-example-edit="(crontab -l; echo '#* * * * * $USER command') | awk '!x[$0]++' | crontab -; env VISUAL=$CRONEDITOR crontab -e"
 alias cron-add-example-edit-="crontab-edit-new"
@@ -551,7 +603,7 @@ alias cron-add-example-edit-="crontab-edit-new"
 
 function crontab-new(){
     #reade -Q 'GREEN' -i 'n' -p "Use ${MAGENTA}https://crontab.guru${GREEN} to get period? (site with explanation around crontabs) [N/y]: " 'y' guru
-    #if test $guru == 'y'; then
+    #if [[ $guru == 'y' ]]; then
     #    xdg-open https://crontab.guru/     
     #fi
     reade -Q 'GREEN' -i 'custom @yearly @annually @monthly @weekly @daily @hourly @reboot' -p 'When? [Custom/@yearly/@annually/@monthly/@weekly/@daily/@hourly/@reboot]: ' when
@@ -578,31 +630,31 @@ function crontab-new(){
     fi
     if [[ 'root' == $user ]] || [[ $user == 'system' ]]; then
         if [[ $format == '@daily' ]]; then
-            if ! [[ -f /etc/cron.daily/schedule ]]; then
+            if ! [ -f /etc/cron.daily/schedule ]; then
                 sudo touch /etc/cron.daily/schedule
             fi
             sudo echo "$format root $cmd" >> /etc/cron.daily/schedule
             sudo chmod 600 /etc/cron.daily/schedule 
         elif [[ $format == '@hourly' ]]; then 
-            if ! [[ -f /etc/cron.hourly/schedule ]]; then
+            if ! [ -f /etc/cron.hourly/schedule ]; then
                 sudo touch /etc/cron.hourly/schedule
             fi
             sudo echo "$format root $cmd" >> /etc/cron.hourly/schedule
             sudo chmod 600 /etc/cron.hourly/schedule 
         elif [[ $format == '@monthly' ]]; then 
-            if ! [[ -f /etc/cron.monthly/schedule ]]; then
+            if ! [ -f /etc/cron.monthly/schedule ]; then
                 sudo touch /etc/cron.monthly/schedule
             fi
             sudo echo "$format root $cmd" >> /etc/cron.monthly/schedule
             sudo chmod 600 /etc/cron.monthly/schedule 
         elif [[ $format == '@weekly' ]]; then 
-            if ! [[ -f /etc/cron.weekly/schedule ]]; then
+            if ! [ -f /etc/cron.weekly/schedule ]; then
                 sudo touch /etc/cron.weekly/schedule
             fi
             sudo echo "$format root $cmd" >> /etc/cron.weekly/schedule
             sudo chmod 600 /etc/cron.weekly/schedule 
         else
-            if ! [[ -f /etc/cron.d/schedule ]]; then
+            if ! [ -f /etc/cron.d/schedule ]; then
                 sudo touch /etc/cron.d/schedule
             fi
             sudo echo "$format root $cmd" >> /etc/cron.d/schedule
@@ -619,7 +671,7 @@ alias cron-new='crontab-new'
 
 function ln-soft(){
     if ([ -d "$1" ] || [ -f "$1" ]); then 
-        if [[ -n "$2" ]] && ([[ $(readlink -f "$2") ]] || [[ $(readlink -d "$2") ]]); then
+        if [ -n "$2" ] && ([[ $(readlink -f "$2") ]] || [[ $(readlink -d "$2") ]]); then
             if [[ "$1" == /* ]]; then  
                 ln -s "$1" "$2";
             else     
@@ -643,11 +695,9 @@ alias link-soft="ln-soft"
 alias softlink="ln-soft"
 alias symlink="ln-soft"
 
-#compdef _filedir ln-soft
-
 function ln-hard(){
     if ([[ "$0" = /* ]] || [ -d "$1" ] || [ -f "$1" ]); then
-        if test -n "$2" && ([[ $(readlink -f "$2") ]] || [[ $(readlink -d "$2") ]]); then
+        if [ -n "$2" ] && ([[ $(readlink -f "$2") ]] || [[ $(readlink -d "$2") ]]); then
             if [[ "$1" == /* ]]; then  
                 ln "$1" "$2";
             else     
@@ -669,8 +719,6 @@ function ln-hard(){
 
 alias hardlink="ln-hard"
 
-#compdef _filedir ln-hard
-
 function trash(){
     for arg in "$@" ; do
         if [ -f "$arg" ] || [ -d "$arg" ]; then
@@ -691,8 +739,6 @@ function trash(){
     done
 }
 
-#compdef _filedir trash
-
 alias trash-list="gio trash --list"
 alias trash-empty="gio trash --empty"
 
@@ -701,9 +747,6 @@ function trash-restore(){
         gio trash --restore "$arg";
     done
 }
-
-compdef _trash trash-list
-compdef _trash trash-restore
 
 function add-to-group() {
     if [ -z $1 ]; then
@@ -715,13 +758,13 @@ function add-to-group() {
     fi 
 }
 
-compdef _groups add_to_group
 
 # https://stackoverflow.com/questions/22381983/how-to-check-file-owner-in-linux
 # I still do == cause used to ¯\_(ツ)_/¯
+#
 
 function set-executable-user() {
-    if [[ -n "$@" ]]; then
+    if [ -n "$@" ]; then
         for i in "$@"; do 
             if [[ "$(stat -c '%U' "$i")" == 'root' ]] || ! [[ "$(stat -c '%U' "$i")" == "$USER" ]]; then
                 sudo chmod u+x $i;
@@ -735,7 +778,7 @@ function set-executable-user() {
 }
 
 function set-executable-group() {
-    if [[ -n "$@" ]]; then
+    if [ -n "$@" ]; then
         for i in "$@"; do 
             if [[ "$(stat -c '%U' "$i")" == 'root' ]] || ! [[ "$(stat -c '%U' "$i")" == "$USER" ]]; then
                 sudo chmod g+x $i;
@@ -749,7 +792,7 @@ function set-executable-group() {
 }
 
 function set-executable-other() {
-    if [[ -n "$@" ]]; then
+    if [ -n "$@" ]; then
         for i in "$@"; do 
             if [[ "$(stat -c '%U' "$i")" == 'root' ]] || ! [[ "$(stat -c '%U' "$i")" == "$USER" ]]; then
                 sudo chmod o+x $i;
@@ -764,7 +807,7 @@ function set-executable-other() {
 
 
 function set-executable-all() {
-    if [[ -n "$@" ]]; then
+    if [ -n "$@" ]; then
         for i in "$@"; do 
             if [[ "$(stat -c '%U' "$i")" == 'root' ]] || ! [[ "$(stat -c '%U' "$i")" == "$USER" ]]; then
                 sudo chmod +x $i;
@@ -779,7 +822,7 @@ function set-executable-all() {
 
 
 function unset-executable-user() {
-    if [[ -n "$@" ]]; then
+    if [ -n "$@" ]; then
         for i in "$@"; do 
             if [[ "$(stat -c '%U' "$i")" == 'root' ]] || ! [[ "$(stat -c '%U' "$i")" == "$USER" ]]; then
                 sudo chmod u-x $i;
@@ -793,7 +836,7 @@ function unset-executable-user() {
 }
 
 function unset-executable-group() {
-    if [[ -n "$@" ]]; then
+    if [ -n "$@" ]; then
         for i in "$@"; do 
             if [[ "$(stat -c '%U' "$i")" == 'root' ]] || ! [[ "$(stat -c '%U' "$i")" == "$USER" ]]; then
                 sudo chmod g-x $i;
@@ -807,7 +850,7 @@ function unset-executable-group() {
 }
 
 function unset-executable-other() {
-    if [[ -n "$@" ]]; then
+    if [ -n "$@" ]; then
         for i in "$@"; do 
             if [[ "$(stat -c '%U' "$i")" == 'root' ]] || ! [[ "$(stat -c '%U' "$i")" == "$USER" ]]; then
                 sudo chmod o-x $i;
@@ -824,7 +867,7 @@ function unset-executable-other() {
 
 function unset-executable-all() {
     local i 
-    if [[ -n "$@" ]]; then
+    if [ -n "$@" ]; then
         for i in "$@"; do 
             if [[ "$(stat -c '%U' "$i")" == 'root' ]] || ! [[ "$(stat -c '%U' "$i")" == "$USER" ]]; then
                 sudo chmod -x $i;
@@ -836,16 +879,21 @@ function unset-executable-all() {
     fi
 }
 
+alias remove-executable-user="unset-executable-user"
+alias remove-executable-group="unset-executable-group"
+alias remove-executable-other="unset-executable-other"
+alias remove-executable-all="unset-executable-all"
+
 # FIND 
 
-hash fd &> /dev/null && 
-    alias fd='fd --color=always --hidden'
+hash fd &> /dev/null && alias fd='fd --color=always --hidden'
 
 tree=''
 hash tree &> /dev/null && 
    tree=' | tree '
 
-if hash fd &> /dev/null; then
+
+if type fd &> /dev/null; then
     alias find-files-dir="fd --search-path . --type file" 
     alias find-files-system="fd --search-path / --type file" 
     alias find-symlinks-dir="fd --search-path . --type symlink $tree | $PAGER"
@@ -864,6 +912,7 @@ alias locales-list-enabled="locale -a"
 # https://stackoverflow.com/questions/18439528/sed-insert-line-with-spaces-to-a-specific-line    
 
 # Escape pathnames to files and dirs properly before putting them on the prompt
+# !! This does not work only as function but does when bound to a key (or turned into a widget and then bound to a key for ZSH). I didn't realize this when writing this !!
 function print-path-to-prompt(){
     local lines="n"
     while getopts ':l' flag; do
@@ -872,15 +921,28 @@ function print-path-to-prompt(){
                 shift 
                 ;;
         esac
-    done
+    done 
     OPTIND=1;
-    local fls=$(echo "$@" | sed 's| |\\ |g' | sed 's|\[|\\\[|g' | sed 's|\]|\\\]|g' | sed 's|(|\\(|g' | sed 's|)|\\)|g' | sed 's|{|\\{|g' | sed 's|}|\\}|g')
+    local p 
+    if [ -z "$@" ]; then
+        p="$(pwd)" 
+    else
+        p="$@"
+    fi
+    local fls=$(echo "$p" | sed 's| |\\ |g; s|\[|\\\[|g; s|\]|\\\]|g; s|(|\\(|g; s|)|\\)|g; s|{|\\{|g; s|}|\\}|g')
     if [[ $lines == 'n' ]]; then
         fls="$(echo $fls | tr "\n" ' ')"
     fi
-    BUFFER="${BUFFER:0:$CURSOR}$fls${BUFFER:$CURSOR}"
-    CURSOR=$(( $CURSOR + ${#fls} ))
+    if [ -n "$BASH_VERSION" ]; then
+        READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$fls${READLINE_LINE:$READLINE_POINT}"
+        READLINE_POINT=$(( READLINE_POINT + ${#fls} ))
+    elif [ -n "$ZSH_VERSION" ]; then 
+        BUFFER="${BUFFER:0:$CURSOR}$fls${BUFFER:$CURSOR}"
+        CURSOR=$(( $CURSOR + ${#fls} ))
+    fi 
 }
+
+# bind -x '"\C-b": print-path-to-prompt'
 
 # Set an escape character \ before each space
 function escape_spaces(){
@@ -904,22 +966,18 @@ function file-insert-after-line(){
     fi
 }
 
-#compdef _files file-insert-after-line
-
 function file-put-quotations-around(){
     if [ -f "$1" ]; then
-       var1=$(sed 's/ /\\ /g' <<< $2);
+        var1=$(sed 's/ /\\ /g' <<< $2);
        sed -i "s/${var1}/\"&\"/" "$1";
     else
         echo "Give up a filename.\n Give all arguments that use spaces a \" \"";
     fi
 }
 
-#compdef _files file-put-quotations-around
-
 alias shutdown-now='shutdown now'
 
-function iommu-groups(){
+function list-iommu-groups(){
     shopt -s nullglob
     for g in $(find /sys/kernel/iommu_groups/* -maxdepth 0 -type d | sort -V); do
         echo "IOMMU Group ${g##*/}:"
@@ -971,16 +1029,8 @@ alias df='df -h -T --total'
 alias df='duf'
 alias lfs='dysk'
 
-
+alias regenerate-initrams="sudo mkinitcpio"
 alias regenerate-initrams-all-kernels="sudo mkinitcpio -P"
-if [[ $DISTRO == 'Manjaro' ]]; then
-    hdrs="$(echo $(uname -r) | cut -d. -f-2)"
-    curr="linux${hdrs//'.'}"
-else 
-    curr="$(uname -r)" 
-fi
-alias regenerate-initrams-current-kernel="sudo mkinitcpi -p $curr"
-unset hdrs curr
 
 alias list-drivers-modules-in-use="lspci -nnk"
 alias motherboard-info="sudo dmidecode -t 1 && sudo dmidecode -t 2"
@@ -988,11 +1038,11 @@ alias mobo-info="motherboard-info"
 alias bios-info="sudo dmidecode -t 0"
 alias motherboard-info-full="sudo dmidecode -t 1 && sudo dmidecode -t 2 && sudo dmidecode -t 0 | $PAGER"
 
-# dual boot stuff
+# Dual boot stuff
 
 function boot-into(){
     local bootnt 
-    local opts="$(efibootmgr | grep --color=never boot00 | awk '{print $1;}' | sed 's/boot//g' | cut -d* -f-1)" 
+    local opts="$(efibootmgr | grep --color=never Boot00 | awk '{print $1;}' | sed 's/Boot//g' | cut -d* -f-1)" 
     local frst="$(echo $opts | awk '{print $1}')" 
     local opts="$(echo $opts | sed "s/\<$frst\> //g")"  
     efibootmgr
@@ -1017,30 +1067,30 @@ function change-username-and-homefolder(){
     local frst="$(echo $(users | word2line | uniq | grep -v root ) | awk '{print $1}')" 
     local words="$(echo $words | sed "s/\<$frst\> //g")" 
     reade -Q 'CYAN' -i "$frst $words" -p "Old username (Empty = $frst): " usrname 
-    [[ -z "$usrname" ]] && 
+    [ -z "$usrname" ] && 
         usrname="$frst" 
     [[ "$USER" == "$usrname" ]] && 
         printf "${RED}Can't change username for $usrname while logged as said\nLogout, press 'Ctrl+Alt+F1/F2/...F6' to drop to a login shell (if not already in one) and login as root or a user other then the one you want to change.\n${YELLOW}(Make sure the root account is enabled with 'sudo passwd su' - you can disable it afterwards with 'sudo passwd -l su')${normal}\n" && 
         return 1 
     
     reade -Q 'MAGENTA' -p 'New username: ' usrname_nw 
-    if [[ -n "$usrname_nw" ]]; then
-        if [[ -n "$(ps -U $usrname 2> /dev/null)" ]]; then
+    if [ -n "$usrname_nw" ]; then
+        if [ -n "$(ps -U $usrname 2> /dev/null)" ]; then
             printf "There are still processes running under user $usrname!\nKilling all processes for user..."  
             sleep 5
             sudo pkill -U $(id -u "$usrname") 
             printf "Done!\n" 
         fi
         
-        sudo usermod -l "$usrname_nw" -d "/home/$usrname_nw" -m "$usrname" &&  
+        sudo usermod -l "$usrname_nw" -d /home/"$usrname_nw" -m "$usrname" &&  
         sudo groupmod -n "$usrname_nw" "$usrname" &&  
-        sudo test -f /etc/lightdm/lightdm.conf && sudo grep -q "autologin-user=$usrname" /etc/lightdm/lightdm.conf && 
+        sudo [ -f /etc/lightdm/lightdm.conf ] && sudo grep -q "autologin-user=$usrname" /etc/lightdm/lightdm.conf && 
             sudo sed -i "s/^autologin-user=$usrname/autologin-user=$usrname_nw/g" /etc/lightdm/lightdm.conf &&
-        [[ -f /home/$usrname_nw/.config/starship.toml ]] && grep -q "/home/$usrname" /home/$usrname_nw/.config/starship.toml && 
-            sed -i "s|/home/$usrname|/home/$usrname_nw|g" /home/$usrname_nw/.config/starship.toml   
-            printf "${GREEN}Changed username and homedirectory to $usrname_nw!${normal}\n" && 
-            return 0 || 
-            return 1; 
+            [ -f /home/$usrname_nw/.config/starship.toml ] && grep -q "/home/$usrname" /home/$usrname_nw/.config/starship.toml && 
+                sed -i "s|/home/$usrname|/home/$usrname_nw|g" /home/$usrname_nw/.config/starship.toml   
+                printf "${GREEN}Changed username and homedirectory to $usrname_nw!${normal}\n" && 
+                return 0 || 
+                return 1; 
     else
         printf "${YELLOW}Please give up a new username to change to.${normal}\n"
         return 1 
@@ -1050,7 +1100,7 @@ function change-username-and-homefolder(){
 function change-device-name-to(){
     local name oldname=$(hostname) 
     reade -Q 'CYAN' -p "New device name (hostname): " name
-    [[ -z "$name" ]] && 
+    [ -z "$name" ] && 
         printf "Name cant be empty.\n" && 
         return 1
     

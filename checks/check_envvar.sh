@@ -36,8 +36,8 @@ if test -f ~/.bash_aliases; then
     export BASH_ALIAS=~/.bash_aliases
 fi
 
-if test -d ~/.bash_aliases.d/; then
-    export BASH_ALIAS_FILEDIR=~/.bash_aliases.d/
+if test -d ~/.aliases.d/; then
+    export BASH_ALIAS_FILEDIR=~/.aliases.d/
 fi
 
 export BASH_COMPLETION=~/.bashrc
@@ -98,8 +98,8 @@ if sudo test -f /root/.bash_aliases; then
     export BASH_ALIAS_R=/root/.bash_aliases
 fi
 
-if sudo test -d /root/.bash_aliases.d/; then
-    export BASH_ALIAS_FILEDIR_R=/root/.bash_aliases.d/
+if sudo test -d /root/.aliases.d/; then
+    export BASH_ALIAS_FILEDIR_R=/root/.aliases.d/
 fi
 
 if sudo test -f /root/.bash_completion; then
