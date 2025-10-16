@@ -40,7 +40,7 @@ if hash ffmpeg &>/dev/null; then
     }
 
     function ins_ffmpg() {
-        cp $ffmpgsh ~/.aliases.d/nix.sh
+        cp $ffmpgsh ~/.aliases.d/
         yes-edit-no -Y 'YELLOW' -f ins_ffmpg_r -g "$ffmpgsh" -p "Install ffmpeg.sh to /root/.aliases.d/?"
     }
 
