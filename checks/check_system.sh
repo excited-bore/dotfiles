@@ -103,6 +103,12 @@ else
     SSHELL=sh
 fi
 
+[ -z "$PAGER" ] && hash less &>/dev/null && 
+    PAGER="$(whereis less | awk '{print $2}')"
+
+[ -z "$MANPAGER" ] &&
+    MANPAGER=$PAGER
+
 if [ -z $EDITOR ]; then
     if hash nano &>/dev/null; then
         EDITOR=nano

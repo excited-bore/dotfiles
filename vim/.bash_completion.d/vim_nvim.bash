@@ -126,4 +126,8 @@ _vim_ctags() {
 # Files matching this pattern are excluded
 excludelist='*.@(o|O|so|SO|so.!(conf)|SO.!(CONF)|a|A|rpm|RPM|deb|DEB|gif|GIF|jp?(e)g|JP?(E)G|mp3|MP3|mp?(e)g|MP?(E)G|avi|AVI|asf|ASF|ogg|OGG|class|CLASS)'
 
+complete -F _files vim-fzf 
+
+complete -F _man-all man-all-nvim                                                       
+
 complete -F _vim_ctags -f -X "${excludelist}" vi vim gvim rvim view rview rgvim rgview gview

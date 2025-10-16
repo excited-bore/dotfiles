@@ -24,12 +24,14 @@ fi
 SCRIPT_DIR=$(get-script-dir)
 
 rlwrpscrpt=aliases/.aliases.d/00-rlwrap_scripts.sh
+colors=aliases/.aliases.d/00-colors.sh
 reade=rlwrap-scripts/reade
 readyn=rlwrap-scripts/readyn
 yesnoedit=rlwrap-scripts/yes-edit-no
 csysm=checks/check_system.sh
 if ! test -d checks/; then
     tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/00-rlwrap_scripts.sh && rlwrapscrpt=$tmp
+    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/00-colors.sh && colors=$tmp
     tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade && reade=$tmp
     tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/readyn && readyn=$tmp
     tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/yes-edit-no && yesnoedit=$tmp
@@ -37,19 +39,21 @@ if ! test -d checks/; then
 fi
 
 reade_r() {
+    sudo cp $colors /root/.aliases.d/
     sudo cp $rlwrpscrpt /root/.aliases.d/
     sudo cp $reade /root/.aliases.d/01-reade.sh
     sudo cp $readyn /root/.aliases.d/02-readyn.sh
     sudo cp $yesnoedit /root/.aliases.d/03-yes-edit-no.sh
 }
 readeu() {
+    cp $colors ~/.aliases.d/
     cp $rlwrpscrpt ~/.aliases.d/
     cp $reade ~/.aliases.d/01-reade.sh
     cp $readyn ~/.aliases.d/02-readyn.sh
     cp $yesnoedit ~/.aliases.d/03-yes-edit-no.sh
     yes-edit-no -y -Y "YELLOW" -f reade_r -g "$reade $readyn $yesnoedit $rlwrpscrpt" -p "Install reade, readyn and yes-edit-no at /root/.aliases.d/?" 
 }
-yes-edit-no -y -f readeu -g "$reade $readyn $yesnoedit $rlwrpscrpt" -p "Install reade, readyn, yes-edit-no and rlwrap_scripts at ~/.aliases.d/ (rlwrap/read functions that are used in other aliases)? "
+yes-edit-no -y -f readeu -g "$colors $reade $readyn $yesnoedit $rlwrpscrpt" -p "Install colors, reade, readyn, yes-edit-no and rlwrap_scripts at ~/.aliases.d/ (colour variables and rlwrap/read functions that are used in other aliases)?"
 
 csysm_r() {
     sudo cp $csysm /root/.aliases.d/04-check_system.sh

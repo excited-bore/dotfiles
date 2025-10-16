@@ -30,18 +30,21 @@ binds=$SCRIPT_DIR/keybinds/.inputrc
 binds0=$SCRIPT_DIR/keybinds/.keybinds.d/00-bind-empty.bash
 binds1=$SCRIPT_DIR/keybinds/.keybinds.d/01-cdw.bash
 binds2=$SCRIPT_DIR/keybinds/.keybinds.d/02-keybinds.bash
-binds3=$SCRIPT_DIR/keybinds/.keybinds
+binds3=$SCRIPT_DIR/keybinds/.keybinds.d/keybinds.zsh
+binds4=$SCRIPT_DIR/keybinds/.keybinds
 if ! [[ -f $binds ]]; then
     tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.inputrc
     tmp0=$(mktemp) && curl -o $tmp0 https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds.d/00-binds-empty.bash
     tmp1=$(mktemp) && curl -o $tmp1 https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds.d/01-cdw.bash
     tmp2=$(mktemp) && curl -o $tmp2 https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds.d/02-keybinds.bash
-    tmp3=$(mktemp) && curl -o $tmp3 https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds
+    tmp3=$(mktemp) && curl -o $tmp3 https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/keybinds.zsh
+    tmp4=$(mktemp) && curl -o $tmp4 https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds
     binds=$tmp
     binds0=$tmp0
     binds1=$tmp1
     binds2=$tmp2
     binds3=$tmp3
+    binds4=$tmp4
 fi
 
 if ! [[ -f /etc/inputrc ]]; then
@@ -56,7 +59,8 @@ shell-keybinds_r() {
     sudo cp $binds0 /root/.keybinds.d/
     sudo cp $binds1 /root/.keybinds.d/
     sudo cp $binds2 /root/.keybinds.d/
-    sudo cp $binds3 /root/.keybinds
+    sudo cp $binds3 /root/.keybinds.d/
+    sudo cp $binds4 /root/
     sudo cp $binds /root/
     
     echo "Next $(tput setaf 1)sudo$(tput sgr0) will check whether '~/.keybinds' is sourced in /root/.bashrc"
@@ -152,7 +156,8 @@ shell-keybinds() {
     cp $binds0 ~/.keybinds.d/
     cp $binds1 ~/.keybinds.d/
     cp $binds2 ~/.keybinds.d/
-    cp $binds3 ~/.keybinds
+    cp $binds3 ~/.keybinds.d/
+    cp $binds4 ~/
     cp $binds ~/
 
     if test -f ~/.bashrc && ! grep -q '~/.keybinds' ~/.bashrc; then

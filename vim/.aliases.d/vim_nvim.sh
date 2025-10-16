@@ -1,9 +1,9 @@
 ### VIM ###
 
-if type vim &> /dev/null || type nvim &> /dev/null; then
+if hash vim &> /dev/null || hash nvim &> /dev/null; then
 
-    type vim &> /dev/null && VIM='vim'
-    type nvim &> /dev/null && VIM='nvim'
+    hash vim &> /dev/null && VIM='vim'
+    hash nvim &> /dev/null && VIM='nvim'
 
     alias vim="$VIM -u ~/.config/nvim/init.vim" 
     alias svim="sudo $VIM"
@@ -12,19 +12,18 @@ if type vim &> /dev/null || type nvim &> /dev/null; then
     alias vim-checkhealth="$VIM +checkhealth"
     alias vim-diff="$VIM -d" 
 
-    if type fzf &> /dev/null; then 
+    if hash fzf &> /dev/null; then 
         function vim-fzf(){
-        query=''
-        if ! test -z $@; then
-            query="--query $@"
-        fi
+            local query=''
+            if ! test -z $@; then
+                query="--query $@"
+            fi
             "$VIM $(fzf --multi $query)"
         }  
-        complete -F _files vim-fzf 
     fi 
 fi
 
-if type nvim &> /dev/null; then
+if hash nvim &> /dev/null; then
 
     function rvim(){ nvr --remote $@; }
 
@@ -46,8 +45,6 @@ if type nvim &> /dev/null; then
     }                                                                                       
                                                                                             
     # Taken from original _man function                                                                                                                                            
-    complete -F _man-all man-all-nvim                                                       
-                                                                                            
     alias mana="man-all-nvim"                                                               
     alias man-a="man-all-nvim"                                                               
     alias superman="man-all-nvim"                                                           

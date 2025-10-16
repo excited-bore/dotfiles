@@ -515,10 +515,10 @@ echo "Install Completion language plugins with ':CocInstall coc-..' / Update wit
 echo "Check installed nvim plugins with 'Lazy' / Check installed vim plugins with 'PlugInstalled' (only work on nvim and vim respectively)"
 
 file=vim/.aliases.d/vim_nvim.sh
-file1=vim/.bash_completion.d/vim_nvim
+file1=vim/.bash_completion.d/vim_nvim.bash
 if ! test -d vim/.aliases.d/ || ! test -d vim/.bash_completion.d/; then
     tmp=$(mktemp) && wget-aria-name $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/vim/.aliases.d/vim_nvim.sh
-    tmp1=$(mktemp) && wget-aria-name $tmp1 https://raw.githubusercontent.com/excited-bore/dotfiles/main/vim/.bash_completion.d/vim_nvim
+    tmp1=$(mktemp) && wget-aria-name $tmp1 https://raw.githubusercontent.com/excited-bore/dotfiles/main/vim/.bash_completion.d/vim_nvim.bash
     file=$tmp
     file1=$tmp1
 fi
