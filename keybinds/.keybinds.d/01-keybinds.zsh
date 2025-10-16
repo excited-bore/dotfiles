@@ -383,6 +383,9 @@ fi
 zle -N clr1
 zle -N clr2
 
+# Based on nav
+# https://github.com/betafcc/nav
+
 # We set this option so every time we change directory, we add said directory to the dir stack 
 # (used by dirs/pushd/popd)
 setopt autopushd pushdignoredups
