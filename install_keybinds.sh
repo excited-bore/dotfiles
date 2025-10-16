@@ -30,21 +30,24 @@ binds=$SCRIPT_DIR/keybinds/.inputrc
 binds0=$SCRIPT_DIR/keybinds/.keybinds.d/00-bind-empty.bash
 binds1=$SCRIPT_DIR/keybinds/.keybinds.d/01-cdw.bash
 binds2=$SCRIPT_DIR/keybinds/.keybinds.d/02-keybinds.bash
-binds3=$SCRIPT_DIR/keybinds/.keybinds.d/keybinds.zsh
-binds4=$SCRIPT_DIR/keybinds/.keybinds
+binds3=$SCRIPT_DIR/keybinds/.keybinds.d/00-bind-empty.zsh
+binds4=$SCRIPT_DIR/keybinds/.keybinds.d/01-keybinds.zsh
+binds5=$SCRIPT_DIR/keybinds/.keybinds
 if ! [[ -f $binds ]]; then
     tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.inputrc
     tmp0=$(mktemp) && curl -o $tmp0 https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds.d/00-binds-empty.bash
     tmp1=$(mktemp) && curl -o $tmp1 https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds.d/01-cdw.bash
     tmp2=$(mktemp) && curl -o $tmp2 https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds.d/02-keybinds.bash
-    tmp3=$(mktemp) && curl -o $tmp3 https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/keybinds.zsh
-    tmp4=$(mktemp) && curl -o $tmp4 https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds
+    tmp3=$(mktemp) && curl -o $tmp3 https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/00-binds-empty.zsh
+    tmp4=$(mktemp) && curl -o $tmp4 https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/01-keybinds.zsh
+    tmp5=$(mktemp) && curl -o $tmp5 https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds
     binds=$tmp
     binds0=$tmp0
     binds1=$tmp1
     binds2=$tmp2
     binds3=$tmp3
     binds4=$tmp4
+    binds5=$tmp5
 fi
 
 if ! [[ -f /etc/inputrc ]]; then
@@ -56,13 +59,9 @@ shell-keybinds_r() {
         sudo sed -i 's|#export INPUTRC.*|export INPUTRC=~/.inputrc|g' /root/.environment.env
     fi
    
-    sudo cp $binds0 /root/.keybinds.d/
-    sudo cp $binds1 /root/.keybinds.d/
-    sudo cp $binds2 /root/.keybinds.d/
-    sudo cp $binds3 /root/.keybinds.d/
-    sudo cp $binds4 /root/
-    sudo cp $binds /root/
-    
+    sudo cp -t /root/.keybinds.d/ $binds0 $binds1 $binds2 $binds3 $binds4
+    sudo cp -t /root/ $binds $binds5
+
     echo "Next $(tput setaf 1)sudo$(tput sgr0) will check whether '~/.keybinds' is sourced in /root/.bashrc"
     if [[ -f /root/.bashrc ]] && ! grep -q '[ -f /root/.keybinds ]' /root/.bashrc; then
         if sudo grep -q '[ -f /root/.bash_aliases ]' /root/.bashrc; then
@@ -153,12 +152,8 @@ shell-keybinds() {
         fi
     fi
 
-    cp $binds0 ~/.keybinds.d/
-    cp $binds1 ~/.keybinds.d/
-    cp $binds2 ~/.keybinds.d/
-    cp $binds3 ~/.keybinds.d/
-    cp $binds4 ~/
-    cp $binds ~/
+    cp -t ~/.keybinds.d/ $binds0 $binds1 $binds2 $binds3 $binds4
+    cp -t $HOME $binds $binds5
 
     if test -f ~/.bashrc && ! grep -q '~/.keybinds' ~/.bashrc; then
         if grep -q '\[ -f ~/.bash_aliases \]' ~/.bashrc; then

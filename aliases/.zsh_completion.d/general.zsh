@@ -27,6 +27,8 @@ _vlc() {
   _arguments '*:media file:_files -g "*.(mp4|m4a|mkv|mp3|ogg)(-.)"'
 }
 
+compdef _run-help man-zsh
+
 compdef _cd cp-all-to
 
 if type _fzf_dir_completion &> /dev/null; then

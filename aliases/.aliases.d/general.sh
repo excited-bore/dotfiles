@@ -41,6 +41,12 @@ if [ -n "$BASH_VERSION" ]; then
     alias list-exports-bash="compgen -e | $PAGER"
     alias list-shellvars-bash="compgen -v | $PAGER"
     alias list-file-and-dirs-bash="compgen -f | $PAGER"
+
+elif [[ -n "$ZSH_VERSION" ]]; then
+    
+    man-zsh(){
+        run-help $@
+    }
 fi
 
 alias list-all-aliases="alias | sed 's|^alias ||g' | \$PAGER"
@@ -70,8 +76,10 @@ if hash curl &> /dev/null; then
 fi
 
 if [[ -n "$BASH_VERSION" ]]; then
+    alias reload-bashrc="stty sane && source ~/.bashrc"
     alias r="stty sane && source ~/.bashrc"
 elif [[ -n "$ZSH_VERSION" ]]; then
+    alias reload-zshrc="source ~/.zshrc"
     alias r="source ~/.zshrc"
 fi
 
@@ -105,42 +113,6 @@ alias my-folder="sudo chown -R $USER:$USER ./"
 
 alias disable-glob="set -f"
 
-if [ -n "$BASH_VERSION" ]; then
-    
-    # Cd wrapper
-    function cd-w() {
-        
-        if ! [ -d $@ ]; then 
-            builtin cd -- "$@" 
-            return 1 
-        fi
-        
-        local push=1
-        local j=0
-        if [[ "$1" == "--" ]]; then
-            shift;
-        fi 
-        for i in $(dirs -l 2>/dev/null); do
-            if [[ -e "$i" ]]; then
-                if [[ -z "${@}" && "$i" == "$HOME" ]] || [[ "$(realpath ${@: -1:1})" == "$i" ]]; then
-                    push=0
-                    pushd -n +$j &>/dev/null
-                fi
-                j=$(($j+1));
-            fi
-        done
-        if [[ $push == 1 ]]; then
-            pushd "$(pwd)" &>/dev/null;  
-        fi
-        builtin cd -- "$@"; 
-        #export DIRS="$(dirs -l)" 
-        #if [[ "$TERM" == 'xterm-kitty' ]] && [ -f ~/.config/kitty/env.conf ]; then
-        #    sed -i "s|env DIRS.*|env DIRS=""$DIRS""|g" ~/.config/kitty/env.conf
-        #fi
-    }
-    alias cd='cd-w'
-fi
-
 # cp recursively, verbose ()
 # cp-skip-existing same but no files older are overwritten
 alias cp-skip-existing="cp -ruv"
@@ -148,7 +120,6 @@ alias copy="cp"
 
 # scp - copy over ssh 
 alias scp="scp -r"
-
 
 function cp-all-to(){
     local dest
@@ -170,44 +141,49 @@ function cp-trash(){
     [[ -n "$ZSH_VERSION" ]] &&
         setopt KSH_ARRAYS       
     
-    local target
-    local suff
-    local bcp
+    local target suff bcp args="$@" othrargs="" i=0 descn descn1
    
-    if [ -z "$CPTRASHDIFF" ]; then
+    if [ -z "$CPTRASH_CMD" ]; then
+        CPTRASH_CMD='command cp'
+    fi 
+    
+    if [ -z "$CPTRASH_PAGER" ]; then
+        CPTRASH_PAGER='less -R --use-color --LINE-NUMBERS --quit-if-one-screen -Q --no-vbell'
+    fi 
+    
+    if [ -z "$CPTRASH_DIFF" ]; then
         if [ -n "$DIFFPROG" ]; then
-            CPTRASHDIFF="$DIFFPROG" 
+            CPTRASH_DIFF="$DIFFPROG" 
         else 
-            CPTRASHDIFF='diff --color=always' 
+            CPTRASH_DIFF='diff --color=always' 
         fi 
     fi
-   
-    if [ -z "$CPTRASHPAGER" ]; then
-        CPTRASHPAGER='less -R --use-color --LINE-NUMBERS --quit-if-one-screen -Q --no-vbell'
-    fi 
 
-    local args="$@" 
-    local othrargs="" 
-    local i=0
-    
     for arg in "$@"; do
         i=$(($i+1)) 
         case "$arg" in
             -a | --archive | --attributes-only | --copy-contents | -d | --debug | -f | --force | -i | --interactive | -H | -l | --link | -L | --dereference | -n | --no-clobber | -P | --no-dererence | -p | --preserve | --preserve=* | --no-preserve=* | --parents | -R | -r | --recursive | --reflink | --reflink=* | --remove-destination | --sparse=* | --strip-trailing-slashes | -s | --symbolic-link | -T | --no-target-directory | --update | --update=* | -u | -v | --verbose | --keep-directory-symlink | -x | --one-file-system | -Z | --context | --context=* | --help | --version) 
-               othrargs="$othrarg $arg"; shift ;; 
-            -b | --backup | --backup=*) 
+               othrargs="$othrargs $arg"; shift ;; 
+            -g | --progress-bar) 
+                if eval "$CPTRASH_CMD --help 2>&1 | grep -q -- $arg"; then
+                    othrargs="$othrargs $arg"; shift ;
+                else 
+                    eval "$CPTRASH_CMD $arg"
+                    return 1
+                fi ;; 
+           -b | --backup | --backup=*) 
                 if [[ "$arg" =~ "--backup=" ]]; then
                     bcp="${arg#--backup=}" ;
                 else
                     bcp="simple" ;
                 fi; 
-                othrargs="$othrarg $arg"; shift ;;
+                othrargs="$othrargs $arg"; shift ;;
             -t) target="${@:$(($i+1)):1}"; shift 2 ;;
             --target-directory=*) target="${arg#--target-directory=}"; shift ;;
             -S) suff="${@:$(($i+1)):1}"; 
-               othrargs="$othrarg $arg $suff"; shift 2 ;; 
+               othrargs="$othrargs $arg $suff"; shift 2 ;; 
             --suffix=*) suff="${arg#--suffix=}"; 
-               othrargs="$othrarg $arg"; shift ;;
+               othrargs="$othrargs $arg"; shift ;;
             -* | --*) echo "cp-trash: unrecognized option '"$arg"'"; return 1 ;; 
             --) break ;; 
         esac
@@ -222,19 +198,30 @@ function cp-trash(){
    
     if [ -z "$target" ]; then
         target="${sorce[-1]}" 
-        unset "sorce[${#sorce[@]}-1]"
+        if [[ -n "$BASH_VERSION" ]]; then
+            unset "sorce[${#sorce[@]}-1]"
+        elif [[ -n "$ZSH_VERSION" ]]; then 
+            # https://stackoverflow.com/questions/3435355/remove-entry-from-array 
+            sorce=(${(@)sorce:#sorce[-1]}) 
+        fi
     fi
-
+  
     if [ -n "$sorce" ]; then
         local s 
         for s in "${sorce[@]}"; do
+            echo "'$s'" 
+            if ! [ -e "$s" ]; then
+                echo "cp-trash: file/directory '${YELLOW}"$s"${normal}' doesn't exist. Exiting.."
+                return 1
+            fi
+            
             local trgt 
             if [ -f $target ]; then
                 trgt=$target 
             else
-                trgt="$target/$(basename $s)" 
+                trgt="$target$(basename $s)" 
             fi
-            if [ -a "$trgt" ]; then 
+            if [ -e "$trgt" ]; then 
                 
                 local opts="overwrite diff trash"
                 local prmpt="[Overwrite/diff/trash]" 
@@ -242,58 +229,56 @@ function cp-trash(){
                     opts="overwrite diff backup trash"
                     prmpt="[Overwrite/diff/backup/trash]" 
                 fi
-                echo "About to overwrite ${CYAN}'$trgt'${YELLOW}" 
+                echo "About to overwrite ${CYAN}'$trgt'${normal}" 
                 reade -Q 'YELLOW' -i "$opts" -p "What to do? $prmpt: " descn
                 if [[ "$descn" == 'overwrite' ]]; then
                     if ([[ "$othrargs" =~ "-f" ]] || [[ "$othrargs" =~ '--force' ]]); then
-                        command cp $othrargs "$s" "$target"
+                        eval "$CPTRASH_CMD $othrargs -- '$s' '$target'"
                     else
-                        command cp -f $othrargs "$s" "$target"
+                        eval "$CPTRASH_CMD -f $othrargs -- '$s' '$target'"
                     fi
                 elif [[ "$descn" == 'backup' ]]; then 
-                    command cp -b $othrargs "$s" "$target"  
+                    eval "$CPTRASH_CMD -b $othrargs -- '$s' '$target'"
                 elif [[ "$descn" == 'diff' ]]; then 
-                    eval "${CPTRASHDIFF} $s $trgt" 
+                    eval "${CPTRASH_DIFF} $s $trgt" 
                     opts="overwrite trash"
                     prmpt="[Overwrite/trash]" 
                     if ! ([[ "$othrargs" =~ '-b' ]] || [[ "$othrargs" =~ '--backup' ]]); then
                         opts="overwrite backup trash"
                         prmpt="[Overwrite/backup/trash]" 
                     fi
-                    echo "About to overwrite ${CYAN}'$trgt'${YELLOW}" 
+                    echo "About to overwrite ${CYAN}'$trgt'${normal}" 
                     reade -Q 'YELLOW' -i "$opts" -p "What to do? $prmpt: " descn1
                     if [[ "$descn1" == 'overwrite' ]]; then
                         if ([[ "$othrargs" =~ "-f" ]] || [[ "$othrargs" =~ '--force' ]]); then
-                            command cp $othrargs "$s" "$target"
+                            eval "$CPTRASH_CMD $othrargs -- '$s' '$target'"
                         else
-                            command cp -f $othrargs "$s" "$target"
+                            eval "$CPTRASH_CMD -f $othrargs -- '$s' '$target'"
                         fi 
                     elif [[ "$descn1" == 'backup' ]]; then 
-                        command cp -b $othrargs "$s" "$target"
+                        eval "$CPTRASH_CMD -b $othrargs -- '$s' '$target'"
                     elif [[ "$descn1" == 'trash' ]]; then
-                        trash "$trgt" 
+                        gio trash "$trgt" 
                         echo "${CYAN}$trgt${normal} trashed before copying"
-                        echo "${GREEN}Backup(s) put in trash. Use ${CYAN}'gio trash --list'${GREEN} to list / ${CYAN}'gio trash --restore'${GREEN} to restore${normal}" 
-                        command cp $args
+                        echo "${GREEN}Backup(s) put in trash. Use ${CYAN}'gio trash --list'${GREEN} to list / ${CYAN}'gio trash --restore'${GREEN} to restore${normal}"
+                        eval "$CPTRASH_CMD $othrargs -- '$s' '$target'"
                     fi
                 elif [[ "$descn" == 'trash' ]]; then
-                    trash "$trgt" 
+                    gio trash "$trgt" 
                     echo "${CYAN}$trgt${normal} trashed before copying"
                     echo "${GREEN}Backup(s) put in trash. Use ${CYAN}'gio trash --list'${GREEN} to list / ${CYAN}'gio trash --restore'${GREEN} to restore${normal}" 
-                    command cp $args
-                     
+                    eval "$CPTRASH_CMD $othrargs -- '$s' '$target'"
                 fi
             fi  
         done
     else
-        command cp $args
+        eval "$CPTRASH_CMD $args"
+        return 1
     fi
-   
-    unset descn descn1 
 }
 
 # Cp recursively and verbose
-alias cp="cp -g  --recursive --verbose --force --dereference"
+alias cp="cp-trash -g  --recursive --verbose --force --dereference"
 alias cp-lookup-symlinks="cp --dereference --driver parblock"
 
 # mv (recursively native) verbose and only ask for interaction when overwriting newer files
@@ -719,6 +704,9 @@ function ln-hard(){
 
 alias hardlink="ln-hard"
 
+alias trash-list="gio trash --list"
+alias trash-empty="gio trash --empty"
+
 function trash(){
     for arg in "$@" ; do
         if [ -f "$arg" ] || [ -d "$arg" ]; then
@@ -738,9 +726,6 @@ function trash(){
         fi
     done
 }
-
-alias trash-list="gio trash --list"
-alias trash-empty="gio trash --empty"
 
 function trash-restore(){
     for arg in "$@"; do
