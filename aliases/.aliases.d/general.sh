@@ -141,7 +141,7 @@ function cp-trash(){
     [[ -n "$ZSH_VERSION" ]] &&
         setopt KSH_ARRAYS       
     
-    local target suff bcp args="$@" othrargs="" i=0 descn descn1
+    local target suff bcp args="$@" othrargs="" i=0 descn descn1 trashed
    
     if [ -z "$CPTRASH_CMD" ]; then
         CPTRASH_CMD='command cp'
@@ -209,7 +209,6 @@ function cp-trash(){
     if [ -n "$sorce" ]; then
         local s 
         for s in "${sorce[@]}"; do
-            echo "'$s'" 
             if ! [ -e "$s" ]; then
                 echo "cp-trash: file/directory '${YELLOW}"$s"${normal}' doesn't exist. Exiting.."
                 return 1
@@ -218,9 +217,14 @@ function cp-trash(){
             local trgt 
             if [ -f $target ]; then
                 trgt=$target 
-            else
-                trgt="$target$(basename $s)" 
+            elif [ -d $target ]; then
+                if [[ "${target: -1}" == "/" ]]; then
+                    trgt="$target$(basename $s)" 
+                else
+                    trgt="$target/$(basename $s)" 
+                fi
             fi
+           
             if [ -e "$trgt" ]; then 
                 
                 local opts="overwrite diff trash"
@@ -260,20 +264,25 @@ function cp-trash(){
                     elif [[ "$descn1" == 'trash' ]]; then
                         gio trash "$trgt" 
                         echo "${CYAN}$trgt${normal} trashed before copying"
-                        echo "${GREEN}Backup(s) put in trash. Use ${CYAN}'gio trash --list'${GREEN} to list / ${CYAN}'gio trash --restore'${GREEN} to restore${normal}"
                         eval "$CPTRASH_CMD $othrargs -- '$s' '$target'"
+                        trashed=1 
                     fi
                 elif [[ "$descn" == 'trash' ]]; then
                     gio trash "$trgt" 
                     echo "${CYAN}$trgt${normal} trashed before copying"
-                    echo "${GREEN}Backup(s) put in trash. Use ${CYAN}'gio trash --list'${GREEN} to list / ${CYAN}'gio trash --restore'${GREEN} to restore${normal}" 
                     eval "$CPTRASH_CMD $othrargs -- '$s' '$target'"
+                    trashed=1 
                 fi
+            else
+                eval "$CPTRASH_CMD $othrargs -- '$s' '$target'"
             fi  
         done
     else
         eval "$CPTRASH_CMD $args"
         return 1
+    fi
+    if [[ -n $trashed ]]; then
+        echo "${GREEN}Backup(s) put in trash. Use ${CYAN}'gio trash --list'${GREEN} to list / ${CYAN}'gio trash --restore'${GREEN} to restore${normal}" 
     fi
 }
 
