@@ -426,13 +426,8 @@ alias rg='rg --color=always'
 
 # Refresh output command every 0.1s
 
-if [[ -n "$BASH_VERSION" ]]; then
-    alias refresh="watch -n0 --color bash -ic"
-    alias refresh-diff="watch -n0 -d --color bash -ic"
-elif [[ -n "$ZSH_VERSION" ]]; then
-    alias refresh="watch -n0 --color zsh -ic"
-    alias refresh-diff="watch -n0 -d --color zsh -ic"
-fi
+alias refresh="watch -n0 --color"
+alias refresh-diff="watch -n0 -d --color"
 
 if hash viddy &> /dev/null; then
     alias refresh="viddy --interval 0.1 --disable_auto_save --shell-options '--login' -- " 
@@ -442,9 +437,9 @@ fi
 #alias cat="bat"
 
 # Redirects to /dev/null 
-alias output-null="> /dev/null"
+alias no-output-except-error="> /dev/null"
 alias error-null="2> /dev/null"
-alias no-error="2> /dev/null"
+alias no-error-output="2> /dev/null"
 alias all-null="&> /dev/null"
 alias no-output="&> /dev/null"
 
