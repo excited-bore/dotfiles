@@ -285,7 +285,7 @@ elif [[ $distro_base == 'Arch' ]]; then
     fi
     unset pacmn_cntr
 
-    if [[ -z "$AUR_pac" &>/dev/null ]]; then
+    if [[ -z "$AUR_pac" ]]; then
         printf "${CYAN}yay${normal} is not installed (Pacman wrapper for installing AUR packages, needed for yay-fzf-install)\n"
         readyn -p "Install yay?" insyay
         if [[ "y" == "$insyay" ]]; then
@@ -325,7 +325,7 @@ fi
 
 echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for polkit related files in '/etc/polkit', '/etc/polkit-1/rules.d/' and '/etc/polkit-1/localauthority.conf.d/'"
 
-if ! sudo [[ -f /etc/polkit/49-nopasswd_global.pkla ]] && ! sudo [[ -f /etc/polkit-1/localauthority.conf.d/90-nopasswd_global.conf ]] && ! sudo [[ -f /etc/polkit-1/rules.d/90-nopasswd_global.rules ]]; then
+if ! sudo [ -f /etc/polkit/49-nopasswd_global.pkla ] && ! sudo [ -f /etc/polkit-1/localauthority.conf.d/90-nopasswd_global.conf ] && ! sudo [-f /etc/polkit-1/rules.d/90-nopasswd_global.rules ]; then
     readyn -Y "YELLOW" -p "Configure polkit for automatic authentication without passwords (sudo still requires passwords)?" plkit
     if [[ "y" == "$plkit" ]]; then
         if ! [[ -f $DIR/conf_polkit_no_pwd.sh ]]; then
