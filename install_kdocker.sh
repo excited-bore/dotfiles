@@ -1,16 +1,18 @@
-#!/bin/bash
+# KDE Docker -> Dock anything to system trays
+# https://github.com/user-none/KDocker
+
+hash kdocker &> /dev/null && SYSTEM_UPDATED='TRUE'
 
 if ! test -f checks/check_all.sh; then
-    if type curl &>/dev/null; then
+    if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-        return 1 || exit 1
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ./checks/check_all.sh
+    . checks/check_all.sh
 fi
 
-if ! type kdocker &> /dev/null && ! test -z "$pac_ins"; then
-    eval "${pac_ins} kdocker"
+if ! hash kdocker &> /dev/null && test -n "$pac_ins_y"; then
+    eval "${pac_ins_y} kdocker"
 fi

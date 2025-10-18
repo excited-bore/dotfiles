@@ -361,15 +361,15 @@ elif [[ "$envvars" == "y" ]]; then
             pagers="more $pagers"
             prmpt="\tmore = Archaic pager - leaves text by default, less customizable (ironically)\n$prmpt"
         fi
-        if type most &>/dev/null; then
+        if hash most &>/dev/null; then
             pagers="most $pagers"
             prmpt="\tmost = Installed pager that is very customizable\n$prmpt"
         fi
-        if type bat &>/dev/null; then
+        if hash bat &>/dev/null; then
             pagers="bat $pagers"
             prmpt="\tbat = Cat clone / pager wrapper with syntax highlighting\n$prmpt"
         fi
-        if type nvimpager &>/dev/null; then
+        if hash nvimpager &>/dev/null; then
             pagers="nvimpager $pagers"
             prmpt="\tnvimpager = The pager that acts and feels like Neovim. Did you guess?\n$prmpt"
         fi
@@ -377,9 +377,9 @@ elif [[ "$envvars" == "y" ]]; then
             pagers="less $pagers"
             prmpt="\tless = Default pager - Basic, archaic but very customizable\n$prmpt"
         fi
-        if type moar &>/dev/null; then
-            pagers="moar $pagers"
-            prmpt="\tmoar = Installed pager with an awesome default configuration\n$prmpt"
+        if hash moor &>/dev/null; then
+            pagers="moor $pagers"
+            prmpt="\tmoor = Installed pager with an awesome default configuration\n$prmpt"
         fi
         printf "${green}$prmpt${normal}"
 
@@ -407,15 +407,15 @@ elif [[ "$envvars" == "y" ]]; then
         fi
         #sed -i 's/#export LESSEDIT=/export LESSEDIT=/' .environment.env
 
-        # Set moar options
-        hash moar &> /dev/null && 
-            sed -i 's/#export MOAR=/export MOAR=/' $pathvr
+        # Set moor options
+        hash moor &> /dev/null && 
+            sed -i 's/#export moor=/export moor=/' $pathvr
       
         # Set bat options
         hash bat &> /dev/null && 
             sed -i 's/#export BAT=/export BAT=/' $pathvr
     
-        if [[ "$(basename ""$pgr2"")" == "bat" ]] && hash moar &>/dev/null || [[ "$(basename ""$pgr2"")" == "bat" ]] && hash nvimpager &>/dev/null; then
+        if [[ "$(basename ""$pgr2"")" == "bat" ]] && hash moor &>/dev/null || [[ "$(basename ""$pgr2"")" == "bat" ]] && hash nvimpager &>/dev/null; then
             prmpt=""
             pagers=""
             
@@ -427,11 +427,11 @@ elif [[ "$envvars" == "y" ]]; then
                 pagers="more $pagers"
                 prmpt="\tmore = Archaic pager - leaves text by default, less customizable (ironically)\n$prmpt"
             fi
-            if type most &>/dev/null; then
+            if hash most &>/dev/null; then
                 pagers="most $pagers"
                 prmpt="\tmost = Installed pager that is very customizable\n$prmpt"
             fi
-            if type nvimpager &>/dev/null; then
+            if hash nvimpager &>/dev/null; then
                 pagers="nvimpager $pagers"
                 prmpt="\tnvimpager = The pager that acts and feels like Neovim. Did you guess?\n$prmpt"
             fi
@@ -439,16 +439,16 @@ elif [[ "$envvars" == "y" ]]; then
                 pagers="less $pagers"
                 prmpt="\tless = Default pager - Basic, archaic but very customizable\n$prmpt"
             fi
-            if type moar &>/dev/null; then
-                pagers="moar $pagers"
-                prmpt="\tmoar = Installed pager with an awesome default configuration\n$prmpt"
+            if hash moor &>/dev/null; then
+                pagers="moor $pagers"
+                prmpt="\tmoor = Installed pager with an awesome default configuration\n$prmpt"
             fi
             printf "${green}$prmpt${normal}"
             
             reade -Q "GREEN" -i "$pagers" -p "BAT_PAGER(less default)=" pgr2
             pgr2="$(where_cmd $pgr2)"
             [[ "$pgr2" =~ "less" ]] && pgr2="$pgr2 \$LESS --line-numbers"
-            [[ "$pgr2" =~ "moar" ]] && pgr2="$pgr2 \$MOAR --no-linenumbers"
+            [[ "$pgr2" =~ "moor" ]] && pgr2="$pgr2 \$moor --no-linenumbers"
             sed 's/^#export BAT_PAGER=/export BAT_PAGER=/' -i $pathvr
             sed -i "s|^export BAT_PAGER=.*|export BAT_PAGER=\"$pgr2\"|" $pathvr
         fi
@@ -456,7 +456,7 @@ elif [[ "$envvars" == "y" ]]; then
     
     unset pagers prmpt
 
-    if type nvim &>/dev/null; then
+    if hash nvim &>/dev/null; then
         readyn -p "Set Neovim as MANPAGER?" manvim
         if [[ "$manvim" == "y" ]]; then
             sed -i 's|.export MANPAGER=.*|export MANPAGER='\''nvim +Man!'\''|g' $pathvr
@@ -612,7 +612,7 @@ elif [[ "$envvars" == "y" ]]; then
     unset edtvsl compedit frst editors prmpt
 
     # Set DISPLAY
-    if type nmcli &>/dev/null; then
+    if hash nmcli &>/dev/null; then
         addr=$(nmcli device show | grep IP4.ADDR | awk 'NR==1{print $2}' | sed 's|\(.*\)/.*|\1|')
     fi
     #reade -Q "GREEN" -i "n" -p "Set DISPLAY to ':$(addr).0'? [Y/n]:" "n" dsply
@@ -624,18 +624,18 @@ elif [[ "$envvars" == "y" ]]; then
     fi
     unset dsply
 
-    if type go &>/dev/null; then
+    if hash go &>/dev/null; then
         #sed -i 's|#export GOPATH|export GOPATH|' $pathvr
         sed -i 's|#export PATH=$PATH:$GOPATH|export PATH=$PATH:$GOPATH|' $pathvr
     fi
     unset snapvrs
 
-    if type snap &>/dev/null; then
+    if hash snap &>/dev/null; then
         sed -i 's|#export PATH=/bin/snap|export PATH=/bin/snap|' $pathvr
     fi
     unset snapvrs
 
-    if type flatpak &>/dev/null; then
+    if hash flatpak &>/dev/null; then
         sed -i 's|#export FLATPAK|export FLATPAK|' $pathvr
         sed -i 's|#\(export PATH=$PATH:$HOME/.local/bin/flatpak\)|\1|g' $pathvr
     fi
@@ -643,7 +643,7 @@ elif [[ "$envvars" == "y" ]]; then
 
     # TODO do something for flatpak  (XDG_DATA_DIRS)
     # Check if xdg installed
-    if type xdg-open &>/dev/null; then
+    if hash xdg-open &>/dev/null; then
         prmpt="${green}This will set XDG environment variables to their respective defaults\n\
         XDG is related to default applications\n\
         Setting these could be usefull when installing certain programs \n\
@@ -670,7 +670,7 @@ elif [[ "$envvars" == "y" ]]; then
 
     # TODO: check around for other systemdvars
     # Check if systemd installed
-    if type systemctl &>/dev/null; then
+    if hash systemctl &>/dev/null; then
         pageSec=1
         printf "${cyan}Systemd comes preinstalled with ${GREEN}SYSTEMD_PAGERSECURE=1${normal}.\n This means any pager without a 'secure mode' cant be used for ${CYAN}systemctl/journalctl${normal}.\n(Features that are fairly obscure and mostly less-specific in the first place -\n No editing (v), no examining (:e), no pipeing (|)...)\n It's an understandable concern to be better safe and sound, but this does constrain the user to ${CYAN}only using less.${normal}\n"
         readyn -N "YELLOW" -n -p "${yellow}Set SYSTEMD_PAGERSECURE to 0?" page_sec
@@ -721,11 +721,11 @@ elif [[ "$envvars" == "y" ]]; then
         fi
     fi
 
-    if test -d $HOME/.fzf/bin; then
+    if [[ -d $HOME/.fzf/bin ]]; then
         sed -i 's|^#export PATH=$PATH:$HOME/.fzf/bin|export PATH=$PATH:$HOME/.fzf/bin|g' $pathvr
     fi
 
-    if type libvirtd &>/dev/null; then
+    if hash libvirtd &>/dev/null; then
         sed -i 's/^#export LIBVIRT_DEFAULT_URI/export LIBVIRT_DEFAULT_URI/' $pathvr
     fi
 

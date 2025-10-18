@@ -1,6 +1,6 @@
 SYSTEM_UPDATED="TRUE"
 
-if ! test -f checks/check_all.sh; then
+if ! [[ -f checks/check_all.sh ]]; then
     if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
@@ -10,7 +10,7 @@ else
     . ./checks/check_all.sh
 fi
 
-if ! test -f checks/check_aliases_dir.sh; then
+if ! [[ -f checks/check_aliases_dir.sh ]]; then
     source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)
 else
     . ./checks/check_aliases_dir.sh
@@ -30,12 +30,12 @@ readyn=rlwrap-scripts/readyn
 yesnoedit=rlwrap-scripts/yes-edit-no
 csysm=checks/check_system.sh
 if ! test -d checks/; then
-    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/00-rlwrap_scripts.sh && rlwrapscrpt=$tmp
-    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/00-colors.sh && colors=$tmp
-    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade && reade=$tmp
-    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/readyn && readyn=$tmp
-    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/yes-edit-no && yesnoedit=$tmp
-    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh && csysm=$tmp
+    tmp=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/00-rlwrap_scripts.sh > $tmp && rlwrapscrpt=$tmp
+    tmp=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/00-colors.sh > $tmp && colors=$tmp
+    tmp=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade > $tmp && reade=$tmp
+    tmp=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/readyn > $tmp && readyn=$tmp
+    tmp=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/yes-edit-no > $tmp && yesnoedit=$tmp
+    tmp=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh > $tmp && csysm=$tmp
 fi
 
 reade_r() {
@@ -67,8 +67,8 @@ yes-edit-no -y -f csysm -g "$csysm" -p "Install check_system.sh at ~/.aliases.d/
 genr=aliases/.aliases.d/general.sh
 genrc=aliases/.bash_completion.d/general.bash
 if ! test -f aliases/.aliases.d/general.sh; then
-    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/general.sh
-    tmp1=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliasases/.bash_completion.d/general.bash
+    tmp=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/general.sh > $tmp
+    tmp1=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliasases/.bash_completion.d/general.bash >  $tmp
     genr=$tmp
     genrc=$tmp1
 fi
@@ -558,19 +558,19 @@ hash ssh &>/dev/null && sshs=aliases/.aliases.d/ssh.sh
 ps1=aliases/.aliases.d/PS1_colours.sh
 variti=aliases/.aliases.d/variety.sh
 hash python &>/dev/null && pthon=aliases/.aliases.d/python.sh
-if ! test -d aliases/.aliases.d/; then
-    tmp1=$(mktemp) && curl -o $tmp1 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/update-system.sh && update_sysm=$tmp1
-    tmp11=$(mktemp) && curl -o $tmp11 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/update-kernel.sh && update_kern=$tmp11
-    rgrp=$(mktemp) && curl -o $rgrp https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/ripgrep-directory.sh 
-    tmp3=$(mktemp) && curl -o $tmp4 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/package_managers.sh && pacmn=$tmp4
-    [[ $distro == "Manjaro" ]] && tmp7=$(mktemp) && curl -o $tmp7 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/manjaro.sh && manjaro=$tmp7
-    hash systemctl &>/dev/null && tmp2=$(mktemp) && curl -o $tmp2 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/systemctl.sh && systemd=$tmp2
-    hash sudo &>/dev/null && tmp3=$(mktemp) && curl -o $tmp3 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/sudo.sh && dosu=$tmp3
-    hash git &>/dev/null && tmp10=$(mktemp) && curl -o $tmp10 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/git.sh && gits=$tmp5
-    hash ssh &>/dev/null && tmp5=$(mktemp) && curl -o $tmp5 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/ssh.sh && sshs=$tmp5
-    tmp6=$(mktemp) && curl -o $tmp6 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/ps1.sh && ps1=$tmp6
-    tmp8=$(mktemp) && curl -o $tmp8 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/variety.sh && variti=$tmp8
-    hash python &>/dev/null && tmp9=$(mktemp) && curl -o $tmp9 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/python.sh && pthon=$tmp9
+if ! [[ -d aliases/.aliases.d/ ]]; then
+    tmp1=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/update-system.sh > $tmp1 && update_sysm=$tmp1
+    tmp11=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/update-kernel.sh > $tmp11 && update_kern=$tmp11
+    rgrp=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/ripgrep-directory.sh > $rgrp 
+    tmp3=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/package_managers.sh > $tmp4 && pacmn=$tmp4
+    [[ $distro == "Manjaro" ]] && tmp7=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/manjaro.sh > $tmp7 && manjaro=$tmp7
+    hash systemctl &>/dev/null && tmp2=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/systemctl.sh > $tmp2 && systemd=$tmp2
+    hash sudo &>/dev/null && tmp3=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/sudo.sh > $tmp3 && dosu=$tmp3
+    hash git &>/dev/null && tmp10=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/git.sh > $tmp10 && gits=$tmp5
+    hash ssh &>/dev/null && tmp5=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/ssh.sh > $tmp5 && sshs=$tmp5
+    tmp6=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/ps1.sh > $tmp6 && ps1=$tmp6
+    tmp8=$(mktemp) && wget-curl $tmp8 https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/variety.sh && variti=$tmp8
+    hash python &>/dev/null && tmp9=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/python.sh > $tmp9 && pthon=$tmp9
 fi
 
 update_sysm_r() {

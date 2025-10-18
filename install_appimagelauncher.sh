@@ -1,41 +1,42 @@
-if ! test -f checks/check_all.sh; then
-    if type curl &>/dev/null; then
+hash AppImageLauncher &> /dev/null && SYSTEM_UPDATED='TRUE'
+
+if ! [[ -f checks/check_all.sh ]]; then
+    if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-        return 1 || exit 1
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
     . ./checks/check_all.sh
 fi
 
-if ! test -f checks/check_appimage_ready.sh; then
-    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_appimage_ready.sh)
+if ! [[ -f checks/check_appimage_ready.sh ]]; then
+    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_appimage_ready.sh)
 else
     . ./checks/check_appimage_ready.sh
 fi
 
-if ! test -f aliases/.aliases.d/package_managers.sh; then
-    source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/package_managers.sh)
+if ! [[ -f aliases/.aliases.d/package_managers.sh ]]; then
+    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/package_managers.sh)
 else
     source aliases/.aliases.d/package_managers.sh
 fi
 
-if ! type AppImageLauncher &>/dev/null; then
+if ! hash AppImageLauncher &>/dev/null; then
     echo "This next $(tput setaf 1)sudo$(tput sgr0) will install Appimagelauncher"
     if [[ $distro_base == "Arch" ]]; then
-        if test -z "$AUR_ins"; then
-            if ! test -f checks/check_AUR.sh; then
-                source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_AUR.sh)
+        if [[ -z "$AUR_ins" ]]; then
+            if ! [[ -f checks/check_AUR.sh ]]; then
+                source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_AUR.sh)
             else
                 source checks/check_AUR.sh
             fi
         fi
 
-        eval "$AUR_ins appimagelauncher"
+        eval "$AUR_ins_y appimagelauncher"
 
     elif [[ $distro_base == "Debian" ]]; then
-        if type add-apt-repository &>/dev/null && [[ $(check-ppa ppa:appimagelauncher-team/stable) =~ 'OK' ]]; then
+        if hash add-apt-repository &>/dev/null && [[ $(check-ppa ppa:appimagelauncher-team/stable) =~ 'OK' ]]; then
             sudo add-apt-repository ppa:appimagelauncher-team/stable
             eval "$pac_up"
             eval "$pac_ins appimagelauncher"

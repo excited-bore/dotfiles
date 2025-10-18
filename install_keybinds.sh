@@ -1,6 +1,6 @@
 SYSTEM_UPDATED="TRUE"
 
-if ! test -f checks/check_all.sh; then
+if ! [[ -f checks/check_all.sh ]]; then
     if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
@@ -12,7 +12,7 @@ fi
 
 SCRIPT_DIR=$(get-script-dir)
 
-if ! test -f $SCRIPT_DIR/checks/check_defaultTerm_keybind.sh; then
+if ! [[ -f $SCRIPT_DIR/checks/check_defaultTerm_keybind.sh ]]; then
    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_defaultTerm_keybind.sh)
 else
    source $SCRIPT_DIR/checks/check_defaultTerm_keybind.sh 
@@ -34,13 +34,13 @@ binds3=$SCRIPT_DIR/keybinds/.keybinds.d/00-bind-empty.zsh
 binds4=$SCRIPT_DIR/keybinds/.keybinds.d/01-keybinds.zsh
 binds5=$SCRIPT_DIR/keybinds/.keybinds
 if ! [[ -f $binds ]]; then
-    tmp=$(mktemp) && curl -o $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.inputrc
-    tmp0=$(mktemp) && curl -o $tmp0 https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds.d/00-binds-empty.bash
-    tmp1=$(mktemp) && curl -o $tmp1 https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds.d/01-cdw.bash
-    tmp2=$(mktemp) && curl -o $tmp2 https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds.d/02-keybinds.bash
-    tmp3=$(mktemp) && curl -o $tmp3 https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/00-binds-empty.zsh
-    tmp4=$(mktemp) && curl -o $tmp4 https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/01-keybinds.zsh
-    tmp5=$(mktemp) && curl -o $tmp5 https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds
+    tmp=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.inputrc > $tmp
+    tmp0=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds.d/00-binds-empty.bash > $tmp0
+    tmp1=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds.d/01-cdw.bash > $tmp1
+    tmp2=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds.d/02-keybinds.bash > $tmp2
+    tmp3=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/00-binds-empty.zsh > $tmp3
+    tmp4=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/01-keybinds.zsh > $tmp4
+    tmp5=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds > $tmp5
     binds=$tmp
     binds0=$tmp0
     binds1=$tmp1

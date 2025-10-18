@@ -40,7 +40,7 @@ Then it helps with installing/configuring:
     - Bashtop: https://github.com/aristocratos/bashtop  
     - Autojump: https://github.com/wting/autojump  
     - Starship: https://starship.rs/  
-    - Moar: https://github.com/walles/moar  
+    - Moor: https://github.com/walles/moor  
     - Ranger: https://github.com/ranger/ranger  
     - Neovim: https://neovim.io/  
 &nbsp;&nbsp;- **Noteworthy plugins**:  
@@ -137,10 +137,10 @@ Script to automate setting up local or global gitignore using templates from htt
 ## Install_flatpak.sh
 Installs flatpak with the added option to set flatpak-wrappers for commandline and install https://github.com/tchx84/Flatseal alongside
 
-## Install_polkit_wheel.sh
+## Conf_polkit_no_pwd.sh
 Prevents password popups if user in wheel/sudo group
 
-## Install_automount_usb.sh
+## Conf_automount_drives.sh
 Script to automate configuring automounting drives in /etc/fstab
 
 ## Install_samba.sh

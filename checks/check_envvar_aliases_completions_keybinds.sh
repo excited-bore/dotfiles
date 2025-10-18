@@ -2,19 +2,19 @@ if ! grep -q "/usr/share/bash-completion/bash_completion" ~/.bashrc; then
     echo "[ -r /usr/share/bash-completion/bash_completion ] && . /usr/share/bash-completion/bash_completion" >>~/.bashrc
 fi
 
-if ! [ -d ~/.aliases.d/ ]; then
+if ! [[ -d ~/.aliases.d/ ]]; then
     mkdir ~/.aliases.d/
 fi
 
-if ! [ -f ~/.bash_aliases ]; then
-    if [ -f aliases/.bash_aliases ]; then
+if ! [[ -f ~/.bash_aliases ]]; then
+    if [[ -f aliases/.bash_aliases ]]; then
         cp aliases/.bash_aliases ~/
     else
         wget -O ~/.bash_aliases https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases 
     fi
 fi
 
-if ! [ -d ~/.bash_completion.d/ ]; then
+if ! [[ -d ~/.bash_completion.d/ ]]; then
     mkdir ~/.bash_completion.d/
 fi
 
@@ -121,7 +121,7 @@ if ! sudo [ -f /root/.bash_completion ]; then
     echo "Next $(tput setaf 1)sudo$(tput sgr0) will install '.bash_completion.d' in /root and source files in it with '/root/.bash_completion"
     if ! sudo [ -f /root/.bash_completion ]; then
         if ! [ -f completions/.bash_completion ]; then
-            sudo curl -o /root/.bash_aliases https://raw.githubusercontent.com/excited-bore/dotfiles/main/completions/.bash_completion
+            sudo wget -O /root/.bash_aliases https://raw.githubusercontent.com/excited-bore/dotfiles/main/completions/.bash_completion
         else
             sudo cp completions/.bash_completion /root/
         fi
@@ -143,7 +143,7 @@ if ! sudo [ -f /root/.keybinds ]; then
     echo "Next $(tput setaf 1)sudo$(tput sgr0) will install '.keybinds.d' in /root and source files in it with '/root/.keybinds"
     if ! [ -f /root/.keybinds ]; then
         if ! [ -f keybinds/.keybinds ]; then
-            sudo curl -o /root/.bash_aliases https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds
+            sudo wget -O /root/.bash_aliases https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds
         else
             sudo cp keybinds/.keybinds /root/
         fi
@@ -159,11 +159,10 @@ fi
 # Check one last time if ~/.bash_preexec - for both $USER and root - is the last line in their ~/.bash_profile and ~/.bashrc
 
 if ! [ -f ./checks/check_bash_source_order.sh ]; then
-    if type curl &>/dev/null; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_bash_source_order.sh)
+    if hash curl &>/dev/null; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_bash_source_order.sh)
     else
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-        return 1 || exit 1
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_bash_source_order.sh)
     fi
 else
     . ./checks/check_bash_source_order.sh

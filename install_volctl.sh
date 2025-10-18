@@ -1,4 +1,6 @@
-if ! test -f checks/check_all.sh; then
+hash volctl &> /dev/null && SYSTEM_UPDATED='TRUE'
+
+if ! [[ -f checks/check_all.sh ]]; then
     if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
@@ -26,10 +28,10 @@ if ! hash volctl &> /dev/null; then
                 eval "$pac_ins_y git" 
             fi
             if ! hash pipx &> /dev/null; then
-                if test -f $SCRIPT_DIR/install_pipx.sh; then
-                    source <(wget-curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh)
+                if [[ -f $SCRIPT_DIR/cli-tools/pkgmngrs/install_pipx.sh ]]; then
+                    source <(wget-curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pkgmngrs/install_pipx.sh)
                 else
-                    . $SCRIPT_DIR/install_pipx.sh
+                    . $SCRIPT_DIR/cli-tools/pkgmngrs/install_pipx.sh
                 fi
             fi
             git clone https://github.com/buzz/volctl $TMPDIR/volctl

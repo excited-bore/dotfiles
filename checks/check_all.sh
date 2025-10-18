@@ -63,6 +63,9 @@ italic=$(tput it)
 
 alias get-script-dir='cd "$( dirname "$-1" )" && pwd'
 
+builtin unalias curl &>/dev/null
+builtin unalias wget &>/dev/null
+
 ([[ "$(type unalias)" =~ 'aliased' ]] || [[ "$(type unalias)" =~ 'function' ]]) && 
     alias unalias="builtin unalias"
 
@@ -195,6 +198,12 @@ if ! type update-system &>/dev/null; then
     else
         . ./aliases/.aliases.d/update-system.sh
     fi
+fi
+
+if ! test -f aliases/.aliases.d/package_managers.sh; then
+    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/package_managers.sh)
+else
+    . ./aliases/.aliases.d/package_managers.sh
 fi
 
 

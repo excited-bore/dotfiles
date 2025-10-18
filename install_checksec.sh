@@ -1,1 +1,1 @@
-${pac_ins} checksec
+eval "${pac_ins} checksec"

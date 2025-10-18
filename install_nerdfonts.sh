@@ -25,10 +25,10 @@ if ! [ -d $XDG_DATA_HOME/fonts ]; then
 fi
 
 if ! hash fzf &> /dev/null; then
-    if ! test -f install_fzf.sh; then
-        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_fzf.sh 'simple')
+    if ! test -f cli-tools/install_fzf.sh; then
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_fzf.sh 'simple')
     else
-        . ./install_fzf.sh 'simple'
+        . cli-tools/install_fzf.sh 'simple'
     fi
 fi
 
@@ -82,10 +82,10 @@ if test -n "$name"; then
             nstll_mgmagick='y'
         fi
         if [[ "$nstll_mgmagick" == 'y' ]]; then 
-            if ! test -f install_imagemagick.sh; then
-                source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_imagemagick.sh)
+            if ! test -f cli-tools/install_imagemagick.sh; then
+                source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_imagemagick.sh)
             else
-                . ./install_imagemagick.sh 
+                . cli-tools/install_imagemagick.sh 
             fi
         fi
         unset nstll_mgmagick
@@ -96,10 +96,10 @@ if test -n "$name"; then
             readyn -p "Install 'imagemagick' and 'ueberzugpp' to preview/show fonts?" yhno
             if [[ "$yhno" == 'y' ]]; then
                 if ! hash ueberzugpp &> /dev/null; then
-                    if ! test -f install_ueberzugpp.sh; then
-                        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ueberzugpp.sh)
+                    if ! test -f cli-tools/install_ueberzugpp.sh; then
+                        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_ueberzugpp.sh)
                     else
-                        . ./install_ueberzugpp.sh
+                        . cli-tools/install_ueberzugpp.sh
                     fi
                 fi
             fi

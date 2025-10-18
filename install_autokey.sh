@@ -4,21 +4,21 @@ if hash autokey &> /dev/null || [[ "$XDG_SESSION_TYPE" == 'wayland' ]]; then
     SYSTEM_UPDATED=TRUE
 fi
 
-if ! [ -f checks/check_all.sh ]; then
+if ! [[ -f checks/check_all.sh ]]; then
     if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ./checks/check_all.sh
+    . checks/check_all.sh
 fi
 
 if [[ $XDG_SESSION_TYPE == 'wayland' ]]; then
     echo "${YELLOW}Current session type - ${RED}Wayland${YELLOW} - is not supported by autokey${normal}" 
 elif ! hash autokey &> /dev/null; then
     if [[ "$distro_base" == 'Debian' ]]; then
-        if ! [ -f aliases/.aliases.d/git.sh ]; then
+        if ! [[ -f aliases/.aliases.d/git.sh ]]; then
             source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/git.sh) 
         else
             . ./aliases/.aliases.d/git.sh
@@ -35,10 +35,10 @@ elif ! hash autokey &> /dev/null; then
         command rm -rf $temp)
     
     elif [[ "$distro_base" == 'Arch' ]]; then
-        if ! [ -f checks/check_AUR.sh ]; then
+        if ! [[ -f checks/check_AUR.sh ]]; then
             source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_AUR.sh) 
         else
-            . ./checks/check_AUR.sh
+            . checks/check_AUR.sh
         fi
         if [[ -n "$AUR_ins" ]]; then
             reade -Q 'GREEN' -i 'gtk qt' -p "Do you want autokey's GUI to be ${cyan}gtk-based${GREEN} or ${cyan}qt-based${GREEN} [Gtk/qt]: " gtk_qt 
@@ -47,10 +47,10 @@ elif ! hash autokey &> /dev/null; then
    
     else
         if ! hash pipx &> /dev/null; then
-            if ! [ -f install_pipx.sh ]; then
-                source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh) 
+            if ! [[ -f cli-tools/pkgmngrs/install_pipx.sh ]]; then
+                source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pkgmngrs/install_pipx.sh) 
             else
-                . ./install_pipx.sh
+                . cli-tools/pkgmngrs/install_pipx.sh
             fi
         fi
         pipx install autokey 

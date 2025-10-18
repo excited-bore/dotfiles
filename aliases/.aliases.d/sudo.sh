@@ -1,6 +1,6 @@
 ### SUDO ###
 
-if ! type reade &> /dev/null && test -f ~/.aliases.d/00-rlwrap_scripts.sh; then
+if ! type reade &> /dev/null && [[ -f ~/.aliases.d/00-rlwrap_scripts.sh ]]; then
     . ~/.aliases.d/00-rlwrap_scripts.sh
 fi
 
@@ -8,7 +8,7 @@ fi
 #Use "su - " "visudo" to edit sudoers file
 #Set $EDITOR to change what editor is being used
 
-# Preserve environment, for running stuff like custom pagers (moar) really necessary
+# Preserve environment, for running stuff like custom pagers (moor) really necessary
 alias sudo-reset-cooldown="faillock --user $USER --reset"
 alias sudo-keep-env="sudo -E"
 alias sudo-shell="sudo -i"
