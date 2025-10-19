@@ -52,8 +52,8 @@ if hash flatpak &> /dev/null && [ -z $FLATPAK ]; then
 fi
 unset flpkvrs
 
-if ! test -f ~/.aliases.d/flatpacks.sh; then
-    readyn -p "Install flatpackwrapper? (For one-word flatpak aliases in terminal)" pam
+if ! test -f ~/.aliases.d/flatpaks.sh; then
+    readyn -p "Install flatpakwrapper? (For one-word flatpak aliases in terminal)" pam
     if [[ "y" == $pam ]]; then
         if ! test -f $TOP/install_bashalias_completions.sh; then
              source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bashalias_completions.sh) 
@@ -61,16 +61,16 @@ if ! test -f ~/.aliases.d/flatpacks.sh; then
              . $TOP/install_bashalias_completions.sh
         fi
         if test -f $TOP/cli-tools/pkgmngrs/flatpak/.aliases.d/flatpaks.sh; then
-            file=flatpak/.aliases.d/flatpaks.sh
+            file=$TOP/cli-tools/pkgmngrs/flatpak/.aliases.d/flatpaks.sh
         else
             dir="$(mktemp -d)"
-            wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pkgmngrs/flatpak/.aliases.d/flatpaks.sh > $dir/flatpak.sh
-            file=$dir/flatpak.sh 
+            wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pkgmngrs/flatpak/.aliases.d/flatpaks.sh > $dir/flatpaks.sh
+            file=$dir/flatpaks.sh 
         fi
          
         cp $file ~/.aliases.d/ 
         if [[ -n "$BASH_VERSION" ]] || [[ -n "$ZSH_VERSION" ]]; then
-            source ~/.aliases.d/flatpacks.sh
+            source ~/.aliases.d/flatpaks.sh
         fi
     fi    
 fi

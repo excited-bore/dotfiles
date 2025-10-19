@@ -283,12 +283,14 @@ unset ktty_conf
 
 readyn -p "Install kitty aliases? (at ~/.aliases.d/kitty.sh)" kittn
 if [[ "y" == "$kittn" ]]; then
-    if ! [ -f checks/check_aliases_dir.sh ]; then
+    if ! [ -f $TOP/checks/check_aliases_dir.sh ]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)
     else
-        . ./checks/check_aliases_dir.sh
+        . $TOP/checks/check_aliases_dir.sh
     fi
+    
     cp $file ~/.aliases.d/kitty.sh
+    
     if hash gio &>/dev/null && [ -f ~/.aliases.d/kitty.sh~ ]; then
         gio trash ~/.aliases.d/kitty.sh~
     fi

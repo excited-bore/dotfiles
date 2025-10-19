@@ -14,7 +14,7 @@ else
     . $TOP/checks/check_all.sh
 fi
 
-if ! hash cargo &> /dev/null || ! [[ $PATH =~ '/.cargo/bin' ]] || (hash rustc &> /dev/null && [[ $(rustc -V | awk '{print $2}') -lt 1.81.0 ]]); then
+if ! hash cargo &> /dev/null || ! [[ $PATH =~ '/.cargo/bin' ]] || (hash rustc &> /dev/null && [[ $(rustc -V | awk '{print $2}') < 1.81.0 ]]); then
     if ! test -f $TOP/cli-tools/pkgmngrs/install_cargo.sh; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pkgmngrs/install_cargo.sh)
     else

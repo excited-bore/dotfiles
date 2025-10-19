@@ -39,11 +39,11 @@ if [[ -f ~/.bashrc ]]; then
     fi
 fi
 
-if [[ -d /root/ ]]; then
-    [[ -z "$bash_r" ]] && readyn -p '(Check and) Install pre-execution hooks for /root as well?' bash_r
+if sudo [ -d /root/ ]; then
+    readyn -p '(Check and) Install pre-execution hooks for /root as well?' bash_r
     if [[ "$bash_r" == 'y' ]]; then
-        if ! [[ -f /root/.bash_preexec ]]; then
-            wget-curl https://raw.githubusercontent.com/rcaloras/bash-preexec/master/bash-preexec.sh | sudo tee /root/.bash_preexec
+        if ! sudo [ -f /root/.bash_preexec ]; then
+            wget-curl https://raw.githubusercontent.com/rcaloras/bash-preexec/master/bash-preexec.sh | sudo tee /root/.bash_preexec > /dev/null
         fi
 
         if [[ -f /root/.bash_profile ]]; then

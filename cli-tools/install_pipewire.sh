@@ -43,9 +43,9 @@ if ! [[ -f ~/.bash_completion.d/pipewire.bash ]]; then
         fi
         cp $pipewire_cmp ~/.bash_completion.d/ 
    
-        pipewire_cmpz=$TOP/pipewire/.zsh_completion.d/pipewire.zsh
-        if ! [[ -f $TOP/pipewire/.zsh_completion.d/pipewire.zsh ]]; then
-            wget-aria-dir $TMPDIR https://raw.githubusercontent.com/excited-bore/dotfiles/main/$TOP/pipewire/.zsh_completion.d/pipewire.zsh 
+        pipewire_cmpz=$TOP/cli-tools/pipewire/.zsh_completion.d/pipewire.zsh
+        if ! [[ -f $TOP/cli-tools/pipewire/.zsh_completion.d/pipewire.zsh ]]; then
+            wget-aria-dir $TMPDIR https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pipewire/.zsh_completion.d/pipewire.zsh 
             pipewire_cmp=$TMPDIR/pipewire.zsh
         fi
         cp $pipewire_cmp ~/.zsh_completion.d/ 

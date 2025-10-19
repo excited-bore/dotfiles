@@ -1,43 +1,43 @@
 ### FLATPAK ###                           
-if ! type reade &> /dev/null && [ -f ~/.aliases.d/00-rlwrap_scripts.sh ]; then
+if ! type readyn &> /dev/null && [ -f ~/.aliases.d/00-rlwrap_scripts.sh ]; then
     . ~/.aliases.d/00-rlwrap_scripts.sh
 fi
 
 function flatpak (){
   env -u SESSION_MANAGER flatpak "$@"
-  pack="${@: -1}" 
-  if [ "$1" == "install" ] && flatpak list --columns=name | grep -i -q --color=never "$pack" && ! grep -q "$pack" ~/.aliases.d/flatpacks.sh; then
+  local pack="${@: -1}" 
+  if [[ "$1" == "install" ]] && flatpak list --columns=name | grep -i -q --color=never "$pack" && ! grep -q "$pack" ~/.aliases.d/flatpaks.sh; then
         #python /usr/bin/update_flatpak_cli.py
-        name="$(flatpak list --columns=name | grep -i --color=never "$pack" | tr ' ' '-' | tr '[:upper:]' '[:lower:]' | awk '{print;}')"
-        app_id="$(flatpak list --columns=application,name | grep -i --color=never "$pack" | awk '{print $1;}')"
-        reade -Q 'GREEN' -i 'y' -p "No previous aliases for app detected. Create alias? (alias $name='flatpak run --file-forwarding $app_id' -> ~/.aliases.d/flatpacks.sh)" ansr
+        local name="$(flatpak list --columns=name | grep -i --color=never "$pack" | tr ' ' '-' | tr '[:upper:]' '[:lower:]' | awk '{print;}')"
+        local app_id="$(flatpak list --columns=application,name | grep -i --color=never "$pack" | awk '{print $1;}')"
+        local ansr 
+        readyn -p "No previous aliases for app detected. Create alias? (alias $name='flatpak run --file-forwarding $app_id' -> ~/.aliases.d/flatpaks.sh)" ansr
         if [[ $ansr == 'y' ]]; then
-            printf "if flatpak list --columns=name | grep \"$name\" &> /dev/null; then\n\talias $name='flatpak run --file-forwarding $app_id'\nfi\n" >> ~/.aliases.d/flatpacks.sh 
+            printf "if flatpak list --columns=name | grep \"$name\" &> /dev/null; then\n\talias $name='flatpak run --file-forwarding $app_id'\nfi\n" >> ~/.aliases.d/flatpaks.sh 
             alias $name="flatpak run --file-forwarding $app_id" 
         fi
-        unset ansr name name_noup app_id 
    fi
 }
 
 if flatpak list --columns=name | grep "Visual Studio Code" &> /dev/null; then
-    alias code='GDK_BACKEND=x11 flatpak run com.visualstudio.code' 
+    alias code="GDK_BACKEND=$XDG_SESSION_TYPE flatpak run com.visualstudio.code" 
 fi
 
 if flatpak list --columns=name | grep "Discord" &> /dev/null; then
-    alias discord='GDK_BACKEND=x11 flatpak run com.discordapp.Discord' 
+    alias discord="GDK_BACKEND=$XDG_SESSION_TYPE flatpak run com.discordapp.Discord" 
 fi
 
 if flatpak list --columns=name | grep "Ryujinx" &> /dev/null; then
-    alias ryujinx='GDK_BACKEND=x11 flatpak run org.ryujinx.Ryujinx' 
+    alias ryujinx="GDK_BACKEND=$XDG_SESSION_TYPE flatpak run org.ryujinx.Ryujinx" 
 fi
 
 if flatpak list --columns=name | grep "Discover Overlay" &> /dev/null; then
-    alias discover-overlay='GDK_BACKEND=x11 flatpak run io.github.trigg.discover_overlay' 
+    alias discover-overlay="GDK_BACKEND=$XDG_SESSION_TYPE flatpak run io.github.trigg.discover_overlay" 
     alias discord-overlay='discover-overlay' 
 fi
 
 if flatpak list --columns=name | grep "Ferdium" &> /dev/null; then
-    alias ferdium='GDK_BACKEND=x11 /usr/bin/flatpak run --branch=stable --arch=x86_64 --command=ferdium --file-forwarding org.ferdium.Ferdium' 
+    alias ferdium="GDK_BACKEND=$XDG_SESSION_TYPE /usr/bin/flatpak run --branch=stable --arch=x86_64 --command=ferdium --file-forwarding org.ferdium.Ferdium" 
 fi
 
 if flatpak list --columns=name | grep "Firefox" &> /dev/null; then

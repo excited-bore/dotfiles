@@ -318,13 +318,13 @@ if [[ -z "$1" ]]; then
                 sudo mv -v /usr/bin/rifle.py /usr/local/bin/rifle
                 sudo chmod 755 /usr/bin/rifle
             fi
-            if ! test -f ranger/.config/ranger/rifle.conf; then
-                wget-aria-dir ~/.config/ranger/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/ranger/.config/ranger/rifle.conf
+            if ! test -f $TOP/cli-tools/ranger/.config/ranger/rifle.conf; then
+                wget-aria-dir $XDG_CONFIG_HOME/ranger/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/ranger/.config/ranger/rifle.conf
                 wget-aria-dir ~/.aliases.d/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/fzf/.aliases.d/fzf-rifle.sh
             else
-                mkdir -p ~/.config/ranger
-                cp ranger/.config/ranger/rifle.conf ~/.config/ranger/
-                cp fzf/.aliases.d/fzf-rifle.sh ~/.aliases.d/
+                mkdir -p $XDG_CONFIG_HOME/ranger
+                cp $TOP/cli-tools/ranger/.config/ranger/rifle.conf $XDG_CONFIG_HOME/ranger/
+                cp $TOP/cli-tools/fzf/.aliases.d/fzf-rifle.sh ~/.aliases.d/
             fi
             sed -i 's/\\\C-f//g' ~/.keybinds.d/fzf-bindings.bash
             sed -i "s|\(bind -m vi-insert '\"\\\C-t\":.*\)|\1\n\n    # CTRL-F - Search with previews and other handy additions\n    bind -m emacs-standard '\"\\\C-f\": \"\\\C-t\"'\n    bind -m vi-command '\"\\\C-f\": \"\\\C-o\\\C-f\\\C-o\"'\n    bind -m vi-insert '\"\\\C-f\": \"\\\C-o\\\C-f\\\C-o\"'|g" ~/.keybinds.d/fzf-bindings.bash

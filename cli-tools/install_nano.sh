@@ -24,15 +24,23 @@ fi
 
 nano --help | $PAGER
 
+if test -f $TOP/cli-tools/nano/.nanorc; then
+    file=$TOP/cli-tools/nano/.nanorc
+else
+    dir=$(mktemp -d) 
+    wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/nano/.nanorc > $dir/.nanorc
+    file=$dir/.nanorc
+fi
+
 if ! test -f ~/.nanorc; then
     readyn -p 'Install nanorc (config) at $HOME?' nsrc
     if [[ $nsrc == 'y' ]]; then
-        if command ls -A /usr/share/nano &>/dev/null && ! grep -q '/usr/share/nano/' nano/.nanorc; then
-            sed -i 's|include "/.*|include "/usr/share/nano/\*\.nanorc"|g' nano/.nanorc
-        elif command ls -A /usr/local/share/nano &>/dev/null && ! grep -q '/usr/local/share/nano/' nano/.nanorc; then
-            sed -i 's|include "/.*|include "/usr/local/share/nano/\*\.nanorc"|g' nano/.nanorc
+        if command ls -A /usr/share/nano &>/dev/null && ! grep -q '/usr/share/nano/' $file; then
+            sed -i 's|include "/.*|include "/usr/share/nano/\*\.nanorc"|g' $file
+        elif command ls -A /usr/local/share/nano &>/dev/null && ! grep -q '/usr/local/share/nano/' $file; then
+            sed -i 's|include "/.*|include "/usr/local/share/nano/\*\.nanorc"|g' $file
         fi
-        cp nano/.nanorc ~/.nanorc
+        cp $file ~/.nanorc
     fi
 fi
 
@@ -43,12 +51,12 @@ echo "This next $(tput setaf 1)sudo$(tput sgr0) will check for /root/.nanorc"
 if ! sudo test -f /root/.nanorc; then
     readyn -p 'Install nanorc (config) at /root/?' nsrc
     if [[ $nsrc == 'y' ]]; then
-        if command ls -A /usr/share/nano &>/dev/null && ! grep -q '/usr/share/nano/' nano/.nanorc; then
-            sed -i 's|include "/.*|include "/usr/share/nano/\*\.nanorc"|g' nano/.nanorc
-        elif command ls -A /usr/local/share/nano &>/dev/null && ! grep -q '/usr/local/share/nano/' nano/.nanorc; then
-            sed -i 's|include "/.*|include "/usr/local/share/nano/\*\.nanorc"|g' nano/.nanorc
+        if command ls -A /usr/share/nano &>/dev/null && ! grep -q '/usr/share/nano/' $file; then
+            sed -i 's|include "/.*|include "/usr/share/nano/\*\.nanorc"|g' $file
+        elif command ls -A /usr/local/share/nano &>/dev/null && ! grep -q '/usr/local/share/nano/' $file; then
+            sed -i 's|include "/.*|include "/usr/local/share/nano/\*\.nanorc"|g' $file
         fi
-        sudo cp nano/.nanorc /root/.nanorc
+        sudo cp $file /root/.nanorc
     fi
 fi
 

@@ -549,9 +549,9 @@ fi
 reade -Q "$color" -i "$pre" -p "Install ${CYAN}duf${color1}, ${CYAN}dysk${color1} or both? (Both are modern replacements for df - tools list hard drive disk space)$prmpt" duf_dysk
 if [[ "both" == "$duf_dysk" ]] || [[ "duf" == "$duf_dysk" ]]; then
     if ! [[ -f $TOP/install_duf.sh ]]; then
-        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_duf.sh)
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_duf.sh)
     else
-        . $TOP/install_duf.sh
+        . $TOP/cli-tools/install_duf.sh
     fi
 fi
 if [[ "both" == "$duf_dysk" ]] || [[ "dysk" == "$duf_dysk" ]]; then
@@ -567,10 +567,10 @@ unset duf_dysk color color1 pre prmpt
 
 readyn -p "Install bash completions for aliases in ~/.bash_completion.d?" -c "! [ -f ~/.bash_completion.d/complete_alias ]" compl
 if [[ "y" == "$compl" ]]; then
-    if ! [[ -f $TOP/cli-tools/install_bashalias_completions.sh ]]; then
-        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_bashalias_completions.sh)
+    if ! [[ -f $TOP/install_bashalias_completions.sh ]]; then
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bashalias_completions.sh)
     else
-        . $TOP/cli-tools/install_bashalias_completions.sh
+        . $TOP/install_bashalias_completions.sh
     fi
 fi
 unset compl

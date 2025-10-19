@@ -1,3 +1,5 @@
+TOP=$(git rev-parse --show-toplevel)
+
 if [ ! -f ~/.keybinds ]; then
     if ! test -f keybinds/.keybinds; then
         wget -O ~/.keybinds https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds   
@@ -12,8 +14,8 @@ fi
 
 # Make sure the ~/.keybinds sources AFTER ~/.bash_aliases to prevent certain keybinds from breaking
 if ! grep -q "source ~/.keybinds" ~/.bashrc; then
-    if grep -q "\[ -f ~/.bash_aliases \] \&\& source ~/.bash_aliases" ~/.bashrc || grep -q '^if [ -f ~/.bash_aliases ]; then' ~/.bashrc; then
-        if grep -q "\[ -f ~/.bash_aliases \] \&\& source ~/.bash_aliases" ~/.bashrc; then
+    if grep -q "\[ -f ~/.bash_aliases \] && source ~/.bash_aliases" ~/.bashrc || grep -q '^if [ -f ~/.bash_aliases ]; then' ~/.bashrc; then
+        if grep -q "\[ -f ~/.bash_aliases \] && source ~/.bash_aliases" ~/.bashrc; then
             sed -i 's|\(\[ -f ~/.keybinds \] \&\& source ~/.keybinds\)|\1\n\n[ -f ~/.keybinds \] \&\& source ~/.keybinds|' ~/.bashrc 
         else
             sed -i -e 's|\(if \[ -f \~/.bash_aliases \]; then\)|#This is commented out since there'\''s a one-liner which sources ~/.bash_aliases later down ~/.bashrc\n\n#\1|g' -e 's|\(^\s*\. ~/.bash_aliases\)|#\1|' ~/.bashrc
@@ -30,8 +32,8 @@ if ! grep -q "source ~/.keybinds" ~/.bashrc; then
 fi
 
 if ! grep -q "source ~/.keybinds" ~/.zshrc; then
-    if grep -q "\[ -f ~/.zsh_aliases \] \&\& source ~/.zsh_aliases" ~/.zshrc || grep -q '^if [ -f ~/.zsh_aliases ]; then' ~/.zshrc; then
-        if grep -q "\[ -f ~/.zsh_aliases \] \&\& source ~/.zsh_aliases" ~/.zshrc; then
+    if grep -q "\[ -f ~/.zsh_aliases \] && source ~/.zsh_aliases" ~/.zshrc || grep -q '^if [ -f ~/.zsh_aliases ]; then' ~/.zshrc; then
+        if grep -q "\[ -f ~/.zsh_aliases \] && source ~/.zsh_aliases" ~/.zshrc; then
             sed -i 's|\(\[ -f ~/.keybinds \] \&\& source ~/.keybinds\)|\1\n\n[ -f ~/.keybinds \] \&\& source ~/.keybinds|' ~/.zshrc 
         else
             sed -i -e 's|\(if \[ -f \~/.zsh_aliases \]; then\)|#This is commented out since there'\''s a one-liner which sources ~/.zsh_aliases later down ~/.zshrc\n\n#\1|g' -e 's|\(^\s*\. ~/.zsh_aliases\)|#\1|' ~/.zshrc
@@ -64,8 +66,8 @@ if ! sudo test -d /root/.keybinds.d/ ; then
 fi
 
 if ! sudo grep -q "source ~/.keybinds" /root/.bashrc; then
-    if sudo grep -q "\[ -f ~/.bash_aliases \] \&\& source ~/.bash_aliases" /root/.bashrc || sudo grep -q '^if [ -f ~/.bash_aliases ]; then' /root/.bashrc; then
-        if sudo grep -q "\[ -f ~/.bash_aliases \] \&\& source ~/.bash_aliases" /root/.bashrc; then
+    if sudo grep -q "\[ -f ~/.bash_aliases \] && source ~/.bash_aliases" /root/.bashrc || sudo grep -q '^if [ -f ~/.bash_aliases ]; then' /root/.bashrc; then
+        if sudo grep -q "\[ -f ~/.bash_aliases \] && source ~/.bash_aliases" /root/.bashrc; then
             sudo sed -i 's|\(\[ -f ~/.keybinds \] \&\& source ~/.keybinds\)|\1\n\n[ -f ~/.keybinds \] \&\& source ~/.keybinds|' /root/.bashrc 
         else
             sudo sed -i -e 's|\(if \[ -f \~/.bash_aliases \]; then\)|#This is commented out since there'\''s a one-liner which sources ~/.bash_aliases later down ~/.bashrc\n\n#\1|g' -e 's|\(^\s*\. ~/.bash_aliases\)|#\1|' /root/.bashrc
@@ -82,8 +84,8 @@ if ! sudo grep -q "source ~/.keybinds" /root/.bashrc; then
 fi
 
 if ! sudo grep -q "source ~/.keybinds" /root/.zshrc; then
-    if sudo grep -q "\[ -f ~/.zsh_aliases \] \&\& source ~/.zsh_aliases" /root/.zshrc || sudo grep -q '^if [ -f ~/.zsh_aliases ]; then' /root/.zshrc; then
-        if sudo grep -q "\[ -f ~/.zsh_aliases \] \&\& source ~/.zsh_aliases" /root/.zshrc; then
+    if sudo grep -q "\[ -f ~/.zsh_aliases \] && source ~/.zsh_aliases" /root/.zshrc || sudo grep -q '^if [ -f ~/.zsh_aliases ]; then' /root/.zshrc; then
+        if sudo grep -q "\[ -f ~/.zsh_aliases \] && source ~/.zsh_aliases" /root/.zshrc; then
             sudo sed -i 's|\(\[ -f ~/.keybinds \] \&\& source ~/.keybinds\)|\1\n\n[ -f ~/.keybinds \] \&\& source ~/.keybinds|' /root/.zshrc 
         else
             sudo sed -i -e 's|\(if \[ -f \~/.zsh_aliases \]; then\)|#This is commented out since there'\''s a one-liner which sources ~/.zsh_aliases later down ~/.zshrc\n\n#\1|g' -e 's|\(^\s*\. ~/.zsh_aliases\)|#\1|' /root/.zshrc
@@ -102,12 +104,12 @@ fi
 
 # Check one last time if ~/.bash_preexec - for both $USER and root - is the last line in their ~/.bash_profile and ~/.bashrc
 
-if ! test -f ./checks/check_bash_source_order.sh; then
+if ! test -f $TOP/checks/check_bash_source_order.sh; then
     if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_bash_source_order.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_bash_source_order.sh)
     fi
 else
-    . ./checks/check_bash_source_order.sh
+    . $TOP/checks/check_bash_source_order.sh
 fi
