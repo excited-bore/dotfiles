@@ -304,10 +304,10 @@ if [[ "$langs" == 'y' ]]; then
     if ! hash gem &>/dev/null || ! gem list | grep neovim &>/dev/null; then
         readyn -p "Install nvim-ruby? " rubyscripts
         if [[ "y" == "$rubyscripts" ]]; then
-            if ! test -f pkgmngrs/install_ruby.sh; then
-                source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pkgmngrs/install_ruby.sh)
+            if ! test -f install_ruby.sh; then
+                source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_ruby.sh)
             else
-                . pkgmngrs/install_ruby.sh
+                . ./install_ruby.sh
             fi
             sudo gem install neovim
         fi
@@ -334,8 +334,8 @@ if [[ "$langs" == 'y' ]]; then
                     if ! hash cpanm &>/dev/null; then
                         eval "${pac_ins_y}" cpanminus
                     fi
-                    /usr/bin/cpanm --local-lib=~/perl5 local::lib && eval "$(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)"
-                    sudo /usr/bin/cpanm --sudo -n Neovim::Ext
+                    /usr/bin/vendor_perl/cpanm --local-lib=~/perl5 local::lib && eval "$(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)"
+                    sudo /usr/bin/vendor_perl/cpanm --sudo -n Neovim::Ext
                 fi
             fi
         fi
@@ -450,7 +450,7 @@ function instvim() {
         mkdir $XDG_CONFIG_HOME/nvim/
     fi
 
-    cp $dir/* ~/.config/nvim/
+    cp $dir/* $XDG_CONFIG_HOME/nvim/
 
     if test -n "$(ls $XDG_CONFIG_HOME/nvim/*~ &>/dev/null)"; then
         gio trash $XDG_CONFIG_HOME/nvim/*~
@@ -472,12 +472,12 @@ function instvim() {
         printf "export MYGVIMRC=$XDG_CONFIG_HOME/nvim/init.vim\n" >>$ENV
     fi
 
-    readyn -p "Set Neovim as MANPAGER? " manvim
+    readyn -p "Set Neovim as MANPAGER?" manvim
     if [[ "$manvim" == "y" ]]; then
         sed -i 's|.export MANPAGER=.*|export MANPAGER='\''nvim +Man!'\''|g' $ENV
     fi
 
-    readyn -p "Set Neovim as default for user EDITOR? " vimrc
+    readyn -p "Set Neovim as default for user EDITOR?" vimrc
     if [[ "$vimrc" == "y" ]]; then
         if grep -q "EDITOR" $ENV; then
             sed -i "s|.export EDITOR=.*|export EDITOR=$(where_cmd nvim)|g" $ENV
@@ -487,7 +487,7 @@ function instvim() {
     fi
     unset vimrc
 
-    readyn -p "Set Neovim as default for user VISUAL? " vimrc
+    readyn -p "Set Neovim as default for user VISUAL?" vimrc
     if [[ "$vimrc" == "y" ]]; then
         if grep -q "VISUAL" $ENV; then
             sed -i "s|.export VISUAL=*|export VISUAL=$(where_cmd nvim)|g" $ENV

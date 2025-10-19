@@ -1,19 +1,21 @@
 hash autojump &> /dev/null && SYSTEM_UPDATED='TRUE'
 
-if ! test -f ../checks/check_all.sh; then
+TOP=$(git rev-parse --show-toplevel)
+
+if ! test -f $TOP/checks/check_all.sh; then
     if type curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ../checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
 
-if ! test -f ../checks/check_AUR.sh; then
+if ! test -f $TOP/checks/check_AUR.sh; then
     source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_AUR.sh)
 else
-    . ../checks/check_AUR.sh
+    . $TOP/checks/check_AUR.sh
 fi
 
 if ! hash autojump &>/dev/null; then

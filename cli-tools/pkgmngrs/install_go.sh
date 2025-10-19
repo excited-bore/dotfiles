@@ -1,13 +1,15 @@
 hash go &> /dev/null && SYSTEM_UPDATED='TRUE'
 
-if ! test -f ../../checks/check_all.sh; then
+TOP=$(git rev-parse --show-toplevel)
+
+if ! test -f $TOP/checks/check_all.sh; then
     if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ../../checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
 
 if ! hash go &> /dev/null; then 
@@ -26,7 +28,6 @@ if ! hash go &> /dev/null; then
         file="$latest.linux-$arch.tar.gz"
         checksum=$(curl -sL "https://golang.google.cn/dl/" | awk 'BEGIN{FS="\n"; RS=""} $0 ~ /'$file'/ &&  $0 ~ /<\/tt>/ {print $0;}' | grep --color=never "<tt>" | sed "s,.*<tt>\(.*\)</tt>.*,\1,g")
         if ! hash go &> /dev/null || ! [[ "$(go version)" =~ $latest ]]; then
-            test -z $TMPDIR && TMPDIR=$(mktemp -d) 
             wget-aria-dir $TMPDIR https://golang.google.cn/dl/$file
             file=$TMPDIR/$file
             sum=$(sha256sum $file | awk '{print $1;}')
@@ -45,10 +46,8 @@ if ! hash go &> /dev/null; then
             if ! [[ $PATH =~ /usr/local/go/bin ]]; then
                 if grep -q 'GOPATH' $ENV; then
                     sed -i 's|.export PATH=$PATH:/usr/local/go/bin|export PATH=$PATH:/usr/local/go/bin|g' $ENV
-                    sed -i 's|.export PATH=$PATH:$(go env GOPATH)/bin|export PATH=$PATH:$(go env GOPATH)/bin|g' $ENV
                 else
                     printf "# GO\nexport PATH=\$PATH:/usr/local/go/bin\n" >> $ENV 
-                    printf "export PATH=\$PATH:\$(go env GOPATH)/bin\n" >> $ENV        
                 fi 
                 
                 source $ENV
@@ -59,7 +58,7 @@ fi
 
 go help | $PAGER
 
-if ! [[ $PATH =~ "\$(go env GOPATH)/bin" ]]; then
+if ! [[ $PATH =~ "$(go env GOPATH)/bin" ]]; then
     if grep -q 'GOPATH' $ENV; then
         sed -i 's|.export PATH=$PATH:$(go env GOPATH)/bin|export PATH=$PATH:$(go env GOPATH)/bin|g' $ENV
     else

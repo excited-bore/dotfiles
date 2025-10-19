@@ -28,7 +28,7 @@ if [ -f ripgrep/.ripgreprc ]; then
     file=ripgrep/.ripgreprc
 else
     dir1="$(mktemp -d -t rg-XXXXXXXXXX)"
-    wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/ripgrep/.ripgreprc > $dir1/.ripgreprc
+    wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/ripgrep/.ripgreprc > $dir1/.ripgreprc
     file=$dir1/.ripgreprc
 fi
 

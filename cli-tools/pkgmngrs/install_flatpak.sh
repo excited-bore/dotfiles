@@ -1,19 +1,21 @@
 hash flatpak &> /dev/null && SYSTEM_UPDATED='TRUE'
 
-if ! test -f checks/check_all.sh; then
+TOP=$(git rev-parse --show-toplevel)
+
+if ! test -f $TOP/checks/check_all.sh; then
     if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ./checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
 
-if ! test -f ../../checks/check_envvar_aliases_completions_keybinds.sh; then
+if ! test -f $TOP/checks/check_envvar_aliases_completions_keybinds.sh; then
      source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar_aliases_completions_keybinds.sh) 
 else
-    . ../../checks/check_envvar_aliases_completions_keybinds.sh
+    . $TOP/checks/check_envvar_aliases_completions_keybinds.sh
 fi
 
 
@@ -53,17 +55,17 @@ unset flpkvrs
 if ! test -f ~/.aliases.d/flatpacks.sh; then
     readyn -p "Install flatpackwrapper? (For one-word flatpak aliases in terminal)" pam
     if [[ "y" == $pam ]]; then
-        if ! test -f ../../install_bashalias_completions.sh; then
+        if ! test -f $TOP/install_bashalias_completions.sh; then
              source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bashalias_completions.sh) 
         else
-             . ../../install_bashalias_completions.sh
+             . $TOP/install_bashalias_completions.sh
         fi
-
-        if test -f flatpak/.aliases.d/flatpacks.sh; then
-            file=flatpak/.aliases.d/flatpacks.sh
+        if test -f $TOP/cli-tools/pkgmngrs/flatpak/.aliases.d/flatpaks.sh; then
+            file=flatpak/.aliases.d/flatpaks.sh
         else
-            file1="$(mktemp)"
-            wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pkgmngrs/flatpak/.aliases.d/flatpacks.sh > $file1
+            dir="$(mktemp -d)"
+            wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pkgmngrs/flatpak/.aliases.d/flatpaks.sh > $dir/flatpak.sh
+            file=$dir/flatpak.sh 
         fi
          
         cp $file ~/.aliases.d/ 
@@ -85,10 +87,10 @@ unset fltseal
 if ! sudo [ -f /etc/polkit/49-nopasswd_global.pkla ] && ! sudo [ -f /etc/polkit-1/localauthority.conf.d/90-nopasswd_global.conf ] && ! sudo [ -f /etc/polkit-1/rules.d/90-nopasswd_global.rules ]; then
     readyn -p "Run installer for no password with pam / polkit?" pam
     if [[ "y" == "$pam" ]]; then
-        if ! [ -f ../../install_polkit_wheel.sh ]; then
+        if ! [ -f $TOP/install_polkit_wheel.sh ]; then
              source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_polkit_wheel.sh) 
         else
-            . ../../install_polkit_wheel.sh
+            . $TOP/install_polkit_wheel.sh
         fi
     fi
     unset pam

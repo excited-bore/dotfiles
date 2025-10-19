@@ -325,7 +325,7 @@ fi
 
 echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for polkit related files in '/etc/polkit', '/etc/polkit-1/rules.d/' and '/etc/polkit-1/localauthority.conf.d/'"
 
-if ! sudo [ -f /etc/polkit/49-nopasswd_global.pkla ] && ! sudo [ -f /etc/polkit-1/localauthority.conf.d/90-nopasswd_global.conf ] && ! sudo [-f /etc/polkit-1/rules.d/90-nopasswd_global.rules ]; then
+if ! sudo [ -f /etc/polkit/49-nopasswd_global.pkla ] && ! sudo [ -f /etc/polkit-1/localauthority.conf.d/90-nopasswd_global.conf ] && ! sudo [ -f /etc/polkit-1/rules.d/90-nopasswd_global.rules ]; then
     readyn -Y "YELLOW" -p "Configure polkit for automatic authentication without passwords (sudo still requires passwords)?" plkit
     if [[ "y" == "$plkit" ]]; then
         if ! [[ -f $DIR/conf_polkit_no_pwd.sh ]]; then
@@ -374,7 +374,7 @@ if [[ "y" == "$insflpk" ]]; then
     if ! [[ -f $DIR/cli-tools/pkgmngrs/install_flatpak.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pkgmngrs/install_flatpak.sh)
     else
-        . $DIR/cli-tools/pkgmngrsinstall_flatpak.sh
+        . $DIR/cli-tools/pkgmngrs/install_flatpak.sh
     fi
 fi
 

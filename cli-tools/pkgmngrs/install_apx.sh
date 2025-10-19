@@ -1,31 +1,33 @@
 hash apx &> /dev/null && SYSTEM_UPDATED='TRUE'
 
-if ! test -f ../../checks/check_all.sh; then
+TOP=$(git rev-parse --show-toplevel)
+
+if ! test -f $TOP/checks/check_all.sh; then
     if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ../../checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
 
-if ! test -f ../../checks/check_completions_dir.sh; then
+if ! test -f $TOP/checks/check_completions_dir.sh; then
      source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh) 
 else
-    . ../../checks/check_completions_dir.sh
+    . $TOP/checks/check_completions_dir.sh
 fi
 
-if ! test -f ../../checks/check_AUR.sh; then
+if ! test -f $TOP/checks/check_AUR.sh; then
      source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_AUR.sh)
 else
-    . ../../checks/check_AUR.sh
+    . $TOP/checks/check_AUR.sh
 fi
 
-if ! test -f ../install_docker.sh; then
-     source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_docker.sh)
+if ! test -f $TOP/cli-tools/install_docker.sh; then
+     source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_docker.sh)
 else
-    . ../install_docker.sh
+    . $TOP/cli-tools/install_docker.sh
 fi
 
 if [[ $distro_base == "Arch" ]]; then
@@ -40,10 +42,10 @@ elif [[ $distro_base == "Debian" ]]; then
     git clone https://github.com/Vanilla-OS/apx $TMPDIR/apx
     
     if ! hash go &> /dev/null; then
-        if ! test -f install_go.sh; then
-             source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_go.sh)
+        if ! test -f $TOP/cli-tools/pkgmngrs/install_go.sh; then
+             source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pkgmngrs/install_go.sh)
         else
-            . ./install_go.sh
+            . $TOP/cli-tools/pkgmngrs/install_go.sh
         fi
     fi
     go build $TMPDIR/apx
@@ -70,4 +72,3 @@ apx completion zsh > ~/.zsh_completion.d/complete-apx.zsh
 
 test -n "$BASH_VERSION" && source ~/.bashrc
 test -n "$ZSH_VERSION" && source ~/.zshrc
-

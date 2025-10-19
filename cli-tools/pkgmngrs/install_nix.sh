@@ -1,20 +1,22 @@
 hash nix &> /dev/null && SYSTEM_UPDATED='TRUE'
 
-if ! test -f ../../checks/check_all.sh; then
+TOP=$(git rev-parse --show-toplevel)
+
+if ! test -f $TOP/checks/check_all.sh; then
     if hash curl &> /dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ../../checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
 
 
-if ! test -f ../../checks/check_envvar_aliases_completions_keybinds.sh; then
+if ! test -f $TOP/checks/check_envvar_aliases_completions_keybinds.sh; then
      source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar_aliases_completions_keybinds.sh) 
 else
-    . ../../checks/check_envvar_aliases_completions_keybinds.sh
+    . $TOP/checks/check_envvar_aliases_completions_keybinds.sh
 fi
 
 

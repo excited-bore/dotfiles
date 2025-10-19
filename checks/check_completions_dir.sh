@@ -60,7 +60,7 @@ echo "Next $(tput setaf 1)sudo$(tput sgr0) will install '.bash_completion.d' in 
 
 if ! sudo test -f /root/.bash_completion; then
     echo "Next $(tput setaf 1)sudo$(tput sgr0) will install '.bash_completion.d' in /root and source it with '/root/.bash_completion"
-    if [ ! -f /root/.bash_completion ]; then
+    if ! [ -f /root/.bash_completion ]; then
         if ! test -f completions/.bash_completion; then
             sudo wget -O /root/.bash_completion https://raw.githubusercontent.com/excited-bore/dotfiles/main/completions/.bash_completion  
         else
@@ -69,7 +69,7 @@ if ! sudo test -f /root/.bash_completion; then
     fi
 fi
 
-if sudo ! [[ -d /root/.bash_completion.d/ ]]; then
+if ! sudo [ -d /root/.bash_completion.d/ ]; then
     sudo mkdir /root/.bash_completion.d/
 fi
 
@@ -85,9 +85,9 @@ if ! sudo grep -q "~/.bash_completion" /root/.bashrc; then
     fi
 fi 
 
-if sudo ! [[ -f /root/.zsh_completion ]]; then
+if ! sudo [ -f /root/.zsh_completion ]; then
     echo "Next $(tput setaf 1)sudo$(tput sgr0) will install '.zsh_completion.d' in /root and source it with '/root/.zsh_completion"
-    if sudo ! [[ -f /root/.zsh_completion ]]; then
+    if ! sudo [ -f /root/.zsh_completion ]; then
         if ! [[ -f completions/.zsh_completion ]]; then
             sudo wget -O /root/.zsh_completion https://raw.githubusercontent.com/excited-bore/dotfiles/main/completions/.zsh_completion  
         else
@@ -96,7 +96,7 @@ if sudo ! [[ -f /root/.zsh_completion ]]; then
     fi
 fi
 
-if sudo ! [[ -d /root/.zsh_completion.d/ ]]; then
+if ! sudo [ -d /root/.zsh_completion.d/ ]; then
     sudo mkdir /root/.zsh_completion.d/
 fi
 

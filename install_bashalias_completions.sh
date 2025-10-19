@@ -18,19 +18,19 @@ else
     . ./checks/check_envvar_aliases_completions_keybinds.sh
 fi
 
-if ! [ -e ~/.bash_completion.d/complete_alias ]; then
-    wget-curl https://raw.githubusercontent.com/cykerway/complete-alias/master/complete_alias 1> ~/.bash_completion.d/complete_alias
-    sed -i 's/#complete -F _complete_alias "\(.*\)"/complete -F _complete_alias "\1"/g' ~/.bash_completion.d/complete_alias
+if ! [ -e ~/.bash_completion.d/complete_alias.bash ]; then
+    wget-curl https://raw.githubusercontent.com/cykerway/complete-alias/master/complete_alias 1> ~/.bash_completion.d/complete_alias.bash
+    sed -i 's/#complete -F _complete_alias "\(.*\)"/complete -F _complete_alias "\1"/g' ~/.bash_completion.d/complete_alias.bash
     
 fi
 
 if test -f ~/.bashrc && ! grep -q '^complete -F _complete_alias' ~/.bashrc; then
     if grep -q '\[ -f ~/.keybinds \]' ~/.bashrc; then
-        sed -i 's|\(\[ -f \~/.keybinds \] \&\& source \~/.keybinds\)|\1\n\ncomplete -F _complete_alias|complete -F _complete_alias\n|g' ~/.bashrc
+        sed -i 's|\(\[ -f \~/.keybinds \] \&\& source \~/.keybinds\)|\1\n\ncomplete -F _complete_alias\n|g' ~/.bashrc
     elif grep -q '\[ -f ~/.bash_completion \]' ~/.bashrc; then
-        sed -i 's|\(\[ -f \~/.bash_completion \] \&\& source \~/.bash_completion\)|\1\n\ncomplete -F _complete_alias|complete -F _complete_alias\n|g' ~/.bashrc
+        sed -i 's|\(\[ -f \~/.bash_completion \] \&\& source \~/.bash_completion\)|\1\n\ncomplete -F _complete_alias\n|g' ~/.bashrc
     elif grep -q '\[ -f ~/.bash_aliases \]' ~/.bashrc; then
-        sed -i 's|\(\[ -f \~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\1\n\ncomplete -F _complete_alias|complete -F _complete_alias\n|g' ~/.bashrc
+        sed -i 's|\(\[ -f \~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\1\n\ncomplete -F _complete_alias\n|g' ~/.bashrc
     else
         echo 'complete -F _complete_alias "${!BASH_ALIASES[@]}"' >> ~/.bashrc
     fi
@@ -49,15 +49,16 @@ if [[ "y" == $rcompl ]]; then
 
     if ! sudo test -e /root/.bash_completion.d/complete_alias; then
         wget-curl https://raw.githubusercontent.com/cykerway/complete-alias/master/complete_alias | sudo tee /root/.bash_completion.d/complete_alias 1>/dev/null
+        echo bl 
         sudo sed -i 's/#complete -F _complete_alias "\(.*\)"/complete -F _complete_alias "\1"/g' /root/.bash_completion.d/complete_alias
     fi
     if sudo test -f /root/.bashrc && ! sudo grep -q '^complete -F _complete_alias' /root/.bashrc; then
         if sudo grep -q '\[ -f ~/.keybinds \]' /root/.bashrc; then
-            sudo sed -i 's|\(\[ -f \~/.keybinds \] \&\& source \~/.keybinds\)|\1\n\ncomplete -F _complete_alias|complete -F _complete_alias\n|g' /root/.bashrc
+            sudo sed -i 's|\(\[ -f \~/.keybinds \] \&\& source \~/.keybinds\)|\1\n\ncomplete -F _complete_alias\n|g' /root/.bashrc
         elif sudo grep -q '\[ -f ~/.bash_completion \]' /root/.bashrc; then
-            sudo sed -i 's|\(\[ -f \~/.bash_completion \] \&\& source \~/.bash_completion\)|\1\n\ncomplete -F _complete_alias|complete -F _complete_alias\n|g' /root/.bashrc
+            sudo sed -i 's|\(\[ -f \~/.bash_completion \] \&\& source \~/.bash_completion\)|\1\n\ncomplete -F _complete_alias\n|g' /root/.bashrc
         elif sudo grep -q '\[ -f ~/.bash_aliases \]' /root/.bashrc; then
-            sudo sed -i 's|\(\[ -f \~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\1\n\ncomplete -F _complete_alias|complete -F _complete_alias\n|g' /root/.bashrc
+            sudo sed -i 's|\(\[ -f \~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\1\n\ncomplete -F _complete_alias\n|g' /root/.bashrc
         else
             printf "complete -F _complete_alias \"\${!BASH_ALIASES[@]}\"\n" | sudo tee -a /root/.bashrc 1> /dev/null
         fi

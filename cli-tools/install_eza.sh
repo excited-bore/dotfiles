@@ -70,7 +70,7 @@ if ! test -f ~/.bash_completion.d/eza; then
         fi
         wget-curl https://raw.githubusercontent.com/eza-community/eza/refs/heads/main/completions/bash/eza > ~/.bash_completion.d/eza.bash
         wget-curl https://raw.githubusercontent.com/eza-community/eza/refs/heads/main/completions/zsh/_eza > ~/.zsh_completion.d/eza.zsh
-    
+	sed -i '/__eza$/ s/__eza/compdef __eza eza/' ~/.zsh_completion.d/eza.zsh    
    fi
 fi
 unset bash_cm

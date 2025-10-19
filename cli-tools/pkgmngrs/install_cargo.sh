@@ -2,17 +2,17 @@
 
 hash cargo &> /dev/null && SYSTEM_UPDATED='TRUE'
 
-if ! test -f ../checks/check_all.sh; then
+TOP=$(git rev-parse --show-toplevel)
+
+if ! test -f $TOP/checks/check_all.sh; then
     if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ../checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
-
-DIR=$(get-script-dir)
 
 #if ! type cargo &> /dev/null; then
 #    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
