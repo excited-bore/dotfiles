@@ -448,7 +448,7 @@ if [[ "y" == "$rmp" ]]; then
     if ! [[ -f $TOP/cli-tools/install_rmprompt.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_rmprompt.sh)
     else
-        $TOP/cli-tools/install_rmprompt.sh
+        . $TOP/cli-tools/install_rmprompt.sh
     fi
 fi
 unset rmp
@@ -652,7 +652,7 @@ fi
 
 # Hhighlighter (or just h)
 
-readyn -c "! hash h &> /dev/null" -p "Install hhighlighter (or just h)? (A tiny utility to highlight multiple keywords with different colors in a textoutput)" h
+readyn -c "! test -f ~/.aliases.d/h.sh" -p "Install hhighlighter (or just h)? (A tiny utility to highlight multiple keywords with different colors in a textoutput)" h
 if [[ "y" == "$h" ]]; then
     if ! hash ack &>/dev/null; then
         printf "For ${CYAN}hhighlighter${normal} to work, ${CYAN}ack${normal} needs to be installed beforehand.\n"
