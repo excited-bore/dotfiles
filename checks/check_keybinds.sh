@@ -27,7 +27,7 @@ if ! grep -q "source ~/.keybinds" ~/.bashrc; then
             echo '[ -f ~/.keybinds ] && source ~/.keybinds' >> ~/.bashrc
         fi
     else
-        printf "\n[ -f ~/.bash_completion ] && source ~/.bash_completion\n\n" >> ~/.bashrc
+        printf "\n[ -f ~/.keybinds ] && source ~/.keybinds\n\n" >> ~/.bashrc
     fi
 fi
 
@@ -45,7 +45,7 @@ if ! grep -q "source ~/.keybinds" ~/.zshrc; then
             echo '[ -f ~/.keybinds ] && source ~/.keybinds' >> ~/.zshrc
         fi
     else
-        printf "\n[ -f ~/.zsh_completion ] && source ~/.zsh_completion\n\n" >> ~/.zshrc
+        printf "\n[ -f ~/.keybinds ] && source ~/.keybinds\n\n" >> ~/.zshrc
     fi
 fi
 
@@ -79,7 +79,7 @@ if ! sudo grep -q "source ~/.keybinds" /root/.bashrc; then
             echo '[ -f ~/.keybinds ] && source ~/.keybinds' | sudo tee -a /root/.bashrc
         fi
     else
-        printf "\n[ -f ~/.bash_completion ] && source ~/.bash_completion\n\n" | sudo tee -a /root/.bashrc
+        printf "\n[ -f ~/.keybinds ] && source ~/.keybinds\n\n" | sudo tee -a /root/.bashrc
     fi
 fi
 
@@ -97,7 +97,7 @@ if ! sudo grep -q "source ~/.keybinds" /root/.zshrc; then
             echo '[ -f ~/.keybinds ] && source ~/.keybinds' | sudo tee -a /root/.zshrc
         fi
     else
-        printf "\n[ -f ~/.zsh_completion ] && source ~/.zsh_completion\n\n" | sudo tee -a /root/.zshrc
+        printf "\n[ -f ~/.keybinds ] && source ~/.keybinds\n\n" | sudo tee -a /root/.zshrc
     fi
 fi
 

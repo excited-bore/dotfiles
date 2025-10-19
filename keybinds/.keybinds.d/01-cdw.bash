@@ -31,10 +31,4 @@ function cd-w() {
     return 0 
 }
 
-complete -F _cd cd-w
-
-if type _fzf_dir_completion &> /dev/null; then
-    complete -F _fzf_dir_completion cd
-fi
-
 alias cd='cd-w'
