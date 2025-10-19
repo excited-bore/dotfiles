@@ -1,16 +1,16 @@
 INSTALL=1
 
-if ! [[ -f checks/check_all.sh ]]; then
-    if hash curl &>/dev/null; then
+TOP=$(git rev-parse --show-toplevel)
+
+if ! test -f $TOP/checks/check_all.sh; then
+    if hash curl &> /dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ./checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
-
-DIR=$(get-script-dir)
 
 if ! (hash zip &>/dev/null || hash unzip &>/dev/null) && [[ -n $pac_ins ]]; then
     printf "${CYAN}zip${normal} and/or ${CYAN}unzip${normal} are not installed \n"
@@ -35,10 +35,10 @@ if ! hash less &> /dev/null || (hash less &> /dev/null && version-higher '633' "
     printf "${CYAN}less${normal} is not installed or is under version 633, which is the version that has a flag that allowas disabling the 'virtual bell', which automatically activates when disabling the audible bell feature for a white screen flash for whenever the audible bell normally would sound, which can be triggering for people with epilespy\n"
     readyn -p "Install latest version of less?" ins_less
     if [[ $ins_less == 'y' ]]; then
-        if ! [[ -f $DIR/install_less.sh ]]; then
-            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_less.sh)
+        if ! [[ -f $TOP/cli-tools/install_less.sh ]]; then
+            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_less.sh)
         else 
-            . $DIR/install_less.sh 
+            . $TOP/cli-tools/install_less.sh 
         fi
     fi
     unset ins_less
@@ -60,10 +60,10 @@ if ! hash fzf &>/dev/null || (hash fzf &> /dev/null && version-higher '0.6' "$(f
     printf "${CYAN}fzf${normal} is not installed \n"
     readyn -p "Install fzf (a fuzzy finder / TUI to make a selection - used in a multitude of functions/tools)?" ins_fzf
     if [[ $ins_fzf == 'y' ]]; then
-        if ! [[ -f cli-tools/install_fzf.sh ]]; then
+        if ! [[ -f $TOP/cli-tools/install_fzf.sh ]]; then
            source <(wget-curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_fzf.sh) "simple"
         else
-            . cli-tools/install_fzf.sh "simple"
+            . $TOP/cli-tools/install_fzf.sh "simple"
         fi
     fi
     unset ins_fzf
@@ -79,10 +79,10 @@ if ! hash aria2c &>/dev/null && [ -n "$pac_ins" ]; then
 fi
 
 if ! hash rlwrap &>/dev/null; then
-    if ! [[ -f $DIR/cli-tools/install_rlwrap.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/install_rlwrap.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_rlwrap.sh)
     else
-        . $DIR/cli-tools/install_rlwrap.sh
+        . $TOP/cli-tools/install_rlwrap.sh
     fi
 fi
 
@@ -95,7 +95,7 @@ fi
 if ! [[ -L ~/config ]] && [[ -d $XDG_CONFIG_HOME ]]; then
     readyn -Y "BLUE" -p "Create $XDG_CONFIG_HOME to ~/config symlink? " sym1
     if [[ "y" == $sym1 ]]; then
-        ln -s ~/.config ~/config
+        ln -s $XDG_CONFIG_HOME ~/config
     fi
 fi
 
@@ -143,17 +143,15 @@ fi
 
 
 
-DIR=$(get-script-dir)
-
 # Environment variables
 
 if ! [[ -f $HOME/.environment.env ]]; then
-    if ! [[ -f $DIR/install_envvars.sh ]]; then
+    if ! [[ -f $TOP/install_envvars.sh ]]; then
         tmp=$(mktemp -d) &&
             wget-aria-dir $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_envvars.sh
         . ./$tmp/install_envvars.sh 'n'
     else
-        . $DIR/install_envvars.sh 'n'
+        . $TOP/install_envvars.sh 'n'
     fi
 fi
 
@@ -161,10 +159,10 @@ if [[ $machine == 'Linux' ]]; then
     if ([[ "$XDG_SESSION_TYPE" == 'x11' ]] && (! hash xclip &> /dev/null || ! hash xsel &> /dev/null)) || ([[ "$XDG_SESSION_TYPE" == 'wayland' ]] && (! hash wl-copy &> /dev/null || ! hash wl-paste &> /dev/null)); then
         readyn -p "Install commandline clipboard? (xsel/xclip on x11, wl-copy/wl-paste on wayland)" clip
         if [[ "y" == "$clip" ]]; then
-            if ! [[ -f $DIR/install_linux_clipboard.sh ]]; then
+            if ! [[ -f $TOP/install_linux_clipboard.sh ]]; then
                 source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_linux_clipboard.sh)
             else
-                . $DIR/install_linux_clipboard.sh
+                . $TOP/install_linux_clipboard.sh
             fi
         fi
         unset clip
@@ -289,10 +287,10 @@ elif [[ $distro_base == 'Arch' ]]; then
         printf "${CYAN}yay${normal} is not installed (Pacman wrapper for installing AUR packages, needed for yay-fzf-install)\n"
         readyn -p "Install yay?" insyay
         if [[ "y" == "$insyay" ]]; then
-            if ! [[ -f $DIR/AUR_installers/install_yay.sh ]]; then
+            if ! [[ -f $TOP/AUR_installers/install_yay.sh ]]; then
                 source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/AUR_installers/install_yay.sh)
             else
-                . $DIR/AUR_installers/install_yay.sh
+                . $TOP/AUR_installers/install_yay.sh
             fi
             if hash yay &>/dev/null; then
                 if ! [[ -f checks/check_system.sh ]]; then
@@ -306,10 +304,10 @@ elif [[ $distro_base == 'Arch' ]]; then
     fi
 
     if hash pamac &>/dev/null; then
-        if ! [[ -f $DIR/checks/check_pamac.sh ]]; then
+        if ! [[ -f $TOP/checks/check_pamac.sh ]]; then
             source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_pamac.sh)
         else
-            . $DIR/checks/check_pamac.sh
+            . $TOP/checks/check_pamac.sh
         fi
     fi
 
@@ -328,27 +326,25 @@ echo "Next $(tput setaf 1)sudo$(tput sgr0) will check for polkit related files i
 if ! sudo [ -f /etc/polkit/49-nopasswd_global.pkla ] && ! sudo [ -f /etc/polkit-1/localauthority.conf.d/90-nopasswd_global.conf ] && ! sudo [ -f /etc/polkit-1/rules.d/90-nopasswd_global.rules ]; then
     readyn -Y "YELLOW" -p "Configure polkit for automatic authentication without passwords (sudo still requires passwords)?" plkit
     if [[ "y" == "$plkit" ]]; then
-        if ! [[ -f $DIR/conf_polkit_no_pwd.sh ]]; then
+        if ! [[ -f $TOP/conf_polkit_no_pwd.sh ]]; then
             source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/conf_polkit_no_pwd.sh)
         else
-            . $DIR/conf_polkit_no_pwd.sh
+            . $TOP/conf_polkit_no_pwd.sh
         fi
     fi
     unset plkit
 fi
 
-DIR=$(get-script-dir)
-
-if ! [[ -f $DIR/checks/check_envvar.sh ]]; then
+if ! [[ -f $TOP/checks/check_envvar.sh ]]; then
     source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)
 else
-    . $DIR/checks/check_envvar.sh
+    . $TOP/checks/check_envvar.sh
 fi
 
-if ! [[ -f $DIR/checks/check_completions_dir.sh ]]; then
+if ! [[ -f $TOP/checks/check_completions_dir.sh ]]; then
     source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)
 else
-    . $DIR/checks/check_completions_dir.sh
+    . $TOP/checks/check_completions_dir.sh
 fi
 
 # Appimagelauncher
@@ -357,10 +353,10 @@ if ! hash AppImageLauncher &>/dev/null; then
     printf "${GREEN}If you want to install applications using appimages, there is a helper called 'appimagelauncher'\n"
     readyn -p "Check if appimage ready and install appimagelauncher?" appimage_install
     if [[ "$appimage_install" == 'y' ]]; then
-        if ! [[ -f $DIR/install_appimagelauncher.sh ]]; then
+        if ! [[ -f $TOP/install_appimagelauncher.sh ]]; then
             source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_appimagelauncher.sh)
         else
-            . $DIR/install_appimagelauncher.sh
+            . $TOP/install_appimagelauncher.sh
         fi
     fi
 fi
@@ -371,10 +367,10 @@ fi
 #printf "%s\n" "${blue}No flatpak detected. (Independent package manager from Red Hat)${normal}"
 readyn -p "Install (or just configure) Flatpak?" -c "[ -z \"$FLATPAK\" ]" insflpk
 if [[ "y" == "$insflpk" ]]; then
-    if ! [[ -f $DIR/cli-tools/pkgmngrs/install_flatpak.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/pkgmngrs/install_flatpak.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pkgmngrs/install_flatpak.sh)
     else
-        . $DIR/cli-tools/pkgmngrs/install_flatpak.sh
+        . $TOP/cli-tools/pkgmngrs/install_flatpak.sh
     fi
 fi
 
@@ -382,10 +378,10 @@ if ! hash snap &>/dev/null; then
     printf "%s\n" "${blue}No snap detected. (Independent package manager from Canonical)${normal}"
     readyn -Y "MAGENTA" -p "Install snap?" -n inssnap
     if [[ "y" == "$inssnap" ]]; then
-        if ! [[ -f $DIR/cli-tools/pkgmngrs/install_snapd.sh ]]; then
+        if ! [[ -f $TOP/cli-tools/pkgmngrs/install_snapd.sh ]]; then
             source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pkgmngrs/install_snapd.sh)
         else
-            . $DIR/cli-tools/pkgmngrs/install_snapd.sh
+            . $TOP/cli-tools/pkgmngrs/install_snapd.sh
         fi
     fi
 fi
@@ -396,10 +392,10 @@ unset inssnap
 readyn -p "Install eza? (A modern replacement for ls)" -c "! hash eza &> /dev/null" rmp
 
 if [[ "y" == "$rmp" ]]; then
-    if ! [[ -f $DIR/cli-tools/install_eza.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/install_eza.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_eza.sh)
     else
-        . $DIR/cli-tools/install_eza.sh
+        . $TOP/cli-tools/install_eza.sh
     fi
 fi
 unset rmp
@@ -429,17 +425,17 @@ fi
 
 reade -Q "$color" -i "$cpgi" -p "Install advcpmv, xcp, all or none? $cpgp" cpg
 if [[ "all" == "$cpg" || "advcpmv" == "$cpg" ]]; then
-    if ! [ -f $DIR/cli-tools/install_advcpmv.sh ]; then
+    if ! [ -f $TOP/cli-tools/install_advcpmv.sh ]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_advcpmv.sh)
     else
-        . $DIR/cli-tools/install_advcpmv.sh
+        . $TOP/cli-tools/install_advcpmv.sh
     fi
 fi
 if [[ "all" == "$cpg" || "xcp" == "$cpg" ]]; then
-    if ! [[ -f $DIR/cli-tools/install_xcp.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/install_xcp.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_xcp.sh)
     else
-        . $DIR/cli-tools/install_xcp.sh
+        . $TOP/cli-tools/install_xcp.sh
     fi
 fi
 unset cpg cpgi cpgp color
@@ -449,10 +445,10 @@ unset cpg cpgi cpgp color
 readyn -p "Install rm-prompt? (Rm but lists files/directories before deletion)" -c "! hash rm-prompt &> /dev/null" rmp
 
 if [[ "y" == "$rmp" ]]; then
-    if ! [[ -f $DIR/cli-tools/install_rmprompt.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/install_rmprompt.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_rmprompt.sh)
     else
-        $DIR/cli-tools/install_rmprompt.sh
+        $TOP/cli-tools/install_rmprompt.sh
     fi
 fi
 unset rmp
@@ -462,10 +458,10 @@ unset rmp
 readyn -p "Install fzf? (Fuzzy file/folder finder - replaces Ctrl-R/reverse-search, binds fzf search files on Ctrl+T and fuzzy search directories on Alt-C + Custom script: Ctrl-f becomes system-wide file opener)" -c "! [[ -f $HOME/.keybinds.d/fzf-bindings.bash ]]" findr
 
 if [[ "y" == "$findr" ]]; then
-    if ! [[ -f $DIR/cli-tools/install_fzf.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/install_fzf.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_fzf.sh)
     else
-        . $DIR/cli-tools/install_fzf.sh
+        . $TOP/cli-tools/install_fzf.sh
     fi
 fi
 unset findr
@@ -475,10 +471,10 @@ unset findr
 readyn -c "! hash ack &> /dev/null" -p "Install ack? (A modern replacement for grep - finds lines in shell output)" ack
 
 if [[ "y" == "$ack" ]]; then
-    if ! [[ -f $DIR/cli-tools/install_ack.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/install_ack.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_ack.sh)
     else
-        . $DIR/cli-tools/install_ack.sh
+        . $TOP/cli-tools/install_ack.sh
     fi
 fi
 unset ack
@@ -510,24 +506,24 @@ fi
 
 reade -Q "$color" -i "$pre" -p "Install dua, dust, ncdu or all? $prmpt" dua_dust_ncdu
 if [[ "all" == "$dua_dust_ncdu" || "dua" == "$dua_dust_ncdu" ]]; then
-    if ! [[ -f $DIR/cli-tools/install_dua_cli.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/install_dua_cli.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_dua_cli.sh)
     else
-        . $DIR/cli-tools/install_dua_cli.sh
+        . $TOP/cli-tools/install_dua_cli.sh
     fi
 fi
 if [[ "all" == "$dua_dust_ncdu" || "dust" == "$dua_dust_ncdu" ]]; then
-    if ! [[ -f $DIR/cli-tools/install_dust.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/install_dust.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_dust.sh)
     else
-        . $DIR/cli-tools/install_dust.sh
+        . $TOP/cli-tools/install_dust.sh
     fi
 fi
 if [[ "all" == "$dua_dust_ncdu" || "ncdu" == "$dua_dust_ncdu" ]]; then
-    if ! [[ -f $DIR/cli-tools/install_ncdu.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/install_ncdu.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_ncdu.sh)
     else
-        . $DIR/cli-tools/install_ncdu.sh
+        . $TOP/cli-tools/install_ncdu.sh
     fi
 fi
 unset dua_dust_ncdu color pre prmpt
@@ -552,17 +548,17 @@ fi
 
 reade -Q "$color" -i "$pre" -p "Install ${CYAN}duf${color1}, ${CYAN}dysk${color1} or both? (Both are modern replacements for df - tools list hard drive disk space)$prmpt" duf_dysk
 if [[ "both" == "$duf_dysk" ]] || [[ "duf" == "$duf_dysk" ]]; then
-    if ! [[ -f $DIR/install_duf.sh ]]; then
+    if ! [[ -f $TOP/install_duf.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_duf.sh)
     else
-        . $DIR/install_duf.sh
+        . $TOP/install_duf.sh
     fi
 fi
 if [[ "both" == "$duf_dysk" ]] || [[ "dysk" == "$duf_dysk" ]]; then
-    if ! [[ -f $DIR/cli-tools/install_dysk.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/install_dysk.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_dysk.sh)
     else
-        . $DIR/cli-tools/install_dysk.sh
+        . $TOP/cli-tools/install_dysk.sh
     fi
 fi
 unset duf_dysk color color1 pre prmpt
@@ -571,10 +567,10 @@ unset duf_dysk color color1 pre prmpt
 
 readyn -p "Install bash completions for aliases in ~/.bash_completion.d?" -c "! [ -f ~/.bash_completion.d/complete_alias ]" compl
 if [[ "y" == "$compl" ]]; then
-    if ! [[ -f $DIR/cli-tools/install_bashalias_completions.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/install_bashalias_completions.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_bashalias_completions.sh)
     else
-        . $DIR/cli-tools/install_bashalias_completions.sh
+        . $TOP/cli-tools/install_bashalias_completions.sh
     fi
 fi
 unset compl
@@ -583,19 +579,17 @@ unset compl
 
 readyn -p "Install python completions in ~/.bash_completion.d?" -c "! hash activate-global-python-argcomplete &> /dev/null" pycomp
 if [[ "y" == "$pycomp" ]]; then
-    if ! [[ -f $DIR/cli-tools/install_python_completions.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/install_python_completions.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_python_completions.sh)
     else
-        . $DIR/cli-tools/install_python_completions.sh
+        . $TOP/cli-tools/install_python_completions.sh
     fi
 fi
 unset pycomp
 
-DIR=$(get-script-dir)
-
 # Xresources
 
-xterm=$DIR/xterm/.Xresources
+xterm=$TOP/xterm/.Xresources
 
 if ! [[ -f $xterm ]]; then
     tmp=$(mktemp) && 
@@ -628,31 +622,31 @@ yes-edit-no -f xresources -g "$xterm" -p "Install .Xresources at ~/? (Xterm conf
 
 readyn -p "Install Starship? (Snazzy looking prompt)" -c "! hash starship &> /dev/null" strshp
 if [[ "$strshp" == "y" ]]; then
-    if ! [[ -f $DIR/cli-tools/install_starship.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/install_starship.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_starship.sh)
     else
-        . $DIR/cli-tools/install_starship.sh
+        . $TOP/cli-tools/install_starship.sh
     fi
 fi
 unset strshp
 
-DIR=$(get-script-dir)
+TOP=$(get-script-dir)
 
 # Aliases
 
 readyn -p "Install bash aliases and other config?" scripts
 if [[ "y" == "$scripts" ]]; then
 
-    if ! [[ -f $DIR/checks/check_aliases_dir.sh ]]; then
+    if ! [[ -f $TOP/checks/check_aliases_dir.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)
     else
-        . $DIR/checks/check_aliases_dir.sh
+        . $TOP/checks/check_aliases_dir.sh
     fi
     
-    if ! [[ -f $DIR/install_aliases.sh ]]; then
+    if ! [[ -f $TOP/install_aliases.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/install_aliases.sh)
     else
-        . $DIR/install_aliases.sh
+        . $TOP/install_aliases.sh
     fi
 fi
 
@@ -664,19 +658,19 @@ if [[ "y" == "$h" ]]; then
         printf "For ${CYAN}hhighlighter${normal} to work, ${CYAN}ack${normal} needs to be installed beforehand.\n"
         readyn -p "Install ack and then hhighlighter?" ansr
         if [[ "$ansr" == 'y' ]]; then
-            if ! [[ -f $DIR/cli-tools/install_ack.sh ]]; then
+            if ! [[ -f $TOP/cli-tools/install_ack.sh ]]; then
                 source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_ack.sh)
             else
-                . $DIR/cli-tools/install_ack.sh
+                . $TOP/cli-tools/install_ack.sh
             fi
         fi
         unset ansr
     fi
     if hash ack &> /dev/null; then
-        if ! [[ -f $DIR/cli-tools/install_hhighlighter.sh ]]; then
+        if ! [[ -f $TOP/cli-tools/install_hhighlighter.sh ]]; then
             source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_hhighlighter.sh)
         else
-            . $DIR/cli-tools/install_hhighlighter.sh
+            . $TOP/cli-tools/install_hhighlighter.sh
         fi
     fi
 fi
@@ -695,17 +689,15 @@ else
     . ./checks/check_all.sh
 fi
 
-DIR=$(get-script-dir)
-
 # Nerdfonts
 
 readyn -p "Install a Nerdfont? (Type of font with icons to distinguish filetypes in the terminal + other types of icons)" nstll_nerdfont
 
 if [[ "y" == "$nstll_nerdfont" ]]; then
-    if ! [[ -f $DIR/install_nerdfonts.sh ]]; then
+    if ! [[ -f $TOP/install_nerdfonts.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nerdfonts.sh)
     else
-        . $DIR/install_nerdfonts.sh
+        . $TOP/install_nerdfonts.sh
     fi
 fi
 unset nstll_nerdfont
@@ -715,10 +707,10 @@ unset nstll_nerdfont
 readyn -p "Install Kitty? (Terminal emulator)" -c "! hash kitty &> /dev/null" kittn
 
 if [[ "y" == "$kittn" ]]; then
-    if ! [[ -f $DIR/install_kitty.sh ]]; then
+    if ! [[ -f $TOP/install_kitty.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_kitty.sh)
     else
-        . $DIR/install_kitty.sh
+        . $TOP/install_kitty.sh
     fi
 fi
 unset kittn
@@ -735,22 +727,22 @@ fi
 
 readyn -p "Install pre-execution hooks for bash in ~/.bash_preexec?" -c "! [ -f ~/.bash_preexec.sh ] || ! [ -f /root/.bash_preexec.sh ]" bash_preexec
 if [[ "y" == "$bash_preexec" ]]; then
-    if ! [[ -f $DIR/install_bash_preexec.sh ]]; then
+    if ! [[ -f $TOP/install_bash_preexec.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bash_preexec.sh)
     else
-        . $DIR/install_bash_preexec.sh
+        . $TOP/install_bash_preexec.sh
     fi
 fi
 unset bash_preexec
 
 # Pipewire (better sound)
 
-readyn -p "Install and configure pipewire? (sound system - pulseaudio replacement)" -c '! hash wireplumber &> /dev/null || ! [ -f ~/.config/pipewire/pipewire-pulse.conf.d/switch-on-connect.conf ];' pipew
+readyn -p "Install and configure pipewire? (sound system - pulseaudio replacement)" -c "! hash wireplumber &> /dev/null || ! [ -f $XDG_CONFIG_HOME/pipewire/pipewire-pulse.conf.d/switch-on-connect.conf ]" pipew
 if [[ "$pipew" == "y" ]]; then
-    if ! [[ -f $DIR/cli-tools/install_pipewire.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/install_pipewire.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_pipewire.sh)
     else
-        . $DIR/cli-tools/install_pipewire.sh
+        . $TOP/cli-tools/install_pipewire.sh
     fi
 fi
 unset pipew
@@ -760,10 +752,10 @@ unset pipew
 readyn -p "Install moor? (Custom pager/less replacement - awesome default options)" -c '! hash moor &> /dev/null;' moor
 
 if [[ "$moor" == "y" ]]; then
-    if ! [[ -f $DIR/cli-tools/install_moor.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/install_moor.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_moor.sh)
     else
-        . $DIR/cli-tools/install_moor.sh
+        . $TOP/cli-tools/install_moor.sh
     fi
 fi
 unset moor
@@ -773,10 +765,10 @@ unset moor
 readyn -p "Install nano + config? (Simple terminal editor)" -c "! hash nano &> /dev/null || ! [ -f ~/.nanorc ]" nno
 
 if [[ "y" == "$nno" ]]; then
-    if ! [[ -f $DIR/cli-tools/install_nano.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/install_nano.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_nano.sh)
     else
-        . $DIR/cli-tools/install_nano.sh
+        . $TOP/cli-tools/install_nano.sh
     fi
 fi
 unset nno
@@ -786,10 +778,10 @@ unset nno
 readyn -p "Install neovim + config? (Complex terminal editor)" -c "! hash nvim &> /dev/null" nvm
 
 if [[ "y" == "$nvm" ]]; then
-    if ! [[ -f $DIR/cli-tools/install_nvim.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/install_nvim.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_nvim.sh)
     else
-        . $DIR/cli-tools/install_nvim.sh
+        . $TOP/cli-tools/install_nvim.sh
     fi
 fi
 unset nvm
@@ -798,10 +790,10 @@ unset nvm
 
 readyn -p "Install ripgrep? (recursively searches the current directory for lines matching a regex pattern)" -c "! hash rg &> /dev/null" rgrp
 if [[ "y" == "$rgrp" ]]; then
-    if ! [[ -f $DIR/cli-tools/install_ripgrep.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/install_ripgrep.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_ripgrep.sh)
     else
-        . $DIR/cli-tools/install_ripgrep.sh
+        . $TOP/cli-tools/install_ripgrep.sh
     fi
 fi
 unset rgrp
@@ -810,10 +802,10 @@ unset rgrp
 
 readyn -p "Install ast-grep? (Search and Rewrite code at large scale using precise AST pattern)" -c "! hash ast-grep &> /dev/null" rgrp
 if [[ "y" == "$rgrp" ]]; then
-    if ! [[ -f $DIR/install_ast-grep.sh ]]; then
+    if ! [[ -f $TOP/install_ast-grep.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_ast-grep.sh)
     else
-        . $DIR/cli-tools/install_ast-grep.sh
+        . $TOP/cli-tools/install_ast-grep.sh
     fi
 fi
 unset rgrp
@@ -823,13 +815,13 @@ unset rgrp
 readyn -p "Install Git and configure? (Project managing tool)" -n -c "! hash git &> /dev/null && [ -f ~/.gitconfig ]" git_ins
 
 if [[ "y" == "$git_ins" ]]; then
-    if ! [[ -f $DIR/cli-tools/install_git.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/install_git.sh ]]; then
         ins_git=$(mktemp)
         wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_git.sh > $ins_git
         chmod u+x "$ins_git"
         eval "$ins_git 'global'"
     else
-        . $DIR/cli-tools/install_git.sh 'global'
+        . $TOP/cli-tools/install_git.sh 'global'
     fi
 fi
 unset git_ins
@@ -839,10 +831,10 @@ unset git_ins
 readyn -p "Install Lazygit?" -c "! hash lazygit &> /dev/null" git_ins
 if [[ "y" == "$git_ins" ]]; then
 
-    if ! [[ -f $DIR/install_lazygit.sh ]]; then
+    if ! [[ -f $TOP/install_lazygit.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_lazygit.sh)
     else
-        . $DIR/cli-tools/install_lazygit.sh
+        . $TOP/cli-tools/install_lazygit.sh
     fi
 
 fi
@@ -859,10 +851,10 @@ unset git_ins
 
 readyn -p "Install Ranger? (Terminal file explorer)" -c "! hash ranger &> /dev/null" rngr
 if [[ "y" == "$rngr" ]]; then
-    if ! [[ -f $DIR/cli-tools/install_ranger.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/install_ranger.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_ranger.sh)
     else
-        . $DIR/cli-tools/install_ranger.sh
+        . $TOP/cli-tools/install_ranger.sh
     fi
 fi
 unset rngr
@@ -871,10 +863,10 @@ unset rngr
 
 readyn -p "Install Tmux? (Terminal multiplexer)" -c "! hash tmux &> /dev/null" tmx
 if [[ "y" == "$tmx" ]]; then
-    if ! [[ -f $DIR/cli-tools/install_tmux.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/install_tmux.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_tmux.sh)
     else
-        . $DIR/cli-tools/install_tmux.sh
+        . $TOP/cli-tools/install_tmux.sh
     fi
 fi
 unset tmx
@@ -884,10 +876,10 @@ unset tmx
 readyn -p "Install Bat? (Cat clone with syntax highlighting)" -c "! hash bat &> /dev/null && ! hash batcat &> /dev/null" bat
 
 if [[ $bat == "y" ]]; then
-    if ! [[ -f $DIR/cli-tools/install_bat.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/install_bat.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_bat.sh)
     else
-        . $DIR/cli-tools/install_bat.sh
+        . $TOP/cli-tools/install_bat.sh
     fi
 fi
 unset bat
@@ -897,10 +889,10 @@ unset bat
 readyn -p "Install neofetch/fastfetch/screenFetch)? (Terminal taskmanager - system information tool)" -c "! hash fastfetch &> /dev/null && ! hash screenfetch &> /dev/null" tojump
 
 if [[ "$tojump" == "y" ]]; then
-    if ! [[ -f $DIR/cli-tools/install_neofetch_onefetch.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/install_neofetch_onefetch.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_neofetch_onefetch.sh)
     else
-        . $DIR/cli-tools/install_neofetch_onefetch.sh
+        . $TOP/cli-tools/install_neofetch_onefetch.sh
     fi
 fi
 unset tojump
@@ -909,10 +901,10 @@ unset tojump
 
 readyn -p "Install Btop? (A processmanager with a fastly improved TUI relative to top/htop written in C++)" -c "! hash btop &> /dev/null" tojump
 if [[ "$tojump" == "y" ]]; then
-    if ! [[ -f $DIR/cli-tools/install_btop.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/install_btop.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_btop.sh)
     else
-        . $DIR/cli-tools/install_btop.sh
+        . $TOP/cli-tools/install_btop.sh
     fi
 fi
 unset tojump
@@ -922,10 +914,10 @@ unset tojump
 
 readyn -n -p "Install autojump? (jump to folders using 'bookmarks' - j_ )" tojump
 if [[ "$tojump" == "y" ]]; then
-    if ! [[ -f $DIR/install_autojump.sh ]]; then
+    if ! [[ -f $TOP/install_autojump.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_autojump.sh)
     else
-        . $DIR/cli-tools/install_autojump.sh
+        . $TOP/cli-tools/install_autojump.sh
     fi
 fi
 unset tojump
@@ -934,10 +926,10 @@ unset tojump
 
 readyn -p "Install zoxide? (A cd that guesses the right path based on a history)" -c "! hash zoxide &> /dev/null" zoxs
 if [[ "$zoxs" == "y" ]]; then
-    if ! [[ -f $DIR/cli-tools/install_zoxide.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/install_zoxide.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_zoxide.sh)
     else
-        . $DIR/cli-tools/install_zoxide.sh
+        . $TOP/cli-tools/install_zoxide.sh
     fi
 fi
 unset zoxs
@@ -947,10 +939,10 @@ unset zoxs
 
 readyn -p "Install 'pay-respects'? (Correct last command that ended with an error - 'thefuck' successor)" -c "! hash pay-respects &> /dev/null" tf
 if [[ "$tf" == "y" ]]; then
-    if ! [[ -f $DIR/cli-tools/install_f.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/install_f.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_f.sh)
     else
-        . $DIR/cli-tools/install_f.sh
+        . $TOP/cli-tools/install_f.sh
     fi
 fi
 unset tf
@@ -959,10 +951,10 @@ unset tf
 
 readyn -p "Install nmap? (Network port scanning tool)" -c '! hash nmap &> /dev/null' nmap
 if [[ "$nmap" == "y" ]]; then
-    if ! [[ -f $DIR/cli-tools/install_nmap.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/install_nmap.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_nmap.sh)
     else
-        . $DIR/cli-tools/install_nmap.sh
+        . $TOP/cli-tools/install_nmap.sh
     fi
 fi
 unset nmap
@@ -971,10 +963,10 @@ unset nmap
 
 readyn -p "Install ufw? (Uncomplicated firewall - Iptables wrapper)" -c "! hash ufw &> /dev/null" ins_ufw
 if [[ "$ins_ufw" == "y" ]]; then
-    if ! [[ -f $DIR/cli-tools/install_ufw.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/install_ufw.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_ufw.sh)
     else
-        . $DIR/cli-tools/install_ufw.sh
+        . $TOP/cli-tools/install_ufw.sh
     fi
 fi
 unset ins_ufw
@@ -1006,10 +998,10 @@ unset ins_ufw
 
 readyn -p "Install lazydocker?" -c "! hash lazydocker &> /dev/null" git_ins
 if [[ "y" == "$git_ins" ]]; then
-    if ! [[ -f $DIR/cli-tools/install_lazydocker.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/install_lazydocker.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_lazydocker.sh)
     else
-        . $DIR/cli-tools/install_lazydocker.sh
+        . $TOP/cli-tools/install_lazydocker.sh
     fi
 fi
 unset git_ins
@@ -1018,10 +1010,10 @@ unset git_ins
 
 readyn -p "Install exiftool? (Metadata wiper for files)" -c "! hash exiftool &> /dev/null" exif_t
 if [[ "$exif_t" == "y" ]]; then
-    if ! [[ -f $DIR/cli-tools/install_exiftool.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/install_exiftool.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_exiftool.sh)
     else
-        . $DIR/cli-tools/install_exiftool.sh
+        . $TOP/cli-tools/install_exiftool.sh
     fi
 fi
 unset exif_t
@@ -1030,10 +1022,10 @@ unset exif_t
 
 readyn -p "Install testdisk? (File recovery tool)" -c "! hash testdisk &> /dev/null" kittn
 if [[ "y" == "$kittn" ]]; then
-    if ! [[ -f $DIR/cli-tools/install_testdisk.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/install_testdisk.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_testdisk.sh)
     else
-        . $DIR/cli-tools/install_testdisk.sh
+        . $TOP/cli-tools/install_testdisk.sh
     fi
 fi
 unset kittn
@@ -1042,10 +1034,10 @@ unset kittn
 
 readyn -p "Install ffmpeg? (video/audio/image file converter)" -c "! hash ffmpeg &> /dev/null || ! [ -f $HOME/.aliases.d/ffmpeg.sh ]" ffmpg
 if [[ "$ffmpg" == "y" ]]; then
-    if ! [[ -f $DIR/cli-tools/install_ffmpeg.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/install_ffmpeg.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_ffmpeg.sh)
     else
-        . $DIR/cli-tools/install_ffmpeg.sh
+        . $TOP/cli-tools/install_ffmpeg.sh
     fi
 fi
 unset ffmpg
@@ -1054,10 +1046,10 @@ unset ffmpg
 
 readyn -p "Install yt-dlp? (youtube video downloader)" -c "! hash yt-dlp &> /dev/null" yt_dlp
 if [[ "$yt_dlp" == "y" ]]; then
-    if ! [[ -f $DIR/cli-tools/install_yt-dlp.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/install_yt-dlp.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_yt-dlp.sh)
     else
-        . $DIR/cli-tools/install_yt-dlp.sh
+        . $TOP/cli-tools/install_yt-dlp.sh
     fi
 fi
 unset yt_dlp
@@ -1078,10 +1070,10 @@ unset yt_dlp
 
 #reade -Q "$color" -i "$pre" -p "Check existence/create .environment.env and link it to .bashrc in $HOME/ and /root/? $prmpt" "$othr" envvars
 #if [[ "$envvars" == "y" ]] || [[ -z "$envvars" ]]  then
-if ! [[ -f $DIR/install_envvars.sh ]]; then
+if ! [[ -f $TOP/install_envvars.sh ]]; then
     source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_envvars.sh)
 else
-    . $DIR/install_envvars.sh
+    . $TOP/install_envvars.sh
 fi
 #fi
 

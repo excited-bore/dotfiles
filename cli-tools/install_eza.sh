@@ -1,20 +1,24 @@
+# https://github.com/eza-community/eza
+
 hash eza &> /dev/null && SYSTEM_UPDATED='TRUE'
 
-if ! test -f ../checks/check_all.sh; then
+TOP=$(git rev-parse --show-toplevel)
+
+if ! test -f $TOP/checks/check_all.sh; then
     if hash curl &> /dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh) 
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh) 
     fi
 else
-    . ../checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
 
 if ! hash cargo &> /dev/null || ! [[ $PATH =~ '/.cargo/bin' ]] || (hash rustc &> /dev/null && [[ $(rustc -V | awk '{print $2}') -lt 1.81.0 ]]); then
-    if ! test -f pkgmngrs/install_cargo.sh; then
+    if ! test -f $TOP/cli-tools/pkgmngrs/install_cargo.sh; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pkgmngrs/install_cargo.sh)
     else
-       . pkgmngrs/install_cargo.sh
+       . $TOP/cli-tools/pkgmngrs/install_cargo.sh
     fi
 fi
 
@@ -63,10 +67,10 @@ eza --help | $PAGER
 if ! test -f ~/.bash_completion.d/eza; then
    readyn -p 'Install shell completions for eza?' bash_cm  
    if [[ $bash_cm == 'y' ]]; then
-        if ! test -f ../checks/check_completions_dir.sh; then
+        if ! test -f $TOP/checks/check_completions_dir.sh; then
              source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh) 
         else
-            . ../checks/check_completions_dir.sh
+            . $TOP/checks/check_completions_dir.sh
         fi
         wget-curl https://raw.githubusercontent.com/eza-community/eza/refs/heads/main/completions/bash/eza > ~/.bash_completion.d/eza.bash
         wget-curl https://raw.githubusercontent.com/eza-community/eza/refs/heads/main/completions/zsh/_eza > ~/.zsh_completion.d/eza.zsh

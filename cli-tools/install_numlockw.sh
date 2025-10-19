@@ -2,22 +2,24 @@
  
 [[ "$XDG_SESSION_TYPE" == 'wayland' ]] && hash numlockw &> /dev/null && SYSTEM_UPDATED='TRUE'
 
-if ! test -f ../checks/check_all.sh; then
+TOP=$(git rev-parse --show-toplevel)
+
+if ! test -f $TOP/checks/check_all.sh; then
     if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ../checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
 
 if [[ $XDG_SESSION_TYPE == 'wayland' ]]; then
     if ! hash pipx &> /dev/null; then
-        if ! test -f pkgmngrs/install_pipx.sh; then
+        if ! test -f $TOP/cli-tools/pkgmngrs/install_pipx.sh; then
             source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pkgmngrs/install_pipx.sh)
         else
-            . pkgmngrs/install_pipx.sh
+            . $TOP/cli-tools/pkgmngrs/install_pipx.sh
         fi
     fi
 
@@ -49,8 +51,8 @@ if [[ $XDG_SESSION_TYPE == 'wayland' ]]; then
             echo "numlockw on" >> ~/.profile
         fi
     
-        if [[ "$XDG_CURRENT_DESKTOP" == 'labwc:wlroots' ]] && ! grep -q 'numlockw on' ~/.config/labwc/autostart; then
-            echo "numlockw on" >> ~/.config/labwc/autostart 
+        if [[ "$XDG_CURRENT_DESKTOP" == 'labwc:wlroots' ]] && ! grep -q 'numlockw on' $XDG_CONFIG_HOME/labwc/autostart; then
+            echo "numlockw on" >> $XDG_CONFIG_HOME/labwc/autostart 
         fi
     fi     
 fi

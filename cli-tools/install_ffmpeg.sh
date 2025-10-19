@@ -1,21 +1,23 @@
+# https://www.ffmpeg.org/
+
 hash ffmpeg &> /dev/null && SYSTEM_UPDATED='TRUE'
 
-if ! test -f checks/check_all.sh; then
+TOP=$(git rev-parse --show-toplevel)
+
+if ! test -f $TOP/checks/check_all.sh; then
     if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ./checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
 
-SCRIPT_DIR=$(get-script-dir)
-
-if ! test -f checks/check_envvar_aliases_completions_keybinds.sh; then
+if ! test -f $TOP/checks/check_envvar_aliases_completions_keybinds.sh; then
     source <(wget-curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar_aliases_completions_keybinds.sh)
 else
-    . ./checks/check_envvar_aliases_completions_keybinds.sh
+    . $TOP/checks/check_envvar_aliases_completions_keybinds.sh
 fi
 
 if ! hash ffmpeg &>/dev/null; then
@@ -30,7 +32,7 @@ fi
 
 if hash ffmpeg &>/dev/null; then
 
-    ffmpgsh=$SCRIPT_DIR/aliases/.aliases.d/ffmpeg.sh
+    ffmpgsh=$TOP/aliases/.aliases.d/ffmpeg.sh
 
     if ! [ -f $ffmpgsh ]; then
         wget-aria-dir $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/ffmpeg.sh

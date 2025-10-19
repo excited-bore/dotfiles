@@ -1,13 +1,15 @@
 SYSTEM_UPDATED="TRUE"
 
-if ! test -f checks/check_all.sh; then
+TOP=$(git rev-parse --show-toplevel)
+
+if ! test -f $TOP/checks/check_all.sh; then
     if hash curl &> /dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ./checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
 
 # Environment variables
@@ -285,9 +287,9 @@ if [[ "$envvars" == "y" ]] && [[ "$1" == 'n' ]]; then
     sed -i 's/^#hash/hash/' $pathvr
 
     # Comment out FZF stuff
-    sed -i 's/  --bind/ #--bind/' $pathvr
-    sed -i 's/  --preview-window/ #--preview-window/' $pathvr
-    sed -i 's/  --color/ #--color/' $pathvr
+    sed -i 's/--bind/#--bind/' $pathvr
+    sed -i 's/--preview-window/#--preview-window/' $pathvr
+    sed -i 's/--color/#--color/' $pathvr
 
     # Check whether fd is installed, comment it out cause it's faster for fzf 
     if hash fd &> /dev/null || hash fd-find &> /dev/null; then
@@ -318,9 +320,9 @@ elif [[ "$envvars" == "y" ]]; then
     sed -i 's/^#hash/hash/' $pathvr
 
     # Comment out FZF stuff
-    sed -i 's/  --bind/ #--bind/' $pathvr
-    sed -i 's/  --preview-window/ #--preview-window/' $pathvr
-    sed -i 's/  --color/ #--color/' $pathvr
+    sed -i 's/--bind/#--bind/' $pathvr
+    sed -i 's/--preview-window/#--preview-window/' $pathvr
+    sed -i 's/--color/#--color/' $pathvr
 
     # Set TMPDIR
     sed 's|#export TMPDIR|export TMPDIR|' -i $pathvr
@@ -736,10 +738,10 @@ fi
 
 # Check one last time if ~/.bash_preexec - for both $USER and root - is the last line in their ~/.bash_profile and ~/.bashrc
 
-if ! test -f ./checks/check_bash_source_order.sh; then
+if ! test -f $TOP/checks/check_bash_source_order.sh; then
     source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_bash_source_order.sh)
 else
-    . ./checks/check_bash_source_order.sh
+    . $TOP/checks/check_bash_source_order.sh
 fi
 
 test -n "$BASH_VERSION" && source ~/.bashrc 

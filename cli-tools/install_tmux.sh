@@ -1,13 +1,17 @@
+# https://github.com/tmux/tmux/wiki
+
 hash tmux &> /dev/null && SYSTEM_UPDATED='TRUE'
 
-if ! test -f ../checks/check_all.sh; then
+TOP=$(git rev-parse --show-toplevel)
+
+if ! test -f $TOP/checks/check_all.sh; then
     if hash curl &> /dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ../checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
 
 
@@ -47,11 +51,11 @@ tmux --help
 #   echo "fi" >> ~/.profile
 #fi
 
-if test -f tmux/.tmux.conf; then
-    file=tmux/.tmux.conf
+if test -f $TOP/cli-tools/tmux/.tmux.conf; then
+    file=$TOP/cli-tools/tmux/.tmux.conf
 else
     dir1="$(mktemp -d -t tmux-XXXXXXXXXX)"
-    wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/tmux/.tmux.conf > $dir1/.tmux.conf
+    wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/tmux/.tmux.conf > $dir1/.tmux.conf
     file=$dir1/.tmux.conf
 fi
 
@@ -90,10 +94,10 @@ unset tmuxx
 readyn -p "Install tmux clipboard plugin? (tmux-yank)" tmuxx
 if [[ "$tmuxx" == "y" ]]; then
     if ([[ "$XDG_SESSION_TYPE" == 'x11' ]] && (! hash xclip &> /dev/null || ! hash xsel &> /dev/null)) || ([[ "$XDG_SESSION_TYPE" == 'wayland' ]] && (! hash wl-copy &> /dev/null || ! hash wl-paste &> /dev/null)); then
-        if ! [[ -f ../install_linux_clipboard.sh ]]; then
+        if ! [[ -f $TOP/install_linux_clipboard.sh ]]; then
             source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_linux_clipboard.sh)
         else
-            . ../install_linux_clipboard.sh
+            . $TOP/install_linux_clipboard.sh
         fi
     fi
     sed -i 's|#set -g @plugin '\''tmux-plugins/tmux-yank'\''|set -g @plugin '\''tmux-plugins/tmux-yank'\''|g' ~/.tmux.conf
@@ -185,10 +189,10 @@ if ! [ -e ~/.bash_completion.d/tmux.bash ]; then
     readyn -p "Install tmux bash completions?" tmuxx
     if [[ "$tmuxx" == "y" ]]; then
 
-        if ! test -f ../checks/check_completions_dir.sh; then
+        if ! test -f $TOP/checks/check_completions_dir.sh; then
             source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)
         else
-            . ../checks/check_completions_dir.sh
+            . $TOP/checks/check_completions_dir.sh
         fi
 
         wget-curl https://raw.githubusercontent.com/imomaliev/tmux-bash-completion/master/completions/tmux >~/.bash_completion.d/tmux.bash 2>/dev/null
@@ -210,18 +214,18 @@ fi
 
 readyn -p "Install tmux.sh at ~/.aliases.d/? (tmux aliases)" tmuxx
 if [[ "$tmuxx" == "y" ]]; then
-    if ! test -f ../checks/check_aliases_dir.sh; then
+    if ! test -f $TOP/checks/check_aliases_dir.sh; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)
     else
-        . ../checks/check_aliases_dir.sh
+        . $TOP/checks/check_aliases_dir.sh
     fi
      
-    if test -f tmux/.aliases.d/tmux.sh; then
-        cp tmux/.aliases.d/tmux.sh ~/.aliases.d/
+    if test -f $TOP/cli-tools/tmux/.aliases.d/tmux.sh; then
+        cp $TOP/cli-tools/tmux/.aliases.d/tmux.sh ~/.aliases.d/
     else
         wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/tmux/.aliases.d/tmux.sh > ~/.aliases.d/tmux.sh
     fi
-    if type gio &>/dev/null && test -f ~/.aliases.d/tmux.sh~; then
+    if hash gio &>/dev/null && test -f ~/.aliases.d/tmux.sh~; then
         gio trash ~/.aliases.d/tmux.sh~
     fi
 fi
@@ -229,10 +233,10 @@ unset tmuxx
 
 readyn -n -p "Set tmux at shell login for SSH? (Conflicts with vim-tmux-kitty navigator)" tmuxxx
 if [[ "$tmuxxx" == "y" ]]; then
-    if ! test -f ../checks/check_aliases_dir.sh; then
+    if ! test -f $TOP/checks/check_aliases_dir.sh; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)
     else
-        . ../checks/check_aliases_dir.sh
+        . $TOP/checks/check_aliases_dir.sh
     fi
      
     touch ~/.aliases.d/tmux_startup.sh

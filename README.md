@@ -23,6 +23,11 @@ If you don't have the github cloned/downloaded, you could try to run this comman
 ```
 source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install.sh)
 ```
+or, if you don't have curl (you really should)  
+
+```
+source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/install.sh)
+```
 
 Creates `.environment.env` for global environment variables (Helps setting up variables for MAN,LESS,PAGER,EDITOR/VISUAL,SYSTEMD,XDG, etc..)  
 Creates `~/.keybinds.d/` and `~/.keybinds.d/keybinds.bash` for Bash (readline) keybindings  
@@ -75,7 +80,7 @@ Then it helps with installing/configuring:
 Also helps configuring global gitconfig and global gitignore, and gives the option to install all kinds of bash-aliases/.aliases.d/functions
 
 
-## switch_keyboard.sh
+## Conf_keyboard.sh
 Script to automate setting up your keyboard in linux.  
 Launches calamares (GUI) in debug mode. Tested and works over ssh.  
 For trying out only this script, try:
@@ -133,7 +138,6 @@ source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main
 ## Install_gitignore.sh
 Script to automate setting up local or global gitignore using templates from https://github.com/github/gitignore
 
-
 ## Install_flatpak.sh
 Installs flatpak with the added option to set flatpak-wrappers for commandline and install https://github.com/tchx84/Flatseal alongside
 
@@ -146,5 +150,5 @@ Script to automate configuring automounting drives in /etc/fstab
 ## Install_samba.sh
 Script to automate the installation of network drives using samba.
 
-## Install_pipewire_switch_on_connect.sh
-Setup to autoswitch to newest plugged in audiodevice.
+## Install_pipewire.sh
+Installs pipewire and helps setting up so HDMI devices are ignored and that it will autoswitch to newest plugged in audiodevice with the exception of a dualshock 4 controller.

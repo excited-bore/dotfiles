@@ -1,19 +1,21 @@
 SYSTEM_UPDATED="TRUE"
 
-if ! [[ -f checks/check_all.sh ]]; then
+TOP=$(git rev-parse --show-toplevel)
+
+if ! [[ -f $TOP/checks/check_all.sh ]]; then
     if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ./checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
 
-if ! [[ -f checks/check_aliases_dir.sh ]]; then
+if ! [[ -f $TOP/checks/check_aliases_dir.sh ]]; then
     source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)
 else
-    . ./checks/check_aliases_dir.sh
+    . $TOP/checks/check_aliases_dir.sh
 fi
 
 #[[ "$(type sudo)" =~ 'aliased' ]] && unalias sudo
@@ -21,15 +23,13 @@ fi
 #    unalias cp && alias cp='cp -fv'
 
 
-SCRIPT_DIR=$(get-script-dir)
-
-rlwrpscrpt=aliases/.aliases.d/00-rlwrap_scripts.sh
-colors=aliases/.aliases.d/00-colors.sh
-reade=rlwrap-scripts/reade
-readyn=rlwrap-scripts/readyn
-yesnoedit=rlwrap-scripts/yes-edit-no
-csysm=checks/check_system.sh
-if ! test -d checks/; then
+rlwrpscrpt=$TOP/aliases/.aliases.d/00-rlwrap_scripts.sh
+colors=$TOP/aliases/.aliases.d/00-colors.sh
+reade=$TOP/rlwrap-scripts/reade
+readyn=$TOP/rlwrap-scripts/readyn
+yesnoedit=$TOP/rlwrap-scripts/yes-edit-no
+csysm=$TOP/checks/check_system.sh
+if ! test -d $TOP/checks/; then
     tmp=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/00-rlwrap_scripts.sh > $tmp && rlwrapscrpt=$tmp
     tmp=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/00-colors.sh > $tmp && colors=$tmp
     tmp=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade > $tmp && reade=$tmp
@@ -546,19 +546,19 @@ if [[ "$int_r" == "both" ]] || [[ "$int_r" == 'exit' ]] || [[ "$int_r" == 'intr'
 fi
 unset int_r sig
 
-update_sysm=aliases/.aliases.d/update-system.sh
-update_kern=aliases/.aliases.d/update-kernel.sh
-pacmn=aliases/.aliases.d/package_managers.sh
-rgrp=aliases/.aliases.d/ripgrep-directory.sh
-[[ $distro == "Manjaro" ]] && manjaro=aliases/.aliases.d/manjaro.sh
-hash systemctl &>/dev/null && systemd=aliases/.aliases.d/systemctl.sh
-hash sudo &>/dev/null && dosu=aliases/.aliases.d/sudo.sh
-hash git &>/dev/null && gits=aliases/.aliases.d/git.sh
-hash ssh &>/dev/null && sshs=aliases/.aliases.d/ssh.sh
-ps1=aliases/.aliases.d/PS1_colours.sh
-variti=aliases/.aliases.d/variety.sh
-hash python &>/dev/null && pthon=aliases/.aliases.d/python.sh
-if ! [[ -d aliases/.aliases.d/ ]]; then
+update_sysm=$TOP/aliases/.aliases.d/update-system.sh
+update_kern=$TOP/aliases/.aliases.d/update-kernel.sh
+pacmn=$TOP/aliases/.aliases.d/package_managers.sh
+rgrp=$TOP/aliases/.aliases.d/ripgrep-directory.sh
+[[ $distro == "Manjaro" ]] && manjaro=$TOP/aliases/.aliases.d/manjaro.sh
+hash systemctl &>/dev/null && systemd=$TOP/aliases/.aliases.d/systemctl.sh
+hash sudo &>/dev/null && dosu=$TOP/aliases/.aliases.d/sudo.sh
+hash git &>/dev/null && gits=$TOP/aliases/.aliases.d/git.sh
+hash ssh &>/dev/null && sshs=$TOP/aliases/.aliases.d/ssh.sh
+ps1=$TOP/aliases/.aliases.d/PS1_colours.sh
+variti=$TOP/aliases/.aliases.d/variety.sh
+hash python &>/dev/null && pthon=$TOP/aliases/.aliases.d/python.sh
+if ! [ -d $TOP/aliases/.aliases.d/ ]; then
     tmp1=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/update-system.sh > $tmp1 && update_sysm=$tmp1
     tmp11=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/update-kernel.sh > $tmp11 && update_kern=$tmp11
     rgrp=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/ripgrep-directory.sh > $rgrp 
@@ -713,15 +713,10 @@ yes-edit-no -f variti -g "$variti" -p "Install variety.sh at ~/.aliases.d/ (alia
 
 # Check one last time if ~/.bash_preexec - for both $USER and root - is the last line in their ~/.bash_profile and ~/.bashrc
 
-if ! test -f ./checks/check_bash_source_order.sh; then
-    if hash curl &>/dev/null; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_bash_source_order.sh)
-    else
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-        return 1 || exit 1
-    fi
+if ! test -f $TOP/checks/check_bash_source_order.sh; then
+    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_bash_source_order.sh)
 else
-    . ./checks/check_bash_source_order.sh
+    . $TOP/checks/check_bash_source_order.sh
 fi
 
 test -n "$BASH_VERSION" && source ~/.bashrc &>/dev/null

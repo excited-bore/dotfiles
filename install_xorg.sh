@@ -1,16 +1,16 @@
 hash Xorg &> /dev/null && SYSTEM_UPDATED='TRUE'
 
-if ! [[ -f checks/check_all.sh ]]; then
-    if hash curl &>/dev/null; then
+TOP=$(git rev-parse --show-toplevel)
+
+if ! test -f $TOP/checks/check_all.sh; then
+    if hash curl &> /dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ./checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
-
-SCRIPT_DIR=$(get-script-dir)
 
 if [[ $distro_base == "Arch" ]] || [[ $distro_base == "Debian" ]]; then
     eval "$pac_ins xorg"

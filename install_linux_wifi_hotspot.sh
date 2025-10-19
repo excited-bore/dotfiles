@@ -1,18 +1,21 @@
-#!/bin/bash
+# https://github.com/lakinduakash/linux-wifi-hotspot 
 
-if ! test -f checks/check_all.sh; then
-    if type curl &>/dev/null; then
+hash wihotspot &> /dev/null && SYSTEM_UPDATED='TRUE'
+
+TOP=$(git rev-parse --show-toplevel)
+
+if ! test -f $TOP/checks/check_all.sh; then
+    if hash curl &> /dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-        return 1 || exit 1
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ./checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
 
 
-if ! type wihotspot &> /dev/null; then
+if ! hash wihotspot &> /dev/null; then
     if [[ $distro == "Ubuntu" ]] && [[ $(check-ppa ppa:lakinduakash/lwh) =~ 'OK' ]]; then
         sudo add-apt-repository ppa:lakinduakash/lwh
         sudo apt update
@@ -39,7 +42,7 @@ fi
 
 wihotspot
 
-if type systemctl &> /dev/null; then
+if hash systemctl &> /dev/null; then
     readyn -Y 'CYAN' -p "Enable hotspot on startup with systemctl?" hotspot
     if [[ $hotspot == "y" ]]; then
         systemctl enable create_ap

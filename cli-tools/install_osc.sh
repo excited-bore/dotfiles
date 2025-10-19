@@ -1,37 +1,45 @@
+# https://github.com/theimpostor/osc
+
 hash osc &> /dev/null && SYSTEM_UPDATED='TRUE'
 
-if ! test -f ../checks/check_all.sh; then
+TOP=$(git rev-parse --show-toplevel)
+
+if ! test -f $TOP/checks/check_all.sh; then
     if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ../checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
 
 if ! hash go &> /dev/null; then
     readyn -p "Installer uses go. Install?" go
     if [[ "y" == "$go" ]]; then
-        if ! test -f pkgmngrs/install_go.sh; then
+        if ! test -f $TOP/cli-tools/pkgmngrs/install_go.sh; then
              source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pkgmngrs/install_go.sh) 
         else
-            . pkgmngrs//install_go.sh
+            . $TOP/cli-tools/pkgmngrs//install_go.sh
         fi
     fi
     unset go
 fi
 
-go install -v github.com/theimpostor/osc@latest
-
-if ! test -f ../checks/check_completions_dir.sh; then
-     source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh) 
-else
-    . ../checks/check_completions_dir.sh
+if ! hash osc &> /dev/null; then
+    go install -v github.com/theimpostor/osc@latest
 fi
 
-osc completion bash > ~/.bash_completion.d/osc.bash
-osc completion zsh > ~/.bash_completion.d/osc.zsh
+if hash osc &> /dev/null; then
+    if ! test -f $TOP/checks/check_completions_dir.sh; then
+         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh) 
+    else
+        . $TOP/checks/check_completions_dir.sh
+    fi
 
-test -n "$BASH_VERSION" && source ~/.bashrc
-test -n "$ZSH_VERSION" && source ~/.zshrc
+    osc completion bash > ~/.bash_completion.d/osc.bash
+    osc completion zsh > ~/.bash_completion.d/osc.zsh
+
+    test -n "$BASH_VERSION" && source ~/.bashrc
+    test -n "$ZSH_VERSION" && source ~/.zshrc
+fi

@@ -1,13 +1,17 @@
+# https://pipewire.org/
+
 hash pipewire &> /dev/null && SYSTEM_UPDATED='TRUE'
 
-if ! [[ -f ../checks/check_all.sh ]]; then
+TOP=$(git rev-parse --show-toplevel)
+
+if ! [[ -f $TOP/checks/check_all.sh ]]; then
     if hash curl &> /dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ../checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
 
 if [[ "$distro" == "Manjaro" ]]; then
@@ -26,22 +30,22 @@ if ! [[ -f ~/.bash_completion.d/pipewire.bash ]]; then
     readyn -p "Install pipewire completions (pw-cli, wpctl)?" comps
     if [[ $comps == 'y' ]]; then
 
-        if ! [[ -f ../checks/check_completions_dir.sh ]]; then
+        if ! [[ -f $TOP/checks/check_completions_dir.sh ]]; then
              source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh) 
         else
-            . ../checks/check_completions_dir.sh
+            . $TOP/checks/check_completions_dir.sh
         fi
          
-        pipewire_cmp=pipewire/.bash_completion.d/pipewire.bash
-        if ! [[ -f pipewire/.bash_completion.d/pipewire.bash ]]; then
-            wget-aria-dir $TMPDIR https://raw.githubusercontent.com/excited-bore/dotfiles/main/pipewire/.bash_completion.d/pipewire.bash 
+        pipewire_cmp=$TOP/cli-tools/pipewire/.bash_completion.d/pipewire.bash
+        if ! [[ -f $TOP/pipewire/.bash_completion.d/pipewire.bash ]]; then
+            wget-aria-dir $TMPDIR https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pipewire/.bash_completion.d/pipewire.bash 
             pipewire_cmp=$TMPDIR/pipewire.bash
         fi
         cp $pipewire_cmp ~/.bash_completion.d/ 
    
-        pipewire_cmpz=pipewire/.zsh_completion.d/pipewire.zsh
-        if ! [[ -f pipewire/.zsh_completion.d/pipewire.zsh ]]; then
-            wget-aria-dir $TMPDIR https://raw.githubusercontent.com/excited-bore/dotfiles/main/pipewire/.bash_completion.d/pipewire.zsh 
+        pipewire_cmpz=$TOP/pipewire/.zsh_completion.d/pipewire.zsh
+        if ! [[ -f $TOP/pipewire/.zsh_completion.d/pipewire.zsh ]]; then
+            wget-aria-dir $TMPDIR https://raw.githubusercontent.com/excited-bore/dotfiles/main/$TOP/pipewire/.zsh_completion.d/pipewire.zsh 
             pipewire_cmp=$TMPDIR/pipewire.zsh
         fi
         cp $pipewire_cmp ~/.zsh_completion.d/ 
@@ -226,10 +230,10 @@ if ! hash easyeffects &> /dev/null; then
     unset ezff 
 fi
 
-file=pipewire/.aliases.d/pipewire.sh
+file=$TOP/cli-tools/pipewire/.aliases.d/pipewire.sh
 if ! [[ -f $file ]]; then
     tmpd=$(mktemp -d)
-    wget-aria-dir $tmpd https://raw.githubusercontent.com/excited-bore/dotfiles/main/pipewire/.aliases.d/pipewire.sh
+    wget-aria-dir $tmpd https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pipewire/.aliases.d/pipewire.sh
     file=$tmpd/pipewire.sh
 fi
 

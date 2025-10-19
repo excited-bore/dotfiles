@@ -1,13 +1,17 @@
+# https://www.greenwoodsoftware.com/less/
+
 hash less &> /dev/null && SYSTEM_UPDATED='TRUE'
 
-if ! test -f ../checks/check_all.sh; then
+TOP=$(git rev-parse --show-toplevel)
+
+if ! test -f $TOP/checks/check_all.sh; then
     if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ../checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
 
 
@@ -24,11 +28,11 @@ if ! hash less &> /dev/null || (hash less &> /dev/null && version-higher '633' "
     fi
 
     if [[ "$distro_base" == 'Debian' ]]; then   
-    	if ! test -f pkgmngrs/install_ppa.sh; then
+    	if ! test -f $TOP/cli-tools/pkgmngrs/install_ppa.sh; then
             source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pkgmngrs/install_ppa.sh)
             
         else
-            . pkgmngrs/install_ppa.sh
+            . $TOP/cli-tools/pkgmngrs/install_ppa.sh
         fi
         
         eval "$pac_ins_y debhelper-compat devscripts build-essential fakeroot libncurses-dev" 

@@ -1,51 +1,65 @@
-if ! [[ -f checks/check_all.sh ]]; then
+# https://code.visualstudio.com/
+# https://neovim.io/doc/user/diff.html#_4.-diff-copying
+# https://mergiraf.org/
+# https://meldmerge.org/
+# https://kdiff3.sourceforge.net/
+# https://github.com/sourcegear/diffmerge
+# https://apps.kde.org/kompare/
+# https://www.perforce.com/products/helix-core-apps/merge-diff-tool-p4merge
+# https://www.sublimemerge.com/
+
+hash code &> /dev/null && hash nvim &> /dev/null && hash fac &> /dev/null && hash mergiraf &> /dev/null && hash meld &> /dev/null && hash diffmerge &> /dev/null && hash kdiff3 &> /dev/null && hash kompare &> /dev/null && hash p4merge &> /dev/null && hash smerge &> /dev/null && SYSTEM_UPDATED='TRUE' 
+
+TOP=$(git rev-parse --show-toplevel)
+
+if ! [[ -f $TOP/checks/check_all.sh ]]; then
     if hash curl &> /dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
-
-SCRIPT_DIR=$(get-script-dir)
 
 reade -Q "GREEN" -i "vscode mergiraf fac meld diffmerge kompare kdiff3 p4merge sublime nvim" -p "Which to install? [Vscode/mergiraf/fac(fixallconflicts)/meld/diffmerge/kdiff3/kompare/p4merge/sublime(sublime merge)/nvim]: " merger
 
 if [[ $merger == 'nvim' ]] ;then
    if ! hash nvim &> /dev/null; then
-        if ! [[ -f cli-tools/install_neovim.sh ]]; then
+        if ! [[ -f $TOP/cli-tools/install_neovim.sh ]]; then
             source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_neovim.sh)
         else
-            . cli-tools/install_neovim.sh
+            . $TOP/cli-tools/install_neovim.sh
         fi 
    fi
 
 elif [[ $merger == 'vscode' ]] ;then
    if ! hash code &> /dev/null; then
-        if ! [[ -f install_visual_studio_code.sh ]]; then
+        if ! [[ -f $TOP/install_visual_studio_code.sh ]]; then
             source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_visual_studio_code.sh)
         else
-            . install_visual_studio_code.sh
+            . $TOP/install_visual_studio_code.sh
         fi 
    fi
 
 elif [[ $merger == 'fac' ]] ;then
-    if ! hash go &> /dev/null; then
-        if ! [[ -f cli-tools/pkgmngrs/install_go.sh ]]; then
+    if ! hash go &> /dev/null || ! [[ $PATH =~ "$(go env GOPATH)/bin" ]]; then
+        if ! [[ -f $TOP/cli-tools/pkgmngrs/install_go.sh ]]; then
             source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pkgmngrs/install_go.sh)
         else
-            . cli-tools/pkgmngrs/install_go.sh
+            . $TOP/cli-tools/pkgmngrs/install_go.sh
         fi
     fi
-    go install github.com/mkchoi212/fac@latest 
+    if ! hash fac &> /dev/null; then
+        go install github.com/mkchoi212/fac@latest 
+    fi
 
 elif [[ $merger == 'mergiraf' ]] ;then
     if ! hash cargo &> /dev/null; then
-        if ! [[ -f pkgmngrs/install_cargo.sh ]]; then
+        if ! [[ -f $TOP/cli-tools/pkgmngrs/install_cargo.sh ]]; then
             source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pkgmngrs/install_cargo.sh)
         else
-            . cli-tools/pkgmngrs/install_cargo.sh
+            . $TOP/cli-tools/pkgmngrs/install_cargo.sh
         fi
     fi
     cargo install --locked mergiraf
@@ -53,10 +67,10 @@ elif [[ $merger == 'mergiraf' ]] ;then
 elif [[ $merger == 'meld' ]] ;then
     if [[ $machine == 'Mac' ]]; then
         if ! hash brew &> /dev/null; then
-            if ! [[ -f cli-tools/pkgmngrs/install_brew.sh ]]; then
+            if ! [[ -f $TOP/cli-tools/pkgmngrs/install_brew.sh ]]; then
                 source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pkgmngrs/install_brew.sh)
             else
-                . cli-tools/pkgmngrs/install_brew.sh
+                . $TOP/cli-tools/pkgmngrs/install_brew.sh
             fi
         fi
         brew install meld 
@@ -68,10 +82,10 @@ elif [[ $merger == 'meld' ]] ;then
         sudo dnf install meld 
     else
         if ! hash pipx &> /dev/null; then
-            if ! [[ -f cli-tools/pkgmngrs/install_pipx.sh ]]; then
+            if ! [[ -f $TOP/cli-tools/pkgmngrs/install_pipx.sh ]]; then
                 source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pkgmngrs/install_pipx.sh)
             else
-                . cli-tools/pkgmngrs/install_pipx.sh
+                . $TOP/cli-tools/pkgmngrs/install_pipx.sh
             fi
         fi
         pipx install meld
@@ -96,38 +110,38 @@ elif [[ $merger == 'kdiff3' ]] ;then
 elif [[ $merger == 'diffmerge' ]] ;then
    if ! hash diffmerge &> /dev/null; then
         if [[ $distro_base == 'Arch' ]]; then
-            if ! [[ -f checks/check_AUR.sh ]]; then
+            if ! [[ -f $TOP/checks/check_AUR.sh ]]; then
                 source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_AUR.sh)
             else
-                . checks/check_AUR.sh
+                . $TOP/checks/check_AUR.sh
             fi
-            eval "$AUR_ins diffmerge" 
+            eval "$AUR_ins_y diffmerge" 
         elif [[ $distro_base == 'Debian' ]]; then
             if ! hash wget &> /dev/null || ! hash jq &> /dev/null; then
                 echo "Next $(tput setaf 1)sudo$(tput sgr0) will install 'wget' and 'jq'"
                 sudo apt install -y jq wget 
             fi
 
-            if ! [[ -f aliases/.aliases.d/git.sh ]]; then
+            if ! [[ -f $TOP/aliases/.aliases.d/git.sh ]]; then
                 source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/git.sh)
             else
-                . aliases/.aliases.d/git.sh
+                . $TOP/aliases/.aliases.d/git.sh
             fi
             #get-latest-releases-github 'https://github.com/sourcegear/diffmerge'  
         fi
    fi
 
 elif [[ $merger == 'kompare' ]] ;then
-    if ! hash kdiff3 &> /dev/null; then
+    if ! hash kompare &> /dev/null; then
         if [[ $distro_base == 'Debian' ]]; then
             sudo apt install kompare
         elif [[ $distro_base == 'Arch' ]]; then
             sudo pacman -S kompare
         elif [[ $machine == 'Linux' ]]; then
-            if ! [[ -f cli-tools/pkgmngrs/install_flatpak.sh ]]; then
+            if ! [[ -f $TOP/cli-tools/pkgmngrs/install_flatpak.sh ]]; then
                 source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pkgmngrs/install_flatpak.sh)
             else
-                . cli-tools/pkgmngrs//install_flatpak.sh
+                . $TOP/cli-tools/pkgmngrs//install_flatpak.sh
             fi
             flatpak install kompare 
         fi 
@@ -135,12 +149,12 @@ elif [[ $merger == 'kompare' ]] ;then
 
 elif [[ $merger == 'p4merge' ]] ;then
 
-    if ! hash kdiff3 &> /dev/null; then
+    if ! hash p4merge &> /dev/null; then
         if [[ $distro_base == 'Arch' ]]; then
-            if ! [[ -f checks/check_AUR.sh ]]; then
+            if ! [[ -f $TOP/checks/check_AUR.sh ]]; then
                 source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_AUR.sh)
             else 
-                . checks/check_AUR.sh
+                . $TOP/checks/check_AUR.sh
             fi
             if [[ -n "$AUR_ins" ]]; then
                 if [[ -n "$AUR_ins_y" ]]; then
@@ -159,7 +173,8 @@ elif [[ $merger == 'p4merge' ]] ;then
 
 elif [[ $merger == 'sublime' ]] ;then
 
-    if ! [[ -f /opt/sublime_merge/sublime_merge ]]; then
+    if ! hash smerge &> /dev/null; then
+        
         if [[ $distro_base == 'Debian' ]]; then
             wget-curl https://download.sublimetext.com/sublimehq-pub.gpg | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/sublimehq-archive.gpg > /dev/null
             if [[ -z $(apt list --installed apt-transport-https 2> /dev/null) ]]; then

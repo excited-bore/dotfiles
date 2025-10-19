@@ -2,25 +2,25 @@
 
 hash fzf &> /dev/null && SYSTEM_UPDATED='TRUE'
 
-if ! test -f ../checks/check_all.sh; then
+TOP=$(git rev-parse --show-toplevel)
+
+if ! test -f $TOP/checks/check_all.sh; then
     if hash curl &> /dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ../checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
-
-SCRIPT_DIR=$(get-script-dir)
 
 # Doesn't matter the argument, will just assume were doing a simple installation
 
 if [ -z "$1" ]; then
-    if ! test -f ../checks/check_envvar_aliases_completions_keybinds.sh; then
+    if ! test -f $TOP/checks/check_envvar_aliases_completions_keybinds.sh; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar_aliases_completions_keybinds.sh)
     else
-        . ../checks/check_envvar_aliases_completions_keybinds.sh
+        . $TOP/checks/check_envvar_aliases_completions_keybinds.sh
     fi
 fi
 
@@ -104,10 +104,10 @@ if [[ -z "$1" ]]; then
     if ! hash fd-find &> /dev/null && ! hash fd &> /dev/null; then
         readyn -p "Install fd and use for fzf? (A faster variant of 'find')" fdr
         if [[ "$fdr" == "y" ]]; then
-            if ! [ -f install_fd.sh ]; then
+            if ! [ -f $TOP/cli-tools/install_fd.sh ]; then
                 source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_fd.sh)
             else
-                . ./install_fd.sh
+                . $TOP/cli-tools/install_fd.sh
             fi
         fi
     fi
@@ -116,10 +116,10 @@ if [[ -z "$1" ]]; then
     if ! hash bfs &> /dev/null; then
         readyn -p "Install bfs (A breadth-first find variant rather then depth-first - first results are closer to current directory)?" bfsnstll
         if [[ "$bfsnstll" == "y" ]]; then
-            if ! test -f install_bfs.sh; then
+            if ! test -f $TOP/cli-tools/install_bfs.sh; then
                 source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_bfs.sh)
             else
-                . ./install_bfs.sh
+                . $TOP/cli-tools/install_bfs.sh
             fi
         fi
     fi
@@ -140,10 +140,10 @@ if [[ -z "$1" ]]; then
     if ! hash bat &> /dev/null; then
         readyn -p "Install bat? (File previews/thumbnails for riflesearch)" bat
         if [[ "$bat" == "y" ]]; then
-            if ! test -f install_bat.sh; then
+            if ! test -f $TOP/cli-tools/install_bat.sh; then
                 source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_bat.sh)
             else
-                . ./install_bat.sh
+                . $TOP/cli-tools/install_bat.sh
             fi
         fi
         unset bat
@@ -153,10 +153,10 @@ if [[ -z "$1" ]]; then
     if ! hash tree &> /dev/null; then
         readyn -p "Install tree? (Builtin cd shortcut gets a nice directory tree preview )" tree
         if [[ "$tree" == "y" ]]; then
-            if ! test -f install_tree.sh; then
+            if ! test -f $TOP/cli-tools/install_tree.sh; then
                 source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_tree.sh)
             else
-                . ./install_tree.sh
+                . $TOP/cli-tools/install_tree.sh
             fi
         fi
         unset tree
@@ -166,10 +166,10 @@ if [[ -z "$1" ]]; then
     if ! hash ffmpegthumbnailer &> /dev/null; then
         readyn -p "Install ffmpegthumbnailer? (Video thumbnails for riflesearch)" ffmpg
         if [[ "$ffmpg" == "y" ]]; then
-            if ! test -f install_ffmpegthumbnailer.sh; then
-                source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_ffmpegthumbnailer.sh)
+            if ! test -f $TOP/cli-tools/install_ffmpegthumbnailer.sh; then
+                source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_ffmpegthumbnailer.sh)
             else
-                . ./install_ffmpegthumbnailer.sh
+                . $TOP/cli-tools/install_ffmpegthumbnailer.sh
             fi
         fi
         unset ffmpg
@@ -181,10 +181,10 @@ if [[ -z "$1" ]]; then
     if ! hash rg &> /dev/null; then
         readyn -y -p "Install ripgrep? (Recursive grep, opens possibility for line by line fzf )" rpgrp
         if [[ "$rpgrp" == "y" ]]; then
-            if ! test -f install_ripgrep.sh; then
+            if ! test -f $TOP/cli-tools/install_ripgrep.sh; then
                 source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_ripgrep.sh)
             else
-                . ./install_ripgrep.sh
+                . $TOP/cli-tools/install_ripgrep.sh
             fi
             if [[ $ENV == ~/.environment.env ]]; then
                 sed -i 's|#export RG_PREFIX|export RG_PREFIX|g' $ENV
@@ -199,8 +199,8 @@ if [[ -z "$1" ]]; then
 
             readyn -p "Add shortcut for ripgrep files in dir? (Ctrl-g)" rpgrpdir
             if [[ "$rpgrpdir" == "y" ]]; then
-                if test -f aliases/.aliases.d/ripgrep-directory.sh; then
-                    cp aliases/.aliases.d/ripgrep-directory.sh ~/.aliases.d/
+                if test -f $TOP/aliases/.aliases.d/ripgrep-directory.sh; then
+                    cp $TOP/aliases/.aliases.d/ripgrep-directory.sh ~/.aliases.d/
                 else
                     wget-aria-dir ~/.aliases.d/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/ripgrep-directory.sh
                 fi
@@ -212,10 +212,10 @@ if [[ -z "$1" ]]; then
     # XCLIP / WL-CLIPBOARD
     if [[ $machine == 'Linux' ]]; then
         if ([[ "$XDG_SESSION_TYPE" == 'x11' ]] && (! hash xclip &> /dev/null || ! hash xsel &> /dev/null)) || ([[ "$XDG_SESSION_TYPE" == 'wayland' ]] && (! hash wl-copy &> /dev/null || ! hash wl-paste &> /dev/null)); then
-            if ! test -f ../install_linux_clipboard.sh; then
+            if ! test -f $TOP/install_linux_clipboard.sh; then
                 source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_linux_clipboard.sh)
             else
-                . ../install_linux_clipboard.sh
+                . $TOP/install_linux_clipboard.sh
             fi
         fi
         if ([[ "$XDG_SESSION_TYPE" == 'x11' ]] && (hash xclip &> /dev/null)) || ([[ "$XDG_SESSION_TYPE" == 'wayland' ]] && (hash wl-copy &> /dev/null)); then
@@ -262,12 +262,12 @@ if [[ -z "$1" ]]; then
         sed -i 's/#--bind/--bind/' $ENV
         sed -i 's/#--preview-window/--preview-window/' $ENV
         sed -i 's/#--color/--color/' $ENV
-        if type tree &>/dev/null; then
+        if hash tree &>/dev/null; then
             sed -i 's|#export FZF_ALT_C_OPTS=|export FZF_ALT_C_OPTS=|g' $ENV
         fi
     elif ! grep -q "export FZF_DEFAULT_COMMAND" $ENV; then
         printf "\n# FZF\nexport FZF_DEFAULT_COMMAND=\"$fnd\"\nexport FZF_CTRL_T_COMMAND='$FZF_DEFAULT_COMMAND'\n" >>$ENV &>/dev/null
-        if type tree &>/dev/null; then
+        if hash tree &>/dev/null; then
             printf "export FZF_ALT_C_OPTS=\"--preview 'tree -C {}\"\n" >>$ENV &>/dev/null
         fi
     fi
@@ -357,10 +357,10 @@ if [[ -z "$1" ]]; then
     if ! test -f ~/.aliases.d/docker-fzf.sh; then
         readyn -p "Install fzf-docker (fzf aliases for docker)?" -c "! test -f $HOME/.aliases.d/docker-fzf.sh" fzf_d
         if [[ "$fzf_d" == "y" ]]; then
-            if ! test -f ../checks/check_aliases_dir.sh; then
+            if ! test -f $TOP/checks/check_aliases_dir.sh; then
                 source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)
             else
-                . ../checks/check_aliases_dir.sh
+                . $TOP/checks/check_aliases_dir.sh
             fi
             wget-aria-name ~/.aliases.d/docker-fzf.sh https://raw.githubusercontent.com/MartinRamm/fzf-docker/master/docker-fzf
         fi

@@ -1,20 +1,24 @@
+# https://zellij.dev/
+
 hash zellij &> /dev/null && SYSTEM_UPDATED='TRUE'
 
-if ! [[ -f ../checks/check_all.sh ]]; then
+TOP=$(git rev-parse --show-toplevel)
+
+if ! [[ -f $TOP/checks/check_all.sh ]]; then
     if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ../checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
 
 if ! hash cargo &> /dev/null; then
-    if ! [[ -f pkgmngrs/install_cargo.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/pkgmngrs/install_cargo.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pkgmngrs/install_cargo.sh)
     else
-       . pkgmngrs/install_cargo.sh
+       . $TOP/cli-tools/pkgmngrs/install_cargo.sh
     fi
 fi
 

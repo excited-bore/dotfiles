@@ -1,13 +1,17 @@
+# https://github.com/muesli/duf
+
 hash duf &> /dev/null && SYSTEM_UPDATED='TRUE'
 
-if ! test -f ../checks/check_all.sh; then
+TOP=$(git rev-parse --show-toplevel)
+
+if ! test -f $TOP/checks/check_all.sh; then
     if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ../checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
 
 
@@ -24,10 +28,10 @@ if ! hash duf &> /dev/null; then
             eval "${pac_ins_y}" git
         fi
          
-        if ! test -f ../install_go.sh; then
-            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_go.sh) 
+        if ! test -f $TOP/cli-tools/pkgmngrs/install_go.sh; then
+            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pkgmngrs/install_go.sh) 
         else
-            . ../install_go.sh
+            . $TOP/cli-tools/pkgmngrs/install_go.sh
         fi
         
         (cd $TMPDIR

@@ -1,16 +1,18 @@
 # https://github.com/jesseduffield/lazygit
 
-if ! test -f ../checks/check_all.sh; then
+hash lazygit &> /dev/null && SYSTEM_UPDATED='TRUE'
+
+TOP=$(git rev-parse --show-toplevel)
+
+if ! test -f $TOP/checks/check_all.sh; then
     if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ../checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
-
-SCRIPT_DIR=$(get-script-dir)
 
 if ! hash lazygit &>/dev/null; then
     if [[ "$distro_base" == "Arch" ]]; then
@@ -36,7 +38,7 @@ if ! hash lazygit &>/dev/null; then
 fi
 lazygit --help | $PAGER
 
-file=lazygit/.config/lazygit/config.yml.example
+file=$TOP/cli-tools/lazygit/.config/lazygit/config.yml.example
 if ! test -f $file; then
     dir=$(mktemp -d) 
     wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/lazygit/.config/lazygit/config.yml.example) > $dir/config.yml.example
@@ -50,20 +52,20 @@ if [[ 'y' == $conflazy ]]; then
         cp $file $XDG_CONFIG_HOME/lazygit/config.yml.example
     }
     yes-edit-no -g "$file" -p 'Copy an example lazygit yaml config file into $XDG_CONFIG_HOME/lazygit/?' -f cp_lazy_conf -c "test -f $XDG_CONFIG_HOME/lazygit/config.yml.example || ! (test -f $XDG_CONFIG_HOME/lazygit/config.yml.example && [[ -n $(diff $XDG_CONFIG_HOME/lazygit/config.yml.example $file 2>/dev/null) ]])"
-    if ! [[ -f install_git.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/install_git.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_git.sh)
     else
-        . ./install_git.sh
+        . $TOP/cli-tools/install_git.sh
     fi
 
     readyn -Y "CYAN" -p "Configure custom interactive diff filter for Lazygit?" gitdiff1
     if [[ "y" == "$gitdiff1" ]]; then
         readyn -p "Install custom diff syntax highlighter?" -c "hash delta &> /dev/null || hash diff-so-fancy &> /dev/null || hash riff &> /dev/null || hash ydiff &> /dev/null || hash diffr &> /dev/null || hash colordiff &> /dev/null || hash kdiff3 &> /dev/null || hash p4merge &> /dev/null || hash difft &> /dev/null" gitpgr
         if [[ "$gitpgr" == "y" ]]; then
-            if ! [[ -f ../install_differ.sh ]]; then
+            if ! [[ -f $TOP/install_differ.sh ]]; then
                 source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_differ.sh)
             else
-                . ../install_differ.sh
+                . $TOP/install_differ.sh
             fi
         fi
         git_hl "lazygit"

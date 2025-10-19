@@ -1,36 +1,39 @@
+# https://code.visualstudio.com/
 
-if ! test -f checks/check_all.sh; then
-    if type curl &>/dev/null; then
+hash code &> /dev/null && SYSTEM_UPDATED='TRUE'
+
+TOP=$(git rev-parse --show-toplevel)
+
+if ! test -f $TOP/checks/check_all.sh; then
+    if hash curl &> /dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-        return 1 || exit 1
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ./checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
 
-if ! type code &> /dev/null; then
+if ! hash code &> /dev/null; then
     if [[ "$distro_base" == "Arch" ]]; then
-        if ! test -f checks/check_AUR.sh; then
-            source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_AUR.sh)
+        if ! test -f $TOP/checks/check_AUR.sh; then
+            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_AUR.sh)
         else 
-            . ./checks/check_AUR.sh
+            . $TOP/checks/check_AUR.sh
         fi
-        if test -n "$AUR_ins"; then 
+        if test -n "$AUR_ins_y"; then 
+            eval "$AUR_ins" visual-studio-code-bin
+        else 
             eval "$AUR_ins" visual-studio-code-bin
         fi
     elif [[ $distro_base == "Debian" ]]; then
-        if ! type wget &> /dev/null; then
-           eval "$pac_ins wget"
-        fi
         if test -z $(apt list --installed software-properties-common 2> /dev/null); then
-            eval "$pac_ins software-properties-common "
+            eval "$pac_ins_y software-properties-common "
         fi
         if test -z $(apt list --installed apt-transport-https 2> /dev/null); then
-            eval "$pac_ins apt-transport-https "
+            eval "$pac_ins_y apt-transport-https "
         fi
-        curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add - 
+        wget-curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add - 
         sudo add-apt-repository "deb [arch=$arch] https://packages.microsoft.com/repos/vscode stable main" 
         sudo apt update 
         eval "$pac_ins code"

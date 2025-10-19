@@ -3,21 +3,22 @@
 [[ "$XDG_SESSION_TYPE" == 'wayland' ]] && hash jq &> /dev/null && hash unzip &> /dev/null && hash fzf &> /dev/null && hash magick &> /dev/null && hash nsxiv &> /dev/null && 
     SYSTEM_UPDATED='TRUE'
 
+TOP=$(git rev-parse --show-toplevel)
 
-if ! test -f checks/check_all.sh; then
+if ! test -f $TOP/checks/check_all.sh; then
     if hash curl &> /dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ./checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
 
-if ! test -f aliases/.aliases.d/git.sh; then
+if ! test -f $TOP/aliases/.aliases.d/git.sh; then
     source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/git.sh)
 else
-    . ./aliases/.aliases.d/git.sh
+    . $TOP/aliases/.aliases.d/git.sh
 fi
 
 if ! [ -d $XDG_DATA_HOME/fonts ]; then
@@ -25,10 +26,10 @@ if ! [ -d $XDG_DATA_HOME/fonts ]; then
 fi
 
 if ! hash fzf &> /dev/null; then
-    if ! test -f cli-tools/install_fzf.sh; then
+    if ! test -f $TOP/cli-tools/install_fzf.sh; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_fzf.sh 'simple')
     else
-        . cli-tools/install_fzf.sh 'simple'
+        . $TOP/cli-tools/install_fzf.sh 'simple'
     fi
 fi
 
@@ -96,10 +97,10 @@ if test -n "$name"; then
             readyn -p "Install 'imagemagick' and 'ueberzugpp' to preview/show fonts?" yhno
             if [[ "$yhno" == 'y' ]]; then
                 if ! hash ueberzugpp &> /dev/null; then
-                    if ! test -f cli-tools/install_ueberzugpp.sh; then
+                    if ! test -f $TOP/cli-tools/install_ueberzugpp.sh; then
                         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_ueberzugpp.sh)
                     else
-                        . cli-tools/install_ueberzugpp.sh
+                        . $TOP/cli-tools/install_ueberzugpp.sh
                     fi
                 fi
             fi

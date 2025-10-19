@@ -1,21 +1,21 @@
 SYSTEM_UPDATED="TRUE"
 
-if ! [[ -f checks/check_all.sh ]]; then
+TOP=$(git rev-parse --show-toplevel)
+
+if ! [[ -f $TOP/checks/check_all.sh ]]; then
     if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ./checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
 
-SCRIPT_DIR=$(get-script-dir)
-
-if ! [[ -f $SCRIPT_DIR/checks/check_defaultTerm_keybind.sh ]]; then
+if ! [[ -f $TOP/checks/check_defaultTerm_keybind.sh ]]; then
    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_defaultTerm_keybind.sh)
 else
-   source $SCRIPT_DIR/checks/check_defaultTerm_keybind.sh 
+   source $TOP/checks/check_defaultTerm_keybind.sh 
 fi
 
 
@@ -26,13 +26,13 @@ fi
 
 # Shell-keybinds
 
-binds=$SCRIPT_DIR/keybinds/.inputrc
-binds0=$SCRIPT_DIR/keybinds/.keybinds.d/00-bind-empty.bash
-binds1=$SCRIPT_DIR/keybinds/.keybinds.d/01-cdw.bash
-binds2=$SCRIPT_DIR/keybinds/.keybinds.d/02-keybinds.bash
-binds3=$SCRIPT_DIR/keybinds/.keybinds.d/00-bind-empty.zsh
-binds4=$SCRIPT_DIR/keybinds/.keybinds.d/01-keybinds.zsh
-binds5=$SCRIPT_DIR/keybinds/.keybinds
+binds=$TOP/keybinds/.inputrc
+binds0=$TOP/keybinds/.keybinds.d/00-bind-empty.bash
+binds1=$TOP/keybinds/.keybinds.d/01-cdw.bash
+binds2=$TOP/keybinds/.keybinds.d/02-keybinds.bash
+binds3=$TOP/keybinds/.keybinds.d/00-bind-empty.zsh
+binds4=$TOP/keybinds/.keybinds.d/01-keybinds.zsh
+binds5=$TOP/keybinds/.keybinds
 if ! [[ -f $binds ]]; then
     tmp=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.inputrc > $tmp
     tmp0=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds.d/00-binds-empty.bash > $tmp0
@@ -79,10 +79,10 @@ shell-keybinds_r() {
 }
 
 shell-keybinds() {
-    if ! [[ -f $SCRIPT_DIR/checks/check_keybinds.sh ]]; then
+    if ! [[ -f $TOP/checks/check_keybinds.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_keybinds.sh)
     else
-        . $SCRIPT_DIR/checks/check_keybinds.sh
+        . $TOP/checks/check_keybinds.sh
     fi
 
     sed -i "s|^set show-mode-in-prompt .*|#set show-mode-in-prompt on|g" $binds
@@ -181,7 +181,7 @@ if [[ "$DESKTOP_SESSION" == 'xfce' ]]; then
         readyn -p "Set default terminal emulator for ${CYAN}xfce4${GREEN}?" deftermemyn
         if [[ $deftermemyn == 'y' ]]; then
             termems="xfce4-terminal" 
-            if type kitty &> /dev/null; then
+            if hash kitty &> /dev/null; then
                 termems="kitty $termems" 
             fi
              

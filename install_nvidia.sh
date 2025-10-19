@@ -1,11 +1,15 @@
-if ! test -f checks/check_all.sh; then
+# TODO: FIXME
+
+TOP=$(git rev-parse --show-toplevel)
+
+if ! test -f $TOP/checks/check_all.sh; then
     if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ./checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
 
 echo "Next $(tput setaf 1)sudo$(tput sgr0) will check whether you're using an nvidia gpu or not"

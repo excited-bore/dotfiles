@@ -1,23 +1,23 @@
 hash git &> /dev/null && SYSTEM_UPDATED='TRUE'
 
+TOP=$(git rev-parse --show-toplevel)
+
 echo "$(tput setaf 6)This script uses $(tput setaf 2)rlwrap$(tput setaf 6) and $(tput setaf 2)fzf$(tput sgr0)."
 
-if ! [[ -f ../checks/check_all.sh ]]; then
+if ! [[ -f $TOP/checks/check_all.sh ]]; then
     if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ../checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
 
-SCRIPT_DIR=$(get-script-dir)
-
-if ! [[ -f ../checks/check_envvar.sh ]]; then
+if ! [[ -f $TOP/checks/check_envvar.sh ]]; then
     source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)
 else
-    . ../checks/check_envvar.sh
+    . $TOP/checks/check_envvar.sh
 fi
 
 if ! hash fzf &> /dev/null; then
@@ -347,54 +347,54 @@ function git_hl() {
             diff="$(echo $diff | awk '{print $1;}')"
             eval "$cmd $diff$opts"
         elif [[ "$cmd" =~ 'lazygit' ]]; then
-            if ! test -f ~/.config/lazygit/config.yml; then
-                touch ~/.config/lazygit/config.yml
+            if ! test -f $XDG_CONFIG_HOME/lazygit/config.yml; then
+                touch $XDG_CONFIG_HOME/lazygit/config.yml
             fi
             if test -n "$sidepanelw"; then
-                if ! grep -q 'sidePanelWidth:' ~/.config/lazygit/config.yml; then
-                    printf "gui:\n sidePanelWidth: $sidepanelw\n" >>~/.config/lazygit/config.yml
+                if ! grep -q 'sidePanelWidth:' $XDG_CONFIG_HOME/lazygit/config.yml; then
+                    printf "gui:\n sidePanelWidth: $sidepanelw\n" >>$XDG_CONFIG_HOME/lazygit/config.yml
                 else
-                    sed -i 's/^[ \t]*sidePanelWidth:*.*/ sidePanelWidth: '"$sidepanelw"'/g' ~/.config/lazygit/config.yml
+                    sed -i 's/^[ \t]*sidePanelWidth:*.*/ sidePanelWidth: '"$sidepanelw"'/g' $XDG_CONFIG_HOME/lazygit/config.yml
                 fi
             fi
 
-            if ! grep -q 'git:' ~/.config/lazygit/config.yml; then
+            if ! grep -q 'git:' $XDG_CONFIG_HOME/lazygit/config.yml; then
                 if [[ "$extrn" == 'n' ]]; then
-                    printf "git:\n paging:\n   useConfig: false\n   colorArg: $colorArg\n   pager: $diff$opts\n" >>~/.config/lazygit/config.yml
+                    printf "git:\n paging:\n   useConfig: false\n   colorArg: $colorArg\n   pager: $diff$opts\n" >>$XDG_CONFIG_HOME/lazygit/config.yml
                 else
-                    printf "git:\n paging:\n   externalDiffCommand: $diff$opts\n" >>~/.config/lazygit/config.yml
+                    printf "git:\n paging:\n   externalDiffCommand: $diff$opts\n" >>$XDG_CONFIG_HOME/lazygit/config.yml
                 fi
-            elif ! grep -q 'paging:' ~/.config/lazygit/config.yml; then
+            elif ! grep -q 'paging:' $XDG_CONFIG_HOME/lazygit/config.yml; then
                 if [[ "$extrn" == 'n' ]]; then
-                    sed -i 's/\(git:\)/\1\n paging:\n   useConfig: false\n   colorArg: '$colorArg'\n   pager: '"$diff$opts"'\n /g' ~/.config/lazygit/config.yml
+                    sed -i 's/\(git:\)/\1\n paging:\n   useConfig: false\n   colorArg: '$colorArg'\n   pager: '"$diff$opts"'\n /g' $XDG_CONFIG_HOME/lazygit/config.yml
                 else
-                    sed -i 's/\(git:\)/\1\n paging:\n   externalDiffCommand: '$colorArg'\n/g' ~/.config/lazygit/config.yml
+                    sed -i 's/\(git:\)/\1\n paging:\n   externalDiffCommand: '$colorArg'\n/g' $XDG_CONFIG_HOME/lazygit/config.yml
 
                 fi
             else
                 if [[ "$extrn" == 'n' ]]; then
-                    sed -i '/externalDiffCommand:.*/d' ~/.config/lazygit/config.yml
-                    if ! grep -q 'pager:' ~/.config/lazygit/config.yml; then
-                        sed -i 's/\(paging:\)/\1\n   useConfig: false\n   colorArg: '$colorArg'\n   pager: '"$diff$opts"'\n /g' ~/.config/lazygit/config.yml
+                    sed -i '/externalDiffCommand:.*/d' $XDG_CONFIG_HOME/lazygit/config.yml
+                    if ! grep -q 'pager:' $XDG_CONFIG_HOME/lazygit/config.yml; then
+                        sed -i 's/\(paging:\)/\1\n   useConfig: false\n   colorArg: '$colorArg'\n   pager: '"$diff$opts"'\n /g' $XDG_CONFIG_HOME/lazygit/config.yml
                     else
-                        sed -i 's/^[ \t]*colorArg:*.*/   colorArg: '"$colorArg"'/g' ~/.config/lazygit/config.yml
-                        sed -i 's/^[ \t]*pager:*.*/   pager: '"$diff$opts"'/g' ~/.config/lazygit/config.yml
+                        sed -i 's/^[ \t]*colorArg:*.*/   colorArg: '"$colorArg"'/g' $XDG_CONFIG_HOME/lazygit/config.yml
+                        sed -i 's/^[ \t]*pager:*.*/   pager: '"$diff$opts"'/g' $XDG_CONFIG_HOME/lazygit/config.yml
                     fi
                 elif [[ "$extrn" == 'y' ]]; then
-                    if ! grep -q 'externalDiffCommand:' ~/.config/lazygit/config.yml; then
-                        sed -i 's/\(paging:\)/\1\n   externalDiffCommand: '"$diff$opts"'\n/g' ~/.config/lazygit/config.yml
+                    if ! grep -q 'externalDiffCommand:' $XDG_CONFIG_HOME/lazygit/config.yml; then
+                        sed -i 's/\(paging:\)/\1\n   externalDiffCommand: '"$diff$opts"'\n/g' $XDG_CONFIG_HOME/lazygit/config.yml
                     else
-                        sed -i 's/^[ \t]*externalDiffCommand:*.*/   externalDiffCommand: '"$diff$opts"'\n/g' ~/.config/lazygit/config.yml
+                        sed -i 's/^[ \t]*externalDiffCommand:*.*/   externalDiffCommand: '"$diff$opts"'\n/g' $XDG_CONFIG_HOME/lazygit/config.yml
                     fi
                 fi
             fi
 
             # Cleanup - remove empty lines
-            sed -i '/^[[:space:]]*$/d' ~/.config/lazygit/config.yml
+            sed -i '/^[[:space:]]*$/d' $XDG_CONFIG_HOME/lazygit/config.yml
 
             # Then show changes
             printf "${GREEN}'$HOME/.config/lazygit/config.yml'${normal}\n"
-            eval "cat -b ~/.config/lazygit/config.yml | $PAGER"
+            eval "cat -b $XDG_CONFIG_HOME/lazygit/config.yml | $PAGER"
         fi
     fi
 
@@ -1035,10 +1035,10 @@ gitt() {
         printf "${CYAN}$pagersf${normal}"
         readyn -n -p "Install custom pager?" gitpgr
         if [[ "$gitpgr" == "y" ]]; then
-            if ! [[ -f ../install_pager.sh ]]; then
+            if ! [[ -f $TOP/install_pager.sh ]]; then
                 source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pager.sh)
             else
-                . ../install_pager.sh
+                . $TOP/install_pager.sh
             fi
         fi
 
@@ -1055,10 +1055,10 @@ gitt() {
 
         readyn -p "Install custom diff syntax highlighter?" -c "test -z '$diffs'" gitpgr
         if [[ "$gitpgr" == "y" ]]; then
-            if ! [[ -f ../install_differ.sh ]]; then
+            if ! [[ -f $TOP/install_differ.sh ]]; then
                 source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_differ.sh)
             else
-                . ../install_differ.sh
+                . $TOP/install_differ.sh
             fi
         fi
 
@@ -1115,10 +1115,10 @@ gitt() {
         if [[ "y" == "$gitdiff1" ]]; then
             readyn -p "Install custom diff syntax highlighter?" -c "test -z '$diffs'" gitpgr
             if [[ "$gitpgr" == "y" ]]; then
-                if ! [[ -f ../install_differ.sh ]]; then
+                if ! [[ -f $TOP/install_differ.sh ]]; then
                     source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_differ.sh)
                 else
-                    . ../install_differ.sh
+                    . $TOP/install_differ.sh
                 fi
             fi
             git_hl "git config $global interactive.difffilter"
@@ -1284,32 +1284,32 @@ gitt() {
         git config $global -e
     fi
 
-    readyn -p "Check and create global gitignore? (~/.config/git/ignore)" gitign
+    readyn -p "Check and create global gitignore? ($XDG_CONFIG_HOME/git/ignore)" gitign
     if [[ "y" == "$gitign" ]]; then
-        if ! test -f install_gitignore.sh; then
+        if ! test -f $TOP/cli-tools/install_gitignore.sh; then
             /bin/bash -c "$(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_gitignore.sh)"
         else
-            . ./install_gitignore.sh
+            . $TOP/cli-tools/install_gitignore.sh
         fi
     fi
 
     if ! hash lazygit &>/dev/null; then
         readyn -p "Install lazygit? (git TUI - terminal user interface)" gitlaz
         if [[ "y" == "$gitlaz" ]]; then
-            if ! test -f install_lazygit.sh; then
+            if ! test -f $TOP/cli-tools/install_lazygit.sh; then
                 source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_lazygit.sh)
             else
-                . ./install_lazygit.sh
+                . $TOP/cli-tools/install_lazygit.sh
             fi
         fi
     fi
 
     #local diffpre="n"
-    #if ! grep -q 'pager:' ~/.config/lazygit/config.yml ; then
+    #if ! grep -q 'pager:' $XDG_CONFIG_HOME/lazygit/config.yml ; then
     #    diffpre="y"
     #fi
 
-    #if ! hash lazygit &>/dev/null || ! grep -q 'pager:' ~/.config/lazygit/config.yml; then
+    #if ! hash lazygit &>/dev/null || ! grep -q 'pager:' $XDG_CONFIG_HOME/lazygit/config.yml; then
     #    readyn -Y "CYAN" -p "Configure custom interactive diff filter for Lazygit?" gitdiff1
     #    if [[ "y" == "$gitdiff1" ]]; then
     #        readyn -n -p "Install custom diff syntax highlighter?" gitpgr
@@ -1342,15 +1342,15 @@ gitt() {
     local gitals
     readyn -p "Install git.sh? (Git aliases)" gitals
     if [[ "$gitals" == "y" ]]; then
-        if ! [[ -f checks/check_aliases_dir.sh ]]; then
+        if ! [[ -f $TOP/checks/check_aliases_dir.sh ]]; then
             source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)
         else
-            . ./checks/check_aliases_dir.sh
+            . $TOP/checks/check_aliases_dir.sh
         fi
-        if ! [[ -f aliases/.aliases.d/git.sh ]]; then
+        if ! [[ -f $TOP/aliases/.aliases.d/git.sh ]]; then
             wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/git.sh > ~/.aliases.d/git.sh
         else
-            cp aliases/.aliases.d/git.sh ~/.aliases.d/
+            cp $TOP/aliases/.aliases.d/git.sh ~/.aliases.d/
         fi
     fi
 

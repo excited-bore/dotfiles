@@ -1,3 +1,5 @@
+# https://github.com/samaaron/ack
+
 hash ack &> /dev/null && SYSTEM_UPDATED='TRUE'
 
 TOP=$(git rev-parse --show-toplevel)

@@ -1,17 +1,20 @@
-#!/bin/bash
+# https://pypi.org/project/argcomplete/
 
-if ! test -f checks/check_all.sh; then
-    if type curl &>/dev/null; then
+hash activate-global-python-argcomplete &> /dev/null && SYSTEM_UPDATED='TRUE'
+
+TOP=$(git rev-parse --show-toplevel)
+
+if ! test -f $TOP/checks/check_all.sh; then
+    if hash curl &> /dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-        return 1 || exit 1
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ./checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
 
-if ! type activate-global-python-argcomplete &> /dev/null; then
+if ! hash activate-global-python-argcomplete &> /dev/null; then
     if [[ $distro_base == "Debian" ]]; then
         eval "$pac_ins python3 python-is-python3"
     elif [[ $distro_base == "Arch" ]]; then
@@ -19,23 +22,23 @@ if ! type activate-global-python-argcomplete &> /dev/null; then
     fi
 fi
 
-if type curl &> /dev/null && ! type pipx &> /dev/null; then
-   if ! test -f install_pipx.sh; then
-        source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pipx.sh) 
+if ! hash pipx &> /dev/null; then
+   if ! test -f $TOP/cli-tools/pkgmngrs/install_pipx.sh; then
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pkgmngrs/install_pipx.sh) 
     else
-        . ./install_pipx.sh
+        . $TOP/cli-tools/pkgmngrs/install_pipx.sh
     fi 
 fi
 
-if ! type pipx &> /dev/null && test -f $HOME/.local/bin/pipx; then
+if ! hash pipx &> /dev/null && test -f $HOME/.local/bin/pipx; then
     $HOME/.local/bin/pipx install argcomplete
 else
     pipx install argcomplete
 fi
 
-if type activate-global-python-argcomplete &> /dev/null; then
+if hash activate-global-python-argcomplete &> /dev/null; then
     activate-global-python-argcomplete --dest=/home/$USER/.bash_completion.d 
-elif type activate-global-python-argcomplete3 &> /dev/null; then
+elif hash activate-global-python-argcomplete3 &> /dev/null; then
     activate-global-python-argcomplete3 --dest=/home/$USER/.bash_completion.d 
 fi
     

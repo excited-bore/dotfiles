@@ -1,25 +1,26 @@
 #!/bin/bash
 
-if ! test -f checks/check_all.sh; then
-    if type curl &>/dev/null; then
+TOP=$(git rev-parse --show-toplevel)
+
+if ! test -f $TOP/checks/check_all.sh; then
+    if hash curl &> /dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-        return 1 || exit 1
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ./checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
 
-if ! type git &> /dev/null; then
+if ! hash git &> /dev/null; then
     eval "$pac_ins git"
 fi
 
-if ! type make &> /dev/null; then
+if ! hash make &> /dev/null; then
     eval "$pac_ins make "
 fi
 
-if ! type cmake &> /dev/null; then
+if ! hash cmake &> /dev/null; then
     eval "$pac_ins cmake "
 fi
 

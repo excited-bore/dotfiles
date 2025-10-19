@@ -1,19 +1,23 @@
+# https://github.com/yt-dlp/yt-dlp
+
 hash yt-dlp &> /dev/null && SYSTEM_UPDATED='TRUE' 
 
-if ! [[ -f ../checks/check_all.sh ]]; then
+TOP=$(git rev-parse --show-toplevel)
+
+if ! [[ -f $TOP/checks/check_all.sh ]]; then
     if hash curl &> /dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ../checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
 
-if ! [[ -f ../checks/check_aliases_dir.sh ]]; then
+if ! [[ -f $TOP/checks/check_aliases_dir.sh ]]; then
     source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)
 else
-    . ../checks/check_aliases_dir.sh
+    . $TOP/checks/check_aliases_dir.sh
 fi
 
 if ! hash yt-dlp &> /dev/null; then
@@ -40,8 +44,8 @@ if ! hash ffmpeg &> /dev/null; then
     fi
 fi
 
-ytbe=aliases/.aliases.d/youtube.sh
-if ! [[ -d aliases/.aliases.d/ ]]; then
+ytbe=$TOP/aliases/.aliases.d/youtube.sh
+if ! [[ -d $TOP/aliases/.aliases.d/ ]]; then
     wget-aria-dir $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/youtube.sh
     ytbe=$TMPDIR/youtube.sh
 fi

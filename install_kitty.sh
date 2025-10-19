@@ -1,14 +1,18 @@
-if ! [ -f checks/check_all.sh ]; then
+# https://sw.kovidgoyal.net/kitty/
+
+hash kitty &> /dev/null && SYSTEM_UPDATED='TRUE'
+
+TOP=$(git rev-parse --show-toplevel)
+
+if ! [ -f $TOP/checks/check_all.sh ]; then
     if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ./checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
-
-SCRIPT_DIR=$(get-script-dir)
 
 if ! hash kitty &>/dev/null; then
     if [[ "$distro_base" == "Arch" || "$distro_base" == "Debian" ]]; then
@@ -29,7 +33,10 @@ if [[ "$distro_base" == 'Arch' ]] && ! ls /usr/share/fonts/noto | grep -i -q emo
     unset emoji
 fi
 
-if ! [ -d kitty/.config/kitty ]; then
+if [ -d $TOP/kitty/.config/kitty ]; then
+    dir=$TOP/kitty/.config/kitty
+    file=$TOP/kitty/.aliases.d/kitty.sh
+else
     tmpdir=$(mktemp -d -t kitty-XXXXXXXXXX)
     tmpfile=$(mktemp)
     wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/download_git_directory.sh | tee "$tmpfile" &>/dev/null
@@ -38,9 +45,6 @@ if ! [ -d kitty/.config/kitty ]; then
     wget-aria-dir $tmpdir https://raw.githubusercontent.com/excited-bore/dotfiles/main/kitty/.aliases.d/kitty.sh
     dir=$tmpdir/kitty/.config/kitty
     file=$tmpdir/kitty.sh
-else
-    dir=kitty/.config/kitty
-    file=kitty/.aliases.d/kitty.sh
 fi
 
 splits_lay="\t  ${bold}Splits${normal}

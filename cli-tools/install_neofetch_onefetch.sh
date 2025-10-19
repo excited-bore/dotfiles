@@ -1,16 +1,22 @@
+# https://github.com/dylanaraps/neofetch
+# https://github.com/fastfetch-cli/fastfetch
+# https://github.com/KittyKatt/screenFetch
+
+# https://github.com/o2sh/onefetch
+
 hash neofetch &>/dev/null || hash fastfetch &>/dev/null || hash screenFetch &>/dev/null && SYSTEM_UPDATED="TRUE"
 
-if ! test -f ../checks/check_all.sh; then
+TOP=$(git rev-parse --show-toplevel)
+
+if ! test -f $TOP/checks/check_all.sh; then
     if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ../checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
-
-SCRIPT_DIR=$(get-script-dir)
 
 if ! hash neofetch &>/dev/null && ! hash fastfetch &>/dev/null && ! hash screenFetch &>/dev/null; then
     #readyn -p "Install neofetch/fastfetch/screenFetch? "" sym2
@@ -22,8 +28,8 @@ if ! hash neofetch &>/dev/null && ! hash fastfetch &>/dev/null && ! hash screenF
             eval "${pac_ins_y}" neofetch
         fi
 
-        if ! test -f ~/.config/neofetch/config.conf; then
-            if test -f neofetch/.config/neofetch/config.conf; then
+        if ! test -f $XDG_CONFIG_HOME/neofetch/config.conf; then
+            if test -f $TOP/cli-tools/neofetch/.config/neofetch/config.conf; then
                 file=neofetch/.config/neofetch/config.conf
             else
                 dir1="$(mktemp -d -t tmux-XXXXXXXXXX)"
@@ -32,8 +38,8 @@ if ! hash neofetch &>/dev/null && ! hash fastfetch &>/dev/null && ! hash screenF
             fi
 
             function neofetch_conf() {
-                mkdir -p ~/.config/neofetch
-                cp $file ~/.config/neofetch/
+                mkdir -p $XDG_CONFIG_HOME/neofetch
+                cp $file $XDG_CONFIG_HOME/neofetch/
             }
             yes-edit-no -f neofetch_conf -g "$file" -p "Install neofetch config.conf at $HOME/.config/neofetch/?"
             neofetch
@@ -74,15 +80,15 @@ if ! hash onefetch &>/dev/null; then
             eval "${pac_ins_y}" onefetch
         elif [[ $distro_base == 'Debian' ]]; then
             if ! hash add-apt-repository &> /dev/null; then     
-                if ! test -f pkgmngrs/install_ppa.sh; then
+                if ! test -f $TOP/cli-tools/pkgmngrs/install_ppa.sh; then
                     source <(wget-curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pkgmngrs/install_ppa.sh)
                 else
-                    . pkgmngrs/install_ppa.sh
+                    . $TOP/cli-tools/pkgmngrs/install_ppa.sh
                 fi
-                if ! test -f ../aliases/.aliases.d/package_managers.sh; then
+                if ! test -f $TOP/aliases/.aliases.d/package_managers.sh; then
                     source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/package_managers.sh)
                 else
-                    . ../aliases/.aliases.d/package_managers.sh
+                    . $TOP/aliases/.aliases.d/package_managers.sh
                 fi
             fi 
             if hash add-apt-repository &>/dev/null && [[ $(check-ppa ppa:o2sh/onefetch) =~ 'OK' ]]; then
@@ -103,10 +109,10 @@ if ! hash onefetch &>/dev/null; then
         elif type nix-env &>/dev/null; then
             nix-env -i onefetch
         else
-            if ! test -f pkgmngrs/install_cargo.sh; then
+            if ! test -f $TOP/cli-tools/pkgmngrs/install_cargo.sh; then
                 source <(wget-curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pkgmngrs/install_cargo.sh)
             else
-                . pkgmngrs/install_cargo.sh
+                . $TOP/cli-tools/pkgmngrs/install_cargo.sh
             fi
             cargo install onefetch
         fi

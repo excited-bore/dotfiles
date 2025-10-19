@@ -1,6 +1,8 @@
-file=rlwrap-scripts/reade
-file1=rlwrap-scripts/readyn
-file2=rlwrap-scripts/yes-edit-no
+TOP=$(git rev-parse --show-toplevel)
+
+file=$TOP/rlwrap-scripts/reade
+file1=$TOP/rlwrap-scripts/readyn
+file2=$TOP/rlwrap-scripts/yes-edit-no
 if ! test -f $file; then
     tmp=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/reade > $tmp
     tmp1=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/rlwrap-scripts/readyn > $tmp1

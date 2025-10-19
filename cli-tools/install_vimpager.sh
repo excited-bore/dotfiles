@@ -1,17 +1,21 @@
+# https://github.com/rkitover/vimpager
+
 hash vimpager &> /dev/null && SYSTEM_UPDATED='TRUE'
 
-if ! [[ -f ../checks/check_all.sh ]]; then
+TOP=$(git rev-parse --show-toplevel)
+
+if ! [[ -f $TOP/checks/check_all.sh ]]; then
     if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ../checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
 
 
-if hash nvimpager &> /dev/null; then
+if ! hash vimpager &> /dev/null; then
     if [[ $distro_base == "Debian" ]]; then
         (cd $TMPDIR
         git clone https://github.com/rkitover/vimpager

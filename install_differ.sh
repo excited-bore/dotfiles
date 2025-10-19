@@ -8,17 +8,19 @@
 # https://github.com/czusual/p4merge
 # https://github.com/KDE/kdiff3
 
-if ! [[ -f checks/check_all.sh ]]; then
+SYSTEM_UPDATED='TRUE'
+
+TOP=$(git rev-parse --show-toplevel)
+
+if ! [[ -f $TOP/checks/check_all.sh ]]; then
     if hash curl &> /dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
-
-SCRIPT_DIR=$(get-script-dir)
 
 wrapprs='delta diff-so-fancy riff ydiff diffr colordiff'
 cmds='difftastic nvim'
@@ -27,33 +29,33 @@ guis='kdiff3 p4merge vscode'
 reade -Q "GREEN" -i "delta difftastic diff-so-fancy riff ydiff diffr colordiff" -p "Which to install? [Delta/difftastic/diff-so-fancy/riff/ydiff/diffr/colordiff]: " pager
 
 if [[ $pager == "bat" ]]; then
-    if ! [[ -f cli-tools/install_bat.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/install_bat.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_bat.sh)
     else
-        . cli-tools/install_bat.sh
+        . $TOP/cli-tools/install_bat.sh
     fi
 
 elif [[ $pager == "riff" ]]; then
-    if ! [[ -f cli-tools/pkgmngrs/install_cargo.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/pkgmngrs/install_cargo.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pkgmngrs/install_cargo.sh)
     else
-        . cli-tools/pkgmngrs/install_cargo.sh
+        . $TOP/cli-tools/pkgmngrs/install_cargo.sh
     fi
     cargo install --locked riffdiff
 
 elif [[ $pager == "difftastic" ]]; then
-    if ! [[ -f pkgmngrs/cli-tools/install_cargo.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/pkgmngrs/install_cargo.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pkgmngrs/install_cargo.sh)
     else
-        . pkgmngrs/cli-tools/install_cargo.sh
+        . $TOP/cli-tools/pkgmngrs/install_cargo.sh
     fi
     cargo install --locked difftastic
 
 elif [[ $pager == "diffr" ]]; then
-    if ! [[ -f pkgmngrs/install_cargo.sh ]]; then
+    if ! [[ -f $TOP/cli-tools/pkgmngrs/install_cargo.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pkgmngrs/install_cargo.sh)
     else
-        . cli-tools/pkgmngrs/install_cargo.sh
+        . $TOP/cli-tools/pkgmngrs/install_cargo.sh
     fi
     cargo install --locked diffr
 fi
@@ -66,10 +68,10 @@ if [[ "$distro_base" == "Arch" ]]; then
     elif [[ $pager == "delta" ]]; then
         eval "$pac_ins_y git-delta"
     elif [[ $pager == "ydiff" ]]; then
-        if ! hash pipx &> /dev/null && ! [[ -f pkgmngrs/install_pipx.sh ]]; then
+        if ! hash pipx &> /dev/null && ! [[ -f $TOP/cli-tools/pkgmngrs/install_pipx.sh ]]; then
             source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pkgmngrs/install_pipx.sh)
         elif ! hash pipx &> /dev/null; then
-            . pkgmngrs/install_pipx.sh
+            . $TOP/cli-tools/pkgmngrs/install_pipx.sh
         fi
         pipx install ydiff
     fi
@@ -80,19 +82,19 @@ elif [[ "$distro_base" == "Debian" ]]; then
     elif [[ $pager == "colordiff" ]]; then
         eval "$pac_ins_y colordiff"
     elif [[ $pager == "delta" ]]; then
-        if ! [[ -f ../aliases/.aliases.d/git.sh ]]; then
+        if ! [[ -f $TOP/aliases/.aliases.d/git.sh ]]; then
             source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/git.sh)
         else
-            . ../aliases/.aliases.d/git.sh
+            . $TOP/aliases/.aliases.d/git.sh
         fi
         get-latest-releases-github 'https://github.com/dandavison/delta/releases' "$TMPDIR" 'git-delta_.*_amd64.deb' 
         sudo dpkg -i $TMPDIR/git-delta_*_amd64.deb 
     elif [[ $pager == "ydiff" ]]; then
         if ! hash pipx &> /dev/null; then 
-            if ! [[ -f cli-tools/pkgmngrs/install_pipx.sh ]]; then
+            if ! [[ -f $TOP/cli-tools/pkgmngrs/install_pipx.sh ]]; then
                 source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pkgmngrs/install_pipx.sh)
             else
-                . cli-tools/pkgmngrs/install_pipx.sh
+                . $TOP/cli-tools/pkgmngrs/install_pipx.sh
             fi
         fi
         pipx install ydiff

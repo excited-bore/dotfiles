@@ -1,25 +1,27 @@
 hash AppImageLauncher &> /dev/null && SYSTEM_UPDATED='TRUE'
 
-if ! [[ -f checks/check_all.sh ]]; then
+TOP=$(git rev-parse --show-toplevel)
+
+if ! [[ -f $TOP/checks/check_all.sh ]]; then
     if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ./checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
 
-if ! [[ -f checks/check_appimage_ready.sh ]]; then
+if ! [[ -f $TOP/checks/check_appimage_ready.sh ]]; then
     source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_appimage_ready.sh)
 else
-    . ./checks/check_appimage_ready.sh
+    . $TOP/checks/check_appimage_ready.sh
 fi
 
-if ! [[ -f aliases/.aliases.d/package_managers.sh ]]; then
+if ! [[ -f $TOP/aliases/.aliases.d/package_managers.sh ]]; then
     source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/package_managers.sh)
 else
-    source aliases/.aliases.d/package_managers.sh
+    source $TOP/aliases/.aliases.d/package_managers.sh
 fi
 
 if ! hash AppImageLauncher &>/dev/null; then

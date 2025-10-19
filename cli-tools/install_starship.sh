@@ -1,13 +1,17 @@
+# https://github.com/starship/starship
+
 hash starship &> /dev/null && SYSTEM_UPDATED='TRUE'
 
-if ! test -f ../checks/check_all.sh; then
+TOP=$(git rev-parse --show-toplevel)
+
+if ! test -f $TOP/checks/check_all.sh; then
     if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ../checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
 
 # https://unix.stackexchange.com/questions/690233/piping-yes-when-running-scripts-from-curl
@@ -22,10 +26,10 @@ if [[ "y" == "$strship" ]]; then
         sed -i '/starship init bash/d' ~/.bashrc 
     fi
 
-    if ! test -f ../checks/check_prompt_dir.sh; then
+    if ! test -f $TOP/checks/check_prompt_dir.sh; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_prompt_dir.sh)
     else
-        . ../checks/check_prompt_dir.sh
+        . $TOP/checks/check_prompt_dir.sh
     fi
   
     # We need to add a specific condition inside starship.bash related to vi/emacs-mode prompts ( (vi/cmd/vis) ) 
@@ -37,20 +41,22 @@ if [[ "y" == "$strship" ]]; then
     if ! grep -q "starship" ~/.zshrc; then
         printf "\neval \"\$(starship init zsh)\"\n" >>~/.zshrc
     fi
-    if ! test -f checks/check_completions_dir.sh; then
+    if ! test -f $TOP/checks/check_completions_dir.sh; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)
     else
-        . ./checks/check_completions_dir.sh
+        . $TOP/checks/check_completions_dir.sh
     fi
+    
     starship completions bash >~/.bash_completion.d/starship.bash
     starship completions zsh >~/.zsh_completion.d/starship.zsh
+    
     #if grep -q '[ -f .bash_preexec ]' ~/.bashrc; then
     #    sed -i '/eval "$(starship init bash)"/d' ~/.bashrc
     #    sed -i 's|\(\[ -f ~/.bash_preexec \] \&\& source \~/.bash_preexec\)|\neval "$(starship init bash)"\n\1\n|g' ~/.bashrc
     #fi
     if [ -d ~/.aliases.d/ ]; then
-        if test -f ../aliases/.aliases.d/starship.sh; then
-            cp ../aliases/.aliases.d/starship.sh ~/.aliases.d/
+        if test -f $TOP/aliases/.aliases.d/starship.sh; then
+            cp $TOP/aliases/.aliases.d/starship.sh ~/.aliases.d/
         else
             wget-aria-dir ~/.aliases.d/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/starship.sh
         fi
@@ -73,15 +79,15 @@ if [[ "y" == "$strship" ]]; then
         #fi
     fi
 
-    if ! test -f checks/check_completions_dir.sh; then
+    if ! test -f $TOP/checks/check_completions_dir.sh; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)
     else
-        . ./checks/check_completions_dir.sh
+        . $TOP/checks/check_completions_dir.sh
     fi
     sudo touch /root/.bash_completion.d/starship
     starship completions bash | sudo tee -a /root/.bash_completion.d/starship &>/dev/null
     if [ -d /root/.aliases.d/ ]; then
-        if test -f aliases/.aliases.d/starship.sh; then
+        if test -f $TOP/aliases/.aliases.d/starship.sh; then
             sudo cp aliases/.aliases.d/starship.sh /root/.aliases.d/
         else
             sudo -E wget-aria-dir /root/.aliases.d/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/starship.sh
@@ -93,19 +99,19 @@ if [[ "y" == "$strship" ]]; then
 fi
 unset strship
 
-if ! test -f ../checks/check_bash_source_order.sh; then
+if ! test -f $TOP/checks/check_bash_source_order.sh; then
    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_bash_source_order.sh)
 else
-    . ../checks/check_bash_source_order.sh
+    . $TOP/checks/check_bash_source_order.sh
 fi
 
 test -n "$BASH_VERSION" && eval "$(starship init bash)"
 test -n "$ZSH_VERSION" && eval "$(starship init zsh)"
 
-if ! test -f ../aliases/.aliases.d/starship.sh; then
+if ! test -f $TOP/aliases/.aliases.d/starship.sh; then
     source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/starship.sh)
 else
-    . ../aliases/.aliases.d/starship.sh
+    . $TOP/aliases/.aliases.d/starship.sh
 fi
 
 if hash fzf &> /dev/null; then
