@@ -13,10 +13,6 @@
 #    fi 
 #fi
 
-if ! type reade &> /dev/null && [[ -f ~/.aliases.d/00-rlwrap_scripts.sh ]]; then
-    . ~/.aliases.d/00-rlwrap_scripts.sh
-fi
-
 #https://stackoverflow.com/questions/41783367/tmux-tmux-true-color-is-not-working-properly
 alias terminal_colours="curl -s https://raw.githubusercontent.com/JohnMorales/dotfiles/master/colors/24-bit-color.sh | bash"
 alias tmux-reload="tmux source ~/.tmux.conf"

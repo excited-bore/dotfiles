@@ -185,16 +185,9 @@ unset tmuxx
 #fi
 #unset tmuxx
 
-if ! [ -e ~/.bash_completion.d/tmux.bash ]; then
+if test -d ~/.bash_completion.d && ! [ -e ~/.bash_completion.d/tmux.bash ]; then
     readyn -p "Install tmux bash completions?" tmuxx
     if [[ "$tmuxx" == "y" ]]; then
-
-        if ! test -f $TOP/checks/check_completions_dir.sh; then
-            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)
-        else
-            . $TOP/checks/check_completions_dir.sh
-        fi
-
         wget-curl https://raw.githubusercontent.com/imomaliev/tmux-bash-completion/master/completions/tmux >~/.bash_completion.d/tmux.bash 2>/dev/null
         test -n "$BASH_VERSION" && source ~/.bashrc
     fi
@@ -212,39 +205,32 @@ if ! [ -e /root/.bash_completion.d/tmux.bash ]; then
     unset tmuux
 fi
 
-readyn -p "Install tmux.sh at ~/.aliases.d/? (tmux aliases)" tmuxx
-if [[ "$tmuxx" == "y" ]]; then
-    if ! test -f $TOP/checks/check_aliases_dir.sh; then
-        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)
-    else
-        . $TOP/checks/check_aliases_dir.sh
+if test -d ~/.aliases.d/; then
+    readyn -p "Install tmux.sh at ~/.aliases.d/? (tmux aliases)" tmuxx
+    if [[ "$tmuxx" == "y" ]]; then
+         
+        if test -f $TOP/cli-tools/tmux/.aliases.d/tmux.sh; then
+            cp $TOP/cli-tools/tmux/.aliases.d/tmux.sh ~/.aliases.d/
+        else
+            wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/tmux/.aliases.d/tmux.sh > ~/.aliases.d/tmux.sh
+        fi
+        if hash gio &>/dev/null && test -f ~/.aliases.d/tmux.sh~; then
+            gio trash ~/.aliases.d/tmux.sh~
+        fi
     fi
-     
-    if test -f $TOP/cli-tools/tmux/.aliases.d/tmux.sh; then
-        cp $TOP/cli-tools/tmux/.aliases.d/tmux.sh ~/.aliases.d/
-    else
-        wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/tmux/.aliases.d/tmux.sh > ~/.aliases.d/tmux.sh
+    unset tmuxx
+    
+    readyn -n -p "Set tmux at shell login for SSH? (Conflicts with vim-tmux-kitty navigator)" tmuxxx
+    if [[ "$tmuxxx" == "y" ]]; then
+         
+        touch ~/.aliases.d/tmux_startup.sh
+        echo 'if [[ $- =~ i ]] && [[ -z "$TMUX" ]] && [[ -n "$SSH_TTY" ]]; then' >>~/.aliases.d/tmux_startup.sh
+        echo '  tmux attach-session -t ssh_tmux || tmux new-session -s ssh_tmux;' >>~/.aliases.d/tmux_startup.sh
+        echo 'fi' >>~/.aliases.d/tmux_startup.sh
     fi
-    if hash gio &>/dev/null && test -f ~/.aliases.d/tmux.sh~; then
-        gio trash ~/.aliases.d/tmux.sh~
-    fi
+    unset tmuxxx
 fi
-unset tmuxx
 
-readyn -n -p "Set tmux at shell login for SSH? (Conflicts with vim-tmux-kitty navigator)" tmuxxx
-if [[ "$tmuxxx" == "y" ]]; then
-    if ! test -f $TOP/checks/check_aliases_dir.sh; then
-        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)
-    else
-        . $TOP/checks/check_aliases_dir.sh
-    fi
-     
-    touch ~/.aliases.d/tmux_startup.sh
-    echo 'if [[ $- =~ i ]] && [[ -z "$TMUX" ]] && [[ -n "$SSH_TTY" ]]; then' >>~/.aliases.d/tmux_startup.sh
-    echo '  tmux attach-session -t ssh_tmux || tmux new-session -s ssh_tmux;' >>~/.aliases.d/tmux_startup.sh
-    echo 'fi' >>~/.aliases.d/tmux_startup.sh
-fi
-unset tmuxxx
 
 tmux source-file ~/.tmux.conf
 ~/.tmux/plugins/tpm/bin/install_plugins

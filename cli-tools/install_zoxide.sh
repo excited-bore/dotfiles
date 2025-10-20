@@ -67,13 +67,8 @@ if hash autojump &>/dev/null; then
 fi
 
 if hash fzf &>/dev/null; then
-    if ! test -f $TOP/checks/check_completions_dir.sh; then
-         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh) 
-    else
-        . $TOP/checks/check_completions_dir.sh
-    fi
      
-    if ! [[ -f ~/.bash_completion.d/zoxide.bash ]]; then
+    if test -d ~/.bash_completion.d && ! test -f ~/.bash_completion.d/zoxide.bash; then
         printf "function __zoxide_zi() {     
     builtin local result;     
     result=\"\$(command zoxide query --interactive)\" && __zoxide_cd \"\${result}\"; 
@@ -83,7 +78,7 @@ complete -F __zoxide_zi -o default -o bashdefault z\n" >>~/.bash_completion.d/zo
         printf "Added fzf completion thingy for zoxide (z ** TAB) in bash\n"
     fi
    
-    if ! [[ -f ~/.zsh_completion.d/zoxide.zsh ]]; then
+    if test -d ~/.zsh_completion.d && ! test -f ~/.zsh_completion.d/zoxide.zsh; then
 
         printf "__zoxide_zi() {
     local result

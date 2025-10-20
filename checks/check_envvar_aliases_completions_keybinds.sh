@@ -1,55 +1,60 @@
-if ! grep -q "/usr/share/bash-completion/bash_completion" ~/.bashrc; then
-    echo "[ -r /usr/share/bash-completion/bash_completion ] && . /usr/share/bash-completion/bash_completion" >>~/.bashrc
+if [[ -n "$BASH" || -n "$ZSH" ]]; then
+    if ! [[ -d ~/.aliases.d/ ]]; then
+        mkdir ~/.aliases.d/
+    fi
+    
+    if ! [ -d ~/.keybinds.d/ ]; then
+        mkdir ~/.keybinds.d/
+    fi
+
+    if ! [ -f ~/.keybinds ]; then
+        if [ -f keybinds/.keybinds ]; then
+            cp keybinds/.keybinds ~/
+        else
+            wget -O ~/.keybinds https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds
+        fi
+    fi
+     
 fi
 
-if ! [[ -d ~/.aliases.d/ ]]; then
-    mkdir ~/.aliases.d/
-fi
+if [[ -n "$BASH" ]]; then
+   
+    # Best to source this at start of ~/.bashrc
+    if [ -f ~/.environment.env ] && ! grep -q "~/.environment.env" ~/.bashrc; then
+        sed -i '1s/^/\[ -f ~\/.environment.env \] \&\& source ~\/.environment.env\n\n/' ~/.bashrc 
+    fi
+    
+    if ! [[ -d ~/.bash_completion.d/ ]]; then
+        mkdir ~/.bash_completion.d/
+    fi
 
-if ! [[ -f ~/.bash_aliases ]]; then
-    if [[ -f aliases/.bash_aliases ]]; then
-        cp aliases/.bash_aliases ~/
-    else
-        wget -O ~/.bash_aliases https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases 
+    if ! [ -f ~/.bash_completion ]; then
+        if [ -f completions/.bash_completion ]; then
+            cp completions/.bash_completion ~/
+        else
+            wget -O ~/.bash_completion https://raw.githubusercontent.com/excited-bore/dotfiles/main/completions/.bash_completion
+        fi
+    fi
+    
+    if ! grep -q "~/.bash_completion" ~/.bashrc; then
+        if grep -q "~/.bash_aliases" ~/.bashrc; then
+            sed -i 's|\(\[ -f ~/.bash_aliases \] && source ~/.bash_aliases\)|\[ -f \~/.bash_completion \] \&\& source \~/.bash_completion\n\1\n|g' ~/.bashrc
+        else
+            printf "\n[ -f ~/.bash_completion ] && source ~/.bash_completion\n\n" >>~/.bashrc
+        fi
+    fi
+     
+
+    if ! [[ -f ~/.bash_aliases ]]; then
+        if [[ -f aliases/.bash_aliases ]]; then
+            cp aliases/.bash_aliases ~/
+        else
+            wget -O ~/.bash_aliases https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases 
+        fi
     fi
 fi
 
-if ! [[ -d ~/.bash_completion.d/ ]]; then
-    mkdir ~/.bash_completion.d/
-fi
 
-if ! [ -f ~/.bash_completion ]; then
-    if [ -f completions/.bash_completion ]; then
-        cp completions/.bash_completion ~/
-    else
-        wget -O ~/.bash_completion https://raw.githubusercontent.com/excited-bore/dotfiles/main/completions/.bash_completion
-    fi
-fi
-
-if ! [ -d ~/.keybinds.d/ ]; then
-    mkdir ~/.keybinds.d/
-fi
-
-if ! [ -f ~/.keybinds ]; then
-    if [ -f keybinds/.keybinds ]; then
-        cp keybinds/.keybinds ~/
-    else
-        wget -O ~/.keybinds https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds
-    fi
-fi
-
-# Best to source this at start of ~/.bashrc
-if [ -f ~/.environment.env ] && ! grep -q "~/.environment.env" ~/.bashrc; then
-    sed -i '1s/^/\[ -f ~\/.environment.env \] \&\& source ~\/.environment.env\n\n/' ~/.bashrc 
-fi
-
-if ! grep -q "~/.bash_completion" ~/.bashrc; then
-    if grep -q "~/.bash_aliases" ~/.bashrc; then
-        sed -i 's|\(\[ -f ~/.bash_aliases \] && source ~/.bash_aliases\)|\[ -f \~/.bash_completion \] \&\& source \~/.bash_completion\n\1\n|g' ~/.bashrc
-    else
-        printf "\n[ -f ~/.bash_completion ] && source ~/.bash_completion\n\n" >>~/.bashrc
-    fi
-fi
 
 if ! grep -q "~/.bash_aliases" ~/.bashrc; then
     printf "\n[ -f ~/.bash_aliases ] && source ~/.bash_aliases\n\n" >>~/.bashrc
@@ -107,7 +112,6 @@ if ! sudo [ -f /root/.bash_aliases ]; then
         sudo mkdir /root/.aliases.d/
         #sudo cp ~/.aliases.d/check_system.sh /root/.aliases.d/check_system.sh
         #sudo cp ~/.aliases.d/bash.sh /root/.aliases.d/bash.sh
-        #sudo cp ~/.aliases.d/00-rlwrap_scripts.sh /root/.aliases.d/00-rlwrap_scripts.sh
     fi
     if ! sudo grep -q "~/.bash_aliases" ~/.bashrc; then
         printf "\n[ -f ~/.bash_aliases ] && source ~/.bash_aliases\n\n" | sudo tee -a /root/.bashrc &>/dev/null

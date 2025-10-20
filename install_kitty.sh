@@ -281,21 +281,20 @@ if [[ $ktty_cnf == 'y' ]]; then
 fi
 unset ktty_conf
 
-readyn -p "Install kitty aliases? (at ~/.aliases.d/kitty.sh)" kittn
-if [[ "y" == "$kittn" ]]; then
-    if ! [ -f $TOP/checks/check_aliases_dir.sh ]; then
-        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)
-    else
-        . $TOP/checks/check_aliases_dir.sh
+# Kitty alias
+
+if test -d ~/.aliases.d/; then
+    readyn -p "Install kitty aliases? (at ~/.aliases.d/kitty.sh)" kittn
+    if [[ "y" == "$kittn" ]]; then
+        
+        cp $file ~/.aliases.d/kitty.sh
+        
+        if hash gio &>/dev/null && [ -f ~/.aliases.d/kitty.sh~ ]; then
+            gio trash ~/.aliases.d/kitty.sh~
+        fi
     fi
-    
-    cp $file ~/.aliases.d/kitty.sh
-    
-    if hash gio &>/dev/null && [ -f ~/.aliases.d/kitty.sh~ ]; then
-        gio trash ~/.aliases.d/kitty.sh~
-    fi
+    unset kittn
 fi
-unset kittn
 
 # TODO: Get sed warnings gone
 if grep -q '# KITTY' $ENV; then

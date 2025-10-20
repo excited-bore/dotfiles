@@ -123,10 +123,10 @@ fi
 unset sym1 sym2 sym3 beep
 
 if [[ "$XDG_CURRENT_DESKTOP" == 'GNOME' && "$(gsettings get org.gnome.desktop.peripherals.keyboard remember-numlock-state)" == "false"  ]] || [[ "$XDG_CURRENT_DESKTOP" == 'XFCE' && $(xfconf-query -c keyboards -lv | grep -i numlock | awk '{print $2}') == 'false' ]] || ([[ "$XDG_CURRENT_DESKTOP" == 'labwc:wlroots' ]] && ! hash numlockw &> /dev/null) ; then
-    if ! [[ -f checsk/check_numlock.sh ]]; then
+    if ! [[ -f $TOP/checsk/check_numlock.sh ]]; then
         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_numlock.sh) 
     else
-        . ./checks/check_numlock.sh 
+        . $TOP/checks/check_numlock.sh 
     fi
 fi
  
@@ -146,12 +146,12 @@ fi
 # Environment variables
 
 if ! [[ -f $HOME/.environment.env ]]; then
-    if ! [[ -f $TOP/install_envvars.sh ]]; then
+    if ! [[ -f $TOP/shell/install_shell_envvars.sh ]]; then
         tmp=$(mktemp -d) &&
-            wget-aria-dir $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_envvars.sh
-        . ./$tmp/install_envvars.sh 'n'
+            wget-aria-dir $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/shell/install_shell_envvars.sh
+        . ./$tmp/install_shell_envvars.sh 'n'
     else
-        . $TOP/install_envvars.sh 'n'
+        . $TOP/install_shell_envvars.sh 'n'
     fi
 fi
 
@@ -217,10 +217,10 @@ if [[ $distro_base == 'Debian' ]]; then
         printf "${CYAN}mainline${normal} is not installed (GUI and cmd tool for managing installation of (newer) kernel versions)\n"
         readyn -p "Install mainline?" mainl_ins
         if [[ $mainl_ins == 'y' ]]; then
-            if ! [[ -f cli-tools/install_mainline.sh ]]; then
+            if ! [[ -f $TOP/cli-tools/install_mainline.sh ]]; then
                 source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_mainline.sh)
             else
-                . cli-tools/install_mainline.sh
+                . $TOP/cli-tools/install_mainline.sh
             fi
         fi
         unset mainl_ins
@@ -252,10 +252,10 @@ if [[ $distro_base == 'Debian' ]]; then
         readyn -p "Install nala?" nala_ins
         if [[ $nala_ins == 'y' ]]; then
             eval "$pac_ins_y nala"
-            if ! [[ -f checks/check_system.sh ]]; then
+            if ! [[ -f $TOP/checks/check_system.sh ]]; then
                 source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)
             else 
-                . ./checks/check_system.sh 
+                . $TOP/checks/check_system.sh 
             fi
         fi
         unset nala_ins
@@ -293,10 +293,10 @@ elif [[ $distro_base == 'Arch' ]]; then
                 . $TOP/AUR_installers/install_yay.sh
             fi
             if hash yay &>/dev/null; then
-                if ! [[ -f checks/check_system.sh ]]; then
+                if ! [[ -f $TOP/checks/check_system.sh ]]; then
                     source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)
                 else 
-                    . ./checks/check_system.sh 
+                    . $TOP/checks/check_system.sh 
                 fi
             fi
         fi
@@ -563,29 +563,6 @@ if [[ "both" == "$duf_dysk" ]] || [[ "dysk" == "$duf_dysk" ]]; then
 fi
 unset duf_dysk color color1 pre prmpt
 
-# Bash alias completions
-
-readyn -p "Install bash completions for aliases in ~/.bash_completion.d?" -c "! [ -f ~/.bash_completion.d/complete_alias ]" compl
-if [[ "y" == "$compl" ]]; then
-    if ! [[ -f $TOP/install_bashalias_completions.sh ]]; then
-        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bashalias_completions.sh)
-    else
-        . $TOP/install_bashalias_completions.sh
-    fi
-fi
-unset compl
-
-# Python completions
-
-readyn -p "Install python completions in ~/.bash_completion.d?" -c "! hash activate-global-python-argcomplete &> /dev/null" pycomp
-if [[ "y" == "$pycomp" ]]; then
-    if ! [[ -f $TOP/cli-tools/install_python_completions.sh ]]; then
-        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_python_completions.sh)
-    else
-        . $TOP/cli-tools/install_python_completions.sh
-    fi
-fi
-unset pycomp
 
 # Xresources
 
@@ -597,14 +574,23 @@ if ! [[ -f $xterm ]]; then
     xterm=$tmp
 fi
 
-xresources_r() {
-    sudo cp $xterm /root/.Xresources
-}
 xresources() {
     cp $xterm ~/.Xresources
-    yes-edit-no -f xresources_r -g "$xterm" -p "Install .Xresources at /root/?" -e -n -Q "RED"
 }
 yes-edit-no -f xresources -g "$xterm" -p "Install .Xresources at ~/? (Xterm configuration)" -e -Q "YELLOW"
+
+# Shell (bash, zsh) completions, aliases, keybinds and other config 
+
+readyn -p "Install shell (Bash, Zsh) completions, aliases, keybinds and other config?" -c "! test -d ~/.aliases.d || ! test -d ~/.bash_completion.d/ || ! test -d ~/.zsh_completion.d" scripts
+if [[ "y" == "$scripts" ]]; then
+
+    if ! [[ -f $TOP/install_shell.sh ]]; then
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/install_shell.sh)
+    else
+        . $TOP/install_shell.sh
+    fi
+fi
+
 
 # Rlwrap scripts
 
@@ -630,64 +616,6 @@ if [[ "$strshp" == "y" ]]; then
 fi
 unset strshp
 
-TOP=$(get-script-dir)
-
-# Aliases
-
-readyn -p "Install bash aliases and other config?" scripts
-if [[ "y" == "$scripts" ]]; then
-
-    if ! [[ -f $TOP/checks/check_aliases_dir.sh ]]; then
-        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)
-    else
-        . $TOP/checks/check_aliases_dir.sh
-    fi
-    
-    if ! [[ -f $TOP/install_aliases.sh ]]; then
-        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/install_aliases.sh)
-    else
-        . $TOP/install_aliases.sh
-    fi
-fi
-
-# Hhighlighter (or just h)
-
-readyn -c "! test -f ~/.aliases.d/h.sh" -p "Install hhighlighter (or just h)? (A tiny utility to highlight multiple keywords with different colors in a textoutput)" h
-if [[ "y" == "$h" ]]; then
-    if ! hash ack &>/dev/null; then
-        printf "For ${CYAN}hhighlighter${normal} to work, ${CYAN}ack${normal} needs to be installed beforehand.\n"
-        readyn -p "Install ack and then hhighlighter?" ansr
-        if [[ "$ansr" == 'y' ]]; then
-            if ! [[ -f $TOP/cli-tools/install_ack.sh ]]; then
-                source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_ack.sh)
-            else
-                . $TOP/cli-tools/install_ack.sh
-            fi
-        fi
-        unset ansr
-    fi
-    if hash ack &> /dev/null; then
-        if ! [[ -f $TOP/cli-tools/install_hhighlighter.sh ]]; then
-            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_hhighlighter.sh)
-        else
-            . $TOP/cli-tools/install_hhighlighter.sh
-        fi
-    fi
-fi
-unset h
-
-[[ -n "$BASH_VERSION" ]] && source ~/.bashrc &>/dev/null
-[[ -n "$ZSH_VERSION" ]] && source ~/.zshrc &>/dev/null
-
-if ! [[ -f checks/check_all.sh ]]; then
-    if hash curl &>/dev/null; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
-    else
-        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
-    fi
-else
-    . ./checks/check_all.sh
-fi
 
 # Nerdfonts
 
@@ -715,25 +643,6 @@ if [[ "y" == "$kittn" ]]; then
 fi
 unset kittn
 
-# Keybinds
-
-if ! [[ -f install_keybinds.sh ]]; then
-    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_keybinds.sh)
-else
-    . ./install_keybinds.sh
-fi
-
-# Bash Preexec
-
-readyn -p "Install pre-execution hooks for bash in ~/.bash_preexec?" -c "! [ -f ~/.bash_preexec.sh ] || ! [ -f /root/.bash_preexec.sh ]" bash_preexec
-if [[ "y" == "$bash_preexec" ]]; then
-    if ! [[ -f $TOP/install_bash_preexec.sh ]]; then
-        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bash_preexec.sh)
-    else
-        . $TOP/install_bash_preexec.sh
-    fi
-fi
-unset bash_preexec
 
 # Pipewire (better sound)
 
@@ -1070,25 +979,15 @@ unset yt_dlp
 
 #reade -Q "$color" -i "$pre" -p "Check existence/create .environment.env and link it to .bashrc in $HOME/ and /root/? $prmpt" "$othr" envvars
 #if [[ "$envvars" == "y" ]] || [[ -z "$envvars" ]]  then
-if ! [[ -f $TOP/install_envvars.sh ]]; then
-    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_envvars.sh)
+if ! [[ -f $TOP/shell/install_shell_envvars.sh ]]; then
+    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/shell/install_shell_envvars.sh)
 else
-    . $TOP/install_envvars.sh
+    . $TOP/shell/install_shell_envvars.sh
 fi
 #fi
 
 # Check one last time if ~/.bash_preexec - for both $USER and root - is the last line in their ~/.bash_profile and ~/.bashrc
 
-#if ! [ -f ./checks/check_bash_source_order.sh ]; then
-#    if hash curl &>/dev/null; then
-#        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_bash_source_order.sh)
-#    else
-#        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-#        return 1 || exit 1
-#    fi
-#else
-#    . ./checks/check_bash_source_order.sh
-#fi
 
 echo "Next $(tput setaf 1)sudo$(tput sgr0) will check whether root account is enabled"
 if ! [[ "$(sudo passwd -S | awk '{print $2}')" == 'L' ]]; then

@@ -85,10 +85,10 @@ if ! hash onefetch &>/dev/null; then
                 else
                     . $TOP/cli-tools/pkgmngrs/install_ppa.sh
                 fi
-                if ! test -f $TOP/aliases/.aliases.d/package_managers.sh; then
-                    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/package_managers.sh)
+                if ! test -f $TOP/shell/aliases/.aliases.d/package_managers.sh; then
+                    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/shell/aliases/.aliases.d/package_managers.sh)
                 else
-                    . $TOP/aliases/.aliases.d/package_managers.sh
+                    . $TOP/shell/aliases/.aliases.d/package_managers.sh
                 fi
             fi 
             if hash add-apt-repository &>/dev/null && [[ $(check-ppa ppa:o2sh/onefetch) =~ 'OK' ]]; then

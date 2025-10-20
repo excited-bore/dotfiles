@@ -20,10 +20,10 @@ if [[ $XDG_SESSION_TYPE == 'wayland' ]]; then
     echo "${YELLOW}Current session type - ${RED}Wayland${YELLOW} - is not supported by autokey${normal}" 
 elif ! hash autokey &> /dev/null; then
     if [[ "$distro_base" == 'Debian' ]]; then
-        if ! [[ -f $TOP/aliases/.aliases.d/git.sh ]]; then
-            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/git.sh) 
+        if ! [[ -f $TOP/shell/aliases/.aliases.d/git.sh ]]; then
+            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/shell/aliases/.aliases.d/git.sh) 
         else
-            . $TOP/aliases/.aliases.d/git.sh
+            . $TOP/shell/aliases/.aliases.d/git.sh
         fi
         reade -Q 'GREEN' -i 'gtk qt' -p "Do you want autokey's GUI to be ${cyan}gtk-based${GREEN} or ${cyan}qt-based${GREEN} [Gtk/qt]: " gtk_qt 
         temp=$(mktemp -d)

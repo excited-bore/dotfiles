@@ -1,18 +1,23 @@
-if ! type reade &> /dev/null; then
+SYSTEM_UPDATED='TRUE'
+
+TOP=$(git rev-parse --show-toplevel)
+
+if ! test -f $TOP/checks/check_all.sh; then
     if hash curl &> /dev/null; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/00-rlwrap_scripts.sh)
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/00-rlwrap_scripts.sh)
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ./aliases/.aliases.d/00-rlwrap_scripts.sh
-fi 
+    . $TOP/checks/check_all.sh
+fi
 
 
 if grep -q "#EnableAUR" /etc/pamac.conf; then
     readyn -p "Enable AUR for pamac?" aurset
     if [[ "$aurset" == "y" ]]; then
         sudo sed -i 's|#EnableAUR|EnableAUR|g' /etc/pamac.conf 
+        pamac checkupdates  
     fi
     unset aurset
 fi

@@ -38,10 +38,10 @@ if ! hash moor &> /dev/null; then
                 fi
                 unset ins_wget 
             fi
-            if ! test -f $TOP/aliases/.aliases.d/git.sh; then
-                source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/git.sh)
+            if ! test -f $TOP/shell/aliases/.aliases.d/git.sh; then
+                source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/shell/aliases/.aliases.d/git.sh)
             else
-                . $TOP/aliases/.aliases.d/git.sh
+                . $TOP/shell/aliases/.aliases.d/git.sh
             fi
             
             if [[ $arch == "armv7l" ]] || [[ $arch == "arm64" ]]; then

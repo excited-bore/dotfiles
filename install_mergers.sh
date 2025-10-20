@@ -122,10 +122,10 @@ elif [[ $merger == 'diffmerge' ]] ;then
                 sudo apt install -y jq wget 
             fi
 
-            if ! [[ -f $TOP/aliases/.aliases.d/git.sh ]]; then
-                source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/git.sh)
+            if ! [[ -f $TOP/shell/aliases/.aliases.d/git.sh ]]; then
+                source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/shell/aliases/.aliases.d/git.sh)
             else
-                . $TOP/aliases/.aliases.d/git.sh
+                . $TOP/shell/aliases/.aliases.d/git.sh
             fi
             #get-latest-releases-github 'https://github.com/sourcegear/diffmerge'  
         fi

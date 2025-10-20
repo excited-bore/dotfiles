@@ -111,15 +111,3 @@ if ! sudo grep -q "~/.zsh_completion" /root/.zshrc; then
         printf "\n[[ -f ~/.zsh_completion ]] && source ~/.zsh_completion\n\n" | sudo tee -a /root/.zshrc &> /dev/null
     fi
 fi
-
-# Check one last time if ~/.bash_preexec - for both $USER and root - is the last line in their ~/.bash_profile and ~/.bashrc
-
-if ! [[ -f ./checks/check_bash_source_order.sh ]]; then
-    if hash curl &>/dev/null; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_bash_source_order.sh)
-    else
-        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_bash_source_order.sh)
-    fi
-else
-    . ./checks/check_bash_source_order.sh
-fi

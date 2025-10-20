@@ -11,7 +11,7 @@ Currently only focused on **bash** on **Linux** (On a distro with *Apt* or *Pacm
 Try it out with if you have curl installed. Worked and tested for Manjaro and Ubuntu.  
 
 You can use the main file `install.sh` to run most of the necessary/interesting tweaks / get on overview of the most interesting tools added. If you have 'rlwrap' installed, it will give you a ton of easy 'yes/no' questions to go through. Keep pressing Ctrl+C if you want to quit out, or use Ctrl+Z in conjunction with 'ps' and 'kill -9 \<ProcessID-number\>' to kill the entire project.   
-Again, if you cloned the github (or downloaded and unzipped it from github), just go into the folder and run the main file `install.sh`, **however** it's best to **source the file** if you want immediate effect (and if you want the greatest chance for the script to run without errors). This is because it includes **a lot of files with bashaliases and other essential scripts that need to be sourced** and **cannot be executed**.  
+Again, if you cloned the github (or downloaded and unzipped it from github), just go into the folder and run the main file `install.sh`, **however** it's best to **source the file** if you want immediate effect (and if you want the greatest chance for the script to run without errors). This is because it includes **a lot of files use aliases and other essential scripts that need to be sourced** and **cannot be executed**.  
 
 To do this, run:  
 
@@ -30,13 +30,13 @@ source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/
 ```
 
 Creates `.environment.env` for global environment variables (Helps setting up variables for MAN,LESS,PAGER,EDITOR/VISUAL,SYSTEMD,XDG, etc..)  
-Creates `~/.keybinds.d/` and `~/.keybinds.d/keybinds.bash` for Bash (readline) keybindings  
-Creates `~/.bash_aliases` and `~/.aliases.d/` for bash-aliases  
 Creates `~/.bash_completion` and `~/.bash_completion.d/` for bash-completions  
+Creates `~/.bash_aliases` and `~/.aliases.d/` for bash-aliases  
+Creates `~/.bash_keybinds` and `~/.bash_keybinds.d/keybinds.bash` for Bash (readline) keybindings  
 
 
 Then it helps with installing/configuring:  
-    - Bash-completions: https://github.com/cykerway/complete-alias/master/complete_alias  
+    - Bash-completions for aliases: https://github.com/cykerway/complete-alias/master/complete_alias  
     - Python-completions: https://github.com/kislyuk/argcomplete  
     - Osc clipboard: https://github.com/theimpostor/osc  
     - Bat (Cat clone): https://github.com/sharkdp/bat  
@@ -77,7 +77,7 @@ Then it helps with installing/configuring:
 &nbsp;&nbsp;- Diffr: https://github.com/mookid/diffr  
 
 
-Also helps configuring global gitconfig and global gitignore, and gives the option to install all kinds of bash-aliases/.aliases.d/functions
+There are a ton of other installer scripts for all kinds of tools located under `cli-tools` that install but also help in configuring tools for **apt-based** and **pacman-based** systems.  
 
 
 ## Conf_keyboard.sh
@@ -100,55 +100,75 @@ source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main
 Replace 'global' with 'local' for local options  
 
 
-## Install_lazygit.sh
+## cli-tools/install_lazygit.sh
 Script to automate setting up lazygit and different internal diff highlighters. Works remotely with
 
 ```
-source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_lazygit.sh)
+source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_lazygit.sh)
 ```
 
-## update-system.sh
+## shell/aliases/.aliases.d/update-system.sh
 System updater. Try it out with:
 
 ```
-source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/update-system.sh) && update-system-yes
+source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/shell/aliases/.aliases.d/update-system.sh) && update-system-yes
 ```
 
-## Install_aliases.sh
-Script to automate setting up bash aliases. Try it out with:
+## shell/install_shell_aliases.sh
+Script to automate setting up bash/zsh aliases. Try it out with:
 
 ```
-source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_aliases.sh)
+source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/shell/install_shell_aliases.sh)
 ```
 
-## Install_go.sh
+## cli-tools/install_go.sh
 Script to automate installation of go, included for installation on distributions with less up-to-date go versions
 
 ```
-source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_go.sh)
+source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_go.sh)
 ```
 
-## Install_pyenv.sh
+## cli-tools/install_pyenv.sh
 Script to automate installation of pyenv, gives a selection of versions to choose from using a nice prompt
 
 ```
-source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_pyenv.sh)
+source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_pyenv.sh)
 ```
 
 ## Install_gitignore.sh
 Script to automate setting up local or global gitignore using templates from https://github.com/github/gitignore
 
-## Install_flatpak.sh
+## cli-tools/pkgmngrs/install_flatpak.sh
 Installs flatpak with the added option to set flatpak-wrappers for commandline and install https://github.com/tchx84/Flatseal alongside
+
+```
+source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pkgmngrs/install_flatpak.sh)
+```
 
 ## Conf_polkit_no_pwd.sh
 Prevents password popups if user in wheel/sudo group
 
+```
+source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/conf_polkit_no_pwd.sh)
+```
+
 ## Conf_automount_drives.sh
 Script to automate configuring automounting drives in /etc/fstab
 
-## Install_samba.sh
+```
+source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/conf_automount_drives.sh)
+```
+
+## cli-tools/install_samba.sh
 Script to automate the installation of network drives using samba.
 
-## Install_pipewire.sh
+```
+source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_samba.sh)
+```
+
+## cli-tools/install_pipewire.sh
 Installs pipewire and helps setting up so HDMI devices are ignored and that it will autoswitch to newest plugged in audiodevice with the exception of a dualshock 4 controller.
+
+```
+source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_pipewire.sh)
+```

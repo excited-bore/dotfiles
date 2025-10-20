@@ -1,8 +1,3 @@
-if ! type reade &>/dev/null; then
-    [ -f aliases/.aliases.d/00-rlwrap_scripts.sh ] && source aliases/.aliases.d/00-rlwrap_scripts.sh ||
-    [ -f ~/.aliases.d/00-rlwrap_scripts.sh ] && source ~/.aliases.d/00-rlwrap_scripts.sh
-fi
-
 unameOut="$(uname -s)"
 case "${unameOut}" in
     Linux*) machine=Linux ;;
@@ -798,12 +793,43 @@ fi
 export BASH_KEYBIND=~/.bashrc
 
 if [ -f ~/.keybinds ]; then
-    export BASH_KEYBIND=~/.keybinds
+    export BASH_KEYBIND=~/.bash_keybinds
 fi
 
 if [ -d ~/.keybinds.d/ ]; then
-    export BASH_KEYBIND_FILEDIR=~/.keybinds.d
+    export BASH_KEYBIND_FILEDIR=~/.bash_keybinds.d
 fi
+
+export ZSH_ALIAS=~/.zshrc
+
+if [ -f ~/.zsh_aliases ]; then
+    export ZSH_ALIAS=~/.zsh_aliases
+fi
+
+if [ -d ~/.aliases.d/ ]; then
+    export BASH_ALIAS_FILEDIR=~/.aliases.d
+fi
+
+export BASH_COMPLETION=~/.bashrc
+
+if [ -f ~/.bash_completion ]; then
+    export ZSH_COMPLETION=~/.zsh_completion
+fi
+
+if [ -d ~/.zsh_completion.d/ ]; then
+    export ZSH_COMPLETION_FILEDIR=~/.zsh_completion.d
+fi
+
+export ZSH_KEYBIND=~/.zshrc
+
+if [ -f ~/.zsh_keybinds ]; then
+    export ZSH_KEYBIND=~/.zsh_keybinds
+fi
+
+if [ -d ~/.zsh_keybinds.d/ ]; then
+    export ZSH_KEYBIND_FILEDIR=~/.zsh_keybinds.d
+fi
+
 
 #echo "These next $(tput setaf 1)sudo's$(tput sgr0) checks for the profile, environment, bash_alias, bash_completion and keybind files and dirs in '/root/' to generate global variables.";
 

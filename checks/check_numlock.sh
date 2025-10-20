@@ -1,13 +1,15 @@
 SYSTEM_UPDATED=TRUE
 
-if ! [[ -f checks/check_all.sh ]]; then
-    if hash curl &>/dev/null; then
+TOP=$(git rev-parse --show-toplevel)
+
+if ! test -f $TOP/checks/check_all.sh; then
+    if hash curl &> /dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
         source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ./checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
 
 if [[ "$XDG_CURRENT_DESKTOP" == 'GNOME' ]]; then
@@ -42,10 +44,10 @@ elif [[ "$XDG_CURRENT_DESKTOP" == 'labwc:wlroots' ]]; then
         printf "There's no native control for the state of numlock on ${CYAN}$XDG_CURRENT_DESKTOP${GREEN}\nHowever, there is a tool called 'numlockw' that you can install that can turn numlock on or off when your shell ($HOME.profile/$HOME/.bash_profile) has been loaded\n${normal}" 
         readyn -p 'Install and activate numlockw?' nmlckw
         if [[ "$nmlckw" == 'y' ]]; then 
-            if ! test -f cli-tools/install_numlockw.sh; then
+            if ! test -f $TOP/cli-tools/install_numlockw.sh; then
                 source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_numlockw.sh)
             else
-                . cli-tools/install_numlockw.sh
+                . $TOP/cli-tools/install_numlockw.sh
             fi
         fi
     fi

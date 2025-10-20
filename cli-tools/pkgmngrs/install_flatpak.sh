@@ -12,13 +12,6 @@ else
     . $TOP/checks/check_all.sh
 fi
 
-if ! test -f $TOP/checks/check_envvar_aliases_completions_keybinds.sh; then
-     source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar_aliases_completions_keybinds.sh) 
-else
-    . $TOP/checks/check_envvar_aliases_completions_keybinds.sh
-fi
-
-
 if ! hash flatpak &> /dev/null; then
     if [[ "$distro" == "Manjaro" ]]; then
         pamac install flatpak libpamac-flatpak-plugin python
@@ -52,14 +45,9 @@ if hash flatpak &> /dev/null && [ -z $FLATPAK ]; then
 fi
 unset flpkvrs
 
-if ! test -f ~/.aliases.d/flatpaks.sh; then
+if test -d ~/.aliases.d && ! test -f ~/.aliases.d/flatpaks.sh; then
     readyn -p "Install flatpakwrapper? (For one-word flatpak aliases in terminal)" pam
     if [[ "y" == $pam ]]; then
-        if ! test -f $TOP/install_bashalias_completions.sh; then
-             source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bashalias_completions.sh) 
-        else
-             . $TOP/install_bashalias_completions.sh
-        fi
         if test -f $TOP/cli-tools/pkgmngrs/flatpak/.aliases.d/flatpaks.sh; then
             file=$TOP/cli-tools/pkgmngrs/flatpak/.aliases.d/flatpaks.sh
         else
@@ -69,6 +57,7 @@ if ! test -f ~/.aliases.d/flatpaks.sh; then
         fi
          
         cp $file ~/.aliases.d/ 
+        
         if [[ -n "$BASH_VERSION" ]] || [[ -n "$ZSH_VERSION" ]]; then
             source ~/.aliases.d/flatpaks.sh
         fi

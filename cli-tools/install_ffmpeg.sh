@@ -14,12 +14,6 @@ else
     . $TOP/checks/check_all.sh
 fi
 
-if ! test -f $TOP/checks/check_envvar_aliases_completions_keybinds.sh; then
-    source <(wget-curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar_aliases_completions_keybinds.sh)
-else
-    . $TOP/checks/check_envvar_aliases_completions_keybinds.sh
-fi
-
 if ! hash ffmpeg &>/dev/null; then
     if [[ $machine == 'Mac' ]] && hash brew &>/dev/null; then
         brew install ffmpeg
@@ -30,22 +24,17 @@ if ! hash ffmpeg &>/dev/null; then
     fi
 fi
 
-if hash ffmpeg &>/dev/null; then
+if hash ffmpeg &>/dev/null && test -d ~/.aliases.d; then
 
-    ffmpgsh=$TOP/aliases/.aliases.d/ffmpeg.sh
+    ffmpgsh=$TOP/shell/aliases/.aliases.d/ffmpeg.sh
 
     if ! [ -f $ffmpgsh ]; then
-        wget-aria-dir $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/ffmpeg.sh
+        wget-aria-dir $TMPDIR/ https://raw.githubusercontent.com/excited-bore/dotfiles/main/shell/aliases/.aliases.d/ffmpeg.sh
         ffmpgsh=$TMPDIR/ffmpeg.sh
     fi
 
-    function ins_ffmpg_r() {
-        sudo cp $ffmpgsh /root/.aliases.d/
-    }
-
     function ins_ffmpg() {
         cp $ffmpgsh ~/.aliases.d/
-        yes-edit-no -Y 'YELLOW' -f ins_ffmpg_r -g "$ffmpgsh" -p "Install ffmpeg.sh to /root/.aliases.d/?"
     }
 
     yes-edit-no -f ins_ffmpg -g "$ffmpgsh" -p "Install ffmpeg.sh to $HOME/.aliases.d/?" 

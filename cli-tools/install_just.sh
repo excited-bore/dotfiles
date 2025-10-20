@@ -26,10 +26,10 @@ if ! hash just &> /dev/null; then
     cargo install just 
     
     if ! [[ $? == 0 ]] || ! hash cargo &> /dev/null; then
-        if ! [ -f $TOP/aliases/.aliases.d/git.sh ]; then
-            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/git.sh)
+        if ! [ -f $TOP/shell/aliases/.aliases.d/git.sh ]; then
+            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/shell/aliases/.aliases.d/git.sh)
         else 
-            . $TOP/aliases/.aliases.d/git.sh
+            . $TOP/shell/aliases/.aliases.d/git.sh
         fi
      
         if [[ "$arch" == '386' || "$arch" == 'amd32' || "$arch" == 'amd64' ]]; then

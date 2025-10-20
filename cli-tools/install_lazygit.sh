@@ -87,11 +87,6 @@ fi
 #    if ! test -d ~/.aliases.d/ || ! test -f ~/.aliases.d/lazygit.sh || (test -f ~/.aliases.d/lazygit.sh && ! grep -q "copy-to" ~/.aliases.d/lazygit.sh); then
 #        readyn -p "Set up an alias so copy-to does a 'run all' when starting up lazygit?" nstll
 #        if [[ "$nstll" == "y" ]]; then
-#            if ! test -f checks/check_aliases_dir.sh; then
-#                source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)
-#            else
-#                . ./checks/check_aliases_dir.sh
-#            fi
 #            if ! test -f ~/.aliases.d/lazygit.sh; then
 #                printf "alias lazygit=\"copy-to run all; lazygit\"\n" >~/.aliases.d/lazygit.sh
 #                echo "$(tput setaf 2)File in ~/.aliases.d/lazygit.sh"

@@ -1330,31 +1330,22 @@ gitt() {
     #if ! test -f ~/.aliases.d/fzf-git.sh; then
     #    readyn -p "Install fzf-git? (Extra fzf stuff on leader-key C-g): "" gitfzf
     #    if [ "$fzfgit" == "y" ]; then
-    #        if ! test -f checks/check_aliases_dir.sh; then
-    #            source <(curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)
-    #        else
-    #           . ./checks/check_aliases_dir.sh
-    #        fi
     #        curl -o ~/.aliases.d/fzf-git.sh https://raw.githubusercontent.com/junegunn/fzf-git.sh/main/fzf-git.sh
     #    fi
     #fi
 
-    local gitals
-    readyn -p "Install git.sh? (Git aliases)" gitals
-    if [[ "$gitals" == "y" ]]; then
-        if ! [[ -f $TOP/checks/check_aliases_dir.sh ]]; then
-            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases_dir.sh)
-        else
-            . $TOP/checks/check_aliases_dir.sh
+    if test -d ~/.aliases.d/; then 
+        local gitals
+        readyn -p "Install git.sh? (Git aliases)" gitals
+        if [[ "$gitals" == "y" ]]; then
+            if ! [[ -f $TOP/shell/aliases/.aliases.d/git.sh ]]; then
+                wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/shell/aliases/.aliases.d/git.sh > ~/.aliases.d/git.sh
+            else
+                cp $TOP/shell/aliases/.aliases.d/git.sh ~/.aliases.d/
+            fi
         fi
-        if ! [[ -f $TOP/aliases/.aliases.d/git.sh ]]; then
-            wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/git.sh > ~/.aliases.d/git.sh
-        else
-            cp $TOP/aliases/.aliases.d/git.sh ~/.aliases.d/
-        fi
+        unset global gitdiff diff gitmerge merge amt rslt gitcnf gitign
     fi
-
-    unset global gitdiff diff gitmerge merge amt rslt gitcnf gitign
 }
 
 test -n "$1" && gitt "$1"

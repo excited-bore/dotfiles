@@ -354,14 +354,9 @@ if [[ -z "$1" ]]; then
     # fi
     #unset fzf_t;
 
-    if ! test -f ~/.aliases.d/docker-fzf.sh; then
+    if test -d ~/.aliases.d/ && ! test -f ~/.aliases.d/docker-fzf.sh; then
         readyn -p "Install fzf-docker (fzf aliases for docker)?" -c "! test -f $HOME/.aliases.d/docker-fzf.sh" fzf_d
         if [[ "$fzf_d" == "y" ]]; then
-            if ! test -f $TOP/checks/check_aliases_dir.sh; then
-                source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_aliases_dir.sh)
-            else
-                . $TOP/checks/check_aliases_dir.sh
-            fi
             wget-aria-name ~/.aliases.d/docker-fzf.sh https://raw.githubusercontent.com/MartinRamm/fzf-docker/master/docker-fzf
         fi
     fi

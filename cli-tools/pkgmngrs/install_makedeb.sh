@@ -60,11 +60,6 @@ elif [[ "$arch" == 'arm64' ]]; then
     sudo sed -i 's/CARCH=".*"/CARCH="arm64"/; s/CHOST=".*"/CHOST="aarch64-unknown-linux-gnu"/; s/-march=x86-64 -mtune=generic -O2 -pipe/-march=armv8-a -O2 -pipe -fstack-protector-strong/; s/-fcf-protection//' /etc/makepkg.conf 
 fi
 
-
-if ! test -f $TOP/checks/check_completions_dir.sh; then
-    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/checks/check_completions_dir.sh)
-else
-    . $TOP/checks/check_completions_dir.sh
+if test -d ~/.bash_completion.d/ && ! test -f ~/.bash_completion.d/makedeb.bash; then
+    wget-curl https://raw.githubusercontent.com/makedeb/makedeb/refs/heads/alpha/completions/makedeb.bash > $HOME/.bash_completion.d/makedeb.bash
 fi
-
-wget-curl https://raw.githubusercontent.com/makedeb/makedeb/refs/heads/alpha/completions/makedeb.bash > $HOME/.bash_completion.d/makedeb.bash

@@ -26,34 +26,36 @@ elif [[ "$distro_base" == "Debian" ]]; then
     eval "$pac_ins_y pipewire pipewire-jack wireplumber pipewire-pulse"
 fi 
 
-if ! [[ -f ~/.bash_completion.d/pipewire.bash ]]; then
-    readyn -p "Install pipewire completions (pw-cli, wpctl)?" comps
+if [ -d ~/.bash_completion.d ] && ! [[ -f ~/.bash_completion.d/pipewire.bash ]]; then
+    readyn -p "Install pipewire completions (pw-cli, wpctl) for ${CYAN}Bash${GREEN}?" comps
     if [[ $comps == 'y' ]]; then
 
-        if ! [[ -f $TOP/checks/check_completions_dir.sh ]]; then
-             source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh) 
-        else
-            . $TOP/checks/check_completions_dir.sh
-        fi
-         
         pipewire_cmp=$TOP/cli-tools/pipewire/.bash_completion.d/pipewire.bash
         if ! [[ -f $TOP/pipewire/.bash_completion.d/pipewire.bash ]]; then
             wget-aria-dir $TMPDIR https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pipewire/.bash_completion.d/pipewire.bash 
             pipewire_cmp=$TMPDIR/pipewire.bash
         fi
         cp $pipewire_cmp ~/.bash_completion.d/ 
-   
+    fi
+    unset comps 
+fi
+
+if [ -d ~/.zsh_completion.d ] && ! [[ -f ~/.zsh_completion.d/pipewire.zsh ]]; then
+    readyn -p "Install pipewire completions (pw-cli, wpctl) for ${CYAN}Zsh${GREEN}?" comps
+    if [[ $comps == 'y' ]]; then
         pipewire_cmpz=$TOP/cli-tools/pipewire/.zsh_completion.d/pipewire.zsh
         if ! [[ -f $TOP/cli-tools/pipewire/.zsh_completion.d/pipewire.zsh ]]; then
             wget-aria-dir $TMPDIR https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pipewire/.zsh_completion.d/pipewire.zsh 
             pipewire_cmp=$TMPDIR/pipewire.zsh
         fi
         cp $pipewire_cmp ~/.zsh_completion.d/ 
-         
     fi
+    unset comps 
 fi
 
-mkdir -p $XDG_CONFIG_HOME/wireplumber/wireplumber.conf.d/
+if [ -d $XDG_CONFIG_HOME/wireplumber/wireplumber.conf.d/ ]; then
+    mkdir -p $XDG_CONFIG_HOME/wireplumber/wireplumber.conf.d/
+fi
 
 if wpctl status | grep -q 'HMDI'; then
     readyn -p "Unlist all HDMI audio devices from pipewire?" unlst_hdmi

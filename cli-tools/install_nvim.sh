@@ -14,12 +14,6 @@ else
     . $TOP/checks/check_all.sh
 fi
 
-if ! [[ -f $TOP/checks/check_envvar_aliases_completions_keybinds.sh ]]; then
-    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar_aliases_completions_keybinds.sh)
-else
-    . $TOP/checks/check_envvar_aliases_completions_keybinds.sh
-fi
-
 #. $DIR/setup_git_build_from_source.sh "y" "neovim" "https://github.com" "neovim/neovim" "stable" "sudo apt update; eval "$pac_ins ninja-build gettext libtool libtool-bin cmake g++ pkg-config unzip curl doxygen" "make CMAKE_BUILD_TYPE=RelWithDebInfo; sudo make install" "sudo make uninstall" "make distclean; make deps" "y""
 
 if [[ "$distro_base" == "Debian" ]]; then
@@ -516,13 +510,28 @@ nvim +checkhealth
 echo "Install Completion language plugins with ':CocInstall coc-..' / Update with :CocUpdate"
 echo "Check installed nvim plugins with 'Lazy' / Check installed vim plugins with 'PlugInstalled' (only work on nvim and vim respectively)"
 
-file=$TOP/cli-tools/vim/.aliases.d/vim_nvim.sh
-file1=$TOP/cli-tools/vim/.bash_completion.d/vim_nvim.bash
-if ! test -d vim/.aliases.d/ || ! test -d vim/.bash_completion.d/; then
-    tmp=$(mktemp) && wget-aria-name $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/vim/.aliases.d/vim_nvim.sh
-    tmp1=$(mktemp) && wget-aria-name $tmp1 https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/vim/.bash_completion.d/vim_nvim.bash
-    file=$tmp
-    file1=$tmp1
+if test -d ~/.bash_completion.d/ && ! test -f ~/.bash_completion.d/vim_nvim.bash; then
+    file1=$TOP/cli-tools/vim/.bash_completion.d/vim_nvim.bash
+    if ! test -d $TOP/vim/.bash_completion.d/; then
+        tmp1=$(mktemp) && wget-aria-name $tmp1 https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/vim/.bash_completion.d/vim_nvim.bash
+        file1=$tmp1
+    fi 
+fi
+
+if test -d ~/.zsh_completion.d/ && ! test -f ~/.zsh_completion.d/vim_nvim.zsh; then
+    file2=$TOP/cli-tools/vim/.bash_completion.d/vim_nvim.zsh
+    if ! test -d $TOP/vim/.zsh_completion.d/; then
+        tmp2=$(mktemp) && wget-aria-name $tmp1 https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/vim/.zsh_completion.d/vim_nvim.zsh
+        file2=$tmp2
+    fi 
+fi
+
+if test -d ~/.aliases.d/ && ! test -f ~/.aliases.d/vim_nvim.sh; then
+    file=$TOP/cli-tools/vim/.aliases.d/vim_nvim.sh
+    if ! test -d $TOP/vim/.aliases.d/ || ! test -d $TOP/vim/.bash_completion.d/; then
+        tmp=$(mktemp) && wget-aria-name $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/vim/.aliases.d/vim_nvim.sh
+        file=$tmp
+    fi
 fi
 
 vimsh_r() {

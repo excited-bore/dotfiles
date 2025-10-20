@@ -13,13 +13,6 @@ else
 fi
 
 
-if ! test -f $TOP/checks/check_envvar_aliases_completions_keybinds.sh; then
-     source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar_aliases_completions_keybinds.sh) 
-else
-    . $TOP/checks/check_envvar_aliases_completions_keybinds.sh
-fi
-
-
 if ! hash nix &> /dev/null; then
     reade -Q 'GREEN' -i 'system user' -p "Install nix systemwide or only $USER [System/user]: " glob
     if [[ $glob == 'system' ]]; then
@@ -29,20 +22,15 @@ if ! hash nix &> /dev/null; then
     fi
 fi
 
-if hash nix &> /dev/null; then
-    local nixsh=$(pwd)/aliases/.aliases.d/nix.sh
+if hash nix &> /dev/null && test -d ~/.aliases.d; then
+    nixsh=$TOP/shell/aliases/.aliases.d/nix.sh
     if ! test -f $nixsh; then
-       tmp=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/nix.sh > $tmp
-       nixsh=$tmp
+       tmp=$(mktemp -d) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/shell/aliases/.aliases.d/nix.sh > $tmp/nix.sh
+       nixsh=$tmp/nix.sh
     fi
-
-    function ins_nix_r(){
-        sudo cp $nixsh /root/.aliases.d/
-    }	
 
     function ins_nix(){
         cp $nixsh ~/.aliases.d/nix.sh
-        yes-edit-no -f ins_nix_r -g "$nixsh" -p "Install nix.sh to /root? (nix bash aliases)" 
     }	
     yes-edit-no -f ins_nix -g "$nixsh" -p "Install nix.sh to $HOME? (nix bash aliases)"
 
@@ -51,4 +39,3 @@ if hash nix &> /dev/null; then
     fi
     nix-shell -p nix-info --run nix-info
 fi
-

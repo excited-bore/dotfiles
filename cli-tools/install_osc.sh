@@ -31,15 +31,12 @@ if ! hash osc &> /dev/null; then
 fi
 
 if hash osc &> /dev/null; then
-    if ! test -f $TOP/checks/check_completions_dir.sh; then
-         source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh) 
-    else
-        . $TOP/checks/check_completions_dir.sh
+   
+    if test -d ~/.bash_completion.d/ && ! test -f ~/.bash_completion.d/osc.bash; then
+        osc completion bash > ~/.bash_completion.d/osc.bash
     fi
-
-    osc completion bash > ~/.bash_completion.d/osc.bash
-    osc completion zsh > ~/.bash_completion.d/osc.zsh
-
-    test -n "$BASH_VERSION" && source ~/.bashrc
-    test -n "$ZSH_VERSION" && source ~/.zshrc
+    
+    if test -d ~/.zsh_completion.d/ && ! test -f ~/.zsh_completion.d/osc.zsh; then
+        osc completion zsh > ~/.bash_completion.d/osc.zsh
+    fi
 fi

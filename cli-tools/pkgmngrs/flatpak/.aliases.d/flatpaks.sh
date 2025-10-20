@@ -1,7 +1,4 @@
 ### FLATPAK ###                           
-if ! type readyn &> /dev/null && [ -f ~/.aliases.d/00-rlwrap_scripts.sh ]; then
-    . ~/.aliases.d/00-rlwrap_scripts.sh
-fi
 
 function flatpak (){
   env -u SESSION_MANAGER flatpak "$@"

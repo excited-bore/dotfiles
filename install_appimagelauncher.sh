@@ -18,10 +18,10 @@ else
     . $TOP/checks/check_appimage_ready.sh
 fi
 
-if ! [[ -f $TOP/aliases/.aliases.d/package_managers.sh ]]; then
-    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/package_managers.sh)
+if ! [[ -f $TOP/shell/aliases/.aliases.d/package_managers.sh ]]; then
+    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/shell/aliases/.aliases.d/package_managers.sh)
 else
-    source $TOP/aliases/.aliases.d/package_managers.sh
+    source $TOP/shell/aliases/.aliases.d/package_managers.sh
 fi
 
 if ! hash AppImageLauncher &>/dev/null; then

@@ -22,23 +22,16 @@ if ! hash pipx &> /dev/null; then
     fi
 fi
 
-if ! test -f $TOP/checks/check_completions_dir.sh; then
-     source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)
-else
-    . $TOP/checks/check_completions_dir.sh
-fi
-
 
 if ! hash poetry &> /dev/null; then
     pipx install poetry
     pipx upgrade poetry
 fi
 
-if ! test -f ~/.bash_completion.d/poetry.bash; then
+if test -d ~/.bash_completion.d/ && ! test -f ~/.bash_completion.d/poetry.bash; then
     poetry completions bash >> ~/.bash_completion.d/poetry.bash
 fi
 
-if ! test -f ~/.zsh_completion.d/poetry.zsh; then
+if test -d ~/.zsh_completion.d/ && ! test -f ~/.zsh_completion.d/poetry.zsh; then
     poetry completions zsh >> ~/.zsh_completion.d/poetry.zsh
 fi
-

@@ -1,65 +1,11 @@
 [[ "$1" == 'n' ]] && SYSTEM_UPDATED='TRUE'
 
+TOP=$(git rev-parse --show-toplevel)
+
 READE_NOSTYLE='filecomp-only'
 
 #! hash wget &> /dev/null && hash brew &> /dev/null &&
 #    brew install wget 
-
-
-# https://stackoverflow.com/questions/5412761/using-colors-with-printf
-# Execute (during printf) for colored prompt
-# printf  "${blue}This text is blue${white}\n"
-
-red=$(tput sgr0 && tput setaf 1)
-red1=$(tput sgr0 && tput setaf 9)
-green=$(tput sgr0 && tput setaf 2)
-green1=$(tput sgr0 && tput setaf 10)
-yellow=$(tput sgr0 && tput setaf 3)
-yellow1=$(tput sgr0 && tput setaf 11)
-blue=$(tput sgr0 && tput setaf 4)
-blue1=$(tput sgr0 && tput setaf 12)
-magenta=$(tput sgr0 && tput setaf 5)
-magenta1=$(tput sgr0 && tput setaf 13)
-cyan=$(tput sgr0 && tput setaf 6)
-cyan1=$(tput sgr0 && tput setaf 14)
-white=$(tput sgr0 && tput setaf 7)
-white1=$(tput sgr0 && tput setaf 15)
-black=$(tput sgr0 && tput setaf 16)
-grey=$(tput sgr0 && tput setaf 8)
-
-RED=$(tput setaf 1 && tput bold)
-RED1=$(tput setaf 9 && tput bold)
-GREEN=$(tput setaf 2 && tput bold)
-GREEN1=$(tput setaf 10 && tput bold)
-YELLOW=$(tput setaf 3 && tput bold)
-YELLOW1=$(tput setaf 11 && tput bold)
-BLUE=$(tput setaf 4 && tput bold)
-BLUE1=$(tput setaf 12 && tput bold)
-MAGENTA=$(tput setaf 5 && tput bold)
-MAGENTA1=$(tput setaf 13 && tput bold)
-CYAN=$(tput setaf 6 && tput bold)
-CYAN1=$(tput setaf 14 && tput bold)
-WHITE=$(tput setaf 7 && tput bold)
-WHITE1=$(tput setaf 15 && tput bold)
-BLACK=$(tput setaf 16 && tput bold)
-GREY=$(tput setaf 8 && tput bold)
-
-bold=$(tput bold)
-underline_on=$(tput smul)
-underline_off=$(tput rmul)
-standout_on=$(tput smso)
-standout_off=$(tput rmso)
-
-half_bright=$(tput dim)
-reverse_color=$(tput rev)
-
-# Reset
-normal=$(tput sgr0)
-
-# Broken !! (Or im dumb?)
-blink=$(tput blink)
-underline=$(tput ul)
-italic=$(tput it)
 
 alias get-script-dir='cd "$( dirname "$-1" )" && pwd'
 
@@ -176,34 +122,46 @@ export LESS='-R --use-color --LINE-NUMBERS --quit-if-one-screen -Q --no-vbell --
 # Arguments: Completions(string with space entries, AWK works too),return value(-a password prompt, -c complete filenames, -p prompt flag, -Q prompt colour, -b break-chars (when does a string break for autocomp), -e change char given for multiple autocompletions)
 # 'man rlwrap' to see all unimplemented options
 
+if ! test -f $TOP/shell/aliases/.aliases.d/00-colors.sh; then
+    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/shell/aliases/.aliases.d/00-colors.sh)
+else
+    source $TOP/shell/aliases/.aliases.d/00-colors.sh
+fi
+
+
 if ! type reade &>/dev/null; then
-   if ! [ -f aliases/.aliases.d/00-rlwrap_scripts.sh ]; then
-        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/00-rlwrap_scripts.sh)
+    if ! [ -f $TOP/shell/rlwrap-scripts/reade ]; then
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/shell/rlwrap-scripts/reade)
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/shell/rlwrap-scripts/readyn)
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/shell/rlwrap-scripts/yes-edit-no)
     else
-        . ./aliases/.aliases.d/00-rlwrap_scripts.sh
+        source $TOP/shell/rlwrap-scripts/reade
+        source $TOP/shell/rlwrap-scripts/readyn
+        source $TOP/shell/rlwrap-scripts/yes-edit-no
     fi
 fi
 
-if ! [ -f checks/check_system.sh ]; then
+if ! [ -f $TOP/checks/check_system.sh ]; then
     source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_system.sh)
 else
-    . ./checks/check_system.sh
+    . $TOP/checks/check_system.sh
 fi
 
 # printf "${green} Will now start with updating system ${normal}\n"
-
 if ! type update-system &>/dev/null; then
-    if ! [ -f aliases/.aliases.d/update-system.sh ]; then
-        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/update-system.sh)
+    if ! [ -f $TOP/shell/aliases/.aliases.d/update-system.sh ]; then
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/shell/aliases/.aliases.d/update-kernel.sh)
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/shell/aliases/.aliases.d/update-system.sh)
     else
-        . ./aliases/.aliases.d/update-system.sh
+        . $TOP/shell/aliases/.aliases.d/update-kernel.sh
+        . $TOP/shell/aliases/.aliases.d/update-system.sh
     fi
 fi
 
-if ! test -f aliases/.aliases.d/package_managers.sh; then
-    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/package_managers.sh)
+if ! test -f $TOP/shell/aliases/.aliases.d/package_managers.sh; then
+    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/shell/aliases/.aliases.d/package_managers.sh)
 else
-    . ./aliases/.aliases.d/package_managers.sh
+    . $TOP/shell/aliases/.aliases.d/package_managers.sh
 fi
 
 

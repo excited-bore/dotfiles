@@ -82,10 +82,10 @@ elif [[ "$distro_base" == "Debian" ]]; then
     elif [[ $pager == "colordiff" ]]; then
         eval "$pac_ins_y colordiff"
     elif [[ $pager == "delta" ]]; then
-        if ! [[ -f $TOP/aliases/.aliases.d/git.sh ]]; then
-            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.aliases.d/git.sh)
+        if ! [[ -f $TOP/shell/aliases/.aliases.d/git.sh ]]; then
+            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/shell/aliases/.aliases.d/git.sh)
         else
-            . $TOP/aliases/.aliases.d/git.sh
+            . $TOP/shell/aliases/.aliases.d/git.sh
         fi
         get-latest-releases-github 'https://github.com/dandavison/delta/releases' "$TMPDIR" 'git-delta_.*_amd64.deb' 
         sudo dpkg -i $TMPDIR/git-delta_*_amd64.deb 
