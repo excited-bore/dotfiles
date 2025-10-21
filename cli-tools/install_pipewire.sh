@@ -239,13 +239,13 @@ if ! [[ -f $file ]]; then
     file=$tmpd/pipewire.sh
 fi
 
-pipewire_r(){ 
-    sudo cp $file /root/.aliases.d/; 
-}
+#pipewire_r(){ 
+#    sudo cp $file /root/.aliases.d/; 
+#}
 
 pipewiresh(){
     cp $file ~/.aliases.d/;
-    yes-edit-no -Y 'YELLOW' -f pipewire_r -g "$file" -p "Install pipewire aliases at /root/.aliases.d/?"
+    #yes-edit-no -Y 'YELLOW' -f pipewire_r -g "$file" -p "Install pipewire aliases at /root/.aliases.d/?"
 }
 yes-edit-no -f pipewiresh -g "$file" -p "Install pipewire aliases at ~/.aliases.d/?"
 

@@ -16,9 +16,9 @@ fi
 
 
 if [[ $distro_base == "Arch" ]]; then
-    eval "$pac_ins opendoas "
+    eval "$pac_ins_y opendoas "
 elif [[ $distro_base == "Debian" ]]; then
-    eval "$pac_ins doas"
+    eval "$pac_ins_y doas"
 fi
 
 sed -i "s/user/$USER/g" $TOP/cli-tools/doas/doas.conf
@@ -30,10 +30,10 @@ if test -d ~/.aliases.d/; then
     readyn -p "Install doas.sh? (~/.aliases.d/doas.sh)" doas
     if [[ $doas == 'y' ]]; then 
         cp $TOP/cli-tools/doas/doas.sh ~/.aliases.d/doas.sh
-        readyn -p "Install doas.sh for root? (/root/.aliases.d/doas.sh" gdoas
-        if [[ $gdoas == 'y' ]]; then
-            sudo cp $TOP/cli-tools/doas/doas.sh /root/.aliases.d/doas.sh
-        fi
+        #readyn -p "Install doas.sh for root? (/root/.aliases.d/doas.sh" gdoas
+        #if [[ $gdoas == 'y' ]]; then
+        #    sudo cp $TOP/cli-tools/doas/doas.sh /root/.aliases.d/doas.sh
+        #fi
     fi
     unset doas gdoas
 fi

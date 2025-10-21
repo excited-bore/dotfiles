@@ -195,15 +195,15 @@ fi
 
 unset tmuxx
 
-if ! [ -e /root/.bash_completion.d/tmux.bash ]; then
-    readyn -Y 'YELLOW' -p "Install tmux bash completions at root?" tmuux
-    if [[ "$tmuux" == "y" ]]; then
-        if ! [ -e /root/.bash_completion.d/tmux.bash ]; then
-            wget-curl https://raw.githubusercontent.com/imomaliev/tmux-bash-completion/master/completions/tmux.bash | sudo tee -a /root/.bash_completion.d/tmux.bash &>/dev/null
-        fi
-    fi
-    unset tmuux
-fi
+#if ! [ -e /root/.bash_completion.d/tmux.bash ]; then
+#    readyn -Y 'YELLOW' -p "Install tmux bash completions at root?" tmuux
+#    if [[ "$tmuux" == "y" ]]; then
+#        if ! [ -e /root/.bash_completion.d/tmux.bash ]; then
+#            wget-curl https://raw.githubusercontent.com/imomaliev/tmux-bash-completion/master/completions/tmux.bash | sudo tee -a /root/.bash_completion.d/tmux.bash &>/dev/null
+#        fi
+#    fi
+#    unset tmuux
+#fi
 
 if test -d ~/.aliases.d/; then
     readyn -p "Install tmux.sh at ~/.aliases.d/? (tmux aliases)" tmuxx

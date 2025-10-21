@@ -305,7 +305,7 @@ if [[ "$langs" == 'y' ]]; then
             else
                 . $TOP/cli-tools/install_ruby.sh
             fi
-            sudo gem install neovim
+            gem install neovim
         fi
     fi
 
@@ -512,23 +512,23 @@ echo "Check installed nvim plugins with 'Lazy' / Check installed vim plugins wit
 
 if test -d ~/.bash_completion.d/ && ! test -f ~/.bash_completion.d/vim_nvim.bash; then
     file1=$TOP/cli-tools/vim/.bash_completion.d/vim_nvim.bash
-    if ! test -d $TOP/vim/.bash_completion.d/; then
+    if ! test -d $TOP/cli-tools/vim/.bash_completion.d/; then
         tmp1=$(mktemp) && wget-aria-name $tmp1 https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/vim/.bash_completion.d/vim_nvim.bash
         file1=$tmp1
     fi 
 fi
 
 if test -d ~/.zsh_completion.d/ && ! test -f ~/.zsh_completion.d/vim_nvim.zsh; then
-    file2=$TOP/cli-tools/vim/.bash_completion.d/vim_nvim.zsh
-    if ! test -d $TOP/vim/.zsh_completion.d/; then
-        tmp2=$(mktemp) && wget-aria-name $tmp1 https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/vim/.zsh_completion.d/vim_nvim.zsh
+    file2=$TOP/cli-tools/vim/.zsh_completion.d/vim_nvim.zsh
+    if ! test -d $TOP/cli-tools/vim/.zsh_completion.d/; then
+        tmp2=$(mktemp) && wget-aria-name $tmp2 https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/vim/.zsh_completion.d/vim_nvim.zsh
         file2=$tmp2
     fi 
 fi
 
 if test -d ~/.aliases.d/ && ! test -f ~/.aliases.d/vim_nvim.sh; then
     file=$TOP/cli-tools/vim/.aliases.d/vim_nvim.sh
-    if ! test -d $TOP/vim/.aliases.d/ || ! test -d $TOP/vim/.bash_completion.d/; then
+    if ! test -d $TOP/cli-tools/vim/.aliases.d/; then
         tmp=$(mktemp) && wget-aria-name $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/vim/.aliases.d/vim_nvim.sh
         file=$tmp
     fi

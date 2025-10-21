@@ -1,3 +1,5 @@
+# https://github.com/cykerway/complete-alias
+
 SYSTEM_UPDATED='TRUE'
 
 TOP=$(git rev-parse --show-toplevel)
@@ -20,12 +22,12 @@ if ! [ -e ~/.bash_completion.d/complete_alias.bash ]; then
 fi
 
 if test -f ~/.bashrc && ! grep -q '^complete -F _complete_alias' ~/.bashrc; then
-    if grep -q '\[ -f ~/.keybinds \]' ~/.bashrc; then
-        sed -i 's|\(\[ -f \~/.keybinds \] \&\& source \~/.keybinds\)|\1\n\ncomplete -F _complete_alias\n|g' ~/.bashrc
+    if grep -q '\[ -f ~/.bash_keybinds \]' ~/.bashrc; then
+        sed -i 's|\(\[ -f \~/.bash_keybinds \] \&\& source \~/.bash_keybinds\)|\1\n\ncomplete -F _complete_alias "${!BASH_ALIASES[@]}"\n|g' ~/.bashrc
     elif grep -q '\[ -f ~/.bash_completion \]' ~/.bashrc; then
-        sed -i 's|\(\[ -f \~/.bash_completion \] \&\& source \~/.bash_completion\)|\1\n\ncomplete -F _complete_alias\n|g' ~/.bashrc
+        sed -i 's|\(\[ -f \~/.bash_completion \] \&\& source \~/.bash_completion\)|\1\n\ncomplete -F _complete_alias "${!BASH_ALIASES[@]}"\n|g' ~/.bashrc
     elif grep -q '\[ -f ~/.bash_aliases \]' ~/.bashrc; then
-        sed -i 's|\(\[ -f \~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\1\n\ncomplete -F _complete_alias\n|g' ~/.bashrc
+        sed -i 's|\(\[ -f \~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\1\n\ncomplete -F _complete_alias "${!BASH_ALIASES[@]}"\n|g' ~/.bashrc
     else
         echo 'complete -F _complete_alias "${!BASH_ALIASES[@]}"' >> ~/.bashrc
     fi

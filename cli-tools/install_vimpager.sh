@@ -59,17 +59,6 @@ fi
 unset moor_usr
 
 
-readyn -n -p "Set .vimrc as default vimpager read config for root?" conf
-if [[ "$conf" == "y" ]]; then
-    if sudo grep -q "VIMPAGER_RC" $ENV_R; then 
-        sudo sed -i "s|.export VIMPAGER_RC=|export VIMPAGER_RC=|g" $ENV_R
-        sudo sed -i "s|export VIMPAGER_RC=.*|export VIMPAGER_RC=~/.vimrc|g" $ENV_R
-    else
-        printf "\n# VIMPAGER\nexport VIMPAGER_RC=~/.vimrc\n" | sudo tee -a $ENV_R &> /dev/null
-    fi
-fi
-unset conf
-
 readyn -n "Set vimpager default pager for root?" moor_root
 if [[ "y" == "$moor_root" ]]; then
     if sudo grep -q " PAGER=" $ENV_R; then
@@ -78,5 +67,15 @@ if [[ "y" == "$moor_root" ]]; then
     else
         printf "export PAGER=$(whereis vimpager | awk '{print $2;}')\n" | sudo tee -a $ENV_R &> /dev/null
     fi
+    
+    readyn -n -p "Set /root/.vimrc as default vimpager readconfig for root?" conf
+    if [[ "$conf" == "y" ]]; then
+        if sudo grep -q "VIMPAGER_RC" $ENV_R; then 
+            sudo sed -i "s|.export VIMPAGER_RC=|export VIMPAGER_RC=|g" $ENV_R
+            sudo sed -i "s|export VIMPAGER_RC=.*|export VIMPAGER_RC=~/.vimrc|g" $ENV_R
+        else
+            printf "\n# VIMPAGER\nexport VIMPAGER_RC=~/.vimrc\n" | sudo tee -a $ENV_R &> /dev/null
+        fi
+    fi
 fi
-unset moor_root
+unset conf moor_root

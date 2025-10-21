@@ -15,7 +15,7 @@ fi
 if ! test -f ~/.exrc; then
     readyn -p "Install exrc (ex config) at $HOME?"  nsrc
     if [[ $nsrc == 'y' ]]; then
-        cp ex/.exrc ~/.exrc
+        cp $TOP/cli-tools/ex/.exrc ~/.exrc
     fi
 fi
 unset nsrc
@@ -24,7 +24,7 @@ echo "This next $(tput setaf 1)sudo$(tput sgr0) will check for /root/.exrc";
 if ! sudo test -f /root/.exrc; then
     readyn -p 'Install exrc (ex config) at /root?' nsrc
     if [[ $nsrc == 'y' ]]; then
-        sudo cp ex/.exrc /root/.exrc
+        sudo cp $TOP/cli-tools/ex/.exrc /root/.exrc
     fi
 fi
 unset nsrc

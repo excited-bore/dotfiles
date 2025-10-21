@@ -29,6 +29,16 @@ echo "Next $(tput setaf 1)sudo$(tput sgr0) will create /var/lib/gems and set the
 sudo mkdir /var/lib/gems
 sudo chown -R $USER:$USER /var/lib/gems/
 
+if test -f ~/.environment.env; then
+    sed -i 's|.export GEM_HOME="$(ruby -e '\''puts Gem.user_dir'\'')"|export GEM_HOME="$(ruby -e '\''puts Gem.user_dir'\'')"|' ~/.environment.env 
+    sed -i 's|.export PATH=$PATH:$GEM_HOME/bin|export PATH=$PATH:$GEM_HOME/bin|' ~/.environment.env 
+else
+    echo 'export GEM_HOME="$(ruby -e '\''puts Gem.user_dir'\'')"' >> ~/.bashrc
+    echo 'export PATH=$PATH:$GEM_HOME/bin' >> ~/.bashrc
+    echo 'export GEM_HOME="$(ruby -e '\''puts Gem.user_dir'\'')"' >> ~/.zshrc
+    echo 'export PATH=$PATH:$GEM_HOME/bin' >> ~/.zshrc
+fi
+
 if test -f ~/.bashrc && ! grep -q 'eval "$(rbenv init -)' ~/.bashrc; then
     printf "eval \"\$(rbenv init -)\"\n" >>~/.bashrc
 fi

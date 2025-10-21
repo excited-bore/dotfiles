@@ -101,7 +101,7 @@ if hash moor &> /dev/null; then
         fi
     fi
    
-    PAGER='moor' 
+    export PAGER='moor' 
 
 fi
     #./setup_git_build_from_source.sh "y" "" "https://github.com" "neovim/neovim" "stable" "sudo apt update; eval "$pac_ins ninja-build gettext libtool libtool-bin cmake g++ pkg-config unzip curl doxygen" "make CMAKE_BUILD_TYPE=RelWithDebInfo; sudo make install" "sudo make uninstall" "make distclean; make deps" "y""
