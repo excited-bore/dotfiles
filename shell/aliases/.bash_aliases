@@ -15,11 +15,6 @@ if [ -d ~/.bash_aliases.d/ ] && [ "$(command ls -A ~/.bash_aliases.d/)" ]; then
     done
 fi
 
-# https://github.com/scop/bash-completion
-# Read the section 'Where should I install my own local completions?'
-# The bash-completion package does not handle the complete_alias function well so we ignore it ~/.bash_completion and source it here
-[ -f ~/.bash_completion.d/complete_alias.bash ] && source ~/.bash_completion.d/complete_alias.bash  
-
 function unalias(){
 	command unalias $@
 	while read -r line; do

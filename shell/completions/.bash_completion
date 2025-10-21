@@ -14,12 +14,11 @@
 
 if [ -d /usr/share/bash-completion/completions/ ] && [ "$(command ls -A /usr/share/bash-completion/completions/)" ]; then
     source /usr/share/bash-completion/completions/systemctl 
+     
 fi
 
 if [ -d ~/.bash_completion.d/ ] && [ "$(command ls -A ~/.bash_completion.d/)" ]; then
-  for compl in ~/.bash_completion.d/*; do 
-      if ! [[ "$compl" =~ "complete_alias" ]]; then 
+    for compl in ~/.bash_completion.d/*; do
         source "$compl"
-      fi
-  done
+    done
 fi
