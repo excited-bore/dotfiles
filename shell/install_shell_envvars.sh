@@ -102,7 +102,7 @@ environment-variables() {
         readyn -p "Source $HOME/.environment.env in $HOME/.bashrc?" bashrc
         if [[ $bashrc == 'y' ]]; then
             if grep -q "[ -f ~/.bash_completion ]" ~/.bashrc; then
-                sed -i 's|\(\[ -f ~/.bash_completion \] \&\& source \~/.bash_completion\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' ~/.bashrc
+                sed -i 's|\(\[ -f ~/.bash_completion \] \&\& [ -z ${BASH_COMPLETION_VERSINFO:-} ] \&\& source \~/.bash_completion\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' ~/.bashrc
             elif grep -q "[ -f ~/.bash_aliases ]" ~/.bashrc || grep -q "~/.bash_aliases" ~/.bashrc; then
                 sed -i 's|\(\[ -f ~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' ~/.bashrc
                 sed -i 's|\(if \[ -f ~/.bash_aliases \]; then\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' ~/.bashrc
@@ -119,7 +119,7 @@ environment-variables() {
         readyn -p "Source $HOME/.environment.env in $HOME/.zshrc?" zshrc
         if [[ $zshrc == 'y' ]]; then
             #if grep -q "[ -f ~/.bash_completion ]" ~/.bashrc; then
-            #    sed -i 's|\(\[ -f ~/.bash_completion \] \&\& source \~/.bash_completion\)|\[ -f \~/.environment.env \] \&\& source \~/.environment\n\n\1\n|g' ~/.bashrc
+            #    sed -i 's|\(\[ -f ~/.bash_completion \] \&\& [ -z ${BASH_COMPLETION_VERSINFO:-} ] \&\& source \~/.bash_completion\)|\[ -f \~/.environment.env \] \&\& source \~/.environment\n\n\1\n|g' ~/.bashrc
             #elif grep -q "[ -f ~/.bash_aliases ]" ~/.bashrc || grep -q "~/.bash_aliases" ~/.bashrc; then
             #    sed -i 's|\(\[ -f ~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\[ -f \~/.environment.env \] \&\& source \~/.environment\n\n\1\n|g' ~/.bashrc
             #    sed -i 's|\(if \[ -f ~/.bash_aliases \]; then\)|\[ -f \~/.environment.env \] \&\& source \~/.environment\n\n\1\n|g' ~/.bashrc

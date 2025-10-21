@@ -23,7 +23,7 @@ if test -f ~/.bashrc && ! grep -q '^complete -F _complete_alias' ~/.bashrc; then
     if grep -q '\[ -f ~/.bash_keybinds \]' ~/.bashrc; then
         sed -i 's|\(\[ -f \~/.bash_keybinds \] \&\& source \~/.bash_keybinds\)|\1\n\ncomplete -F _complete_alias "${!BASH_ALIASES[@]}"\n|g' ~/.bashrc
     elif grep -q '\[ -f ~/.bash_completion \]' ~/.bashrc; then
-        sed -i 's|\(\[ -f \~/.bash_completion \] \&\& source \~/.bash_completion\)|\1\n\ncomplete -F _complete_alias "${!BASH_ALIASES[@]}"\n|g' ~/.bashrc
+        sed -i 's|\(\[ -f \~/.bash_completion \] \&\& [ -z ${BASH_COMPLETION_VERSINFO:-} ] \&\& source \~/.bash_completion\)|\1\n\ncomplete -F _complete_alias "${!BASH_ALIASES[@]}"\n|g' ~/.bashrc
     elif grep -q '\[ -f ~/.bash_aliases \]' ~/.bashrc; then
         sed -i 's|\(\[ -f \~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\1\n\ncomplete -F _complete_alias "${!BASH_ALIASES[@]}"\n|g' ~/.bashrc
     else

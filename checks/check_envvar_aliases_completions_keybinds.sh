@@ -38,9 +38,9 @@ if [[ -n "$BASH" ]]; then
     
     if ! grep -q "~/.bash_completion" ~/.bashrc; then
         if grep -q "~/.bash_aliases" ~/.bashrc; then
-            sed -i 's|\(\[ -f ~/.bash_aliases \] && source ~/.bash_aliases\)|\[ -f \~/.bash_completion \] \&\& source \~/.bash_completion\n\1\n|g' ~/.bashrc
+            sed -i 's|\(\[ -f ~/.bash_aliases \] && source ~/.bash_aliases\)|\[ -f \~/.bash_completion \] \&\& [ -z ${BASH_COMPLETION_VERSINFO:-} ] \&\& source \~/.bash_completion\n\1\n|g' ~/.bashrc
         else
-            printf "\n[ -f ~/.bash_completion ] && source ~/.bash_completion\n\n" >>~/.bashrc
+            printf "\n[ -f ~/.bash_completion ] && [ -z \${BASH_COMPLETION_VERSINFO:-} ] && source ~/.bash_completion\n\n" >>~/.bashrc
         fi
     fi
      
@@ -77,7 +77,7 @@ fi
 #        sed -i 's|\(\[ -f ~/.keybinds \] \&\& source ~/.keybinds\)|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\n\1\n|g' ~/.bashrc
 #    elif grep -q "[ -f ~/.bash_completion ]" ~/.bashrc; then
 #        sed -i 's|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash||g' ~/.bashrc
-#        sed -i 's|\(\[ -f ~/.bash_completion \] \&\& source \~/.bash_completion\)|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\n\1\n|g' ~/.bashrc
+#        sed -i 's|\(\[ -f ~/.bash_completion \] \&\& [ -z ${BASH_COMPLETION_VERSINFO:-} ] \&\& source \~/.bash_completion\)|\[ -f \~/.fzf.bash \] \&\& source \~/.fzf.bash\n\1\n|g' ~/.bashrc
 #    fi
 #    if grep -q "complete -F _complete_alias" ~/.bashrc; then
 #        sed -i '/complete -F _complete_alias "${!BASH_ALIASES\[@\]}"/d' ~/.bashrc
@@ -98,79 +98,67 @@ fi
 #    echo "fi" >> ~/.bashrc
 #fi
 
-echo "This next $(tput setaf 1)sudo$(tput sgr0) is checks for the envvar, bash_alias, bash_completion and keybind files and dirs in '/root/'."
-
-if [ -f /root/.environment.env ] && ! grep -q "~/.environment.env" /root/.bashrc; then
-    printf "\n[ -f ~/.environment.env ] && source ~/.environment.env\n\n" | sudo tee -a /root/.bashrc &>/dev/null
-    printf "Added '[ -f ~/.environment.env ] && source ~/.environment.env' to /root/.bashrc\n"
-fi
-
-if ! sudo [ -f /root/.bash_aliases ]; then
-    echo "Next $(tput setaf 1)sudo$(tput sgr0) will install '.aliases.d' in /root and source files in it with '/root/.bash_aliases' "
-    sudo cp ~/.bash_aliases /root/
-    if ! sudo [ -d /root/.aliases.d/ ]; then
-        sudo mkdir /root/.aliases.d/
-        #sudo cp ~/.aliases.d/check_system.sh /root/.aliases.d/check_system.sh
-        #sudo cp ~/.aliases.d/bash.sh /root/.aliases.d/bash.sh
-    fi
-    if ! sudo grep -q "~/.bash_aliases" ~/.bashrc; then
-        printf "\n[ -f ~/.bash_aliases ] && source ~/.bash_aliases\n\n" | sudo tee -a /root/.bashrc &>/dev/null
-        if sudo grep -q "complete -F _complete_alias" /root/.bashrc; then
-            sudo sed -i '/complete -F _complete_alias "${!BASH_ALIASES\[@\]}"/d' /root/.bashrc
-        fi
-    fi
-fi
-
-if ! sudo [ -f /root/.bash_completion ]; then
-    echo "Next $(tput setaf 1)sudo$(tput sgr0) will install '.bash_completion.d' in /root and source files in it with '/root/.bash_completion"
-    if ! sudo [ -f /root/.bash_completion ]; then
-        if ! [ -f completions/.bash_completion ]; then
-            sudo wget -O /root/.bash_aliases https://raw.githubusercontent.com/excited-bore/dotfiles/main/completions/.bash_completion
-        else
-            sudo cp completions/.bash_completion /root/
-        fi
-    fi
-    if ! sudo [ -d /root/.bash_completion.d/ ]; then
-        sudo mkdir /root/.bash_completion.d/
-    fi
-
-    if ! sudo grep -q "~/.bash_completion" /root/.bashrc; then
-        if sudo grep -q "~/.bash_aliases" /root/.bashrc; then
-            sudo sed -i 's|\(\[ -f ~/.bash_aliases \] && source ~/.bash_aliases\)|\[ -f \~/.bash_completion \] \&\& source \~/.bash_completion\n\1\n|g' /root/.bashrc &>/dev/null
-        else
-            printf "\n[ -f ~/.bash_completion ] && source ~/.bash_completion\n\n" | sudo tee -a /root/.bashrc &>/dev/null
-        fi
-    fi
-fi
-
-if ! sudo [ -f /root/.keybinds ]; then
-    echo "Next $(tput setaf 1)sudo$(tput sgr0) will install '.keybinds.d' in /root and source files in it with '/root/.keybinds"
-    if ! [ -f /root/.keybinds ]; then
-        if ! [ -f keybinds/.keybinds ]; then
-            sudo wget -O /root/.bash_aliases https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds
-        else
-            sudo cp keybinds/.keybinds /root/
-        fi
-    fi
-    if ! sudo [ -d /root/.keybinds.d/ ]; then
-        sudo mkdir /root/.keybinds.d/
-    fi
-    if ! sudo grep -q "~/.keybinds" /root/.bashrc; then
-        printf "\n[ -f ~/.keybinds/ ] && source ~/.keybinds\n" | sudo tee -a /root/.bashrc &>/dev/null
-    fi
-fi
-
-# Check one last time if ~/.bash_preexec - for both $USER and root - is the last line in their ~/.bash_profile and ~/.bashrc
-
-if ! [ -f ./checks/check_bash_source_order.sh ]; then
-    if hash curl &>/dev/null; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_bash_source_order.sh)
-    else
-        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_bash_source_order.sh)
-    fi
-else
-    . ./checks/check_bash_source_order.sh
-fi
+#echo "This next $(tput setaf 1)sudo$(tput sgr0) is checks for the envvar, bash_alias, bash_completion and keybind files and dirs in '/root/'."
+#
+#if [ -f /root/.environment.env ] && ! grep -q "~/.environment.env" /root/.bashrc; then
+#    printf "\n[ -f ~/.environment.env ] && source ~/.environment.env\n\n" | sudo tee -a /root/.bashrc &>/dev/null
+#    printf "Added '[ -f ~/.environment.env ] && source ~/.environment.env' to /root/.bashrc\n"
+#fi
+#
+#if ! sudo [ -f /root/.bash_aliases ]; then
+#    echo "Next $(tput setaf 1)sudo$(tput sgr0) will install '.aliases.d' in /root and source files in it with '/root/.bash_aliases' "
+#    sudo cp ~/.bash_aliases /root/
+#    if ! sudo [ -d /root/.aliases.d/ ]; then
+#        sudo mkdir /root/.aliases.d/
+#        #sudo cp ~/.aliases.d/check_system.sh /root/.aliases.d/check_system.sh
+#        #sudo cp ~/.aliases.d/bash.sh /root/.aliases.d/bash.sh
+#    fi
+#    if ! sudo grep -q "~/.bash_aliases" ~/.bashrc; then
+#        printf "\n[ -f ~/.bash_aliases ] && source ~/.bash_aliases\n\n" | sudo tee -a /root/.bashrc &>/dev/null
+#        if sudo grep -q "complete -F _complete_alias" /root/.bashrc; then
+#            sudo sed -i '/complete -F _complete_alias "${!BASH_ALIASES\[@\]}"/d' /root/.bashrc
+#        fi
+#    fi
+#fi
+#
+#if ! sudo [ -f /root/.bash_completion ]; then
+#    echo "Next $(tput setaf 1)sudo$(tput sgr0) will install '.bash_completion.d' in /root and source files in it with '/root/.bash_completion"
+#    if ! sudo [ -f /root/.bash_completion ]; then
+#        if ! [ -f completions/.bash_completion ]; then
+#            sudo wget -O /root/.bash_aliases https://raw.githubusercontent.com/excited-bore/dotfiles/main/completions/.bash_completion
+#        else
+#            sudo cp completions/.bash_completion /root/
+#        fi
+#    fi
+#    if ! sudo [ -d /root/.bash_completion.d/ ]; then
+#        sudo mkdir /root/.bash_completion.d/
+#    fi
+#
+#    if ! sudo grep -q "~/.bash_completion" /root/.bashrc; then
+#        if sudo grep -q "~/.bash_aliases" /root/.bashrc; then
+#            sudo sed -i 's|\(\[ -f ~/.bash_aliases \] && source ~/.bash_aliases\)|\[ -f \~/.bash_completion \] \&\& source \~/.bash_completion\n\1\n|g' /root/.bashrc &>/dev/null
+#        else
+#            printf "\n[ -f ~/.bash_completion ] && source ~/.bash_completion\n\n" | sudo tee -a /root/.bashrc &>/dev/null
+#        fi
+#    fi
+#fi
+#
+#if ! sudo [ -f /root/.keybinds ]; then
+#    echo "Next $(tput setaf 1)sudo$(tput sgr0) will install '.keybinds.d' in /root and source files in it with '/root/.keybinds"
+#    if ! [ -f /root/.keybinds ]; then
+#        if ! [ -f keybinds/.keybinds ]; then
+#            sudo wget -O /root/.bash_aliases https://raw.githubusercontent.com/excited-bore/dotfiles/main/keybinds/.keybinds
+#        else
+#            sudo cp keybinds/.keybinds /root/
+#        fi
+#    fi
+#    if ! sudo [ -d /root/.keybinds.d/ ]; then
+#        sudo mkdir /root/.keybinds.d/
+#    fi
+#    if ! sudo grep -q "~/.keybinds" /root/.bashrc; then
+#        printf "\n[ -f ~/.keybinds/ ] && source ~/.keybinds\n" | sudo tee -a /root/.bashrc &>/dev/null
+#    fi
+#fi
 
 # VARS
 

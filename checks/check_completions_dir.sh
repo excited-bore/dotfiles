@@ -17,14 +17,14 @@ fi
 
 # Make sure the ~/.bash_completion sources BEFORE ~/.bash_aliases to prevent bashalias-completions from breaking
 if ! grep -q "~/.bash_completion" ~/.bashrc; then
-    if grep -q "[[ -f ~/.bash_aliases ]] && source ~/.bash_aliases" ~/.bashrc || grep -q '^if \[\[ -f ~/.bash_aliases \]\]; then' ~/.bashrc; then
-        if grep -q "[[ -f ~/.bash_aliases ]] && source ~/.bash_aliases" ~/.bashrc; then
-            sed -i 's|\([[ -f ~/.bash_aliases ]] \&\& source ~/.bash_aliases\)|[[ -f ~/.bash_completion ]] \&\& source ~/.bash_completion\n\n\1|' ~/.bashrc 
+    if grep -q "[ -f ~/.bash_aliases ] && source ~/.bash_aliases" ~/.bashrc || grep -q '^if \[ -f ~/.bash_aliases \]; then' ~/.bashrc; then
+        if grep -q "[ -f ~/.bash_aliases ] && source ~/.bash_aliases" ~/.bashrc; then
+            sed -i 's|\([-f ~/.bash_aliases ] \&\& source ~/.bash_aliases\)|[-f ~/.bash_completion ] \&\& [ -z ${BASH_COMPLETION_VERSINFO:-} ] \&\& source ~/.bash_completion\n\n\1|' ~/.bashrc 
         else
-            sed -i 's|\(\^if [[ -f ~/.bash_aliases ]]; then\)|[[ -f ~/.bash_completion ]] \&\& source ~/.bash_completion\n\n\1|' ~/.bashrc 
+            sed -i 's|\(\^if [[ -f ~/.bash_aliases ]]; then\)|[ -f ~/.bash_completion ] \&\& [ -z ${BASH_COMPLETION_VERSINFO:-} ] \&\& source ~/.bash_completion\n\n\1|' ~/.bashrc 
         fi
     else
-        printf "\n[[ -f ~/.bash_completion ]] && source ~/.bash_completion\n\n" >> ~/.bashrc
+        printf "\n[ -f ~/.bash_completion ] \&\& [ -z \${BASH_COMPLETION_VERSINFO:-} ] && source ~/.bash_completion\n\n" >> ~/.bashrc
     fi
 fi
 
@@ -43,11 +43,11 @@ fi
 
 # Make sure the ~/.zsh_completion sources BEFORE ~/.zsh_aliases to prevent zshalias-completions from breaking
 if ! grep -q "~/.zsh_completion" ~/.zshrc; then
-    if grep -q "[[ -f ~/.zsh_aliases ]] && source ~/.zsh_aliases" ~/.zshrc || grep -q '^if \[\[ -f ~/.zsh_aliases \]\]; then' ~/.zshrc; then
-        if grep -q "[[ -f ~/.zsh_aliases ]] && source ~/.zsh_aliases" ~/.zshrc; then
-            sed -i 's|\([[ -f ~/.zsh_aliases ]] && source ~/.zsh_aliases\)|[[ -f ~/.zsh_completion ]] \&\& source ~/.zsh_completion\n\n\1|' ~/.zshrc 
+    if grep -q "[ -f ~/.zsh_aliases ] && source ~/.zsh_aliases" ~/.zshrc || grep -q '^if \[ -f ~/.zsh_aliases \]; then' ~/.zshrc; then
+        if grep -q "[ -f ~/.zsh_aliases ] && source ~/.zsh_aliases" ~/.zshrc; then
+            sed -i 's|\([ -f ~/.zsh_aliases ] && source ~/.zsh_aliases\)|[ -f ~/.zsh_completion ] \&\& [ -z ${BASH_COMPLETION_VERSINFO:-} ] \&\& source ~/.zsh_completion\n\n\1|' ~/.zshrc 
         else
-            sed -i 's|\(\^if [[ -f ~/.zsh_aliases ]]; then\)|[[ -f ~/.zsh_completion ]] \&\& source ~/.zsh_completion\n\n\1|' ~/.zshrc 
+            sed -i 's|\(\^if [[ -f ~/.zsh_aliases ]]; then\)|[ -f ~/.zsh_completion ] \&\& source ~/.zsh_completion\n\n\1|' ~/.zshrc 
         fi
     else
         printf "\n[[ -f ~/.zsh_completion ]] && source ~/.zsh_completion\n\n" >> ~/.zshrc

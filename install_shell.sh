@@ -114,14 +114,14 @@ if [[ -n "$BASH" ]] || [ -d ~/.bash_completion.d ]; then
      
     # Make sure the ~/.bash_completion sources BEFORE ~/.bash_aliases to prevent bashalias-completions from breaking
     if ! grep -q "~/.bash_completion" ~/.bashrc; then
-        if grep -q "[[ -f ~/.bash_aliases ]] && source ~/.bash_aliases" ~/.bashrc || grep -q '^if \[\[ -f ~/.bash_aliases \]\]; then' ~/.bashrc; then
-            if grep -q "[[ -f ~/.bash_aliases ]] && source ~/.bash_aliases" ~/.bashrc; then
-                sed -i 's|\([[ -f ~/.bash_aliases ]] \&\& source ~/.bash_aliases\)|[[ -f ~/.bash_completion ]] \&\& source ~/.bash_completion\n\n\1|' ~/.bashrc 
+        if grep -q "[ -f ~/.bash_aliases ] && source ~/.bash_aliases" ~/.bashrc || grep -q '^if \[ -f ~/.bash_aliases \]; then' ~/.bashrc; then
+            if grep -q "[ -f ~/.bash_aliases ] && source ~/.bash_aliases" ~/.bashrc; then
+                sed -i 's|\([ -f ~/.bash_aliases ] \&\& source ~/.bash_aliases\)|[ -f ~/.bash_completion ] \&\& [ -z ${BASH_COMPLETION_VERSINFO:-} ] \&\& source ~/.bash_completion\n\n\1|' ~/.bashrc 
             else
-                sed -i 's|\(\^if [[ -f ~/.bash_aliases ]]; then\)|[[ -f ~/.bash_completion ]] \&\& source ~/.bash_completion\n\n\1|' ~/.bashrc 
+                sed -i 's|\(\^if [[ -f ~/.bash_aliases ]]; then\)|[ -f ~/.bash_completion ] \&\& [ -z ${BASH_COMPLETION_VERSINFO:-} ] \&\& [ -z ${BASH_COMPLETION_VERSINFO:-} ] \&\& source ~/.bash_completion\n\n\1|' ~/.bashrc
             fi
         else
-            printf "\n[[ -f ~/.bash_completion ]] && source ~/.bash_completion\n\n" >> ~/.bashrc
+            printf "\n[ -f ~/.bash_completion ] && [ -z \${BASH_COMPLETION_VERSINFO:-} ] && source ~/.bash_completion\n\n" >> ~/.bashrc
         fi
     fi
 
@@ -135,6 +135,12 @@ if [[ -n "$BASH" ]] || [ -d ~/.bash_completion.d ]; then
         fi
     fi
     unset bsh_cmp
+
+    # If bash-completion is installed we want to avoid that it get's sourced more then once 
+    bsh_cmp=$(eval "$pac_ls_ins bash-completion 2> /dev/null")
+    if test -n "$bsh_cmp" && grep -q '\. /usr/share/bash-completion/bash_completion' /etc/bash.bashrc && grep -q '\. /usr/share/bash-completion/bash_completion' ~/.bashrc; then
+        sed -i '/. \/usr\/share\/bash-completion\/bash_completion/d' ~/.bashrc 
+    fi
 
     # Bash alias completions
 
