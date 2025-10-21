@@ -66,14 +66,16 @@ elif type reade &> /dev/null; then
     } 
 fi
 
-echo "Current shell: ${CYAN}$current_shell${GREEN}"
+echo "${CYAN}Current shell: ${GREEN}$current_shell${normal}"
 
 readyn -p "Change this (Only configuration is given for (/usr/bin/)\|(/bin/)bash and (/usr/bin/)\|(/bin/)zsh)?" -c "! [[ $current_shell == '/bin/bash' || $current_shell == '/usr/bin/bash' || $current_shell == '/bin/zsh' || $current_shell == '/usr/bin/zsh' ]]" chshell
 if [[ "$chshell" == 'y' ]]; then
     set-default-shell-user 
 fi
+
 unset current_shell chshell
 
+BASH='' ZSH=''
 if hash bash &> /dev/null && hash zsh &> /dev/null; then
    reade -Q 'GREEN' -i 'both bash zsh' -p "Install configuration files for ${CYAN}Bash${GREEN}, ${CYAN}Zsh${GREEN} or ${CYAN}Both${GREEN}? [Both/bash/zsh]: " bash_zsh
    if [[ "$bash_zsh" == 'both' || "$bash_zsh" == 'bash' ]]; then
@@ -82,7 +84,19 @@ if hash bash &> /dev/null && hash zsh &> /dev/null; then
    if [[ "$bash_zsh" == 'both' || "$bash_zsh" == 'zsh' ]]; then
         ZSH=1
    fi
+elif hash bash &> /dev/null; then 
+   readyn -p "Install configuration files for ${CYAN}Bash${GREEN}?" bash
+   if [[ "$bash" == 'y' ]]; then
+        BASH=1
+   fi
+elif hash zsh &> /dev/null; then 
+   readyn -p "Install configuration files for ${CYAN}Zsh${GREEN}?" zsh
+   if [[ "$zsh" == 'y' ]]; then
+        ZSH=1
+   fi
 fi
+unset bash_zsh bash zsh
+
 
 if [[ -n "$BASH" ]] || [ -d ~/.bash_completion.d ]; then
 
@@ -114,7 +128,7 @@ if [[ -n "$BASH" ]] || [ -d ~/.bash_completion.d ]; then
     # Bash Completion
    
     bsh_cmp=$(eval "$pac_ls_ins bash-completion 2> /dev/null")
-    if test -z $bsh_cmp; then
+    if test -z "$bsh_cmp"; then
         readyn -p "Bash completions package is not installed (Adds completion to a lot of commands). Install ${CYAN}Bash-completion${GREEN}?" ns_bashc
         if [[ "$ns_bashc" == 'y' ]]; then
             eval "$pac_ins_y bash-completion" 

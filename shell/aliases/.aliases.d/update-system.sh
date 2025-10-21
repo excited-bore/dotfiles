@@ -231,50 +231,78 @@ function update-system() {
       
         if test -n "$APT_FULLUPGRADE_YN"; then 
 
-            local pac_upg pac_upg_y 
-            if [[ "$APT_FULLUPGRADE_YN" == 'y' ]]; then
-                if [[ "$distro" == 'Ubuntu' ]]; then
-                    pac_upg="sudo apt full-upgrade" 
-                    pac_upg_y="sudo apt full-upgrade -y" 
-                else 
-                    pac_upg="$pac_fullup" 
-                    pac_upg_y="$pac_fullup_y" 
-                fi
-            elif [[ "$APT_FULLUPGRADE_YN" == 'n' ]]; then
-                if [[ "$distro" == 'Ubuntu' ]]; then
-                    pac_upg="sudo apt upgrade" 
-                    pac_upg_y="sudo apt upgrade -y" 
-                else 
-                    pac_upg="$pac_up" 
-                    pac_upg_y="$pac_up_y"
-                fi
-            fi  
-
-            local upgrd 
-
-            echo "This next $(tput setaf 1)sudo$(tput sgr0) will try to update the packages for your system using the package managers it knows";
-            readyn $flag -p "Upgrade system using $pac_upg?" upgrd
-
-            if [[ $upgrd == 'y' ]];then
-                if test -n "$YES"; then 
-                    if test -n "$pac_upg_y"; then
-                        eval "${pac_upg_y}"
-                    else
-                        eval "yes | ${pac_upg}"
+            apt_upgrade(){
+                local pac_upg pac_upg_y 
+                if [[ "$APT_FULLUPGRADE_YN" == 'y' ]]; then
+                    if [[ "$distro" == 'Ubuntu' ]]; then
+                        pac_upg="sudo apt full-upgrade" 
+                        pac_upg_y="sudo apt full-upgrade -y" 
+                    else 
+                        pac_upg="$pac_fullup" 
+                        pac_upg_y="$pac_fullup_y" 
                     fi
-                else            
-                    eval "${pac_upg}" 
+                elif [[ "$APT_FULLUPGRADE_YN" == 'n' ]]; then
+                    if [[ "$distro" == 'Ubuntu' ]]; then
+                        pac_upg="sudo apt upgrade" 
+                        pac_upg_y="sudo apt upgrade -y" 
+                    else 
+                        pac_upg="$pac_up" 
+                        pac_upg_y="$pac_up_y"
+                    fi
+                fi  
+                local upgrd 
+
+                echo "This next $(tput setaf 1)sudo$(tput sgr0) will try to update the packages for your system using the package managers it knows";
+                readyn $flag -p "Upgrade system using $pac_upg?" upgrd
+
+                if [[ $upgrd == 'y' ]];then
+                    if test -n "$YES"; then 
+                        if test -n "$pac_upg_y"; then
+                            eval "${pac_upg_y}"
+                        else
+                            eval "yes | ${pac_upg}"
+                        fi
+                    else            
+                        eval "${pac_upg}" 
+                    fi
+                    
+                    #if test -n "$YES"; then
+                    #    if test -n "$pac_refresh_y"; then
+                    #        eval "${pac_refresh_y}"
+                    #    else
+                    #        eval "yes | ${pac_refresh}"
+                    #    fi
+                    #else
+                    #    eval "${pac_refresh}"
+                    #fi
                 fi
-                
-                #if test -n "$YES"; then
-                #    if test -n "$pac_refresh_y"; then
-                #        eval "${pac_refresh_y}"
-                #    else
-                #        eval "yes | ${pac_refresh}"
-                #    fi
-                #else
-                #    eval "${pac_refresh}"
-                #fi
+            }
+           
+            apt_upgrade
+            if ! [[ $? == 0 ]]; then
+                local run_dpkg run_fix_broken err=$(sudo apt upgrade 2>&1)     
+                if [[ "$err" =~ "dpkg was interrupted" ]]; then
+                    readyn -Y 'YELLOW' -p "${YELLOW}Run ${CYAN}'sudo dpkg --configure -a'${YELLOW}?${normal}"  run_dpkg
+                    if [[ "$run_dpkg" == 'y' ]]; then
+                        sudo dpkg --configure -a 
+                        echo "${YELLOW}There might be unmet dependencies now${normal}" 
+                        readyn -p "${GREEN}Run ${CYAN}'sudo apt --fix-broken install'${GREEN} to fix this?" run_fix_broken
+                        if [[ "$run_fix_broken" == 'y' ]]; then
+                            sudo apt --fix-broken install
+                        fi             
+                        apt_upgrade
+                    else
+                        return 100
+                    fi
+                elif [[ "$err" =~ 'Unmet dependencies' ]]; then
+                    readyn -p "${GREEN}Run ${CYAN}'sudo apt --fix-broken install'${GREEN}?" run_fix_broken
+                    if [[ "$run_fix_broken" == 'y' ]]; then
+                        sudo apt --fix-broken install
+                        apt_upgrade
+                    else 
+                        return 100
+                    fi             
+                fi
             fi
         fi
  

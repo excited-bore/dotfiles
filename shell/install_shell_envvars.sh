@@ -14,122 +14,6 @@ fi
 
 # Environment variables
 
-environment-variables_r() {
-    sudo cp $pathvr /root/.environment.env
-    if ! sudo test -f /root/.profile; then
-        sudo touch /root/.profile
-    fi
-    shell_profiles="${MAGENTA}\t- /root/.profile\n"
-    shell_rcs=""
-    if sudo test -f /root/.bash_profile; then
-        shell_profiles="$shell_profiles${CYAN}\t- /root/.bash_profile\n"
-    fi
-    if sudo test -f /root/.zsh_profile; then
-        shell_profiles="$shell_profiles${CYAN}\t- /root/.zsh_profile\n"
-    fi
-    if sudo test -f /root/.bashrc; then
-        shell_rcs="$shell_rcs${GREEN}\t- /root/.bashrc\n"
-    fi
-    if sudo test -f /root/.zshrc; then
-        shell_rcs="$shell_rcs${GREEN}\t- /root/.zshrc\n"
-    fi
-    prmpt="File(s):\n$shell_profiles${normal}${GREEN}should${normal} get sourced at login...\nHowever, if a ${CYAN}*shell*_profile${normal} (f.ex. .bash_profile) file exists, ${MAGENTA}.profile${RED} won't get sourced at login${normal}\nFile(s):\n${CYAN}$shell_rcs${normal}get sourced when starting a new *interactive* shell (f.ex. ${CYAN}bash${normal} shell)\n"
-#Certain programs check the correct ${CYAN}*shell*_profile${normal}, others (by accident) only check ${MAGENTA}.profile${normal}..\n"
-    printf "$prmpt"
-
-    if ! sudo grep -q "/root/.environment.env" /root/.profile; then
-        readyn -p "Link .environment.env in ${YELLOW}/root/.profile${GREEN}?" prof
-        if [[ $prof == 'y' ]]; then
-            printf "\n[ -f /root/.environment.env ] && source /root/.environment.env\n\n" | sudo tee -a /root/.profile 1> /dev/null
-        fi
-    fi
-    if test -f /root/.bash_profile || test -f /root/.zsh_profile; then
-        printf "\n${GREEN}Since a ${cyan}$HOME/.*shell*_profile${green} file exists, the shell in question won't source ${magenta}$HOME/.profile${green} natively at login.\n${normal}"
-         
-        if test -f /root/.bash_profile && ! sudo grep -q "/root/.environment.env" /root/.bash_profile; then
-            printf "${GREEN}Just source ${YELLOW}/root/.environment.env${normal} in ${YELLOW}/root/.bash_profile\n${normal}"
-            reade -Q 'GREEN' -i 'source delete' -p "Or copy everything from ${YELLOW}/root/.bash_profile${GREEN} into ${YELLOW}/root/.profile${GREEN} and also delete ${YELLOW}/root/.bash_profile${GREEN}? [Source/delete]: " bprof_r 
-
-            if [[ $bprof_r == 'source' ]]; then
-                if ! sudo grep -q "/root/.environment.env" /root/.bash_profile; then 
-                    printf "\n[ -f /root/.environment.env ] && source /root/.environment.env\n\n" | sudo tee -a /root/.bash_profile 1> /dev/null
-                fi 
-            elif [[ $bprof_r == 'delete' ]]; then 
-                sudo cat /root/.bash_profile | sudo tee -a /root/.profile
-                readyn -p 'Check ~/.profile? (will remove /root/.bash_profile afterwards)' eprof
-                if [[ $eprofr == 'y' ]]; then
-                    sudo less /root/.profile 
-                fi
-                sudo rm /root/.bash_profile
-            fi
-        fi
-        
-        if test -f /root/.zsh_profile && ! sudo grep -q "/root/.environment.env" /root/.zsh_profile; then
-            printf "${GREEN}Just source $HOME/.environment.env in $HOME/.zsh_profile\n${normal}" 
-            reade -Q "GREEN" -i 'source delete' -p "Or copy everything from $HOME/.zsh_profile into $HOME/.profile and also delete $HOME/.zsh_profile? [Source/delete]: " zprof_r
-
-            if [[ $zprof_r == 'source' ]]; then
-                if ! sudo grep -q "/root/.environment.env" /root/.zsh_profile; then 
-                    printf "\n[ -f /root/.environment.env ] && source /root/.environment.env\n\n" | sudo tee -a /root/.zsh_profile 1> /dev/null
-                fi 
-            elif [[ $zprof_r == 'delete' ]]; then 
-                sudo cat /root/.zsh_profile | sudo tee -a /root/.profile
-                sudo rm /root/.zsh_profile
-            fi
-        fi
-    fi
-
-    # This always breaks !  
-
-    #if test -f /root/.bash_profile && ! sudo grep -q "/root/.bash_profile" /root/.profile; then
-    #    readyn -n -p "Link /root/.bash_profile in /root/.profile?" bprofr
-    #    if [[ "$bprofr" == 'y' ]]; then
-    #        printf "\n[ -f /root/.bash_profile ] && source /root/.bash_profile\n\n" | sudo tee -a /root/.profile 1> /dev/null
-    #    fi
-    #    unset bprofr
-    #fi
-    #if test -f /root/.zsh_profile && ! grep -q "/root/.zsh_profile" ~/.profile; then
-    #    readyn -p "Link /root/.zsh_profile in /root/.profile?" zprofr
-    #    if [[ "$zprofr" == 'y' ]]; then
-    #        printf "\n[ -f /root/.zsh_profile ] && source /root/.zsh_profile\n\n" | sudo tee -a /root/.profile 1> /dev/null
-    #    fi
-    #    unset zprofr
-    #fi
-    
-    if sudo test -f /root/.bashrc && ! sudo grep -q "~/.environment.env" /root/.bashrc; then
-        readyn -Y 'GREEN' -p "Source /root/.environment.env in /root/.bashrc?" bashrc
-        if [[ $bashrc == 'y' ]]; then
-            if sudo grep -q "[ -f ~/.bash_completion ]" /root/.bashrc; then
-                sudo sed -i 's|\(\[ -f ~/.bash_completion \] \&\& source \~/.bash_completion\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' /root/.bashrc
-            elif sudo grep -q "[ -f ~/.bash_aliases ]" /root/.bashrc; then
-                sudo sed -i 's|\(\[ -f ~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' /root/.bashrc
-                sudo sed -i 's|\(if \[ -f ~/.bash_aliases \]; then\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' /root/.bashrc
-            elif sudo grep -q "[ -f ~/.keybinds ]" /root/.bashrc; then
-                sudo sed -i 's|\(\[ -f ~/.keybinds \] \&\& source \~/.keybinds\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' /root/.bashrc
-            else
-                printf "\n[ -f ~/.environment.env ] && source ~/.environment.env\n\n" | sudo tee -a /root/.bashrc 1> /dev/null
-            fi
-        fi
-    fi
-    if sudo test -f /root/.zshrc && ! sudo grep -q "/root/.environment.env" /root/.zshrc; then
-        readyn -p "Source /root/.environment.env in /root/.zhrc?" zshrc
-        if [[ $zshrc == 'y' ]]; then
-            #if grep -q "[ -f ~/.bash_completion ]" ~/.bashrc; then
-            #    sed -i 's|\(\[ -f ~/.bash_completion \] \&\& source \~/.bash_completion\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' ~/.bashrc
-            #elif grep -q "[ -f ~/.bash_aliases ]" ~/.bashrc || grep -q "~/.bash_aliases" ~/.bashrc; then
-            #    sed -i 's|\(\[ -f ~/.bash_aliases \] \&\& source \~/.bash_aliases\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' ~/.bashrc
-            #    sed -i 's|\(if \[ -f ~/.bash_aliases \]; then\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' ~/.bashrc
-            #elif grep -q "[ -f ~/.keybinds ]" ~/.bashrc; then
-            #    sed -i 's|\(\[ -f ~/.keybinds \] \&\& source \~/.keybinds\)|\[ -f \~/.environment.env \] \&\& source \~/.environment.env\n\n\1\n|g' ~/.bashrc
-            #else
-            printf "\n[ -f /root/.environment.env ] && source /root/.environment.env\n\n" | sudo tee -a /root/.zshrc 1> /dev/null
-            #fi
-        fi
-        unset bash_prof_ex prmpt shell_profiles shell_rcs prof bashrc
-    fi 
-    unset bash_prof_ex prmpt shell_profiles shell_rcs prof bashrc
-}
-
 environment-variables() {
     cp $pathvr ~/.environment.env
     if ! test -f ~/.profile; then
@@ -137,16 +21,16 @@ environment-variables() {
     fi
     shell_profiles="${MAGENTA}\t- $HOME/.profile\n"
     shell_rcs=""
-    if sudo test -f ~/.bash_profile; then
+    if test -f ~/.bash_profile; then
         shell_profiles="$shell_profiles${CYAN}\t- $HOME/.bash_profile\n"
     fi
-    if sudo test -f ~/.zsh_profile; then
+    if test -f ~/.zsh_profile; then
         shell_profiles="$shell_profiles${CYAN}\t- $HOME/.zsh_profile\n"
     fi
-    if sudo test -f ~/.bashrc; then
+    if test -f ~/.bashrc; then
         shell_rcs="$shell_rcs${GREEN}\t- $HOME/.bashrc\n"
     fi
-    if sudo test -f ~/.zshrc; then
+    if test -f ~/.zshrc; then
         shell_rcs="$shell_rcs${GREEN}\t- $HOME/.zshrc\n"
     fi
     prmpt="File(s):\n$shell_profiles${normal}${GREEN}should${normal} get sourced at login...\nHowever, if a ${CYAN}*shell*_profile${normal} (f.ex. .bash_profile) file exists, ${MAGENTA}.profile${RED} won't get sourced at login${normal}\nFile(s):\n${CYAN}$shell_rcs${normal}get sourced when starting a new *interactive* shell (f.ex. ${CYAN}bash${normal} shell)\n"
@@ -249,14 +133,13 @@ environment-variables() {
     fi 
 
     #if ! grep -q '.environment' /root/.bashrc && ! grep -q '.environment' $PROFILE_R; then
-    yes-edit-no -f environment-variables_r -g "$pathvr" -p "Install .environment.env in /root/?" -e -Q "YELLOW"
     #fi
 }
 
-pathvr=$(pwd)/envvars/.environment.env
+pathvr=$TOP/shell/envvars/.environment.env
 if ! test -f $pathvr; then
     tmp=$(mktemp) && 
-        wget -O $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/envvars/.environment
+        wget -O $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/shellenvvars/.environment
     pathvr=$tmp
 fi
 
@@ -273,7 +156,7 @@ prmpt='[Y/n]: '
 #    prmpt='[N/y]: '
 #fi
 
-reade -Q "$color" -i "$pre $othr" -p "Check existence/Create '.environment.env' and link it to '.bashrc' in $HOME/ and /root/? $prmpt" envvars
+reade -Q "$color" -i "$pre $othr" -p "Check existence/Create '.environment.env' and link it to '.bashrc' in $HOME/? $prmpt" envvars
 
 if [[ "$envvars" == "y" ]] && [[ "$1" == 'n' ]]; then
 

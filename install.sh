@@ -151,7 +151,7 @@ if ! [[ -f $HOME/.environment.env ]]; then
             wget-aria-dir $tmp https://raw.githubusercontent.com/excited-bore/dotfiles/main/shell/install_shell_envvars.sh
         . ./$tmp/install_shell_envvars.sh 'n'
     else
-        . $TOP/install_shell_envvars.sh 'n'
+        . $TOP/shell/install_shell_envvars.sh 'n'
     fi
 fi
 
@@ -339,12 +339,6 @@ if ! [[ -f $TOP/checks/check_envvar.sh ]]; then
     source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_envvar.sh)
 else
     . $TOP/checks/check_envvar.sh
-fi
-
-if ! [[ -f $TOP/checks/check_completions_dir.sh ]]; then
-    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions_dir.sh)
-else
-    . $TOP/checks/check_completions_dir.sh
 fi
 
 # Appimagelauncher
