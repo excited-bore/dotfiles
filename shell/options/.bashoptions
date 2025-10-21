@@ -1,0 +1,260 @@
+#!/bin/bash
+# https://www.gnu.org/software/bash/manual/html_node/The-Shopt-Builtin.html
+
+# shopt [-pqsu] [-o] [optname ...]
+#
+# Options have the following meanings: 
+#
+# -p 
+#    List state of all available options
+#
+# -s
+#
+#    Enable (set) each optname.
+# -u
+#
+#    Disable (unset) each optname.
+# -q
+#
+#    Suppresses normal output; the return status indicates whether the optname is set or unset. 
+#    If multiple optname arguments are supplied with -q, the return status is zero if all optnames are enabled; non-zero otherwise.
+# -o
+#
+#    Restricts the values of optname to be those defined for the -o option to the set builtin 
+#    (See https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html). 
+# 
+
+# If set, the shell suppresses multiple evaluation of associative and indexed array subscripts during arithmetic expression evaluation, 
+# while executing builtins that can perform variable assignments, 
+# and while executing builtins that perform array dereferencing. 
+# shopt -s array_expand_once
+
+# Deprecated synonym for array_expand_once. 
+# shopt -s assoc_expand_once
+
+# If a directory is typed like a command, cd to it
+shopt -s autocd
+
+# Filenames added to the BASH_SOURCE array variable are converted to full pathnames
+# shopt -s bash_source_fullpath
+
+# Arguments to cd that are not a directory are assumed to be variables with directories as value
+# shopt -s cdable_vars
+
+# Attempts to correct minor mistakes when mistyping directory for cd
+# Errors include: 
+# - transposed characters,
+# - missing characters
+# - an extra character. 
+# If a correction is made, the corrected name will be printed and the command will be proceeded.
+# shopt -s cdspell
+
+# If checkhash is set, Bash checks that a command found in the hash table exists before trying to execute it. 
+# If a hashed command no longer exists, Bash performs a normal path search. 
+# shopt -s checkhash
+
+# If set, Bash lists the status of any stopped and running jobs before exiting an interactive shell. 
+# If any jobs are running, Bash defers the exit until a second exit is attempted without an intervening command
+shopt -s checkjobs
+
+# If set, Bash checks the window size after each external (non-builtin) command 
+# and, if necessary, updates the values of LINES and COLUMNS, 
+# This option is enabled by default.
+# shopt -u checkwinsize
+
+# If set, Bash attempts to save all lines of a multiple-line command in the same history entry. 
+# This allows easy re-editing of multi-line commands. 
+# This option is enabled by default, but only has an effect if command history is enabled
+# shopt -u cmdhist
+
+# These control aspects of the shell’s compatibility mode .
+# See https://www.gnu.org/software/bash/manual/html_node/Shell-Compatibility-Mode.html
+# shopt -s compat31
+# shopt -s compat32
+# shopt -s compat40
+# shopt -s compat41
+# shopt -s compat42
+# shopt -s compat43
+# shopt -s compat44
+
+# If set, Bash quotes all shell metacharacters in filenames and directory names when performing completion. 
+# If not set, Bash removes metacharacters such as the dollar sign from the set of characters that will be quoted in completed filenames when these metacharacters appear in shell variable references in words to be completed. 
+# This means that dollar signs in variable names that expand to directories will not be quoted; however, any dollar signs appearing in filenames will not be quoted, either.
+# This is active only when Bash is using backslashes to quote completed filenames. 
+# This variable is set by default, which is the default Bash behavior in versions through 4.2. 
+# shopt -u complete_fullquote
+
+# If set, Bash replaces directory names with the results of word expansion when performing filename completion. This changes the contents of the Readline editing buffer. 
+# If not set, Bash attempts to preserve what the user typed.
+# shopt -s direxpand
+
+# If set, Bash attempts spelling correction on directory names during word completion 
+# if the directory name initially supplied does not exist. 
+# shopt -s dirspell
+
+# To include hidden files (like .bashrc) when using file expansion (f.ex. 'ls *')
+shopt -s dotglob
+
+# If this is set, a non-interactive shell will not exit if it cannot execute the file specified as an argument to the exec builtin. 
+# An interactive shell does not exit if exec fails.
+# shopt -s execfail
+
+# If set, aliases are expanded as described below under Aliases.
+# See https://www.gnu.org/software/bash/manual/html_node/Aliases.html
+# This option is enabled by default for interactive shells.
+# shopt -u expand_aliases
+
+# If set at shell invocation, or in a shell startup file, arrange to execute the debugger profile before the shell starts, identical to the --debugger option. 
+# If set after invocation, behavior intended for use by debuggers is enabled:
+# 1) The -F option to the declare builtin (see Bash Builtin Commands) displays the source file name and line number corresponding to each function name supplied as an argument.
+# 2) If the command run by the DEBUG trap returns a non-zero value, the next command is skipped and not executed.
+# 3) If the command run by the DEBUG trap returns a value of 2, and the shell is executing in a subroutine (a shell function or a shell script executed by the . or source builtins), the shell simulates a call to return.
+# 4) BASH_ARGC and BASH_ARGV are updated as described in their descriptions (see Bash Variables).
+# 5) Function tracing is enabled: command substitution, shell functions, and subshells invoked with (command) inherit the DEBUG and RETURN traps.
+# 6) Error tracing is enabled: command substitution, shell functions, and subshells invoked with (command) inherit the ERR trap. 
+# shopt -s extdebug
+
+# If set, enable the extended pattern matching features described above.
+# See https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html
+# shopt -s extglob
+
+# If set, $'string' and $"string" quoting is performed within ${parameter} expansions enclosed in double quotes. This option is enabled by default.
+# shopt -u extquote
+
+# If set, patterns which fail to match filenames during filename expansion result in an expansion error.
+# shopt -s failglob
+
+# If set, the suffixes specified by the FIGNORE shell variable cause words to be ignored when performing word completion even if the ignored words are the only possible completions.
+# Look for a description of FIGNORE in https://www.gnu.org/software/bash/manual/html_node/Bash-Variables.html. 
+# This option is enabled by default.
+# shopt -u force_fignore
+
+# If set, range expressions used in pattern matching bracket expressions (see https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html) 
+# behave as if in the traditional C locale when performing comparisons. 
+# That is, pattern matching does not take the current locale’s collating sequence into account, so ‘b’ will not collate between ‘A’ and ‘B’, and upper-case and lower-case ASCII characters will collate together.
+# shopt -s globasciiranges
+
+# If set, filename expansion will never match the filenames . and .., even if the pattern begins with a ‘.’. 
+# This option is enabled by default.
+shopt -u globskipdots
+
+# If set, the pattern ‘**’ used in a filename expansion context will match all files and zero or more directories and subdirectories. 
+# If the pattern is followed by a ‘/’, only directories and subdirectories match.
+# shopt -s globstar
+
+# If set, shell error messages are written in the standard GNU error message format.
+# shopt -s gnu_errfmt
+
+# If set, the history list is appended to the file named by the value of the HISTFILE variable when the shell exits, rather than overwriting the file.
+# shopt -s histappend
+
+# History subsitition is calling the last known used example of 'command' that bash can find in known history
+# by using '!command' to call up the history entry
+# F.ex. '$ ls -lA' -> '$ !ls' becomes '$ ls -lA'
+
+# If set, and Readline is being used, the user is given the opportunity to re-edit a failed history substitution
+# So if I type '!lss' instead of '!ls', it will stay typed out to try again
+# shopt -s histreedit
+
+# If set, and Readline is being used, the results of history substitution are not immediately passed to the shell parser. 
+# Instead, the resulting line is loaded into the Readline editing buffer, allowing further modification.
+# shopt -s histverify
+
+# If set, and Readline is being used, Bash will attempt to perform hostname completion when a word containing a ‘@’ is being completed 
+# (See https://www.gnu.org/software/bash/manual/html_node/Commands-For-Completion.html). 
+# This option is enabled by default.
+# shopt -u hostcomplete
+
+# If set, Bash will send SIGHUP to all jobs when an interactive login shell exits 
+# (see https://www.gnu.org/software/bash/manual/html_node/Signals.html).
+# shopt -s huponexit
+
+# If set, command substitution inherits the value of the errexit option, instead of unsetting it in the subshell environment. 
+# This option is enabled when POSIX mode is enabled.
+# shopt -s inherit_errexit
+
+# In an interactive shell, a word beginning with ‘#’ causes that word and all remaining characters on that line 
+# to be ignored, as in a non-interactive shell. 
+# This option is enabled by default.
+# shopt -u interactive_comments
+
+# If set, and job control is not active, the shell runs the last command of a pipeline not executed in the background in the current shell environment.
+# shopt -s lastpipe
+
+# If enabled, and the cmdhist option is enabled, multi-line commands are saved to the history with embedded newlines rather than using semicolon separators where possible.
+# shopt -s lithist
+
+# If set, local variables inherit the value and attributes of a variable of the same name that exists at a previous scope before any new value is assigned. 
+# The nameref attribute is not inherited.
+# shopt -s localvar_inherit
+
+# If set, calling unset on local variables in previous function scopes marks them so subsequent lookups find them unset until that function returns. 
+# This is identical to the behavior of unsetting local variables at the current function scope.
+# shopt -s localvar_unset
+
+# The shell sets this option if it is started as a login shell (see Invoking Bash). 
+# The value may not be changed.
+# shopts -u login_shell
+
+# If set, and a file that Bash is checking for mail has been accessed since the last time it was checked, 
+# Bash displays the message "The mail in mailfile has been read".
+# shopt -s mailwarn 
+
+# If set, and Readline is being used, Bash does not search the PATH for possible completions when completion is attempted on an empty line.
+# shopt -s no_empty_cmd_completion
+
+# If set, Bash matches filenames in a case-insensitive fashion when performing filename expansion.
+# shopt -s nocaseglob
+
+# If set, Bash matches patterns in a case-insensitive fashion when performing matching while executing case or [[ conditional commands 
+# (see https://www.gnu.org/software/bash/manual/html_node/Conditional-Constructs.html
+#,  when performing pattern substitution word expansions, or when filtering possible completions as part of programmable completion.
+# shopt -s nocasematch
+
+# If set, Bash encloses the translated results of $"…" quoting in single quotes instead of double quotes. 
+# If the string is not translated, this has no effect.
+# shopt -s noexpand_translation
+
+# To print nothing when using wildcard (f.ex. *.png) and there are no results. 
+# At default it would result at printing out '*.png'
+shopt -s nullglob
+
+# If set, Bash expands occurrences of ‘&’ in the replacement string of pattern substitution to the text matched by the pattern, as described above 
+# (see https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html). 
+# This option is enabled by default.
+# shopt -u patsub_replacement
+
+# If set, enable the programmable completion facilities 
+# (See https://www.gnu.org/software/bash/manual/html_node/Programmable-Completion.html). 
+# This option is enabled by default.
+# shopt -u progcomp
+
+# If set, and programmable completion is enabled, Bash treats a command name that doesn’t have any completions as a possible alias and attempts alias expansion. 
+# If it has an alias, Bash attempts programmable completion using the command word resulting from the expanded alias.
+# shopt -s progcomp_alias
+
+# If set, prompt strings undergo parameter expansion, command substitution, arithmetic expansion, and quote removal after being expanded as described below 
+# (See https://www.gnu.org/software/bash/manual/html_node/Controlling-the-Prompt.html).
+# This option is enabled by default.
+# shopt -u promptvars
+
+# The shell sets this option if it is started in restricted mode (see The Restricted Shell). The value may not be changed. 
+# This is not reset when the startup files are executed, allowing the startup files to discover whether or not a shell is restricted.
+# shopt -u restricted_shell
+
+# If this is set, the shift builtin prints an error message when the shift count exceeds the number of positional parameters.
+# shopt -u shift_verbose
+
+# If set, the . (source) builtin uses the value of PATH to find the directory containing the file supplied as an argument when the -p option is not supplied. 
+# This option is enabled by default.
+# shopt -u sourcepath
+
+# If set, the shell automatically closes file descriptors assigned using the {varname} redirection syntax 
+# (See https://www.gnu.org/software/bash/manual/html_node/Redirections.html) 
+# instead of leaving them open when the command completes.
+# shopt -s varredir_close
+
+# If set, the echo builtin expands backslash-escape sequences by default. 
+# If the posix shell option is also enabled, echo does not interpret any options.
+# (See https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html) 
+# shopt -s xpg_echo
