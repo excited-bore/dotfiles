@@ -9,15 +9,17 @@
 #  done
 #fi
 
-test -z "$BASH_COMPLETION_VERSINFO" && [ -r /usr/share/bash-completion/bash_completion ] && source /usr/share/bash-completion/bash_completion 
+[[ $PS1 && ! ${BASH_COMPLETION_VERSINFO:-} && -f /usr/share/bash-completion/bash_completion ]] &&
+    source /usr/share/bash-completion/bash_completion
 
 if [ -d /usr/share/bash-completion/completions/ ] && [ "$(command ls -A /usr/share/bash-completion/completions/)" ]; then
     source /usr/share/bash-completion/completions/systemctl 
 fi
 
-
 if [ -d ~/.bash_completion.d/ ] && [ "$(command ls -A ~/.bash_completion.d/)" ]; then
-  for compl in ~/.bash_completion.d/*; do
-      source "$compl" 
+  for compl in ~/.bash_completion.d/*; do 
+      if ! [[ "$compl" =~ "complete_alias" ]]; then 
+        source "$compl"
+      fi
   done
 fi
