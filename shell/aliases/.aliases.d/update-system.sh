@@ -32,7 +32,7 @@ function version-higher() {
 # https://www.explainxkcd.com/wiki/index.php/1654:_Universal_Install_Script
 
 function update-system() {
-    local SCRIPT_DIR=$(get-script-dir) 
+    local TOP=$(git rev-parse --show-toplevel 2> /dev/null)
     local YES flag NOGUI 
     while [[ $# -gt 0 ]]; do
         case $1 in

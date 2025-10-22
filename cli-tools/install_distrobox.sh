@@ -1,4 +1,4 @@
-TOP=$(git rev-parse --show-toplevel)
+TOP=$(git rev-parse --show-toplevel 2> /dev/null)
 
 if ! test -f $TOP/checks/check_all.sh; then
     if hash curl &> /dev/null; then

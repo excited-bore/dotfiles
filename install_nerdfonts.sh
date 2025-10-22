@@ -3,7 +3,7 @@
 [[ "$XDG_SESSION_TYPE" == 'wayland' ]] && hash jq &> /dev/null && hash unzip &> /dev/null && hash fzf &> /dev/null && hash magick &> /dev/null && hash nsxiv &> /dev/null && 
     SYSTEM_UPDATED='TRUE'
 
-TOP=$(git rev-parse --show-toplevel)
+TOP=$(git rev-parse --show-toplevel 2> /dev/null)
 
 if ! test -f $TOP/checks/check_all.sh; then
     if hash curl &> /dev/null; then

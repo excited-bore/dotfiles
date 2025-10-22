@@ -226,8 +226,8 @@ function git-commit() {
 
     if git status &> /dev/null; then
 
-        #if test -f $(git rev-parse --show-toplevel)/.git/hooks/pre-commit; then
-        #    sh $(git rev-parse --show-toplevel)/.git/hooks/pre-commit
+        #if test -f $(git rev-parse --show-toplevel 2> /dev/null)/.git/hooks/pre-commit; then
+        #    sh $(git rev-parse --show-toplevel 2> /dev/null)/.git/hooks/pre-commit
         #fi
 
         local untraked amnd msg
@@ -308,7 +308,7 @@ git-remove-worktree-and-ignore() {
     local wrktree=$(git worktree list -v | tail -n +2 | nl | fzf --ansi --track --no-sort --layout=reverse-list | awk '{print $2}')
     if ! [ -z "$wrktree" ]; then
         git worktree remove "$wrktree"
-        local top=$(git rev-parse --show-toplevel)
+        local top=$(git rev-parse --show-toplevel 2> /dev/null)
         local path=$(echo $wrktree | sed "s|$top/||")
         if [ "${path: -1}" != "/" ]; then
             path="$path/"

@@ -1,6 +1,6 @@
 [[ "$1" == 'n' ]] && SYSTEM_UPDATED='TRUE'
 
-TOP=$(git rev-parse --show-toplevel)
+TOP=$(git rev-parse --show-toplevel 2> /dev/null)
 
 READE_NOSTYLE='filecomp-only'
 

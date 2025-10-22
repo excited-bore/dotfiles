@@ -1,6 +1,6 @@
 hash git &> /dev/null && SYSTEM_UPDATED='TRUE'
 
-TOP=$(git rev-parse --show-toplevel)
+TOP=$(git rev-parse --show-toplevel 2> /dev/null)
 
 echo "$(tput setaf 6)This script uses $(tput setaf 2)rlwrap$(tput setaf 6) and $(tput setaf 2)fzf$(tput sgr0)."
 

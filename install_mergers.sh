@@ -10,7 +10,7 @@
 
 hash code &> /dev/null && hash nvim &> /dev/null && hash fac &> /dev/null && hash mergiraf &> /dev/null && hash meld &> /dev/null && hash diffmerge &> /dev/null && hash kdiff3 &> /dev/null && hash kompare &> /dev/null && hash p4merge &> /dev/null && hash smerge &> /dev/null && SYSTEM_UPDATED='TRUE' 
 
-TOP=$(git rev-parse --show-toplevel)
+TOP=$(git rev-parse --show-toplevel 2> /dev/null)
 
 if ! [[ -f $TOP/checks/check_all.sh ]]; then
     if hash curl &> /dev/null; then

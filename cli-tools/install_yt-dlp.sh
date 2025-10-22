@@ -2,7 +2,7 @@
 
 hash yt-dlp &> /dev/null && SYSTEM_UPDATED='TRUE' 
 
-TOP=$(git rev-parse --show-toplevel)
+TOP=$(git rev-parse --show-toplevel 2> /dev/null)
 
 if ! [[ -f $TOP/checks/check_all.sh ]]; then
     if hash curl &> /dev/null; then
