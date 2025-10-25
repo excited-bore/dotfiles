@@ -2,8 +2,10 @@
 # Shebang not really except for nvim bash language server registering
 
 function reade() {
+     
+    # For ZSH, we just set some nice options like localtraps and options
     if test -n "$ZSH_VERSION"; then 
-        setopt localoptions errreturn localtraps histfcntllock nohistsavebycopy extendedglob
+        setopt localoptions localtraps errreturn histfcntllock nohistsavebycopy
         if [[ -z $HISTSIZE || $HISTSIZE -lt 1000 ]]; then
             HISTSIZE=1000 
         fi
@@ -11,6 +13,7 @@ function reade() {
             SAVEHIST=1000
         fi
     fi 
+
 
     local red=$(tput sgr0 && tput setaf 1)
     local red1=$(tput sgr0 && tput setaf 9)
@@ -175,7 +178,7 @@ function reade() {
 
        (From rlwrap manual) Consider  the specified characters word-breaking (whitespace is always word-breaking). This determines what is considered a \"word\", both when completing and when building a completion word list from files specified by -f options following (not preceding!) it.\n Default list (){}[],'+-=&^%%\$#@\";|\ \n Unless -c is specified, / and . (period) are included in the default list
        
-       ${bold}( This option is kind of broken )${bold}\n\n"
+       ${bold}( This option is kind of broken )${bold}\n\n${normal}"
 
     while :; do
         case $1 in
@@ -673,11 +676,6 @@ function reade() {
         fi
 	
     else
-        if [[ $# < 1 ]]; then
-            echo "Give at least 1 variable up for reade(). "
-            echo "- A variable for the return string"
-            return 1
-        fi
     
         local rlwstring="rlwrap --ansi-colour-aware -s 1000 -D 0 -b \"$breaklines\" -o cat"
 
@@ -705,27 +703,26 @@ function reade() {
                     args=$(echo ${OPTARG} | sed "s \<$arg\>  g" | xargs)
                     if test -z "$args"; then 
                         one='y' 
-                    elif test -n "$args"; then
-                        args=$(echo $args | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }')
-                        args=$(echo $args | tr ' ' '\n')
+                    else
+                        args=$(echo $args | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }' | tr ' ' '\n')
                         tmpf=$(mktemp)
                         echo "$args" >"$tmpf"
-                        rlwstring=$(echo $rlwstring | sed 's| -o cat| \-H $tmpf  \-f <(echo \"${args[@]}\") -o cat|g')
+                        rlwstring=$(echo "$rlwstring" | sed 's| -o cat| \-H $tmpf \-f <(echo \"${args[@]}\") \-o cat|g')
                     fi
                     ;;
                 # Prompt
                 p)
-                    rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-S \"${OPTARG}\" |g")
+                    rlwstring=$(echo "$rlwstring" | sed "s|rlwrap |rlwrap -S \"${OPTARG}\" |g")
                     prmpt="${OPTARG}"
                     ;;
                 # Prompt colours
                 Q)
-                    rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-p${OPTARG} |g")
+                    rlwstring=$(echo "$rlwstring" | sed "s|rlwrap |rlwrap \-p${OPTARG} |g")
                     color="${OPTARG}" 
                     ;;
                 # Password
                 s)
-                    rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-aEN\"${OPTARG}\" |g")
+                    rlwstring=$(echo "$rlwstring" | sed "s|rlwrap |rlwrap \-aEN\"${OPTARG}\" |g")
                     ;;
                 *) ;;
             esac
@@ -734,6 +731,7 @@ function reade() {
         shift $((OPTIND - 1))
 
         unset vvvvvvvvvv ${@:$#:1} 
+
 
         if [[ "$auto" == 'y' ]] || [[ "$auto" == 'one' && "$one" == 'y' ]]; then
             if [[ -z "$prmpt" ]]; then
@@ -747,7 +745,7 @@ function reade() {
             fi
             vvvvvvvv=$arg       
         else
-            vvvvvvvv="$(eval $rlwstring)"
+            vvvvvvvv=$(eval "$rlwstring")
         fi
         
         export REPLY="$vvvvvvvv"

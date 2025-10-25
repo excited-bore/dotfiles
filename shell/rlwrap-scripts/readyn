@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Get script dir
 
 if test -n "$BASH_VERSION"; then
@@ -151,7 +153,7 @@ function readyn(){
             Default list (){}[],'+-=&^%%\$#@\";|\  
             Unless -c is specified, / and . (period) are included in the default list
             
-            ${bold}( This option is kind of broken )${bold}\n\n"
+            ${bold}( This option is kind of broken )${bold}\n\n${normal}"
             
             return 0
           ;;
