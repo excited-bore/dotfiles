@@ -10,37 +10,37 @@ else
     . $TOP/checks/check_all.sh
 fi
 
-if (test -z "$BASH" && hash bash &> /dev/null && (! test -f ~/.bashrc || ! test -d ~/.aliases.d || ! test -d ~/.bash_aliases.d || ! test -f ~/.bash_aliases || ! test -f /etc/bash.bashrc || ! test -d /etc/aliases.d || ! test -d /etc/bash_aliases.d || ! test -f /etc/bash_aliases)) && (test -z "$ZSH" && hash zsh &> /dev/null && (! test -f ~/.zshrc || ! test -d ~/.aliases.d || ! test -d ~/.zsh_aliases.d || ! test -f ~/.zsh_aliases || ! test -f /etc/zshrc || ! test -d /etc/aliases.d || ! test -d /etc/zsh_aliases.d || ! test -f /etc/zsh_aliases)); then
-   reade -Q 'GREEN' -i 'both bash zsh' -p "Install aliases for ${CYAN}Bash${GREEN}, ${CYAN}Zsh${GREEN} or both? [Both/bash/zsh]: " bash_zsh_alias
+if (test -z "$BASH_A" && hash bash &> /dev/null && (! test -f ~/.bashrc || ! test -d ~/.aliases.d || ! test -d ~/.bash_aliases.d || ! test -f ~/.bash_aliases || ! test -f /etc/bash.bashrc || ! test -d /etc/aliases.d || ! test -d /etc/bash_aliases.d || ! test -f /etc/bash_aliases)) && (test -z "$ZSH_A" && hash zsh &> /dev/null && (! test -f ~/.zshrc || ! test -d ~/.aliases.d || ! test -d ~/.zsh_aliases.d || ! test -f ~/.zsh_aliases || ! test -f /etc/zshrc || ! test -d /etc/aliases.d || ! test -d /etc/zsh_aliases.d || ! test -f /etc/zsh_aliases)); then
+   reade -Q 'GREEN' -i 'both bash zsh' -p "Create directories and install files filled with aliases/functions for ${CYAN}Bash${GREEN}, ${CYAN}Zsh${GREEN} or both? [Both/bash/zsh]: " bash_zsh_alias
 elif (test -z "$BASH" && hash bash &> /dev/null && (! test -f ~/.bashrc || ! test -d ~/.aliases.d || ! test -d ~/.bash_aliases.d || ! test -f ~/.bash_aliases || ! test -f /etc/bash.bashrc || ! test -d /etc/aliases.d || ! test -d /etc/bash_aliases.d || ! test -f /etc/bash_aliases)); then
-   readyn -p "Install aliases for ${CYAN}Bash${GREEN}?" bash_zsh_alias
+   readyn -p "Install aliases/functions for ${CYAN}Bash${GREEN}?" bash_zsh_alias
    [[ "$bash_zsh_alias" == 'y' ]] && bash_zsh_alias='bash' 
 elif (test -z "$ZSH" && hash zsh &> /dev/null && (! test -f ~/.zshrc || ! test -d ~/.aliases.d || ! test -d ~/.zsh_aliases.d || ! test -f ~/.zsh_aliases || ! test -f /etc/zshrc || ! test -d /etc/aliases.d || ! test -d /etc/zsh_aliases.d || ! test -f /etc/zsh_aliases)); then
-   readyn -p "Install aliases for ${CYAN}Zsh${GREEN}?" bash_zsh_alias
+   readyn -p "Install aliases/functions for ${CYAN}Zsh${GREEN}?" bash_zsh_alias
    [[ "$bash_zsh_alias" == 'y' ]] && bash_zsh_alias='zsh' 
 fi
 
 if [[ "$bash_zsh_alias" == 'both' || "$bash_zsh_alias" == 'bash' ]]; then
-    BASH="1" 
-    if test -z "$BASH_G" && (! test -f /etc/bash.bashrc || ! test -d /etc/aliases.d || ! test -d /etc/bash_aliases.d || ! test -f /etc/bash_aliases); then
+    BASH_A="1" 
+    if test -z "$BASH_A_G" && (! test -f /etc/bash.bashrc || ! test -d /etc/aliases.d || ! test -d /etc/bash_aliases.d || ! test -f /etc/bash_aliases); then
         readyn -p "Install aliases for ${CYAN}bash systemwide/for all users${GREEN}?" bash_g
         if [[ "$bash_g" == 'y' ]]; then
-            BASH_G='1'
+            BASH_A_G='1'
         fi
     fi
 fi
 if [[ "$bash_zsh_alias" == 'both' || "$bash_zsh_alias" == 'zsh' ]]; then
-    ZSH="1" 
-    if test -z "$ZSH_G" && (! test -f /etc/zshrc || ! test -d /etc/aliases.d || ! test -d /etc/zsh_aliases.d || ! test -f /etc/zsh_aliases); then
+    ZSH_A="1" 
+    if test -z "$ZSH_A_G" && (! test -f /etc/zshrc || ! test -d /etc/aliases.d || ! test -d /etc/zsh_aliases.d || ! test -f /etc/zsh_aliases); then
         readyn -p "Install aliases for ${CYAN}zsh systemwide/for all users${GREEN}?" zsh_g
         if [[ "$zsh_g" == 'y' ]]; then
-            ZSH_G='1'
+            ZSH_A_G='1'
         fi
     fi
 fi
 
 
-if (test -n "$BASH" && (! test -d ~/.aliases.d || ! test -d ~/.bash_aliases.d)) || (test -n "$ZSH" && (! test -d ~/.aliases.d || ! test -d ~/.zsh_aliases.d)); then
+if (test -n "$BASH_A" && (! test -d ~/.aliases.d || ! test -d ~/.bash_aliases.d)) || (test -n "$ZSH_A" && (! test -d ~/.aliases.d || ! test -d ~/.zsh_aliases.d)); then
     if ! test -d ~/.aliases.d/; then
         printf "${YELLOW}$HOME/.aliases.d/${yellow} not created${normal}\n" 
         readyn -p "Create ${CYAN}$HOME/.aliases.d/${GREEN}?" aliases_d
@@ -48,14 +48,14 @@ if (test -n "$BASH" && (! test -d ~/.aliases.d || ! test -d ~/.bash_aliases.d)) 
             mkdir $HOME/.aliases.d 
         fi
     fi
-    if test -n "$BASH" && ! test -d ~/.bash_aliases.d/; then
+    if test -n "$BASH_A" && ! test -d ~/.bash_aliases.d/; then
         printf "${YELLOW}$HOME/.bash_aliases.d/${yellow} not created${normal}\n" 
         readyn -p "Create ${CYAN}$HOME/.bash_aliases.d/${GREEN}?" baliases_d
         if [[ "$baliases_d" == 'y' ]]; then
             mkdir $HOME/.bash_aliases.d 
         fi
     fi
-    if test -n "$ZSH" && ! test -d ~/.zsh_aliases.d/; then
+    if test -n "$ZSH_A" && ! test -d ~/.zsh_aliases.d/; then
         printf "${YELLOW}$HOME/.zsh_aliases.d/${yellow} not created${normal}\n" 
         readyn -p "Create ${CYAN}$HOME/.zsh_aliases.d/${GREEN}?" zaliases_d
         if [[ "$zaliases_d" == 'y' ]]; then
@@ -67,7 +67,7 @@ if (test -n "$BASH" && (! test -d ~/.aliases.d || ! test -d ~/.bash_aliases.d)) 
         touch $HOME/.bashrc 
     fi
     
-    if test -n "$BASH" && (test -d ~/.aliases.d/ || test -d ~/.bash_aliases.d) && ! test -f $HOME/.bash_aliases; then
+    if test -n "$BASH_A" && (test -d ~/.aliases.d/ || test -d ~/.bash_aliases.d) && ! test -f $HOME/.bash_aliases; then
         printf "${YELLOW}$HOME/.bash_aliases${yellow} not installed${normal}\n" 
         bash_alias="$TOP/shell/aliases/.bash_aliases"    
         if ! test -f $bash_alias; then
@@ -94,7 +94,7 @@ if (test -n "$BASH" && (! test -d ~/.aliases.d || ! test -d ~/.bash_aliases.d)) 
         yes-edit-no -f bash_alias -g "$bash_alias" -p "Install $HOME/.bash_aliases? (Sources everything under $HOME/.aliases.d and $HOME/.bash_aliases.d)?"
     fi
     
-    if test -n "$ZSH" && (test -d ~/.aliases.d/ || test -d ~/.bash_aliases.d) && ! test -f $HOME/.zsh_aliases; then
+    if test -n "$ZSH_A" && (test -d ~/.aliases.d/ || test -d ~/.bash_aliases.d) && ! test -f $HOME/.zsh_aliases; then
         if ! test -f ~/.zshrc; then
             touch $HOME/.zshrc 
         fi
@@ -126,7 +126,7 @@ if (test -n "$BASH" && (! test -d ~/.aliases.d || ! test -d ~/.bash_aliases.d)) 
     fi
      
 
-    if (test -n "$BASH_G" && (! test -d /etc/aliases.d || ! test -d /etc/bash_aliases.d)) || (test -n "$ZSH_G" && (! test -d /etc/aliases.d || ! test -d /etc/zsh_aliases.d)); then
+    if (test -n "$BASH_A_G" && (! test -d /etc/aliases.d || ! test -d /etc/bash_aliases.d)) || (test -n "$ZSH_A_G" && (! test -d /etc/aliases.d || ! test -d /etc/zsh_aliases.d)); then
         if ! test -d /etc/.aliases.d/; then
             printf "${YELLOW}/etc/aliases.d/${yellow} not created${normal}\n" 
             readyn -p "Create ${CYAN}/etc/aliases.d/${GREEN}? (Requires ${RED}sudo${GREEN})" aliases_dg
@@ -149,7 +149,7 @@ if (test -n "$BASH" && (! test -d ~/.aliases.d || ! test -d ~/.bash_aliases.d)) 
             fi
         fi
         
-        if test -n "$BASH_G" && (test -d /etc/.aliases.d/ || test -d /etc/bash_aliases.d) && ! test -f /etc/bash_aliases; then
+        if test -n "$BASH_A_G" && (test -d /etc/.aliases.d/ || test -d /etc/bash_aliases.d) && ! test -f /etc/bash_aliases; then
             
             if ! test -f /etc/bash.bashrc; then
                 sudo touch /etc/bash.bashrc 
@@ -177,7 +177,7 @@ if (test -n "$BASH" && (! test -d ~/.aliases.d || ! test -d ~/.bash_aliases.d)) 
             yes-edit-no -f bash_alias_g -g "$bash_alias" -p "Install /etc/bash_aliases? (Sources everything under /etc/aliases.d and /etc/bash_aliases.d)?"
         fi
         
-        if test -n "$ZSH_G" && (test -d /etc/.aliases.d/ || test -d /etc/bash_aliases.d) && ! test -f /etc/zsh_aliases; then
+        if test -n "$ZSH_A_G" && (test -d /etc/.aliases.d/ || test -d /etc/zsh_aliases.d) && ! test -f /etc/zsh_aliases; then
             
             if ! test -f /etc/zshrc; then
                 sudo touch /etc/zshrc 

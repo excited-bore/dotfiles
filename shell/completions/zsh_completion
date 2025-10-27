@@ -1,0 +1,7 @@
+# Let's load the compinit module at the top of the file
+autoload -U compinit 
+
+# Let's put every completion file inside ~/.zsh_completion.d/site-functions in the variable fpath
+export fpath=(/usr/share/zsh/site-functions/* $fpath)
+
+compinit

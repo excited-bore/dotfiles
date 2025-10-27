@@ -1,21 +1,16 @@
 
 # Let's load the compinit module at the top of the file
 autoload -U compinit 
-compinit
 
+# Let's put every completion file inside ~/.zsh_completion.d/site-functions in the variable fpath
+export fpath=($HOME/.zsh_completion.d/site-functions/* $fpath)
 
-if [ -d ~/.zsh_completion.d/ ] && [ "$(command ls -A ~/.zsh_completion.d/)" ]; then
-    for compl in ~/.zsh_completion.d/*; do
-        source "$compl" 
-         
-        # https://github.com/Aloxaf/fzf-tab
-        if [[ "$compl" == "fzf-tab.plugin.zsh" ]]; then
-            if hash eza &> /dev/null; then
-                # preview directory's content with eza using icons when completing cd
-                zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --header --color=always --icons=always $realpath' 
-            fi
-        fi
-  done
+if test -f ~/.zsh_completion.d/fzf-tab/fzf-tab.plugin.zsh; then
+    source ~/.zsh_completion.d/fzf-tab/fzf-tab.plugin.zsh
+    if hash eza &> /dev/null; then
+        # preview directory's content with eza using icons when completing cd
+        zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --header --color=always --icons=always $realpath' 
+    fi
 fi
 
 #
@@ -86,3 +81,5 @@ zstyle ':completion:*' cache-path "$XDG_CACHE_HOME/zsh/.zcompcache"
 # Usually, on Unix systems, // is expanded to /. 
 # If you prefer this behavior, you can set the style squeeze-slashes to true as follows:
 #zstyle ':completion:*' squeeze-slashes true
+
+compinit
