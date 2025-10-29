@@ -95,8 +95,12 @@ if [[ "$bash_zsh_comp" == 'both' || "$bash_zsh_comp" == 'bash' ]]; then
         readyn -p "Configure ${CYAN}bash${GREEN} completions ${CYAN}systemwide/for all users${GREEN}?" bash_g
         if [[ "$bash_g" == 'y' ]]; then
             BASH_C_G='1'
+        else
+            BASH_C_G='0'
         fi
     fi
+else
+    BASH_C='0' BASH_C_G='0'
 fi
 if [[ "$bash_zsh_comp" == 'both' || "$bash_zsh_comp" == 'zsh' ]]; then
     ZSH_C="1" 
@@ -104,8 +108,12 @@ if [[ "$bash_zsh_comp" == 'both' || "$bash_zsh_comp" == 'zsh' ]]; then
         readyn -p "Configure ${CYAN}zsh${GREEN} completions ${CYAN}systemwide/for all users${GREEN}?" zsh_g
         if [[ "$zsh_g" == 'y' ]]; then
             ZSH_C_G='1'
+        else 
+            ZSH_C_G='0'
         fi
     fi
+else
+    ZSH_C='0' ZSH_C_G='0'
 fi
 
 unset bash_zsh_comp 
@@ -128,8 +136,12 @@ if [[ "$bash_zsh_alias" == 'both' || "$bash_zsh_alias" == 'bash' ]]; then
         readyn -p "Install aliases for ${CYAN}bash systemwide/for all users${GREEN}?" bash_g
         if [[ "$bash_g" == 'y' ]]; then
             BASH_A_G='1'
+        else
+            BASH_A_G='0'
         fi
     fi
+else
+    BASH_A='0' BASH_A_G='0'
 fi
 if [[ "$bash_zsh_alias" == 'both' || "$bash_zsh_alias" == 'zsh' ]]; then
     ZSH_A="1" 
@@ -137,10 +149,16 @@ if [[ "$bash_zsh_alias" == 'both' || "$bash_zsh_alias" == 'zsh' ]]; then
         readyn -p "Install aliases for ${CYAN}zsh systemwide/for all users${GREEN}?" zsh_g
         if [[ "$zsh_g" == 'y' ]]; then
             ZSH_A_G='1'
+        else
+            ZSH_A_G='0'
         fi
     fi
+else
+    ZSH_A='0' ZSH_A_G='0'
 fi
 
+
+# Completions
 
 if ! test -f $TOP/checks/check_completions.sh; then
     source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_completions.sh)
@@ -148,7 +166,7 @@ else
     source $TOP/checks/check_completions.sh
 fi
 
-if [[ -n "$BASH" ]] || [ -d ~/.bash_completion.d ]; then
+if [[ -n "$BASH_C" ]]; then
 
     # Bash Completion
    
@@ -181,33 +199,7 @@ if [[ -n "$BASH" ]] || [ -d ~/.bash_completion.d ]; then
     
 fi
 
-if [[ -n "$ZSH" ]] || [ -d ~/.zsh_completion.d ]; then
-
-    if ! [[ -d ~/.zsh_completion.d/ ]]; then
-        mkdir ~/.zsh_completion.d/
-    fi
-
-    if ! [[ -f ~/.zsh_completion ]]; then
-        if ! [[ -f $TOP/shell/completions/.zsh_completion ]]; then
-            curl-wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/shell/completions/.zsh_completion > ~/.zsh_completion 
-        else
-            cp $TOP/shell/completions/.zsh_completion ~/
-        fi 
-    fi
-
-    # Make sure the ~/.zsh_completion sources BEFORE ~/.zsh_aliases to prevent zshalias-completions from breaking
-    if ! grep -q "~/.zsh_completion" ~/.zshrc; then
-        if grep -q "[[ -f ~/.zsh_aliases ]] && source ~/.zsh_aliases" ~/.zshrc || grep -q '^if \[\[ -f ~/.zsh_aliases \]\]; then' ~/.zshrc; then
-            if grep -q "[[ -f ~/.zsh_aliases ]] && source ~/.zsh_aliases" ~/.zshrc; then
-                sed -i 's|\([[ -f ~/.zsh_aliases ]] && source ~/.zsh_aliases\)|[[ -f ~/.zsh_completion ]] \&\& source ~/.zsh_completion\n\n\1|' ~/.zshrc 
-            else
-                sed -i 's|\(\^if [[ -f ~/.zsh_aliases ]]; then\)|[[ -f ~/.zsh_completion ]] \&\& source ~/.zsh_completion\n\n\1|' ~/.zshrc 
-            fi
-        else
-            printf "\n[[ -f ~/.zsh_completion ]] && source ~/.zsh_completion\n\n" >> ~/.zshrc
-        fi
-    fi
-     
+if [[ -n "$ZSH_C" ]]; then
 
     # ZSH Completions
     
@@ -233,80 +225,35 @@ if [[ -n "$ZSH" ]] || [ -d ~/.zsh_completion.d ]; then
     unset fzf_tab 
 fi
 
-# Python completions
 
-readyn -p "Install python completions in ~/.bash_completion.d?" -c "! hash activate-global-python-argcomplete &> /dev/null" pycomp
-if [[ "y" == "$pycomp" ]]; then
-    if ! [[ -f $TOP/shell/install_python_completions.sh ]]; then
-        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/shell/install_python_completions.sh)
-    else
-        . $TOP/shell/install_python_completions.sh
+if [[ -n "$BASH_C" || -n "$ZSH_C" ]]; then
+
+    # Python completions
+
+    readyn -p "Install completions for python commands?" -c "! hash activate-global-python-argcomplete &> /dev/null" pycomp
+    if [[ "y" == "$pycomp" ]]; then
+        if ! [[ -f $TOP/shell/install_python_completions.sh ]]; then
+            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/shell/install_python_completions.sh)
+        else
+            . $TOP/shell/install_python_completions.sh
+        fi
     fi
+    unset pycomp
 fi
-unset pycomp
 
 # Aliases
 
-if [[ -n "$BASH" || -n "$ZSH" ]] && ! test -d ~/.aliases.d; then
-   mkdir ~/.aliases.d 
+if ! test -f $TOP/checks/check_aliases.sh; then
+    source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_aliases.sh)
+else 
+    source $TOP/checks/check_aliases.sh
 fi
 
-if [[ -n "$BASH" ]]; then
-    if ! [ -f ~/.bash_aliases ]; then
-        if ! [ -f $TOP/shell/aliases/.bash_aliases ]; then
-            curl-wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases > ~/.bash_aliases 
-        else
-            cp $TOP/shell/aliases/.bash_aliases ~/
-        fi 
-    fi
-
-    if [[ -f ~/.bashrc ]] && ! grep -q '\[ -f ~/.bash_aliases \] && source ~/.bash_aliases' ~/.bashrc; then
-        if grep -q '^if \[ -f ~/.bash_aliases \]; then' ~/.bashrc; then
-            sed -i -e 's|\(if \[ -f \~/.bash_aliases \]; then\)|#This is commented out since there'\''s a one-liner which sources ~/.bash_aliases later down ~/.bashrc\n\n#\1|g' -e 's|\(^\s*\. ~/.bash_aliases\)|#\1|' ~/.bashrc
-            ubbashrcfi="$(awk '/\. ~\/.bash_aliases/{print NR+1};' ~/.bashrc)" 
-            sed -i "$ubbashrcfi s/^fi/#fi/" ~/.bashrc   
-            unset ubbashrcfi 
-        fi
-       
-        if grep -q '\[ -f ~/.bash_keybinds \]' ~/.bashrc; then
-            sed -i 's|\(\[ -f \~/.bash_keybinds \] \&\& source \~/.bash_keybinds\)|\[ -f \~/.bash_aliases \] \&\& source \~/.bash_aliases\n\n\1|g' ~/.bashrc
-        else
-            echo '[ -f ~/.bash_aliases ] && source ~/.bash_aliases' >> ~/.bashrc
-        fi
-    fi
-     
-fi
-    
-if [[ -n "$ZSH" ]]; then
-    if ! [ -f ~/.zsh_aliases ]; then
-        if ! [[ -f $TOP/shell/aliases/.zsh_aliases ]]; then
-            curl-wget https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.zsh_aliases > ~/.zsh_aliases  
-        else
-            cp $TOP/shell/aliases/.zsh_aliases ~/
-        fi 
-    fi
-
-    if [[ -f ~/.zshrc ]] && ! grep -q '\[ -f ~/.zsh_aliases \] && source ~/.zsh_aliases' ~/.zshrc; then
-        if grep -q '^if \[ -f ~/.zsh_aliases \]; then' ~/.zshrc; then
-            sed -i -e 's|\(if \[ -f \~/.zsh_aliases \]; then\)|#This is commented out since there'\''s a one-liner which sources ~/.zsh_aliases later down ~/.zshrc\n\n#\1|g' -e 's|\(^\s*\. ~/.zsh_aliases\)|#\1|' ~/.zshrc
-            ubzshrcfi="$(awk '/\. ~\/.zsh_aliases/{print NR+1};' ~/.zshrc)" 
-            sed -i "$ubzshrcfi s/^fi/#fi/" ~/.zshrc   
-            unset ubzshrcfi 
-        fi
-       
-        if grep -q '\[ -f ~/.zsh_keybinds \]' ~/.zshrc; then
-            sed -i 's|\(\[ -f \~/.zsh_keybinds \] \&\& source \~/.zsh_keybinds\)|\[ -f \~/.zsh_aliases \] \&\& source \~/.zsh_aliases\n\n\1|g' ~/.zshrc
-        else
-            echo '[ -f ~/.zsh_aliases ] && source ~/.zsh_aliases' >> ~/.zshrc
-        fi
-    fi
-fi
-
-if [ -n "$BASH" ] && [ -z "$ZSH" ]; then
+if [ -n "$BASH_A" ] && [ -z "$ZSH_A" ]; then
     readyn -p "Install aliases (and functions) for ${CYAN}Bash${GREEN}?" scripts
-elif [ -n "$ZSH" ] && [ -z "$BASH" ]; then
+elif [ -n "$ZSH_A" ] && [ -z "$BASH_A" ]; then
     readyn -p "Install aliases (and functions) for ${CYAN}Zsh${GREEN}?" scripts
-elif [ -n "$ZSH" ] && [ -n "$BASH" ]; then
+elif [ -n "$ZSH_A" ] && [ -n "$BASH_A" ]; then
     readyn -p "Install aliases (and functions) for ${CYAN}Bash${GREEN} and ${CYAN}Zsh${GREEN}?" scripts
 fi
 

@@ -44,11 +44,11 @@ if test -d ~/.bash_completion.d; then
     fi
 fi
 
-if test -d ~/.zsh_completion.d; then
+if test -d ~/.zsh_completion.d/site-functions/; then
     if hash activate-global-python-argcomplete &> /dev/null; then
-        activate-global-python-argcomplete --dest=$HOME/.zsh_completion.d 
+        activate-global-python-argcomplete --dest=$HOME/.zsh_completion.d/site-functions/ 
     elif hash activate-global-python-argcomplete3 &> /dev/null; then
-        activate-global-python-argcomplete3 --dest=$HOME/.zsh_completion.d 
+        activate-global-python-argcomplete3 --dest=$HOME/.zsh_completion.d/site-functions/ 
     fi
 fi
 

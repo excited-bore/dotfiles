@@ -42,15 +42,15 @@ if [[ "$bash_zsh_comp" == 'both' || "$bash_zsh_comp" == 'zsh' ]]; then
     fi
 fi
 
-if (test -n "$BASH_C" && (! test -d ~/.bash_completion.d)) || (test -n "$ZSH_C" && (! test -d ~/.zsh_completion.d/site-functions)); then
-    if test -n "$BASH_C" && ! test -d ~/.bash_completion.d/; then
+if ([[ "$BASH_C" == "1" ]] && (! test -d ~/.bash_completion.d)) || ([[ "$ZSH_C" == "1" ]] && (! test -d ~/.zsh_completion.d/site-functions)); then
+    if [[ "$BASH_C" == "1" ]] && ! test -d ~/.bash_completion.d/; then
         printf "${YELLOW}$HOME/.bash_completion.d/${yellow} not created${normal}\n" 
         readyn -p "Create ${CYAN}$HOME/.bash_completion.d/${GREEN}?" bcompletions_d
         if [[ "$bcompletions_d" == 'y' ]]; then
             mkdir $HOME/.bash_completion.d 
         fi
     fi
-    if test -n "$ZSH_C" && ! test -d ~/.zsh_completion.d/site-functions; then
+    if [[ "$ZSH_C" == "1" ]] && ! test -d ~/.zsh_completion.d/site-functions; then
         printf "${YELLOW}$HOME/.zsh_completion.d/site-functions${yellow} not created${normal}\n" 
         readyn -p "Create ${CYAN}$HOME/.zsh_completion.d/site-functions${GREEN}?" zcompletions_d
         if [[ "$zcompletions_d" == 'y' ]]; then
@@ -59,7 +59,7 @@ if (test -n "$BASH_C" && (! test -d ~/.bash_completion.d)) || (test -n "$ZSH_C" 
     fi
 
     
-    if test -n "$BASH_C" && (test -d ~/.bash_completion.d) && ! test -f $HOME/.bash_completion; then
+    if [[ "$BASH_C" == "1" ]] && (test -d ~/.bash_completion.d) && ! test -f $HOME/.bash_completion; then
         
         if ! test -f ~/.bashrc; then
             touch $HOME/.bashrc 
@@ -97,7 +97,7 @@ if (test -n "$BASH_C" && (! test -d ~/.bash_completion.d)) || (test -n "$ZSH_C" 
         yes-edit-no -f bash_comp -g "$bash_comp" -p "Install $HOME/.bash_completion? (Sources /usr/share/bash-completion/bash_completion and everything under $HOME/.bash_completion.d)?"
     fi
     
-    if test -n "$ZSH_C" && (test -d ~/.zsh_completion.d/site-functions) && ! test -f $HOME/.zsh_completion; then
+    if [[ "$ZSH_C" == "1" ]] && (test -d ~/.zsh_completion.d/site-functions) && ! test -f $HOME/.zsh_completion; then
         
         if ! test -f ~/.zshrc; then
             touch $HOME/.zshrc 
@@ -126,15 +126,17 @@ if (test -n "$BASH_C" && (! test -d ~/.bash_completion.d)) || (test -n "$ZSH_C" 
     yes-edit-no -f zsh_comp -g "$zsh_comp" -p "Install $HOME/.zsh_completion? (Loads all zsh completions (under /usr/share/zsh/site-functions and $HOME/.zsh_completion.d/site-functions) while also settings specific styles for certain zsh completions?"
     fi
 
-    if (test -n "$BASH_C_G" && (! test -d /usr/share/bash-completion/completions)) || (test -n "$ZSH_C_G" && (! test -d /usr/share/zsh/site-functions)); then
-        if hash bash &> /dev/null && ! test -d /usr/share/bash-completion/completions/; then
+    if ([[ "$BASH_C_G" == "1" ]] && ! test -d /usr/share/bash-completion/completions) || ([[ "$ZSH_C_G" == "1" ]] && ! test -d /usr/share/zsh/site-functions); then
+        
+        if [[ "$BASH_C_G" == "1" ]] && ! test -d /usr/share/bash-completion/completions/; then
             printf "${YELLOW}/usr/share/bash-completion/completions/${yellow} not created${normal}\n" 
-            readyn -p "Create ${CYAN}/usr/share/bash-completion/completions/${GREEN} (Requires ${RED}sudo${GREEN}?" bcomp_dg
+            readyn -p "create ${cyan}/usr/share/bash-completion/completions/${green} (requires ${red}sudo${green}?" bcomp_dg
             if [[ "$bcomp_dg" == 'y' ]]; then
                 sudo mkdir -p /usr/share/bash-completion/completions/ 
             fi
         fi
-        if hash zsh &> /dev/null && ! test -d /usr/share/zsh/site-functions/; then
+        
+        if [[ "$ZSH_C_G" == "1" ]] && ! test -d /usr/share/zsh/site-functions/; then
             printf "${YELLOW}/usr/share/zsh/site-functions/${yellow} not created${normal}\n" 
             readyn -p "Create ${CYAN}/usr/share/zsh/site-functions/${GREEN} (Requires ${RED}sudo${GREEN}?" zcomp_d
             if [[ "$zcomp_d" == 'y' ]]; then
@@ -142,12 +144,14 @@ if (test -n "$BASH_C" && (! test -d ~/.bash_completion.d)) || (test -n "$ZSH_C" 
             fi
         fi
         
-        if test -n "$BASH_C_G" && (test -d /usr/share/bash-completion/completions) && ! test -f /usr/share/bash-completion/bash_completion; then
+        if [[ "$BASH_C_G" == "1" ]] && test -d /usr/share/bash-completion/completions && ! test -f /usr/share/bash-completion/bash_completion; then
             
             if ! test -f /etc/bash.bashrc; then
                 sudo touch /etc/bash.bashrc 
             fi
-           
+          
+            # BASH Completions
+              
             printf "${YELLOW}/usr/share/bash-completion/bash_completion${yellow} not installed${normal}\n" 
             readyn -p "Install ${CYAN}bash-completion${GREEN}?" bash_comp
             if [[ "$bash_comp" == 'y' ]]; then
@@ -155,7 +159,7 @@ if (test -n "$BASH_C" && (! test -d ~/.bash_completion.d)) || (test -n "$ZSH_C" 
             fi
         fi
        
-        if test -f /usr/share/bash-completion/bash_completion && (! grep -q '\[ -f /usr/share/bash-completion/bash_completion \]' /etc/bash.bashrc && ! grep -q 'if \[\[ -r /usr/share/bash-completion/bash_completion \]\]; then' /etc/bash.bashrc); then
+        if [[ "$BASH_C_G" == "1" ]] && test -f /usr/share/bash-completion/bash_completion && (! grep -q '\[ -f /usr/share/bash-completion/bash_completion \]' /etc/bash.bashrc && ! grep -q 'if \[\[ -r /usr/share/bash-completion/bash_completion \]\]; then' /etc/bash.bashrc); then
             if grep -q '\[ -f /etc/bash_aliasess \]' /etc/bash.bashrc; then
                 sudo sed -i 's|\(\[ -f /etc/bash_aliases \] \&\& source /etc/bash_aliases\)|\[ -f /usr/share/bash-completion/bash_completion \] \&\& source /usr/share/bash-completion/bash_completion\n\n\1|g' /etc/bash.bashrc
             else
@@ -164,11 +168,21 @@ if (test -n "$BASH_C" && (! test -d ~/.bash_completion.d)) || (test -n "$ZSH_C" 
 
         fi 
 
-        if test -n "$ZSH_C_G" && (test -d /usr/share/zsh/site-functions/) && ! test -f /etc/zsh_completion; then
+        if [[ "$ZSH_C_G" == "1" ]] && test -d /usr/share/zsh/site-functions/ && ! test -f /etc/zsh_completion; then
             
             if ! test -f /etc/zshrc; then
                 sudo touch /etc/zshrc 
             fi
+
+            # ZSH Completions
+
+            if [[ -z "$(command ls /usr/share/zsh/site-functions/*)" ]]; then
+                readyn -p "No function files available for ZSH at ${CYAN}/usr/share/zsh/site-functions/${GREEN}. Install package ${CYAN}Zsh-completions${GREEN} for additional completer functions?" ns_zshc
+                if [[ "$ns_zshc" == 'y' ]]; then
+                    eval "$pac_ins_y zsh-completions" 
+                fi
+            fi
+
 
             printf "${YELLOW}/etc/zsh_completion${yellow} not installed${normal}\n" 
             zsh_comp="$TOP/shell/completion/zsh_completion"    
