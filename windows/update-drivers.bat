@@ -18,10 +18,17 @@ if /i "%manufacturer%"=="Hewlett-Packard" set HP=1
 
 if /i "%manufacturer%"=="Dell Inc." (
     echo This is a Dell system.
+    winget install --id Dell.CommandUpdate --silent --accept-package-agreements --accept-source-agreements
+    "C:\Program Files (x86)\Dell\CommandUpdate\dcu-cli.exe" /scan
+    "C:\Program Files (x86)\Dell\CommandUpdate\dcu-cli.exe" /applyupdates
 ) else if defined HP (
     echo This is a HP system.
+    winget install --id HP.ImageAssistant --silent --accept-package-agreements --accept-source-agreements
+    "C:\SWSetup\HPImageAssistant\HPImageAssistant.exe" /Action:Install /AutoCleanup /Category:BIOS,Drivers,Firmware /Silent
 ) else if /i "%manufacturer%"=="LENOVO" (
     echo This is a Lenovo system.
+    winget install --id Lenovo.SystemUpdate --silent --accept-package-agreements --accept-source-agreements
+    "C:\Program Files (x86)\Lenovo\System Update\tvsu.exe" /CM -search A -action INSTALL -noicon -rebootprompt -nolicense
 ) else if /i "%manufacturer%"=="ASUSTeK COMPUTER INC." (
     echo This is an ASUS system.
 ) else if /i "%manufacturer%"=="Acer" (
