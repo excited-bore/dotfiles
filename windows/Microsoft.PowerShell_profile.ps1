@@ -1,5 +1,8 @@
-# Install sudo if not found
+# Disable startup message
 
+$env:POWERSHELL_STARTUP_PROFILE = '0'
+
+# Install sudo if not found
 if (-Not (Get-Command sudo -errorAction SilentlyContinue)){
     Write-Host 'Sudo not found. Installing...'
     Install-Module -Name Sudo

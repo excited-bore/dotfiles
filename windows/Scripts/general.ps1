@@ -358,9 +358,9 @@ Set-Alias -Name eval -Value "Invoke-Expression"
 
 # if wget.exe doesn't exist, Invoke-WebRequest alias for wget
 
-if (-not (Get-Command wget.exe -ErrorAction SilentlyContinue)){
-   Set-Alias -Name wget -Value 'Invoke-WebRequest' 
-}
+#if (-not (Get-Command wget.exe -ErrorAction SilentlyContinue)){
+#   Set-Alias -Name wget -Value 'Invoke-WebRequest' 
+#}
 
 # Grep and Sed replacements
 # https://quisitive.com/using-sed-and-grep-in-powershell/
