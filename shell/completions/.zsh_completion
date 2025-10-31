@@ -1,0 +1,85 @@
+
+# Let's load the compinit module at the top of the file
+autoload -U compinit 
+
+# Let's put every completion file inside ~/.zsh_completion.d/site-functions in the variable fpath
+export fpath=($HOME/.zsh_completion.d/site-functions/* $fpath)
+
+if test -f ~/.zsh_completion.d/fzf-tab/fzf-tab.plugin.zsh; then
+    source ~/.zsh_completion.d/fzf-tab/fzf-tab.plugin.zsh
+    if hash eza &> /dev/null; then
+        # preview directory's content with eza using icons when completing cd
+        zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --header --color=always --icons=always $realpath' 
+    fi
+fi
+
+#
+# https://thevaluable.dev/zsh-completion-guide-examples/
+#
+
+# To configure the completion system, you can use zstyle patterns following this template:
+
+#  ':completion:<function>:<completer>:<command>:<argument>:<tag>'
+#
+# The substring separated with colons : are called components. Let’s look at the ones used for the completion system in details:
+#
+#    completion - String acting as a namespace, to avoid pattern collisions with other scripts also using zstyle.
+#    <function> - Apply the style to the completion of an external function or widget.
+#    <completer> - Apply the style to a specific completer. We need to drop the underscore from the completer’s name here.
+#    <command> - Apply the style to a specific command, like cd, rm, or sed for example.
+#    <argument> - Apply the style to the nth option or the nth argument. It’s not available for many styles.
+#    <tag> - Apply the style to a specific tag.
+#    
+#    You can think of a tag as a type of match. 
+#    For example “files”, “domains”, “users”, or “options” are tags.
+#
+#    List of tags => 'man zshcompsys', search for “Standard Tags”
+#
+# You don’t have to define every component of the pattern. Instead, you can replace each of them with a star *. 
+# The more specific the pattern will be, the more precedence it will have over less specific patterns. 
+
+# For example:
+#  'zstyle ':completion:*:*:cp:*' file-sort size'
+#  'zstyle ':completion:*' file-sort modification'
+
+# The pattern :completion:*:*:cp:* has precedence over :completion:* because it’s considered more precise.
+
+# The * replace any character including the colon :. 
+# That’s why the pattern :completion:*:*:cp:* is equivalent to :completion:*:cp:*. 
+# That said, I find the second form confusing: it’s not clear what cp is. Is it a command? A function? A tag? In that case it’s pretty obvious, but it’s not always cp in the pattern. 
+# Personally, it's always good try and use the first form whenever possible
+
+# `man zshcompsys` for things related directly to zsh completion
+# `man zshmodules` for learning about `zstyle`
+
+# Taken from manjaro zsh-config
+
+# Case insensitive tab completion
+zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}'     
+
+# Colored completion use the same colors as shown by ls instead of those from the ZSH_COLOR variable
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"                               
+
+# Automatically find new executables in path 
+zstyle ':completion:*' rehash true                                                    
+
+# Highlight menu selection
+zstyle ':completion:*' menu select                                                    
+
+# Speed up completions
+
+# If there's one option, accept it
+zstyle ':completion:*' accept-exact '*(N)'
+
+# Use cache
+zstyle ':completion:*' use-cache on
+zstyle ':completion:*' cache-path "$XDG_CACHE_HOME/zsh/.zcompcache"
+
+# By default, the completion system will expand // to /*/. 
+# For example, cd ~//Documents will be expanded to cd ~/*/Documents.
+
+# Usually, on Unix systems, // is expanded to /. 
+# If you prefer this behavior, you can set the style squeeze-slashes to true as follows:
+#zstyle ':completion:*' squeeze-slashes true
+
+compinit

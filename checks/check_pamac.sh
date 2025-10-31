@@ -1,16 +1,23 @@
-#!/bin/bash
+SYSTEM_UPDATED='TRUE'
 
-if ! type reade &> /dev/null; then
-     source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)
+TOP=$(git rev-parse --show-toplevel 2> /dev/null)
+
+if ! test -f $TOP/checks/check_all.sh; then
+    if hash curl &> /dev/null; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
+    else
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
+    fi
 else
-    . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
-fi 
+    . $TOP/checks/check_all.sh
+fi
 
 
 if grep -q "#EnableAUR" /etc/pamac.conf; then
     readyn -p "Enable AUR for pamac?" aurset
     if [[ "$aurset" == "y" ]]; then
         sudo sed -i 's|#EnableAUR|EnableAUR|g' /etc/pamac.conf 
+        pamac checkupdates  
     fi
     unset aurset
 fi
@@ -40,7 +47,7 @@ if grep -q "#CheckAURVCSUpdates" /etc/pamac.conf; then
     fi
     unset aurset1
 fi
-if type flatpak &> /dev/null && grep -q "#EnableFlatpak" /etc/pamac.conf; then
+if hash flatpak &> /dev/null && grep -q "#EnableFlatpak" /etc/pamac.conf; then
     readyn -p "Enable flatpak in pamac?" fltpak
     if [[ "$fltpak" == "y" ]]; then
         eval "${pac_ins} libpamac-flatpak-plugin"
@@ -57,7 +64,7 @@ if type flatpak &> /dev/null && grep -q "#EnableFlatpak" /etc/pamac.conf; then
     fi
 fi
 
-if type snap &> /dev/null && grep -q "#EnableSnap" /etc/pamac.conf; then
+if hash snap &> /dev/null && grep -q "#EnableSnap" /etc/pamac.conf; then
     readyn -p "Enable snap in pamac? " snap
     if [[ "$snap" == "y" ]]; then
         eval "$pac_ins libpamac-snap-plugin"

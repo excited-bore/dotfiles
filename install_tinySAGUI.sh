@@ -1,3 +1,16 @@
+TOP=$(git rev-parse --show-toplevel 2> /dev/null)
+
+if ! test -f $TOP/checks/check_all.sh; then
+    if hash curl &> /dev/null; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
+    else
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
+    fi
+else
+    . $TOP/checks/check_all.sh
+fi
+
+
 #if ! type QtTinySA &> /dev/null; then
     gtb_link="https://github.com/g4ixt/QtTinySA"
     new_url="$(echo "$(echo "$gtb_link" | sed 's|https://github.com|https://api.github.com/repos|g')/releases/latest")" 
@@ -10,7 +23,7 @@
         exit 1 
     fi
     tmpd=$(mktemp -d)     
-    wget -P $tmpd "$link"
+    wget-aria-dir $tmpd "$link"
     mv $tmpd/QtTinySA.bin $tmpd/QtTinySA  
     if ! groups $USER | grep -qw 'dialout'; then
         echo "$(tput bold && tput setaf 1)User '$USER' is not added to the group 'dialout'$(tput sgr0) which is needed to gain access to serial ports"

@@ -1,0 +1,758 @@
+#!/bin/bash
+# Shebang not really except for nvim bash language server registering
+
+function reade() {
+     
+    # For ZSH, we just set some nice options like localtraps and options
+    if test -n "$ZSH_VERSION"; then 
+        setopt localoptions localtraps errreturn histfcntllock nohistsavebycopy
+        if [[ -z $HISTSIZE || $HISTSIZE -lt 1000 ]]; then
+            HISTSIZE=1000 
+        fi
+        if [[ -z $SAVEHIST || $SAVEHIST -lt 1000 ]]; then
+            SAVEHIST=1000
+        fi
+    fi 
+
+
+    local red=$(tput sgr0 && tput setaf 1)
+    local red1=$(tput sgr0 && tput setaf 9)
+    local orange=$(tput sgr0 && tput setaf 166)
+    local green=$(tput sgr0 && tput setaf 2)
+    local green1=$(tput sgr0 && tput setaf 10)
+    local yellow=$(tput sgr0 && tput setaf 3)
+    local yellow1=$(tput sgr0 && tput setaf 11)
+    local blue=$(tput sgr0 && tput setaf 4)
+    local blue1=$(tput sgr0 && tput setaf 12)
+    local magenta=$(tput sgr0 && tput setaf 5)
+    local magenta1=$(tput sgr0 && tput setaf 13)
+    local cyan=$(tput sgr0 && tput setaf 6)
+    local cyan1=$(tput sgr0 && tput setaf 14)
+    local white=$(tput sgr0 && tput setaf 7)
+    local white1=$(tput sgr0 && tput setaf 15)
+    local black=$(tput sgr0 && tput setaf 16)
+    local grey=$(tput sgr0 && tput setaf 8)
+
+    local RED=$(tput setaf 1 && tput bold)
+    local RED1=$(tput setaf 9 && tput bold)
+    local ORANGE=$(tput setaf 166 && tput bold)
+    local GREEN=$(tput setaf 2 && tput bold)
+    local GREEN1=$(tput setaf 10 && tput bold)
+    local YELLOW=$(tput setaf 3 && tput bold)
+    local YELLOW1=$(tput setaf 11 && tput bold)
+    local BLUE=$(tput setaf 4 && tput bold)
+    local BLUE1=$(tput setaf 12 && tput bold)
+    local MAGENTA=$(tput setaf 5 && tput bold)
+    local MAGENTA1=$(tput setaf 13 && tput bold)
+    local CYAN=$(tput setaf 6 && tput bold)
+    local CYAN1=$(tput setaf 14 && tput bold)
+    local WHITE=$(tput setaf 7 && tput bold)
+    local WHITE1=$(tput setaf 15 && tput bold)
+    local BLACK=$(tput setaf 16 && tput bold)
+    local GREY=$(tput setaf 8 && tput bold)
+
+
+    local bold=$(tput bold)
+    local underline_on=$(tput smul)
+    local underline_off=$(tput rmul)
+    local standout_on=$(tput smso)
+    local standout_off=$(tput rmso)
+    local half_bright=$(tput dim)
+    local reverse_color=$(tput rev)
+
+    # Reset
+    local normal=$(tput sgr0)
+
+    # Broken !! (Or im dumb?)
+    local blink=$(tput blink)
+    local underline=$(tput ul)
+    local italic=$(tput it)
+
+    local VERSION='2.0'
+
+    unset READE_VALUE
+
+    local hlpstr="${bold}READE${normal} [ -h / --help ] [ -v / --version] [ -i / --pregiven PREGIVEN(S) SPACESEPARATED STRING ] [ -s / --no-echo ] [ -a / --auto ( ${bold}always${normal}/oneoption ) ] [ -e / --file-completion ]  [ -p / --prompt PROMPTSTRING ] [ -Q / --colour COLOURSTRING ] [ -r / --read-no-style ( ${bold}never${normal}/nocomp/filecomp-only ) ] [ -b/--break-chars BREAKCHARS-STRING ] ${bold}returnvar${normal}
+   
+   reade version $VERSION
+
+   Simplifies prompt for ${bold}read/vared/read-from-minibuffer/rlwrap${normal} in both Bash and Zsh. 
+   If 'reade' is run inside a Zsh widget, it will 'read-from-minifbuffer', otherwise it will check if 'rlwrap' is installed and use that, 
+   otherwise 'reade' resorts to a combination of 'printf' and 'read' for Bash, and 'vared' for Zsh.
+   
+   Takes at least one argument, otherwise it will prompt this help page.
+
+   If '-i/--pre-given' is supplied with arguments, any single argument can be chosen between without typing by using the ${bold}up${normal} and ${bold}down${normal} arrow keys when the command is running.
+   The first argument given to '-i/--pre-given' will fill automatically when the command runs. For example 'reade -p \"Question?: \" -i \"first-answer\"' will result in 'Question?: ' with 'first-answer' already typed out.
+
+   Supply at least 1 variable: 
+
+   - The last argument - a variable to put the prompt response in. If no variable is supplied, the returned value will be in the '\$REPLY' and '\$READE_VALUE'. 
+
+   -h, --help  
+        
+        Print this text and exit
+
+   -v, --version  
+        
+        Print version and exit
+
+   -p, --prompt ${underline_on}Promptstring${underline_off}
+        
+        Supply this flag with a string for the prompt. Similar to read -p 'STRING' in bash or read '?STRING' in zsh.
+
+   -Q, --colour ${underline_on}Colour${underline_off}
+
+        Use  one  of  the  colour names black, red, green, yellow, blue, cyan, purple (=magenta) or white, or an ANSI-conformant <colour_spec> to colour any prompt displayed  by  command.\n An uppercase colour name (Yellow or YELLOW ) gives a bold prompt.\n Prompts that already contain (colour) escape sequences or one of the readline \"ignore markers\" (ASCII 0x01 and 0x02) are not coloured.\n
+        Available colours in both normal (undercase) and ${bold}bold${normal} (UPPERCASE) versions are:
+            - ${red}red${normal}
+            - ${red1}red1${normal}
+            - ${orange}orange${normal}
+            - ${green}green${normal}
+            - ${green1}green1${normal}
+            - ${yellow}yellow${normal}
+            - ${yellow1}yellow1${normal}
+            - ${blue}blue${normal}
+            - ${blue}blue1${normal}
+            - ${magenta}magenta${normal}
+            - ${magenta1}magenta1${normal}
+            - ${cyan}cyan${normal}
+            - ${cyan1}cyan1${normal}
+            - ${white}white${normal}
+            - ${white1}white1${normal}
+            - ${black}black${normal}
+            - ${grey}grey${normal}
+    
+        There are also '${bold}bold${normal}' and '${underline_on}underline_on${underline_off}/underline_off'
+        
+        ! You don't *need* to use the colour flag, certainly if you want to mix different colours/styles or use them only for specific words / parts of the prompt
+        When supplying the --prompt/-p flag, you can use variable expansion (after a backslash) on any of the styles/colours to activate them untill the end of the prompt. F.ex : '\\\${blue}'
+        !! If you end up doing this, do *always* add the '\\\${normal}' variable expansion to the end of the string. This makes sure all styles and colours are reset. 
+        !! If -p is supplied with a colour/style but \${normal}/\$(tput sgr0) is left out, the terminal ${bold}will${normal} keep these colors/styles activate even after the command is done running !!
+        Example: 'reade -p \"What \\\${cyan}${cyan}day${normal}\\\${normal} of the week do you want to select?: \" -i 'monday tuesday wednesday thursday friday saturday sunday' day'
+
+    -i, --pre-given ${underline_on}PREGIVEN(S) - SPACESEPERATED WORD STRING${underline_off} 
+
+        Autofill prompt with 'PREGIVEN' - must come in the form of a string (only works when rlwrap is installed) and every WORD needs to be space-separated. Only the first will be show at first, the others will be selectable with autocompletion/arrowkeys in the order they were given ${bold}if rlwrap is installed${normal} 
+
+   -s, --no-echo 
+
+        Doesn't echo what's being typed to the terminal - usefull for password prompts and the like
+
+   -a, --auto ( ${bold}always${normal}/oneoption ) 
+            
+        Fill in with the pregiven immediately. Usefull when running variants of scripts that use readyn and are supposed to automatically fill in a default answer.
+        If multiple pregivens are supplied with -i / --pre-given, the first one will become the automatic answer.
+        Two optional arguments: 
+            - 'always': always autocomplete (Default behaviour)
+            - 'oneoption': only autocomplete if there's only one option available
+            
+   -e, --file-completion 
+
+        Use filecompletions. 
+        When supplied, this flag will prevent using rlwrap if it is installed because 'rlwrap' doesn't properly add slashed before spaces in filenames/directorynames
+        Will force the use of 'read -e' on Bash and 'vared' on Zsh.
+   
+    -r, --read-no-style [ OPTION - ${bold}'nocomp'/'filecomp-only'${normal} ] 
+
+        This will stop read from using ${GREEN}colors${normal}/${bold}${underline_on}styles${normal} when applied.
+        
+        As read is pretty archaic and has been broken for a while, having a colorized 'read -p' prompt that uses prefixes/autocomp while obtaining bashhistory from readline using the '-e' flag can be problematic because cycling enough times through the given options will cause part of the option to 'stick' to the prompt - essentially breaking the prompt.
+        This is why most reade colorized prompts have their autocompletion underneath the prompt when rlwrap is not installed - it uses 'printf PROMPT' instead of using 'read -p PROMPT' 
+        (!! ${bold}even when no color is supplied, since color/style can still supplied as a part of a given prompt so this is suspected${normal} !!). 
+        
+        This flag ${bold}${underline_on}mitigates that${normal}, which will remove all applied colors/styles and thus mitigate the need to avoid using 'read -p' 
+        (with an extra style removing check on the supplied prompt to make sure no style is passed).
+        
+        No option will never leave a style
+        Option (optional) can be one of these: 
+            - 'never': never leave any style (Default behaviour) 
+            - 'filecomp-only' causes reade to only remove colors/styles when using read's filecompletion flag '-e'.
+            - 'nocomp' causes reade to ${bold}allow colors/styles but never use multiple autocompletions feature${normal} to avoid moving arrowkeys up and down, the cause of prompts breaking)
+            In other words nocomp will not autocomplete ${bold}apart from the first (or only) pregiven/prefix${normal} 
+
+        There's also a environment variable READE_NOSTYLE that can be set beforehand with options: 'true', 'false', 'nocomp', 'filecomp-only'
+        This flag will preceed the option set with READE_NOSTYLE. 
+    
+   -b, --break=chars ${underline_on}list_of_characters${underline_off} 
+
+       (From rlwrap manual) Consider  the specified characters word-breaking (whitespace is always word-breaking). This determines what is considered a \"word\", both when completing and when building a completion word list from files specified by -f options following (not preceding!) it.\n Default list (){}[],'+-=&^%%\$#@\";|\ \n Unless -c is specified, / and . (period) are included in the default list
+       
+       ${bold}( This option is kind of broken )${bold}\n\n${normal}"
+
+    while :; do
+        case $1 in
+        '' | -h | -\? | --help)
+            printf "$hlpstr"
+            return 0
+            ;;
+        -v | --version)
+            printf "${bold}Version${normal} : $VERSION\n"
+            return 0
+            ;;
+        # Otherwise
+        *)
+            break
+            ;;
+        esac
+    done 
+    OPTIND=1
+
+    # https://stackoverflow.com/questions/12022592/how-can-i-use-long-options-with-the-bash-getopts-builtin
+    # I'm ignoring this because I don't want to deal with the hassle of making sure the GNU/right version of getopt is installed
+
+    for arg in "$@"; do
+        shift
+        case "$arg" in
+            '--break-chars')        set -- "$@" '-b' ;;
+            '--colour')             set -- "$@" '-Q' ;;
+            '--prompt')             set -- "$@" '-p' ;;
+            '--file-completions')   set -- "$@" '-e' ;;
+            '--pre-given')          set -- "$@" '-i' ;;
+            '--auto')               set -- "$@" '-a' ;;
+            '--read-no-style')      set -- "$@" '-r' ;; 
+            '--no-echo')            set -- "$@" '-s' ;;
+            *)                      set -- "$@" "$arg" ;;
+        esac
+    done
+
+    local fcomp='n' auto='n' nostyle='n' noecho='n'
+
+    if [[ "$READE_NOSTYLE" ]]; then
+        [[ "$READE_NOSTYLE" == 'false' ]] && nostyle='n'  
+        [[ "$READE_NOSTYLE" == 'true' ]] && nostyle='y'
+        [[ "$READE_NOSTYLE" == 'nocomp' ]] && nostyle='c'  
+        [[ "$READE_NOSTYLE" == 'filecomp-only' ]] && nostyle='f'  
+    fi
+
+    # a = flag without argument
+    # a: = flag with argument
+    # a:: = flag with optional argument (bash > 4.3 only)
+    # I'm ignoring this because I need this script to be ZSH compatible
+
+    local flag 
+
+    while getopts ':seb:i:p:Q:r:a:' flag; do
+        case "${flag}" in
+        a)
+            auto='y'
+            if [[ "${OPTARG}" ]]; then
+                if [[ "${OPTARG}" == 'always' ]]; then
+                    auto='y'
+                elif [[ "${OPTARG}" == 'oneoption' ]]; then
+                    auto='one'
+                elif [[ "${OPTARG}" == '-Q' || "${OPTARG}" == '-b' || "${OPTARG}" == '-e' || "${OPTARG}" == '-i' || "${OPTARG}" == '-p' || "${OPTARG}" == '-r' ]]; then
+                    OPTIND=$(($OPTIND - 1)) 
+                else 
+                    echo "${red}'${OPTARG}'${normal} is not an option for -a/--always"
+                    echo "Choose between --auto always or --auto oneoption"
+                    return 1
+                fi
+            fi 
+            ;;
+        e)
+            fcomp='y'
+            ;;
+        r)
+            nostyle='y'
+            if [[ "${OPTARG}" ]]; then
+                if [[ "${OPTARG}" == 'never' ]]; then
+                    nostyle= 'y'
+                elif [[ "${OPTARG}" == 'nocomp' ]]; then
+                    nostyle= 'c'
+                elif [[ "${OPTARG}" == 'filecomp-only' ]]; then
+                    nostyle='f'
+                elif [[ "${OPTARG}" == '-Q' || "${OPTARG}" == '-b' || "${OPTARG}" == '-e' || "${OPTARG}" == '-i' || "${OPTARG}" == '-p' || "${OPTARG}" == '-a' ]]; then 
+                    OPTIND=$(($OPTIND - 1))
+                else
+                    echo "${red}'${OPTARG}'${normal} is not an option for -r/--read-no-style"
+                    echo "Choose between --read-no-style never, --read-no-style nocomp or --read-no-style filecomp-only" 
+                    return 1
+                fi
+            fi
+            ;;
+        s)
+            noecho='y'
+            ;;
+        esac
+    done 
+    OPTIND=1
+
+    local rlwrap_installable='y'
+
+    if [[ $(uname -s) =~ 'MINGW' ]] && ! type hash &>/dev/null; then
+        rlwrap_installable='n'
+    fi
+
+    local old_up old_down prmpt oldhist='' color="" arg='' args='' tmpf='' eflag=0 one='n' pre='' keymap upmap upmapx downmap downmapx breaklines=''
+
+    # This means reade is being run inside a custom ZSH widget, so rlwrap/read/vared won't work
+    if [[ -n $ZSH_VERSION ]] && [[ -n $WIDGET ]]; then
+       
+        local REPLY
+        autoload -Uz read-from-minibuffer
+        local first=''
+        while getopts ':seb:i:p:Q:a:r:' flag; do
+            case "${flag}" in
+                # Auto flag already handled
+                a)  if [[ "${OPTARG}" == '-Q' || "${OPTARG}" == '-b' || "${OPTARG}" == '-e' || "${OPTARG}" == '-i' || "${OPTARG}" == '-p' || "${OPTARG}" == '-r' ]]; then 
+                         OPTIND=$(($OPTIND-1))
+                    fi 
+                    ;;
+                # Read-no-style flag already handled
+                r)  if [[ "${OPTARG}" == '-Q' || "${OPTARG}" == '-b' || "${OPTARG}" == '-e' || "${OPTARG}" == '-i' || "${OPTARG}" == '-p' || "${OPTARG}" == '-a' ]]; then 
+                         OPTIND=$(($OPTIND-1))
+                    fi
+                    ;;
+                # Colours don't work using read-from-minibuffer - tested this out 
+                Q)  if [[ "${OPTARG}" == '-r' || "${OPTARG}" == '-b' || "${OPTARG}" == '-e' || "${OPTARG}" == '-i' || "${OPTARG}" == '-p' || "${OPTARG}" == '-a' ]]; then 
+                         OPTIND=$(($OPTIND-1))
+                    fi
+                    ;;
+                e) ;;
+                i)  #arg="$(echo ${OPTARG} | awk '{print $1;}')"
+                    #args="$(echo ${OPTARG} | sed "s \<$arg\>  g" | xargs)"
+                    args="${OPTARG}"
+                    args=$(echo "$args" | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }')
+                    args=$(echo "$args" | tr ' ' '\n') 
+                    tmpf=$(mktemp)
+                    echo "$args" > "$tmpf" 
+                    
+                    # Make sure up/down arrow keys are bound to something sensible 
+                    if ! [[ $(bindkey '^[[A') =~ 'up-line' ]]; then  
+                        old_up=$(bindkey '^[[A')
+                        bindkey '^[[A' up-line-or-history  
+                    fi
+                    
+                    if ! [[ $(bindkey '^[[B') =~ 'down-line' ]]; then  
+                        old_down=$(bindkey '^[[B') 
+                        bindkey '^[[B' down-line-or-history
+                    fi 
+                    
+                    # Write to current historyfile
+                    fc -W
+                    
+                    # Then load different one - no need to clear
+                    fc -ap "$tmpf"
+
+                    # Make sure we set the first pregiven instead of leaving the prompt empty
+                    zle up-line-or-history 
+                    ;;
+                p)  # We make sure color is removed from the prompt because it comes out wrong
+                    setopt EXTENDED_GLOB
+                    prmpt="${OPTARG//$'\e'[\[(]#([0-9;]#)[@-n]/}"
+                   ;;
+                b) ;;
+                s) ;;
+                *) ;;
+            esac
+        done
+
+        shift $((OPTIND - 1))
+
+        TRAPINT() {
+            ! [[ -z $old_up ]] && ! [[ $old_up =~ "bindkey: no binding" ]] &&
+                eval "bindkey $old_up"      
+            ! [[ -z $old_down ]] && ! [[ $old_down =~ "bindkey: no binding" ]] &&
+                eval "bindkey $old_down"      
+            [[ -f $tmpf ]] && command rm -f "$tmpf"
+            
+            # We can't clear the line/BUFFER since BUFFER is a read-only variable inside of a trap function???
+            # So we send keys to ZLE to clear the line/BUFFER
+            zle -U $'\C-U'
+            return $((128 + $1))
+        } 
+
+        # Now the normal prompt would normally also going up the history, so we're just going to hide it
+        # Most terminals are like 50 lines high, so idk we go up one line and echo nothing 60 times to be sure the terminal looks blank 
+        if [[ -n $args ]]; then
+            clear
+            for i in $(seq 1 60); do
+                tput cuu1
+                echo
+            done
+        fi
+        # Create a sub-prompt, pre-populated with the current contents of the command line.
+        # https://superuser.com/questions/1045605/zsh-read-input-in-zle-widget
+        read-from-minibuffer "$prmpt" $LBUFFER $RBUFFER
+        
+        [[ -n $args ]] && BUFFER="" 
+
+        ! [[ -z $old_up ]] && ! [[ $old_up =~ "bindkey: no binding" ]] &&
+            eval "bindkey $old_up"      
+        ! [[ -z $old_down ]] && ! [[ $old_down =~ "bindkey: no binding" ]] &&
+            eval "bindkey $old_down"      
+        [[ -f $tmpf ]] && command rm -f "$tmpf"
+
+        zle reset-prompt 
+
+        export REPLY="$REPLY"
+        export READE_VALUE="$REPLY"
+
+        if [[ -n "$@" ]]; then
+            eval "${@:$#:1}='$REPLY'"
+        fi 
+
+    elif ! hash rlwrap &>/dev/null || [[ "$fcomp" == 'y' ]] || [[ "$rlwrap_installable" == 'n' ]]; then
+
+        local readstr=''
+
+        if [[ -n "$BASH_VERSION" ]]; then
+            readstr="read -r vvvvvvvvvv"
+        fi
+
+        if [[ -n "$ZSH_VERSION" ]]; then
+            if [[ "$noecho" == 'y' ]]; then
+                readstr="read vvvvvvvvvv"
+            elif [[ "$noecho" == 'n' ]]; then
+                readstr="vvvvvvvvvv=''; vared vvvvvvvvvv"
+            fi
+        fi
+     
+        while getopts ':seb:i:p:Q:a:r:' flag; do
+            case "${flag}" in
+                a)  if [[ "${OPTARG}" == '-Q' || "${OPTARG}" == '-b' || "${OPTARG}" == '-e' || "${OPTARG}" == '-i' || "${OPTARG}" == '-p' || "${OPTARG}" == '-r' ]]; then 
+                         OPTIND=$(($OPTIND-1))
+                    fi 
+                    ;;
+                r)  if [[ "${OPTARG}" == '-Q' || "${OPTARG}" == '-b' || "${OPTARG}" == '-e' || "${OPTARG}" == '-i' || "${OPTARG}" == '-p' || "${OPTARG}" == '-a' ]]; then 
+                         OPTIND=$(($OPTIND-1))
+                    fi
+                    ;;
+                b)  ;;
+                e)  if [[ -n "$BASH_VERSION" ]] || [[ "$noecho" == 'y' ]]; then
+                        readstr=$(echo "$readstr" | sed 's|read |read -e |g')
+                    fi
+                    if [[ -n "$ZSH_VERSION" ]]; then
+                        readstr=$(echo "$readstr" | sed 's|vvvvvvvvvv=.*; vared|vvvvvvvvvv="\$(pwd)"; vared|g')
+                    fi
+                    ;;
+                    
+                    # Even though it's in the read man for bash, -i (on it's own) does not actually work
+                i)  arg="$(echo ${OPTARG} | awk '{print $1;}')"
+                    args="$(echo ${OPTARG} | sed "s \<$arg\>  g" | xargs)"
+
+                    local eflag='-e' 
+                    [[ "$nostyle" == 'c' ]] && eflag=''
+
+                    if [[ -n "$BASH_VERSION" ]]; then
+                        readstr=$(echo "$readstr" | sed 's|read |read '"$eflag"' -i "'"$arg"'" |g')
+                    elif [[ -n "$ZSH_VERSION" ]] && [[ $noecho == 'n' ]]; then
+                        readstr=$(echo "$readstr" | sed "s|vvvvvvvvvv=.*; vared|vvvvvvvvvv="$arg"; vared -h|g")
+                    fi
+                    pre="$arg"
+
+                    if [[ -z "$args" ]]; then 
+                        one='y'
+                    elif [[ -n "$args" ]] && ! [[ "$nostyle" == 'c' ]]; then
+                        args=$(echo "$args" | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }')
+                        args=$(echo "$args" | tr ' ' '\n')
+
+                        tmpf=$(mktemp)
+
+                        echo "$args" > "$tmpf"
+
+                        #if ! test -e "$HISTFILE"; then
+                        oldhist=$(mktemp)
+                        echo -e "$(history | awk '{$1=""; print;}' | sed 's/^\ //g')" > $oldhist
+                        #fi
+
+                        if [[ -n "$BASH_VERSION" ]]; then
+                            while IFS='' read -r LINE || [ -n "${LINE}" ]; do
+                                history -s "${LINE}"
+                            done <"$tmpf"
+                            history -c
+                            history -r $tmpf
+                            
+                            # Gotta check if the up and down arrow keys are actually bound to previous/next-history
+                            if ! bind -p | grep -q '"\\e\[A": previous-history' || ! bind -p | grep -q '"\\e\[B": next-history'; then
+                                if set -o | grep -Eq 'emacs\s+on'; then
+                                    keymap="emacs-standard"
+                                else
+                                    keymap="vi-insert" 
+                                fi
+                                
+                                if ! bind -p | grep -q '"\\e\[A": previous-history'; then 
+                                    if bind -m $keymap -p | grep -q '"\\e\[A":'; then
+                                        upmap=$(bind -m $keymap -p | grep '"\\e\[A":' | awk '{$1=""; print}' | xargs)
+                                    elif bind -m $keymap -s | grep -q '"\\e\[A":'; then
+                                        upmap=$(bind -m $keymap -s | grep '"\\e\[A":' | awk '{$1=""; print}' | xargs)
+                                    elif bind -m $keymap -X | grep -q '"\\e\[A"'; then
+                                        upmapx='-x ' 
+                                        upmap=$(bind -m $keymap -X | grep '"\\e\[A"' | awk '{$1=""; print}' | xargs)
+                                    fi
+                                    bind -m $keymap '"\e[A": previous-history'  
+                                fi
+                                
+                                if ! bind -p | grep -q '"\\e\[B": next-history'; then 
+                                    if bind -m $keymap -p | grep -q '"\\e\[B":'; then
+                                        downmap=$(bind -m $keymap -p | grep '"\\e\[B":' | awk '{$1=""; print}' | xargs)
+                                    elif bind -m $keymap -s | grep -q '"\\e\[B":'; then
+                                        downmap=$(bind -m $keymap -s | grep '"\\e\[B":' | awk '{$1=""; print}' | xargs)
+                                    elif bind -m $keymap -X | grep -q '"\\e\[B"'; then
+                                        downmapx='-x '
+                                        downmap=$(bind -m $keymap -X | grep '"\\e\[B"' | awk '{$1=""; print}' | xargs)
+                                    fi
+                                    bind -m $keymap '"\e[B": next-history' 
+                                fi
+                            fi
+                        elif [[ -n "$ZSH_VERSION" ]]; then
+
+                            # Write to current historyfile
+                            fc -W
+                            
+                            # Then load different one - no need to clear
+                            fc -ap "$tmpf"
+                            
+                            # Make sure up/down arrow keys are bound to something sensible 
+                            if ! [[ $(bindkey '^[[A') =~ 'up-line' ]]; then  
+                                old_up=$(bindkey '^[[A')
+                                bindkey '^[[A' up-line-or-history  
+                            fi
+                            
+                            if ! [[ $(bindkey '^[[B') =~ 'down-line' ]]; then  
+                                old_down=$(bindkey '^[[B') 
+                                bindkey '^[[B' down-line-or-history
+                            fi
+                            
+                        fi
+
+                        # https://unix.stackexchange.com/questions/265957/zsh-histfile-still-read-from-zsh-history
+                    fi
+                    ;;
+                Q)
+                    if [[ "${OPTARG}" =~ ^[[:upper:]]+$ ]]; then
+                        color="${bold}"
+                    fi
+                    OPTARG=$(echo "${OPTARG}" | awk '{print tolower($0)}')
+                    if [[ "${OPTARG}" =~ "red" ]]; then
+                        color=$color"${red}"
+                    elif [[ "${OPTARG}" =~ "green" ]]; then
+                        color=$color"${green}"
+                    elif [[ "${OPTARG}" =~ "blue" ]]; then
+                        color=$color"${blue}"
+                    elif [[ "${OPTARG}" =~ "yellow" ]]; then
+                        color=$color"${yellow}"
+                    elif [[ "${OPTARG}" =~ "cyan" ]]; then
+                        color=$color"${cyan}"
+                    elif [[ "${OPTARG}" =~ "magenta" ]]; then
+                        color=$color"${magenta}"
+                    elif [[ "${OPTARG}" =~ "black" ]]; then
+                        color=$color"${black}"
+                    elif [[ "${OPTARG}" =~ "white" ]]; then
+                        color=$color"${white}"
+                    fi
+                    ;;
+                p)
+                    if [[ -n "$BASH_VERSION" ]]; then
+                        
+                        if [[ $nostyle == 'y' ]] || ([[ $nostyle == 'f' ]] && [[ $fcomp == 'y' ]]); then 
+                           
+                            # Removing other styles and colours from prompt using sed
+                            # https://stackoverflow.com/questions/58096998/how-to-remove-color-style-format-from-a-variable 
+                            
+                            local pre="$(echo shopt | grep 'extglob' | awk '{print $2;}')"
+                            shopt -s extglob
+                            OPTARG="${OPTARG//$'\e'[\[(]*([0-9;])[@-n]/}"
+                            readstr=$(echo "$readstr" | sed 's|read |read -p "'"${OPTARG}"'" |g')
+                            prmpt="${OPTARG}"
+
+                            [[ "$pre" == 'off' ]] && 
+                                shopt -u extglob 
+                        
+                        elif [[ $nostyle == 'c' ]]; then
+                            readstr=$(echo "$readstr" | sed 's|read |read -p "'"${color}${OPTARG}${normal}"'" |g')
+                            prmpt="${color}${OPTARG}${normal}"
+                        elif [[ -z "$color" ]]; then
+                            readstr=$(echo "$readstr" | sed 's|read |printf "'"${OPTARG}"'\n"; read |g') 
+                            prmpt="${OPTARG}"
+                        else
+                            readstr=$(echo "$readstr" | sed 's|read |printf "'"${color}${OPTARG}${normal}"'\n"; read |g')
+                            prmpt="${color}${OPTARG}${normal}"
+                        fi
+                    fi
+
+                    if [[ -n "$ZSH_VERSION" ]]; then
+                        if [[ $noecho == 'y' ]]; then
+                            if [[ -z "$color" ]]; then
+                                readstr=$(echo "$readstr" | sed 's|vvvvvvvvvv|"?'"${OPTARG}"'" vvvvvvvvvv|g') 
+                                prmpt="${OPTARG}"
+                            else
+                                readstr=$(echo "$readstr" | sed 's|vvvvvvvvvv|"?'"${color}${OPTARG}${normal}"'" vvvvvvvvvv|g')
+                                prmpt="${color}${OPTARG}${normal}"
+                            fi
+                        elif [[ -n "$color" ]]; then
+                            readstr=$(echo "$readstr" | sed 's|vared |vared -p "'"${color}${OPTARG}${normal}"'" |g')
+                            prmpt="${color}${OPTARG}${normal}"
+                        else
+                            readstr=$(echo "$readstr" | sed 's|vared |vared -p "'"${OPTARG}"'" |g')
+                            prmpt="${OPTARG}"
+                        fi
+                    fi
+                    ;;
+                s)
+                    readstr=$(echo "$readstr" | sed 's|read |read -s |g')
+                    ;;
+                *) ;;
+            esac
+        done
+
+        shift $((OPTIND - 1))
+
+        if [[ "$auto" == 'y' ]] || [[ "$auto" == 'one' && "$one" == 'y' ]]; then
+            if [[ -z "$prmpt" ]]; then
+                printf "$pre\n"; 
+            else
+                printf "$prmpt$pre${normal}\n"; 
+                #if test -n "$BASH_VERSION"; then
+                #elif test -n "$ZSH_VERSION"; then
+                #    printf "${(P)color}$prmpt$prmpt1$pre${normal}\n";   
+                #fi
+            fi
+        
+        else 
+
+            local oldtrps="$(trap)"
+            
+            # https://stackoverflow.com/questions/14702148/how-to-fire-a-command-when-a-shell-script-is-interrupted
+
+            [[ -n "$BASH_VERSION" ]] &&
+                trap "history -c; history -r $oldhist; [[ -f $tmpf ]] && command rm -f $tmpf; [[ -n \"$oldtrps\" ]] && eval \"$oldtrps\" || trap - SIGINT; [[ -n $upmap ]] && bind -m $keymap $upmapx '\"\e[A\": $upmap'; [[ -n $downmap ]] && bind -m $keymap $downmapx '\"\e[B\": $downmap'; return" SIGINT
+            
+            [[ -n "$ZSH_VERSION" ]] &&
+                TRAPINT() {
+                    ! [[ -z $old_up ]] && ! [[ $old_up =~ "bindkey: no binding" ]] &&
+                        eval "bindkey $old_up"      
+                    ! [[ -z $old_down ]] && ! [[ $old_down =~ "bindkey: no binding" ]] &&
+                        eval "bindkey $old_down"      
+                    fc -IR $oldhist
+                    fc -IR
+                    [[ -f $tmpf ]] && command rm -f "$tmpf"
+                    return $((128 + $1))
+                }
+           
+
+            eval "${readstr}"
+
+
+            if [[ -n "$BASH_VERSION" ]]; then
+                history -c
+                history -r $oldhist
+                
+                if [[ -n "$oldtrps" ]]; then
+                    eval "$oldtrps"
+                else
+                    trap - SIGINT
+                fi
+             
+                [[ -n $upmap ]] && 
+                    bind -m $keymap $upmapx "\"\e[A\": \"$upmap\""
+                
+                [[ -n $downmap ]] && 
+                    bind -m $keymap $downmapx "\"\e[B\": \"$downmap\""
+            fi
+
+            if [[ -n "$ZSH_VERSION" ]]; then
+                ! [[ -z $old_up ]] && ! [[ $old_up =~ "bindkey: no binding" ]] &&
+                    eval "bindkey $old_up"      
+                ! [[ -z $old_down ]] && ! [[ $old_down =~ "bindkey: no binding" ]] &&
+                    eval "bindkey $old_down"      
+                fc -IR $oldhist
+            fi
+
+            [[ -f $tmpf ]] && command rm -f $tmpf
+
+        fi
+        
+        if [[ -n "$pre" ]] && [[ -z "$vvvvvvvvvv" ]] || [[ "$vvvvvvvvvv" == "" ]]; then
+            vvvvvvvvvv="$pre"
+        fi
+        
+        export READE_VALUE="$vvvvvvvvvv"
+        export REPLY="$vvvvvvvvvv"
+
+        if [[ -n "$@" ]]; then
+            eval "${@:$#:1}='$vvvvvvvvvv'"
+        fi
+	
+    else
+    
+        local rlwstring="rlwrap --ansi-colour-aware -s 1000 -D 0 -b \"$breaklines\" -o cat"
+
+        while getopts ':sea:b:i:p:Q:r:' flag; do
+            case "${flag}" in
+                a)  if [[ "${OPTARG}" == '-Q' || "${OPTARG}" == '-b' || "${OPTARG}" == '-e' || "${OPTARG}" == '-i' || "${OPTARG}" == '-p' || "${OPTARG}" == '-r' ]]; then 
+                         OPTIND=$(($OPTIND-1))
+                    fi 
+                    ;;
+                r)  if [[ "${OPTARG}" == '-Q' || "${OPTARG}" == '-b' || "${OPTARG}" == '-e' || "${OPTARG}" == '-i' || "${OPTARG}" == '-p' || "${OPTARG}" == '-a' ]]; then 
+                         OPTIND=$(($OPTIND-1))
+                    fi
+                    ;;
+                b)
+                    breaklines=${OPTARG}
+                    ;;
+                # File completions
+                e) #rlwstring=$(echo $rlwstring | sed "s| -f <(echo \"${args[@]}\") | |g");
+                    rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-c |g")
+                    ;;
+                # Pre-filled answer
+                i)
+                    arg="$(echo ${OPTARG} | awk '{print $1}')"
+                    rlwstring=$(echo $rlwstring | sed "s|rlwrap |rlwrap \-P \"$arg\" |g")
+                    args=$(echo ${OPTARG} | sed "s \<$arg\>  g" | xargs)
+                    if test -z "$args"; then 
+                        one='y' 
+                    else
+                        args=$(echo $args | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }' | tr ' ' '\n')
+                        tmpf=$(mktemp)
+                        echo "$args" >"$tmpf"
+                        rlwstring=$(echo "$rlwstring" | sed 's| -o cat| \-H $tmpf \-f <(echo \"${args[@]}\") \-o cat|g')
+                    fi
+                    ;;
+                # Prompt
+                p)
+                    rlwstring=$(echo "$rlwstring" | sed "s|rlwrap |rlwrap -S \"${OPTARG}\" |g")
+                    prmpt="${OPTARG}"
+                    ;;
+                # Prompt colours
+                Q)
+                    rlwstring=$(echo "$rlwstring" | sed "s|rlwrap |rlwrap \-p${OPTARG} |g")
+                    color="${OPTARG}" 
+                    ;;
+                # Password
+                s)
+                    rlwstring=$(echo "$rlwstring" | sed "s|rlwrap |rlwrap \-aEN\"${OPTARG}\" |g")
+                    ;;
+                *) ;;
+            esac
+        done
+
+        shift $((OPTIND - 1))
+
+        unset vvvvvvvvvv ${@:$#:1} 
+
+
+        if [[ "$auto" == 'y' ]] || [[ "$auto" == 'one' && "$one" == 'y' ]]; then
+            if [[ -z "$prmpt" ]]; then
+                printf "$arg\n"; 
+            else
+                if [[ -n "$BASH_VERSION" ]]; then
+                   printf "${!color}$prmpt${normal}$arg\n"; 
+                elif [[ -n "$ZSH_VERSION" ]]; then
+                    printf "${(P)color}$prmpt${normal}$arg\n";   
+                fi
+            fi
+            vvvvvvvv=$arg       
+        else
+            vvvvvvvv=$(eval "$rlwstring")
+        fi
+        
+        export REPLY="$vvvvvvvv"
+        export READE_VALUE="$vvvvvvvv"
+
+        [[ $# != 0 ]] && eval "${@:$#:1}=$vvvvvvvv"
+
+        [[ -f $tmpf ]] && command rm $tmpf &>/dev/null
+    fi
+}

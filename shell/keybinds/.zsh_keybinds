@@ -1,0 +1,5 @@
+if [ -d ~/.zsh_keybinds.d/ ] && [ "$(command ls -A ~/.zsh_keybinds.d/)" ]; then
+  for keybind in ~/.zsh_keybinds.d/*; do
+      . "$keybind" 
+  done
+fi

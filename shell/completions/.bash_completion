@@ -1,0 +1,24 @@
+#!/bin/bash
+# vim: set filetype=bash
+
+#if [ -d /usr/share/bash-completion/completions/ ] && [ "$(ls -A /usr/share/bash-completion/completions/)" ]; then
+#  for compl in /usr/share/bash-completion/completions/*; do
+#      [[ $compl =~ *grub* ]] && continue  
+#      test -f "$compl" && test -r "$compl" && source "$compl" 
+#      ! test $? == 0 && echo $compl  
+#  done
+#fi
+
+[[ $PS1 && ! ${BASH_COMPLETION_VERSINFO:-} && -f /usr/share/bash-completion/bash_completion ]] &&
+    source /usr/share/bash-completion/bash_completion
+
+if [ -d /usr/share/bash-completion/completions/ ] && [ "$(command ls -A /usr/share/bash-completion/completions/)" ]; then
+    source /usr/share/bash-completion/completions/systemctl 
+     
+fi
+
+if [ -d ~/.bash_completion.d/ ] && [ "$(command ls -A ~/.bash_completion.d/)" ]; then
+    for compl in ~/.bash_completion.d/*; do
+        source "$compl"
+    done
+fi

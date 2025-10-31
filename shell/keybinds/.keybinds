@@ -1,0 +1,13 @@
+if test -n "$BASH_VERSION"; then
+    if [ -d ~/.keybinds.d/ ] && [ "$(command ls -A ~/.keybinds.d/)" ]; then
+      for keybind in ~/.keybinds.d/*.bash; do
+          . "$keybind" 
+      done
+    fi
+elif test -n "$ZSH_VERSION"; then
+    if [ -d ~/.keybinds.d/ ] && [ "$(command ls -A ~/.keybinds.d/)" ]; then
+      for keybind in ~/.keybinds.d/*.zsh; do
+          . "$keybind" 
+      done
+    fi
+fi

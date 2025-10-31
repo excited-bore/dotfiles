@@ -1,18 +1,24 @@
-#/bin/bash
+#!/bin/bash
 
-if ! type reade &> /dev/null; then
-    source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/aliases/.bash_aliases.d/00-rlwrap_scripts.sh)
+TOP=$(git rev-parse --show-toplevel 2> /dev/null)
+
+if ! [[ -f $TOP/checks/check_all.sh ]]; then
+    if hash curl &>/dev/null; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
+    else
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
+    fi
 else
-    . ./aliases/.bash_aliases.d/00-rlwrap_scripts.sh
+    . $TOP/checks/check_all.sh
 fi
 
-if test -z $1; then
+if [[ -z $1 ]]; then
     reade -Q "GREEN" -p "Give up git directory url: " gitdir
 else
     git_url=$1
 fi
 
-if test -z $2; then
+if [[ -z $2 ]]; then
     reade -Q "GREEN" -p "Target directory: " -e target_dir
 else
     target_dir="$(realpath $2)"
@@ -51,7 +57,7 @@ function url_get_dirs() {
         b=$(cat "$1" | sed -n ''$j'p' | awk '{print $2}' | cut -d, -f-1 | sed 's,"\(.*\)",\1,g')
         dir="$(echo "$b" | sed 's,.*/contents/\(.*\),\1,g' | cut -d? -f-1)"  
         file="$(mktemp)"
-        curl -- "$b" 2> /dev/null | tee "$file" &> /dev/null
+        wget-curl -- "$b" 2> /dev/null | tee "$file" &> /dev/null
         file_array+=("$file")
         dir_array+=("$dir")
     done
@@ -62,7 +68,7 @@ git_url=$(echo "$git_url" | sed 's,tree/[^/]*/,contents/,g')
 
 main_dir="$(echo $git_url | sed 's,.*/contents/\(.*\),\1,g' | cut -d? -f-1)"  
 file="$(mktemp)"
-curl -- "$git_url" 2> /dev/null | tee "$file" &> /dev/null
+wget-curl -- "$git_url" 2> /dev/null | tee "$file" &> /dev/null
 
 cat $file
 file_array=("$file") 
@@ -76,7 +82,7 @@ while ! test -z "$file_array"; do
         cat $i
         for j in $(cat "$i" | grep 'download_url' | awk '{print $2}' | cut -d, -f-1 | sed 's,"\(.*\)",\1,g'); do
             if ! test "$j" == "null"; then
-                wget -P "$current_dir" -- "$j" 
+                wget-aria-dir "$current_dir" -- "$j" 
             fi
         done
         dir_array=($(pop_element "${dir_array[@]}" "$main_dir"))

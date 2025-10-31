@@ -1,0 +1,161 @@
+#!/bin/bash
+
+# Exit when script errors
+set -e
+
+# Arguments: Completions(string with space entries, AWK works too),return value(-a password prompt, -c complete filenames, -p prompt flag, -Q prompt colour, -b break-chars (when does a string break for autocomp), -e change char given for multiple autocompletions)
+# 'man rlwrap' to see all unimplemented options
+
+
+# reade because its rlwrap with read -e for file completions
+# The upside is that files with spaces are backslashed
+# The downside is that prompts with colour break when using arrow keys (accidently)
+# This goes for both tput and escape codes
+#
+# read -e -r -p $'\e[31mFoobar\e[0m: ' foo  for example
+# printf "${CYAN}bluh"; read -e -r foo  is also problematic because prompt disappears when arrow up and back down
+
+function rm-prompt(){
+    
+    local red=$(tput sgr0 && tput setaf 1)
+    local red1=$(tput sgr0 && tput setaf 9)
+    local orange=$(tput sgr0 && tput setaf 166)
+    local green=$(tput sgr0 && tput setaf 2)
+    local green1=$(tput sgr0 && tput setaf 10)
+    local yellow=$(tput sgr0 && tput setaf 3)
+    local yellow1=$(tput sgr0 && tput setaf 11)
+    local blue=$(tput sgr0 && tput setaf 4)
+    local blue1=$(tput sgr0 && tput setaf 12)
+    local magenta=$(tput sgr0 && tput setaf 5)
+    local magenta1=$(tput sgr0 && tput setaf 13)
+    local cyan=$(tput sgr0 && tput setaf 6)
+    local cyan1=$(tput sgr0 && tput setaf 14)
+    local white=$(tput sgr0 && tput setaf 7)
+    local white1=$(tput sgr0 && tput setaf 15)
+    local black=$(tput sgr0 && tput setaf 16)
+    local grey=$(tput sgr0 && tput setaf 8)
+    
+    local RED=$(tput setaf 1 && tput bold)
+    local RED1=$(tput setaf 9 && tput bold)
+    local ORANGE=$(tput setaf 166 && tput bold)
+    local GREEN=$(tput setaf 2 && tput bold)
+    local GREEN1=$(tput setaf 10 && tput bold)
+    local YELLOW=$(tput setaf 3 && tput bold)
+    local YELLOW1=$(tput setaf 11 && tput bold)
+    local BLUE=$(tput setaf 4 && tput bold)
+    local BLUE1=$(tput setaf 12 && tput bold)
+    local MAGENTA=$(tput setaf 5 && tput bold)
+    local MAGENTA1=$(tput setaf 13 && tput bold)
+    local CYAN=$(tput setaf 6 && tput bold)
+    local CYAN1=$(tput setaf 14 && tput bold)
+    local WHITE=$(tput setaf 7 && tput bold)
+    local WHITE1=$(tput setaf 15 && tput bold)
+    local BLACK=$(tput setaf 16 && tput bold)
+    local GREY=$(tput setaf 8 && tput bold)
+    
+    local bold=$(tput bold)
+    local underline_on=$(tput smul)
+    local underline_off=$(tput rmul)
+    local standout_on=$(tput smso)
+    local standout_off=$(tput rmso)
+    local half_bright=$(tput dim)
+    local reverse_color=$(tput rev)
+    
+    # Reset
+    local normal=$(tput sgr0)
+    
+    # Broken !! (Or im dumb?)
+    local blink=$(tput blink)
+    local underline=$(tput ul)
+    local italic=$(tput it)
+    
+
+    while :; do
+       case "$1" in
+          -h|-\?|--help)  
+               printf "Prompt items to remove before removing them (by outputting ls and pipe it to a pager)
+    -h/--help : Show this explanation on screen
+    
+    Environment variables:
+        ${CYAN}RMPROMPT_RM_OPT${normal}: Rm options
+        ${CYAN}RMPROMPT_LS_CMD${normal}: Ls command + options. Uses 'ls -ARh --color=always' of none are supplied
+        ${CYAN}RMPROMPT_LS_DIR_CMD${normal}: Ls command + options for directories only. Uses command above if none are supplied.
+        ${CYAN}RMPROMPT_PAGER${normal}: Rmprompt pager. Defaults to PAGER if not empty or 'less -R -Q --no-vbell --LINE-NUMBERS --use-color --quit-if-one-screen'
+        ${CYAN}RMPROMPT_NOPAGER${normal}: Set this to any value to avoid paging\n"
+               exit 
+               ;;
+          --)              # End of all options.
+              break
+              ;;
+          *)               # Default case: No more options, so break out of the loop.
+              break 
+       esac
+    done 
+
+    if test -z $RMPROMPT_RM_OPT; then
+        RMPROMPT_RM_OPT='-rv' 
+    fi
+    
+    if test -z "$RMPROMPT_LS_CMD"; then
+        RMPROMPT_LS_CMD='ls -ARh --color=always' 
+    fi
+    
+    if test -z "$RMPROMPT_LS_DIR_CMD"; then
+        RMPROMPT_LS_DIR_CMD="$RMPROMPT_LS_CMD" 
+    fi
+    
+    if test -z "$RMPROMPT_PAGER" && test -n "$PAGER"; then
+        RMPROMPT_PAGER=$PAGER 
+    elif test -z "$PAGER"; then
+        RMPROMPT_PAGER="less -R -Q --no-vbell --LINE-NUMBERS --use-color --quit-if-one-screen" 
+    fi
+    
+    if [[ "$RMPROMPT_NOPAGER" ]]; then  
+        eval "$RMPROMPT_LS_DIR_CMD -- $@"
+    else 
+        eval "$RMPROMPT_LS_DIR_CMD -- $@ | $RMPROMPT_PAGER"
+    fi
+
+    local rm_stff symlinks=0 files=0 dirss=0 exitmeyesplease=0 itm ffiles ssymlinks ddirss
+
+    files=$(($files + $(command find "$@" -type f 2> /dev/null | wc -l ))) 
+    symlinks=$(($symlinks + $(command find "$@" -type l 2> /dev/null | wc -l)))  
+    dirss=$(($dirss + $(command find "$@" -type d 2> /dev/null | wc -l))) 
+
+    [ $files -gt 0 ] && 
+        ffiles="${RED}$files${YELLOW}" || 
+        ffiles="${CYAN}$files${YELLOW}" 
+    [ $symlinks -gt 0 ] && 
+        ssymlinks="${RED}$symlinks${YELLOW}" || 
+        ssymlinks="${CYAN}$symlinks${YELLOW}"
+    [ $dirss -gt 0 ] && 
+        ddirss="${RED}$dirss${YELLOW}" || 
+        ddirss="${CYAN}$dirss${YELLOW}" 
+   
+    if [ $files -gt 0 ] || [ $symlinks -gt 0 ] || [ $dirss -gt 0 ]; then
+        local rm_stff 
+        # I'm specifically checking for installed scripts, not functions here 
+        #if hash reade &> /dev/null; then
+        #    reade -Q 'YELLOW' -i 'y n' -p "Remove all $ssymlinks symlink(s), $ffiles file(s) and all $ddirss directory(s)? [Y/n]: " rm_stff
+        if hash rlwrap &> /dev/null; then
+            tmpf=$(mktemp)
+            echo n > $tmpf
+            rm_stff=$(rlwrap -p'YELLOW' --ansi-colour-aware -H $tmpf -f <(echo "n") -s 1000 -D 0 -P 'y' -S "Remove all $ssymlinks symlink(s), $ffiles file(s) and all $ddirss directory(s)? [Y/n]: " -o cat)
+            command rm $tmpf 
+        else
+            read -p "Remove all $ssymlinks symlink(s), $ffiles file(s) and all $ddirss directory(s)? [Y/n]: " rm_stff
+        fi
+        if [[ "$rm_stff" == 'y' || "$rm_stff" == 'Y' || -z "$rm_stff" ]]; then
+            command rm -f $RMPROMPT_RM_OPT -- $@ 
+        fi
+    else
+        printf "${CYAN}'$@'${YELLOW} doesn't exist, nothing to remove!${normal}\n"
+    fi
+}
+
+if [[ -n "$@" ]]; then
+    rm-prompt "$@"
+else
+    printf "${RED}Please give up at least 1 file or directory as argument${normal}\n"
+    exit 1
+fi

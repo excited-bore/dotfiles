@@ -1,43 +1,49 @@
-#/bin/bash
+# https://github.com/sharkdp/bat
 
-if ! test -f checks/check_all.sh; then
-    if type curl &>/dev/null; then
+# https://www.greenwoodsoftware.com/less/
+# https://github.com/walles/moor
+# https://www.jedsoft.org/most/
+
+# https://github.com/lucc/nvimpager
+
+hash less &> /dev/null && hash bat &> /dev/null && hash moor &> /dev/null && hash most &> /dev/null && hash nvimpager &> /dev/null && SYSTEM_UPDATED='TRUE'
+
+TOP=$(git rev-parse --show-toplevel 2> /dev/null)
+
+if ! [[ -f $TOP/checks/check_all.sh ]]; then
+    if hash curl &>/dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-        return 1 || exit 1
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ./checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
 
-SCRIPT_DIR=$(get-script-dir)
-
-
-reade -Q "GREEN" -i "moar bat most nvimpager" -p "Which to install? [Bat/moar/most/nvimpager]: " pager
+reade -Q "GREEN" -i "moor bat most nvimpager" -p "Which to install? [Bat/moor/most/nvimpager]: " pager
 if [[ $pager == "bat" ]]; then
-    if ! test -f install_bat.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_bat.sh)
+    if ! [[ -f $TOP/cli-tools/install_bat.sh ]]; then
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_bat.sh)
     else
-        . ./install_bat.sh
+        . $TOP/cli-tools/install_bat.sh
     fi
 
-elif [[ $pager == "moar" ]]; then
-    if ! test -f install_moar.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_moar.sh)
+elif [[ $pager == "moor" ]]; then
+    if ! [[ -f $TOP/cli-tools/install_moor.sh ]]; then
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_moor.sh)
     else
-        . ./install_moar.sh
+        . $TOP/cli-tools/install_moor.sh
     fi
 elif [[ $pager == "most" ]]; then
-    if ! test -f install_most.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_most.sh)
+    if ! [[ -f $TOP/cli-tools/install_most.sh ]]; then
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_most.sh)
     else
-        . ./install_most.sh
+        . $TOP/cli-tools/install_most.sh
     fi
 elif [[ $pager == "nvimpager" ]]; then
-    if ! test -f install_nvimpager.sh; then
-        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_nvimpager.sh)
+    if ! [[ -f $TOP/cli-tools/install_nvimpager.sh ]]; then
+        source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/install_nvimpager.sh)
     else
-        . ./install_nvimpager.sh
+        . $TOP/cli-tools/install_nvimpager.sh
     fi
 fi

@@ -1,23 +1,23 @@
-#!/bin/bash
+TOP=$(git rev-parse --show-toplevel 2> /dev/null)
 
-if ! test -f checks/check_all.sh; then
-     if type curl &> /dev/null; then
-           source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
-     else
-         continue
-     fi
- else
-     . ./checks/check_all.sh
- fi
+if ! test -f $TOP/checks/check_all.sh; then
+    if hash curl &> /dev/null; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
+    else
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
+    fi
+else
+    . $TOP/checks/check_all.sh
+fi
 
 if [[ $distro_base == 'Arch' ]] && test -z "$AUR_ins" &> /dev/null; then
     printf "An AUR installer / pacman wrapper is needed. ${CYAN}yay${normal} is recommended for this\n"
     readyn -p "Install yay?" insyay
     if [[ "y" == "$insyay" ]]; then
-        if type curl &>/dev/null && ! test -f $SCRIPT_DIR/AUR_installers/install_yay.sh; then
-            source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/AUR_installers/install_yay.sh)
+        if ! test -f $TOP/AUR_installers/install_yay.sh; then
+            source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/AUR_installers/install_yay.sh)
         else
-            . $SCRIPT_DIR/AUR_installers/install_yay.sh
+            . $TOP/AUR_installers/install_yay.sh
         fi
         AUR_pac="yay"
         AUR_up="yay -Syu"

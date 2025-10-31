@@ -1,13 +1,15 @@
-#!/bin/bash
+# https://github.com/winapps-org/winapps
 
-if ! test -f checks/check_all.sh; then
-    if type curl &>/dev/null; then
+TOP=$(git rev-parse --show-toplevel 2> /dev/null)
+
+if ! test -f $TOP/checks/check_all.sh; then
+    if hash curl &> /dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        continue
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ./checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
 
 if [[ "$distro_base" == "Debian" ]]; then
@@ -24,8 +26,8 @@ sudo systemctl start --user libvirtd.service
 sudo usermod -aG libvirt $(whoami)
 sudo usermod -aG kvm $(whoami)
 
-if ! grep -q "LIBVIRT" $ENVVAR; then
-    printf "\n#LIBVIRT\nexport LIBVIRT_DEFAULT_URI=qemu:///system\n" >> $ENVVAR
+if ! grep -q "LIBVIRT" $ENV; then
+    printf "\n#LIBVIRT\nexport LIBVIRT_DEFAULT_URI=qemu:///system\n" >> $ENV
 else
-    sed -i "s|.export LIBVIRT_DEFAULT_URI=.*|export LIBVIRT_DEFAULT_URI=qemu:///system|g" $ENVVAR
+    sed -i "s|.export LIBVIRT_DEFAULT_URI=.*|export LIBVIRT_DEFAULT_URI=qemu:///system|g" $ENV
 fi

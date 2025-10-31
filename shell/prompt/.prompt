@@ -1,0 +1,42 @@
+if test -n "$BASH_VERSION"; then
+
+    # Show whether it's normal or insert mode (@ - Change back with Alt-p)
+    # bind 'set show-mode-in-prompt on'
+
+    # You can set a different cursor shape for each mode by using "\1 .. \2" escapes: 
+    # Insert mode / Emacs mode have small cursor, command mode has block cursor
+    # Different cursor shapes escape sequences for virtual terminal
+    # https://wiki.archlinux.org/title/Readline
+    # Insert mode / Emacs mode are magenta, command mode is blue
+    # https://github.com/calid/bash
+    # 
+    #if [[ $TERM = linux ]]; then
+    #        #Version with color (insert - purple / command - blue)
+    #        #set vi-ins-mode-string \1\e[35;1m\2(ins)\1\e[?0c\2\1\e[3m\2
+    #        #set vi-cmd-mode-string \1\e[34;1m\2(cmd)\1\e[?8c\2\1\e[3m\2
+    #        #set emacs-mode-string  \1\e[35;1m\2(emacs)\1\e[?0c\2\1\e[3m\2
+    #        bind 'set vi-ins-mode-string (ins)\1\e[?0c\2\1\e[3m\2'
+    #        bind 'set vi-cmd-mode-string (cmd)\1\e[?8c\2\1\e[3m\2'
+    #        bind 'set emacs-mode-string  (emacs)\1\e[?0c\2\1\e[3m\2'
+    #else
+    #        #set vi-ins-mode-string \1\e[35;1m\2(ins)\1\e[5 q\2\1\e[3m\2
+    #        #set vi-cmd-mode-string \1\e[34;1m\2(cmd)\1\e[2 q\2\1\e[3m\2
+    #        #set emacs-mode-string  \1\e[35;1m\2(emacs)\1\e[5 q\2\1\e[3m\2
+    #        bind 'set vi-ins-mode-string (ins)\1\e[5 q\2\1\e[3m\2'
+    #        bind 'set vi-cmd-mode-string (cmd)\1\e[2 q\2\1\e[3m\2'
+    #        bind 'set emacs-mode-string  (emacs)\1\e[5 q\2\1\e[3m\2'
+    #fi
+ 
+    [ -f ~/.prompt.d/PS1_colours.bash ] && ! [ -f ~/.prompt.d/starship.bash ] && 
+        source ~/.prompt.d/PS1_colours.bash
+    
+    [ -f ~/.prompt.d/starship.bash ] && source ~/.prompt.d/starship.bash
+
+elif test -n "$ZSH_VERSION"; then
+    # if [ -d ~/.prompt.d/ ] && [ "$(command ls -A ~/.prompt.d/)" ]; then
+    #   for prompt in ~/.prompt.d/*.zsh; do
+    #       . "$prompt" 
+    #   done
+    # fi
+    eval "$(starship init zsh)"
+fi

@@ -1,19 +1,18 @@
-#!/bin/bash
+TOP=$(git rev-parse --show-toplevel 2> /dev/null)
 
-if ! test -f checks/check_all.sh; then
-    if type curl &>/dev/null; then
+if ! test -f $TOP/checks/check_all.sh; then
+    if hash curl &> /dev/null; then
         source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     else
-        printf "If not downloading/git cloning the scriptfolder, you should at least install 'curl' beforehand when expecting any sort of succesfull result...\n"
-        return 1 || exit 1
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
     fi
 else
-    . ./checks/check_all.sh
+    . $TOP/checks/check_all.sh
 fi
 
-if test $distro == "Arch" || test $distro == "Manjaro"; then
-    eval "$pac_ins remmina"
-elif test $distro_base == "Debian"; then
+if [[ $distro_base == "Arch" ]]; then
+    eval "$pac_ins_y remmina"
+elif [[ $distro_base == "Debian" ]]; then
     eval "$pac_ins realvnc-vnc-server realvnc-vnc-viewer"
 fi
 

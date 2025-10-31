@@ -1,0 +1,86 @@
+hash flatpak &> /dev/null && SYSTEM_UPDATED='TRUE'
+
+TOP=$(git rev-parse --show-toplevel 2> /dev/null)
+
+if ! test -f $TOP/checks/check_all.sh; then
+    if hash curl &>/dev/null; then
+        source <(curl -fsSL https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
+    else
+        source <(wget -qO- https://raw.githubusercontent.com/excited-bore/dotfiles/main/checks/check_all.sh)
+    fi
+else
+    . $TOP/checks/check_all.sh
+fi
+
+if ! hash flatpak &> /dev/null; then
+    if [[ "$distro" == "Manjaro" ]]; then
+        pamac install flatpak libpamac-flatpak-plugin python
+    elif [[ "$distro_base" == "Arch" ]]; then
+        eval "$pac_ins_y flatpak python"
+    elif [[ "$distro_base" == "Debian" ]]; then
+        if [[ "$XDG_CURRENT_DESKTOP" =~ "GNOME" ]]; then
+            eval "$pac_ins_y gnome-software-plugin-flatpak gir1.2-xdpgtk* gir1.2-flatpak* python3 "
+        else 
+            eval "$pac_ins_y flatpak python3 gir1.2-xdpgtk* gir1.2-flatpak*"
+        fi
+        flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+    fi
+fi
+
+if hash flatpak &> /dev/null && [ -z $FLATPAK ]; then
+    readyn -p "Add flatpak dirs to path? (XDG_DATA_DIRS)" flpkvrs 
+    if [[ "$flpkvrs" == "y" ]]; then
+        if grep -q "FLATPAK" $ENV; then
+            sed -i 's|.export PATH=$PATH:$HOME/.local/bin|export PATH=$PATH:$HOME/.local/bin|g' $ENV
+            sed -i 's|.export FLATPAK=|export FLATPAK=$HOME/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share|'  $ENV 
+            sed -i 's|.export FLATPAK_ENABLE_SDK_EXT=|export FLATPAK_ENABLE_SDK_EXT=*|' $ENV
+            if ! grep -q 'XDG_DATA_DIRS*.*:$FLATPAK' $ENV; then
+                sed -i 's|.export XDG_DATA_DIRS=\(.*\) |export XDG_DATA_DIRS=\1:$FLATPAK|' $ENV
+            fi
+        else
+            echo 'export PATH=$PATH:$HOME/.local/bin' >> $ENV
+            echo 'export XDG_DATA_DIRS=$XDG_DATA_DIRS:$HOME/.local/bin/flatpak:$HOME/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share' >> $ENV
+        fi
+    fi
+fi
+unset flpkvrs
+
+if test -d ~/.aliases.d && ! test -f ~/.aliases.d/flatpaks.sh; then
+    readyn -p "Install flatpakwrapper? (For one-word flatpak aliases in terminal)" pam
+    if [[ "y" == $pam ]]; then
+        if test -f $TOP/cli-tools/pkgmngrs/flatpak/.aliases.d/flatpaks.sh; then
+            file=$TOP/cli-tools/pkgmngrs/flatpak/.aliases.d/flatpaks.sh
+        else
+            dir="$(mktemp -d)"
+            wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pkgmngrs/flatpak/.aliases.d/flatpaks.sh > $dir/flatpaks.sh
+            file=$dir/flatpaks.sh 
+        fi
+         
+        cp $file ~/.aliases.d/ 
+        
+        if [[ -n "$BASH_VERSION" ]] || [[ -n "$ZSH_VERSION" ]]; then
+            source ~/.aliases.d/flatpaks.sh
+        fi
+    fi    
+fi
+unset pam file dir1
+
+if ! echo $(flatpak list --columns=name) | grep -q "Flatseal"; then
+    readyn -p "Install GUI for configuring flatpak permissions - flatseal?" fltseal
+    if [[ "y" == $fltseal ]]; then
+        flatpak install --assumeyes flatseal
+    fi
+fi
+unset fltseal
+
+if ! sudo [ -f /etc/polkit/49-nopasswd_global.pkla ] && ! sudo [ -f /etc/polkit-1/localauthority.conf.d/90-nopasswd_global.conf ] && ! sudo [ -f /etc/polkit-1/rules.d/90-nopasswd_global.rules ]; then
+    readyn -p "Run installer for no password with pam / polkit?" pam
+    if [[ "y" == "$pam" ]]; then
+        if ! [ -f $TOP/install_polkit_wheel.sh ]; then
+             source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/install_polkit_wheel.sh) 
+        else
+            . $TOP/install_polkit_wheel.sh
+        fi
+    fi
+    unset pam
+fi
