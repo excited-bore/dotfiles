@@ -1,0 +1,1 @@
+if (Get-Module -ListAvailable -Name PSReadLine) { [Microsoft.PowerShell.PSConsoleReadLine]::ClearHistory() ; Remove-Item -LiteralPath (Get-PSReadLineOption).HistorySavePath -Force -ErrorAction SilentlyContinue }
