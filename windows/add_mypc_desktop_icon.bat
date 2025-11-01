@@ -1,0 +1,2 @@
+@echo off
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$key = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel'; $key1 = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu'; Set-ItemProperty $key '{20D04FE0-3AEA-1069-A2D8-08002B30309D}' 0; Set-ItemProperty $key1 '{20D04FE0-3AEA-1069-A2D8-08002B30309D}' 0; taskkill /f /im explorer.exe; start explorer.exe;"
