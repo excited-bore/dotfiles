@@ -22,9 +22,9 @@ if ! hash code &> /dev/null; then
             . $TOP/checks/check_AUR.sh
         fi
         if test -n "$AUR_ins_y"; then 
-            eval "$AUR_ins" visual-studio-code-bin
+            eval "$AUR_ins_y" visual-studio-code-bin
         else 
-            eval "$AUR_ins" visual-studio-code-bin
+            eval "$AUR_ins_y" visual-studio-code-bin
         fi
     elif [[ $distro_base == "Debian" ]]; then
         if test -z $(apt list --installed software-properties-common 2> /dev/null); then

@@ -518,7 +518,7 @@ if test -d ~/.bash_completion.d/ && ! test -f ~/.bash_completion.d/vim_nvim.bash
     fi 
 fi
 
-if test -d ~/.zsh_completion.d/ && ! test -f ~/.zsh_completion.d/vim_nvim.zsh; then
+if test -d ~/.zsh_completion.d/ && ! test -f ~/.zsh_completion.d/site-functions/vim_nvim.zsh; then
     file2=$TOP/cli-tools/vim/.zsh_completion.d/vim_nvim.zsh
     if ! test -d $TOP/cli-tools/vim/.zsh_completion.d/; then
         tmp2=$(mktemp) && wget-aria-name $tmp2 https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/vim/.zsh_completion.d/vim_nvim.zsh
@@ -534,15 +534,10 @@ if test -d ~/.aliases.d/ && ! test -f ~/.aliases.d/vim_nvim.sh; then
     fi
 fi
 
-vimsh_r() {
-    sudo cp $file /root/.aliases.d/
-    sudo cp $file1 /root/.bash_completion.d/
-}
-
 vimsh() {
     cp $file ~/.aliases.d/
     cp $file1 ~/.bash_completion.d/
-    yes-edit-no -f vimsh_r -g "$file $file1" -p "Install vim aliases at /root/.aliases.d/ (and completions at ~/.bash_completion.d/)?"
+    cp $file2 ~/.zsh_completion.d/site-functions/
 }
 yes-edit-no -f vimsh -g "$file $file1" -p "Install vim aliases at ~/.aliases.d/ (and completions at ~/.bash_completion.d/)?"
 

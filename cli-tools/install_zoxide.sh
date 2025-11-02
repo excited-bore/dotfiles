@@ -68,13 +68,13 @@ fi
 
 if hash fzf &>/dev/null; then
      
-    if test -d ~/.bash_completion.d && ! test -f ~/.bash_completion.d/zoxide.bash; then
+    if test -d ~/.bash_completion.d && ! test -f ~/.bash_completion.d/zoxide; then
         printf "function __zoxide_zi() {     
     builtin local result;     
     result=\"\$(command zoxide query --interactive)\" && __zoxide_cd \"\${result}\"; 
 }
 
-complete -F __zoxide_zi -o default -o bashdefault z\n" >>~/.bash_completion.d/zoxide.bash
+complete -F __zoxide_zi -o default -o bashdefault z\n" >>~/.bash_completion.d/zoxide
         printf "Added fzf completion thingy for zoxide (z ** TAB) in bash\n"
     fi
    
@@ -86,7 +86,7 @@ complete -F __zoxide_zi -o default -o bashdefault z\n" >>~/.bash_completion.d/zo
       __zoxide_cd \"\$result\"
     }
 
-compdef __zoxide_zi z\n" >> ~/.zsh_completion.d/zoxide.zsh 
+compdef __zoxide_zi z\n" >> ~/.zsh_completion.d/site-functions/zoxide 
         printf "Added fzf completion thingy for zoxide (z ** TAB) in zsh\n"
     fi
 fi

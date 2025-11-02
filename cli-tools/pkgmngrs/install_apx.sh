@@ -63,10 +63,10 @@ if hash systemctl &> /dev/null && systemctl status docker | grep -q dead; then
     systemctl start docker.service
 fi
 
-if test -d ~/.bash_completion.d/ && ! test -f ~/.bash_completion.d/complete-apx.bash; then
-    apx completion bash > ~/.bash_completion.d/complete-apx.bash
+if test -d ~/.bash_completion.d/ && ! test -f ~/.bash_completion.d/complete-apx; then
+    apx completion bash > ~/.bash_completion.d/complete-apx
 fi
 
-if test -d ~/.zsh_completion.d/ && ! test -f ~/.zsh_completion.d/complete-apx.zsh; then
-    apx completion zsh > ~/.zsh_completion.d/complete-apx.zsh
+if test -d ~/.zsh_completion.d/site-functions/ && ! test -f ~/.zsh_completion.d/site-functions/complete-apx; then
+    apx completion zsh > ~/.zsh_completion.d/site-functions/complete-apx
 fi

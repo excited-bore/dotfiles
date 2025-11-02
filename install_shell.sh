@@ -75,17 +75,17 @@ fi
 
 unset current_shell chshell
 
-BASH_C='' ZSH_C='' BASH_C_G='' ZSH_C_G='' BASH_A="" ZSH_A="" BASH_A_G="" ZSH_A_G=""
+BASH_C='' ZSH_C='' BASH_C_G='' ZSH_C_G='' BASH_A="" ZSH_A="" BASH_A_G="" ZSH_A_G="" BASH_K="" ZSH_K="" BASH_K_G="" ZSH_K_G=""
 
 # Completions
 
 if hash bash &> /dev/null && (! test -f ~/.bashrc || ! test -d ~/.bash_completion.d || ! test -f ~/.bash_completion || ! test -f /etc/bash.bashrc || ! test -d /usr/share/bash-completion/completions/ || ! test -f /usr/share/bash-completion/bash_completion) && hash zsh &> /dev/null && (! test -f ~/.zshrc || ! test -d ~/.zsh_completion.d/site-functions || ! test -f ~/.zsh_completion || ! test -f /etc/zshrc || ! test -d /usr/share/zsh/site-functions/ || ! test -f /etc/zsh_completion); then
    reade -Q 'GREEN' -i 'both bash zsh' -p "Create directories and install files for completion functions for ${CYAN}Bash${GREEN}, ${CYAN}Zsh${GREEN} or both? [Both/bash/zsh]: " bash_zsh_comp
 elif hash bash &> /dev/null && (! test -f ~/.bashrc || ! test -d ~/.bash_completion.d || ! test -f ~/.bash_completion || ! test -f /etc/bash.bashrc || ! test -d /usr/share/bash-completion/completions/ || ! test -f /usr/share/bash-completion/bash_completion); then
-   readyn -p "Install completion functions for ${CYAN}Bash${GREEN}?" bash_zsh_comp
+   readyn -p "Create directories and install completion functions for ${CYAN}Bash${GREEN}?" bash_zsh_comp
    [[ "$bash_zsh_comp" == 'y' ]] && bash_zsh_comp='bash' 
 elif hash zsh &> /dev/null && (! test -f ~/.zshrc || ! test -d ~/.zsh_completion.d/site-functions || ! test -f ~/.zsh_completion || ! test -f /etc/zshrc || ! test -d /usr/share/zsh/site-functions/ || ! test -f /etc/zsh_completion); then
-   readyn -p "Install completion functions for ${CYAN}Zsh${GREEN}?" bash_zsh_comp
+   readyn -p "Create directories and install completion functions for ${CYAN}Zsh${GREEN}?" bash_zsh_comp
    [[ "$bash_zsh_comp" == 'y' ]] && bash_zsh_comp='zsh' 
 fi
 
@@ -123,10 +123,10 @@ unset bash_zsh_comp
 if hash bash &> /dev/null && (! test -f ~/.bashrc || ! test -d ~/.aliases.d || ! test -d ~/.bash_aliases.d || ! test -f ~/.bash_aliases || ! test -f /etc/bash.bashrc || ! test -d /etc/aliases.d || ! test -d /etc/bash_aliases.d || ! test -f /etc/bash_aliases) && hash zsh &> /dev/null && (! test -f ~/.zshrc || ! test -d ~/.aliases.d || ! test -d ~/.zsh_aliases.d || ! test -f ~/.zsh_aliases || ! test -f /etc/zshrc || ! test -d /etc/aliases.d || ! test -d /etc/zsh_aliases.d || ! test -f /etc/zsh_aliases); then
    reade -Q 'GREEN' -i 'both bash zsh' -p "Create directories and install files filled with aliases/functions for ${CYAN}Bash${GREEN}, ${CYAN}Zsh${GREEN} or both? [Both/bash/zsh]: " bash_zsh_alias
 elif hash bash &> /dev/null && (! test -f ~/.bashrc || ! test -d ~/.aliases.d || ! test -d ~/.bash_aliases.d || ! test -f ~/.bash_aliases || ! test -f /etc/bash.bashrc || ! test -d /etc/aliases.d || ! test -d /etc/bash_aliases.d || ! test -f /etc/bash_aliases); then
-   readyn -p "Install aliases/functions for ${CYAN}Bash${GREEN}?" bash_zsh_alias
+   readyn -p "Create directories and install aliases/functions for ${CYAN}Bash${GREEN}?" bash_zsh_alias
    [[ "$bash_zsh_alias" == 'y' ]] && bash_zsh_alias='bash' 
 elif hash zsh &> /dev/null && (! test -f ~/.zshrc || ! test -d ~/.aliases.d || ! test -d ~/.zsh_aliases.d || ! test -f ~/.zsh_aliases || ! test -f /etc/zshrc || ! test -d /etc/aliases.d || ! test -d /etc/zsh_aliases.d || ! test -f /etc/zsh_aliases); then
-   readyn -p "Install aliases/functions for ${CYAN}Zsh${GREEN}?" bash_zsh_alias
+   readyn -p "Create directories and install aliases/functions for ${CYAN}Zsh${GREEN}?" bash_zsh_alias
    [[ "$bash_zsh_alias" == 'y' ]] && bash_zsh_alias='zsh' 
 fi
 
@@ -156,6 +156,48 @@ if [[ "$bash_zsh_alias" == 'both' || "$bash_zsh_alias" == 'zsh' ]]; then
 else
     ZSH_A='0' ZSH_A_G='0'
 fi
+
+
+# Keybinds
+
+if hash bash &> /dev/null && (! test -f ~/.bashrc || ! test -d ~/.bash_keybinds.d || ! test -f ~/.bash_keybinds || ! test -f /etc/bash.bashrc || ! test -d /etc/bash_keybinds.d || ! test -f /etc/bash_keybinds) && hash zsh &> /dev/null && (! test -f ~/.zshrc || ! test -d ~/.zsh_keyinds.d || ! test -f ~/.zsh_keybinds || ! test -f /etc/zshrc || ! test -d /etc/zsh_keybinds.d || ! test -f /etc/zsh_keybinds); then
+   reade -Q 'GREEN' -i 'both bash zsh' -p "Create directories and install files that bind keys to shortcuts in ${CYAN}Bash${GREEN}, ${CYAN}Zsh${GREEN} or both? [Both/bash/zsh]: " bash_zsh_keybind
+elif hash bash &> /dev/null && (! test -f ~/.bashrc || ! test -d ~/.bash_keyinds.d || ! test -f ~/.bash_keyinds || ! test -f /etc/bash.bashrc || ! test -d /etc/bash_keyinds.d || ! test -f /etc/bash_keybinds); then
+   readyn -p "Create directories and install files that bind keys to shortcuts for ${CYAN}Bash${GREEN}?" bash_zsh_keybind
+   [[ "$bash_zsh_keybind" == 'y' ]] && bash_zsh_keybind='bash' 
+elif hash zsh &> /dev/null && (! test -f ~/.zshrc || ! test -d ~/.zsh_keybinds.d || ! test -f ~/.zsh_keybinds || ! test -f /etc/zshrc || ! test -d /etc/keybinds.d || ! test -d /etc/zsh_keybinds.d || ! test -f /etc/zsh_keybinds); then
+   readyn -p "Create directories and install files that bind keys to shortcuts for ${CYAN}Zsh${GREEN}?" bash_zsh_keybind
+   [[ "$bash_zsh_keybind" == 'y' ]] && bash_zsh_keybind='zsh' 
+fi
+
+if [[ "$bash_zsh_keybind" == 'both' || "$bash_zsh_keybind" == 'bash' ]]; then
+    BASH_K="1" 
+    if ! test -f /etc/bash.bashrc || ! test -d /etc/bash_keybinds.d || ! test -f /etc/bash_keybinds; then
+        readyn -p "Create directories and install keybinds for ${CYAN}bash systemwide/for all users${GREEN}?" bash_g
+        if [[ "$bash_g" == 'y' ]]; then
+            BASH_K_G='1'
+        else
+            BASH_K_G='0'
+        fi
+    fi
+else
+    BASH_K='0' BASH_K_G='0'
+fi
+
+if [[ "$bash_zsh_keybind" == 'both' || "$bash_zsh_keybind" == 'zsh' ]]; then
+    ZSH_K="1" 
+    if ! test -f /etc/zshrc || ! test -d /etc/zsh_keybinds.d || ! test -f /etc/zsh_keybinds; then
+        readyn -p "Create directories and install keybinds for ${CYAN}zsh systemwide/for all users${GREEN}?" zsh_g
+        if [[ "$zsh_g" == 'y' ]]; then
+            ZSH_K_G='1'
+        else
+            ZSH_K_G='0'
+        fi
+    fi
+else
+    ZSH_K='0' ZSH_K_G='0'
+fi
+
 
 
 # Completions
@@ -215,7 +257,7 @@ if [[ -n "$ZSH_C" ]]; then
     # FZF-tab completion
 
     if ! test -f ~/.zsh_completion.d/fzf-tab.plugin.zsh; then
-        readyn -n -p "Fzf completion for Zsh is not installed? Install ${CYAN}Fzf-tab${GREEN}?" fzf_tab
+        readyn -n -p "Fzf completion for Zsh is not installed? Install ${CYAN}Fzf-tab${YELLOW}?" fzf_tab
         if [[ "$fzf_tab" == 'y' ]]; then
             git clone https://github.com/Aloxaf/fzf-tab ~/.zsh_completion.d/fzf-tab
             mv ~/.zsh_completion.d/fzf-tab/fzf-tab.plugin.zsh ~/.zsh_completion.d
@@ -230,7 +272,7 @@ if [[ -n "$BASH_C" || -n "$ZSH_C" ]]; then
 
     # Python completions
 
-    readyn -p "Install completions for python commands?" -c "! hash activate-global-python-argcomplete &> /dev/null" pycomp
+    readyn -p "Install completions for python commands?" -c "(! hash activate-global-python-argcomplete &> /dev/null && ! hash activate-global-python-argcomplete3 &> /dev/null) || ! test -f ~/.bash_completion.d/_python-argcomplete || ! test -f ~/.zsh_completion.d/site-functions/_python-argcomplete" pycomp
     if [[ "y" == "$pycomp" ]]; then
         if ! [[ -f $TOP/shell/install_python_completions.sh ]]; then
             source <(wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/shell/install_python_completions.sh)

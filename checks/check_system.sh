@@ -816,8 +816,8 @@ if [ -f ~/.bash_completion ]; then
     export ZSH_COMPLETION=~/.zsh_completion
 fi
 
-if [ -d ~/.zsh_completion.d/ ]; then
-    export ZSH_COMPLETION_FILEDIR=~/.zsh_completion.d
+if [ -d ~/.zsh_completion.d/site-functions/ ]; then
+    export ZSH_COMPLETION_FILEDIR=~/.zsh_completion.d/site-functions/
 fi
 
 export ZSH_KEYBIND=~/.zshrc

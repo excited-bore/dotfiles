@@ -26,7 +26,7 @@ elif [[ "$distro_base" == "Debian" ]]; then
     eval "$pac_ins_y pipewire pipewire-jack wireplumber pipewire-pulse"
 fi 
 
-if [ -d ~/.bash_completion.d ] && ! [[ -f ~/.bash_completion.d/pipewire.bash ]]; then
+if [ -d ~/.bash_completion.d ] && ! [ -f ~/.bash_completion.d/pipewire ]; then
     readyn -p "Install pipewire completions (pw-cli, wpctl) for ${CYAN}Bash${GREEN}?" comps
     if [[ $comps == 'y' ]]; then
 
@@ -35,12 +35,12 @@ if [ -d ~/.bash_completion.d ] && ! [[ -f ~/.bash_completion.d/pipewire.bash ]];
             wget-aria-dir $TMPDIR https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pipewire/.bash_completion.d/pipewire.bash 
             pipewire_cmp=$TMPDIR/pipewire.bash
         fi
-        cp $pipewire_cmp ~/.bash_completion.d/ 
+        cp $pipewire_cmp ~/.bash_completion.d/pipewire 
     fi
     unset comps 
 fi
 
-if [ -d ~/.zsh_completion.d ] && ! [[ -f ~/.zsh_completion.d/pipewire.zsh ]]; then
+if [ -d ~/.zsh_completion.d ] && ! [ -f ~/.zsh_completion.d/site-functions/pipewire ]; then
     readyn -p "Install pipewire completions (pw-cli, wpctl) for ${CYAN}Zsh${GREEN}?" comps
     if [[ $comps == 'y' ]]; then
         pipewire_cmpz=$TOP/cli-tools/pipewire/.zsh_completion.d/pipewire.zsh
@@ -48,7 +48,7 @@ if [ -d ~/.zsh_completion.d ] && ! [[ -f ~/.zsh_completion.d/pipewire.zsh ]]; th
             wget-aria-dir $TMPDIR https://raw.githubusercontent.com/excited-bore/dotfiles/main/cli-tools/pipewire/.zsh_completion.d/pipewire.zsh 
             pipewire_cmp=$TMPDIR/pipewire.zsh
         fi
-        cp $pipewire_cmp ~/.zsh_completion.d/ 
+        cp $pipewire_cmp ~/.zsh_completion.d/site-functions/pipewire 
     fi
     unset comps 
 fi

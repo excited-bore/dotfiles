@@ -25,12 +25,12 @@ if ! hash ast-grep &>/dev/null; then
 
     cargo install ast-grep
 
-    if test -d ~/.bash_completion.d/ && ! test -f ~/.bash_completion.d/ast-grep.bash; then
-        echo "$(ast-grep completions bash)" >~/.bash_completion.d/ast-grep.bash
+    if test -d ~/.bash_completion.d/ && ! test -f ~/.bash_completion.d/ast-grep; then
+        echo "$(ast-grep completions bash)" >~/.bash_completion.d/ast-grep
     fi
 
-    if test -d ~/.zsh_completion.d/ && ! test -f ~/.zsh_completion.d/ast-grep.zsh; then
-        echo "$(ast-grep completions zsh)" >~/.zsh_completion.d/ast-grep.zsh
+    if test -d ~/.zsh_completion.d/site-functions && ! test -f ~/.zsh_completion.d/site-functions/ast-grep; then
+        echo "$(ast-grep completions zsh)" >~/.zsh_completion.d/site-functions/ast-grep
     fi
 fi
 

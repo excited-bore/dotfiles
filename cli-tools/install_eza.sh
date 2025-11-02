@@ -64,19 +64,19 @@ fi
 unset ezv carv
 eza --help | $PAGER 
 
-if test -d ~/.bash_completion.d && ! test -f ~/.bash_completion.d/eza.bash; then
+if test -d ~/.bash_completion.d && ! test -f ~/.bash_completion.d/eza; then
    readyn -p 'Install bash completions for eza?' bash_cm  
    if [[ $bash_cm == 'y' ]]; then
-        wget-curl https://raw.githubusercontent.com/eza-community/eza/refs/heads/main/completions/bash/eza > ~/.bash_completion.d/eza.bash
+        wget-curl https://raw.githubusercontent.com/eza-community/eza/refs/heads/main/completions/bash/eza > ~/.bash_completion.d/eza
    fi
    unset bash_cm
 fi
 
-if test -d ~/.zsh_completion.d && ! test -f ~/.zsh_completion.d/eza.zsh; then
+if test -d ~/.zsh_completion.d/site-functions/ && ! test -f ~/.zsh_completion.d/site-functions/_eza; then
    readyn -p 'Install zsh completions for eza?' zsh_cm  
    if [[ $zsh_cm == 'y' ]]; then
-        wget-curl https://raw.githubusercontent.com/eza-community/eza/refs/heads/main/completions/zsh/_eza > ~/.zsh_completion.d/eza.zsh
-	sed -i '/__eza$/ s/__eza/compdef __eza eza/' ~/.zsh_completion.d/eza.zsh    
+        wget-curl https://raw.githubusercontent.com/eza-community/eza/refs/heads/main/completions/zsh/_eza > ~/.zsh_completion.d/site-functions/_eza
+	sed -i '/__eza$/ s/__eza/compdef __eza eza/' ~/.zsh_completion.d/site-functions/_eza    
    fi
    unset zsh_cm
 fi

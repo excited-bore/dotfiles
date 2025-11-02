@@ -32,11 +32,11 @@ fi
 
 if hash osc &> /dev/null; then
    
-    if test -d ~/.bash_completion.d/ && ! test -f ~/.bash_completion.d/osc.bash; then
-        osc completion bash > ~/.bash_completion.d/osc.bash
+    if test -d ~/.bash_completion.d/ && ! test -f ~/.bash_completion.d/osc; then
+        osc completion bash > ~/.bash_completion.d/osc
     fi
     
-    if test -d ~/.zsh_completion.d/ && ! test -f ~/.zsh_completion.d/osc.zsh; then
-        osc completion zsh > ~/.bash_completion.d/osc.zsh
+    if test -d ~/.zsh_completion.d/ && ! test -f ~/.zsh_completion.d/site-functions/osc; then
+        osc completion zsh > ~/.zsh_completion.d/site-functions/osc
     fi
 fi

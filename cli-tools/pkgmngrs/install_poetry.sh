@@ -28,10 +28,10 @@ if ! hash poetry &> /dev/null; then
     pipx upgrade poetry
 fi
 
-if test -d ~/.bash_completion.d/ && ! test -f ~/.bash_completion.d/poetry.bash; then
-    poetry completions bash >> ~/.bash_completion.d/poetry.bash
+if test -d ~/.bash_completion.d/ && ! test -f ~/.bash_completion.d/poetry; then
+    poetry completions bash >> ~/.bash_completion.d/poetry
 fi
 
-if test -d ~/.zsh_completion.d/ && ! test -f ~/.zsh_completion.d/poetry.zsh; then
-    poetry completions zsh >> ~/.zsh_completion.d/poetry.zsh
+if test -d ~/.zsh_completion.d/site-functions/ && ! test -f ~/.zsh_completion.d/site-functions/poetry; then
+    poetry completions zsh >> ~/.zsh_completion.d/site-functions/poetry
 fi

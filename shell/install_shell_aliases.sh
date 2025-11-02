@@ -59,7 +59,7 @@ fi
 upkernsysm() {
     cp $upkern ~/.aliases.d/05-update-kernel.sh
     cp $upsysm ~/.aliases.d/06-update-system.sh
-    sed -i '/SYSTEM_UPDATED="TRUE"/d' ~/.aliases.d/update-system.sh
+    sed -i '/SYSTEM_UPDATED="TRUE"/d' ~/.aliases.d/06-update-system.sh
 
     if [[ $distro_base == 'Debian' ]]; then
         if ! hash mainline &>/dev/null; then

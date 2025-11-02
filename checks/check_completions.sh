@@ -104,10 +104,10 @@ if ([[ "$BASH_C" == "1" ]] && (! test -d ~/.bash_completion.d)) || ([[ "$ZSH_C" 
         fi
 
         printf "${YELLOW}$HOME/.zsh_completion${yellow} not installed${normal}\n" 
-        zsh_alias="$TOP/shell/completion/.zsh_completion"    
+        zsh_alias="$TOP/shell/completions/.zsh_completion"    
         if ! test -f $zsh_alias; then
             temp=$(mktemp -d) 
-            wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/shell/completion/.zsh_completion > $temp/.zsh_completion 
+            wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/shell/completions/.zsh_completion > $temp/.zsh_completion 
             zsh_comp=$temp/.zsh_completion 
         fi
         
@@ -185,10 +185,10 @@ if ([[ "$BASH_C" == "1" ]] && (! test -d ~/.bash_completion.d)) || ([[ "$ZSH_C" 
 
 
             printf "${YELLOW}/etc/zsh_completion${yellow} not installed${normal}\n" 
-            zsh_comp="$TOP/shell/completion/zsh_completion"    
+            zsh_comp="$TOP/shell/completions/zsh_completion"    
             if ! test -f $zsh_comp; then
                 temp=$(mktemp -d) 
-                wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/shell/completion/zsh_completion > $temp/zsh_completion 
+                wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/shell/completions/zsh_completion > $temp/zsh_completion 
                 zsh_comp=$temp/zsh_completion 
             fi
             
