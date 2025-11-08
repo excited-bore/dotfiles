@@ -15,6 +15,8 @@ if (-Not (Get-Command jq -errorAction SilentlyContinue)){
 
 Import-Module $HOME\Documents\PowerShell\Modules\copy-to.psm1
 
+# Import-Module -Name International -UseWindowsPowerShell -WarningAction SilentlyContinue
+
 # Source every script in the 'Scripts' folder that ends on '.ps1'
 
 if (Test-Path "$($PSScriptRoot)\Scripts\*.ps1"){
