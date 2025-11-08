@@ -87,7 +87,7 @@ function git-https-to-ssh(){
     if ($args.count -eq 0){
         Write-Host "You should give up the name of a remote";
         $resp = Read-Host "Do you want me to look for 'origin'? [Y/n]"
-        if ((!$resp) -or ($resp == 'y')){
+        if ((!$resp) -or ($resp -eq 'y')){
             $gitRm = $(git remote get-url origin)
             $gitRm = $gitRm -replace '.*.com/', 'git@github.com:'
             git remote -v set-url origin $gitRm
@@ -101,11 +101,11 @@ function git-https-to-ssh(){
     }
 }
 
-function git-https-to-ssh(){
+function git-ssh-to-https(){
     if ( $args.count -eq 0 ){
         Write-Host "You should give up the name of a remote";
         $resp = Read-Host "Do you want me to look for 'origin'? [Y/n]"
-        if ((! $null -eq $resp) -or ( $resp == 'y' )){
+        if ((! $null -eq $resp) -or ( $resp -eq 'y' )){
             $gitRm = $(git remote get-url origin)
             $gitRm = $gitRm -replace '.*.com:', 'https://github.com/'
             git remote -v set-url origin $gitRm
