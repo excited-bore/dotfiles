@@ -136,14 +136,8 @@ if [[ "$BASH_K" == '1' ]]; then
 
             printf "${cyan}You can always switch between vi/emacs mode with ${CYAN}Ctrl-o${normal}\n"
 
-            readyn -n -N "CYAN" -p "Startup in ${MAGENTA}vi-mode${CYAN} instead of ${GREEN}emacs${CYAN} mode? (might cause issues with pasteing)" vimde
-
+            # We set editing mode later in keybinds.bash
             sed -i "s|^set editing-mode .*|#set editing-mode vi|g" $binds
-            sed -i "s|^bind 'set editing-mode vi'|# bind 'set editing-mode vi'|g" $binds2
-
-            if [[ "$vimde" == "y" ]]; then
-                sed -i "s|# bind 'set editing-mode vi'|bind 'set editing-mode vi'|g" $binds2
-            fi
 
             sed -i "s|^setxkbmap |#setxkbmap |g" $binds
 
@@ -156,9 +150,6 @@ if [[ "$BASH_K" == '1' ]]; then
                 # X based settings is generally not for root and will throw errors
                 if grep -q '^setxkbmap' $binds; then
                     sed -i 's|^setxkbmap|#setxkbmap|g' $binds
-                fi
-                if grep -q '^setxkbmap' $binds2; then
-                    sed -i 's|^setxkbmap|#setxkbmap|g' $binds2
                 fi
             fi
 
@@ -202,6 +193,19 @@ if [[ "$BASH_K" == '1' ]]; then
         
         bash-keybinds() {
             
+            readyn -n -N "CYAN" -p "Startup in ${MAGENTA}vi-mode${CYAN} instead of ${GREEN}emacs${CYAN} mode? (might cause issues with pasteing)" vimde
+
+            sed -i "s|^bind 'set editing-mode vi'|# bind 'set editing-mode vi'|g" $binds2
+
+            if [[ "$vimde" == "y" ]]; then
+                sed -i "s|# bind 'set editing-mode vi'|bind 'set editing-mode vi'|g" $binds2
+            fi
+
+            # X based settings is generally not for root and will throw errors
+            if [[ "$XDG_SESSION_TYPE" == 'x11' && $USER != 'root' ]] && grep -q '^setxkbmap' $binds2; then
+                sed -i 's|^setxkbmap|#setxkbmap|g' $binds2
+            fi
+
             cp -t $HOME $binds3
             cp -t ~/.bash_keybinds.d/ $binds0 $binds1 $binds2
       
@@ -232,6 +236,7 @@ if [[ "$BASH_K" == '1' ]]; then
 
         yes-edit-no -f bash-keybinds -g "$binds3 $binds0 $binds1 $binds2" -p "Install ${CYAN}.bash_keybinds${GREEN} at ${BLUE}$HOME${GREEN} and ${CYAN}00-bind-empty.bash${GREEN}, ${CYAN}01-cdw.bash${GREEN} and ${CYAN}02-keybinds.bash${GREEN} at ${BLUE}$HOME/.bash_keybinds.d/${GREEN}? (keybinds configuration)"
 
+    fi
 fi
 
 if [[ $ZSH_K == '1' ]]; then
@@ -260,8 +265,8 @@ if [[ $ZSH_K == '1' ]]; then
         
         zsh-keybinds() {
 
-            cp -t ~/.zsh_keybinds.d/ $binds0 $binds1
-            cp -t $HOME $binds 
+            cp -t ~/.zsh_keybinds.d/ $binds $binds0
+            cp -t $HOME $binds1 
            
             if ! test -f ~/.zshrc; then
                 touch ~/.zshrc 
@@ -285,6 +290,7 @@ if [[ $ZSH_K == '1' ]]; then
 
         yes-edit-no -f zsh-keybinds -g "$binds1 $binds0 $binds" -p "Install ${CYAN}.zsh_keybinds${GREEN} at ${BLUE}$HOME${GREEN} and ${CYAN}00-bind-empty.zsh${GREEN} and ${CYAN}01-keybinds.zsh${GREEN} at ${BLUE}$HOME/.zsh_keybinds.d/${GREEN}? (Zsh keybinds configuration)"
 
+    fi
 fi
 
 if [[ "$DESKTOP_SESSION" == 'xfce' ]]; then
@@ -307,8 +313,8 @@ if [[ "$DESKTOP_SESSION" == 'xfce' ]]; then
     fi
 
    
-     nobind=0
-     while read -r i; do
+    nobind=0
+    while read -r i; do
         if [[ "$i" == 'xfce4-terminal' ]] || [[ "$i" == 'exo-open --launch TerminalEmulator' ]] || (hash kitty &> /dev/null && [[ "$i" == 'kitty' ]]); then
             unset nobind 
         fi
@@ -335,9 +341,11 @@ if [[ "$DESKTOP_SESSION" == 'xfce' ]]; then
         fi
         
         if [[ "y" == "$setermemkeybind" ]]; then
+            
             printf "Format: ${CYAN}[Control/Shift/Alt/Windowkey]-[Control/Shift/Alt/Windowkey]-[Control/Shift/Alt/Windowkey]${GREEN}-Key\n${normal}"
 
             list-binds-xfce4
+            
             reade -Q 'GREEN' -i 'Control-Alt-t Windowkey-t' -p 'What keybind?: ' keyb
                 
             while [[ -n "$keyb" ]]; do 
