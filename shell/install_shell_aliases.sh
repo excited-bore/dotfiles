@@ -77,7 +77,9 @@ upkernsysm() {
     fi
     
     if ! hash xmllint &>/dev/null; then
+        
         printf "${CYAN}xmllint${normal} is not installed (cmd tool for lint xml/html - used in helper script for checking on latest LTS kernel)\n"
+        
         readyn -p "Install xmllint?" xml_ins
         if [[ $xml_ins == 'y' ]]; then
             if [[ "$distro_base" == 'Debian' ]]; then

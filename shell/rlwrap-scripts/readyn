@@ -345,11 +345,16 @@ function readyn(){
         vvvvvvvvvv=$pre 
     else
         if test -z "$prmpt"; then
-            reade -Q "$color" $nostyle $breaklines -i "$pre $othr" -p "$prmpt1" vvvvvvvvvv;   
+            test -n "$BASH_VERSION" &&
+                reade -Q "$color" $nostyle $breaklines -i "$pre $othr" -p "${!color}$prmpt1${normal}" vvvvvvvvvv; 
+            test -n "$ZSH_VERSION" &&
+                reade -Q "$color" $nostyle $breaklines -i "$pre $othr" -p "${(P)color}$prmpt1${normal}" vvvvvvvvvv 
         else
-            reade -Q "$color" $nostyle $breaklines -i "$pre $othr" -p "$prmpt$prmpt1" vvvvvvvvvv;    
+            test -n "$BASH_VERSION" &&
+                reade -Q "$color" $nostyle $breaklines -i "$pre $othr" -p "${!color}$prmpt$prmpt1${normal}" vvvvvvvvvv; 
+            test -n "$ZSH_VERSION" &&
+                reade -Q "$color" $nostyle $breaklines -i "$pre $othr" -p "${(P)color}$prmpt$prmpt1${normal}" vvvvvvvvvv 
         fi
-         
     fi 
 
     export READE_VALUE="$vvvvvvvvvv" 

@@ -13,7 +13,7 @@ else
 fi
 
 if test -z "$BASH_K" && hash bash &> /dev/null && (! test -f ~/.bashrc || ! test -d ~/.bash_keybinds.d || ! test -f ~/.bash_keybinds || ! test -f /etc/bash.bashrc || ! test -d /etc/bash_keybinds.d || ! test -f /etc/bash_keybinds) && test -z "$ZSH_K" && hash zsh &> /dev/null && (! test -f ~/.zshrc || ! test -d ~/.zsh_keyinds.d || ! test -f ~/.zsh_keybinds || ! test -f /etc/zshrc || ! test -d /etc/zsh_keybinds.d || ! test -f /etc/zsh_keybinds); then
-   reade -Q 'GREEN' -i 'both bash zsh' -p "Create directories and install files that bind keys to shortcuts in ${CYAN}Bash${GREEN}, ${CYAN}Zsh${GREEN} or both? [Both/bash/zsh]: " bash_zsh_keybind
+   reade -Q 'GREEN' -i 'both bash zsh' -p "${GREEN}Create directories and install files that bind keys to shortcuts in ${CYAN}Bash${GREEN}, ${CYAN}Zsh${GREEN} or both? [Both/bash/zsh]: ${normal}" bash_zsh_keybind
 elif test -z "$BASH_K" && hash bash &> /dev/null && (! test -f ~/.bashrc || ! test -d ~/.bash_keyinds.d || ! test -f ~/.bash_keyinds || ! test -f /etc/bash.bashrc || ! test -d /etc/bash_keyinds.d || ! test -f /etc/bash_keybinds); then
    readyn -p "Create directories and install files that bind keys to shortcuts for ${CYAN}Bash${GREEN}?" bash_zsh_keybind
    [[ "$bash_zsh_keybind" == 'y' ]] && bash_zsh_keybind='bash' 
@@ -253,7 +253,7 @@ if [[ $ZSH_K == '1' ]]; then
         printf "${YELLOW}$HOME/.zsh_keybinds${yellow} not installed${normal}\n" 
         binds=$TOP/shell/keybinds/.zsh_keybinds.d/00-bind-empty.zsh
         binds0=$TOP/shell/keybinds/.zsh_keybinds.d/01-keybinds.zsh
-        binds1=$TOP/shell/keybinds/.zsh_keybinds
+        binds1=$TOP/shell/keybinds/.zcsh_keybinds
         if ! [[ -f $binds ]]; then
             tmp=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/shell/keybinds/.zsh_keybinds.d/00-binds-empty.zsh > $tmp
             tmp0=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/shell/keybinds/.zsh_keybinds.d/01-keybinds.zsh > $tmp0
