@@ -34,7 +34,7 @@ fi
 
 sudo usermod -aG sambashare $USER
 
-local wordcomp
+#local wordcomp
 for i in $(seq 1 7); do
     for j in $(seq 1 7); do
         for k in $(seq 1 7); do
@@ -42,6 +42,7 @@ for i in $(seq 1 7); do
         done
     done
 done
+
 
 reade -Q "GREEN" -p "Drive name: (doesn't matter): "  drive
 if [ -z "$drive" ]; then
@@ -57,6 +58,7 @@ readyn -p "Writeable: " write
 readyn -p "Public" public
 reade -Q "GREEN" -i "0777 $wordcomp" -p "Create file mask (Default: 0777): " fmask
 reade -Q "GREEN" -i "0777 $wordcomp" -p "Directory mask (Default: 0777): " dmask
+unset wordcomp
 
 if [[ "y" == $write ]]; then
     write="yes"
