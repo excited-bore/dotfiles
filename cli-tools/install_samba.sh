@@ -18,7 +18,7 @@ fi
 if ! hash samba &> /dev/null; then
     if [[ "$distro_base" == "Arch" ]]; then
 
-        eval "$pac_ins_y samba"
+        eval "$pac_ins_y samba wsdd"
 
         if [[ "$distro" == "Manjaro" ]]; then
             pamac install manjaro-settings-samba
@@ -28,7 +28,7 @@ if ! hash samba &> /dev/null; then
             eval "$pac_ins_y thunar-shares-plugin"
         fi
     elif [[ $distro_base == "Debian" ]];then
-        eval "$pac_ins_y samba samba-common"
+        eval "$pac_ins_y samba samba-common wsdd"
     fi
 fi
 
@@ -119,8 +119,7 @@ else
 	    sudo smbpasswd -a $usr
 	fi
 	sudo systemctl restart smbd.service
-	sudo systemctl status smbd.service
-	
 	sudo systemctl restart nmbd.service
-	sudo systemctl status nmbd.service
+	
+	sudo systemctl status smbd.service nmbd.service wsdd.service
 fi
