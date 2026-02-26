@@ -253,7 +253,7 @@ if [[ $ZSH_K == '1' ]]; then
         printf "${YELLOW}$HOME/.zsh_keybinds${yellow} not installed${normal}\n" 
         binds=$TOP/shell/keybinds/.zsh_keybinds.d/00-bind-empty.zsh
         binds0=$TOP/shell/keybinds/.zsh_keybinds.d/01-keybinds.zsh
-        binds1=$TOP/shell/keybinds/.zcsh_keybinds
+        binds1=$TOP/shell/keybinds/.zsh_keybinds
         if ! [[ -f $binds ]]; then
             tmp=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/shell/keybinds/.zsh_keybinds.d/00-binds-empty.zsh > $tmp
             tmp0=$(mktemp) && wget-curl https://raw.githubusercontent.com/excited-bore/dotfiles/main/shell/keybinds/.zsh_keybinds.d/01-keybinds.zsh > $tmp0
