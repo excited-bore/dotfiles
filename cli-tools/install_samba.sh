@@ -48,7 +48,7 @@ reade -Q "GREEN" -p "Drive name: (doesn't matter): "  drive
 if [ -z "$drive" ]; then
     printf "${red}Drive name can't be empty\n${normal}"
     #exit 1
-elif sudo grep -q "^[$drive" /etc/samba/smb.conf; then
+elif sudo grep -q "^\[$drive" /etc/samba/smb.conf; then
     printf "${red}Drive name already taken\n${normal}"
     #exit 1
 else
