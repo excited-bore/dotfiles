@@ -467,9 +467,9 @@ function update-system() {
             if [[ "$hdrs_ins" == "y" ]]; then
 
                 if test -n "$YES"; then 
-                    eval "${pac_ins_y} $flag $hdrs"
+                    eval "${pac_ins_y} $hdrs"
                 else 
-                    eval "${pac_ins} $flag $hdrs"
+                    eval "${pac_ins} $hdrs"
                 fi
             fi
         fi
@@ -478,7 +478,8 @@ function update-system() {
         local cachcln 
        
         if test -n "$(pacman -Qdtq)"; then 
-            readyn $flag -p "Clean / autoremove orphan packages - dependencies that aren't used by any package?" cachcln
+            
+	    readyn --no $flag -p "Clean / autoremove orphan packages - dependencies that aren't used by any package?" cachcln
             
             if [[ "$cachcln" == 'y' ]]; then
                 
