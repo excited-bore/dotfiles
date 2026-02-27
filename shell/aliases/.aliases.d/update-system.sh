@@ -310,7 +310,7 @@ function update-system() {
            
             local remove
 
-            readyn $flag -p 'Autoremove orphaned/unnecessary packages (unused dependencies)?' remove
+            readyn --no $flag -p 'Autoremove orphaned/unnecessary packages (unused dependencies)?' remove
        
             if [[ "$remove" == 'y' ]]; then
                 if test -n "$YES"; then
