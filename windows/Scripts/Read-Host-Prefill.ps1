@@ -9,7 +9,7 @@ function Read-Host-Prefill {
 
 	[string[]]$Prefills,
 
-	[string]$ForegroundColor
+	[System.ConsoleColor]$ForegroundColor
     )
 
     $Verbose = $PSBoundParameters.ContainsKey('Verbose')   
