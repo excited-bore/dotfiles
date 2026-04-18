@@ -422,7 +422,7 @@ require("lazy").setup({
                 end,
             })
             end
-        },{
+         --[[ },{
             
             "nvim-treesitter/nvim-treesitter", version = false,
             
@@ -445,6 +445,7 @@ require("lazy").setup({
                     }
                 })
            end
+        ]]--
         },{
             "echasnovski/mini.icons",
             
