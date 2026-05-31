@@ -40,6 +40,7 @@ if [[ $drive ]]; then
             fi
         fi
     fi
+    
     uuid=$(sudo blkid | grep $drive | perl -pe 's|.*?UUID="(.*?)".*|UUID=\1|')
     type_fs=$(sudo blkid | grep $drive | perl -pe 's|.*?TYPE="(.*?)".*|\1|')
 
